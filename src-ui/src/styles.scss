@@ -198,19 +198,28 @@ a, a:hover, .btn-link, .btn-link:hover {
     min-height: calc(1.5em + 0.75rem + 5px);
     line-height: 1.5;
 
-    .ng-select-container {
-      height: 100%;
-      border-top-right-radius: 0;
-      border-bottom-right-radius: 0;
+    .ng-select-container .ng-value-container .ng-input {
+      top: 7px;
+    }
 
-      .ng-value-container .ng-input {
-        top: 10px;
-      }
+    .paperless-input-select .ng-select .ng-select-container
+
+    .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-marked {
+      background-color: var(--pngx-bg-darker) !important;
+      color: var(--pngx-body-color-accent) !important;
     }
 
     .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-selected,
     .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-selected.ng-option-marked {
       background: none;
+    }
+  }
+
+  .input-group {
+    .ng-select-container {
+      height: 100%;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
     }
   }
 }
@@ -259,6 +268,11 @@ textarea,
 
 .form-check-input:focus {
   border-color: var(--bs-primary);
+}
+
+.form-control:disabled, .form-control[readonly] {
+  background-color: var(--pngx-bg-alt);
+  cursor: not-allowed;
 }
 
 .page-link {
@@ -495,4 +509,8 @@ a.badge {
 .btn-outline-primary:not(:disabled):not(.disabled).active,.btn-outline-primary:not(:disabled):not(.disabled):active,.show>.btn-outline-primary.dropdown-toggle {
     background-color: var(--bs-primary);
     border-color: var(--bs-primary);
+}
+
+code {
+  color: var(--pngx-body-color-accent)
 }

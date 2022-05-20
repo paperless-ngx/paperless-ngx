@@ -1,5 +1,8 @@
 describe('manage', () => {
   beforeEach(() => {
+    cy.intercept('http://localhost:8000/api/ui_settings/', {
+      fixture: 'ui_settings/settings.json',
+    })
     cy.intercept('http://localhost:8000/api/correspondents/*', {
       fixture: 'correspondents/correspondents.json',
     })
@@ -26,7 +29,7 @@ describe('manage', () => {
         req.reply({ count: 3, next: null, previous: null, results: [] })
     })
     cy.visit('/tags')
-    cy.get('tbody').find('button').contains('Documents').first().click() // id = 4
+    cy.get('tbody').find('button:visible').contains('Documents').first().click() // id = 4
     cy.contains('3 documents')
   })
 })

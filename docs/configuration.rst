@@ -111,6 +111,14 @@ PAPERLESS_FILENAME_FORMAT=<format>
 
     Default is none, which disables this feature.
 
+PAPERLESS_FILENAME_FORMAT_REMOVE_NONE=<bool>
+    Tells paperless to replace placeholders in `PAPERLESS_FILENAME_FORMAT` that would resolve
+    to 'none' to be omitted from the resulting filename. This also holds true for directory
+    names.
+    See :ref:`advanced-file_name_handling` for details.
+
+    Defaults to `false` which disables this feature.
+
 PAPERLESS_LOGGING_DIR=<path>
     This is where paperless will store log files.
 
@@ -587,6 +595,28 @@ PAPERLESS_CONSUMER_POLLING=<num>
 
     Defaults to 0, which disables polling and uses filesystem notifications.
 
+PAPERLESS_CONSUMER_POLLING_RETRY_COUNT=<num>
+    If consumer polling is enabled, sets the number of times paperless will check for a
+    file to remain unmodified.
+
+    Defaults to 5.
+
+PAPERLESS_CONSUMER_POLLING_DELAY=<num>
+    If consumer polling is enabled, sets the delay in seconds between each check (above) paperless
+    will do while waiting for a file to remain unmodified.
+
+    Defaults to 5.
+
+.. _configuration-inotify:
+
+PAPERLESS_CONSUMER_INOTIFY_DELAY=<num>
+    Sets the time in seconds the consumer will wait for additional events
+    from inotify before the consumer will consider a file ready and begin consumption.
+    Certain scanners or network setups may generate multiple events for a single file,
+    leading to multiple consumers working on the same file.  Configure this to
+    prevent that.
+
+    Defaults to 0.5 seconds.
 
 PAPERLESS_CONSUMER_DELETE_DUPLICATES=<bool>
     When the consumer detects a duplicate document, it will not touch the
@@ -647,7 +677,6 @@ PAPERLESS_CONSUMER_BARCODE_STRING=PATCHT
 
   Defaults to "PATCHT"
 
-
 PAPERLESS_CONVERT_MEMORY_LIMIT=<num>
     On smaller systems, or even in the case of Very Large Documents, the consumer
     may explode, complaining about how it's "unable to extend pixel cache".  In
@@ -693,6 +722,9 @@ PAPERLESS_FILENAME_DATE_ORDER=<format>
     The filename will be checked first, and if nothing is found, the document
     text will be checked as normal.
 
+    A date in a filename must have some separators (`.`, `-`, `/`, etc)
+    for it to be parsed.
+
     Defaults to none, which disables this feature.
 
 PAPERLESS_THUMBNAIL_FONT_NAME=<filename>
@@ -710,10 +742,7 @@ PAPERLESS_IGNORE_DATES=<string>
     this process. This is useful for special dates (like date of birth) that appear
     in documents regularly but are very unlikely to be the documents creation date.
 
-    You may specify dates in a multitude of formats supported by dateparser (see
-    https://dateparser.readthedocs.io/en/latest/#popular-formats) but as the dates
-    need to be comma separated, the options are limited.
-    Example: "2020-12-02,22.04.1999"
+    The date is parsed using the order specified in PAPERLESS_DATE_ORDER
 
     Defaults to an empty string to not ignore any dates.
 

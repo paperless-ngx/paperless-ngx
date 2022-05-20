@@ -9,11 +9,10 @@ import {
 import { map } from 'rxjs/operators'
 import { PaperlessDocument } from 'src/app/data/paperless-document'
 import { DocumentService } from 'src/app/services/rest/document.service'
-import {
-  SettingsService,
-  SETTINGS_KEYS,
-} from 'src/app/services/settings.service'
+import { SettingsService } from 'src/app/services/settings.service'
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
+import { OpenDocumentsService } from 'src/app/services/open-documents.service'
+import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 
 @Component({
   selector: 'app-document-card-small',
@@ -26,7 +25,8 @@ import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
 export class DocumentCardSmallComponent implements OnInit {
   constructor(
     private documentService: DocumentService,
-    private settingsService: SettingsService
+    private settingsService: SettingsService,
+    public openDocumentsService: OpenDocumentsService
   ) {}
 
   @Input()
@@ -46,6 +46,9 @@ export class DocumentCardSmallComponent implements OnInit {
 
   @Output()
   clickDocumentType = new EventEmitter<number>()
+
+  @Output()
+  clickStoragePath = new EventEmitter<number>()
 
   moreTags: number = null
 

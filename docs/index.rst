@@ -52,7 +52,7 @@ resources in the documentation:
 *   Paperless is now integrated with a
     :ref:`task processing queue <setup-task_processor>` that tells you
     at a glance when and why something is not working.
-*   The :ref:`changelog <paperless_changelog>` contains a detailed list of all changes
+*   The :doc:`changelog </changelog>` contains a detailed list of all changes
     in paperless-ngx.
 
 Contents

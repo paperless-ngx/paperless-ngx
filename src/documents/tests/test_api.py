@@ -4,8 +4,15 @@ import json
 import os
 import shutil
 import tempfile
+import urllib.request
 import zipfile
 from unittest import mock
+from unittest.mock import MagicMock
+
+try:
+    import zoneinfo
+except ImportError:
+    import backports.zoneinfo as zoneinfo
 
 import pytest
 from django.conf import settings
@@ -19,15 +26,19 @@ from documents.models import Document
 from documents.models import DocumentType
 from documents.models import MatchingModel
 from documents.models import SavedView
+from documents.models import StoragePath
 from documents.models import Tag
+from documents.models import UiSettings
+from documents.models import StoragePath
 from documents.tests.utils import DirectoriesMixin
+from paperless import version
 from rest_framework.test import APITestCase
 from whoosh.writing import AsyncWriter
 
 
 class TestDocumentApi(DirectoriesMixin, APITestCase):
     def setUp(self):
-        super(TestDocumentApi, self).setUp()
+        super().setUp()
 
         self.user = User.objects.create_superuser(username="temp_admin")
         self.client.force_login(user=self.user)
@@ -70,7 +81,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         returned_doc["title"] = "the new title"
 
         response = self.client.put(
-            "/api/documents/{}/".format(doc.pk),
+            f"/api/documents/{doc.pk}/",
             returned_doc,
             format="json",
         )
@@ -82,7 +93,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(doc_after_save.correspondent, c2)
         self.assertEqual(doc_after_save.title, "the new title")
 
-        self.client.delete("/api/documents/{}/".format(doc_after_save.pk))
+        self.client.delete(f"/api/documents/{doc_after_save.pk}/")
 
         self.assertEqual(len(Document.objects.all()), 0)
 
@@ -90,6 +101,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         c = Correspondent.objects.create(name="c", pk=41)
         dt = DocumentType.objects.create(name="dt", pk=63)
         tag = Tag.objects.create(name="t", pk=85)
+        storage_path = StoragePath.objects.create(name="sp", pk=77, path="p")
         doc = Document.objects.create(
             title="WOW",
             content="the content",
@@ -97,6 +109,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
             document_type=dt,
             checksum="123",
             mime_type="application/pdf",
+            storage_path=storage_path,
         )
 
         response = self.client.get("/api/documents/", format="json")
@@ -163,27 +176,27 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         )
 
         with open(
-            os.path.join(self.dirs.thumbnail_dir, "{:07d}.png".format(doc.pk)),
+            os.path.join(self.dirs.thumbnail_dir, f"{doc.pk:07d}.png"),
             "wb",
         ) as f:
             f.write(content_thumbnail)
 
-        response = self.client.get("/api/documents/{}/download/".format(doc.pk))
+        response = self.client.get(f"/api/documents/{doc.pk}/download/")
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, content)
 
-        response = self.client.get("/api/documents/{}/preview/".format(doc.pk))
+        response = self.client.get(f"/api/documents/{doc.pk}/preview/")
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, content)
 
-        response = self.client.get("/api/documents/{}/thumb/".format(doc.pk))
+        response = self.client.get(f"/api/documents/{doc.pk}/thumb/")
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, content_thumbnail)
 
-    @override_settings(PAPERLESS_FILENAME_FORMAT="")
+    @override_settings(FILENAME_FORMAT="")
     def test_download_with_archive(self):
 
         content = b"This is a test"
@@ -202,25 +215,25 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         with open(doc.archive_path, "wb") as f:
             f.write(content_archive)
 
-        response = self.client.get("/api/documents/{}/download/".format(doc.pk))
+        response = self.client.get(f"/api/documents/{doc.pk}/download/")
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, content_archive)
 
         response = self.client.get(
-            "/api/documents/{}/download/?original=true".format(doc.pk),
+            f"/api/documents/{doc.pk}/download/?original=true",
         )
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, content)
 
-        response = self.client.get("/api/documents/{}/preview/".format(doc.pk))
+        response = self.client.get(f"/api/documents/{doc.pk}/preview/")
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, content_archive)
 
         response = self.client.get(
-            "/api/documents/{}/preview/?original=true".format(doc.pk),
+            f"/api/documents/{doc.pk}/preview/?original=true",
         )
 
         self.assertEqual(response.status_code, 200)
@@ -234,13 +247,13 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
             mime_type="application/pdf",
         )
 
-        response = self.client.get("/api/documents/{}/download/".format(doc.pk))
+        response = self.client.get(f"/api/documents/{doc.pk}/download/")
         self.assertEqual(response.status_code, 404)
 
-        response = self.client.get("/api/documents/{}/preview/".format(doc.pk))
+        response = self.client.get(f"/api/documents/{doc.pk}/preview/")
         self.assertEqual(response.status_code, 404)
 
-        response = self.client.get("/api/documents/{}/thumb/".format(doc.pk))
+        response = self.client.get(f"/api/documents/{doc.pk}/thumb/")
         self.assertEqual(response.status_code, 404)
 
     def test_document_filters(self):
@@ -283,7 +296,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertCountEqual([results[0]["id"], results[1]["id"]], [doc2.id, doc3.id])
 
         response = self.client.get(
-            "/api/documents/?tags__id__in={},{}".format(tag_inbox.id, tag_3.id),
+            f"/api/documents/?tags__id__in={tag_inbox.id},{tag_3.id}",
         )
         self.assertEqual(response.status_code, 200)
         results = response.data["results"]
@@ -291,7 +304,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertCountEqual([results[0]["id"], results[1]["id"]], [doc1.id, doc3.id])
 
         response = self.client.get(
-            "/api/documents/?tags__id__in={},{}".format(tag_2.id, tag_3.id),
+            f"/api/documents/?tags__id__in={tag_2.id},{tag_3.id}",
         )
         self.assertEqual(response.status_code, 200)
         results = response.data["results"]
@@ -299,7 +312,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertCountEqual([results[0]["id"], results[1]["id"]], [doc2.id, doc3.id])
 
         response = self.client.get(
-            "/api/documents/?tags__id__all={},{}".format(tag_2.id, tag_3.id),
+            f"/api/documents/?tags__id__all={tag_2.id},{tag_3.id}",
         )
         self.assertEqual(response.status_code, 200)
         results = response.data["results"]
@@ -307,27 +320,27 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(results[0]["id"], doc3.id)
 
         response = self.client.get(
-            "/api/documents/?tags__id__all={},{}".format(tag_inbox.id, tag_3.id),
+            f"/api/documents/?tags__id__all={tag_inbox.id},{tag_3.id}",
         )
         self.assertEqual(response.status_code, 200)
         results = response.data["results"]
         self.assertEqual(len(results), 0)
 
         response = self.client.get(
-            "/api/documents/?tags__id__all={}a{}".format(tag_inbox.id, tag_3.id),
+            f"/api/documents/?tags__id__all={tag_inbox.id}a{tag_3.id}",
         )
         self.assertEqual(response.status_code, 200)
         results = response.data["results"]
         self.assertEqual(len(results), 3)
 
-        response = self.client.get("/api/documents/?tags__id__none={}".format(tag_3.id))
+        response = self.client.get(f"/api/documents/?tags__id__none={tag_3.id}")
         self.assertEqual(response.status_code, 200)
         results = response.data["results"]
         self.assertEqual(len(results), 2)
         self.assertCountEqual([results[0]["id"], results[1]["id"]], [doc1.id, doc2.id])
 
         response = self.client.get(
-            "/api/documents/?tags__id__none={},{}".format(tag_3.id, tag_2.id),
+            f"/api/documents/?tags__id__none={tag_3.id},{tag_2.id}",
         )
         self.assertEqual(response.status_code, 200)
         results = response.data["results"]
@@ -335,7 +348,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(results[0]["id"], doc1.id)
 
         response = self.client.get(
-            "/api/documents/?tags__id__none={},{}".format(tag_2.id, tag_inbox.id),
+            f"/api/documents/?tags__id__none={tag_2.id},{tag_inbox.id}",
         )
         self.assertEqual(response.status_code, 200)
         results = response.data["results"]
@@ -571,10 +584,12 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         t2 = Tag.objects.create(name="tag2")
         c = Correspondent.objects.create(name="correspondent")
         dt = DocumentType.objects.create(name="type")
+        sp = StoragePath.objects.create(name="path")
 
         d1 = Document.objects.create(checksum="1", correspondent=c, content="test")
         d2 = Document.objects.create(checksum="2", document_type=dt, content="test")
         d3 = Document.objects.create(checksum="3", content="test")
+
         d3.tags.add(t)
         d3.tags.add(t2)
         d4 = Document.objects.create(
@@ -589,6 +604,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
             content="test",
         )
         d6 = Document.objects.create(checksum="6", content="test2")
+        d7 = Document.objects.create(checksum="7", storage_path=sp, content="test")
 
         with AsyncWriter(index.open_index()) as writer:
             for doc in Document.objects.all():
@@ -599,18 +615,30 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
             self.assertEqual(r.status_code, 200)
             return [hit["id"] for hit in r.data["results"]]
 
-        self.assertCountEqual(search_query(""), [d1.id, d2.id, d3.id, d4.id, d5.id])
+        self.assertCountEqual(
+            search_query(""),
+            [d1.id, d2.id, d3.id, d4.id, d5.id, d7.id],
+        )
         self.assertCountEqual(search_query("&is_tagged=true"), [d3.id, d4.id])
-        self.assertCountEqual(search_query("&is_tagged=false"), [d1.id, d2.id, d5.id])
+        self.assertCountEqual(
+            search_query("&is_tagged=false"),
+            [d1.id, d2.id, d5.id, d7.id],
+        )
         self.assertCountEqual(search_query("&correspondent__id=" + str(c.id)), [d1.id])
         self.assertCountEqual(search_query("&document_type__id=" + str(dt.id)), [d2.id])
+        self.assertCountEqual(search_query("&storage_path__id=" + str(sp.id)), [d7.id])
+
+        self.assertCountEqual(
+            search_query("&storage_path__isnull"),
+            [d1.id, d2.id, d3.id, d4.id, d5.id],
+        )
         self.assertCountEqual(
             search_query("&correspondent__isnull"),
-            [d2.id, d3.id, d4.id, d5.id],
+            [d2.id, d3.id, d4.id, d5.id, d7.id],
         )
         self.assertCountEqual(
             search_query("&document_type__isnull"),
-            [d1.id, d3.id, d4.id, d5.id],
+            [d1.id, d3.id, d4.id, d5.id, d7.id],
         )
         self.assertCountEqual(
             search_query("&tags__id__all=" + str(t.id) + "," + str(t2.id)),
@@ -952,6 +980,34 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
         async_task.assert_not_called()
 
+    @mock.patch("documents.views.async_task")
+    def test_upload_with_created(self, async_task):
+        created = datetime.datetime(
+            2022,
+            5,
+            12,
+            0,
+            0,
+            0,
+            0,
+            tzinfo=zoneinfo.ZoneInfo("America/Los_Angeles"),
+        )
+        with open(
+            os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"),
+            "rb",
+        ) as f:
+            response = self.client.post(
+                "/api/documents/post_document/",
+                {"document": f, "created": created},
+            )
+        self.assertEqual(response.status_code, 200)
+
+        async_task.assert_called_once()
+
+        args, kwargs = async_task.call_args
+
+        self.assertEqual(kwargs["override_created"], created)
+
     def test_get_metadata(self):
         doc = Document.objects.create(
             title="test",
@@ -1043,35 +1099,49 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.data,
-            {"correspondents": [], "tags": [], "document_types": []},
+            {
+                "correspondents": [],
+                "tags": [],
+                "document_types": [],
+                "storage_paths": [],
+            },
         )
 
     def test_get_suggestions_invalid_doc(self):
         response = self.client.get(f"/api/documents/34676/suggestions/")
         self.assertEqual(response.status_code, 404)
 
-    @mock.patch("documents.views.match_correspondents")
-    @mock.patch("documents.views.match_tags")
+    @mock.patch("documents.views.match_storage_paths")
     @mock.patch("documents.views.match_document_types")
+    @mock.patch("documents.views.match_tags")
+    @mock.patch("documents.views.match_correspondents")
     def test_get_suggestions(
         self,
-        match_document_types,
-        match_tags,
         match_correspondents,
+        match_tags,
+        match_document_types,
+        match_storage_paths,
     ):
         doc = Document.objects.create(
             title="test",
             mime_type="application/pdf",
             content="this is an invoice!",
         )
+
+        match_correspondents.return_value = [Correspondent(id=88), Correspondent(id=2)]
         match_tags.return_value = [Tag(id=56), Tag(id=123)]
         match_document_types.return_value = [DocumentType(id=23)]
-        match_correspondents.return_value = [Correspondent(id=88), Correspondent(id=2)]
+        match_storage_paths.return_value = [StoragePath(id=99), StoragePath(id=77)]
 
         response = self.client.get(f"/api/documents/{doc.pk}/suggestions/")
         self.assertEqual(
             response.data,
-            {"correspondents": [88, 2], "tags": [56, 123], "document_types": [23]},
+            {
+                "correspondents": [88, 2],
+                "tags": [56, 123],
+                "document_types": [23],
+                "storage_paths": [99, 77],
+            },
         )
 
     def test_saved_views(self):
@@ -1284,7 +1354,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
 class TestDocumentApiV2(DirectoriesMixin, APITestCase):
     def setUp(self):
-        super(TestDocumentApiV2, self).setUp()
+        super().setUp()
 
         self.user = User.objects.create_superuser(username="temp_admin")
 
@@ -1362,10 +1432,45 @@ class TestDocumentApiV2(DirectoriesMixin, APITestCase):
             "#000000",
         )
 
+    def test_ui_settings(self):
+        test_user = User.objects.create_superuser(username="test")
+        self.client.force_login(user=test_user)
+
+        response = self.client.get("/api/ui_settings/", format="json")
+        self.assertEqual(response.status_code, 200)
+        self.assertDictEqual(
+            response.data["settings"],
+            {},
+        )
+
+        settings = {
+            "settings": {
+                "dark_mode": {
+                    "enabled": True,
+                },
+            },
+        }
+
+        response = self.client.post(
+            "/api/ui_settings/",
+            json.dumps(settings),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get("/api/ui_settings/", format="json")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertDictEqual(
+            response.data["settings"],
+            settings["settings"],
+        )
+
 
 class TestBulkEdit(DirectoriesMixin, APITestCase):
     def setUp(self):
-        super(TestBulkEdit, self).setUp()
+        super().setUp()
 
         user = User.objects.create_superuser(username="temp_admin")
         self.client.force_login(user=user)
@@ -1397,6 +1502,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
         self.doc2.tags.add(self.t1)
         self.doc3.tags.add(self.t2)
         self.doc4.tags.add(self.t1, self.t2)
+        self.sp1 = StoragePath.objects.create(name="sp1", path="Something/{checksum}")
 
     def test_set_correspondent(self):
         self.assertEqual(Document.objects.filter(correspondent=self.c2).count(), 1)
@@ -1435,6 +1541,60 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
         self.async_task.assert_called_once()
         args, kwargs = self.async_task.call_args
         self.assertCountEqual(kwargs["document_ids"], [self.doc2.id, self.doc3.id])
+
+    def test_set_document_storage_path(self):
+        """
+        GIVEN:
+            - 5 documents without defined storage path
+        WHEN:
+            - Bulk edit called to add storage path to 1 document
+        THEN:
+            - Single document storage path update
+        """
+        self.assertEqual(Document.objects.filter(storage_path=None).count(), 5)
+
+        bulk_edit.set_storage_path(
+            [self.doc1.id],
+            self.sp1.id,
+        )
+
+        self.assertEqual(Document.objects.filter(storage_path=None).count(), 4)
+
+        self.async_task.assert_called_once()
+        args, kwargs = self.async_task.call_args
+
+        self.assertCountEqual(kwargs["document_ids"], [self.doc1.id])
+
+    def test_unset_document_storage_path(self):
+        """
+        GIVEN:
+            - 4 documents without defined storage path
+            - 1 document with a defined storage
+        WHEN:
+            - Bulk edit called to remove storage path from 1 document
+        THEN:
+            - Single document storage path removed
+        """
+        self.assertEqual(Document.objects.filter(storage_path=None).count(), 5)
+
+        bulk_edit.set_storage_path(
+            [self.doc1.id],
+            self.sp1.id,
+        )
+
+        self.assertEqual(Document.objects.filter(storage_path=None).count(), 4)
+
+        bulk_edit.set_storage_path(
+            [self.doc1.id],
+            None,
+        )
+
+        self.assertEqual(Document.objects.filter(storage_path=None).count(), 5)
+
+        self.async_task.assert_called()
+        args, kwargs = self.async_task.call_args
+
+        self.assertCountEqual(kwargs["document_ids"], [self.doc1.id])
 
     def test_add_tag(self):
         self.assertEqual(Document.objects.filter(tags__id=self.t1.id).count(), 2)
@@ -1886,7 +2046,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
 
 class TestBulkDownload(DirectoriesMixin, APITestCase):
     def setUp(self):
-        super(TestBulkDownload, self).setUp()
+        super().setUp()
 
         user = User.objects.create_superuser(username="temp_admin")
         self.client.force_login(user=user)
@@ -2094,3 +2254,170 @@ class TestApiAuth(APITestCase):
         response = self.client.get("/api/")
         self.assertIn("X-Api-Version", response)
         self.assertIn("X-Version", response)
+
+
+class TestRemoteVersion(APITestCase):
+    ENDPOINT = "/api/remote_version/"
+
+    def setUp(self):
+        super().setUp()
+
+    def test_remote_version_default(self):
+        response = self.client.get(self.ENDPOINT)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertDictEqual(
+            response.data,
+            {
+                "version": "0.0.0",
+                "update_available": False,
+                "feature_is_set": False,
+            },
+        )
+
+    @override_settings(
+        ENABLE_UPDATE_CHECK=False,
+    )
+    def test_remote_version_disabled(self):
+        response = self.client.get(self.ENDPOINT)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertDictEqual(
+            response.data,
+            {
+                "version": "0.0.0",
+                "update_available": False,
+                "feature_is_set": True,
+            },
+        )
+
+    @override_settings(
+        ENABLE_UPDATE_CHECK=True,
+    )
+    @mock.patch("urllib.request.urlopen")
+    def test_remote_version_enabled_no_update_prefix(self, urlopen_mock):
+
+        cm = MagicMock()
+        cm.getcode.return_value = 200
+        cm.read.return_value = json.dumps({"tag_name": "ngx-1.6.0"}).encode()
+        cm.__enter__.return_value = cm
+        urlopen_mock.return_value = cm
+
+        response = self.client.get(self.ENDPOINT)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertDictEqual(
+            response.data,
+            {
+                "version": "1.6.0",
+                "update_available": False,
+                "feature_is_set": True,
+            },
+        )
+
+    @override_settings(
+        ENABLE_UPDATE_CHECK=True,
+    )
+    @mock.patch("urllib.request.urlopen")
+    def test_remote_version_enabled_no_update_no_prefix(self, urlopen_mock):
+
+        cm = MagicMock()
+        cm.getcode.return_value = 200
+        cm.read.return_value = json.dumps(
+            {"tag_name": version.__full_version_str__},
+        ).encode()
+        cm.__enter__.return_value = cm
+        urlopen_mock.return_value = cm
+
+        response = self.client.get(self.ENDPOINT)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertDictEqual(
+            response.data,
+            {
+                "version": version.__full_version_str__,
+                "update_available": False,
+                "feature_is_set": True,
+            },
+        )
+
+    @override_settings(
+        ENABLE_UPDATE_CHECK=True,
+    )
+    @mock.patch("urllib.request.urlopen")
+    def test_remote_version_enabled_update(self, urlopen_mock):
+
+        new_version = (
+            version.__version__[0],
+            version.__version__[1],
+            version.__version__[2] + 1,
+        )
+        new_version_str = ".".join(map(str, new_version))
+
+        cm = MagicMock()
+        cm.getcode.return_value = 200
+        cm.read.return_value = json.dumps(
+            {"tag_name": new_version_str},
+        ).encode()
+        cm.__enter__.return_value = cm
+        urlopen_mock.return_value = cm
+
+        response = self.client.get(self.ENDPOINT)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertDictEqual(
+            response.data,
+            {
+                "version": new_version_str,
+                "update_available": True,
+                "feature_is_set": True,
+            },
+        )
+
+    @override_settings(
+        ENABLE_UPDATE_CHECK=True,
+    )
+    @mock.patch("urllib.request.urlopen")
+    def test_remote_version_bad_json(self, urlopen_mock):
+
+        cm = MagicMock()
+        cm.getcode.return_value = 200
+        cm.read.return_value = b'{ "blah":'
+        cm.__enter__.return_value = cm
+        urlopen_mock.return_value = cm
+
+        response = self.client.get(self.ENDPOINT)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertDictEqual(
+            response.data,
+            {
+                "version": "0.0.0",
+                "update_available": False,
+                "feature_is_set": True,
+            },
+        )
+
+    @override_settings(
+        ENABLE_UPDATE_CHECK=True,
+    )
+    @mock.patch("urllib.request.urlopen")
+    def test_remote_version_exception(self, urlopen_mock):
+
+        cm = MagicMock()
+        cm.getcode.return_value = 200
+        cm.read.side_effect = urllib.error.URLError("an error")
+        cm.__enter__.return_value = cm
+        urlopen_mock.return_value = cm
+
+        response = self.client.get(self.ENDPOINT)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertDictEqual(
+            response.data,
+            {
+                "version": "0.0.0",
+                "update_available": False,
+                "feature_is_set": True,
+            },
+        )

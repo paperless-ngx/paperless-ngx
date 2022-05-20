@@ -4,6 +4,7 @@ import re
 from documents.models import Correspondent
 from documents.models import DocumentType
 from documents.models import MatchingModel
+from documents.models import StoragePath
 from documents.models import Tag
 
 
@@ -54,6 +55,22 @@ def match_tags(document, classifier):
 
     return list(
         filter(lambda o: matches(o, document) or o.pk in predicted_tag_ids, tags),
+    )
+
+
+def match_storage_paths(document, classifier):
+    if classifier:
+        pred_id = classifier.predict_storage_path(document.content)
+    else:
+        pred_id = None
+
+    storage_paths = StoragePath.objects.all()
+
+    return list(
+        filter(
+            lambda o: matches(o, document) or o.pk == pred_id,
+            storage_paths,
+        ),
     )
 
 

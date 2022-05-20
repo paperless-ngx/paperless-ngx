@@ -65,7 +65,7 @@ class TestExportImport(DirectoriesMixin, TestCase):
         self.d1.correspondent = self.c1
         self.d1.document_type = self.dt1
         self.d1.save()
-        super(TestExportImport, self).setUp()
+        super().setUp()
 
     def _get_document_from_manifest(self, manifest, id):
         f = list(
@@ -200,7 +200,7 @@ class TestExportImport(DirectoriesMixin, TestCase):
         )
 
         with override_settings(
-            PAPERLESS_FILENAME_FORMAT="{created_year}/{correspondent}/{title}",
+            FILENAME_FORMAT="{created_year}/{correspondent}/{title}",
         ):
             self.test_exporter(use_filename_format=True)
 
@@ -309,7 +309,7 @@ class TestExportImport(DirectoriesMixin, TestCase):
 
         self.assertTrue(len(manifest), 6)
 
-    @override_settings(PAPERLESS_FILENAME_FORMAT="{title}/{correspondent}")
+    @override_settings(FILENAME_FORMAT="{title}/{correspondent}")
     def test_update_export_changed_location(self):
         shutil.rmtree(os.path.join(self.dirs.media_dir, "documents"))
         shutil.copytree(

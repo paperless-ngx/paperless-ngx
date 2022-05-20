@@ -5,6 +5,7 @@ from .models import Document
 from .models import DocumentType
 from .models import SavedView
 from .models import SavedViewFilterRule
+from .models import StoragePath
 from .models import Tag
 
 
@@ -74,19 +75,19 @@ class DocumentAdmin(admin.ModelAdmin):
             for o in queryset:
                 index.remove_document(writer, o)
 
-        super(DocumentAdmin, self).delete_queryset(request, queryset)
+        super().delete_queryset(request, queryset)
 
     def delete_model(self, request, obj):
         from documents import index
 
         index.remove_document_from_index(obj)
-        super(DocumentAdmin, self).delete_model(request, obj)
+        super().delete_model(request, obj)
 
     def save_model(self, request, obj, form, change):
         from documents import index
 
         index.add_or_update_document(obj)
-        super(DocumentAdmin, self).save_model(request, obj, form, change)
+        super().save_model(request, obj, form, change)
 
 
 class RuleInline(admin.TabularInline):
@@ -100,8 +101,19 @@ class SavedViewAdmin(admin.ModelAdmin):
     inlines = [RuleInline]
 
 
+class StoragePathInline(admin.TabularInline):
+    model = StoragePath
+
+
+class StoragePathAdmin(admin.ModelAdmin):
+    list_display = ("name", "path", "match", "matching_algorithm")
+    list_filter = ("path", "matching_algorithm")
+    list_editable = ("path", "match", "matching_algorithm")
+
+
 admin.site.register(Correspondent, CorrespondentAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(DocumentType, DocumentTypeAdmin)
 admin.site.register(Document, DocumentAdmin)
 admin.site.register(SavedView, SavedViewAdmin)
+admin.site.register(StoragePath, StoragePathAdmin)
