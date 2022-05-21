@@ -23,7 +23,7 @@ export function generateParams(
   }
 }
 
-export function parseQueryParams(queryParams: ParamMap): ListViewState {
+export function getStateFromQueryParams(queryParams: ParamMap): ListViewState {
   let filterRules = filterRulesFromQueryParams(queryParams)
   let sortField = queryParams.get(SORT_FIELD_PARAMETER)
   let sortReverse =
