@@ -15,7 +15,7 @@ export function generateParams(
 ): Params {
   let params = {}
   params[SORT_FIELD_PARAMETER] = sortField
-  params[SORT_REVERSE_PARAMETER] = sortReverse
+  params[SORT_REVERSE_PARAMETER] = sortReverse ? 1 : undefined
   params[PAGE_PARAMETER] = isNaN(currentPage) ? 1 : currentPage
   return {
     ...queryParamsFromFilterRules(filterRules),
@@ -41,7 +41,9 @@ export function getStateFromQueryParams(queryParams: ParamMap): ListViewState {
   }
 }
 
-export function filterRulesFromQueryParams(queryParams: ParamMap) {
+export function filterRulesFromQueryParams(
+  queryParams: ParamMap
+): FilterRule[] {
   const allFilterRuleQueryParams: string[] = FILTER_RULE_TYPES.map(
     (rt) => rt.filtervar
   )
@@ -67,6 +69,8 @@ export function filterRulesFromQueryParams(queryParams: ParamMap) {
       filterRulesFromQueryParams = filterRulesFromQueryParams.concat(
         // map all values to filter rules
         filterQueryParamValues.map((val) => {
+          if (rule_type.datatype == 'boolean')
+            val = val.replace('1', 'true').replace('0', 'false')
           return {
             rule_type: rule_type.id,
             value: isNullRuleType ? null : val,
@@ -88,9 +92,12 @@ export function queryParamsFromFilterRules(filterRules: FilterRule[]): Params {
           ? params[ruleType.filtervar] + ',' + rule.value
           : rule.value
       } else if (ruleType.isnull_filtervar && rule.value == null) {
-        params[ruleType.isnull_filtervar] = true
+        params[ruleType.isnull_filtervar] = 1
       } else {
         params[ruleType.filtervar] = rule.value
+        if (ruleType.datatype == 'boolean')
+          params[ruleType.filtervar] =
+            rule.value == 'true' || rule.value == '1' ? 1 : 0
       }
     }
     return params
