@@ -313,7 +313,10 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
           break
         case FILTER_ASN_ISNULL:
           this.textFilterTarget = TEXT_FILTER_TARGET_ASN
-          this.textFilterModifier = TEXT_FILTER_MODIFIER_NULL
+          this.textFilterModifier =
+            rule.value == 'true' || rule.value == '1'
+              ? TEXT_FILTER_MODIFIER_NULL
+              : TEXT_FILTER_MODIFIER_NOTNULL
           break
         case FILTER_ASN_GT:
           this.textFilterTarget = TEXT_FILTER_TARGET_ASN
