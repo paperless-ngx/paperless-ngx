@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { ActivatedRoute, Params, Router } from '@angular/router'
+import { ParamMap, Router } from '@angular/router'
 import { Observable } from 'rxjs'
 import {
   cloneFilterRules,
@@ -10,7 +10,7 @@ import { PaperlessDocument } from '../data/paperless-document'
 import { PaperlessSavedView } from '../data/paperless-saved-view'
 import { SETTINGS_KEYS } from '../data/paperless-uisettings'
 import { DOCUMENT_LIST_SERVICE } from '../data/storage-keys'
-import { generateParams, parseQueryParams } from '../utils/query-params'
+import { generateParams, getStateFromQueryParams } from '../utils/query-params'
 import { DocumentService, DOCUMENT_SORT_FIELDS } from './rest/document.service'
 import { SettingsService } from './settings.service'
 
@@ -166,13 +166,17 @@ export class DocumentListViewService {
     }
   }
 
-  loadFromQueryParams(queryParams) {
-    let newState: ListViewState = parseQueryParams(queryParams)
+  loadFromQueryParams(queryParams: ParamMap) {
+    const paramsEmpty: boolean = queryParams.keys.length == 0
+    let newState: ListViewState = this.listViewStates.get(null)
+    if (!paramsEmpty) newState = getStateFromQueryParams(queryParams)
+    if (newState == undefined) newState = this.defaultListViewState() // if nothing in local storage
+
     this.activeListViewState.filterRules = newState.filterRules
     this.activeListViewState.sortField = newState.sortField
     this.activeListViewState.sortReverse = newState.sortReverse
     this.activeListViewState.currentPage = newState.currentPage
-    this.reload(null, false)
+    this.reload(null, paramsEmpty) // update the params if there arent any
   }
 
   reload(onFinish?, updateQueryParams: boolean = true) {
@@ -278,13 +282,6 @@ export class DocumentListViewService {
 
   get sortReverse(): boolean {
     return this.activeListViewState.sortReverse
-  }
-
-  get sortParams(): Params {
-    return {
-      sortField: this.sortField,
-      sortReverse: this.sortReverse,
-    }
   }
 
   get collectionSize(): number {
