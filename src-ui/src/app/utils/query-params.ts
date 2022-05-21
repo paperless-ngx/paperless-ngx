@@ -7,23 +7,17 @@ const SORT_FIELD_PARAMETER = 'sort'
 const SORT_REVERSE_PARAMETER = 'reverse'
 const PAGE_PARAMETER = 'page'
 
-export function generateParams(
-  filterRules: FilterRule[],
-  sortField: string,
-  sortReverse: boolean,
-  currentPage: number
-): Params {
-  let params = {}
-  params[SORT_FIELD_PARAMETER] = sortField
-  params[SORT_REVERSE_PARAMETER] = sortReverse ? 1 : undefined
-  params[PAGE_PARAMETER] = isNaN(currentPage) ? 1 : currentPage
-  return {
-    ...queryParamsFromFilterRules(filterRules),
-    ...params,
-  }
+export function generateParams(viewState: ListViewState): Params {
+  let params = queryParamsFromFilterRules(viewState.filterRules)
+  params[SORT_FIELD_PARAMETER] = viewState.sortField
+  params[SORT_REVERSE_PARAMETER] = viewState.sortReverse ? 1 : undefined
+  params[PAGE_PARAMETER] = isNaN(viewState.currentPage)
+    ? 1
+    : viewState.currentPage
+  return params
 }
 
-export function getStateFromQueryParams(queryParams: ParamMap): ListViewState {
+export function parseParams(queryParams: ParamMap): ListViewState {
   let filterRules = filterRulesFromQueryParams(queryParams)
   let sortField = queryParams.get(SORT_FIELD_PARAMETER)
   let sortReverse =
