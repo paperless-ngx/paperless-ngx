@@ -10,7 +10,7 @@ import { PaperlessDocument } from '../data/paperless-document'
 import { PaperlessSavedView } from '../data/paperless-saved-view'
 import { SETTINGS_KEYS } from '../data/paperless-uisettings'
 import { DOCUMENT_LIST_SERVICE } from '../data/storage-keys'
-import { generateParams, getStateFromQueryParams } from '../utils/query-params'
+import { generateParams, parseParams } from '../utils/query-params'
 import { DocumentService, DOCUMENT_SORT_FIELDS } from './rest/document.service'
 import { SettingsService } from './settings.service'
 
@@ -169,7 +169,7 @@ export class DocumentListViewService {
   loadFromQueryParams(queryParams: ParamMap) {
     const paramsEmpty: boolean = queryParams.keys.length == 0
     let newState: ListViewState = this.listViewStates.get(null)
-    if (!paramsEmpty) newState = getStateFromQueryParams(queryParams)
+    if (!paramsEmpty) newState = parseParams(queryParams)
     if (newState == undefined) newState = this.defaultListViewState() // if nothing in local storage
 
     this.activeListViewState.filterRules = newState.filterRules
@@ -200,12 +200,7 @@ export class DocumentListViewService {
           if (updateQueryParams && !this._activeSavedViewId) {
             let base = ['/documents']
             this.router.navigate(base, {
-              queryParams: generateParams(
-                activeListViewState.filterRules,
-                activeListViewState.sortField,
-                activeListViewState.sortReverse,
-                activeListViewState.currentPage
-              ),
+              queryParams: generateParams(activeListViewState),
             })
           }
 
