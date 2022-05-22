@@ -30,7 +30,18 @@ export class DateComponent
 
   placeholder: string
 
-  // prevent chars other than numbers and separators
+  onPaste(event: ClipboardEvent) {
+    let clipboardData: DataTransfer =
+      event.clipboardData || window['clipboardData']
+    if (clipboardData) {
+      let pastedText = clipboardData.getData('text')
+      pastedText = pastedText.replace(/[\sa-z#!$%\^&\*;:{}=\-_`~()]+/g, '')
+      event.preventDefault()
+      this.value = pastedText
+      this.onChange(pastedText)
+    }
+  }
+
   onKeyPress(event: KeyboardEvent) {
     if ('Enter' !== event.key && !/[0-9,\.\/-]+/.test(event.key)) {
       event.preventDefault()
