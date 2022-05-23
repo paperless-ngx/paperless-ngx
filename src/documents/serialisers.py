@@ -598,12 +598,29 @@ class UiSettingsViewSerializer(serializers.ModelSerializer):
         return ui_settings
 
 
-class TasksViewSerializer(serializers.Serializer):
+class TasksViewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PaperlessTask
+        depth = 1
+        fields = "__all__"
 
-    type = serializers.ChoiceField(
-        choices=["all", "incomplete", "complete", "failed"],
-        default="all",
-    )
+    type = serializers.SerializerMethodField()
+
+    def get_type(self, obj):
+        # just file tasks, for now
+        return "file"
+
+    status = serializers.SerializerMethodField()
+
+    def get_status(self, obj):
+        if obj.attempted_task is None:
+            return "incomplete"
+        elif obj.attempted_task.success:
+            return "complete"
+        elif not obj.attempted_task.success:
+            return "failed"
+        else:
+            return "unknown"
 
 
 class AcknowledgeTasksViewSerializer(serializers.Serializer):
