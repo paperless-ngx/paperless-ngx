@@ -142,6 +142,13 @@
             </a>
           </li>
           <li class="nav-item">
+            <a class="nav-link" routerLink="tasks" routerLinkActive="active" (click)="closeMenu()">
+              <svg class="sidebaricon" fill="currentColor">
+                <use xlink:href="assets/bootstrap-icons.svg#list-task"/>
+              </svg>&nbsp;<ng-container i18n>File Tasks</ng-container>
+            </a>
+          </li>
+          <li class="nav-item">
             <a class="nav-link" routerLink="logs" routerLinkActive="active" (click)="closeMenu()">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#text-left"/>
