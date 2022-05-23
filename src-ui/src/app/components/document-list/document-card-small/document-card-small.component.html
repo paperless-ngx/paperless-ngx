@@ -10,10 +10,8 @@
         </div>
       </div>
 
-      <div style="top: 0; right: 0; font-size: large" class="text-end position-absolute me-1">
-        <div *ngFor="let t of getTagsLimited$() | async">
-          <app-tag [tag]="t" (click)="clickTag.emit(t.id);$event.stopPropagation()" [clickable]="true" linkTitle="Filter by tag" i18n-linkTitle></app-tag>
-        </div>
+      <div class="tags d-flex flex-column text-end position-absolute me-1 fs-6">
+        <app-tag *ngFor="let t of getTagsLimited$() | async" [tag]="t" (click)="clickTag.emit(t.id);$event.stopPropagation()" [clickable]="true" linkTitle="Filter by tag" i18n-linkTitle></app-tag>
         <div *ngIf="moreTags">
           <span class="badge badge-secondary">+ {{moreTags}}</span>
         </div>
