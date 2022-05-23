@@ -34,9 +34,10 @@ export class TasksComponent implements OnInit, OnDestroy {
   }
 
   dismissTasks(task: PaperlessTask = undefined) {
-    this.tasksService.dismissTasks(
-      task ? new Set([task.id]) : this.selectedTasks
-    )
+    let tasks = task ? new Set([task.id]) : this.selectedTasks
+    if (this.selectedTasks.size == 0)
+      tasks = new Set(this.currentTasks.map((t) => t.id))
+    this.tasksService.dismissTasks(tasks)
   }
 
   toggleSelected(task: PaperlessTask) {
@@ -49,13 +50,13 @@ export class TasksComponent implements OnInit, OnDestroy {
     let tasks: PaperlessTask[]
     switch (this.activeTab) {
       case 'incomplete':
-        tasks = this.tasksService.incomplete
+        tasks = this.tasksService.incompleteFileTasks
         break
       case 'completed':
-        tasks = this.tasksService.completed
+        tasks = this.tasksService.completedFileTasks
         break
       case 'failed':
-        tasks = this.tasksService.failed
+        tasks = this.tasksService.failedFileTasks
         break
       default:
         break

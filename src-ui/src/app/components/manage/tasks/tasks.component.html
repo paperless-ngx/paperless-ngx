@@ -18,7 +18,7 @@
   </div>
 </app-page-header>
 
-<ng-container *ngIf="!tasksService.completed && tasksService.loading">
+<ng-container *ngIf="!tasksService.completedFileTasks && tasksService.loading">
   <div class="spinner-border spinner-border-sm fw-normal ms-2 me-auto" role="status"></div>
   <div class="visually-hidden" i18n>Loading...</div>
 </ng-container>
@@ -62,21 +62,21 @@
 
 <ul ngbNav #nav="ngbNav" [(activeId)]="activeTab" class="nav-tabs">
   <li ngbNavItem="incomplete">
-    <a ngbNavLink i18n>Incomplete&nbsp;<span class="badge bg-secondary ms-1">{{tasksService.incomplete.length}}</span></a>
+    <a ngbNavLink i18n>Incomplete&nbsp;<span class="badge bg-secondary ms-1">{{tasksService.incompleteFileTasks.length}}</span></a>
     <ng-template ngbNavContent>
-      <ng-container [ngTemplateOutlet]="tasksTemplate" [ngTemplateOutletContext]="{tasks:tasksService.incomplete}"></ng-container>
+      <ng-container [ngTemplateOutlet]="tasksTemplate" [ngTemplateOutletContext]="{tasks:tasksService.incompleteFileTasks}"></ng-container>
     </ng-template>
   </li>
   <li ngbNavItem="completed">
-    <a ngbNavLink i18n>Completed&nbsp;<span class="badge bg-secondary ms-1">{{tasksService.completed.length}}</span></a>
+    <a ngbNavLink i18n>Completed&nbsp;<span class="badge bg-secondary ms-1">{{tasksService.completedFileTasks.length}}</span></a>
     <ng-template ngbNavContent>
-      <ng-container [ngTemplateOutlet]="tasksTemplate" [ngTemplateOutletContext]="{tasks:tasksService.completed}"></ng-container>
+      <ng-container [ngTemplateOutlet]="tasksTemplate" [ngTemplateOutletContext]="{tasks:tasksService.completedFileTasks}"></ng-container>
     </ng-template>
   </li>
   <li ngbNavItem="failed">
-    <a ngbNavLink i18n>Failed&nbsp;<span class="badge bg-secondary ms-1">{{tasksService.failed.length}}</span></a>
+    <a ngbNavLink i18n>Failed&nbsp;<span class="badge bg-secondary ms-1">{{tasksService.failedFileTasks.length}}</span></a>
     <ng-template ngbNavContent>
-      <ng-container [ngTemplateOutlet]="tasksTemplate" [ngTemplateOutletContext]="{tasks:tasksService.failed}"></ng-container>
+      <ng-container [ngTemplateOutlet]="tasksTemplate" [ngTemplateOutletContext]="{tasks:tasksService.failedFileTasks}"></ng-container>
     </ng-template>
   </li>
 </ul>
