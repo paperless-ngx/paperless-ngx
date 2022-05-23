@@ -497,6 +497,8 @@ table.table {
 // Bootstrap 5 tweaks
 a.badge {
   text-decoration: none;
+  word-break: initial;
+  white-space: initial;
 }
 
 .btn-link {
