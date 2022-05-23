@@ -90,6 +90,7 @@ import localeZh from '@angular/common/locales/zh'
 import { StoragePathListComponent } from './components/manage/storage-path-list/storage-path-list.component'
 import { StoragePathEditDialogComponent } from './components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
 import { SettingsService } from './services/settings.service'
+import { TasksComponent } from './components/manage/tasks/tasks.component'
 
 registerLocaleData(localeBe)
 registerLocaleData(localeCs)
@@ -171,6 +172,7 @@ function initializeApp(settings: SettingsService) {
     DateComponent,
     ColorComponent,
     DocumentAsnComponent,
+    TasksComponent,
   ],
   imports: [
     BrowserModule,
