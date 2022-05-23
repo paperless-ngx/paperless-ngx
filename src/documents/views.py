@@ -46,6 +46,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.viewsets import ViewSet
 
 from .bulk_download import ArchiveOnlyStrategy
@@ -800,51 +801,18 @@ class UiSettingsView(GenericAPIView):
         )
 
 
-class TasksView(GenericAPIView):
+class TasksViewSet(ReadOnlyModelViewSet):
 
     permission_classes = (IsAuthenticated,)
     serializer_class = TasksViewSerializer
 
-    def get(self, request, format=None):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        tasks = (
-            PaperlessTask.objects.filter(
-                acknowledged=False,
-            )
-            .order_by("attempted_task__started")
-            .reverse()
+    queryset = (
+        PaperlessTask.objects.filter(
+            acknowledged=False,
         )
-        incomplete_tasks = tasks.filter(attempted_task=None).values(
-            "id",
-            "task_id",
-            "name",
-            "created",
-            "acknowledged",
-        )
-        failed_tasks = tasks.filter(attempted_task__success=0).values(
-            "id",
-            "task_id",
-            "name",
-            "created",
-            "acknowledged",
-        )
-        completed_tasks = tasks.filter(attempted_task__success=1).values(
-            "id",
-            "task_id",
-            "name",
-            "created",
-            "acknowledged",
-        )
-        return Response(
-            {
-                "total": tasks.count(),
-                "incomplete": incomplete_tasks,
-                "failed": failed_tasks,
-                "completed": completed_tasks,
-            },
-        )
+        .order_by("created")
+        .reverse()
+    )
 
 
 class AcknowledgeTasksView(GenericAPIView):
@@ -859,11 +827,9 @@ class AcknowledgeTasksView(GenericAPIView):
         tasks = serializer.validated_data.get("tasks")
 
         try:
-            logger.debug(tasks)
             result = PaperlessTask.objects.filter(id__in=tasks).update(
                 acknowledged=True,
             )
             return Response({"result": result})
-            pass
-        except Exception as e:
-            return HttpResponseBadRequest(str(e))
+        except Exception:
+            return HttpResponseBadRequest()
