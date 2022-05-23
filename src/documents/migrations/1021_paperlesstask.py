@@ -11,8 +11,8 @@ def init_paperless_tasks(apps, schema_editor):
     for task in Task.objects.all():
         if not hasattr(task, "paperlesstask"):
             paperlesstask = PaperlessTask.objects.create(
-                task=task,
-                q_task_id=task.id,
+                attempted_task=task,
+                task_id=task.id,
                 name=task.name,
                 created=task.started,
                 acknowledged=False,
@@ -41,7 +41,7 @@ class Migration(migrations.Migration):
                         verbose_name="ID",
                     ),
                 ),
-                ("q_task_id", models.CharField(max_length=128)),
+                ("task_id", models.CharField(max_length=128)),
                 ("name", models.CharField(max_length=256)),
                 (
                     "created",
@@ -51,12 +51,12 @@ class Migration(migrations.Migration):
                 ),
                 ("acknowledged", models.BooleanField(default=False)),
                 (
-                    "task",
+                    "attempted_task",
                     models.OneToOneField(
                         blank=True,
                         null=True,
                         on_delete=django.db.models.deletion.CASCADE,
-                        related_name="task",
+                        related_name="attempted_task",
                         to="django_q.task",
                     ),
                 ),

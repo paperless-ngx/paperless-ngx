@@ -10,7 +10,6 @@ from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from django.conf import settings
 from django.db.models.signals import post_save
-from django_q.tasks import Task
 from documents import index
 from documents import sanity_checker
 from documents.classifier import DocumentClassifier
@@ -360,16 +359,3 @@ def bulk_update_documents(document_ids):
     with AsyncWriter(ix) as writer:
         for doc in documents:
             index.update_document(writer, doc)
-
-
-def create_paperless_task(sender, instance, created, **kwargs):
-    if created:
-        Task.objects.create(thing=instance)
-
-
-post_save.connect(
-    create_paperless_task,
-    sender=Task,
-    weak=False,
-    dispatch_uid="models.create_paperless_task",
-)

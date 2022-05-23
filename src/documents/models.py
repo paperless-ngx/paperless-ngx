@@ -505,13 +505,13 @@ class UiSettings(models.Model):
 
 class PaperlessTask(models.Model):
 
-    q_task_id = models.CharField(max_length=128)
+    task_id = models.CharField(max_length=128)
     name = models.CharField(max_length=256)
     created = models.DateTimeField(_("created"), auto_now=True, db_index=True)
-    task = models.OneToOneField(
+    attempted_task = models.OneToOneField(
         Task,
         on_delete=models.CASCADE,
-        related_name="task",
+        related_name="attempted_task",
         null=True,
         blank=True,
     )
