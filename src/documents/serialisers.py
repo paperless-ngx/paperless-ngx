@@ -12,6 +12,7 @@ from .models import Correspondent
 from .models import Document
 from .models import DocumentType
 from .models import MatchingModel
+from .models import PaperlessTask
 from .models import SavedView
 from .models import SavedViewFilterRule
 from .models import StoragePath
@@ -597,9 +598,35 @@ class UiSettingsViewSerializer(serializers.ModelSerializer):
         return ui_settings
 
 
-class ConsupmtionTasksViewSerializer(serializers.Serializer):
+class TasksViewSerializer(serializers.Serializer):
 
     type = serializers.ChoiceField(
         choices=["all", "incomplete", "complete", "failed"],
         default="all",
     )
+
+
+class AcknowledgeTasksViewSerializer(serializers.Serializer):
+
+    tasks = serializers.ListField(
+        required=True,
+        label="Tasks",
+        write_only=True,
+        child=serializers.IntegerField(),
+    )
+
+    def _validate_task_id_list(self, tasks, name="tasks"):
+        pass
+        if not type(tasks) == list:
+            raise serializers.ValidationError(f"{name} must be a list")
+        if not all([type(i) == int for i in tasks]):
+            raise serializers.ValidationError(f"{name} must be a list of integers")
+        count = PaperlessTask.objects.filter(id__in=tasks).count()
+        if not count == len(tasks):
+            raise serializers.ValidationError(
+                f"Some tasks in {name} don't exist or were " f"specified twice.",
+            )
+
+    def validate_tasks(self, tasks):
+        self._validate_task_id_list(tasks)
+        return tasks
