@@ -64,12 +64,14 @@ from .matching import match_tags
 from .models import Correspondent
 from .models import Document
 from .models import DocumentType
+from .models import PaperlessTask
 from .models import SavedView
 from .models import StoragePath
 from .models import Tag
 from .parsers import get_parser_class_for_mime_type
 from .serialisers import BulkDownloadSerializer
 from .serialisers import BulkEditSerializer
+from .serialisers import ConsupmtionTasksViewSerializer
 from .serialisers import CorrespondentSerializer
 from .serialisers import DocumentListSerializer
 from .serialisers import DocumentSerializer
@@ -793,5 +795,52 @@ class UiSettingsView(GenericAPIView):
         return Response(
             {
                 "success": True,
+            },
+        )
+
+
+class ConsupmtionTasksView(GenericAPIView):
+
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ConsupmtionTasksViewSerializer
+
+    def get(self, request, format=None):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        consumption_tasks = (
+            PaperlessTask.objects.filter(
+                acknowledged=False,
+            )
+            .order_by("task__started")
+            .reverse()
+        )
+        incomplete_tasks = consumption_tasks.filter(task=None).values(
+            "id",
+            "q_task_id",
+            "name",
+            "created",
+            "acknowledged",
+        )
+        failed_tasks = consumption_tasks.filter(task__success=0).values(
+            "id",
+            "q_task_id",
+            "name",
+            "created",
+            "acknowledged",
+        )
+        completed_tasks = consumption_tasks.filter(task__success=1).values(
+            "id",
+            "q_task_id",
+            "name",
+            "created",
+            "acknowledged",
+        )
+        return Response(
+            {
+                "total": consumption_tasks.count(),
+                "incomplete": incomplete_tasks,
+                "failed": failed_tasks,
+                "completed": completed_tasks,
             },
         )

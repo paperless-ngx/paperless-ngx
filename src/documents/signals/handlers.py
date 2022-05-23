@@ -13,6 +13,9 @@ from django.db.models import Q
 from django.dispatch import receiver
 from django.utils import termcolors
 from django.utils import timezone
+from django_q.signals import post_save
+from django_q.signals import pre_enqueue
+from django_q.tasks import Task
 from filelock import FileLock
 
 from .. import matching
@@ -21,6 +24,7 @@ from ..file_handling import delete_empty_directories
 from ..file_handling import generate_unique_filename
 from ..models import Document
 from ..models import MatchingModel
+from ..models import PaperlessTask
 from ..models import Tag
 
 
@@ -499,3 +503,20 @@ def add_to_index(sender, document, **kwargs):
     from documents import index
 
     index.add_or_update_document(document)
+
+
+@receiver(pre_enqueue)
+def init_paperless_task(sender, task, **kwargs):
+    if task["func"] == "documents.tasks.consume_file":
+        paperless_task = PaperlessTask.objects.get_or_create(q_task_id=task["id"])
+        paperless_task.name = task["name"]
+        paperless_task.created = task["started"]
+
+
+@receiver(post_save, sender=Task)
+def update_paperless_task(sender, instance, **kwargs):
+    logger.debug(sender, instance)
+    papeless_task = PaperlessTask.objects.find(q_task_id=instance.id)
+    if papeless_task:
+        papeless_task.task = instance
+        papeless_task.save()
