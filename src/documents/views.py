@@ -69,9 +69,9 @@ from .models import SavedView
 from .models import StoragePath
 from .models import Tag
 from .parsers import get_parser_class_for_mime_type
+from .serialisers import AcknowledgeTasksViewSerializer
 from .serialisers import BulkDownloadSerializer
 from .serialisers import BulkEditSerializer
-from .serialisers import ConsupmtionTasksViewSerializer
 from .serialisers import CorrespondentSerializer
 from .serialisers import DocumentListSerializer
 from .serialisers import DocumentSerializer
@@ -81,6 +81,7 @@ from .serialisers import SavedViewSerializer
 from .serialisers import StoragePathSerializer
 from .serialisers import TagSerializer
 from .serialisers import TagSerializerVersion1
+from .serialisers import TasksViewSerializer
 from .serialisers import UiSettingsViewSerializer
 
 logger = logging.getLogger("paperless.api")
@@ -799,37 +800,37 @@ class UiSettingsView(GenericAPIView):
         )
 
 
-class ConsupmtionTasksView(GenericAPIView):
+class TasksView(GenericAPIView):
 
     permission_classes = (IsAuthenticated,)
-    serializer_class = ConsupmtionTasksViewSerializer
+    serializer_class = TasksViewSerializer
 
     def get(self, request, format=None):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        consumption_tasks = (
+        tasks = (
             PaperlessTask.objects.filter(
                 acknowledged=False,
             )
             .order_by("attempted_task__started")
             .reverse()
         )
-        incomplete_tasks = consumption_tasks.filter(task=None).values(
+        incomplete_tasks = tasks.filter(attempted_task=None).values(
             "id",
             "task_id",
             "name",
             "created",
             "acknowledged",
         )
-        failed_tasks = consumption_tasks.filter(attempted_task__success=0).values(
+        failed_tasks = tasks.filter(attempted_task__success=0).values(
             "id",
             "task_id",
             "name",
             "created",
             "acknowledged",
         )
-        completed_tasks = consumption_tasks.filter(attempted_task__success=1).values(
+        completed_tasks = tasks.filter(attempted_task__success=1).values(
             "id",
             "task_id",
             "name",
@@ -838,9 +839,31 @@ class ConsupmtionTasksView(GenericAPIView):
         )
         return Response(
             {
-                "total": consumption_tasks.count(),
+                "total": tasks.count(),
                 "incomplete": incomplete_tasks,
                 "failed": failed_tasks,
                 "completed": completed_tasks,
             },
         )
+
+
+class AcknowledgeTasksView(GenericAPIView):
+
+    permission_classes = (IsAuthenticated,)
+    serializer_class = AcknowledgeTasksViewSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        tasks = serializer.validated_data.get("tasks")
+
+        try:
+            logger.debug(tasks)
+            result = PaperlessTask.objects.filter(id__in=tasks).update(
+                acknowledged=True,
+            )
+            return Response({"result": result})
+            pass
+        except Exception as e:
+            return HttpResponseBadRequest(str(e))

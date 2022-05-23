@@ -5,7 +5,7 @@
         <use xlink:href="assets/bootstrap-icons.svg#x"/>
       </svg>&nbsp;<ng-container i18n>Clear selection</ng-container>
     </button>
-    <button class="btn btn-sm btn-outline-primary me-4" (click)="dismissMany()" [disabled]="tasksService.total == 0">
+    <button class="btn btn-sm btn-outline-primary me-4" (click)="dismissTasks()" [disabled]="tasksService.total == 0">
       <svg class="sidebaricon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#check2-all"/>
       </svg>&nbsp;<ng-container i18n>{{dismissButtonText}}</ng-container>
