@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { Observable } from 'rxjs'
 import { first, map } from 'rxjs/operators'
 import { PaperlessTask } from 'src/app/data/paperless-task'
 import { environment } from 'src/environments/environment'
@@ -43,7 +42,7 @@ export class TasksService {
     this.loading = true
 
     this.http
-      .get<TasksAPIResponse>(`${this.baseUrl}consumption_tasks/`)
+      .get<TasksAPIResponse>(`${this.baseUrl}tasks/`)
       .pipe(first())
       .subscribe((r) => {
         this.total = r.total
@@ -55,35 +54,14 @@ export class TasksService {
       })
   }
 
-  // private savedViews: PaperlessSavedView[] = []
-
-  // get allViews() {
-  //   return this.savedViews
-  // }
-
-  // get sidebarViews() {
-  //   return this.savedViews.filter((v) => v.show_in_sidebar)
-  // }
-
-  // get dashboardViews() {
-  //   return this.savedViews.filter((v) => v.show_on_dashboard)
-  // }
-
-  // create(o: PaperlessSavedView) {
-  //   return super.create(o).pipe(tap(() => this.reload()))
-  // }
-
-  // update(o: PaperlessSavedView) {
-  //   return super.update(o).pipe(tap(() => this.reload()))
-  // }
-
-  // patchMany(objects: PaperlessSavedView[]): Observable<PaperlessSavedView[]> {
-  //   return combineLatest(objects.map((o) => super.patch(o))).pipe(
-  //     tap(() => this.reload())
-  //   )
-  // }
-
-  // delete(o: PaperlessSavedView) {
-  //   return super.delete(o).pipe(tap(() => this.reload()))
-  // }
+  public dismissTasks(task_ids: Set<number>) {
+    this.http
+      .post(`${this.baseUrl}acknowledge_tasks/`, {
+        tasks: [...task_ids],
+      })
+      .pipe(first())
+      .subscribe((r) => {
+        this.reload()
+      })
+  }
 }

@@ -7,9 +7,9 @@ from django.urls import re_path
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import RedirectView
+from documents.views import AcknowledgeTasksView
 from documents.views import BulkDownloadView
 from documents.views import BulkEditView
-from documents.views import ConsupmtionTasksView
 from documents.views import CorrespondentViewSet
 from documents.views import DocumentTypeViewSet
 from documents.views import IndexView
@@ -22,6 +22,7 @@ from documents.views import SelectionDataView
 from documents.views import StatisticsView
 from documents.views import StoragePathViewSet
 from documents.views import TagViewSet
+from documents.views import TasksView
 from documents.views import UiSettingsView
 from documents.views import UnifiedSearchViewSet
 from paperless.consumers import StatusConsumer
@@ -88,9 +89,14 @@ urlpatterns = [
                     name="ui_settings",
                 ),
                 re_path(
-                    r"^consumption_tasks/",
-                    ConsupmtionTasksView.as_view(),
-                    name="consumption_tasks",
+                    r"^tasks/",
+                    TasksView.as_view(),
+                    name="tasks",
+                ),
+                re_path(
+                    r"^acknowledge_tasks/",
+                    AcknowledgeTasksView.as_view(),
+                    name="acknowledge_tasks",
                 ),
                 path("token/", views.obtain_auth_token),
             ]

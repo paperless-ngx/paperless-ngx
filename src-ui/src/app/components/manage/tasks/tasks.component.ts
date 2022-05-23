@@ -30,11 +30,13 @@ export class TasksComponent implements OnInit, OnDestroy {
   }
 
   dismissTask(task: PaperlessTask) {
-    throw new Error('Not implemented' + task)
+    this.dismissTasks(task)
   }
 
-  dismissMany() {
-    throw new Error('Not implemented')
+  dismissTasks(task: PaperlessTask = undefined) {
+    this.tasksService.dismissTasks(
+      task ? new Set([task.id]) : this.selectedTasks
+    )
   }
 
   toggleSelected(task: PaperlessTask) {
