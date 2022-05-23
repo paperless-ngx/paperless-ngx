@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'
 import { FormControl } from '@angular/forms'
 import { ActivatedRoute, Router, Params } from '@angular/router'
-import { from, Observable, Subscription, BehaviorSubject } from 'rxjs'
+import { from, Observable } from 'rxjs'
 import {
   debounceTime,
   distinctUntilChanged,
@@ -15,14 +15,13 @@ import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SearchService } from 'src/app/services/rest/search.service'
 import { environment } from 'src/environments/environment'
 import { DocumentDetailComponent } from '../document-detail/document-detail.component'
-import { Meta } from '@angular/platform-browser'
-import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { FILTER_FULLTEXT_QUERY } from 'src/app/data/filter-rule-type'
 import {
   RemoteVersionService,
   AppRemoteVersion,
 } from 'src/app/services/rest/remote-version.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 
 @Component({
   selector: 'app-app-frame',
