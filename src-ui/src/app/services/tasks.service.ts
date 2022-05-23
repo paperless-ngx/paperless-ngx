@@ -1,12 +1,15 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
+import { Observable } from 'rxjs'
 import { first, map } from 'rxjs/operators'
-import {
-  PaperlessTask,
-  PaperlessTaskStatus,
-  PaperlessTaskType,
-} from 'src/app/data/paperless-task'
+import { PaperlessTask } from 'src/app/data/paperless-task'
 import { environment } from 'src/environments/environment'
+
+interface TasksAPIResponse {
+  incomplete: Array<PaperlessTask>
+  completed: Array<PaperlessTask>
+  failed: Array<PaperlessTask>
+}
 
 @Injectable({
   providedIn: 'root',
@@ -16,26 +19,19 @@ export class TasksService {
 
   loading: boolean
 
-  private fileTasks: PaperlessTask[] = []
-
-  public get total(): number {
-    return this.fileTasks?.length
+  private incompleteTasks: PaperlessTask[] = []
+  public get incomplete(): PaperlessTask[] {
+    return this.incompleteTasks
   }
 
-  public get incompleteFileTasks(): PaperlessTask[] {
-    return this.fileTasks.filter(
-      (t) => t.status == PaperlessTaskStatus.Incomplete
-    )
+  private completedTasks: PaperlessTask[] = []
+  public get completed(): PaperlessTask[] {
+    return this.completedTasks
   }
 
-  public get completedFileTasks(): PaperlessTask[] {
-    return this.fileTasks.filter(
-      (t) => t.status == PaperlessTaskStatus.Complete
-    )
-  }
-
-  public get failedFileTasks(): PaperlessTask[] {
-    return this.fileTasks.filter((t) => t.status == PaperlessTaskStatus.Failed)
+  private failedTasks: PaperlessTask[] = []
+  public get failed(): PaperlessTask[] {
+    return this.failedTasks
   }
 
   constructor(private http: HttpClient) {}
@@ -44,23 +40,46 @@ export class TasksService {
     this.loading = true
 
     this.http
-      .get<PaperlessTask[]>(`${this.baseUrl}tasks/`)
+      .get<TasksAPIResponse>(`${this.baseUrl}consumption_tasks/`)
       .pipe(first())
       .subscribe((r) => {
-        this.fileTasks = r.filter((t) => t.type == PaperlessTaskType.File) // they're all File tasks, for now
+        this.incompleteTasks = r.incomplete
+        this.completedTasks = r.completed
+        this.failedTasks = r.failed
         this.loading = false
         return true
       })
   }
 
-  public dismissTasks(task_ids: Set<number>) {
-    this.http
-      .post(`${this.baseUrl}acknowledge_tasks/`, {
-        tasks: [...task_ids],
-      })
-      .pipe(first())
-      .subscribe((r) => {
-        this.reload()
-      })
-  }
+  // private savedViews: PaperlessSavedView[] = []
+
+  // get allViews() {
+  //   return this.savedViews
+  // }
+
+  // get sidebarViews() {
+  //   return this.savedViews.filter((v) => v.show_in_sidebar)
+  // }
+
+  // get dashboardViews() {
+  //   return this.savedViews.filter((v) => v.show_on_dashboard)
+  // }
+
+  // create(o: PaperlessSavedView) {
+  //   return super.create(o).pipe(tap(() => this.reload()))
+  // }
+
+  // update(o: PaperlessSavedView) {
+  //   return super.update(o).pipe(tap(() => this.reload()))
+  // }
+
+  // patchMany(objects: PaperlessSavedView[]): Observable<PaperlessSavedView[]> {
+  //   return combineLatest(objects.map((o) => super.patch(o))).pipe(
+  //     tap(() => this.reload())
+  //   )
+  // }
+
+  // delete(o: PaperlessSavedView) {
+  //   return super.delete(o).pipe(tap(() => this.reload()))
+  // }
 }
