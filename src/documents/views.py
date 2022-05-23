@@ -812,26 +812,26 @@ class ConsupmtionTasksView(GenericAPIView):
             PaperlessTask.objects.filter(
                 acknowledged=False,
             )
-            .order_by("task__started")
+            .order_by("attempted_task__started")
             .reverse()
         )
         incomplete_tasks = consumption_tasks.filter(task=None).values(
             "id",
-            "q_task_id",
+            "task_id",
             "name",
             "created",
             "acknowledged",
         )
-        failed_tasks = consumption_tasks.filter(task__success=0).values(
+        failed_tasks = consumption_tasks.filter(attempted_task__success=0).values(
             "id",
-            "q_task_id",
+            "task_id",
             "name",
             "created",
             "acknowledged",
         )
-        completed_tasks = consumption_tasks.filter(task__success=1).values(
+        completed_tasks = consumption_tasks.filter(attempted_task__success=1).values(
             "id",
-            "q_task_id",
+            "task_id",
             "name",
             "created",
             "acknowledged",
