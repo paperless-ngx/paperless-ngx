@@ -17,7 +17,7 @@ autobahn==22.4.2; python_version >= '3.7'
 automat==20.2.0
 backports.zoneinfo==0.2.1; python_version < '3.9'
 blessed==1.19.1; python_version >= '2.7'
-certifi==2021.10.8
+certifi==2022.5.18.1
 cffi==1.15.0
 channels-redis==3.4.0
 channels==3.0.4
