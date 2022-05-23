@@ -47,7 +47,7 @@ export class SavedViewWidgetComponent implements OnInit, OnDestroy {
   }
 
   reload() {
-    this.loading = true
+    this.loading = this.documents.length == 0
     this.documentService
       .listFiltered(
         1,
