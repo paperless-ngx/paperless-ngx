@@ -8,7 +8,7 @@ def init_paperless_tasks(apps, schema_editor):
     PaperlessTask = apps.get_model("documents", "PaperlessTask")
     Task = apps.get_model("django_q", "Task")
 
-    for task in Task.objects.all():
+    for task in Task.objects.filter(func="documents.tasks.consume_file"):
         if not hasattr(task, "paperlesstask"):
             paperlesstask = PaperlessTask.objects.create(
                 attempted_task=task,

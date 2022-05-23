@@ -22,7 +22,7 @@ from documents.views import SelectionDataView
 from documents.views import StatisticsView
 from documents.views import StoragePathViewSet
 from documents.views import TagViewSet
-from documents.views import TasksView
+from documents.views import TasksViewSet
 from documents.views import UiSettingsView
 from documents.views import UnifiedSearchViewSet
 from paperless.consumers import StatusConsumer
@@ -38,6 +38,7 @@ api_router.register(r"logs", LogViewSet, basename="logs")
 api_router.register(r"tags", TagViewSet)
 api_router.register(r"saved_views", SavedViewViewSet)
 api_router.register(r"storage_paths", StoragePathViewSet)
+api_router.register(r"tasks", TasksViewSet, basename="tasks")
 
 
 urlpatterns = [
@@ -87,11 +88,6 @@ urlpatterns = [
                     r"^ui_settings/",
                     UiSettingsView.as_view(),
                     name="ui_settings",
-                ),
-                re_path(
-                    r"^tasks/",
-                    TasksView.as_view(),
-                    name="tasks",
                 ),
                 re_path(
                     r"^acknowledge_tasks/",
