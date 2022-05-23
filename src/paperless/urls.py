@@ -9,6 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import RedirectView
 from documents.views import BulkDownloadView
 from documents.views import BulkEditView
+from documents.views import ConsupmtionTasksView
 from documents.views import CorrespondentViewSet
 from documents.views import DocumentTypeViewSet
 from documents.views import IndexView
@@ -85,6 +86,11 @@ urlpatterns = [
                     r"^ui_settings/",
                     UiSettingsView.as_view(),
                     name="ui_settings",
+                ),
+                re_path(
+                    r"^consumption_tasks/",
+                    ConsupmtionTasksView.as_view(),
+                    name="consumption_tasks",
                 ),
                 path("token/", views.obtain_auth_token),
             ]

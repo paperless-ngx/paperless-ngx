@@ -595,3 +595,11 @@ class UiSettingsViewSerializer(serializers.ModelSerializer):
             defaults={"settings": validated_data.get("settings", None)},
         )
         return ui_settings
+
+
+class ConsupmtionTasksViewSerializer(serializers.Serializer):
+
+    type = serializers.ChoiceField(
+        choices=["all", "incomplete", "complete", "failed"],
+        default="all",
+    )
