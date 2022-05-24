@@ -200,6 +200,19 @@ Install Paperless from Docker Hub
         You can copy any setting from the file ``paperless.conf.example`` and paste it here.
         Have a look at :ref:`configuration` to see what's available.
 
+    .. note::
+
+        You can utilize Docker secrets for some configuration settings by
+        appending `_FILE` to some configuration values.  This is supported currently
+        only by:
+          * PAPERLESS_DBUSER
+          * PAPERLESS_DBPASS
+          * PAPERLESS_SECRET_KEY
+          * PAPERLESS_AUTO_LOGIN_USERNAME
+          * PAPERLESS_ADMIN_USER
+          * PAPERLESS_ADMIN_MAIL
+          * PAPERLESS_ADMIN_PASSWORD
+
     .. caution::
 
         Some file systems such as NFS network shares don't support file system
