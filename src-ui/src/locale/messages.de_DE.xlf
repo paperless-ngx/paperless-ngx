@@ -1941,7 +1941,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">209,211</context>
         </context-group>
-        <target state="translated">Dieser Vorgang wird die folgenden Tags hinzufügen <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Dieser Vorgang wird die folgenden Tags hinzufügen <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> zu <x id="PH_1" equiv-text="this.list.selected.size"/> ausgewählten Dokument(en).</target>
       </trans-unit>
       <trans-unit id="7181166515756808573" datatype="html" approved="yes">
         <source>This operation will remove the tag &quot;<x id="PH" equiv-text="tag.name"/>&quot; from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -1957,7 +1957,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">222,224</context>
         </context-group>
-        <target state="translated">Dieser Vorgang wird die folgenden Tags entfernen <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Dieser Vorgang wird die folgenden Tags entfernen <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> von <x id="PH_1" equiv-text="this.list.selected.size"/> ausgewählten Dokument(en).</target>
       </trans-unit>
       <trans-unit id="2739066218579571288" datatype="html">
         <source>This operation will add the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> and remove the tags <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> on <x id="PH_2" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -1965,7 +1965,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">226,230</context>
         </context-group>
-        <target state="translated">Dieser Vorgang wird die folgenden Tags hinzufügen <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> and remove the tags <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> on <x id="PH_2" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Dieser Vorgang wird die folgenden Tags hinzufügen <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> und die folgenden entfernen <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> von <x id="PH_2" equiv-text="this.list.selected.size"/> ausgewählten Dokumenten(en).</target>
       </trans-unit>
       <trans-unit id="2996713129519325161" datatype="html" approved="yes">
         <source>Confirm correspondent assignment</source>
