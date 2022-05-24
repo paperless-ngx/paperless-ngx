@@ -41,7 +41,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         super().setUp()
 
         self.user = User.objects.create_superuser(username="temp_admin")
-        self.client.force_login(user=self.user)
+        self.client.force_authenticate(user=self.user)
 
     def testDocuments(self):
 
@@ -1176,7 +1176,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
         self.assertEqual(self.client.get(f"/api/saved_views/{v1.id}/").status_code, 404)
 
-        self.client.force_login(user=u1)
+        self.client.force_authenticate(user=u1)
 
         response = self.client.get("/api/saved_views/")
         self.assertEqual(response.status_code, 200)
@@ -1184,7 +1184,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
         self.assertEqual(self.client.get(f"/api/saved_views/{v1.id}/").status_code, 200)
 
-        self.client.force_login(user=u2)
+        self.client.force_authenticate(user=u2)
 
         response = self.client.get("/api/saved_views/")
         self.assertEqual(response.status_code, 200)
@@ -1358,7 +1358,7 @@ class TestDocumentApiV2(DirectoriesMixin, APITestCase):
 
         self.user = User.objects.create_superuser(username="temp_admin")
 
-        self.client.force_login(user=self.user)
+        self.client.force_authenticate(user=self.user)
         self.client.defaults["HTTP_ACCEPT"] = "application/json; version=2"
 
     def test_tag_validate_color(self):
@@ -1434,7 +1434,7 @@ class TestDocumentApiV2(DirectoriesMixin, APITestCase):
 
     def test_ui_settings(self):
         test_user = User.objects.create_superuser(username="test")
-        self.client.force_login(user=test_user)
+        self.client.force_authenticate(user=test_user)
 
         response = self.client.get("/api/ui_settings/", format="json")
         self.assertEqual(response.status_code, 200)
@@ -1473,7 +1473,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
         super().setUp()
 
         user = User.objects.create_superuser(username="temp_admin")
-        self.client.force_login(user=user)
+        self.client.force_authenticate(user=user)
 
         patcher = mock.patch("documents.bulk_edit.async_task")
         self.async_task = patcher.start()
@@ -2049,7 +2049,7 @@ class TestBulkDownload(DirectoriesMixin, APITestCase):
         super().setUp()
 
         user = User.objects.create_superuser(username="temp_admin")
-        self.client.force_login(user=user)
+        self.client.force_authenticate(user=user)
 
         self.doc1 = Document.objects.create(title="unrelated", checksum="A")
         self.doc2 = Document.objects.create(
@@ -2250,7 +2250,7 @@ class TestApiAuth(APITestCase):
 
     def test_api_version_with_auth(self):
         user = User.objects.create_superuser(username="test")
-        self.client.force_login(user)
+        self.client.force_authenticate(user)
         response = self.client.get("/api/")
         self.assertIn("X-Api-Version", response)
         self.assertIn("X-Version", response)
