@@ -22,7 +22,7 @@
               <option *ngFor="let lang of displayLanguageOptions" [ngValue]="lang.code">{{lang.name}}<span *ngIf="lang.code && currentLocale != 'en-US'"> - {{lang.englishName}}</span></option>
             </select>
 
-            <small class="form-text text-muted" i18n>You need to reload the page after applying a new language.</small>
+            <small *ngIf="displayLanguageIsDirty" class="form-text text-primary" i18n>You need to reload the page after applying a new language.</small>
 
           </div>
         </div>
