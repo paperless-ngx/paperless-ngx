@@ -4,7 +4,7 @@ import os
 import random
 import uuid
 from collections import namedtuple
-from typing import ContextManager
+from typing import ContextManager, Callable
 from typing import List
 from typing import Union
 from unittest import mock
@@ -96,6 +96,18 @@ class BogusMailBox(ContextManager):
         if "UNFLAGGED" in criteria:
             msg = filter(lambda m: not m.flagged, msg)
 
+        if "NO_KEYWORD" in criteria:
+            tag: str = criteria[criteria.index("NO_KEYWORD") + 1].strip('"')
+            print(f"selected tag is {tag}.")
+            for m in msg:
+                print(f"Message with id {m.uid} has tags {','.join(m.flags)}")
+            msg = filter(lambda m: tag not in m.flags, msg)
+
+        if "KEYWORD" in criteria:
+            tag = criteria[criteria.index("KEYWORD") + 1].strip('"')
+            print(f"selected tag is {tag}.")
+            msg = filter(lambda m: tag in m.flags, msg)
+
         return list(msg)
 
     def delete(self, uid_list):
@@ -130,6 +142,7 @@ def create_message(
     from_: str = "noone@mail.com",
     seen: bool = False,
     flagged: bool = False,
+    processed: bool = False,
 ) -> MailMessage:
     email_msg = email.message.EmailMessage()
     # TODO: This does NOT set the UID
@@ -175,6 +188,10 @@ def create_message(
 
     imap_msg.seen = seen
     imap_msg.flagged = flagged
+
+    # Allows to test for both unset tags, and explicitly 'false' ones.
+    if processed:
+        imap_msg._raw_flag_data.append("+FLAGS (processed)".encode())
 
     return imap_msg
 
@@ -225,6 +242,7 @@ class TestMail(DirectoriesMixin, TestCase):
                 body="from my favorite electronic store",
                 seen=False,
                 flagged=True,
+                processed=True
             ),
         )
         self.bogus_mailbox.messages.append(
@@ -570,6 +588,29 @@ class TestMail(DirectoriesMixin, TestCase):
         self.assertEqual(self.async_task.call_count, 1)
         self.assertEqual(len(self.bogus_mailbox.messages), 2)
         self.assertEqual(len(self.bogus_mailbox.messages_spam), 1)
+
+    def test_handle_mail_account_tag(self):
+        account = MailAccount.objects.create(
+            name="test",
+            imap_server="",
+            username="admin",
+            password="secret",
+        )
+
+        _ = MailRule.objects.create(
+            name="testrule",
+            account=account,
+            action=MailRule.MailAction.TAG,
+            action_parameter="processed",
+        )
+
+        self.assertEqual(len(self.bogus_mailbox.messages), 3)
+        self.assertEqual(self.async_task.call_count, 0)
+        self.assertEqual(len(self.bogus_mailbox.fetch("NO_KEYWORD processed", False)), 2)
+        self.mail_account_handler.handle_mail_account(account)
+        self.assertEqual(self.async_task.call_count, 2)
+        self.assertEqual(len(self.bogus_mailbox.fetch("NO_KEYWORD processed", False)), 0)
+        self.assertEqual(len(self.bogus_mailbox.messages), 3)
 
     def test_error_login(self):
         account = MailAccount.objects.create(
