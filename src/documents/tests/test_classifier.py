@@ -204,7 +204,12 @@ class TestClassifier(DirectoriesMixin, TestCase):
         MODEL_FILE=os.path.join(os.path.dirname(__file__), "data", "model.pickle"),
     )
     def test_load_and_classify(self):
+        # Generate test data, train and save to the model file
+        # This ensures the model file sklearn version matches
+        # and eliminates a warning
         self.generate_test_data()
+        self.classifier.train()
+        self.classifier.save()
 
         new_classifier = DocumentClassifier()
         new_classifier.load()
