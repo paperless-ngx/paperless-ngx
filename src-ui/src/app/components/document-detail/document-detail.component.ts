@@ -18,10 +18,7 @@ import { DocumentTypeEditDialogComponent } from '../common/edit-dialog/document-
 import { PDFDocumentProxy } from 'ng2-pdf-viewer'
 import { ToastService } from 'src/app/services/toast.service'
 import { TextComponent } from '../common/input/text/text.component'
-import {
-  SettingsService,
-  SETTINGS_KEYS,
-} from 'src/app/services/settings.service'
+import { SettingsService } from 'src/app/services/settings.service'
 import { dirtyCheck, DirtyComponent } from '@ngneat/dirty-check-forms'
 import { Observable, Subject, BehaviorSubject } from 'rxjs'
 import {
@@ -34,7 +31,11 @@ import {
 } from 'rxjs/operators'
 import { PaperlessDocumentSuggestions } from 'src/app/data/paperless-document-suggestions'
 import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type'
-import { QueryParamsService } from 'src/app/services/query-params.service'
+import { normalizeDateStr } from 'src/app/utils/date'
+import { StoragePathService } from 'src/app/services/rest/storage-path.service'
+import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
+import { StoragePathEditDialogComponent } from '../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
+import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 
 @Component({
   selector: 'app-document-detail',
@@ -67,6 +68,7 @@ export class DocumentDetailComponent
 
   correspondents: PaperlessCorrespondent[]
   documentTypes: PaperlessDocumentType[]
+  storagePaths: PaperlessStoragePath[]
 
   documentForm: FormGroup = new FormGroup({
     title: new FormControl(''),
@@ -74,6 +76,7 @@ export class DocumentDetailComponent
     created_date: new FormControl(),
     correspondent: new FormControl(),
     document_type: new FormControl(),
+    storage_path: new FormControl(),
     archive_serial_number: new FormControl(),
     tags: new FormControl([]),
   })
@@ -116,7 +119,7 @@ export class DocumentDetailComponent
     private documentTitlePipe: DocumentTitlePipe,
     private toastService: ToastService,
     private settings: SettingsService,
-    private queryParamsService: QueryParamsService
+    private storagePathService: StoragePathService
   ) {}
 
   titleKeyUp(event) {
@@ -145,10 +148,16 @@ export class DocumentDetailComponent
       .listAll()
       .pipe(first())
       .subscribe((result) => (this.correspondents = result.results))
+
     this.documentTypeService
       .listAll()
       .pipe(first())
       .subscribe((result) => (this.documentTypes = result.results))
+
+    this.storagePathService
+      .listAll()
+      .pipe(first())
+      .subscribe((result) => (this.storagePaths = result.results))
 
     this.route.paramMap
       .pipe(
@@ -210,6 +219,7 @@ export class DocumentDetailComponent
             created_date: doc.created_date,
             correspondent: doc.correspondent,
             document_type: doc.document_type,
+            storage_path: doc.storage_path,
             archive_serial_number: doc.archive_serial_number,
             tags: [...doc.tags],
           })
@@ -307,6 +317,27 @@ export class DocumentDetailComponent
       .subscribe(({ newCorrespondent, correspondents }) => {
         this.correspondents = correspondents.results
         this.documentForm.get('correspondent').setValue(newCorrespondent.id)
+      })
+  }
+
+  createStoragePath(newName: string) {
+    var modal = this.modalService.open(StoragePathEditDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.dialogMode = 'create'
+    if (newName) modal.componentInstance.object = { name: newName }
+    modal.componentInstance.success
+      .pipe(
+        switchMap((newStoragePath) => {
+          return this.storagePathService
+            .listAll()
+            .pipe(map((storagePaths) => ({ newStoragePath, storagePaths })))
+        })
+      )
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(({ newStoragePath, documentTypes: storagePaths }) => {
+        this.storagePaths = storagePaths.results
+        this.documentForm.get('storage_path').setValue(newStoragePath.id)
       })
   }
 
@@ -434,7 +465,7 @@ export class DocumentDetailComponent
   }
 
   moreLike() {
-    this.queryParamsService.navigateWithFilterRules([
+    this.documentListViewService.quickFilter([
       {
         rule_type: FILTER_FULLTEXT_MORELIKE,
         value: this.documentId.toString(),

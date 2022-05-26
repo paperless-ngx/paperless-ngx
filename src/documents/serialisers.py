@@ -20,7 +20,9 @@ from .models import DocumentType
 from .models import MatchingModel
 from .models import SavedView
 from .models import SavedViewFilterRule
+from .models import StoragePath
 from .models import Tag
+from .models import UiSettings
 from .parsers import is_mime_type_supported
 
 
@@ -204,11 +206,17 @@ class DocumentTypeField(serializers.PrimaryKeyRelatedField):
         return DocumentType.objects.all()
 
 
+class StoragePathField(serializers.PrimaryKeyRelatedField):
+    def get_queryset(self):
+        return StoragePath.objects.all()
+
+
 class DocumentSerializer(DynamicFieldsModelSerializer):
 
     correspondent = CorrespondentField(allow_null=True)
     tags = TagsField(many=True)
     document_type = DocumentTypeField(allow_null=True)
+    storage_path = StoragePathField(allow_null=True)
 
     original_file_name = SerializerMethodField()
     archived_file_name = SerializerMethodField()
@@ -242,6 +250,7 @@ class DocumentSerializer(DynamicFieldsModelSerializer):
             "id",
             "correspondent",
             "document_type",
+            "storage_path",
             "title",
             "content",
             "tags",
@@ -329,6 +338,7 @@ class BulkEditSerializer(DocumentListSerializer):
         choices=[
             "set_correspondent",
             "set_document_type",
+            "set_storage_path",
             "add_tag",
             "remove_tag",
             "modify_tags",
@@ -356,6 +366,8 @@ class BulkEditSerializer(DocumentListSerializer):
             return bulk_edit.set_correspondent
         elif method == "set_document_type":
             return bulk_edit.set_document_type
+        elif method == "set_storage_path":
+            return bulk_edit.set_storage_path
         elif method == "add_tag":
             return bulk_edit.add_tag
         elif method == "remove_tag":
@@ -402,6 +414,20 @@ class BulkEditSerializer(DocumentListSerializer):
         else:
             raise serializers.ValidationError("correspondent not specified")
 
+    def _validate_storage_path(self, parameters):
+        if "storage_path" in parameters:
+            storage_path_id = parameters["storage_path"]
+            if storage_path_id is None:
+                return
+            try:
+                StoragePath.objects.get(id=storage_path_id)
+            except StoragePath.DoesNotExist:
+                raise serializers.ValidationError(
+                    "Storage path does not exist",
+                )
+        else:
+            raise serializers.ValidationError("storage path not specified")
+
     def _validate_parameters_modify_tags(self, parameters):
         if "add_tags" in parameters:
             self._validate_tag_id_list(parameters["add_tags"], "add_tags")
@@ -426,6 +452,8 @@ class BulkEditSerializer(DocumentListSerializer):
             self._validate_parameters_tags(parameters)
         elif method == bulk_edit.modify_tags:
             self._validate_parameters_modify_tags(parameters)
+        elif method == bulk_edit.set_storage_path:
+            self._validate_storage_path(parameters)
 
         return attrs
 
@@ -525,3 +553,65 @@ class BulkDownloadSerializer(DocumentListSerializer):
             "bzip2": zipfile.ZIP_BZIP2,
             "lzma": zipfile.ZIP_LZMA,
         }[compression]
+
+
+class StoragePathSerializer(MatchingModelSerializer):
+    document_count = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = StoragePath
+        fields = (
+            "id",
+            "slug",
+            "name",
+            "path",
+            "match",
+            "matching_algorithm",
+            "is_insensitive",
+            "document_count",
+        )
+
+    def validate_path(self, path):
+        try:
+            path.format(
+                title="title",
+                correspondent="correspondent",
+                document_type="document_type",
+                created="created",
+                created_year="created_year",
+                created_month="created_month",
+                created_day="created_day",
+                added="added",
+                added_year="added_year",
+                added_month="added_month",
+                added_day="added_day",
+                asn="asn",
+                tags="tags",
+                tag_list="tag_list",
+            )
+
+        except (KeyError):
+            raise serializers.ValidationError(_("Invalid variable detected."))
+
+        return path
+
+
+class UiSettingsViewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UiSettings
+        depth = 1
+        fields = [
+            "id",
+            "settings",
+        ]
+
+    def update(self, instance, validated_data):
+        super().update(instance, validated_data)
+        return instance
+
+    def create(self, validated_data):
+        ui_settings = UiSettings.objects.update_or_create(
+            user=validated_data.get("user"),
+            defaults={"settings": validated_data.get("settings", None)},
+        )
+        return ui_settings

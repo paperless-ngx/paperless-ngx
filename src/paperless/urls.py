@@ -19,7 +19,9 @@ from documents.views import SavedViewViewSet
 from documents.views import SearchAutoCompleteView
 from documents.views import SelectionDataView
 from documents.views import StatisticsView
+from documents.views import StoragePathViewSet
 from documents.views import TagViewSet
+from documents.views import UiSettingsView
 from documents.views import UnifiedSearchViewSet
 from paperless.consumers import StatusConsumer
 from paperless.views import FaviconView
@@ -33,6 +35,7 @@ api_router.register(r"documents", UnifiedSearchViewSet)
 api_router.register(r"logs", LogViewSet, basename="logs")
 api_router.register(r"tags", TagViewSet)
 api_router.register(r"saved_views", SavedViewViewSet)
+api_router.register(r"storage_paths", StoragePathViewSet)
 
 
 urlpatterns = [
@@ -77,6 +80,11 @@ urlpatterns = [
                     r"^remote_version/",
                     RemoteVersionView.as_view(),
                     name="remoteversion",
+                ),
+                re_path(
+                    r"^ui_settings/",
+                    UiSettingsView.as_view(),
+                    name="ui_settings",
                 ),
                 path("token/", views.obtain_auth_token),
             ]

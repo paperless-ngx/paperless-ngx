@@ -26,7 +26,10 @@ from documents.models import Document
 from documents.models import DocumentType
 from documents.models import MatchingModel
 from documents.models import SavedView
+from documents.models import StoragePath
 from documents.models import Tag
+from documents.models import UiSettings
+from documents.models import StoragePath
 from documents.tests.utils import DirectoriesMixin
 from paperless import version
 from rest_framework.test import APITestCase
@@ -38,7 +41,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         super().setUp()
 
         self.user = User.objects.create_superuser(username="temp_admin")
-        self.client.force_login(user=self.user)
+        self.client.force_authenticate(user=self.user)
 
     def testDocuments(self):
 
@@ -98,6 +101,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         c = Correspondent.objects.create(name="c", pk=41)
         dt = DocumentType.objects.create(name="dt", pk=63)
         tag = Tag.objects.create(name="t", pk=85)
+        storage_path = StoragePath.objects.create(name="sp", pk=77, path="p")
         doc = Document.objects.create(
             title="WOW",
             content="the content",
@@ -105,6 +109,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
             document_type=dt,
             checksum="123",
             mime_type="application/pdf",
+            storage_path=storage_path,
         )
 
         response = self.client.get("/api/documents/", format="json")
@@ -191,7 +196,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, content_thumbnail)
 
-    @override_settings(PAPERLESS_FILENAME_FORMAT="")
+    @override_settings(FILENAME_FORMAT="")
     def test_download_with_archive(self):
 
         content = b"This is a test"
@@ -579,10 +584,12 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         t2 = Tag.objects.create(name="tag2")
         c = Correspondent.objects.create(name="correspondent")
         dt = DocumentType.objects.create(name="type")
+        sp = StoragePath.objects.create(name="path")
 
         d1 = Document.objects.create(checksum="1", correspondent=c, content="test")
         d2 = Document.objects.create(checksum="2", document_type=dt, content="test")
         d3 = Document.objects.create(checksum="3", content="test")
+
         d3.tags.add(t)
         d3.tags.add(t2)
         d4 = Document.objects.create(
@@ -597,6 +604,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
             content="test",
         )
         d6 = Document.objects.create(checksum="6", content="test2")
+        d7 = Document.objects.create(checksum="7", storage_path=sp, content="test")
 
         with AsyncWriter(index.open_index()) as writer:
             for doc in Document.objects.all():
@@ -607,18 +615,30 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
             self.assertEqual(r.status_code, 200)
             return [hit["id"] for hit in r.data["results"]]
 
-        self.assertCountEqual(search_query(""), [d1.id, d2.id, d3.id, d4.id, d5.id])
+        self.assertCountEqual(
+            search_query(""),
+            [d1.id, d2.id, d3.id, d4.id, d5.id, d7.id],
+        )
         self.assertCountEqual(search_query("&is_tagged=true"), [d3.id, d4.id])
-        self.assertCountEqual(search_query("&is_tagged=false"), [d1.id, d2.id, d5.id])
+        self.assertCountEqual(
+            search_query("&is_tagged=false"),
+            [d1.id, d2.id, d5.id, d7.id],
+        )
         self.assertCountEqual(search_query("&correspondent__id=" + str(c.id)), [d1.id])
         self.assertCountEqual(search_query("&document_type__id=" + str(dt.id)), [d2.id])
+        self.assertCountEqual(search_query("&storage_path__id=" + str(sp.id)), [d7.id])
+
+        self.assertCountEqual(
+            search_query("&storage_path__isnull"),
+            [d1.id, d2.id, d3.id, d4.id, d5.id],
+        )
         self.assertCountEqual(
             search_query("&correspondent__isnull"),
-            [d2.id, d3.id, d4.id, d5.id],
+            [d2.id, d3.id, d4.id, d5.id, d7.id],
         )
         self.assertCountEqual(
             search_query("&document_type__isnull"),
-            [d1.id, d3.id, d4.id, d5.id],
+            [d1.id, d3.id, d4.id, d5.id, d7.id],
         )
         self.assertCountEqual(
             search_query("&tags__id__all=" + str(t.id) + "," + str(t2.id)),
@@ -1079,35 +1099,49 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.data,
-            {"correspondents": [], "tags": [], "document_types": []},
+            {
+                "correspondents": [],
+                "tags": [],
+                "document_types": [],
+                "storage_paths": [],
+            },
         )
 
     def test_get_suggestions_invalid_doc(self):
         response = self.client.get(f"/api/documents/34676/suggestions/")
         self.assertEqual(response.status_code, 404)
 
-    @mock.patch("documents.views.match_correspondents")
-    @mock.patch("documents.views.match_tags")
+    @mock.patch("documents.views.match_storage_paths")
     @mock.patch("documents.views.match_document_types")
+    @mock.patch("documents.views.match_tags")
+    @mock.patch("documents.views.match_correspondents")
     def test_get_suggestions(
         self,
-        match_document_types,
-        match_tags,
         match_correspondents,
+        match_tags,
+        match_document_types,
+        match_storage_paths,
     ):
         doc = Document.objects.create(
             title="test",
             mime_type="application/pdf",
             content="this is an invoice!",
         )
+
+        match_correspondents.return_value = [Correspondent(id=88), Correspondent(id=2)]
         match_tags.return_value = [Tag(id=56), Tag(id=123)]
         match_document_types.return_value = [DocumentType(id=23)]
-        match_correspondents.return_value = [Correspondent(id=88), Correspondent(id=2)]
+        match_storage_paths.return_value = [StoragePath(id=99), StoragePath(id=77)]
 
         response = self.client.get(f"/api/documents/{doc.pk}/suggestions/")
         self.assertEqual(
             response.data,
-            {"correspondents": [88, 2], "tags": [56, 123], "document_types": [23]},
+            {
+                "correspondents": [88, 2],
+                "tags": [56, 123],
+                "document_types": [23],
+                "storage_paths": [99, 77],
+            },
         )
 
     def test_saved_views(self):
@@ -1142,7 +1176,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
         self.assertEqual(self.client.get(f"/api/saved_views/{v1.id}/").status_code, 404)
 
-        self.client.force_login(user=u1)
+        self.client.force_authenticate(user=u1)
 
         response = self.client.get("/api/saved_views/")
         self.assertEqual(response.status_code, 200)
@@ -1150,7 +1184,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
         self.assertEqual(self.client.get(f"/api/saved_views/{v1.id}/").status_code, 200)
 
-        self.client.force_login(user=u2)
+        self.client.force_authenticate(user=u2)
 
         response = self.client.get("/api/saved_views/")
         self.assertEqual(response.status_code, 200)
@@ -1324,7 +1358,7 @@ class TestDocumentApiV2(DirectoriesMixin, APITestCase):
 
         self.user = User.objects.create_superuser(username="temp_admin")
 
-        self.client.force_login(user=self.user)
+        self.client.force_authenticate(user=self.user)
         self.client.defaults["HTTP_ACCEPT"] = "application/json; version=2"
 
     def test_tag_validate_color(self):
@@ -1398,13 +1432,48 @@ class TestDocumentApiV2(DirectoriesMixin, APITestCase):
             "#000000",
         )
 
+    def test_ui_settings(self):
+        test_user = User.objects.create_superuser(username="test")
+        self.client.force_authenticate(user=test_user)
+
+        response = self.client.get("/api/ui_settings/", format="json")
+        self.assertEqual(response.status_code, 200)
+        self.assertDictEqual(
+            response.data["settings"],
+            {},
+        )
+
+        settings = {
+            "settings": {
+                "dark_mode": {
+                    "enabled": True,
+                },
+            },
+        }
+
+        response = self.client.post(
+            "/api/ui_settings/",
+            json.dumps(settings),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get("/api/ui_settings/", format="json")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertDictEqual(
+            response.data["settings"],
+            settings["settings"],
+        )
+
 
 class TestBulkEdit(DirectoriesMixin, APITestCase):
     def setUp(self):
         super().setUp()
 
         user = User.objects.create_superuser(username="temp_admin")
-        self.client.force_login(user=user)
+        self.client.force_authenticate(user=user)
 
         patcher = mock.patch("documents.bulk_edit.async_task")
         self.async_task = patcher.start()
@@ -1433,6 +1502,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
         self.doc2.tags.add(self.t1)
         self.doc3.tags.add(self.t2)
         self.doc4.tags.add(self.t1, self.t2)
+        self.sp1 = StoragePath.objects.create(name="sp1", path="Something/{checksum}")
 
     def test_set_correspondent(self):
         self.assertEqual(Document.objects.filter(correspondent=self.c2).count(), 1)
@@ -1471,6 +1541,60 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
         self.async_task.assert_called_once()
         args, kwargs = self.async_task.call_args
         self.assertCountEqual(kwargs["document_ids"], [self.doc2.id, self.doc3.id])
+
+    def test_set_document_storage_path(self):
+        """
+        GIVEN:
+            - 5 documents without defined storage path
+        WHEN:
+            - Bulk edit called to add storage path to 1 document
+        THEN:
+            - Single document storage path update
+        """
+        self.assertEqual(Document.objects.filter(storage_path=None).count(), 5)
+
+        bulk_edit.set_storage_path(
+            [self.doc1.id],
+            self.sp1.id,
+        )
+
+        self.assertEqual(Document.objects.filter(storage_path=None).count(), 4)
+
+        self.async_task.assert_called_once()
+        args, kwargs = self.async_task.call_args
+
+        self.assertCountEqual(kwargs["document_ids"], [self.doc1.id])
+
+    def test_unset_document_storage_path(self):
+        """
+        GIVEN:
+            - 4 documents without defined storage path
+            - 1 document with a defined storage
+        WHEN:
+            - Bulk edit called to remove storage path from 1 document
+        THEN:
+            - Single document storage path removed
+        """
+        self.assertEqual(Document.objects.filter(storage_path=None).count(), 5)
+
+        bulk_edit.set_storage_path(
+            [self.doc1.id],
+            self.sp1.id,
+        )
+
+        self.assertEqual(Document.objects.filter(storage_path=None).count(), 4)
+
+        bulk_edit.set_storage_path(
+            [self.doc1.id],
+            None,
+        )
+
+        self.assertEqual(Document.objects.filter(storage_path=None).count(), 5)
+
+        self.async_task.assert_called()
+        args, kwargs = self.async_task.call_args
+
+        self.assertCountEqual(kwargs["document_ids"], [self.doc1.id])
 
     def test_add_tag(self):
         self.assertEqual(Document.objects.filter(tags__id=self.t1.id).count(), 2)
@@ -1925,7 +2049,7 @@ class TestBulkDownload(DirectoriesMixin, APITestCase):
         super().setUp()
 
         user = User.objects.create_superuser(username="temp_admin")
-        self.client.force_login(user=user)
+        self.client.force_authenticate(user=user)
 
         self.doc1 = Document.objects.create(title="unrelated", checksum="A")
         self.doc2 = Document.objects.create(
@@ -2126,7 +2250,7 @@ class TestApiAuth(APITestCase):
 
     def test_api_version_with_auth(self):
         user = User.objects.create_superuser(username="test")
-        self.client.force_login(user)
+        self.client.force_authenticate(user)
         response = self.client.get("/api/")
         self.assertIn("X-Api-Version", response)
         self.assertIn("X-Version", response)
