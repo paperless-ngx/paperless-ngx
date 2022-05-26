@@ -27,29 +27,40 @@
   <table class="table table-striped align-middle border shadow-sm">
     <thead>
       <tr>
-        <th>
+        <th scope="col">
           <div class="form-check">
             <input type="checkbox" class="form-check-input" id="all-tasks" [disabled]="currentTasks.length == 0" (click)="toggleAll($event); $event.stopPropagation();">
             <label class="form-check-label" for="all-tasks"></label>
           </div>
         </th>
-        <th scope="col" i18n>Name</th>
-        <th scope="col" i18n>Created</th>
-        <th scope="col" i18n>Actions</th>
+        <th scope="col" width="25%" i18n>Name</th>
+        <th scope="col" width="20%" i18n>Created</th>
+        <th scope="col" width="45%" i18n>Results</th>
+        <th scope="col" width="10%" i18n>Actions</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let task of tasks">
-        <td>
+        <th>
           <div class="form-check">
             <input type="checkbox" class="form-check-input" id="task{{task.id}}" [checked]="selectedTasks.has(task.id)" (click)="toggleSelected(task, $event); $event.stopPropagation();">
             <label class="form-check-label" for="task{{task.id}}"></label>
           </div>
+        </th>
+        <td>{{ task.name }}</td>
+        <td>{{ task.created | customDate:'short' }}</td>
+        <td>
+          <div class="text-primary" *ngIf="task.result.length > 50" [ngbPopover]="resultPopover" popoverClass="shadow font-monospace small" triggers="mouseenter:mouseleave:click">
+            <svg fill="currentColor" class="me-2" width="1.2em" height="1.2em" style="vertical-align: text-top;" viewBox="0 0 16 16">
+              <use xlink:href="assets/bootstrap-icons.svg#info-circle" />
+            </svg>
+            <span class="small d-none d-md-inline-block font-monospace text-muted">{{ task.result | slice:0:50 }}&hellip;</span>
+          </div>
+          <span *ngIf="task.result.length <= 50" class="small d-none d-md-inline-block font-monospace">{{ task.result | slice:0:50 }}</span>
+          <ng-template #resultPopover><div class="small">{{ task.result }}</div></ng-template>
         </td>
-        <td scope="row">{{ task.name }}</td>
-        <td scope="row">{{ task.created | customDate:'medium' }}</td>
         <td scope="row">
-          <button class="btn btn-sm btn-outline-secondary" (click)="dismissTask(task)">
+          <button class="btn btn-sm btn-outline-secondary" (click)="acknowledgeTask(task)">
             <svg class="sidebaricon" fill="currentColor">
               <use xlink:href="assets/bootstrap-icons.svg#check"/>
             </svg>&nbsp;<ng-container i18n>Dismiss</ng-container>
