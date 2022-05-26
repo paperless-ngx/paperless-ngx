@@ -17,7 +17,7 @@
 ### Bug Fixes
 
 - Feature / fix saved view \& sort field query params [\@shamoon](https://github.com/shamoon) ([\#881](https://github.com/paperless-ngx/paperless-ngx/pull/881))
-- Mobile friendlier manage pages [\@shamoon](https://github.com/shamoon) ([\#873](https://github.com/paperless-ngx/paperless-ngx/pull/873))
+- mobile friendlier manage pages [\@shamoon](https://github.com/shamoon) ([\#873](https://github.com/paperless-ngx/paperless-ngx/pull/873))
 - Add timeout to healthcheck [\@shamoon](https://github.com/shamoon) ([\#880](https://github.com/paperless-ngx/paperless-ngx/pull/880))
 - Always accept yyyy-mm-dd date inputs [\@shamoon](https://github.com/shamoon) ([\#864](https://github.com/paperless-ngx/paperless-ngx/pull/864))
 - Fix local Docker image building [\@stumpylog](https://github.com/stumpylog) ([\#849](https://github.com/paperless-ngx/paperless-ngx/pull/849))
@@ -70,137 +70,137 @@
 
 ## paperless-ngx 1.7.0
 
-### Breaking Changes
+Breaking Changes
 
 - `PAPERLESS_URL` is now required when using a reverse proxy. See
   [\#674](https://github.com/paperless-ngx/paperless-ngx/pull/674).
 
-### Features
+Features
 
 - Allow setting more than one tag in mail rules
-  [\@jonasc](https://github.com/jonasc) ([\#270](https://github.com/paperless-ngx/paperless-ngx/pull/270))
-- Global drag\'n\'drop [\@shamoon](https://github.com/shamoon)
-  ([\#283](https://github.com/paperless-ngx/paperless-ngx/pull/283))
+  [\@jonasc](https://github.com/jonasc) (\#270)
+- global drag\'n\'drop [\@shamoon](https://github.com/shamoon)
+  (\#283).
 - Fix: download buttons should disable while waiting
-  [\@shamoon](https://github.com/shamoon) ([\#630](https://github.com/paperless-ngx/paperless-ngx/pull/630))
-- Update checker [\@shamoon](https://github.com/shamoon) ([\#591](https://github.com/paperless-ngx/paperless-ngx/pull/591))
+  [\@shamoon](https://github.com/shamoon) (\#630).
+- Update checker [\@shamoon](https://github.com/shamoon) (\#591).
 - Show prompt on password-protected pdfs
-  [\@shamoon](https://github.com/shamoon) ([\#564](https://github.com/paperless-ngx/paperless-ngx/pull/564))
+  [\@shamoon](https://github.com/shamoon) (\#564).
 - Filtering query params aka browser navigation for filtering
-  [\@shamoon](https://github.com/shamoon) ([\#540](https://github.com/paperless-ngx/paperless-ngx/pull/540))
+  [\@shamoon](https://github.com/shamoon) (\#540).
 - Clickable tags in dashboard widgets
-  [\@shamoon](https://github.com/shamoon) ([\#515](https://github.com/paperless-ngx/paperless-ngx/pull/515))
+  [\@shamoon](https://github.com/shamoon) (\#515).
 - Add bottom pagination [\@shamoon](https://github.com/shamoon)
-  ([\#372](https://github.com/paperless-ngx/paperless-ngx/pull/372))
+  (\#372).
 - Feature barcode splitter [\@gador](https://github.com/gador)
-  ([\#532](https://github.com/paperless-ngx/paperless-ngx/pull/532))
-- App loading screen [\@shamoon](https://github.com/shamoon) ([\#298](https://github.com/paperless-ngx/paperless-ngx/pull/298))
+  (\#532).
+- App loading screen [\@shamoon](https://github.com/shamoon) (\#298).
 - Use progress bar for delayed buttons
-  [\@shamoon](https://github.com/shamoon) ([\#415](https://github.com/paperless-ngx/paperless-ngx/pull/415))
+  [\@shamoon](https://github.com/shamoon) (\#415).
 - Add minimum length for documents text filter
-  [\@shamoon](https://github.com/shamoon) ([\#401](https://github.com/paperless-ngx/paperless-ngx/pull/401))
+  [\@shamoon](https://github.com/shamoon) (\#401).
 - Added nav buttons in the document detail view
-  [\@GruberViktor](https://github.com/gruberviktor) ([\#273](https://github.com/paperless-ngx/paperless-ngx/pull/273))
+  [\@GruberViktor](https://github.com/gruberviktor) (\#273).
 - Improve date keyboard input [\@shamoon](https://github.com/shamoon)
-  ([\#253](https://github.com/paperless-ngx/paperless-ngx/pull/253))
-- Color theming [\@shamoon](https://github.com/shamoon) ([\#243](https://github.com/paperless-ngx/paperless-ngx/pull/243))
+  (\#253).
+- Color theming [\@shamoon](https://github.com/shamoon) (\#243).
 - Parse dates when entered without separators
-  [\@GruberViktor](https://github.com/gruberviktor) ([\#250](https://github.com/paperless-ngx/paperless-ngx/pull/250))
+  [\@GruberViktor](https://github.com/gruberviktor) (\#250).
 
-### Bug Fixes
+Bug Fixes
 
-- Add \"localhost\" to ALLOWED_HOSTS
-  [\@gador](https://github.com/gador) ([\#700](https://github.com/paperless-ngx/paperless-ngx/pull/700))
-- Fix: scanners table [\@qcasey](https://github.com/qcasey) ([\#690](https://github.com/paperless-ngx/paperless-ngx/pull/690))
+- add \"localhost\" to ALLOWED_HOSTS
+  [\@gador](https://github.com/gador) (\#700).
+- Fix: scanners table [\@qcasey](https://github.com/qcasey) (\#690).
 - Adds wait for file before consuming
-  [\@stumpylog](https://github.com/stumpylog) ([\#483](https://github.com/paperless-ngx/paperless-ngx/pull/483))
+  [\@stumpylog](https://github.com/stumpylog) (\#483).
 - Fix: frontend document editing erases time data
-  [\@shamoon](https://github.com/shamoon) ([\#654](https://github.com/paperless-ngx/paperless-ngx/pull/654))
+  [\@shamoon](https://github.com/shamoon) (\#654).
 - Increase length of SavedViewFilterRule
-  [\@stumpylog](https://github.com/stumpylog) ([\#612](https://github.com/paperless-ngx/paperless-ngx/pull/612))
+  [\@stumpylog](https://github.com/stumpylog) (\#612).
 - Fixes attachment filename matching during mail fetching
-  [\@stumpylog](https://github.com/stumpylog) ([\#680](https://github.com/paperless-ngx/paperless-ngx/pull/680))
+  [\@stumpylog](https://github.com/stumpylog) (\#680).
 - Add `PAPERLESS_URL` env variable & CSRF var
-  [\@shamoon](https://github.com/shamoon) ([\#674](https://github.com/paperless-ngx/paperless-ngx/discussions/674))
+  [\@shamoon](https://github.com/shamoon) (\#674).
 - Fix: download buttons should disable while waiting
-  [\@shamoon](https://github.com/shamoon) ([\#630](https://github.com/paperless-ngx/paperless-ngx/pull/630))
+  [\@shamoon](https://github.com/shamoon) (\#630).
 - Fixes downloaded filename, add more consumer ignore settings
-  [\@stumpylog](https://github.com/stumpylog) ([\#599](https://github.com/paperless-ngx/paperless-ngx/pull/599))
+  [\@stumpylog](https://github.com/stumpylog) (\#599).
 - FIX BUG: case-sensitive matching was not possible
-  [\@danielBreitlauch](https://github.com/danielbreitlauch) ([\#594](https://github.com/paperless-ngx/paperless-ngx/pull/594))
-- Uses shutil.move instead of rename
-  [\@gador](https://github.com/gador) ([\#617](https://github.com/paperless-ngx/paperless-ngx/pull/617))
+  [\@danielBreitlauch](https://github.com/danielbreitlauch) (\#594).
+- uses shutil.move instead of rename
+  [\@gador](https://github.com/gador) (\#617).
 - Fix npm deps 01.02.22 2 [\@shamoon](https://github.com/shamoon)
-  ([\#610](https://github.com/paperless-ngx/paperless-ngx/discussions/610))
+  (\#610).
 - Fix npm dependencies 01.02.22
-  [\@shamoon](https://github.com/shamoon) ([\#600](https://github.com/paperless-ngx/paperless-ngx/pull/600))
-- Fix issue 416: implement `PAPERLESS_OCR_MAX_IMAGE_PIXELS`
-  [\@hacker-h](https://github.com/hacker-h) ([\#441](https://github.com/paperless-ngx/paperless-ngx/pull/441))
-- Fix: exclude cypress from build in Dockerfile
-  [\@FrankStrieter](https://github.com/FrankStrieter) ([\#526](https://github.com/paperless-ngx/paperless-ngx/pull/526))
+  [\@shamoon](https://github.com/shamoon) (\#600).
+- fix issue 416: implement PAPERLESS_OCR_MAX_IMAGE_PIXELS
+  [\@hacker-h](https://github.com/hacker-h) (\#441).
+- fix: exclude cypress from build in Dockerfile
+  [\@FrankStrieter](https://github.com/FrankStrieter) (\#526).
 - Corrections to pass pre-commit hooks
-  [\@schnuffle](https://github.com/schnuffle) ([\#454](https://github.com/paperless-ngx/paperless-ngx/pull/454))
+  [\@schnuffle](https://github.com/schnuffle) (\#454).
 - Fix 311 unable to click checkboxes in document list
-  [\@shamoon](https://github.com/shamoon) ([\#313](https://github.com/paperless-ngx/paperless-ngx/pull/313))
+  [\@shamoon](https://github.com/shamoon) (\#313).
 - Fix imap tools bug [\@stumpylog](https://github.com/stumpylog)
-  ([\#393](https://github.com/paperless-ngx/paperless-ngx/pull/393))
+  (\#393).
 - Fix filterable dropdown buttons arent translated
-  [\@shamoon](https://github.com/shamoon) ([\#366](https://github.com/paperless-ngx/paperless-ngx/pull/366))
+  [\@shamoon](https://github.com/shamoon) (\#366).
 - Fix 224: \"Auto-detected date is day before receipt date\"
-  [\@a17t](https://github.com/a17t) ([\#246](https://github.com/paperless-ngx/paperless-ngx/pull/246))
+  [\@a17t](https://github.com/a17t) (\#246).
 - Fix minor sphinx errors [\@shamoon](https://github.com/shamoon)
-  ([\#322](https://github.com/paperless-ngx/paperless-ngx/pull/322))
+  (\#322).
 - Fix page links hidden [\@shamoon](https://github.com/shamoon)
-  ([\#314](https://github.com/paperless-ngx/paperless-ngx/pull/314))
+  (\#314).
 - Fix: Include excluded items in dropdown count
-  [\@shamoon](https://github.com/shamoon) ([\#263](https://github.com/paperless-ngx/paperless-ngx/pull/263))
+  [\@shamoon](https://github.com/shamoon) (\#263).
 
-### Translation
+Translation
 
 - [\@miku323](https://github.com/miku323) contributed to Slovenian
-  translation
+  translation.
 - [\@FaintGhost](https://github.com/FaintGhost) contributed to Chinese
-  Simplified translation
+  Simplified translation.
 - [\@DarkoBG79](https://github.com/DarkoBG79) contributed to Serbian
-  translation
+  translation.
 - [Kemal Secer](https://crowdin.com/profile/kemal.secer) contributed
-  to Turkish translation
+  to Turkish translation.
 - [\@Prominence](https://github.com/Prominence) contributed to
-  Belarusian translation
+  Belarusian translation.
 
-### Documentation
+Documentation
 
-- Fix: scanners table [\@qcasey](https://github.com/qcasey) ([\#690](https://github.com/paperless-ngx/paperless-ngx/pull/690))
-- Add `PAPERLESS_URL` env variable & CSRF var
-  [\@shamoon](https://github.com/shamoon) ([\#674](https://github.com/paperless-ngx/paperless-ngx/pull/674))
+- Fix: scanners table [\@qcasey](https://github.com/qcasey) (\#690).
+- Add [PAPERLESS\_URL]{.title-ref} env variable & CSRF var
+  [\@shamoon](https://github.com/shamoon) (\#674).
 - Fixes downloaded filename, add more consumer ignore settings
-  [\@stumpylog](https://github.com/stumpylog) ([\#599](https://github.com/paperless-ngx/paperless-ngx/pull/599))
-- Fix issue 416: implement `PAPERLESS_OCR_MAX_IMAGE_PIXELS`
-  [\@hacker-h](https://github.com/hacker-h) ([\#441](https://github.com/paperless-ngx/paperless-ngx/pull/441))
+  [\@stumpylog](https://github.com/stumpylog) (\#599).
+- fix issue 416: implement `PAPERLESS_OCR_MAX_IMAGE_PIXELS`
+  [\@hacker-h](https://github.com/hacker-h) (\#441).
 - Fix minor sphinx errors [\@shamoon](https://github.com/shamoon)
-  ([\#322](https://github.com/paperless-ngx/paperless-ngx/pull/322))
+  (\#322).
 
-### Maintenance
+Maintenance
 
 - Add `PAPERLESS_URL` env variable & CSRF var
-  [\@shamoon](https://github.com/shamoon) ([\#674](https://github.com/paperless-ngx/paperless-ngx/pull/674))
+  [\@shamoon](https://github.com/shamoon) (\#674).
 - Chore: Implement release-drafter action for Changelogs
-  [\@qcasey](https://github.com/qcasey) ([\#669](https://github.com/paperless-ngx/paperless-ngx/pull/669))
-- Chore: Add CODEOWNERS [\@qcasey](https://github.com/qcasey) ([\#667](https://github.com/paperless-ngx/paperless-ngx/pull/667))
+  [\@qcasey](https://github.com/qcasey) (\#669).
+- Chore: Add CODEOWNERS [\@qcasey](https://github.com/qcasey) (\#667).
 - Support docker-compose v2 in install
-  [\@stumpylog](https://github.com/stumpylog) ([\#611](https://github.com/paperless-ngx/paperless-ngx/pull/611))
+  [\@stumpylog](https://github.com/stumpylog) (\#611).
 - Add Belarusian localization [\@shamoon](https://github.com/shamoon)
-  ([\#588](https://github.com/paperless-ngx/paperless-ngx/pull/588))
+  (\#588).
 - Add Turkish localization [\@shamoon](https://github.com/shamoon)
-  ([\#536](https://github.com/paperless-ngx/paperless-ngx/pull/536))
+  (\#536).
 - Add Serbian localization [\@shamoon](https://github.com/shamoon)
-  ([\#504](https://github.com/paperless-ngx/paperless-ngx/pull/504))
+  (\#504).
 - Create PULL_REQUEST_TEMPLATE.md
-  [\@shamoon](https://github.com/shamoon) ([\#304](https://github.com/paperless-ngx/paperless-ngx/pull/304))
+  [\@shamoon](https://github.com/shamoon) (\#304).
 - Add Chinese localization [\@shamoon](https://github.com/shamoon)
-  ([\#247](https://github.com/paperless-ngx/paperless-ngx/pull/247))
+  (\#247).
 - Add Slovenian language for frontend
-  [\@shamoon](https://github.com/shamoon) ([\#315](https://github.com/paperless-ngx/paperless-ngx/pull/315))
+  [\@shamoon](https://github.com/shamoon) (\#315).
 
 ## paperless-ngx 1.6.0
 
@@ -216,46 +216,46 @@ include:
 - Updated Python and Angular dependencies.
 - Dropped support for Python 3.7.
 - Dropped support for Ansible playbooks (thanks
-  [\@slankes](https://github.com/slankes) [\#109](https://github.com/paperless-ngx/paperless-ngx/pull/109)). If someone would
-  like to continue supporting them, please see our [ansible
+  [\@slankes](https://github.com/slankes) \#109). If someone would
+  like to continue supporting them, please see the [ansible
   repo](https://github.com/paperless-ngx/paperless-ngx-ansible).
 - Python code is now required to use Black formatting (thanks
-  [\@kpj](https://github.com/kpj) [\#168](https://github.com/paperless-ngx/paperless-ngx/pull/168)).
+  [\@kpj](https://github.com/kpj) \#168).
 - [\@tribut](https://github.com/tribut) added support for a custom SSO
-  logout redirect ([jonaswinkler\#1258](https://github.com/jonaswinkler/paperless-ng/pull/1258)). See
+  logout redirect (jonaswinkler\#1258). See
   `PAPERLESS_LOGOUT_REDIRECT_URL`.
 - [\@shamoon](https://github.com/shamoon) added a loading indicator
-  when document list is reloading ([jonaswinkler\#1297](https://github.com/jonaswinkler/paperless-ng/pull/1297)).
+  when document list is reloading (jonaswinkler\#1297).
 - [\@shamoon](https://github.com/shamoon) improved the PDF viewer on
-  mobile ([\#2](https://github.com/paperless-ngx/paperless-ngx/pull/2)).
+  mobile (\#2).
 - [\@shamoon](https://github.com/shamoon) added \'any\' / \'all\' and
-  \'not\' filtering with tags ([\#10](https://github.com/paperless-ngx/paperless-ngx/pull/10)).
+  \'not\' filtering with tags (\#10).
 - [\@shamoon](https://github.com/shamoon) added warnings for unsaved
-  changes, with smart edit buttons ([\#13](https://github.com/paperless-ngx/paperless-ngx/pull/13)).
+  changes, with smart edit buttons (\#13).
 - [\@benjaminfrank](https://github.com/benjaminfrank) enabled a
-  non-root access to port 80 via systemd ([\#18](https://github.com/paperless-ngx/paperless-ngx/pull/18)).
+  non-root access to port 80 via systemd (\#18).
 - [\@tribut](https://github.com/tribut) added simple \"delete to
-  trash\" functionality ([\#24](https://github.com/paperless-ngx/paperless-ngx/pull/24)). See `PAPERLESS_TRASH_DIR`.
+  trash\" functionality (\#24). See `PAPERLESS_TRASH_DIR`.
 - [\@amenk](https://github.com/amenk) fixed the search box overlay
-  menu on mobile ([\#32](https://github.com/paperless-ngx/paperless-ngx/pull/32)).
+  menu on mobile (\#32).
 - [\@dblitt](https://github.com/dblitt) updated the login form to not
-  auto-capitalize usernames ([\#36](https://github.com/paperless-ngx/paperless-ngx/pull/36)).
+  auto-capitalize usernames (\#36).
 - [\@evilsidekick293](https://github.com/evilsidekick293) made the
-  worker timeout configurable ([\#37](https://github.com/paperless-ngx/paperless-ngx/pull/37)). See `PAPERLESS_WORKER_TIMEOUT`.
+  worker timeout configurable (\#37). See `PAPERLESS_WORKER_TIMEOUT`.
 - [\@Nicarim](https://github.com/Nicarim) fixed downloads of UTF-8
-  formatted documents in Firefox ([\#56](https://github.com/paperless-ngx/paperless-ngx/pull/56)).
+  formatted documents in Firefox (\#56).
 - [\@mweimerskirch](https://github.com/mweimerskirch) sorted the
-  language dropdown by locale ([\#78](https://github.com/paperless-ngx/paperless-ngx/issues/78)).
+  language dropdown by locale (\#78).
 - [\@mweimerskirch](https://github.com/mweimerskirch) enabled the
-  Czech ([\#83](https://github.com/paperless-ngx/paperless-ngx/pull/83)) and Danish ([\#84](https://github.com/paperless-ngx/paperless-ngx/pull/84)) translations.
+  Czech (\#83) and Danish (\#84) translations.
 - [\@cschmatzler](https://github.com/cschmatzler) enabled specifying
-  the webserver port ([\#124](https://github.com/paperless-ngx/paperless-ngx/pull/124)). See `PAPERLESS_PORT`.
+  the webserver port (\#124). See `PAPERLESS_PORT`.
 - [\@muellermartin](https://github.com/muellermartin) fixed an error
-  when uploading transparent PNGs ([\#133](https://github.com/paperless-ngx/paperless-ngx/pull/133)).
+  when uploading transparent PNGs (\#133).
 - [\@shamoon](https://github.com/shamoon) created a slick new logo
-  ([\#165](https://github.com/paperless-ngx/paperless-ngx/pull/165)).
+  (\#165).
 - [\@tim-vogel](https://github.com/tim-vogel) fixed exports missing
-  groups ([\#193](https://github.com/paperless-ngx/paperless-ngx/pull/193)).
+  groups (\#193).
 
 Known issues:
 
