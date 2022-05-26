@@ -610,6 +610,14 @@ class TasksViewSerializer(serializers.ModelSerializer):
         # just file tasks, for now
         return "file"
 
+    result = serializers.SerializerMethodField()
+
+    def get_result(self, obj):
+        result = ""
+        if hasattr(obj, "attempted_task"):
+            result = obj.attempted_task.result
+        return result
+
     status = serializers.SerializerMethodField()
 
     def get_status(self, obj):
