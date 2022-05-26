@@ -152,4 +152,4 @@ class Command(BaseCommand):
                     ),
                 )
         except KeyboardInterrupt:
-            self.stdout.write(self.style.NOTICE(("Aborting...")))
+            self.stdout.write(self.style.NOTICE("Aborting..."))

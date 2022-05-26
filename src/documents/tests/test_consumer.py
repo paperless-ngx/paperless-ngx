@@ -320,7 +320,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
         shutil.copy(src, dst)
         return dst
 
-    @override_settings(PAPERLESS_FILENAME_FORMAT=None, TIME_ZONE="America/Chicago")
+    @override_settings(FILENAME_FORMAT=None, TIME_ZONE="America/Chicago")
     def testNormalOperation(self):
 
         filename = self.get_test_file()
@@ -351,7 +351,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
 
         self.assertEqual(document.created.tzinfo, zoneinfo.ZoneInfo("America/Chicago"))
 
-    @override_settings(PAPERLESS_FILENAME_FORMAT=None)
+    @override_settings(FILENAME_FORMAT=None)
     def testDeleteMacFiles(self):
         # https://github.com/jonaswinkler/paperless-ng/discussions/1037
 
@@ -518,7 +518,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
         # Database empty
         self.assertEqual(len(Document.objects.all()), 0)
 
-    @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{title}")
+    @override_settings(FILENAME_FORMAT="{correspondent}/{title}")
     def testFilenameHandling(self):
         filename = self.get_test_file()
 
@@ -530,7 +530,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
 
         self._assert_first_last_send_progress()
 
-    @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{title}")
+    @override_settings(FILENAME_FORMAT="{correspondent}/{title}")
     @mock.patch("documents.signals.handlers.generate_unique_filename")
     def testFilenameHandlingUnstableFormat(self, m):
 
@@ -612,7 +612,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
 
         self._assert_first_last_send_progress(last_status="FAILED")
 
-    @override_settings(PAPERLESS_FILENAME_FORMAT="{title}")
+    @override_settings(FILENAME_FORMAT="{title}")
     @mock.patch("documents.parsers.document_consumer_declaration.send")
     def test_similar_filenames(self, m):
         shutil.copy(
@@ -660,7 +660,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
 @mock.patch("documents.consumer.magic.from_file", fake_magic_from_file)
 class TestConsumerCreatedDate(DirectoriesMixin, TestCase):
     def setUp(self):
-        super(TestConsumerCreatedDate, self).setUp()
+        super().setUp()
 
         # this prevents websocket message reports during testing.
         patcher = mock.patch("documents.consumer.Consumer._send_progress")

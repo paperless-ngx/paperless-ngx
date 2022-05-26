@@ -1,0 +1,24 @@
+<form [formGroup]="objectForm" (ngSubmit)="save()">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">{{getTitle()}}</h4>
+    <button type="button" [disabled]="!closeEnabled" class="btn-close" aria-label="Close" (click)="cancel()">
+    </button>
+  </div>
+  <div class="modal-body">
+
+    <p *ngIf="this.dialogMode == 'edit'" i18n>
+      <em>Note that editing a path does not apply changes to stored files until you have run the 'document_renamer' utility. See the <a target="_blank" href="https://paperless-ngx.readthedocs.io/en/latest/administration.html#utilities-renamer">documentation</a>.</em>
+    </p>
+
+    <app-input-text i18n-title title="Name" formControlName="name" [error]="error?.name"></app-input-text>
+    <app-input-text i18n-title title="Path" formControlName="path" [error]="error?.path" [hint]="pathHint"></app-input-text>
+    <app-input-select i18n-title title="Matching algorithm" [items]="getMatchingAlgorithms()" formControlName="matching_algorithm"></app-input-select>
+    <app-input-text *ngIf="patternRequired" i18n-title title="Matching pattern" formControlName="match" [error]="error?.match"></app-input-text>
+    <app-input-check *ngIf="patternRequired" i18n-title title="Case insensitive" formControlName="is_insensitive"></app-input-check>
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="cancel()" i18n [disabled]="networkActive">Cancel</button>
+    <button type="submit" class="btn btn-primary" i18n [disabled]="networkActive">Save</button>
+  </div>
+</form>
