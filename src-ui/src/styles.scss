@@ -425,12 +425,16 @@ table.table {
   right: 0;
   bottom: 0;
   left: 0;
-  background-color: rgba(23, 84, 31, .8);
+  background-color: hsla(var(--pngx-primary), var(--pngx-primary-lightness), .8);
   z-index: 1055; // $zindex-modal
   pointer-events: none !important;
   user-select: none !important;
   text-align: center;
   padding-top: 25%;
+
+  h2 {
+    color: var(--pngx-primary-text-contrast)
+  }
 
   &.show {
     opacity: 1 !important;
