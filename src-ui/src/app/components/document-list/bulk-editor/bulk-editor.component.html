@@ -53,6 +53,15 @@
         [(selectionModel)]="documentTypeSelectionModel"
         (apply)="setDocumentTypes($event)">
       </app-filterable-dropdown>
+      <app-filterable-dropdown class="me-2 me-md-3" title="Storage path" icon="folder-fill" i18n-title
+        filterPlaceholder="Filter storage paths" i18n-filterPlaceholder
+        [items]="storagePaths"
+        [editing]="true"
+        [applyOnClose]="applyOnClose"
+        (open)="openStoragePathDropdown()"
+        [(selectionModel)]="storagePathsSelectionModel"
+        (apply)="setStoragePaths($event)">
+      </app-filterable-dropdown>
     </div>
   </div>
   <div class="col-auto ms-auto mb-2 mb-xl-0 d-flex">

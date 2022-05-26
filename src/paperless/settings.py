@@ -5,6 +5,7 @@ import multiprocessing
 import os
 import re
 from typing import Final
+from typing import Optional
 from typing import Set
 from urllib.parse import urlparse
 
@@ -551,10 +552,9 @@ OCR_ROTATE_PAGES_THRESHOLD = float(
     os.getenv("PAPERLESS_OCR_ROTATE_PAGES_THRESHOLD", 12.0),
 )
 
-OCR_MAX_IMAGE_PIXELS = os.environ.get(
-    "PAPERLESS_OCR_MAX_IMAGE_PIXELS",
-    256000000,
-)
+OCR_MAX_IMAGE_PIXELS: Optional[int] = None
+if os.environ.get("PAPERLESS_OCR_MAX_IMAGE_PIXELS") is not None:
+    OCR_MAX_IMAGE_PIXELS: int = int(os.environ.get("PAPERLESS_OCR_MAX_IMAGE_PIXELS"))
 
 OCR_USER_ARGS = os.getenv("PAPERLESS_OCR_USER_ARGS", "{}")
 
@@ -597,15 +597,22 @@ FILENAME_PARSE_TRANSFORMS = []
 for t in json.loads(os.getenv("PAPERLESS_FILENAME_PARSE_TRANSFORMS", "[]")):
     FILENAME_PARSE_TRANSFORMS.append((re.compile(t["pattern"]), t["repl"]))
 
-# TODO: this should not have a prefix.
 # Specify the filename format for out files
-PAPERLESS_FILENAME_FORMAT = os.getenv("PAPERLESS_FILENAME_FORMAT")
+FILENAME_FORMAT = os.getenv("PAPERLESS_FILENAME_FORMAT")
+
+# If this is enabled, variables in filename format will resolve to empty-string instead of 'none'.
+# Directories with 'empty names' are omitted, too.
+FILENAME_FORMAT_REMOVE_NONE = __get_boolean(
+    "PAPERLESS_FILENAME_FORMAT_REMOVE_NONE",
+    "NO",
+)
 
 THUMBNAIL_FONT_NAME = os.getenv(
     "PAPERLESS_THUMBNAIL_FONT_NAME",
     "/usr/share/fonts/liberation/LiberationSerif-Regular.ttf",
 )
 
+# TODO: this should not have a prefix.
 # Tika settings
 PAPERLESS_TIKA_ENABLED = __get_boolean("PAPERLESS_TIKA_ENABLED", "NO")
 PAPERLESS_TIKA_ENDPOINT = os.getenv("PAPERLESS_TIKA_ENDPOINT", "http://localhost:9998")

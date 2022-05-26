@@ -4,5 +4,5 @@
   [class]="toast.classname"
   (hidden)="toastService.closeToast(toast)">
   <p>{{toast.content}}</p>
-  <p *ngIf="toast.action"><button class="btn btn-sm btn-outline-secondary" (click)="toastService.closeToast(toast); toast.action()">{{toast.actionName}}</button></p>
+  <p class="mb-0" *ngIf="toast.action"><button class="btn btn-sm btn-outline-secondary" (click)="toastService.closeToast(toast); toast.action()">{{toast.actionName}}</button></p>
 </ngb-toast>

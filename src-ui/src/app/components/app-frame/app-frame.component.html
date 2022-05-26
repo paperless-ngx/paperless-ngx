@@ -21,17 +21,17 @@
   </div>
   <ul ngbNav class="order-sm-3">
     <li ngbDropdown class="nav-item dropdown">
-      <button class="btn text-light" id="userDropdown" ngbDropdownToggle>
-        <span *ngIf="displayName" class="navbar-text small me-2 text-light d-none d-sm-inline">
-          {{displayName}}
+      <button class="btn" id="userDropdown" ngbDropdownToggle>
+        <span class="small me-2 d-none d-sm-inline">
+          {{this.settingsService.displayName}}
         </span>
         <svg width="1.3em" height="1.3em" fill="currentColor">
           <use xlink:href="assets/bootstrap-icons.svg#person-circle"/>
         </svg>
       </button>
       <div ngbDropdownMenu class="dropdown-menu-end shadow me-2" aria-labelledby="userDropdown">
-        <div *ngIf="displayName" class="d-sm-none">
-          <p class="small mb-0 px-3 text-muted" i18n>Logged in as {{displayName}}</p>
+        <div class="d-sm-none">
+          <p class="small mb-0 px-3 text-muted" i18n>Logged in as {{this.settingsService.displayName}}</p>
           <div class="dropdown-divider"></div>
         </div>
         <a ngbDropdownItem class="nav-link" routerLink="settings" (click)="closeMenu()">
@@ -132,6 +132,13 @@
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#hash"/>
               </svg>&nbsp;<ng-container i18n>Document types</ng-container>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="storagepaths" routerLinkActive="active" (click)="closeMenu()">
+              <svg class="sidebaricon" fill="currentColor">
+                <use xlink:href="assets/bootstrap-icons.svg#folder"/>
+              </svg>&nbsp;<ng-container i18n>Storage paths</ng-container>
             </a>
           </li>
           <li class="nav-item">

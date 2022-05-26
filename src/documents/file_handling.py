@@ -128,13 +128,26 @@ def generate_unique_filename(doc, archive_filename=False):
 
 def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
     path = ""
+    filename_format = settings.FILENAME_FORMAT
 
     try:
-        if settings.PAPERLESS_FILENAME_FORMAT is not None:
-            tags = defaultdictNoStr(lambda: slugify(None), many_to_dictionary(doc.tags))
+        if doc.storage_path is not None:
+            logger.debug(
+                f"Document has storage_path {doc.storage_path.id} "
+                f"({doc.storage_path.path}) set",
+            )
+            filename_format = doc.storage_path.path
+
+        if filename_format is not None:
+            tags = defaultdictNoStr(
+                lambda: slugify(None),
+                many_to_dictionary(doc.tags),
+            )
 
             tag_list = pathvalidate.sanitize_filename(
-                ",".join(sorted(tag.name for tag in doc.tags.all())),
+                ",".join(
+                    sorted(tag.name for tag in doc.tags.all()),
+                ),
                 replacement_text="-",
             )
 
@@ -144,7 +157,7 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
                     replacement_text="-",
                 )
             else:
-                correspondent = "none"
+                correspondent = "-none-"
 
             if doc.document_type:
                 document_type = pathvalidate.sanitize_filename(
@@ -152,18 +165,18 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
                     replacement_text="-",
                 )
             else:
-                document_type = "none"
+                document_type = "-none-"
 
             if doc.archive_serial_number:
                 asn = str(doc.archive_serial_number)
             else:
-                asn = "none"
+                asn = "-none-"
 
             # Convert UTC database date to localized date
             local_added = timezone.localdate(doc.added)
             local_created = timezone.localdate(doc.created)
 
-            path = settings.PAPERLESS_FILENAME_FORMAT.format(
+            path = filename_format.format(
                 title=pathvalidate.sanitize_filename(doc.title, replacement_text="-"),
                 correspondent=correspondent,
                 document_type=document_type,
@@ -180,12 +193,17 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
                 tag_list=tag_list,
             ).strip()
 
+            if settings.FILENAME_FORMAT_REMOVE_NONE:
+                path = path.replace("-none-/", "")  # remove empty directories
+                path = path.replace(" -none-", "")  # remove when spaced, with space
+                path = path.replace("-none-", "")  # remove rest of the occurences
+
+            path = path.replace("-none-", "none")  # backward compatibility
             path = path.strip(os.sep)
 
     except (ValueError, KeyError, IndexError):
         logger.warning(
-            f"Invalid PAPERLESS_FILENAME_FORMAT: "
-            f"{settings.PAPERLESS_FILENAME_FORMAT}, falling back to default",
+            f"Invalid filename_format '{filename_format}', falling back to default",
         )
 
     counter_str = f"_{counter:02}" if counter else ""

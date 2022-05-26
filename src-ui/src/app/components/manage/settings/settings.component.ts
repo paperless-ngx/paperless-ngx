@@ -13,11 +13,11 @@ import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import {
   LanguageOption,
   SettingsService,
-  SETTINGS_KEYS,
 } from 'src/app/services/settings.service'
-import { ToastService } from 'src/app/services/toast.service'
+import { Toast, ToastService } from 'src/app/services/toast.service'
 import { dirtyCheck, DirtyComponent } from '@ngneat/dirty-check-forms'
-import { Observable, Subscription, BehaviorSubject } from 'rxjs'
+import { Observable, Subscription, BehaviorSubject, first } from 'rxjs'
+import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 
 @Component({
   selector: 'app-settings',
@@ -58,6 +58,13 @@ export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
       this.settingsForm.value.dateLocale ||
       this.settingsForm.value.displayLanguage ||
       this.currentLocale
+    )
+  }
+
+  get displayLanguageIsDirty(): boolean {
+    return (
+      this.settingsForm.get('displayLanguage').value !=
+      this.store?.getValue()['displayLanguage']
     )
   }
 
@@ -170,6 +177,7 @@ export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
   }
 
   private saveLocalSettings() {
+    const reloadRequired = this.displayLanguageIsDirty // just this one, for now
     this.settings.set(
       SETTINGS_KEYS.BULK_EDIT_APPLY_ON_CLOSE,
       this.settingsForm.value.bulkEditApplyOnClose
@@ -227,10 +235,36 @@ export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
       this.settingsForm.value.notificationsConsumerSuppressOnDashboard
     )
     this.settings.setLanguage(this.settingsForm.value.displayLanguage)
-    this.store.next(this.settingsForm.value)
-    this.documentListViewService.updatePageSize()
-    this.settings.updateAppearanceSettings()
-    this.toastService.showInfo($localize`Settings saved successfully.`)
+    this.settings
+      .storeSettings()
+      .pipe(first())
+      .subscribe({
+        next: () => {
+          this.store.next(this.settingsForm.value)
+          this.documentListViewService.updatePageSize()
+          this.settings.updateAppearanceSettings()
+          let savedToast: Toast = {
+            title: $localize`Settings saved`,
+            content: $localize`Settings were saved successfully.`,
+            delay: 500000,
+          }
+          if (reloadRequired) {
+            ;(savedToast.content = $localize`Settings were saved successfully. Reload is required to apply some changes.`),
+              (savedToast.actionName = $localize`Reload now`)
+            savedToast.action = () => {
+              location.reload()
+            }
+          }
+
+          this.toastService.show(savedToast)
+        },
+        error: (error) => {
+          this.toastService.showError(
+            $localize`An error occurred while saving settings.`
+          )
+          console.log(error)
+        },
+      })
   }
 
   get displayLanguageOptions(): LanguageOption[] {
