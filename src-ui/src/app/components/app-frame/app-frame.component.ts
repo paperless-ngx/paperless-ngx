@@ -22,7 +22,6 @@ import {
   RemoteVersionService,
   AppRemoteVersion,
 } from 'src/app/services/rest/remote-version.service'
-import { QueryParamsService } from 'src/app/services/query-params.service'
 import { SettingsService } from 'src/app/services/settings.service'
 
 @Component({
@@ -38,7 +37,7 @@ export class AppFrameComponent {
     private searchService: SearchService,
     public savedViewService: SavedViewService,
     private remoteVersionService: RemoteVersionService,
-    private queryParamsService: QueryParamsService,
+    private list: DocumentListViewService,
     public settingsService: SettingsService
   ) {
     this.remoteVersionService
@@ -94,7 +93,7 @@ export class AppFrameComponent {
 
   search() {
     this.closeMenu()
-    this.queryParamsService.navigateWithFilterRules([
+    this.list.quickFilter([
       {
         rule_type: FILTER_FULLTEXT_QUERY,
         value: (this.searchField.value as string).trim(),
