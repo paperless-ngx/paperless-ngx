@@ -11,9 +11,13 @@
       </svg>&nbsp;<ng-container i18n>{{dismissButtonText}}</ng-container>
     </button>
     <button class="btn btn-sm btn-outline-primary" (click)="tasksService.reload()">
-      <svg class="sidebaricon" fill="currentColor">
+      <svg *ngIf="!tasksService.loading" class="sidebaricon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#arrow-clockwise"/>
-      </svg>&nbsp;<ng-container i18n>Refresh</ng-container>
+      </svg>
+      <ng-container *ngIf="tasksService.loading">
+        <div class="spinner-border spinner-border-sm fw-normal" role="status"></div>
+        <div class="visually-hidden" i18n>Loading...</div>
+      </ng-container>&nbsp;<ng-container i18n>Refresh</ng-container>
     </button>
   </div>
 </app-page-header>
@@ -41,7 +45,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let task of tasks">
+      <tr *ngFor="let task of tasks" (click)="toggleSelected(task, $event); $event.stopPropagation();">
         <th>
           <div class="form-check">
             <input type="checkbox" class="form-check-input" id="task{{task.id}}" [checked]="selectedTasks.has(task.id)" (click)="toggleSelected(task, $event); $event.stopPropagation();">
@@ -56,7 +60,7 @@
               <use xlink:href="assets/bootstrap-icons.svg#info-circle" />
             </svg>
             <span class="small d-none d-md-inline-block font-monospace text-muted">{{ task.result | slice:0:50 }}&hellip;</span>
-            <ng-template #resultPopover><div class="small">{{ task.result }}</div></ng-template>
+            <ng-template #resultPopover><pre class="small">{{ task.result }}</pre></ng-template>
           </div>
           <span *ngIf="task.result.length <= 50" class="small d-none d-md-inline-block font-monospace">{{ task.result | slice:0:50 }}</span>
         </td>
@@ -69,7 +73,7 @@
           <ng-template #resultPopoverMobile><div class="small">{{ task.created | customDate:'short' }}<div class="font-monospace">{{ task.result }}</div></div></ng-template>
         </td>
         <td scope="row">
-          <button class="btn btn-sm btn-outline-secondary" (click)="dismissTask(task)">
+          <button class="btn btn-sm btn-outline-secondary" (click)="dismissTask(task); $event.stopPropagation();">
             <svg class="sidebaricon" fill="currentColor">
               <use xlink:href="assets/bootstrap-icons.svg#check"/>
             </svg>&nbsp;<ng-container i18n>Dismiss</ng-container>
