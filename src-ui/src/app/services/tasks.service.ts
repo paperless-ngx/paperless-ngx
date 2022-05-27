@@ -53,7 +53,6 @@ export class TasksService {
       .subscribe((r) => {
         this.fileTasks = r.filter((t) => t.type == PaperlessTaskType.File) // they're all File tasks, for now
         this.loading = false
-        return true
       })
   }
 

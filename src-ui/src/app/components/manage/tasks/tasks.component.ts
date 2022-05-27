@@ -14,6 +14,7 @@ export class TasksComponent implements OnInit, OnDestroy {
   public activeTab: string
   public selectedTasks: Set<number> = new Set()
   private unsubscribeNotifer = new Subject()
+  public expandedTask: number
 
   get dismissButtonText(): string {
     return this.selectedTasks.size > 0
@@ -61,6 +62,10 @@ export class TasksComponent implements OnInit, OnDestroy {
       this.tasksService.dismissTasks(tasks)
       this.selectedTasks.clear()
     }
+  }
+
+  expandTask(task: PaperlessTask) {
+    this.expandedTask = this.expandedTask == task.id ? undefined : task.id
   }
 
   toggleSelected(task: PaperlessTask) {
