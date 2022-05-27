@@ -1,6 +1,5 @@
 import dataclasses
 import email.contentmanager
-import imaplib
 import os
 import random
 import uuid
@@ -99,8 +98,7 @@ class BogusMailBox(ContextManager):
 
         if "UNKEYWORD" in criteria:
             tag = criteria[criteria.index("UNKEYWORD") + 1].strip("'")
-            # For custom-flags, we need to access the `_raw_flags` field, as calls to `.flags` get cached, thus breaking the test.
-            msg = filter(lambda m: "processed" not in parse_raw_tags_omit_cache(m), msg)
+            msg = filter(lambda m: "processed" not in m.flags, msg)
 
         return list(msg)
 
@@ -117,6 +115,7 @@ class BogusMailBox(ContextManager):
                         message.seen = value
                     if flag == "processed":
                         message._raw_flag_data.append(f"+FLAGS (processed)".encode())
+                        MailMessage.flags.fget.cache_clear()
 
     def move(self, uid_list, folder):
         if folder == "spam":
@@ -186,6 +185,7 @@ def create_message(
     imap_msg.flagged = flagged
     if processed:
         imap_msg._raw_flag_data.append(f"+FLAGS (processed)".encode())
+        MailMessage.flags.fget.cache_clear()
 
     return imap_msg
 
@@ -198,13 +198,6 @@ def fake_magic_from_buffer(buffer, mime=False):
             return "unknown/type"
     else:
         return "Some verbose file description"
-
-
-def parse_raw_tags_omit_cache(m: MailMessage) -> List[str]:
-    raw_result: list[bytes] = []
-    for rf in m._raw_flag_data:
-        raw_result.extend(imaplib.ParseFlags(rf))
-    return [f.decode().strip() for f in raw_result]
 
 
 @mock.patch("paperless_mail.mail.magic.from_buffer", fake_magic_from_buffer)
