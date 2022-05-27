@@ -33,10 +33,11 @@
             <label class="form-check-label" for="all-tasks"></label>
           </div>
         </th>
-        <th scope="col" width="25%" i18n>Name</th>
-        <th scope="col" width="20%" i18n>Created</th>
-        <th scope="col" width="45%" i18n>Results</th>
-        <th scope="col" width="10%" i18n>Actions</th>
+        <th scope="col" i18n>Name</th>
+        <th scope="col" class="d-none d-lg-table-cell" i18n>Created</th>
+        <th scope="col" class="d-none d-lg-table-cell" *ngIf="activeTab != 'incomplete'" i18n>Results</th>
+        <th scope="col" class="d-table-cell d-lg-none" i18n>Info</th>
+        <th scope="col" i18n>Actions</th>
       </tr>
     </thead>
     <tbody>
@@ -47,20 +48,28 @@
             <label class="form-check-label" for="task{{task.id}}"></label>
           </div>
         </th>
-        <td>{{ task.name }}</td>
-        <td>{{ task.created | customDate:'short' }}</td>
-        <td>
+        <td class="overflow-auto">{{ task.name }}</td>
+        <td class="d-none d-lg-table-cell">{{ task.created | customDate:'short' }}</td>
+        <td class="d-none d-lg-table-cell" *ngIf="activeTab != 'incomplete'">
           <div class="text-primary" *ngIf="task.result.length > 50" [ngbPopover]="resultPopover" popoverClass="shadow font-monospace small" triggers="mouseenter:mouseleave:click">
             <svg fill="currentColor" class="me-2" width="1.2em" height="1.2em" style="vertical-align: text-top;" viewBox="0 0 16 16">
               <use xlink:href="assets/bootstrap-icons.svg#info-circle" />
             </svg>
             <span class="small d-none d-md-inline-block font-monospace text-muted">{{ task.result | slice:0:50 }}&hellip;</span>
+            <ng-template #resultPopover><div class="small">{{ task.result }}</div></ng-template>
           </div>
           <span *ngIf="task.result.length <= 50" class="small d-none d-md-inline-block font-monospace">{{ task.result | slice:0:50 }}</span>
-          <ng-template #resultPopover><div class="small">{{ task.result }}</div></ng-template>
+        </td>
+        <td class="d-lg-none">
+          <span [ngbPopover]="resultPopoverMobile" popoverClass="shadow small mobile" container="body">
+            <svg fill="currentColor" class="me-2" width="1.2em" height="1.2em" style="vertical-align: text-top;" viewBox="0 0 16 16">
+              <use xlink:href="assets/bootstrap-icons.svg#info-circle" />
+            </svg>
+          </span>
+          <ng-template #resultPopoverMobile><div class="small">{{ task.created | customDate:'short' }}<div class="font-monospace">{{ task.result }}</div></div></ng-template>
         </td>
         <td scope="row">
-          <button class="btn btn-sm btn-outline-secondary" (click)="acknowledgeTask(task)">
+          <button class="btn btn-sm btn-outline-secondary" (click)="dismissTask(task)">
             <svg class="sidebaricon" fill="currentColor">
               <use xlink:href="assets/bootstrap-icons.svg#check"/>
             </svg>&nbsp;<ng-container i18n>Dismiss</ng-container>
@@ -79,7 +88,7 @@
     </ng-template>
   </li>
   <li ngbNavItem="completed">
-    <a ngbNavLink i18n>Completed&nbsp;<span class="badge bg-secondary ms-1">{{tasksService.completedFileTasks.length}}</span></a>
+    <a ngbNavLink i18n>Complete&nbsp;<span class="badge bg-secondary ms-1">{{tasksService.completedFileTasks.length}}</span></a>
     <ng-template ngbNavContent>
       <ng-container [ngTemplateOutlet]="tasksTemplate" [ngTemplateOutletContext]="{tasks:tasksService.completedFileTasks}"></ng-container>
     </ng-template>
