@@ -45,7 +45,8 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let task of tasks" (click)="toggleSelected(task, $event); $event.stopPropagation();">
+      <ng-container *ngFor="let task of tasks">
+      <tr (click)="toggleSelected(task, $event); $event.stopPropagation();">
         <th>
           <div class="form-check">
             <input type="checkbox" class="form-check-input" id="task{{task.id}}" [checked]="selectedTasks.has(task.id)" (click)="toggleSelected(task, $event); $event.stopPropagation();">
@@ -55,22 +56,22 @@
         <td class="overflow-auto">{{ task.name }}</td>
         <td class="d-none d-lg-table-cell">{{ task.created | customDate:'short' }}</td>
         <td class="d-none d-lg-table-cell" *ngIf="activeTab != 'incomplete'">
-          <div class="text-primary" *ngIf="task.result.length > 50" [ngbPopover]="resultPopover" popoverClass="shadow font-monospace small" triggers="mouseenter:mouseleave:click">
-            <svg fill="currentColor" class="me-2" width="1.2em" height="1.2em" style="vertical-align: text-top;" viewBox="0 0 16 16">
-              <use xlink:href="assets/bootstrap-icons.svg#info-circle" />
-            </svg>
+          <div *ngIf="task.result.length > 50" class="result" (click)="expandTask(task); $event.stopPropagation();"
+            [ngbPopover]="resultPopover" popoverClass="shadow small mobile" triggers="mouseenter:mouseleave" container="body">
             <span class="small d-none d-md-inline-block font-monospace text-muted">{{ task.result | slice:0:50 }}&hellip;</span>
-            <ng-template #resultPopover><pre class="small">{{ task.result }}</pre></ng-template>
           </div>
-          <span *ngIf="task.result.length <= 50" class="small d-none d-md-inline-block font-monospace">{{ task.result | slice:0:50 }}</span>
+          <span *ngIf="task.result.length <= 50" class="small d-none d-md-inline-block font-monospace text-muted">{{ task.result }}</span>
+          <ng-template #resultPopover>
+            <pre class="small mb-0">{{ task.result | slice:0:300 }}<ng-container *ngIf="task.result.length > 300">&hellip;</ng-container></pre>
+            <ng-container *ngIf="task.result.length > 300"><br/><em>(<ng-container i18n>click for full output</ng-container>)</em></ng-container>
+          </ng-template>
         </td>
         <td class="d-lg-none">
-          <span [ngbPopover]="resultPopoverMobile" popoverClass="shadow small mobile" container="body">
-            <svg fill="currentColor" class="me-2" width="1.2em" height="1.2em" style="vertical-align: text-top;" viewBox="0 0 16 16">
+          <button class="btn btn-link" (click)="expandTask(task); $event.stopPropagation();">
+            <svg fill="currentColor" class="" width="1.2em" height="1.2em" style="vertical-align: text-top;" viewBox="0 0 16 16">
               <use xlink:href="assets/bootstrap-icons.svg#info-circle" />
             </svg>
-          </span>
-          <ng-template #resultPopoverMobile><div class="small">{{ task.created | customDate:'short' }}<div class="font-monospace">{{ task.result }}</div></div></ng-template>
+          </button>
         </td>
         <td scope="row">
           <button class="btn btn-sm btn-outline-secondary" (click)="dismissTask(task); $event.stopPropagation();">
@@ -80,6 +81,12 @@
           </button>
         </td>
       </tr>
+      <tr>
+        <td class="p-0" [class.border-0]="expandedTask != task.id" colspan="5">
+          <pre #collapse="ngbCollapse" [ngbCollapse]="expandedTask !== task.id" class="small mb-0"><div class="small p-1 p-lg-3 ms-lg-3">{{ task.result }}</div></pre>
+        </td>
+      </tr>
+      </ng-container>
     </tbody>
   </table>
 </ng-template>
