@@ -614,7 +614,7 @@ class TasksViewSerializer(serializers.ModelSerializer):
 
     def get_result(self, obj):
         result = ""
-        if hasattr(obj, "attempted_task"):
+        if hasattr(obj, "attempted_task") and obj.attempted_task:
             result = obj.attempted_task.result
         return result
 
