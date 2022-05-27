@@ -98,7 +98,7 @@
     </ng-template>
   </li>
   <li ngbNavItem="failed">
-    <a ngbNavLink i18n>Failed&nbsp;<span class="badge bg-secondary ms-1">{{tasksService.failedFileTasks.length}}</span></a>
+    <a ngbNavLink i18n>Failed&nbsp;<span class="badge bg-danger ms-1">{{tasksService.failedFileTasks.length}}</span></a>
     <ng-template ngbNavContent>
       <ng-container [ngTemplateOutlet]="tasksTemplate" [ngTemplateOutletContext]="{tasks:tasksService.failedFileTasks}"></ng-container>
     </ng-template>
