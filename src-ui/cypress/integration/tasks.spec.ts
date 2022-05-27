@@ -40,7 +40,7 @@ describe('tasks', () => {
   })
 
   it('should show a list of dismissable tasks in tabs', () => {
-    cy.get('tbody').find('tr:visible').its('length').should('eq', 5)
+    cy.get('tbody').find('tr:visible').its('length').should('eq', 10) // double because collapsible result tr
     cy.wait(500) // stabilizes the test, for some reason...
     cy.get('tbody')
       .find('button:visible')
@@ -50,7 +50,7 @@ describe('tasks', () => {
       .wait('@tasks')
       .wait(2000)
       .then(() => {
-        cy.get('tbody').find('tr:visible').its('length').should('eq', 4)
+        cy.get('tbody').find('tr:visible').its('length').should('eq', 8) // double because collapsible result tr
       })
   })
 
