@@ -35,7 +35,7 @@ export class TasksComponent implements OnInit, OnDestroy {
 
   dismissTasks(task: PaperlessTask = undefined) {
     let tasks = task ? new Set([task.id]) : this.selectedTasks
-    if (this.selectedTasks.size == 0)
+    if (!task && this.selectedTasks.size == 0)
       tasks = new Set(this.currentTasks.map((t) => t.id))
     this.tasksService.dismissTasks(tasks)
   }

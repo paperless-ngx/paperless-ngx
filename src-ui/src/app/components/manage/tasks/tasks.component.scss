@@ -1,3 +1,7 @@
 ::ng-deep .popover {
     max-width: 50%;
 }
+
+::ng-deep .popover.mobile {
+    max-width: 75%;
+}
