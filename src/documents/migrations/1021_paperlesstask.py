@@ -15,7 +15,7 @@ def init_paperless_tasks(apps, schema_editor):
                 task_id=task.id,
                 name=task.name,
                 created=task.started,
-                acknowledged=False,
+                acknowledged=True,
             )
             task.paperlesstask = paperlesstask
             task.save()
