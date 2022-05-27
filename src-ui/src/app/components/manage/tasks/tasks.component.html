@@ -85,22 +85,22 @@
 </ng-template>
 
 <ul ngbNav #nav="ngbNav" [(activeId)]="activeTab" class="nav-tabs">
-  <li ngbNavItem="incomplete">
-    <a ngbNavLink i18n>Incomplete&nbsp;<span class="badge bg-secondary ms-1">{{tasksService.incompleteFileTasks.length}}</span></a>
+  <li ngbNavItem="failed">
+    <a ngbNavLink i18n>Failed&nbsp;<span *ngIf="tasksService.failedFileTasks.length > 0" class="badge bg-danger ms-1">{{tasksService.failedFileTasks.length}}</span></a>
     <ng-template ngbNavContent>
-      <ng-container [ngTemplateOutlet]="tasksTemplate" [ngTemplateOutletContext]="{tasks:tasksService.incompleteFileTasks}"></ng-container>
+      <ng-container [ngTemplateOutlet]="tasksTemplate" [ngTemplateOutletContext]="{tasks:tasksService.failedFileTasks}"></ng-container>
     </ng-template>
   </li>
   <li ngbNavItem="completed">
-    <a ngbNavLink i18n>Complete&nbsp;<span class="badge bg-secondary ms-1">{{tasksService.completedFileTasks.length}}</span></a>
+    <a ngbNavLink i18n>Complete&nbsp;<span *ngIf="tasksService.completedFileTasks.length > 0" class="badge bg-secondary ms-1">{{tasksService.completedFileTasks.length}}</span></a>
     <ng-template ngbNavContent>
       <ng-container [ngTemplateOutlet]="tasksTemplate" [ngTemplateOutletContext]="{tasks:tasksService.completedFileTasks}"></ng-container>
     </ng-template>
   </li>
-  <li ngbNavItem="failed">
-    <a ngbNavLink i18n>Failed&nbsp;<span class="badge bg-danger ms-1">{{tasksService.failedFileTasks.length}}</span></a>
+  <li ngbNavItem="incomplete">
+    <a ngbNavLink i18n>Incomplete&nbsp;<span *ngIf="tasksService.incompleteFileTasks.length > 0" class="badge bg-secondary ms-1">{{tasksService.incompleteFileTasks.length}}</span></a>
     <ng-template ngbNavContent>
-      <ng-container [ngTemplateOutlet]="tasksTemplate" [ngTemplateOutletContext]="{tasks:tasksService.failedFileTasks}"></ng-container>
+      <ng-container [ngTemplateOutlet]="tasksTemplate" [ngTemplateOutletContext]="{tasks:tasksService.incompleteFileTasks}"></ng-container>
     </ng-template>
   </li>
 </ul>

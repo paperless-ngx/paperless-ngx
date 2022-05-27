@@ -55,9 +55,11 @@ export class TasksComponent implements OnInit, OnDestroy {
         modal.componentInstance.buttonsEnabled = false
         modal.close()
         this.tasksService.dismissTasks(tasks)
+        this.selectedTasks.clear()
       })
     } else {
       this.tasksService.dismissTasks(tasks)
+      this.selectedTasks.clear()
     }
   }
 
@@ -94,6 +96,6 @@ export class TasksComponent implements OnInit, OnDestroy {
   }
 
   clearSelection() {
-    this.selectedTasks = new Set()
+    this.selectedTasks.clear()
   }
 }
