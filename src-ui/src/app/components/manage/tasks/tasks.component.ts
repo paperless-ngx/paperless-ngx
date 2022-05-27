@@ -9,7 +9,15 @@ import { TasksService } from 'src/app/services/tasks.service'
   styleUrls: ['./tasks.component.scss'],
 })
 export class TasksComponent implements OnInit, OnDestroy {
+  public activeTab: string
+  public selectedTasks: Set<number> = new Set()
   private unsubscribeNotifer = new Subject()
+
+  get dismissButtonText(): string {
+    return this.selectedTasks.size > 0
+      ? $localize`Dismiss selected`
+      : $localize`Dismiss all`
+  }
 
   constructor(public tasksService: TasksService) {}
 
@@ -21,7 +29,50 @@ export class TasksComponent implements OnInit, OnDestroy {
     this.unsubscribeNotifer.next(true)
   }
 
-  acknowledgeTask(task: PaperlessTask) {
-    throw new Error('Not implemented' + task)
+  dismissTask(task: PaperlessTask) {
+    this.dismissTasks(task)
+  }
+
+  dismissTasks(task: PaperlessTask = undefined) {
+    let tasks = task ? new Set([task.id]) : this.selectedTasks
+    if (this.selectedTasks.size == 0)
+      tasks = new Set(this.currentTasks.map((t) => t.id))
+    this.tasksService.dismissTasks(tasks)
+  }
+
+  toggleSelected(task: PaperlessTask) {
+    this.selectedTasks.has(task.id)
+      ? this.selectedTasks.delete(task.id)
+      : this.selectedTasks.add(task.id)
+  }
+
+  get currentTasks(): PaperlessTask[] {
+    let tasks: PaperlessTask[]
+    switch (this.activeTab) {
+      case 'incomplete':
+        tasks = this.tasksService.incompleteFileTasks
+        break
+      case 'completed':
+        tasks = this.tasksService.completedFileTasks
+        break
+      case 'failed':
+        tasks = this.tasksService.failedFileTasks
+        break
+      default:
+        break
+    }
+    return tasks
+  }
+
+  toggleAll(event: PointerEvent) {
+    if ((event.target as HTMLInputElement).checked) {
+      this.selectedTasks = new Set(this.currentTasks.map((t) => t.id))
+    } else {
+      this.clearSelection()
+    }
+  }
+
+  clearSelection() {
+    this.selectedTasks = new Set()
   }
 }
