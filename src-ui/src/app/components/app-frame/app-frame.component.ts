@@ -22,6 +22,7 @@ import {
   AppRemoteVersion,
 } from 'src/app/services/rest/remote-version.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { TasksService } from 'src/app/services/tasks.service'
 
 @Component({
   selector: 'app-app-frame',
@@ -37,13 +38,15 @@ export class AppFrameComponent {
     public savedViewService: SavedViewService,
     private remoteVersionService: RemoteVersionService,
     private list: DocumentListViewService,
-    public settingsService: SettingsService
+    public settingsService: SettingsService,
+    public tasksService: TasksService
   ) {
     this.remoteVersionService
       .checkForUpdates()
       .subscribe((appRemoteVersion: AppRemoteVersion) => {
         this.appRemoteVersion = appRemoteVersion
       })
+    tasksService.reload()
   }
 
   versionString = `${environment.appTitle} ${environment.version}`
