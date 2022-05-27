@@ -22,6 +22,10 @@ export class TasksService {
     return this.fileTasks?.length
   }
 
+  public get allFileTasks(): PaperlessTask[] {
+    return this.fileTasks.slice(0)
+  }
+
   public get incompleteFileTasks(): PaperlessTask[] {
     return this.fileTasks.filter(
       (t) => t.status == PaperlessTaskStatus.Incomplete
