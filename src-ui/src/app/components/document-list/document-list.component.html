@@ -93,7 +93,7 @@
         <span i18n *ngIf="list.selected.size == 0">{list.collectionSize, plural, =1 {One document} other {{{list.collectionSize || 0}} documents}}</span>&nbsp;<span i18n *ngIf="isFiltered">(filtered)</span>
       </ng-container>
     </p>
-    <ngb-pagination [pageSize]="list.currentPageSize" [collectionSize]="list.collectionSize" [(page)]="list.currentPage" [maxSize]="5"
+    <ngb-pagination [pageSize]="list.currentPageSize" [collectionSize]="list.collectionSize" (pageChange)="setPage($event)" [page]="list.currentPage" [maxSize]="5"
     [rotate]="true" aria-label="Default pagination"></ngb-pagination>
   </div>
 </ng-template>

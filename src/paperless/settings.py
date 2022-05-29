@@ -5,6 +5,7 @@ import multiprocessing
 import os
 import re
 from typing import Final
+from typing import Optional
 from typing import Set
 from urllib.parse import urlparse
 
@@ -551,10 +552,9 @@ OCR_ROTATE_PAGES_THRESHOLD = float(
     os.getenv("PAPERLESS_OCR_ROTATE_PAGES_THRESHOLD", 12.0),
 )
 
-OCR_MAX_IMAGE_PIXELS = os.environ.get(
-    "PAPERLESS_OCR_MAX_IMAGE_PIXELS",
-    256000000,
-)
+OCR_MAX_IMAGE_PIXELS: Optional[int] = None
+if os.environ.get("PAPERLESS_OCR_MAX_IMAGE_PIXELS") is not None:
+    OCR_MAX_IMAGE_PIXELS: int = int(os.environ.get("PAPERLESS_OCR_MAX_IMAGE_PIXELS"))
 
 OCR_USER_ARGS = os.getenv("PAPERLESS_OCR_USER_ARGS", "{}")
 
