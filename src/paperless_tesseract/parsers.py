@@ -8,8 +8,6 @@ from documents.parsers import make_thumbnail_from_pdf
 from documents.parsers import ParseError
 from PIL import Image
 
-Image.MAX_IMAGE_PIXELS = settings.OCR_MAX_IMAGE_PIXELS
-
 
 class NoTextFoundException(Exception):
     pass
@@ -223,6 +221,24 @@ class RasterisedDocumentParser(DocumentParser):
                     "warning",
                     f"There is an issue with PAPERLESS_OCR_USER_ARGS, so "
                     f"they will not be used. Error: {e}",
+                )
+
+        if settings.OCR_MAX_IMAGE_PIXELS is not None:
+            # Convert pixels to mega-pixels and provide to ocrmypdf
+            max_pixels_mpixels = settings.OCR_MAX_IMAGE_PIXELS / 1_000_000.0
+            if max_pixels_mpixels > 0:
+
+                self.log(
+                    "debug",
+                    f"Calculated {max_pixels_mpixels} megapixels for OCR",
+                )
+
+                ocrmypdf_args["max_image_mpixels"] = max_pixels_mpixels
+            else:
+                self.log(
+                    "warning",
+                    "There is an issue with PAPERLESS_OCR_MAX_IMAGE_PIXELS, "
+                    "this value must be at least 1 megapixel if set",
                 )
 
         return ocrmypdf_args
