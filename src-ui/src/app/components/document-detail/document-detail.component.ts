@@ -32,7 +32,6 @@ import {
 import { PaperlessDocumentSuggestions } from 'src/app/data/paperless-document-suggestions'
 import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type'
 import { normalizeDateStr } from 'src/app/utils/date'
-import { QueryParamsService } from 'src/app/services/query-params.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
 import { StoragePathEditDialogComponent } from '../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
@@ -120,8 +119,7 @@ export class DocumentDetailComponent
     private documentTitlePipe: DocumentTitlePipe,
     private toastService: ToastService,
     private settings: SettingsService,
-    private storagePathService: StoragePathService,
-    private queryParamsService: QueryParamsService
+    private storagePathService: StoragePathService
   ) {}
 
   titleKeyUp(event) {
@@ -494,7 +492,7 @@ export class DocumentDetailComponent
   }
 
   moreLike() {
-    this.queryParamsService.navigateWithFilterRules([
+    this.documentListViewService.quickFilter([
       {
         rule_type: FILTER_FULLTEXT_MORELIKE,
         value: this.documentId.toString(),
