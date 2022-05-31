@@ -38,7 +38,10 @@ class SanityCheckMessages:
             for doc_pk in self._messages:
                 if doc_pk is not None:
                     doc = all_docs.get(pk=doc_pk)
-                    logger.info(f"Document: {doc.pk}, title: {doc.title}")
+                    logger.info(
+                        f"Detected following issue(s) with document #{doc.pk},"
+                        f" titled {doc.title}",
+                    )
                 for msg in self._messages[doc_pk]:
                     logger.log(msg["level"], msg["message"])
 

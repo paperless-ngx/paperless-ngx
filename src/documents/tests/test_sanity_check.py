@@ -63,9 +63,9 @@ class TestSanityCheck(DirectoriesMixin, TestCase):
         self.assertTrue(messages.has_error)
         with self.assertLogs() as capture:
             messages.log_messages()
-            self.assertRegex(
+            self.assertEqual(
                 capture.records[0].message,
-                f"Document: {doc.pk}, title: {doc.title}",
+                f"Detected following issue(s) with document #{doc.pk}, titled {doc.title}",
             )
             self.assertRegex(capture.records[1].message, messageRegex)
 
