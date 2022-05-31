@@ -3,6 +3,7 @@ import shutil
 from pathlib import Path
 from typing import Type
 
+import tqdm
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.management.base import BaseCommand
 from documents.models import Document
@@ -21,6 +22,14 @@ class Command(BaseCommand):
     )
 
     def add_arguments(self, parser):
+
+        parser.add_argument(
+            "--no-progress-bar",
+            default=False,
+            action="store_true",
+            help="If set, the progress bar will not be shown",
+        )
+
         parser.add_argument(
             "documents",
             nargs="+",
@@ -33,9 +42,9 @@ class Command(BaseCommand):
 
         all_docs = Document.objects.all()
 
-        for doc_pk in args.documents:
+        for doc_pk in tqdm.tqdm(args.documents, disable=options["no_progress_bar"]):
             try:
-                self.stdout.write(f"Parsing document {doc_pk}")
+                self.stdout.write(self.style.INFO(f"Parsing document {doc_pk}"))
                 doc: Document = all_docs.get(pk=doc_pk)
             except ObjectDoesNotExist:
                 self.stdout.write(self.style.ERROR(f"Document {doc_pk} does not exist"))
