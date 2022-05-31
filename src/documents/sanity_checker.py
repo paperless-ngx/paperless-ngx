@@ -1,6 +1,7 @@
 import hashlib
 import logging
 import os
+from collections import defaultdict
 
 from django.conf import settings
 from documents.models import Document
@@ -9,16 +10,20 @@ from tqdm import tqdm
 
 class SanityCheckMessages:
     def __init__(self):
-        self._messages = []
+        self._messages = defaultdict(list)
+        self.has_error = False
+        self.has_warning = False
 
-    def error(self, message):
-        self._messages.append({"level": logging.ERROR, "message": message})
+    def error(self, doc_pk, message):
+        self._messages[doc_pk].append({"level": logging.ERROR, "message": message})
+        self.has_error = True
 
-    def warning(self, message):
-        self._messages.append({"level": logging.WARNING, "message": message})
+    def warning(self, doc_pk, message):
+        self._messages[doc_pk].append({"level": logging.WARNING, "message": message})
+        self.has_warning = True
 
-    def info(self, message):
-        self._messages.append({"level": logging.INFO, "message": message})
+    def info(self, doc_pk, message):
+        self._messages[doc_pk].append({"level": logging.INFO, "message": message})
 
     def log_messages(self):
         logger = logging.getLogger("paperless.sanity_checker")
@@ -26,8 +31,16 @@ class SanityCheckMessages:
         if len(self._messages) == 0:
             logger.info("Sanity checker detected no issues.")
         else:
-            for msg in self._messages:
-                logger.log(msg["level"], msg["message"])
+
+            # Query once
+            all_docs = Document.objects.all()
+
+            for doc_pk in self._messages:
+                if doc_pk is not None:
+                    doc = all_docs.get(pk=doc_pk)
+                    logger.info(f"Document: {doc.pk}, title: {doc.title}")
+                for msg in self._messages[doc_pk]:
+                    logger.log(msg["level"], msg["message"])
 
     def __len__(self):
         return len(self._messages)
@@ -35,18 +48,12 @@ class SanityCheckMessages:
     def __getitem__(self, item):
         return self._messages[item]
 
-    def has_error(self):
-        return any([msg["level"] == logging.ERROR for msg in self._messages])
-
-    def has_warning(self):
-        return any([msg["level"] == logging.WARNING for msg in self._messages])
-
 
 class SanityCheckFailedException(Exception):
     pass
 
 
-def check_sanity(progress=False):
+def check_sanity(progress=False) -> SanityCheckMessages:
     messages = SanityCheckMessages()
 
     present_files = []
@@ -61,7 +68,7 @@ def check_sanity(progress=False):
     for doc in tqdm(Document.objects.all(), disable=not progress):
         # Check sanity of the thumbnail
         if not os.path.isfile(doc.thumbnail_path):
-            messages.error(f"Thumbnail of document {doc.pk} does not exist.")
+            messages.error(doc.pk, "Thumbnail of document does not exist.")
         else:
             if os.path.normpath(doc.thumbnail_path) in present_files:
                 present_files.remove(os.path.normpath(doc.thumbnail_path))
@@ -69,12 +76,12 @@ def check_sanity(progress=False):
                 with doc.thumbnail_file as f:
                     f.read()
             except OSError as e:
-                messages.error(f"Cannot read thumbnail file of document {doc.pk}: {e}")
+                messages.error(doc.pk, f"Cannot read thumbnail file of document: {e}")
 
         # Check sanity of the original file
         # TODO: extract method
         if not os.path.isfile(doc.source_path):
-            messages.error(f"Original of document {doc.pk} does not exist.")
+            messages.error(doc.pk, "Original of document does not exist.")
         else:
             if os.path.normpath(doc.source_path) in present_files:
                 present_files.remove(os.path.normpath(doc.source_path))
@@ -82,28 +89,29 @@ def check_sanity(progress=False):
                 with doc.source_file as f:
                     checksum = hashlib.md5(f.read()).hexdigest()
             except OSError as e:
-                messages.error(f"Cannot read original file of document {doc.pk}: {e}")
+                messages.error(doc.pk, f"Cannot read original file of document: {e}")
             else:
                 if not checksum == doc.checksum:
                     messages.error(
-                        f"Checksum mismatch of document {doc.pk}. "
+                        doc.pk,
+                        "Checksum mismatch. "
                         f"Stored: {doc.checksum}, actual: {checksum}.",
                     )
 
         # Check sanity of the archive file.
         if doc.archive_checksum and not doc.archive_filename:
             messages.error(
-                f"Document {doc.pk} has an archive file checksum, but no "
-                f"archive filename.",
+                doc.pk,
+                "Document has an archive file checksum, but no archive filename.",
             )
         elif not doc.archive_checksum and doc.archive_filename:
             messages.error(
-                f"Document {doc.pk} has an archive file, but its checksum is "
-                f"missing.",
+                doc.pk,
+                "Document has an archive file, but its checksum is missing.",
             )
         elif doc.has_archive_version:
             if not os.path.isfile(doc.archive_path):
-                messages.error(f"Archived version of document {doc.pk} does not exist.")
+                messages.error(doc.pk, "Archived version of document does not exist.")
             else:
                 if os.path.normpath(doc.archive_path) in present_files:
                     present_files.remove(os.path.normpath(doc.archive_path))
@@ -112,22 +120,23 @@ def check_sanity(progress=False):
                         checksum = hashlib.md5(f.read()).hexdigest()
                 except OSError as e:
                     messages.error(
-                        f"Cannot read archive file of document {doc.pk}: {e}",
+                        doc.pk,
+                        f"Cannot read archive file of document : {e}",
                     )
                 else:
                     if not checksum == doc.archive_checksum:
                         messages.error(
-                            f"Checksum mismatch of archived document "
-                            f"{doc.pk}. "
+                            doc.pk,
+                            "Checksum mismatch of archived document. "
                             f"Stored: {doc.archive_checksum}, "
                             f"actual: {checksum}.",
                         )
 
         # other document checks
         if not doc.content:
-            messages.info(f"Document {doc.pk} has no content.")
+            messages.info(doc.pk, "Document has no content.")
 
     for extra_file in present_files:
-        messages.warning(f"Orphaned file in media dir: {extra_file}")
+        messages.warning(None, f"Orphaned file in media dir: {extra_file}")
 
     return messages
