@@ -464,6 +464,7 @@ Q_CLUSTER = {
     "timeout": PAPERLESS_WORKER_TIMEOUT,
     "workers": TASK_WORKERS,
     "redis": os.getenv("PAPERLESS_REDIS", "redis://localhost:6379"),
+    "log_level": "DEBUG" if DEBUG else "INFO",
 }
 
 
