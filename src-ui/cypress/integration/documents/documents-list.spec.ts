@@ -72,6 +72,7 @@ describe('documents-list', () => {
       fixture: 'document_types/doctypes.json',
     })
 
+    cy.viewport(1280, 1024)
     cy.visit('/documents')
   })
 
