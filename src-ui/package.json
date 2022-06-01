@@ -44,7 +44,7 @@
     "@types/jest": "27.4.1",
     "@types/node": "^17.0.38",
     "codelyzer": "^6.0.2",
-    "concurrently": "7.1.0",
+    "concurrently": "7.2.1",
     "jest": "28.1.0",
     "jest-environment-jsdom": "^28.0.2",
     "jest-preset-angular": "^12.0.1",
