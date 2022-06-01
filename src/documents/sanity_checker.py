@@ -137,7 +137,7 @@ def check_sanity(progress=False) -> SanityCheckMessages:
 
         # other document checks
         if not doc.content:
-            messages.info(doc.pk, "Document has no content.")
+            messages.info(doc.pk, "Document contains no OCR data")
 
     for extra_file in present_files:
         messages.warning(None, f"Orphaned file in media dir: {extra_file}")
