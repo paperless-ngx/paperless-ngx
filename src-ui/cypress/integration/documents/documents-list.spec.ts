@@ -77,7 +77,7 @@ describe('documents-list', () => {
 
   it('should show a list of documents rendered as cards with thumbnails', () => {
     cy.contains('3 documents')
-    cy.contains('lorem-ipsum')
+    cy.contains('lorem ipsum')
     cy.get('app-document-card-small:first-of-type img')
       .invoke('attr', 'src')
       .should('eq', 'http://localhost:8000/api/documents/1/thumb/')
