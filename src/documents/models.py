@@ -233,10 +233,13 @@ class Document(models.Model):
         # Convert UTC database time to local time
         created = datetime.date.isoformat(timezone.localdate(self.created))
 
-        if self.correspondent and self.title:
-            return f"{created} {self.correspondent} {self.title}"
-        else:
-            return f"{created} {self.title}"
+        res = f"{created}"
+
+        if self.correspondent:
+            res += f" {self.correspondent}"
+        if self.title:
+            res += f" {self.title}"
+        return res
 
     @property
     def source_path(self):
