@@ -2,7 +2,6 @@ import { DatePipe } from '@angular/common'
 import { Inject, LOCALE_ID, Pipe, PipeTransform } from '@angular/core'
 import { SETTINGS_KEYS } from '../data/paperless-uisettings'
 import { SettingsService } from '../services/settings.service'
-import { normalizeDateStr } from '../utils/date'
 
 const FORMAT_TO_ISO_FORMAT = {
   longDate: 'y-MM-dd',
