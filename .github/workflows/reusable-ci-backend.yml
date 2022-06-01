@@ -87,7 +87,7 @@ jobs:
       -
         name: Get changed files
         id: changed-files-specific
-        uses: tj-actions/changed-files@v19
+        uses: tj-actions/changed-files@v22.1
         with:
           files: |
             src/**
