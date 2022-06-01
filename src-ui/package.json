@@ -19,7 +19,7 @@
     "@angular/forms": "~13.3.5",
     "@angular/localize": "~13.3.5",
     "@angular/platform-browser": "~13.3.5",
-    "@angular/platform-browser-dynamic": "~13.3.5",
+    "@angular/platform-browser-dynamic": "~13.3.11",
     "@angular/router": "~13.3.5",
     "@ng-bootstrap/ng-bootstrap": "^12.1.1",
     "@ng-select/ng-select": "^8.1.1",
