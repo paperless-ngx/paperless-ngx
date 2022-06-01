@@ -143,7 +143,7 @@ class TestSanityCheck(DirectoriesMixin, TestCase):
         self.assertFalse(messages.has_error)
         self.assertFalse(messages.has_warning)
         self.assertEqual(len(messages), 1)
-        self.assertRegex(messages[doc.pk][0]["message"], "Document has no content.")
+        self.assertRegex(messages[doc.pk][0]["message"], "Document contains no OCR data.")
 
     def test_orphaned_file(self):
         doc = self.make_test_data()
