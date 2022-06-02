@@ -2,27 +2,8 @@ import { PaperlessDocument } from 'src/app/data/paperless-document'
 
 describe('documents query params', () => {
   beforeEach(() => {
-    cy.intercept('http://localhost:8000/api/ui_settings/', {
-      fixture: 'ui_settings/settings.json',
-    })
-    cy.intercept('http://localhost:8000/api/remote_version/', {
-      fixture: 'remote_version/remote_version.json',
-    })
-    cy.intercept('http://localhost:8000/api/correspondents/*', {
-      fixture: 'correspondents/correspondents.json',
-    })
-    cy.intercept('http://localhost:8000/api/document_types/*', {
-      fixture: 'document_types/doctypes.json',
-    })
-    cy.intercept('http://localhost:8000/api/saved_views/*', {
-      fixture: 'saved_views/savedviews.json',
-    })
-    cy.intercept('http://localhost:8000/api/storage_paths/*', {
-      fixture: 'storage_paths/storage_paths.json',
-    })
-    cy.intercept('http://localhost:8000/api/tags/*', {
-      fixture: 'tags/tags.json',
-    })
+    // also uses global fixtures from cypress/support/e2e.ts
+
     cy.fixture('documents/documents.json').then((documentsJson) => {
       // mock api filtering
       cy.intercept('GET', 'http://localhost:8000/api/documents/*', (req) => {
