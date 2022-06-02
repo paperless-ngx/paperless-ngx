@@ -190,7 +190,7 @@ class TestExportImport(DirectoriesMixin, TestCase):
             self.assertEqual(Document.objects.get(id=self.d4.id).title, "wow_dec")
             messages = check_sanity()
             # everything is alright after the test
-            self.assertEqual(len(messages), 0, str([str(m) for m in messages]))
+            self.assertEqual(len(messages), 0)
 
     def test_exporter_with_filename_format(self):
         shutil.rmtree(os.path.join(self.dirs.media_dir, "documents"))
