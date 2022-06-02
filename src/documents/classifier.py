@@ -106,17 +106,16 @@ class DocumentClassifier:
 
             # Check for the warning about unpickling from differing versions
             # and consider it incompatible
-            if len(w) > 0:
-                sk_learn_warning_url = (
-                    "https://scikit-learn.org/stable/"
-                    "model_persistence.html"
-                    "#security-maintainability-limitations"
-                )
-                for warning in w:
-                    if issubclass(warning.category, UserWarning):
-                        w_msg = str(warning.message)
-                        if sk_learn_warning_url in w_msg:
-                            raise IncompatibleClassifierVersionError()
+            sk_learn_warning_url = (
+                "https://scikit-learn.org/stable/"
+                "model_persistence.html"
+                "#security-maintainability-limitations"
+            )
+            for warning in w:
+                if issubclass(warning.category, UserWarning):
+                    w_msg = str(warning.message)
+                    if sk_learn_warning_url in w_msg:
+                        raise IncompatibleClassifierVersionError()
 
     def save(self):
         target_file = settings.MODEL_FILE
