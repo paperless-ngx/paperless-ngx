@@ -1,17 +1,43 @@
-// ***********************************************************
-// This example support/index.js is processed and
-// loaded automatically before your test files.
-//
-// This is a great place to put global configuration and
-// behavior that modifies Cypress.
-//
-// You can change the location of this file or turn off
-// automatically serving support files with the
-// 'supportFile' configuration option.
-//
-// You can read more here:
-// https://on.cypress.io/configuration
-// ***********************************************************
+// mock API methods
 
-// When a command from ./commands is ready to use, import with `import './commands'` syntax
-// import './commands';
+beforeEach(() => {
+  cy.intercept('http://localhost:8000/api/ui_settings/', {
+    fixture: 'ui_settings/settings.json',
+  })
+
+  cy.intercept('http://localhost:8000/api/remote_version/', {
+    fixture: 'remote_version/remote_version.json',
+  })
+
+  cy.intercept('http://localhost:8000/api/saved_views/*', {
+    fixture: 'saved_views/savedviews.json',
+  })
+
+  cy.intercept('http://localhost:8000/api/tags/*', {
+    fixture: 'tags/tags.json',
+  })
+
+  cy.intercept('http://localhost:8000/api/correspondents/*', {
+    fixture: 'correspondents/correspondents.json',
+  })
+
+  cy.intercept('http://localhost:8000/api/document_types/*', {
+    fixture: 'document_types/doctypes.json',
+  })
+
+  cy.intercept('http://localhost:8000/api/storage_paths/*', {
+    fixture: 'storage_paths/storage_paths.json',
+  })
+
+  cy.intercept('http://localhost:8000/api/documents/1/metadata/', {
+    fixture: 'documents/1/metadata.json',
+  })
+
+  cy.intercept('http://localhost:8000/api/documents/1/suggestions/', {
+    fixture: 'documents/1/suggestions.json',
+  })
+
+  cy.intercept('http://localhost:8000/api/documents/1/thumb/', {
+    fixture: 'documents/lorem-ipsum.png',
+  })
+})
