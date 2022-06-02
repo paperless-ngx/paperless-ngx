@@ -338,9 +338,9 @@ def sanity_check():
 
     messages.log_messages()
 
-    if messages.has_error():
+    if messages.has_error:
         raise SanityCheckFailedException("Sanity check failed with errors. See log.")
-    elif messages.has_warning():
+    elif messages.has_warning:
         return "Sanity check exited with warnings. See log."
     elif len(messages) > 0:
         return "Sanity check exited with infos. See log."
