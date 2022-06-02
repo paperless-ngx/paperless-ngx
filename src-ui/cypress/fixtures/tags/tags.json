@@ -1,1 +1,103 @@
-{"count":8,"next":null,"previous":null,"results":[{"id":4,"slug":"another-sample-tag","name":"Another Sample Tag","color":"#a6cee3","text_color":"#000000","match":"","matching_algorithm":6,"is_insensitive":true,"is_inbox_tag":false,"document_count":3},{"id":7,"slug":"newone","name":"NewOne","color":"#9e4ad1","text_color":"#ffffff","match":"","matching_algorithm":1,"is_insensitive":true,"is_inbox_tag":false,"document_count":2},{"id":6,"slug":"partial-tag","name":"Partial Tag","color":"#72dba7","text_color":"#000000","match":"","matching_algorithm":1,"is_insensitive":true,"is_inbox_tag":false,"document_count":1},{"id":2,"slug":"tag-2","name":"Tag 2","color":"#612db7","text_color":"#ffffff","match":"","matching_algorithm":1,"is_insensitive":true,"is_inbox_tag":false,"document_count":3},{"id":3,"slug":"tag-3","name":"Tag 3","color":"#b2df8a","text_color":"#000000","match":"","matching_algorithm":1,"is_insensitive":true,"is_inbox_tag":false,"document_count":4},{"id":5,"slug":"tagwithpartial","name":"TagWithPartial","color":"#3b2db4","text_color":"#ffffff","match":"","matching_algorithm":6,"is_insensitive":true,"is_inbox_tag":false,"document_count":2},{"id":8,"slug":"test-another","name":"Test Another","color":"#3ccea5","text_color":"#000000","match":"","matching_algorithm":4,"is_insensitive":true,"is_inbox_tag":false,"document_count":0},{"id":1,"slug":"test-tag","name":"Test Tag","color":"#fb9a99","text_color":"#000000","match":"","matching_algorithm":1,"is_insensitive":true,"is_inbox_tag":false,"document_count":4}]}
+{
+    "count": 8,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": 4,
+            "slug": "another-sample-tag",
+            "name": "Another Sample Tag",
+            "color": "#a6cee3",
+            "text_color": "#000000",
+            "match": "",
+            "matching_algorithm": 6,
+            "is_insensitive": true,
+            "is_inbox_tag": false,
+            "document_count": 3
+        },
+        {
+            "id": 7,
+            "slug": "newone",
+            "name": "NewOne",
+            "color": "#9e4ad1",
+            "text_color": "#ffffff",
+            "match": "",
+            "matching_algorithm": 1,
+            "is_insensitive": true,
+            "is_inbox_tag": false,
+            "document_count": 2
+        },
+        {
+            "id": 6,
+            "slug": "partial-tag",
+            "name": "Partial Tag",
+            "color": "#72dba7",
+            "text_color": "#000000",
+            "match": "",
+            "matching_algorithm": 1,
+            "is_insensitive": true,
+            "is_inbox_tag": false,
+            "document_count": 1
+        },
+        {
+            "id": 2,
+            "slug": "tag-2",
+            "name": "Tag 2",
+            "color": "#612db7",
+            "text_color": "#ffffff",
+            "match": "",
+            "matching_algorithm": 1,
+            "is_insensitive": true,
+            "is_inbox_tag": false,
+            "document_count": 3
+        },
+        {
+            "id": 3,
+            "slug": "tag-3",
+            "name": "Tag 3",
+            "color": "#b2df8a",
+            "text_color": "#000000",
+            "match": "",
+            "matching_algorithm": 1,
+            "is_insensitive": true,
+            "is_inbox_tag": false,
+            "document_count": 4
+        },
+        {
+            "id": 5,
+            "slug": "tagwithpartial",
+            "name": "TagWithPartial",
+            "color": "#3b2db4",
+            "text_color": "#ffffff",
+            "match": "",
+            "matching_algorithm": 6,
+            "is_insensitive": true,
+            "is_inbox_tag": false,
+            "document_count": 2
+        },
+        {
+            "id": 8,
+            "slug": "test-another",
+            "name": "Test Another",
+            "color": "#3ccea5",
+            "text_color": "#000000",
+            "match": "",
+            "matching_algorithm": 4,
+            "is_insensitive": true,
+            "is_inbox_tag": false,
+            "document_count": 0
+        },
+        {
+            "id": 1,
+            "slug": "test-tag",
+            "name": "Test Tag",
+            "color": "#fb9a99",
+            "text_color": "#000000",
+            "match": "",
+            "matching_algorithm": 1,
+            "is_insensitive": true,
+            "is_inbox_tag": false,
+            "document_count": 4
+        }
+    ]
+}
