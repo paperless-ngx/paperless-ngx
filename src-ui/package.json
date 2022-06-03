@@ -55,6 +55,6 @@
   },
   "optionalDependencies": {
     "@cypress/schematic": "^2.0.0",
-    "cypress": "~9.6.0"
+    "cypress": "~10.0.1"
   }
 }
