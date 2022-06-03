@@ -1,11 +1,9 @@
 describe('documents-list', () => {
   beforeEach(() => {
+    // also uses global fixtures from cypress/support/e2e.ts
+
     this.bulkEdits = {}
 
-    // mock API methods
-    cy.intercept('http://localhost:8000/api/ui_settings/', {
-      fixture: 'ui_settings/settings.json',
-    })
     cy.fixture('documents/documents.json').then((documentsJson) => {
       // bulk edit
       cy.intercept(
@@ -54,22 +52,6 @@ describe('documents-list', () => {
 
         req.reply(response)
       })
-    })
-
-    cy.intercept('http://localhost:8000/api/documents/1/thumb/', {
-      fixture: 'documents/lorem-ipsum.png',
-    })
-
-    cy.intercept('http://localhost:8000/api/tags/*', {
-      fixture: 'tags/tags.json',
-    })
-
-    cy.intercept('http://localhost:8000/api/correspondents/*', {
-      fixture: 'correspondents/correspondents.json',
-    })
-
-    cy.intercept('http://localhost:8000/api/document_types/*', {
-      fixture: 'document_types/doctypes.json',
     })
 
     cy.viewport(1280, 1024)
