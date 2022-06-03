@@ -15,23 +15,36 @@ map_uidgid() {
 	fi
 }
 
+map_folders() {
+	# Export these so they can be used in docker-prepare.sh
+	export DATA_DIR="${PAPERLESS_DATA_DIR:-/usr/src/paperless/data}"
+	export MEDIA_ROOT_DIR="${PAPERLESS_MEDIA_ROOT:-/usr/src/paperless/media}"
+}
+
 initialize() {
+	# Change the user and group IDs if needed
 	map_uidgid
 
-	for dir in export data data/index media media/documents media/documents/originals media/documents/thumbnails; do
-		if [[ ! -d "../$dir" ]]; then
-			echo "Creating directory ../$dir"
-			mkdir ../$dir
+	# Check for overrides of certain folders
+	map_folders
+
+	for dir in ${DATA_DIR} ${DATA_DIR}/index ${MEDIA_ROOT_DIR} ${MEDIA_ROOT_DIR}/documents ${MEDIA_ROOT_DIR}/documents/originals ${MEDIA_ROOT_DIR}/documents/thumbnails; do
+		if [[ ! -d "${dir}" ]]; then
+			echo "Creating directory ${dir}"
+			mkdir "${dir}"
 		fi
 	done
 
-	echo "Creating directory /tmp/paperless"
-	mkdir -p /tmp/paperless
+	local tmp_dir="/tmp/paperless"
+	echo "Creating directory ${tmp_dir}"
+	mkdir -p "${tmp_dir}"
 
 	set +e
 	echo "Adjusting permissions of paperless files. This may take a while."
-	chown -R paperless:paperless /tmp/paperless
-	find .. -not \( -user paperless -and -group paperless \) -exec chown paperless:paperless {} +
+	chown -R paperless:paperless ${tmp_dir}
+	for dir in ${DATA_DIR} ${MEDIA_ROOT_DIR}; do
+		find "${dir}" -not \( -user paperless -and -group paperless \) -exec chown paperless:paperless {} +
+	done
 	set -e
 
 	gosu paperless /sbin/docker-prepare.sh
