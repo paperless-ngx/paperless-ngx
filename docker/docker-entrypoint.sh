@@ -28,7 +28,9 @@ initialize() {
 	# Check for overrides of certain folders
 	map_folders
 
-	for dir in "${DATA_DIR}" "${DATA_DIR}/index" "${MEDIA_ROOT_DIR}" "${MEDIA_ROOT_DIR}/documents" "${MEDIA_ROOT_DIR}/documents/originals" "${MEDIA_ROOT_DIR}/documents/thumbnails"; do
+	local export_dir="/usr/src/paperless/export"
+
+	for dir in "${export_dir}" "${DATA_DIR}" "${DATA_DIR}/index" "${MEDIA_ROOT_DIR}" "${MEDIA_ROOT_DIR}/documents" "${MEDIA_ROOT_DIR}/documents/originals" "${MEDIA_ROOT_DIR}/documents/thumbnails"; do
 		if [[ ! -d "${dir}" ]]; then
 			echo "Creating directory ${dir}"
 			mkdir "${dir}"
@@ -42,7 +44,7 @@ initialize() {
 	set +e
 	echo "Adjusting permissions of paperless files. This may take a while."
 	chown -R paperless:paperless ${tmp_dir}
-	for dir in "${DATA_DIR}" "${MEDIA_ROOT_DIR}"; do
+	for dir in "${export_dir}" "${DATA_DIR}" "${MEDIA_ROOT_DIR}"; do
 		find "${dir}" -not \( -user paperless -and -group paperless \) -exec chown paperless:paperless {} +
 	done
 	set -e
