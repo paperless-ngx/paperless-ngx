@@ -12,7 +12,7 @@
       "sizes": "any"
     }
   ],
-  "name": "Paperless NGX",
-  "short_name": "Paperless NGX",
+  "name": "Paperless-ngx",
+  "short_name": "Paperless-ngx",
   "start_url": "/"
 }
