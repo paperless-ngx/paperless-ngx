@@ -1,19 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 25.0.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<svg version="1.1"
-	 id="svg4812" inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)" sodipodi:docname="logo-dark-notext.svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg"
-	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 198.4 238.9"
-	 style="enable-background:new 0 0 198.4 238.9;" xml:space="preserve">
-<sodipodi:namedview  bordercolor="#666666" borderopacity="1.0" id="base" inkscape:current-layer="SvgjsG1020" inkscape:cx="328.04904" inkscape:cy="330.33332" inkscape:document-rotation="0" inkscape:document-units="mm" inkscape:pageopacity="0.0" inkscape:pageshadow="2" inkscape:window-height="1016" inkscape:window-maximized="1" inkscape:window-width="1920" inkscape:window-x="1280" inkscape:window-y="27" inkscape:zoom="0.98994949" pagecolor="#ffffff" showgrid="false">
-	</sodipodi:namedview>
-<g id="layer1" transform="translate(-9.9999792,-10.000082)" inkscape:groupmode="layer" inkscape:label="Layer 1">
-	<g id="SvgjsG1020" transform="matrix(0.10341565,0,0,0.10341565,1.2287665,8.3453496)">
-		<path id="path57" d="M1967.5,16C1672.7,702,255.4,787,709,1892.5c5.7,14.2-104.9,164.4-178.6,289.1c-17-62.4-36.9-130.4-34-136.1
-			c368.5-436.5-263.6-683.1-297.6-1040.3C40,1288.7-16.7,1784.8,462.3,2071.1c2.8,0,25.5,107.7,36.9,161.6
-			c-11.3,22.7-22.7,45.4-28.3,62.4c-11.3,28.3,73.7,25.5,73.7,31.2c8.5-2.8,209.8-357.2,215.4-360
-			C1899.5,1705.4,2100.8,679.3,1967.5,16z M1386.4,738.8C853.5,1215,762.8,1569.4,779.8,1742.3
-			C601.2,1319.9,1125.7,855,1386.4,738.8z M357.5,1419.1c102,93.5,272.1,379.8,127.6,547.1C519,1889.7,530.4,1716.8,357.5,1419.1z"
-			/>
-	</g>
-</g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 198.4 238.9" style="enable-background:new 0 0 198.4 238.9" xml:space="preserve">
+  <path d="M194.7 0C164.211 70.943 17.64 79.733 64.55 194.06c.59 1.468-10.848 17-18.47 29.897-1.758-6.453-3.816-13.486-3.516-14.075 38.109-45.141-27.26-70.643-30.776-107.583-16.423 29.318-22.286 80.623 27.25 110.23.29 0 2.637 11.138 3.816 16.712-1.169 2.348-2.348 4.695-2.927 6.454-1.168 2.926 7.622 2.637 7.622 3.226.879-.29 21.697-36.94 22.276-37.23C187.667 174.711 208.485 68.596 194.699 0zm-60.096 74.749c-55.11 49.246-64.49 85.897-62.732 103.777-18.47-43.682 35.772-91.76 62.732-103.777zM28.2 145.102c10.548 9.67 28.14 39.278 13.196 56.58 3.506-7.912 4.684-25.793-13.196-56.58z"/>
 </svg>
