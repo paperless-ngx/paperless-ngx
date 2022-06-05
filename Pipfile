@@ -14,7 +14,7 @@ django = "~=4.0"
 django-cors-headers = "*"
 django-extensions = "*"
 django-filter = "~=21.1"
-django-q = {editable = true, ref = "relock-deps", git = "https://github.com/stumpylog/django-q.git"}
+django-q = {editable = true, ref = "paperless-main", git = "https://github.com/paperless-ngx/django-q.git"}
 djangorestframework = "~=3.13"
 filelock = "*"
 fuzzywuzzy = {extras = ["speedup"], version = "*"}
@@ -23,13 +23,11 @@ imap-tools = "*"
 langdetect = "*"
 pathvalidate = "*"
 pillow = "~=9.1"
-# Any version update to pikepdf requires a base image update
 pikepdf = "~=5.1"
 python-gnupg = "*"
 python-dotenv = "*"
 python-dateutil = "*"
 python-magic = "*"
-# Any version update to psycopg2 requires a base image update
 psycopg2 = "*"
 redis = "*"
 # Pinned because aarch64 wheels and updates cause warnings when loading the classifier model.
