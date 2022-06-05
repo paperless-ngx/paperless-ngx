@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "1d3e45af4ae34722d55a93f3255fc60f5f95b2671d46fb97e4f06323bf8667c4"
+            "sha256": "5eb8d3dd2f13d65f3f334413f6905f1a7badc42adc79d34c8f8c8c61525aff59"
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -322,8 +322,8 @@
         },
         "django-q": {
             "editable": true,
-            "git": "https://github.com/stumpylog/django-q.git",
-            "ref": "20aa962739d41ea187540267e92bc01539c914d6"
+            "git": "https://github.com/paperless-ngx/django-q.git",
+            "ref": "71abc78fdaec029cf71e9849a3b0fa084a1678f7"
         },
         "djangorestframework": {
             "hashes": [
@@ -1695,9 +1695,7 @@
             "version": "==0.4.4"
         },
         "coverage": {
-            "extras": [
-                "toml"
-            ],
+            "extras": [],
             "hashes": [
                 "sha256:01c5615d13f3dd3aa8543afc069e5319cfa0c7d712f6e04b920431e5c564a749",
                 "sha256:106c16dfe494de3193ec55cac9640dd039b66e196e4641fa8ac396181578b982",
