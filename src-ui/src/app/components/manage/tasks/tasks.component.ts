@@ -77,8 +77,11 @@ export class TasksComponent implements OnInit, OnDestroy {
   get currentTasks(): PaperlessTask[] {
     let tasks: PaperlessTask[]
     switch (this.activeTab) {
-      case 'incomplete':
-        tasks = this.tasksService.incompleteFileTasks
+      case 'queued':
+        tasks = this.tasksService.queuedFileTasks
+        break
+      case 'started':
+        tasks = this.tasksService.startedFileTasks
         break
       case 'completed':
         tasks = this.tasksService.completedFileTasks

@@ -15,6 +15,7 @@ def init_paperless_tasks(apps, schema_editor):
                 task_id=task.id,
                 name=task.name,
                 created=task.started,
+                started=task.started,
                 acknowledged=True,
             )
             task.paperlesstask = paperlesstask
@@ -45,9 +46,11 @@ class Migration(migrations.Migration):
                 ("name", models.CharField(max_length=256)),
                 (
                     "created",
-                    models.DateTimeField(
-                        auto_now=True, db_index=True, verbose_name="created"
-                    ),
+                    models.DateTimeField(auto_now=True, verbose_name="created"),
+                ),
+                (
+                    "started",
+                    models.DateTimeField(verbose_name="started"),
                 ),
                 ("acknowledged", models.BooleanField(default=False)),
                 (
