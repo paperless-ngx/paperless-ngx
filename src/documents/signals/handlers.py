@@ -514,12 +514,24 @@ def init_paperless_task(sender, task, **kwargs):
         paperless_task.save()
 
 
-@receiver(models.signals.post_save, sender=django_q.tasks.Task)
-def update_paperless_task(sender, instance, **kwargs):
+@receiver(django_q.signals.pre_execute)
+def paperless_task_started(sender, task, **kwargs):
+    print(task)
     try:
-        if instance.func == "documents.tasks.consume_file":
-            paperless_task = PaperlessTask.objects.get(task_id=instance.id)
-            paperless_task.attempted_task = instance
+        if task["func"] == "documents.tasks.consume_file":
+            paperless_task = PaperlessTask.objects.get(task_id=task["id"])
+            paperless_task.started = timezone.now()
+            paperless_task.save()
+    except PaperlessTask.DoesNotExist:
+        pass
+
+
+@receiver(models.signals.post_save, sender=django_q.tasks.Task)
+def update_paperless_task(sender, task, **kwargs):
+    try:
+        if task.func == "documents.tasks.consume_file":
+            paperless_task = PaperlessTask.objects.get(task_id=task.id)
+            paperless_task.attempted_task = task
             paperless_task.save()
     except PaperlessTask.DoesNotExist:
         pass

@@ -507,7 +507,8 @@ class PaperlessTask(models.Model):
 
     task_id = models.CharField(max_length=128)
     name = models.CharField(max_length=256)
-    created = models.DateTimeField(_("created"), auto_now=True, db_index=True)
+    created = models.DateTimeField(_("created"), auto_now=True)
+    started = models.DateTimeField(_("started"))
     attempted_task = models.OneToOneField(
         Task,
         on_delete=models.CASCADE,

@@ -622,7 +622,10 @@ class TasksViewSerializer(serializers.ModelSerializer):
 
     def get_status(self, obj):
         if obj.attempted_task is None:
-            return "incomplete"
+            if obj.started:
+                return "started"
+            else:
+                return "queued"
         elif obj.attempted_task.success:
             return "complete"
         elif not obj.attempted_task.success:
