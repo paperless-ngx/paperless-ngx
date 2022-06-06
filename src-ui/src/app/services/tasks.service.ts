@@ -26,10 +26,12 @@ export class TasksService {
     return this.fileTasks.slice(0)
   }
 
-  public get incompleteFileTasks(): PaperlessTask[] {
-    return this.fileTasks.filter(
-      (t) => t.status == PaperlessTaskStatus.Incomplete
-    )
+  public get queuedFileTasks(): PaperlessTask[] {
+    return this.fileTasks.filter((t) => t.status == PaperlessTaskStatus.Queued)
+  }
+
+  public get startedFileTasks(): PaperlessTask[] {
+    return this.fileTasks.filter((t) => t.status == PaperlessTaskStatus.Started)
   }
 
   public get completedFileTasks(): PaperlessTask[] {
