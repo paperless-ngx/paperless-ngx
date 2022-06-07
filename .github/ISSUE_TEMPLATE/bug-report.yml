@@ -63,9 +63,11 @@ body:
     attributes:
       label: Installation method
       options:
-        - Docker
+        - Docker - official image
+        - Docker - linuxserver.io image
         - Bare metal
         - Other (please describe above)
+      description: Note there are significant differences from the official image and linuxserver.io, please check if your issue is specific to the third-party image.
     validations:
       required: true
   - type: input
