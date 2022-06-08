@@ -50,7 +50,6 @@ def _main():
 
     # Default output values
     version = None
-    git_tag = None
     extra_config = {}
 
     if args.package in pipfile_data["default"]:
@@ -59,12 +58,6 @@ def _main():
         pkg_version = pkg_data["version"].split("==")[-1]
         version = pkg_version
 
-        # Based on the package, generate the expected Git tag name
-        if args.package == "pikepdf":
-            git_tag = f"v{pkg_version}"
-        elif args.package == "psycopg2":
-            git_tag = pkg_version.replace(".", "_")
-
         # Any extra/special values needed
         if args.package == "pikepdf":
             extra_config["qpdf_version"] = build_json["qpdf"]["version"]
@@ -72,8 +65,6 @@ def _main():
     elif args.package in build_json:
         version = build_json[args.package]["version"]
 
-        if "git_tag" in build_json[args.package]:
-            git_tag = build_json[args.package]["git_tag"]
     else:
         raise NotImplementedError(args.package)
 
@@ -81,7 +72,6 @@ def _main():
     output = {
         "name": args.package,
         "version": version,
-        "git_tag": git_tag,
         "image_tag": get_image_tag(repo_name, args.package, version),
         "cache_tag": get_cache_image_tag(
             repo_name,
