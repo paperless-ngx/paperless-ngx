@@ -2,8 +2,7 @@
 # Inputs:
 #    - REPO - Docker repository to pull qpdf from
 #    - QPDF_VERSION - The image qpdf version to copy .deb files from
-#    - PIKEPDF_GIT_TAG - The Git tag to clone and build from
-#    - PIKEPDF_VERSION - Used to force the built pikepdf version to match
+#    - PIKEPDF_VERSION - Version of pikepdf to build wheel for
 
 # Default to pulling from the main repo registry when manually building
 ARG REPO="paperless-ngx/paperless-ngx"
@@ -77,7 +76,7 @@ RUN set -eux \
   && echo "Building pikepdf wheel ${PIKEPDF_VERSION}" \
   && mkdir wheels \
   && python3 -m pip wheel \
-    # Build the package at the requried version
+    # Build the package at the required version
     pikepdf==${PIKEPDF_VERSION} \
     # Output the *.whl into this directory
     --wheel-dir wheels \

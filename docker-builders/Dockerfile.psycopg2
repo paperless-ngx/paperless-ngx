@@ -1,7 +1,6 @@
 # This Dockerfile builds the psycopg2 wheel
 # Inputs:
-#    - PSYCOPG2_GIT_TAG - The Git tag to clone and build from
-#    - PSYCOPG2_VERSION - Unused, kept for future possible usage
+#    - PSYCOPG2_VERSION - Version to build
 
 FROM python:3.9-slim-bullseye as main
 
@@ -38,7 +37,7 @@ RUN set -eux \
   && cd /usr/src \
   && mkdir wheels \
   && python3 -m pip wheel \
-    # Build the package at the requried version
+    # Build the package at the required version
     psycopg2==${PSYCOPG2_VERSION} \
     # Output the *.whl into this directory
     --wheel-dir wheels \
