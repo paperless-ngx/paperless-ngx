@@ -230,17 +230,21 @@ jobs:
         name: Checkout
         uses: actions/checkout@v3
       -
+        name: Install pipenv
+        run: pipx install pipenv
+      -
         name: Set up Python
         uses: actions/setup-python@v3
         with:
-          python-version: 3.9
+          python-version: "3.9"
+          cache: "pipenv"
+          cache-dependency-path: 'Pipfile.lock'
       -
         name: Install dependencies
         run: |
           sudo apt-get update -qq
           sudo apt-get install -qq --no-install-recommends gettext liblept5
-          pip3 install --upgrade pip setuptools wheel
-          pip3 install -r requirements.txt
+          pipenv sync --dev
       -
         name: Download frontend artifact
         uses: actions/download-artifact@v3
@@ -254,6 +258,18 @@ jobs:
           name: documentation
           path: docs/_build/html/
       -
+        name: Compile messages
+        run: |
+          ls -ahl
+          cd src/
+          ls -ahl
+          pipenv run manage.py compilemessages
+      -
+        name: Collect static files
+        run: |
+          cd src/
+          pipenv run manage.py collectstatic --no-input
+      -
         name: Move files
         run: |
           mkdir dist
@@ -266,16 +282,7 @@ jobs:
           cp scripts/*.service scripts/*.sh dist/paperless-ngx/scripts/
           cp src/ dist/paperless-ngx/src -r
           cp docs/_build/html/ dist/paperless-ngx/docs -r
-      -
-        name: Compile messages
-        run: |
-          cd dist/paperless-ngx/src
-          python3 manage.py compilemessages
-      -
-        name: Collect static files
-        run: |
-          cd dist/paperless-ngx/src
-          python3 manage.py collectstatic --no-input
+
       -
         name: Make release package
         run: |
