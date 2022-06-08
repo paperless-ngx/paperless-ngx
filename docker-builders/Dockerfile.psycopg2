@@ -11,7 +11,6 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 ARG BUILD_PACKAGES="\
   build-essential \
-  git \
   python3-dev \
   python3-pip \
   # https://www.psycopg.org/docs/install.html#prerequisites
@@ -32,14 +31,20 @@ RUN set -eux \
 # For better caching, seperate the basic installs from
 # the building
 
-ARG PSYCOPG2_GIT_TAG
 ARG PSYCOPG2_VERSION
 
 RUN set -eux \
-  && echo "Building psycopg2 wheel" \
+  && echo "Building psycopg2 wheel ${PSYCOPG2_VERSION}" \
   && cd /usr/src \
-  && git clone --quiet --depth 1 --branch ${PSYCOPG2_GIT_TAG} https://github.com/psycopg/psycopg2.git \
-  && cd psycopg2 \
   && mkdir wheels \
-  && python3 -m pip wheel . --wheel-dir wheels \
+  && python3 -m pip wheel \
+    # Build the package at the requried version
+    psycopg2==${PSYCOPG2_VERSION} \
+    # Output the *.whl into this directory
+    --wheel-dir wheels \
+    # Do not use a binary packge for the package being built
+    --no-binary=psycopg2 \
+    # Do use binary packages for dependencies
+    --prefer-binary \
+    --no-cache-dir \
   && ls -ahl wheels/

@@ -23,7 +23,6 @@ ARG BUILD_PACKAGES="\
   build-essential \
   python3-dev \
   python3-pip \
-  git \
   # qpdf requirement - https://github.com/qpdf/qpdf#crypto-providers
   libgnutls28-dev \
   # lxml requrements - https://lxml.de/installation.html
@@ -72,21 +71,19 @@ RUN set -eux \
 # For better caching, seperate the basic installs from
 # the building
 
-ARG PIKEPDF_GIT_TAG
 ARG PIKEPDF_VERSION
 
 RUN set -eux \
-  && echo "building pikepdf wheel" \
-  # Note the v in the tag name here
-  && git clone --quiet --depth 1 --branch "${PIKEPDF_GIT_TAG}" https://github.com/pikepdf/pikepdf.git \
-  && cd pikepdf \
-  # pikepdf seems to specifciy either a next version when built OR
-  # a post release tag.
-  # In either case, this won't match what we want from requirements.txt
-  # Directly modify the setup.py to set the version we just checked out of Git
-  && sed -i "s/use_scm_version=True/version=\"${PIKEPDF_VERSION}\"/g" setup.py \
-  # https://github.com/pikepdf/pikepdf/issues/323
-  && rm pyproject.toml \
+  && echo "Building pikepdf wheel ${PIKEPDF_VERSION}" \
   && mkdir wheels \
-  && python3 -m pip wheel . --wheel-dir wheels \
+  && python3 -m pip wheel \
+    # Build the package at the requried version
+    pikepdf==${PIKEPDF_VERSION} \
+    # Output the *.whl into this directory
+    --wheel-dir wheels \
+    # Do not use a binary packge for the package being built
+    --no-binary=pikepdf \
+    # Do use binary packages for dependencies
+    --prefer-binary \
+    --no-cache-dir \
   && ls -ahl wheels
