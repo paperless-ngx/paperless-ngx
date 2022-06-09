@@ -1,0 +1,54 @@
+# This Dockerfile builds the lxml wheel
+# Inputs:
+#    - LXML_VERSION - Version of lxml to build wheel for
+
+# Default to pulling from the main repo registry when manually building
+ARG REPO="paperless-ngx/paperless-ngx"
+
+FROM python:3.9-slim-bullseye as main
+
+LABEL org.opencontainers.image.description="A intermediate image with lxml wheel built"
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+ARG BUILD_PACKAGES="\
+  build-essential \
+  python3-dev \
+  python3-pip \
+  # lxml requrements - https://lxml.de/installation.html
+  libxml2-dev \
+  libxslt1-dev"
+
+WORKDIR /usr/src
+
+# As this is an base image for a multi-stage final image
+# the added size of the install is basically irrelevant
+
+RUN set -eux \
+  && apt-get update --quiet \
+  && apt-get install --yes --quiet --no-install-recommends ${BUILD_PACKAGES} \
+  && python3 -m pip install --no-cache-dir --upgrade \
+    pip \
+    wheel \
+  && rm -rf /var/lib/apt/lists/*
+
+# Layers after this point change according to required version
+# For better caching, seperate the basic installs from
+# the building
+
+ARG LXML_VERSION
+
+RUN set -eux \
+  && echo "Building lxml wheel ${LXML_VERSION}" \
+  && mkdir wheels \
+  && python3 -m pip wheel \
+    # Build the package at the required version
+    lxml==${LXML_VERSION} \
+    # Output the *.whl into this directory
+    --wheel-dir wheels \
+    # Do not use a binary packge for the package being built
+    --no-binary=lxml \
+    # Do use binary packages for dependencies
+    --prefer-binary \
+    --no-cache-dir \
+  && ls -ahl wheels

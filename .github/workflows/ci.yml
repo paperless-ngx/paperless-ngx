@@ -260,20 +260,19 @@ jobs:
       -
         name: Compile messages
         run: |
-          ls -ahl
           cd src/
-          ls -ahl
-          pipenv run manage.py compilemessages
+          pipenv run python3 manage.py compilemessages
       -
         name: Collect static files
         run: |
           cd src/
-          pipenv run manage.py collectstatic --no-input
+          pipenv run python3 manage.py collectstatic --no-input
       -
         name: Move files
         run: |
           mkdir dist
           mkdir dist/paperless-ngx
+          mkdir dist/paperless-ngx/static
           mkdir dist/paperless-ngx/scripts
           cp .dockerignore .env Dockerfile Pipfile Pipfile.lock LICENSE README.md requirements.txt dist/paperless-ngx/
           cp paperless.conf.example dist/paperless-ngx/paperless.conf
@@ -282,12 +281,11 @@ jobs:
           cp scripts/*.service scripts/*.sh dist/paperless-ngx/scripts/
           cp src/ dist/paperless-ngx/src -r
           cp docs/_build/html/ dist/paperless-ngx/docs -r
-
+          cp -r static dist/paperless-ngx
       -
         name: Make release package
         run: |
           cd dist
-          find . -name __pycache__ | xargs rm -r
           tar -cJf paperless-ngx.tar.xz paperless-ngx/
       -
         name: Upload release artifact

@@ -71,6 +71,17 @@ jobs:
           echo ${build_json}
 
           echo ::set-output name=pikepdf-json::${build_json}
+
+      -
+        name: Setup lxml image
+        id: lxml-setup
+        run: |
+          build_json=$(python ${GITHUB_WORKSPACE}/.github/scripts/get-build-json.py lxml)
+
+          echo ${build_json}
+
+          echo ::set-output name=lxml-json::${build_json}
+
       -
         name: Setup jbig2enc image
         id: jbig2enc-setup
@@ -86,6 +97,8 @@ jobs:
       qpdf-json: ${{ steps.qpdf-setup.outputs.qpdf-json }}
 
       pikepdf-json: ${{ steps.pikepdf-setup.outputs.pikepdf-json }}
+
+      lxml-json: ${{ steps.lxml-setup.outputs.lxml-json }}
 
       psycopg2-json: ${{ steps.psycopg2-setup.outputs.psycopg2-json }}
 
@@ -124,11 +137,23 @@ jobs:
       build-args: |
         PSYCOPG2_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.psycopg2-json).version }}
 
+  build-lxml-wheel:
+    name: lxml
+    needs:
+      - prepare-docker-build
+    uses: ./.github/workflows/reusable-workflow-builder.yml
+    with:
+      dockerfile: ./docker-builders/Dockerfile.lxml
+      build-json: ${{ needs.prepare-docker-build.outputs.lxml-json }}
+      build-args: |
+        LXML_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.lxml-json).version }}
+
   build-pikepdf-wheel:
     name: pikepdf
     needs:
       - prepare-docker-build
       - build-qpdf-debs
+      - build-lxml-wheel
     uses: ./.github/workflows/reusable-workflow-builder.yml
     with:
       dockerfile: ./docker-builders/Dockerfile.pikepdf
@@ -136,4 +161,5 @@ jobs:
       build-args: |
         REPO=${{ github.repository }}
         QPDF_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.qpdf-json).version }}
+        LXML_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.lxml-json).version }}
         PIKEPDF_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.pikepdf-json).version }}

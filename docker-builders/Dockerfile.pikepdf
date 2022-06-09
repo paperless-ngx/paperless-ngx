@@ -8,7 +8,9 @@
 ARG REPO="paperless-ngx/paperless-ngx"
 
 ARG QPDF_VERSION
+ARG LXML_VERSION
 FROM ghcr.io/${REPO}/builder/qpdf:${QPDF_VERSION} as qpdf-builder
+FROM ghcr.io/${REPO}/builder/lxml:${LXML_VERSION} as lxml-builder
 
 # This does nothing, except provide a name for a copy below
 
@@ -24,9 +26,6 @@ ARG BUILD_PACKAGES="\
   python3-pip \
   # qpdf requirement - https://github.com/qpdf/qpdf#crypto-providers
   libgnutls28-dev \
-  # lxml requrements - https://lxml.de/installation.html
-  libxml2-dev \
-  libxslt1-dev \
   # Pillow requirements - https://pillow.readthedocs.io/en/stable/installation.html#external-libraries
   # JPEG functionality
   libjpeg62-turbo-dev \
@@ -50,6 +49,7 @@ ARG BUILD_PACKAGES="\
 WORKDIR /usr/src
 
 COPY --from=qpdf-builder /usr/src/qpdf/*.deb ./
+COPY --from=lxml-builder /usr/src/wheels/*.whl ./
 
 # As this is an base image for a multi-stage final image
 # the added size of the install is basically irrelevant
@@ -85,4 +85,6 @@ RUN set -eux \
     # Do use binary packages for dependencies
     --prefer-binary \
     --no-cache-dir \
+    # Use current directory to locate lxml wheel
+    --find-links=. \
   && ls -ahl wheels
