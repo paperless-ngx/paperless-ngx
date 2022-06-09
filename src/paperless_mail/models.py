@@ -65,6 +65,7 @@ class MailRule(models.Model):
         MOVE = 2, _("Move to specified folder")
         MARK_READ = 3, _("Mark as read, don't process read mails")
         FLAG = 4, _("Flag the mail, don't process flagged mails")
+        TAG = 5, _("Tag the mail with specified tag, don't process tagged mails")
 
     class TitleSource(models.IntegerChoices):
         FROM_SUBJECT = 1, _("Use subject as title")

@@ -1,15 +1,5 @@
 describe('manage', () => {
-  beforeEach(() => {
-    cy.intercept('http://localhost:8000/api/ui_settings/', {
-      fixture: 'ui_settings/settings.json',
-    })
-    cy.intercept('http://localhost:8000/api/correspondents/*', {
-      fixture: 'correspondents/correspondents.json',
-    })
-    cy.intercept('http://localhost:8000/api/tags/*', {
-      fixture: 'tags/tags.json',
-    })
-  })
+  // also uses global fixtures from cypress/support/e2e.ts
 
   it('should show a list of correspondents with bottom pagination as well', () => {
     cy.visit('/correspondents')

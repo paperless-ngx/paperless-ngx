@@ -238,5 +238,5 @@ class TestSanityChecker(DirectoriesMixin, TestCase):
         with self.assertLogs() as capture:
             call_command("document_sanity_checker")
 
-        self.assertEqual(len(capture.output), 1)
-        self.assertIn("Checksum mismatch of document", capture.output[0])
+        self.assertEqual(len(capture.output), 2)
+        self.assertIn("Checksum mismatch. Stored: abc, actual:", capture.output[1])

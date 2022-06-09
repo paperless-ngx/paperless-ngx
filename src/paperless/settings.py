@@ -458,12 +458,14 @@ PAPERLESS_WORKER_RETRY: Final[int] = __get_int(
 
 Q_CLUSTER = {
     "name": "paperless",
+    "guard_cycle": 5,
     "catch_up": False,
     "recycle": 1,
     "retry": PAPERLESS_WORKER_RETRY,
     "timeout": PAPERLESS_WORKER_TIMEOUT,
     "workers": TASK_WORKERS,
     "redis": os.getenv("PAPERLESS_REDIS", "redis://localhost:6379"),
+    "log_level": "DEBUG" if DEBUG else "INFO",
 }
 
 
