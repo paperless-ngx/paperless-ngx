@@ -2,16 +2,6 @@ describe('tasks', () => {
   beforeEach(() => {
     this.dismissedTasks = new Set<number>()
 
-    cy.intercept('http://localhost:8000/api/ui_settings/', {
-      fixture: 'ui_settings/settings.json',
-    })
-    cy.intercept('http://localhost:8000/api/correspondents/*', {
-      fixture: 'correspondents/correspondents.json',
-    })
-    cy.intercept('http://localhost:8000/api/tags/*', {
-      fixture: 'tags/tags.json',
-    })
-
     cy.fixture('tasks/tasks.json').then((tasksViewsJson) => {
       // acknowledge tasks POST
       cy.intercept(

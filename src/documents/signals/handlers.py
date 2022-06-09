@@ -516,7 +516,6 @@ def init_paperless_task(sender, task, **kwargs):
 
 @receiver(django_q.signals.pre_execute)
 def paperless_task_started(sender, task, **kwargs):
-    print(task)
     try:
         if task["func"] == "documents.tasks.consume_file":
             paperless_task = PaperlessTask.objects.get(task_id=task["id"])
