@@ -538,7 +538,7 @@ class TestTasks(DirectoriesMixin, TestCase):
     @mock.patch("documents.tasks.sanity_checker.check_sanity")
     def test_sanity_check_error(self, m):
         messages = SanityCheckMessages()
-        messages.error("Some error")
+        messages.error(None, "Some error")
         m.return_value = messages
         self.assertRaises(SanityCheckFailedException, tasks.sanity_check)
         m.assert_called_once()
@@ -546,7 +546,7 @@ class TestTasks(DirectoriesMixin, TestCase):
     @mock.patch("documents.tasks.sanity_checker.check_sanity")
     def test_sanity_check_warning(self, m):
         messages = SanityCheckMessages()
-        messages.warning("Some warning")
+        messages.warning(None, "Some warning")
         m.return_value = messages
         self.assertEqual(
             tasks.sanity_check(),
@@ -557,7 +557,7 @@ class TestTasks(DirectoriesMixin, TestCase):
     @mock.patch("documents.tasks.sanity_checker.check_sanity")
     def test_sanity_check_info(self, m):
         messages = SanityCheckMessages()
-        messages.info("Some info")
+        messages.info(None, "Some info")
         m.return_value = messages
         self.assertEqual(
             tasks.sanity_check(),

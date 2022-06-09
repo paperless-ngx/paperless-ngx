@@ -33,13 +33,13 @@
 version: "3.4"
 services:
   broker:
-    image: redis:6.0
+    image: docker.io/library/redis:6.0
     restart: unless-stopped
     volumes:
       - redisdata:/data
 
   db:
-    image: postgres:13
+    image: docker.io/library/postgres:13
     restart: unless-stopped
     volumes:
       - pgdata:/var/lib/postgresql/data
@@ -77,7 +77,7 @@ services:
       PAPERLESS_TIKA_ENDPOINT: http://tika:9998
 
   gotenberg:
-    image: gotenberg/gotenberg:7.4
+    image: docker.io/gotenberg/gotenberg:7.4
     restart: unless-stopped
     command:
       - "gotenberg"

@@ -161,6 +161,9 @@ These are as follows:
     will not consume flagged mails.
 *   **Move to folder:** Moves consumed mails out of the way so that paperless wont
     consume them again.
+*   **Add custom Tag:** Adds a custom tag to mails with consumed documents (the IMAP
+    standard calls these "keywords"). Paperless will not consume mails already tagged.
+    Not all mail servers support this feature!
 
 .. caution::
 
