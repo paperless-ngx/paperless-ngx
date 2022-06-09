@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "5eb8d3dd2f13d65f3f334413f6905f1a7badc42adc79d34c8f8c8c61525aff59"
+            "sha256": "52ea8399376ee7e4f9df8b7e261a9e3f6790060423f8431ebe73f200b33af055"
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -474,7 +474,7 @@
                 "sha256:84d9dd047ffa80596e0f246e2eab0b391788b0503584e8945f2368256d2735ff",
                 "sha256:9d643ff0a55b762d5cdb124b8eaa99c66322e2157b69160bc32796e824360e6d"
             ],
-            "markers": "python_version >= '3'",
+            "markers": "python_version >= '3.5'",
             "version": "==3.3"
         },
         "imap-tools": {
@@ -1695,7 +1695,9 @@
             "version": "==0.4.4"
         },
         "coverage": {
-            "extras": [],
+            "extras": [
+                "toml"
+            ],
             "hashes": [
                 "sha256:01c5615d13f3dd3aa8543afc069e5319cfa0c7d712f6e04b920431e5c564a749",
                 "sha256:106c16dfe494de3193ec55cac9640dd039b66e196e4641fa8ac396181578b982",
@@ -1816,7 +1818,7 @@
                 "sha256:84d9dd047ffa80596e0f246e2eab0b391788b0503584e8945f2368256d2735ff",
                 "sha256:9d643ff0a55b762d5cdb124b8eaa99c66322e2157b69160bc32796e824360e6d"
             ],
-            "markers": "python_version >= '3'",
+            "markers": "python_version >= '3.5'",
             "version": "==3.3"
         },
         "imagesize": {
@@ -2143,11 +2145,11 @@
         },
         "sphinx": {
             "hashes": [
-                "sha256:7bf8ca9637a4ee15af412d1a1d9689fec70523a68ca9bb9127c2f3eeb344e2e6",
-                "sha256:ebf612653238bcc8f4359627a9b7ce44ede6fdd75d9d30f68255c7383d3a6226"
+                "sha256:36aa2a3c2f6d5230be94585bc5d74badd5f9ed8f3388b8eedc1726fe45b1ad30",
+                "sha256:f4da1187785a5bc7312cc271b0e867a93946c319d106363e102936a3d9857306"
             ],
             "index": "pypi",
-            "version": "==4.5.0"
+            "version": "==5.0.1"
         },
         "sphinx-autobuild": {
             "hashes": [
@@ -2279,7 +2281,7 @@
                 "sha256:fa2ba70284fa42c2a5ecb35e322e68823288a4251f9ba9cc77be04ae15eada68",
                 "sha256:fba85b6cd9c39be262fcd23865652920832b61583de2a2ca907dbd8e8a8c81e5"
             ],
-            "markers": "python_version > '2.7'",
+            "markers": "python_version >= '3.5'",
             "version": "==6.1"
         },
         "tox": {
