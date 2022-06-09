@@ -229,22 +229,22 @@ export class DocumentListComponent implements OnInit, OnDestroy {
 
   clickTag(tagID: number) {
     this.list.selectNone()
-    this.filterEditor.addTag(tagID)
+    this.filterEditor.toggleTag(tagID)
   }
 
   clickCorrespondent(correspondentID: number) {
     this.list.selectNone()
-    this.filterEditor.addCorrespondent(correspondentID)
+    this.filterEditor.toggleCorrespondent(correspondentID)
   }
 
   clickDocumentType(documentTypeID: number) {
     this.list.selectNone()
-    this.filterEditor.addDocumentType(documentTypeID)
+    this.filterEditor.toggleDocumentType(documentTypeID)
   }
 
   clickStoragePath(storagePathID: number) {
     this.list.selectNone()
-    this.filterEditor.addStoragePath(storagePathID)
+    this.filterEditor.toggleStoragePath(storagePathID)
   }
 
   clickMoreLike(documentID: number) {
