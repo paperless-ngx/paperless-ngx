@@ -34,6 +34,7 @@ branch_name=$(git rev-parse --abbrev-ref HEAD)
 export DOCKER_BUILDKIT=1
 
 docker build --file "$1" \
+	--progress=plain \
 	--cache-from ghcr.io/paperless-ngx/paperless-ngx/builder/cache/app:"${branch_name}" \
 	--cache-from ghcr.io/paperless-ngx/paperless-ngx/builder/cache/app:dev \
 	--build-arg JBIG2ENC_VERSION="${jbig2enc_version}" \
