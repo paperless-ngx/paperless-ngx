@@ -30,47 +30,65 @@ class Command(BaseCommand):
 
         documents = Document.objects.all()
 
-        for document in documents:
-            existing_thumbnail = Path(document.thumbnail_path)
+        with tempfile.TemporaryDirectory() as tempdir:
 
-            if existing_thumbnail.suffix == "png":
+            for document in documents:
+                existing_thumbnail = Path(document.thumbnail_path).resolve()
 
-                self.stdout.write(f"Converting thumbnail: {existing_thumbnail}")
+                if existing_thumbnail.suffix == ".png":
 
-                converted_thumbnail = Path(tempfile.mkstemp(suffix=".webp"))
+                    self.stdout.write(f"Converting thumbnail: {existing_thumbnail}")
 
-                try:
-                    run_convert(
-                        density=300,
-                        scale="500x5000>",
-                        alpha="remove",
-                        strip=True,
-                        trim=False,
-                        auto_orient=True,
-                        input_file=f"{existing_thumbnail}[0]",
-                        output_file=str(converted_thumbnail),
-                    )
+                    # Change the existing filename suffix from png to webp
+                    converted_thumbnail_name = existing_thumbnail.with_suffix(
+                        ".webp",
+                    ).name
 
-                    self.stdout.write("Replacing existing thumbnail")
+                    # Create the expected output filename in the tempdir
+                    converted_thumbnail = (
+                        Path(tempdir) / Path(converted_thumbnail_name)
+                    ).resolve()
 
-                    if converted_thumbnail.exists():
-                        shutil.copy(converted_thumbnail, existing_thumbnail)
+                    try:
+                        # Run actual conversion
+                        run_convert(
+                            density=300,
+                            scale="500x5000>",
+                            alpha="remove",
+                            strip=True,
+                            trim=False,
+                            auto_orient=True,
+                            input_file=f"{existing_thumbnail}[0]",
+                            output_file=str(converted_thumbnail),
+                        )
 
-                    self.stdout.write(
-                        self.style.SUCCESS("Conversion to WebP completed"),
-                    )
+                        if converted_thumbnail.exists():
+                            # Copy newly created thumbnail to thumbnail directory
+                            shutil.copy(converted_thumbnail, existing_thumbnail.parent)
 
-                except Exception as e:
-                    self.stderr.write(
-                        self.style.ERROR(
-                            f"Error converting thumbnail (existing will be kept): {e}",
-                        ),
-                    )
-                finally:
-                    if converted_thumbnail.exists():
-                        converted_thumbnail.unlink()
+                            # Remove the PNG version
+                            existing_thumbnail.unlink()
 
-        end = time.time()
-        duration = end - start
+                            self.stdout.write(
+                                self.style.SUCCESS(
+                                    "Conversion to WebP completed",
+                                ),
+                            )
+                        else:
+                            # Highly unlike to reach here
+                            self.stderr.write(
+                                self.style.WARNING("Converted thumbnail doesn't exist"),
+                            )
+
+                    except Exception as e:
+                        self.stderr.write(
+                            self.style.ERROR(
+                                f"Error converting thumbnail"
+                                f" (existing file unchanged): {e}",
+                            ),
+                        )
+
+            end = time.time()
+            duration = end - start
 
         self.stdout.write(f"Conversion completed in {duration:.3f}s")
