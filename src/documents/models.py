@@ -300,10 +300,26 @@ class Document(models.Model):
             png_file_name += ".gpg"
             webp_file_name += ".gpg"
 
-        thumb = os.path.join(settings.THUMBNAIL_DIR, webp_file_name)
+        # This property is used to both generate the file path
+        # and locate the file itself
+        # Hence why this looks a little weird
 
-        if not os.path.exists(thumb):
-            thumb = os.path.join(settings.THUMBNAIL_DIR, png_file_name)
+        webp_file_path = os.path.join(settings.THUMBNAIL_DIR, webp_file_name)
+        png_file_path = thumb = os.path.join(settings.THUMBNAIL_DIR, png_file_name)
+
+        # 1. Assume the thumbnail is WebP
+
+        if not os.path.exists(webp_file_path):
+            # 2. If WebP doesn't exist, check PNG
+            if not os.path.exists(png_file_path):
+                # 3. If PNG doesn't exist, filename is being constructed, return WebP
+                thumb = webp_file_path
+            else:
+                # 2.1 - PNG file exists, return path to it
+                thumb = png_file_name
+        else:
+            # 1.1 - WebP file exists, return path to it
+            thumb = webp_file_path
         return thumb
 
     @property
