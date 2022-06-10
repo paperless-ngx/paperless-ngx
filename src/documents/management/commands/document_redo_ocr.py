@@ -1,4 +1,3 @@
-import logging
 import shutil
 from pathlib import Path
 from typing import Type
@@ -38,13 +37,14 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        logging.getLogger().handlers[0].level = logging.ERROR
-
         all_docs = Document.objects.all()
 
-        for doc_pk in tqdm.tqdm(args.documents, disable=options["no_progress_bar"]):
+        for doc_pk in tqdm.tqdm(
+            options["documents"],
+            disable=options["no_progress_bar"],
+        ):
             try:
-                self.stdout.write(self.style.INFO(f"Parsing document {doc_pk}"))
+                self.stdout.write(f"Parsing document {doc_pk}")
                 doc: Document = all_docs.get(pk=doc_pk)
             except ObjectDoesNotExist:
                 self.stdout.write(self.style.ERROR(f"Document {doc_pk} does not exist"))
@@ -64,11 +64,15 @@ class Command(BaseCommand):
             shutil.copy(doc.source_path, temp_file)
 
             try:
+                self.stdout.write(
+                    f"Using {type(document_parser).__name__} for document",
+                )
                 # Try to re-parse the document into text
                 document_parser.parse(str(temp_file), doc.mime_type)
 
                 doc.content = document_parser.get_text()
                 doc.save()
+                self.stdout.write("Document OCR updated")
 
             except ParseError as e:
                 self.stdout.write(self.style.ERROR(f"Error parsing document: {e}"))
