@@ -305,10 +305,9 @@ class Document(models.Model):
         # Hence why this looks a little weird
 
         webp_file_path = os.path.join(settings.THUMBNAIL_DIR, webp_file_name)
-        png_file_path = thumb = os.path.join(settings.THUMBNAIL_DIR, png_file_name)
+        png_file_path = os.path.join(settings.THUMBNAIL_DIR, png_file_name)
 
         # 1. Assume the thumbnail is WebP
-
         if not os.path.exists(webp_file_path):
             # 2. If WebP doesn't exist, check PNG
             if not os.path.exists(png_file_path):
@@ -316,11 +315,11 @@ class Document(models.Model):
                 thumb = webp_file_path
             else:
                 # 2.1 - PNG file exists, return path to it
-                thumb = png_file_name
+                thumb = png_file_path
         else:
             # 1.1 - WebP file exists, return path to it
             thumb = webp_file_path
-        return thumb
+        return os.path.normpath(thumb)
 
     @property
     def thumbnail_file(self):
