@@ -3,6 +3,7 @@ import logging
 import os
 import re
 from collections import OrderedDict
+from typing import Optional
 
 import dateutil.parser
 import pathvalidate
@@ -228,7 +229,7 @@ class Document(models.Model):
         verbose_name = _("document")
         verbose_name_plural = _("documents")
 
-    def __str__(self):
+    def __str__(self) -> str:
 
         # Convert UTC database time to local time
         created = datetime.date.isoformat(timezone.localdate(self.created))
@@ -242,7 +243,7 @@ class Document(models.Model):
         return res
 
     @property
-    def source_path(self):
+    def source_path(self) -> str:
         if self.filename:
             fname = str(self.filename)
         else:
@@ -257,11 +258,11 @@ class Document(models.Model):
         return open(self.source_path, "rb")
 
     @property
-    def has_archive_version(self):
+    def has_archive_version(self) -> bool:
         return self.archive_filename is not None
 
     @property
-    def archive_path(self):
+    def archive_path(self) -> Optional[str]:
         if self.has_archive_version:
             return os.path.join(settings.ARCHIVE_DIR, str(self.archive_filename))
         else:
@@ -271,7 +272,7 @@ class Document(models.Model):
     def archive_file(self):
         return open(self.archive_path, "rb")
 
-    def get_public_filename(self, archive=False, counter=0, suffix=None):
+    def get_public_filename(self, archive=False, counter=0, suffix=None) -> str:
         result = str(self)
 
         if counter:
@@ -292,17 +293,18 @@ class Document(models.Model):
         return get_default_file_extension(self.mime_type)
 
     @property
-    def thumbnail_path(self):
-        file_name = f"{self.pk:07}.webp"
+    def thumbnail_path(self) -> str:
+        png_file_name = f"{self.pk:07}.png"
+        webp_file_name = f"{self.pk:07}.webp"
         if self.storage_type == self.STORAGE_TYPE_GPG:
-            file_name += ".gpg"
+            png_file_name += ".gpg"
+            webp_file_name += ".gpg"
 
-        thumb = os.path.join(settings.THUMBNAIL_DIR, file_name)
+        thumb = os.path.join(settings.THUMBNAIL_DIR, webp_file_name)
 
-        if os.path.exists(thumb):
-            return thumb
-        else:
-            return os.path.splitext(thumb)[0] + ".png"
+        if not os.path.exists(thumb):
+            thumb = os.path.join(settings.THUMBNAIL_DIR, png_file_name)
+        return thumb
 
     @property
     def thumbnail_file(self):

@@ -30,8 +30,8 @@ class TextDocumentParser(DocumentParser):
         )
         draw.text((5, 5), read_text(), font=font, fill="black")
 
-        out_path = os.path.join(self.tempdir, "thumb.png")
-        img.save(out_path)
+        out_path = os.path.join(self.tempdir, "thumb.webp")
+        img.save(out_path, format="WEBP")
 
         return out_path
 
