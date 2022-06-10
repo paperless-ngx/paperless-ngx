@@ -293,11 +293,16 @@ class Document(models.Model):
 
     @property
     def thumbnail_path(self):
-        file_name = f"{self.pk:07}.png"
+        file_name = f"{self.pk:07}.webp"
         if self.storage_type == self.STORAGE_TYPE_GPG:
             file_name += ".gpg"
 
-        return os.path.join(settings.THUMBNAIL_DIR, file_name)
+        thumb = os.path.join(settings.THUMBNAIL_DIR, file_name)
+
+        if os.path.exists(thumb):
+            return thumb
+        else:
+            return os.path.splitext(thumb)[0] + ".png"
 
     @property
     def thumbnail_file(self):

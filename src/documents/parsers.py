@@ -191,7 +191,7 @@ def make_thumbnail_from_pdf(in_path, temp_dir, logging_group=None) -> str:
     """
     The thumbnail of a PDF is just a 500px wide image of the first page.
     """
-    out_path = os.path.join(temp_dir, "convert.png")
+    out_path = os.path.join(temp_dir, "convert.webp")
 
     # Run convert to get a decent thumbnail
     try:
@@ -321,7 +321,7 @@ class DocumentParser(LoggingMixin):
 
     def get_optimised_thumbnail(self, document_path, mime_type, file_name=None):
         thumbnail = self.get_thumbnail(document_path, mime_type, file_name)
-        if settings.OPTIMIZE_THUMBNAILS:
+        if settings.OPTIMIZE_THUMBNAILS and os.path.splitext(thumbnail)[1] == ".png":
             out_path = os.path.join(self.tempdir, "thumb_optipng.png")
 
             args = (
