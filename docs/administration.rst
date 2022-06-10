@@ -518,3 +518,15 @@ Basic usage to disable encryption of your document store:
 .. code::
 
     decrypt_documents [--passphrase SECR3TP4SSPHRA$E]
+
+Managing thumbnail format
+===================
+
+Document thumbnails were originally created as PNG format.  Newly
+uploaded documents are now using WebP to reduce both storage space and
+page loading times.  To convert older PNG format thumbnails to WebP
+run:
+
+.. code::
+
+    convert_thumbnails
