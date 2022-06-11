@@ -150,9 +150,9 @@ class TestDecryptDocuments(TestCase):
                 "samples",
                 "documents",
                 "thumbnails",
-                f"0000004.png.gpg",
+                f"0000004.webp.gpg",
             ),
-            os.path.join(thumb_dir, f"{doc.id:07}.png.gpg"),
+            os.path.join(thumb_dir, f"{doc.id:07}.webp.gpg"),
         )
 
         call_command("decrypt_documents")

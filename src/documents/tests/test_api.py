@@ -176,7 +176,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         )
 
         with open(
-            os.path.join(self.dirs.thumbnail_dir, f"{doc.pk:07d}.png"),
+            os.path.join(self.dirs.thumbnail_dir, f"{doc.pk:07d}.webp"),
             "wb",
         ) as f:
             f.write(content_thumbnail)
@@ -1022,7 +1022,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
             "samples",
             "documents",
             "thumbnails",
-            "0000001.png",
+            "0000001.webp",
         )
         archive_file = os.path.join(os.path.dirname(__file__), "samples", "simple.pdf")
 
