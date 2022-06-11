@@ -77,7 +77,6 @@ ARG RUNTIME_PACKAGES="\
   libraqm0 \
   libgnutls30 \
   libjpeg62-turbo \
-  optipng \
   python3 \
   python3-pip \
   python3-setuptools \

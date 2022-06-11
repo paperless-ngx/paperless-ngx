@@ -273,7 +273,7 @@ class Consumer(LoggingMixin):
 
             self.log("debug", f"Generating thumbnail for {self.filename}...")
             self._send_progress(70, 100, "WORKING", MESSAGE_GENERATING_THUMBNAIL)
-            thumbnail = document_parser.get_optimised_thumbnail(
+            thumbnail = document_parser.get_thumbnail(
                 self.path,
                 mime_type,
                 self.filename,

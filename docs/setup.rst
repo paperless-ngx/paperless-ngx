@@ -286,7 +286,6 @@ writing. Windows is not and will never be supported.
 
     *   ``fonts-liberation`` for generating thumbnails for plain text files
     *   ``imagemagick`` >= 6 for PDF conversion
-    *   ``optipng`` for optimizing thumbnails
     *   ``gnupg`` for handling encrypted documents
     *   ``libpq-dev`` for PostgreSQL
     *   ``libmagic-dev`` for mime type detection
@@ -298,7 +297,7 @@ writing. Windows is not and will never be supported.
 
     .. code::
 
-        python3 python3-pip python3-dev imagemagick fonts-liberation optipng gnupg libpq-dev libmagic-dev mime-support libzbar0 poppler-utils
+        python3 python3-pip python3-dev imagemagick fonts-liberation gnupg libpq-dev libmagic-dev mime-support libzbar0 poppler-utils
 
     These dependencies are required for OCRmyPDF, which is used for text recognition.
 
@@ -730,8 +729,6 @@ configuring some options in paperless can help improve performance immensely:
 *   If you want to perform OCR on the device, consider using ``PAPERLESS_OCR_CLEAN=none``.
     This will speed up OCR times and use less memory at the expense of slightly worse
     OCR results.
-*   Set ``PAPERLESS_OPTIMIZE_THUMBNAILS`` to 'false' if you want faster consumption
-    times. Thumbnails will be about 20% larger.
 *   If using docker, consider setting ``PAPERLESS_WEBSERVER_WORKERS`` to
     1. This will save some memory.
 
