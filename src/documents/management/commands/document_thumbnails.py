@@ -29,7 +29,7 @@ def _process_document(doc_in):
         if existing_thumbnail.exists() and existing_thumbnail.suffix == ".png":
             existing_thumbnail.unlink()
 
-        thumb = parser.get_optimised_thumbnail(
+        thumb = parser.get_thumbnail(
             document.source_path,
             document.mime_type,
             document.get_public_filename(),

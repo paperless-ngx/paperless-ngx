@@ -137,32 +137,3 @@ class TestConvertThumbnails(TestCase):
                 run_convert_mock.assert_called_once()
                 self.assertIn("Error converting thumbnail", stderr)
                 self.assertTrue(thumb_file.exists())
-
-    @mock.patch("documents.management.commands.convert_thumbnails.run_convert")
-    def test_convert_single_thumbnail_no_output(self, run_convert_mock):
-        """
-        GIVEN:
-            - Document exists with PNG thumbnail
-        WHEN:
-            - Thumbnail conversion is attempted, but there is no output WebP
-        THEN:
-            - Single thumbnail is converted
-        """
-
-        with tempfile.TemporaryDirectory() as thumbnail_dir:
-
-            with override_settings(
-                THUMBNAIL_DIR=thumbnail_dir,
-            ):
-
-                thumb_file = self.create_png_thumbnail_file(thumbnail_dir)
-
-                stdout, stderr = self.call_command()
-
-                run_convert_mock.assert_called_once()
-                self.assertIn(f"{thumb_file}", stdout)
-                self.assertNotIn("Conversion to WebP completed", stdout)
-                self.assertIn("Converted thumbnail doesn't exist", stderr)
-
-                self.assertTrue(thumb_file.exists())
-                self.assertFalse(thumb_file.with_suffix(".webp").exists())
