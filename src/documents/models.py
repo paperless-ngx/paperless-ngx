@@ -294,26 +294,13 @@ class Document(models.Model):
 
     @property
     def thumbnail_path(self) -> str:
-        png_file_name = f"{self.pk:07}.png"
         webp_file_name = f"{self.pk:07}.webp"
         if self.storage_type == self.STORAGE_TYPE_GPG:
-            png_file_name += ".gpg"
             webp_file_name += ".gpg"
 
-        # This property is used to both generate the file path
-        # and locate the file itself
-        # Hence why this looks a little weird
-
         webp_file_path = os.path.join(settings.THUMBNAIL_DIR, webp_file_name)
-        png_file_path = os.path.join(settings.THUMBNAIL_DIR, png_file_name)
 
-        # 1. Assume the thumbnail is WebP
-        if os.path.exists(png_file_path):
-            thumb = png_file_path
-        else:
-            thumb = webp_file_path
-
-        return os.path.normpath(thumb)
+        return os.path.normpath(webp_file_path)
 
     @property
     def thumbnail_file(self):

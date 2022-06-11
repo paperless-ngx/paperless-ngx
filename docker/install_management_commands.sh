@@ -2,8 +2,7 @@
 
 set -eu
 
-for command in convert_thumbnails \
-	decrypt_documents \
+for command in decrypt_documents \
 	document_archiver \
 	document_exporter \
 	document_importer \
