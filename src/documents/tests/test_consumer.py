@@ -183,7 +183,7 @@ class DummyParser(DocumentParser):
         _, self.fake_thumb = tempfile.mkstemp(suffix=".png", dir=scratch_dir)
         self.archive_path = archive_path
 
-    def get_optimised_thumbnail(self, document_path, mime_type, file_name=None):
+    def get_thumbnail(self, document_path, mime_type, file_name=None):
         return self.fake_thumb
 
     def parse(self, document_path, mime_type, file_name=None):
@@ -194,7 +194,7 @@ class CopyParser(DocumentParser):
     def get_thumbnail(self, document_path, mime_type, file_name=None):
         return self.fake_thumb
 
-    def get_optimised_thumbnail(self, document_path, mime_type, file_name=None):
+    def get_thumbnail(self, document_path, mime_type, file_name=None):
         return self.fake_thumb
 
     def __init__(self, logging_group, progress_callback=None):
@@ -216,7 +216,7 @@ class FaultyParser(DocumentParser):
         super().__init__(logging_group)
         _, self.fake_thumb = tempfile.mkstemp(suffix=".png", dir=scratch_dir)
 
-    def get_optimised_thumbnail(self, document_path, mime_type, file_name=None):
+    def get_thumbnail(self, document_path, mime_type, file_name=None):
         return self.fake_thumb
 
     def parse(self, document_path, mime_type, file_name=None):
