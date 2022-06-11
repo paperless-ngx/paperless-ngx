@@ -83,8 +83,6 @@ ARG RUNTIME_PACKAGES="\
   postgresql-client \
   # For Numpy
   libatlas3-base \
-  # thumbnail size reduction
-  pngquant \
   # OCRmyPDF dependencies
   tesseract-ocr \
   tesseract-ocr-eng \
