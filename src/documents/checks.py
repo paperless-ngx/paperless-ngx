@@ -1,9 +1,7 @@
 import textwrap
-from pathlib import Path
 
 from django.conf import settings
 from django.core.checks import Error
-from django.core.checks import Info
 from django.core.checks import register
 from django.core.exceptions import FieldError
 from django.db.utils import OperationalError
@@ -68,23 +66,3 @@ def parser_check(app_configs, **kwargs):
         ]
     else:
         return []
-
-
-@register()
-def png_thumbnail_check(app_configs, **kwargs):
-    from documents.models import Document
-
-    try:
-        documents = Document.objects.all()
-        for document in documents:
-            existing_thumbnail = Path(document.thumbnail_path).resolve()
-            if existing_thumbnail.suffix == ".png":
-                return [
-                    Info(
-                        "PNG thumbnails found, consider running convert_thumbnails "
-                        "to convert to WebP",
-                    ),
-                ]
-        return []
-    except (OperationalError, ProgrammingError, FieldError):
-        return []  # No documents table yet

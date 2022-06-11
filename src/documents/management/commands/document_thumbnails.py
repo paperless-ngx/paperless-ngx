@@ -1,7 +1,6 @@
 import logging
 import multiprocessing
 import shutil
-from pathlib import Path
 
 import tqdm
 from django import db
@@ -22,12 +21,6 @@ def _process_document(doc_in):
         return
 
     try:
-
-        existing_thumbnail = Path(document.thumbnail_path).resolve()
-
-        # Remove an existing PNG format thumbnail, if it existed
-        if existing_thumbnail.exists() and existing_thumbnail.suffix == ".png":
-            existing_thumbnail.unlink()
 
         thumb = parser.get_thumbnail(
             document.source_path,

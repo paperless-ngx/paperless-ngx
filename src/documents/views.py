@@ -362,11 +362,7 @@ class DocumentViewSet(
                 handle = doc.thumbnail_file
             # TODO: Send ETag information and use that to send new thumbnails
             #  if available
-            thumbnail_path = doc.thumbnail_path
-            if os.path.splitext(thumbnail_path)[1] == ".webp":
-                content_type = "image/webp"
-            else:
-                content_type = "image/png"
+            content_type = "image/webp"
 
             return HttpResponse(handle, content_type=content_type)
         except (FileNotFoundError, Document.DoesNotExist):
