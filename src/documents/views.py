@@ -362,9 +362,8 @@ class DocumentViewSet(
                 handle = doc.thumbnail_file
             # TODO: Send ETag information and use that to send new thumbnails
             #  if available
-            content_type = "image/webp"
 
-            return HttpResponse(handle, content_type=content_type)
+            return HttpResponse(handle, content_type="image/webp")
         except (FileNotFoundError, Document.DoesNotExist):
             raise Http404()
 
