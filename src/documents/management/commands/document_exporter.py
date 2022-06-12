@@ -189,7 +189,7 @@ class Command(BaseCommand):
             original_target = os.path.join(self.target, original_name)
             document_dict[EXPORTER_FILE_NAME] = original_name
 
-            thumbnail_name = base_name + "-thumbnail.png"
+            thumbnail_name = base_name + "-thumbnail.webp"
             thumbnail_target = os.path.join(self.target, thumbnail_name)
             document_dict[EXPORTER_THUMBNAIL_NAME] = thumbnail_name
 

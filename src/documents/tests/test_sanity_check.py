@@ -42,9 +42,9 @@ class TestSanityCheck(DirectoriesMixin, TestCase):
                     "samples",
                     "documents",
                     "thumbnails",
-                    "0000001.png",
+                    "0000001.webp",
                 ),
-                os.path.join(self.dirs.thumbnail_dir, "0000001.png"),
+                os.path.join(self.dirs.thumbnail_dir, "0000001.webp"),
             )
 
         return Document.objects.create(
