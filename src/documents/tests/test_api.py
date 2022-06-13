@@ -1432,17 +1432,25 @@ class TestDocumentApiV2(DirectoriesMixin, APITestCase):
             "#000000",
         )
 
-    def test_ui_settings(self):
-        test_user = User.objects.create_superuser(username="test")
-        self.client.force_authenticate(user=test_user)
 
-        response = self.client.get("/api/ui_settings/", format="json")
+class TestApiUiSettings(DirectoriesMixin, APITestCase):
+
+    ENDPOINT = "/api/ui_settings/"
+
+    def setUp(self):
+        super().setUp()
+        self.test_user = User.objects.create_superuser(username="test")
+        self.client.force_authenticate(user=self.test_user)
+
+    def test_api_get_ui_settings(self):
+        response = self.client.get(self.ENDPOINT, format="json")
         self.assertEqual(response.status_code, 200)
         self.assertDictEqual(
             response.data["settings"],
             {},
         )
 
+    def test_api_set_ui_settings(self):
         settings = {
             "settings": {
                 "dark_mode": {
@@ -1452,14 +1460,14 @@ class TestDocumentApiV2(DirectoriesMixin, APITestCase):
         }
 
         response = self.client.post(
-            "/api/ui_settings/",
+            self.ENDPOINT,
             json.dumps(settings),
             content_type="application/json",
         )
 
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.get("/api/ui_settings/", format="json")
+        response = self.client.get(self.ENDPOINT, format="json")
 
         self.assertEqual(response.status_code, 200)
         self.assertDictEqual(
@@ -2362,7 +2370,7 @@ class TestBulkDownload(DirectoriesMixin, APITestCase):
         )
 
 
-class TestApiAuth(APITestCase):
+class TestApiAuth(DirectoriesMixin, APITestCase):
     def test_auth_required(self):
 
         d = Document.objects.create(title="Test")
@@ -2415,7 +2423,7 @@ class TestApiAuth(APITestCase):
         self.assertIn("X-Version", response)
 
 
-class TestRemoteVersion(APITestCase):
+class TestRemoteVersion(DirectoriesMixin, APITestCase):
     ENDPOINT = "/api/remote_version/"
 
     def setUp(self):
