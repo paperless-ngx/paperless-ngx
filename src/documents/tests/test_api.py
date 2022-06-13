@@ -2599,8 +2599,6 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
         self.assertEqual(resp_storage_path["id"], self.sp1.id)
         self.assertEqual(resp_storage_path["path"], self.sp1.path)
 
-    # TODO: Need to investigate and fix
-    @pytest.mark.skip(reason="Return 400, unsure as to why")
     def test_api_create_storage_path(self):
         response = self.client.post(
             self.ENDPOINT,
@@ -2610,6 +2608,6 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
                     "path": "Somewhere/{asn}",
                 },
             ),
-            format="json",
+            content_type="application/json",
         )
         self.assertEqual(response.status_code, 201)
