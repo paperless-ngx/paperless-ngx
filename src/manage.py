@@ -2,7 +2,7 @@
 import os
 import sys
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: nocover
 
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "paperless.settings")
 

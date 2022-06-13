@@ -536,8 +536,6 @@ class BulkDownloadSerializer(DocumentListSerializer):
 
 
 class StoragePathSerializer(MatchingModelSerializer):
-    document_count = serializers.IntegerField(read_only=True)
-
     class Meta:
         model = StoragePath
         fields = (
@@ -574,6 +572,10 @@ class StoragePathSerializer(MatchingModelSerializer):
             raise serializers.ValidationError(_("Invalid variable detected."))
 
         return path
+
+    def create(self, validated_data):
+        storage_path = StoragePath.objects.create(**validated_data)
+        return storage_path
 
 
 class UiSettingsViewSerializer(serializers.ModelSerializer):
