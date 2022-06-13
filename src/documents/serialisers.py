@@ -585,10 +585,6 @@ class UiSettingsViewSerializer(serializers.ModelSerializer):
             "settings",
         ]
 
-    def update(self, instance, validated_data):
-        super().update(instance, validated_data)
-        return instance
-
     def create(self, validated_data):
         ui_settings = UiSettings.objects.update_or_create(
             user=validated_data.get("user"),
