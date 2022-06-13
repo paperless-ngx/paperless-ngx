@@ -1786,6 +1786,34 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
         self.assertEqual(kwargs["add_tags"], [self.t1.id])
         self.assertEqual(kwargs["remove_tags"], [self.t2.id])
 
+    @mock.patch("documents.serialisers.bulk_edit.modify_tags")
+    def test_api_modify_tags_not_provided(self, m):
+        """
+        GIVEN:
+            - API data to modify tags is missing modify_tags field
+        WHEN:
+            - API to edit tags is called
+        THEN:
+            - API returns HTTP 400
+            - modify_tags is not called
+        """
+        m.return_value = "OK"
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc1.id, self.doc3.id],
+                    "method": "modify_tags",
+                    "parameters": {
+                        "add_tags": [self.t1.id],
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 400)
+        m.assert_not_called()
+
     @mock.patch("documents.serialisers.bulk_edit.delete")
     def test_api_delete(self, m):
         m.return_value = "OK"
@@ -1801,6 +1829,137 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
         args, kwargs = m.call_args
         self.assertEqual(args[0], [self.doc1.id])
         self.assertEqual(len(kwargs), 0)
+
+    @mock.patch("documents.serialisers.bulk_edit.set_storage_path")
+    def test_api_set_storage_path(self, m):
+        """
+        GIVEN:
+            - API data to set the storage path of a document
+        WHEN:
+            - API is called
+        THEN:
+            - set_storage_path is called with correct document IDs and storage_path ID
+        """
+        m.return_value = "OK"
+
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc1.id],
+                    "method": "set_storage_path",
+                    "parameters": {"storage_path": self.sp1.id},
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        m.assert_called_once()
+        args, kwargs = m.call_args
+
+        self.assertListEqual(args[0], [self.doc1.id])
+        self.assertEqual(kwargs["storage_path"], self.sp1.id)
+
+    @mock.patch("documents.serialisers.bulk_edit.set_storage_path")
+    def test_api_unset_storage_path(self, m):
+        """
+        GIVEN:
+            - API data to clear/unset the storage path of a document
+        WHEN:
+            - API is called
+        THEN:
+            - set_storage_path is called with correct document IDs and None storage_path
+        """
+        m.return_value = "OK"
+
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc1.id],
+                    "method": "set_storage_path",
+                    "parameters": {"storage_path": None},
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        m.assert_called_once()
+        args, kwargs = m.call_args
+
+        self.assertListEqual(args[0], [self.doc1.id])
+        self.assertEqual(kwargs["storage_path"], None)
+
+    def test_api_invalid_storage_path(self):
+        """
+        GIVEN:
+            - API data to set the storage path of a document
+            - Given storage_path ID isn't valid
+        WHEN:
+            - API is called
+        THEN:
+            - set_storage_path is called with correct document IDs and storage_path ID
+        """
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc1.id],
+                    "method": "set_storage_path",
+                    "parameters": {"storage_path": self.sp1.id + 10},
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.async_task.assert_not_called()
+
+    def test_api_set_storage_path_not_provided(self):
+        """
+        GIVEN:
+            - API data to set the storage path of a document
+            - API data is missing storage path ID
+        WHEN:
+            - API is called
+        THEN:
+            - set_storage_path is called with correct document IDs and storage_path ID
+        """
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc1.id],
+                    "method": "set_storage_path",
+                    "parameters": {},
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.async_task.assert_not_called()
+
+    def test_api_get_storage_path(self):
+        """
+        GIVEN:
+            - API request to get all storage paths
+        WHEN:
+            - API is called
+        THEN:
+            - Existing storage paths are returned
+        """
+        response = self.client.get("/api/storage_paths/", format="json")
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["count"], 1)
+
+        resp_storage_path = response.data["results"][0]
+        self.assertEqual(resp_storage_path["id"], self.sp1.id)
+        self.assertEqual(resp_storage_path["path"], self.sp1.path)
 
     def test_api_invalid_doc(self):
         self.assertEqual(Document.objects.count(), 5)
