@@ -50,7 +50,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "started",
-                    models.DateTimeField(verbose_name="started"),
+                    models.DateTimeField(null=True, verbose_name="started"),
                 ),
                 ("acknowledged", models.BooleanField(default=False)),
                 (
