@@ -18,7 +18,7 @@ from documents.tests.utils import DirectoriesMixin
 from PIL import Image
 
 
-class TestTasks(DirectoriesMixin, TestCase):
+class TestIndexReindex(DirectoriesMixin, TestCase):
     def test_index_reindex(self):
         Document.objects.create(
             title="test",
@@ -43,6 +43,8 @@ class TestTasks(DirectoriesMixin, TestCase):
 
         tasks.index_optimize()
 
+
+class TestClassifier(DirectoriesMixin, TestCase):
     @mock.patch("documents.tasks.load_classifier")
     def test_train_classifier_no_auto_matching(self, load_classifier):
         tasks.train_classifier()
@@ -93,6 +95,8 @@ class TestTasks(DirectoriesMixin, TestCase):
         mtime3 = os.stat(settings.MODEL_FILE).st_mtime
         self.assertNotEqual(mtime2, mtime3)
 
+
+class TestBarcode(DirectoriesMixin, TestCase):
     def test_barcode_reader(self):
         test_file = os.path.join(
             os.path.dirname(__file__),
@@ -529,6 +533,8 @@ class TestTasks(DirectoriesMixin, TestCase):
 
         self.assertEqual(tasks.consume_file(dst), "File successfully split")
 
+
+class TestSanityCheck(DirectoriesMixin, TestCase):
     @mock.patch("documents.tasks.sanity_checker.check_sanity")
     def test_sanity_check_success(self, m):
         m.return_value = SanityCheckMessages()
@@ -565,6 +571,8 @@ class TestTasks(DirectoriesMixin, TestCase):
         )
         m.assert_called_once()
 
+
+class TestBulkUpdate(DirectoriesMixin, TestCase):
     def test_bulk_update_documents(self):
         doc1 = Document.objects.create(
             title="test",
