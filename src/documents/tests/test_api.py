@@ -2600,6 +2600,15 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
         self.assertEqual(resp_storage_path["path"], self.sp1.path)
 
     def test_api_create_storage_path(self):
+        """
+        GIVEN:
+            - API request to create a storage paths
+        WHEN:
+            - API is called
+        THEN:
+            - Correct HTTP response
+            - New storage path is created
+        """
         response = self.client.post(
             self.ENDPOINT,
             json.dumps(
@@ -2611,3 +2620,28 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, 201)
+        self.assertEqual(StoragePath.objects.count(), 2)
+
+    def test_api_create_invalid_storage_path(self):
+        """
+        GIVEN:
+            - API request to create a storage paths
+            - Storage path format is incorrect
+        WHEN:
+            - API is called
+        THEN:
+            - Correct HTTP 400 response
+            - No storage path is created
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Another storage path",
+                    "path": "Somewhere/{correspdent}",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(StoragePath.objects.count(), 1)
