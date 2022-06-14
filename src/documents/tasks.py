@@ -93,7 +93,6 @@ def consume_file(
         else:
             separators = []
             document_list = []
-            converted_tiff = None
 
             if mime_type == "image/tiff":
                 file_to_process = barcodes.convert_from_tiff_to_pdf(path)
@@ -117,13 +116,17 @@ def consume_file(
                     else:
                         newname = None
                     barcodes.save_to_dir(document, newname=newname)
+
                 # if we got here, the document was successfully split
                 # and can safely be deleted
-                if converted_tiff is not None:
+                if mime_type == "image/tiff":
+                    # Remove the TIFF converted to PDF file
                     logger.debug(f"Deleting file {file_to_process}")
                     os.unlink(file_to_process)
+                # Remove the original file (new file is saved above)
                 logger.debug(f"Deleting file {path}")
                 os.unlink(path)
+
                 # notify the sender, otherwise the progress bar
                 # in the UI stays stuck
                 payload = {
