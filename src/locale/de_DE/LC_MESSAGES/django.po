@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-19 15:24-0700\n"
-"PO-Revision-Date: 2022-06-08 07:10\n"
+"PO-Revision-Date: 2022-06-14 11:24\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -390,7 +390,7 @@ msgstr "Dateityp %(type)s nicht unterstützt"
 
 #: documents/serialisers.py:574
 msgid "Invalid variable detected."
-msgstr ""
+msgstr "Ungültige Variable entdeckt."
 
 #: documents/templates/index.html:78
 msgid "Paperless-ngx is loading..."
@@ -402,7 +402,7 @@ msgstr "Du bist noch hier?! Hmm, da muss wohl etwas schief gelaufen sein."
 
 #: documents/templates/index.html:79
 msgid "Here's a link to the docs."
-msgstr ""
+msgstr "Hier ist ein Link zur Dokumentation."
 
 #: documents/templates/registration/logged_out.html:14
 msgid "Paperless-ngx signed out"
@@ -522,7 +522,7 @@ msgstr "Türkisch"
 
 #: paperless/settings.py:358
 msgid "Chinese Simplified"
-msgstr ""
+msgstr "Vereinfachtes Chinesisch"
 
 #: paperless/urls.py:153
 msgid "Paperless-ngx administration"
@@ -686,7 +686,7 @@ msgstr "Ordner"
 
 #: paperless_mail/models.py:95
 msgid "Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server."
-msgstr ""
+msgstr "Unterordner müssen durch ein Trennzeichen getrennt sein. Oft ist dies ein Punkt (\".\") oder ein Schrägstrich (\"/\"); dies variiert bei unterschiedlichen Mail-Servern."
 
 #: paperless_mail/models.py:101
 msgid "filter from"
