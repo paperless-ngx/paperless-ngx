@@ -573,10 +573,6 @@ class StoragePathSerializer(MatchingModelSerializer):
 
         return path
 
-    def create(self, validated_data):
-        storage_path = StoragePath.objects.create(**validated_data)
-        return storage_path
-
 
 class UiSettingsViewSerializer(serializers.ModelSerializer):
     class Meta:
