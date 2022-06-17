@@ -40,5 +40,5 @@ def get_log_level(args) -> int:
     }
     level = levels.get(args.loglevel.lower())
     if level is None:
-        raise ArgumentError(f"{args.loglevel} is not a valid level")
+        level = logging.INFO
     return level
