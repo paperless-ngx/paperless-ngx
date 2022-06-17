@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-19 15:24-0700\n"
-"PO-Revision-Date: 2022-05-19 22:26\n"
+"PO-Revision-Date: 2022-06-17 22:58\n"
 "Last-Translator: \n"
 "Language-Team: Finnish\n"
 "Language: fi_FI\n"
@@ -100,15 +100,15 @@ msgstr "asiakirjatyypit"
 
 #: documents/models.py:88
 msgid "path"
-msgstr ""
+msgstr "polku"
 
 #: documents/models.py:94 documents/models.py:122
 msgid "storage path"
-msgstr ""
+msgstr "tallennustilan polku"
 
 #: documents/models.py:95
 msgid "storage paths"
-msgstr ""
+msgstr "tallennustilan polut"
 
 #: documents/models.py:103
 msgid "Unencrypted"
@@ -316,173 +316,173 @@ msgstr "luotu kuukautena"
 
 #: documents/models.py:375
 msgid "created day is"
-msgstr ""
+msgstr "luomispäivä on"
 
 #: documents/models.py:376
 msgid "added before"
-msgstr ""
+msgstr "lisätty ennen"
 
 #: documents/models.py:377
 msgid "added after"
-msgstr ""
+msgstr "lisätty jälkeen"
 
 #: documents/models.py:378
 msgid "modified before"
-msgstr ""
+msgstr "muokattu ennen"
 
 #: documents/models.py:379
 msgid "modified after"
-msgstr ""
+msgstr "muokattu jälkeen"
 
 #: documents/models.py:380
 msgid "does not have tag"
-msgstr ""
+msgstr "ei ole tagia"
 
 #: documents/models.py:381
 msgid "does not have ASN"
-msgstr ""
+msgstr "ei ole ASN-numeroa"
 
 #: documents/models.py:382
 msgid "title or content contains"
-msgstr ""
+msgstr "otsikko tai sisältö sisältää"
 
 #: documents/models.py:383
 msgid "fulltext query"
-msgstr ""
+msgstr "fulltext-kysely"
 
 #: documents/models.py:384
 msgid "more like this"
-msgstr ""
+msgstr "enemmän kuten tämä"
 
 #: documents/models.py:385
 msgid "has tags in"
-msgstr ""
+msgstr "sisältää tagit"
 
 #: documents/models.py:395
 msgid "rule type"
-msgstr ""
+msgstr "sääntötyyppi"
 
 #: documents/models.py:397
 msgid "value"
-msgstr ""
+msgstr "arvo"
 
 #: documents/models.py:400
 msgid "filter rule"
-msgstr ""
+msgstr "suodatussääntö"
 
 #: documents/models.py:401
 msgid "filter rules"
-msgstr ""
+msgstr "suodatussäännöt"
 
 #: documents/serialisers.py:63
 #, python-format
 msgid "Invalid regular expression: %(error)s"
-msgstr ""
+msgstr "Virheellinen regex-lauseke: %(error)s"
 
 #: documents/serialisers.py:184
 msgid "Invalid color."
-msgstr ""
+msgstr "Virheellinen väri."
 
 #: documents/serialisers.py:491
 #, python-format
 msgid "File type %(type)s not supported"
-msgstr ""
+msgstr "Tiedostotyyppiä %(type)s ei tueta"
 
 #: documents/serialisers.py:574
 msgid "Invalid variable detected."
-msgstr ""
+msgstr "Virheellinen muuttuja havaittu."
 
 #: documents/templates/index.html:78
 msgid "Paperless-ngx is loading..."
-msgstr ""
+msgstr "Paperless-ngx latautuu..."
 
 #: documents/templates/index.html:79
 msgid "Still here?! Hmm, something might be wrong."
-msgstr ""
+msgstr "Vielä täällä?! Hmm, jokin saattaa olla vialla."
 
 #: documents/templates/index.html:79
 msgid "Here's a link to the docs."
-msgstr ""
+msgstr "Tässä on linkki dokumentteihin."
 
 #: documents/templates/registration/logged_out.html:14
 msgid "Paperless-ngx signed out"
-msgstr ""
+msgstr "Paperless-ngx kirjauduttu ulos"
 
 #: documents/templates/registration/logged_out.html:59
 msgid "You have been successfully logged out. Bye!"
-msgstr ""
+msgstr "Uloskirjautuminen onnistui. Heippa!"
 
 #: documents/templates/registration/logged_out.html:60
 msgid "Sign in again"
-msgstr ""
+msgstr "Kirjaudu uudelleen"
 
 #: documents/templates/registration/login.html:15
 msgid "Paperless-ngx sign in"
-msgstr ""
+msgstr "Paperless-ngx kirjaudu sisään"
 
 #: documents/templates/registration/login.html:61
 msgid "Please sign in."
-msgstr ""
+msgstr "Kirjaudu sisään."
 
 #: documents/templates/registration/login.html:64
 msgid "Your username and password didn't match. Please try again."
-msgstr ""
+msgstr "Käyttäjätunnus ja salasana eivät täsmää. Yritä uudelleen."
 
 #: documents/templates/registration/login.html:67
 msgid "Username"
-msgstr ""
+msgstr "Käyttäjänimi"
 
 #: documents/templates/registration/login.html:68
 msgid "Password"
-msgstr ""
+msgstr "Salasana"
 
 #: documents/templates/registration/login.html:73
 msgid "Sign in"
-msgstr ""
+msgstr "Kirjaudu sisään"
 
 #: paperless/settings.py:338
 msgid "English (US)"
-msgstr ""
+msgstr "Englanti (US)"
 
 #: paperless/settings.py:339
 msgid "Belarusian"
-msgstr ""
+msgstr "valkovenäjä"
 
 #: paperless/settings.py:340
 msgid "Czech"
-msgstr ""
+msgstr "Tšekki"
 
 #: paperless/settings.py:341
 msgid "Danish"
-msgstr ""
+msgstr "Tanska"
 
 #: paperless/settings.py:342
 msgid "German"
-msgstr ""
+msgstr "Saksa"
 
 #: paperless/settings.py:343
 msgid "English (GB)"
-msgstr ""
+msgstr "Englanti (US)"
 
 #: paperless/settings.py:344
 msgid "Spanish"
-msgstr ""
+msgstr "Espanja"
 
 #: paperless/settings.py:345
 msgid "French"
-msgstr ""
+msgstr "Ranska"
 
 #: paperless/settings.py:346
 msgid "Italian"
-msgstr ""
+msgstr "Italia"
 
 #: paperless/settings.py:347
 msgid "Luxembourgish"
-msgstr ""
+msgstr "Luxemburg"
 
 #: paperless/settings.py:348
 msgid "Dutch"
-msgstr ""
+msgstr "Hollanti"
 
 #: paperless/settings.py:349
 msgid "Polish"
@@ -506,11 +506,11 @@ msgstr "venäjä"
 
 #: paperless/settings.py:354
 msgid "Slovenian"
-msgstr ""
+msgstr "Slovenia"
 
 #: paperless/settings.py:355
 msgid "Serbian"
-msgstr ""
+msgstr "Serbia"
 
 #: paperless/settings.py:356
 msgid "Swedish"
@@ -518,11 +518,11 @@ msgstr "ruotsi"
 
 #: paperless/settings.py:357
 msgid "Turkish"
-msgstr ""
+msgstr "Turkki"
 
 #: paperless/settings.py:358
 msgid "Chinese Simplified"
-msgstr ""
+msgstr "Kiina (yksinkertaistettu)"
 
 #: paperless/urls.py:153
 msgid "Paperless-ngx administration"
@@ -550,7 +550,7 @@ msgstr "Toiminnot"
 
 #: paperless_mail/admin.py:67
 msgid "The action applied to the mail. This action is only performed when documents were consumed from the mail. Mails without attachments will remain entirely untouched."
-msgstr ""
+msgstr "Sähköpostiin sovellettu toiminto. Tämä toiminto suoritetaan vasta, kun asiakirjat on luettu sähköpostin kautta. Sähköpostit ilman liitteitä pysyvät täysin koskemattomina."
 
 #: paperless_mail/admin.py:75
 msgid "Metadata"
