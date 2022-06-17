@@ -1,102 +1,159 @@
-#!/usr/bin/env python3
-"""
-When a feature branch is created, a new GitHub container is built and tagged
-with the feature branch name.  When a feature branch is deleted, either through
-a merge or deletion, the old image tag will still exist.
-
-Though this isn't a problem for storage size, etc, it does lead to a long list
-of tags which are no longer relevant and the last released version is pushed
- further and further down that list.
-
-This script utlizes the GitHub API (through the gh cli application) to list the
-package versions (aka tags) and the repository branches.  Then it removes feature
-tags which have no matching branch
-
-This pruning is applied to the primary package, the frontend builder package and the
-frontend build cache package.
-
-"""
-import argparse
 import logging
-import os.path
-import pprint
-from typing import Dict
+import os
+from argparse import ArgumentParser
 from typing import Final
 from typing import List
+from urllib.parse import quote
 
+import requests
 from common import get_log_level
-from ghapi.all import GhApi
-from ghapi.all import paged
+
+logger = logging.getLogger("cleanup-tags")
 
 
-def _get_feature_packages(
-    logger: logging.Logger,
-    api: GhApi,
-    is_org_repo: bool,
-    repo_owner: str,
-    package_name: str,
-) -> Dict:
-    """
-    Uses the GitHub packages API endpoint data filter to containers
-    which have a tag starting with "feature-"
-    """
-
-    # Get all package versions
-    pkg_versions = []
-    if is_org_repo:
-
-        for pkg_version in paged(
-            api.packages.get_all_package_versions_for_package_owned_by_org,
-            org=repo_owner,
-            package_type="container",
-            package_name=package_name,
-        ):
-            pkg_versions.extend(pkg_version)
-    else:
-        for pkg_version in paged(
-            api.packages.get_all_package_versions_for_package_owned_by_authenticated_user,  # noqa: E501
-            package_type="container",
-            package_name=package_name,
-        ):
-            pkg_versions.extend(pkg_version)
-
-    logger.debug(f"Found {len(pkg_versions)} package versions for {package_name}")
-
-    # Filter to just those containers tagged "feature-"
-    feature_versions = {}
-
-    for item in pkg_versions:
-        is_feature_version = False
-        feature_tag_name = None
-        if (
-            "metadata" in item
-            and "container" in item["metadata"]
-            and "tags" in item["metadata"]["container"]
-        ):
-            for tag in item["metadata"]["container"]["tags"]:
-                if tag.startswith("feature-"):
-                    feature_tag_name = tag
-                    is_feature_version = True
-        if is_feature_version:
-            logger.info(
-                f"Located feature tag: {feature_tag_name} for image {package_name}",
-            )
-            # logger.debug(pprint.pformat(item, indent=2))
-            feature_versions[feature_tag_name] = item
+class GithubContainerRegistry:
+    def __init__(
+        self,
+        session: requests.Session,
+        token: str,
+        owner_or_org: str,
+    ):
+        self._session: requests.Session = session
+        self._token = token
+        self._owner_or_org = owner_or_org
+        self._BRANCHES_ENDPOINT = "https://api.github.com/repos/{OWNER}/{REPO}/branches"
+        if self._owner_or_org == "paperless-ngx":
+            self._PACKAGES_VERSIONS_ENDPOINT = "https://api.github.com/orgs/{ORG}/packages/{PACKAGE_TYPE}/{PACKAGE_NAME}/versions"
+            self._PACKAGE_VERSION_DELETE_ENDPOINT = "https://api.github.com/orgs/{ORG}/packages/{PACKAGE_TYPE}/{PACKAGE_NAME}/versions/{PACKAGE_VERSION_ID}"
         else:
-            logger.debug(f"Filtered {pprint.pformat(item, indent=2)}")
+            self._PACKAGES_VERSIONS_ENDPOINT = "https://api.github.com/user/packages/{PACKAGE_TYPE}/{PACKAGE_NAME}/versions"
+            self._PACKAGE_VERSION_DELETE_ENDPOINT = "https://api.github.com/user/packages/{PACKAGE_TYPE}/{PACKAGE_NAME}/versions/{PACKAGE_VERSION_ID}"
 
-    logger.info(
-        f"Found {len(feature_versions)} package versions for"
-        f" {package_name} with feature tags",
-    )
+    def __enter__(self):
+        self._session.headers.update(
+            {
+                "Accept": "application/vnd.github.v3+json",
+                "Authorization": f"token {self._token}",
+            },
+        )
+        return self
 
-    return feature_versions
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if "Accept" in self._session.headers:
+            del self._session.headers["Accept"]
+        if "Authorization" in self._session.headers:
+            del self._session.headers["Authorization"]
+
+    def _read_all_pages(self, endpoint):
+        internal_data = []
+
+        while True:
+            resp = self._session.get(endpoint)
+            if resp.status_code == 200:
+                internal_data += resp.json()
+                if "next" in resp.links:
+                    endpoint = resp.links["next"]["url"]
+                else:
+                    logger.debug("Exiting pagination loop")
+                    break
+            else:
+                logger.warning(f"Request to {endpoint} return HTTP {resp.status_code}")
+                break
+
+        return internal_data
+
+    def get_branches(self, repo: str):
+        endpoint = self._BRANCHES_ENDPOINT.format(OWNER=self._owner_or_org, REPO=repo)
+        internal_data = self._read_all_pages(endpoint)
+        return internal_data
+
+    def filter_branches_by_name_pattern(self, branch_data, pattern: str):
+        matches = {}
+
+        for branch in branch_data:
+            if branch["name"].startswith(pattern):
+                matches[branch["name"]] = branch
+
+        return matches
+
+    def get_package_versions(
+        self,
+        package_name: str,
+        package_type: str = "container",
+    ) -> List:
+        package_name = quote(package_name, safe="")
+        endpoint = self._PACKAGES_VERSIONS_ENDPOINT.format(
+            ORG=self._owner_or_org,
+            PACKAGE_TYPE=package_type,
+            PACKAGE_NAME=package_name,
+        )
+
+        internal_data = self._read_all_pages(endpoint)
+
+        return internal_data
+
+    def filter_packages_by_tag_pattern(self, package_data, pattern: str):
+        matches = {}
+
+        for package in package_data:
+            if "metadata" in package and "container" in package["metadata"]:
+                container_metadata = package["metadata"]["container"]
+                if "tags" in container_metadata:
+                    container_tags = container_metadata["tags"]
+                    for tag in container_tags:
+                        if tag.startswith(pattern):
+                            matches[tag] = package
+                            break
+
+        return matches
+
+    def filter_packages_untagged(self, package_data):
+        matches = {}
+
+        for package in package_data:
+            if "metadata" in package and "container" in package["metadata"]:
+                container_metadata = package["metadata"]["container"]
+                if "tags" in container_metadata:
+                    container_tags = container_metadata["tags"]
+                    if not len(container_tags):
+                        matches[package["name"]] = package
+
+        return matches
+
+    def delete_package_version(self, package_name, package_data):
+        package_name = quote(package_name, safe="")
+        endpoint = self._PACKAGE_VERSION_DELETE_ENDPOINT.format(
+            ORG=self._owner_or_org,
+            PACKAGE_TYPE=package_data["metadata"]["package_type"],
+            PACKAGE_NAME=package_name,
+            PACKAGE_VERSION_ID=package_data["id"],
+        )
+        resp = self._session.delete(endpoint)
+        if resp.status_code != 204:
+            logger.warning(
+                f"Request to delete {endpoint} returned HTTP {resp.status_code}",
+            )
+
+
+class DockerHubContainerRegistery:
+    def __init__(self):
+        pass
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
+
+    def get_image_versions(self) -> List:
+        return []
+
+    def delete_image_version(self):
+        pass
 
 
 def _main():
-
-    parser = argparse.ArgumentParser(
+    parser = ArgumentParser(
         description="Using the GitHub API locate and optionally delete container"
         " tags which no longer have an associated feature branch",
     )
@@ -106,6 +163,14 @@ def _main():
         action="store_true",
         default=False,
         help="If provided, actually delete the container tags",
+    )
+
+    # TODO There's a lot of untagged images, do those need to stay for anything?
+    parser.add_argument(
+        "--untagged",
+        action="store_true",
+        default=False,
+        help="If provided, delete untagged containers as well",
     )
 
     parser.add_argument(
@@ -122,88 +187,81 @@ def _main():
         format="%(asctime)s %(levelname)-8s %(message)s",
     )
 
-    logger = logging.getLogger("cleanup-tags")
-
-    repo: Final[str] = os.environ["GITHUB_REPOSITORY"]
     repo_owner: Final[str] = os.environ["GITHUB_REPOSITORY_OWNER"]
+    repo: Final[str] = os.environ["GITHUB_REPOSITORY"]
+    gh_token: Final[str] = os.environ["GITHUB_TOKEN"]
 
-    is_org_repo: Final[bool] = repo_owner == "paperless-ngx"
-    dry_run: Final[bool] = not args.delete
+    with requests.session() as sess:
+        with GithubContainerRegistry(sess, gh_token, repo_owner) as gh_api:
+            all_branches = gh_api.get_branches("paperless-ngx")
+            logger.info(f"Located {len(all_branches)} branches of {repo_owner}/{repo} ")
 
-    logger.debug(f"Org Repo? {is_org_repo}")
-    logger.debug(f"Dry Run? {dry_run}")
-
-    api = GhApi(
-        owner=repo_owner,
-        repo=os.path.basename(repo),
-        token=os.environ["GITHUB_TOKEN"],
-    )
-
-    pkg_list: Final[List[str]] = [
-        "paperless-ngx",
-        # TODO: It would be nice to cleanup additional packages, but we can't
-        # see https://github.com/fastai/ghapi/issues/84
-        # "builder/frontend",
-        # "builder-frontend-cache",
-    ]
-
-    # Get the list of current "feature-" branches
-    feature_branch_info = api.list_branches(prefix="feature-")
-    feature_branch_names = []
-    for branch in feature_branch_info:
-        name_only = branch["ref"].removeprefix("refs/heads/")
-        logger.info(f"Located feature branch: {name_only}")
-        feature_branch_names.append(name_only)
-
-    logger.info(f"Located {len(feature_branch_names)} feature branches")
-
-    # TODO The deletion doesn't yet actually work
-    # See https://github.com/fastai/ghapi/issues/132
-    # This would need to be updated to use gh cli app or requests or curl
-    # or something
-    if is_org_repo:
-        endpoint = (
-            "https://api.github.com/orgs/{ORG}/packages/container/{name}/versions/{id}"
-        )
-    else:
-        endpoint = "https://api.github.com/user/packages/container/{name}/{id}"
-
-    for package_name in pkg_list:
-
-        logger.info(f"Processing image {package_name}")
-
-        # Get the list of images tagged with "feature-"
-        feature_packages = _get_feature_packages(
-            logger,
-            api,
-            is_org_repo,
-            repo_owner,
-            package_name,
-        )
-
-        # Get the set of container tags without matching feature branches
-        to_delete = list(set(feature_packages.keys()) - set(feature_branch_names))
-
-        for container_tag in to_delete:
-            container_info = feature_packages[container_tag]
-
-            formatted_endpoint = endpoint.format(
-                ORG=repo_owner,
-                name=package_name,
-                id=container_info["id"],
+            feature_branches = gh_api.filter_branches_by_name_pattern(
+                all_branches,
+                "feature-",
             )
+            logger.info(f"Located {len(feature_branches)} feature branches")
 
-            if dry_run:
+            for package_name in ["paperless-ngx", "paperless-ngx/builder/cache/app"]:
+
+                all_package_versions = gh_api.get_package_versions(package_name)
                 logger.info(
-                    f"Would delete {package_name}:{container_tag} with"
-                    f" id: {container_info['id']}",
+                    f"Located {len(all_package_versions)} versions of package {package_name}",
                 )
-                # logger.debug(formatted_endpoint)
-            else:
+
+                packages_tagged_feature = gh_api.filter_packages_by_tag_pattern(
+                    all_package_versions,
+                    "feature-",
+                )
                 logger.info(
-                    f"Deleting {package_name}:{container_tag} with"
-                    f" id: {container_info['id']}",
+                    f'Located {len(packages_tagged_feature)} versions of package {package_name} tagged "feature-"',
                 )
+
+                untagged_packages = gh_api.filter_packages_untagged(
+                    all_package_versions,
+                )
+                logger.info(
+                    f"Located {len(untagged_packages)} untagged versions of package {package_name}",
+                )
+
+                to_delete = list(
+                    set(packages_tagged_feature.keys()) - set(feature_branches.keys()),
+                )
+                logger.info(
+                    f"Located {len(to_delete)} versions of package {package_name} to delete",
+                )
+
+                for tag_to_delete in to_delete:
+                    package_version_info = packages_tagged_feature[tag_to_delete]
+
+                    logger.info(
+                        f"Deleting {tag_to_delete} (id {package_version_info['id']})",
+                    )
+                    if args.delete:
+                        gh_api.delete_package_version(
+                            package_name,
+                            package_version_info,
+                        )
+
+                if args.untagged:
+                    logger.info(f"Deleting untagged packages of {package_name}")
+                    for to_delete_name in untagged_packages:
+                        to_delete_version = untagged_packages[to_delete_name]
+                        logger.info(f"Deleting id {to_delete_version['id']}")
+                        if args.delete:
+                            gh_api.delete_package_version(
+                                package_name,
+                                to_delete_version,
+                            )
+
+        with DockerHubContainerRegistery() as dh_api:
+            docker_hub_image_version = dh_api.get_image_versions()
+
+            # TODO
+            docker_hub_to_delete = []
+
+            for x in docker_hub_to_delete:
+                dh_api.delete_image_version()
 
 
 if __name__ == "__main__":

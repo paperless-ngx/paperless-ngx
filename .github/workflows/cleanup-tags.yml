@@ -39,9 +39,9 @@ jobs:
         with:
           python-version: "3.9"
       -
-        name: Install fastai GitHub API
+        name: Install requests
         run: |
-          python -m pip install ghapi requests
+          python -m pip install requests
       -
         name: Cleanup feature tags
         run: |
