@@ -475,6 +475,7 @@ class Consumer(LoggingMixin):
                 created=create_date,
                 modified=create_date,
                 storage_type=storage_type,
+                original_filename=self.filename
             )
 
         self.apply_overrides(document)
