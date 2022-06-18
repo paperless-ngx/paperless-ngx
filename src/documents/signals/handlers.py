@@ -525,12 +525,12 @@ def paperless_task_started(sender, task, **kwargs):
         pass
 
 
-@receiver(models.signals.post_save, sender=django_q.tasks.Task)
-def update_paperless_task(sender, task, **kwargs):
+@receiver(models.signals.post_save, sender=django_q.models.Task)
+def update_paperless_task(sender, instance, **kwargs):
     try:
-        if task.func == "documents.tasks.consume_file":
-            paperless_task = PaperlessTask.objects.get(task_id=task.id)
-            paperless_task.attempted_task = task
+        if instance.func == "documents.tasks.consume_file":
+            paperless_task = PaperlessTask.objects.get(task_id=instance.id)
+            paperless_task.attempted_task = instance
             paperless_task.save()
     except PaperlessTask.DoesNotExist:
         pass
