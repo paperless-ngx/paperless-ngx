@@ -214,6 +214,16 @@ class Document(models.Model):
         help_text=_("Current archive filename in storage"),
     )
 
+    original_filename = models.FilePathField(
+        _("original filename"),
+        max_length=1024,
+        editable=False,
+        default=None,
+        unique=False,
+        null=True,
+        help_text=_("The original name of the file when it was uploaded")
+    )
+
     archive_serial_number = models.IntegerField(
         _("archive serial number"),
         blank=True,
