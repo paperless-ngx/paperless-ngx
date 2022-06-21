@@ -165,6 +165,9 @@ class Consumer(LoggingMixin):
         script_env = os.environ.copy()
 
         script_env["DOCUMENT_ID"] = str(document.pk)
+        script_env["DOCUMENT_CREATED"] = str(document.created)
+        script_env["DOCUMENT_MODIFIED"] = str(document.modified)
+        script_env["DOCUMENT_ADDED"] = str(document.added)
         script_env["DOCUMENT_FILE_NAME"] = document.get_public_filename()
         script_env["DOCUMENT_SOURCE_PATH"] = os.path.normpath(document.source_path)
         script_env["DOCUMENT_THUMBNAIL_PATH"] = os.path.normpath(
