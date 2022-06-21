@@ -7,6 +7,9 @@ following additional information about it:
 
 * Generated File Name: ${DOCUMENT_FILE_NAME}
 * Source Path: ${DOCUMENT_SOURCE_PATH}
+* Created: ${DOCUMENT_CREATED}
+* Added: ${DOCUMENT_ADDED}
+* Modified: ${DOCUMENT_MODIFIED}
 * Thumbnail Path: ${DOCUMENT_THUMBNAIL_PATH}
 * Download URL: ${DOCUMENT_DOWNLOAD_URL}
 * Thumbnail URL: ${DOCUMENT_THUMBNAIL_URL}
