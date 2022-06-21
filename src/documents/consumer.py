@@ -134,8 +134,11 @@ class Consumer(LoggingMixin):
 
         self.log("info", f"Executing pre-consume script {settings.PRE_CONSUME_SCRIPT}")
 
+        script_env = os.environ.copy()
+        script_env["DOCUMENT_SOURCE_PATH"] = os.path.normpath(self.path)
+
         try:
-            Popen((settings.PRE_CONSUME_SCRIPT, self.path)).wait()
+            Popen(settings.PRE_CONSUME_SCRIPT, env=script_env).wait()
         except Exception as e:
             self._fail(
                 MESSAGE_PRE_CONSUME_SCRIPT_ERROR,
@@ -159,19 +162,29 @@ class Consumer(LoggingMixin):
             f"Executing post-consume script {settings.POST_CONSUME_SCRIPT}",
         )
 
+        script_env = os.environ.copy()
+
+        script_env["DOCUMENT_ID"] = str(document.pk)
+        script_env["DOCUMENT_FILE_NAME"] = document.get_public_filename()
+        script_env["DOCUMENT_SOURCE_PATH"] = os.path.normpath(document.source_path)
+        script_env["DOCUMENT_THUMBNAIL_PATH"] = os.path.normpath(
+            document.thumbnail_path
+        )
+        script_env["DOCUMENT_DOWNLOAD_URL"] = reverse(
+            "document-download", kwargs={"pk": document.pk}
+        )
+        script_env["DOCUMENT_THUMBNAIL_URL"] = reverse(
+            "document-thumb", kwargs={"pk": document.pk}
+        )
+        script_env["DOCUMENT_CORRESPONDENT"] = str(document.correspondent)
+        script_env["DOCUMENT_TAGS"] = str(
+            ",".join(document.tags.all().values_list("name", flat=True))
+        )
+
         try:
             Popen(
-                (
-                    settings.POST_CONSUME_SCRIPT,
-                    str(document.pk),
-                    document.get_public_filename(),
-                    os.path.normpath(document.source_path),
-                    os.path.normpath(document.thumbnail_path),
-                    reverse("document-download", kwargs={"pk": document.pk}),
-                    reverse("document-thumb", kwargs={"pk": document.pk}),
-                    str(document.correspondent),
-                    str(",".join(document.tags.all().values_list("name", flat=True))),
-                ),
+                settings.POST_CONSUME_SCRIPT,
+                env=script_env,
             ).wait()
         except Exception as e:
             self._fail(
