@@ -323,6 +323,7 @@ class BulkEditSerializer(DocumentListSerializer):
             "remove_tag",
             "modify_tags",
             "delete",
+            "redo_ocr",
         ],
         label="Method",
         write_only=True,
@@ -356,6 +357,8 @@ class BulkEditSerializer(DocumentListSerializer):
             return bulk_edit.modify_tags
         elif method == "delete":
             return bulk_edit.delete
+        elif method == "redo_ocr":
+            return bulk_edit.redo_ocr
         else:
             raise serializers.ValidationError("Unsupported method.")
 
