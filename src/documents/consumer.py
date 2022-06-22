@@ -170,6 +170,7 @@ class Consumer(LoggingMixin):
         script_env["DOCUMENT_ADDED"] = str(document.added)
         script_env["DOCUMENT_FILE_NAME"] = document.get_public_filename()
         script_env["DOCUMENT_SOURCE_PATH"] = os.path.normpath(document.source_path)
+        script_env["DOCUMENT_ARCHIVE_PATH"] = os.path.normpath(str(document.archive_path))
         script_env["DOCUMENT_THUMBNAIL_PATH"] = os.path.normpath(
             document.thumbnail_path
         )
