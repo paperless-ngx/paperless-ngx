@@ -1,14 +1,6 @@
-import shutil
-from pathlib import Path
-from typing import Type
-
 import tqdm
-from django.core.exceptions import ObjectDoesNotExist
 from django.core.management.base import BaseCommand
-from documents.models import Document
-from documents.parsers import DocumentParser
-from documents.parsers import get_parser_class_for_mime_type
-from documents.parsers import ParseError
+from documents.tasks import redo_ocr
 
 
 class Command(BaseCommand):
@@ -36,47 +28,8 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-
-        all_docs = Document.objects.all()
-
-        for doc_pk in tqdm.tqdm(
+        doc_pks = tqdm.tqdm(
             options["documents"],
             disable=options["no_progress_bar"],
-        ):
-            try:
-                self.stdout.write(f"Parsing document {doc_pk}")
-                doc: Document = all_docs.get(pk=doc_pk)
-            except ObjectDoesNotExist:
-                self.stdout.write(self.style.ERROR(f"Document {doc_pk} does not exist"))
-                continue
-
-            # Get the correct parser for this mime type
-            parser_class: Type[DocumentParser] = get_parser_class_for_mime_type(
-                doc.mime_type,
-            )
-            document_parser: DocumentParser = parser_class(
-                "redo-ocr",
-            )
-
-            # Create a file path to copy the original file to for working on
-            temp_file = (Path(document_parser.tempdir) / Path("new-ocr-file")).resolve()
-
-            shutil.copy(doc.source_path, temp_file)
-
-            try:
-                self.stdout.write(
-                    f"Using {type(document_parser).__name__} for document",
-                )
-                # Try to re-parse the document into text
-                document_parser.parse(str(temp_file), doc.mime_type)
-
-                doc.content = document_parser.get_text()
-                doc.save()
-                self.stdout.write("Document OCR updated")
-
-            except ParseError as e:
-                self.stdout.write(self.style.ERROR(f"Error parsing document: {e}"))
-            finally:
-                # Remove the file path if it was created
-                if temp_file.exists() and temp_file.is_file():
-                    temp_file.unlink()
+        )
+        redo_ocr(doc_pks)
