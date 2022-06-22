@@ -118,3 +118,10 @@ def delete(doc_ids):
             index.remove_document_by_id(writer, id)
 
     return "OK"
+
+
+def redo_ocr(doc_ids):
+
+    async_task("documents.tasks.redo_ocr", document_ids=doc_ids)
+
+    return "OK"
