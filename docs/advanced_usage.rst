@@ -165,6 +165,7 @@ into paperless. It receives the following environment variables:
 * ``DOCUMENT_MODIFIED``
 * ``DOCUMENT_ADDED``
 * ``DOCUMENT_SOURCE_PATH``
+* ``DOCUMENT_ARCHIVE_PATH``
 * ``DOCUMENT_THUMBNAIL_PATH``
 * ``DOCUMENT_DOWNLOAD_URL``
 * ``DOCUMENT_THUMBNAIL_URL``
