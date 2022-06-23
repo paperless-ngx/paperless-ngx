@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-19 15:24-0700\n"
-"PO-Revision-Date: 2022-06-22 21:24\n"
+"PO-Revision-Date: 2022-06-23 13:05\n"
 "Last-Translator: \n"
 "Language-Team: Hebrew\n"
 "Language: he_IL\n"
@@ -558,71 +558,71 @@ msgstr "מטא-נתונים"
 
 #: paperless_mail/admin.py:78
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
-msgstr ""
+msgstr "שייך מטא נתונים למסמכים ההמתקבלים מהכלל הזה באופן אוטומטי. אם לא תשייך כאן תגיות, סוגים או מכותבים, Paperless עדיין יעבד את כל הכללים התואמים שהגדרת."
 
 #: paperless_mail/apps.py:8
 msgid "Paperless mail"
-msgstr ""
+msgstr "דואר Paperless"
 
 #: paperless_mail/models.py:8
 msgid "mail account"
-msgstr ""
+msgstr "חשבון דואר"
 
 #: paperless_mail/models.py:9
 msgid "mail accounts"
-msgstr ""
+msgstr "חשבונות דואר"
 
 #: paperless_mail/models.py:12
 msgid "No encryption"
-msgstr ""
+msgstr "ללא הצפנה"
 
 #: paperless_mail/models.py:13
 msgid "Use SSL"
-msgstr ""
+msgstr "השתמש ב-SSL"
 
 #: paperless_mail/models.py:14
 msgid "Use STARTTLS"
-msgstr ""
+msgstr "השתמש ב-STARTTLS"
 
 #: paperless_mail/models.py:18
 msgid "IMAP server"
-msgstr ""
+msgstr "שרת IMAP"
 
 #: paperless_mail/models.py:21
 msgid "IMAP port"
-msgstr ""
+msgstr "פורט IMAP"
 
 #: paperless_mail/models.py:25
 msgid "This is usually 143 for unencrypted and STARTTLS connections, and 993 for SSL connections."
-msgstr ""
+msgstr "זה בדרך כלל 143 עבור חיבורי STARTTLS לא מוצפנים, ו-993 עבור חיבורי SSL."
 
 #: paperless_mail/models.py:31
 msgid "IMAP security"
-msgstr ""
+msgstr "אבטחת IMAP"
 
 #: paperless_mail/models.py:36
 msgid "username"
-msgstr ""
+msgstr "שם משתמש"
 
 #: paperless_mail/models.py:38
 msgid "password"
-msgstr ""
+msgstr "סיסמה"
 
 #: paperless_mail/models.py:41
 msgid "character set"
-msgstr ""
+msgstr "ערכת תווים"
 
 #: paperless_mail/models.py:45
 msgid "The character set to use when communicating with the mail server, such as 'UTF-8' or 'US-ASCII'."
-msgstr ""
+msgstr "ערכת התווים לשימוש בעת תקשורת עם שרת הדואר, כגון 'UTF-8' או 'US-ASCII'."
 
 #: paperless_mail/models.py:56
 msgid "mail rule"
-msgstr ""
+msgstr "כלל דואר אלקטרוני"
 
 #: paperless_mail/models.py:57
 msgid "mail rules"
-msgstr ""
+msgstr "כללי דואר אלקטרוני"
 
 #: paperless_mail/models.py:60
 msgid "Only process attachments."
