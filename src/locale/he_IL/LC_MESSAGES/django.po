@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-19 15:24-0700\n"
-"PO-Revision-Date: 2022-06-23 19:29\n"
+"PO-Revision-Date: 2022-06-23 21:02\n"
 "Last-Translator: \n"
 "Language-Team: Hebrew\n"
 "Language: he_IL\n"
@@ -240,185 +240,185 @@ msgstr "יומני רישום"
 
 #: documents/models.py:339 documents/models.py:392
 msgid "saved view"
-msgstr ""
+msgstr "תצוגה שמורה"
 
 #: documents/models.py:340
 msgid "saved views"
-msgstr ""
+msgstr "תצוגות שמורות"
 
 #: documents/models.py:342
 msgid "user"
-msgstr ""
+msgstr "משתמש"
 
 #: documents/models.py:346
 msgid "show on dashboard"
-msgstr ""
+msgstr "הצג בדשבורד"
 
 #: documents/models.py:349
 msgid "show in sidebar"
-msgstr ""
+msgstr "הצג בסרגל צידי"
 
 #: documents/models.py:353
 msgid "sort field"
-msgstr ""
+msgstr "שדה המיון"
 
 #: documents/models.py:358
 msgid "sort reverse"
-msgstr ""
+msgstr "מיין הפוך"
 
 #: documents/models.py:363
 msgid "title contains"
-msgstr ""
+msgstr "כותרת מכילה"
 
 #: documents/models.py:364
 msgid "content contains"
-msgstr ""
+msgstr "תוכן מכיל"
 
 #: documents/models.py:365
 msgid "ASN is"
-msgstr ""
+msgstr "מס\"ד הוא"
 
 #: documents/models.py:366
 msgid "correspondent is"
-msgstr ""
+msgstr "מכותב הוא"
 
 #: documents/models.py:367
 msgid "document type is"
-msgstr ""
+msgstr "סוג מסמך הוא"
 
 #: documents/models.py:368
 msgid "is in inbox"
-msgstr ""
+msgstr "בתיבה הנכנסת"
 
 #: documents/models.py:369
 msgid "has tag"
-msgstr ""
+msgstr "ישנו תיוג"
 
 #: documents/models.py:370
 msgid "has any tag"
-msgstr ""
+msgstr "ישנו כל תיוג"
 
 #: documents/models.py:371
 msgid "created before"
-msgstr ""
+msgstr "נוצר לפני"
 
 #: documents/models.py:372
 msgid "created after"
-msgstr ""
+msgstr "נוצר לאחר"
 
 #: documents/models.py:373
 msgid "created year is"
-msgstr ""
+msgstr "נוצר בשנת"
 
 #: documents/models.py:374
 msgid "created month is"
-msgstr ""
+msgstr "נוצר בחודש"
 
 #: documents/models.py:375
 msgid "created day is"
-msgstr ""
+msgstr "נוצר ביום"
 
 #: documents/models.py:376
 msgid "added before"
-msgstr ""
+msgstr "הוסף לפני"
 
 #: documents/models.py:377
 msgid "added after"
-msgstr ""
+msgstr "הוסף אחרי"
 
 #: documents/models.py:378
 msgid "modified before"
-msgstr ""
+msgstr "נערך לפני"
 
 #: documents/models.py:379
 msgid "modified after"
-msgstr ""
+msgstr "נערך אחרי"
 
 #: documents/models.py:380
 msgid "does not have tag"
-msgstr ""
+msgstr "אינו כולל את התיוג"
 
 #: documents/models.py:381
 msgid "does not have ASN"
-msgstr ""
+msgstr "אינו בעל מס\"ד"
 
 #: documents/models.py:382
 msgid "title or content contains"
-msgstr ""
+msgstr "כותרת או תוכן מכילים"
 
 #: documents/models.py:383
 msgid "fulltext query"
-msgstr ""
+msgstr "שאילתת טקסט מלא"
 
 #: documents/models.py:384
 msgid "more like this"
-msgstr ""
+msgstr "עוד כמו זה"
 
 #: documents/models.py:385
 msgid "has tags in"
-msgstr ""
+msgstr "מכיל תגים ב-"
 
 #: documents/models.py:395
 msgid "rule type"
-msgstr ""
+msgstr "סוג כלל"
 
 #: documents/models.py:397
 msgid "value"
-msgstr ""
+msgstr "ערך"
 
 #: documents/models.py:400
 msgid "filter rule"
-msgstr ""
+msgstr "חוק סינון"
 
 #: documents/models.py:401
 msgid "filter rules"
-msgstr ""
+msgstr "חוקי סינון"
 
 #: documents/serialisers.py:63
 #, python-format
 msgid "Invalid regular expression: %(error)s"
-msgstr ""
+msgstr "ביטוי רגולרי בלתי חוקי: %(error)s"
 
 #: documents/serialisers.py:184
 msgid "Invalid color."
-msgstr ""
+msgstr "צבע לא חוקי."
 
 #: documents/serialisers.py:491
 #, python-format
 msgid "File type %(type)s not supported"
-msgstr ""
+msgstr "סוג קובץ %(type)s לא נתמך"
 
 #: documents/serialisers.py:574
 msgid "Invalid variable detected."
-msgstr ""
+msgstr "משתנה לא חוקי זוהה."
 
 #: documents/templates/index.html:78
 msgid "Paperless-ngx is loading..."
-msgstr ""
+msgstr "Paperless-ngx נטען..."
 
 #: documents/templates/index.html:79
 msgid "Still here?! Hmm, something might be wrong."
-msgstr ""
+msgstr "עדיין כאן?! הממ, יכול להיות שמשהו לא בסדר."
 
 #: documents/templates/index.html:79
 msgid "Here's a link to the docs."
-msgstr ""
+msgstr "הנה קישור למסמכים."
 
 #: documents/templates/registration/logged_out.html:14
 msgid "Paperless-ngx signed out"
-msgstr ""
+msgstr "Paperless-ngx נותק"
 
 #: documents/templates/registration/logged_out.html:59
 msgid "You have been successfully logged out. Bye!"
-msgstr ""
+msgstr "יצאת מהמערכת בהצלחה. להתראות!"
 
 #: documents/templates/registration/logged_out.html:60
 msgid "Sign in again"
-msgstr ""
+msgstr "התחבר שוב"
 
 #: documents/templates/registration/login.html:15
 msgid "Paperless-ngx sign in"
-msgstr ""
+msgstr "התחברות Paperless-ngx"
 
 #: documents/templates/registration/login.html:61
 msgid "Please sign in."
