@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-19 15:24-0700\n"
-"PO-Revision-Date: 2022-06-23 13:05\n"
+"PO-Revision-Date: 2022-06-23 14:14\n"
 "Last-Translator: \n"
 "Language-Team: Hebrew\n"
 "Language: he_IL\n"
@@ -626,99 +626,99 @@ msgstr "כללי דואר אלקטרוני"
 
 #: paperless_mail/models.py:60
 msgid "Only process attachments."
-msgstr ""
+msgstr "עבד רק קבצים מצורפים."
 
 #: paperless_mail/models.py:61
 msgid "Process all files, including 'inline' attachments."
-msgstr ""
+msgstr "עבד את כל הקבצים, כולל קבצים מצורפים 'מוטבעים'."
 
 #: paperless_mail/models.py:64
 msgid "Delete"
-msgstr ""
+msgstr "מחק"
 
 #: paperless_mail/models.py:65
 msgid "Move to specified folder"
-msgstr ""
+msgstr "העבר לתיקיה שצוינה"
 
 #: paperless_mail/models.py:66
 msgid "Mark as read, don't process read mails"
-msgstr ""
+msgstr "סמן כנקרא, אל תעבד הודעות דואר שנקראו"
 
 #: paperless_mail/models.py:67
 msgid "Flag the mail, don't process flagged mails"
-msgstr ""
+msgstr "סמן דואר, אל תעבד הודעות דואר שסומנו"
 
 #: paperless_mail/models.py:70
 msgid "Use subject as title"
-msgstr ""
+msgstr "השתמש בנושא ככותרת"
 
 #: paperless_mail/models.py:71
 msgid "Use attachment filename as title"
-msgstr ""
+msgstr "השתמש בשם הקובץ המצורף ככותרת"
 
 #: paperless_mail/models.py:74
 msgid "Do not assign a correspondent"
-msgstr ""
+msgstr "אל תשייך מכותב"
 
 #: paperless_mail/models.py:75
 msgid "Use mail address"
-msgstr ""
+msgstr "השתמש בכתובת הדואר"
 
 #: paperless_mail/models.py:76
 msgid "Use name (or mail address if not available)"
-msgstr ""
+msgstr "השתמש בשם (או בכתובת דואר אם אין שם)"
 
 #: paperless_mail/models.py:77
 msgid "Use correspondent selected below"
-msgstr ""
+msgstr "השתמש במכותב הנבחר להלן"
 
 #: paperless_mail/models.py:81
 msgid "order"
-msgstr ""
+msgstr "סדר"
 
 #: paperless_mail/models.py:87
 msgid "account"
-msgstr ""
+msgstr "חשבון"
 
 #: paperless_mail/models.py:91
 msgid "folder"
-msgstr ""
+msgstr "תיקייה"
 
 #: paperless_mail/models.py:95
 msgid "Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server."
-msgstr ""
+msgstr "יש להפריד בין תיקיות משנה באמצעות תוחם, לרוב נקודה ('.') או קו נטוי ('/'), אך זה משתנה לפי שרת הדואר."
 
 #: paperless_mail/models.py:101
 msgid "filter from"
-msgstr ""
+msgstr "סנן 'מאת'"
 
 #: paperless_mail/models.py:107
 msgid "filter subject"
-msgstr ""
+msgstr "סנן 'נושא'"
 
 #: paperless_mail/models.py:113
 msgid "filter body"
-msgstr ""
+msgstr "סנן 'גוף'"
 
 #: paperless_mail/models.py:120
 msgid "filter attachment filename"
-msgstr ""
+msgstr "סנן 'שם קובץ מצורף'"
 
 #: paperless_mail/models.py:125
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr ""
+msgstr "קבל רק מסמכים שתואמים לחלוטין את שם הקובץ הזה אם צוין. תווים כלליים כגון pdf.* או *חשבונית* מותרים. חסר רגישות תווים גדולים/קטנים (אנגלית)."
 
 #: paperless_mail/models.py:132
 msgid "maximum age"
-msgstr ""
+msgstr "גיל מקסימלי"
 
 #: paperless_mail/models.py:134
 msgid "Specified in days."
-msgstr ""
+msgstr "נקוב בימים."
 
 #: paperless_mail/models.py:138
 msgid "attachment type"
-msgstr ""
+msgstr "סוג קובץ מצורף"
 
 #: paperless_mail/models.py:142
 msgid "Inline attachments include embedded images, so it's best to combine this option with a filename filter."
