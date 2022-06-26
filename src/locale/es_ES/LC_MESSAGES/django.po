@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-19 15:24-0700\n"
-"PO-Revision-Date: 2022-05-19 22:26\n"
+"PO-Revision-Date: 2022-06-26 16:53\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -100,15 +100,15 @@ msgstr "tipos de documento"
 
 #: documents/models.py:88
 msgid "path"
-msgstr ""
+msgstr "ruta"
 
 #: documents/models.py:94 documents/models.py:122
 msgid "storage path"
-msgstr ""
+msgstr "ruta de almacenamiento"
 
 #: documents/models.py:95
 msgid "storage paths"
-msgstr ""
+msgstr "rutas de almacenamiento"
 
 #: documents/models.py:103
 msgid "Unencrypted"
@@ -390,7 +390,7 @@ msgstr "Tipo de fichero %(type)s no suportado"
 
 #: documents/serialisers.py:574
 msgid "Invalid variable detected."
-msgstr ""
+msgstr "Variable inválida."
 
 #: documents/templates/index.html:78
 msgid "Paperless-ngx is loading..."
@@ -398,11 +398,11 @@ msgstr "Paperless-ngx está cargando..."
 
 #: documents/templates/index.html:79
 msgid "Still here?! Hmm, something might be wrong."
-msgstr ""
+msgstr "¡¿Todavía estás aquí?! Hmm, algo podría estar mal."
 
 #: documents/templates/index.html:79
 msgid "Here's a link to the docs."
-msgstr ""
+msgstr "Aquí hay un enlace a la documentación."
 
 #: documents/templates/registration/logged_out.html:14
 msgid "Paperless-ngx signed out"
@@ -446,7 +446,7 @@ msgstr "Inglés (US)"
 
 #: paperless/settings.py:339
 msgid "Belarusian"
-msgstr ""
+msgstr "Bielorruso"
 
 #: paperless/settings.py:340
 msgid "Czech"
@@ -506,11 +506,11 @@ msgstr "Ruso"
 
 #: paperless/settings.py:354
 msgid "Slovenian"
-msgstr ""
+msgstr "Esloveno"
 
 #: paperless/settings.py:355
 msgid "Serbian"
-msgstr ""
+msgstr "Serbio"
 
 #: paperless/settings.py:356
 msgid "Swedish"
@@ -518,11 +518,11 @@ msgstr "Sueco"
 
 #: paperless/settings.py:357
 msgid "Turkish"
-msgstr ""
+msgstr "Turco"
 
 #: paperless/settings.py:358
 msgid "Chinese Simplified"
-msgstr ""
+msgstr "Chino simplificado"
 
 #: paperless/urls.py:153
 msgid "Paperless-ngx administration"
