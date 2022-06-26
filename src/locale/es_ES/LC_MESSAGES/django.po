@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-19 15:24-0700\n"
-"PO-Revision-Date: 2022-06-26 16:53\n"
+"PO-Revision-Date: 2022-06-26 18:11\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -686,7 +686,7 @@ msgstr "carpeta"
 
 #: paperless_mail/models.py:95
 msgid "Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server."
-msgstr ""
+msgstr "Las subcarpetas deben estar separadas por un delimitador, normalmente un punto ('.') o barra ('/'), pero depende según el servidor de correo."
 
 #: paperless_mail/models.py:101
 msgid "filter from"
