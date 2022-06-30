@@ -137,7 +137,7 @@
           <context context-type="sourcefile">node_modules/src/pagination/pagination.ts</context>
           <context context-type="linenumber">363</context>
         </context-group>
-        <target state="needs-translation">Next</target>
+        <target state="translated">Neste</target>
       </trans-unit>
       <trans-unit id="ngb.pagination.last-aria" datatype="html">
         <source>Last</source>
@@ -145,7 +145,7 @@
           <context context-type="sourcefile">node_modules/src/pagination/pagination.ts</context>
           <context context-type="linenumber">379,380</context>
         </context-group>
-        <target state="needs-translation">Last</target>
+        <target state="translated">Siste</target>
       </trans-unit>
       <trans-unit id="ngb.progressbar.value" datatype="html">
         <source>
@@ -171,7 +171,7 @@
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
           <context context-type="linenumber">161</context>
         </context-group>
-        <target state="needs-translation">Hours</target>
+        <target state="translated">Timer</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.MM" datatype="html">
         <source>MM</source>
@@ -179,7 +179,7 @@
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
           <context context-type="linenumber">182</context>
         </context-group>
-        <target state="needs-translation">MM</target>
+        <target state="translated">MM</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.minutes" datatype="html">
         <source>Minutes</source>
@@ -187,7 +187,7 @@
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
           <context context-type="linenumber">199</context>
         </context-group>
-        <target state="needs-translation">Minutes</target>
+        <target state="translated">Minutter</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.increment-hours" datatype="html">
         <source>Increment hours</source>
@@ -195,7 +195,7 @@
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
           <context context-type="linenumber">218,219</context>
         </context-group>
-        <target state="needs-translation">Increment hours</target>
+        <target state="translated">Økende timer</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.decrement-hours" datatype="html">
         <source>Decrement hours</source>
@@ -203,7 +203,7 @@
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
           <context context-type="linenumber">240,243</context>
         </context-group>
-        <target state="needs-translation">Decrement hours</target>
+        <target state="translated">Reduksjon i timer</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.increment-minutes" datatype="html">
         <source>Increment minutes</source>
@@ -211,7 +211,7 @@
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
           <context context-type="linenumber">268</context>
         </context-group>
-        <target state="needs-translation">Increment minutes</target>
+        <target state="translated">Økende minutter</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.decrement-minutes" datatype="html">
         <source>Decrement minutes</source>
@@ -219,7 +219,7 @@
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
           <context context-type="linenumber">288,289</context>
         </context-group>
-        <target state="needs-translation">Decrement minutes</target>
+        <target state="translated">Reduksjon i minutter</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.SS" datatype="html">
         <source>SS</source>
@@ -227,7 +227,7 @@
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
           <context context-type="linenumber">295</context>
         </context-group>
-        <target state="needs-translation">SS</target>
+        <target state="translated">SS</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.seconds" datatype="html">
         <source>Seconds</source>
@@ -235,7 +235,7 @@
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
           <context context-type="linenumber">295</context>
         </context-group>
-        <target state="needs-translation">Seconds</target>
+        <target state="translated">Sekunder</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.increment-seconds" datatype="html">
         <source>Increment seconds</source>
@@ -293,7 +293,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">72</context>
         </context-group>
-        <target state="needs-translation">Document added</target>
+        <target state="translated">Dokument lagt til</target>
       </trans-unit>
       <trans-unit id="9204248378636247318" datatype="html">
         <source>Document <x id="PH" equiv-text="status.filename"/> was added to paperless.</source>
@@ -313,7 +313,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="needs-translation">Open document</target>
+        <target state="translated">Åpne dokumentet</target>
       </trans-unit>
       <trans-unit id="8582620835547864448" datatype="html">
         <source>Could not add <x id="PH" equiv-text="status.filename"/>: <x id="PH_1" equiv-text="status.message"/></source>
@@ -345,7 +345,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">141</context>
         </context-group>
-        <target state="needs-translation">Initiating upload...</target>
+        <target state="translated">Starter opplasting...</target>
       </trans-unit>
       <trans-unit id="2173456130768795374" datatype="html">
         <source>Paperless-ngx</source>
@@ -354,7 +354,7 @@
           <context context-type="linenumber">11</context>
         </context-group>
         <note priority="1" from="description">app title</note>
-        <target state="needs-translation">Paperless-ngx</target>
+        <target state="translated">Paperless-ngx</target>
       </trans-unit>
       <trans-unit id="7100953725264790651" datatype="html">
         <source>Search documents</source>
@@ -362,7 +362,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="needs-translation">Search documents</target>
+        <target state="translated">Søk i Dokumenter</target>
       </trans-unit>
       <trans-unit id="2448391510242468907" datatype="html">
         <source>Logged in as <x id="INTERPOLATION" equiv-text="{{this.settingsService.displayName}}"/></source>
@@ -386,7 +386,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="needs-translation">Settings</target>
+        <target state="translated">Innstillinger</target>
       </trans-unit>
       <trans-unit id="3797778920049399855" datatype="html">
         <source>Logout</source>
@@ -394,7 +394,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="needs-translation">Logout</target>
+        <target state="translated">Logg ut</target>
       </trans-unit>
       <trans-unit id="6570363013146073520" datatype="html">
         <source>Dashboard</source>
@@ -406,7 +406,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="needs-translation">Dashboard</target>
+        <target state="translated">Skrivebord</target>
       </trans-unit>
       <trans-unit id="4733307402565258070" datatype="html">
         <source>Documents</source>
@@ -434,7 +434,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
           <context context-type="linenumber">54</context>
         </context-group>
-        <target state="needs-translation">Documents</target>
+        <target state="translated">Dokumenter</target>
       </trans-unit>
       <trans-unit id="472206565520537964" datatype="html">
         <source>Saved views</source>
@@ -446,7 +446,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">150</context>
         </context-group>
-        <target state="needs-translation">Saved views</target>
+        <target state="translated">Lagrede visninger</target>
       </trans-unit>
       <trans-unit id="6988090220128974198" datatype="html">
         <source>Open documents</source>
@@ -454,7 +454,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">88</context>
         </context-group>
-        <target state="needs-translation">Open documents</target>
+        <target state="translated">Åpne dokumenter</target>
       </trans-unit>
       <trans-unit id="5687256342387781369" datatype="html">
         <source>Close all</source>
@@ -462,7 +462,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">107</context>
         </context-group>
-        <target state="needs-translation">Close all</target>
+        <target state="translated">Lukk alle</target>
       </trans-unit>
       <trans-unit id="3897348120591552265" datatype="html">
         <source>Manage</source>
@@ -470,7 +470,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">113</context>
         </context-group>
-        <target state="needs-translation">Manage</target>
+        <target state="translated">Behandle</target>
       </trans-unit>
       <trans-unit id="7437910965833684826" datatype="html">
         <source>Correspondents</source>
@@ -478,7 +478,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">120</context>
         </context-group>
-        <target state="needs-translation">Correspondents</target>
+        <target state="translated">Korrespondenter</target>
       </trans-unit>
       <trans-unit id="7886570921510760899" datatype="html">
         <source>Tags</source>
@@ -498,7 +498,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="needs-translation">Tags</target>
+        <target state="translated">Tags</target>
       </trans-unit>
       <trans-unit id="3079652255369035" datatype="html">
         <source>Document types</source>
@@ -506,7 +506,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">134</context>
         </context-group>
-        <target state="needs-translation">Document types</target>
+        <target state="translated">Dokumenttyper</target>
       </trans-unit>
       <trans-unit id="8835528846812581148" datatype="html">
         <source>Storage paths</source>
@@ -514,7 +514,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">141</context>
         </context-group>
-        <target state="needs-translation">Storage paths</target>
+        <target state="translated">Lagringssti</target>
       </trans-unit>
       <trans-unit id="4804785061014590286" datatype="html">
         <source>Logs</source>
@@ -526,7 +526,7 @@
           <context context-type="sourcefile">src/app/components/manage/logs/logs.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="needs-translation">Logs</target>
+        <target state="translated">Logger</target>
       </trans-unit>
       <trans-unit id="5041354590769758251" datatype="html">
         <source>Admin</source>
@@ -534,7 +534,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">162</context>
         </context-group>
-        <target state="needs-translation">Admin</target>
+        <target state="translated">Admin</target>
       </trans-unit>
       <trans-unit id="314315645942131479" datatype="html">
         <source>Info</source>
@@ -542,7 +542,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">168</context>
         </context-group>
-        <target state="needs-translation">Info</target>
+        <target state="translated">Info</target>
       </trans-unit>
       <trans-unit id="4895326106573044490" datatype="html">
         <source>Documentation</source>
@@ -550,7 +550,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">175</context>
         </context-group>
-        <target state="needs-translation">Documentation</target>
+        <target state="translated">Dokumentasjon</target>
       </trans-unit>
       <trans-unit id="1534029177398918729" datatype="html">
         <source>GitHub</source>
@@ -974,7 +974,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.ts</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">e.g.</target>
+        <target state="translated">f.eks.</target>
       </trans-unit>
       <trans-unit id="1918584360573970155" datatype="html">
         <source>or use slashes to add directories e.g.</source>
@@ -1018,7 +1018,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.ts</context>
           <context context-type="linenumber">35</context>
         </context-group>
-        <target state="needs-translation">Color</target>
+        <target state="translated">Farger</target>
       </trans-unit>
       <trans-unit id="1426037806946650347" datatype="html">
         <source>Inbox tag</source>
@@ -1026,7 +1026,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation">Inbox tag</target>
+        <target state="translated">Innboks tag</target>
       </trans-unit>
       <trans-unit id="8566220514470905459" datatype="html">
         <source>Inbox tags are automatically assigned to all consumed documents.</source>
@@ -1042,7 +1042,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component.ts</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">Create new tag</target>
+        <target state="translated">Opprett ny tagg</target>
       </trans-unit>
       <trans-unit id="5872175735754226507" datatype="html">
         <source>Edit tag</source>
@@ -1050,7 +1050,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component.ts</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="needs-translation">Edit tag</target>
+        <target state="translated">Rediger Tag</target>
       </trans-unit>
       <trans-unit id="4391289919356861627" datatype="html">
         <source>Apply</source>
@@ -1058,7 +1058,7 @@
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
           <context context-type="linenumber">39</context>
         </context-group>
-        <target state="needs-translation">Apply</target>
+        <target state="translated">Bruk</target>
       </trans-unit>
       <trans-unit id="7780041345210191160" datatype="html">
         <source>Click again to exclude items.</source>
@@ -1066,7 +1066,7 @@
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="needs-translation">Click again to exclude items.</target>
+        <target state="translated">Klikk igjen for å ekskludere elementer.</target>
       </trans-unit>
       <trans-unit id="7593728289020204896" datatype="html">
         <source>Not assigned</source>
@@ -1075,7 +1075,7 @@
           <context context-type="linenumber">261</context>
         </context-group>
         <note priority="1" from="description">Filter drop down element to filter for documents with no correspondent/type/tag assigned</note>
-        <target state="needs-translation">Not assigned</target>
+        <target state="translated">Ikke tildelt</target>
       </trans-unit>
       <trans-unit id="445302259125375799" datatype="html">
         <source>Invalid date.</source>
@@ -1083,7 +1083,7 @@
           <context context-type="sourcefile">src/app/components/common/input/date/date.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">Invalid date.</target>
+        <target state="translated">Ugyldig dato.</target>
       </trans-unit>
       <trans-unit id="2722549756198502062" datatype="html">
         <source>Add item</source>
@@ -1092,7 +1092,7 @@
           <context context-type="linenumber">11</context>
         </context-group>
         <note priority="1" from="description">Used for both types, correspondents, storage paths</note>
-        <target state="needs-translation">Add item</target>
+        <target state="translated">Legg til element</target>
       </trans-unit>
       <trans-unit id="524422427194414813" datatype="html">
         <source>Suggestions:</source>
@@ -1104,7 +1104,7 @@
           <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.html</context>
           <context context-type="linenumber">42</context>
         </context-group>
-        <target state="needs-translation">Suggestions:</target>
+        <target state="translated">Forslag:</target>
       </trans-unit>
       <trans-unit id="6560126119609945418" datatype="html">
         <source>Add tag</source>
@@ -1112,7 +1112,7 @@
           <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="needs-translation">Add tag</target>
+        <target state="translated">Legg til tag</target>
       </trans-unit>
       <trans-unit id="3797570084942068182" datatype="html">
         <source>Select</source>
@@ -1128,7 +1128,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">8</context>
         </context-group>
-        <target state="needs-translation">Select</target>
+        <target state="translated">Velg</target>
       </trans-unit>
       <trans-unit id="7103181924469214926" datatype="html">
         <source>Please select an object</source>
@@ -1136,7 +1136,7 @@
           <context context-type="sourcefile">src/app/components/common/select-dialog/select-dialog.component.ts</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Please select an object</target>
+        <target state="translated">Velg et objekt</target>
       </trans-unit>
       <trans-unit id="3894950702316166331" datatype="html">
         <source>Loading...</source>
@@ -1152,7 +1152,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">89</context>
         </context-group>
-        <target state="needs-translation">Loading...</target>
+        <target state="translated">Laster...</target>
       </trans-unit>
       <trans-unit id="5412339817978503936" datatype="html">
         <source>Hello <x id="PH" equiv-text="this.settingsService.displayName"/>, welcome to Paperless-ngx!</source>
@@ -1160,7 +1160,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
           <context context-type="linenumber">19</context>
         </context-group>
-        <target state="needs-translation">Hello <x id="PH" equiv-text="this.settingsService.displayName"/>, welcome to Paperless-ngx!</target>
+        <target state="translated">Hei <x id="PH" equiv-text="this.settingsService.displayName"/>, velkommen til Paperless-ngx!</target>
       </trans-unit>
       <trans-unit id="795745990148149834" datatype="html">
         <source>Welcome to Paperless-ngx!</source>
@@ -1168,7 +1168,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="needs-translation">Welcome to Paperless-ngx!</target>
+        <target state="translated">Velkommen til Paperless-ngx!</target>
       </trans-unit>
       <trans-unit id="2946624699882754313" datatype="html">
         <source>Show all</source>
@@ -1180,7 +1180,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
           <context context-type="linenumber">27</context>
         </context-group>
-        <target state="needs-translation">Show all</target>
+        <target state="translated">Vis alle</target>
       </trans-unit>
       <trans-unit id="4207916966377787111" datatype="html">
         <source>Created</source>
@@ -1200,7 +1200,7 @@
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="needs-translation">Created</target>
+        <target state="translated">Opprettet</target>
       </trans-unit>
       <trans-unit id="5701618810648052610" datatype="html">
         <source>Title</source>
@@ -1224,7 +1224,7 @@
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Title</target>
+        <target state="translated">Tittel</target>
       </trans-unit>
       <trans-unit id="1069523139277190436" datatype="html">
         <source>Statistics</source>
@@ -1232,7 +1232,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="needs-translation">Statistics</target>
+        <target state="translated">Statistikk</target>
       </trans-unit>
       <trans-unit id="1171694977288479084" datatype="html">
         <source>Documents in inbox: <x id="INTERPOLATION" equiv-text="{{statistics?.documents_inbox}}"/></source>
@@ -1240,7 +1240,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">3</context>
         </context-group>
-        <target state="needs-translation">Documents in inbox: <x id="INTERPOLATION" equiv-text="{{statistics?.documents_inbox}}"/></target>
+        <target state="translated">Dokumenter i innboks: <x id="INTERPOLATION" equiv-text="{{statistics?.documents_inbox}}"/></target>
       </trans-unit>
       <trans-unit id="4207135462646354574" datatype="html">
         <source>Total documents: <x id="INTERPOLATION" equiv-text="{{statistics?.documents_total}}"/></source>
@@ -1248,7 +1248,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="needs-translation">Total documents: <x id="INTERPOLATION" equiv-text="{{statistics?.documents_total}}"/></target>
+        <target state="translated">Totalt antall dokumenter: <x id="INTERPOLATION" equiv-text="{{statistics?.documents_total}}"/></target>
       </trans-unit>
       <trans-unit id="8187573012244728580" datatype="html">
         <source>Upload new documents</source>
@@ -1256,7 +1256,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="needs-translation">Upload new documents</target>
+        <target state="translated">Last opp nye dokumenter</target>
       </trans-unit>
       <trans-unit id="1749180330008942007" datatype="html">
         <source>Dismiss completed</source>
@@ -1265,7 +1265,7 @@
           <context context-type="linenumber">4</context>
         </context-group>
         <note priority="1" from="description">This button dismisses all status messages about processed documents on the dashboard (failed and successful)</note>
-        <target state="needs-translation">Dismiss completed</target>
+        <target state="translated">Avvis fullført</target>
       </trans-unit>
       <trans-unit id="118343233500414755" datatype="html">
         <source>Drop documents here or</source>
@@ -1273,7 +1273,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">Drop documents here or</target>
+        <target state="translated">Slipp dokumenter her eller</target>
       </trans-unit>
       <trans-unit id="8133800334834354642" datatype="html">
         <source>Browse files</source>
@@ -1281,7 +1281,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">Browse files</target>
+        <target state="translated">Bla igjennom filer</target>
       </trans-unit>
       <trans-unit id="2330646618997399019" datatype="html">
         <source>{VAR_PLURAL, plural, =1 {One more document} other {<x id="INTERPOLATION"/> more documents}}</source>
@@ -1306,7 +1306,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.ts</context>
           <context context-type="linenumber">40</context>
         </context-group>
-        <target state="needs-translation">Failed: <x id="PH" equiv-text="countFailed"/></target>
+        <target state="translated">Mislyktes: <x id="PH" equiv-text="countFailed"/></target>
       </trans-unit>
       <trans-unit id="534116346205124059" datatype="html">
         <source>Added: <x id="PH" equiv-text="countSuccess"/></source>
@@ -1314,7 +1314,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.ts</context>
           <context context-type="linenumber">43</context>
         </context-group>
-        <target state="needs-translation">Added: <x id="PH" equiv-text="countSuccess"/></target>
+        <target state="translated">Lagt til: <x id="PH" equiv-text="countSuccess"/></target>
       </trans-unit>
       <trans-unit id="760986369763309193" datatype="html">
         <source>, </source>
@@ -1327,7 +1327,7 @@
           <context context-type="linenumber">179</context>
         </context-group>
         <note priority="1" from="description">this string is used to separate processing, failed and added on the file upload widget</note>
-        <target state="needs-translation">, </target>
+        <target state="translated">, </target>
       </trans-unit>
       <trans-unit id="8522270084976549870" datatype="html">
         <source>First steps</source>
@@ -1335,7 +1335,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="needs-translation">First steps</target>
+        <target state="translated">Første skritt</target>
       </trans-unit>
       <trans-unit id="3028507502889531992" datatype="html">
         <source>Paperless is running! :)</source>
@@ -1343,7 +1343,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">5</context>
         </context-group>
-        <target state="needs-translation">Paperless is running! :)</target>
+        <target state="translated">Paperless is running! :)</target>
       </trans-unit>
       <trans-unit id="3219476236085665313" datatype="html">
         <source>You can start uploading documents by dropping them in the file upload box to the right or by dropping them in the configured consumption folder and they&apos;ll start showing up in the documents list. After you&apos;ve added some metadata to your documents, use the filtering mechanisms of paperless to create custom views (such as &apos;Recently added&apos;, &apos;Tagged TODO&apos;) and they will appear on the dashboard instead of this message.</source>
