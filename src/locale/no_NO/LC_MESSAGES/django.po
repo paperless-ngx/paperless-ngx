@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-19 15:24-0700\n"
-"PO-Revision-Date: 2022-06-27 16:25\n"
+"PO-Revision-Date: 2022-06-30 11:19\n"
 "Last-Translator: \n"
 "Language-Team: Norwegian\n"
 "Language: no_NO\n"
@@ -19,48 +19,48 @@ msgstr ""
 
 #: documents/apps.py:9
 msgid "Documents"
-msgstr ""
+msgstr "Dokumenter"
 
 #: documents/models.py:27
 msgid "Any word"
-msgstr ""
+msgstr "Hvilket som helst ord"
 
 #: documents/models.py:28
 msgid "All words"
-msgstr ""
+msgstr "Alle ord"
 
 #: documents/models.py:29
 msgid "Exact match"
-msgstr ""
+msgstr "Eksakt match"
 
 #: documents/models.py:30
 msgid "Regular expression"
-msgstr ""
+msgstr "Regulære uttrykk"
 
 #: documents/models.py:31
 msgid "Fuzzy word"
-msgstr ""
+msgstr "Fuzzy word"
 
 #: documents/models.py:32
 msgid "Automatic"
-msgstr ""
+msgstr "Automatisk"
 
 #: documents/models.py:35 documents/models.py:343 paperless_mail/models.py:16
 #: paperless_mail/models.py:79
 msgid "name"
-msgstr ""
+msgstr "navn"
 
 #: documents/models.py:37
 msgid "match"
-msgstr ""
+msgstr "treff"
 
 #: documents/models.py:40
 msgid "matching algorithm"
-msgstr ""
+msgstr "samsvarende algoritme"
 
 #: documents/models.py:45
 msgid "is insensitive"
-msgstr ""
+msgstr "er insensitiv"
 
 #: documents/models.py:58 documents/models.py:113
 msgid "correspondent"
