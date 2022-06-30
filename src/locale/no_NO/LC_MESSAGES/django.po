@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-19 15:24-0700\n"
-"PO-Revision-Date: 2022-06-30 12:29\n"
+"PO-Revision-Date: 2022-06-30 14:11\n"
 "Last-Translator: \n"
 "Language-Team: Norwegian\n"
 "Language: no_NO\n"
@@ -554,7 +554,7 @@ msgstr ""
 
 #: paperless_mail/admin.py:75
 msgid "Metadata"
-msgstr ""
+msgstr "Metadata"
 
 #: paperless_mail/admin.py:78
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
@@ -566,19 +566,19 @@ msgstr ""
 
 #: paperless_mail/models.py:8
 msgid "mail account"
-msgstr ""
+msgstr "e-post konto"
 
 #: paperless_mail/models.py:9
 msgid "mail accounts"
-msgstr ""
+msgstr "e-post kontoer"
 
 #: paperless_mail/models.py:12
 msgid "No encryption"
-msgstr ""
+msgstr "Ingen datakryptering"
 
 #: paperless_mail/models.py:13
 msgid "Use SSL"
-msgstr ""
+msgstr "Bruk SSL"
 
 #: paperless_mail/models.py:14
 msgid "Use STARTTLS"
@@ -602,15 +602,15 @@ msgstr ""
 
 #: paperless_mail/models.py:36
 msgid "username"
-msgstr ""
+msgstr "brukernavn"
 
 #: paperless_mail/models.py:38
 msgid "password"
-msgstr ""
+msgstr "passord"
 
 #: paperless_mail/models.py:41
 msgid "character set"
-msgstr ""
+msgstr "tegnsett"
 
 #: paperless_mail/models.py:45
 msgid "The character set to use when communicating with the mail server, such as 'UTF-8' or 'US-ASCII'."
@@ -618,7 +618,7 @@ msgstr ""
 
 #: paperless_mail/models.py:56
 msgid "mail rule"
-msgstr ""
+msgstr "e-post regel"
 
 #: paperless_mail/models.py:57
 msgid "mail rules"
