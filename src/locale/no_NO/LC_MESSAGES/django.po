@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-19 15:24-0700\n"
-"PO-Revision-Date: 2022-06-30 11:19\n"
+"PO-Revision-Date: 2022-06-30 12:29\n"
 "Last-Translator: \n"
 "Language-Team: Norwegian\n"
 "Language: no_NO\n"
@@ -64,159 +64,159 @@ msgstr "er insensitiv"
 
 #: documents/models.py:58 documents/models.py:113
 msgid "correspondent"
-msgstr ""
+msgstr "korrespondent"
 
 #: documents/models.py:59
 msgid "correspondents"
-msgstr ""
+msgstr "korrespondenter"
 
 #: documents/models.py:64
 msgid "color"
-msgstr ""
+msgstr "farge"
 
 #: documents/models.py:67
 msgid "is inbox tag"
-msgstr ""
+msgstr "er innboks tag"
 
 #: documents/models.py:70
 msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
-msgstr ""
+msgstr "Markerer dette merket som en innboks-tag: Alle nybrukte dokumenter vil bli merket med innboks-tagger."
 
 #: documents/models.py:76
 msgid "tag"
-msgstr ""
+msgstr "tagg"
 
 #: documents/models.py:77 documents/models.py:151
 msgid "tags"
-msgstr ""
+msgstr "tagger"
 
 #: documents/models.py:82 documents/models.py:133
 msgid "document type"
-msgstr ""
+msgstr "dokument type"
 
 #: documents/models.py:83
 msgid "document types"
-msgstr ""
+msgstr "dokumenttyper"
 
 #: documents/models.py:88
 msgid "path"
-msgstr ""
+msgstr "sti"
 
 #: documents/models.py:94 documents/models.py:122
 msgid "storage path"
-msgstr ""
+msgstr "lagringssti"
 
 #: documents/models.py:95
 msgid "storage paths"
-msgstr ""
+msgstr "lagringsveier"
 
 #: documents/models.py:103
 msgid "Unencrypted"
-msgstr ""
+msgstr "Ukryptert"
 
 #: documents/models.py:104
 msgid "Encrypted with GNU Privacy Guard"
-msgstr ""
+msgstr "Kryptert med GNU Personvernvakt"
 
 #: documents/models.py:125
 msgid "title"
-msgstr ""
+msgstr "tittel"
 
 #: documents/models.py:137
 msgid "content"
-msgstr ""
+msgstr "innhold"
 
 #: documents/models.py:140
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
-msgstr ""
+msgstr "Raw, tekstbare data fra dokumentet. Dette feltet brukes primært for søking."
 
 #: documents/models.py:145
 msgid "mime type"
-msgstr ""
+msgstr "mime type"
 
 #: documents/models.py:155
 msgid "checksum"
-msgstr ""
+msgstr "sjekksum"
 
 #: documents/models.py:159
 msgid "The checksum of the original document."
-msgstr ""
+msgstr "Sjekksummen av det opprinnelige dokumentet."
 
 #: documents/models.py:163
 msgid "archive checksum"
-msgstr ""
+msgstr "arkiv sjekksum"
 
 #: documents/models.py:168
 msgid "The checksum of the archived document."
-msgstr ""
+msgstr "Sjekksummen av det arkiverte dokumentet."
 
 #: documents/models.py:171 documents/models.py:324
 msgid "created"
-msgstr ""
+msgstr "opprettet"
 
 #: documents/models.py:174
 msgid "modified"
-msgstr ""
+msgstr "endret"
 
 #: documents/models.py:181
 msgid "storage type"
-msgstr ""
+msgstr "lagringstype"
 
 #: documents/models.py:189
 msgid "added"
-msgstr ""
+msgstr "lagt til"
 
 #: documents/models.py:196
 msgid "filename"
-msgstr ""
+msgstr "filnavn"
 
 #: documents/models.py:202
 msgid "Current filename in storage"
-msgstr ""
+msgstr "Gjeldende filnavn i lagring"
 
 #: documents/models.py:206
 msgid "archive filename"
-msgstr ""
+msgstr "arkiver filnavn"
 
 #: documents/models.py:212
 msgid "Current archive filename in storage"
-msgstr ""
+msgstr "Gjeldende arkiv filnavn i lagring"
 
 #: documents/models.py:216
 msgid "archive serial number"
-msgstr ""
+msgstr "arkiver serienummer"
 
 #: documents/models.py:222
 msgid "The position of this document in your physical document archive."
-msgstr ""
+msgstr "Dokumentets posisjon i ditt fysiske dokumentarkiv."
 
 #: documents/models.py:228
 msgid "document"
-msgstr ""
+msgstr "dokument"
 
 #: documents/models.py:229
 msgid "documents"
-msgstr ""
+msgstr "dokumenter"
 
 #: documents/models.py:307
 msgid "debug"
-msgstr ""
+msgstr "feilsøk"
 
 #: documents/models.py:308
 msgid "information"
-msgstr ""
+msgstr "informasjon"
 
 #: documents/models.py:309
 msgid "warning"
-msgstr ""
+msgstr "advarsel"
 
 #: documents/models.py:310
 msgid "error"
-msgstr ""
+msgstr "feil"
 
 #: documents/models.py:311
 msgid "critical"
-msgstr ""
+msgstr "kritisk"
 
 #: documents/models.py:314
 msgid "group"
@@ -422,131 +422,131 @@ msgstr ""
 
 #: documents/templates/registration/login.html:61
 msgid "Please sign in."
-msgstr ""
+msgstr "Vennligst logg inn."
 
 #: documents/templates/registration/login.html:64
 msgid "Your username and password didn't match. Please try again."
-msgstr ""
+msgstr "Ditt brukernavn og passord stemte ikke. Prøv på nytt."
 
 #: documents/templates/registration/login.html:67
 msgid "Username"
-msgstr ""
+msgstr "Brukernavn"
 
 #: documents/templates/registration/login.html:68
 msgid "Password"
-msgstr ""
+msgstr "Passord"
 
 #: documents/templates/registration/login.html:73
 msgid "Sign in"
-msgstr ""
+msgstr "Logg inn"
 
 #: paperless/settings.py:338
 msgid "English (US)"
-msgstr ""
+msgstr "Engelsk (US)"
 
 #: paperless/settings.py:339
 msgid "Belarusian"
-msgstr ""
+msgstr "Belarusian"
 
 #: paperless/settings.py:340
 msgid "Czech"
-msgstr ""
+msgstr "Czech"
 
 #: paperless/settings.py:341
 msgid "Danish"
-msgstr ""
+msgstr "Danish"
 
 #: paperless/settings.py:342
 msgid "German"
-msgstr ""
+msgstr "German"
 
 #: paperless/settings.py:343
 msgid "English (GB)"
-msgstr ""
+msgstr "English (GB)"
 
 #: paperless/settings.py:344
 msgid "Spanish"
-msgstr ""
+msgstr "Spanish"
 
 #: paperless/settings.py:345
 msgid "French"
-msgstr ""
+msgstr "French"
 
 #: paperless/settings.py:346
 msgid "Italian"
-msgstr ""
+msgstr "Italian"
 
 #: paperless/settings.py:347
 msgid "Luxembourgish"
-msgstr ""
+msgstr "Luxembourgish"
 
 #: paperless/settings.py:348
 msgid "Dutch"
-msgstr ""
+msgstr "Dutch"
 
 #: paperless/settings.py:349
 msgid "Polish"
-msgstr ""
+msgstr "Polish"
 
 #: paperless/settings.py:350
 msgid "Portuguese (Brazil)"
-msgstr ""
+msgstr "Portuguese (Brazil)"
 
 #: paperless/settings.py:351
 msgid "Portuguese"
-msgstr ""
+msgstr "Portuguese"
 
 #: paperless/settings.py:352
 msgid "Romanian"
-msgstr ""
+msgstr "Romanian"
 
 #: paperless/settings.py:353
 msgid "Russian"
-msgstr ""
+msgstr "Russian"
 
 #: paperless/settings.py:354
 msgid "Slovenian"
-msgstr ""
+msgstr "Slovenian"
 
 #: paperless/settings.py:355
 msgid "Serbian"
-msgstr ""
+msgstr "Serbian"
 
 #: paperless/settings.py:356
 msgid "Swedish"
-msgstr ""
+msgstr "Swedish"
 
 #: paperless/settings.py:357
 msgid "Turkish"
-msgstr ""
+msgstr "Turkish"
 
 #: paperless/settings.py:358
 msgid "Chinese Simplified"
-msgstr ""
+msgstr "Chinese Simplified"
 
 #: paperless/urls.py:153
 msgid "Paperless-ngx administration"
-msgstr ""
+msgstr "Paperless-ngx-administrasjon"
 
 #: paperless_mail/admin.py:29
 msgid "Authentication"
-msgstr ""
+msgstr "Autentisering"
 
 #: paperless_mail/admin.py:30
 msgid "Advanced settings"
-msgstr ""
+msgstr "Avanserte innstillinger"
 
 #: paperless_mail/admin.py:47
 msgid "Filter"
-msgstr ""
+msgstr "Filter"
 
 #: paperless_mail/admin.py:50
 msgid "Paperless will only process mails that match ALL of the filters given below."
-msgstr ""
+msgstr "Paperless vil kun behandle e-poster som samsvarer med ALLE filtrene som er gitt nedenfor."
 
 #: paperless_mail/admin.py:64
 msgid "Actions"
-msgstr ""
+msgstr "Handlinger"
 
 #: paperless_mail/admin.py:67
 msgid "The action applied to the mail. This action is only performed when documents were consumed from the mail. Mails without attachments will remain entirely untouched."
