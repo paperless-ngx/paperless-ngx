@@ -146,7 +146,7 @@ jobs:
       -
         name: Gather Docker metadata
         id: docker-meta
-        uses: docker/metadata-action@v3
+        uses: docker/metadata-action@v4
         with:
           images: |
             ghcr.io/${{ github.repository }}
