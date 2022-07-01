@@ -46,7 +46,7 @@
     "codelyzer": "^6.0.2",
     "concurrently": "7.2.2",
     "jest": "28.1.2",
-    "jest-environment-jsdom": "^28.0.2",
+    "jest-environment-jsdom": "^28.1.2",
     "jest-preset-angular": "^12.1.0",
     "ts-node": "~10.8.0",
     "tslint": "~6.1.3",
