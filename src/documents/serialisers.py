@@ -1,7 +1,13 @@
+import datetime
 import math
 import re
 
+try:
+    import zoneinfo
+except ImportError:
+    import backports.zoneinfo as zoneinfo
 import magic
+from django.conf import settings
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
 from rest_framework import serializers
@@ -214,6 +220,7 @@ class DocumentSerializer(DynamicFieldsModelSerializer):
 
     original_file_name = SerializerMethodField()
     archived_file_name = SerializerMethodField()
+    created_date = serializers.DateField(required=False)
 
     def get_original_file_name(self, obj):
         return obj.get_public_filename()
@@ -223,6 +230,18 @@ class DocumentSerializer(DynamicFieldsModelSerializer):
             return obj.get_public_filename(archive=True)
         else:
             return None
+
+    def update(self, instance, validated_data):
+        if "created_date" in validated_data and "created" not in validated_data:
+            new_datetime = datetime.datetime.combine(
+                validated_data.get("created_date"),
+                datetime.time(0, 0, 0, 0, zoneinfo.ZoneInfo(settings.TIME_ZONE)),
+            )
+            instance.created = new_datetime
+            instance.save()
+        validated_data.pop("created_date")
+        super().update(instance, validated_data)
+        return instance
 
     class Meta:
         model = Document
@@ -236,6 +255,7 @@ class DocumentSerializer(DynamicFieldsModelSerializer):
             "content",
             "tags",
             "created",
+            "created_date",
             "modified",
             "added",
             "archive_serial_number",

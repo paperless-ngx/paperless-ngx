@@ -306,6 +306,10 @@ class Document(models.Model):
     def thumbnail_file(self):
         return open(self.thumbnail_path, "rb")
 
+    @property
+    def created_date(self):
+        return timezone.localdate(self.created)
+
 
 class Log(models.Model):
 
