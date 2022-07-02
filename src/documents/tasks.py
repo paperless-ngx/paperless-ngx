@@ -1,10 +1,14 @@
 import logging
 import os
+import shutil
+from pathlib import Path
+from typing import Type
 
 import tqdm
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.signals import post_save
 from documents import barcodes
 from documents import index
@@ -18,6 +22,9 @@ from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.parsers import DocumentParser
+from documents.parsers import get_parser_class_for_mime_type
+from documents.parsers import ParseError
 from documents.sanity_checker import SanityCheckFailedException
 from whoosh.writing import AsyncWriter
 
@@ -198,3 +205,46 @@ def bulk_update_documents(document_ids):
     with AsyncWriter(ix) as writer:
         for doc in documents:
             index.update_document(writer, doc)
+
+
+def redo_ocr(document_ids):
+    all_docs = Document.objects.all()
+
+    for doc_pk in document_ids:
+        try:
+            logger.info(f"Parsing document {doc_pk}")
+            doc: Document = all_docs.get(pk=doc_pk)
+        except ObjectDoesNotExist:
+            logger.error(f"Document {doc_pk} does not exist")
+            continue
+
+        # Get the correct parser for this mime type
+        parser_class: Type[DocumentParser] = get_parser_class_for_mime_type(
+            doc.mime_type,
+        )
+        document_parser: DocumentParser = parser_class(
+            "redo-ocr",
+        )
+
+        # Create a file path to copy the original file to for working on
+        temp_file = (Path(document_parser.tempdir) / Path("new-ocr-file")).resolve()
+
+        shutil.copy(doc.source_path, temp_file)
+
+        try:
+            logger.info(
+                f"Using {type(document_parser).__name__} for document",
+            )
+            # Try to re-parse the document into text
+            document_parser.parse(str(temp_file), doc.mime_type)
+
+            doc.content = document_parser.get_text()
+            doc.save()
+            logger.info("Document OCR updated")
+
+        except ParseError as e:
+            logger.error(f"Error parsing document: {e}")
+        finally:
+            # Remove the file path if it was created
+            if temp_file.exists() and temp_file.is_file():
+                temp_file.unlink()
