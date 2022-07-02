@@ -13,7 +13,7 @@ dateparser = "~=1.1"
 django = "~=4.0"
 django-cors-headers = "*"
 django-extensions = "*"
-django-filter = "~=21.1"
+django-filter = "~=22.1"
 django-q = {editable = true, ref = "paperless-main", git = "https://github.com/paperless-ngx/django-q.git"}
 djangorestframework = "~=3.13"
 filelock = "*"
