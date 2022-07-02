@@ -61,7 +61,7 @@ import { SafeUrlPipe } from './pipes/safeurl.pipe'
 import { SafeHtmlPipe } from './pipes/safehtml.pipe'
 import { CustomDatePipe } from './pipes/custom-date.pipe'
 import { DateComponent } from './components/common/input/date/date.component'
-import { ISODateTimeAdapter } from './utils/ngb-iso-date-time-adapter'
+import { ISODateAdapter } from './utils/ngb-iso-date-adapter'
 import { LocalizedDateParserFormatter } from './utils/ngb-date-parser-formatter'
 import { ApiVersionInterceptor } from './interceptors/api-version.interceptor'
 import { ColorSliderModule } from 'ngx-color/slider'
@@ -205,7 +205,7 @@ function initializeApp(settings: SettingsService) {
     },
     FilterPipe,
     DocumentTitlePipe,
-    { provide: NgbDateAdapter, useClass: ISODateTimeAdapter },
+    { provide: NgbDateAdapter, useClass: ISODateAdapter },
     { provide: NgbDateParserFormatter, useClass: LocalizedDateParserFormatter },
   ],
   bootstrap: [AppComponent],

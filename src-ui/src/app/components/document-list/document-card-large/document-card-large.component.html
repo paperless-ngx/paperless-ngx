@@ -92,7 +92,7 @@
                 <path d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z"/>
                 <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
               </svg>
-              <small>{{document.created | customDate:'mediumDate'}}</small>
+              <small>{{document.created_date | customDate:'mediumDate'}}</small>
             </div>
             <div *ngIf="document.__search_hit__?.score" class="list-group-item bg-light text-dark border-0 d-flex p-0 ps-4 search-score">
               <small class="text-muted" i18n>Score:</small>

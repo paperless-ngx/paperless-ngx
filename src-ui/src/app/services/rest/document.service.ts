@@ -133,6 +133,12 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
     return url
   }
 
+  update(o: PaperlessDocument): Observable<PaperlessDocument> {
+    // we want to only set created_date
+    o.created = undefined
+    return super.update(o)
+  }
+
   uploadDocument(formData) {
     return this.http.post(
       this.getResourceUrl(null, 'post_document'),
