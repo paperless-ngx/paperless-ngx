@@ -746,7 +746,7 @@ class RemoteVersionView(GenericAPIView):
 
 
 class StoragePathViewSet(ModelViewSet):
-    model = DocumentType
+    model = StoragePath
 
     queryset = StoragePath.objects.annotate(document_count=Count("documents")).order_by(
         Lower("name"),

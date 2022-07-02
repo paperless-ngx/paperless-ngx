@@ -539,8 +539,6 @@ class BulkDownloadSerializer(DocumentListSerializer):
 
 
 class StoragePathSerializer(MatchingModelSerializer):
-    document_count = serializers.IntegerField(read_only=True)
-
     class Meta:
         model = StoragePath
         fields = (
@@ -587,10 +585,6 @@ class UiSettingsViewSerializer(serializers.ModelSerializer):
             "id",
             "settings",
         ]
-
-    def update(self, instance, validated_data):
-        super().update(instance, validated_data)
-        return instance
 
     def create(self, validated_data):
         ui_settings = UiSettings.objects.update_or_create(
