@@ -1,4 +1,6 @@
 import os
+import shutil
+import tempfile
 import uuid
 from typing import ContextManager
 from unittest import mock
@@ -225,11 +227,18 @@ class TestParser(DirectoriesMixin, TestCase):
     def test_image_simple_alpha(self):
         parser = RasterisedDocumentParser(None)
 
-        parser.parse(os.path.join(self.SAMPLE_FILES, "simple-alpha.png"), "image/png")
+        with tempfile.TemporaryDirectory() as tempdir:
+            # Copy sample file to temp directory, as the parsing changes the file
+            # and this makes it modified to Git
+            sample_file = os.path.join(self.SAMPLE_FILES, "simple-alpha.png")
+            dest_file = os.path.join(tempdir, "simple-alpha.png")
+            shutil.copy(sample_file, dest_file)
 
-        self.assertTrue(os.path.isfile(parser.archive_path))
+            parser.parse(dest_file, "image/png")
 
-        self.assertContainsStrings(parser.get_text(), ["This is a test document."])
+            self.assertTrue(os.path.isfile(parser.archive_path))
+
+            self.assertContainsStrings(parser.get_text(), ["This is a test document."])
 
     def test_image_calc_a4_dpi(self):
         parser = RasterisedDocumentParser(None)

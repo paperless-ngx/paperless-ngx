@@ -87,10 +87,10 @@ def _convert_thumbnails_to_webp(apps, schema_editor):
             ) as pool:
                 pool.map(_do_convert, work_packages)
 
-        end = time.time()
-        duration = end - start
+                end = time.time()
+                duration = end - start
 
-    logger.info(f"Conversion completed in {duration:.3f}s")
+            logger.info(f"Conversion completed in {duration:.3f}s")
 
 
 class Migration(migrations.Migration):
