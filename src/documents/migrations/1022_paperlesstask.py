@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("django_q", "0014_schedule_cluster"),
-        ("documents", "1020_merge_20220518_1839"),
+        ("documents", "1021_webp_thumbnail_conversion"),
     ]
 
     operations = [
