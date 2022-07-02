@@ -649,7 +649,7 @@ class AcknowledgeTasksViewSerializer(serializers.Serializer):
         count = PaperlessTask.objects.filter(id__in=tasks).count()
         if not count == len(tasks):
             raise serializers.ValidationError(
-                f"Some tasks in {name} don't exist or were " f"specified twice.",
+                f"Some tasks in {name} don't exist or were specified twice.",
             )
 
     def validate_tasks(self, tasks):

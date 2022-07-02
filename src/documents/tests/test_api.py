@@ -2661,7 +2661,6 @@ class TestTasks(APITestCase):
         self.client.force_authenticate(user=self.user)
 
     def test_get_tasks(self):
-
         task_id1 = str(uuid.uuid4())
         PaperlessTask.objects.create(task_id=task_id1)
         Task.objects.create(
@@ -2687,7 +2686,6 @@ class TestTasks(APITestCase):
         self.assertIsNone(returned_task2["attempted_task"])
 
     def test_acknowledge_tasks(self):
-
         task_id = str(uuid.uuid4())
         task = PaperlessTask.objects.create(task_id=task_id)
 
