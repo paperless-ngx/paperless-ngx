@@ -13,23 +13,21 @@
       <button ngbDropdownItem (click)="list.selectAll()" i18n>Select all</button>
     </div>
   </div>
-
-  <div class="btn-group btn-group-toggle flex-fill" ngbRadioGroup [(ngModel)]="displayMode"
-    (ngModelChange)="saveDisplayMode()">
-    <label ngbButtonLabel class="btn-outline-primary btn-sm">
-      <input ngbButton type="radio" class="btn-check btn-sm" value="details">
+  <div class="btn-group flex-fill" role="group">
+    <input type="radio" class="btn-check" [(ngModel)]="displayMode" value="details" (ngModelChange)="saveDisplayMode()" id="displayModeDetails">
+    <label for="displayModeDetails" class="btn btn-outline-primary btn-sm">
       <svg class="toolbaricon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#list-ul" />
       </svg>
     </label>
-    <label ngbButtonLabel class="btn-outline-primary btn-sm">
-      <input ngbButton type="radio" class="btn-check btn-sm" value="smallCards">
+    <input type="radio" class="btn-check" [(ngModel)]="displayMode" value="smallCards" (ngModelChange)="saveDisplayMode()" id="displayModeSmall">
+    <label for="displayModeSmall" class="btn btn-outline-primary btn-sm">
       <svg class="toolbaricon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#grid" />
       </svg>
     </label>
-    <label ngbButtonLabel class="btn-outline-primary btn-sm">
-      <input ngbButton type="radio" class="btn-check btn-sm" value="largeCards">
+    <input type="radio" class="btn-check" [(ngModel)]="displayMode" value="largeCards" (ngModelChange)="saveDisplayMode()" id="displayModeLarge">
+    <label for="displayModeLarge" class="btn btn-outline-primary btn-sm">
       <svg class="toolbaricon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#hdd-stack" />
       </svg>
@@ -39,15 +37,15 @@
   <div ngbDropdown class="btn-group ms-2 flex-fill">
     <button class="btn btn-outline-primary btn-sm" id="dropdownBasic1" ngbDropdownToggle i18n>Sort</button>
     <div ngbDropdownMenu aria-labelledby="dropdownBasic1" class="shadow dropdown-menu-right">
-      <div class="w-100 d-flex btn-group-toggle pb-2 mb-1 border-bottom" ngbRadioGroup [(ngModel)]="listSort">
-        <label ngbButtonLabel class="btn-outline-primary btn-sm mx-2 flex-fill">
-          <input ngbButton type="radio" class="btn btn-check btn-sm" [value]="false">
+      <div class="w-100 d-flex pb-2 mb-1 border-bottom">
+        <input type="radio" class="btn-check" [value]="false" [(ngModel)]="listSortReverse" id="listSortReverseFalse">
+        <label class="btn btn-outline-primary btn-sm mx-2 flex-fill" for="listSortReverseFalse">
           <svg class="toolbaricon" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#sort-alpha-down" />
           </svg>
         </label>
-        <label ngbButtonLabel class="btn-outline-primary btn-sm me-2 flex-fill">
-          <input ngbButton type="radio" class="btn btn-check btn-sm" [value]="true">
+        <input type="radio" class="btn-check" [value]="true" [(ngModel)]="listSortReverse" id="listSortReverseTrue">
+        <label class="btn btn-outline-primary btn-sm me-2 flex-fill" for="listSortReverseTrue">
           <svg class="toolbaricon" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#sort-alpha-up-alt" />
           </svg>
