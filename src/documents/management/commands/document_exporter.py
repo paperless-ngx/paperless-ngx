@@ -232,7 +232,7 @@ class Command(BaseCommand):
                         archive_target,
                     )
 
-        # 4. write manifest to target forlder
+        # 4. write manifest to target folder
         manifest_path = os.path.abspath(os.path.join(self.target, "manifest.json"))
 
         with open(manifest_path, "w") as f:
