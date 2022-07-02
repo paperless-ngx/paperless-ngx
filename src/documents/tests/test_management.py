@@ -150,9 +150,9 @@ class TestDecryptDocuments(TestCase):
                 "samples",
                 "documents",
                 "thumbnails",
-                f"0000004.png.gpg",
+                f"0000004.webp.gpg",
             ),
-            os.path.join(thumb_dir, f"{doc.id:07}.png.gpg"),
+            os.path.join(thumb_dir, f"{doc.id:07}.webp.gpg"),
         )
 
         call_command("decrypt_documents")
@@ -163,7 +163,7 @@ class TestDecryptDocuments(TestCase):
         self.assertEqual(doc.filename, "0000004.pdf")
         self.assertTrue(os.path.isfile(os.path.join(originals_dir, "0000004.pdf")))
         self.assertTrue(os.path.isfile(doc.source_path))
-        self.assertTrue(os.path.isfile(os.path.join(thumb_dir, f"{doc.id:07}.png")))
+        self.assertTrue(os.path.isfile(os.path.join(thumb_dir, f"{doc.id:07}.webp")))
         self.assertTrue(os.path.isfile(doc.thumbnail_path))
 
         with doc.source_file as f:
