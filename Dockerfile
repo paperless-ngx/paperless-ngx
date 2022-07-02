@@ -77,15 +77,12 @@ ARG RUNTIME_PACKAGES="\
   libraqm0 \
   libgnutls30 \
   libjpeg62-turbo \
-  optipng \
   python3 \
   python3-pip \
   python3-setuptools \
   postgresql-client \
   # For Numpy
   libatlas3-base \
-  # thumbnail size reduction
-  pngquant \
   # OCRmyPDF dependencies
   tesseract-ocr \
   tesseract-ocr-eng \

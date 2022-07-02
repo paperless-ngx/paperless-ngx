@@ -324,6 +324,7 @@ class BulkEditSerializer(DocumentListSerializer):
             "remove_tag",
             "modify_tags",
             "delete",
+            "redo_ocr",
         ],
         label="Method",
         write_only=True,
@@ -357,6 +358,8 @@ class BulkEditSerializer(DocumentListSerializer):
             return bulk_edit.modify_tags
         elif method == "delete":
             return bulk_edit.delete
+        elif method == "redo_ocr":
+            return bulk_edit.redo_ocr
         else:
             raise serializers.ValidationError("Unsupported method.")
 
@@ -537,8 +540,6 @@ class BulkDownloadSerializer(DocumentListSerializer):
 
 
 class StoragePathSerializer(MatchingModelSerializer):
-    document_count = serializers.IntegerField(read_only=True)
-
     class Meta:
         model = StoragePath
         fields = (
@@ -585,10 +586,6 @@ class UiSettingsViewSerializer(serializers.ModelSerializer):
             "id",
             "settings",
         ]
-
-    def update(self, instance, validated_data):
-        super().update(instance, validated_data)
-        return instance
 
     def create(self, validated_data):
         ui_settings = UiSettings.objects.update_or_create(

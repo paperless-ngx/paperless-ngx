@@ -11,7 +11,7 @@ from ...parsers import get_parser_class_for_mime_type
 
 
 def _process_document(doc_in):
-    document = Document.objects.get(id=doc_in)
+    document: Document = Document.objects.get(id=doc_in)
     parser_class = get_parser_class_for_mime_type(document.mime_type)
 
     if parser_class:
@@ -21,7 +21,8 @@ def _process_document(doc_in):
         return
 
     try:
-        thumb = parser.get_optimised_thumbnail(
+
+        thumb = parser.get_thumbnail(
             document.source_path,
             document.mime_type,
             document.get_public_filename(),
@@ -69,7 +70,7 @@ class Command(BaseCommand):
         ids = [doc.id for doc in documents]
 
         # Note to future self: this prevents django from reusing database
-        # conncetions between processes, which is bad and does not work
+        # connections between processes, which is bad and does not work
         # with postgres.
         db.connections.close_all()
 

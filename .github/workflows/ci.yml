@@ -26,7 +26,7 @@ jobs:
         run: pipx install pipenv
       -
         name: Set up Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: 3.9
           cache: "pipenv"
@@ -73,7 +73,7 @@ jobs:
         uses: actions/checkout@v3
       -
         name: Set up Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: "3.9"
       -
@@ -146,7 +146,7 @@ jobs:
       -
         name: Gather Docker metadata
         id: docker-meta
-        uses: docker/metadata-action@v3
+        uses: docker/metadata-action@v4
         with:
           images: |
             ghcr.io/${{ github.repository }}
@@ -231,7 +231,7 @@ jobs:
         uses: actions/checkout@v3
       -
         name: Set up Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: 3.9
       -

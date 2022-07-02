@@ -712,13 +712,6 @@ PAPERLESS_CONVERT_TMPDIR=<path>
 
     Default is none, which disables the temporary directory.
 
-PAPERLESS_OPTIMIZE_THUMBNAILS=<bool>
-    Use optipng to optimize thumbnails. This usually reduces the size of
-    thumbnails by about 20%, but uses considerable compute time during
-    consumption.
-
-    Defaults to true.
-
 PAPERLESS_POST_CONSUME_SCRIPT=<filename>
     After a document is consumed, Paperless can trigger an arbitrary script if
     you like.  This script will be passed a number of arguments for you to work
@@ -788,9 +781,6 @@ PAPERLESS_CONVERT_BINARY=<path>
 
 PAPERLESS_GS_BINARY=<path>
     Defaults to "/usr/bin/gs".
-
-PAPERLESS_OPTIPNG_BINARY=<path>
-    Defaults to "/usr/bin/optipng".
 
 
 .. _configuration-docker:
