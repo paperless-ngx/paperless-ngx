@@ -1,9 +1,7 @@
 import logging
 import os
 import shutil
-import tempfile
 from pathlib import Path
-from typing import List  # for type hinting. Can be removed, if only Python >3.8 is used
 from typing import Type
 
 import tqdm
