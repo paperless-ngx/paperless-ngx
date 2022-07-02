@@ -67,12 +67,12 @@ describe('documents-list', () => {
   })
 
   it('should change to table "details" view', () => {
-    cy.get('div.btn-group-toggle input[value="details"]').parent().click()
+    cy.get('div.btn-group input[value="details"]').next().click()
     cy.get('table')
   })
 
   it('should change to large cards view', () => {
-    cy.get('div.btn-group-toggle input[value="largeCards"]').parent().click()
+    cy.get('div.btn-group input[value="largeCards"]').next().click()
     cy.get('app-document-card-large')
   })
 
