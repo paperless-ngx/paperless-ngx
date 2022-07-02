@@ -550,29 +550,20 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     this.updateRules()
   }
 
-  addTag(tagId: number) {
-    this.tagSelectionModel.set(tagId, ToggleableItemState.Selected)
+  toggleTag(tagId: number) {
+    this.tagSelectionModel.toggle(tagId)
   }
 
-  addCorrespondent(correspondentId: number) {
-    this.correspondentSelectionModel.set(
-      correspondentId,
-      ToggleableItemState.Selected
-    )
+  toggleCorrespondent(correspondentId: number) {
+    this.correspondentSelectionModel.toggle(correspondentId)
   }
 
-  addDocumentType(documentTypeId: number) {
-    this.documentTypeSelectionModel.set(
-      documentTypeId,
-      ToggleableItemState.Selected
-    )
+  toggleDocumentType(documentTypeId: number) {
+    this.documentTypeSelectionModel.toggle(documentTypeId)
   }
 
-  addStoragePath(storagePathID: number) {
-    this.storagePathSelectionModel.set(
-      storagePathID,
-      ToggleableItemState.Selected
-    )
+  toggleStoragePath(storagePathID: number) {
+    this.storagePathSelectionModel.toggle(storagePathID)
   }
 
   onTagsDropdownOpen() {
