@@ -31,7 +31,7 @@ python-magic = "*"
 psycopg2 = "*"
 redis = "*"
 # Pinned because aarch64 wheels and updates cause warnings when loading the classifier model.
-scikit-learn="==1.0.2"
+scikit-learn="==1.1.1"
 whitenoise = "~=6.2.0"
 watchdog = "~=2.1.0"
 whoosh="~=2.7.4"
