@@ -150,11 +150,14 @@ def run_convert(
 
 
 def get_default_thumbnail() -> str:
+    """
+    Returns the path to a generic thumbnail
+    """
     return os.path.join(os.path.dirname(__file__), "resources", "document.png")
 
 
 def make_thumbnail_from_pdf_gs_fallback(in_path, temp_dir, logging_group=None) -> str:
-    out_path = os.path.join(temp_dir, "convert_gs.png")
+    out_path = os.path.join(temp_dir, "convert_gs.webp")
 
     # if convert fails, fall back to extracting
     # the first PDF page as a PNG using Ghostscript
@@ -191,7 +194,7 @@ def make_thumbnail_from_pdf(in_path, temp_dir, logging_group=None) -> str:
     """
     The thumbnail of a PDF is just a 500px wide image of the first page.
     """
-    out_path = os.path.join(temp_dir, "convert.png")
+    out_path = os.path.join(temp_dir, "convert.webp")
 
     # Run convert to get a decent thumbnail
     try:
@@ -318,29 +321,6 @@ class DocumentParser(LoggingMixin):
         Returns the path to a file we can use as a thumbnail for this document.
         """
         raise NotImplementedError()
-
-    def get_optimised_thumbnail(self, document_path, mime_type, file_name=None):
-        thumbnail = self.get_thumbnail(document_path, mime_type, file_name)
-        if settings.OPTIMIZE_THUMBNAILS:
-            out_path = os.path.join(self.tempdir, "thumb_optipng.png")
-
-            args = (
-                settings.OPTIPNG_BINARY,
-                "-silent",
-                "-o5",
-                thumbnail,
-                "-out",
-                out_path,
-            )
-
-            self.log("debug", f"Execute: {' '.join(args)}")
-
-            if not subprocess.Popen(args).wait() == 0:
-                raise ParseError(f"Optipng failed at {args}")
-
-            return out_path
-        else:
-            return thumbnail
 
     def get_text(self):
         return self.text
