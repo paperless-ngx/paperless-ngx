@@ -71,11 +71,11 @@ export class DocumentListComponent implements OnInit, OnDestroy {
       : DOCUMENT_SORT_FIELDS
   }
 
-  set listSort(reverse: boolean) {
+  set listSortReverse(reverse: boolean) {
     this.list.sortReverse = reverse
   }
 
-  get listSort(): boolean {
+  get listSortReverse(): boolean {
     return this.list.sortReverse
   }
 
