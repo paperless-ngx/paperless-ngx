@@ -11,7 +11,7 @@
       </div>
 
       <div class="tags d-flex flex-column text-end position-absolute me-1 fs-6">
-        <app-tag *ngFor="let t of getTagsLimited$() | async" [tag]="t" (click)="clickTag.emit(t.id);$event.stopPropagation()" [clickable]="true" linkTitle="Filter by tag" i18n-linkTitle></app-tag>
+        <app-tag *ngFor="let t of getTagsLimited$() | async" [tag]="t" (click)="clickTag.emit(t.id);$event.stopPropagation()" [clickable]="true" linkTitle="Toggle tag filter" i18n-linkTitle></app-tag>
         <div *ngIf="moreTags">
           <span class="badge badge-secondary">+ {{moreTags}}</span>
         </div>
@@ -21,21 +21,21 @@
     <div class="card-body p-2">
       <p class="card-text">
         <ng-container *ngIf="document.correspondent">
-          <a title="Filter by correspondent" i18n-title (click)="clickCorrespondent.emit(document.correspondent);$event.stopPropagation()" class="fw-bold btn-link">{{(document.correspondent$ | async)?.name}}</a>:
+          <a title="Toggle correspondent filter" i18n-title (click)="clickCorrespondent.emit(document.correspondent);$event.stopPropagation()" class="fw-bold btn-link">{{(document.correspondent$ | async)?.name}}</a>:
         </ng-container>
         {{document.title | documentTitle}}
       </p>
     </div>
     <div class="card-footer pt-0 pb-2 px-2">
       <div class="list-group list-group-flush border-0 pt-1 pb-2 card-info">
-        <button *ngIf="document.document_type" type="button" class="list-group-item list-group-item-action bg-transparent ps-0 p-1 border-0" title="Filter by document type" i18n-title
+        <button *ngIf="document.document_type" type="button" class="list-group-item list-group-item-action bg-transparent ps-0 p-1 border-0" title="Toggle document type filter" i18n-title
          (click)="clickDocumentType.emit(document.document_type);$event.stopPropagation()">
           <svg class="metadata-icon me-2 text-muted bi bi-file-earmark" viewBox="0 0 16 16" fill="currentColor">
             <path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zm-3 0A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5h-2z"/>
           </svg>
           <small>{{(document.document_type$ | async)?.name}}</small>
         </button>
-        <button *ngIf="document.storage_path" type="button" class="list-group-item list-group-item-action bg-transparent ps-0 p-1 border-0" title="Filter by storage path" i18n-title
+        <button *ngIf="document.storage_path" type="button" class="list-group-item list-group-item-action bg-transparent ps-0 p-1 border-0" title="Toggle storage path filter" i18n-title
          (click)="clickStoragePath.emit(document.storage_path);$event.stopPropagation()">
           <svg class="metadata-icon me-2 text-muted bi bi-folder" viewBox="0 0 16 16" fill="currentColor">
             <path d="M0 2a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1v7.5a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 1 12.5V5a1 1 0 0 1-1-1V2zm2 3v7.5A1.5 1.5 0 0 0 3.5 14h9a1.5 1.5 0 0 0 1.5-1.5V5H2zm13-3H1v2h14V2zM5 7.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z"/>
