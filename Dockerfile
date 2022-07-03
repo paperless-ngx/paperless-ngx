@@ -117,9 +117,10 @@ COPY gunicorn.conf.py .
 # setup docker-specific things
 # Use mounts to avoid copying installer files into the image
 # These change sometimes, but rarely
-WORKDIR /usr/src/paperless/src/docker/
+ARG DOCKER_SRC=/usr/src/paperless/src/docker/
+WORKDIR ${DOCKER_SRC}
 
-RUN --mount=type=bind,readwrite,source=docker,target=./ \
+RUN --mount=type=bind,readwrite,source=docker,target=${DOCKER_SRC} \
   set -eux \
   && echo "Configuring ImageMagick" \
     && cp imagemagick-policy.xml /etc/ImageMagick-6/policy.xml \
