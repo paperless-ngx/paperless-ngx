@@ -2,7 +2,7 @@
 daysUntilStale: 30
 # Number of days of inactivity before a stale issue is closed
 daysUntilClose: 7
-any-of-labels: unconfirmed,cant-reproduce,stale
+any-of-issue-labels: unconfirmed,cant-reproduce,stale
 # Label to use when marking an issue as stale
 staleLabel: stale
 # Comment to post when marking an issue as stale. Set to `false` to disable
