@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import logging
+from argparse import ArgumentError
 
 
 def get_image_tag(
@@ -25,3 +27,18 @@ def get_cache_image_tag(
     rebuilds, generally almost instant for the same version
     """
     return f"ghcr.io/{repo_name}/builder/cache/{pkg_name}:{pkg_version}"
+
+
+def get_log_level(args) -> int:
+    levels = {
+        "critical": logging.CRITICAL,
+        "error": logging.ERROR,
+        "warn": logging.WARNING,
+        "warning": logging.WARNING,
+        "info": logging.INFO,
+        "debug": logging.DEBUG,
+    }
+    level = levels.get(args.loglevel.lower())
+    if level is None:
+        level = logging.INFO
+    return level
