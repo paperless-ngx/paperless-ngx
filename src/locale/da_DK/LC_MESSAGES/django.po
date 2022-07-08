@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-19 15:24-0700\n"
-"PO-Revision-Date: 2022-05-19 22:26\n"
+"POT-Creation-Date: 2022-07-08 14:11-0700\n"
+"PO-Revision-Date: 2022-07-08 22:07\n"
 "Last-Translator: \n"
 "Language-Team: Danish\n"
 "Language: da_DK\n"
@@ -21,374 +21,378 @@ msgstr ""
 msgid "Documents"
 msgstr "Dokumenter"
 
-#: documents/models.py:27
+#: documents/models.py:29
 msgid "Any word"
 msgstr "Ethvert ord"
 
-#: documents/models.py:28
+#: documents/models.py:30
 msgid "All words"
 msgstr "Alle ord"
 
-#: documents/models.py:29
+#: documents/models.py:31
 msgid "Exact match"
 msgstr "Præcis match"
 
-#: documents/models.py:30
+#: documents/models.py:32
 msgid "Regular expression"
 msgstr "Regulær udtryk"
 
-#: documents/models.py:31
+#: documents/models.py:33
 msgid "Fuzzy word"
 msgstr "Tilnærmet ord"
 
-#: documents/models.py:32
+#: documents/models.py:34
 msgid "Automatic"
 msgstr "Automatisk"
 
-#: documents/models.py:35 documents/models.py:343 paperless_mail/models.py:16
-#: paperless_mail/models.py:79
+#: documents/models.py:37 documents/models.py:354 paperless_mail/models.py:16
+#: paperless_mail/models.py:80
 msgid "name"
 msgstr "navn"
 
-#: documents/models.py:37
+#: documents/models.py:39
 msgid "match"
 msgstr "match"
 
-#: documents/models.py:40
+#: documents/models.py:42
 msgid "matching algorithm"
 msgstr "matching algoritme"
 
-#: documents/models.py:45
+#: documents/models.py:47
 msgid "is insensitive"
 msgstr "er usensitiv"
 
-#: documents/models.py:58 documents/models.py:113
+#: documents/models.py:60 documents/models.py:115
 msgid "correspondent"
 msgstr "korrespondent"
 
-#: documents/models.py:59
+#: documents/models.py:61
 msgid "correspondents"
 msgstr "korrespondenter"
 
-#: documents/models.py:64
+#: documents/models.py:66
 msgid "color"
 msgstr "farve"
 
-#: documents/models.py:67
+#: documents/models.py:69
 msgid "is inbox tag"
 msgstr "er indbakkeetiket"
 
-#: documents/models.py:70
+#: documents/models.py:72
 msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
 msgstr "Markerer denne etiket som en indbakkeetiket: Alle ny-bearbejdede dokumenter vil blive mærket med indbakkeetiketter."
 
-#: documents/models.py:76
+#: documents/models.py:78
 msgid "tag"
 msgstr "etiket"
 
-#: documents/models.py:77 documents/models.py:151
+#: documents/models.py:79 documents/models.py:153
 msgid "tags"
 msgstr "etiketter"
 
-#: documents/models.py:82 documents/models.py:133
+#: documents/models.py:84 documents/models.py:135
 msgid "document type"
 msgstr "dokumenttype"
 
-#: documents/models.py:83
+#: documents/models.py:85
 msgid "document types"
 msgstr "dokumenttyper"
 
-#: documents/models.py:88
+#: documents/models.py:90
 msgid "path"
 msgstr ""
 
-#: documents/models.py:94 documents/models.py:122
+#: documents/models.py:96 documents/models.py:124
 msgid "storage path"
 msgstr ""
 
-#: documents/models.py:95
+#: documents/models.py:97
 msgid "storage paths"
 msgstr ""
 
-#: documents/models.py:103
+#: documents/models.py:105
 msgid "Unencrypted"
 msgstr "Ukrypteret"
 
-#: documents/models.py:104
+#: documents/models.py:106
 msgid "Encrypted with GNU Privacy Guard"
 msgstr "Krypteret med GNU Privacy Guard"
 
-#: documents/models.py:125
+#: documents/models.py:127
 msgid "title"
 msgstr "titel"
 
-#: documents/models.py:137
+#: documents/models.py:139
 msgid "content"
 msgstr "indhold"
 
-#: documents/models.py:140
+#: documents/models.py:142
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
 msgstr "Dokumentets rå tekstdata. Dette felt bruges primært til søgning."
 
-#: documents/models.py:145
+#: documents/models.py:147
 msgid "mime type"
 msgstr "MIME-type"
 
-#: documents/models.py:155
+#: documents/models.py:157
 msgid "checksum"
 msgstr "kontrolsum"
 
-#: documents/models.py:159
+#: documents/models.py:161
 msgid "The checksum of the original document."
 msgstr "Kontrolsummen af det oprindelige dokument."
 
-#: documents/models.py:163
+#: documents/models.py:165
 msgid "archive checksum"
 msgstr "arkiv kontrolsum"
 
-#: documents/models.py:168
+#: documents/models.py:170
 msgid "The checksum of the archived document."
 msgstr "Kontrolsummen af det arkiverede dokument."
 
-#: documents/models.py:171 documents/models.py:324
+#: documents/models.py:173 documents/models.py:335 documents/models.py:520
 msgid "created"
 msgstr "oprettet"
 
-#: documents/models.py:174
+#: documents/models.py:176
 msgid "modified"
 msgstr "ændret"
 
-#: documents/models.py:181
+#: documents/models.py:183
 msgid "storage type"
 msgstr "lagringstype"
 
-#: documents/models.py:189
+#: documents/models.py:191
 msgid "added"
 msgstr "tilføjet"
 
-#: documents/models.py:196
+#: documents/models.py:198
 msgid "filename"
 msgstr "filnavn"
 
-#: documents/models.py:202
+#: documents/models.py:204
 msgid "Current filename in storage"
 msgstr "Nuværende filnavn lagret"
 
-#: documents/models.py:206
+#: documents/models.py:208
 msgid "archive filename"
 msgstr "arkiv filnavn"
 
-#: documents/models.py:212
+#: documents/models.py:214
 msgid "Current archive filename in storage"
 msgstr "Nuværende arkivfilnavn lagret"
 
-#: documents/models.py:216
+#: documents/models.py:218
 msgid "archive serial number"
 msgstr "arkiv serienummer"
 
-#: documents/models.py:222
+#: documents/models.py:224
 msgid "The position of this document in your physical document archive."
 msgstr "Placeringen af dette dokument i dit fysiske dokumentarkiv."
 
-#: documents/models.py:228
+#: documents/models.py:230
 msgid "document"
 msgstr "dokument"
 
-#: documents/models.py:229
+#: documents/models.py:231
 msgid "documents"
 msgstr "dokumenter"
 
-#: documents/models.py:307
+#: documents/models.py:318
 msgid "debug"
 msgstr "fejlfinding"
 
-#: documents/models.py:308
+#: documents/models.py:319
 msgid "information"
 msgstr "information"
 
-#: documents/models.py:309
+#: documents/models.py:320
 msgid "warning"
 msgstr "advarsel"
 
-#: documents/models.py:310
+#: documents/models.py:321
 msgid "error"
 msgstr "fejl"
 
-#: documents/models.py:311
+#: documents/models.py:322
 msgid "critical"
 msgstr "kritisk"
 
-#: documents/models.py:314
+#: documents/models.py:325
 msgid "group"
 msgstr "gruppe"
 
-#: documents/models.py:316
+#: documents/models.py:327
 msgid "message"
 msgstr "besked"
 
-#: documents/models.py:319
+#: documents/models.py:330
 msgid "level"
 msgstr "niveau"
 
-#: documents/models.py:328
+#: documents/models.py:339
 msgid "log"
 msgstr "log"
 
-#: documents/models.py:329
+#: documents/models.py:340
 msgid "logs"
 msgstr "logninger"
 
-#: documents/models.py:339 documents/models.py:392
+#: documents/models.py:350 documents/models.py:403
 msgid "saved view"
 msgstr "gemt visning"
 
-#: documents/models.py:340
+#: documents/models.py:351
 msgid "saved views"
 msgstr "gemte visninger"
 
-#: documents/models.py:342
+#: documents/models.py:353
 msgid "user"
 msgstr "bruger"
 
-#: documents/models.py:346
+#: documents/models.py:357
 msgid "show on dashboard"
 msgstr "vis på betjeningspanel"
 
-#: documents/models.py:349
+#: documents/models.py:360
 msgid "show in sidebar"
 msgstr "vis i sidepanelet"
 
-#: documents/models.py:353
+#: documents/models.py:364
 msgid "sort field"
 msgstr "sortér felt"
 
-#: documents/models.py:358
+#: documents/models.py:369
 msgid "sort reverse"
 msgstr "sortér omvendt"
 
-#: documents/models.py:363
+#: documents/models.py:374
 msgid "title contains"
 msgstr "titel indeholder"
 
-#: documents/models.py:364
+#: documents/models.py:375
 msgid "content contains"
 msgstr "indhold indeholder"
 
-#: documents/models.py:365
+#: documents/models.py:376
 msgid "ASN is"
 msgstr "ASN er"
 
-#: documents/models.py:366
+#: documents/models.py:377
 msgid "correspondent is"
 msgstr "korrespondent er"
 
-#: documents/models.py:367
+#: documents/models.py:378
 msgid "document type is"
 msgstr "dokumenttype er"
 
-#: documents/models.py:368
+#: documents/models.py:379
 msgid "is in inbox"
 msgstr "er i indbakke"
 
-#: documents/models.py:369
+#: documents/models.py:380
 msgid "has tag"
 msgstr "har etiket"
 
-#: documents/models.py:370
+#: documents/models.py:381
 msgid "has any tag"
 msgstr "har en etiket"
 
-#: documents/models.py:371
+#: documents/models.py:382
 msgid "created before"
 msgstr "oprettet før"
 
-#: documents/models.py:372
+#: documents/models.py:383
 msgid "created after"
 msgstr "oprettet efter"
 
-#: documents/models.py:373
+#: documents/models.py:384
 msgid "created year is"
 msgstr "oprettet år er"
 
-#: documents/models.py:374
+#: documents/models.py:385
 msgid "created month is"
 msgstr "oprettet måned er"
 
-#: documents/models.py:375
+#: documents/models.py:386
 msgid "created day is"
 msgstr "oprettet dag er"
 
-#: documents/models.py:376
+#: documents/models.py:387
 msgid "added before"
 msgstr "tilføjet før"
 
-#: documents/models.py:377
+#: documents/models.py:388
 msgid "added after"
 msgstr "tilføjet efter"
 
-#: documents/models.py:378
+#: documents/models.py:389
 msgid "modified before"
 msgstr "ændret før"
 
-#: documents/models.py:379
+#: documents/models.py:390
 msgid "modified after"
 msgstr "ændret efter"
 
-#: documents/models.py:380
+#: documents/models.py:391
 msgid "does not have tag"
 msgstr "har ikke nogen etiket"
 
-#: documents/models.py:381
+#: documents/models.py:392
 msgid "does not have ASN"
 msgstr "har ikke ASN"
 
-#: documents/models.py:382
+#: documents/models.py:393
 msgid "title or content contains"
 msgstr "titel eller indhold indeholder"
 
-#: documents/models.py:383
+#: documents/models.py:394
 msgid "fulltext query"
 msgstr "fuldtekst forespørgsel"
 
-#: documents/models.py:384
+#: documents/models.py:395
 msgid "more like this"
 msgstr "mere som dette"
 
-#: documents/models.py:385
+#: documents/models.py:396
 msgid "has tags in"
 msgstr "har etiketter i"
 
-#: documents/models.py:395
+#: documents/models.py:406
 msgid "rule type"
 msgstr "regeltype"
 
-#: documents/models.py:397
+#: documents/models.py:408
 msgid "value"
 msgstr "værdi"
 
-#: documents/models.py:400
+#: documents/models.py:411
 msgid "filter rule"
 msgstr "filtreringsregel"
 
-#: documents/models.py:401
+#: documents/models.py:412
 msgid "filter rules"
 msgstr "filtreringsregler"
 
-#: documents/serialisers.py:63
+#: documents/models.py:521
+msgid "started"
+msgstr ""
+
+#: documents/serialisers.py:70
 #, python-format
 msgid "Invalid regular expression: %(error)s"
 msgstr "Ugyldigt regulært udtryk: %(error)s"
 
-#: documents/serialisers.py:184
+#: documents/serialisers.py:191
 msgid "Invalid color."
 msgstr "Ugyldig farve."
 
-#: documents/serialisers.py:491
+#: documents/serialisers.py:515
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Filtype %(type)s understøttes ikke"
 
-#: documents/serialisers.py:574
+#: documents/serialisers.py:596
 msgid "Invalid variable detected."
 msgstr ""
 
@@ -440,91 +444,91 @@ msgstr "Adgangskode"
 msgid "Sign in"
 msgstr "Log ind"
 
-#: paperless/settings.py:338
+#: paperless/settings.py:339
 msgid "English (US)"
 msgstr "Engelsk (USA)"
 
-#: paperless/settings.py:339
+#: paperless/settings.py:340
 msgid "Belarusian"
 msgstr ""
 
-#: paperless/settings.py:340
+#: paperless/settings.py:341
 msgid "Czech"
 msgstr "Tjekkisk"
 
-#: paperless/settings.py:341
+#: paperless/settings.py:342
 msgid "Danish"
 msgstr "Dansk"
 
-#: paperless/settings.py:342
+#: paperless/settings.py:343
 msgid "German"
 msgstr "Tysk"
 
-#: paperless/settings.py:343
+#: paperless/settings.py:344
 msgid "English (GB)"
 msgstr "Engelsk (GB)"
 
-#: paperless/settings.py:344
+#: paperless/settings.py:345
 msgid "Spanish"
 msgstr "Spansk"
 
-#: paperless/settings.py:345
+#: paperless/settings.py:346
 msgid "French"
 msgstr "Fransk"
 
-#: paperless/settings.py:346
+#: paperless/settings.py:347
 msgid "Italian"
 msgstr "Italiensk"
 
-#: paperless/settings.py:347
+#: paperless/settings.py:348
 msgid "Luxembourgish"
 msgstr "Luxemburgsk"
 
-#: paperless/settings.py:348
+#: paperless/settings.py:349
 msgid "Dutch"
 msgstr "Hollandsk"
 
-#: paperless/settings.py:349
+#: paperless/settings.py:350
 msgid "Polish"
 msgstr "Polsk"
 
-#: paperless/settings.py:350
+#: paperless/settings.py:351
 msgid "Portuguese (Brazil)"
 msgstr "Portugisisk (Brasilien)"
 
-#: paperless/settings.py:351
+#: paperless/settings.py:352
 msgid "Portuguese"
 msgstr "Portugisisk"
 
-#: paperless/settings.py:352
+#: paperless/settings.py:353
 msgid "Romanian"
 msgstr "Romansk"
 
-#: paperless/settings.py:353
+#: paperless/settings.py:354
 msgid "Russian"
 msgstr "Russisk"
 
-#: paperless/settings.py:354
+#: paperless/settings.py:355
 msgid "Slovenian"
 msgstr ""
 
-#: paperless/settings.py:355
+#: paperless/settings.py:356
 msgid "Serbian"
 msgstr ""
 
-#: paperless/settings.py:356
+#: paperless/settings.py:357
 msgid "Swedish"
 msgstr "Svensk"
 
-#: paperless/settings.py:357
+#: paperless/settings.py:358
 msgid "Turkish"
 msgstr ""
 
-#: paperless/settings.py:358
+#: paperless/settings.py:359
 msgid "Chinese Simplified"
 msgstr ""
 
-#: paperless/urls.py:153
+#: paperless/urls.py:161
 msgid "Paperless-ngx administration"
 msgstr "Paperless-ngx administration"
 
@@ -648,111 +652,115 @@ msgstr "Markér som læst, behandl ikke læste emails"
 msgid "Flag the mail, don't process flagged mails"
 msgstr "Flag emailen, undlad at behandle flagede emails"
 
-#: paperless_mail/models.py:70
+#: paperless_mail/models.py:68
+msgid "Tag the mail with specified tag, don't process tagged mails"
+msgstr ""
+
+#: paperless_mail/models.py:71
 msgid "Use subject as title"
 msgstr "Brug emnet som titel"
 
-#: paperless_mail/models.py:71
+#: paperless_mail/models.py:72
 msgid "Use attachment filename as title"
 msgstr "Benyt vedhæftningsfilnavn som titel"
 
-#: paperless_mail/models.py:74
+#: paperless_mail/models.py:75
 msgid "Do not assign a correspondent"
 msgstr "Tildel ikke en korrespondent"
 
-#: paperless_mail/models.py:75
+#: paperless_mail/models.py:76
 msgid "Use mail address"
 msgstr "Brug emailadresse"
 
-#: paperless_mail/models.py:76
+#: paperless_mail/models.py:77
 msgid "Use name (or mail address if not available)"
 msgstr "Benyt navn (eller emailadresse hvis den ikke er tilgængelig)"
 
-#: paperless_mail/models.py:77
+#: paperless_mail/models.py:78
 msgid "Use correspondent selected below"
 msgstr "Benyt korrespondent valgt nedenfor"
 
-#: paperless_mail/models.py:81
+#: paperless_mail/models.py:82
 msgid "order"
 msgstr "rækkefølge"
 
-#: paperless_mail/models.py:87
+#: paperless_mail/models.py:88
 msgid "account"
 msgstr "konto"
 
-#: paperless_mail/models.py:91
+#: paperless_mail/models.py:92
 msgid "folder"
 msgstr "mappe"
 
-#: paperless_mail/models.py:95
+#: paperless_mail/models.py:96
 msgid "Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server."
 msgstr ""
 
-#: paperless_mail/models.py:101
+#: paperless_mail/models.py:102
 msgid "filter from"
 msgstr "filtrér fra"
 
-#: paperless_mail/models.py:107
+#: paperless_mail/models.py:108
 msgid "filter subject"
 msgstr "filtrér emne"
 
-#: paperless_mail/models.py:113
+#: paperless_mail/models.py:114
 msgid "filter body"
 msgstr "filtrér krop"
 
-#: paperless_mail/models.py:120
+#: paperless_mail/models.py:121
 msgid "filter attachment filename"
 msgstr "filtrér for vedhæftningens filnavn"
 
-#: paperless_mail/models.py:125
+#: paperless_mail/models.py:126
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
 msgstr "Bearbejd kun dokumenter, der helt matcher dette filnavn, hvis angivet. Wildcards såsom *.pdf eller *faktura * er tilladt."
 
-#: paperless_mail/models.py:132
+#: paperless_mail/models.py:133
 msgid "maximum age"
 msgstr "maksimal alder"
 
-#: paperless_mail/models.py:134
+#: paperless_mail/models.py:135
 msgid "Specified in days."
 msgstr "Specificeret i dage."
 
-#: paperless_mail/models.py:138
+#: paperless_mail/models.py:139
 msgid "attachment type"
 msgstr "vedhæftningstype"
 
-#: paperless_mail/models.py:142
+#: paperless_mail/models.py:143
 msgid "Inline attachments include embedded images, so it's best to combine this option with a filename filter."
 msgstr "Indlejrede vedhæftede filer er også indlejrede billeder, så det er bedst at kombinere denne indstilling med et filnavn."
 
-#: paperless_mail/models.py:148
+#: paperless_mail/models.py:149
 msgid "action"
 msgstr "handling"
 
-#: paperless_mail/models.py:154
+#: paperless_mail/models.py:155
 msgid "action parameter"
 msgstr "parameter for handling"
 
-#: paperless_mail/models.py:159
+#: paperless_mail/models.py:160
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
 msgstr "Yderligere parameter for handlingen der er valgt ovenfor, dvs. destinationsmappen for \"flyt til mappe\"-handlingen. Undermapper skal adskilles af prikker."
 
-#: paperless_mail/models.py:167
+#: paperless_mail/models.py:168
 msgid "assign title from"
 msgstr "tildel titel fra"
 
-#: paperless_mail/models.py:175
+#: paperless_mail/models.py:176
 msgid "assign this tag"
 msgstr "tildel denne etiket"
 
-#: paperless_mail/models.py:183
+#: paperless_mail/models.py:184
 msgid "assign this document type"
 msgstr "tildel denne dokumenttype"
 
-#: paperless_mail/models.py:187
+#: paperless_mail/models.py:188
 msgid "assign correspondent from"
 msgstr "tildel korrespondent fra"
 
-#: paperless_mail/models.py:197
+#: paperless_mail/models.py:198
 msgid "assign this correspondent"
 msgstr "tildel denne korrespondent"
 
