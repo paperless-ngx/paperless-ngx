@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-19 15:24-0700\n"
-"PO-Revision-Date: 2022-05-19 22:26\n"
+"POT-Creation-Date: 2022-07-08 14:11-0700\n"
+"PO-Revision-Date: 2022-07-08 22:07\n"
 "Last-Translator: \n"
 "Language-Team: Finnish\n"
 "Language: fi_FI\n"
@@ -21,510 +21,514 @@ msgstr ""
 msgid "Documents"
 msgstr "Dokumentit"
 
-#: documents/models.py:27
+#: documents/models.py:29
 msgid "Any word"
 msgstr "Mikä tahansa sana"
 
-#: documents/models.py:28
+#: documents/models.py:30
 msgid "All words"
 msgstr "Kaikki sanat"
 
-#: documents/models.py:29
+#: documents/models.py:31
 msgid "Exact match"
 msgstr "Tarkka osuma"
 
-#: documents/models.py:30
+#: documents/models.py:32
 msgid "Regular expression"
 msgstr "Säännöllinen lauseke (regex)"
 
-#: documents/models.py:31
+#: documents/models.py:33
 msgid "Fuzzy word"
 msgstr "Sumea sana"
 
-#: documents/models.py:32
+#: documents/models.py:34
 msgid "Automatic"
 msgstr "Automaattinen"
 
-#: documents/models.py:35 documents/models.py:343 paperless_mail/models.py:16
-#: paperless_mail/models.py:79
+#: documents/models.py:37 documents/models.py:354 paperless_mail/models.py:16
+#: paperless_mail/models.py:80
 msgid "name"
 msgstr "nimi"
 
-#: documents/models.py:37
+#: documents/models.py:39
 msgid "match"
 msgstr "osuma"
 
-#: documents/models.py:40
+#: documents/models.py:42
 msgid "matching algorithm"
 msgstr "tunnistusalgoritmi"
 
-#: documents/models.py:45
+#: documents/models.py:47
 msgid "is insensitive"
 msgstr "ei ole herkkä"
 
-#: documents/models.py:58 documents/models.py:113
+#: documents/models.py:60 documents/models.py:115
 msgid "correspondent"
 msgstr "yhteyshenkilö"
 
-#: documents/models.py:59
+#: documents/models.py:61
 msgid "correspondents"
 msgstr "yhteyshenkilöt"
 
-#: documents/models.py:64
+#: documents/models.py:66
 msgid "color"
 msgstr "väri"
 
-#: documents/models.py:67
+#: documents/models.py:69
 msgid "is inbox tag"
 msgstr "on uusien tunniste"
 
-#: documents/models.py:70
+#: documents/models.py:72
 msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
 msgstr "Merkitsee tämän tunnisteen uusien tunnisteeksi: Kaikille vastasyötetyille tiedostoille annetaan tämä tunniste."
 
-#: documents/models.py:76
+#: documents/models.py:78
 msgid "tag"
 msgstr "tunniste"
 
-#: documents/models.py:77 documents/models.py:151
+#: documents/models.py:79 documents/models.py:153
 msgid "tags"
 msgstr "tunnisteet"
 
-#: documents/models.py:82 documents/models.py:133
+#: documents/models.py:84 documents/models.py:135
 msgid "document type"
 msgstr "asiakirjatyyppi"
 
-#: documents/models.py:83
+#: documents/models.py:85
 msgid "document types"
 msgstr "asiakirjatyypit"
 
-#: documents/models.py:88
+#: documents/models.py:90
 msgid "path"
-msgstr ""
+msgstr "polku"
 
-#: documents/models.py:94 documents/models.py:122
+#: documents/models.py:96 documents/models.py:124
 msgid "storage path"
-msgstr ""
+msgstr "tallennustilan polku"
 
-#: documents/models.py:95
+#: documents/models.py:97
 msgid "storage paths"
-msgstr ""
+msgstr "tallennustilan polut"
 
-#: documents/models.py:103
+#: documents/models.py:105
 msgid "Unencrypted"
 msgstr "Salaamaton"
 
-#: documents/models.py:104
+#: documents/models.py:106
 msgid "Encrypted with GNU Privacy Guard"
 msgstr "GNU Privacy Guard -salattu"
 
-#: documents/models.py:125
+#: documents/models.py:127
 msgid "title"
 msgstr "otsikko"
 
-#: documents/models.py:137
+#: documents/models.py:139
 msgid "content"
 msgstr "sisältö"
 
-#: documents/models.py:140
+#: documents/models.py:142
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
 msgstr "Raaka vain teksti -muotoinen dokumentin sisältö. Kenttää käytetään pääasiassa hakutoiminnossa."
 
-#: documents/models.py:145
+#: documents/models.py:147
 msgid "mime type"
 msgstr "mime-tyyppi"
 
-#: documents/models.py:155
+#: documents/models.py:157
 msgid "checksum"
 msgstr "tarkistussumma"
 
-#: documents/models.py:159
+#: documents/models.py:161
 msgid "The checksum of the original document."
 msgstr "Alkuperäisen dokumentin tarkistussumma."
 
-#: documents/models.py:163
+#: documents/models.py:165
 msgid "archive checksum"
 msgstr "arkistotarkastussumma"
 
-#: documents/models.py:168
+#: documents/models.py:170
 msgid "The checksum of the archived document."
 msgstr "Arkistoidun dokumentin tarkistussumma."
 
-#: documents/models.py:171 documents/models.py:324
+#: documents/models.py:173 documents/models.py:335 documents/models.py:520
 msgid "created"
 msgstr "luotu"
 
-#: documents/models.py:174
+#: documents/models.py:176
 msgid "modified"
 msgstr "muokattu"
 
-#: documents/models.py:181
+#: documents/models.py:183
 msgid "storage type"
 msgstr "tallennustilan tyyppi"
 
-#: documents/models.py:189
+#: documents/models.py:191
 msgid "added"
 msgstr "lisätty"
 
-#: documents/models.py:196
+#: documents/models.py:198
 msgid "filename"
 msgstr "tiedostonimi"
 
-#: documents/models.py:202
+#: documents/models.py:204
 msgid "Current filename in storage"
 msgstr "Tiedostonimi tallennustilassa"
 
-#: documents/models.py:206
+#: documents/models.py:208
 msgid "archive filename"
 msgstr "arkistointitiedostonimi"
 
-#: documents/models.py:212
+#: documents/models.py:214
 msgid "Current archive filename in storage"
 msgstr "Tämänhetkinen arkistointitiedostoimi tallennustilassa"
 
-#: documents/models.py:216
+#: documents/models.py:218
 msgid "archive serial number"
 msgstr "arkistointisarjanumero"
 
-#: documents/models.py:222
+#: documents/models.py:224
 msgid "The position of this document in your physical document archive."
 msgstr "Dokumentin sijainti fyysisessa dokumenttiarkistossa."
 
-#: documents/models.py:228
+#: documents/models.py:230
 msgid "document"
 msgstr "dokumentti"
 
-#: documents/models.py:229
+#: documents/models.py:231
 msgid "documents"
 msgstr "dokumentit"
 
-#: documents/models.py:307
+#: documents/models.py:318
 msgid "debug"
 msgstr "virheenjäljitys"
 
-#: documents/models.py:308
+#: documents/models.py:319
 msgid "information"
 msgstr "informaatio"
 
-#: documents/models.py:309
+#: documents/models.py:320
 msgid "warning"
 msgstr "varoitus"
 
-#: documents/models.py:310
+#: documents/models.py:321
 msgid "error"
 msgstr "virhe"
 
-#: documents/models.py:311
+#: documents/models.py:322
 msgid "critical"
 msgstr "kriittinen"
 
-#: documents/models.py:314
+#: documents/models.py:325
 msgid "group"
 msgstr "ryhmä"
 
-#: documents/models.py:316
+#: documents/models.py:327
 msgid "message"
 msgstr "viesti"
 
-#: documents/models.py:319
+#: documents/models.py:330
 msgid "level"
 msgstr "taso"
 
-#: documents/models.py:328
+#: documents/models.py:339
 msgid "log"
 msgstr "loki"
 
-#: documents/models.py:329
+#: documents/models.py:340
 msgid "logs"
 msgstr "lokit"
 
-#: documents/models.py:339 documents/models.py:392
+#: documents/models.py:350 documents/models.py:403
 msgid "saved view"
 msgstr "tallennettu näkymä"
 
-#: documents/models.py:340
+#: documents/models.py:351
 msgid "saved views"
 msgstr "tallennetut näkymät"
 
-#: documents/models.py:342
+#: documents/models.py:353
 msgid "user"
 msgstr "käyttäjä"
 
-#: documents/models.py:346
+#: documents/models.py:357
 msgid "show on dashboard"
 msgstr "näytä etusivulla"
 
-#: documents/models.py:349
+#: documents/models.py:360
 msgid "show in sidebar"
 msgstr "näytä sivupaneelissa"
 
-#: documents/models.py:353
+#: documents/models.py:364
 msgid "sort field"
 msgstr "lajittelukenttä"
 
-#: documents/models.py:358
+#: documents/models.py:369
 msgid "sort reverse"
 msgstr "lajittele käänteisesti"
 
-#: documents/models.py:363
+#: documents/models.py:374
 msgid "title contains"
 msgstr "otsikko sisältää"
 
-#: documents/models.py:364
+#: documents/models.py:375
 msgid "content contains"
 msgstr "sisältö sisältää"
 
-#: documents/models.py:365
+#: documents/models.py:376
 msgid "ASN is"
 msgstr "ASN on"
 
-#: documents/models.py:366
+#: documents/models.py:377
 msgid "correspondent is"
 msgstr "yhteyshenkilö on"
 
-#: documents/models.py:367
+#: documents/models.py:378
 msgid "document type is"
 msgstr "dokumenttityyppi on"
 
-#: documents/models.py:368
+#: documents/models.py:379
 msgid "is in inbox"
 msgstr "on uusi"
 
-#: documents/models.py:369
+#: documents/models.py:380
 msgid "has tag"
 msgstr "on tagattu"
 
-#: documents/models.py:370
+#: documents/models.py:381
 msgid "has any tag"
 msgstr "on mikä tahansa tagi"
 
-#: documents/models.py:371
+#: documents/models.py:382
 msgid "created before"
 msgstr "luotu ennen"
 
-#: documents/models.py:372
+#: documents/models.py:383
 msgid "created after"
 msgstr "luotu jälkeen"
 
-#: documents/models.py:373
+#: documents/models.py:384
 msgid "created year is"
 msgstr "luotu vuonna"
 
-#: documents/models.py:374
+#: documents/models.py:385
 msgid "created month is"
 msgstr "luotu kuukautena"
 
-#: documents/models.py:375
+#: documents/models.py:386
 msgid "created day is"
-msgstr ""
+msgstr "luomispäivä on"
 
-#: documents/models.py:376
+#: documents/models.py:387
 msgid "added before"
-msgstr ""
+msgstr "lisätty ennen"
 
-#: documents/models.py:377
+#: documents/models.py:388
 msgid "added after"
-msgstr ""
+msgstr "lisätty jälkeen"
 
-#: documents/models.py:378
+#: documents/models.py:389
 msgid "modified before"
-msgstr ""
+msgstr "muokattu ennen"
 
-#: documents/models.py:379
+#: documents/models.py:390
 msgid "modified after"
-msgstr ""
+msgstr "muokattu jälkeen"
 
-#: documents/models.py:380
+#: documents/models.py:391
 msgid "does not have tag"
-msgstr ""
+msgstr "ei ole tagia"
 
-#: documents/models.py:381
+#: documents/models.py:392
 msgid "does not have ASN"
-msgstr ""
+msgstr "ei ole ASN-numeroa"
 
-#: documents/models.py:382
+#: documents/models.py:393
 msgid "title or content contains"
-msgstr ""
+msgstr "otsikko tai sisältö sisältää"
 
-#: documents/models.py:383
+#: documents/models.py:394
 msgid "fulltext query"
-msgstr ""
-
-#: documents/models.py:384
-msgid "more like this"
-msgstr ""
-
-#: documents/models.py:385
-msgid "has tags in"
-msgstr ""
+msgstr "fulltext-kysely"
 
 #: documents/models.py:395
+msgid "more like this"
+msgstr "enemmän kuten tämä"
+
+#: documents/models.py:396
+msgid "has tags in"
+msgstr "sisältää tagit"
+
+#: documents/models.py:406
 msgid "rule type"
-msgstr ""
+msgstr "sääntötyyppi"
 
-#: documents/models.py:397
+#: documents/models.py:408
 msgid "value"
-msgstr ""
+msgstr "arvo"
 
-#: documents/models.py:400
+#: documents/models.py:411
 msgid "filter rule"
-msgstr ""
+msgstr "suodatussääntö"
 
-#: documents/models.py:401
+#: documents/models.py:412
 msgid "filter rules"
+msgstr "suodatussäännöt"
+
+#: documents/models.py:521
+msgid "started"
 msgstr ""
 
-#: documents/serialisers.py:63
+#: documents/serialisers.py:70
 #, python-format
 msgid "Invalid regular expression: %(error)s"
-msgstr ""
+msgstr "Virheellinen regex-lauseke: %(error)s"
 
-#: documents/serialisers.py:184
+#: documents/serialisers.py:191
 msgid "Invalid color."
-msgstr ""
+msgstr "Virheellinen väri."
 
-#: documents/serialisers.py:491
+#: documents/serialisers.py:515
 #, python-format
 msgid "File type %(type)s not supported"
-msgstr ""
+msgstr "Tiedostotyyppiä %(type)s ei tueta"
 
-#: documents/serialisers.py:574
+#: documents/serialisers.py:596
 msgid "Invalid variable detected."
-msgstr ""
+msgstr "Virheellinen muuttuja havaittu."
 
 #: documents/templates/index.html:78
 msgid "Paperless-ngx is loading..."
-msgstr ""
+msgstr "Paperless-ngx latautuu..."
 
 #: documents/templates/index.html:79
 msgid "Still here?! Hmm, something might be wrong."
-msgstr ""
+msgstr "Vielä täällä?! Hmm, jokin saattaa olla vialla."
 
 #: documents/templates/index.html:79
 msgid "Here's a link to the docs."
-msgstr ""
+msgstr "Tässä on linkki dokumentteihin."
 
 #: documents/templates/registration/logged_out.html:14
 msgid "Paperless-ngx signed out"
-msgstr ""
+msgstr "Paperless-ngx kirjauduttu ulos"
 
 #: documents/templates/registration/logged_out.html:59
 msgid "You have been successfully logged out. Bye!"
-msgstr ""
+msgstr "Uloskirjautuminen onnistui. Heippa!"
 
 #: documents/templates/registration/logged_out.html:60
 msgid "Sign in again"
-msgstr ""
+msgstr "Kirjaudu uudelleen"
 
 #: documents/templates/registration/login.html:15
 msgid "Paperless-ngx sign in"
-msgstr ""
+msgstr "Paperless-ngx kirjaudu sisään"
 
 #: documents/templates/registration/login.html:61
 msgid "Please sign in."
-msgstr ""
+msgstr "Kirjaudu sisään."
 
 #: documents/templates/registration/login.html:64
 msgid "Your username and password didn't match. Please try again."
-msgstr ""
+msgstr "Käyttäjätunnus ja salasana eivät täsmää. Yritä uudelleen."
 
 #: documents/templates/registration/login.html:67
 msgid "Username"
-msgstr ""
+msgstr "Käyttäjänimi"
 
 #: documents/templates/registration/login.html:68
 msgid "Password"
-msgstr ""
+msgstr "Salasana"
 
 #: documents/templates/registration/login.html:73
 msgid "Sign in"
-msgstr ""
-
-#: paperless/settings.py:338
-msgid "English (US)"
-msgstr ""
+msgstr "Kirjaudu sisään"
 
 #: paperless/settings.py:339
-msgid "Belarusian"
-msgstr ""
+msgid "English (US)"
+msgstr "Englanti (US)"
 
 #: paperless/settings.py:340
-msgid "Czech"
-msgstr ""
+msgid "Belarusian"
+msgstr "valkovenäjä"
 
 #: paperless/settings.py:341
-msgid "Danish"
-msgstr ""
+msgid "Czech"
+msgstr "Tšekki"
 
 #: paperless/settings.py:342
-msgid "German"
-msgstr ""
+msgid "Danish"
+msgstr "Tanska"
 
 #: paperless/settings.py:343
-msgid "English (GB)"
-msgstr ""
+msgid "German"
+msgstr "Saksa"
 
 #: paperless/settings.py:344
-msgid "Spanish"
-msgstr ""
+msgid "English (GB)"
+msgstr "Englanti (US)"
 
 #: paperless/settings.py:345
-msgid "French"
-msgstr ""
+msgid "Spanish"
+msgstr "Espanja"
 
 #: paperless/settings.py:346
-msgid "Italian"
-msgstr ""
+msgid "French"
+msgstr "Ranska"
 
 #: paperless/settings.py:347
-msgid "Luxembourgish"
-msgstr ""
+msgid "Italian"
+msgstr "Italia"
 
 #: paperless/settings.py:348
-msgid "Dutch"
-msgstr ""
+msgid "Luxembourgish"
+msgstr "Luxemburg"
 
 #: paperless/settings.py:349
+msgid "Dutch"
+msgstr "Hollanti"
+
+#: paperless/settings.py:350
 msgid "Polish"
 msgstr "puola"
 
-#: paperless/settings.py:350
+#: paperless/settings.py:351
 msgid "Portuguese (Brazil)"
 msgstr "portugali (Brasilia)"
 
-#: paperless/settings.py:351
+#: paperless/settings.py:352
 msgid "Portuguese"
 msgstr "portugali"
 
-#: paperless/settings.py:352
+#: paperless/settings.py:353
 msgid "Romanian"
 msgstr "romania"
 
-#: paperless/settings.py:353
+#: paperless/settings.py:354
 msgid "Russian"
 msgstr "venäjä"
 
-#: paperless/settings.py:354
-msgid "Slovenian"
-msgstr ""
-
 #: paperless/settings.py:355
-msgid "Serbian"
-msgstr ""
+msgid "Slovenian"
+msgstr "Slovenia"
 
 #: paperless/settings.py:356
+msgid "Serbian"
+msgstr "Serbia"
+
+#: paperless/settings.py:357
 msgid "Swedish"
 msgstr "ruotsi"
 
-#: paperless/settings.py:357
-msgid "Turkish"
-msgstr ""
-
 #: paperless/settings.py:358
-msgid "Chinese Simplified"
-msgstr ""
+msgid "Turkish"
+msgstr "Turkki"
 
-#: paperless/urls.py:153
+#: paperless/settings.py:359
+msgid "Chinese Simplified"
+msgstr "Kiina (yksinkertaistettu)"
+
+#: paperless/urls.py:161
 msgid "Paperless-ngx administration"
 msgstr "Paperless-ngx hallintapaneeli"
 
@@ -550,7 +554,7 @@ msgstr "Toiminnot"
 
 #: paperless_mail/admin.py:67
 msgid "The action applied to the mail. This action is only performed when documents were consumed from the mail. Mails without attachments will remain entirely untouched."
-msgstr ""
+msgstr "Sähköpostiin sovellettu toiminto. Tämä toiminto suoritetaan vasta, kun asiakirjat on luettu sähköpostin kautta. Sähköpostit ilman liitteitä pysyvät täysin koskemattomina."
 
 #: paperless_mail/admin.py:75
 msgid "Metadata"
@@ -648,111 +652,115 @@ msgstr "Merkitse luetuksi, älä prosessoi luettuja sähköposteja"
 msgid "Flag the mail, don't process flagged mails"
 msgstr ""
 
-#: paperless_mail/models.py:70
-msgid "Use subject as title"
+#: paperless_mail/models.py:68
+msgid "Tag the mail with specified tag, don't process tagged mails"
 msgstr ""
 
 #: paperless_mail/models.py:71
+msgid "Use subject as title"
+msgstr ""
+
+#: paperless_mail/models.py:72
 msgid "Use attachment filename as title"
 msgstr ""
 
-#: paperless_mail/models.py:74
+#: paperless_mail/models.py:75
 msgid "Do not assign a correspondent"
 msgstr ""
 
-#: paperless_mail/models.py:75
+#: paperless_mail/models.py:76
 msgid "Use mail address"
 msgstr ""
 
-#: paperless_mail/models.py:76
+#: paperless_mail/models.py:77
 msgid "Use name (or mail address if not available)"
 msgstr ""
 
-#: paperless_mail/models.py:77
+#: paperless_mail/models.py:78
 msgid "Use correspondent selected below"
 msgstr ""
 
-#: paperless_mail/models.py:81
+#: paperless_mail/models.py:82
 msgid "order"
 msgstr ""
 
-#: paperless_mail/models.py:87
+#: paperless_mail/models.py:88
 msgid "account"
 msgstr ""
 
-#: paperless_mail/models.py:91
+#: paperless_mail/models.py:92
 msgid "folder"
 msgstr ""
 
-#: paperless_mail/models.py:95
+#: paperless_mail/models.py:96
 msgid "Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server."
 msgstr ""
 
-#: paperless_mail/models.py:101
+#: paperless_mail/models.py:102
 msgid "filter from"
 msgstr ""
 
-#: paperless_mail/models.py:107
+#: paperless_mail/models.py:108
 msgid "filter subject"
 msgstr ""
 
-#: paperless_mail/models.py:113
+#: paperless_mail/models.py:114
 msgid "filter body"
 msgstr ""
 
-#: paperless_mail/models.py:120
+#: paperless_mail/models.py:121
 msgid "filter attachment filename"
 msgstr ""
 
-#: paperless_mail/models.py:125
+#: paperless_mail/models.py:126
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
 msgstr ""
 
-#: paperless_mail/models.py:132
+#: paperless_mail/models.py:133
 msgid "maximum age"
 msgstr ""
 
-#: paperless_mail/models.py:134
+#: paperless_mail/models.py:135
 msgid "Specified in days."
 msgstr ""
 
-#: paperless_mail/models.py:138
+#: paperless_mail/models.py:139
 msgid "attachment type"
 msgstr ""
 
-#: paperless_mail/models.py:142
+#: paperless_mail/models.py:143
 msgid "Inline attachments include embedded images, so it's best to combine this option with a filename filter."
 msgstr ""
 
-#: paperless_mail/models.py:148
+#: paperless_mail/models.py:149
 msgid "action"
 msgstr ""
 
-#: paperless_mail/models.py:154
+#: paperless_mail/models.py:155
 msgid "action parameter"
 msgstr ""
 
-#: paperless_mail/models.py:159
+#: paperless_mail/models.py:160
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
 msgstr ""
 
-#: paperless_mail/models.py:167
+#: paperless_mail/models.py:168
 msgid "assign title from"
 msgstr ""
 
-#: paperless_mail/models.py:175
+#: paperless_mail/models.py:176
 msgid "assign this tag"
 msgstr ""
 
-#: paperless_mail/models.py:183
+#: paperless_mail/models.py:184
 msgid "assign this document type"
 msgstr ""
 
-#: paperless_mail/models.py:187
+#: paperless_mail/models.py:188
 msgid "assign correspondent from"
 msgstr ""
 
-#: paperless_mail/models.py:197
+#: paperless_mail/models.py:198
 msgid "assign this correspondent"
 msgstr ""
 
