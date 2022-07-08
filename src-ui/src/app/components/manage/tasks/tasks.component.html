@@ -1,0 +1,120 @@
+<app-page-header title="File Tasks" i18n-title>
+  <div class="btn-toolbar col col-md-auto">
+    <button class="btn btn-sm btn-outline-secondary me-2" (click)="clearSelection()" [hidden]="selectedTasks.size == 0">
+      <svg class="sidebaricon" fill="currentColor">
+        <use xlink:href="assets/bootstrap-icons.svg#x"/>
+      </svg>&nbsp;<ng-container i18n>Clear selection</ng-container>
+    </button>
+    <button class="btn btn-sm btn-outline-primary me-4" (click)="dismissTasks()" [disabled]="tasksService.total == 0">
+      <svg class="sidebaricon" fill="currentColor">
+        <use xlink:href="assets/bootstrap-icons.svg#check2-all"/>
+      </svg>&nbsp;<ng-container i18n>{{dismissButtonText}}</ng-container>
+    </button>
+    <button class="btn btn-sm btn-outline-primary" (click)="tasksService.reload()">
+      <svg *ngIf="!tasksService.loading" class="sidebaricon" fill="currentColor">
+        <use xlink:href="assets/bootstrap-icons.svg#arrow-clockwise"/>
+      </svg>
+      <ng-container *ngIf="tasksService.loading">
+        <div class="spinner-border spinner-border-sm fw-normal" role="status"></div>
+        <div class="visually-hidden" i18n>Loading...</div>
+      </ng-container>&nbsp;<ng-container i18n>Refresh</ng-container>
+    </button>
+  </div>
+</app-page-header>
+
+<ng-container *ngIf="!tasksService.completedFileTasks && tasksService.loading">
+  <div class="spinner-border spinner-border-sm fw-normal ms-2 me-auto" role="status"></div>
+  <div class="visually-hidden" i18n>Loading...</div>
+</ng-container>
+
+<ng-template let-tasks="tasks" #tasksTemplate>
+  <table class="table table-striped align-middle border shadow-sm">
+    <thead>
+      <tr>
+        <th scope="col">
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="all-tasks" [disabled]="currentTasks.length == 0" (click)="toggleAll($event); $event.stopPropagation();">
+            <label class="form-check-label" for="all-tasks"></label>
+          </div>
+        </th>
+        <th scope="col" i18n>Name</th>
+        <th scope="col" class="d-none d-lg-table-cell" i18n>Created</th>
+        <th scope="col" class="d-none d-lg-table-cell" *ngIf="activeTab != 'started' && activeTab != 'queued'" i18n>Results</th>
+        <th scope="col" class="d-table-cell d-lg-none" i18n>Info</th>
+        <th scope="col" i18n>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <ng-container *ngFor="let task of tasks">
+      <tr (click)="toggleSelected(task, $event); $event.stopPropagation();">
+        <th>
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="task{{task.id}}" [checked]="selectedTasks.has(task.id)" (click)="toggleSelected(task, $event); $event.stopPropagation();">
+            <label class="form-check-label" for="task{{task.id}}"></label>
+          </div>
+        </th>
+        <td class="overflow-auto">{{ task.name }}</td>
+        <td class="d-none d-lg-table-cell">{{ task.created | customDate:'short' }}</td>
+        <td class="d-none d-lg-table-cell" *ngIf="activeTab != 'incomplete'">
+          <div *ngIf="task.result.length > 50" class="result" (click)="expandTask(task); $event.stopPropagation();"
+            [ngbPopover]="resultPopover" popoverClass="shadow small mobile" triggers="mouseenter:mouseleave" container="body">
+            <span class="small d-none d-md-inline-block font-monospace text-muted">{{ task.result | slice:0:50 }}&hellip;</span>
+          </div>
+          <span *ngIf="task.result.length <= 50" class="small d-none d-md-inline-block font-monospace text-muted">{{ task.result }}</span>
+          <ng-template #resultPopover>
+            <pre class="small mb-0">{{ task.result | slice:0:300 }}<ng-container *ngIf="task.result.length > 300">&hellip;</ng-container></pre>
+            <ng-container *ngIf="task.result.length > 300"><br/><em>(<ng-container i18n>click for full output</ng-container>)</em></ng-container>
+          </ng-template>
+        </td>
+        <td class="d-lg-none">
+          <button class="btn btn-link" (click)="expandTask(task); $event.stopPropagation();">
+            <svg fill="currentColor" class="" width="1.2em" height="1.2em" style="vertical-align: text-top;" viewBox="0 0 16 16">
+              <use xlink:href="assets/bootstrap-icons.svg#info-circle" />
+            </svg>
+          </button>
+        </td>
+        <td scope="row">
+          <button class="btn btn-sm btn-outline-secondary" (click)="dismissTask(task); $event.stopPropagation();">
+            <svg class="sidebaricon" fill="currentColor">
+              <use xlink:href="assets/bootstrap-icons.svg#check"/>
+            </svg>&nbsp;<ng-container i18n>Dismiss</ng-container>
+          </button>
+        </td>
+      </tr>
+      <tr>
+        <td class="p-0" [class.border-0]="expandedTask != task.id" colspan="5">
+          <pre #collapse="ngbCollapse" [ngbCollapse]="expandedTask !== task.id" class="small mb-0"><div class="small p-1 p-lg-3 ms-lg-3">{{ task.result }}</div></pre>
+        </td>
+      </tr>
+      </ng-container>
+    </tbody>
+  </table>
+</ng-template>
+
+<ul ngbNav #nav="ngbNav" [(activeId)]="activeTab" class="nav-tabs">
+  <li ngbNavItem="failed">
+    <a ngbNavLink i18n>Failed&nbsp;<span *ngIf="tasksService.failedFileTasks.length > 0" class="badge bg-danger ms-1">{{tasksService.failedFileTasks.length}}</span></a>
+    <ng-template ngbNavContent>
+      <ng-container [ngTemplateOutlet]="tasksTemplate" [ngTemplateOutletContext]="{tasks:tasksService.failedFileTasks}"></ng-container>
+    </ng-template>
+  </li>
+  <li ngbNavItem="completed">
+    <a ngbNavLink i18n>Complete&nbsp;<span *ngIf="tasksService.completedFileTasks.length > 0" class="badge bg-secondary ms-1">{{tasksService.completedFileTasks.length}}</span></a>
+    <ng-template ngbNavContent>
+      <ng-container [ngTemplateOutlet]="tasksTemplate" [ngTemplateOutletContext]="{tasks:tasksService.completedFileTasks}"></ng-container>
+    </ng-template>
+  </li>
+  <li ngbNavItem="started">
+    <a ngbNavLink i18n>Started&nbsp;<span *ngIf="tasksService.startedFileTasks.length > 0" class="badge bg-secondary ms-1">{{tasksService.startedFileTasks.length}}</span></a>
+    <ng-template ngbNavContent>
+      <ng-container [ngTemplateOutlet]="tasksTemplate" [ngTemplateOutletContext]="{tasks:tasksService.startedFileTasks}"></ng-container>
+    </ng-template>
+  </li>
+  <li ngbNavItem="queued">
+    <a ngbNavLink i18n>Queued&nbsp;<span *ngIf="tasksService.queuedFileTasks.length > 0" class="badge bg-secondary ms-1">{{tasksService.queuedFileTasks.length}}</span></a>
+    <ng-template ngbNavContent>
+      <ng-container [ngTemplateOutlet]="tasksTemplate" [ngTemplateOutletContext]="{tasks:tasksService.queuedFileTasks}"></ng-container>
+    </ng-template>
+  </li>
+</ul>
+<div [ngbNavOutlet]="nav"></div>

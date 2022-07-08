@@ -18,6 +18,7 @@ from .models import Correspondent
 from .models import Document
 from .models import DocumentType
 from .models import MatchingModel
+from .models import PaperlessTask
 from .models import SavedView
 from .models import SavedViewFilterRule
 from .models import StoragePath
@@ -612,3 +613,65 @@ class UiSettingsViewSerializer(serializers.ModelSerializer):
             defaults={"settings": validated_data.get("settings", None)},
         )
         return ui_settings
+
+
+class TasksViewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PaperlessTask
+        depth = 1
+        fields = "__all__"
+
+    type = serializers.SerializerMethodField()
+
+    def get_type(self, obj):
+        # just file tasks, for now
+        return "file"
+
+    result = serializers.SerializerMethodField()
+
+    def get_result(self, obj):
+        result = ""
+        if hasattr(obj, "attempted_task") and obj.attempted_task:
+            result = obj.attempted_task.result
+        return result
+
+    status = serializers.SerializerMethodField()
+
+    def get_status(self, obj):
+        if obj.attempted_task is None:
+            if obj.started:
+                return "started"
+            else:
+                return "queued"
+        elif obj.attempted_task.success:
+            return "complete"
+        elif not obj.attempted_task.success:
+            return "failed"
+        else:
+            return "unknown"
+
+
+class AcknowledgeTasksViewSerializer(serializers.Serializer):
+
+    tasks = serializers.ListField(
+        required=True,
+        label="Tasks",
+        write_only=True,
+        child=serializers.IntegerField(),
+    )
+
+    def _validate_task_id_list(self, tasks, name="tasks"):
+        pass
+        if not type(tasks) == list:
+            raise serializers.ValidationError(f"{name} must be a list")
+        if not all([type(i) == int for i in tasks]):
+            raise serializers.ValidationError(f"{name} must be a list of integers")
+        count = PaperlessTask.objects.filter(id__in=tasks).count()
+        if not count == len(tasks):
+            raise serializers.ValidationError(
+                f"Some tasks in {name} don't exist or were specified twice.",
+            )
+
+    def validate_tasks(self, tasks):
+        self._validate_task_id_list(tasks)
+        return tasks
