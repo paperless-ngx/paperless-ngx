@@ -16,7 +16,7 @@ import { debounceTime, distinctUntilChanged, filter } from 'rxjs/operators'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
-import { FilterRule } from 'src/app/data/filter-rule'
+import { filterRulesDiffer, FilterRule } from 'src/app/data/filter-rule'
 import {
   FILTER_ADDED_AFTER,
   FILTER_ADDED_BEFORE,
@@ -204,7 +204,10 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   @Input()
   set unmodifiedFilterRules(value: FilterRule[]) {
     this._unmodifiedFilterRules = value
-    this.checkIfRulesHaveChanged()
+    this.rulesModified = filterRulesDiffer(
+      this._unmodifiedFilterRules,
+      this._filterRules
+    )
   }
 
   get unmodifiedFilterRules(): FilterRule[] {
@@ -330,7 +333,10 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
           break
       }
     })
-    this.checkIfRulesHaveChanged()
+    this.rulesModified = filterRulesDiffer(
+      this._unmodifiedFilterRules,
+      this._filterRules
+    )
   }
 
   get filterRules(): FilterRule[] {
@@ -472,31 +478,6 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   filterRulesChange = new EventEmitter<FilterRule[]>()
 
   rulesModified: boolean = false
-
-  private checkIfRulesHaveChanged() {
-    let modified = false
-    if (this._unmodifiedFilterRules.length != this._filterRules.length) {
-      modified = true
-    } else {
-      modified = this._unmodifiedFilterRules.some((rule) => {
-        return (
-          this._filterRules.find(
-            (fri) => fri.rule_type == rule.rule_type && fri.value == rule.value
-          ) == undefined
-        )
-      })
-
-      if (!modified) {
-        // only check other direction if we havent already determined is modified
-        modified = this._filterRules.some((rule) => {
-          this._unmodifiedFilterRules.find(
-            (fr) => fr.rule_type == rule.rule_type && fr.value == rule.value
-          ) == undefined
-        })
-      }
-    }
-    this.rulesModified = modified
-  }
 
   updateRules() {
     this.filterRulesChange.next(this.filterRules)
