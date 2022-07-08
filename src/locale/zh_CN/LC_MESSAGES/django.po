@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-19 15:24-0700\n"
-"PO-Revision-Date: 2022-05-19 22:26\n"
+"PO-Revision-Date: 2022-07-08 15:34\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -100,15 +100,15 @@ msgstr "文档类型"
 
 #: documents/models.py:88
 msgid "path"
-msgstr ""
+msgstr "路径"
 
 #: documents/models.py:94 documents/models.py:122
 msgid "storage path"
-msgstr ""
+msgstr "保存路径"
 
 #: documents/models.py:95
 msgid "storage paths"
-msgstr ""
+msgstr "保存路径"
 
 #: documents/models.py:103
 msgid "Unencrypted"
@@ -390,7 +390,7 @@ msgstr "不支持文件类型 %(type)s"
 
 #: documents/serialisers.py:574
 msgid "Invalid variable detected."
-msgstr ""
+msgstr "检测到无效变量。"
 
 #: documents/templates/index.html:78
 msgid "Paperless-ngx is loading..."
@@ -398,11 +398,11 @@ msgstr "Paperless-ngx 正在加载..."
 
 #: documents/templates/index.html:79
 msgid "Still here?! Hmm, something might be wrong."
-msgstr ""
+msgstr "还是在这里？嗯，可能有些错误。"
 
 #: documents/templates/index.html:79
 msgid "Here's a link to the docs."
-msgstr ""
+msgstr "这是与文档的链接。"
 
 #: documents/templates/registration/logged_out.html:14
 msgid "Paperless-ngx signed out"
@@ -446,7 +446,7 @@ msgstr "英语(美国)"
 
 #: paperless/settings.py:339
 msgid "Belarusian"
-msgstr ""
+msgstr "白俄罗斯语"
 
 #: paperless/settings.py:340
 msgid "Czech"
@@ -506,11 +506,11 @@ msgstr "俄语"
 
 #: paperless/settings.py:354
 msgid "Slovenian"
-msgstr ""
+msgstr "斯洛语尼亚语"
 
 #: paperless/settings.py:355
 msgid "Serbian"
-msgstr ""
+msgstr "塞尔维亚语"
 
 #: paperless/settings.py:356
 msgid "Swedish"
@@ -518,11 +518,11 @@ msgstr "瑞典语"
 
 #: paperless/settings.py:357
 msgid "Turkish"
-msgstr ""
+msgstr "土耳其语"
 
 #: paperless/settings.py:358
 msgid "Chinese Simplified"
-msgstr ""
+msgstr "简体中文"
 
 #: paperless/urls.py:153
 msgid "Paperless-ngx administration"
@@ -686,7 +686,7 @@ msgstr "文件夹"
 
 #: paperless_mail/models.py:95
 msgid "Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server."
-msgstr ""
+msgstr "子文件夹必须用分隔符分隔，通常是一个 dot ('.') 或 slash ('/')，但它因邮件服务器而异。"
 
 #: paperless_mail/models.py:101
 msgid "filter from"
