@@ -29,28 +29,19 @@ export function filterRulesDiffer(
   filterRulesA: FilterRule[],
   filterRulesB: FilterRule[]
 ): boolean {
-  let modified = false
+  let differ = false
   if (filterRulesA.length != filterRulesB.length) {
-    modified = true
+    differ = true
   } else {
-    modified = filterRulesA.some((rule) => {
+    differ = filterRulesA.some((rule) => {
       return (
         filterRulesB.find(
           (fri) => fri.rule_type == rule.rule_type && fri.value == rule.value
         ) == undefined
       )
     })
-
-    if (!modified) {
-      // only check other direction if we havent already determined is modified
-      modified = filterRulesB.some((rule) => {
-        filterRulesA.find(
-          (fr) => fr.rule_type == rule.rule_type && fr.value == rule.value
-        ) == undefined
-      })
-    }
   }
-  return modified
+  return differ
 }
 
 export interface FilterRule {
