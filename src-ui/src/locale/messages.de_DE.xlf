@@ -982,7 +982,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.ts</context>
           <context context-type="linenumber">27</context>
         </context-group>
-        <target state="translated">oder benutzen Sie Schragstriche, um bspw. Verzeichnisse hinzuzufügen</target>
+        <target state="translated">oder benutzen Sie Schrägstriche, um bspw. Verzeichnisse hinzuzufügen</target>
       </trans-unit>
       <trans-unit id="7992597438102889079" datatype="html">
         <source>See &lt;a target=&quot;_blank&quot; href=&quot;https://paperless-ngx.readthedocs.io/en/latest/advanced_usage.html#file-name-handling&quot;&gt;documentation&lt;/a&gt; for full list.</source>
