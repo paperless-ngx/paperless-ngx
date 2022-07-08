@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-19 15:24-0700\n"
-"PO-Revision-Date: 2022-06-23 21:02\n"
+"POT-Creation-Date: 2022-07-08 14:11-0700\n"
+"PO-Revision-Date: 2022-07-08 22:06\n"
 "Last-Translator: \n"
 "Language-Team: Hebrew\n"
 "Language: he_IL\n"
@@ -21,374 +21,378 @@ msgstr ""
 msgid "Documents"
 msgstr "מסמכים"
 
-#: documents/models.py:27
+#: documents/models.py:29
 msgid "Any word"
 msgstr "מילה כלשהי"
 
-#: documents/models.py:28
+#: documents/models.py:30
 msgid "All words"
 msgstr "כל המילים"
 
-#: documents/models.py:29
+#: documents/models.py:31
 msgid "Exact match"
 msgstr "התאמה מדוייקת"
 
-#: documents/models.py:30
+#: documents/models.py:32
 msgid "Regular expression"
 msgstr "ביטוי רגולרי"
 
-#: documents/models.py:31
+#: documents/models.py:33
 msgid "Fuzzy word"
 msgstr "מילה מעורפלת"
 
-#: documents/models.py:32
+#: documents/models.py:34
 msgid "Automatic"
 msgstr "אוטומטי"
 
-#: documents/models.py:35 documents/models.py:343 paperless_mail/models.py:16
-#: paperless_mail/models.py:79
+#: documents/models.py:37 documents/models.py:354 paperless_mail/models.py:16
+#: paperless_mail/models.py:80
 msgid "name"
 msgstr "שם"
 
-#: documents/models.py:37
+#: documents/models.py:39
 msgid "match"
 msgstr "התאמה"
 
-#: documents/models.py:40
+#: documents/models.py:42
 msgid "matching algorithm"
 msgstr "אלגוריתם התאמה"
 
-#: documents/models.py:45
+#: documents/models.py:47
 msgid "is insensitive"
 msgstr "אינו רגיש"
 
-#: documents/models.py:58 documents/models.py:113
+#: documents/models.py:60 documents/models.py:115
 msgid "correspondent"
 msgstr "מכותב"
 
-#: documents/models.py:59
+#: documents/models.py:61
 msgid "correspondents"
 msgstr "מכותבים"
 
-#: documents/models.py:64
+#: documents/models.py:66
 msgid "color"
 msgstr "צבע"
 
-#: documents/models.py:67
+#: documents/models.py:69
 msgid "is inbox tag"
 msgstr "תגית דואר נכנס"
 
-#: documents/models.py:70
+#: documents/models.py:72
 msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
 msgstr "מסמן תגית זו כתגית דואר נכנס: כל המסמכים החדשים שהתקבלו יתויגו עם תגית דואר נכנס."
 
-#: documents/models.py:76
+#: documents/models.py:78
 msgid "tag"
 msgstr "תגית"
 
-#: documents/models.py:77 documents/models.py:151
+#: documents/models.py:79 documents/models.py:153
 msgid "tags"
 msgstr "תגיות"
 
-#: documents/models.py:82 documents/models.py:133
+#: documents/models.py:84 documents/models.py:135
 msgid "document type"
 msgstr "סוג מסמך"
 
-#: documents/models.py:83
+#: documents/models.py:85
 msgid "document types"
 msgstr "סוגי מסמך"
 
-#: documents/models.py:88
+#: documents/models.py:90
 msgid "path"
 msgstr "נתיב"
 
-#: documents/models.py:94 documents/models.py:122
+#: documents/models.py:96 documents/models.py:124
 msgid "storage path"
 msgstr "נתיב אכסון"
 
-#: documents/models.py:95
+#: documents/models.py:97
 msgid "storage paths"
 msgstr "נתיבי אכסון"
 
-#: documents/models.py:103
+#: documents/models.py:105
 msgid "Unencrypted"
 msgstr "לא מוצפן"
 
-#: documents/models.py:104
+#: documents/models.py:106
 msgid "Encrypted with GNU Privacy Guard"
 msgstr "הוצפן באמצעות GNU Privacy Guard"
 
-#: documents/models.py:125
+#: documents/models.py:127
 msgid "title"
 msgstr "כותרת"
 
-#: documents/models.py:137
+#: documents/models.py:139
 msgid "content"
 msgstr "תוכן"
 
-#: documents/models.py:140
+#: documents/models.py:142
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
 msgstr "הנתונים הגולמיים של המסמך, המכילים טקסט בלבד. שדה זה משמש בעיקר לצורך חיפוש."
 
-#: documents/models.py:145
+#: documents/models.py:147
 msgid "mime type"
 msgstr "סוג mime"
 
-#: documents/models.py:155
+#: documents/models.py:157
 msgid "checksum"
 msgstr "מחרוזת בדיקה"
 
-#: documents/models.py:159
+#: documents/models.py:161
 msgid "The checksum of the original document."
 msgstr "מחרוזת בדיקה של המסמך המקורי."
 
-#: documents/models.py:163
+#: documents/models.py:165
 msgid "archive checksum"
 msgstr "מחרוזת בדיקה לארכיון"
 
-#: documents/models.py:168
+#: documents/models.py:170
 msgid "The checksum of the archived document."
 msgstr "מחרוזת הבדיקה למסמך בארכיון."
 
-#: documents/models.py:171 documents/models.py:324
+#: documents/models.py:173 documents/models.py:335 documents/models.py:520
 msgid "created"
 msgstr "נוצר"
 
-#: documents/models.py:174
+#: documents/models.py:176
 msgid "modified"
 msgstr "נערך לאחרונה"
 
-#: documents/models.py:181
+#: documents/models.py:183
 msgid "storage type"
 msgstr "סוג אחסון"
 
-#: documents/models.py:189
+#: documents/models.py:191
 msgid "added"
 msgstr "התווסף"
 
-#: documents/models.py:196
+#: documents/models.py:198
 msgid "filename"
 msgstr "שם קובץ"
 
-#: documents/models.py:202
+#: documents/models.py:204
 msgid "Current filename in storage"
 msgstr "שם קובץ נוכחי באחסון"
 
-#: documents/models.py:206
+#: documents/models.py:208
 msgid "archive filename"
 msgstr "שם קובץ בארכיון"
 
-#: documents/models.py:212
+#: documents/models.py:214
 msgid "Current archive filename in storage"
 msgstr "שם קובץ ארכיוני נוכחי באחסון"
 
-#: documents/models.py:216
+#: documents/models.py:218
 msgid "archive serial number"
 msgstr "מספר סידורי בארכיון"
 
-#: documents/models.py:222
+#: documents/models.py:224
 msgid "The position of this document in your physical document archive."
 msgstr "מיקומו של מסמך זה בארכיון המסמכים הפיזי שלך."
 
-#: documents/models.py:228
+#: documents/models.py:230
 msgid "document"
 msgstr "מסמך"
 
-#: documents/models.py:229
+#: documents/models.py:231
 msgid "documents"
 msgstr "מסמכים"
 
-#: documents/models.py:307
+#: documents/models.py:318
 msgid "debug"
 msgstr "ניפוי שגיאות"
 
-#: documents/models.py:308
+#: documents/models.py:319
 msgid "information"
 msgstr "מידע"
 
-#: documents/models.py:309
+#: documents/models.py:320
 msgid "warning"
 msgstr "אזהרה"
 
-#: documents/models.py:310
+#: documents/models.py:321
 msgid "error"
 msgstr "שגיאה"
 
-#: documents/models.py:311
+#: documents/models.py:322
 msgid "critical"
 msgstr "קריטי"
 
-#: documents/models.py:314
+#: documents/models.py:325
 msgid "group"
 msgstr "קבוצה"
 
-#: documents/models.py:316
+#: documents/models.py:327
 msgid "message"
 msgstr "הודעה"
 
-#: documents/models.py:319
+#: documents/models.py:330
 msgid "level"
 msgstr "רמה"
 
-#: documents/models.py:328
+#: documents/models.py:339
 msgid "log"
 msgstr "יומן רישום"
 
-#: documents/models.py:329
+#: documents/models.py:340
 msgid "logs"
 msgstr "יומני רישום"
 
-#: documents/models.py:339 documents/models.py:392
+#: documents/models.py:350 documents/models.py:403
 msgid "saved view"
 msgstr "תצוגה שמורה"
 
-#: documents/models.py:340
+#: documents/models.py:351
 msgid "saved views"
 msgstr "תצוגות שמורות"
 
-#: documents/models.py:342
+#: documents/models.py:353
 msgid "user"
 msgstr "משתמש"
 
-#: documents/models.py:346
+#: documents/models.py:357
 msgid "show on dashboard"
 msgstr "הצג בדשבורד"
 
-#: documents/models.py:349
+#: documents/models.py:360
 msgid "show in sidebar"
 msgstr "הצג בסרגל צידי"
 
-#: documents/models.py:353
+#: documents/models.py:364
 msgid "sort field"
 msgstr "שדה המיון"
 
-#: documents/models.py:358
+#: documents/models.py:369
 msgid "sort reverse"
 msgstr "מיין הפוך"
 
-#: documents/models.py:363
+#: documents/models.py:374
 msgid "title contains"
 msgstr "כותרת מכילה"
 
-#: documents/models.py:364
+#: documents/models.py:375
 msgid "content contains"
 msgstr "תוכן מכיל"
 
-#: documents/models.py:365
+#: documents/models.py:376
 msgid "ASN is"
 msgstr "מס\"ד הוא"
 
-#: documents/models.py:366
+#: documents/models.py:377
 msgid "correspondent is"
 msgstr "מכותב הוא"
 
-#: documents/models.py:367
+#: documents/models.py:378
 msgid "document type is"
 msgstr "סוג מסמך הוא"
 
-#: documents/models.py:368
+#: documents/models.py:379
 msgid "is in inbox"
 msgstr "בתיבה הנכנסת"
 
-#: documents/models.py:369
+#: documents/models.py:380
 msgid "has tag"
 msgstr "ישנו תיוג"
 
-#: documents/models.py:370
+#: documents/models.py:381
 msgid "has any tag"
 msgstr "ישנו כל תיוג"
 
-#: documents/models.py:371
+#: documents/models.py:382
 msgid "created before"
 msgstr "נוצר לפני"
 
-#: documents/models.py:372
+#: documents/models.py:383
 msgid "created after"
 msgstr "נוצר לאחר"
 
-#: documents/models.py:373
+#: documents/models.py:384
 msgid "created year is"
 msgstr "נוצר בשנת"
 
-#: documents/models.py:374
+#: documents/models.py:385
 msgid "created month is"
 msgstr "נוצר בחודש"
 
-#: documents/models.py:375
+#: documents/models.py:386
 msgid "created day is"
 msgstr "נוצר ביום"
 
-#: documents/models.py:376
+#: documents/models.py:387
 msgid "added before"
 msgstr "הוסף לפני"
 
-#: documents/models.py:377
+#: documents/models.py:388
 msgid "added after"
 msgstr "הוסף אחרי"
 
-#: documents/models.py:378
+#: documents/models.py:389
 msgid "modified before"
 msgstr "נערך לפני"
 
-#: documents/models.py:379
+#: documents/models.py:390
 msgid "modified after"
 msgstr "נערך אחרי"
 
-#: documents/models.py:380
+#: documents/models.py:391
 msgid "does not have tag"
 msgstr "אינו כולל את התיוג"
 
-#: documents/models.py:381
+#: documents/models.py:392
 msgid "does not have ASN"
 msgstr "אינו בעל מס\"ד"
 
-#: documents/models.py:382
+#: documents/models.py:393
 msgid "title or content contains"
 msgstr "כותרת או תוכן מכילים"
 
-#: documents/models.py:383
+#: documents/models.py:394
 msgid "fulltext query"
 msgstr "שאילתת טקסט מלא"
 
-#: documents/models.py:384
+#: documents/models.py:395
 msgid "more like this"
 msgstr "עוד כמו זה"
 
-#: documents/models.py:385
+#: documents/models.py:396
 msgid "has tags in"
 msgstr "מכיל תגים ב-"
 
-#: documents/models.py:395
+#: documents/models.py:406
 msgid "rule type"
 msgstr "סוג כלל"
 
-#: documents/models.py:397
+#: documents/models.py:408
 msgid "value"
 msgstr "ערך"
 
-#: documents/models.py:400
+#: documents/models.py:411
 msgid "filter rule"
 msgstr "חוק סינון"
 
-#: documents/models.py:401
+#: documents/models.py:412
 msgid "filter rules"
 msgstr "חוקי סינון"
 
-#: documents/serialisers.py:63
+#: documents/models.py:521
+msgid "started"
+msgstr ""
+
+#: documents/serialisers.py:70
 #, python-format
 msgid "Invalid regular expression: %(error)s"
 msgstr "ביטוי רגולרי בלתי חוקי: %(error)s"
 
-#: documents/serialisers.py:184
+#: documents/serialisers.py:191
 msgid "Invalid color."
 msgstr "צבע לא חוקי."
 
-#: documents/serialisers.py:491
+#: documents/serialisers.py:515
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "סוג קובץ %(type)s לא נתמך"
 
-#: documents/serialisers.py:574
+#: documents/serialisers.py:596
 msgid "Invalid variable detected."
 msgstr "משתנה לא חוקי זוהה."
 
@@ -440,91 +444,91 @@ msgstr "סיסמה"
 msgid "Sign in"
 msgstr "התחבר"
 
-#: paperless/settings.py:338
+#: paperless/settings.py:339
 msgid "English (US)"
 msgstr "אנגלית (ארה\"ב)"
 
-#: paperless/settings.py:339
+#: paperless/settings.py:340
 msgid "Belarusian"
 msgstr "בלרוסית"
 
-#: paperless/settings.py:340
+#: paperless/settings.py:341
 msgid "Czech"
 msgstr "צ'כית"
 
-#: paperless/settings.py:341
+#: paperless/settings.py:342
 msgid "Danish"
 msgstr "דנית"
 
-#: paperless/settings.py:342
+#: paperless/settings.py:343
 msgid "German"
 msgstr "גרמנית"
 
-#: paperless/settings.py:343
+#: paperless/settings.py:344
 msgid "English (GB)"
 msgstr "אנגלית (בריטניה)"
 
-#: paperless/settings.py:344
+#: paperless/settings.py:345
 msgid "Spanish"
 msgstr "ספרדית"
 
-#: paperless/settings.py:345
+#: paperless/settings.py:346
 msgid "French"
 msgstr "צרפתית"
 
-#: paperless/settings.py:346
+#: paperless/settings.py:347
 msgid "Italian"
 msgstr "איטלקית"
 
-#: paperless/settings.py:347
+#: paperless/settings.py:348
 msgid "Luxembourgish"
 msgstr "לוקסמבורגית"
 
-#: paperless/settings.py:348
+#: paperless/settings.py:349
 msgid "Dutch"
 msgstr "הולנדית"
 
-#: paperless/settings.py:349
+#: paperless/settings.py:350
 msgid "Polish"
 msgstr "פולנית"
 
-#: paperless/settings.py:350
+#: paperless/settings.py:351
 msgid "Portuguese (Brazil)"
 msgstr "פורטוגזית (ברזיל)"
 
-#: paperless/settings.py:351
+#: paperless/settings.py:352
 msgid "Portuguese"
 msgstr "פורטוגזית"
 
-#: paperless/settings.py:352
+#: paperless/settings.py:353
 msgid "Romanian"
 msgstr "רומנית"
 
-#: paperless/settings.py:353
+#: paperless/settings.py:354
 msgid "Russian"
 msgstr "רוסית"
 
-#: paperless/settings.py:354
+#: paperless/settings.py:355
 msgid "Slovenian"
 msgstr "סלובנית"
 
-#: paperless/settings.py:355
+#: paperless/settings.py:356
 msgid "Serbian"
 msgstr "סרבית"
 
-#: paperless/settings.py:356
+#: paperless/settings.py:357
 msgid "Swedish"
 msgstr "שוודית"
 
-#: paperless/settings.py:357
+#: paperless/settings.py:358
 msgid "Turkish"
 msgstr "טורקית"
 
-#: paperless/settings.py:358
+#: paperless/settings.py:359
 msgid "Chinese Simplified"
 msgstr "סינית מופשטת"
 
-#: paperless/urls.py:153
+#: paperless/urls.py:161
 msgid "Paperless-ngx administration"
 msgstr "ניהול Paperless-ngx"
 
@@ -648,111 +652,115 @@ msgstr "סמן כנקרא, אל תעבד הודעות דואר שנקראו"
 msgid "Flag the mail, don't process flagged mails"
 msgstr "סמן דואר, אל תעבד הודעות דואר שסומנו"
 
-#: paperless_mail/models.py:70
+#: paperless_mail/models.py:68
+msgid "Tag the mail with specified tag, don't process tagged mails"
+msgstr ""
+
+#: paperless_mail/models.py:71
 msgid "Use subject as title"
 msgstr "השתמש בנושא ככותרת"
 
-#: paperless_mail/models.py:71
+#: paperless_mail/models.py:72
 msgid "Use attachment filename as title"
 msgstr "השתמש בשם הקובץ המצורף ככותרת"
 
-#: paperless_mail/models.py:74
+#: paperless_mail/models.py:75
 msgid "Do not assign a correspondent"
 msgstr "אל תשייך מכותב"
 
-#: paperless_mail/models.py:75
+#: paperless_mail/models.py:76
 msgid "Use mail address"
 msgstr "השתמש בכתובת הדואר"
 
-#: paperless_mail/models.py:76
+#: paperless_mail/models.py:77
 msgid "Use name (or mail address if not available)"
 msgstr "השתמש בשם (או בכתובת דואר אם אין שם)"
 
-#: paperless_mail/models.py:77
+#: paperless_mail/models.py:78
 msgid "Use correspondent selected below"
 msgstr "השתמש במכותב הנבחר להלן"
 
-#: paperless_mail/models.py:81
+#: paperless_mail/models.py:82
 msgid "order"
 msgstr "סדר"
 
-#: paperless_mail/models.py:87
+#: paperless_mail/models.py:88
 msgid "account"
 msgstr "חשבון"
 
-#: paperless_mail/models.py:91
+#: paperless_mail/models.py:92
 msgid "folder"
 msgstr "תיקייה"
 
-#: paperless_mail/models.py:95
+#: paperless_mail/models.py:96
 msgid "Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server."
 msgstr "יש להפריד בין תיקיות משנה באמצעות תוחם, לרוב נקודה ('.') או קו נטוי ('/'), אך זה משתנה לפי שרת הדואר."
 
-#: paperless_mail/models.py:101
+#: paperless_mail/models.py:102
 msgid "filter from"
 msgstr "סנן 'מאת'"
 
-#: paperless_mail/models.py:107
+#: paperless_mail/models.py:108
 msgid "filter subject"
 msgstr "סנן 'נושא'"
 
-#: paperless_mail/models.py:113
+#: paperless_mail/models.py:114
 msgid "filter body"
 msgstr "סנן 'גוף'"
 
-#: paperless_mail/models.py:120
+#: paperless_mail/models.py:121
 msgid "filter attachment filename"
 msgstr "סנן 'שם קובץ מצורף'"
 
-#: paperless_mail/models.py:125
+#: paperless_mail/models.py:126
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
 msgstr "קבל רק מסמכים שתואמים לחלוטין את שם הקובץ הזה אם צוין. תווים כלליים כגון pdf.* או *חשבונית* מותרים. חסר רגישות תווים גדולים/קטנים (אנגלית)."
 
-#: paperless_mail/models.py:132
+#: paperless_mail/models.py:133
 msgid "maximum age"
 msgstr "גיל מקסימלי"
 
-#: paperless_mail/models.py:134
+#: paperless_mail/models.py:135
 msgid "Specified in days."
 msgstr "נקוב בימים."
 
-#: paperless_mail/models.py:138
+#: paperless_mail/models.py:139
 msgid "attachment type"
 msgstr "סוג קובץ מצורף"
 
-#: paperless_mail/models.py:142
+#: paperless_mail/models.py:143
 msgid "Inline attachments include embedded images, so it's best to combine this option with a filename filter."
 msgstr "קבצים מצורפים 'מוטבעים' עלולים לכלול תמונות מוטמעות, לכן האופציה הטובה ביותר היא לשלב אופציה זו עם סנן 'שם קובץ מצורף'."
 
-#: paperless_mail/models.py:148
+#: paperless_mail/models.py:149
 msgid "action"
 msgstr "פעולה"
 
-#: paperless_mail/models.py:154
+#: paperless_mail/models.py:155
 msgid "action parameter"
 msgstr "פרמטר פעולה"
 
-#: paperless_mail/models.py:159
+#: paperless_mail/models.py:160
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
 msgstr "פרמטר נוסף עבור הפעולה שנבחרה לעיל, כלומר, תיקיית היעד של פעולת המעבר לתיקיה. יש להפריד בין תיקיות משנה באמצעות נקודות."
 
-#: paperless_mail/models.py:167
+#: paperless_mail/models.py:168
 msgid "assign title from"
 msgstr "שייך כותרת מ-"
 
-#: paperless_mail/models.py:175
+#: paperless_mail/models.py:176
 msgid "assign this tag"
 msgstr "שייך תגית זו"
 
-#: paperless_mail/models.py:183
+#: paperless_mail/models.py:184
 msgid "assign this document type"
 msgstr "שייך סוג מסמך זה"
 
-#: paperless_mail/models.py:187
+#: paperless_mail/models.py:188
 msgid "assign correspondent from"
 msgstr "שייך מכותב מ-"
 
-#: paperless_mail/models.py:197
+#: paperless_mail/models.py:198
 msgid "assign this correspondent"
 msgstr "שייך מכותב זה"
 
