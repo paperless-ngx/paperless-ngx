@@ -2,6 +2,7 @@ import logging
 import os
 import shutil
 
+import django_q
 from django.conf import settings
 from django.contrib.admin.models import ADDITION
 from django.contrib.admin.models import LogEntry
@@ -21,6 +22,7 @@ from ..file_handling import delete_empty_directories
 from ..file_handling import generate_unique_filename
 from ..models import Document
 from ..models import MatchingModel
+from ..models import PaperlessTask
 from ..models import Tag
 
 
@@ -499,3 +501,36 @@ def add_to_index(sender, document, **kwargs):
     from documents import index
 
     index.add_or_update_document(document)
+
+
+@receiver(django_q.signals.pre_enqueue)
+def init_paperless_task(sender, task, **kwargs):
+    if task["func"] == "documents.tasks.consume_file":
+        paperless_task, created = PaperlessTask.objects.get_or_create(
+            task_id=task["id"],
+        )
+        paperless_task.name = task["name"]
+        paperless_task.created = task["started"]
+        paperless_task.save()
+
+
+@receiver(django_q.signals.pre_execute)
+def paperless_task_started(sender, task, **kwargs):
+    try:
+        if task["func"] == "documents.tasks.consume_file":
+            paperless_task = PaperlessTask.objects.get(task_id=task["id"])
+            paperless_task.started = timezone.now()
+            paperless_task.save()
+    except PaperlessTask.DoesNotExist:
+        pass
+
+
+@receiver(models.signals.post_save, sender=django_q.models.Task)
+def update_paperless_task(sender, instance, **kwargs):
+    try:
+        if instance.func == "documents.tasks.consume_file":
+            paperless_task = PaperlessTask.objects.get(task_id=instance.id)
+            paperless_task.attempted_task = instance
+            paperless_task.save()
+    except PaperlessTask.DoesNotExist:
+        pass

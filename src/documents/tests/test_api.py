@@ -5,6 +5,7 @@ import os
 import shutil
 import tempfile
 import urllib.request
+import uuid
 import zipfile
 from unittest import mock
 from unittest.mock import MagicMock
@@ -19,12 +20,14 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import override_settings
 from django.utils import timezone
+from django_q.models import Task
 from documents import bulk_edit
 from documents import index
 from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import MatchingModel
+from documents.models import PaperlessTask
 from documents.models import SavedView
 from documents.models import StoragePath
 from documents.models import Tag
@@ -2645,3 +2648,55 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(response.status_code, 400)
         self.assertEqual(StoragePath.objects.count(), 1)
+
+
+class TestTasks(APITestCase):
+    ENDPOINT = "/api/tasks/"
+    ENDPOINT_ACKOWLEDGE = "/api/acknowledge_tasks/"
+
+    def setUp(self):
+        super().setUp()
+
+        self.user = User.objects.create_superuser(username="temp_admin")
+        self.client.force_authenticate(user=self.user)
+
+    def test_get_tasks(self):
+        task_id1 = str(uuid.uuid4())
+        PaperlessTask.objects.create(task_id=task_id1)
+        Task.objects.create(
+            id=task_id1,
+            started=timezone.now() - datetime.timedelta(seconds=30),
+            stopped=timezone.now(),
+            func="documents.tasks.consume_file",
+        )
+        task_id2 = str(uuid.uuid4())
+        PaperlessTask.objects.create(task_id=task_id2)
+
+        response = self.client.get(self.ENDPOINT)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
+        returned_task1 = response.data[1]
+        returned_task2 = response.data[0]
+        self.assertEqual(returned_task1["task_id"], task_id1)
+        self.assertEqual(returned_task1["status"], "complete")
+        self.assertIsNotNone(returned_task1["attempted_task"])
+        self.assertEqual(returned_task2["task_id"], task_id2)
+        self.assertEqual(returned_task2["status"], "queued")
+        self.assertIsNone(returned_task2["attempted_task"])
+
+    def test_acknowledge_tasks(self):
+        task_id = str(uuid.uuid4())
+        task = PaperlessTask.objects.create(task_id=task_id)
+
+        response = self.client.get(self.ENDPOINT)
+        self.assertEqual(len(response.data), 1)
+
+        response = self.client.post(
+            self.ENDPOINT_ACKOWLEDGE,
+            {"tasks": [task.id]},
+        )
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get(self.ENDPOINT)
+        self.assertEqual(len(response.data), 0)
