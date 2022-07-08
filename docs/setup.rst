@@ -184,6 +184,29 @@ Install Paperless from Docker Hub
     port 8000. Modifying the part before the colon will map requests on another
     port to the webserver running on the default port.
 
+    **Rootless**
+
+    If you want to run Paperless as a rootless container, you will need to:
+
+    - set the ``user`` running the container to map to the ``paperless`` user in the
+      container.
+      See ``USERMAP_UID`` and ``USERMAP_GID`` :ref:`here <configuration-polling>`.
+
+    - override some of the ``supervisord`` defaults by setting the ``command`` to:
+
+     .. code::
+
+        command:
+          - "/usr/local/bin/supervisord"
+          - "-c"
+          - "/etc/supervisord.conf"
+          - "--user"
+          - "paperless"
+          - "--logfile"
+          - "supervisord.log"
+          - "--pidfile"
+          - "supervisord.pid"
+
 5.  Modify ``docker-compose.env``, following the comments in the file. The
     most important change is to set ``USERMAP_UID`` and ``USERMAP_GID``
     to the uid and gid of your user on the host system. Use ``id -u`` and
