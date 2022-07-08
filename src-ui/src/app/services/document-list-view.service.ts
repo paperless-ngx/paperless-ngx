@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core'
 import { ParamMap, Router } from '@angular/router'
 import { Observable } from 'rxjs'
 import {
+  filterRulesDiffer,
   cloneFilterRules,
   FilterRule,
   isFullTextFilterRule,
@@ -67,6 +68,7 @@ export interface ListViewState {
 })
 export class DocumentListViewService {
   isReloading: boolean = false
+  initialized: boolean = false
   error: string = null
 
   rangeSelectionAnchorIndex: number
@@ -172,11 +174,24 @@ export class DocumentListViewService {
     if (!paramsEmpty) newState = parseParams(queryParams)
     if (newState == undefined) newState = this.defaultListViewState() // if nothing in local storage
 
-    this.activeListViewState.filterRules = newState.filterRules
-    this.activeListViewState.sortField = newState.sortField
-    this.activeListViewState.sortReverse = newState.sortReverse
-    this.activeListViewState.currentPage = newState.currentPage
-    this.reload(null, paramsEmpty) // update the params if there arent any
+    // only reload if things have changed
+    if (
+      !this.initialized ||
+      paramsEmpty ||
+      this.activeListViewState.sortField !== newState.sortField ||
+      this.activeListViewState.sortReverse !== newState.sortReverse ||
+      this.activeListViewState.currentPage !== newState.currentPage ||
+      filterRulesDiffer(
+        this.activeListViewState.filterRules,
+        newState.filterRules
+      )
+    ) {
+      this.activeListViewState.filterRules = newState.filterRules
+      this.activeListViewState.sortField = newState.sortField
+      this.activeListViewState.sortReverse = newState.sortReverse
+      this.activeListViewState.currentPage = newState.currentPage
+      this.reload(null, paramsEmpty) // update the params if there arent any
+    }
   }
 
   reload(onFinish?, updateQueryParams: boolean = true) {
@@ -193,6 +208,7 @@ export class DocumentListViewService {
       )
       .subscribe({
         next: (result) => {
+          this.initialized = true
           this.isReloading = false
           activeListViewState.collectionSize = result.count
           activeListViewState.documents = result.results
