@@ -186,26 +186,35 @@ Install Paperless from Docker Hub
 
     **Rootless**
 
-    If you want to run Paperless as a rootless container, you will need to:
+    If you want to run Paperless as a rootless container, you will need to add the
+    following to your ``docker-compose.yml``:
 
     - set the ``user`` running the container to map to the ``paperless`` user in the
       container.
-      See ``USERMAP_UID`` and ``USERMAP_GID`` :ref:`here <configuration-polling>`.
+      This value (``user_id`` below), should be the same id that ``USERMAP_UID`` and
+      ``USERMAP_GID`` are set to in the next step.
+      See ``USERMAP_UID`` and ``USERMAP_GID`` :ref:`here <configuration-docker>`.
 
-    - override some of the ``supervisord`` defaults by setting the ``command`` to:
+    - override some of the ``supervisord`` defaults by setting the docker ``command``
+      (`see here <https://docs.docker.com/compose/compose-file/#command>`_) to:
+
+    Your ``docker-compose.yml`` entry for Paperless will look something like:
 
      .. code::
 
-        command:
-          - "/usr/local/bin/supervisord"
-          - "-c"
-          - "/etc/supervisord.conf"
-          - "--user"
-          - "paperless"
-          - "--logfile"
-          - "supervisord.log"
-          - "--pidfile"
-          - "supervisord.pid"
+        webserver:
+          image: ghcr.io/paperless-ngx/paperless-ngx:latest
+          user: <user_id>
+          command:
+            - "/usr/local/bin/supervisord"
+            - "-c"
+            - "/etc/supervisord.conf"
+            - "--user"
+            - "paperless"
+            - "--logfile"
+            - "supervisord.log"
+            - "--pidfile"
+            - "supervisord.pid"
 
 5.  Modify ``docker-compose.env``, following the comments in the file. The
     most important change is to set ``USERMAP_UID`` and ``USERMAP_GID``
