@@ -125,6 +125,7 @@ COPY [ \
 	"docker/supervisord.conf", \
 	"docker/docker-entrypoint.sh", \
 	"docker/docker-prepare.sh", \
+	"docker/paperless_cmd.sh", \
 	"docker/wait-for-redis.py", \
 	"docker/management_script.sh", \
 	"docker/install_management_commands.sh", \
@@ -144,6 +145,8 @@ RUN set -eux \
     && chmod 755 /sbin/docker-prepare.sh \
     && mv wait-for-redis.py /sbin/wait-for-redis.py \
     && chmod 755 /sbin/wait-for-redis.py \
+    && mv paperless_cmd.sh /usr/local/bin/paperless_cmd.sh \
+    && chmod 755 /usr/local/bin/paperless_cmd.sh \
   && echo "Installing managment commands" \
     && chmod +x install_management_commands.sh \
     && ./install_management_commands.sh
@@ -222,4 +225,4 @@ ENTRYPOINT ["/sbin/docker-entrypoint.sh"]
 
 EXPOSE 8000
 
-CMD ["/usr/local/bin/supervisord", "-c", "/etc/supervisord.conf"]
+CMD ["/usr/local/bin/paperless_cmd.sh"]
