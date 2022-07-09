@@ -69,8 +69,8 @@ jobs:
       - ci-frontend
     steps:
       -
-        name: Set gchr repository name
-        id: set-ghrc-repository
+        name: Set ghcr repository name
+        id: set-ghcr-repository
         run: |
           ghcr_name=$(echo "${GITHUB_REPOSITORY}" | awk '{ print tolower($0) }')
           echo ::set-output name=repository::${ghcr_name}
@@ -121,7 +121,7 @@ jobs:
 
     outputs:
 
-      ghcr-repository: ${{ steps.set-ghrc-repository.outputs.repository }}
+      ghcr-repository: ${{ steps.set-ghcr-repository.outputs.repository }}
 
       qpdf-json: ${{ steps.qpdf-setup.outputs.qpdf-json }}
 
