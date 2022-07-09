@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-07-08 14:11-0700\n"
-"PO-Revision-Date: 2022-07-08 22:06\n"
+"PO-Revision-Date: 2022-07-09 11:02\n"
 "Last-Translator: \n"
 "Language-Team: Croatian\n"
 "Language: hr_HR\n"
@@ -19,204 +19,204 @@ msgstr ""
 
 #: documents/apps.py:9
 msgid "Documents"
-msgstr ""
+msgstr "Dokumenti"
 
 #: documents/models.py:29
 msgid "Any word"
-msgstr ""
+msgstr "Bilo koja riječ"
 
 #: documents/models.py:30
 msgid "All words"
-msgstr ""
+msgstr "Sve riječi"
 
 #: documents/models.py:31
 msgid "Exact match"
-msgstr ""
+msgstr "Točno podudaranje"
 
 #: documents/models.py:32
 msgid "Regular expression"
-msgstr ""
+msgstr "Uobičajeni izraz"
 
 #: documents/models.py:33
 msgid "Fuzzy word"
-msgstr ""
+msgstr "Nejasna riječ"
 
 #: documents/models.py:34
 msgid "Automatic"
-msgstr ""
+msgstr "Automatski"
 
 #: documents/models.py:37 documents/models.py:354 paperless_mail/models.py:16
 #: paperless_mail/models.py:80
 msgid "name"
-msgstr ""
+msgstr "ime"
 
 #: documents/models.py:39
 msgid "match"
-msgstr ""
+msgstr "podudarati"
 
 #: documents/models.py:42
 msgid "matching algorithm"
-msgstr ""
+msgstr "algoritam podudaranja"
 
 #: documents/models.py:47
 msgid "is insensitive"
-msgstr ""
+msgstr "ne razlikuje velika i mala slova"
 
 #: documents/models.py:60 documents/models.py:115
 msgid "correspondent"
-msgstr ""
+msgstr "dopisnik"
 
 #: documents/models.py:61
 msgid "correspondents"
-msgstr ""
+msgstr "dopisnici"
 
 #: documents/models.py:66
 msgid "color"
-msgstr ""
+msgstr "boja"
 
 #: documents/models.py:69
 msgid "is inbox tag"
-msgstr ""
+msgstr "oznaka ulazne pošte (inbox)"
 
 #: documents/models.py:72
 msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
-msgstr ""
+msgstr "Označava ovu oznaku kao oznaku ulazne pošte (inbox): Svi novopotrošeni dokumenti bit će označeni oznakama ulazne pošte (inbox)."
 
 #: documents/models.py:78
 msgid "tag"
-msgstr ""
+msgstr "oznaka"
 
 #: documents/models.py:79 documents/models.py:153
 msgid "tags"
-msgstr ""
+msgstr "oznake"
 
 #: documents/models.py:84 documents/models.py:135
 msgid "document type"
-msgstr ""
+msgstr "vrsta dokumenta"
 
 #: documents/models.py:85
 msgid "document types"
-msgstr ""
+msgstr "vrste dokumenta"
 
 #: documents/models.py:90
 msgid "path"
-msgstr ""
+msgstr "putanja"
 
 #: documents/models.py:96 documents/models.py:124
 msgid "storage path"
-msgstr ""
+msgstr "putanja pohrane"
 
 #: documents/models.py:97
 msgid "storage paths"
-msgstr ""
+msgstr "putanje pohrane"
 
 #: documents/models.py:105
 msgid "Unencrypted"
-msgstr ""
+msgstr "Nekriptirano"
 
 #: documents/models.py:106
 msgid "Encrypted with GNU Privacy Guard"
-msgstr ""
+msgstr "Enkriptirano s GNU Privacy Guard"
 
 #: documents/models.py:127
 msgid "title"
-msgstr ""
+msgstr "naslov"
 
 #: documents/models.py:139
 msgid "content"
-msgstr ""
+msgstr "sadržaj"
 
 #: documents/models.py:142
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
-msgstr ""
+msgstr "Neobrađeni tekstualni podaci dokumenta. Ovo se polje koristi prvenstveno za pretraživanje."
 
 #: documents/models.py:147
 msgid "mime type"
-msgstr ""
+msgstr "vrste mime"
 
 #: documents/models.py:157
 msgid "checksum"
-msgstr ""
+msgstr "kontrolni zbroj"
 
 #: documents/models.py:161
 msgid "The checksum of the original document."
-msgstr ""
+msgstr "Kontrolni zbroj originalnog dokumenta."
 
 #: documents/models.py:165
 msgid "archive checksum"
-msgstr ""
+msgstr "arhivski kontrolni zbroj"
 
 #: documents/models.py:170
 msgid "The checksum of the archived document."
-msgstr ""
+msgstr "Kontrolni zbroj arhiviranog dokumenta."
 
 #: documents/models.py:173 documents/models.py:335 documents/models.py:520
 msgid "created"
-msgstr ""
+msgstr "stvoreno"
 
 #: documents/models.py:176
 msgid "modified"
-msgstr ""
+msgstr "modificiran"
 
 #: documents/models.py:183
 msgid "storage type"
-msgstr ""
+msgstr "vrsta pohrane"
 
 #: documents/models.py:191
 msgid "added"
-msgstr ""
+msgstr "dodano"
 
 #: documents/models.py:198
 msgid "filename"
-msgstr ""
+msgstr "naziv datoteke"
 
 #: documents/models.py:204
 msgid "Current filename in storage"
-msgstr ""
+msgstr "Trenutni naziv pohranjene datoteke"
 
 #: documents/models.py:208
 msgid "archive filename"
-msgstr ""
+msgstr "naziv arhivirane datoteke"
 
 #: documents/models.py:214
 msgid "Current archive filename in storage"
-msgstr ""
+msgstr "Trenutni naziv arhivirane pohranjene datoteke"
 
 #: documents/models.py:218
 msgid "archive serial number"
-msgstr ""
+msgstr "arhivirani serijski broj"
 
 #: documents/models.py:224
 msgid "The position of this document in your physical document archive."
-msgstr ""
+msgstr "Položaj ovog dokumenta u vašoj fizičkoj arhivi dokumenata."
 
 #: documents/models.py:230
 msgid "document"
-msgstr ""
+msgstr "dokument"
 
 #: documents/models.py:231
 msgid "documents"
-msgstr ""
+msgstr "dokumenti"
 
 #: documents/models.py:318
 msgid "debug"
-msgstr ""
+msgstr "otklanjanje pogrešaka"
 
 #: documents/models.py:319
 msgid "information"
-msgstr ""
+msgstr "informacije"
 
 #: documents/models.py:320
 msgid "warning"
-msgstr ""
+msgstr "upozorenje"
 
 #: documents/models.py:321
 msgid "error"
-msgstr ""
+msgstr "greška"
 
 #: documents/models.py:322
 msgid "critical"
-msgstr ""
+msgstr "kritično"
 
 #: documents/models.py:325
 msgid "group"
@@ -422,7 +422,7 @@ msgstr ""
 
 #: documents/templates/registration/login.html:15
 msgid "Paperless-ngx sign in"
-msgstr ""
+msgstr "Paperless-ngx prijava"
 
 #: documents/templates/registration/login.html:61
 msgid "Please sign in."
