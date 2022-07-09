@@ -120,19 +120,29 @@ COPY gunicorn.conf.py .
 ARG DOCKER_SRC=/usr/src/paperless/src/docker/
 WORKDIR ${DOCKER_SRC}
 
-RUN --mount=type=bind,readwrite,source=docker,target=${DOCKER_SRC} \
-  set -eux \
+COPY [ \
+	"docker/imagemagick-policy.xml", \
+	"docker/supervisord.conf", \
+	"docker/docker-entrypoint.sh", \
+	"docker/docker-prepare.sh", \
+	"docker/wait-for-redis.py", \
+	"docker/management_script.sh", \
+	"docker/install_management_commands.sh", \
+	"${DOCKER_SRC}" \
+]
+
+RUN set -eux \
   && echo "Configuring ImageMagick" \
-    && cp imagemagick-policy.xml /etc/ImageMagick-6/policy.xml \
+    && mv imagemagick-policy.xml /etc/ImageMagick-6/policy.xml \
   && echo "Configuring supervisord" \
     && mkdir /var/log/supervisord /var/run/supervisord \
-    && cp supervisord.conf /etc/supervisord.conf \
+    && mv supervisord.conf /etc/supervisord.conf \
   && echo "Setting up Docker scripts" \
-    && cp docker-entrypoint.sh /sbin/docker-entrypoint.sh \
+    && mv docker-entrypoint.sh /sbin/docker-entrypoint.sh \
     && chmod 755 /sbin/docker-entrypoint.sh \
-    && cp docker-prepare.sh /sbin/docker-prepare.sh \
+    && mv docker-prepare.sh /sbin/docker-prepare.sh \
     && chmod 755 /sbin/docker-prepare.sh \
-    && cp wait-for-redis.py /sbin/wait-for-redis.py \
+    && mv wait-for-redis.py /sbin/wait-for-redis.py \
     && chmod 755 /sbin/wait-for-redis.py \
   && echo "Installing managment commands" \
     && chmod +x install_management_commands.sh \
