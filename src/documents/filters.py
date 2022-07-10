@@ -1,13 +1,18 @@
 from django.db.models import Q
 from django_filters.rest_framework import BooleanFilter, FilterSet, Filter
 
-from .models import Correspondent, Document, Tag, DocumentType, Log
+from .models import Category, Correspondent, Document, Tag, DocumentType, Log
 
 CHAR_KWARGS = ["istartswith", "iendswith", "icontains", "iexact"]
 ID_KWARGS = ["in", "exact"]
 INT_KWARGS = ["exact", "gt", "gte", "lt", "lte", "isnull"]
 DATE_KWARGS = ["year", "month", "day", "date__gt", "gt", "date__lt", "lt"]
 
+
+class CategoryFilterSet(FilterSet):
+    class Meta:
+        model = Category
+        fields = {"name": CHAR_KWARGS}
 
 class CorrespondentFilterSet(FilterSet):
     class Meta:

@@ -12,6 +12,7 @@ import { TagListComponent } from './components/manage/tag-list/tag-list.componen
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import {DocumentAsnComponent} from "./components/document-asn/document-asn.component";
 import { DirtyFormGuard } from './guards/dirty-form.guard';
+import { CategoryListComponent } from './components/manage/category-list/category-list.component';
 
 const routes: Routes = [
   {path: '', redirectTo: 'dashboard', pathMatch: 'full'},
@@ -24,6 +25,7 @@ const routes: Routes = [
     {path: 'tags', component: TagListComponent },
     {path: 'documenttypes', component: DocumentTypeListComponent },
     {path: 'correspondents', component: CorrespondentListComponent },
+    {path: 'categories', component: CategoryListComponent },
     {path: 'logs', component: LogsComponent },
     {path: 'settings', component: SettingsComponent, canDeactivate: [DirtyFormGuard] },
   ]},

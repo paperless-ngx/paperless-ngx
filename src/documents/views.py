@@ -42,15 +42,17 @@ from .bulk_download import (
 )
 from .classifier import load_classifier
 from .filters import (
+    CategoryFilterSet,
     CorrespondentFilterSet,
     DocumentFilterSet,
     TagFilterSet,
     DocumentTypeFilterSet,
 )
 from .matching import match_correspondents, match_tags, match_document_types
-from .models import Correspondent, Document, Tag, DocumentType, SavedView
+from .models import Category, Correspondent, Document, Tag, DocumentType, SavedView
 from .parsers import get_parser_class_for_mime_type
 from .serialisers import (
+    CategorySerializer,
     CorrespondentSerializer,
     DocumentSerializer,
     TagSerializerVersion1,
@@ -101,6 +103,19 @@ class IndexView(TemplateView):
         ] = f"frontend/{self.get_language()}/apple-touch-icon.png"  # NOQA: E501
         return context
 
+class CategoryViewSet(ModelViewSet):
+    model = Category
+
+    queryset = Category.objects.all()
+
+    serializer_class = CategorySerializer
+    pagination_class = StandardPagination
+    permission_classes = (IsAuthenticated,)
+    filter_backends = (DjangoFilterBackend, OrderingFilter)
+    filterset_class = CategoryFilterSet
+    ordering_fields = (
+        "name",
+    )
 
 class CorrespondentViewSet(ModelViewSet):
     model = Correspondent

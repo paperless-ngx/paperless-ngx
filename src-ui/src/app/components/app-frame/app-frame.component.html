@@ -113,6 +113,13 @@
         </h6>
         <ul class="nav flex-column mb-2">
           <li class="nav-item">
+            <a class="nav-link" routerLink="categories" routerLinkActive="active" (click)="closeMenu()">
+              <svg class="sidebaricon" fill="currentColor">
+                <use xlink:href="assets/bootstrap-icons.svg#tag"/>
+              </svg>&nbsp;<ng-container i18n>Categories</ng-container>
+            </a>
+          </li>
+          <li class="nav-item">
             <a class="nav-link" routerLink="correspondents" routerLinkActive="active" (click)="closeMenu()">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#person"/>

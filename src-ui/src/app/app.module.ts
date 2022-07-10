@@ -79,6 +79,8 @@ import localePt from '@angular/common/locales/pt';
 import localeSv from '@angular/common/locales/sv';
 import localeRo from '@angular/common/locales/ro';
 import localeRu from '@angular/common/locales/ru';
+import { CategoryListComponent } from './components/manage/category-list/category-list.component';
+import { CategoryEditDialogComponent } from './components/manage/category-list/category-edit-dialog/category-edit-dialog.component';
 
 
 registerLocaleData(localeCs)
@@ -104,11 +106,13 @@ registerLocaleData(localeSv)
     DocumentDetailComponent,
     DashboardComponent,
     TagListComponent,
+    CategoryListComponent,
     CorrespondentListComponent,
     DocumentTypeListComponent,
     LogsComponent,
     SettingsComponent,
     NotFoundComponent,
+    CategoryEditDialogComponent,
     CorrespondentEditDialogComponent,
     ConfirmDialogComponent,
     TagEditDialogComponent,

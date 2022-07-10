@@ -54,8 +54,29 @@ class MatchingModel(models.Model):
     def __str__(self):
         return self.name
 
+class Category(models.Model):
+
+    name = models.CharField(_("name"), max_length=128, unique=True)
+
+    class Meta:
+        ordering = ("name",)
+        verbose_name = _("category")
+        verbose_name_plural = _("categories")
+
+    def __str__(self):
+        return self.name
 
 class Correspondent(MatchingModel):
+
+    category = models.ForeignKey(
+           Category,
+           blank=True,
+           null=True,
+           related_name="categories",
+           on_delete=models.SET_NULL,
+           verbose_name=_("correspondant category"),
+    )
+
     class Meta:
         ordering = ("name",)
         verbose_name = _("correspondent")

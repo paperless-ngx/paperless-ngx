@@ -17,6 +17,7 @@
     <thead>
     <tr>
       <th scope="col" sortable="name" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Name</th>
+      <th scope="col" sortable="category" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Category</th>
       <th scope="col" sortable="matching_algorithm" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Matching</th>
       <th scope="col" sortable="document_count" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Document count</th>
       <th scope="col" sortable="last_correspondence" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Last correspondence</th>
@@ -26,6 +27,11 @@
     <tbody>
     <tr *ngFor="let correspondent of data">
       <td scope="row">{{ correspondent.name }}</td>
+      <td scope="row">
+          <ng-container *ngIf="correspondent.category">
+            {{(correspondent.category$ | async)?.name}}
+          </ng-container>
+      </td>
       <td scope="row">{{ getMatching(correspondent) }}</td>
       <td scope="row">{{ correspondent.document_count }}</td>
       <td scope="row">{{ correspondent.last_correspondence | customDate }}</td>

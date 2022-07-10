@@ -13,6 +13,7 @@ from django.conf import settings
 
 from paperless.consumers import StatusConsumer
 from documents.views import (
+    CategoryViewSet,
     CorrespondentViewSet,
     UnifiedSearchViewSet,
     LogViewSet,
@@ -30,6 +31,7 @@ from documents.views import (
 from paperless.views import FaviconView
 
 api_router = DefaultRouter()
+api_router.register(r"categories", CategoryViewSet)
 api_router.register(r"correspondents", CorrespondentViewSet)
 api_router.register(r"document_types", DocumentTypeViewSet)
 api_router.register(r"documents", UnifiedSearchViewSet)

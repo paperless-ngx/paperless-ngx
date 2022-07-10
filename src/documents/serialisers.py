@@ -8,6 +8,7 @@ from rest_framework.fields import SerializerMethodField
 
 from . import bulk_edit
 from .models import (
+    Category,
     Correspondent,
     Tag,
     Document,
@@ -66,6 +67,12 @@ class MatchingModelSerializer(serializers.ModelSerializer):
         return match
 
 
+class CategorySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Category
+        fields = ("id", "name",)
+
 class CorrespondentSerializer(MatchingModelSerializer):
 
     last_correspondence = serializers.DateTimeField(read_only=True)
@@ -76,6 +83,7 @@ class CorrespondentSerializer(MatchingModelSerializer):
             "id",
             "slug",
             "name",
+            "category",
             "match",
             "matching_algorithm",
             "is_insensitive",

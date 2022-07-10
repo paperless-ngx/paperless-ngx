@@ -4,11 +4,11 @@
 
 export const environment = {
   production: false,
-  apiBaseUrl: "http://localhost:8000/api/",
+  apiBaseUrl: "https://dev-paperless.zion-control.org/api/",
   apiVersion: "2",
   appTitle: "Paperless-ngx",
   version: "DEVELOPMENT",
-  webSocketHost: "localhost:8000",
+  webSocketHost: "dev-paperless.zion-control.org",
   webSocketProtocol: "ws:",
   webSocketBaseUrl: "/ws/",
 };

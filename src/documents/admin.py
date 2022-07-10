@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 from .models import (
+    Category,
     Correspondent,
     Document,
     DocumentType,
@@ -9,12 +10,16 @@ from .models import (
     SavedViewFilterRule,
 )
 
+class CategoryAdmin(admin.ModelAdmin):
+
+    list_display = ("name",)
+    list_filter = ("name",)
 
 class CorrespondentAdmin(admin.ModelAdmin):
 
-    list_display = ("name", "match", "matching_algorithm")
-    list_filter = ("matching_algorithm",)
-    list_editable = ("match", "matching_algorithm")
+    list_display = ("name", "category", "match", "matching_algorithm")
+    list_filter = ("matching_algorithm","category" )
+    list_editable = ("match", "category", "matching_algorithm")
 
 
 class TagAdmin(admin.ModelAdmin):
@@ -102,6 +107,7 @@ class SavedViewAdmin(admin.ModelAdmin):
     inlines = [RuleInline]
 
 
+admin.site.register(Category, CategoryAdmin)
 admin.site.register(Correspondent, CorrespondentAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(DocumentType, DocumentTypeAdmin)

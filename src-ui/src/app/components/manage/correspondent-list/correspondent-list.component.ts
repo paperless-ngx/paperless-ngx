@@ -3,6 +3,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FILTER_CORRESPONDENT } from 'src/app/data/filter-rule-type';
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
 import { DocumentListViewService } from 'src/app/services/document-list-view.service';
+import { CategoryService } from 'src/app/services/rest/category.service';
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { GenericListComponent } from '../generic-list/generic-list.component';
@@ -15,7 +16,7 @@ import { CorrespondentEditDialogComponent } from './correspondent-edit-dialog/co
 })
 export class CorrespondentListComponent extends GenericListComponent<PaperlessCorrespondent> {
 
-  constructor(correspondentsService: CorrespondentService, modalService: NgbModal,
+  constructor(correspondentsService: CorrespondentService, categoryService: CategoryService, modalService: NgbModal,
     private list: DocumentListViewService,
     toastService: ToastService
   ) {
@@ -28,5 +29,9 @@ export class CorrespondentListComponent extends GenericListComponent<PaperlessCo
 
   filterDocuments(object: PaperlessCorrespondent) {
     this.list.quickFilter([{rule_type: FILTER_CORRESPONDENT, value: object.id.toString()}])
+  }
+
+  getCategory(object: PaperlessCorrespondent) {
+
   }
 }
