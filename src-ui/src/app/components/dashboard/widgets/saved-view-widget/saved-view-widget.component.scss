@@ -6,3 +6,7 @@ table {
 th:first-child {
   width: 25%;
 }
+
+tbody tr {
+  cursor: pointer;
+}

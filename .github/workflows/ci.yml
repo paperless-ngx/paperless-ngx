@@ -2,7 +2,11 @@ name: ci
 
 on:
   push:
-    tags: ng-*
+    tags:
+      # https://semver.org/#spec-item-2
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+      # https://semver.org/#spec-item-9
+      - 'v[0-9]+.[0-9]+.[0-9]+-beta.rc[0-9]+'
     branches-ignore:
       - 'translations**'
   pull_request:
@@ -11,304 +15,199 @@ on:
 
 jobs:
   documentation:
+    name: "Build Documentation"
     runs-on: ubuntu-20.04
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+      -
+        name: Install pipenv
+        run: pipx install pipenv
       -
         name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: 3.9
-      -
-        name: Get pip cache dir
-        id: pip-cache
-        run: |
-          echo "::set-output name=dir::$(pip cache dir)"
-      -
-        name: Persistent Github pip cache
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.pip-cache.outputs.dir }}
-          key: ${{ runner.os }}-pip3.8}
+          cache: "pipenv"
+          cache-dependency-path: 'Pipfile.lock'
       -
         name: Install dependencies
         run: |
-          pip install --upgrade pipenv
-          pipenv install --system --dev --ignore-pipfile
+          pipenv sync --dev
       -
         name: Make documentation
         run: |
           cd docs/
-          make html
+          pipenv run make html
       -
         name: Upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: documentation
           path: docs/_build/html/
 
-  codestyle:
+  ci-backend:
+    uses: ./.github/workflows/reusable-ci-backend.yml
+
+  ci-frontend:
+    uses: ./.github/workflows/reusable-ci-frontend.yml
+
+  prepare-docker-build:
+    name: Prepare Docker Pipeline Data
+    if: github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/feature-') || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/beta' || contains(github.ref, 'beta.rc') || startsWith(github.ref, 'refs/tags/v'))
     runs-on: ubuntu-20.04
+    needs:
+      - documentation
+      - ci-backend
+      - ci-frontend
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       -
         name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
-          python-version: 3.9
+          python-version: "3.9"
       -
-        name: Get pip cache dir
-        id: pip-cache
+        name: Setup qpdf image
+        id: qpdf-setup
         run: |
-          echo "::set-output name=dir::$(pip cache dir)"
-      -
-        name: Persistent Github pip cache
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.pip-cache.outputs.dir }}
-          key: ${{ runner.os }}-pip${{ matrix.python-version }}
-      -
-        name: Install dependencies
-        run: |
-          pip install --upgrade pipenv
-          pipenv install --system --dev --ignore-pipfile
-      -
-        name: Codestyle
-        run: |
-          cd src/
-          pycodestyle
-  whitespace:
-    runs-on: ubuntu-20.04
-    steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v2
-      -
-        name: Ensure there are no trailing spaces
-        run: |
-          .github/workflow-scripts/check-trailing-whitespace
-      -
-        name: Ensure all text files end with a trailing newline
-        run: |
-          .github/workflow-scripts/check-trailing-whitespace
+          build_json=$(python ${GITHUB_WORKSPACE}/.github/scripts/get-build-json.py qpdf)
 
-  tests:
-    runs-on: ubuntu-20.04
-    strategy:
-      matrix:
-        python-version: ['3.7', '3.8', '3.9']
-      fail-fast: false
-    steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v2
-      -
-        name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: "${{ matrix.python-version }}"
-      -
-        name: Get pip cache dir
-        id: pip-cache
-        run: |
-          echo "::set-output name=dir::$(pip cache dir)"
-      -
-        name: Persistent Github pip cache
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.pip-cache.outputs.dir }}
-          key: ${{ runner.os }}-pip${{ matrix.python-version }}
-      -
-        name: Install dependencies
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -qq --no-install-recommends unpaper tesseract-ocr imagemagick ghostscript optipng
-          pip install --upgrade pipenv
-          pipenv install --system --dev --ignore-pipfile
-      -
-        name: Tests
-        run: |
-          cd src/
-          pytest
-      -
-        name: Publish coverage results
-        if: matrix.python-version == '3.9'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        # https://github.com/coveralls-clients/coveralls-python/issues/251
-        run: |
-          cd src/
-          coveralls --service=github
+          echo ${build_json}
 
-  frontend:
-    runs-on: ubuntu-20.04
-    steps:
-    -
-      name: Checkout
-      uses: actions/checkout@v2
-    -
-      uses: actions/setup-node@v2
-      with:
-        node-version: '15'
-    -
-      name: Configure version on dev branches
-      if: startsWith(github.ref, 'refs/heads/feature-') || github.ref == 'refs/heads/dev'
-      run: |
-        git_hash=$(git rev-parse --short "$GITHUB_SHA")
-        git_branch=${GITHUB_REF#refs/heads/}
-        sed -i -E "s/version: \"(.*)\"/version: \"${git_branch} ${git_hash}\"/g" src-ui/src/environments/environment.prod.ts
-    -
-      name: Build frontend
-      run: ./compile-frontend.sh
-    -
-      name: Upload artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: frontend-compiled
-        path: src/documents/static/frontend/
+          echo ::set-output name=qpdf-json::${build_json}
+      -
+        name: Setup psycopg2 image
+        id: psycopg2-setup
+        run: |
+          build_json=$(python ${GITHUB_WORKSPACE}/.github/scripts/get-build-json.py psycopg2)
 
-  build-release:
-    needs: [frontend, documentation, tests, whitespace, codestyle]
-    runs-on: ubuntu-20.04
-    steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v2
-      -
-        name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.9
-      -
-        name: Install dependencies
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -qq --no-install-recommends gettext liblept5
-          pip3 install -r requirements.txt
-      -
-        name: Download frontend artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: frontend-compiled
-          path: src/documents/static/frontend/
-      -
-        name: Download documentation artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: documentation
-          path: docs/_build/html/
-      -
-        name: Move files
-        run: |
-          mkdir dist
-          mkdir dist/paperless-ng
-          mkdir dist/paperless-ng/scripts
-          cp .dockerignore .env Dockerfile Pipfile Pipfile.lock LICENSE README.md requirements.txt dist/paperless-ng/
-          cp paperless.conf.example dist/paperless-ng/paperless.conf
-          cp gunicorn.conf.py dist/paperless-ng/gunicorn.conf.py
-          cp docker/ dist/paperless-ng/docker -r
-          cp scripts/*.service scripts/*.sh dist/paperless-ng/scripts/
-          cp src/ dist/paperless-ng/src -r
-          cp docs/_build/html/ dist/paperless-ng/docs -r
-      -
-        name: Compile messages
-        run: |
-          cd dist/paperless-ng/src
-          python3 manage.py compilemessages
-      -
-        name: Collect static files
-        run: |
-          cd dist/paperless-ng/src
-          python3 manage.py collectstatic --no-input
-      -
-        name: Make release package
-        run: |
-          cd dist
-          find . -name __pycache__ | xargs rm -r
-          tar -cJf paperless-ng.tar.xz paperless-ng/
-      -
-        name: Upload release artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: release
-          path: dist/paperless-ng.tar.xz
+          echo ${build_json}
 
-  publish-release:
-    runs-on: ubuntu-latest
-    needs: build-release
-    if: contains(github.ref, 'refs/tags/ng-')
-    steps:
+          echo ::set-output name=psycopg2-json::${build_json}
       -
-        name: Download release artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: release
-          path: ./
-      -
-        name: Get version
-        id: get_version
+        name: Setup pikepdf image
+        id: pikepdf-setup
         run: |
-          echo ::set-output name=version::${GITHUB_REF#refs/tags/ng-}
+          build_json=$(python ${GITHUB_WORKSPACE}/.github/scripts/get-build-json.py pikepdf)
+
+          echo ${build_json}
+
+          echo ::set-output name=pikepdf-json::${build_json}
       -
-        name: Create release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ng-${{ steps.get_version.outputs.version }}
-          release_name: Paperless-ng ${{ steps.get_version.outputs.version }}
-          draft: false
-          prerelease: false
-          body: |
-            For a complete list of changes, see the changelog at https://paperless-ng.readthedocs.io/en/latest/changelog.html.
-      -
-        name: Upload release archive
-        id: upload-release-asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-          asset_path: ./paperless-ng.tar.xz
-          asset_name: paperless-ng-${{ steps.get_version.outputs.version }}.tar.xz
-          asset_content_type: application/x-xz
+        name: Setup jbig2enc image
+        id: jbig2enc-setup
+        run: |
+          build_json=$(python ${GITHUB_WORKSPACE}/.github/scripts/get-build-json.py jbig2enc)
+
+          echo ${build_json}
+
+          echo ::set-output name=jbig2enc-json::${build_json}
+
+    outputs:
+
+      qpdf-json: ${{ steps.qpdf-setup.outputs.qpdf-json }}
+
+      pikepdf-json: ${{ steps.pikepdf-setup.outputs.pikepdf-json }}
+
+      psycopg2-json: ${{ steps.psycopg2-setup.outputs.psycopg2-json }}
+
+      jbig2enc-json: ${{ steps.jbig2enc-setup.outputs.jbig2enc-json}}
+
+  build-qpdf-debs:
+    name: qpdf
+    needs:
+      - prepare-docker-build
+    uses: ./.github/workflows/reusable-workflow-builder.yml
+    with:
+      dockerfile: ./docker-builders/Dockerfile.qpdf
+      build-json: ${{ needs.prepare-docker-build.outputs.qpdf-json }}
+      build-args: |
+        QPDF_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.qpdf-json).version }}
+
+  build-jbig2enc:
+    name: jbig2enc
+    needs:
+      - prepare-docker-build
+    uses: ./.github/workflows/reusable-workflow-builder.yml
+    with:
+      dockerfile: ./docker-builders/Dockerfile.jbig2enc
+      build-json: ${{ needs.prepare-docker-build.outputs.jbig2enc-json }}
+      build-args: |
+        JBIG2ENC_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.jbig2enc-json).version }}
+
+  build-psycopg2-wheel:
+    name: psycopg2
+    needs:
+      - prepare-docker-build
+    uses: ./.github/workflows/reusable-workflow-builder.yml
+    with:
+      dockerfile: ./docker-builders/Dockerfile.psycopg2
+      build-json: ${{ needs.prepare-docker-build.outputs.psycopg2-json }}
+      build-args: |
+        PSYCOPG2_GIT_TAG=${{ fromJSON(needs.prepare-docker-build.outputs.psycopg2-json).git_tag }}
+        PSYCOPG2_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.psycopg2-json).version }}
+
+  build-pikepdf-wheel:
+    name: pikepdf
+    needs:
+      - prepare-docker-build
+      - build-qpdf-debs
+    uses: ./.github/workflows/reusable-workflow-builder.yml
+    with:
+      dockerfile: ./docker-builders/Dockerfile.pikepdf
+      build-json: ${{ needs.prepare-docker-build.outputs.pikepdf-json }}
+      build-args: |
+        REPO=${{ github.repository }}
+        QPDF_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.qpdf-json).version }}
+        PIKEPDF_GIT_TAG=${{ fromJSON(needs.prepare-docker-build.outputs.pikepdf-json).git_tag }}
+        PIKEPDF_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.pikepdf-json).version }}
 
   # build and push image to docker hub.
   build-docker-image:
-    if: github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/feature-') || github.ref == 'refs/heads/dev' || startsWith(github.ref, 'refs/tags/ng-'))
-    runs-on: ubuntu-latest
-    needs: [frontend, tests, whitespace, codestyle]
+    runs-on: ubuntu-20.04
+    concurrency:
+      group: ${{ github.workflow }}-build-docker-image-${{ github.ref_name }}
+      cancel-in-progress: true
+    needs:
+      - prepare-docker-build
+      - build-psycopg2-wheel
+      - build-jbig2enc
+      - build-qpdf-debs
+      - build-pikepdf-wheel
     steps:
       -
-        name: Prepare
-        id: prepare
+        name: Check pushing to Docker Hub
+        id: docker-hub
+        # Only push to Dockerhub from the main repo
+        # Otherwise forks would require a Docker Hub account and secrets setup
         run: |
-          IMAGE_NAME=jonaswinkler/paperless-ng
-          if [[ $GITHUB_REF == refs/tags/ng-* ]]; then
-            TAGS=${IMAGE_NAME}:${GITHUB_REF#refs/tags/ng-},${IMAGE_NAME}:latest
-            INSPECT_TAG=${IMAGE_NAME}:latest
-          elif [[ $GITHUB_REF == refs/heads/* ]]; then
-            TAGS=${IMAGE_NAME}:${GITHUB_REF#refs/heads/}
-            INSPECT_TAG=${TAGS}
+          if [[ ${{ github.repository }} == "paperless-ngx/paperless-ngx" ]] ; then
+            echo ::set-output name=enable::"true"
           else
-            exit 1
+            echo ::set-output name=enable::"false"
           fi
-          echo ::set-output name=tags::${TAGS}
-          echo ::set-output name=inspect_tag::${INSPECT_TAG}
+      -
+        name: Gather Docker metadata
+        id: docker-meta
+        uses: docker/metadata-action@v3
+        with:
+          images: |
+            ghcr.io/${{ github.repository }}
+            name=paperlessngx/paperless-ngx,enable=${{ steps.docker-hub.outputs.enable }}
+          tags: |
+            # Tag branches with branch name
+            type=ref,event=branch
+            # Process semver tags
+            # For a tag x.y.z or vX.Y.Z, output an x.y.z and x.y image tag
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
       -
         name: Checkout
-        uses: actions/checkout@v2
-      -
-        name: Download frontend artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: frontend-compiled
-          path: src/documents/static/frontend/
+        uses: actions/checkout@v3
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
@@ -316,19 +215,20 @@ jobs:
         name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       -
-        name: Cache Docker layers
-        uses: actions/cache@v2
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
-      -
-        name: Login to DockerHub
+        name: Login to Github Container Registry
         uses: docker/login-action@v1
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      -
+        name: Login to Docker Hub
+        uses: docker/login-action@v1
+        # Don't attempt to login is not pushing to Docker Hub
+        if: steps.docker-hub.outputs.enable == 'true'
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
         name: Build and push
         uses: docker/build-push-action@v2
@@ -336,11 +236,166 @@ jobs:
           context: .
           file: ./Dockerfile
           platforms: linux/amd64,linux/arm/v7,linux/arm64
-          push: true
-          tags: ${{ steps.prepare.outputs.tags }}
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.docker-meta.outputs.tags }}
+          labels: ${{ steps.docker-meta.outputs.labels }}
+          build-args: |
+            JBIG2ENC_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.jbig2enc-json).version }}
+            QPDF_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.qpdf-json).version }}
+            PIKEPDF_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.pikepdf-json).version }}
+            PSYCOPG2_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.psycopg2-json).version }}
+          # Get cache layers from this branch, then dev, then main
+          # This allows new branches to get at least some cache benefits, generally from dev
+          cache-from: |
+            type=registry,ref=ghcr.io/${{ github.repository }}/builder/cache/app:${{ github.ref_name }}
+            type=registry,ref=ghcr.io/${{ github.repository }}/builder/cache/app:dev
+            type=registry,ref=ghcr.io/${{ github.repository }}/builder/cache/app:main
+          cache-to: |
+            type=registry,mode=max,ref=ghcr.io/${{ github.repository }}/builder/cache/app:${{ github.ref_name }}
       -
         name: Inspect image
         run: |
-          docker buildx imagetools inspect ${{ steps.prepare.outputs.inspect_tag }}
+          docker buildx imagetools inspect ${{ fromJSON(steps.docker-meta.outputs.json).tags[0] }}
+      -
+        name: Export frontend artifact from docker
+        run: |
+          docker create --name frontend-extract ${{ fromJSON(steps.docker-meta.outputs.json).tags[0] }}
+          docker cp frontend-extract:/usr/src/paperless/src/documents/static/frontend src/documents/static/frontend/
+      -
+        name: Upload frontend artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: frontend-compiled
+          path: src/documents/static/frontend/
+
+  build-release:
+    needs:
+      - build-docker-image
+    runs-on: ubuntu-20.04
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.9
+      -
+        name: Install dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -qq --no-install-recommends gettext liblept5
+          pip3 install --upgrade pip setuptools wheel
+          pip3 install -r requirements.txt
+      -
+        name: Download frontend artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: frontend-compiled
+          path: src/documents/static/frontend/
+      -
+        name: Download documentation artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: documentation
+          path: docs/_build/html/
+      -
+        name: Move files
+        run: |
+          mkdir dist
+          mkdir dist/paperless-ngx
+          mkdir dist/paperless-ngx/scripts
+          cp .dockerignore .env Dockerfile Pipfile Pipfile.lock LICENSE README.md requirements.txt dist/paperless-ngx/
+          cp paperless.conf.example dist/paperless-ngx/paperless.conf
+          cp gunicorn.conf.py dist/paperless-ngx/gunicorn.conf.py
+          cp docker/ dist/paperless-ngx/docker -r
+          cp scripts/*.service scripts/*.sh dist/paperless-ngx/scripts/
+          cp src/ dist/paperless-ngx/src -r
+          cp docs/_build/html/ dist/paperless-ngx/docs -r
+      -
+        name: Compile messages
+        run: |
+          cd dist/paperless-ngx/src
+          python3 manage.py compilemessages
+      -
+        name: Collect static files
+        run: |
+          cd dist/paperless-ngx/src
+          python3 manage.py collectstatic --no-input
+      -
+        name: Make release package
+        run: |
+          cd dist
+          find . -name __pycache__ | xargs rm -r
+          tar -cJf paperless-ngx.tar.xz paperless-ngx/
+      -
+        name: Upload release artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: release
+          path: dist/paperless-ngx.tar.xz
+
+  publish-release:
+    runs-on: ubuntu-20.04
+    needs:
+      - build-release
+    if: github.ref_type == 'tag' && (startsWith(github.ref_name, 'v') || contains(github.ref_name, '-beta.rc'))
+    steps:
+      -
+        name: Download release artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: release
+          path: ./
+      -
+        name: Get version
+        id: get_version
+        run: |
+          echo ::set-output name=version::${{ github.ref_name }}
+          if [[ ${{ contains(github.ref_name, '-beta.rc') }} == 'true' ]]; then
+            echo ::set-output name=prerelease::true
+          else
+            echo ::set-output name=prerelease::false
+          fi
+      -
+        name: Create Release and Changelog
+        id: create-release
+        uses: release-drafter/release-drafter@v5
+        with:
+          name: Paperless-ngx ${{ steps.get_version.outputs.version }}
+          tag: ${{ steps.get_version.outputs.version }}
+          version: ${{ steps.get_version.outputs.version }}
+          prerelease: ${{ steps.get_version.outputs.prerelease }}
+          publish: true # ensures release is not marked as draft
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      -
+        name: Upload release archive
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create-release.outputs.upload_url }}
+          asset_path: ./paperless-ngx.tar.xz
+          asset_name: paperless-ngx-${{ steps.get_version.outputs.version }}.tar.xz
+          asset_content_type: application/x-xz
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: main
+      -
+        name: Append Changelog to docs
+        id: append-Changelog
+        working-directory: docs
+        run: |
+          echo -e "# Changelog\n\n${{ steps.create-release.outputs.body }}\n" > changelog-new.md
+          CURRENT_CHANGELOG=`tail --lines +2 changelog.md`
+          echo -e "$CURRENT_CHANGELOG" >> changelog-new.md
+          mv changelog-new.md changelog.md
+          git config --global user.name "github-actions"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "Changelog ${{ steps.get_version.outputs.version }} - GHA"
+          git push origin HEAD:main

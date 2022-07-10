@@ -64,9 +64,9 @@ Updating Paperless
 Docker Route
 ============
 
-If a new release of paperless-ng is available, upgrading depends on how you
-installed paperless-ng in the first place. The releases are available at the
-`release page <https://github.com/jonaswinkler/paperless-ng/releases>`_.
+If a new release of paperless-ngx is available, upgrading depends on how you
+installed paperless-ngx in the first place. The releases are available at the
+`release page <https://github.com/paperless-ngx/paperless-ngx/releases>`_.
 
 First of all, ensure that paperless is stopped.
 
@@ -92,31 +92,47 @@ B.  If you built the image yourself, do the following:
     .. code:: shell-session
 
         $ git pull
-        $ ./compile-frontend.sh
         $ docker-compose build
         $ docker-compose up
 
 Running ``docker-compose up`` will also apply any new database migrations.
 If you see everything working, press CTRL+C once to gracefully stop paperless.
-Then you can start paperless-ng with ``-d`` to have it run in the background.
+Then you can start paperless-ngx with ``-d`` to have it run in the background.
 
     .. note::
 
         In version 0.9.14, the update process was changed. In 0.9.13 and earlier, the
         docker-compose files specified exact versions and pull won't automatically
         update to newer versions. In order to enable updates as described above, either
-        get the new ``docker-compose.yml`` file from `here <https://github.com/jonaswinkler/paperless-ng/tree/master/docker/compose>`_
+        get the new ``docker-compose.yml`` file from `here <https://github.com/paperless-ngx/paperless-ngx/tree/master/docker/compose>`_
         or edit the ``docker-compose.yml`` file, find the line that says
 
             .. code::
 
-                image: jonaswinkler/paperless-ng:0.9.x
+                image: ghcr.io/paperless-ngx/paperless-ngx:0.9.x
 
         and replace the version with ``latest``:
 
             .. code::
 
-                image: jonaswinkler/paperless-ng:latest
+                image: ghcr.io/paperless-ngx/paperless-ngx:latest
+
+    .. note::
+        In version 1.7.1 and onwards, the Docker image can now be pinned to a release series.
+        This is often combined with automatic updaters such as Watchtower to allow safer
+        unattended upgrading to new bugfix releases only.  It is still recommended to always
+        review release notes before upgrading.  To pin your install to a release series, edit
+        the ``docker-compose.yml`` find the line that says
+
+            .. code::
+
+                image: ghcr.io/paperless-ngx/paperless-ngx:latest
+
+        and replace the version with the series you want to track, for example:
+
+            .. code::
+
+                image: ghcr.io/paperless-ngx/paperless-ngx:1.7
 
 Bare Metal Route
 ================
@@ -143,32 +159,6 @@ After grabbing the new release and unpacking the contents, do the following:
 
     This might not actually do anything. Not every new paperless version comes with new
     database migrations.
-
-Ansible Route
-=============
-
-Most of the update process is automated when using the ansible role.
-
-1.  Update the role to the target release tag to make sure the ansible scripts are compatible:
-
-    .. code:: shell-session
-
-        $ ansible-galaxy install git+https://github.com/jonaswinkler/paperless-ng.git,master --force
-
-2.  Update the role variable definitions ``vars/paperless-ng.yml`` (where appropriate).
-
-3.  Run the ansible playbook you created created during :ref:`installation <setup-ansible>` again:
-
-    .. note::
-
-        When ansible detects that an update run is in progress, it backs up the entire ``paperlessng_directory`` to ``paperlessng_directory-TIMESTAMP``.
-        Updates can be rolled back by simply moving the timestamped folder back to the original location.
-        If the update succeeds and you want to continue using the new release, please don't forget to delete the backup folder.
-
-    .. code:: shell-session
-
-        $ ansible-playbook playbook.yml
-
 
 Downgrading Paperless
 #####################
@@ -396,8 +386,8 @@ the naming scheme.
 
 .. warning::
 
-    Since this command moves you documents around alot, it is advised to to
-    a backup before. The renaming logic is robust and will never overwrite
+    Since this command moves your documents, it is advised to do
+    a backup beforehand. The renaming logic is robust and will never overwrite
     or delete a file, but you can't ever be careful enough.
 
 .. code::
@@ -405,6 +395,8 @@ the naming scheme.
     document_renamer
 
 The command takes no arguments and processes all your documents at once.
+
+Learn how to use :ref:`Management Utilities<utilities-management-commands>`.
 
 
 .. _utilities-sanity-checker:
@@ -493,7 +485,7 @@ Documents can be stored in Paperless using GnuPG encryption.
 
 .. danger::
 
-    Encryption is deprecated since paperless-ng 0.9 and doesn't really provide any
+    Encryption is deprecated since paperless-ngx 0.9 and doesn't really provide any
     additional security, since you have to store the passphrase in a configuration
     file on the same system as the encrypted documents for paperless to work.
     Furthermore, the entire text content of the documents is stored plain in the

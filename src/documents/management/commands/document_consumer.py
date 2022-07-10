@@ -1,17 +1,20 @@
 import logging
 import os
-from pathlib import Path, PurePath
+from pathlib import Path
+from pathlib import PurePath
 from threading import Thread
+from time import monotonic
 from time import sleep
+from typing import Final
 
 from django.conf import settings
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
+from django.core.management.base import CommandError
 from django_q.tasks import async_task
-from watchdog.events import FileSystemEventHandler
-from watchdog.observers.polling import PollingObserver
-
 from documents.models import Tag
 from documents.parsers import is_file_ext_supported
+from watchdog.events import FileSystemEventHandler
+from watchdog.observers.polling import PollingObserver
 
 try:
     from inotifyrecursive import INotify, flags
@@ -23,24 +26,21 @@ logger = logging.getLogger("paperless.management.consumer")
 
 def _tags_from_path(filepath):
     """Walk up the directory tree from filepath to CONSUMPTION_DIR
-       and get or create Tag IDs for every directory.
+    and get or create Tag IDs for every directory.
     """
     tag_ids = set()
-    path_parts = Path(filepath).relative_to(
-                settings.CONSUMPTION_DIR).parent.parts
+    path_parts = Path(filepath).relative_to(settings.CONSUMPTION_DIR).parent.parts
     for part in path_parts:
-        tag_ids.add(Tag.objects.get_or_create(name__iexact=part, defaults={
-            "name": part
-        })[0].pk)
+        tag_ids.add(
+            Tag.objects.get_or_create(name__iexact=part, defaults={"name": part})[0].pk,
+        )
 
     return tag_ids
 
 
 def _is_ignored(filepath: str) -> bool:
-    filepath_relative = PurePath(filepath).relative_to(
-        settings.CONSUMPTION_DIR)
-    return any(
-        filepath_relative.match(p) for p in settings.CONSUMER_IGNORE_PATTERNS)
+    filepath_relative = PurePath(filepath).relative_to(settings.CONSUMPTION_DIR)
+    return any(filepath_relative.match(p) for p in settings.CONSUMER_IGNORE_PATTERNS)
 
 
 def _consume(filepath):
@@ -48,29 +48,48 @@ def _consume(filepath):
         return
 
     if not os.path.isfile(filepath):
-        logger.debug(
-            f"Not consuming file {filepath}: File has moved.")
+        logger.debug(f"Not consuming file {filepath}: File has moved.")
         return
 
     if not is_file_ext_supported(os.path.splitext(filepath)[1]):
-        logger.warning(
-            f"Not consuming file {filepath}: Unknown file extension.")
+        logger.warning(f"Not consuming file {filepath}: Unknown file extension.")
+        return
+
+    # Total wait time: up to 500ms
+    os_error_retry_count: Final[int] = 50
+    os_error_retry_wait: Final[float] = 0.01
+
+    read_try_count = 0
+    file_open_ok = False
+
+    while (read_try_count < os_error_retry_count) and not file_open_ok:
+        try:
+            with open(filepath, "rb"):
+                file_open_ok = True
+        except OSError:
+            read_try_count += 1
+            sleep(os_error_retry_wait)
+
+    if read_try_count >= os_error_retry_count:
+        logger.warning(f"Not consuming file {filepath}: OS reports file as busy still")
         return
 
     tag_ids = None
     try:
         if settings.CONSUMER_SUBDIRS_AS_TAGS:
             tag_ids = _tags_from_path(filepath)
-    except Exception as e:
+    except Exception:
         logger.exception("Error creating tags from path")
 
     try:
         logger.info(f"Adding {filepath} to the task queue.")
-        async_task("documents.tasks.consume_file",
-                   filepath,
-                   override_tag_ids=tag_ids if tag_ids else None,
-                   task_name=os.path.basename(filepath)[:100])
-    except Exception as e:
+        async_task(
+            "documents.tasks.consume_file",
+            filepath,
+            override_tag_ids=tag_ids if tag_ids else None,
+            task_name=os.path.basename(filepath)[:100],
+        )
+    except Exception:
         # Catch all so that the consumer won't crash.
         # This is also what the test case is listening for to check for
         # errors.
@@ -83,18 +102,23 @@ def _consume_wait_unmodified(file):
 
     logger.debug(f"Waiting for file {file} to remain unmodified")
     mtime = -1
+    size = -1
     current_try = 0
     while current_try < settings.CONSUMER_POLLING_RETRY_COUNT:
         try:
-            new_mtime = os.stat(file).st_mtime
+            stat_data = os.stat(file)
+            new_mtime = stat_data.st_mtime
+            new_size = stat_data.st_size
         except FileNotFoundError:
-            logger.debug(f"File {file} moved while waiting for it to remain "
-                         f"unmodified.")
+            logger.debug(
+                f"File {file} moved while waiting for it to remain " f"unmodified.",
+            )
             return
-        if new_mtime == mtime:
+        if new_mtime == mtime and new_size == size:
             _consume(file)
             return
         mtime = new_mtime
+        size = new_size
         sleep(settings.CONSUMER_POLLING_DELAY)
         current_try += 1
 
@@ -102,16 +126,11 @@ def _consume_wait_unmodified(file):
 
 
 class Handler(FileSystemEventHandler):
-
     def on_created(self, event):
-        Thread(
-            target=_consume_wait_unmodified, args=(event.src_path,)
-        ).start()
+        Thread(target=_consume_wait_unmodified, args=(event.src_path,)).start()
 
     def on_moved(self, event):
-        Thread(
-            target=_consume_wait_unmodified, args=(event.dest_path,)
-        ).start()
+        Thread(target=_consume_wait_unmodified, args=(event.dest_path,)).start()
 
 
 class Command(BaseCommand):
@@ -130,26 +149,19 @@ class Command(BaseCommand):
             "directory",
             default=settings.CONSUMPTION_DIR,
             nargs="?",
-            help="The consumption directory."
+            help="The consumption directory.",
         )
-        parser.add_argument(
-            "--oneshot",
-            action="store_true",
-            help="Run only once."
-        )
+        parser.add_argument("--oneshot", action="store_true", help="Run only once.")
 
     def handle(self, *args, **options):
         directory = options["directory"]
         recursive = settings.CONSUMER_RECURSIVE
 
         if not directory:
-            raise CommandError(
-                "CONSUMPTION_DIR does not appear to be set."
-            )
+            raise CommandError("CONSUMPTION_DIR does not appear to be set.")
 
         if not os.path.isdir(directory):
-            raise CommandError(
-                f"Consumption directory {directory} does not exist")
+            raise CommandError(f"Consumption directory {directory} does not exist")
 
         if recursive:
             for dirpath, _, filenames in os.walk(directory):
@@ -171,8 +183,7 @@ class Command(BaseCommand):
         logger.debug("Consumer exiting.")
 
     def handle_polling(self, directory, recursive):
-        logger.info(
-            f"Polling directory for changes: {directory}")
+        logger.info(f"Polling directory for changes: {directory}")
         self.observer = PollingObserver(timeout=settings.CONSUMER_POLLING)
         self.observer.schedule(Handler(), directory, recursive=recursive)
         self.observer.start()
@@ -186,8 +197,7 @@ class Command(BaseCommand):
         self.observer.join()
 
     def handle_inotify(self, directory, recursive):
-        logger.info(
-            f"Using inotify to watch directory for changes: {directory}")
+        logger.info(f"Using inotify to watch directory for changes: {directory}")
 
         inotify = INotify()
         inotify_flags = flags.CLOSE_WRITE | flags.MOVED_TO
@@ -197,14 +207,32 @@ class Command(BaseCommand):
             descriptor = inotify.add_watch(directory, inotify_flags)
 
         try:
+
+            inotify_debounce: Final[float] = 0.5
+            notified_files = {}
+
             while not self.stop_flag:
+
                 for event in inotify.read(timeout=1000):
                     if recursive:
                         path = inotify.get_path(event.wd)
                     else:
                         path = directory
                     filepath = os.path.join(path, event.name)
-                    _consume(filepath)
+                    notified_files[filepath] = monotonic()
+
+                # Check the files against the timeout
+                still_waiting = {}
+                for filepath in notified_files:
+                    # Time of the last inotify event for this file
+                    last_event_time = notified_files[filepath]
+                    if (monotonic() - last_event_time) > inotify_debounce:
+                        _consume(filepath)
+                    else:
+                        still_waiting[filepath] = last_event_time
+                # These files are still waiting to hit the timeout
+                notified_files = still_waiting
+
         except KeyboardInterrupt:
             pass
 

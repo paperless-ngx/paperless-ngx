@@ -1,8 +1,8 @@
 import os
 
 from django.conf import settings
-from django.core.management.base import BaseCommand, CommandError
-
+from django.core.management.base import BaseCommand
+from django.core.management.base import CommandError
 from documents.models import Document
 from paperless.db import GnuPG
 from smart_open import open
@@ -20,7 +20,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--passphrase",
             help="If PAPERLESS_PASSPHRASE isn't set already, you need to "
-                 "specify it here"
+            "specify it here",
         )
 
     def handle(self, *args, **options):
@@ -32,9 +32,9 @@ class Command(BaseCommand):
                 "this unless you've got a recent backup\nWARNING: handy.  It "
                 "*should* work without a hitch, but be safe and backup your\n"
                 "WARNING: stuff first.\n\nHit Ctrl+C to exit now, or Enter to "
-                "continue.\n\n"
+                "continue.\n\n",
             )
-            __ = input()
+            _ = input()
         except KeyboardInterrupt:
             return
 
@@ -42,7 +42,7 @@ class Command(BaseCommand):
         if not passphrase:
             raise CommandError(
                 "Passphrase not defined.  Please set it with --passphrase or "
-                "by declaring it in your environment or your config."
+                "by declaring it in your environment or your config.",
             )
 
         self.__gpg_to_unencrypted(passphrase)
@@ -51,26 +51,29 @@ class Command(BaseCommand):
     def __gpg_to_unencrypted(passphrase):
 
         encrypted_files = Document.objects.filter(
-            storage_type=Document.STORAGE_TYPE_GPG)
+            storage_type=Document.STORAGE_TYPE_GPG,
+        )
 
         for document in encrypted_files:
 
-            print("Decrypting {}".format(
-                document).encode('utf-8'))
+            print(f"Decrypting {document}".encode())
 
             old_paths = [document.source_path, document.thumbnail_path]
 
-            raw_document = GnuPG.decrypted(document.source_file, passphrase)
-            raw_thumb = GnuPG.decrypted(document.thumbnail_file, passphrase)
+            with document.source_file as file_handle:
+                raw_document = GnuPG.decrypted(file_handle, passphrase)
+            with document.thumbnail_file as file_handle:
+                raw_thumb = GnuPG.decrypted(file_handle, passphrase)
 
             document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
 
             ext = os.path.splitext(document.filename)[1]
 
-            if not ext == '.gpg':
+            if not ext == ".gpg":
                 raise CommandError(
                     f"Abort: encrypted file {document.source_path} does not "
-                    f"end with .gpg")
+                    f"end with .gpg",
+                )
 
             document.filename = os.path.splitext(document.filename)[0]
 
@@ -81,7 +84,9 @@ class Command(BaseCommand):
                 f.write(raw_thumb)
 
             Document.objects.filter(id=document.id).update(
-                storage_type=document.storage_type, filename=document.filename)
+                storage_type=document.storage_type,
+                filename=document.filename,
+            )
 
             for path in old_paths:
                 os.unlink(path)

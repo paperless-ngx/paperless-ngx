@@ -24,7 +24,7 @@ Each document has a couple of fields that you can assign to them:
 * A *Document* is a piece of paper that sometimes contains valuable
   information.
 * The *correspondent* of a document is the person, institution or company that
-  a document either originates form, or is sent to.
+  a document either originates from, or is sent to.
 * A *tag* is a label that you can assign to documents. Think of labels as more
   powerful folders: Multiple documents can be grouped together with a single
   tag, however, a single document can also have multiple tags. This is not
@@ -62,7 +62,7 @@ your documents:
 
 1.  OCR the document, if it has no text. Digital documents usually have text,
     and this step will be skipped for those documents.
-2.  Paperless will create an archiveable PDF/A document from your document.
+2.  Paperless will create an archivable PDF/A document from your document.
     If this document is coming from your scanner, it will have embedded selectable text.
 3.  Paperless performs automatic matching of tags, correspondents and types on the
     document before storing it in the database.
@@ -86,10 +86,9 @@ The consumption directory
 =========================
 
 The primary method of getting documents into your database is by putting them in
-the consumption directory.  The consumer runs in an infinite
-loop looking for new additions to this directory and when it finds them, it goes
-about the process of parsing them with the OCR, indexing what it finds, and storing
-it in the media directory.
+the consumption directory.  The consumer runs in an infinite loop, looking for new
+additions to this directory. When it finds them, the consumer goes about the process
+of parsing them with the OCR, indexing what it finds, and storing it in the media directory.
 
 Getting stuff into this directory is up to you.  If you're running Paperless
 on your local computer, you might just want to drag and drop files there, but if
@@ -103,12 +102,14 @@ files from the scanner.  Typically, you're looking at an FTP server like
 
 .. TODO: hyperref to configuration of the location of this magic folder.
 
-Dashboard upload
-================
+Web UI Upload
+=============
 
 The dashboard has a file drop field to upload documents to paperless. Simply drag a file
 onto this field or select a file with the file dialog. Multiple files are supported.
 
+You can also upload documents on any other page of the web UI by dragging-and-dropping
+files into your browser window.
 
 .. _usage-mobile_upload:
 
@@ -127,7 +128,7 @@ which not only has document upload, but also document browsing and download feat
 IMAP (Email)
 ============
 
-You can tell paperless-ng to consume documents from your email accounts.
+You can tell paperless-ngx to consume documents from your email accounts.
 This is a very flexible and powerful feature, if you regularly received documents
 via mail that you need to archive. The mail consumer can be configured by using the
 admin interface in the following manner:
@@ -178,6 +179,15 @@ These are as follows:
     your favorite mail client to move to be consumed mails into that folder
     automatically or manually and tell paperless to move them to yet another folder
     after consumption. It's up to you.
+
+.. note::
+
+    When defining a mail rule with a folder, you may need to try different characters to
+    define how the sub-folders are separated.  Common values include ".", "/" or "|", but
+    this varies by the mail server.  Check the documentation for your mail server.  In the
+    event of an error fetching mail from a certain folder, check the Paperless logs.  When
+    a folder is not located, Paperless will attempt to list all folders found in the account
+    to the Paperless logs.
 
 .. note::
 
@@ -396,7 +406,7 @@ Task management
 
 Some documents require attention and require you to act on the document. You
 may take two different approaches to handle these documents based on how
-regularly you intent to use paperless and scan documents.
+regularly you intend to scan documents and use paperless.
 
 * If you scan and process your documents in paperless regularly, assign a
   TODO tag to all scanned documents that you need to process. Create a saved

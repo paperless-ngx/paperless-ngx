@@ -10,19 +10,33 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Document',
+            name="Document",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('sender', models.CharField(blank=True, db_index=True, max_length=128)),
-                ('title', models.CharField(blank=True, db_index=True, max_length=128)),
-                ('content', models.TextField(db_index=("mysql" not in settings.DATABASES["default"]["ENGINE"]))),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('modified', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("sender", models.CharField(blank=True, db_index=True, max_length=128)),
+                ("title", models.CharField(blank=True, db_index=True, max_length=128)),
+                (
+                    "content",
+                    models.TextField(
+                        db_index=(
+                            "mysql" not in settings.DATABASES["default"]["ENGINE"]
+                        )
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("modified", models.DateTimeField(auto_now=True)),
             ],
         ),
     ]

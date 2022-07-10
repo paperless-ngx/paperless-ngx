@@ -9,35 +9,36 @@ verify_ssl = true
 name = "piwheels"
 
 [packages]
-dateparser = "~=1.0.0"
-django = "~=3.2"
+dateparser = "~=1.1"
+django = "~=4.0"
 django-cors-headers = "*"
 django-extensions = "*"
-django-filter = "~=2.4.0"
-django-q = "~=1.3.4"
-djangorestframework = "~=3.12.2"
+django-filter = "~=21.1"
+django-q = "~=1.3"
+djangorestframework = "~=3.13"
 filelock = "*"
 fuzzywuzzy = {extras = ["speedup"], version = "*"}
 gunicorn = "*"
-imap-tools = "*"
+imap-tools = "~=0.54.0"
 langdetect = "*"
-numpy = "~=1.20.0"
 pathvalidate = "*"
-pillow = "~=8.1"
-pikepdf = "~=2.5"
+pillow = "~=9.1"
+# Any version update to pikepdf requires a base image update
+pikepdf = "~=5.1"
 python-gnupg = "*"
 python-dotenv = "*"
 python-dateutil = "*"
 python-magic = "*"
-psycopg2-binary = "*"
+# Any version update to psycopg2 requires a base image update
+psycopg2 = "*"
 redis = "*"
 # Pinned because aarch64 wheels and updates cause warnings when loading the classifier model.
-scikit-learn="==0.24.0"
-whitenoise = "~=5.3.0"
+scikit-learn="==1.0.2"
+whitenoise = "~=6.0.0"
 watchdog = "~=2.1.0"
 whoosh="~=2.7.4"
-inotifyrecursive = "~=0.3.4"
-ocrmypdf = "~=12.3"
+inotifyrecursive = "~=0.3"
+ocrmypdf = "~=13.4"
 tqdm = "*"
 tika = "*"
 # TODO: This will sadly also install daphne+dependencies,
@@ -46,11 +47,12 @@ channels = "~=3.0"
 channels-redis = "*"
 uvicorn = {extras = ["standard"], version = "*"}
 concurrent-log-handler = "*"
-# uvloop 0.15+ incompatible with python 3.6
-uvloop = "~=0.15"
-cryptography = "~=3.4"
 "pdfminer.six" = "*"
-"backports.zoneinfo" = "*"
+"backports.zoneinfo" = {version = "*", markers = "python_version < '3.9'"}
+"importlib-resources" = {version = "*", markers = "python_version < '3.9'"}
+zipp = {version = "*", markers = "python_version < '3.9'"}
+pyzbar = "*"
+pdf2image = "*"
 
 [dev-packages]
 coveralls = "*"
@@ -62,6 +64,9 @@ pytest-django = "*"
 pytest-env = "*"
 pytest-sugar = "*"
 pytest-xdist = "*"
-sphinx = "~=3.4.2"
+sphinx = "~=4.5.0"
 sphinx_rtd_theme = "*"
 tox = "*"
+black = "*"
+pre-commit = "*"
+myst-parser = "*"

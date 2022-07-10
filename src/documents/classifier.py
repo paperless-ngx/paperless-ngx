@@ -6,8 +6,8 @@ import re
 import shutil
 
 from django.conf import settings
-
-from documents.models import Document, MatchingModel
+from documents.models import Document
+from documents.models import MatchingModel
 
 
 class IncompatibleClassifierVersionError(Exception):
@@ -31,8 +31,8 @@ def preprocess_content(content):
 def load_classifier():
     if not os.path.isfile(settings.MODEL_FILE):
         logger.debug(
-            f"Document classification model does not exist (yet), not "
-            f"performing automatic matching."
+            "Document classification model does not exist (yet), not "
+            "performing automatic matching.",
         )
         return None
 
@@ -40,32 +40,28 @@ def load_classifier():
     try:
         classifier.load()
 
-    except (ClassifierModelCorruptError,
-            IncompatibleClassifierVersionError):
+    except (ClassifierModelCorruptError, IncompatibleClassifierVersionError):
         # there's something wrong with the model file.
         logger.exception(
-            f"Unrecoverable error while loading document "
-            f"classification model, deleting model file."
+            "Unrecoverable error while loading document "
+            "classification model, deleting model file.",
         )
         os.unlink(settings.MODEL_FILE)
         classifier = None
     except OSError:
-        logger.exception(
-            f"IO error while loading document classification model"
-        )
+        logger.exception("IO error while loading document classification model")
         classifier = None
     except Exception:
-        logger.exception(
-            f"Unknown error while loading document classification model"
-        )
+        logger.exception("Unknown error while loading document classification model")
         classifier = None
 
     return classifier
 
 
-class DocumentClassifier(object):
+class DocumentClassifier:
 
-    FORMAT_VERSION = 6
+    # v7 - Updated scikit-learn package version
+    FORMAT_VERSION = 7
 
     def __init__(self):
         # hash of the training data. used to prevent re-training when the
@@ -84,7 +80,8 @@ class DocumentClassifier(object):
 
             if schema_version != self.FORMAT_VERSION:
                 raise IncompatibleClassifierVersionError(
-                    "Cannor load classifier, incompatible versions.")
+                    "Cannot load classifier, incompatible versions.",
+                )
             else:
                 try:
                     self.data_hash = pickle.load(f)
@@ -126,30 +123,35 @@ class DocumentClassifier(object):
         # Step 1: Extract and preprocess training data from the database.
         logger.debug("Gathering data from database...")
         m = hashlib.sha1()
-        for doc in Document.objects.order_by('pk').exclude(tags__is_inbox_tag=True):  # NOQA: E501
+        for doc in Document.objects.order_by("pk").exclude(
+            tags__is_inbox_tag=True,
+        ):
             preprocessed_content = preprocess_content(doc.content)
-            m.update(preprocessed_content.encode('utf-8'))
+            m.update(preprocessed_content.encode("utf-8"))
             data.append(preprocessed_content)
 
             y = -1
             dt = doc.document_type
             if dt and dt.matching_algorithm == MatchingModel.MATCH_AUTO:
                 y = dt.pk
-            m.update(y.to_bytes(4, 'little', signed=True))
+            m.update(y.to_bytes(4, "little", signed=True))
             labels_document_type.append(y)
 
             y = -1
             cor = doc.correspondent
             if cor and cor.matching_algorithm == MatchingModel.MATCH_AUTO:
                 y = cor.pk
-            m.update(y.to_bytes(4, 'little', signed=True))
+            m.update(y.to_bytes(4, "little", signed=True))
             labels_correspondent.append(y)
 
-            tags = sorted([tag.pk for tag in doc.tags.filter(
-                matching_algorithm=MatchingModel.MATCH_AUTO
-            )])
+            tags = sorted(
+                tag.pk
+                for tag in doc.tags.filter(
+                    matching_algorithm=MatchingModel.MATCH_AUTO,
+                )
+            )
             for tag in tags:
-                m.update(tag.to_bytes(4, 'little', signed=True))
+                m.update(tag.to_bytes(4, "little", signed=True))
             labels_tags.append(tags)
 
         if not data:
@@ -160,7 +162,7 @@ class DocumentClassifier(object):
         if self.data_hash and new_data_hash == self.data_hash:
             return False
 
-        labels_tags_unique = set([tag for tags in labels_tags for tag in tags])
+        labels_tags_unique = {tag for tags in labels_tags for tag in tags}
 
         num_tags = len(labels_tags_unique)
 
@@ -178,8 +180,8 @@ class DocumentClassifier(object):
                 len(data),
                 num_tags,
                 num_correspondents,
-                num_document_types
-            )
+                num_document_types,
+            ),
         )
 
         from sklearn.feature_extraction.text import CountVectorizer
@@ -191,7 +193,7 @@ class DocumentClassifier(object):
         self.data_vectorizer = CountVectorizer(
             analyzer="word",
             ngram_range=(1, 2),
-            min_df=0.01
+            min_df=0.01,
         )
         data_vectorized = self.data_vectorizer.fit_transform(data)
 
@@ -202,54 +204,43 @@ class DocumentClassifier(object):
             if num_tags == 1:
                 # Special case where only one tag has auto:
                 # Fallback to binary classification.
-                labels_tags = [label[0] if len(label) == 1 else -1
-                               for label in labels_tags]
+                labels_tags = [
+                    label[0] if len(label) == 1 else -1 for label in labels_tags
+                ]
                 self.tags_binarizer = LabelBinarizer()
                 labels_tags_vectorized = self.tags_binarizer.fit_transform(
-                    labels_tags).ravel()
+                    labels_tags,
+                ).ravel()
             else:
                 self.tags_binarizer = MultiLabelBinarizer()
-                labels_tags_vectorized = self.tags_binarizer.fit_transform(
-                    labels_tags)
+                labels_tags_vectorized = self.tags_binarizer.fit_transform(labels_tags)
 
             self.tags_classifier = MLPClassifier(tol=0.01)
             self.tags_classifier.fit(data_vectorized, labels_tags_vectorized)
         else:
             self.tags_classifier = None
-            logger.debug(
-                "There are no tags. Not training tags classifier."
-            )
+            logger.debug("There are no tags. Not training tags classifier.")
 
         if num_correspondents > 0:
-            logger.debug(
-                "Training correspondent classifier..."
-            )
+            logger.debug("Training correspondent classifier...")
             self.correspondent_classifier = MLPClassifier(tol=0.01)
-            self.correspondent_classifier.fit(
-                data_vectorized,
-                labels_correspondent
-            )
+            self.correspondent_classifier.fit(data_vectorized, labels_correspondent)
         else:
             self.correspondent_classifier = None
             logger.debug(
                 "There are no correspondents. Not training correspondent "
-                "classifier."
+                "classifier.",
             )
 
         if num_document_types > 0:
-            logger.debug(
-                "Training document type classifier..."
-            )
+            logger.debug("Training document type classifier...")
             self.document_type_classifier = MLPClassifier(tol=0.01)
-            self.document_type_classifier.fit(
-                data_vectorized,
-                labels_document_type
-            )
+            self.document_type_classifier.fit(data_vectorized, labels_document_type)
         else:
             self.document_type_classifier = None
             logger.debug(
                 "There are no document types. Not training document type "
-                "classifier."
+                "classifier.",
             )
 
         self.data_hash = new_data_hash
@@ -285,10 +276,10 @@ class DocumentClassifier(object):
             X = self.data_vectorizer.transform([preprocess_content(content)])
             y = self.tags_classifier.predict(X)
             tags_ids = self.tags_binarizer.inverse_transform(y)[0]
-            if type_of_target(y).startswith('multilabel'):
+            if type_of_target(y).startswith("multilabel"):
                 # the usual case when there are multiple tags.
                 return list(tags_ids)
-            elif type_of_target(y) == 'binary' and tags_ids != -1:
+            elif type_of_target(y) == "binary" and tags_ids != -1:
                 # This is for when we have binary classification with only one
                 # tag and the result is to assign this tag.
                 return [tags_ids]

@@ -6,24 +6,24 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('documents', '1008_auto_20201216_1736'),
+        ("documents", "1008_auto_20201216_1736"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='correspondent',
-            options={'ordering': ('name',)},
+            name="correspondent",
+            options={"ordering": ("name",)},
         ),
         migrations.AlterModelOptions(
-            name='documenttype',
-            options={'ordering': ('name',)},
+            name="documenttype",
+            options={"ordering": ("name",)},
         ),
         migrations.AlterModelOptions(
-            name='savedview',
-            options={'ordering': ('name',)},
+            name="savedview",
+            options={"ordering": ("name",)},
         ),
         migrations.AlterModelOptions(
-            name='tag',
-            options={'ordering': ('name',)},
+            name="tag",
+            options={"ordering": ("name",)},
         ),
     ]

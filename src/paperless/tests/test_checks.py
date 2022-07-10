@@ -1,15 +1,15 @@
 import os
 import shutil
 
-from django.test import TestCase, override_settings
-
+from django.test import override_settings
+from django.test import TestCase
 from documents.tests.utils import DirectoriesMixin
-from paperless import binaries_check, paths_check
+from paperless import binaries_check
+from paperless import paths_check
 from paperless.checks import debug_mode_check
 
 
 class TestChecks(DirectoriesMixin, TestCase):
-
     def test_binaries(self):
         self.assertEqual(binaries_check(None), [])
 
@@ -20,9 +20,11 @@ class TestChecks(DirectoriesMixin, TestCase):
     def test_paths_check(self):
         self.assertEqual(paths_check(None), [])
 
-    @override_settings(MEDIA_ROOT="uuh",
-                       DATA_DIR="whatever",
-                       CONSUMPTION_DIR="idontcare")
+    @override_settings(
+        MEDIA_ROOT="uuh",
+        DATA_DIR="whatever",
+        CONSUMPTION_DIR="idontcare",
+    )
     def test_paths_check_dont_exist(self):
         msgs = paths_check(None)
         self.assertEqual(len(msgs), 3, str(msgs))

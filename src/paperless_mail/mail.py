@@ -1,20 +1,27 @@
 import os
 import tempfile
-from datetime import timedelta, date
+from datetime import date
+from datetime import timedelta
 from fnmatch import fnmatch
+from imaplib import IMAP4
 
 import magic
 import pathvalidate
 from django.conf import settings
 from django.db import DatabaseError
 from django_q.tasks import async_task
-from imap_tools import MailBox, MailBoxUnencrypted, AND, MailMessageFlags, \
-    MailboxFolderSelectError
-
 from documents.loggers import LoggingMixin
 from documents.models import Correspondent
 from documents.parsers import is_mime_type_supported
-from paperless_mail.models import MailAccount, MailRule
+from imap_tools import AND
+from imap_tools import MailBox
+from imap_tools import MailboxFolderSelectError
+from imap_tools import MailBoxUnencrypted
+from imap_tools import MailMessage
+from imap_tools import MailMessageFlags
+from imap_tools.mailbox import MailBoxTls
+from paperless_mail.models import MailAccount
+from paperless_mail.models import MailRule
 
 from smart_open import open
 
@@ -23,7 +30,6 @@ class MailError(Exception):
 
 
 class BaseMailAction:
-
     def get_criteria(self):
         return {}
 
@@ -32,43 +38,39 @@ class BaseMailAction:
 
 
 class DeleteMailAction(BaseMailAction):
-
     def post_consume(self, M, message_uids, parameter):
         M.delete(message_uids)
 
 
 class MarkReadMailAction(BaseMailAction):
-
     def get_criteria(self):
-        return {'seen': False}
+        return {"seen": False}
 
     def post_consume(self, M, message_uids, parameter):
-        M.seen(message_uids, True)
+        M.flag(message_uids, [MailMessageFlags.SEEN], True)
 
 
 class MoveMailAction(BaseMailAction):
-
     def post_consume(self, M, message_uids, parameter):
         M.move(message_uids, parameter)
 
 
 class FlagMailAction(BaseMailAction):
-
     def get_criteria(self):
-        return {'flagged': False}
+        return {"flagged": False}
 
     def post_consume(self, M, message_uids, parameter):
         M.flag(message_uids, [MailMessageFlags.FLAGGED], True)
 
 
 def get_rule_action(rule):
-    if rule.action == MailRule.ACTION_FLAG:
+    if rule.action == MailRule.MailAction.FLAG:
         return FlagMailAction()
-    elif rule.action == MailRule.ACTION_DELETE:
+    elif rule.action == MailRule.MailAction.DELETE:
         return DeleteMailAction()
-    elif rule.action == MailRule.ACTION_MOVE:
+    elif rule.action == MailRule.MailAction.MOVE:
         return MoveMailAction()
-    elif rule.action == MailRule.ACTION_MARK_READ:
+    elif rule.action == MailRule.MailAction.MARK_READ:
         return MarkReadMailAction()
     else:
         raise NotImplementedError("Unknown action.")  # pragma: nocover
@@ -90,11 +92,11 @@ def make_criterias(rule):
 
 
 def get_mailbox(server, port, security):
-    if security == MailAccount.IMAP_SECURITY_NONE:
+    if security == MailAccount.ImapSecurity.NONE:
         mailbox = MailBoxUnencrypted(server, port)
-    elif security == MailAccount.IMAP_SECURITY_STARTTLS:
-        mailbox = MailBox(server, port, starttls=True)
-    elif security == MailAccount.IMAP_SECURITY_SSL:
+    elif security == MailAccount.ImapSecurity.STARTTLS:
+        mailbox = MailBoxTls(server, port)
+    elif security == MailAccount.ImapSecurity.SSL:
         mailbox = MailBox(server, port)
     else:
         raise NotImplementedError("Unknown IMAP security")  # pragma: nocover
@@ -109,105 +111,164 @@ class MailAccountHandler(LoggingMixin):
         try:
             return Correspondent.objects.get_or_create(name=name)[0]
         except DatabaseError as e:
-            self.log(
-                "error",
-                f"Error while retrieving correspondent {name}: {e}"
-            )
+            self.log("error", f"Error while retrieving correspondent {name}: {e}")
             return None
 
     def get_title(self, message, att, rule):
-        if rule.assign_title_from == MailRule.TITLE_FROM_SUBJECT:
+        if rule.assign_title_from == MailRule.TitleSource.FROM_SUBJECT:
             return message.subject
 
-        elif rule.assign_title_from == MailRule.TITLE_FROM_FILENAME:
+        elif rule.assign_title_from == MailRule.TitleSource.FROM_FILENAME:
             return os.path.splitext(os.path.basename(att.filename))[0]
 
         else:
-            raise NotImplementedError("Unknown title selector.")  # pragma: nocover  # NOQA: E501
+            raise NotImplementedError(
+                "Unknown title selector.",
+            )  # pragma: nocover
 
-    def get_correspondent(self, message, rule):
+    def get_correspondent(self, message: MailMessage, rule):
         c_from = rule.assign_correspondent_from
 
-        if c_from == MailRule.CORRESPONDENT_FROM_NOTHING:
+        if c_from == MailRule.CorrespondentSource.FROM_NOTHING:
             return None
 
-        elif c_from == MailRule.CORRESPONDENT_FROM_EMAIL:
+        elif c_from == MailRule.CorrespondentSource.FROM_EMAIL:
             return self._correspondent_from_name(message.from_)
 
-        elif c_from == MailRule.CORRESPONDENT_FROM_NAME:
-            if message.from_values and 'name' in message.from_values and message.from_values['name']:  # NOQA: E501
-                return self._correspondent_from_name(
-                    message.from_values['name'])
+        elif c_from == MailRule.CorrespondentSource.FROM_NAME:
+            from_values = message.from_values
+            if from_values is not None and len(from_values.name) > 0:
+                return self._correspondent_from_name(from_values.name)
             else:
                 return self._correspondent_from_name(message.from_)
 
-        elif c_from == MailRule.CORRESPONDENT_FROM_CUSTOM:
+        elif c_from == MailRule.CorrespondentSource.FROM_CUSTOM:
             return rule.assign_correspondent
 
         else:
-            raise NotImplementedError("Unknwown correspondent selector")  # pragma: nocover  # NOQA: E501
+            raise NotImplementedError(
+                "Unknown correspondent selector",
+            )  # pragma: nocover
 
     def handle_mail_account(self, account):
 
         self.renew_logging_group()
 
-        self.log('debug', f"Processing mail account {account}")
+        self.log("debug", f"Processing mail account {account}")
 
         total_processed_files = 0
+        try:
+            with get_mailbox(
+                account.imap_server,
+                account.imap_port,
+                account.imap_security,
+            ) as M:
 
-        with get_mailbox(account.imap_server,
-                         account.imap_port,
-                         account.imap_security) as M:
-
-            try:
-                M.login(account.username, account.password)
-            except Exception:
-                raise MailError(
-                    f"Error while authenticating account {account}")
-
-            self.log('debug', f"Account {account}: Processing "
-                              f"{account.rules.count()} rule(s)")
-
-            for rule in account.rules.order_by('order'):
                 try:
-                    total_processed_files += self.handle_mail_rule(M, rule)
+                    M.login(account.username, account.password)
+
+                except UnicodeEncodeError:
+                    self.log("debug", "Falling back to AUTH=PLAIN")
+                    try:
+                        # rfc2595 section 6 - PLAIN SASL mechanism
+                        client: IMAP4 = M.client
+                        encoded = (
+                            b"\0"
+                            + account.username.encode("utf8")
+                            + b"\0"
+                            + account.password.encode("utf8")
+                        )
+                        # Assumption is the server supports AUTH=PLAIN capability
+                        # Could check the list with client.capability(), but then what?
+                        # We're failing anyway then
+                        client.authenticate("PLAIN", lambda x: encoded)
+
+                        # Need to transition out of AUTH state to SELECTED
+                        M.folder.set("INBOX")
+                    except Exception:
+                        self.log(
+                            "error",
+                            "Unable to authenticate with mail server using AUTH=PLAIN",
+                        )
+                        raise MailError(f"Error while authenticating account {account}")
                 except Exception as e:
                     self.log(
                         "error",
-                        f"Rule {rule}: Error while processing rule: {e}",
-                        exc_info=True
+                        f"Error while authenticating account {account}: {e}",
+                        exc_info=False,
                     )
+                    raise MailError(
+                        f"Error while authenticating account {account}",
+                    ) from e
+
+                self.log(
+                    "debug",
+                    f"Account {account}: Processing "
+                    f"{account.rules.count()} rule(s)",
+                )
+
+                for rule in account.rules.order_by("order"):
+                    try:
+                        total_processed_files += self.handle_mail_rule(M, rule)
+                    except Exception as e:
+                        self.log(
+                            "error",
+                            f"Rule {rule}: Error while processing rule: {e}",
+                            exc_info=True,
+                        )
+        except MailError:
+            raise
+        except Exception as e:
+            self.log(
+                "error",
+                f"Error while retrieving mailbox {account}: {e}",
+                exc_info=False,
+            )
 
         return total_processed_files
 
-    def handle_mail_rule(self, M, rule):
+    def handle_mail_rule(self, M: MailBox, rule):
 
-        self.log(
-            'debug',
-            f"Rule {rule}: Selecting folder {rule.folder}")
+        self.log("debug", f"Rule {rule}: Selecting folder {rule.folder}")
 
         try:
             M.folder.set(rule.folder)
         except MailboxFolderSelectError:
+
+            self.log(
+                "error",
+                f"Unable to access folder {rule.folder}, attempting folder listing",
+            )
+            try:
+                for folder_info in M.folder.list():
+                    self.log("info", f"Located folder: {folder_info.name}")
+            except Exception as e:
+                self.log(
+                    "error",
+                    "Exception during folder listing, unable to provide list folders: "
+                    + str(e),
+                )
+
             raise MailError(
                 f"Rule {rule}: Folder {rule.folder} "
-                f"does not exist in account {rule.account}")
+                f"does not exist in account {rule.account}",
+            )
 
         criterias = make_criterias(rule)
 
         self.log(
-            'debug',
-            f"Rule {rule}: Searching folder with criteria "
-            f"{str(AND(**criterias))}")
+            "debug",
+            f"Rule {rule}: Searching folder with criteria " f"{str(AND(**criterias))}",
+        )
 
         try:
             messages = M.fetch(
                 criteria=AND(**criterias),
                 mark_seen=False,
-                charset=rule.account.character_set)
+                charset=rule.account.character_set,
+            )
         except Exception:
-            raise MailError(
-                f"Rule {rule}: Error while fetching folder {rule.folder}")
+            raise MailError(f"Rule {rule}: Error while fetching folder {rule.folder}")
 
         post_consume_messages = []
 
@@ -225,60 +286,71 @@ class MailAccountHandler(LoggingMixin):
             except Exception as e:
                 self.log(
                     "error",
-                    f"Rule {rule}: Error while processing mail "
-                    f"{message.uid}: {e}",
-                    exc_info=True)
+                    f"Rule {rule}: Error while processing mail " f"{message.uid}: {e}",
+                    exc_info=True,
+                )
+
+        self.log("debug", f"Rule {rule}: Processed {mails_processed} matching mail(s)")
 
         self.log(
-            'debug',
-            f"Rule {rule}: Processed {mails_processed} matching mail(s)")
-
-        self.log(
-            'debug',
+            "debug",
             f"Rule {rule}: Running mail actions on "
-            f"{len(post_consume_messages)} mails")
+            f"{len(post_consume_messages)} mails",
+        )
 
         try:
             get_rule_action(rule).post_consume(
                 M,
                 post_consume_messages,
-                rule.action_parameter)
+                rule.action_parameter,
+            )
 
         except Exception as e:
             raise MailError(
-                f"Rule {rule}: Error while processing post-consume actions: "
-                f"{e}")
+                f"Rule {rule}: Error while processing post-consume actions: " f"{e}",
+            )
 
         return total_processed_files
 
-    def handle_message(self, message, rule):
+    def handle_message(self, message, rule) -> int:
         if not message.attachments:
             return 0
 
         self.log(
-            'debug',
+            "debug",
             f"Rule {rule}: "
             f"Processing mail {message.subject} from {message.from_} with "
-            f"{len(message.attachments)} attachment(s)")
+            f"{len(message.attachments)} attachment(s)",
+        )
 
         correspondent = self.get_correspondent(message, rule)
-        tag = rule.assign_tag
+        tag_ids = [tag.id for tag in rule.assign_tags.all()]
         doc_type = rule.assign_document_type
 
         processed_attachments = 0
 
         for att in message.attachments:
 
-            if not att.content_disposition == "attachment" and rule.attachment_type == MailRule.ATTACHMENT_TYPE_ATTACHMENTS_ONLY:  # NOQA: E501
+            if (
+                not att.content_disposition == "attachment"
+                and rule.attachment_type
+                == MailRule.AttachmentProcessing.ATTACHMENTS_ONLY
+            ):
                 self.log(
-                    'debug',
+                    "debug",
                     f"Rule {rule}: "
                     f"Skipping attachment {att.filename} "
-                    f"with content disposition {att.content_disposition}")
+                    f"with content disposition {att.content_disposition}",
+                )
                 continue
 
             if rule.filter_attachment_filename:
-                if not fnmatch(att.filename, rule.filter_attachment_filename):
+                # Force the filename and pattern to the lowercase
+                # as this is system dependent otherwise
+                if not fnmatch(
+                    att.filename.lower(),
+                    rule.filter_attachment_filename.lower(),
+                ):
                     continue
 
             title = self.get_title(message, att, rule)
@@ -290,35 +362,43 @@ class MailAccountHandler(LoggingMixin):
             if is_mime_type_supported(mime_type):
 
                 os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
-                _, temp_filename = tempfile.mkstemp(prefix="paperless-mail-",
-                                                    dir=settings.SCRATCH_DIR)
-                with open(temp_filename, 'wb') as f:
+                _, temp_filename = tempfile.mkstemp(
+                    prefix="paperless-mail-",
+                    dir=settings.SCRATCH_DIR,
+                )
+                with open(temp_filename, "wb") as f:
                     f.write(att.payload)
 
                 self.log(
-                    'info',
+                    "info",
                     f"Rule {rule}: "
                     f"Consuming attachment {att.filename} from mail "
-                    f"{message.subject} from {message.from_}")
+                    f"{message.subject} from {message.from_}",
+                )
 
                 async_task(
                     "documents.tasks.consume_file",
                     path=temp_filename,
-                    override_filename=pathvalidate.sanitize_filename(att.filename),  # NOQA: E501
+                    override_filename=pathvalidate.sanitize_filename(
+                        att.filename,
+                    ),
                     override_title=title,
-                    override_correspondent_id=correspondent.id if correspondent else None,  # NOQA: E501
-                    override_document_type_id=doc_type.id if doc_type else None,  # NOQA: E501
-                    override_tag_ids=[tag.id] if tag else None,
-                    task_name=att.filename[:100]
+                    override_correspondent_id=correspondent.id
+                    if correspondent
+                    else None,
+                    override_document_type_id=doc_type.id if doc_type else None,
+                    override_tag_ids=tag_ids,
+                    task_name=att.filename[:100],
                 )
 
                 processed_attachments += 1
             else:
                 self.log(
-                    'debug',
+                    "debug",
                     f"Rule {rule}: "
                     f"Skipping attachment {att.filename} "
                     f"since guessed mime type {mime_type} is not supported "
-                    f"by paperless")
+                    f"by paperless",
+                )
 
         return processed_attachments

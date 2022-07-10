@@ -1,13 +1,13 @@
 .. _extending:
 
-Paperless development
-#####################
+Paperless-ngx Development
+#########################
 
-This section describes the steps you need to take to start development on paperless-ng.
+This section describes the steps you need to take to start development on paperless-ngx.
 
 Check out the source from github. The repository is organized in the following way:
 
-*   ``master`` always represents the latest release and will only see changes
+*   ``main`` always represents the latest release and will only see changes
     when a new release is made.
 *   ``dev`` contains the code that will be in the next release.
 *   ``feature-X`` contain bigger changes that will be in some release, but not
@@ -23,6 +23,33 @@ Apart from that, the folder structure is as follows:
 *   ``scripts/`` - Various scripts that help with different parts of development.
 *   ``docker/`` - Files required to build the docker image.
 
+Contributing to Paperless
+=========================
+
+Maybe you've been using Paperless for a while and want to add a feature or two,
+or maybe you've come across a bug that you have some ideas how to solve.  The
+beauty of open source software is that you can see what's wrong and help to get
+it fixed for everyone!
+
+Before contributing please review our `code of conduct`_ and other important
+information in the `contributing guidelines`_.
+
+.. _code-formatting-with-pre-commit-hooks:
+
+Code formatting with pre-commit Hooks
+=====================================
+
+To ensure a consistent style and formatting across the project source, the project
+utilizes a Git `pre-commit` hook to perform some formatting and linting before a
+commit is allowed. That way, everyone uses the same style and some common issues
+can be caught early on. See below for installation instructions.
+
+Once installed, hooks will run when you commit. If the formatting isn't quite right
+or a linter catches something, the commit will be rejected. You'll need to look at the
+output and fix the issue. Some hooks, such as the Python formatting tool `black`,
+will format failing files, so all you need to do is `git add` those files again and
+retry your commit.
+
 Initial setup and first start
 =============================
 
@@ -37,13 +64,19 @@ To do the setup you need to perform the steps from the following chapters in a c
 
         $ npm install -g @angular/cli
 
-4.  Create ``consume`` and ``media`` folders in the cloned root folder.
+4.  Install pre-commit
+
+    .. code:: shell-session
+
+        pre-commit install
+
+5.  Create ``consume`` and ``media`` folders in the cloned root folder.
 
     .. code:: shell-session
 
         mkdir -p consume media
 
-5.  You can now either ...
+6.  You can now either ...
 
     *  install redis or
     *  use the included scripts/start-services.sh to use docker to fire up a redis instance (and some other services such as tika, gotenberg and a postgresql server) or
@@ -51,41 +84,44 @@ To do the setup you need to perform the steps from the following chapters in a c
 
         .. code:: shell-session
 
-            docker run -d -p 6379:6379 -restart unless-stopped redis:latest
+            docker run -d -p 6379:6379 --restart unless-stopped redis:latest
 
-6.  Install the python dependencies by performing in the src/ directory.
+7.  Install the python dependencies by performing in the src/ directory.
 
     .. code:: shell-session
 
         pipenv install --dev
 
-7.  Generate the static UI so you can perform a login to get session that is required for frontend development (this needs to be done one time only). From root folder:
+  * Make sure you're using python 3.9.x or lower. Otherwise you might get issues with building dependencies. You can use `pyenv <https://github.com/pyenv/pyenv>`_ to install a specific python version.
+
+8.  Generate the static UI so you can perform a login to get session that is required for frontend development (this needs to be done one time only). From src-ui directory:
 
     .. code:: shell-session
 
-        compile-frontend.sh
+        npm install .
+        ./node_modules/.bin/ng build --configuration production
 
-8.  Apply migrations and create a superuser for your dev instance:
+9.  Apply migrations and create a superuser for your dev instance:
 
     .. code:: shell-session
 
         python3 manage.py migrate
         python3 manage.py createsuperuser
 
-9.  Now spin up the dev backend. Depending on which part of paperless you're developing for, you need to have some or all of them running.
+10.  Now spin up the dev backend. Depending on which part of paperless you're developing for, you need to have some or all of them running.
 
     .. code:: shell-session
 
         python3 manage.py runserver & python3 manage.py document_consumer & python3 manage.py qcluster
 
-10. Login with the superuser credentials provided in step 8 at ``http://localhost:8000`` to create a session that enables you to use the backend.
+11. Login with the superuser credentials provided in step 8 at ``http://localhost:8000`` to create a session that enables you to use the backend.
 
 Backend development environment is now ready, to start Frontend development go to ``/src-ui`` and run ``ng serve``. From there you can use ``http://localhost:4200`` for a preview.
 
 Back end development
 ====================
 
-The backend is a django application. I use PyCharm for development, but you can use whatever
+The backend is a django application. PyCharm works well for development, but you can use whatever
 you want.
 
 Configure the IDE to use the src/ folder as the base source folder. Configure the following
@@ -106,7 +142,9 @@ Testing and code style:
 *   Run ``pytest`` in the src/ directory to execute all tests. This also generates a HTML coverage
     report. When runnings test, paperless.conf is loaded as well. However: the tests rely on the default
     configuration. This is not ideal. But for now, make sure no settings except for DEBUG are overridden when testing.
-*   Run ``pycodestyle`` to test your code for issues with the configured code style settings.
+*   Coding style is enforced by the Git pre-commit hooks.  These will ensure your code is formatted and do some
+    linting when you do a `git commit`.
+*   You can also run ``black`` manually to format your code
 
     .. note::
 
@@ -118,9 +156,8 @@ Testing and code style:
 Front end development
 =====================
 
-The front end is build using angular. I use the ``Code - OSS`` IDE for development.
-
-In order to get started, you need ``npm``. Install the Angular CLI interface with
+The front end is built using Angular. In order to get started, you need ``npm``.
+Install the Angular CLI interface with
 
 .. code:: shell-session
 
@@ -148,6 +185,31 @@ If you enabled DEBUG on the back end, several security overrides for allowed hos
 X-Frame-Options are in place so that the front end behaves exactly as in production. This also
 relies on you being logged into the back end. Without a valid session, The front end will simply
 not work.
+
+Testing and code style:
+
+*   The frontend code (.ts, .html, .scss) use ``prettier`` for code formatting via the Git
+    ``pre-commit`` hooks which run automatically on commit. See
+    :ref:`above <code-formatting-with-pre-commit-hooks>` for installation. You can also run this
+    via cli with a command such as
+
+    .. code:: shell-session
+
+        $ git ls-files -- '*.ts' | xargs pre-commit run prettier --files
+
+*   Frontend testing uses jest and cypress. There is currently a need for significantly more
+    frontend tests. Unit tests and e2e tests, respectively, can be run non-interactively with:
+
+    .. code:: shell-session
+
+        $ ng test
+        $ npm run e2e:ci
+
+    Cypress also includes a UI which can be run from within the ``src-ui`` directory with
+
+    .. code:: shell-session
+
+        $ ./node_modules/.bin/cypress open
 
 In order to build the front end and serve it as part of django, execute
 
@@ -272,19 +334,17 @@ directory.
 Building the Docker image
 =========================
 
-Building the docker image from source requires the following two steps:
+The docker image is primarily built by the GitHub actions workflow, but it can be
+faster when developing to build and tag an image locally.
 
-1.  Build the front end.
+To provide the build arguments automatically, build the image using the helper
+script ``build-docker-image.sh``.
 
-    .. code:: shell-session
-
-        ./compile-frontend.sh
-
-2.  Build the docker image.
+Building the docker image from source:
 
     .. code:: shell-session
 
-        docker build . -t <your-tag>
+        ./build-docker-image.sh Dockerfile -t <your-tag>
 
 Extending Paperless
 ===================
@@ -366,3 +426,6 @@ that returns information about your parser:
     download. We could guess that from the file extensions, but some mime types have many extensions
     associated with them and the python methods responsible for guessing the extension do not always
     return the same value.
+
+.. _code of conduct: https://github.com/paperless-ngx/paperless-ngx/blob/main/CODE_OF_CONDUCT.md
+.. _contributing guidelines: https://github.com/paperless-ngx/paperless-ngx/blob/main/CONTRIBUTING.md

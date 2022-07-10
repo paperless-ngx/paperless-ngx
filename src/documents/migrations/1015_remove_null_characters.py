@@ -8,20 +8,20 @@ logger = logging.getLogger("paperless.migrations")
 
 
 def remove_null_characters(apps, schema_editor):
-    Document = apps.get_model('documents', 'Document')
+    Document = apps.get_model("documents", "Document")
 
     for doc in Document.objects.all():
         content: str = doc.content
-        if '\0' in content:
+        if "\0" in content:
             logger.info(f"Removing null characters from document {doc}...")
-            doc.content = content.replace('\0', ' ')
+            doc.content = content.replace("\0", " ")
             doc.save()
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('documents', '1014_auto_20210228_1614'),
+        ("documents", "1014_auto_20210228_1614"),
     ]
 
     operations = [

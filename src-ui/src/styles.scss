@@ -1,27 +1,149 @@
-@import "theme";
-@import "theme_dark";
-@import "print";
+// bs options
+$enable-negative-margins: true;
+
 @import "node_modules/bootstrap/scss/bootstrap";
 @import "~@ng-select/ng-select/themes/default.theme.css";
+@import "theme";
+@import "print";
 
-.toolbaricon {
-  width: 1.2em;
-  height: 1.2em;
-}
-
-.buttonicon {
-  width: 1.2em;
-  height: 1.2em;
-}
-
-.sidebaricon {
-  width: 16px;
-  height: 16px;
-  vertical-align: text-bottom;
-}
-
+// Paperless-ngx styles
 body {
   font-size: 0.875rem;
+  height: 100vh;
+}
+
+* {
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+svg.logo {
+  .leaf {
+    fill: var(--bs-primary) !important;
+  }
+  .text {
+    fill: var(--bs-body-color) !important;
+  }
+}
+
+.navbar.bg-primary {
+  --bs-primary: hsl(var(--pngx-primary),var(--pngx-primary-lightness));
+  --bs-primary-rgb: var(--bs-primary);
+}
+
+.border {
+  border-color: var(--bs-border-color) !important;
+}
+
+.border-end {
+  border-right: 1px solid var(--bs-border-color) !important;
+}
+
+.border-start {
+  border-left: 1px solid var(--bs-border-color) !important;
+}
+
+.border-bottom {
+  border-bottom: 1px solid var(--bs-border-color) !important;
+}
+
+.nav-link, .list-group-item {
+  color: var(--bs-body-color);
+}
+
+.bg-body {
+  background-color: var(--bs-body-bg);
+}
+
+.bg-primary {
+  background-color: var(--bs-primary) !important;
+  color: var(--pngx-primary-text-contrast);
+}
+
+.navbar-brand {
+  color: var(--pngx-primary-text-contrast) !important;
+}
+
+.navbar .dropdown .btn {
+  color: var(--pngx-primary-text-contrast) !important;
+}
+
+.btn-primary {
+  color: var(--pngx-primary-text-contrast);
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+
+  &:hover, &:focus {
+    background-color: var(--pngx-primary-darken-5);
+    border-color: var(--pngx-primary-darken-5);
+  }
+
+  &:disabled, &.disabled {
+    color: var(--pngx-primary-text-contrast);
+    background-color: var(--pngx-primary-darken-5) !important;
+    border-color: var(--pngx-primary-darken-5) !important;
+  }
+}
+
+.btn-outline-primary {
+  border-color: var(--bs-primary) !important;
+  color: var(--bs-primary) !important;
+
+  &:hover, &:focus, &.active, &:active {
+    background-color: var(--bs-primary) !important;
+    color: var(--bs-light) !important;
+  }
+}
+
+.btn-outline-secondary {
+  color: var(--bs-secondary);
+
+  &:hover {
+    color: var(--bs-light);
+  }
+}
+
+.nav-item .sidebaricon {
+  color: var(--bs-secondary);
+}
+
+.btn:focus,
+.btn:active:focus,
+.dropdown-item:focus,
+.btn-check:focus + .btn,
+.form-control:focus,
+.form-check-input:focus,
+.form-check-radio:focus,
+.form-select:focus {
+  box-shadow: 0 0 0 0.25rem hsla(var(--pngx-primary), var(--pngx-primary-lightness), var(--pngx-focus-alpha));
+}
+
+.form-switch .form-check-input:focus {
+  background-image: escape-svg(url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='3' fill='#bbb'/></svg>"));
+}
+
+.nav-item a:focus-visible {
+  outline: none;
+  background-color: var(--bs-body-bg);
+}
+
+a.navbar-brand:focus-visible {
+  outline: none;
+  color: var(--pngx-primary-darken-5);
+}
+
+.dropdown.show {
+  > .btn-primary {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+  }
+
+  > .btn-outline-primary {
+    color: var(--pngx-primary-text-contrast) !important;
+  }
+}
+
+a, a:hover, .btn-link, .btn-link:hover {
+  color: var(--bs-primary);
 }
 
 .form-control-dark {
@@ -113,6 +235,264 @@ body {
   }
 }
 
-.ngx-file-drop__drop-zone--over {
-  background-color: $primaryFaded !important;
+.form-control:not(.btn),
+input,
+select,
+textarea,
+.form-select:not(.is-invalid):not(:disabled),
+.form-check-input,
+.ng-select .ng-select-container .ng-value-container .ng-input > input {
+  color: var(--bs-body-color);
+  background-color: var(--bs-body-bg);
+  border-color: var(--bs-border-color);
+
+  &:focus {
+    background-color: var(--pngx-bg-darker);
+    color: var(--bs-body-color);
+  }
+}
+
+.form-check-input:checked {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+}
+
+.form-check-input:focus {
+  border-color: var(--bs-primary);
+}
+
+.page-link {
+  color: var(--bs-secondary);
+  background-color: var(--bs-body-bg);
+  border-color: var(--bs-border-color) !important;
+
+  &:hover, &:focus {
+    background-color: var(--bs-primary) !important;
+    color: var(--bs-light) !important;
+  }
+}
+
+.page-item.active .page-link {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary) !important;
+  color: var(--bs-light);
+}
+
+.page-item.disabled .page-link {
+  background-color: var(--pngx-bg-darker);
+}
+
+.nav-tabs {
+  border-bottom: 1px solid var(--bs-border-color);
+
+  .nav-link {
+    color: var(--bs-primary);
+
+    &.active, &:hover {
+      border-color: var(--bs-border-color);
+      background-color: var(--bs-body-bg);
+      color: var(--bs-body-color);
+      border-bottom: 1px solid transparent;
+    }
+
+    &:focus {
+      border-color: var(--bs-border-color);
+    }
+
+    &.active:focus, &:active {
+      border-bottom: 1px solid transparent;
+    }
+  }
+}
+
+.ng-select-container,
+.ng-select.ng-select-opened > .ng-select-container,
+.ng-dropdown-panel,
+.ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
+  background-color: var(--bs-body-bg) !important;
+  color: var(--bs-body-color) !important;
+  border-color: var(--bs-border-color) !important;
+
+  input:focus {
+    background-color: transparent !important;
+  }
+}
+
+.input-group-text {
+  color: var(--bs-body-color);
+  background-color: var(--bs-body-bg);
+  border-color: var(--bs-border-color);
+}
+
+.list-group-item {
+  color: var(--bs-body-color);
+  background-color: var(--bs-body-bg);
+  border-color: var(--bs-border-color);
+
+  &:hover, &:focus {
+    background-color: var(--bs-body-bg);
+  }
+}
+
+.dropdown-menu {
+  background-color: var(--bs-body-bg);
+
+  .dropdown-divider {
+    border-color: var(--bs-border-color);
+  }
+
+  .dropdown-item {
+    color: var(--bs-body-color);
+
+    &:hover, &:focus {
+      background-color: var(--pngx-bg-darker);
+      color: var(--bs-body-color);
+    }
+
+    &.active {
+      background-color: var(--bs-primary);
+      color: var(--pngx-primary-text-contrast);
+    }
+  }
+}
+
+.doc-img-container {
+  border: none !important;
+  border-top-left-radius: .25rem;
+  border-top-right-radius: .25rem;
+  overflow: hidden;
+}
+
+// icons
+.toolbaricon {
+  width: 1.2em;
+  height: 1.2em;
+}
+
+.buttonicon {
+  width: 1.2em;
+  height: 1.2em;
+}
+
+.sidebaricon {
+  width: 16px;
+  height: 16px;
+  vertical-align: text-bottom;
+}
+
+table.table {
+  color: var(--bs-body-color);
+
+  .des,.asc {
+    background-color: var(--bs-body-bg) !important;
+  }
+}
+
+.close {
+  color: var(--bs-body-color);
+}
+
+.modal .btn-close {
+  color: var(--bs-body-color);
+}
+
+.main-dropzone {
+  height: 100%;
+  width: 100%;
+
+  &.ngx-file-drop__drop-zone--over {
+    background-color: transparent !important;
+  }
+}
+
+.global-dropzone-overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(23, 84, 31, .8);
+  z-index: 1055; // $zindex-modal
+  pointer-events: none !important;
+  user-select: none !important;
+  text-align: center;
+  padding-top: 25%;
+
+  &.show {
+    opacity: 1 !important;
+  }
+
+  &.hide {
+    display: none;
+  }
+}
+
+.ngx-file-drop__drop-zone--over .global-dropzone-overlay {
+  opacity: 0;
+}
+
+.inert {
+  pointer-events: none !important;
+  user-select: none !important;
+}
+
+.alert-danger {
+  color: var(--bs-body-color);
+  background-color: var(--bs-danger);
+  border-color: var(--bs-danger);
+}
+
+.progress {
+  background-color: var(--bs-body-bg);
+}
+
+.ngb-dp-header,
+.ngb-dp-weekdays,
+.ngb-dp-month {
+  background-color: var(--bs-body-bg);
+}
+
+.popover {
+  .popover-header,
+  .popover-body {
+    background-color: var(--pngx-bg-alt);
+    border-color: var(--bs-border-color);
+    color: var(--bs-body-color);
+  }
+}
+
+// fix popover carat colors
+.bs-popover-start > .popover-arrow::after, .bs-popover-auto[data-popper-placement^="left"] {
+  border-left-color: var(--pngx-bg-alt);
+}
+.bs-popover-end > .popover-arrow::after, .bs-popover-auto[data-popper-placement^="right"] {
+  border-right-color: var(--pngx-bg-alt);
+}
+.bs-popover-top > .popover-arrow::after, .bs-popover-auto[data-popper-placement^="top"] {
+  border-top-color: var(--pngx-bg-alt);
+}
+.bs-popover-bottom > .popover-arrow::after, .bs-popover-auto[data-popper-placement^="bottom"] {
+  border-bottom-color: var(--pngx-bg-alt);
+}
+
+.bs-popover-bottom .popover-header::before,
+.bs-popover-auto[x-placement^=bottom] .popover-header::before {
+  border-bottom-color: var(--pngx-bg-alt);
+}
+
+// Bootstrap 5 tweaks
+a.badge {
+  text-decoration: none;
+}
+
+.btn-link {
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.btn-outline-primary:not(:disabled):not(.disabled).active,.btn-outline-primary:not(:disabled):not(.disabled):active,.show>.btn-outline-primary.dropdown-toggle {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
 }

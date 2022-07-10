@@ -1,12 +1,14 @@
 from django.core.management.base import BaseCommand
-
 from paperless_mail import tasks
 
 
 class Command(BaseCommand):
 
     help = """
-    """.replace("    ", "")
+    """.replace(
+        "    ",
+        "",
+    )
 
     def handle(self, *args, **options):
 

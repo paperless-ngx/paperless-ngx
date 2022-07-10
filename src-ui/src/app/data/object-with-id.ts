@@ -1,5 +1,3 @@
 export interface ObjectWithId {
-
-    id?: number
-
+  id?: number
 }

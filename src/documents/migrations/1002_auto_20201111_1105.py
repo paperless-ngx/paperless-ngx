@@ -6,13 +6,19 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('documents', '1001_auto_20201109_1636'),
+        ("documents", "1001_auto_20201109_1636"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='document',
-            name='filename',
-            field=models.FilePathField(default=None, editable=False, help_text='Current filename in storage', max_length=1024, null=True),
+            model_name="document",
+            name="filename",
+            field=models.FilePathField(
+                default=None,
+                editable=False,
+                help_text="Current filename in storage",
+                max_length=1024,
+                null=True,
+            ),
         ),
     ]

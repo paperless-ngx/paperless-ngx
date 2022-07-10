@@ -1,0 +1,9 @@
+[Unit]
+Description=Paperless Webserver Socket
+
+[Socket]
+ListenStream=80
+NoDelay=true
+
+[Install]
+WantedBy=sockets.target

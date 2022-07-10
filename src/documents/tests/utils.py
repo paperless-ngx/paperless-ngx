@@ -7,7 +7,8 @@ from contextlib import contextmanager
 from django.apps import apps
 from django.db import connection
 from django.db.migrations.executor import MigrationExecutor
-from django.test import override_settings, TransactionTestCase
+from django.test import override_settings
+from django.test import TransactionTestCase
 
 
 def setup_directories():
@@ -42,8 +43,7 @@ def setup_directories():
         LOGGING_DIR=dirs.logging_dir,
         INDEX_DIR=dirs.index_dir,
         MODEL_FILE=os.path.join(dirs.data_dir, "classification_model.pickle"),
-        MEDIA_LOCK=os.path.join(dirs.media_dir, "media.lock")
-
+        MEDIA_LOCK=os.path.join(dirs.media_dir, "media.lock"),
     )
     dirs.settings_override.enable()
 
@@ -70,22 +70,20 @@ def paperless_environment():
 
 
 class DirectoriesMixin:
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.dirs = None
 
     def setUp(self) -> None:
         self.dirs = setup_directories()
-        super(DirectoriesMixin, self).setUp()
+        super().setUp()
 
     def tearDown(self) -> None:
-        super(DirectoriesMixin, self).tearDown()
+        super().tearDown()
         remove_dirs(self.dirs)
 
 
 class TestMigrations(TransactionTestCase):
-
     @property
     def app(self):
         return apps.get_containing_app_config(type(self).__module__).name
@@ -95,10 +93,13 @@ class TestMigrations(TransactionTestCase):
     auto_migrate = True
 
     def setUp(self):
-        super(TestMigrations, self).setUp()
+        super().setUp()
 
-        assert self.migrate_from and self.migrate_to, \
-            "TestCase '{}' must define migrate_from and migrate_to     properties".format(type(self).__name__)
+        assert (
+            self.migrate_from and self.migrate_to
+        ), "TestCase '{}' must define migrate_from and migrate_to     properties".format(
+            type(self).__name__,
+        )
         self.migrate_from = [(self.app, self.migrate_from)]
         self.migrate_to = [(self.app, self.migrate_to)]
         executor = MigrationExecutor(connection)

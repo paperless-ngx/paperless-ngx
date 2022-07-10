@@ -15,38 +15,47 @@ def re_slug_all_the_things(apps, schema_editor):
 
     for klass in (Tag, Correspondent):
         for instance in klass.objects.all():
-            klass.objects.filter(
-                pk=instance.pk
-            ).update(
-                slug=slugify(instance.slug)
-            )
+            klass.objects.filter(pk=instance.pk).update(slug=slugify(instance.slug))
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('documents', '0021_document_storage_type'),
+        ("documents", "0021_document_storage_type"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='tag',
-            options={'ordering': ('name',)},
+            name="tag",
+            options={"ordering": ("name",)},
         ),
         migrations.AlterField(
-            model_name='correspondent',
-            name='slug',
+            model_name="correspondent",
+            name="slug",
             field=models.SlugField(blank=True, editable=False),
         ),
         migrations.AlterField(
-            model_name='document',
-            name='file_type',
-            field=models.CharField(choices=[('pdf', 'PDF'), ('png', 'PNG'), ('jpg', 'JPG'), ('gif', 'GIF'), ('tiff', 'TIFF'), ('txt', 'TXT'), ('csv', 'CSV'), ('md', 'MD')], editable=False, max_length=4),
+            model_name="document",
+            name="file_type",
+            field=models.CharField(
+                choices=[
+                    ("pdf", "PDF"),
+                    ("png", "PNG"),
+                    ("jpg", "JPG"),
+                    ("gif", "GIF"),
+                    ("tiff", "TIFF"),
+                    ("txt", "TXT"),
+                    ("csv", "CSV"),
+                    ("md", "MD"),
+                ],
+                editable=False,
+                max_length=4,
+            ),
         ),
         migrations.AlterField(
-            model_name='tag',
-            name='slug',
+            model_name="tag",
+            name="slug",
             field=models.SlugField(blank=True, editable=False),
         ),
-        migrations.RunPython(re_slug_all_the_things, migrations.RunPython.noop)
+        migrations.RunPython(re_slug_all_the_things, migrations.RunPython.noop),
     ]

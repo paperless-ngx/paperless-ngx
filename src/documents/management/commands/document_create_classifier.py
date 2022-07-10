@@ -8,7 +8,10 @@ class Command(BaseCommand):
     help = """
         Trains the classifier on your data and saves the resulting models to a
         file. The document consumer will then automatically use this new model.
-    """.replace("    ", "")
+    """.replace(
+        "    ",
+        "",
+    )
 
     def __init__(self, *args, **kwargs):
         BaseCommand.__init__(self, *args, **kwargs)

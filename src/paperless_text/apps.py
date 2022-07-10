@@ -1,5 +1,4 @@
 from django.apps import AppConfig
-
 from paperless_text.signals import text_consumer_declaration
 
 

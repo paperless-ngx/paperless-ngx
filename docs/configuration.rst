@@ -80,6 +80,15 @@ PAPERLESS_DATA_DIR=<path>
 
     Defaults to "../data/", relative to the "src" directory.
 
+PAPERLESS_TRASH_DIR=<path>
+    Instead of removing deleted documents, they are moved to this directory.
+
+    This must be writeable by the user running paperless. When running inside
+    docker, ensure that this path is within a permanent volume (such as
+    "../media/trash") so it won't get lost on upgrades.
+
+    Defaults to empty (i.e. really delete documents).
+
 PAPERLESS_MEDIA_ROOT=<path>
     This is where your documents and thumbnails are stored.
 
@@ -121,6 +130,8 @@ PAPERLESS_LOGROTATE_MAX_BACKUPS=<num>
 
     Defaults to 20.
 
+.. _hosting-and-security:
+
 Hosting & Security
 ##################
 
@@ -133,7 +144,24 @@ PAPERLESS_SECRET_KEY=<key>
 
     Default is listed in the file ``src/paperless/settings.py``.
 
-PAPERLESS_ALLOWED_HOSTS<comma-separated-list>
+PAPERLESS_URL=<url>
+    This setting can be used to set the three options below (ALLOWED_HOSTS,
+    CORS_ALLOWED_HOSTS and CSRF_TRUSTED_ORIGINS). If the other options are
+    set the values will be combined with this one. Do not include a trailing
+    slash. E.g. https://paperless.domain.com
+
+    Defaults to empty string, leaving the other settings unaffected.
+
+PAPERLESS_CSRF_TRUSTED_ORIGINS=<comma-separated-list>
+    A list of trusted origins for unsafe requests (e.g. POST). As of Django 4.0
+    this is required to access the Django admin via the web.
+    See https://docs.djangoproject.com/en/4.0/ref/settings/#csrf-trusted-origins
+
+    Can also be set using PAPERLESS_URL (see above).
+
+    Defaults to empty string, which does not add any origins to the trusted list.
+
+PAPERLESS_ALLOWED_HOSTS=<comma-separated-list>
     If you're planning on putting Paperless on the open internet, then you
     really should set this value to the domain name you're using.  Failing to do
     so leaves you open to HTTP host header attacks:
@@ -142,11 +170,18 @@ PAPERLESS_ALLOWED_HOSTS<comma-separated-list>
     Just remember that this is a comma-separated list, so "example.com" is fine,
     as is "example.com,www.example.com", but NOT " example.com" or "example.com,"
 
+    Can also be set using PAPERLESS_URL (see above).
+
+    If manually set, please remember to include "localhost". Otherwise docker
+    healthcheck will fail.
+
     Defaults to "*", which is all hosts.
 
-PAPERLESS_CORS_ALLOWED_HOSTS<comma-separated-list>
+PAPERLESS_CORS_ALLOWED_HOSTS=<comma-separated-list>
     You need to add your servers to the list of allowed hosts that can do CORS
     calls. Set this to your public domain name.
+
+    Can also be set using PAPERLESS_URL (see above).
 
     Defaults to "http://localhost:8000".
 
@@ -176,7 +211,7 @@ PAPERLESS_AUTO_LOGIN_USERNAME=<username>
 PAPERLESS_ADMIN_USER=<username>
     If this environment variable is specified, Paperless automatically creates
     a superuser with the provided username at start. This is useful in cases
-    where you can not run the `createsuperuser` command seperately, such as Kubernetes
+    where you can not run the `createsuperuser` command separately, such as Kubernetes
     or AWS ECS.
 
     Requires `PAPERLESS_ADMIN_PASSWORD` to be set.
@@ -232,6 +267,13 @@ PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME=<str>
     normalized actual header name.
 
     Defaults to `HTTP_REMOTE_USER`.
+
+PAPERLESS_LOGOUT_REDIRECT_URL=<str>
+    URL to redirect the user to after a logout. This can be used together with
+    `PAPERLESS_ENABLE_HTTP_REMOTE_USER` to redirect the user back to the SSO
+    application's logout page.
+
+    Defaults to None, which disables this feature.
 
 .. _configuration-ocr:
 
@@ -373,6 +415,15 @@ PAPERLESS_OCR_IMAGE_DPI=<num>
     Default is none, which will automatically calculate image DPI so that
     the produced PDF documents are A4 sized.
 
+PAPERLESS_OCR_MAX_IMAGE_PIXELS=<num>
+    Paperless will not OCR images that have more pixels than this limit.
+    This is intended to prevent decompression bombs from overloading paperless.
+    Increasing this limit is desired if you face a DecompressionBombError despite
+    the concerning file not being malicious; this could e.g. be caused by invalidly
+    recognized metadata.
+    If you have enough resources or if you are certain that your uploaded files
+    are not malicious you can increase this value to your needs.
+    The default value is 256000000, an image with more pixels than that would not be parsed.
 
 PAPERLESS_OCR_USER_ARGS=<json>
     OCRmyPDF offers many more options. Use this parameter to specify any
@@ -402,7 +453,7 @@ Tika settings
 #############
 
 Paperless can make use of `Tika <https://tika.apache.org/>`_ and
-`Gotenberg <https://thecodingmachine.github.io/gotenberg/>`_ for parsing and
+`Gotenberg <https://gotenberg.dev/>`_ for parsing and
 converting "Office" documents (such as ".doc", ".xlsx" and ".odt"). If you
 wish to use this, you must provide a Tika server and a Gotenberg server,
 configure their endpoints, and enable the feature.
@@ -423,7 +474,7 @@ PAPERLESS_TIKA_GOTENBERG_ENDPOINT=<url>
     Defaults to "http://localhost:3000".
 
 If you run paperless on docker, you can add those services to the docker-compose
-file (see the provided ``docker-compose.tika.yml`` file for reference). The changes
+file (see the provided ``docker-compose.sqlite-tika.yml`` file for reference). The changes
 requires are as follows:
 
 .. code:: yaml
@@ -444,18 +495,21 @@ requires are as follows:
         # ...
 
         gotenberg:
-            image: thecodingmachine/gotenberg
+            image: gotenberg/gotenberg:7.4
             restart: unless-stopped
-            environment:
-                DISABLE_GOOGLE_CHROME: 1
+            command:
+                - "gotenberg"
+                - "--chromium-disable-routes=true"
 
         tika:
-            image: apache/tika
+            image: ghcr.io/paperless-ngx/tika:latest
             restart: unless-stopped
 
 Add the configuration variables to the environment of the webserver (alternatively
 put the configuration in the ``docker-compose.env`` file) and add the additional
 services below the webserver service. Watch out for indentation.
+
+Make sure to use the correct format `PAPERLESS_TIKA_ENABLED = 1` so python_dotenv can parse the statement correctly.
 
 Software tweaks
 ###############
@@ -507,6 +561,16 @@ PAPERLESS_THREADS_PER_WORKER=<num>
     PAPERLESS_THREADS_PER_WORKER automatically.
 
 
+PAPERLESS_WORKER_TIMEOUT=<num>
+    Machines with few cores or weak ones might not be able to finish OCR on
+    large documents within the default 1800 seconds. So extending this timeout
+    may prove to be useful on weak hardware setups.
+
+PAPERLESS_WORKER_RETRY=<num>
+    If PAPERLESS_WORKER_TIMEOUT has been configured, the retry time for a task can
+    also be configured.  By default, this value will be set to 10s more than the
+    worker timeout.  This value should never be set less than the worker timeout.
+
 PAPERLESS_TIME_ZONE=<timezone>
     Set the time zone here.
     See https://docs.djangoproject.com/en/3.1/ref/settings/#std:setting-TIME_ZONE
@@ -553,6 +617,38 @@ PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS=<bool>
     PAPERLESS_CONSUMER_RECURSIVE must be enabled for this to work.
 
     Defaults to false.
+
+PAPERLESS_CONSUMER_ENABLE_BARCODES=<bool>
+    Enables the scanning and page separation based on detected barcodes.
+    This allows for scanning and adding multiple documents per uploaded
+    file, which are separated by one or multiple barcode pages.
+
+    For ease of use, it is suggested to use a standardized separation page,
+    e.g. `here <https://www.alliancegroup.co.uk/patch-codes.htm>`_.
+
+    If no barcodes are detected in the uploaded file, no page separation
+    will happen.
+
+    The original document will be removed and the separated pages will be
+    saved as pdf.
+
+    Defaults to false.
+
+PAPERLESS_CONSUMER_BARCODE_TIFF_SUPPORT=<bool>
+    Whether TIFF image files should be scanned for barcodes.
+    This will automatically convert any TIFF image(s) to pdfs for later
+    processing.
+    This only has an effect, if PAPERLESS_CONSUMER_ENABLE_BARCODES has been
+    enabled.
+
+    Defaults to false.
+
+PAPERLESS_CONSUMER_BARCODE_STRING=PATCHT
+  Defines the string to be detected as a separator barcode.
+  If paperless is used with the PATCH-T separator pages, users
+  shouldn't change this.
+
+  Defaults to "PATCHT"
 
 
 PAPERLESS_CONVERT_MEMORY_LIMIT=<num>
@@ -637,7 +733,7 @@ PAPERLESS_CONSUMER_IGNORE_PATTERNS=<json>
 
     This can be adjusted by configuring a custom json array with patterns to exclude.
 
-    Defautls to ``[".DS_STORE/*", "._*", ".stfolder/*"]``.
+    Defaults to ``[".DS_STORE/*", "._*", ".stfolder/*", ".stversions/*", ".localized/*", "desktop.ini"]``.
 
 Binaries
 ########
@@ -676,6 +772,17 @@ PAPERLESS_WEBSERVER_WORKERS=<num>
     Consider configuring this to 1 on low power devices with limited amount of RAM.
 
     Defaults to 2.
+
+PAPERLESS_PORT=<port>
+    The port number the webserver will listen on inside the container. There are
+    special setups where you may need this to avoid collisions with other
+    services (like using podman with multiple containers in one pod).
+
+    Don't change this when using Docker. To change the port the webserver is
+    reachable outside of the container, instead refer to the "ports" key in
+    ``docker-compose.yml``.
+
+    Defaults to 8000.
 
 USERMAP_UID=<uid>
     The ID of the paperless user in the container. Set this to your actual user ID on the
@@ -719,3 +826,26 @@ PAPERLESS_OCR_LANGUAGES=<list>
         PAPERLESS_OCR_LANGUAGE=tur
 
     Defaults to none, which does not install any additional languages.
+
+
+.. _configuration-update-checking:
+
+Update Checking
+###############
+
+PAPERLESS_ENABLE_UPDATE_CHECK=<bool>
+    Enable (or disable) the automatic check for available updates. This feature is disabled
+    by default but if it is not explicitly set Paperless-ngx will show a message about this.
+
+    If enabled, the feature works by pinging the the Github API for the latest release e.g.
+    https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest
+    to determine whether a new version is available.
+
+    Actual updating of the app must still be performed manually.
+
+    Note that for users of thirdy-party containers e.g. linuxserver.io this notification
+    may be 'ahead' of a new release from the third-party maintainers.
+
+    In either case, no tracking data is collected by the app in any way.
+
+    Defaults to none, which disables the feature.

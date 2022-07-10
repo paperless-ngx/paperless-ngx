@@ -1,5 +1,3 @@
-@import "/src/theme";
-
 .card-text {
   font-size: 90%;
 }
@@ -16,10 +14,19 @@
   position: absolute;
   top: 0;
   left: 0;
+  padding: 0.5rem;
+  border-top-left-radius: 0.25rem;
+  border-bottom-right-radius: 0.25rem;
+  pointer-events: none;
 
-  .custom-control {
-    margin-left: 4px;
-    margin-right: -3px;
+  .form-check {
+    padding: 0;
+    min-height: 0;
+    margin-bottom: 0;
+
+    .form-check-input {
+      margin-left: 0;
+    }
   }
 }
 
@@ -28,7 +35,7 @@
 }
 
 .card-selected {
-  border-color: $primary;
+  border-color:var(--bs-primary);
 
   .document-card-check {
     display: block;
@@ -36,7 +43,7 @@
 }
 
 .doc-img-background-selected {
-  background-color: $primaryFaded;
+  background-color: var(--pngx-primary-faded);
 }
 
 .card-info {
@@ -48,7 +55,7 @@
     &:hover,
     &:focus {
       background-color: transparent !important;
-      color: $primary;
+      color: var(--bs-primary);
     }
   }
 
@@ -66,4 +73,8 @@
 ::ng-deep .tooltip-inner {
   text-align: left !important;
   font-size: 90%;
+}
+
+a {
+  cursor: pointer;
 }

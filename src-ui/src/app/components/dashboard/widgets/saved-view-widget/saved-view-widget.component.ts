@@ -1,24 +1,26 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { Subscription } from 'rxjs';
-import { PaperlessDocument } from 'src/app/data/paperless-document';
-import { PaperlessSavedView } from 'src/app/data/paperless-saved-view';
-import { DocumentListViewService } from 'src/app/services/document-list-view.service';
-import { ConsumerStatusService } from 'src/app/services/consumer-status.service';
-import { DocumentService } from 'src/app/services/rest/document.service';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core'
+import { Router } from '@angular/router'
+import { Subscription } from 'rxjs'
+import { PaperlessDocument } from 'src/app/data/paperless-document'
+import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
+import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
+import { DocumentService } from 'src/app/services/rest/document.service'
+import { PaperlessTag } from 'src/app/data/paperless-tag'
+import { FILTER_HAS_TAGS_ALL } from 'src/app/data/filter-rule-type'
+import { QueryParamsService } from 'src/app/services/query-params.service'
 
 @Component({
   selector: 'app-saved-view-widget',
   templateUrl: './saved-view-widget.component.html',
-  styleUrls: ['./saved-view-widget.component.scss']
+  styleUrls: ['./saved-view-widget.component.scss'],
 })
 export class SavedViewWidgetComponent implements OnInit, OnDestroy {
-
   constructor(
     private documentService: DocumentService,
     private router: Router,
-    private list: DocumentListViewService,
-    private consumerStatusService: ConsumerStatusService) { }
+    private queryParamsService: QueryParamsService,
+    private consumerStatusService: ConsumerStatusService
+  ) {}
 
   @Input()
   savedView: PaperlessSavedView
@@ -29,9 +31,11 @@ export class SavedViewWidgetComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.reload()
-    this.subscription = this.consumerStatusService.onDocumentConsumptionFinished().subscribe(status => {
-      this.reload()
-    })
+    this.subscription = this.consumerStatusService
+      .onDocumentConsumptionFinished()
+      .subscribe((status) => {
+        this.reload()
+      })
   }
 
   ngOnDestroy(): void {
@@ -39,18 +43,32 @@ export class SavedViewWidgetComponent implements OnInit, OnDestroy {
   }
 
   reload() {
-    this.documentService.listFiltered(1,10,this.savedView.sort_field, this.savedView.sort_reverse, this.savedView.filter_rules).subscribe(result => {
-      this.documents = result.results
-    })
+    this.documentService
+      .listFiltered(
+        1,
+        10,
+        this.savedView.sort_field,
+        this.savedView.sort_reverse,
+        this.savedView.filter_rules
+      )
+      .subscribe((result) => {
+        this.documents = result.results
+      })
   }
 
   showAll() {
     if (this.savedView.show_in_sidebar) {
       this.router.navigate(['view', this.savedView.id])
     } else {
-      this.list.loadSavedView(this.savedView, true)
-      this.router.navigate(["documents"])
+      this.router.navigate(['documents'], {
+        queryParams: { view: this.savedView.id },
+      })
     }
   }
 
+  clickTag(tag: PaperlessTag) {
+    this.queryParamsService.navigateWithFilterRules([
+      { rule_type: FILTER_HAS_TAGS_ALL, value: tag.id.toString() },
+    ])
+  }
 }

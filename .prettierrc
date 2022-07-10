@@ -1,0 +1,4 @@
+# https://prettier.io/docs/en/options.html#semicolons
+semi: false
+# https://prettier.io/docs/en/options.html#quotes
+singleQuote: true

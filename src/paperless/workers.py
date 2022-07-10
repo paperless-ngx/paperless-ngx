@@ -1,6 +1,7 @@
 import os
-from uvicorn.workers import UvicornWorker
+
 from django.conf import settings
+from uvicorn.workers import UvicornWorker
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "paperless.settings")
 

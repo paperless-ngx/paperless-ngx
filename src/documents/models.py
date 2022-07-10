@@ -1,21 +1,16 @@
-# coding=utf-8
 import datetime
 import logging
 import os
 import re
 from collections import OrderedDict
 
-import pathvalidate
-
 import dateutil.parser
+import pathvalidate
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
-from django.utils.timezone import is_aware
-
 from django.utils.translation import gettext_lazy as _
-
 from documents.parsers import get_default_file_extension
 from smart_open import open
 
@@ -37,23 +32,17 @@ class MatchingModel(models.Model):
         (MATCH_AUTO, _("Automatic")),
     )
 
-    name = models.CharField(
-        _("name"),
-        max_length=128, unique=True)
+    name = models.CharField(_("name"), max_length=128, unique=True)
 
-    match = models.CharField(
-        _("match"),
-        max_length=256, blank=True)
+    match = models.CharField(_("match"), max_length=256, blank=True)
 
     matching_algorithm = models.PositiveIntegerField(
         _("matching algorithm"),
         choices=MATCHING_ALGORITHMS,
-        default=MATCH_ANY
+        default=MATCH_ANY,
     )
 
-    is_insensitive = models.BooleanField(
-        _("is insensitive"),
-        default=True)
+    is_insensitive = models.BooleanField(_("is insensitive"), default=True)
 
     class Meta:
         abstract = True
@@ -64,7 +53,6 @@ class MatchingModel(models.Model):
 
 
 class Correspondent(MatchingModel):
-
     class Meta:
         ordering = ("name",)
         verbose_name = _("correspondent")
@@ -73,17 +61,15 @@ class Correspondent(MatchingModel):
 
 class Tag(MatchingModel):
 
-    color = models.CharField(
-        _("color"),
-        max_length=7,
-        default="#a6cee3"
-    )
+    color = models.CharField(_("color"), max_length=7, default="#a6cee3")
 
     is_inbox_tag = models.BooleanField(
         _("is inbox tag"),
         default=False,
-        help_text=_("Marks this tag as an inbox tag: All newly consumed "
-                    "documents will be tagged with inbox tags.")
+        help_text=_(
+            "Marks this tag as an inbox tag: All newly consumed "
+            "documents will be tagged with inbox tags.",
+        ),
     )
 
     class Meta:
@@ -92,7 +78,6 @@ class Tag(MatchingModel):
 
 
 class DocumentType(MatchingModel):
-
     class Meta:
         verbose_name = _("document type")
         verbose_name_plural = _("document types")
@@ -104,7 +89,7 @@ class Document(models.Model):
     STORAGE_TYPE_GPG = "gpg"
     STORAGE_TYPES = (
         (STORAGE_TYPE_UNENCRYPTED, _("Unencrypted")),
-        (STORAGE_TYPE_GPG, _("Encrypted with GNU Privacy Guard"))
+        (STORAGE_TYPE_GPG, _("Encrypted with GNU Privacy Guard")),
     )
 
     correspondent = models.ForeignKey(
@@ -113,12 +98,10 @@ class Document(models.Model):
         null=True,
         related_name="documents",
         on_delete=models.SET_NULL,
-        verbose_name=_("correspondent")
+        verbose_name=_("correspondent"),
     )
 
-    title = models.CharField(
-        _("title"),
-        max_length=128, blank=True, db_index=True)
+    title = models.CharField(_("title"), max_length=128, blank=True, db_index=True)
 
     document_type = models.ForeignKey(
         DocumentType,
@@ -126,25 +109,25 @@ class Document(models.Model):
         null=True,
         related_name="documents",
         on_delete=models.SET_NULL,
-        verbose_name=_("document type")
+        verbose_name=_("document type"),
     )
 
     content = models.TextField(
         _("content"),
         blank=True,
-        help_text=_("The raw, text-only data of the document. This field is "
-                    "primarily used for searching.")
+        help_text=_(
+            "The raw, text-only data of the document. This field is "
+            "primarily used for searching.",
+        ),
     )
 
-    mime_type = models.CharField(
-        _("mime type"),
-        max_length=256,
-        editable=False
-    )
+    mime_type = models.CharField(_("mime type"), max_length=256, editable=False)
 
     tags = models.ManyToManyField(
-        Tag, related_name="documents", blank=True,
-        verbose_name=_("tags")
+        Tag,
+        related_name="documents",
+        blank=True,
+        verbose_name=_("tags"),
     )
 
     checksum = models.CharField(
@@ -152,7 +135,7 @@ class Document(models.Model):
         max_length=32,
         editable=False,
         unique=True,
-        help_text=_("The checksum of the original document.")
+        help_text=_("The checksum of the original document."),
     )
 
     archive_checksum = models.CharField(
@@ -161,28 +144,32 @@ class Document(models.Model):
         editable=False,
         blank=True,
         null=True,
-        help_text=_("The checksum of the archived document.")
+        help_text=_("The checksum of the archived document."),
     )
 
-    created = models.DateTimeField(
-        _("created"),
-        default=timezone.now, db_index=True)
+    created = models.DateTimeField(_("created"), default=timezone.now, db_index=True)
 
     modified = models.DateTimeField(
         _("modified"),
-        auto_now=True, editable=False, db_index=True)
+        auto_now=True,
+        editable=False,
+        db_index=True,
+    )
 
     storage_type = models.CharField(
         _("storage type"),
         max_length=11,
         choices=STORAGE_TYPES,
         default=STORAGE_TYPE_UNENCRYPTED,
-        editable=False
+        editable=False,
     )
 
     added = models.DateTimeField(
         _("added"),
-        default=timezone.now, editable=False, db_index=True)
+        default=timezone.now,
+        editable=False,
+        db_index=True,
+    )
 
     filename = models.FilePathField(
         _("filename"),
@@ -191,7 +178,7 @@ class Document(models.Model):
         default=None,
         unique=True,
         null=True,
-        help_text=_("Current filename in storage")
+        help_text=_("Current filename in storage"),
     )
 
     archive_filename = models.FilePathField(
@@ -201,7 +188,7 @@ class Document(models.Model):
         default=None,
         unique=True,
         null=True,
-        help_text=_("Current archive filename in storage")
+        help_text=_("Current archive filename in storage"),
     )
 
     archive_serial_number = models.IntegerField(
@@ -210,8 +197,9 @@ class Document(models.Model):
         null=True,
         unique=True,
         db_index=True,
-        help_text=_("The position of this document in your physical document "
-                    "archive.")
+        help_text=_(
+            "The position of this document in your physical document " "archive.",
+        ),
     )
 
     class Meta:
@@ -220,10 +208,8 @@ class Document(models.Model):
         verbose_name_plural = _("documents")
 
     def __str__(self):
-        if is_aware(self.created):
-            created = timezone.localdate(self.created).isoformat()
-        else:
-            created = datetime.date.isoformat(self.created)
+        created = datetime.date.isoformat(self.created)
+
         if self.correspondent and self.title:
             return f"{created} {self.correspondent} {self.title}"
         else:
@@ -234,14 +220,11 @@ class Document(models.Model):
         if self.filename:
             fname = str(self.filename)
         else:
-            fname = "{:07}{}".format(self.pk, self.file_type)
+            fname = f"{self.pk:07}{self.file_type}"
             if self.storage_type == self.STORAGE_TYPE_GPG:
                 fname += ".gpg"  # pragma: no cover
 
-        return os.path.join(
-            settings.ORIGINALS_DIR,
-            fname
-        )
+        return os.path.join(settings.ORIGINALS_DIR, fname)
 
     @property
     def source_file(self):
@@ -254,10 +237,7 @@ class Document(models.Model):
     @property
     def archive_path(self):
         if self.has_archive_version:
-            return os.path.join(
-                settings.ARCHIVE_DIR,
-                str(self.archive_filename)
-            )
+            return os.path.join(settings.ARCHIVE_DIR, str(self.archive_filename))
         else:
             return None
 
@@ -287,14 +267,11 @@ class Document(models.Model):
 
     @property
     def thumbnail_path(self):
-        file_name = "{:07}.png".format(self.pk)
+        file_name = f"{self.pk:07}.png"
         if self.storage_type == self.STORAGE_TYPE_GPG:
             file_name += ".gpg"
 
-        return os.path.join(
-            settings.THUMBNAIL_DIR,
-            file_name
-        )
+        return os.path.join(settings.THUMBNAIL_DIR, file_name)
 
     @property
     def thumbnail_file(self):
@@ -311,15 +288,15 @@ class Log(models.Model):
         (logging.CRITICAL, _("critical")),
     )
 
-    group = models.UUIDField(
-        _("group"),
-        blank=True, null=True)
+    group = models.UUIDField(_("group"), blank=True, null=True)
 
     message = models.TextField(_("message"))
 
     level = models.PositiveIntegerField(
         _("level"),
-        choices=LEVELS, default=logging.INFO)
+        choices=LEVELS,
+        default=logging.INFO,
+    )
 
     created = models.DateTimeField(_("created"), auto_now_add=True)
 
@@ -333,18 +310,14 @@ class Log(models.Model):
 
 
 class SavedView(models.Model):
-
     class Meta:
 
         ordering = ("name",)
         verbose_name = _("saved view")
         verbose_name_plural = _("saved views")
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE,
-                             verbose_name=_("user"))
-    name = models.CharField(
-        _("name"),
-        max_length=128)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_("user"))
+    name = models.CharField(_("name"), max_length=128)
 
     show_on_dashboard = models.BooleanField(
         _("show on dashboard"),
@@ -357,11 +330,9 @@ class SavedView(models.Model):
         _("sort field"),
         max_length=128,
         null=True,
-        blank=True
+        blank=True,
     )
-    sort_reverse = models.BooleanField(
-        _("sort reverse"),
-        default=False)
+    sort_reverse = models.BooleanField(_("sort reverse"), default=False)
 
 
 class SavedViewFilterRule(models.Model):
@@ -387,25 +358,20 @@ class SavedViewFilterRule(models.Model):
         (18, _("does not have ASN")),
         (19, _("title or content contains")),
         (20, _("fulltext query")),
-        (21, _("more like this"))
+        (21, _("more like this")),
+        (22, _("has tags in")),
     ]
 
     saved_view = models.ForeignKey(
         SavedView,
         on_delete=models.CASCADE,
         related_name="filter_rules",
-        verbose_name=_("saved view")
+        verbose_name=_("saved view"),
     )
 
-    rule_type = models.PositiveIntegerField(
-        _("rule type"),
-        choices=RULE_TYPES)
+    rule_type = models.PositiveIntegerField(_("rule type"), choices=RULE_TYPES)
 
-    value = models.CharField(
-        _("value"),
-        max_length=128,
-        blank=True,
-        null=True)
+    value = models.CharField(_("value"), max_length=255, blank=True, null=True)
 
     class Meta:
         verbose_name = _("filter rule")
@@ -415,20 +381,28 @@ class SavedViewFilterRule(models.Model):
 # TODO: why is this in the models file?
 class FileInfo:
 
-    REGEXES = OrderedDict([
-        ("created-title", re.compile(
-            r"^(?P<created>\d\d\d\d\d\d\d\d(\d\d\d\d\d\d)?Z) - "
-            r"(?P<title>.*)$",
-            flags=re.IGNORECASE
-        )),
-        ("title", re.compile(
-            r"(?P<title>.*)$",
-            flags=re.IGNORECASE
-        ))
-    ])
+    REGEXES = OrderedDict(
+        [
+            (
+                "created-title",
+                re.compile(
+                    r"^(?P<created>\d\d\d\d\d\d\d\d(\d\d\d\d\d\d)?Z) - "
+                    r"(?P<title>.*)$",
+                    flags=re.IGNORECASE,
+                ),
+            ),
+            ("title", re.compile(r"(?P<title>.*)$", flags=re.IGNORECASE)),
+        ],
+    )
 
-    def __init__(self, created=None, correspondent=None, title=None, tags=(),
-                 extension=None):
+    def __init__(
+        self,
+        created=None,
+        correspondent=None,
+        title=None,
+        tags=(),
+        extension=None,
+    ):
 
         self.created = created
         self.title = title
@@ -439,7 +413,7 @@ class FileInfo:
     @classmethod
     def _get_created(cls, created):
         try:
-            return dateutil.parser.parse("{:0<14}Z".format(created[:-1]))
+            return dateutil.parser.parse(f"{created[:-1]:0<14}Z")
         except ValueError:
             return None
 
@@ -450,9 +424,7 @@ class FileInfo:
     @classmethod
     def _mangle_property(cls, properties, name):
         if name in properties:
-            properties[name] = getattr(cls, "_get_{}".format(name))(
-                properties[name]
-            )
+            properties[name] = getattr(cls, f"_get_{name}")(properties[name])
 
     @classmethod
     def from_filename(cls, filename):

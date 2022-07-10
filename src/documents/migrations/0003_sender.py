@@ -19,9 +19,11 @@ def move_sender_strings_to_sender_model(apps, schema_editor):
     # Create the sender and log the relationship with the document
     for document in document_model.objects.all():
         if document.sender:
-            DOCUMENT_SENDER_MAP[document.pk], created = sender_model.objects.get_or_create(
-                name=document.sender,
-                defaults={"slug": slugify(document.sender)}
+            (
+                DOCUMENT_SENDER_MAP[document.pk],
+                created,
+            ) = sender_model.objects.get_or_create(
+                name=document.sender, defaults={"slug": slugify(document.sender)}
             )
 
 
@@ -33,27 +35,39 @@ def realign_senders(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('documents', '0002_auto_20151226_1316'),
+        ("documents", "0002_auto_20151226_1316"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Sender',
+            name="Sender",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=128, unique=True)),
-                ('slug', models.SlugField()),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=128, unique=True)),
+                ("slug", models.SlugField()),
             ],
         ),
         migrations.RunPython(move_sender_strings_to_sender_model),
         migrations.RemoveField(
-            model_name='document',
-            name='sender',
+            model_name="document",
+            name="sender",
         ),
         migrations.AddField(
-            model_name='document',
-            name='sender',
-            field=models.ForeignKey(blank=True, on_delete=django.db.models.deletion.CASCADE, to='documents.Sender'),
+            model_name="document",
+            name="sender",
+            field=models.ForeignKey(
+                blank=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="documents.Sender",
+            ),
         ),
         migrations.RunPython(realign_senders),
     ]

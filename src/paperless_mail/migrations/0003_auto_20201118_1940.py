@@ -6,18 +6,22 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('paperless_mail', '0002_auto_20201117_1334'),
+        ("paperless_mail", "0002_auto_20201117_1334"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='mailaccount',
-            name='imap_port',
-            field=models.IntegerField(blank=True, help_text='This is usually 143 for unencrypted and STARTTLS connections, and 993 for SSL connections.', null=True),
+            model_name="mailaccount",
+            name="imap_port",
+            field=models.IntegerField(
+                blank=True,
+                help_text="This is usually 143 for unencrypted and STARTTLS connections, and 993 for SSL connections.",
+                null=True,
+            ),
         ),
         migrations.AlterField(
-            model_name='mailrule',
-            name='name',
+            model_name="mailrule",
+            name="name",
             field=models.CharField(max_length=256, unique=True),
         ),
     ]

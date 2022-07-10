@@ -20,10 +20,7 @@ def source_path(self):
         if self.storage_type == STORAGE_TYPE_GPG:
             fname += ".gpg"
 
-    return os.path.join(
-        settings.ORIGINALS_DIR,
-        fname
-    )
+    return os.path.join(settings.ORIGINALS_DIR, fname)
 
 
 def add_mime_types(apps, schema_editor):
@@ -49,43 +46,51 @@ def add_file_extensions(apps, schema_editor):
     documents = Document.objects.all()
 
     for d in documents:
-        d.file_type = os.path.splitext(d.filename)[1].strip('.')
+        d.file_type = os.path.splitext(d.filename)[1].strip(".")
         d.save()
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('documents', '1002_auto_20201111_1105'),
+        ("documents", "1002_auto_20201111_1105"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='document',
-            name='mime_type',
+            model_name="document",
+            name="mime_type",
             field=models.CharField(default="-", editable=False, max_length=256),
             preserve_default=False,
         ),
         migrations.RunPython(add_mime_types, migrations.RunPython.noop),
-
         # This operation is here so that we can revert the entire migration:
         # By allowing this field to be blank and null, we can revert the
         # remove operation further down and the database won't complain about
         # NOT NULL violations.
         migrations.AlterField(
-            model_name='document',
-            name='file_type',
+            model_name="document",
+            name="file_type",
             field=models.CharField(
-                choices=[('pdf', 'PDF'), ('png', 'PNG'), ('jpg', 'JPG'), ('gif', 'GIF'), ('tiff', 'TIFF'), ('txt', 'TXT'), ('csv', 'CSV'), ('md', 'MD')],
+                choices=[
+                    ("pdf", "PDF"),
+                    ("png", "PNG"),
+                    ("jpg", "JPG"),
+                    ("gif", "GIF"),
+                    ("tiff", "TIFF"),
+                    ("txt", "TXT"),
+                    ("csv", "CSV"),
+                    ("md", "MD"),
+                ],
                 editable=False,
                 max_length=4,
                 null=True,
-                blank=True
+                blank=True,
             ),
         ),
         migrations.RunPython(migrations.RunPython.noop, add_file_extensions),
         migrations.RemoveField(
-            model_name='document',
-            name='file_type',
+            model_name="document",
+            name="file_type",
         ),
     ]

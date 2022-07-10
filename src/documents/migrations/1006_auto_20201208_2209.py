@@ -6,20 +6,20 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('documents', '1005_checksums'),
+        ("documents", "1005_checksums"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='correspondent',
-            name='slug',
+            model_name="correspondent",
+            name="slug",
         ),
         migrations.RemoveField(
-            model_name='documenttype',
-            name='slug',
+            model_name="documenttype",
+            name="slug",
         ),
         migrations.RemoveField(
-            model_name='tag',
-            name='slug',
+            model_name="tag",
+            name="slug",
         ),
     ]

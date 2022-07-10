@@ -8,20 +8,32 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('documents', '0007_auto_20160126_2114'),
+        ("documents", "0007_auto_20160126_2114"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='document',
-            name='file_type',
-            field=models.CharField(choices=[('pdf', 'PDF'), ('png', 'PNG'), ('jpg', 'JPG'), ('gif', 'GIF'), ('tiff', 'TIFF')], default='pdf', editable=False, max_length=4),
+            model_name="document",
+            name="file_type",
+            field=models.CharField(
+                choices=[
+                    ("pdf", "PDF"),
+                    ("png", "PNG"),
+                    ("jpg", "JPG"),
+                    ("gif", "GIF"),
+                    ("tiff", "TIFF"),
+                ],
+                default="pdf",
+                editable=False,
+                max_length=4,
+            ),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='document',
-            name='tags',
-            field=models.ManyToManyField(blank=True, related_name='documents', to='documents.Tag'),
+            model_name="document",
+            name="tags",
+            field=models.ManyToManyField(
+                blank=True, related_name="documents", to="documents.Tag"
+            ),
         ),
     ]
-

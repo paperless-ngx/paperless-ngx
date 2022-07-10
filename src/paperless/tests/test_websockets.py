@@ -2,20 +2,19 @@ from unittest import mock
 
 from channels.layers import get_channel_layer
 from channels.testing import WebsocketCommunicator
-from django.test import TestCase, override_settings
-
+from django.test import override_settings
+from django.test import TestCase
 from paperless.asgi import application
 
 
 TEST_CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
     },
 }
 
 
 class TestWebSockets(TestCase):
-
     @override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
     async def test_no_auth(self):
         communicator = WebsocketCommunicator(application, "/ws/status/")
@@ -43,15 +42,13 @@ class TestWebSockets(TestCase):
         connected, subprotocol = await communicator.connect()
         self.assertTrue(connected)
 
-        message = {
-            "task_id": "test"
-        }
+        message = {"task_id": "test"}
 
         channel_layer = get_channel_layer()
-        await channel_layer.group_send("status_updates", {
-            "type": "status_update",
-            "data": message
-        })
+        await channel_layer.group_send(
+            "status_updates",
+            {"type": "status_update", "data": message},
+        )
 
         response = await communicator.receive_json_from()
 

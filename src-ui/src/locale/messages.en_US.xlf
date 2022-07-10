@@ -1,0 +1,2340 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file source-language="en" datatype="plaintext" original="ng2.template" target-language="en">
+    <body>
+      <trans-unit id="9103526311244275943" datatype="html">
+        <source>Document added</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">51</context>
+        </context-group>
+        <target state="needs-translation">Document added</target>
+      </trans-unit>
+      <trans-unit id="9204248378636247318" datatype="html">
+        <source>Document <x id="PH" equiv-text="status.filename"/> was added to paperless.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">51</context>
+        </context-group>
+        <target state="needs-translation">Document <x id="PH" equiv-text="status.filename"/> was added to paperless.</target>
+      </trans-unit>
+      <trans-unit id="1931214133925051574" datatype="html">
+        <source>Open document</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">51</context>
+        </context-group>
+        <target state="needs-translation">Open document</target>
+      </trans-unit>
+      <trans-unit id="8582620835547864448" datatype="html">
+        <source>Could not add <x id="PH" equiv-text="status.filename"/>: <x id="PH_1" equiv-text="status.message"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">59</context>
+        </context-group>
+        <target state="needs-translation">Could not add <x id="PH" equiv-text="status.filename"/>: <x id="PH_1" equiv-text="status.message"/></target>
+      </trans-unit>
+      <trans-unit id="1710712016675379662" datatype="html">
+        <source>New document detected</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">65</context>
+        </context-group>
+        <target state="needs-translation">New document detected</target>
+      </trans-unit>
+      <trans-unit id="587031278561344416" datatype="html">
+        <source>Document <x id="PH" equiv-text="status.filename"/> is being processed by paperless.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">65</context>
+        </context-group>
+        <target state="needs-translation">Document <x id="PH" equiv-text="status.filename"/> is being processed by paperless.</target>
+      </trans-unit>
+      <trans-unit id="4733307402565258070" datatype="html">
+        <source>Documents</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
+          <context context-type="linenumber">51</context>
+        </context-group>
+        <target state="needs-translation">Documents</target>
+      </trans-unit>
+      <trans-unit id="2155249406916744630" datatype="html">
+        <source>View &quot;<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>&quot; saved successfully.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
+          <context context-type="linenumber">116</context>
+        </context-group>
+        <target state="needs-translation">View "<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>" saved successfully.</target>
+      </trans-unit>
+      <trans-unit id="6837554170707123455" datatype="html">
+        <source>View &quot;<x id="PH" equiv-text="savedView.name"/>&quot; created successfully.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
+          <context context-type="linenumber">138</context>
+        </context-group>
+        <target state="needs-translation">View "<x id="PH" equiv-text="savedView.name"/>" created successfully.</target>
+      </trans-unit>
+      <trans-unit id="9ca82952a6bc860b5391d5975322d8af8ceddfa4" datatype="html">
+        <source>Select</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+        <target state="needs-translation">Select</target>
+      </trans-unit>
+      <trans-unit id="7e1f9a7054aff842832620c03dedae894787ba41" datatype="html">
+        <source>Select none</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+        <target state="needs-translation">Select none</target>
+      </trans-unit>
+      <trans-unit id="2ed8a0c2ce4968f8614151eefed20a0aa3daeeb9" datatype="html">
+        <source>Select page</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+        <target state="needs-translation">Select page</target>
+      </trans-unit>
+      <trans-unit id="b463541a7e303aa4d0b1102eaff8afbaf34e7a74" datatype="html">
+        <source>Select all</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+        <target state="needs-translation">Select all</target>
+      </trans-unit>
+      <trans-unit id="5d43539fc358c3a548b9d487be821db73e2702ff" datatype="html">
+        <source>Sort</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
+          <context context-type="linenumber">39</context>
+        </context-group>
+        <target state="needs-translation">Sort</target>
+      </trans-unit>
+      <trans-unit id="b7641aed03492978b4ec6843b1e53f30464294d9" datatype="html">
+        <source>Views</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
+          <context context-type="linenumber">64</context>
+        </context-group>
+        <target state="needs-translation">Views</target>
+      </trans-unit>
+      <trans-unit id="b69d81ff62cdc22b6bf88fe0b72dc1f66ccfa44f" datatype="html">
+        <source>Save as...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
+          <context context-type="linenumber">72</context>
+        </context-group>
+        <target state="needs-translation">Save as...</target>
+      </trans-unit>
+      <trans-unit id="5f5ce787c428d917c30c9bd70789a618e09743a7" datatype="html">
+        <source>Save &quot;<x id="INTERPOLATION" equiv-text="{{list.activeSavedViewTitle}}"/>&quot;</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
+          <context context-type="linenumber">71</context>
+        </context-group>
+        <target state="needs-translation">Save "<x id="INTERPOLATION" equiv-text="{{list.activeSavedViewTitle}}"/>"</target>
+      </trans-unit>
+      <trans-unit id="439e7cc3c1ecefded167ed4d37f7d22dad6a9159" datatype="html">
+        <source>{VAR_PLURAL, plural, =1 {Selected <x id="INTERPOLATION"/> of one document} other {Selected <x id="INTERPOLATION"/> of <x id="INTERPOLATION_1"/> documents}}</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
+          <context context-type="linenumber">85</context>
+        </context-group>
+        <target state="needs-translation">{VAR_PLURAL, plural, =1 {Selected <x id="INTERPOLATION"/> of one document} other {Selected <x id="INTERPOLATION"/> of <x id="INTERPOLATION_1"/> documents}}</target>
+      </trans-unit>
+      <trans-unit id="bb773fdeaad5e7fb8e6cd77e1cc558e1b194a0c9" datatype="html">
+        <source>{VAR_PLURAL, plural, =1 {One document} other {<x id="INTERPOLATION"/> documents}}</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
+          <context context-type="linenumber">86</context>
+        </context-group>
+        <target state="needs-translation">{VAR_PLURAL, plural, =1 {One document} other {<x id="INTERPOLATION"/> documents}}</target>
+      </trans-unit>
+      <trans-unit id="bb91083b44e3f77dd68de773ceab467ca3d57507" datatype="html">
+        <source>(filtered)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
+          <context context-type="linenumber">86</context>
+        </context-group>
+        <target state="needs-translation">(filtered)</target>
+      </trans-unit>
+      <trans-unit id="ca0b795795658155d44ddca02e95f1feeeb4a88f" datatype="html">
+        <source>ASN</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
+          <context context-type="linenumber">111</context>
+        </context-group>
+        <target state="needs-translation">ASN</target>
+      </trans-unit>
+      <trans-unit id="7b5c6286aaded63fb279d6deb8aa8c704e085ced" datatype="html">
+        <source>Correspondent</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
+          <context context-type="linenumber">117</context>
+        </context-group>
+        <target state="needs-translation">Correspondent</target>
+      </trans-unit>
+      <trans-unit id="fdf7cbdc140d0aab0f0b6c06065a0fd448ed6a2e" datatype="html">
+        <source>Title</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
+          <context context-type="linenumber">123</context>
+        </context-group>
+        <target state="needs-translation">Title</target>
+      </trans-unit>
+      <trans-unit id="2bd5919e8098513664a89d5b7b52d61e3063950f" datatype="html">
+        <source>Document type</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
+          <context context-type="linenumber">129</context>
+        </context-group>
+        <target state="needs-translation">Document type</target>
+      </trans-unit>
+      <trans-unit id="1b051734b0ee9021991c91b3ed4e81c244322462" datatype="html">
+        <source>Created</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
+          <context context-type="linenumber">135</context>
+        </context-group>
+        <target state="needs-translation">Created</target>
+      </trans-unit>
+      <trans-unit id="80e3b490720757978c99a7b5af3885faf202b955" datatype="html">
+        <source>Added</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
+          <context context-type="linenumber">141</context>
+        </context-group>
+        <target state="needs-translation">Added</target>
+      </trans-unit>
+      <trans-unit id="9021887951960049161" datatype="html">
+        <source>Confirm delete</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
+          <context context-type="linenumber">206</context>
+        </context-group>
+        <target state="needs-translation">Confirm delete</target>
+      </trans-unit>
+      <trans-unit id="5382975254277698192" datatype="html">
+        <source>Do you really want to delete document &quot;<x id="PH" equiv-text="this.document.title"/>&quot;?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
+          <context context-type="linenumber">207</context>
+        </context-group>
+        <target state="needs-translation">Do you really want to delete document "<x id="PH" equiv-text="this.document.title"/>"?</target>
+      </trans-unit>
+      <trans-unit id="6691075929777935948" datatype="html">
+        <source>The files for this document will be deleted permanently. This operation cannot be undone.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
+          <context context-type="linenumber">208</context>
+        </context-group>
+        <target state="needs-translation">The files for this document will be deleted permanently. This operation cannot be undone.</target>
+      </trans-unit>
+      <trans-unit id="719892092227206532" datatype="html">
+        <source>Delete document</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
+          <context context-type="linenumber">210</context>
+        </context-group>
+        <target state="needs-translation">Delete document</target>
+      </trans-unit>
+      <trans-unit id="1844801255494293730" datatype="html">
+        <source>Error deleting document: <x id="PH" equiv-text="JSON.stringify(error)"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
+          <context context-type="linenumber">217</context>
+        </context-group>
+        <target state="needs-translation">Error deleting document: <x id="PH" equiv-text="JSON.stringify(error)"/></target>
+      </trans-unit>
+      <trans-unit id="826b25211922a1b46436589233cb6f1a163d89b7" datatype="html">
+        <source>Delete</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+        <target state="needs-translation">Delete</target>
+      </trans-unit>
+      <trans-unit id="dc75033a5238fdc4f462212c847a45ba8018a3fd" datatype="html">
+        <source>Download</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
+          <context context-type="linenumber">23</context>
+        </context-group>
+        <target state="needs-translation">Download</target>
+      </trans-unit>
+      <trans-unit id="4ea3c236bca3528318e3b3a411a20909e5fa8be4" datatype="html">
+        <source>More like this</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
+          <context context-type="linenumber">38</context>
+        </context-group>
+        <target state="needs-translation">More like this</target>
+      </trans-unit>
+      <trans-unit id="f4e529ae5ffd73001d1ff4bbdeeb0a72e342e5c8" datatype="html">
+        <source>Close</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+        <target state="needs-translation">Close</target>
+      </trans-unit>
+      <trans-unit id="4f8b2bb476981727ab34ed40fde1218361f92c45" datatype="html">
+        <source>Details</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
+          <context context-type="linenumber">56</context>
+        </context-group>
+        <target state="needs-translation">Details</target>
+      </trans-unit>
+      <trans-unit id="4ab4cb601522b9194922554d934c4c30bd93567d" datatype="html">
+        <source>Content</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
+          <context context-type="linenumber">72</context>
+        </context-group>
+        <target state="needs-translation">Content</target>
+      </trans-unit>
+      <trans-unit id="f721a500a68c357e8f2a01e60510f6a01e4ba529" datatype="html">
+        <source>Metadata</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
+          <context context-type="linenumber">81</context>
+        </context-group>
+        <target state="needs-translation">Metadata</target>
+      </trans-unit>
+      <trans-unit id="3f5a652a1f473f4e243e3c6805ef1b383e270bb7" datatype="html">
+        <source>Discard</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
+          <context context-type="linenumber">130</context>
+        </context-group>
+        <target state="needs-translation">Discard</target>
+      </trans-unit>
+      <trans-unit id="52c9a103b812f258bcddc3d90a6e3f46871d25fe" datatype="html">
+        <source>Save</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
+          <context context-type="linenumber">132</context>
+        </context-group>
+        <target state="needs-translation">Save</target>
+      </trans-unit>
+      <trans-unit id="8380d9eff8613c0bc58edc7cebc2aa72e17b11e3" datatype="html">
+        <source>Page</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+        <target state="needs-translation">Page</target>
+      </trans-unit>
+      <trans-unit id="c972a8e7d09f86e0c408a80349990fb213b32c08" datatype="html">
+        <source>of <x id="INTERPOLATION" equiv-text="{{previewNumPages}}"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+        <target state="needs-translation">of <x id="INTERPOLATION" equiv-text="{{previewNumPages}}"/></target>
+      </trans-unit>
+      <trans-unit id="a071e35fecc10753065b1cb5b38608be66da2c8b" datatype="html">
+        <source>Download original</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
+        <target state="needs-translation">Download original</target>
+      </trans-unit>
+      <trans-unit id="9b3996b5ddcc628a999a7df72fbfc2a2eae8c8a5" datatype="html">
+        <source>Archive serial number</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
+          <context context-type="linenumber">60</context>
+        </context-group>
+        <target state="needs-translation">Archive serial number</target>
+      </trans-unit>
+      <trans-unit id="30eebc2dd656dbcb259d8d5286d244ee397d63bd" datatype="html">
+        <source>Date created</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
+          <context context-type="linenumber">61</context>
+        </context-group>
+        <target state="needs-translation">Date created</target>
+      </trans-unit>
+      <trans-unit id="6e58f1baf7acb6a0cfe3636b9c2a61b4d1183720" datatype="html">
+        <source>Date modified</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
+          <context context-type="linenumber">87</context>
+        </context-group>
+        <target state="needs-translation">Date modified</target>
+      </trans-unit>
+      <trans-unit id="c1ae0f9ac4efb2dcd43cd947ddba09d6c4328269" datatype="html">
+        <source>Date added</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
+          <context context-type="linenumber">91</context>
+        </context-group>
+        <target state="needs-translation">Date added</target>
+      </trans-unit>
+      <trans-unit id="c7ea641c3a61a12a3599ce5a75c6d0dbba409ad3" datatype="html">
+        <source>Media filename</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
+          <context context-type="linenumber">95</context>
+        </context-group>
+        <target state="needs-translation">Media filename</target>
+      </trans-unit>
+      <trans-unit id="74a894d2a8ae24a1eed4bc56e9afdc27dc2c31c8" datatype="html">
+        <source>Original MD5 checksum</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
+          <context context-type="linenumber">99</context>
+        </context-group>
+        <target state="needs-translation">Original MD5 checksum</target>
+      </trans-unit>
+      <trans-unit id="e92ca184ea785769fb26138fc25ee9fa06fff6e5" datatype="html">
+        <source>Original file size</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
+          <context context-type="linenumber">103</context>
+        </context-group>
+        <target state="needs-translation">Original file size</target>
+      </trans-unit>
+      <trans-unit id="b5e93f30cc3411f20bd62025a6cc7394568f1bfd" datatype="html">
+        <source>Original mime type</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
+          <context context-type="linenumber">107</context>
+        </context-group>
+        <target state="needs-translation">Original mime type</target>
+      </trans-unit>
+      <trans-unit id="edbf54e4117606b5dd87aaea3c14b21ebf398020" datatype="html">
+        <source>Archive MD5 checksum</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
+          <context context-type="linenumber">111</context>
+        </context-group>
+        <target state="needs-translation">Archive MD5 checksum</target>
+      </trans-unit>
+      <trans-unit id="e6bf12eadecbfd80016eca15fa78651c6ca90c64" datatype="html">
+        <source>Archive file size</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
+          <context context-type="linenumber">115</context>
+        </context-group>
+        <target state="needs-translation">Archive file size</target>
+      </trans-unit>
+      <trans-unit id="203c7adb5bd74ae18e84e1e3b66ddfe76bc0023f" datatype="html">
+        <source>Original document metadata</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
+          <context context-type="linenumber">121</context>
+        </context-group>
+        <target state="needs-translation">Original document metadata</target>
+      </trans-unit>
+      <trans-unit id="7174dcea4a3d0b743e7e4a78747e902230727f67" datatype="html">
+        <source>Archived document metadata</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
+          <context context-type="linenumber">122</context>
+        </context-group>
+        <target state="needs-translation">Archived document metadata</target>
+      </trans-unit>
+      <trans-unit id="3fb9f1a31c3798173b2fea72638732c783b152fe" datatype="html">
+        <source>Save &amp; next</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
+          <context context-type="linenumber">131</context>
+        </context-group>
+        <target state="needs-translation">Save &amp; next</target>
+      </trans-unit>
+      <trans-unit id="8765497970646365998" datatype="html">
+        <source>Hello <x id="PH" equiv-text="this.displayName"/>, welcome to Paperless-ngx!</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+        <target state="needs-translation">Hello <x id="PH" equiv-text="this.displayName"/>, welcome to Paperless-ngx!</target>
+      </trans-unit>
+      <trans-unit id="7016571167317583872" datatype="html">
+        <source>Welcome to Paperless-ngx!</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+        <target state="needs-translation">Welcome to Paperless-ngx!</target>
+      </trans-unit>
+      <trans-unit id="f65253954b66e929a8b4d5ecaf61f9129f8cec64" datatype="html">
+        <source>Dashboard</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+        <target state="needs-translation">Dashboard</target>
+      </trans-unit>
+      <trans-unit id="93754014749412887" datatype="html">
+        <source>Do you really want to delete the tag &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.ts</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+        <target state="needs-translation">Do you really want to delete the tag "<x id="PH" equiv-text="object.name"/>"?</target>
+      </trans-unit>
+      <trans-unit id="cafc87479686947e2590b9f588a88040aeaf660b" datatype="html">
+        <source>Tags</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+        <target state="needs-translation">Tags</target>
+      </trans-unit>
+      <trans-unit id="70a67e04629f6d412db0a12d51820b480788d795" datatype="html">
+        <source>Create</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+        <target state="needs-translation">Create</target>
+      </trans-unit>
+      <trans-unit id="ddb40946e790522301687ecddb9ce1cb8ad40dd1" datatype="html">
+        <source>Filter by:</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+        <target state="needs-translation">Filter by:</target>
+      </trans-unit>
+      <trans-unit id="cff1428d10d59d14e45edec3c735a27b5482db59" datatype="html">
+        <source>Name</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+        <target state="needs-translation">Name</target>
+      </trans-unit>
+      <trans-unit id="8fa4d523f7b91df4390120b85ed0406138273e1a" datatype="html">
+        <source>Color</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+        <target state="needs-translation">Color</target>
+      </trans-unit>
+      <trans-unit id="d0c4488f742efeba0915e90e285a022da813deff" datatype="html">
+        <source>Matching</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
+          <context context-type="linenumber">21</context>
+        </context-group>
+        <target state="needs-translation">Matching</target>
+      </trans-unit>
+      <trans-unit id="9bcf8d20d23c111eca1431abd2d2ce0de324499c" datatype="html">
+        <source>Document count</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
+          <context context-type="linenumber">22</context>
+        </context-group>
+        <target state="needs-translation">Document count</target>
+      </trans-unit>
+      <trans-unit id="030b4423b92167200e39519599f9b863b4f7c62c" datatype="html">
+        <source>Actions</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
+          <context context-type="linenumber">23</context>
+        </context-group>
+        <target state="needs-translation">Actions</target>
+      </trans-unit>
+      <trans-unit id="9d51b3c90afda70700229d1b8a55371c13cb3bce" datatype="html">
+        <source>Documents</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
+          <context context-type="linenumber">38</context>
+        </context-group>
+        <target state="needs-translation">Documents</target>
+      </trans-unit>
+      <trans-unit id="28f86ffd419b869711aa13f5e5ff54be6d70731c" datatype="html">
+        <source>Edit</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+        <target state="needs-translation">Edit</target>
+      </trans-unit>
+      <trans-unit id="4990731724078522539" datatype="html">
+        <source>Do you really want to delete the document type &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.ts</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+        <target state="needs-translation">Do you really want to delete the document type "<x id="PH" equiv-text="object.name"/>"?</target>
+      </trans-unit>
+      <trans-unit id="bc000b39af12c0925c424f4cb85f0c31c0f8eca8" datatype="html">
+        <source>Document types</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+        <target state="needs-translation">Document types</target>
+      </trans-unit>
+      <trans-unit id="eb3d5aefff38a814b76da74371cbf02c0789a1ef" datatype="html">
+        <source>Logs</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/logs/logs.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+        <target state="needs-translation">Logs</target>
+      </trans-unit>
+      <trans-unit id="5610279464668232148" datatype="html">
+        <source>Saved view &quot;<x id="PH" equiv-text="savedView.name"/>&quot; deleted.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
+          <context context-type="linenumber">68</context>
+        </context-group>
+        <target state="needs-translation">Saved view "<x id="PH" equiv-text="savedView.name"/>" deleted.</target>
+      </trans-unit>
+      <trans-unit id="5647210819299459618" datatype="html">
+        <source>Settings saved successfully.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
+          <context context-type="linenumber">89</context>
+        </context-group>
+        <target state="needs-translation">Settings saved successfully.</target>
+      </trans-unit>
+      <trans-unit id="6839066544204061364" datatype="html">
+        <source>Use system language</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
+          <context context-type="linenumber">94</context>
+        </context-group>
+        <target state="needs-translation">Use system language</target>
+      </trans-unit>
+      <trans-unit id="7729897675462249787" datatype="html">
+        <source>Use date format of display language</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
+          <context context-type="linenumber">100</context>
+        </context-group>
+        <target state="needs-translation">Use date format of display language</target>
+      </trans-unit>
+      <trans-unit id="8488620293789898901" datatype="html">
+        <source>Error while storing settings on server: <x id="PH" equiv-text="JSON.stringify(error.error)"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
+          <context context-type="linenumber">117</context>
+        </context-group>
+        <target state="needs-translation">Error while storing settings on server: <x id="PH" equiv-text="JSON.stringify(error.error)"/></target>
+      </trans-unit>
+      <trans-unit id="121cc5391cd2a5115bc2b3160379ee5b36cd7716" datatype="html">
+        <source>Settings</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+        <target state="needs-translation">Settings</target>
+      </trans-unit>
+      <trans-unit id="11ebd254cc9294717105c5982eb0cd2af30a446d" datatype="html">
+        <source>General settings</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+        <target state="needs-translation">General settings</target>
+      </trans-unit>
+      <trans-unit id="8bcabdf6b16cad0313a86c7e940c5e3ad7f9f8ab" datatype="html">
+        <source>Notifications</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">116</context>
+        </context-group>
+        <target state="needs-translation">Notifications</target>
+      </trans-unit>
+      <trans-unit id="99dee94e92dbd9e21a008d4569f9719ed206ae37" datatype="html">
+        <source>Saved views</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">134</context>
+        </context-group>
+        <target state="needs-translation">Saved views</target>
+      </trans-unit>
+      <trans-unit id="bbe41ac2ea4a6c00ea941a41b33105048f8e9f13" datatype="html">
+        <source>Appearance</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+        <target state="needs-translation">Appearance</target>
+      </trans-unit>
+      <trans-unit id="75f8908d266f7cc9b9e68e0be906fd080a223606" datatype="html">
+        <source>Display language</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+        <target state="needs-translation">Display language</target>
+      </trans-unit>
+      <trans-unit id="1284a077dc18a2d1ff1b744f16f1797eea28ae37" datatype="html">
+        <source>You need to reload the page after applying a new language.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">25</context>
+        </context-group>
+        <target state="needs-translation">You need to reload the page after applying a new language.</target>
+      </trans-unit>
+      <trans-unit id="0cd55822928764cc82a62ee3e6f3adbc1c630479" datatype="html">
+        <source>Date display</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+        <target state="needs-translation">Date display</target>
+      </trans-unit>
+      <trans-unit id="7df4de0d0704a06a302d853e31f2580eba98f127" datatype="html">
+        <source>Date format</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">45</context>
+        </context-group>
+        <target state="needs-translation">Date format</target>
+      </trans-unit>
+      <trans-unit id="69852399a18b8ca4fca8c5bfddd3f00a6d137593" datatype="html">
+        <source>Short: <x id="INTERPOLATION" equiv-text="{{today | customDate:&apos;shortDate&apos;:null:computedDateLocale}}"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">51</context>
+        </context-group>
+        <target state="needs-translation">Short: <x id="INTERPOLATION" equiv-text="{{today | customDate:'shortDate':null:computedDateLocale}}"/></target>
+      </trans-unit>
+      <trans-unit id="d01a59285e711252b98c4f193394e4b854615c78" datatype="html">
+        <source>Medium: <x id="INTERPOLATION" equiv-text="{{today | customDate:&apos;mediumDate&apos;:null:computedDateLocale}}"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">55</context>
+        </context-group>
+        <target state="needs-translation">Medium: <x id="INTERPOLATION" equiv-text="{{today | customDate:'mediumDate':null:computedDateLocale}}"/></target>
+      </trans-unit>
+      <trans-unit id="00481629776699b1caebd12b3b1176e2e23740a8" datatype="html">
+        <source>Long: <x id="INTERPOLATION" equiv-text="{{today | customDate:&apos;longDate&apos;:null:computedDateLocale}}"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">59</context>
+        </context-group>
+        <target state="needs-translation">Long: <x id="INTERPOLATION" equiv-text="{{today | customDate:'longDate':null:computedDateLocale}}"/></target>
+      </trans-unit>
+      <trans-unit id="2045151788cbdda7512752e408da59a6b54a8ef0" datatype="html">
+        <source>Items per page</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">67</context>
+        </context-group>
+        <target state="needs-translation">Items per page</target>
+      </trans-unit>
+      <trans-unit id="c4435e56bf0289e78fedc462f1d21fb30b9de55d" datatype="html">
+        <source>Document editor</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">83</context>
+        </context-group>
+        <target state="needs-translation">Document editor</target>
+      </trans-unit>
+      <trans-unit id="4903e521c9bfd11ce88e7a5575106ef638912e0d" datatype="html">
+        <source>Use PDF viewer provided by the browser</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">87</context>
+        </context-group>
+        <target state="needs-translation">Use PDF viewer provided by the browser</target>
+      </trans-unit>
+      <trans-unit id="d7db07023e53f8396d18d375c2b78c25fc81c197" datatype="html">
+        <source>This is usually faster for displaying large PDF documents, but it might not work on some browsers.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">87</context>
+        </context-group>
+        <target state="needs-translation">This is usually faster for displaying large PDF documents, but it might not work on some browsers.</target>
+      </trans-unit>
+      <trans-unit id="9ee5d1cbfd6ee168dae37aaba2b59b50bcabb2ff" datatype="html">
+        <source>Dark mode</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">94</context>
+        </context-group>
+        <target state="needs-translation">Dark mode</target>
+      </trans-unit>
+      <trans-unit id="f8cb5506e70fd71fddc9bb71cee18bfff7b29637" datatype="html">
+        <source>Use system settings</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">97</context>
+        </context-group>
+        <target state="needs-translation">Use system settings</target>
+      </trans-unit>
+      <trans-unit id="8ee474504043fa89821d626e4f3413240fa91b53" datatype="html">
+        <source>Enable dark mode</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">98</context>
+        </context-group>
+        <target state="needs-translation">Enable dark mode</target>
+      </trans-unit>
+      <trans-unit id="71bad20b37410c8972c9aa0f7c62996534b84339" datatype="html">
+        <source>Invert thumbnails in dark mode</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">99</context>
+        </context-group>
+        <target state="needs-translation">Invert thumbnails in dark mode</target>
+      </trans-unit>
+      <trans-unit id="3863a86cd9e69a61d143d3daf51df44203df4a82" datatype="html">
+        <source>Bulk editing</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">103</context>
+        </context-group>
+        <target state="needs-translation">Bulk editing</target>
+      </trans-unit>
+      <trans-unit id="c0ac61661c6c326d6e0e00c231b95cf2ac0c6586" datatype="html">
+        <source>Show confirmation dialogs</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">107</context>
+        </context-group>
+        <target state="needs-translation">Show confirmation dialogs</target>
+      </trans-unit>
+      <trans-unit id="291bbe56ecbe945dcf05580a57d679fa7bd1e06a" datatype="html">
+        <source>Deleting documents will always ask for confirmation.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">107</context>
+        </context-group>
+        <target state="needs-translation">Deleting documents will always ask for confirmation.</target>
+      </trans-unit>
+      <trans-unit id="8cfddc13e04f5545ac63f419ef363505d6f78c2e" datatype="html">
+        <source>Apply on close</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">108</context>
+        </context-group>
+        <target state="needs-translation">Apply on close</target>
+      </trans-unit>
+      <trans-unit id="8680abbea249ebe9c2fe35556559c8e1a9eb5841" datatype="html">
+        <source>Document processing</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">119</context>
+        </context-group>
+        <target state="needs-translation">Document processing</target>
+      </trans-unit>
+      <trans-unit id="2ad4d76b36341c589d94004ad2a213fd4d6f5ca0" datatype="html">
+        <source>Show notifications when new documents are detected</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">123</context>
+        </context-group>
+        <target state="needs-translation">Show notifications when new documents are detected</target>
+      </trans-unit>
+      <trans-unit id="e775f4f7c40249d31426ae61a21616a0c9d8e84f" datatype="html">
+        <source>Show notifications when document processing completes successfully</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">124</context>
+        </context-group>
+        <target state="needs-translation">Show notifications when document processing completes successfully</target>
+      </trans-unit>
+      <trans-unit id="e3844dd174d8e817ddb551fae28f14ae80ca36b6" datatype="html">
+        <source>Show notifications when document processing fails</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">125</context>
+        </context-group>
+        <target state="needs-translation">Show notifications when document processing fails</target>
+      </trans-unit>
+      <trans-unit id="af113f7c9f7e13145c3461f61a1aedf12d57bd71" datatype="html">
+        <source>Suppress notifications on dashboard</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">126</context>
+        </context-group>
+        <target state="needs-translation">Suppress notifications on dashboard</target>
+      </trans-unit>
+      <trans-unit id="e27bd3804d2936a6897e81c2e52e294490e5e5a8" datatype="html">
+        <source>This will suppress all messages about document processing status on the dashboard.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">126</context>
+        </context-group>
+        <target state="needs-translation">This will suppress all messages about document processing status on the dashboard.</target>
+      </trans-unit>
+      <trans-unit id="8cb90334f5dfd7fc67205085f59381e2a334ccfc" datatype="html">
+        <source>Appears on</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">146</context>
+        </context-group>
+        <target state="needs-translation">Appears on</target>
+      </trans-unit>
+      <trans-unit id="6717cf1acf04728fc2b7c39f6d3297f8ff15fde5" datatype="html">
+        <source>Show on dashboard</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">149</context>
+        </context-group>
+        <target state="needs-translation">Show on dashboard</target>
+      </trans-unit>
+      <trans-unit id="541bfc5b123b3f8867fd681eaceefb663a811973" datatype="html">
+        <source>Show in sidebar</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">153</context>
+        </context-group>
+        <target state="needs-translation">Show in sidebar</target>
+      </trans-unit>
+      <trans-unit id="abba764a7a595d04dc8c3b26e04b3780d4fdb540" datatype="html">
+        <source>No saved views defined.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">163</context>
+        </context-group>
+        <target state="needs-translation">No saved views defined.</target>
+      </trans-unit>
+      <trans-unit id="ef60a738a565f498b858e903e42bc5ffc3cc1299" datatype="html">
+        <source>404 Not Found</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/not-found/not-found.component.html</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+        <target state="needs-translation">404 Not Found</target>
+      </trans-unit>
+      <trans-unit id="7427874343955308724" datatype="html">
+        <source>Do you really want to delete the correspondent &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.ts</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+        <target state="needs-translation">Do you really want to delete the correspondent "<x id="PH" equiv-text="object.name"/>"?</target>
+      </trans-unit>
+      <trans-unit id="c3f3334de899327bf3ec8999236e10798ff76e72" datatype="html">
+        <source>Correspondents</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+        <target state="needs-translation">Correspondents</target>
+      </trans-unit>
+      <trans-unit id="0488919cff4fcc2174d34e4a1167f1b3c586ca37" datatype="html">
+        <source>Last correspondence</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.html</context>
+          <context context-type="linenumber">22</context>
+        </context-group>
+        <target state="needs-translation">Last correspondence</target>
+      </trans-unit>
+      <trans-unit id="1234709746630139322" datatype="html">
+        <source>Confirmation</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/confirm-dialog/confirm-dialog.component.ts</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+        <target state="needs-translation">Confirmation</target>
+      </trans-unit>
+      <trans-unit id="9178182467454450952" datatype="html">
+        <source>Confirm</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/confirm-dialog/confirm-dialog.component.ts</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
+        <target state="needs-translation">Confirm</target>
+      </trans-unit>
+      <trans-unit id="d7b35c384aecd25a516200d6921836374613dfe7" datatype="html">
+        <source>Cancel</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/confirm-dialog/confirm-dialog.component.html</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+        <target state="needs-translation">Cancel</target>
+      </trans-unit>
+      <trans-unit id="6457471243969293847" datatype="html">
+        <source>Create new correspondent</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component.ts</context>
+          <context context-type="linenumber">21</context>
+        </context-group>
+        <target state="needs-translation">Create new correspondent</target>
+      </trans-unit>
+      <trans-unit id="2059822531169388684" datatype="html">
+        <source>Edit correspondent</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component.ts</context>
+          <context context-type="linenumber">25</context>
+        </context-group>
+        <target state="needs-translation">Edit correspondent</target>
+      </trans-unit>
+      <trans-unit id="3d5caa52b0a51bfd2757215f7614183554d740f0" datatype="html">
+        <source>Matching algorithm</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component.html</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+        <target state="needs-translation">Matching algorithm</target>
+      </trans-unit>
+      <trans-unit id="eab7fc7cf2d663e54de934b779fce4275a303f0f" datatype="html">
+        <source>Matching pattern</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component.html</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+        <target state="needs-translation">Matching pattern</target>
+      </trans-unit>
+      <trans-unit id="632e529f49cf3d367dfbd15bd055e9b53aef30fb" datatype="html">
+        <source>Case insensitive</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component.html</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+        <target state="needs-translation">Case insensitive</target>
+      </trans-unit>
+      <trans-unit id="9153094873118985366" datatype="html">
+        <source>Create new tag</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/tag-list/tag-edit-dialog/tag-edit-dialog.component.ts</context>
+          <context context-type="linenumber">22</context>
+        </context-group>
+        <target state="needs-translation">Create new tag</target>
+      </trans-unit>
+      <trans-unit id="5872175735754226507" datatype="html">
+        <source>Edit tag</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/tag-list/tag-edit-dialog/tag-edit-dialog.component.ts</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+        <target state="needs-translation">Edit tag</target>
+      </trans-unit>
+      <trans-unit id="f2a30b4e1a89a8a0db0bd147b54d6626b9a9bc42" datatype="html">
+        <source>Inbox tag</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/tag-list/tag-edit-dialog/tag-edit-dialog.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+        <target state="needs-translation">Inbox tag</target>
+      </trans-unit>
+      <trans-unit id="5e2f1a4ea12a1b8606ee3f0548d0ba64bf266077" datatype="html">
+        <source>Inbox tags are automatically assigned to all consumed documents.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/tag-list/tag-edit-dialog/tag-edit-dialog.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+        <target state="needs-translation">Inbox tags are automatically assigned to all consumed documents.</target>
+      </trans-unit>
+      <trans-unit id="6672809941092516947" datatype="html">
+        <source>Create new document type</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-edit-dialog/document-type-edit-dialog.component.ts</context>
+          <context context-type="linenumber">21</context>
+        </context-group>
+        <target state="needs-translation">Create new document type</target>
+      </trans-unit>
+      <trans-unit id="36335016091244220" datatype="html">
+        <source>Edit document type</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-edit-dialog/document-type-edit-dialog.component.ts</context>
+          <context context-type="linenumber">25</context>
+        </context-group>
+        <target state="needs-translation">Edit document type</target>
+      </trans-unit>
+      <trans-unit id="41147374f427980a9f1a8cd5e3f4b1666e6f2418" datatype="html">
+        <source>Paperless-ngx</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+        <note priority="1" from="description">app title</note>
+        <target state="needs-translation">Paperless-ngx</target>
+      </trans-unit>
+      <trans-unit id="069566c6ed4f051b5b5617ef1935837226585dad" datatype="html">
+        <source>Search documents</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+        <target state="needs-translation">Search documents</target>
+      </trans-unit>
+      <trans-unit id="bb694b49d408265c91c62799c2b3a7e3151c824d" datatype="html">
+        <source>Logout</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
+          <context context-type="linenumber">45</context>
+        </context-group>
+        <target state="needs-translation">Logout</target>
+      </trans-unit>
+      <trans-unit id="68949525c4d9a901e0cd15a94e3fc8d2711e9918" datatype="html">
+        <source>Manage</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
+          <context context-type="linenumber">112</context>
+        </context-group>
+        <target state="needs-translation">Manage</target>
+      </trans-unit>
+      <trans-unit id="408cb6073e60c5d966296a3207fc596adca75e01" datatype="html">
+        <source>Admin</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
+          <context context-type="linenumber">154</context>
+        </context-group>
+        <target state="needs-translation">Admin</target>
+      </trans-unit>
+      <trans-unit id="321e4419a943044e674beb55b8039f42a9761ca5" datatype="html">
+        <source>Info</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
+          <context context-type="linenumber">160</context>
+        </context-group>
+        <target state="needs-translation">Info</target>
+      </trans-unit>
+      <trans-unit id="fcfd4675b4c90f08d18d3abede9a9a4dff4cfdc7" datatype="html">
+        <source>Documentation</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
+          <context context-type="linenumber">167</context>
+        </context-group>
+        <target state="needs-translation">Documentation</target>
+      </trans-unit>
+      <trans-unit id="355a222236bc01b9a8cd3cb9ecf76891125aed69" datatype="html">
+        <source>GitHub</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
+          <context context-type="linenumber">175</context>
+        </context-group>
+        <target state="needs-translation">GitHub</target>
+      </trans-unit>
+      <trans-unit id="ea3a452c5238897cabc5781308cceb2d37dcf258" datatype="html">
+        <source>Suggest an idea</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
+          <context context-type="linenumber">181</context>
+        </context-group>
+        <target state="needs-translation">Suggest an idea</target>
+      </trans-unit>
+      <trans-unit id="af665f8de8fabe306aaf27443957e69bcbbce63c" datatype="html">
+        <source>Logged in as <x id="INTERPOLATION" equiv-text="{{displayName}}"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+        <target state="needs-translation">Logged in as <x id="INTERPOLATION" equiv-text="{{displayName}}"/></target>
+      </trans-unit>
+      <trans-unit id="4f55b670f49d927c6026bb614c7c62b1f2a394c0" datatype="html">
+        <source>Open documents</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
+          <context context-type="linenumber">87</context>
+        </context-group>
+        <target state="needs-translation">Open documents</target>
+      </trans-unit>
+      <trans-unit id="dca5bf9344a759fa5a07f1b21f50286ec242ba44" datatype="html">
+        <source>Close all</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
+          <context context-type="linenumber">106</context>
+        </context-group>
+        <target state="needs-translation">Close all</target>
+      </trans-unit>
+      <trans-unit id="5195932016807797291" datatype="html">
+        <source>Correspondent: <x id="PH" equiv-text="this.correspondents.find(c =&gt; c.id == +rule.value)?.name"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
+          <context context-type="linenumber">37</context>
+        </context-group>
+        <target state="needs-translation">Correspondent: <x id="PH" equiv-text="this.correspondents.find(c =&gt; c.id == +rule.value)?.name"/></target>
+      </trans-unit>
+      <trans-unit id="8170755470576301659" datatype="html">
+        <source>Without correspondent</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
+          <context context-type="linenumber">39</context>
+        </context-group>
+        <target state="needs-translation">Without correspondent</target>
+      </trans-unit>
+      <trans-unit id="8705701325879965907" datatype="html">
+        <source>Type: <x id="PH" equiv-text="this.documentTypes.find(dt =&gt; dt.id == +rule.value)?.name"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+        <target state="needs-translation">Type: <x id="PH" equiv-text="this.documentTypes.find(dt =&gt; dt.id == +rule.value)?.name"/></target>
+      </trans-unit>
+      <trans-unit id="4362173610367509215" datatype="html">
+        <source>Without document type</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+        <target state="needs-translation">Without document type</target>
+      </trans-unit>
+      <trans-unit id="8180755793012580465" datatype="html">
+        <source>Tag: <x id="PH" equiv-text="this.tags.find(t =&gt; t.id == +rule.value)?.name"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
+          <context context-type="linenumber">50</context>
+        </context-group>
+        <target state="needs-translation">Tag: <x id="PH" equiv-text="this.tags.find(t =&gt; t.id == +rule.value)?.name"/></target>
+      </trans-unit>
+      <trans-unit id="6494566478302448576" datatype="html">
+        <source>Without any tag</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
+          <context context-type="linenumber">54</context>
+        </context-group>
+        <target state="needs-translation">Without any tag</target>
+      </trans-unit>
+      <trans-unit id="6523384805359286307" datatype="html">
+        <source>Title: <x id="PH" equiv-text="rule.value"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
+          <context context-type="linenumber">58</context>
+        </context-group>
+        <target state="needs-translation">Title: <x id="PH" equiv-text="rule.value"/></target>
+      </trans-unit>
+      <trans-unit id="1872523635812236432" datatype="html">
+        <source>ASN: <x id="PH" equiv-text="rule.value"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
+          <context context-type="linenumber">61</context>
+        </context-group>
+        <target state="needs-translation">ASN: <x id="PH" equiv-text="rule.value"/></target>
+      </trans-unit>
+      <trans-unit id="5701618810648052610" datatype="html">
+        <source>Title</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
+          <context context-type="linenumber">88</context>
+        </context-group>
+        <target state="needs-translation">Title</target>
+      </trans-unit>
+      <trans-unit id="3100631071441658964" datatype="html">
+        <source>Title &amp; content</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
+          <context context-type="linenumber">89</context>
+        </context-group>
+        <target state="needs-translation">Title &amp; content</target>
+      </trans-unit>
+      <trans-unit id="7517688192215738656" datatype="html">
+        <source>ASN</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
+          <context context-type="linenumber">90</context>
+        </context-group>
+        <target state="needs-translation">ASN</target>
+      </trans-unit>
+      <trans-unit id="1010505078885609376" datatype="html">
+        <source>Advanced search</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
+          <context context-type="linenumber">91</context>
+        </context-group>
+        <target state="needs-translation">Advanced search</target>
+      </trans-unit>
+      <trans-unit id="2649431021108393503" datatype="html">
+        <source>More like</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
+          <context context-type="linenumber">94</context>
+        </context-group>
+        <target state="needs-translation">More like</target>
+      </trans-unit>
+      <trans-unit id="02d184c288f567825a1fcbf83bcd3099a10853d5" datatype="html">
+        <source>Filter tags</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+        <target state="needs-translation">Filter tags</target>
+      </trans-unit>
+      <trans-unit id="4b089ca12c472cf0b46167bb5afe4b527b301bbc" datatype="html">
+        <source>Filter correspondents</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
+          <context context-type="linenumber">27</context>
+        </context-group>
+        <target state="needs-translation">Filter correspondents</target>
+      </trans-unit>
+      <trans-unit id="0ad509732aaf702b7ea8c771c7809fa84bc85908" datatype="html">
+        <source>Filter document types</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+        <target state="needs-translation">Filter document types</target>
+      </trans-unit>
+      <trans-unit id="2d9d55f1b70142ff4597ba32179d16888fd9c6b2" datatype="html">
+        <source>Reset filters</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
+          <context context-type="linenumber">57</context>
+        </context-group>
+        <target state="needs-translation">Reset filters</target>
+      </trans-unit>
+      <trans-unit id="7593728289020204896" datatype="html">
+        <source>Not assigned</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.ts</context>
+          <context context-type="linenumber">166</context>
+        </context-group>
+        <note priority="1" from="description">Filter drop down element to filter for documents with no correspondent/type/tag assigned</note>
+        <target state="needs-translation">Not assigned</target>
+      </trans-unit>
+      <trans-unit id="c2d0ac9f528bbd5f53fd34269fde8b59e029621b" datatype="html">
+        <source>Apply</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+        <target state="needs-translation">Apply</target>
+      </trans-unit>
+      <trans-unit id="4873149362496451858" datatype="html">
+        <source>Last 7 days</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.ts</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+        <target state="needs-translation">Last 7 days</target>
+      </trans-unit>
+      <trans-unit id="4463380307954693363" datatype="html">
+        <source>Last month</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.ts</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+        <target state="needs-translation">Last month</target>
+      </trans-unit>
+      <trans-unit id="8697368973702409683" datatype="html">
+        <source>Last 3 months</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.ts</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+        <target state="needs-translation">Last 3 months</target>
+      </trans-unit>
+      <trans-unit id="3566342898065860218" datatype="html">
+        <source>Last year</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.ts</context>
+          <context context-type="linenumber">37</context>
+        </context-group>
+        <target state="needs-translation">Last year</target>
+      </trans-unit>
+      <trans-unit id="be2add3a3d9e4e2556b8f9048a15a9c0f00bf1ad" datatype="html">
+        <source>After</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+        <target state="needs-translation">After</target>
+      </trans-unit>
+      <trans-unit id="8785188e6c678b842fcb93b7392faf86db7ec676" datatype="html">
+        <source>Before</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.html</context>
+          <context context-type="linenumber">38</context>
+        </context-group>
+        <target state="needs-translation">Before</target>
+      </trans-unit>
+      <trans-unit id="99ee4faa69cd2ea8e3678c1f557c0ff1f05aae46" datatype="html">
+        <source>Clear</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.html</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+        <target state="needs-translation">Clear</target>
+      </trans-unit>
+      <trans-unit id="6829218544e108e152f5fa72cb79c4ccb82e0d06" datatype="html">
+        <source>View</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
+          <context context-type="linenumber">51</context>
+        </context-group>
+        <target state="needs-translation">View</target>
+      </trans-unit>
+      <trans-unit id="cd6f3fd48957e1fea6545c2b2defc7b2435ebfa8" datatype="html">
+        <source>Filter by correspondent</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+        <target state="needs-translation">Filter by correspondent</target>
+      </trans-unit>
+      <trans-unit id="bdb9a910523610254872e147222689e9a4115b84" datatype="html">
+        <source>Filter by tag</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+        <target state="needs-translation">Filter by tag</target>
+      </trans-unit>
+      <trans-unit id="9c5fdf21ec2cc7baa6f062f2dc417af45c8dbe60" datatype="html">
+        <source>Score:</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
+          <context context-type="linenumber">87</context>
+        </context-group>
+        <target state="needs-translation">Score:</target>
+      </trans-unit>
+      <trans-unit id="727d980bba2b3e0b3d8705607f1208eef046479b" datatype="html">
+        <source>Created: <x id="INTERPOLATION" equiv-text="{{ document.created | customDate}}"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+        <target state="needs-translation">Created: <x id="INTERPOLATION" equiv-text="{{ document.created | customDate}}"/></target>
+      </trans-unit>
+      <trans-unit id="0f5d856cb63c69fde44fbfc653ec0655f9040865" datatype="html">
+        <source>Added: <x id="INTERPOLATION" equiv-text="{{ document.added | customDate}}"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+        <target state="needs-translation">Added: <x id="INTERPOLATION" equiv-text="{{ document.added | customDate}}"/></target>
+      </trans-unit>
+      <trans-unit id="a205126adef6251fc63305f1a6228d07bc2795a8" datatype="html">
+        <source>Modified: <x id="INTERPOLATION" equiv-text="{{ document.modified | customDate}}"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
+          <context context-type="linenumber">45</context>
+        </context-group>
+        <target state="needs-translation">Modified: <x id="INTERPOLATION" equiv-text="{{ document.modified | customDate}}"/></target>
+      </trans-unit>
+      <trans-unit id="7985804062689412812" datatype="html">
+        <source>Error executing bulk operation: <x id="PH" equiv-text="JSON.stringify(error.error)"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+          <context context-type="linenumber">74</context>
+        </context-group>
+        <target state="needs-translation">Error executing bulk operation: <x id="PH" equiv-text="JSON.stringify(error.error)"/></target>
+      </trans-unit>
+      <trans-unit id="7894972847287473517" datatype="html">
+        <source>&quot;<x id="PH" equiv-text="items[0].name"/>&quot;</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+          <context context-type="linenumber">113</context>
+        </context-group>
+        <target state="needs-translation">"<x id="PH" equiv-text="items[0].name"/>"</target>
+      </trans-unit>
+      <trans-unit id="8639884465898458690" datatype="html">
+        <source>&quot;<x id="PH" equiv-text="items[0].name"/>&quot; and &quot;<x id="PH_1" equiv-text="items[1].name"/>&quot;</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+          <context context-type="linenumber">115</context>
+        </context-group>
+        <note priority="1" from="description">This is for messages like 'modify "tag1" and "tag2"'</note>
+        <target state="needs-translation">"<x id="PH" equiv-text="items[0].name"/>" and "<x id="PH_1" equiv-text="items[1].name"/>"</target>
+      </trans-unit>
+      <trans-unit id="760986369763309193" datatype="html">
+        <source>, </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+          <context context-type="linenumber">117</context>
+        </context-group>
+        <note priority="1" from="description">this is used to separate enumerations and should probably be a comma and a whitespace in most languages</note>
+        <target state="needs-translation">, </target>
+      </trans-unit>
+      <trans-unit id="1822679894391095557" datatype="html">
+        <source><x id="PH" equiv-text="list"/> and &quot;<x id="PH_1" equiv-text="items[items.length - 1].name"/>&quot;</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+          <context context-type="linenumber">118</context>
+        </context-group>
+        <note priority="1" from="description">this is for messages like 'modify "tag1", "tag2" and "tag3"'</note>
+        <target state="needs-translation"><x id="PH" equiv-text="list"/> and "<x id="PH_1" equiv-text="items[items.length - 1].name"/>"</target>
+      </trans-unit>
+      <trans-unit id="4137232459980262849" datatype="html">
+        <source>Confirm tags assignment</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+          <context context-type="linenumber">127</context>
+        </context-group>
+        <target state="needs-translation">Confirm tags assignment</target>
+      </trans-unit>
+      <trans-unit id="6619516195038467207" datatype="html">
+        <source>This operation will add the tag &quot;<x id="PH" equiv-text="tag.name"/>&quot; to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+          <context context-type="linenumber">130</context>
+        </context-group>
+        <target state="needs-translation">This operation will add the tag "<x id="PH" equiv-text="tag.name"/>" to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
+      </trans-unit>
+      <trans-unit id="1894412783609570695" datatype="html">
+        <source>This operation will add the tags <x id="PH" equiv-text="this._localizeList(changedTags.itemsToAdd)"/> to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+          <context context-type="linenumber">132</context>
+        </context-group>
+        <target state="needs-translation">This operation will add the tags <x id="PH" equiv-text="this._localizeList(changedTags.itemsToAdd)"/> to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
+      </trans-unit>
+      <trans-unit id="7181166515756808573" datatype="html">
+        <source>This operation will remove the tag &quot;<x id="PH" equiv-text="tag.name"/>&quot; from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+          <context context-type="linenumber">135</context>
+        </context-group>
+        <target state="needs-translation">This operation will remove the tag "<x id="PH" equiv-text="tag.name"/>" from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
+      </trans-unit>
+      <trans-unit id="3819792277998068944" datatype="html">
+        <source>This operation will remove the tags <x id="PH" equiv-text="this._localizeList(changedTags.itemsToRemove)"/> from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+          <context context-type="linenumber">137</context>
+        </context-group>
+        <target state="needs-translation">This operation will remove the tags <x id="PH" equiv-text="this._localizeList(changedTags.itemsToRemove)"/> from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
+      </trans-unit>
+      <trans-unit id="2739066218579571288" datatype="html">
+        <source>This operation will add the tags <x id="PH" equiv-text="this._localizeList(changedTags.itemsToAdd)"/> and remove the tags <x id="PH_1" equiv-text="this._localizeList(changedTags.itemsToRemove)"/> on <x id="PH_2" equiv-text="this.list.selected.size"/> selected document(s).</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+          <context context-type="linenumber">139</context>
+        </context-group>
+        <target state="needs-translation">This operation will add the tags <x id="PH" equiv-text="this._localizeList(changedTags.itemsToAdd)"/> and remove the tags <x id="PH_1" equiv-text="this._localizeList(changedTags.itemsToRemove)"/> on <x id="PH_2" equiv-text="this.list.selected.size"/> selected document(s).</target>
+      </trans-unit>
+      <trans-unit id="2996713129519325161" datatype="html">
+        <source>Confirm correspondent assignment</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+          <context context-type="linenumber">159</context>
+        </context-group>
+        <target state="needs-translation">Confirm correspondent assignment</target>
+      </trans-unit>
+      <trans-unit id="6900893559485781849" datatype="html">
+        <source>This operation will assign the correspondent &quot;<x id="PH" equiv-text="correspondent.name"/>&quot; to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+          <context context-type="linenumber">161</context>
+        </context-group>
+        <target state="needs-translation">This operation will assign the correspondent "<x id="PH" equiv-text="correspondent.name"/>" to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
+      </trans-unit>
+      <trans-unit id="1257522660364398440" datatype="html">
+        <source>This operation will remove the correspondent from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+          <context context-type="linenumber">163</context>
+        </context-group>
+        <target state="needs-translation">This operation will remove the correspondent from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</target>
+      </trans-unit>
+      <trans-unit id="5393409374423140648" datatype="html">
+        <source>Confirm document type assignment</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+          <context context-type="linenumber">182</context>
+        </context-group>
+        <target state="needs-translation">Confirm document type assignment</target>
+      </trans-unit>
+      <trans-unit id="332180123895325027" datatype="html">
+        <source>This operation will assign the document type &quot;<x id="PH" equiv-text="documentType.name"/>&quot; to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+          <context context-type="linenumber">184</context>
+        </context-group>
+        <target state="needs-translation">This operation will assign the document type "<x id="PH" equiv-text="documentType.name"/>" to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
+      </trans-unit>
+      <trans-unit id="2236642492594872779" datatype="html">
+        <source>This operation will remove the document type from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+          <context context-type="linenumber">186</context>
+        </context-group>
+        <target state="needs-translation">This operation will remove the document type from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</target>
+      </trans-unit>
+      <trans-unit id="749430623564850405" datatype="html">
+        <source>Delete confirm</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+          <context context-type="linenumber">201</context>
+        </context-group>
+        <target state="needs-translation">Delete confirm</target>
+      </trans-unit>
+      <trans-unit id="4303174930844518780" datatype="html">
+        <source>This operation will permanently delete <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+          <context context-type="linenumber">202</context>
+        </context-group>
+        <target state="needs-translation">This operation will permanently delete <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</target>
+      </trans-unit>
+      <trans-unit id="5641451190833696892" datatype="html">
+        <source>This operation cannot be undone.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+          <context context-type="linenumber">203</context>
+        </context-group>
+        <target state="needs-translation">This operation cannot be undone.</target>
+      </trans-unit>
+      <trans-unit id="6734339521247847366" datatype="html">
+        <source>Delete document(s)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+          <context context-type="linenumber">205</context>
+        </context-group>
+        <target state="needs-translation">Delete document(s)</target>
+      </trans-unit>
+      <trans-unit id="8b0609df23817024b3bed12beb9b64fc1009f588" datatype="html">
+        <source>Select:</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+        <target state="needs-translation">Select:</target>
+      </trans-unit>
+      <trans-unit id="dfc3c34e182ea73c5d784ff7c8135f087992dac1" datatype="html">
+        <source>All</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+        <target state="needs-translation">All</target>
+      </trans-unit>
+      <trans-unit id="907df6a2b68daecc3c399cf40a764b358bd9fd84" datatype="html">
+        <source>Edit:</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
+          <context context-type="linenumber">27</context>
+        </context-group>
+        <target state="needs-translation">Edit:</target>
+      </trans-unit>
+      <trans-unit id="fc2de37422d7c4af6686842283cc2afd781b6848" datatype="html">
+        <source>Download originals</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
+          <context context-type="linenumber">68</context>
+        </context-group>
+        <target state="needs-translation">Download originals</target>
+      </trans-unit>
+      <trans-unit id="0f72a164f5a5d10d1fbdeeb84ac80a63c04b7e1b" datatype="html">
+        <source>Add item</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/input/select/select.component.html</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+        <note priority="1" from="description">Used for both types and correspondents</note>
+        <target state="needs-translation">Add item</target>
+      </trans-unit>
+      <trans-unit id="a1e6c11f20d4bf6e8e6b43e3c6d2561b2080645e" datatype="html">
+        <source>Suggestions:</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/input/select/select.component.html</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+        <target state="needs-translation">Suggestions:</target>
+      </trans-unit>
+      <trans-unit id="27d158b47717ff9305d19866960418c603f19d55" datatype="html">
+        <source>Save current view</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/save-view-config-dialog/save-view-config-dialog.component.html</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+        <target state="needs-translation">Save current view</target>
+      </trans-unit>
+      <trans-unit id="21fd41eb147f55ca26362f9c398e47733639837a" datatype="html">
+        <source>Add tag</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.html</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+        <target state="needs-translation">Add tag</target>
+      </trans-unit>
+      <trans-unit id="4eb84de23219c85432e38fb4fbdeb6c0f103ff8b" datatype="html">
+        <source>Show all</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/saved-view-widget/saved-view-widget.component.html</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+        <target state="needs-translation">Show all</target>
+      </trans-unit>
+      <trans-unit id="61e0f26d843eec0b33ff475e111b0c2f7a80b835" datatype="html">
+        <source>Statistics</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+        <target state="needs-translation">Statistics</target>
+      </trans-unit>
+      <trans-unit id="c0d907c2687c09612395aee6ef7c04ca8e5e5e0a" datatype="html">
+        <source>Total documents: <x id="INTERPOLATION" equiv-text="{{statistics?.documents_total}}"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+        <target state="needs-translation">Total documents: <x id="INTERPOLATION" equiv-text="{{statistics?.documents_total}}"/></target>
+      </trans-unit>
+      <trans-unit id="13e8d49dbcad9f9d71e66a9a56d6f328cff430c9" datatype="html">
+        <source>Documents in inbox: <x id="INTERPOLATION" equiv-text="{{statistics?.documents_inbox}}"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+        <target state="needs-translation">Documents in inbox: <x id="INTERPOLATION" equiv-text="{{statistics?.documents_inbox}}"/></target>
+      </trans-unit>
+      <trans-unit id="6443586946875325554" datatype="html">
+        <source>Processing: <x id="PH" equiv-text="countUploadingAndProcessing"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.ts</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+        <target state="needs-translation">Processing: <x id="PH" equiv-text="countUploadingAndProcessing"/></target>
+      </trans-unit>
+      <trans-unit id="9182918211699394982" datatype="html">
+        <source>Failed: <x id="PH" equiv-text="countFailed"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.ts</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+        <target state="needs-translation">Failed: <x id="PH" equiv-text="countFailed"/></target>
+      </trans-unit>
+      <trans-unit id="534116346205124059" datatype="html">
+        <source>Added: <x id="PH" equiv-text="countSuccess"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.ts</context>
+          <context context-type="linenumber">38</context>
+        </context-group>
+        <target state="needs-translation">Added: <x id="PH" equiv-text="countSuccess"/></target>
+      </trans-unit>
+      <trans-unit id="3852289441366561594" datatype="html">
+        <source>Connecting...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.ts</context>
+          <context context-type="linenumber">118</context>
+        </context-group>
+        <target state="needs-translation">Connecting...</target>
+      </trans-unit>
+      <trans-unit id="1245343823699368872" datatype="html">
+        <source>Uploading...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.ts</context>
+          <context context-type="linenumber">123</context>
+        </context-group>
+        <target state="needs-translation">Uploading...</target>
+      </trans-unit>
+      <trans-unit id="7446520539098045935" datatype="html">
+        <source>Upload complete, waiting...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.ts</context>
+          <context context-type="linenumber">126</context>
+        </context-group>
+        <target state="needs-translation">Upload complete, waiting...</target>
+      </trans-unit>
+      <trans-unit id="1405142710727603568" datatype="html">
+        <source>HTTP error: <x id="PH" equiv-text="error.status"/> <x id="PH_1" equiv-text="error.statusText"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.ts</context>
+          <context context-type="linenumber">136</context>
+        </context-group>
+        <target state="needs-translation">HTTP error: <x id="PH" equiv-text="error.status"/> <x id="PH_1" equiv-text="error.statusText"/></target>
+      </trans-unit>
+      <trans-unit id="e022072b3e4dd77e3f09960817ef3359a49963b3" datatype="html">
+        <source>Upload new documents</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+        <target state="needs-translation">Upload new documents</target>
+      </trans-unit>
+      <trans-unit id="52d5d56b6667ba3f7c759cbc0d4c39d34a99701e" datatype="html">
+        <source>Drop documents here or</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+        <target state="needs-translation">Drop documents here or</target>
+      </trans-unit>
+      <trans-unit id="865c511f4a24558ed0e954f9bbbff557bbb8954d" datatype="html">
+        <source>Browse files</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+        <target state="needs-translation">Browse files</target>
+      </trans-unit>
+      <trans-unit id="bd4a8607e4a002d939cffb347ec056664dfb2c73" datatype="html">
+        <source>Dismiss completed</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+        <note priority="1" from="description">This button dismisses all status messages about processed documents on the dashboard (failed and successful)</note>
+        <target state="needs-translation">Dismiss completed</target>
+      </trans-unit>
+      <trans-unit id="90917e1a0a7bb59e9d11bdde9183e9391963e17b" datatype="html">
+        <source>{VAR_PLURAL, plural, =1 {One more document} other {<x id="INTERPOLATION"/> more documents}}</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
+          <context context-type="linenumber">25</context>
+        </context-group>
+        <note priority="1" from="description">This is shown as a summary line when there are more than 5 document in the processing pipeline.</note>
+        <target state="needs-translation">{VAR_PLURAL, plural, =1 {One more document} other {<x id="INTERPOLATION"/> more documents}}</target>
+      </trans-unit>
+      <trans-unit id="710254a196a2649674438edf8a15b7ab1f48271b" datatype="html">
+        <source>Open document</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
+          <context context-type="linenumber">45</context>
+        </context-group>
+        <target state="needs-translation">Open document</target>
+      </trans-unit>
+      <trans-unit id="45854ddec74086b271e62be6a363f4fa5036f7fc" datatype="html">
+        <source>First steps</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+        <target state="needs-translation">First steps</target>
+      </trans-unit>
+      <trans-unit id="a0dc8218a6fcc5d11a4723ed127bd6be9d6d3ef3" datatype="html">
+        <source>Paperless is running! :)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
+          <context context-type="linenumber">5</context>
+        </context-group>
+        <target state="needs-translation">Paperless is running! :)</target>
+      </trans-unit>
+      <trans-unit id="ea8d9a9486d5639d1c38c012900b8d34d5e4135d" datatype="html">
+        <source>You can start uploading documents by dropping them in the file upload box to the right or by dropping them in the configured consumption folder and they&apos;ll start showing up in the documents list. After you&apos;ve added some metadata to your documents, use the filtering mechanisms of paperless to create custom views (such as &apos;Recently added&apos;, &apos;Tagged TODO&apos;) and they will appear on the dashboard instead of this message.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
+          <context context-type="linenumber">6,7</context>
+        </context-group>
+        <target state="needs-translation">You can start uploading documents by dropping them in the file upload box to the right or by dropping them in the configured consumption folder and they'll start showing up in the documents list. After you've added some metadata to your documents, use the filtering mechanisms of paperless to create custom views (such as 'Recently added', 'Tagged TODO') and they will appear on the dashboard instead of this message.</target>
+      </trans-unit>
+      <trans-unit id="cf5f85690feaba6e29343f9881e57a6c0ea6e82b" datatype="html">
+        <source>Paperless offers some more features that try to make your life easier:</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+        <target state="needs-translation">Paperless offers some more features that try to make your life easier:</target>
+      </trans-unit>
+      <trans-unit id="edb41dc36af2e70789d8e3422325d930e783253e" datatype="html">
+        <source>Once you&apos;ve got a couple documents in paperless and added metadata to them, paperless can assign that metadata to new documents automatically.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+        <target state="needs-translation">Once you've got a couple documents in paperless and added metadata to them, paperless can assign that metadata to new documents automatically.</target>
+      </trans-unit>
+      <trans-unit id="9dca488928c0b7af46c3866f86a6c2c8548399aa" datatype="html">
+        <source>You can configure paperless to read your mails and add documents from attached files.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+        <target state="needs-translation">You can configure paperless to read your mails and add documents from attached files.</target>
+      </trans-unit>
+      <trans-unit id="d282f6277cbf6704f697170d2ad19ce500790e20" datatype="html">
+        <source>Consult the documentation on how to use these features. The section on basic usage also has some information on how to use paperless in general.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+        <target state="needs-translation">Consult the documentation on how to use these features. The section on basic usage also has some information on how to use paperless in general.</target>
+      </trans-unit>
+      <trans-unit id="218403386307979629" datatype="html">
+        <source>Metadata</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/metadata-collapse/metadata-collapse.component.ts</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+        <target state="needs-translation">Metadata</target>
+      </trans-unit>
+      <trans-unit id="3797570084942068182" datatype="html">
+        <source>Select</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/select-dialog/select-dialog.component.ts</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+        <target state="needs-translation">Select</target>
+      </trans-unit>
+      <trans-unit id="7103181924469214926" datatype="html">
+        <source>Please select an object</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/select-dialog/select-dialog.component.ts</context>
+          <context context-type="linenumber">21</context>
+        </context-group>
+        <target state="needs-translation">Please select an object</target>
+      </trans-unit>
+      <trans-unit id="d6529debfc1613db22d6fa096ebfeb8a85fa739d" datatype="html">
+        <source>Invalid date.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/input/date/date.component.html</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+        <target state="needs-translation">Invalid date.</target>
+      </trans-unit>
+      <trans-unit id="bd5ca454e336126f3eeb67417d9264696b5c852c" datatype="html">
+        <source>Searching document with asn <x id="INTERPOLATION" equiv-text="{{asn}}"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-asn/document-asn.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+        <target state="needs-translation">Searching document with asn <x id="INTERPOLATION" equiv-text="{{asn}}"/></target>
+      </trans-unit>
+      <trans-unit id="2807800733729323332" datatype="html">
+        <source>Yes</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pipes/yes-no.pipe.ts</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+        <target state="needs-translation">Yes</target>
+      </trans-unit>
+      <trans-unit id="3542042671420335679" datatype="html">
+        <source>No</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pipes/yes-no.pipe.ts</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+        <target state="needs-translation">No</target>
+      </trans-unit>
+      <trans-unit id="7536524521722799066" datatype="html">
+        <source>(no title)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pipes/document-title.pipe.ts</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+        <target state="needs-translation">(no title)</target>
+      </trans-unit>
+      <trans-unit id="1206520795340730278" datatype="html">
+        <source>English (US)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">90</context>
+        </context-group>
+        <target state="needs-translation">English (US)</target>
+      </trans-unit>
+      <trans-unit id="6987083569809053351" datatype="html">
+        <source>English (GB)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">91</context>
+        </context-group>
+        <target state="needs-translation">English (GB)</target>
+      </trans-unit>
+      <trans-unit id="1858110241312746425" datatype="html">
+        <source>German</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">92</context>
+        </context-group>
+        <target state="needs-translation">German</target>
+      </trans-unit>
+      <trans-unit id="3071065188816255493" datatype="html">
+        <source>Dutch</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">93</context>
+        </context-group>
+        <target state="needs-translation">Dutch</target>
+      </trans-unit>
+      <trans-unit id="7633754075223722162" datatype="html">
+        <source>French</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">94</context>
+        </context-group>
+        <target state="needs-translation">French</target>
+      </trans-unit>
+      <trans-unit id="153799456510623899" datatype="html">
+        <source>Portuguese</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">95</context>
+        </context-group>
+        <target state="needs-translation">Portuguese</target>
+      </trans-unit>
+      <trans-unit id="9184513005098760425" datatype="html">
+        <source>Portuguese (Brazil)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">96</context>
+        </context-group>
+        <target state="needs-translation">Portuguese (Brazil)</target>
+      </trans-unit>
+      <trans-unit id="2935232983274991580" datatype="html">
+        <source>Italian</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">97</context>
+        </context-group>
+        <target state="needs-translation">Italian</target>
+      </trans-unit>
+      <trans-unit id="8118856427047826368" datatype="html">
+        <source>Romanian</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">98</context>
+        </context-group>
+        <target state="needs-translation">Romanian</target>
+      </trans-unit>
+      <trans-unit id="7137419789978325708" datatype="html">
+        <source>Russian</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">99</context>
+        </context-group>
+        <target state="needs-translation">Russian</target>
+      </trans-unit>
+      <trans-unit id="5190825892106392539" datatype="html">
+        <source>Spanish</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">100</context>
+        </context-group>
+        <target state="needs-translation">Spanish</target>
+      </trans-unit>
+      <trans-unit id="792060551707690640" datatype="html">
+        <source>Polish</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">101</context>
+        </context-group>
+        <target state="needs-translation">Polish</target>
+      </trans-unit>
+      <trans-unit id="499386805970351976" datatype="html">
+        <source>Swedish</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">102</context>
+        </context-group>
+        <target state="needs-translation">Swedish</target>
+      </trans-unit>
+      <trans-unit id="4912706592792948707" datatype="html">
+        <source>ISO 8601</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">107</context>
+        </context-group>
+        <target state="needs-translation">ISO 8601</target>
+      </trans-unit>
+      <trans-unit id="2119857572761283468" datatype="html">
+        <source>Document already exists.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+        <target state="needs-translation">Document already exists.</target>
+      </trans-unit>
+      <trans-unit id="148389968432135849" datatype="html">
+        <source>File not found.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+        <target state="needs-translation">File not found.</target>
+      </trans-unit>
+      <trans-unit id="1520671543092565667" datatype="html">
+        <source>Pre-consume script does not exist.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+        <note priority="1" from="description">Pre-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
+        <target state="needs-translation">Pre-consume script does not exist.</target>
+      </trans-unit>
+      <trans-unit id="7742915911032564889" datatype="html">
+        <source>Error while executing pre-consume script.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+        <note priority="1" from="description">Pre-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
+        <target state="needs-translation">Error while executing pre-consume script.</target>
+      </trans-unit>
+      <trans-unit id="8995193730018060346" datatype="html">
+        <source>Post-consume script does not exist.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+        <note priority="1" from="description">Post-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
+        <target state="needs-translation">Post-consume script does not exist.</target>
+      </trans-unit>
+      <trans-unit id="256773668518189604" datatype="html">
+        <source>Error while executing post-consume script.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+        <note priority="1" from="description">Post-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
+        <target state="needs-translation">Error while executing post-consume script.</target>
+      </trans-unit>
+      <trans-unit id="6252258095055634191" datatype="html">
+        <source>Received new file.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
+          <context context-type="linenumber">21</context>
+        </context-group>
+        <target state="needs-translation">Received new file.</target>
+      </trans-unit>
+      <trans-unit id="7337565919209746135" datatype="html">
+        <source>File type not supported.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
+          <context context-type="linenumber">22</context>
+        </context-group>
+        <target state="needs-translation">File type not supported.</target>
+      </trans-unit>
+      <trans-unit id="5002399167376099234" datatype="html">
+        <source>Processing document...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
+          <context context-type="linenumber">23</context>
+        </context-group>
+        <target state="needs-translation">Processing document...</target>
+      </trans-unit>
+      <trans-unit id="1085975194762600381" datatype="html">
+        <source>Generating thumbnail...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+        <target state="needs-translation">Generating thumbnail...</target>
+      </trans-unit>
+      <trans-unit id="3280851677698431426" datatype="html">
+        <source>Retrieving date from document...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
+          <context context-type="linenumber">25</context>
+        </context-group>
+        <target state="needs-translation">Retrieving date from document...</target>
+      </trans-unit>
+      <trans-unit id="7162102384876037296" datatype="html">
+        <source>Saving document...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+        <target state="needs-translation">Saving document...</target>
+      </trans-unit>
+      <trans-unit id="4550450765009165976" datatype="html">
+        <source>Finished.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
+          <context context-type="linenumber">27</context>
+        </context-group>
+        <target state="needs-translation">Finished.</target>
+      </trans-unit>
+      <trans-unit id="1519954996184640001" datatype="html">
+        <source>Error</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/toast.service.ts</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+        <target state="needs-translation">Error</target>
+      </trans-unit>
+      <trans-unit id="5037437391296624618" datatype="html">
+        <source>Information</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/toast.service.ts</context>
+          <context context-type="linenumber">39</context>
+        </context-group>
+        <target state="needs-translation">Information</target>
+      </trans-unit>
+      <trans-unit id="2691296884221415710" datatype="html">
+        <source>Correspondent</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+        <target state="needs-translation">Correspondent</target>
+      </trans-unit>
+      <trans-unit id="5066119607229701477" datatype="html">
+        <source>Document type</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+        <target state="needs-translation">Document type</target>
+      </trans-unit>
+      <trans-unit id="4207916966377787111" datatype="html">
+        <source>Created</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
+          <context context-type="linenumber">21</context>
+        </context-group>
+        <target state="needs-translation">Created</target>
+      </trans-unit>
+      <trans-unit id="231679111972850796" datatype="html">
+        <source>Added</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
+          <context context-type="linenumber">22</context>
+        </context-group>
+        <target state="needs-translation">Added</target>
+      </trans-unit>
+      <trans-unit id="3553216189604488439" datatype="html">
+        <source>Modified</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
+          <context context-type="linenumber">23</context>
+        </context-group>
+        <target state="needs-translation">Modified</target>
+      </trans-unit>
+      <trans-unit id="4460262093225954455" datatype="html">
+        <source>Search score</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+        <note priority="1" from="description">Score is a value returned by the full text search engine and specifies how well a result matches the given query</note>
+        <target state="needs-translation">Search score</target>
+      </trans-unit>
+      <trans-unit id="4561076822163447092" datatype="html">
+        <source>Create new item</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/edit-dialog/edit-dialog.component.ts</context>
+          <context context-type="linenumber">50</context>
+        </context-group>
+        <target state="needs-translation">Create new item</target>
+      </trans-unit>
+      <trans-unit id="5324147361912094446" datatype="html">
+        <source>Edit item</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/edit-dialog/edit-dialog.component.ts</context>
+          <context context-type="linenumber">54</context>
+        </context-group>
+        <target state="needs-translation">Edit item</target>
+      </trans-unit>
+      <trans-unit id="1699589597032579396" datatype="html">
+        <source>Could not save element: <x id="PH" equiv-text="error"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/edit-dialog/edit-dialog.component.ts</context>
+          <context context-type="linenumber">58</context>
+        </context-group>
+        <target state="needs-translation">Could not save element: <x id="PH" equiv-text="error"/></target>
+      </trans-unit>
+      <trans-unit id="810888510148304696" datatype="html">
+        <source>Automatic</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/generic-list/generic-list.component.ts</context>
+          <context context-type="linenumber">39</context>
+        </context-group>
+        <target state="needs-translation">Automatic</target>
+      </trans-unit>
+      <trans-unit id="5044611416737085530" datatype="html">
+        <source>Do you really want to delete this element?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/generic-list/generic-list.component.ts</context>
+          <context context-type="linenumber">97</context>
+        </context-group>
+        <target state="needs-translation">Do you really want to delete this element?</target>
+      </trans-unit>
+      <trans-unit id="8371896857609524947" datatype="html">
+        <source>Associated documents will not be deleted.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/generic-list/generic-list.component.ts</context>
+          <context context-type="linenumber">104</context>
+        </context-group>
+        <target state="needs-translation">Associated documents will not be deleted.</target>
+      </trans-unit>
+      <trans-unit id="7022070615528435141" datatype="html">
+        <source>Delete</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/generic-list/generic-list.component.ts</context>
+          <context context-type="linenumber">106</context>
+        </context-group>
+        <target state="needs-translation">Delete</target>
+      </trans-unit>
+      <trans-unit id="5467489005440577210" datatype="html">
+        <source>Error while deleting element: <x id="PH" equiv-text="JSON.stringify(error.error)"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/generic-list/generic-list.component.ts</context>
+          <context context-type="linenumber">114</context>
+        </context-group>
+        <target state="needs-translation">Error while deleting element: <x id="PH" equiv-text="JSON.stringify(error.error)"/></target>
+      </trans-unit>
+      <trans-unit id="5851669019930456395" datatype="html">
+        <source>Any word</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/data/matching-model.ts</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+        <target state="needs-translation">Any word</target>
+      </trans-unit>
+      <trans-unit id="7517655726614958140" datatype="html">
+        <source>Any: Document contains any of these words (space separated)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/data/matching-model.ts</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+        <target state="needs-translation">Any: Document contains any of these words (space separated)</target>
+      </trans-unit>
+      <trans-unit id="700315718208181326" datatype="html">
+        <source>All words</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/data/matching-model.ts</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+        <target state="needs-translation">All words</target>
+      </trans-unit>
+      <trans-unit id="111914402588955480" datatype="html">
+        <source>All: Document contains all of these words (space separated)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/data/matching-model.ts</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+        <target state="needs-translation">All: Document contains all of these words (space separated)</target>
+      </trans-unit>
+      <trans-unit id="9180173992399180575" datatype="html">
+        <source>Exact match</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/data/matching-model.ts</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+        <target state="needs-translation">Exact match</target>
+      </trans-unit>
+      <trans-unit id="7109184332944610787" datatype="html">
+        <source>Exact: Document contains this string</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/data/matching-model.ts</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+        <target state="needs-translation">Exact: Document contains this string</target>
+      </trans-unit>
+      <trans-unit id="1338733395833138319" datatype="html">
+        <source>Regular expression</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/data/matching-model.ts</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+        <target state="needs-translation">Regular expression</target>
+      </trans-unit>
+      <trans-unit id="7548151332424148033" datatype="html">
+        <source>Regular expression: Document matches this regular expression</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/data/matching-model.ts</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+        <target state="needs-translation">Regular expression: Document matches this regular expression</target>
+      </trans-unit>
+      <trans-unit id="1856513373880048959" datatype="html">
+        <source>Fuzzy word</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/data/matching-model.ts</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+        <target state="needs-translation">Fuzzy word</target>
+      </trans-unit>
+      <trans-unit id="8419167206585286450" datatype="html">
+        <source>Fuzzy: Document contains a word similar to this word</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/data/matching-model.ts</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+        <target state="needs-translation">Fuzzy: Document contains a word similar to this word</target>
+      </trans-unit>
+      <trans-unit id="2167862279705099846" datatype="html">
+        <source>Auto: Learn matching automatically</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/data/matching-model.ts</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+        <target state="needs-translation">Auto: Learn matching automatically</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

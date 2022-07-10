@@ -6,18 +6,28 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('paperless_mail', '0004_mailrule_order'),
+        ("paperless_mail", "0004_mailrule_order"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='mailrule',
-            name='action',
-            field=models.PositiveIntegerField(choices=[(3, "Mark as read, don't process read mails"), (4, "Flag the mail, don't process flagged mails"), (2, 'Move to specified folder'), (1, 'Delete')], default=3),
+            model_name="mailrule",
+            name="action",
+            field=models.PositiveIntegerField(
+                choices=[
+                    (3, "Mark as read, don't process read mails"),
+                    (4, "Flag the mail, don't process flagged mails"),
+                    (2, "Move to specified folder"),
+                    (1, "Delete"),
+                ],
+                default=3,
+            ),
         ),
         migrations.AlterField(
-            model_name='mailrule',
-            name='maximum_age',
-            field=models.PositiveIntegerField(default=30, help_text='Specified in days.'),
+            model_name="mailrule",
+            name="maximum_age",
+            field=models.PositiveIntegerField(
+                default=30, help_text="Specified in days."
+            ),
         ),
     ]

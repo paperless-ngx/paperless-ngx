@@ -9,17 +9,19 @@ import django.utils.timezone
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('documents', '0001_initial'),
+        ("documents", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='document',
-            options={'ordering': ('sender', 'title')},
+            name="document",
+            options={"ordering": ("sender", "title")},
         ),
         migrations.AlterField(
-            model_name='document',
-            name='created',
-            field=models.DateTimeField(default=django.utils.timezone.now, editable=False),
+            model_name="document",
+            name="created",
+            field=models.DateTimeField(
+                default=django.utils.timezone.now, editable=False
+            ),
         ),
     ]

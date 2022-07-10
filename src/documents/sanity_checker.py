@@ -3,13 +3,11 @@ import logging
 import os
 
 from django.conf import settings
-from tqdm import tqdm
-
 from documents.models import Document
+from tqdm import tqdm
 
 
 class SanityCheckMessages:
-
     def __init__(self):
         self._messages = []
 
@@ -29,7 +27,7 @@ class SanityCheckMessages:
             logger.info("Sanity checker detected no issues.")
         else:
             for msg in self._messages:
-                logger.log(msg['level'], msg['message'])
+                logger.log(msg["level"], msg["message"])
 
     def __len__(self):
         return len(self._messages)
@@ -38,10 +36,10 @@ class SanityCheckMessages:
         return self._messages[item]
 
     def has_error(self):
-        return any([msg['level'] == logging.ERROR for msg in self._messages])
+        return any([msg["level"] == logging.ERROR for msg in self._messages])
 
     def has_warning(self):
-        return any([msg['level'] == logging.WARNING for msg in self._messages])
+        return any([msg["level"] == logging.WARNING for msg in self._messages])
 
 
 class SanityCheckFailedException(Exception):
@@ -71,9 +69,7 @@ def check_sanity(progress=False):
                 with doc.thumbnail_file as f:
                     f.read()
             except OSError as e:
-                messages.error(
-                    f"Cannot read thumbnail file of document {doc.pk}: {e}"
-                )
+                messages.error(f"Cannot read thumbnail file of document {doc.pk}: {e}")
 
         # Check sanity of the original file
         # TODO: extract method
@@ -86,31 +82,28 @@ def check_sanity(progress=False):
                 with doc.source_file as f:
                     checksum = hashlib.md5(f.read()).hexdigest()
             except OSError as e:
-                messages.error(
-                    f"Cannot read original file of document {doc.pk}: {e}")
+                messages.error(f"Cannot read original file of document {doc.pk}: {e}")
             else:
                 if not checksum == doc.checksum:
                     messages.error(
                         f"Checksum mismatch of document {doc.pk}. "
-                        f"Stored: {doc.checksum}, actual: {checksum}."
+                        f"Stored: {doc.checksum}, actual: {checksum}.",
                     )
 
         # Check sanity of the archive file.
         if doc.archive_checksum and not doc.archive_filename:
             messages.error(
                 f"Document {doc.pk} has an archive file checksum, but no "
-                f"archive filename."
+                f"archive filename.",
             )
         elif not doc.archive_checksum and doc.archive_filename:
             messages.error(
                 f"Document {doc.pk} has an archive file, but its checksum is "
-                f"missing."
+                f"missing.",
             )
         elif doc.has_archive_version:
             if not os.path.isfile(doc.archive_path):
-                messages.error(
-                    f"Archived version of document {doc.pk} does not exist."
-                )
+                messages.error(f"Archived version of document {doc.pk} does not exist.")
             else:
                 if os.path.normpath(doc.archive_path) in present_files:
                     present_files.remove(os.path.normpath(doc.archive_path))
@@ -119,7 +112,7 @@ def check_sanity(progress=False):
                         checksum = hashlib.md5(f.read()).hexdigest()
                 except OSError as e:
                     messages.error(
-                        f"Cannot read archive file of document {doc.pk}: {e}"
+                        f"Cannot read archive file of document {doc.pk}: {e}",
                     )
                 else:
                     if not checksum == doc.archive_checksum:
@@ -127,7 +120,7 @@ def check_sanity(progress=False):
                             f"Checksum mismatch of archived document "
                             f"{doc.pk}. "
                             f"Stored: {doc.archive_checksum}, "
-                            f"actual: {checksum}."
+                            f"actual: {checksum}.",
                         )
 
         # other document checks

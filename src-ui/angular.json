@@ -16,19 +16,26 @@
 			"i18n": {
 				"sourceLocale": "en-US",
 				"locales": {
+					"be-BY": "src/locale/messages.be_BY.xlf",
+					"cs-CZ": "src/locale/messages.cs_CZ.xlf",
+					"da-DK": "src/locale/messages.da_DK.xlf",
 					"de-DE": "src/locale/messages.de_DE.xlf",
-					"nl-NL": "src/locale/messages.nl_NL.xlf",
-					"fr-FR": "src/locale/messages.fr_FR.xlf",
 					"en-GB": "src/locale/messages.en_GB.xlf",
+					"es-ES": "src/locale/messages.es_ES.xlf",
+					"fr-FR": "src/locale/messages.fr_FR.xlf",
+					"it-IT": "src/locale/messages.it_IT.xlf",
+					"lb-LU": "src/locale/messages.lb_LU.xlf",
+					"nl-NL": "src/locale/messages.nl_NL.xlf",
+					"pl-PL": "src/locale/messages.pl_PL.xlf",
 					"pt-BR": "src/locale/messages.pt_BR.xlf",
 					"pt-PT": "src/locale/messages.pt_PT.xlf",
-					"it-IT": "src/locale/messages.it_IT.xlf",
 					"ro-RO": "src/locale/messages.ro_RO.xlf",
 					"ru-RU": "src/locale/messages.ru_RU.xlf",
-					"es-ES": "src/locale/messages.es_ES.xlf",
-					"pl-PL": "src/locale/messages.pl_PL.xlf",
+					"sl-SI": "src/locale/messages.sl_SI.xlf",
+					"sr-CS": "src/locale/messages.sr_CS.xlf",
 					"sv-SE": "src/locale/messages.sv_SE.xlf",
-					"lb-LU": "src/locale/messages.lb_LU.xlf"
+					"tr-TR": "src/locale/messages.tr_TR.xlf",
+					"zh-CN": "src/locale/messages.zh_CN.xlf"
 				}
 			},
 			"architect": {
@@ -42,7 +49,6 @@
 						"polyfills": "src/polyfills.ts",
 						"tsConfig": "tsconfig.app.json",
 						"localize": true,
-						"aot": true,
 						"assets": [
 							"src/favicon.ico",
 							"src/apple-touch-icon.png",
@@ -59,7 +65,13 @@
 						"scripts": [],
 						"allowedCommonJsDependencies": [
 							"ng2-pdf-viewer"
-						]
+						],
+						"vendorChunk": true,
+						"extractLicenses": false,
+						"buildOptimizer": false,
+						"sourceMap": true,
+						"optimization": false,
+						"namedChunks": true
 					},
 					"configurations": {
 						"production": {
@@ -93,7 +105,8 @@
 						"en-US": {
 							"localize": ["en-US"]
 						}
-					}
+					},
+					"defaultConfiguration": ""
 				},
 				"serve": {
 					"builder": "@angular-devkit/build-angular:dev-server",
@@ -109,17 +122,13 @@
 				"extract-i18n": {
 					"builder": "@angular-devkit/build-angular:extract-i18n",
 					"options": {
-						"browserTarget": "paperless-ui:build",
-						"ivy": true
+						"browserTarget": "paperless-ui:build"
 					}
 				},
 				"test": {
-					"builder": "@angular-devkit/build-angular:karma",
+					"builder": "@angular-builders/jest:run",
 					"options": {
-						"main": "src/test.ts",
-						"polyfills": "src/polyfills.ts",
 						"tsConfig": "tsconfig.spec.json",
-						"karmaConfig": "karma.conf.js",
 						"assets": [
 							"src/favicon.ico",
 							"src/apple-touch-icon.png",
@@ -132,29 +141,35 @@
 						"scripts": []
 					}
 				},
-				"lint": {
-					"builder": "@angular-devkit/build-angular:tslint",
+				"e2e": {
+					"builder": "@cypress/schematic:cypress",
 					"options": {
-						"tsConfig": [
-							"tsconfig.app.json",
-							"tsconfig.spec.json",
-							"e2e/tsconfig.json"
-						],
-						"exclude": [
-							"**/node_modules/**"
-						]
+						"devServerTarget": "paperless-ui:serve",
+						"watch": true,
+						"headless": false
+					},
+					"configurations": {
+						"production": {
+							"devServerTarget": "paperless-ui:serve:production"
+						}
 					}
 				},
-				"e2e": {
-					"builder": "@angular-devkit/build-angular:protractor",
+				"cypress-run": {
+					"builder": "@cypress/schematic:cypress",
 					"options": {
-						"protractorConfig": "e2e/protractor.conf.js",
 						"devServerTarget": "paperless-ui:serve"
 					},
 					"configurations": {
 						"production": {
 							"devServerTarget": "paperless-ui:serve:production"
 						}
+					}
+				},
+				"cypress-open": {
+					"builder": "@cypress/schematic:cypress",
+					"options": {
+						"watch": true,
+						"headless": false
 					}
 				}
 			}

@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('documents', '1009_auto_20201216_2005'),
+        ("documents", "1009_auto_20201216_2005"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='savedviewfilterrule',
-            name='value',
+            model_name="savedviewfilterrule",
+            name="value",
             field=models.CharField(blank=True, max_length=128, null=True),
         ),
     ]

@@ -60,7 +60,7 @@ The endpoints correctly serve the response header fields ``Content-Disposition``
 and ``Content-Type`` to indicate the filename for download and the type of content of
 the document.
 
-In order to download or preview the original document when an archied document is available,
+In order to download or preview the original document when an archived document is available,
 supply the query parameter ``original=true``.
 
 .. hint::
@@ -255,7 +255,7 @@ process itself is available, since that happens in a different process.
 API Versioning
 ##############
 
-The REST API is versioned since Paperless-ng 1.3.0.
+The REST API is versioned since Paperless-ngx 1.3.0.
 
 * Versioning ensures that changes to the API don't break older clients.
 * Clients specify the specific version of the API they wish to use with every request and Paperless will handle the request using the specified API version.

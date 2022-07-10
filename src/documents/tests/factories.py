@@ -1,11 +1,11 @@
 from factory import Faker
 from factory.django import DjangoModelFactory
 
-from ..models import Document, Correspondent
+from ..models import Correspondent
+from ..models import Document
 
 
 class CorrespondentFactory(DjangoModelFactory):
-
     class Meta:
         model = Correspondent
 
@@ -13,6 +13,5 @@ class CorrespondentFactory(DjangoModelFactory):
 
 
 class DocumentFactory(DjangoModelFactory):
-
     class Meta:
         model = Document

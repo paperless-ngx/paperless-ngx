@@ -3,14 +3,20 @@ import tempfile
 from pathlib import Path
 from unittest import mock
 
-from django.test import TestCase, override_settings
+try:
+    import zoneinfo
+except ImportError:
+    import backports.zoneinfo as zoneinfo
+
+from django.test import override_settings
+from django.test import TestCase
 from django.utils import timezone
 
-from ..models import Document, Correspondent
+from ..models import Correspondent
+from ..models import Document
 
 
 class TestDocument(TestCase):
-
     def setUp(self) -> None:
         self.originals_dir = tempfile.mkdtemp()
         self.thumb_dir = tempfile.mkdtemp()
@@ -30,7 +36,7 @@ class TestDocument(TestCase):
             title="Title",
             content="content",
             checksum="checksum",
-            mime_type="application/pdf"
+            mime_type="application/pdf",
         )
 
         file_path = document.source_path
@@ -47,20 +53,54 @@ class TestDocument(TestCase):
 
     def test_file_name(self):
 
-        doc = Document(mime_type="application/pdf", title="test", created=timezone.datetime(2020, 12, 25))
+        doc = Document(
+            mime_type="application/pdf",
+            title="test",
+            created=timezone.datetime(2020, 12, 25),
+        )
+        self.assertEqual(doc.get_public_filename(), "2020-12-25 test.pdf")
+
+    def test_file_name_with_timezone(self):
+
+        doc = Document(
+            mime_type="application/pdf",
+            title="test",
+            created=timezone.datetime(
+                2020,
+                12,
+                25,
+                0,
+                0,
+                0,
+                0,
+                zoneinfo.ZoneInfo("Europe/Berlin"),
+            ),
+        )
         self.assertEqual(doc.get_public_filename(), "2020-12-25 test.pdf")
 
     def test_file_name_jpg(self):
 
-        doc = Document(mime_type="image/jpeg", title="test", created=timezone.datetime(2020, 12, 25))
+        doc = Document(
+            mime_type="image/jpeg",
+            title="test",
+            created=timezone.datetime(2020, 12, 25),
+        )
         self.assertEqual(doc.get_public_filename(), "2020-12-25 test.jpg")
 
     def test_file_name_unknown(self):
 
-        doc = Document(mime_type="application/zip", title="test", created=timezone.datetime(2020, 12, 25))
+        doc = Document(
+            mime_type="application/zip",
+            title="test",
+            created=timezone.datetime(2020, 12, 25),
+        )
         self.assertEqual(doc.get_public_filename(), "2020-12-25 test.zip")
 
     def test_file_name_invalid_type(self):
 
-        doc = Document(mime_type="image/jpegasd", title="test", created=timezone.datetime(2020, 12, 25))
+        doc = Document(
+            mime_type="image/jpegasd",
+            title="test",
+            created=timezone.datetime(2020, 12, 25),
+        )
         self.assertEqual(doc.get_public_filename(), "2020-12-25 test")

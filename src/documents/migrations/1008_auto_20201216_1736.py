@@ -7,28 +7,28 @@ import django.db.models.functions.text
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('documents', '1007_savedview_savedviewfilterrule'),
+        ("documents", "1007_savedview_savedviewfilterrule"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='correspondent',
-            options={'ordering': (django.db.models.functions.text.Lower('name'),)},
+            name="correspondent",
+            options={"ordering": (django.db.models.functions.text.Lower("name"),)},
         ),
         migrations.AlterModelOptions(
-            name='document',
-            options={'ordering': ('-created',)},
+            name="document",
+            options={"ordering": ("-created",)},
         ),
         migrations.AlterModelOptions(
-            name='documenttype',
-            options={'ordering': (django.db.models.functions.text.Lower('name'),)},
+            name="documenttype",
+            options={"ordering": (django.db.models.functions.text.Lower("name"),)},
         ),
         migrations.AlterModelOptions(
-            name='savedview',
-            options={'ordering': (django.db.models.functions.text.Lower('name'),)},
+            name="savedview",
+            options={"ordering": (django.db.models.functions.text.Lower("name"),)},
         ),
         migrations.AlterModelOptions(
-            name='tag',
-            options={'ordering': (django.db.models.functions.text.Lower('name'),)},
+            name="tag",
+            options={"ordering": (django.db.models.functions.text.Lower("name"),)},
         ),
     ]

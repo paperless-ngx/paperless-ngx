@@ -1,5 +1,5 @@
-<div class="form-group paperless-input-select paperless-input-tags">
-  <label for="tags" i18n>Tags</label>
+<div class="mb-3 paperless-input-select paperless-input-tags">
+  <label class="form-label" for="tags" i18n>Tags</label>
 
   <div class="input-group flex-nowrap">
     <ng-select name="tags" [items]="tags" bindLabel="name" bindValue="id" [(ngModel)]="value"
@@ -26,24 +26,22 @@
       </ng-template>
       <ng-template ng-option-tmp let-item="item" let-index="index" let-search="searchTerm">
         <div class="tag-wrap">
-          <app-tag *ngIf="item.id && tags" class="mr-2" [tag]="getTag(item.id)"></app-tag>
+          <app-tag *ngIf="item.id && tags" class="me-2" [tag]="getTag(item.id)"></app-tag>
         </div>
       </ng-template>
     </ng-select>
 
-    <div class="input-group-append">
-      <button class="btn btn-outline-secondary" type="button" (click)="createTag()">
-        <svg class="buttonicon" fill="currentColor">
-          <use xlink:href="assets/bootstrap-icons.svg#plus" />
-        </svg>
-      </button>
-    </div>
+    <button class="btn btn-outline-secondary" type="button" (click)="createTag()">
+      <svg class="buttonicon" fill="currentColor">
+        <use xlink:href="assets/bootstrap-icons.svg#plus" />
+      </svg>
+    </button>
   </div>
   <small class="form-text text-muted" *ngIf="hint">{{hint}}</small>
   <small *ngIf="getSuggestions().length > 0">
     <span i18n>Suggestions:</span>&nbsp;
     <ng-container *ngFor="let tag of getSuggestions()">
-      <a (click)="addTag(tag.id)" [routerLink]="">{{tag.name}}</a>&nbsp;
+      <a (click)="addTag(tag.id)" [routerLink]="[]">{{tag.name}}</a>&nbsp;
     </ng-container>
 
 
