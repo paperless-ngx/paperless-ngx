@@ -78,3 +78,11 @@
 a {
   cursor: pointer;
 }
+
+.tags {
+  top: 0;
+  right: 0;
+  max-width: 80%;
+  row-gap: .2rem;
+  line-height: 1;
+}

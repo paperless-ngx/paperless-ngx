@@ -62,6 +62,17 @@ class FlagMailAction(BaseMailAction):
         M.flag(message_uids, [MailMessageFlags.FLAGGED], True)
 
 
+class TagMailAction(BaseMailAction):
+    def __init__(self, parameter):
+        self.keyword = parameter
+
+    def get_criteria(self):
+        return {"no_keyword": self.keyword}
+
+    def post_consume(self, M: MailBox, message_uids, parameter):
+        M.flag(message_uids, [self.keyword], True)
+
+
 def get_rule_action(rule):
     if rule.action == MailRule.MailAction.FLAG:
         return FlagMailAction()
@@ -71,6 +82,8 @@ def get_rule_action(rule):
         return MoveMailAction()
     elif rule.action == MailRule.MailAction.MARK_READ:
         return MarkReadMailAction()
+    elif rule.action == MailRule.MailAction.TAG:
+        return TagMailAction(rule.action_parameter)
     else:
         raise NotImplementedError("Unknown action.")  # pragma: nocover
 

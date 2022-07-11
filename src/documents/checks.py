@@ -11,7 +11,6 @@ from documents.signals import document_consumer_declaration
 
 @register()
 def changed_password_check(app_configs, **kwargs):
-
     from documents.models import Document
     from paperless.db import GnuPG
 

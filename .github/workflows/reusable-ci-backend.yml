@@ -65,7 +65,7 @@ jobs:
         run: pipx install pipenv
       -
         name: Set up Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: "${{ matrix.python-version }}"
           cache: "pipenv"
@@ -74,7 +74,7 @@ jobs:
         name: Install system dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -qq --no-install-recommends unpaper tesseract-ocr imagemagick ghostscript optipng libzbar0 poppler-utils
+          sudo apt-get install -qq --no-install-recommends unpaper tesseract-ocr imagemagick ghostscript libzbar0 poppler-utils
       -
         name: Install Python dependencies
         run: |
@@ -87,7 +87,7 @@ jobs:
       -
         name: Get changed files
         id: changed-files-specific
-        uses: tj-actions/changed-files@v19
+        uses: tj-actions/changed-files@v23.1
         with:
           files: |
             src/**

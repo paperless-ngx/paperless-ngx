@@ -46,6 +46,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.viewsets import ViewSet
 
 from .bulk_download import ArchiveOnlyStrategy
@@ -64,10 +65,12 @@ from .matching import match_tags
 from .models import Correspondent
 from .models import Document
 from .models import DocumentType
+from .models import PaperlessTask
 from .models import SavedView
 from .models import StoragePath
 from .models import Tag
 from .parsers import get_parser_class_for_mime_type
+from .serialisers import AcknowledgeTasksViewSerializer
 from .serialisers import BulkDownloadSerializer
 from .serialisers import BulkEditSerializer
 from .serialisers import CorrespondentSerializer
@@ -79,6 +82,7 @@ from .serialisers import SavedViewSerializer
 from .serialisers import StoragePathSerializer
 from .serialisers import TagSerializer
 from .serialisers import TagSerializerVersion1
+from .serialisers import TasksViewSerializer
 from .serialisers import UiSettingsViewSerializer
 
 logger = logging.getLogger("paperless.api")
@@ -362,7 +366,8 @@ class DocumentViewSet(
                 handle = doc.thumbnail_file
             # TODO: Send ETag information and use that to send new thumbnails
             #  if available
-            return HttpResponse(handle, content_type="image/png")
+
+            return HttpResponse(handle, content_type="image/webp")
         except (FileNotFoundError, Document.DoesNotExist):
             raise Http404()
 
@@ -745,7 +750,7 @@ class RemoteVersionView(GenericAPIView):
 
 
 class StoragePathViewSet(ModelViewSet):
-    model = DocumentType
+    model = StoragePath
 
     queryset = StoragePath.objects.annotate(document_count=Count("documents")).order_by(
         Lower("name"),
@@ -795,3 +800,37 @@ class UiSettingsView(GenericAPIView):
                 "success": True,
             },
         )
+
+
+class TasksViewSet(ReadOnlyModelViewSet):
+
+    permission_classes = (IsAuthenticated,)
+    serializer_class = TasksViewSerializer
+
+    queryset = (
+        PaperlessTask.objects.filter(
+            acknowledged=False,
+        )
+        .order_by("created")
+        .reverse()
+    )
+
+
+class AcknowledgeTasksView(GenericAPIView):
+
+    permission_classes = (IsAuthenticated,)
+    serializer_class = AcknowledgeTasksViewSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        tasks = serializer.validated_data.get("tasks")
+
+        try:
+            result = PaperlessTask.objects.filter(id__in=tasks).update(
+                acknowledged=True,
+            )
+            return Response({"result": result})
+        except Exception:
+            return HttpResponseBadRequest()

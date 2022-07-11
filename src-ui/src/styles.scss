@@ -84,6 +84,10 @@ svg.logo {
   }
 }
 
+.text-primary {
+  color: var(--bs-primary) !important;
+}
+
 .btn-outline-primary {
   border-color: var(--bs-primary) !important;
   color: var(--bs-primary) !important;
@@ -115,6 +119,15 @@ svg.logo {
 .form-check-radio:focus,
 .form-select:focus {
   box-shadow: 0 0 0 0.25rem hsla(var(--pngx-primary), var(--pngx-primary-lightness), var(--pngx-focus-alpha));
+}
+
+.btn-check:checked + .btn-outline-primary,
+.btn-check:active + .btn-outline-primary,
+.btn-outline-primary:active,
+.btn-outline-primary.active,
+.btn-outline-primary.dropdown-toggle.show {
+  background-color: var(--bs-primary);
+  color: var(--pngx-primary-text-contrast) !important;
 }
 
 .form-switch .form-check-input:focus {
@@ -425,12 +438,16 @@ table.table {
   right: 0;
   bottom: 0;
   left: 0;
-  background-color: rgba(23, 84, 31, .8);
+  background-color: hsla(var(--pngx-primary), var(--pngx-primary-lightness), .8);
   z-index: 1055; // $zindex-modal
   pointer-events: none !important;
   user-select: none !important;
   text-align: center;
   padding-top: 25%;
+
+  h2 {
+    color: var(--pngx-primary-text-contrast)
+  }
 
   &.show {
     opacity: 1 !important;
