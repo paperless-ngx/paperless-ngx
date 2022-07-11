@@ -67,17 +67,19 @@ def _consume(filepath):
 
     read_try_count = 0
     file_open_ok = False
+    os_error_str = None
 
     while (read_try_count < os_error_retry_count) and not file_open_ok:
         try:
             with open(filepath, "rb"):
                 file_open_ok = True
-        except OSError:
+        except OSError as e:
             read_try_count += 1
+            os_error_str = str(e)
             sleep(os_error_retry_wait)
 
     if read_try_count >= os_error_retry_count:
-        logger.warning(f"Not consuming file {filepath}: OS reports file as busy still")
+        logger.warning(f"Not consuming file {filepath}: OS reports {os_error_str}")
         return
 
     tag_ids = None
