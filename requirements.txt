@@ -76,7 +76,7 @@ pytz-deprecation-shim==0.1.0.post0; python_version >= '2.7' and python_version n
 pyyaml==6.0
 pyzbar==0.1.9
 redis==4.3.4
-regex==2022.3.2; python_version >= '3.6'
+regex==2022.7.9; python_version >= '3.6'
 reportlab==3.6.11; python_version >= '3.7' and python_version < '4'
 requests==2.28.1; python_version >= '3.7' and python_version < '4'
 scikit-learn==1.1.1
