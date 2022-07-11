@@ -135,23 +135,6 @@ class GithubContainerRegistry:
             )
 
 
-class DockerHubContainerRegistery:
-    def __init__(self):
-        pass
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        pass
-
-    def get_image_versions(self) -> List:
-        return []
-
-    def delete_image_version(self):
-        pass
-
-
 def _main():
     parser = ArgumentParser(
         description="Using the GitHub API locate and optionally delete container"
@@ -253,15 +236,6 @@ def _main():
                                 package_name,
                                 to_delete_version,
                             )
-
-        with DockerHubContainerRegistery() as dh_api:
-            docker_hub_image_version = dh_api.get_image_versions()
-
-            # TODO
-            docker_hub_to_delete = []
-
-            for x in docker_hub_to_delete:
-                dh_api.delete_image_version()
 
 
 if __name__ == "__main__":
