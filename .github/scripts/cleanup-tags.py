@@ -222,13 +222,18 @@ def _main():
                 for tag_to_delete in to_delete:
                     package_version_info = packages_tagged_feature[tag_to_delete]
 
-                    logger.info(
-                        f"Deleting {tag_to_delete} (id {package_version_info['id']})",
-                    )
                     if args.delete:
+                        logger.info(
+                            f"Deleting {tag_to_delete} (id {package_version_info['id']})",
+                        )
                         gh_api.delete_package_version(
                             package_name,
                             package_version_info,
+                        )
+
+                    else:
+                        logger.info(
+                            f"Would delete {tag_to_delete} (id {package_version_info['id']})",
                         )
 
                 if args.untagged:
@@ -241,6 +246,8 @@ def _main():
                                 package_name,
                                 to_delete_version,
                             )
+                else:
+                    logger.info("Leaving untagged images untouched")
 
 
 if __name__ == "__main__":
