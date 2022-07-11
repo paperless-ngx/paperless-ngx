@@ -2701,7 +2701,7 @@
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.ts</context>
           <context context-type="linenumber">34</context>
         </context-group>
-        <target state="needs-translation">correspondents</target>
+        <target state="translated">correspondants</target>
       </trans-unit>
       <trans-unit id="6360600151505327572" datatype="html">
         <source>Last used</source>
