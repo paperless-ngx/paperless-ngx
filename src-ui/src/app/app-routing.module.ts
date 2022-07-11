@@ -13,6 +13,7 @@ import { NotFoundComponent } from './components/not-found/not-found.component'
 import { DocumentAsnComponent } from './components/document-asn/document-asn.component'
 import { DirtyFormGuard } from './guards/dirty-form.guard'
 import { StoragePathListComponent } from './components/manage/storage-path-list/storage-path-list.component'
+import { TasksComponent } from './components/manage/tasks/tasks.component'
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -35,6 +36,7 @@ const routes: Routes = [
         component: SettingsComponent,
         canDeactivate: [DirtyFormGuard],
       },
+      { path: 'tasks', component: TasksComponent },
     ],
   },
 

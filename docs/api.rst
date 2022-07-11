@@ -31,7 +31,8 @@ The objects served by the document endpoint contain the following fields:
 *   ``tags``: List of IDs of tags assigned to this document, or empty list.
 *   ``document_type``: Document type of this document, or null.
 *   ``correspondent``:  Correspondent of this document or null.
-*   ``created``: The date at which this document was created.
+*   ``created``: The date time at which this document was created.
+*   ``created_date``: The date (YYYY-MM-DD) at which this document was created. Optional. If also passed with created, this is ignored.
 *   ``modified``: The date at which this document was last edited in paperless. Read-only.
 *   ``added``: The date at which this document was added to paperless. Read-only.
 *   ``archive_serial_number``: The identifier of this document in a physical document archive.

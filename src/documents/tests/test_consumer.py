@@ -180,10 +180,10 @@ class DummyParser(DocumentParser):
 
     def __init__(self, logging_group, scratch_dir, archive_path):
         super().__init__(logging_group, None)
-        _, self.fake_thumb = tempfile.mkstemp(suffix=".png", dir=scratch_dir)
+        _, self.fake_thumb = tempfile.mkstemp(suffix=".webp", dir=scratch_dir)
         self.archive_path = archive_path
 
-    def get_optimised_thumbnail(self, document_path, mime_type, file_name=None):
+    def get_thumbnail(self, document_path, mime_type, file_name=None):
         return self.fake_thumb
 
     def parse(self, document_path, mime_type, file_name=None):
@@ -194,12 +194,12 @@ class CopyParser(DocumentParser):
     def get_thumbnail(self, document_path, mime_type, file_name=None):
         return self.fake_thumb
 
-    def get_optimised_thumbnail(self, document_path, mime_type, file_name=None):
+    def get_thumbnail(self, document_path, mime_type, file_name=None):
         return self.fake_thumb
 
     def __init__(self, logging_group, progress_callback=None):
         super().__init__(logging_group, progress_callback)
-        _, self.fake_thumb = tempfile.mkstemp(suffix=".png", dir=self.tempdir)
+        _, self.fake_thumb = tempfile.mkstemp(suffix=".webp", dir=self.tempdir)
 
     def parse(self, document_path, mime_type, file_name=None):
         self.text = "The text"
@@ -214,9 +214,9 @@ class FaultyParser(DocumentParser):
 
     def __init__(self, logging_group, scratch_dir):
         super().__init__(logging_group)
-        _, self.fake_thumb = tempfile.mkstemp(suffix=".png", dir=scratch_dir)
+        _, self.fake_thumb = tempfile.mkstemp(suffix=".webp", dir=scratch_dir)
 
-    def get_optimised_thumbnail(self, document_path, mime_type, file_name=None):
+    def get_thumbnail(self, document_path, mime_type, file_name=None):
         return self.fake_thumb
 
     def parse(self, document_path, mime_type, file_name=None):
@@ -230,6 +230,8 @@ def fake_magic_from_file(file, mime=False):
             return "application/pdf"
         elif os.path.splitext(file)[1] == ".png":
             return "image/png"
+        elif os.path.splitext(file)[1] == ".webp":
+            return "image/webp"
         else:
             return "unknown"
     else:

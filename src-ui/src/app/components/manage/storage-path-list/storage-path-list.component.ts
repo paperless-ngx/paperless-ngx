@@ -3,7 +3,6 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { FILTER_STORAGE_PATH } from 'src/app/data/filter-rule-type'
 import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import { QueryParamsService } from 'src/app/services/query-params.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { StoragePathEditDialogComponent } from '../../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
@@ -19,14 +18,14 @@ export class StoragePathListComponent extends ManagementListComponent<PaperlessS
     directoryService: StoragePathService,
     modalService: NgbModal,
     toastService: ToastService,
-    queryParamsService: QueryParamsService
+    documentListViewService: DocumentListViewService
   ) {
     super(
       directoryService,
       modalService,
       StoragePathEditDialogComponent,
       toastService,
-      queryParamsService,
+      documentListViewService,
       FILTER_STORAGE_PATH,
       $localize`storage path`,
       $localize`storage paths`,

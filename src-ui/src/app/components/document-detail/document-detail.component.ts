@@ -31,8 +31,6 @@ import {
 } from 'rxjs/operators'
 import { PaperlessDocumentSuggestions } from 'src/app/data/paperless-document-suggestions'
 import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type'
-import { normalizeDateStr } from 'src/app/utils/date'
-import { QueryParamsService } from 'src/app/services/query-params.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
 import { StoragePathEditDialogComponent } from '../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
@@ -74,7 +72,7 @@ export class DocumentDetailComponent
   documentForm: FormGroup = new FormGroup({
     title: new FormControl(''),
     content: new FormControl(''),
-    created: new FormControl(),
+    created_date: new FormControl(),
     correspondent: new FormControl(),
     document_type: new FormControl(),
     storage_path: new FormControl(),
@@ -120,8 +118,7 @@ export class DocumentDetailComponent
     private documentTitlePipe: DocumentTitlePipe,
     private toastService: ToastService,
     private settings: SettingsService,
-    private storagePathService: StoragePathService,
-    private queryParamsService: QueryParamsService
+    private storagePathService: StoragePathService
   ) {}
 
   titleKeyUp(event) {
@@ -141,27 +138,8 @@ export class DocumentDetailComponent
   ngOnInit(): void {
     this.documentForm.valueChanges
       .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe((changes) => {
+      .subscribe(() => {
         this.error = null
-        if (this.ogDate) {
-          try {
-            let newDate = new Date(normalizeDateStr(changes['created']))
-            newDate.setHours(
-              this.ogDate.getHours(),
-              this.ogDate.getMinutes(),
-              this.ogDate.getSeconds(),
-              this.ogDate.getMilliseconds()
-            )
-            this.documentForm.patchValue(
-              { created: newDate.toISOString() },
-              { emitEvent: false }
-            )
-          } catch (e) {
-            // catch this before we try to save and simulate an api error
-            this.error = { created: e.message }
-          }
-        }
-
         Object.assign(this.document, this.documentForm.value)
       })
 
@@ -233,25 +211,17 @@ export class DocumentDetailComponent
               },
             })
 
-          this.ogDate = new Date(normalizeDateStr(doc.created.toString()))
-
           // Initialize dirtyCheck
           this.store = new BehaviorSubject({
             title: doc.title,
             content: doc.content,
-            created: this.ogDate.toISOString(),
+            created_date: doc.created_date,
             correspondent: doc.correspondent,
             document_type: doc.document_type,
             storage_path: doc.storage_path,
             archive_serial_number: doc.archive_serial_number,
             tags: [...doc.tags],
           })
-
-          // start with ISO8601 string
-          this.documentForm.patchValue(
-            { created: this.ogDate.toISOString() },
-            { emitEvent: false }
-          )
 
           this.isDirty$ = dirtyCheck(
             this.documentForm,
@@ -494,7 +464,7 @@ export class DocumentDetailComponent
   }
 
   moreLike() {
-    this.queryParamsService.navigateWithFilterRules([
+    this.documentListViewService.quickFilter([
       {
         rule_type: FILTER_FULLTEXT_MORELIKE,
         value: this.documentId.toString(),

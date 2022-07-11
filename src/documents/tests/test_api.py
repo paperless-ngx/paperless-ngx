@@ -5,6 +5,7 @@ import os
 import shutil
 import tempfile
 import urllib.request
+import uuid
 import zipfile
 from unittest import mock
 from unittest.mock import MagicMock
@@ -19,12 +20,14 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import override_settings
 from django.utils import timezone
+from django_q.models import Task
 from documents import bulk_edit
 from documents import index
 from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import MatchingModel
+from documents.models import PaperlessTask
 from documents.models import SavedView
 from documents.models import StoragePath
 from documents.models import Tag
@@ -41,7 +44,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         super().setUp()
 
         self.user = User.objects.create_superuser(username="temp_admin")
-        self.client.force_login(user=self.user)
+        self.client.force_authenticate(user=self.user)
 
     def testDocuments(self):
 
@@ -176,7 +179,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         )
 
         with open(
-            os.path.join(self.dirs.thumbnail_dir, f"{doc.pk:07d}.png"),
+            os.path.join(self.dirs.thumbnail_dir, f"{doc.pk:07d}.webp"),
             "wb",
         ) as f:
             f.write(content_thumbnail)
@@ -1022,7 +1025,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
             "samples",
             "documents",
             "thumbnails",
-            "0000001.png",
+            "0000001.webp",
         )
         archive_file = os.path.join(os.path.dirname(__file__), "samples", "simple.pdf")
 
@@ -1176,7 +1179,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
         self.assertEqual(self.client.get(f"/api/saved_views/{v1.id}/").status_code, 404)
 
-        self.client.force_login(user=u1)
+        self.client.force_authenticate(user=u1)
 
         response = self.client.get("/api/saved_views/")
         self.assertEqual(response.status_code, 200)
@@ -1184,7 +1187,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
         self.assertEqual(self.client.get(f"/api/saved_views/{v1.id}/").status_code, 200)
 
-        self.client.force_login(user=u2)
+        self.client.force_authenticate(user=u2)
 
         response = self.client.get("/api/saved_views/")
         self.assertEqual(response.status_code, 200)
@@ -1358,7 +1361,7 @@ class TestDocumentApiV2(DirectoriesMixin, APITestCase):
 
         self.user = User.objects.create_superuser(username="temp_admin")
 
-        self.client.force_login(user=self.user)
+        self.client.force_authenticate(user=self.user)
         self.client.defaults["HTTP_ACCEPT"] = "application/json; version=2"
 
     def test_tag_validate_color(self):
@@ -1432,17 +1435,25 @@ class TestDocumentApiV2(DirectoriesMixin, APITestCase):
             "#000000",
         )
 
-    def test_ui_settings(self):
-        test_user = User.objects.create_superuser(username="test")
-        self.client.force_login(user=test_user)
 
-        response = self.client.get("/api/ui_settings/", format="json")
+class TestApiUiSettings(DirectoriesMixin, APITestCase):
+
+    ENDPOINT = "/api/ui_settings/"
+
+    def setUp(self):
+        super().setUp()
+        self.test_user = User.objects.create_superuser(username="test")
+        self.client.force_authenticate(user=self.test_user)
+
+    def test_api_get_ui_settings(self):
+        response = self.client.get(self.ENDPOINT, format="json")
         self.assertEqual(response.status_code, 200)
         self.assertDictEqual(
             response.data["settings"],
             {},
         )
 
+    def test_api_set_ui_settings(self):
         settings = {
             "settings": {
                 "dark_mode": {
@@ -1452,18 +1463,16 @@ class TestDocumentApiV2(DirectoriesMixin, APITestCase):
         }
 
         response = self.client.post(
-            "/api/ui_settings/",
+            self.ENDPOINT,
             json.dumps(settings),
             content_type="application/json",
         )
 
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.get("/api/ui_settings/", format="json")
-
-        self.assertEqual(response.status_code, 200)
+        ui_settings = self.test_user.ui_settings
         self.assertDictEqual(
-            response.data["settings"],
+            ui_settings.settings,
             settings["settings"],
         )
 
@@ -1473,7 +1482,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
         super().setUp()
 
         user = User.objects.create_superuser(username="temp_admin")
-        self.client.force_login(user=user)
+        self.client.force_authenticate(user=user)
 
         patcher = mock.patch("documents.bulk_edit.async_task")
         self.async_task = patcher.start()
@@ -1786,6 +1795,34 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
         self.assertEqual(kwargs["add_tags"], [self.t1.id])
         self.assertEqual(kwargs["remove_tags"], [self.t2.id])
 
+    @mock.patch("documents.serialisers.bulk_edit.modify_tags")
+    def test_api_modify_tags_not_provided(self, m):
+        """
+        GIVEN:
+            - API data to modify tags is missing modify_tags field
+        WHEN:
+            - API to edit tags is called
+        THEN:
+            - API returns HTTP 400
+            - modify_tags is not called
+        """
+        m.return_value = "OK"
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc1.id, self.doc3.id],
+                    "method": "modify_tags",
+                    "parameters": {
+                        "add_tags": [self.t1.id],
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 400)
+        m.assert_not_called()
+
     @mock.patch("documents.serialisers.bulk_edit.delete")
     def test_api_delete(self, m):
         m.return_value = "OK"
@@ -1801,6 +1838,118 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
         args, kwargs = m.call_args
         self.assertEqual(args[0], [self.doc1.id])
         self.assertEqual(len(kwargs), 0)
+
+    @mock.patch("documents.serialisers.bulk_edit.set_storage_path")
+    def test_api_set_storage_path(self, m):
+        """
+        GIVEN:
+            - API data to set the storage path of a document
+        WHEN:
+            - API is called
+        THEN:
+            - set_storage_path is called with correct document IDs and storage_path ID
+        """
+        m.return_value = "OK"
+
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc1.id],
+                    "method": "set_storage_path",
+                    "parameters": {"storage_path": self.sp1.id},
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        m.assert_called_once()
+        args, kwargs = m.call_args
+
+        self.assertListEqual(args[0], [self.doc1.id])
+        self.assertEqual(kwargs["storage_path"], self.sp1.id)
+
+    @mock.patch("documents.serialisers.bulk_edit.set_storage_path")
+    def test_api_unset_storage_path(self, m):
+        """
+        GIVEN:
+            - API data to clear/unset the storage path of a document
+        WHEN:
+            - API is called
+        THEN:
+            - set_storage_path is called with correct document IDs and None storage_path
+        """
+        m.return_value = "OK"
+
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc1.id],
+                    "method": "set_storage_path",
+                    "parameters": {"storage_path": None},
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        m.assert_called_once()
+        args, kwargs = m.call_args
+
+        self.assertListEqual(args[0], [self.doc1.id])
+        self.assertEqual(kwargs["storage_path"], None)
+
+    def test_api_invalid_storage_path(self):
+        """
+        GIVEN:
+            - API data to set the storage path of a document
+            - Given storage_path ID isn't valid
+        WHEN:
+            - API is called
+        THEN:
+            - set_storage_path is called with correct document IDs and storage_path ID
+        """
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc1.id],
+                    "method": "set_storage_path",
+                    "parameters": {"storage_path": self.sp1.id + 10},
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.async_task.assert_not_called()
+
+    def test_api_set_storage_path_not_provided(self):
+        """
+        GIVEN:
+            - API data to set the storage path of a document
+            - API data is missing storage path ID
+        WHEN:
+            - API is called
+        THEN:
+            - set_storage_path is called with correct document IDs and storage_path ID
+        """
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc1.id],
+                    "method": "set_storage_path",
+                    "parameters": {},
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.async_task.assert_not_called()
 
     def test_api_invalid_doc(self):
         self.assertEqual(Document.objects.count(), 5)
@@ -2049,7 +2198,7 @@ class TestBulkDownload(DirectoriesMixin, APITestCase):
         super().setUp()
 
         user = User.objects.create_superuser(username="temp_admin")
-        self.client.force_login(user=user)
+        self.client.force_authenticate(user=user)
 
         self.doc1 = Document.objects.create(title="unrelated", checksum="A")
         self.doc2 = Document.objects.create(
@@ -2203,7 +2352,7 @@ class TestBulkDownload(DirectoriesMixin, APITestCase):
         )
 
 
-class TestApiAuth(APITestCase):
+class TestApiAuth(DirectoriesMixin, APITestCase):
     def test_auth_required(self):
 
         d = Document.objects.create(title="Test")
@@ -2250,13 +2399,13 @@ class TestApiAuth(APITestCase):
 
     def test_api_version_with_auth(self):
         user = User.objects.create_superuser(username="test")
-        self.client.force_login(user)
+        self.client.force_authenticate(user)
         response = self.client.get("/api/")
         self.assertIn("X-Api-Version", response)
         self.assertIn("X-Version", response)
 
 
-class TestRemoteVersion(APITestCase):
+class TestApiRemoteVersion(DirectoriesMixin, APITestCase):
     ENDPOINT = "/api/remote_version/"
 
     def setUp(self):
@@ -2421,3 +2570,133 @@ class TestRemoteVersion(APITestCase):
                 "feature_is_set": True,
             },
         )
+
+
+class TestApiStoragePaths(DirectoriesMixin, APITestCase):
+    ENDPOINT = "/api/storage_paths/"
+
+    def setUp(self) -> None:
+        super().setUp()
+
+        user = User.objects.create(username="temp_admin")
+        self.client.force_authenticate(user=user)
+
+        self.sp1 = StoragePath.objects.create(name="sp1", path="Something/{checksum}")
+
+    def test_api_get_storage_path(self):
+        """
+        GIVEN:
+            - API request to get all storage paths
+        WHEN:
+            - API is called
+        THEN:
+            - Existing storage paths are returned
+        """
+        response = self.client.get(self.ENDPOINT, format="json")
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["count"], 1)
+
+        resp_storage_path = response.data["results"][0]
+        self.assertEqual(resp_storage_path["id"], self.sp1.id)
+        self.assertEqual(resp_storage_path["path"], self.sp1.path)
+
+    def test_api_create_storage_path(self):
+        """
+        GIVEN:
+            - API request to create a storage paths
+        WHEN:
+            - API is called
+        THEN:
+            - Correct HTTP response
+            - New storage path is created
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "A storage path",
+                    "path": "Somewhere/{asn}",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(StoragePath.objects.count(), 2)
+
+    def test_api_create_invalid_storage_path(self):
+        """
+        GIVEN:
+            - API request to create a storage paths
+            - Storage path format is incorrect
+        WHEN:
+            - API is called
+        THEN:
+            - Correct HTTP 400 response
+            - No storage path is created
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Another storage path",
+                    "path": "Somewhere/{correspdent}",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(StoragePath.objects.count(), 1)
+
+
+class TestTasks(APITestCase):
+    ENDPOINT = "/api/tasks/"
+    ENDPOINT_ACKOWLEDGE = "/api/acknowledge_tasks/"
+
+    def setUp(self):
+        super().setUp()
+
+        self.user = User.objects.create_superuser(username="temp_admin")
+        self.client.force_authenticate(user=self.user)
+
+    def test_get_tasks(self):
+        task_id1 = str(uuid.uuid4())
+        PaperlessTask.objects.create(task_id=task_id1)
+        Task.objects.create(
+            id=task_id1,
+            started=timezone.now() - datetime.timedelta(seconds=30),
+            stopped=timezone.now(),
+            func="documents.tasks.consume_file",
+        )
+        task_id2 = str(uuid.uuid4())
+        PaperlessTask.objects.create(task_id=task_id2)
+
+        response = self.client.get(self.ENDPOINT)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
+        returned_task1 = response.data[1]
+        returned_task2 = response.data[0]
+        self.assertEqual(returned_task1["task_id"], task_id1)
+        self.assertEqual(returned_task1["status"], "complete")
+        self.assertIsNotNone(returned_task1["attempted_task"])
+        self.assertEqual(returned_task2["task_id"], task_id2)
+        self.assertEqual(returned_task2["status"], "queued")
+        self.assertIsNone(returned_task2["attempted_task"])
+
+    def test_acknowledge_tasks(self):
+        task_id = str(uuid.uuid4())
+        task = PaperlessTask.objects.create(task_id=task_id)
+
+        response = self.client.get(self.ENDPOINT)
+        self.assertEqual(len(response.data), 1)
+
+        response = self.client.post(
+            self.ENDPOINT_ACKOWLEDGE,
+            {"tasks": [task.id]},
+        )
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get(self.ENDPOINT)
+        self.assertEqual(len(response.data), 0)

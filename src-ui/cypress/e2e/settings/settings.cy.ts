@@ -1,5 +1,7 @@
 describe('settings', () => {
   beforeEach(() => {
+    // also uses global fixtures from cypress/support/e2e.ts
+
     this.modifiedViews = []
 
     // mock API methods
@@ -41,14 +43,6 @@ describe('settings', () => {
           response = response.results.find((d) => d.id == 1)
           req.reply(response)
         })
-      })
-
-      cy.intercept('http://localhost:8000/api/documents/1/metadata/', {
-        fixture: 'documents/1/metadata.json',
-      })
-
-      cy.intercept('http://localhost:8000/api/documents/1/suggestions/', {
-        fixture: 'documents/1/suggestions.json',
       })
     })
 

@@ -5,6 +5,7 @@ import multiprocessing
 import os
 import re
 from typing import Final
+from typing import Optional
 from typing import Set
 from urllib.parse import urlparse
 
@@ -457,12 +458,14 @@ PAPERLESS_WORKER_RETRY: Final[int] = __get_int(
 
 Q_CLUSTER = {
     "name": "paperless",
+    "guard_cycle": 5,
     "catch_up": False,
     "recycle": 1,
     "retry": PAPERLESS_WORKER_RETRY,
     "timeout": PAPERLESS_WORKER_TIMEOUT,
     "workers": TASK_WORKERS,
     "redis": os.getenv("PAPERLESS_REDIS", "redis://localhost:6379"),
+    "log_level": "DEBUG" if DEBUG else "INFO",
 }
 
 
@@ -523,8 +526,6 @@ CONSUMER_BARCODE_TIFF_SUPPORT = __get_boolean(
 
 CONSUMER_BARCODE_STRING = os.getenv("PAPERLESS_CONSUMER_BARCODE_STRING", "PATCHT")
 
-OPTIMIZE_THUMBNAILS = __get_boolean("PAPERLESS_OPTIMIZE_THUMBNAILS", "true")
-
 OCR_PAGES = int(os.getenv("PAPERLESS_OCR_PAGES", 0))
 
 # The default language that tesseract will attempt to use when parsing
@@ -551,10 +552,9 @@ OCR_ROTATE_PAGES_THRESHOLD = float(
     os.getenv("PAPERLESS_OCR_ROTATE_PAGES_THRESHOLD", 12.0),
 )
 
-OCR_MAX_IMAGE_PIXELS = os.environ.get(
-    "PAPERLESS_OCR_MAX_IMAGE_PIXELS",
-    256000000,
-)
+OCR_MAX_IMAGE_PIXELS: Optional[int] = None
+if os.environ.get("PAPERLESS_OCR_MAX_IMAGE_PIXELS") is not None:
+    OCR_MAX_IMAGE_PIXELS: int = int(os.environ.get("PAPERLESS_OCR_MAX_IMAGE_PIXELS"))
 
 OCR_USER_ARGS = os.getenv("PAPERLESS_OCR_USER_ARGS", "{}")
 
@@ -567,8 +567,6 @@ CONVERT_TMPDIR = os.getenv("PAPERLESS_CONVERT_TMPDIR")
 CONVERT_MEMORY_LIMIT = os.getenv("PAPERLESS_CONVERT_MEMORY_LIMIT")
 
 GS_BINARY = os.getenv("PAPERLESS_GS_BINARY", "gs")
-
-OPTIPNG_BINARY = os.getenv("PAPERLESS_OPTIPNG_BINARY", "optipng")
 
 
 # Pre-2.x versions of Paperless stored your documents locally with GPG

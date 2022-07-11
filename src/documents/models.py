@@ -3,6 +3,7 @@ import logging
 import os
 import re
 from collections import OrderedDict
+from typing import Optional
 
 import dateutil.parser
 import pathvalidate
@@ -11,6 +12,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django_q.tasks import Task
 from documents.parsers import get_default_file_extension
 
 
@@ -228,18 +230,21 @@ class Document(models.Model):
         verbose_name = _("document")
         verbose_name_plural = _("documents")
 
-    def __str__(self):
+    def __str__(self) -> str:
 
         # Convert UTC database time to local time
         created = datetime.date.isoformat(timezone.localdate(self.created))
 
-        if self.correspondent and self.title:
-            return f"{created} {self.correspondent} {self.title}"
-        else:
-            return f"{created} {self.title}"
+        res = f"{created}"
+
+        if self.correspondent:
+            res += f" {self.correspondent}"
+        if self.title:
+            res += f" {self.title}"
+        return res
 
     @property
-    def source_path(self):
+    def source_path(self) -> str:
         if self.filename:
             fname = str(self.filename)
         else:
@@ -254,11 +259,11 @@ class Document(models.Model):
         return open(self.source_path, "rb")
 
     @property
-    def has_archive_version(self):
+    def has_archive_version(self) -> bool:
         return self.archive_filename is not None
 
     @property
-    def archive_path(self):
+    def archive_path(self) -> Optional[str]:
         if self.has_archive_version:
             return os.path.join(settings.ARCHIVE_DIR, str(self.archive_filename))
         else:
@@ -268,7 +273,7 @@ class Document(models.Model):
     def archive_file(self):
         return open(self.archive_path, "rb")
 
-    def get_public_filename(self, archive=False, counter=0, suffix=None):
+    def get_public_filename(self, archive=False, counter=0, suffix=None) -> str:
         result = str(self)
 
         if counter:
@@ -289,16 +294,22 @@ class Document(models.Model):
         return get_default_file_extension(self.mime_type)
 
     @property
-    def thumbnail_path(self):
-        file_name = f"{self.pk:07}.png"
+    def thumbnail_path(self) -> str:
+        webp_file_name = f"{self.pk:07}.webp"
         if self.storage_type == self.STORAGE_TYPE_GPG:
-            file_name += ".gpg"
+            webp_file_name += ".gpg"
 
-        return os.path.join(settings.THUMBNAIL_DIR, file_name)
+        webp_file_path = os.path.join(settings.THUMBNAIL_DIR, webp_file_name)
+
+        return os.path.normpath(webp_file_path)
 
     @property
     def thumbnail_file(self):
         return open(self.thumbnail_path, "rb")
+
+    @property
+    def created_date(self):
+        return timezone.localdate(self.created)
 
 
 class Log(models.Model):
@@ -500,3 +511,19 @@ class UiSettings(models.Model):
 
     def __str__(self):
         return self.user.username
+
+
+class PaperlessTask(models.Model):
+
+    task_id = models.CharField(max_length=128)
+    name = models.CharField(max_length=256)
+    created = models.DateTimeField(_("created"), auto_now=True)
+    started = models.DateTimeField(_("started"), null=True)
+    attempted_task = models.OneToOneField(
+        Task,
+        on_delete=models.CASCADE,
+        related_name="attempted_task",
+        null=True,
+        blank=True,
+    )
+    acknowledged = models.BooleanField(default=False)
