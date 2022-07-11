@@ -45,4 +45,4 @@ jobs:
       -
         name: Cleanup feature tags
         run: |
-          python ${GITHUB_WORKSPACE}/.github/scripts/cleanup-tags.py --loglevel info
+          python ${GITHUB_WORKSPACE}/.github/scripts/cleanup-tags.py --loglevel info --delete
