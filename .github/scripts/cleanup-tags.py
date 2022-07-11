@@ -21,12 +21,17 @@ class GithubContainerRegistry:
         self._session: requests.Session = session
         self._token = token
         self._owner_or_org = owner_or_org
+        # https://docs.github.com/en/rest/branches/branches
         self._BRANCHES_ENDPOINT = "https://api.github.com/repos/{OWNER}/{REPO}/branches"
         if self._owner_or_org == "paperless-ngx":
+            # https://docs.github.com/en/rest/packages#get-all-package-versions-for-a-package-owned-by-an-organization
             self._PACKAGES_VERSIONS_ENDPOINT = "https://api.github.com/orgs/{ORG}/packages/{PACKAGE_TYPE}/{PACKAGE_NAME}/versions"
+            # https://docs.github.com/en/rest/packages#delete-package-version-for-an-organization
             self._PACKAGE_VERSION_DELETE_ENDPOINT = "https://api.github.com/orgs/{ORG}/packages/{PACKAGE_TYPE}/{PACKAGE_NAME}/versions/{PACKAGE_VERSION_ID}"
         else:
+            # https://docs.github.com/en/rest/packages#get-all-package-versions-for-a-package-owned-by-the-authenticated-user
             self._PACKAGES_VERSIONS_ENDPOINT = "https://api.github.com/user/packages/{PACKAGE_TYPE}/{PACKAGE_NAME}/versions"
+            # https://docs.github.com/en/rest/packages#delete-a-package-version-for-the-authenticated-user
             self._PACKAGE_VERSION_DELETE_ENDPOINT = "https://api.github.com/user/packages/{PACKAGE_TYPE}/{PACKAGE_NAME}/versions/{PACKAGE_VERSION_ID}"
 
     def __enter__(self):
@@ -135,23 +140,6 @@ class GithubContainerRegistry:
             )
 
 
-class DockerHubContainerRegistery:
-    def __init__(self):
-        pass
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        pass
-
-    def get_image_versions(self) -> List:
-        return []
-
-    def delete_image_version(self):
-        pass
-
-
 def _main():
     parser = ArgumentParser(
         description="Using the GitHub API locate and optionally delete container"
@@ -234,13 +222,18 @@ def _main():
                 for tag_to_delete in to_delete:
                     package_version_info = packages_tagged_feature[tag_to_delete]
 
-                    logger.info(
-                        f"Deleting {tag_to_delete} (id {package_version_info['id']})",
-                    )
                     if args.delete:
+                        logger.info(
+                            f"Deleting {tag_to_delete} (id {package_version_info['id']})",
+                        )
                         gh_api.delete_package_version(
                             package_name,
                             package_version_info,
+                        )
+
+                    else:
+                        logger.info(
+                            f"Would delete {tag_to_delete} (id {package_version_info['id']})",
                         )
 
                 if args.untagged:
@@ -253,15 +246,8 @@ def _main():
                                 package_name,
                                 to_delete_version,
                             )
-
-        with DockerHubContainerRegistery() as dh_api:
-            docker_hub_image_version = dh_api.get_image_versions()
-
-            # TODO
-            docker_hub_to_delete = []
-
-            for x in docker_hub_to_delete:
-                dh_api.delete_image_version()
+                else:
+                    logger.info("Leaving untagged images untouched")
 
 
 if __name__ == "__main__":
