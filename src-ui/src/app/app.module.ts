@@ -61,7 +61,7 @@ import { SafeUrlPipe } from './pipes/safeurl.pipe'
 import { SafeHtmlPipe } from './pipes/safehtml.pipe'
 import { CustomDatePipe } from './pipes/custom-date.pipe'
 import { DateComponent } from './components/common/input/date/date.component'
-import { ISODateTimeAdapter } from './utils/ngb-iso-date-time-adapter'
+import { ISODateAdapter } from './utils/ngb-iso-date-adapter'
 import { LocalizedDateParserFormatter } from './utils/ngb-date-parser-formatter'
 import { ApiVersionInterceptor } from './interceptors/api-version.interceptor'
 import { ColorSliderModule } from 'ngx-color/slider'
@@ -90,6 +90,7 @@ import localeZh from '@angular/common/locales/zh'
 import { StoragePathListComponent } from './components/manage/storage-path-list/storage-path-list.component'
 import { StoragePathEditDialogComponent } from './components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
 import { SettingsService } from './services/settings.service'
+import { TasksComponent } from './components/manage/tasks/tasks.component'
 
 registerLocaleData(localeBe)
 registerLocaleData(localeCs)
@@ -171,6 +172,7 @@ function initializeApp(settings: SettingsService) {
     DateComponent,
     ColorComponent,
     DocumentAsnComponent,
+    TasksComponent,
   ],
   imports: [
     BrowserModule,
@@ -205,7 +207,7 @@ function initializeApp(settings: SettingsService) {
     },
     FilterPipe,
     DocumentTitlePipe,
-    { provide: NgbDateAdapter, useClass: ISODateTimeAdapter },
+    { provide: NgbDateAdapter, useClass: ISODateAdapter },
     { provide: NgbDateParserFormatter, useClass: LocalizedDateParserFormatter },
   ],
   bootstrap: [AppComponent],

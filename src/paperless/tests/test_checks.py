@@ -13,9 +13,9 @@ class TestChecks(DirectoriesMixin, TestCase):
     def test_binaries(self):
         self.assertEqual(binaries_check(None), [])
 
-    @override_settings(CONVERT_BINARY="uuuhh", OPTIPNG_BINARY="forgot")
+    @override_settings(CONVERT_BINARY="uuuhh")
     def test_binaries_fail(self):
-        self.assertEqual(len(binaries_check(None)), 2)
+        self.assertEqual(len(binaries_check(None)), 1)
 
     def test_paths_check(self):
         self.assertEqual(paths_check(None), [])

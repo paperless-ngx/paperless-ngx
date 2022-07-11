@@ -14,8 +14,12 @@
 }
 
 ::ng-deep .ng2-pdf-viewer-container .page {
-  --page-margin: 1px 0 -8px;
+  --page-margin: 1px 0 10px;
   width: 100% !important;
+}
+
+::ng-deep .ng2-pdf-viewer-container .page:last-child {
+  --page-margin: 1px 0 20px;
 }
 
 .password-prompt {

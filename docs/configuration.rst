@@ -424,14 +424,23 @@ PAPERLESS_OCR_IMAGE_DPI=<num>
     the produced PDF documents are A4 sized.
 
 PAPERLESS_OCR_MAX_IMAGE_PIXELS=<num>
-    Paperless will not OCR images that have more pixels than this limit.
-    This is intended to prevent decompression bombs from overloading paperless.
-    Increasing this limit is desired if you face a DecompressionBombError despite
-    the concerning file not being malicious; this could e.g. be caused by invalidly
-    recognized metadata.
-    If you have enough resources or if you are certain that your uploaded files
-    are not malicious you can increase this value to your needs.
-    The default value is 256000000, an image with more pixels than that would not be parsed.
+    Paperless will raise a warning when OCRing images which are over this limit and
+    will not OCR images which are more than twice this limit.  Note this does not
+    prevent the document from being consumed, but could result in missing text content.
+
+    If unset, will default to the value determined by
+    `Pillow <https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.MAX_IMAGE_PIXELS>`_.
+
+    .. note::
+
+        Increasing this limit could cause Paperless to consume additional resources
+        when consuming a file.  Be sure you have sufficient system resources.
+
+    .. caution::
+
+        The limit is intended to prevent malicious files from consuming system resources
+        and causing crashes and other errors.  Only increase this value if you are certain
+        your documents are not malicious and you need the text which was not OCRed
 
 PAPERLESS_OCR_USER_ARGS=<json>
     OCRmyPDF offers many more options. Use this parameter to specify any
@@ -700,13 +709,6 @@ PAPERLESS_CONVERT_TMPDIR=<path>
 
     Default is none, which disables the temporary directory.
 
-PAPERLESS_OPTIMIZE_THUMBNAILS=<bool>
-    Use optipng to optimize thumbnails. This usually reduces the size of
-    thumbnails by about 20%, but uses considerable compute time during
-    consumption.
-
-    Defaults to true.
-
 PAPERLESS_POST_CONSUME_SCRIPT=<filename>
     After a document is consumed, Paperless can trigger an arbitrary script if
     you like.  This script will be passed a number of arguments for you to work
@@ -776,9 +778,6 @@ PAPERLESS_CONVERT_BINARY=<path>
 
 PAPERLESS_GS_BINARY=<path>
     Defaults to "/usr/bin/gs".
-
-PAPERLESS_OPTIPNG_BINARY=<path>
-    Defaults to "/usr/bin/optipng".
 
 
 .. _configuration-docker:

@@ -70,6 +70,7 @@ target/
 .virtualenv
 virtualenv
 /venv
+.venv/
 /docker-compose.env
 /docker-compose.yml
 

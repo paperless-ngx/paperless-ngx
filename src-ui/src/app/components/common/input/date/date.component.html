@@ -2,7 +2,7 @@
   <label class="form-label" [for]="inputId">{{title}}</label>
   <div class="input-group" [class.is-invalid]="error">
     <input class="form-control" [class.is-invalid]="error" [placeholder]="placeholder" [id]="inputId" maxlength="10"
-          (dateSelect)="onChange(value)" (change)="onChange(value)" (keypress)="onKeyPress($event)"
+          (dateSelect)="onChange(value)" (change)="onChange(value)" (keypress)="onKeyPress($event)" (paste)="onPaste($event)"
           name="dp" [(ngModel)]="value" ngbDatepicker #datePicker="ngbDatepicker" #datePickerContent="ngModel">
     <button class="btn btn-outline-secondary calendar" (click)="datePicker.toggle()" type="button">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar" viewBox="0 0 16 16">

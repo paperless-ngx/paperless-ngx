@@ -200,6 +200,19 @@ Install Paperless from Docker Hub
         You can copy any setting from the file ``paperless.conf.example`` and paste it here.
         Have a look at :ref:`configuration` to see what's available.
 
+    .. note::
+
+        You can utilize Docker secrets for some configuration settings by
+        appending `_FILE` to some configuration values.  This is supported currently
+        only by:
+          * PAPERLESS_DBUSER
+          * PAPERLESS_DBPASS
+          * PAPERLESS_SECRET_KEY
+          * PAPERLESS_AUTO_LOGIN_USERNAME
+          * PAPERLESS_ADMIN_USER
+          * PAPERLESS_ADMIN_MAIL
+          * PAPERLESS_ADMIN_PASSWORD
+
     .. caution::
 
         Some file systems such as NFS network shares don't support file system
@@ -286,7 +299,6 @@ writing. Windows is not and will never be supported.
 
     *   ``fonts-liberation`` for generating thumbnails for plain text files
     *   ``imagemagick`` >= 6 for PDF conversion
-    *   ``optipng`` for optimizing thumbnails
     *   ``gnupg`` for handling encrypted documents
     *   ``libpq-dev`` for PostgreSQL
     *   ``libmagic-dev`` for mime type detection
@@ -298,7 +310,7 @@ writing. Windows is not and will never be supported.
 
     .. code::
 
-        python3 python3-pip python3-dev imagemagick fonts-liberation optipng gnupg libpq-dev libmagic-dev mime-support libzbar0 poppler-utils
+        python3 python3-pip python3-dev imagemagick fonts-liberation gnupg libpq-dev libmagic-dev mime-support libzbar0 poppler-utils
 
     These dependencies are required for OCRmyPDF, which is used for text recognition.
 
@@ -730,8 +742,6 @@ configuring some options in paperless can help improve performance immensely:
 *   If you want to perform OCR on the device, consider using ``PAPERLESS_OCR_CLEAN=none``.
     This will speed up OCR times and use less memory at the expense of slightly worse
     OCR results.
-*   Set ``PAPERLESS_OPTIMIZE_THUMBNAILS`` to 'false' if you want faster consumption
-    times. Thumbnails will be about 20% larger.
 *   If using docker, consider setting ``PAPERLESS_WEBSERVER_WORKERS`` to
     1. This will save some memory.
 

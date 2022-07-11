@@ -6,8 +6,6 @@ from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
 
-Image.MAX_IMAGE_PIXELS = settings.OCR_MAX_IMAGE_PIXELS
-
 
 class TextDocumentParser(DocumentParser):
     """
@@ -28,12 +26,12 @@ class TextDocumentParser(DocumentParser):
         font = ImageFont.truetype(
             font=settings.THUMBNAIL_FONT_NAME,
             size=20,
-            layout_engine=ImageFont.LAYOUT_BASIC,
+            layout_engine=ImageFont.Layout.BASIC,
         )
         draw.text((5, 5), read_text(), font=font, fill="black")
 
-        out_path = os.path.join(self.tempdir, "thumb.png")
-        img.save(out_path)
+        out_path = os.path.join(self.tempdir, "thumb.webp")
+        img.save(out_path, format="WEBP")
 
         return out_path
 
