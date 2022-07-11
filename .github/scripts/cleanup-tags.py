@@ -21,12 +21,17 @@ class GithubContainerRegistry:
         self._session: requests.Session = session
         self._token = token
         self._owner_or_org = owner_or_org
+        # https://docs.github.com/en/rest/branches/branches
         self._BRANCHES_ENDPOINT = "https://api.github.com/repos/{OWNER}/{REPO}/branches"
         if self._owner_or_org == "paperless-ngx":
+            # https://docs.github.com/en/rest/packages#get-all-package-versions-for-a-package-owned-by-an-organization
             self._PACKAGES_VERSIONS_ENDPOINT = "https://api.github.com/orgs/{ORG}/packages/{PACKAGE_TYPE}/{PACKAGE_NAME}/versions"
+            # https://docs.github.com/en/rest/packages#delete-package-version-for-an-organization
             self._PACKAGE_VERSION_DELETE_ENDPOINT = "https://api.github.com/orgs/{ORG}/packages/{PACKAGE_TYPE}/{PACKAGE_NAME}/versions/{PACKAGE_VERSION_ID}"
         else:
+            # https://docs.github.com/en/rest/packages#get-all-package-versions-for-a-package-owned-by-the-authenticated-user
             self._PACKAGES_VERSIONS_ENDPOINT = "https://api.github.com/user/packages/{PACKAGE_TYPE}/{PACKAGE_NAME}/versions"
+            # https://docs.github.com/en/rest/packages#delete-a-package-version-for-the-authenticated-user
             self._PACKAGE_VERSION_DELETE_ENDPOINT = "https://api.github.com/user/packages/{PACKAGE_TYPE}/{PACKAGE_NAME}/versions/{PACKAGE_VERSION_ID}"
 
     def __enter__(self):
