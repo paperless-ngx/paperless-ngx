@@ -8,7 +8,7 @@
           <context context-type="sourcefile">node_modules/src/alert/alert.ts</context>
           <context context-type="linenumber">42,44</context>
         </context-group>
-        <target state="needs-translation">Close</target>
+        <target state="translated">Zatvori</target>
       </trans-unit>
       <trans-unit id="ngb.carousel.slide-number" datatype="html">
         <source> Slide <x id="INTERPOLATION" equiv-text="ing when mouse"/> of <x id="INTERPOLATION_1" equiv-text="e.    *    * @s"/> </source>
@@ -17,7 +17,7 @@
           <context context-type="linenumber">157,166</context>
         </context-group>
         <note priority="1" from="description">Currently selected slide number read by screen reader</note>
-        <target state="needs-translation"> Slide <x id="INTERPOLATION" equiv-text="ing when mouse"/> of <x id="INTERPOLATION_1" equiv-text="e.    *    * @s"/> </target>
+        <target state="translated"> Slajd <x id="INTERPOLATION" equiv-text="ing when mouse"/> od <x id="INTERPOLATION_1" equiv-text="e.    *    * @s"/> </target>
       </trans-unit>
       <trans-unit id="ngb.carousel.previous" datatype="html">
         <source>Previous</source>
@@ -25,7 +25,7 @@
           <context context-type="sourcefile">node_modules/src/carousel/carousel.ts</context>
           <context context-type="linenumber">188,191</context>
         </context-group>
-        <target state="needs-translation">Previous</target>
+        <target state="translated">Prethodno</target>
       </trans-unit>
       <trans-unit id="ngb.carousel.next" datatype="html">
         <source>Next</source>
@@ -33,7 +33,7 @@
           <context context-type="sourcefile">node_modules/src/carousel/carousel.ts</context>
           <context context-type="linenumber">209,211</context>
         </context-group>
-        <target state="needs-translation">Next</target>
+        <target state="translated">Sljedeće</target>
       </trans-unit>
       <trans-unit id="ngb.datepicker.select-month" datatype="html">
         <source>Select month</source>
@@ -45,7 +45,7 @@
           <context context-type="sourcefile">node_modules/src/datepicker/datepicker-navigation-select.ts</context>
           <context context-type="linenumber">41,42</context>
         </context-group>
-        <target state="needs-translation">Select month</target>
+        <target state="translated">Odaberi mjesec</target>
       </trans-unit>
       <trans-unit id="ngb.datepicker.select-year" datatype="html">
         <source>Select year</source>
@@ -57,7 +57,7 @@
           <context context-type="sourcefile">node_modules/src/datepicker/datepicker-navigation-select.ts</context>
           <context context-type="linenumber">41,42</context>
         </context-group>
-        <target state="needs-translation">Select year</target>
+        <target state="translated">Odaberi godinu</target>
       </trans-unit>
       <trans-unit id="ngb.datepicker.previous-month" datatype="html">
         <source>Previous month</source>
@@ -69,7 +69,7 @@
           <context context-type="sourcefile">node_modules/src/datepicker/datepicker-navigation.ts</context>
           <context context-type="linenumber">43,46</context>
         </context-group>
-        <target state="needs-translation">Previous month</target>
+        <target state="translated">Prethodni mjesec</target>
       </trans-unit>
       <trans-unit id="ngb.datepicker.next-month" datatype="html">
         <source>Next month</source>
@@ -81,7 +81,7 @@
           <context context-type="sourcefile">node_modules/src/datepicker/datepicker-navigation.ts</context>
           <context context-type="linenumber">43,46</context>
         </context-group>
-        <target state="needs-translation">Next month</target>
+        <target state="translated">Sljedeći mjesec</target>
       </trans-unit>
       <trans-unit id="ngb.pagination.first" datatype="html">
         <source>««</source>
@@ -89,7 +89,7 @@
           <context context-type="sourcefile">node_modules/src/pagination/pagination.ts</context>
           <context context-type="linenumber">224,225</context>
         </context-group>
-        <target state="needs-translation">««</target>
+        <target state="translated">««</target>
       </trans-unit>
       <trans-unit id="ngb.pagination.previous" datatype="html">
         <source>«</source>
@@ -97,7 +97,7 @@
           <context context-type="sourcefile">node_modules/src/pagination/pagination.ts</context>
           <context context-type="linenumber">224,225</context>
         </context-group>
-        <target state="needs-translation">«</target>
+        <target state="translated">«</target>
       </trans-unit>
       <trans-unit id="ngb.pagination.next" datatype="html">
         <source>»</source>
@@ -105,7 +105,7 @@
           <context context-type="sourcefile">node_modules/src/pagination/pagination.ts</context>
           <context context-type="linenumber">224,225</context>
         </context-group>
-        <target state="needs-translation">»</target>
+        <target state="translated">»</target>
       </trans-unit>
       <trans-unit id="ngb.pagination.last" datatype="html">
         <source>»»</source>
@@ -113,7 +113,7 @@
           <context context-type="sourcefile">node_modules/src/pagination/pagination.ts</context>
           <context context-type="linenumber">224,225</context>
         </context-group>
-        <target state="needs-translation">»»</target>
+        <target state="translated">»»</target>
       </trans-unit>
       <trans-unit id="ngb.pagination.first-aria" datatype="html">
         <source>First</source>
@@ -121,7 +121,7 @@
           <context context-type="sourcefile">node_modules/src/pagination/pagination.ts</context>
           <context context-type="linenumber">224,226</context>
         </context-group>
-        <target state="needs-translation">First</target>
+        <target state="translated">Prvi</target>
       </trans-unit>
       <trans-unit id="ngb.pagination.previous-aria" datatype="html">
         <source>Previous</source>
@@ -129,7 +129,7 @@
           <context context-type="sourcefile">node_modules/src/pagination/pagination.ts</context>
           <context context-type="linenumber">224,226</context>
         </context-group>
-        <target state="needs-translation">Previous</target>
+        <target state="translated">Prethodni</target>
       </trans-unit>
       <trans-unit id="ngb.pagination.next-aria" datatype="html">
         <source>Next</source>
@@ -137,7 +137,7 @@
           <context context-type="sourcefile">node_modules/src/pagination/pagination.ts</context>
           <context context-type="linenumber">224,225</context>
         </context-group>
-        <target state="needs-translation">Next</target>
+        <target state="translated">Sljedeći</target>
       </trans-unit>
       <trans-unit id="ngb.pagination.last-aria" datatype="html">
         <source>Last</source>
@@ -145,7 +145,7 @@
           <context context-type="sourcefile">node_modules/src/pagination/pagination.ts</context>
           <context context-type="linenumber">224,225</context>
         </context-group>
-        <target state="needs-translation">Last</target>
+        <target state="translated">Zadnji</target>
       </trans-unit>
       <trans-unit id="ngb.progressbar.value" datatype="html">
         <source>
@@ -155,7 +155,7 @@
           <context context-type="sourcefile">node_modules/src/progressbar/progressbar.ts</context>
           <context context-type="linenumber">23,26</context>
         </context-group>
-        <target state="needs-translation"><x id="INTERPOLATION" equiv-text="* The maxim"/></target>
+        <target state="translated"><x id="INTERPOLATION" equiv-text="* Maksima"/></target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.HH" datatype="html">
         <source>HH</source>
@@ -163,7 +163,7 @@
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
           <context context-type="linenumber">138,141</context>
         </context-group>
-        <target state="needs-translation">HH</target>
+        <target state="translated">HH</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.hours" datatype="html">
         <source>Hours</source>
@@ -171,7 +171,7 @@
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
           <context context-type="linenumber">161</context>
         </context-group>
-        <target state="needs-translation">Hours</target>
+        <target state="translated">Sati</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.MM" datatype="html">
         <source>MM</source>
@@ -179,7 +179,7 @@
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
           <context context-type="linenumber">182</context>
         </context-group>
-        <target state="needs-translation">MM</target>
+        <target state="translated">MM</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.minutes" datatype="html">
         <source>Minutes</source>
@@ -187,7 +187,7 @@
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
           <context context-type="linenumber">199</context>
         </context-group>
-        <target state="needs-translation">Minutes</target>
+        <target state="translated">Minute</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.increment-hours" datatype="html">
         <source>Increment hours</source>
@@ -195,7 +195,7 @@
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
           <context context-type="linenumber">218,219</context>
         </context-group>
-        <target state="needs-translation">Increment hours</target>
+        <target state="translated">Povećanje sati</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.decrement-hours" datatype="html">
         <source>Decrement hours</source>
@@ -203,7 +203,7 @@
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
           <context context-type="linenumber">240,243</context>
         </context-group>
-        <target state="needs-translation">Decrement hours</target>
+        <target state="translated">Smanjenje sati</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.increment-minutes" datatype="html">
         <source>Increment minutes</source>
@@ -211,7 +211,7 @@
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
           <context context-type="linenumber">268</context>
         </context-group>
-        <target state="needs-translation">Increment minutes</target>
+        <target state="translated">Povečanje minuta</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.decrement-minutes" datatype="html">
         <source>Decrement minutes</source>
@@ -219,7 +219,7 @@
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
           <context context-type="linenumber">288,289</context>
         </context-group>
-        <target state="needs-translation">Decrement minutes</target>
+        <target state="translated">Smanjenje minuta</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.SS" datatype="html">
         <source>SS</source>
@@ -227,7 +227,7 @@
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
           <context context-type="linenumber">295</context>
         </context-group>
-        <target state="needs-translation">SS</target>
+        <target state="translated">SS</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.seconds" datatype="html">
         <source>Seconds</source>
@@ -235,7 +235,7 @@
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
           <context context-type="linenumber">295</context>
         </context-group>
-        <target state="needs-translation">Seconds</target>
+        <target state="translated">Sekunde</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.increment-seconds" datatype="html">
         <source>Increment seconds</source>
@@ -243,7 +243,7 @@
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
           <context context-type="linenumber">295</context>
         </context-group>
-        <target state="needs-translation">Increment seconds</target>
+        <target state="translated">Povečanje sekundi</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.decrement-seconds" datatype="html">
         <source>Decrement seconds</source>
@@ -251,7 +251,7 @@
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
           <context context-type="linenumber">295</context>
         </context-group>
-        <target state="needs-translation">Decrement seconds</target>
+        <target state="translated">Smanjenje sekundi</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.PM" datatype="html">
         <source>
@@ -277,7 +277,7 @@
           <context context-type="sourcefile">node_modules/src/toast/toast.ts</context>
           <context context-type="linenumber">70,71</context>
         </context-group>
-        <target state="needs-translation">Close</target>
+        <target state="translated">Zatvori</target>
       </trans-unit>
       <trans-unit id="7103632680753685326" datatype="html">
         <source>Drop files to begin upload</source>
@@ -285,7 +285,7 @@
           <context context-type="sourcefile">src/app/app.component.html</context>
           <context context-type="linenumber">7</context>
         </context-group>
-        <target state="needs-translation">Drop files to begin upload</target>
+        <target state="translated">Odloži datoteke kako bi započeo prijenos</target>
       </trans-unit>
       <trans-unit id="9103526311244275943" datatype="html">
         <source>Document added</source>
@@ -293,7 +293,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">75</context>
         </context-group>
-        <target state="needs-translation">Document added</target>
+        <target state="translated">Dokument dodan</target>
       </trans-unit>
       <trans-unit id="9204248378636247318" datatype="html">
         <source>Document <x id="PH" equiv-text="status.filename"/> was added to paperless.</source>
@@ -301,7 +301,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">77</context>
         </context-group>
-        <target state="needs-translation">Document <x id="PH" equiv-text="status.filename"/> was added to paperless.</target>
+        <target state="translated">Dokument <x id="PH" equiv-text="status.filename"/> je dodan u paperless.</target>
       </trans-unit>
       <trans-unit id="1931214133925051574" datatype="html">
         <source>Open document</source>
@@ -313,7 +313,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="needs-translation">Open document</target>
+        <target state="translated">Otvori dokument</target>
       </trans-unit>
       <trans-unit id="8582620835547864448" datatype="html">
         <source>Could not add <x id="PH" equiv-text="status.filename"/>: <x id="PH_1" equiv-text="status.message"/></source>
@@ -321,7 +321,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">94</context>
         </context-group>
-        <target state="needs-translation">Could not add <x id="PH" equiv-text="status.filename"/>: <x id="PH_1" equiv-text="status.message"/></target>
+        <target state="translated">Bezuspješno dodavanje <x id="PH" equiv-text="status.filename"/>: <x id="PH_1" equiv-text="status.message"/></target>
       </trans-unit>
       <trans-unit id="1710712016675379662" datatype="html">
         <source>New document detected</source>
@@ -329,7 +329,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">109</context>
         </context-group>
-        <target state="needs-translation">New document detected</target>
+        <target state="translated">Novi dokument detektiran</target>
       </trans-unit>
       <trans-unit id="587031278561344416" datatype="html">
         <source>Document <x id="PH" equiv-text="status.filename"/> is being processed by paperless.</source>
@@ -337,7 +337,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">111</context>
         </context-group>
-        <target state="needs-translation">Document <x id="PH" equiv-text="status.filename"/> is being processed by paperless.</target>
+        <target state="translated">Dokument <x id="PH" equiv-text="status.filename"/> je u fazi obrade.</target>
       </trans-unit>
       <trans-unit id="5749300816154614125" datatype="html">
         <source>Initiating upload...</source>
@@ -345,7 +345,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">146</context>
         </context-group>
-        <target state="needs-translation">Initiating upload...</target>
+        <target state="translated">Pokretanje prijenosa...</target>
       </trans-unit>
       <trans-unit id="2173456130768795374" datatype="html">
         <source>Paperless-ngx</source>
@@ -354,7 +354,7 @@
           <context context-type="linenumber">11</context>
         </context-group>
         <note priority="1" from="description">app title</note>
-        <target state="needs-translation">Paperless-ngx</target>
+        <target state="translated">Paperless-ngx</target>
       </trans-unit>
       <trans-unit id="7100953725264790651" datatype="html">
         <source>Search documents</source>
@@ -362,7 +362,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="needs-translation">Search documents</target>
+        <target state="translated">Pretraži dokumente</target>
       </trans-unit>
       <trans-unit id="2448391510242468907" datatype="html">
         <source>Logged in as <x id="INTERPOLATION" equiv-text="{{this.settingsService.displayName}}"/></source>
@@ -370,7 +370,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">34</context>
         </context-group>
-        <target state="needs-translation">Logged in as <x id="INTERPOLATION" equiv-text="{{this.settingsService.displayName}}"/></target>
+        <target state="translated">Prijavljen kao <x id="INTERPOLATION" equiv-text="{{this.settingsService.displayName}}"/></target>
       </trans-unit>
       <trans-unit id="4930506384627295710" datatype="html">
         <source>Settings</source>
@@ -386,7 +386,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="needs-translation">Settings</target>
+        <target state="translated">Postavke</target>
       </trans-unit>
       <trans-unit id="3797778920049399855" datatype="html">
         <source>Logout</source>
@@ -394,7 +394,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="needs-translation">Logout</target>
+        <target state="translated">Odjavi se</target>
       </trans-unit>
       <trans-unit id="6570363013146073520" datatype="html">
         <source>Dashboard</source>
@@ -406,7 +406,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="needs-translation">Dashboard</target>
+        <target state="translated">Nadzorna ploča</target>
       </trans-unit>
       <trans-unit id="4733307402565258070" datatype="html">
         <source>Documents</source>
@@ -434,7 +434,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
           <context context-type="linenumber">54</context>
         </context-group>
-        <target state="needs-translation">Documents</target>
+        <target state="translated">Dokumenti</target>
       </trans-unit>
       <trans-unit id="472206565520537964" datatype="html">
         <source>Saved views</source>
@@ -446,7 +446,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">150</context>
         </context-group>
-        <target state="needs-translation">Saved views</target>
+        <target state="translated">Spremljeni prikazi</target>
       </trans-unit>
       <trans-unit id="6988090220128974198" datatype="html">
         <source>Open documents</source>
@@ -454,7 +454,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">88</context>
         </context-group>
-        <target state="needs-translation">Open documents</target>
+        <target state="translated">Otvoreni dokumenti</target>
       </trans-unit>
       <trans-unit id="5687256342387781369" datatype="html">
         <source>Close all</source>
@@ -462,7 +462,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">107</context>
         </context-group>
-        <target state="needs-translation">Close all</target>
+        <target state="translated">Zatvori sve</target>
       </trans-unit>
       <trans-unit id="3897348120591552265" datatype="html">
         <source>Manage</source>
@@ -470,7 +470,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">113</context>
         </context-group>
-        <target state="needs-translation">Manage</target>
+        <target state="translated">Upravljaj</target>
       </trans-unit>
       <trans-unit id="7437910965833684826" datatype="html">
         <source>Correspondents</source>
@@ -478,7 +478,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">120</context>
         </context-group>
-        <target state="needs-translation">Correspondents</target>
+        <target state="translated">Dopisnici</target>
       </trans-unit>
       <trans-unit id="7886570921510760899" datatype="html">
         <source>Tags</source>
@@ -498,7 +498,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="needs-translation">Tags</target>
+        <target state="translated">Oznake</target>
       </trans-unit>
       <trans-unit id="3079652255369035" datatype="html">
         <source>Document types</source>
@@ -506,7 +506,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">134</context>
         </context-group>
-        <target state="needs-translation">Document types</target>
+        <target state="translated">Vrste dokumenta</target>
       </trans-unit>
       <trans-unit id="8835528846812581148" datatype="html">
         <source>Storage paths</source>
@@ -514,7 +514,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">141</context>
         </context-group>
-        <target state="needs-translation">Storage paths</target>
+        <target state="translated">Putanje pohrane</target>
       </trans-unit>
       <trans-unit id="5164080148396013258" datatype="html">
         <source>File Tasks<x id="START_TAG_NG_CONTAINER" ctype="x-ng_container" equiv-text="&lt;ng-container *ngIf=&quot;tasksService.failedFileTasks.length &gt; 0&quot;&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-danger ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_NG_CONTAINER" ctype="x-ng_container" equiv-text="&lt;/ng-container&gt;"/></source>
@@ -522,7 +522,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">148</context>
         </context-group>
-        <target state="needs-translation">File Tasks<x id="START_TAG_NG_CONTAINER" ctype="x-ng_container" equiv-text="&lt;ng-container *ngIf=&quot;tasksService.failedFileTasks.length &gt; 0&quot;&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-danger ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_NG_CONTAINER" ctype="x-ng_container" equiv-text="&lt;/ng-container&gt;"/></target>
+        <target state="translated">Zadaci datoteke<x id="START_TAG_NG_CONTAINER" ctype="x-ng_container" equiv-text="&lt;ng-container *ngIf=&quot;tasksService.failedFileTasks.length &gt; 0&quot;&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-danger ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_NG_CONTAINER" ctype="x-ng_container" equiv-text="&lt;/ng-container&gt;"/></target>
       </trans-unit>
       <trans-unit id="4804785061014590286" datatype="html">
         <source>Logs</source>
@@ -534,7 +534,7 @@
           <context context-type="sourcefile">src/app/components/manage/logs/logs.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="needs-translation">Logs</target>
+        <target state="translated">Zapisnici</target>
       </trans-unit>
       <trans-unit id="5041354590769758251" datatype="html">
         <source>Admin</source>
@@ -542,7 +542,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">169</context>
         </context-group>
-        <target state="needs-translation">Admin</target>
+        <target state="translated">Administrator</target>
       </trans-unit>
       <trans-unit id="314315645942131479" datatype="html">
         <source>Info</source>
@@ -554,7 +554,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">43</context>
         </context-group>
-        <target state="needs-translation">Info</target>
+        <target state="translated">Informacije</target>
       </trans-unit>
       <trans-unit id="4895326106573044490" datatype="html">
         <source>Documentation</source>
@@ -562,7 +562,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">182</context>
         </context-group>
-        <target state="needs-translation">Documentation</target>
+        <target state="translated">Dokumentacija</target>
       </trans-unit>
       <trans-unit id="1534029177398918729" datatype="html">
         <source>GitHub</source>
@@ -570,7 +570,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">190</context>
         </context-group>
-        <target state="needs-translation">GitHub</target>
+        <target state="translated">GitHub</target>
       </trans-unit>
       <trans-unit id="5612903193691847840" datatype="html">
         <source>Suggest an idea</source>
@@ -578,7 +578,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">196</context>
         </context-group>
-        <target state="needs-translation">Suggest an idea</target>
+        <target state="translated">Predloži ideju</target>
       </trans-unit>
       <trans-unit id="4112664765954374539" datatype="html">
         <source>is available.</source>
@@ -586,7 +586,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">205</context>
         </context-group>
-        <target state="needs-translation">is available.</target>
+        <target state="translated">je dostupno.</target>
       </trans-unit>
       <trans-unit id="1175891574282637937" datatype="html">
         <source>Click to view.</source>
@@ -594,7 +594,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">205</context>
         </context-group>
-        <target state="needs-translation">Click to view.</target>
+        <target state="translated">Klikni za prikaz.</target>
       </trans-unit>
       <trans-unit id="5052123870893768885" datatype="html">
         <source>Checking for updates is disabled.</source>
@@ -602,7 +602,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">208</context>
         </context-group>
-        <target state="needs-translation">Checking for updates is disabled.</target>
+        <target state="translated">Provjera ažuriranja je onemogućena.</target>
       </trans-unit>
       <trans-unit id="3601519436351639860" datatype="html">
         <source>Click for more information.</source>
@@ -610,7 +610,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">208</context>
         </context-group>
-        <target state="needs-translation">Click for more information.</target>
+        <target state="translated">Kliknite za više informacija.</target>
       </trans-unit>
       <trans-unit id="509090351011426949" datatype="html">
         <source>Update available</source>
@@ -618,7 +618,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">216</context>
         </context-group>
-        <target state="needs-translation">Update available</target>
+        <target state="translated">Dostupno ažuriranje</target>
       </trans-unit>
       <trans-unit id="5000042972069710005" datatype="html">
         <source><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;d-inline-block&quot; style=&quot;padding-bottom: 1px;&quot; &gt;"/>Cancel<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
@@ -634,7 +634,7 @@
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/confirm-dialog.component.ts</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="needs-translation">Confirmation</target>
+        <target state="translated">Potvrda</target>
       </trans-unit>
       <trans-unit id="9178182467454450952" datatype="html">
         <source>Confirm</source>
@@ -658,7 +658,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">344</context>
         </context-group>
-        <target state="needs-translation">Confirm</target>
+        <target state="translated">Potvrdi</target>
       </trans-unit>
       <trans-unit id="6371576811194810854" datatype="html">
         <source>After</source>
@@ -666,7 +666,7 @@
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">After</target>
+        <target state="translated">Nakon</target>
       </trans-unit>
       <trans-unit id="8700121026680200191" datatype="html">
         <source>Clear</source>
@@ -678,7 +678,7 @@
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.html</context>
           <context context-type="linenumber">41</context>
         </context-group>
-        <target state="needs-translation">Clear</target>
+        <target state="translated">Očisti</target>
       </trans-unit>
       <trans-unit id="1218334388194408974" datatype="html">
         <source>Before</source>
@@ -686,7 +686,7 @@
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.html</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="needs-translation">Before</target>
+        <target state="translated">Prije</target>
       </trans-unit>
       <trans-unit id="4873149362496451858" datatype="html">
         <source>Last 7 days</source>
@@ -694,7 +694,7 @@
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.ts</context>
           <context context-type="linenumber">38</context>
         </context-group>
-        <target state="needs-translation">Last 7 days</target>
+        <target state="translated">Posljednjih 7 dana</target>
       </trans-unit>
       <trans-unit id="4463380307954693363" datatype="html">
         <source>Last month</source>
@@ -702,7 +702,7 @@
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.ts</context>
           <context context-type="linenumber">39</context>
         </context-group>
-        <target state="needs-translation">Last month</target>
+        <target state="translated">Posljednji mjesec</target>
       </trans-unit>
       <trans-unit id="8697368973702409683" datatype="html">
         <source>Last 3 months</source>
@@ -710,7 +710,7 @@
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.ts</context>
           <context context-type="linenumber">40</context>
         </context-group>
-        <target state="needs-translation">Last 3 months</target>
+        <target state="translated">Posljednja 3 mjeseca</target>
       </trans-unit>
       <trans-unit id="3566342898065860218" datatype="html">
         <source>Last year</source>
@@ -718,7 +718,7 @@
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.ts</context>
           <context context-type="linenumber">41</context>
         </context-group>
-        <target state="needs-translation">Last year</target>
+        <target state="translated">Prošla godina</target>
       </trans-unit>
       <trans-unit id="8953033926734869941" datatype="html">
         <source>Name</source>
@@ -782,7 +782,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">40</context>
         </context-group>
-        <target state="needs-translation">Name</target>
+        <target state="translated">Ime</target>
       </trans-unit>
       <trans-unit id="8743659855412792665" datatype="html">
         <source>Matching algorithm</source>
@@ -802,7 +802,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">Matching algorithm</target>
+        <target state="translated">Algoritam podudaranja</target>
       </trans-unit>
       <trans-unit id="2656329676292524585" datatype="html">
         <source>Matching pattern</source>
@@ -822,7 +822,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component.html</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="needs-translation">Matching pattern</target>
+        <target state="translated">Odgovarajući uzorak</target>
       </trans-unit>
       <trans-unit id="6063936469630366525" datatype="html">
         <source>Case insensitive</source>
@@ -842,7 +842,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component.html</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="needs-translation">Case insensitive</target>
+        <target state="translated">Neosjetljivo na velika i mala slova</target>
       </trans-unit>
       <trans-unit id="2159130950882492111" datatype="html">
         <source>Cancel</source>
@@ -874,7 +874,7 @@
           <context context-type="sourcefile">src/app/components/document-list/save-view-config-dialog/save-view-config-dialog.component.html</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="needs-translation">Cancel</target>
+        <target state="translated">Odustani</target>
       </trans-unit>
       <trans-unit id="3768927257183755959" datatype="html">
         <source>Save</source>
@@ -906,7 +906,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">189</context>
         </context-group>
-        <target state="needs-translation">Save</target>
+        <target state="translated">Spremi</target>
       </trans-unit>
       <trans-unit id="6457471243969293847" datatype="html">
         <source>Create new correspondent</source>
@@ -914,7 +914,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component.ts</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="needs-translation">Create new correspondent</target>
+        <target state="translated">Stvori novog dopisnika</target>
       </trans-unit>
       <trans-unit id="2059822531169388684" datatype="html">
         <source>Edit correspondent</source>
@@ -922,7 +922,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component.ts</context>
           <context context-type="linenumber">28</context>
         </context-group>
-        <target state="needs-translation">Edit correspondent</target>
+        <target state="translated">Preuredi dopisnika</target>
       </trans-unit>
       <trans-unit id="6672809941092516947" datatype="html">
         <source>Create new document type</source>
@@ -930,7 +930,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component.ts</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="needs-translation">Create new document type</target>
+        <target state="translated">Stvori novu vrstu dokumenta</target>
       </trans-unit>
       <trans-unit id="36335016091244220" datatype="html">
         <source>Edit document type</source>
@@ -938,7 +938,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component.ts</context>
           <context context-type="linenumber">28</context>
         </context-group>
-        <target state="needs-translation">Edit document type</target>
+        <target state="translated">Preuredi vrstu dokumenta</target>
       </trans-unit>
       <trans-unit id="4561076822163447092" datatype="html">
         <source>Create new item</source>
@@ -946,7 +946,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/edit-dialog.component.ts</context>
           <context context-type="linenumber">52</context>
         </context-group>
-        <target state="needs-translation">Create new item</target>
+        <target state="translated">Stvori novu stavku</target>
       </trans-unit>
       <trans-unit id="5324147361912094446" datatype="html">
         <source>Edit item</source>
@@ -954,7 +954,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/edit-dialog.component.ts</context>
           <context context-type="linenumber">56</context>
         </context-group>
-        <target state="needs-translation">Edit item</target>
+        <target state="translated">Uredi stavku</target>
       </trans-unit>
       <trans-unit id="1699589597032579396" datatype="html">
         <source>Could not save element: <x id="PH" equiv-text="error"/></source>
@@ -962,7 +962,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/edit-dialog.component.ts</context>
           <context context-type="linenumber">60</context>
         </context-group>
-        <target state="needs-translation">Could not save element: <x id="PH" equiv-text="error"/></target>
+        <target state="translated">Nije moguće spremiti element: <x id="PH" equiv-text="error"/></target>
       </trans-unit>
       <trans-unit id="6036319582202941456" datatype="html">
         <source><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>Note that editing a path does not apply changes to stored files until you have run the &apos;document_renamer&apos; utility. See the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a target=&quot;_blank&quot; href=&quot;https://paperless-ngx.readthedocs.io/en/latest/administration.html#utilities-renamer&quot;&gt;"/>documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></source>
@@ -970,7 +970,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.html</context>
           <context context-type="linenumber">10</context>
         </context-group>
-        <target state="needs-translation"><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>Note that editing a path does not apply changes to stored files until you have run the 'document_renamer' utility. See the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a target=&quot;_blank&quot; href=&quot;https://paperless-ngx.readthedocs.io/en/latest/administration.html#utilities-renamer&quot;&gt;"/>documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></target>
+        <target state="translated"><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>Imajte na umu da uređivanje putanje se ne primjenjuje na pohranjene datoteke dok ne pokrenete uslužni program 'document_renamer'. Vidi <x id="START_LINK" ctype="x-a" equiv-text="&lt;a target=&quot;_blank&quot; href=&quot;https://paperless-ngx.readthedocs.io/en/latest/administration.html#utilities-renamer&quot;&gt;"/>documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></target>
       </trans-unit>
       <trans-unit id="8911059720204770105" datatype="html">
         <source>Path</source>
@@ -982,7 +982,7 @@
           <context context-type="sourcefile">src/app/components/manage/storage-path-list/storage-path-list.component.ts</context>
           <context context-type="linenumber">35</context>
         </context-group>
-        <target state="needs-translation">Path</target>
+        <target state="translated">Putanja</target>
       </trans-unit>
       <trans-unit id="6625768491622252297" datatype="html">
         <source>e.g.</source>
@@ -990,7 +990,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.ts</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">e.g.</target>
+        <target state="translated">npr.</target>
       </trans-unit>
       <trans-unit id="1918584360573970155" datatype="html">
         <source>or use slashes to add directories e.g.</source>
@@ -998,7 +998,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.ts</context>
           <context context-type="linenumber">27</context>
         </context-group>
-        <target state="needs-translation">or use slashes to add directories e.g.</target>
+        <target state="translated">ili koristite kose crte za dodavanje imenika, npr.</target>
       </trans-unit>
       <trans-unit id="7992597438102889079" datatype="html">
         <source>See &lt;a target=&quot;_blank&quot; href=&quot;https://paperless-ngx.readthedocs.io/en/latest/advanced_usage.html#file-name-handling&quot;&gt;documentation&lt;/a&gt; for full list.</source>
@@ -1006,7 +1006,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.ts</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="needs-translation">See &lt;a target="_blank" href="https://paperless-ngx.readthedocs.io/en/latest/advanced_usage.html#file-name-handling"&gt;documentation&lt;/a&gt; for full list.</target>
+        <target state="translated">Vidi &lt;a target="_blank" href="https://paperless-ngx.readthedocs.io/en/latest/advanced_usage.html#file-name-handling"&gt;documentation&lt;/a&gt; za cijeli popis.</target>
       </trans-unit>
       <trans-unit id="6898961890896270754" datatype="html">
         <source>Create new storage path</source>
@@ -1014,7 +1014,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.ts</context>
           <context context-type="linenumber">34</context>
         </context-group>
-        <target state="needs-translation">Create new storage path</target>
+        <target state="translated">Stvori novu putanju pohrane</target>
       </trans-unit>
       <trans-unit id="3754859110054016570" datatype="html">
         <source>Edit storage path</source>
@@ -1022,7 +1022,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.ts</context>
           <context context-type="linenumber">38</context>
         </context-group>
-        <target state="needs-translation">Edit storage path</target>
+        <target state="translated">Uredi putanju pohrane</target>
       </trans-unit>
       <trans-unit id="9011959596901584887" datatype="html">
         <source>Color</source>
@@ -1034,7 +1034,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.ts</context>
           <context context-type="linenumber">35</context>
         </context-group>
-        <target state="needs-translation">Color</target>
+        <target state="translated">Boja</target>
       </trans-unit>
       <trans-unit id="1426037806946650347" datatype="html">
         <source>Inbox tag</source>
@@ -1042,7 +1042,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation">Inbox tag</target>
+        <target state="translated">Oznaka pristigle pošte</target>
       </trans-unit>
       <trans-unit id="8566220514470905459" datatype="html">
         <source>Inbox tags are automatically assigned to all consumed documents.</source>
@@ -1050,7 +1050,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation">Inbox tags are automatically assigned to all consumed documents.</target>
+        <target state="translated">Oznake ulazne pošte automatski se dodjeljuju svim konzumiranim dokumentima.</target>
       </trans-unit>
       <trans-unit id="9153094873118985366" datatype="html">
         <source>Create new tag</source>
@@ -1058,7 +1058,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component.ts</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">Create new tag</target>
+        <target state="translated">Izradi novu oznaku</target>
       </trans-unit>
       <trans-unit id="5872175735754226507" datatype="html">
         <source>Edit tag</source>
@@ -1066,7 +1066,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component.ts</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="needs-translation">Edit tag</target>
+        <target state="translated">Preuredi oznaku</target>
       </trans-unit>
       <trans-unit id="1616102757855967475" datatype="html">
         <source>All</source>
@@ -1078,7 +1078,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">All</target>
+        <target state="translated">Sve</target>
       </trans-unit>
       <trans-unit id="3184700926171002527" datatype="html">
         <source>Any</source>
@@ -1086,7 +1086,7 @@
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="needs-translation">Any</target>
+        <target state="translated">Bilo koji</target>
       </trans-unit>
       <trans-unit id="4391289919356861627" datatype="html">
         <source>Apply</source>
@@ -1094,7 +1094,7 @@
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="needs-translation">Apply</target>
+        <target state="translated">Primijeni</target>
       </trans-unit>
       <trans-unit id="7780041345210191160" datatype="html">
         <source>Click again to exclude items.</source>
@@ -1102,7 +1102,7 @@
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
           <context context-type="linenumber">43</context>
         </context-group>
-        <target state="needs-translation">Click again to exclude items.</target>
+        <target state="translated">Pritisnite ponovo da biste isključili stavke.</target>
       </trans-unit>
       <trans-unit id="7593728289020204896" datatype="html">
         <source>Not assigned</source>
@@ -1111,7 +1111,7 @@
           <context context-type="linenumber">261</context>
         </context-group>
         <note priority="1" from="description">Filter drop down element to filter for documents with no correspondent/type/tag assigned</note>
-        <target state="needs-translation">Not assigned</target>
+        <target state="translated">Nije dodijeljen</target>
       </trans-unit>
       <trans-unit id="445302259125375799" datatype="html">
         <source>Invalid date.</source>
@@ -1119,7 +1119,7 @@
           <context context-type="sourcefile">src/app/components/common/input/date/date.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">Invalid date.</target>
+        <target state="translated">Neispravan datum.</target>
       </trans-unit>
       <trans-unit id="2722549756198502062" datatype="html">
         <source>Add item</source>
@@ -1128,7 +1128,7 @@
           <context context-type="linenumber">11</context>
         </context-group>
         <note priority="1" from="description">Used for both types, correspondents, storage paths</note>
-        <target state="needs-translation">Add item</target>
+        <target state="translated">Dodaj predmet</target>
       </trans-unit>
       <trans-unit id="524422427194414813" datatype="html">
         <source>Suggestions:</source>
@@ -1140,7 +1140,7 @@
           <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.html</context>
           <context context-type="linenumber">42</context>
         </context-group>
-        <target state="needs-translation">Suggestions:</target>
+        <target state="translated">Prijedlozi:</target>
       </trans-unit>
       <trans-unit id="6560126119609945418" datatype="html">
         <source>Add tag</source>
@@ -1148,7 +1148,7 @@
           <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="needs-translation">Add tag</target>
+        <target state="translated">Dodaj oznaku</target>
       </trans-unit>
       <trans-unit id="3797570084942068182" datatype="html">
         <source>Select</source>
@@ -1164,7 +1164,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">8</context>
         </context-group>
-        <target state="needs-translation">Select</target>
+        <target state="translated">Odaberi</target>
       </trans-unit>
       <trans-unit id="7103181924469214926" datatype="html">
         <source>Please select an object</source>
@@ -1172,7 +1172,7 @@
           <context context-type="sourcefile">src/app/components/common/select-dialog/select-dialog.component.ts</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Please select an object</target>
+        <target state="translated">Molimo odaberite objekt</target>
       </trans-unit>
       <trans-unit id="3894950702316166331" datatype="html">
         <source>Loading...</source>
@@ -1196,7 +1196,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">27</context>
         </context-group>
-        <target state="needs-translation">Loading...</target>
+        <target state="translated">Učitavanje...</target>
       </trans-unit>
       <trans-unit id="5412339817978503936" datatype="html">
         <source>Hello <x id="PH" equiv-text="this.settingsService.displayName"/>, welcome to Paperless-ngx!</source>
@@ -1204,7 +1204,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
           <context context-type="linenumber">19</context>
         </context-group>
-        <target state="needs-translation">Hello <x id="PH" equiv-text="this.settingsService.displayName"/>, welcome to Paperless-ngx!</target>
+        <target state="translated">Bok <x id="PH" equiv-text="this.settingsService.displayName"/>, dobrodošao u Paperless-ngx!</target>
       </trans-unit>
       <trans-unit id="795745990148149834" datatype="html">
         <source>Welcome to Paperless-ngx!</source>
@@ -1212,7 +1212,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="needs-translation">Welcome to Paperless-ngx!</target>
+        <target state="translated">Dobrodošao u Paperless-ngx!</target>
       </trans-unit>
       <trans-unit id="2946624699882754313" datatype="html">
         <source>Show all</source>
@@ -1224,7 +1224,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
           <context context-type="linenumber">27</context>
         </context-group>
-        <target state="needs-translation">Show all</target>
+        <target state="translated">Prikaži sve</target>
       </trans-unit>
       <trans-unit id="4207916966377787111" datatype="html">
         <source>Created</source>
@@ -1248,7 +1248,7 @@
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="needs-translation">Created</target>
+        <target state="translated">Stvoreno</target>
       </trans-unit>
       <trans-unit id="5701618810648052610" datatype="html">
         <source>Title</source>
@@ -1272,7 +1272,7 @@
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Title</target>
+        <target state="translated">Naslov</target>
       </trans-unit>
       <trans-unit id="1069523139277190436" datatype="html">
         <source>Statistics</source>
@@ -1280,7 +1280,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="needs-translation">Statistics</target>
+        <target state="translated">Statistika</target>
       </trans-unit>
       <trans-unit id="1171694977288479084" datatype="html">
         <source>Documents in inbox: <x id="INTERPOLATION" equiv-text="{{statistics?.documents_inbox}}"/></source>
@@ -1288,7 +1288,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">3</context>
         </context-group>
-        <target state="needs-translation">Documents in inbox: <x id="INTERPOLATION" equiv-text="{{statistics?.documents_inbox}}"/></target>
+        <target state="translated">Dokumenti u pristigloj pošti: <x id="INTERPOLATION" equiv-text="{{statistics?.documents_inbox}}"/></target>
       </trans-unit>
       <trans-unit id="4207135462646354574" datatype="html">
         <source>Total documents: <x id="INTERPOLATION" equiv-text="{{statistics?.documents_total}}"/></source>
@@ -1296,7 +1296,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="needs-translation">Total documents: <x id="INTERPOLATION" equiv-text="{{statistics?.documents_total}}"/></target>
+        <target state="translated">Sveukupno dokumenata: <x id="INTERPOLATION" equiv-text="{{statistics?.documents_total}}"/></target>
       </trans-unit>
       <trans-unit id="8187573012244728580" datatype="html">
         <source>Upload new documents</source>
@@ -1304,7 +1304,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="needs-translation">Upload new documents</target>
+        <target state="translated">Prenesi nove dokumente</target>
       </trans-unit>
       <trans-unit id="1749180330008942007" datatype="html">
         <source>Dismiss completed</source>
@@ -1313,7 +1313,7 @@
           <context context-type="linenumber">4</context>
         </context-group>
         <note priority="1" from="description">This button dismisses all status messages about processed documents on the dashboard (failed and successful)</note>
-        <target state="needs-translation">Dismiss completed</target>
+        <target state="translated">Odbacivanje dovršeno</target>
       </trans-unit>
       <trans-unit id="118343233500414755" datatype="html">
         <source>Drop documents here or</source>
@@ -1321,7 +1321,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">Drop documents here or</target>
+        <target state="translated">Ovdje ispustite dokumente ili</target>
       </trans-unit>
       <trans-unit id="8133800334834354642" datatype="html">
         <source>Browse files</source>
@@ -1329,7 +1329,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">Browse files</target>
+        <target state="translated">Pregledavanje datoteka</target>
       </trans-unit>
       <trans-unit id="2330646618997399019" datatype="html">
         <source>{VAR_PLURAL, plural, =1 {One more document} other {<x id="INTERPOLATION"/> more documents}}</source>
