@@ -536,6 +536,8 @@ PAPERLESS_TASK_WORKERS=<num>
     maintain the automatic matching algorithm, check emails, consume documents,
     etc. This variable specifies how many things it will do in parallel.
 
+    Defaults to 1
+
 
 PAPERLESS_THREADS_PER_WORKER=<num>
     Furthermore, paperless uses multiple threads when consuming documents to
@@ -797,9 +799,7 @@ PAPERLESS_WEBSERVER_WORKERS=<num>
     also loads the entire application into memory separately, so increasing this value
     will increase RAM usage.
 
-    Consider configuring this to 1 on low power devices with limited amount of RAM.
-
-    Defaults to 2.
+    Defaults to 1.
 
 PAPERLESS_PORT=<port>
     The port number the webserver will listen on inside the container. There are
