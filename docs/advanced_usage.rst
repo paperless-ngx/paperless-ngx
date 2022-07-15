@@ -121,10 +121,10 @@ Pre-consumption script
 ======================
 
 Executed after the consumer sees a new document in the consumption folder, but
-before any processing of the document is performed. This script receives exactly
-one argument:
+before any processing of the document is performed. This script can access the
+following relevant environment variables set:
 
-* Document file name
+* ``DOCUMENT_SOURCE_PATH``
 
 A simple but common example for this would be creating a simple script like
 this:
@@ -134,7 +134,7 @@ this:
 .. code:: bash
 
     #!/usr/bin/env bash
-    pdf2pdfocr.py -i ${1}
+    pdf2pdfocr.py -i ${DOCUMENT_SOURCE_PATH}
 
 ``/etc/paperless.conf``
 
@@ -157,16 +157,20 @@ Post-consumption script
 =======================
 
 Executed after the consumer has successfully processed a document and has moved it
-into paperless. It receives the following arguments:
+into paperless. It receives the following environment variables:
 
-* Document id
-* Generated file name
-* Source path
-* Thumbnail path
-* Download URL
-* Thumbnail URL
-* Correspondent
-* Tags
+* ``DOCUMENT_ID``
+* ``DOCUMENT_FILE_NAME``
+* ``DOCUMENT_CREATED``
+* ``DOCUMENT_MODIFIED``
+* ``DOCUMENT_ADDED``
+* ``DOCUMENT_SOURCE_PATH``
+* ``DOCUMENT_ARCHIVE_PATH``
+* ``DOCUMENT_THUMBNAIL_PATH``
+* ``DOCUMENT_DOWNLOAD_URL``
+* ``DOCUMENT_THUMBNAIL_URL``
+* ``DOCUMENT_CORRESPONDENT``
+* ``DOCUMENT_TAGS``
 
 The script can be in any language, but for a simple shell script
 example, you can take a look at `post-consumption-example.sh`_ in this project.
