@@ -134,8 +134,19 @@ class Consumer(LoggingMixin):
 
         self.log("info", f"Executing pre-consume script {settings.PRE_CONSUME_SCRIPT}")
 
+        filepath_arg = os.path.normpath(self.path)
+
+        script_env = os.environ.copy()
+        script_env["DOCUMENT_SOURCE_PATH"] = filepath_arg
+
         try:
-            Popen((settings.PRE_CONSUME_SCRIPT, self.path)).wait()
+            Popen(
+                (
+                    settings.PRE_CONSUME_SCRIPT,
+                    filepath_arg,
+                ),
+                env=script_env,
+            ).wait()
         except Exception as e:
             self._fail(
                 MESSAGE_PRE_CONSUME_SCRIPT_ERROR,
@@ -159,6 +170,33 @@ class Consumer(LoggingMixin):
             f"Executing post-consume script {settings.POST_CONSUME_SCRIPT}",
         )
 
+        script_env = os.environ.copy()
+
+        script_env["DOCUMENT_ID"] = str(document.pk)
+        script_env["DOCUMENT_CREATED"] = str(document.created)
+        script_env["DOCUMENT_MODIFIED"] = str(document.modified)
+        script_env["DOCUMENT_ADDED"] = str(document.added)
+        script_env["DOCUMENT_FILE_NAME"] = document.get_public_filename()
+        script_env["DOCUMENT_SOURCE_PATH"] = os.path.normpath(document.source_path)
+        script_env["DOCUMENT_ARCHIVE_PATH"] = os.path.normpath(
+            str(document.archive_path),
+        )
+        script_env["DOCUMENT_THUMBNAIL_PATH"] = os.path.normpath(
+            document.thumbnail_path,
+        )
+        script_env["DOCUMENT_DOWNLOAD_URL"] = reverse(
+            "document-download",
+            kwargs={"pk": document.pk},
+        )
+        script_env["DOCUMENT_THUMBNAIL_URL"] = reverse(
+            "document-thumb",
+            kwargs={"pk": document.pk},
+        )
+        script_env["DOCUMENT_CORRESPONDENT"] = str(document.correspondent)
+        script_env["DOCUMENT_TAGS"] = str(
+            ",".join(document.tags.all().values_list("name", flat=True)),
+        )
+
         try:
             Popen(
                 (
@@ -172,6 +210,7 @@ class Consumer(LoggingMixin):
                     str(document.correspondent),
                     str(",".join(document.tags.all().values_list("name", flat=True))),
                 ),
+                env=script_env,
             ).wait()
         except Exception as e:
             self._fail(
