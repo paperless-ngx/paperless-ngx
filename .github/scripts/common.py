@@ -11,7 +11,7 @@ def get_image_tag(
     """
     Returns a string representing the normal image for a given package
     """
-    return f"ghcr.io/{repo_name}/builder/{pkg_name}:{pkg_version}"
+    return f"ghcr.io/{repo_name.lower()}/builder/{pkg_name}:{pkg_version}"
 
 
 def get_cache_image_tag(
@@ -26,7 +26,7 @@ def get_cache_image_tag(
     Registry type caching is utilized for the builder images, to allow fast
     rebuilds, generally almost instant for the same version
     """
-    return f"ghcr.io/{repo_name}/builder/cache/{pkg_name}:{pkg_version}"
+    return f"ghcr.io/{repo_name.lower()}/builder/cache/{pkg_name}:{pkg_version}"
 
 
 def get_log_level(args) -> int:
