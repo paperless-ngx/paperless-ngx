@@ -69,6 +69,12 @@ jobs:
       - ci-frontend
     steps:
       -
+        name: Set ghcr repository name
+        id: set-ghcr-repository
+        run: |
+          ghcr_name=$(echo "${GITHUB_REPOSITORY}" | awk '{ print tolower($0) }')
+          echo ::set-output name=repository::${ghcr_name}
+      -
         name: Checkout
         uses: actions/checkout@v3
       -
@@ -115,6 +121,8 @@ jobs:
 
     outputs:
 
+      ghcr-repository: ${{ steps.set-ghcr-repository.outputs.repository }}
+
       qpdf-json: ${{ steps.qpdf-setup.outputs.qpdf-json }}
 
       pikepdf-json: ${{ steps.pikepdf-setup.outputs.pikepdf-json }}
@@ -142,7 +150,7 @@ jobs:
         #  a tag
         # Otherwise forks would require a Docker Hub account and secrets setup
         run: |
-          if [[ ${{ github.repository }} == "paperless-ngx/paperless-ngx" && ( ${{ github.ref_name }} == "main" || ${{ github.ref_name }} == "dev" || ${{ github.ref_name }} == "beta" || ${{ startsWith(github.ref, 'refs/tags/v') }} == "true" ) ]] ; then
+          if [[ ${{ needs.prepare-docker-build.outputs.ghcr-repository }} == "paperless-ngx/paperless-ngx" && ( ${{ github.ref_name }} == "main" || ${{ github.ref_name }} == "dev" || ${{ github.ref_name }} == "beta" || ${{ startsWith(github.ref, 'refs/tags/v') }} == "true" ) ]] ; then
             echo "Enabling DockerHub image push"
             echo ::set-output name=enable::"true"
           else
@@ -155,7 +163,7 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: |
-            ghcr.io/${{ github.repository }}
+            ghcr.io/${{ needs.prepare-docker-build.outputs.ghcr-repository }}
             name=paperlessngx/paperless-ngx,enable=${{ steps.docker-hub.outputs.enable }}
           tags: |
             # Tag branches with branch name
@@ -206,11 +214,11 @@ jobs:
           # Get cache layers from this branch, then dev, then main
           # This allows new branches to get at least some cache benefits, generally from dev
           cache-from: |
-            type=registry,ref=ghcr.io/${{ github.repository }}/builder/cache/app:${{ github.ref_name }}
-            type=registry,ref=ghcr.io/${{ github.repository }}/builder/cache/app:dev
-            type=registry,ref=ghcr.io/${{ github.repository }}/builder/cache/app:main
+            type=registry,ref=ghcr.io/${{ needs.prepare-docker-build.outputs.ghcr-repository }}/builder/cache/app:${{ github.ref_name }}
+            type=registry,ref=ghcr.io/${{ needs.prepare-docker-build.outputs.ghcr-repository }}/builder/cache/app:dev
+            type=registry,ref=ghcr.io/${{ needs.prepare-docker-build.outputs.ghcr-repository }}/builder/cache/app:main
           cache-to: |
-            type=registry,mode=max,ref=ghcr.io/${{ github.repository }}/builder/cache/app:${{ github.ref_name }}
+            type=registry,mode=max,ref=ghcr.io/${{ needs.prepare-docker-build.outputs.ghcr-repository }}/builder/cache/app:${{ github.ref_name }}
       -
         name: Inspect image
         run: |
