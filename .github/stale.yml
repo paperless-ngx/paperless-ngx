@@ -5,7 +5,7 @@ daysUntilStale: 30
 daysUntilClose: 7
 
 # Only issues or pull requests with all of these labels are check if stale. Defaults to `[]` (disabled)
-onlyLabels: [unconfirmed,cant-reproduce]
+onlyLabels: [cant-reproduce]
 
 # Label to use when marking an issue as stale
 staleLabel: stale
