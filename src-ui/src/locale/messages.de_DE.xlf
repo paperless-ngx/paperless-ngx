@@ -3315,7 +3315,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">42</context>
         </context-group>
-        <target state="needs-translation">Results</target>
+        <target state="translated">Ergebnisse</target>
       </trans-unit>
       <trans-unit id="8958063833276423847" datatype="html">
         <source>click for full output</source>
