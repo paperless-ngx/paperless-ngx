@@ -35,7 +35,7 @@ whitenoise = "~=6.2.0"
 watchdog = "~=2.1.9"
 whoosh="~=2.7.4"
 inotifyrecursive = "~=0.3"
-ocrmypdf = "~=13.4"
+ocrmypdf = "~=13.6"
 tqdm = "*"
 tika = "*"
 # TODO: This will sadly also install daphne+dependencies,
