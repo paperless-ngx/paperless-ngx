@@ -124,8 +124,6 @@ jobs:
         name: Checkout
         uses: actions/checkout@v3
       -
-        uses: hadolint/hadolint-action@v2.0.0
+        uses: hadolint/hadolint-action@v2.0
         with:
-          failure-threshold: warning
           dockerfile: ${{ matrix.dockerfile }}
-          ignore: DL3008,DL3013,DL3003
