@@ -124,6 +124,6 @@ jobs:
         name: Checkout
         uses: actions/checkout@v3
       -
-        uses: hadolint/hadolint-action@v2.0
+        uses: hadolint/hadolint-action@v2.1.0
         with:
           dockerfile: ${{ matrix.dockerfile }}
