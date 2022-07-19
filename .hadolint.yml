@@ -1,0 +1,8 @@
+failure-threshold: warning
+ignored:
+  # https://github.com/hadolint/hadolint/wiki/DL3008
+  - DL3008
+  # https://github.com/hadolint/hadolint/wiki/DL3013
+  - DL3013
+  # https://github.com/hadolint/hadolint/wiki/DL3003
+  - DL3003
