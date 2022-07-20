@@ -90,6 +90,10 @@ ARG RUNTIME_PACKAGES="\
   tesseract-ocr-fra \
   tesseract-ocr-ita \
   tesseract-ocr-spa \
+  # Suggested for OCRmyPDF
+  pngquant \
+  # Suggested for pikepdf
+  jbig2dec \
   tzdata \
   unpaper \
   # Mime type detection
