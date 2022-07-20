@@ -106,3 +106,24 @@ jobs:
         run: |
           cd src/
           pipenv run coveralls --service=github
+
+  dockerfile-lint:
+    name: "Lint ${{ matrix.dockerfile }}"
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        dockerfile:
+          - Dockerfile
+          - docker-builders/Dockerfile.qpdf
+          - docker-builders/Dockerfile.jbig2enc
+          - docker-builders/Dockerfile.psycopg2
+          - docker-builders/Dockerfile.pikepdf
+      fail-fast: false
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        uses: hadolint/hadolint-action@v2.1.0
+        with:
+          dockerfile: ${{ matrix.dockerfile }}
