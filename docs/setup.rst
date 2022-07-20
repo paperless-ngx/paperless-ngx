@@ -339,7 +339,7 @@ writing. Windows is not and will never be supported.
     *   ``qpdf``
     *   ``liblept5``
     *   ``libxml2``
-    *   ``pngquant``
+    *   ``pngquant`` (suggested for certain PDF image optimizations)
     *   ``zlib1g``
     *   ``tesseract-ocr`` >= 4.0.0 for OCR
     *   ``tesseract-ocr`` language packs (``tesseract-ocr-eng``, ``tesseract-ocr-deu``, etc)
