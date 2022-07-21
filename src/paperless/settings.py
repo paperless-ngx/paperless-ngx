@@ -327,6 +327,13 @@ if os.getenv("PAPERLESS_DBHOST"):
     if os.getenv("PAPERLESS_DBPORT"):
         DATABASES["default"]["PORT"] = os.getenv("PAPERLESS_DBPORT")
 
+if os.getenv("PAPERLESS_DB_TIMEOUT") is not None:
+    _new_opts = {"timeout": float(os.getenv("PAPERLESS_DB_TIMEOUT"))}
+    if "OPTIONS" in DATABASES["default"]:
+        DATABASES["default"]["OPTIONS"].update(_new_opts)
+    else:
+        DATABASES["default"]["OPTIONS"] = _new_opts
+
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 ###############################################################################
