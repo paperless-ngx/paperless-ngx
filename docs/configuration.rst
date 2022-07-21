@@ -31,7 +31,7 @@ PAPERLESS_REDIS=<url>
 
 PAPERLESS_DBHOST=<hostname>
     By default, sqlite is used as the database backend. This can be changed here.
-    Set PAPERLESS_DBHOST and PostgreSQL will be used instead of mysql.
+    Set PAPERLESS_DBHOST and PostgreSQL will be used instead of sqlite.
 
 PAPERLESS_DBPORT=<port>
     Adjust port if necessary.
@@ -59,6 +59,13 @@ PAPERLESS_DBSSLMODE=<mode>
     See `the official documentation about sslmode <https://www.postgresql.org/docs/current/libpq-ssl.html>`_.
 
     Default is ``prefer``.
+
+PAPERLESS_DB_TIMEOUT=<float>
+    Amount of time for a database connection to wait for the database to unlock.
+    Mostly applicable for an sqlite based installation, consider changing to postgresql
+    if you need to increase this.
+
+    Defaults to unset, keeping the Django defaults.
 
 Paths and folders
 #################
