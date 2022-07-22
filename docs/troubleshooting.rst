@@ -309,7 +309,7 @@ You might find messages like these in your log files:
 
 .. code::
 
-    [WARNING] [paperless.management.consumer] Not consuming file /usr/src/paperless/src/../consume/SCN_0001.pdf: OS reports file as busy still
+    [ERROR] [paperless.management.consumer] Creating PaperlessTask failed: db locked
 
 You are likely using an sqlite based installation, with an increased number of workers and are running into sqlite's concurrency limitations.
 Uploading or consuming multiple files at once results in many workers attempting to access the database simultaneously.
