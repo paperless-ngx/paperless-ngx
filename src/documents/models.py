@@ -214,7 +214,7 @@ class Document(models.Model):
         help_text=_("Current archive filename in storage"),
     )
 
-    original_filename = models.FilePathField(
+    original_filename = models.CharField(
         _("original filename"),
         max_length=1024,
         editable=False,
