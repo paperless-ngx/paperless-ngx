@@ -472,6 +472,42 @@ export class DocumentDetailComponent
     ])
   }
 
+  redoOcr() {
+    let modal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.title = $localize`Redo OCR confirm`
+    modal.componentInstance.messageBold = $localize`This operation will permanently redo OCR for this document.`
+    modal.componentInstance.message = $localize`This operation cannot be undone.`
+    modal.componentInstance.btnClass = 'btn-danger'
+    modal.componentInstance.btnCaption = $localize`Proceed`
+    modal.componentInstance.confirmClicked.subscribe(() => {
+      modal.componentInstance.buttonsEnabled = false
+      this.documentsService
+        .bulkEdit([this.document.id], 'redo_ocr', {})
+        .subscribe({
+          next: () => {
+            this.toastService.showInfo(
+              $localize`Redo OCR operation will begin in the background.`
+            )
+            if (modal) {
+              modal.close()
+            }
+          },
+          error: (error) => {
+            if (modal) {
+              modal.componentInstance.buttonsEnabled = true
+            }
+            this.toastService.showError(
+              $localize`Error executing operation: ${JSON.stringify(
+                error.error
+              )}`
+            )
+          },
+        })
+    })
+  }
+
   hasNext() {
     return this.documentListViewService.hasNext(this.documentId)
   }
