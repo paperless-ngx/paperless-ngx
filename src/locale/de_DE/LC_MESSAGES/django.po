@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-07-08 14:11-0700\n"
-"PO-Revision-Date: 2022-07-08 22:07\n"
+"PO-Revision-Date: 2022-07-18 16:55\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -376,7 +376,7 @@ msgstr "Filterregeln"
 
 #: documents/models.py:521
 msgid "started"
-msgstr ""
+msgstr "gestartet"
 
 #: documents/serialisers.py:70
 #, python-format
@@ -654,7 +654,7 @@ msgstr "Als wichtig markieren, markierte E-Mails nicht verarbeiten"
 
 #: paperless_mail/models.py:68
 msgid "Tag the mail with specified tag, don't process tagged mails"
-msgstr ""
+msgstr "Markiere die Mail mit dem angegebenen Tag, verarbeite nicht markierte Mails"
 
 #: paperless_mail/models.py:71
 msgid "Use subject as title"
