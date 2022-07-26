@@ -1,3 +1,8 @@
+# This workflow runs on certain conditions to check for and potentially
+# delete container images from the GHCR which no longer have an associated
+# code branch.
+# Requires a PAT with the correct scope set in the secrets
+
 name: Cleanup Image Tags
 
 on:
@@ -13,15 +18,13 @@ on:
       - ".github/scripts/cleanup-tags.py"
       - ".github/scripts/common.py"
 
-env:
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
 jobs:
   cleanup:
     name: Cleanup Image Tags
     runs-on: ubuntu-20.04
-    permissions:
-      packages: write
+    env:
+      # Requires a personal access token with the OAuth scope delete:packages
+      TOKEN: ${{ secrets.GHA_CONTAINER_DELETE_TOKEN }}
     steps:
       -
         name: Checkout
@@ -44,5 +47,7 @@ jobs:
           python -m pip install requests
       -
         name: Cleanup feature tags
+        # Only run if the token is not empty
+        if: "${{ env.TOKEN != '' }}"
         run: |
-          python ${GITHUB_WORKSPACE}/.github/scripts/cleanup-tags.py --loglevel info --delete
+          python ${GITHUB_WORKSPACE}/.github/scripts/cleanup-tags.py --loglevel info --untagged --delete
