@@ -17,7 +17,7 @@
           <context context-type="linenumber">157,166</context>
         </context-group>
         <note priority="1" from="description">Currently selected slide number read by screen reader</note>
-        <target state="needs-translation"> Slide <x id="INTERPOLATION" equiv-text="ing when mouse"/> of <x id="INTERPOLATION_1" equiv-text="e.    *    * @s"/> </target>
+        <target state="translated"> Diapositive <x id="INTERPOLATION" equiv-text="ing when mouse"/> sur <x id="INTERPOLATION_1" equiv-text="e.    *    * @s"/> </target>
       </trans-unit>
       <trans-unit id="ngb.carousel.previous" datatype="html">
         <source>Previous</source>
@@ -370,7 +370,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">34</context>
         </context-group>
-        <target state="needs-translation">Logged in as <x id="INTERPOLATION" equiv-text="{{this.settingsService.displayName}}"/></target>
+        <target state="translated">Connecté en tant que <x id="INTERPOLATION" equiv-text="{{this.settingsService.displayName}}"/></target>
       </trans-unit>
       <trans-unit id="4930506384627295710" datatype="html" approved="yes">
         <source>Settings</source>
@@ -514,7 +514,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">141</context>
         </context-group>
-        <target state="needs-translation">Storage paths</target>
+        <target state="translated">Chemins de stockage</target>
       </trans-unit>
       <trans-unit id="5164080148396013258" datatype="html">
         <source>File Tasks<x id="START_TAG_NG_CONTAINER" ctype="x-ng_container" equiv-text="&lt;ng-container *ngIf=&quot;tasksService.failedFileTasks.length &gt; 0&quot;&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-danger ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_NG_CONTAINER" ctype="x-ng_container" equiv-text="&lt;/ng-container&gt;"/></source>
@@ -982,7 +982,7 @@
           <context context-type="sourcefile">src/app/components/manage/storage-path-list/storage-path-list.component.ts</context>
           <context context-type="linenumber">35</context>
         </context-group>
-        <target state="needs-translation">Path</target>
+        <target state="translated">Chemin</target>
       </trans-unit>
       <trans-unit id="6625768491622252297" datatype="html">
         <source>e.g.</source>
@@ -990,7 +990,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.ts</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">e.g.</target>
+        <target state="translated">par ex.</target>
       </trans-unit>
       <trans-unit id="1918584360573970155" datatype="html">
         <source>or use slashes to add directories e.g.</source>
@@ -2485,7 +2485,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">175</context>
         </context-group>
-        <target state="needs-translation">Edit document</target>
+        <target state="translated">Éditer le document</target>
       </trans-unit>
       <trans-unit id="2155249406916744630" datatype="html" approved="yes">
         <source>View &quot;<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>&quot; saved successfully.</source>
@@ -3307,7 +3307,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Refresh</target>
+        <target state="translated">Rafraîchir</target>
       </trans-unit>
       <trans-unit id="5968132631442328843" datatype="html">
         <source>Results</source>
@@ -3315,7 +3315,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">42</context>
         </context-group>
-        <target state="needs-translation">Results</target>
+        <target state="translated">Résultats</target>
       </trans-unit>
       <trans-unit id="8958063833276423847" datatype="html">
         <source>click for full output</source>
@@ -3323,7 +3323,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">66</context>
         </context-group>
-        <target state="needs-translation">click for full output</target>
+        <target state="translated">cliquez pour obtenir l'affichage complet</target>
       </trans-unit>
       <trans-unit id="1536087519743707362" datatype="html">
         <source>Dismiss</source>
@@ -3335,7 +3335,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.ts</context>
           <context context-type="linenumber">54</context>
         </context-group>
-        <target state="needs-translation">Dismiss</target>
+        <target state="translated">Ignorer</target>
       </trans-unit>
       <trans-unit id="6798650225457993016" datatype="html">
         <source>Failed <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.failedFileTasks.length &gt; 0&quot; class=&quot;badge bg-danger ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
@@ -3375,7 +3375,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.ts</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="needs-translation">Dismiss selected</target>
+        <target state="translated">Ignorer la sélection</target>
       </trans-unit>
       <trans-unit id="8829078752502782653" datatype="html">
         <source>Dismiss all</source>
@@ -3387,7 +3387,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.ts</context>
           <context context-type="linenumber">52</context>
         </context-group>
-        <target state="needs-translation">Dismiss all</target>
+        <target state="translated">Ignorer tout</target>
       </trans-unit>
       <trans-unit id="1323591410517879795" datatype="html">
         <source>Confirm Dismiss All</source>
@@ -3395,7 +3395,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.ts</context>
           <context context-type="linenumber">50</context>
         </context-group>
-        <target state="needs-translation">Confirm Dismiss All</target>
+        <target state="translated">Confirmer « ignorer tout »</target>
       </trans-unit>
       <trans-unit id="6566358716882976903" datatype="html">
         <source>tasks?</source>
@@ -3683,7 +3683,7 @@
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
           <context context-type="linenumber">113</context>
         </context-group>
-        <target state="needs-translation">You have unsaved changes to the document</target>
+        <target state="translated">Vous avez des modifications non enregistrées sur ce document</target>
       </trans-unit>
       <trans-unit id="2089045849587358256" datatype="html">
         <source>Are you sure you want to close this document?</source>
@@ -3916,7 +3916,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">372</context>
         </context-group>
-        <target state="needs-translation">Successfully completed one-time migratration of settings to the database!</target>
+        <target state="translated">La migration des paramètres vers la base de données a été effectuée avec succès !</target>
       </trans-unit>
       <trans-unit id="5558341108007064934" datatype="html">
         <source>Unable to migrate settings to the database, please try saving manually.</source>
@@ -3924,7 +3924,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">373</context>
         </context-group>
-        <target state="needs-translation">Unable to migrate settings to the database, please try saving manually.</target>
+        <target state="translated">Impossible de migrer les paramètres vers la base de données, veuillez essayer d’enregistrer manuellement.</target>
       </trans-unit>
       <trans-unit id="1519954996184640001" datatype="html" approved="yes">
         <source>Error</source>
