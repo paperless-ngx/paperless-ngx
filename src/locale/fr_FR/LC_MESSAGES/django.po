@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-07-08 14:11-0700\n"
-"PO-Revision-Date: 2022-07-08 22:07\n"
+"PO-Revision-Date: 2022-07-27 17:57\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -100,15 +100,15 @@ msgstr "types de document"
 
 #: documents/models.py:90
 msgid "path"
-msgstr ""
+msgstr "chemin"
 
 #: documents/models.py:96 documents/models.py:124
 msgid "storage path"
-msgstr ""
+msgstr "chemin de stockage"
 
 #: documents/models.py:97
 msgid "storage paths"
-msgstr ""
+msgstr "chemins de stockage"
 
 #: documents/models.py:105
 msgid "Unencrypted"
@@ -376,7 +376,7 @@ msgstr "règles de filtrage"
 
 #: documents/models.py:521
 msgid "started"
-msgstr ""
+msgstr "commencé"
 
 #: documents/serialisers.py:70
 #, python-format
@@ -394,7 +394,7 @@ msgstr "Type de fichier %(type)s non pris en charge"
 
 #: documents/serialisers.py:596
 msgid "Invalid variable detected."
-msgstr ""
+msgstr "Variable invalide détectée."
 
 #: documents/templates/index.html:78
 msgid "Paperless-ngx is loading..."
@@ -402,11 +402,11 @@ msgstr "Paperless-ngx est en cours de chargement..."
 
 #: documents/templates/index.html:79
 msgid "Still here?! Hmm, something might be wrong."
-msgstr ""
+msgstr "Toujours ici ? Hum, quelque chose a dû mal se passer."
 
 #: documents/templates/index.html:79
 msgid "Here's a link to the docs."
-msgstr ""
+msgstr "Voici un lien vers la documentation."
 
 #: documents/templates/registration/logged_out.html:14
 msgid "Paperless-ngx signed out"
@@ -450,7 +450,7 @@ msgstr "Anglais (US)"
 
 #: paperless/settings.py:340
 msgid "Belarusian"
-msgstr ""
+msgstr "Biélorusse"
 
 #: paperless/settings.py:341
 msgid "Czech"
@@ -510,11 +510,11 @@ msgstr "Russe"
 
 #: paperless/settings.py:355
 msgid "Slovenian"
-msgstr ""
+msgstr "Slovène"
 
 #: paperless/settings.py:356
 msgid "Serbian"
-msgstr ""
+msgstr "Serbe"
 
 #: paperless/settings.py:357
 msgid "Swedish"
@@ -522,11 +522,11 @@ msgstr "Suédois"
 
 #: paperless/settings.py:358
 msgid "Turkish"
-msgstr ""
+msgstr "Turc"
 
 #: paperless/settings.py:359
 msgid "Chinese Simplified"
-msgstr ""
+msgstr "Chinois simplifié"
 
 #: paperless/urls.py:161
 msgid "Paperless-ngx administration"
@@ -654,7 +654,7 @@ msgstr "Marquer le courriel, ne pas traiter les courriels marqués"
 
 #: paperless_mail/models.py:68
 msgid "Tag the mail with specified tag, don't process tagged mails"
-msgstr ""
+msgstr "Affecter l’étiquette spécifée au courrier, ne pas traiter les courriels étiquetés"
 
 #: paperless_mail/models.py:71
 msgid "Use subject as title"
@@ -694,7 +694,7 @@ msgstr "répertoire"
 
 #: paperless_mail/models.py:96
 msgid "Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server."
-msgstr ""
+msgstr "Les sous-dossiers doivent être séparés par un délimiteurs, souvent un point ('.') ou un slash ('/'), en fonction du serveur de messagerie."
 
 #: paperless_mail/models.py:102
 msgid "filter from"
