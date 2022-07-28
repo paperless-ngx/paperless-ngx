@@ -11,6 +11,7 @@ from unicodedata import normalize
 from urllib.parse import quote
 
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.db.models import Case
 from django.db.models import Count
 from django.db.models import IntegerField
@@ -45,6 +46,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.viewsets import ViewSet
 
 from .bulk_download import ArchiveOnlyStrategy
@@ -54,16 +56,21 @@ from .classifier import load_classifier
 from .filters import CorrespondentFilterSet
 from .filters import DocumentFilterSet
 from .filters import DocumentTypeFilterSet
+from .filters import StoragePathFilterSet
 from .filters import TagFilterSet
 from .matching import match_correspondents
 from .matching import match_document_types
+from .matching import match_storage_paths
 from .matching import match_tags
 from .models import Correspondent
 from .models import Document
 from .models import DocumentType
+from .models import PaperlessTask
 from .models import SavedView
+from .models import StoragePath
 from .models import Tag
 from .parsers import get_parser_class_for_mime_type
+from .serialisers import AcknowledgeTasksViewSerializer
 from .serialisers import BulkDownloadSerializer
 from .serialisers import BulkEditSerializer
 from .serialisers import CorrespondentSerializer
@@ -72,8 +79,11 @@ from .serialisers import DocumentSerializer
 from .serialisers import DocumentTypeSerializer
 from .serialisers import PostDocumentSerializer
 from .serialisers import SavedViewSerializer
+from .serialisers import StoragePathSerializer
 from .serialisers import TagSerializer
 from .serialisers import TagSerializerVersion1
+from .serialisers import TasksViewSerializer
+from .serialisers import UiSettingsViewSerializer
 
 logger = logging.getLogger("paperless.api")
 
@@ -81,12 +91,18 @@ logger = logging.getLogger("paperless.api")
 class IndexView(TemplateView):
     template_name = "index.html"
 
-    def get_language(self):
+    def get_frontend_language(self):
+        if hasattr(
+            self.request.user,
+            "ui_settings",
+        ) and self.request.user.ui_settings.settings.get("language"):
+            lang = self.request.user.ui_settings.settings.get("language")
+        else:
+            lang = get_language()
         # This is here for the following reason:
         # Django identifies languages in the form "en-us"
         # However, angular generates locales as "en-US".
         # this translates between these two forms.
-        lang = get_language()
         if "-" in lang:
             first = lang[: lang.index("-")]
             second = lang[lang.index("-") + 1 :]
@@ -99,16 +115,18 @@ class IndexView(TemplateView):
         context["cookie_prefix"] = settings.COOKIE_PREFIX
         context["username"] = self.request.user.username
         context["full_name"] = self.request.user.get_full_name()
-        context["styles_css"] = f"frontend/{self.get_language()}/styles.css"
-        context["runtime_js"] = f"frontend/{self.get_language()}/runtime.js"
-        context["polyfills_js"] = f"frontend/{self.get_language()}/polyfills.js"
-        context["main_js"] = f"frontend/{self.get_language()}/main.js"
+        context["styles_css"] = f"frontend/{self.get_frontend_language()}/styles.css"
+        context["runtime_js"] = f"frontend/{self.get_frontend_language()}/runtime.js"
+        context[
+            "polyfills_js"
+        ] = f"frontend/{self.get_frontend_language()}/polyfills.js"
+        context["main_js"] = f"frontend/{self.get_frontend_language()}/main.js"
         context[
             "webmanifest"
-        ] = f"frontend/{self.get_language()}/manifest.webmanifest"  # noqa: E501
+        ] = f"frontend/{self.get_frontend_language()}/manifest.webmanifest"  # noqa: E501
         context[
             "apple_touch_icon"
-        ] = f"frontend/{self.get_language()}/apple-touch-icon.png"  # noqa: E501
+        ] = f"frontend/{self.get_frontend_language()}/apple-touch-icon.png"  # noqa: E501
         return context
 
 
@@ -325,6 +343,7 @@ class DocumentViewSet(
                 "document_types": [
                     dt.id for dt in match_document_types(doc, classifier)
                 ],
+                "storage_paths": [dt.id for dt in match_storage_paths(doc, classifier)],
             },
         )
 
@@ -347,7 +366,8 @@ class DocumentViewSet(
                 handle = doc.thumbnail_file
             # TODO: Send ETag information and use that to send new thumbnails
             #  if available
-            return HttpResponse(handle, content_type="image/png")
+
+            return HttpResponse(handle, content_type="image/webp")
         except (FileNotFoundError, Document.DoesNotExist):
             raise Http404()
 
@@ -504,6 +524,7 @@ class PostDocumentView(GenericAPIView):
         document_type_id = serializer.validated_data.get("document_type")
         tag_ids = serializer.validated_data.get("tags")
         title = serializer.validated_data.get("title")
+        created = serializer.validated_data.get("created")
 
         t = int(mktime(datetime.now().timetuple()))
 
@@ -530,6 +551,7 @@ class PostDocumentView(GenericAPIView):
             override_tag_ids=tag_ids,
             task_id=task_id,
             task_name=os.path.basename(doc_name)[:100],
+            override_created=created,
         )
 
         return Response("OK")
@@ -565,6 +587,12 @@ class SelectionDataView(GenericAPIView):
             ),
         )
 
+        storage_paths = StoragePath.objects.annotate(
+            document_count=Count(
+                Case(When(documents__id__in=ids, then=1), output_field=IntegerField()),
+            ),
+        )
+
         r = Response(
             {
                 "selected_correspondents": [
@@ -576,6 +604,10 @@ class SelectionDataView(GenericAPIView):
                 ],
                 "selected_document_types": [
                     {"id": t.id, "document_count": t.document_count} for t in types
+                ],
+                "selected_storage_paths": [
+                    {"id": t.id, "document_count": t.document_count}
+                    for t in storage_paths
                 ],
             },
         )
@@ -692,7 +724,10 @@ class RemoteVersionView(GenericAPIView):
                     remote = response.read().decode("utf-8")
                 try:
                     remote_json = json.loads(remote)
-                    remote_version = remote_json["tag_name"].removeprefix("ngx-")
+                    remote_version = remote_json["tag_name"]
+                    # Basically PEP 616 but that only went in 3.9
+                    if remote_version.startswith("ngx-"):
+                        remote_version = remote_version[len("ngx-") :]
                 except ValueError:
                     logger.debug("An error occurred parsing remote version json")
             except urllib.error.URLError:
@@ -712,3 +747,90 @@ class RemoteVersionView(GenericAPIView):
                 "feature_is_set": feature_is_set,
             },
         )
+
+
+class StoragePathViewSet(ModelViewSet):
+    model = StoragePath
+
+    queryset = StoragePath.objects.annotate(document_count=Count("documents")).order_by(
+        Lower("name"),
+    )
+
+    serializer_class = StoragePathSerializer
+    pagination_class = StandardPagination
+    permission_classes = (IsAuthenticated,)
+    filter_backends = (DjangoFilterBackend, OrderingFilter)
+    filterset_class = StoragePathFilterSet
+    ordering_fields = ("name", "path", "matching_algorithm", "match", "document_count")
+
+
+class UiSettingsView(GenericAPIView):
+
+    permission_classes = (IsAuthenticated,)
+    serializer_class = UiSettingsViewSerializer
+
+    def get(self, request, format=None):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = User.objects.get(pk=request.user.id)
+        displayname = user.username
+        if user.first_name or user.last_name:
+            displayname = " ".join([user.first_name, user.last_name])
+        settings = {}
+        if hasattr(user, "ui_settings"):
+            settings = user.ui_settings.settings
+        return Response(
+            {
+                "user_id": user.id,
+                "username": user.username,
+                "display_name": displayname,
+                "settings": settings,
+            },
+        )
+
+    def post(self, request, format=None):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        serializer.save(user=self.request.user)
+
+        return Response(
+            {
+                "success": True,
+            },
+        )
+
+
+class TasksViewSet(ReadOnlyModelViewSet):
+
+    permission_classes = (IsAuthenticated,)
+    serializer_class = TasksViewSerializer
+
+    queryset = (
+        PaperlessTask.objects.filter(
+            acknowledged=False,
+        )
+        .order_by("created")
+        .reverse()
+    )
+
+
+class AcknowledgeTasksView(GenericAPIView):
+
+    permission_classes = (IsAuthenticated,)
+    serializer_class = AcknowledgeTasksViewSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        tasks = serializer.validated_data.get("tasks")
+
+        try:
+            result = PaperlessTask.objects.filter(id__in=tasks).update(
+                acknowledged=True,
+            )
+            return Response({"result": result})
+        except Exception:
+            return HttpResponseBadRequest()

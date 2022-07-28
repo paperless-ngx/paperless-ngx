@@ -287,6 +287,10 @@ When you use the provided docker compose script, put the export inside the
 ``export`` folder in your paperless source directory. Specify ``../export``
 as the ``source``.
 
+.. note::
+
+    Importing from a previous version of Paperless may work, but for best results
+    it is suggested to match the versions.
 
 .. _utilities-retagger:
 

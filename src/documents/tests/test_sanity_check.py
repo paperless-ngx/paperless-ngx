@@ -8,60 +8,7 @@ from django.conf import settings
 from django.test import TestCase
 from documents.models import Document
 from documents.sanity_checker import check_sanity
-from documents.sanity_checker import SanityCheckMessages
 from documents.tests.utils import DirectoriesMixin
-
-
-class TestSanityCheckMessages(TestCase):
-    def test_no_messages(self):
-        messages = SanityCheckMessages()
-        self.assertEqual(len(messages), 0)
-        self.assertFalse(messages.has_error())
-        self.assertFalse(messages.has_warning())
-        with self.assertLogs() as capture:
-            messages.log_messages()
-            self.assertEqual(len(capture.output), 1)
-            self.assertEqual(capture.records[0].levelno, logging.INFO)
-            self.assertEqual(
-                capture.records[0].message,
-                "Sanity checker detected no issues.",
-            )
-
-    def test_info(self):
-        messages = SanityCheckMessages()
-        messages.info("Something might be wrong")
-        self.assertEqual(len(messages), 1)
-        self.assertFalse(messages.has_error())
-        self.assertFalse(messages.has_warning())
-        with self.assertLogs() as capture:
-            messages.log_messages()
-            self.assertEqual(len(capture.output), 1)
-            self.assertEqual(capture.records[0].levelno, logging.INFO)
-            self.assertEqual(capture.records[0].message, "Something might be wrong")
-
-    def test_warning(self):
-        messages = SanityCheckMessages()
-        messages.warning("Something is wrong")
-        self.assertEqual(len(messages), 1)
-        self.assertFalse(messages.has_error())
-        self.assertTrue(messages.has_warning())
-        with self.assertLogs() as capture:
-            messages.log_messages()
-            self.assertEqual(len(capture.output), 1)
-            self.assertEqual(capture.records[0].levelno, logging.WARNING)
-            self.assertEqual(capture.records[0].message, "Something is wrong")
-
-    def test_error(self):
-        messages = SanityCheckMessages()
-        messages.error("Something is seriously wrong")
-        self.assertEqual(len(messages), 1)
-        self.assertTrue(messages.has_error())
-        self.assertFalse(messages.has_warning())
-        with self.assertLogs() as capture:
-            messages.log_messages()
-            self.assertEqual(len(capture.output), 1)
-            self.assertEqual(capture.records[0].levelno, logging.ERROR)
-            self.assertEqual(capture.records[0].message, "Something is seriously wrong")
 
 
 class TestSanityCheck(DirectoriesMixin, TestCase):
@@ -95,9 +42,9 @@ class TestSanityCheck(DirectoriesMixin, TestCase):
                     "samples",
                     "documents",
                     "thumbnails",
-                    "0000001.png",
+                    "0000001.webp",
                 ),
-                os.path.join(self.dirs.thumbnail_dir, "0000001.png"),
+                os.path.join(self.dirs.thumbnail_dir, "0000001.webp"),
             )
 
         return Document.objects.create(
@@ -111,10 +58,30 @@ class TestSanityCheck(DirectoriesMixin, TestCase):
             archive_filename="0000001.pdf",
         )
 
-    def assertSanityError(self, messageRegex):
+    def assertSanityError(self, doc: Document, messageRegex):
         messages = check_sanity()
-        self.assertTrue(messages.has_error())
-        self.assertRegex(messages[0]["message"], messageRegex)
+        self.assertTrue(messages.has_error)
+        with self.assertLogs() as capture:
+            messages.log_messages()
+            self.assertEqual(
+                capture.records[0].message,
+                f"Detected following issue(s) with document #{doc.pk}, titled {doc.title}",
+            )
+            self.assertRegex(capture.records[1].message, messageRegex)
+
+    def test_no_issues(self):
+        self.make_test_data()
+        messages = check_sanity()
+        self.assertFalse(messages.has_error)
+        self.assertFalse(messages.has_warning)
+        with self.assertLogs() as capture:
+            messages.log_messages()
+            self.assertEqual(len(capture.output), 1)
+            self.assertEqual(capture.records[0].levelno, logging.INFO)
+            self.assertEqual(
+                capture.records[0].message,
+                "Sanity checker detected no issues.",
+            )
 
     def test_no_docs(self):
         self.assertEqual(len(check_sanity()), 0)
@@ -126,75 +93,82 @@ class TestSanityCheck(DirectoriesMixin, TestCase):
     def test_no_thumbnail(self):
         doc = self.make_test_data()
         os.remove(doc.thumbnail_path)
-        self.assertSanityError("Thumbnail of document .* does not exist")
+        self.assertSanityError(doc, "Thumbnail of document does not exist")
 
     def test_thumbnail_no_access(self):
         doc = self.make_test_data()
         os.chmod(doc.thumbnail_path, 0o000)
-        self.assertSanityError("Cannot read thumbnail file of document")
+        self.assertSanityError(doc, "Cannot read thumbnail file of document")
         os.chmod(doc.thumbnail_path, 0o777)
 
     def test_no_original(self):
         doc = self.make_test_data()
         os.remove(doc.source_path)
-        self.assertSanityError("Original of document .* does not exist.")
+        self.assertSanityError(doc, "Original of document does not exist.")
 
     def test_original_no_access(self):
         doc = self.make_test_data()
         os.chmod(doc.source_path, 0o000)
-        self.assertSanityError("Cannot read original file of document")
+        self.assertSanityError(doc, "Cannot read original file of document")
         os.chmod(doc.source_path, 0o777)
 
     def test_original_checksum_mismatch(self):
         doc = self.make_test_data()
         doc.checksum = "WOW"
         doc.save()
-        self.assertSanityError("Checksum mismatch of document")
+        self.assertSanityError(doc, "Checksum mismatch. Stored: WOW, actual: ")
 
     def test_no_archive(self):
         doc = self.make_test_data()
         os.remove(doc.archive_path)
-        self.assertSanityError("Archived version of document .* does not exist.")
+        self.assertSanityError(doc, "Archived version of document does not exist.")
 
     def test_archive_no_access(self):
         doc = self.make_test_data()
         os.chmod(doc.archive_path, 0o000)
-        self.assertSanityError("Cannot read archive file of document")
+        self.assertSanityError(doc, "Cannot read archive file of document")
         os.chmod(doc.archive_path, 0o777)
 
     def test_archive_checksum_mismatch(self):
         doc = self.make_test_data()
         doc.archive_checksum = "WOW"
         doc.save()
-        self.assertSanityError("Checksum mismatch of archived document")
+        self.assertSanityError(doc, "Checksum mismatch of archived document")
 
     def test_empty_content(self):
         doc = self.make_test_data()
         doc.content = ""
         doc.save()
         messages = check_sanity()
-        self.assertFalse(messages.has_error())
-        self.assertFalse(messages.has_warning())
+        self.assertFalse(messages.has_error)
+        self.assertFalse(messages.has_warning)
         self.assertEqual(len(messages), 1)
-        self.assertRegex(messages[0]["message"], "Document .* has no content.")
+        self.assertRegex(
+            messages[doc.pk][0]["message"],
+            "Document contains no OCR data",
+        )
 
     def test_orphaned_file(self):
         doc = self.make_test_data()
         Path(self.dirs.originals_dir, "orphaned").touch()
         messages = check_sanity()
-        self.assertFalse(messages.has_error())
-        self.assertTrue(messages.has_warning())
-        self.assertEqual(len(messages), 1)
-        self.assertRegex(messages[0]["message"], "Orphaned file in media dir")
+        self.assertTrue(messages.has_warning)
+        self.assertRegex(
+            messages._messages[None][0]["message"],
+            "Orphaned file in media dir",
+        )
 
     def test_archive_filename_no_checksum(self):
         doc = self.make_test_data()
         doc.archive_checksum = None
         doc.save()
-        self.assertSanityError("has an archive file, but its checksum is missing.")
+        self.assertSanityError(doc, "has an archive file, but its checksum is missing.")
 
     def test_archive_checksum_no_filename(self):
         doc = self.make_test_data()
         doc.archive_filename = None
         doc.save()
-        self.assertSanityError("has an archive file checksum, but no archive filename.")
+        self.assertSanityError(
+            doc,
+            "has an archive file checksum, but no archive filename.",
+        )

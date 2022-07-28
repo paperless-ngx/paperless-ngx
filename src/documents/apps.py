@@ -16,6 +16,7 @@ class DocumentsConfig(AppConfig):
             set_correspondent,
             set_document_type,
             set_tags,
+            set_storage_path,
             add_to_index,
         )
 
@@ -23,6 +24,7 @@ class DocumentsConfig(AppConfig):
         document_consumption_finished.connect(set_correspondent)
         document_consumption_finished.connect(set_document_type)
         document_consumption_finished.connect(set_tags)
+        document_consumption_finished.connect(set_storage_path)
         document_consumption_finished.connect(set_log_entry)
         document_consumption_finished.connect(add_to_index)
 

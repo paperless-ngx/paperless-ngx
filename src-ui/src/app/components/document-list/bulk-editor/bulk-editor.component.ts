@@ -19,12 +19,12 @@ import {
 } from '../../common/filterable-dropdown/filterable-dropdown.component'
 import { ToggleableItemState } from '../../common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component'
 import { MatchingModel } from 'src/app/data/matching-model'
-import {
-  SettingsService,
-  SETTINGS_KEYS,
-} from 'src/app/services/settings.service'
+import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { saveAs } from 'file-saver'
+import { StoragePathService } from 'src/app/services/rest/storage-path.service'
+import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
+import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 
 @Component({
   selector: 'app-bulk-editor',
@@ -35,10 +35,12 @@ export class BulkEditorComponent {
   tags: PaperlessTag[]
   correspondents: PaperlessCorrespondent[]
   documentTypes: PaperlessDocumentType[]
+  storagePaths: PaperlessStoragePath[]
 
   tagSelectionModel = new FilterableDropdownSelectionModel()
   correspondentSelectionModel = new FilterableDropdownSelectionModel()
   documentTypeSelectionModel = new FilterableDropdownSelectionModel()
+  storagePathsSelectionModel = new FilterableDropdownSelectionModel()
   awaitingDownload: boolean
 
   constructor(
@@ -50,7 +52,8 @@ export class BulkEditorComponent {
     private modalService: NgbModal,
     private openDocumentService: OpenDocumentsService,
     private settings: SettingsService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private storagePathService: StoragePathService
   ) {}
 
   applyOnClose: boolean = this.settings.get(
@@ -70,6 +73,9 @@ export class BulkEditorComponent {
     this.documentTypeService
       .listAll()
       .subscribe((result) => (this.documentTypes = result.results))
+    this.storagePathService
+      .listAll()
+      .subscribe((result) => (this.storagePaths = result.results))
   }
 
   private executeBulkOperation(modal, method: string, args) {
@@ -143,6 +149,17 @@ export class BulkEditorComponent {
         this.applySelectionData(
           s.selected_correspondents,
           this.correspondentSelectionModel
+        )
+      })
+  }
+
+  openStoragePathDropdown() {
+    this.documentService
+      .getSelectionData(Array.from(this.list.selected))
+      .subscribe((s) => {
+        this.applySelectionData(
+          s.selected_storage_paths,
+          this.storagePathsSelectionModel
         )
       })
   }
@@ -301,6 +318,42 @@ export class BulkEditorComponent {
     }
   }
 
+  setStoragePaths(changedDocumentPaths: ChangedItems) {
+    if (
+      changedDocumentPaths.itemsToAdd.length == 0 &&
+      changedDocumentPaths.itemsToRemove.length == 0
+    )
+      return
+
+    let storagePath =
+      changedDocumentPaths.itemsToAdd.length > 0
+        ? changedDocumentPaths.itemsToAdd[0]
+        : null
+
+    if (this.showConfirmationDialogs) {
+      let modal = this.modalService.open(ConfirmDialogComponent, {
+        backdrop: 'static',
+      })
+      modal.componentInstance.title = $localize`Confirm storage path assignment`
+      if (storagePath) {
+        modal.componentInstance.message = $localize`This operation will assign the storage path "${storagePath.name}" to ${this.list.selected.size} selected document(s).`
+      } else {
+        modal.componentInstance.message = $localize`This operation will remove the storage path from ${this.list.selected.size} selected document(s).`
+      }
+      modal.componentInstance.btnClass = 'btn-warning'
+      modal.componentInstance.btnCaption = $localize`Confirm`
+      modal.componentInstance.confirmClicked.subscribe(() => {
+        this.executeBulkOperation(modal, 'set_storage_path', {
+          storage_path: storagePath ? storagePath.id : null,
+        })
+      })
+    } else {
+      this.executeBulkOperation(null, 'set_storage_path', {
+        storage_path: storagePath ? storagePath.id : null,
+      })
+    }
+  }
+
   applyDelete() {
     let modal = this.modalService.open(ConfirmDialogComponent, {
       backdrop: 'static',
@@ -325,5 +378,20 @@ export class BulkEditorComponent {
         saveAs(result, 'documents.zip')
         this.awaitingDownload = false
       })
+  }
+
+  redoOcrSelected() {
+    let modal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.title = $localize`Redo OCR confirm`
+    modal.componentInstance.messageBold = $localize`This operation will permanently redo OCR for ${this.list.selected.size} selected document(s).`
+    modal.componentInstance.message = $localize`This operation cannot be undone.`
+    modal.componentInstance.btnClass = 'btn-danger'
+    modal.componentInstance.btnCaption = $localize`Proceed`
+    modal.componentInstance.confirmClicked.subscribe(() => {
+      modal.componentInstance.buttonsEnabled = false
+      this.executeBulkOperation(modal, 'redo_ocr', {})
+    })
   }
 }

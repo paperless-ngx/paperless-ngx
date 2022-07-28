@@ -3,6 +3,7 @@ import { ObjectWithId } from './object-with-id'
 import { PaperlessTag } from './paperless-tag'
 import { PaperlessDocumentType } from './paperless-document-type'
 import { Observable } from 'rxjs'
+import { PaperlessStoragePath } from './paperless-storage-path'
 
 export interface SearchHit {
   score?: number
@@ -20,6 +21,10 @@ export interface PaperlessDocument extends ObjectWithId {
 
   document_type?: number
 
+  storage_path$?: Observable<PaperlessStoragePath>
+
+  storage_path?: number
+
   title?: string
 
   content?: string
@@ -32,7 +37,11 @@ export interface PaperlessDocument extends ObjectWithId {
 
   checksum?: string
 
+  // UTC
   created?: Date
+
+  // localized date
+  created_date?: Date
 
   modified?: Date
 

@@ -1,21 +1,24 @@
 import { Injectable } from '@angular/core'
-import { ActivatedRoute, Params, Router } from '@angular/router'
+import { ParamMap, Router } from '@angular/router'
 import { Observable } from 'rxjs'
 import {
+  filterRulesDiffer,
   cloneFilterRules,
   FilterRule,
   isFullTextFilterRule,
 } from '../data/filter-rule'
 import { PaperlessDocument } from '../data/paperless-document'
 import { PaperlessSavedView } from '../data/paperless-saved-view'
+import { SETTINGS_KEYS } from '../data/paperless-uisettings'
 import { DOCUMENT_LIST_SERVICE } from '../data/storage-keys'
+import { generateParams, parseParams } from '../utils/query-params'
 import { DocumentService, DOCUMENT_SORT_FIELDS } from './rest/document.service'
-import { SettingsService, SETTINGS_KEYS } from './settings.service'
+import { SettingsService } from './settings.service'
 
 /**
  * Captures the current state of the list view.
  */
-interface ListViewState {
+export interface ListViewState {
   /**
    * Title of the document list view. Either "Documents" (localized) or the name of a saved view.
    */
@@ -31,7 +34,7 @@ interface ListViewState {
   /**
    * Total amount of documents with the current filter rules. Used to calculate the number of pages.
    */
-  collectionSize: number
+  collectionSize?: number
 
   /**
    * Currently selected sort field.
@@ -65,6 +68,7 @@ interface ListViewState {
 })
 export class DocumentListViewService {
   isReloading: boolean = false
+  initialized: boolean = false
   error: string = null
 
   rangeSelectionAnchorIndex: number
@@ -82,6 +86,32 @@ export class DocumentListViewService {
 
   get activeSavedViewTitle() {
     return this.activeListViewState.title
+  }
+
+  constructor(
+    private documentService: DocumentService,
+    private settings: SettingsService,
+    private router: Router
+  ) {
+    let documentListViewConfigJson = localStorage.getItem(
+      DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG
+    )
+    if (documentListViewConfigJson) {
+      try {
+        let savedState: ListViewState = JSON.parse(documentListViewConfigJson)
+        // Remove null elements from the restored state
+        Object.keys(savedState).forEach((k) => {
+          if (savedState[k] == null) {
+            delete savedState[k]
+          }
+        })
+        //only use restored state attributes instead of defaults if they are not null
+        let newState = Object.assign(this.defaultListViewState(), savedState)
+        this.listViewStates.set(null, newState)
+      } catch (e) {
+        localStorage.removeItem(DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG)
+      }
+    }
   }
 
   private defaultListViewState(): ListViewState {
@@ -121,20 +151,53 @@ export class DocumentListViewService {
     if (closeCurrentView) {
       this._activeSavedViewId = null
     }
+
     this.activeListViewState.filterRules = cloneFilterRules(view.filter_rules)
     this.activeListViewState.sortField = view.sort_field
     this.activeListViewState.sortReverse = view.sort_reverse
     if (this._activeSavedViewId) {
       this.activeListViewState.title = view.name
     }
+
     this.reduceSelectionToFilter()
+
+    if (!this.router.routerState.snapshot.url.includes('/view/')) {
+      this.router.navigate([], {
+        queryParams: { view: view.id },
+      })
+    }
   }
 
-  reload(onFinish?) {
+  loadFromQueryParams(queryParams: ParamMap) {
+    const paramsEmpty: boolean = queryParams.keys.length == 0
+    let newState: ListViewState = this.listViewStates.get(null)
+    if (!paramsEmpty) newState = parseParams(queryParams)
+    if (newState == undefined) newState = this.defaultListViewState() // if nothing in local storage
+
+    // only reload if things have changed
+    if (
+      !this.initialized ||
+      paramsEmpty ||
+      this.activeListViewState.sortField !== newState.sortField ||
+      this.activeListViewState.sortReverse !== newState.sortReverse ||
+      this.activeListViewState.currentPage !== newState.currentPage ||
+      filterRulesDiffer(
+        this.activeListViewState.filterRules,
+        newState.filterRules
+      )
+    ) {
+      this.activeListViewState.filterRules = newState.filterRules
+      this.activeListViewState.sortField = newState.sortField
+      this.activeListViewState.sortReverse = newState.sortReverse
+      this.activeListViewState.currentPage = newState.currentPage
+      this.reload(null, paramsEmpty) // update the params if there arent any
+    }
+  }
+
+  reload(onFinish?, updateQueryParams: boolean = true) {
     this.isReloading = true
     this.error = null
     let activeListViewState = this.activeListViewState
-
     this.documentService
       .listFiltered(
         activeListViewState.currentPage,
@@ -145,9 +208,18 @@ export class DocumentListViewService {
       )
       .subscribe({
         next: (result) => {
+          this.initialized = true
           this.isReloading = false
           activeListViewState.collectionSize = result.count
           activeListViewState.documents = result.results
+
+          if (updateQueryParams && !this._activeSavedViewId) {
+            let base = ['/documents']
+            this.router.navigate(base, {
+              queryParams: generateParams(activeListViewState),
+            })
+          }
+
           if (onFinish) {
             onFinish()
           }
@@ -190,6 +262,7 @@ export class DocumentListViewService {
     ) {
       this.activeListViewState.sortField = 'created'
     }
+    this._activeSavedViewId = null
     this.activeListViewState.filterRules = filterRules
     this.reload()
     this.reduceSelectionToFilter()
@@ -201,6 +274,7 @@ export class DocumentListViewService {
   }
 
   set sortField(field: string) {
+    this._activeSavedViewId = null
     this.activeListViewState.sortField = field
     this.reload()
     this.saveDocumentListView()
@@ -211,6 +285,7 @@ export class DocumentListViewService {
   }
 
   set sortReverse(reverse: boolean) {
+    this._activeSavedViewId = null
     this.activeListViewState.sortReverse = reverse
     this.reload()
     this.saveDocumentListView()
@@ -218,13 +293,6 @@ export class DocumentListViewService {
 
   get sortReverse(): boolean {
     return this.activeListViewState.sortReverse
-  }
-
-  get sortParams(): Params {
-    return {
-      sortField: this.sortField,
-      sortReverse: this.sortReverse,
-    }
   }
 
   get collectionSize(): number {
@@ -236,6 +304,8 @@ export class DocumentListViewService {
   }
 
   set currentPage(page: number) {
+    if (this.activeListViewState.currentPage == page) return
+    this._activeSavedViewId = null
     this.activeListViewState.currentPage = page
     this.reload()
     this.saveDocumentListView()
@@ -270,6 +340,10 @@ export class DocumentListViewService {
         JSON.stringify(savedState)
       )
     }
+  }
+
+  quickFilter(filterRules: FilterRule[]) {
+    this.filterRules = filterRules
   }
 
   getLastPage(): number {
@@ -429,30 +503,5 @@ export class DocumentListViewService {
 
   documentIndexInCurrentView(documentID: number): number {
     return this.documents.map((d) => d.id).indexOf(documentID)
-  }
-
-  constructor(
-    private documentService: DocumentService,
-    private settings: SettingsService
-  ) {
-    let documentListViewConfigJson = localStorage.getItem(
-      DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG
-    )
-    if (documentListViewConfigJson) {
-      try {
-        let savedState: ListViewState = JSON.parse(documentListViewConfigJson)
-        // Remove null elements from the restored state
-        Object.keys(savedState).forEach((k) => {
-          if (savedState[k] == null) {
-            delete savedState[k]
-          }
-        })
-        //only use restored state attributes instead of defaults if they are not null
-        let newState = Object.assign(this.defaultListViewState(), savedState)
-        this.listViewStates.set(null, newState)
-      } catch (e) {
-        localStorage.removeItem(DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG)
-      }
-    }
   }
 }

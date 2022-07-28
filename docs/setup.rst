@@ -184,6 +184,25 @@ Install Paperless from Docker Hub
     port 8000. Modifying the part before the colon will map requests on another
     port to the webserver running on the default port.
 
+    **Rootless**
+
+    If you want to run Paperless as a rootless container, you will need to do the
+    following in your ``docker-compose.yml``:
+
+    - set the ``user`` running the container to map to the ``paperless`` user in the
+      container.
+      This value (``user_id`` below), should be the same id that ``USERMAP_UID`` and
+      ``USERMAP_GID`` are set to in the next step.
+      See ``USERMAP_UID`` and ``USERMAP_GID`` :ref:`here <configuration-docker>`.
+
+    Your entry for Paperless should contain something like:
+
+     .. code::
+
+        webserver:
+          image: ghcr.io/paperless-ngx/paperless-ngx:latest
+          user: <user_id>
+
 5.  Modify ``docker-compose.env``, following the comments in the file. The
     most important change is to set ``USERMAP_UID`` and ``USERMAP_GID``
     to the uid and gid of your user on the host system. Use ``id -u`` and
@@ -199,6 +218,19 @@ Install Paperless from Docker Hub
 
         You can copy any setting from the file ``paperless.conf.example`` and paste it here.
         Have a look at :ref:`configuration` to see what's available.
+
+    .. note::
+
+        You can utilize Docker secrets for some configuration settings by
+        appending `_FILE` to some configuration values.  This is supported currently
+        only by:
+          * PAPERLESS_DBUSER
+          * PAPERLESS_DBPASS
+          * PAPERLESS_SECRET_KEY
+          * PAPERLESS_AUTO_LOGIN_USERNAME
+          * PAPERLESS_ADMIN_USER
+          * PAPERLESS_ADMIN_MAIL
+          * PAPERLESS_ADMIN_PASSWORD
 
     .. caution::
 
@@ -286,7 +318,6 @@ writing. Windows is not and will never be supported.
 
     *   ``fonts-liberation`` for generating thumbnails for plain text files
     *   ``imagemagick`` >= 6 for PDF conversion
-    *   ``optipng`` for optimizing thumbnails
     *   ``gnupg`` for handling encrypted documents
     *   ``libpq-dev`` for PostgreSQL
     *   ``libmagic-dev`` for mime type detection
@@ -298,7 +329,7 @@ writing. Windows is not and will never be supported.
 
     .. code::
 
-        python3 python3-pip python3-dev imagemagick fonts-liberation optipng gnupg libpq-dev libmagic-dev mime-support libzbar0 poppler-utils
+        python3 python3-pip python3-dev imagemagick fonts-liberation gnupg libpq-dev libmagic-dev mime-support libzbar0 poppler-utils
 
     These dependencies are required for OCRmyPDF, which is used for text recognition.
 
@@ -308,7 +339,7 @@ writing. Windows is not and will never be supported.
     *   ``qpdf``
     *   ``liblept5``
     *   ``libxml2``
-    *   ``pngquant``
+    *   ``pngquant`` (suggested for certain PDF image optimizations)
     *   ``zlib1g``
     *   ``tesseract-ocr`` >= 4.0.0 for OCR
     *   ``tesseract-ocr`` language packs (``tesseract-ocr-eng``, ``tesseract-ocr-deu``, etc)
@@ -331,6 +362,12 @@ writing. Windows is not and will never be supported.
 
 3.  Optional. Install ``postgresql`` and configure a database, user and password for paperless. If you do not wish
     to use PostgreSQL, SQLite is available as well.
+
+    .. note::
+
+        On bare-metal installations using SQLite, ensure the
+        `JSON1 extension <https://code.djangoproject.com/wiki/JSON1Extension>`_ is enabled. This is
+        usually the case, but not always.
 
 4.  Get the release archive from `<https://github.com/paperless-ngx/paperless-ngx/releases>`_.
     If you clone the git repo as it is, you also have to compile the front end by yourself.
@@ -724,8 +761,6 @@ configuring some options in paperless can help improve performance immensely:
 *   If you want to perform OCR on the device, consider using ``PAPERLESS_OCR_CLEAN=none``.
     This will speed up OCR times and use less memory at the expense of slightly worse
     OCR results.
-*   Set ``PAPERLESS_OPTIMIZE_THUMBNAILS`` to 'false' if you want faster consumption
-    times. Thumbnails will be about 20% larger.
 *   If using docker, consider setting ``PAPERLESS_WEBSERVER_WORKERS`` to
     1. This will save some memory.
 

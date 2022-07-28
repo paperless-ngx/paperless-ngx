@@ -25,6 +25,25 @@ export function isFullTextFilterRule(filterRules: FilterRule[]): boolean {
   )
 }
 
+export function filterRulesDiffer(
+  filterRulesA: FilterRule[],
+  filterRulesB: FilterRule[]
+): boolean {
+  let differ = false
+  if (filterRulesA.length != filterRulesB.length) {
+    differ = true
+  } else {
+    differ = filterRulesA.some((rule) => {
+      return (
+        filterRulesB.find(
+          (fri) => fri.rule_type == rule.rule_type && fri.value == rule.value
+        ) == undefined
+      )
+    })
+  }
+  return differ
+}
+
 export interface FilterRule {
   rule_type: number
   value: string

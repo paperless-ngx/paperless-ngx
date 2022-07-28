@@ -1,9 +1,28 @@
+import shutil
+import tempfile
+
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.test import override_settings
 from django.test import TestCase
 
 
 class TestViews(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        # Provide a dummy static dir to silence whitenoise warnings
+        cls.static_dir = tempfile.mkdtemp()
+
+        cls.override = override_settings(
+            STATIC_ROOT=cls.static_dir,
+        )
+        cls.override.enable()
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls.static_dir, ignore_errors=True)
+        cls.override.disable()
+
     def setUp(self) -> None:
         self.user = User.objects.create_user("testuser")
 

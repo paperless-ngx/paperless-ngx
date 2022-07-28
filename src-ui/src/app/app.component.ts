@@ -1,4 +1,5 @@
-import { SettingsService, SETTINGS_KEYS } from './services/settings.service'
+import { SettingsService } from './services/settings.service'
+import { SETTINGS_KEYS } from './data/paperless-uisettings'
 import { Component, OnDestroy, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 import { Subscription } from 'rxjs'
@@ -6,6 +7,7 @@ import { ConsumerStatusService } from './services/consumer-status.service'
 import { ToastService } from './services/toast.service'
 import { NgxFileDropEntry } from 'ngx-file-drop'
 import { UploadDocumentsService } from './services/upload-documents.service'
+import { TasksService } from './services/tasks.service'
 
 @Component({
   selector: 'app-root',
@@ -26,7 +28,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private consumerStatusService: ConsumerStatusService,
     private toastService: ToastService,
     private router: Router,
-    private uploadDocumentsService: UploadDocumentsService
+    private uploadDocumentsService: UploadDocumentsService,
+    private tasksService: TasksService
   ) {
     let anyWindow = window as any
     anyWindow.pdfWorkerSrc = 'assets/js/pdf.worker.min.js'
@@ -64,6 +67,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.successSubscription = this.consumerStatusService
       .onDocumentConsumptionFinished()
       .subscribe((status) => {
+        this.tasksService.reload()
         if (
           this.showNotification(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUCCESS)
         ) {
@@ -82,6 +86,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.failedSubscription = this.consumerStatusService
       .onDocumentConsumptionFailed()
       .subscribe((status) => {
+        this.tasksService.reload()
         if (
           this.showNotification(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_FAILED)
         ) {
@@ -94,6 +99,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.newDocumentSubscription = this.consumerStatusService
       .onDocumentDetected()
       .subscribe((status) => {
+        this.tasksService.reload()
         if (
           this.showNotification(
             SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_NEW_DOCUMENT

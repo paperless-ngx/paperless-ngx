@@ -2,6 +2,7 @@ import logging
 import os
 import shutil
 
+import django_q
 from django.conf import settings
 from django.contrib.admin.models import ADDITION
 from django.contrib.admin.models import LogEntry
@@ -10,6 +11,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import DatabaseError
 from django.db import models
 from django.db.models import Q
+from django.db.utils import OperationalError
 from django.dispatch import receiver
 from django.utils import termcolors
 from django.utils import timezone
@@ -21,6 +23,7 @@ from ..file_handling import delete_empty_directories
 from ..file_handling import generate_unique_filename
 from ..models import Document
 from ..models import MatchingModel
+from ..models import PaperlessTask
 from ..models import Tag
 
 
@@ -230,6 +233,76 @@ def set_tags(
         document.tags.add(*relevant_tags)
 
 
+def set_storage_path(
+    sender,
+    document=None,
+    logging_group=None,
+    classifier=None,
+    replace=False,
+    use_first=True,
+    suggest=False,
+    base_url=None,
+    color=False,
+    **kwargs,
+):
+    if document.storage_path and not replace:
+        return
+
+    potential_storage_path = matching.match_storage_paths(
+        document,
+        classifier,
+    )
+
+    potential_count = len(potential_storage_path)
+    if potential_storage_path:
+        selected = potential_storage_path[0]
+    else:
+        selected = None
+
+    if potential_count > 1:
+        if use_first:
+            logger.info(
+                f"Detected {potential_count} potential storage paths, "
+                f"so we've opted for {selected}",
+                extra={"group": logging_group},
+            )
+        else:
+            logger.info(
+                f"Detected {potential_count} potential storage paths, "
+                f"not assigning any storage directory",
+                extra={"group": logging_group},
+            )
+            return
+
+    if selected or replace:
+        if suggest:
+            if base_url:
+                print(
+                    termcolors.colorize(str(document), fg="green")
+                    if color
+                    else str(document),
+                )
+                print(f"{base_url}/documents/{document.pk}")
+            else:
+                print(
+                    (
+                        termcolors.colorize(str(document), fg="green")
+                        if color
+                        else str(document)
+                    )
+                    + f" [{document.pk}]",
+                )
+            print(f"Sugest storage directory {selected}")
+        else:
+            logger.info(
+                f"Assigning storage path {selected} to {document}",
+                extra={"group": logging_group},
+            )
+
+            document.storage_path = selected
+            document.save(update_fields=("storage_path",))
+
+
 @receiver(models.signals.post_delete, sender=Document)
 def cleanup_document_deletion(sender, instance, using, **kwargs):
     with FileLock(settings.MEDIA_LOCK):
@@ -429,3 +502,47 @@ def add_to_index(sender, document, **kwargs):
     from documents import index
 
     index.add_or_update_document(document)
+
+
+@receiver(django_q.signals.pre_enqueue)
+def init_paperless_task(sender, task, **kwargs):
+    if task["func"] == "documents.tasks.consume_file":
+        try:
+            paperless_task, created = PaperlessTask.objects.get_or_create(
+                task_id=task["id"],
+            )
+            paperless_task.name = task["name"]
+            paperless_task.created = task["started"]
+            paperless_task.save()
+        except OperationalError as e:
+            logger.error(f"Creating PaperlessTask failed: {e}")
+
+
+@receiver(django_q.signals.pre_execute)
+def paperless_task_started(sender, task, **kwargs):
+    try:
+        if task["func"] == "documents.tasks.consume_file":
+            paperless_task, created = PaperlessTask.objects.get_or_create(
+                task_id=task["id"],
+            )
+            paperless_task.started = timezone.now()
+            paperless_task.save()
+    except OperationalError as e:
+        logger.error(f"Creating PaperlessTask failed: {e}")
+    except PaperlessTask.DoesNotExist:
+        pass
+
+
+@receiver(models.signals.post_save, sender=django_q.models.Task)
+def update_paperless_task(sender, instance, **kwargs):
+    try:
+        if instance.func == "documents.tasks.consume_file":
+            paperless_task, created = PaperlessTask.objects.get_or_create(
+                task_id=instance.id,
+            )
+            paperless_task.attempted_task = instance
+            paperless_task.save()
+    except OperationalError as e:
+        logger.error(f"Creating PaperlessTask failed: {e}")
+    except PaperlessTask.DoesNotExist:
+        pass

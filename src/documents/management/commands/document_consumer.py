@@ -28,8 +28,11 @@ def _tags_from_path(filepath):
     """Walk up the directory tree from filepath to CONSUMPTION_DIR
     and get or create Tag IDs for every directory.
     """
+    normalized_consumption_dir = os.path.abspath(
+        os.path.normpath(settings.CONSUMPTION_DIR),
+    )
     tag_ids = set()
-    path_parts = Path(filepath).relative_to(settings.CONSUMPTION_DIR).parent.parts
+    path_parts = Path(filepath).relative_to(normalized_consumption_dir).parent.parts
     for part in path_parts:
         tag_ids.add(
             Tag.objects.get_or_create(name__iexact=part, defaults={"name": part})[0].pk,
@@ -39,7 +42,10 @@ def _tags_from_path(filepath):
 
 
 def _is_ignored(filepath: str) -> bool:
-    filepath_relative = PurePath(filepath).relative_to(settings.CONSUMPTION_DIR)
+    normalized_consumption_dir = os.path.abspath(
+        os.path.normpath(settings.CONSUMPTION_DIR),
+    )
+    filepath_relative = PurePath(filepath).relative_to(normalized_consumption_dir)
     return any(filepath_relative.match(p) for p in settings.CONSUMER_IGNORE_PATTERNS)
 
 
@@ -61,17 +67,19 @@ def _consume(filepath):
 
     read_try_count = 0
     file_open_ok = False
+    os_error_str = None
 
     while (read_try_count < os_error_retry_count) and not file_open_ok:
         try:
             with open(filepath, "rb"):
                 file_open_ok = True
-        except OSError:
+        except OSError as e:
             read_try_count += 1
+            os_error_str = str(e)
             sleep(os_error_retry_wait)
 
     if read_try_count >= os_error_retry_count:
-        logger.warning(f"Not consuming file {filepath}: OS reports file as busy still")
+        logger.warning(f"Not consuming file {filepath}: OS reports {os_error_str}")
         return
 
     tag_ids = None
@@ -160,6 +168,8 @@ class Command(BaseCommand):
         if not directory:
             raise CommandError("CONSUMPTION_DIR does not appear to be set.")
 
+        directory = os.path.abspath(directory)
+
         if not os.path.isdir(directory):
             raise CommandError(f"Consumption directory {directory} does not exist")
 
@@ -208,7 +218,7 @@ class Command(BaseCommand):
 
         try:
 
-            inotify_debounce: Final[float] = 0.5
+            inotify_debounce: Final[float] = settings.CONSUMER_INOTIFY_DELAY
             notified_files = {}
 
             while not self.stop_flag:
@@ -226,10 +236,23 @@ class Command(BaseCommand):
                 for filepath in notified_files:
                     # Time of the last inotify event for this file
                     last_event_time = notified_files[filepath]
-                    if (monotonic() - last_event_time) > inotify_debounce:
+
+                    # Current time - last time over the configured timeout
+                    waited_long_enough = (
+                        monotonic() - last_event_time
+                    ) > inotify_debounce
+
+                    # Also make sure the file exists still, some scanners might write a
+                    # temporary file first
+                    file_still_exists = os.path.exists(filepath) and os.path.isfile(
+                        filepath,
+                    )
+
+                    if waited_long_enough and file_still_exists:
                         _consume(filepath)
-                    else:
+                    elif file_still_exists:
                         still_waiting[filepath] = last_event_time
+
                 # These files are still waiting to hit the timeout
                 notified_files = still_waiting
 

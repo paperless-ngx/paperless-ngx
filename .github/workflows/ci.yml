@@ -26,7 +26,7 @@ jobs:
         run: pipx install pipenv
       -
         name: Set up Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: 3.9
           cache: "pipenv"
@@ -57,17 +57,29 @@ jobs:
     name: Prepare Docker Pipeline Data
     if: github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/feature-') || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/beta' || contains(github.ref, 'beta.rc') || startsWith(github.ref, 'refs/tags/v'))
     runs-on: ubuntu-20.04
+    # If the push triggered the installer library workflow, wait for it to
+    # complete here.  This ensures the required versions for the final
+    # image have been built, while not waiting at all if the versions haven't changed
+    concurrency:
+      group: build-installer-library
+      cancel-in-progress: false
     needs:
       - documentation
       - ci-backend
       - ci-frontend
     steps:
       -
+        name: Set ghcr repository name
+        id: set-ghcr-repository
+        run: |
+          ghcr_name=$(echo "${GITHUB_REPOSITORY}" | awk '{ print tolower($0) }')
+          echo ::set-output name=repository::${ghcr_name}
+      -
         name: Checkout
         uses: actions/checkout@v3
       -
         name: Set up Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: "3.9"
       -
@@ -109,6 +121,8 @@ jobs:
 
     outputs:
 
+      ghcr-repository: ${{ steps.set-ghcr-repository.outputs.repository }}
+
       qpdf-json: ${{ steps.qpdf-setup.outputs.qpdf-json }}
 
       pikepdf-json: ${{ steps.pikepdf-setup.outputs.pikepdf-json }}
@@ -116,55 +130,6 @@ jobs:
       psycopg2-json: ${{ steps.psycopg2-setup.outputs.psycopg2-json }}
 
       jbig2enc-json: ${{ steps.jbig2enc-setup.outputs.jbig2enc-json}}
-
-  build-qpdf-debs:
-    name: qpdf
-    needs:
-      - prepare-docker-build
-    uses: ./.github/workflows/reusable-workflow-builder.yml
-    with:
-      dockerfile: ./docker-builders/Dockerfile.qpdf
-      build-json: ${{ needs.prepare-docker-build.outputs.qpdf-json }}
-      build-args: |
-        QPDF_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.qpdf-json).version }}
-
-  build-jbig2enc:
-    name: jbig2enc
-    needs:
-      - prepare-docker-build
-    uses: ./.github/workflows/reusable-workflow-builder.yml
-    with:
-      dockerfile: ./docker-builders/Dockerfile.jbig2enc
-      build-json: ${{ needs.prepare-docker-build.outputs.jbig2enc-json }}
-      build-args: |
-        JBIG2ENC_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.jbig2enc-json).version }}
-
-  build-psycopg2-wheel:
-    name: psycopg2
-    needs:
-      - prepare-docker-build
-    uses: ./.github/workflows/reusable-workflow-builder.yml
-    with:
-      dockerfile: ./docker-builders/Dockerfile.psycopg2
-      build-json: ${{ needs.prepare-docker-build.outputs.psycopg2-json }}
-      build-args: |
-        PSYCOPG2_GIT_TAG=${{ fromJSON(needs.prepare-docker-build.outputs.psycopg2-json).git_tag }}
-        PSYCOPG2_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.psycopg2-json).version }}
-
-  build-pikepdf-wheel:
-    name: pikepdf
-    needs:
-      - prepare-docker-build
-      - build-qpdf-debs
-    uses: ./.github/workflows/reusable-workflow-builder.yml
-    with:
-      dockerfile: ./docker-builders/Dockerfile.pikepdf
-      build-json: ${{ needs.prepare-docker-build.outputs.pikepdf-json }}
-      build-args: |
-        REPO=${{ github.repository }}
-        QPDF_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.qpdf-json).version }}
-        PIKEPDF_GIT_TAG=${{ fromJSON(needs.prepare-docker-build.outputs.pikepdf-json).git_tag }}
-        PIKEPDF_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.pikepdf-json).version }}
 
   # build and push image to docker hub.
   build-docker-image:
@@ -174,29 +139,31 @@ jobs:
       cancel-in-progress: true
     needs:
       - prepare-docker-build
-      - build-psycopg2-wheel
-      - build-jbig2enc
-      - build-qpdf-debs
-      - build-pikepdf-wheel
     steps:
       -
         name: Check pushing to Docker Hub
         id: docker-hub
-        # Only push to Dockerhub from the main repo
+        # Only push to Dockerhub from the main repo AND the ref is either:
+        #  main
+        #  dev
+        #  beta
+        #  a tag
         # Otherwise forks would require a Docker Hub account and secrets setup
         run: |
-          if [[ ${{ github.repository }} == "paperless-ngx/paperless-ngx" ]] ; then
+          if [[ ${{ needs.prepare-docker-build.outputs.ghcr-repository }} == "paperless-ngx/paperless-ngx" && ( ${{ github.ref_name }} == "main" || ${{ github.ref_name }} == "dev" || ${{ github.ref_name }} == "beta" || ${{ startsWith(github.ref, 'refs/tags/v') }} == "true" ) ]] ; then
+            echo "Enabling DockerHub image push"
             echo ::set-output name=enable::"true"
           else
+            echo "Not pushing to DockerHub"
             echo ::set-output name=enable::"false"
           fi
       -
         name: Gather Docker metadata
         id: docker-meta
-        uses: docker/metadata-action@v3
+        uses: docker/metadata-action@v4
         with:
           images: |
-            ghcr.io/${{ github.repository }}
+            ghcr.io/${{ needs.prepare-docker-build.outputs.ghcr-repository }}
             name=paperlessngx/paperless-ngx,enable=${{ steps.docker-hub.outputs.enable }}
           tags: |
             # Tag branches with branch name
@@ -210,20 +177,20 @@ jobs:
         uses: actions/checkout@v3
       -
         name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v2
       -
         name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v2
       -
         name: Login to Github Container Registry
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       -
         name: Login to Docker Hub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         # Don't attempt to login is not pushing to Docker Hub
         if: steps.docker-hub.outputs.enable == 'true'
         with:
@@ -231,7 +198,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
         name: Build and push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           context: .
           file: ./Dockerfile
@@ -247,11 +214,11 @@ jobs:
           # Get cache layers from this branch, then dev, then main
           # This allows new branches to get at least some cache benefits, generally from dev
           cache-from: |
-            type=registry,ref=ghcr.io/${{ github.repository }}/builder/cache/app:${{ github.ref_name }}
-            type=registry,ref=ghcr.io/${{ github.repository }}/builder/cache/app:dev
-            type=registry,ref=ghcr.io/${{ github.repository }}/builder/cache/app:main
+            type=registry,ref=ghcr.io/${{ needs.prepare-docker-build.outputs.ghcr-repository }}/builder/cache/app:${{ github.ref_name }}
+            type=registry,ref=ghcr.io/${{ needs.prepare-docker-build.outputs.ghcr-repository }}/builder/cache/app:dev
+            type=registry,ref=ghcr.io/${{ needs.prepare-docker-build.outputs.ghcr-repository }}/builder/cache/app:main
           cache-to: |
-            type=registry,mode=max,ref=ghcr.io/${{ github.repository }}/builder/cache/app:${{ github.ref_name }}
+            type=registry,mode=max,ref=ghcr.io/${{ needs.prepare-docker-build.outputs.ghcr-repository }}/builder/cache/app:${{ github.ref_name }}
       -
         name: Inspect image
         run: |
@@ -278,7 +245,7 @@ jobs:
         uses: actions/checkout@v3
       -
         name: Set up Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: 3.9
       -
@@ -338,6 +305,10 @@ jobs:
 
   publish-release:
     runs-on: ubuntu-20.04
+    outputs:
+      prerelease: ${{ steps.get_version.outputs.prerelease }}
+      changelog: ${{ steps.create-release.outputs.body }}
+      version: ${{ steps.get_version.outputs.version }}
     needs:
       - build-release
     if: github.ref_type == 'tag' && (startsWith(github.ref_name, 'v') || contains(github.ref_name, '-beta.rc'))
@@ -381,6 +352,13 @@ jobs:
           asset_path: ./paperless-ngx.tar.xz
           asset_name: paperless-ngx-${{ steps.get_version.outputs.version }}.tar.xz
           asset_content_type: application/x-xz
+
+  append-changelog:
+    runs-on: ubuntu-20.04
+    needs:
+      - publish-release
+    if: needs.publish-release.outputs.prerelease == 'false'
+    steps:
       -
         name: Checkout
         uses: actions/checkout@v3
@@ -391,11 +369,33 @@ jobs:
         id: append-Changelog
         working-directory: docs
         run: |
-          echo -e "# Changelog\n\n${{ steps.create-release.outputs.body }}\n" > changelog-new.md
+          git branch ${{ needs.publish-release.outputs.version }}-changelog
+          git checkout ${{ needs.publish-release.outputs.version }}-changelog
+          echo -e "# Changelog\n\n${{ needs.publish-release.outputs.changelog }}\n" > changelog-new.md
           CURRENT_CHANGELOG=`tail --lines +2 changelog.md`
           echo -e "$CURRENT_CHANGELOG" >> changelog-new.md
           mv changelog-new.md changelog.md
           git config --global user.name "github-actions"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -am "Changelog ${{ steps.get_version.outputs.version }} - GHA"
-          git push origin HEAD:main
+          git push origin ${{ needs.publish-release.outputs.version }}-changelog
+      -
+        name: Create Pull Request
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { repo, owner } = context.repo;
+            const result = await github.rest.pulls.create({
+              title: '[Documentation] Add ${{ needs.publish-release.outputs.version }} changelog',
+              owner,
+              repo,
+              head: '${{ needs.publish-release.outputs.version }}-changelog',
+              base: 'main',
+              body: 'This PR is auto-generated by CI.'
+            });
+            github.rest.issues.addLabels({
+              owner,
+              repo,
+              issue_number: result.data.number,
+              labels: ['documentation']
+            });

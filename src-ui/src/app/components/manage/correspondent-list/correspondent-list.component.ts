@@ -3,7 +3,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { FILTER_CORRESPONDENT } from 'src/app/data/filter-rule-type'
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
-import { QueryParamsService } from 'src/app/services/query-params.service'
+import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { CorrespondentEditDialogComponent } from '../../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
@@ -20,7 +20,7 @@ export class CorrespondentListComponent extends ManagementListComponent<Paperles
     correspondentsService: CorrespondentService,
     modalService: NgbModal,
     toastService: ToastService,
-    queryParamsService: QueryParamsService,
+    documentListViewService: DocumentListViewService,
     private datePipe: CustomDatePipe
   ) {
     super(
@@ -28,9 +28,10 @@ export class CorrespondentListComponent extends ManagementListComponent<Paperles
       modalService,
       CorrespondentEditDialogComponent,
       toastService,
-      queryParamsService,
+      documentListViewService,
       FILTER_CORRESPONDENT,
       $localize`correspondent`,
+      $localize`correspondents`,
       [
         {
           key: 'last_correspondence',
