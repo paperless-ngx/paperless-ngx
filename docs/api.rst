@@ -31,7 +31,8 @@ The objects served by the document endpoint contain the following fields:
 *   ``tags``: List of IDs of tags assigned to this document, or empty list.
 *   ``document_type``: Document type of this document, or null.
 *   ``correspondent``:  Correspondent of this document or null.
-*   ``created``: The date at which this document was created.
+*   ``created``: The date time at which this document was created.
+*   ``created_date``: The date (YYYY-MM-DD) at which this document was created. Optional. If also passed with created, this is ignored.
 *   ``modified``: The date at which this document was last edited in paperless. Read-only.
 *   ``added``: The date at which this document was added to paperless. Read-only.
 *   ``archive_serial_number``: The identifier of this document in a physical document archive.
@@ -240,10 +241,12 @@ be instructed to consume the document from there.
 The endpoint supports the following optional form fields:
 
 *   ``title``: Specify a title that the consumer should use for the document.
+*   ``created``: Specify a DateTime where the document was created (e.g. "2016-04-19" or "2016-04-19 06:15:00+02:00").
 *   ``correspondent``: Specify the ID of a correspondent that the consumer should use for the document.
 *   ``document_type``: Similar to correspondent.
 *   ``tags``: Similar to correspondent. Specify this multiple times to have multiple tags added
     to the document.
+
 
 The endpoint will immediately return "OK" if the document consumption process
 was started successfully. No additional status information about the consumption

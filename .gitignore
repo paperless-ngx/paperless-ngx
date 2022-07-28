@@ -63,11 +63,14 @@ target/
 
 # VS Code
 .vscode
+/src-ui/.vscode
+/docs/.vscode
 
 # Other stuff that doesn't belong
 .virtualenv
 virtualenv
 /venv
+.venv/
 /docker-compose.env
 /docker-compose.yml
 
@@ -84,8 +87,9 @@ scripts/nuke
 /paperless.conf
 /consume/
 /export/
-/src-ui/.vscode
 
 # this is where the compiled frontend is moved to.
 /src/documents/static/frontend/
-/docs/.vscode/settings.json
+
+# mac os
+.DS_Store

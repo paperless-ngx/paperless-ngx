@@ -3,16 +3,17 @@
 set -e
 
 wait_for_postgres() {
-	attempt_num=1
-	max_attempts=5
+	local attempt_num=1
+	local max_attempts=5
 
 	echo "Waiting for PostgreSQL to start..."
 
-	host="${PAPERLESS_DBHOST:=localhost}"
-	port="${PAPERLESS_DBPORT:=5432}"
+	local host="${PAPERLESS_DBHOST:-localhost}"
+	local port="${PAPERLESS_DBPORT:-5432}"
 
-
-	while [ ! "$(pg_isready -h $host -p $port)" ]; do
+	# Disable warning, host and port can't have spaces
+	# shellcheck disable=SC2086
+	while [ ! "$(pg_isready -h ${host} -p ${port})" ]; do
 
 		if [ $attempt_num -eq $max_attempts ]; then
 			echo "Unable to connect to database."
@@ -43,17 +44,18 @@ migrations() {
 		flock 200
 		echo "Apply database migrations..."
 		python3 manage.py migrate
-	) 200>/usr/src/paperless/data/migration_lock
+	) 200>"${DATA_DIR}/migration_lock"
 }
 
 search_index() {
-	index_version=1
-	index_version_file=/usr/src/paperless/data/.index_version
 
-	if [[ (! -f "$index_version_file") || $(<$index_version_file) != "$index_version" ]]; then
+	local index_version=1
+	local index_version_file=${DATA_DIR}/.index_version
+
+	if [[ (! -f "${index_version_file}") || $(<"${index_version_file}") != "$index_version" ]]; then
 		echo "Search index out of date. Updating..."
-		python3 manage.py document_index reindex
-		echo $index_version | tee $index_version_file >/dev/null
+		python3 manage.py document_index reindex --no-progress-bar
+		echo ${index_version} | tee "${index_version_file}" >/dev/null
 	fi
 }
 

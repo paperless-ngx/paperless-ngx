@@ -16,7 +16,7 @@ import { debounceTime, distinctUntilChanged, filter } from 'rxjs/operators'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
-import { FilterRule } from 'src/app/data/filter-rule'
+import { filterRulesDiffer, FilterRule } from 'src/app/data/filter-rule'
 import {
   FILTER_ADDED_AFTER,
   FILTER_ADDED_BEFORE,
@@ -33,17 +33,29 @@ import {
   FILTER_DOES_NOT_HAVE_TAG,
   FILTER_TITLE,
   FILTER_TITLE_CONTENT,
+  FILTER_STORAGE_PATH,
+  FILTER_ASN_ISNULL,
+  FILTER_ASN_GT,
+  FILTER_ASN_LT,
 } from 'src/app/data/filter-rule-type'
 import { FilterableDropdownSelectionModel } from '../../common/filterable-dropdown/filterable-dropdown.component'
 import { ToggleableItemState } from '../../common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { PaperlessDocument } from 'src/app/data/paperless-document'
+import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
+import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 
 const TEXT_FILTER_TARGET_TITLE = 'title'
 const TEXT_FILTER_TARGET_TITLE_CONTENT = 'title-content'
 const TEXT_FILTER_TARGET_ASN = 'asn'
 const TEXT_FILTER_TARGET_FULLTEXT_QUERY = 'fulltext-query'
 const TEXT_FILTER_TARGET_FULLTEXT_MORELIKE = 'fulltext-morelike'
+
+const TEXT_FILTER_MODIFIER_EQUALS = 'equals'
+const TEXT_FILTER_MODIFIER_NULL = 'is null'
+const TEXT_FILTER_MODIFIER_NOTNULL = 'not null'
+const TEXT_FILTER_MODIFIER_GT = 'greater'
+const TEXT_FILTER_MODIFIER_LT = 'less'
 
 @Component({
   selector: 'app-filter-editor',
@@ -98,7 +110,8 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     private documentTypeService: DocumentTypeService,
     private tagService: TagService,
     private correspondentService: CorrespondentService,
-    private documentService: DocumentService
+    private documentService: DocumentService,
+    private storagePathService: StoragePathService
   ) {}
 
   @ViewChild('textFilterInput')
@@ -107,6 +120,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   tags: PaperlessTag[] = []
   correspondents: PaperlessCorrespondent[] = []
   documentTypes: PaperlessDocumentType[] = []
+  storagePaths: PaperlessStoragePath[] = []
 
   _textFilter = ''
   _moreLikeId: number
@@ -141,9 +155,43 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
       ?.name
   }
 
+  public textFilterModifier: string
+
+  get textFilterModifiers() {
+    return [
+      {
+        id: TEXT_FILTER_MODIFIER_EQUALS,
+        label: $localize`equals`,
+      },
+      {
+        id: TEXT_FILTER_MODIFIER_NULL,
+        label: $localize`is empty`,
+      },
+      {
+        id: TEXT_FILTER_MODIFIER_NOTNULL,
+        label: $localize`is not empty`,
+      },
+      {
+        id: TEXT_FILTER_MODIFIER_GT,
+        label: $localize`greater than`,
+      },
+      {
+        id: TEXT_FILTER_MODIFIER_LT,
+        label: $localize`less than`,
+      },
+    ]
+  }
+
+  get textFilterModifierIsNull(): boolean {
+    return [TEXT_FILTER_MODIFIER_NULL, TEXT_FILTER_MODIFIER_NOTNULL].includes(
+      this.textFilterModifier
+    )
+  }
+
   tagSelectionModel = new FilterableDropdownSelectionModel()
   correspondentSelectionModel = new FilterableDropdownSelectionModel()
   documentTypeSelectionModel = new FilterableDropdownSelectionModel()
+  storagePathSelectionModel = new FilterableDropdownSelectionModel()
 
   dateCreatedBefore: string
   dateCreatedAfter: string
@@ -156,7 +204,10 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   @Input()
   set unmodifiedFilterRules(value: FilterRule[]) {
     this._unmodifiedFilterRules = value
-    this.checkIfRulesHaveChanged()
+    this.rulesModified = filterRulesDiffer(
+      this._unmodifiedFilterRules,
+      this._filterRules
+    )
   }
 
   get unmodifiedFilterRules(): FilterRule[] {
@@ -168,6 +219,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     this._filterRules = value
 
     this.documentTypeSelectionModel.clear(false)
+    this.storagePathSelectionModel.clear(false)
     this.tagSelectionModel.clear(false)
     this.correspondentSelectionModel.clear(false)
     this._textFilter = null
@@ -176,6 +228,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     this.dateAddedAfter = null
     this.dateCreatedBefore = null
     this.dateCreatedAfter = null
+    this.textFilterModifier = TEXT_FILTER_MODIFIER_EQUALS
 
     value.forEach((rule) => {
       switch (rule.rule_type) {
@@ -254,9 +307,36 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
             false
           )
           break
+        case FILTER_STORAGE_PATH:
+          this.storagePathSelectionModel.set(
+            rule.value ? +rule.value : null,
+            ToggleableItemState.Selected,
+            false
+          )
+          break
+        case FILTER_ASN_ISNULL:
+          this.textFilterTarget = TEXT_FILTER_TARGET_ASN
+          this.textFilterModifier =
+            rule.value == 'true' || rule.value == '1'
+              ? TEXT_FILTER_MODIFIER_NULL
+              : TEXT_FILTER_MODIFIER_NOTNULL
+          break
+        case FILTER_ASN_GT:
+          this.textFilterTarget = TEXT_FILTER_TARGET_ASN
+          this.textFilterModifier = TEXT_FILTER_MODIFIER_GT
+          this._textFilter = rule.value
+          break
+        case FILTER_ASN_LT:
+          this.textFilterTarget = TEXT_FILTER_TARGET_ASN
+          this.textFilterModifier = TEXT_FILTER_MODIFIER_LT
+          this._textFilter = rule.value
+          break
       }
     })
-    this.checkIfRulesHaveChanged()
+    this.rulesModified = filterRulesDiffer(
+      this._unmodifiedFilterRules,
+      this._filterRules
+    )
   }
 
   get filterRules(): FilterRule[] {
@@ -273,8 +353,33 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     if (this._textFilter && this.textFilterTarget == TEXT_FILTER_TARGET_TITLE) {
       filterRules.push({ rule_type: FILTER_TITLE, value: this._textFilter })
     }
-    if (this._textFilter && this.textFilterTarget == TEXT_FILTER_TARGET_ASN) {
-      filterRules.push({ rule_type: FILTER_ASN, value: this._textFilter })
+    if (this.textFilterTarget == TEXT_FILTER_TARGET_ASN) {
+      if (
+        this.textFilterModifier == TEXT_FILTER_MODIFIER_EQUALS &&
+        this._textFilter
+      ) {
+        filterRules.push({ rule_type: FILTER_ASN, value: this._textFilter })
+      } else if (this.textFilterModifierIsNull) {
+        filterRules.push({
+          rule_type: FILTER_ASN_ISNULL,
+          value: (
+            this.textFilterModifier == TEXT_FILTER_MODIFIER_NULL
+          ).toString(),
+        })
+      } else if (
+        [TEXT_FILTER_MODIFIER_GT, TEXT_FILTER_MODIFIER_LT].includes(
+          this.textFilterModifier
+        ) &&
+        this._textFilter
+      ) {
+        filterRules.push({
+          rule_type:
+            this.textFilterModifier == TEXT_FILTER_MODIFIER_GT
+              ? FILTER_ASN_GT
+              : FILTER_ASN_LT,
+          value: this._textFilter,
+        })
+      }
     }
     if (
       this._textFilter &&
@@ -336,6 +441,12 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
           value: documentType.id?.toString(),
         })
       })
+    this.storagePathSelectionModel.getSelectedItems().forEach((storagePath) => {
+      filterRules.push({
+        rule_type: FILTER_STORAGE_PATH,
+        value: storagePath.id?.toString(),
+      })
+    })
     if (this.dateCreatedBefore) {
       filterRules.push({
         rule_type: FILTER_CREATED_BEFORE,
@@ -368,37 +479,12 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
 
   rulesModified: boolean = false
 
-  private checkIfRulesHaveChanged() {
-    let modified = false
-    if (this._unmodifiedFilterRules.length != this._filterRules.length) {
-      modified = true
-    } else {
-      modified = this._unmodifiedFilterRules.some((rule) => {
-        return (
-          this._filterRules.find(
-            (fri) => fri.rule_type == rule.rule_type && fri.value == rule.value
-          ) == undefined
-        )
-      })
-
-      if (!modified) {
-        // only check other direction if we havent already determined is modified
-        modified = this._filterRules.some((rule) => {
-          this._unmodifiedFilterRules.find(
-            (fr) => fr.rule_type == rule.rule_type && fr.value == rule.value
-          ) == undefined
-        })
-      }
-    }
-    this.rulesModified = modified
-  }
-
   updateRules() {
     this.filterRulesChange.next(this.filterRules)
   }
 
   get textFilter() {
-    return this._textFilter
+    return this.textFilterModifierIsNull ? '' : this._textFilter
   }
 
   set textFilter(value) {
@@ -418,6 +504,9 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     this.documentTypeService
       .listAll()
       .subscribe((result) => (this.documentTypes = result.results))
+    this.storagePathService
+      .listAll()
+      .subscribe((result) => (this.storagePaths = result.results))
 
     this.textFilterDebounce = new Subject<string>()
 
@@ -442,22 +531,20 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     this.updateRules()
   }
 
-  addTag(tagId: number) {
-    this.tagSelectionModel.set(tagId, ToggleableItemState.Selected)
+  toggleTag(tagId: number) {
+    this.tagSelectionModel.toggle(tagId)
   }
 
-  addCorrespondent(correspondentId: number) {
-    this.correspondentSelectionModel.set(
-      correspondentId,
-      ToggleableItemState.Selected
-    )
+  toggleCorrespondent(correspondentId: number) {
+    this.correspondentSelectionModel.toggle(correspondentId)
   }
 
-  addDocumentType(documentTypeId: number) {
-    this.documentTypeSelectionModel.set(
-      documentTypeId,
-      ToggleableItemState.Selected
-    )
+  toggleDocumentType(documentTypeId: number) {
+    this.documentTypeSelectionModel.toggle(documentTypeId)
+  }
+
+  toggleStoragePath(storagePathID: number) {
+    this.storagePathSelectionModel.toggle(storagePathID)
   }
 
   onTagsDropdownOpen() {
@@ -470,6 +557,10 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
 
   onDocumentTypeDropdownOpen() {
     this.documentTypeSelectionModel.apply()
+  }
+
+  onStoragePathDropdownOpen() {
+    this.storagePathSelectionModel.apply()
   }
 
   updateTextFilter(text) {
@@ -497,5 +588,19 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     this.textFilterTarget = target
     this.textFilterInput.nativeElement.focus()
     this.updateRules()
+  }
+
+  textFilterModifierChange() {
+    if (
+      this.textFilterModifierIsNull ||
+      ([
+        TEXT_FILTER_MODIFIER_EQUALS,
+        TEXT_FILTER_MODIFIER_GT,
+        TEXT_FILTER_MODIFIER_LT,
+      ].includes(this.textFilterModifier) &&
+        this._textFilter)
+    ) {
+      this.updateRules()
+    }
   }
 }

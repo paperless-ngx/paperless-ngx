@@ -18,10 +18,12 @@ from documents.models import DocumentType
 from documents.models import SavedView
 from documents.models import SavedViewFilterRule
 from documents.models import Tag
+from documents.models import UiSettings
 from documents.settings import EXPORTER_ARCHIVE_NAME
 from documents.settings import EXPORTER_FILE_NAME
 from documents.settings import EXPORTER_THUMBNAIL_NAME
 from filelock import FileLock
+from paperless import version
 from paperless.db import GnuPG
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
@@ -111,8 +113,8 @@ class Command(BaseCommand):
                 map(lambda f: os.path.abspath(os.path.join(root, f)), files),
             )
 
-        # 2. Create manifest, containing all correspondents, types, tags and
-        # documents
+        # 2. Create manifest, containing all correspondents, types, tags,
+        # documents and ui_settings
         with transaction.atomic():
             manifest = json.loads(
                 serializers.serialize("json", Correspondent.objects.all()),
@@ -149,6 +151,10 @@ class Command(BaseCommand):
 
             manifest += json.loads(serializers.serialize("json", User.objects.all()))
 
+            manifest += json.loads(
+                serializers.serialize("json", UiSettings.objects.all()),
+            )
+
         # 3. Export files from each document
         for index, document_dict in tqdm.tqdm(
             enumerate(document_manifest),
@@ -183,7 +189,7 @@ class Command(BaseCommand):
             original_target = os.path.join(self.target, original_name)
             document_dict[EXPORTER_FILE_NAME] = original_name
 
-            thumbnail_name = base_name + "-thumbnail.png"
+            thumbnail_name = base_name + "-thumbnail.webp"
             thumbnail_target = os.path.join(self.target, thumbnail_name)
             document_dict[EXPORTER_THUMBNAIL_NAME] = thumbnail_name
 
@@ -232,11 +238,17 @@ class Command(BaseCommand):
                         archive_target,
                     )
 
-        # 4. write manifest to target forlder
+        # 4.1 write manifest to target folder
         manifest_path = os.path.abspath(os.path.join(self.target, "manifest.json"))
 
         with open(manifest_path, "w") as f:
             json.dump(manifest, f, indent=2)
+
+        # 4.2 write version information to target folder
+        version_path = os.path.abspath(os.path.join(self.target, "version.json"))
+
+        with open(version_path, "w") as f:
+            json.dump({"version": version.__full_version_str__}, f, indent=2)
 
         if self.delete:
             # 5. Remove files which we did not explicitly export in this run

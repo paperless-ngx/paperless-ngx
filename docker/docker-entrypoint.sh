@@ -2,6 +2,37 @@
 
 set -e
 
+# Adapted from:
+# https://github.com/docker-library/postgres/blob/master/docker-entrypoint.sh
+# usage: file_env VAR
+#    ie: file_env 'XYZ_DB_PASSWORD' will allow for "$XYZ_DB_PASSWORD_FILE" to
+# fill in the value of "$XYZ_DB_PASSWORD" from a file, especially for Docker's
+# secrets feature
+file_env() {
+	local var="$1"
+	local fileVar="${var}_FILE"
+
+	# Basic validation
+	if [ "${!var:-}" ] && [ "${!fileVar:-}" ]; then
+		echo >&2 "error: both $var and $fileVar are set (but are exclusive)"
+		exit 1
+	fi
+
+	# Only export var if the _FILE exists
+	if [ "${!fileVar:-}" ]; then
+		# And the file exists
+		if [[ -f ${!fileVar} ]]; then
+			echo "Setting ${var} from file"
+			val="$(< "${!fileVar}")"
+			export "$var"="$val"
+		else
+			echo "File ${!fileVar} doesn't exist"
+			exit 1
+		fi
+	fi
+
+}
+
 # Source: https://github.com/sameersbn/docker-gitlab/
 map_uidgid() {
 	USERMAP_ORIG_UID=$(id -u paperless)
@@ -15,26 +46,56 @@ map_uidgid() {
 	fi
 }
 
+map_folders() {
+	# Export these so they can be used in docker-prepare.sh
+	export DATA_DIR="${PAPERLESS_DATA_DIR:-/usr/src/paperless/data}"
+	export MEDIA_ROOT_DIR="${PAPERLESS_MEDIA_ROOT:-/usr/src/paperless/media}"
+}
+
 initialize() {
+
+	# Setup environment from secrets before anything else
+	for env_var in \
+		PAPERLESS_DBUSER \
+		PAPERLESS_DBPASS \
+		PAPERLESS_SECRET_KEY \
+		PAPERLESS_AUTO_LOGIN_USERNAME \
+		PAPERLESS_ADMIN_USER \
+		PAPERLESS_ADMIN_MAIL \
+		PAPERLESS_ADMIN_PASSWORD; do
+		# Check for a version of this var with _FILE appended
+		# and convert the contents to the env var value
+		file_env ${env_var}
+	done
+
+	# Change the user and group IDs if needed
 	map_uidgid
 
-	for dir in export data data/index media media/documents media/documents/originals media/documents/thumbnails; do
-		if [[ ! -d "../$dir" ]]; then
-			echo "Creating directory ../$dir"
-			mkdir ../$dir
+	# Check for overrides of certain folders
+	map_folders
+
+	local export_dir="/usr/src/paperless/export"
+
+	for dir in "${export_dir}" "${DATA_DIR}" "${DATA_DIR}/index" "${MEDIA_ROOT_DIR}" "${MEDIA_ROOT_DIR}/documents" "${MEDIA_ROOT_DIR}/documents/originals" "${MEDIA_ROOT_DIR}/documents/thumbnails"; do
+		if [[ ! -d "${dir}" ]]; then
+			echo "Creating directory ${dir}"
+			mkdir "${dir}"
 		fi
 	done
 
-	echo "Creating directory /tmp/paperless"
-	mkdir -p /tmp/paperless
+	local tmp_dir="/tmp/paperless"
+	echo "Creating directory ${tmp_dir}"
+	mkdir -p "${tmp_dir}"
 
 	set +e
 	echo "Adjusting permissions of paperless files. This may take a while."
-	chown -R paperless:paperless /tmp/paperless
-	find .. -not \( -user paperless -and -group paperless \) -exec chown paperless:paperless {} +
+	chown -R paperless:paperless ${tmp_dir}
+	for dir in "${export_dir}" "${DATA_DIR}" "${MEDIA_ROOT_DIR}"; do
+		find "${dir}" -not \( -user paperless -and -group paperless \) -exec chown paperless:paperless {} +
+	done
 	set -e
 
-	gosu paperless /sbin/docker-prepare.sh
+	${gosu_cmd[@]} /sbin/docker-prepare.sh
 }
 
 install_languages() {
@@ -76,6 +137,11 @@ install_languages() {
 
 echo "Paperless-ngx docker container starting..."
 
+gosu_cmd=(gosu paperless)
+if [ $(id -u) == $(id -u paperless) ]; then
+	gosu_cmd=()
+fi
+
 # Install additional languages if specified
 if [[ -n "$PAPERLESS_OCR_LANGUAGES" ]]; then
 	install_languages "$PAPERLESS_OCR_LANGUAGES"
@@ -85,7 +151,7 @@ initialize
 
 if [[ "$1" != "/"* ]]; then
 	echo Executing management command "$@"
-	exec gosu paperless python3 manage.py "$@"
+	exec ${gosu_cmd[@]} python3 manage.py "$@"
 else
 	echo Executing "$@"
 	exec "$@"

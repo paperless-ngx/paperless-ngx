@@ -1,14 +1,16 @@
 import logging
 import os
 import shutil
-import tempfile
-from typing import List  # for type hinting. Can be removed, if only Python >3.8 is used
+from pathlib import Path
+from typing import Type
 
 import tqdm
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.signals import post_save
+from documents import barcodes
 from documents import index
 from documents import sanity_checker
 from documents.classifier import DocumentClassifier
@@ -18,13 +20,12 @@ from documents.consumer import ConsumerError
 from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import StoragePath
 from documents.models import Tag
+from documents.parsers import DocumentParser
+from documents.parsers import get_parser_class_for_mime_type
+from documents.parsers import ParseError
 from documents.sanity_checker import SanityCheckFailedException
-from pdf2image import convert_from_path
-from pikepdf import Pdf
-from PIL import Image
-from PIL import ImageSequence
-from pyzbar import pyzbar
 from whoosh.writing import AsyncWriter
 
 
@@ -52,6 +53,7 @@ def train_classifier():
         not Tag.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
         and not DocumentType.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
         and not Correspondent.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
+        and not StoragePath.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
     ):
 
         return
@@ -74,147 +76,6 @@ def train_classifier():
         logger.warning("Classifier error: " + str(e))
 
 
-def barcode_reader(image) -> List[str]:
-    """
-    Read any barcodes contained in image
-    Returns a list containing all found barcodes
-    """
-    barcodes = []
-    # Decode the barcode image
-    detected_barcodes = pyzbar.decode(image)
-
-    if detected_barcodes:
-        # Traverse through all the detected barcodes in image
-        for barcode in detected_barcodes:
-            if barcode.data:
-                decoded_barcode = barcode.data.decode("utf-8")
-                barcodes.append(decoded_barcode)
-                logger.debug(
-                    f"Barcode of type {str(barcode.type)} found: {decoded_barcode}",
-                )
-    return barcodes
-
-
-def convert_from_tiff_to_pdf(filepath: str) -> str:
-    """
-    converts a given TIFF image file to pdf into a temp. directory.
-    Returns the new pdf file.
-    """
-    file_name = os.path.splitext(os.path.basename(filepath))[0]
-    file_extension = os.path.splitext(os.path.basename(filepath))[1].lower()
-    tempdir = tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR)
-    # use old file name with pdf extension
-    if file_extension == ".tif" or file_extension == ".tiff":
-        newpath = os.path.join(tempdir, file_name + ".pdf")
-    else:
-        logger.warning(f"Cannot convert from {str(file_extension)} to pdf.")
-        return None
-    with Image.open(filepath) as image:
-        images = []
-        for i, page in enumerate(ImageSequence.Iterator(image)):
-            page = page.convert("RGB")
-            images.append(page)
-        try:
-            if len(images) == 1:
-                images[0].save(newpath)
-            else:
-                images[0].save(newpath, save_all=True, append_images=images[1:])
-        except OSError as e:
-            logger.warning(
-                f"Could not save the file as pdf. Error: {str(e)}",
-            )
-            return None
-    return newpath
-
-
-def scan_file_for_separating_barcodes(filepath: str) -> List[int]:
-    """
-    Scan the provided pdf file for page separating barcodes
-    Returns a list of pagenumbers, which separate the file
-    """
-    separator_page_numbers = []
-    separator_barcode = str(settings.CONSUMER_BARCODE_STRING)
-    # use a temporary directory in case the file os too big to handle in memory
-    with tempfile.TemporaryDirectory() as path:
-        pages_from_path = convert_from_path(filepath, output_folder=path)
-        for current_page_number, page in enumerate(pages_from_path):
-            current_barcodes = barcode_reader(page)
-            if separator_barcode in current_barcodes:
-                separator_page_numbers.append(current_page_number)
-    return separator_page_numbers
-
-
-def separate_pages(filepath: str, pages_to_split_on: List[int]) -> List[str]:
-    """
-    Separate the provided pdf file on the pages_to_split_on.
-    The pages which are defined by page_numbers will be removed.
-    Returns a list of (temporary) filepaths to consume.
-    These will need to be deleted later.
-    """
-    os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
-    tempdir = tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR)
-    fname = os.path.splitext(os.path.basename(filepath))[0]
-    pdf = Pdf.open(filepath)
-    document_paths = []
-    logger.debug(f"Temp dir is {str(tempdir)}")
-    if not pages_to_split_on:
-        logger.warning("No pages to split on!")
-    else:
-        # go from the first page to the first separator page
-        dst = Pdf.new()
-        for n, page in enumerate(pdf.pages):
-            if n < pages_to_split_on[0]:
-                dst.pages.append(page)
-        output_filename = f"{fname}_document_0.pdf"
-        savepath = os.path.join(tempdir, output_filename)
-        with open(savepath, "wb") as out:
-            dst.save(out)
-        document_paths = [savepath]
-
-        # iterate through the rest of the document
-        for count, page_number in enumerate(pages_to_split_on):
-            logger.debug(f"Count: {str(count)} page_number: {str(page_number)}")
-            dst = Pdf.new()
-            try:
-                next_page = pages_to_split_on[count + 1]
-            except IndexError:
-                next_page = len(pdf.pages)
-            # skip the first page_number. This contains the barcode page
-            for page in range(page_number + 1, next_page):
-                logger.debug(
-                    f"page_number: {str(page_number)} next_page: {str(next_page)}",
-                )
-                dst.pages.append(pdf.pages[page])
-            output_filename = f"{fname}_document_{str(count + 1)}.pdf"
-            logger.debug(f"pdf no:{str(count)} has {str(len(dst.pages))} pages")
-            savepath = os.path.join(tempdir, output_filename)
-            with open(savepath, "wb") as out:
-                dst.save(out)
-            document_paths.append(savepath)
-    logger.debug(f"Temp files are {str(document_paths)}")
-    return document_paths
-
-
-def save_to_dir(
-    filepath: str,
-    newname: str = None,
-    target_dir: str = settings.CONSUMPTION_DIR,
-):
-    """
-    Copies filepath to target_dir.
-    Optionally rename the file.
-    """
-    if os.path.isfile(filepath) and os.path.isdir(target_dir):
-        dst = shutil.copy(filepath, target_dir)
-        logging.debug(f"saved {str(filepath)} to {str(dst)}")
-        if newname:
-            dst_new = os.path.join(target_dir, newname)
-            logger.debug(f"moving {str(dst)} to {str(dst_new)}")
-            os.rename(dst, dst_new)
-    else:
-        logger.warning(f"{str(filepath)} or {str(target_dir)} don't exist.")
-
-
 def consume_file(
     path,
     override_filename=None,
@@ -223,36 +84,35 @@ def consume_file(
     override_document_type_id=None,
     override_tag_ids=None,
     task_id=None,
+    override_created=None,
 ):
 
     # check for separators in current document
     if settings.CONSUMER_ENABLE_BARCODES:
-        separators = []
-        document_list = []
-        converted_tiff = None
-        if settings.CONSUMER_BARCODE_TIFF_SUPPORT:
-            supported_extensions = [".pdf", ".tiff", ".tif"]
-        else:
-            supported_extensions = [".pdf"]
-        file_extension = os.path.splitext(os.path.basename(path))[1].lower()
-        if file_extension not in supported_extensions:
+
+        mime_type = barcodes.get_file_mime_type(path)
+
+        if not barcodes.supported_file_type(mime_type):
             # if not supported, skip this routine
             logger.warning(
-                f"Unsupported file format for barcode reader: {str(file_extension)}",
+                f"Unsupported file format for barcode reader: {str(mime_type)}",
             )
         else:
-            if file_extension in {".tif", ".tiff"}:
-                file_to_process = convert_from_tiff_to_pdf(path)
+            separators = []
+            document_list = []
+
+            if mime_type == "image/tiff":
+                file_to_process = barcodes.convert_from_tiff_to_pdf(path)
             else:
                 file_to_process = path
 
-            separators = scan_file_for_separating_barcodes(file_to_process)
+            separators = barcodes.scan_file_for_separating_barcodes(file_to_process)
 
             if separators:
                 logger.debug(
                     f"Pages with separators found in: {str(path)}",
                 )
-                document_list = separate_pages(file_to_process, separators)
+                document_list = barcodes.separate_pages(file_to_process, separators)
 
             if document_list:
                 for n, document in enumerate(document_list):
@@ -262,14 +122,18 @@ def consume_file(
                         newname = f"{str(n)}_" + override_filename
                     else:
                         newname = None
-                    save_to_dir(document, newname=newname)
+                    barcodes.save_to_dir(document, newname=newname)
+
                 # if we got here, the document was successfully split
                 # and can safely be deleted
-                if converted_tiff:
+                if mime_type == "image/tiff":
+                    # Remove the TIFF converted to PDF file
                     logger.debug(f"Deleting file {file_to_process}")
                     os.unlink(file_to_process)
+                # Remove the original file (new file is saved above)
                 logger.debug(f"Deleting file {path}")
                 os.unlink(path)
+
                 # notify the sender, otherwise the progress bar
                 # in the UI stays stuck
                 payload = {
@@ -303,6 +167,7 @@ def consume_file(
         override_document_type_id=override_document_type_id,
         override_tag_ids=override_tag_ids,
         task_id=task_id,
+        override_created=override_created,
     )
 
     if document:
@@ -319,9 +184,9 @@ def sanity_check():
 
     messages.log_messages()
 
-    if messages.has_error():
+    if messages.has_error:
         raise SanityCheckFailedException("Sanity check failed with errors. See log.")
-    elif messages.has_warning():
+    elif messages.has_warning:
         return "Sanity check exited with warnings. See log."
     elif len(messages) > 0:
         return "Sanity check exited with infos. See log."
@@ -340,3 +205,46 @@ def bulk_update_documents(document_ids):
     with AsyncWriter(ix) as writer:
         for doc in documents:
             index.update_document(writer, doc)
+
+
+def redo_ocr(document_ids):
+    all_docs = Document.objects.all()
+
+    for doc_pk in document_ids:
+        try:
+            logger.info(f"Parsing document {doc_pk}")
+            doc: Document = all_docs.get(pk=doc_pk)
+        except ObjectDoesNotExist:
+            logger.error(f"Document {doc_pk} does not exist")
+            continue
+
+        # Get the correct parser for this mime type
+        parser_class: Type[DocumentParser] = get_parser_class_for_mime_type(
+            doc.mime_type,
+        )
+        document_parser: DocumentParser = parser_class(
+            "redo-ocr",
+        )
+
+        # Create a file path to copy the original file to for working on
+        temp_file = (Path(document_parser.tempdir) / Path("new-ocr-file")).resolve()
+
+        shutil.copy(doc.source_path, temp_file)
+
+        try:
+            logger.info(
+                f"Using {type(document_parser).__name__} for document",
+            )
+            # Try to re-parse the document into text
+            document_parser.parse(str(temp_file), doc.mime_type)
+
+            doc.content = document_parser.get_text()
+            doc.save()
+            logger.info("Document OCR updated")
+
+        except ParseError as e:
+            logger.error(f"Error parsing document: {e}")
+        finally:
+            # Remove the file path if it was created
+            if temp_file.exists() and temp_file.is_file():
+                temp_file.unlink()

@@ -5,10 +5,14 @@
   "icons": [
     {
       "src": "favicon.ico",
-      "sizes": "128x128"
+      "sizes": "256x256"
+    },
+    {
+      "src": "assets/logo-notext.svg",
+      "sizes": "any"
     }
   ],
-  "name": "Paperless NG",
-  "short_name": "Paperless NG",
+  "name": "Paperless-ngx",
+  "short_name": "Paperless-ngx",
   "start_url": "/"
 }

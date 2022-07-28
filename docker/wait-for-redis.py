@@ -26,9 +26,11 @@ if __name__ == "__main__":
             try:
                 client.ping()
                 break
-            except Exception:
+            except Exception as e:
                 print(
-                    f"Redis ping #{attempt} failed, waiting {RETRY_SLEEP_SECONDS}s",
+                    f"Redis ping #{attempt} failed.\n"
+                    f"Error: {str(e)}.\n"
+                    f"Waiting {RETRY_SLEEP_SECONDS}s",
                     flush=True,
                 )
                 time.sleep(RETRY_SLEEP_SECONDS)

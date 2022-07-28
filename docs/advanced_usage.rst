@@ -7,12 +7,12 @@ easier.
 
 .. _advanced-matching:
 
-Matching tags, correspondents and document types
-################################################
+Matching tags, correspondents, document types, and storage paths
+################################################################
 
-Paperless will compare the matching algorithms defined by every tag and
-correspondent already set in your database to see if they apply to the text in
-a document.  In other words, if you defined a tag called ``Home Utility``
+Paperless will compare the matching algorithms defined by every tag, correspondent,
+document type, and storage path in your database to see if they apply to the text
+in a document. In other words, if you define a tag called ``Home Utility``
 that had a ``match`` property of ``bc hydro`` and a ``matching_algorithm`` of
 ``literal``, Paperless will automatically tag your newly-consumed document with
 your ``Home Utility`` tag so long as the text ``bc hydro`` appears in the body
@@ -22,10 +22,10 @@ The matching logic is quite powerful. It supports searching the text of your
 document with different algorithms, and as such, some experimentation may be
 necessary to get things right.
 
-In order to have a tag, correspondent, or type assigned automatically to newly
-consumed documents, assign a match and matching algorithm using the web
-interface. These settings define when to assign correspondents, tags, and types
-to documents.
+In order to have a tag, correspondent, document type, or storage path assigned
+automatically to newly consumed documents, assign a match and matching algorithm
+using the web interface. These settings define when to assign tags, correspondents,
+document types, and storage paths to documents.
 
 The following algorithms are available:
 
@@ -37,7 +37,7 @@ The following algorithms are available:
 * **Literal:** Matches only if the match appears exactly as provided (i.e. preserve ordering) in the PDF.
 * **Regular expression:** Parses the match as a regular expression and tries to
   find a match within the document.
-* **Fuzzy match:** I dont know. Look at the source.
+* **Fuzzy match:** I don't know. Look at the source.
 * **Auto:** Tries to automatically match new documents. This does not require you
   to set a match. See the notes below.
 
@@ -47,9 +47,9 @@ defining a match text of ``"Bank of America" BofA`` using the *any* algorithm,
 will match documents that contain either "Bank of America" or "BofA", but will
 not match documents containing "Bank of South America".
 
-Then just save your tag/correspondent and run another document through the
-consumer.  Once complete, you should see the newly-created document,
-automatically tagged with the appropriate data.
+Then just save your tag, correspondent, document type, or storage path and run
+another document through the consumer.  Once complete, you should see the
+newly-created document, automatically tagged with the appropriate data.
 
 
 .. _advanced-automatic_matching:
@@ -58,9 +58,9 @@ Automatic matching
 ==================
 
 Paperless-ngx comes with a new matching algorithm called *Auto*. This matching
-algorithm tries to assign tags, correspondents, and document types to your
-documents based on how you have already assigned these on existing documents. It
-uses a neural network under the hood.
+algorithm tries to assign tags, correspondents, document types, and storage paths
+to your documents based on how you have already assigned these on existing documents.
+It uses a neural network under the hood.
 
 If, for example, all your bank statements of your account 123 at the Bank of
 America are tagged with the tag "bofa_123" and the matching algorithm of this
@@ -80,20 +80,21 @@ feature:
   that the neural network only learns from documents which you have correctly
   tagged before.
 * The matching algorithm can only work if there is a correlation between the
-  tag, correspondent, or document type and the document itself. Your bank
-  statements usually contain your bank account number and the name of the bank,
-  so this works reasonably well, However, tags such as "TODO" cannot be
-  automatically assigned.
+  tag, correspondent, document type, or storage path and the document itself.
+  Your bank statements usually contain your bank account number and the name
+  of the bank, so this works reasonably well, However, tags such as "TODO"
+  cannot be automatically assigned.
 * The matching algorithm needs a reasonable number of documents to identify when
-  to assign tags, correspondents, and types. If one out of a thousand documents
-  has the correspondent "Very obscure web shop I bought something five years
-  ago", it will probably not assign this correspondent automatically if you buy
-  something from them again. The more documents, the better.
+  to assign tags, correspondents, storage paths, and types. If one out of a
+  thousand documents has the correspondent "Very obscure web shop I bought
+  something five years ago", it will probably not assign this correspondent
+  automatically if you buy something from them again. The more documents, the better.
 * Paperless also needs a reasonable amount of negative examples to decide when
-  not to assign a certain tag, correspondent or type. This will usually be the
-  case as you start filling up paperless with documents. Example: If all your
-  documents are either from "Webshop" and "Bank", paperless will assign one of
-  these correspondents to ANY new document, if both are set to automatic matching.
+  not to assign a certain tag, correspondent, document type, or storage path. This will
+  usually be the case as you start filling up paperless with documents.
+  Example: If all your documents are either from "Webshop" and "Bank", paperless
+  will assign one of these correspondents to ANY new document, if both are set
+  to automatic matching.
 
 Hooking into the consumption process
 ####################################
@@ -120,10 +121,10 @@ Pre-consumption script
 ======================
 
 Executed after the consumer sees a new document in the consumption folder, but
-before any processing of the document is performed. This script receives exactly
-one argument:
+before any processing of the document is performed. This script can access the
+following relevant environment variables set:
 
-* Document file name
+* ``DOCUMENT_SOURCE_PATH``
 
 A simple but common example for this would be creating a simple script like
 this:
@@ -133,7 +134,7 @@ this:
 .. code:: bash
 
     #!/usr/bin/env bash
-    pdf2pdfocr.py -i ${1}
+    pdf2pdfocr.py -i ${DOCUMENT_SOURCE_PATH}
 
 ``/etc/paperless.conf``
 
@@ -156,16 +157,20 @@ Post-consumption script
 =======================
 
 Executed after the consumer has successfully processed a document and has moved it
-into paperless. It receives the following arguments:
+into paperless. It receives the following environment variables:
 
-* Document id
-* Generated file name
-* Source path
-* Thumbnail path
-* Download URL
-* Thumbnail URL
-* Correspondent
-* Tags
+* ``DOCUMENT_ID``
+* ``DOCUMENT_FILE_NAME``
+* ``DOCUMENT_CREATED``
+* ``DOCUMENT_MODIFIED``
+* ``DOCUMENT_ADDED``
+* ``DOCUMENT_SOURCE_PATH``
+* ``DOCUMENT_ARCHIVE_PATH``
+* ``DOCUMENT_THUMBNAIL_PATH``
+* ``DOCUMENT_DOWNLOAD_URL``
+* ``DOCUMENT_THUMBNAIL_URL``
+* ``DOCUMENT_CORRESPONDENT``
+* ``DOCUMENT_TAGS``
 
 The script can be in any language, but for a simple shell script
 example, you can take a look at `post-consumption-example.sh`_ in this project.
@@ -269,6 +274,17 @@ append ``_01``, ``_02``, etc to the filename. This happens if all the placeholde
 evaluate to the same value.
 
 .. hint::
+    You can affect how empty placeholders are treated by changing the following setting to
+    `true`.
+
+    .. code::
+
+        PAPERLESS_FILENAME_FORMAT_REMOVE_NONE=True
+
+    Doing this results in all empty placeholders resolving to "" instead of "none" as stated above.
+    Spaces before empty placeholders are removed as well, empty directories are omitted.
+
+.. hint::
 
     Paperless checks the filename of a document whenever it is saved. Therefore,
     you need to update the filenames of your documents and move them after altering
@@ -290,3 +306,59 @@ evaluate to the same value.
 
     However, keep in mind that inside docker, if files get stored outside of the
     predefined volumes, they will be lost after a restart of paperless.
+
+
+Storage paths
+#############
+
+One of the best things in Paperless is that you can not only access the documents via the
+web interface, but also via the file system.
+
+When as single storage layout is not sufficient for your use case, storage paths come to
+the rescue. Storage paths allow you to configure more precisely where each document is stored
+in the file system.
+
+- Each storage path is a `PAPERLESS_FILENAME_FORMAT` and follows the rules described above
+- Each document is assigned a storage path using the matching algorithms described above, but
+  can be overwritten at any time
+
+For example, you could define the following two storage paths:
+
+1. Normal communications are put into a folder structure sorted by `year/correspondent`
+2. Communications with insurance companies are stored in a flat structure with longer file names,
+   but containing the full date of the correspondence.
+
+.. code::
+
+    By Year = {created_year}/{correspondent}/{title}
+    Insurances = Insurances/{correspondent}/{created_year}-{created_month}-{created_day} {title}
+
+
+If you then map these storage paths to the documents, you might get the following result.
+For simplicity, `By Year` defines the same structure as in the previous example above.
+
+.. code:: text
+
+   2019/                                   # By Year
+      My bank/
+        Statement January.pdf
+        Statement February.pdf
+
+    Insurances/                           # Insurances
+      Healthcare 123/
+        2022-01-01 Statement January.pdf
+        2022-02-02 Letter.pdf
+        2022-02-03 Letter.pdf
+      Dental 456/
+        2021-12-01 New Conditions.pdf
+
+
+.. hint::
+
+    Defining a storage path is optional. If no storage path is defined for a document, the global
+    `PAPERLESS_FILENAME_FORMAT` is applied.
+
+.. caution::
+
+    If you adjust the format of an existing storage path, old documents don't get relocated automatically.
+    You need to run the :ref:`document renamer <utilities-renamer>` to adjust their pathes.

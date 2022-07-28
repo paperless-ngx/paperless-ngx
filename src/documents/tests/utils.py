@@ -19,6 +19,7 @@ def setup_directories():
     dirs.scratch_dir = tempfile.mkdtemp()
     dirs.media_dir = tempfile.mkdtemp()
     dirs.consumption_dir = tempfile.mkdtemp()
+    dirs.static_dir = tempfile.mkdtemp()
     dirs.index_dir = os.path.join(dirs.data_dir, "index")
     dirs.originals_dir = os.path.join(dirs.media_dir, "documents", "originals")
     dirs.thumbnail_dir = os.path.join(dirs.media_dir, "documents", "thumbnails")
@@ -42,6 +43,7 @@ def setup_directories():
         CONSUMPTION_DIR=dirs.consumption_dir,
         LOGGING_DIR=dirs.logging_dir,
         INDEX_DIR=dirs.index_dir,
+        STATIC_ROOT=dirs.static_dir,
         MODEL_FILE=os.path.join(dirs.data_dir, "classification_model.pickle"),
         MEDIA_LOCK=os.path.join(dirs.media_dir, "media.lock"),
     )
@@ -55,6 +57,7 @@ def remove_dirs(dirs):
     shutil.rmtree(dirs.data_dir, ignore_errors=True)
     shutil.rmtree(dirs.scratch_dir, ignore_errors=True)
     shutil.rmtree(dirs.consumption_dir, ignore_errors=True)
+    shutil.rmtree(dirs.static_dir, ignore_errors=True)
     dirs.settings_override.disable()
 
 

@@ -53,27 +53,43 @@
         [(selectionModel)]="documentTypeSelectionModel"
         (apply)="setDocumentTypes($event)">
       </app-filterable-dropdown>
+      <app-filterable-dropdown class="me-2 me-md-3" title="Storage path" icon="folder-fill" i18n-title
+        filterPlaceholder="Filter storage paths" i18n-filterPlaceholder
+        [items]="storagePaths"
+        [editing]="true"
+        [applyOnClose]="applyOnClose"
+        (open)="openStoragePathDropdown()"
+        [(selectionModel)]="storagePathsSelectionModel"
+        (apply)="setStoragePaths($event)">
+      </app-filterable-dropdown>
     </div>
   </div>
   <div class="col-auto ms-auto mb-2 mb-xl-0 d-flex">
     <div class="btn-group btn-group-sm me-2">
-      <button type="button" [disabled]="awaitingDownload" class="btn btn-outline-primary btn-sm" (click)="downloadSelected()">
-        <svg *ngIf="!awaitingDownload" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
-          <use xlink:href="assets/bootstrap-icons.svg#download" />
-        </svg>
-        <div *ngIf="awaitingDownload" class="spinner-border spinner-border-sm" role="status">
-          <span class="visually-hidden">Preparing download...</span>
-        </div>
-        &nbsp;
-        <ng-container i18n>Download</ng-container>
-      </button>
-      <div class="btn-group" ngbDropdown role="group" aria-label="Button group with nested dropdown">
-        <button [disabled]="awaitingDownload" class="btn btn-outline-primary btn-sm dropdown-toggle-split" ngbDropdownToggle></button>
-        <div class="dropdown-menu shadow" ngbDropdownMenu>
-          <button ngbDropdownItem i18n (click)="downloadSelected('originals')">Download originals</button>
+
+      <div ngbDropdown class="me-2 d-flex">
+        <button class="btn btn-sm btn-outline-primary" id="dropdownSelect" ngbDropdownToggle>
+          <svg class="toolbaricon" fill="currentColor">
+            <use xlink:href="assets/bootstrap-icons.svg#three-dots" />
+          </svg>
+          <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Actions</ng-container></div>
+        </button>
+        <div ngbDropdownMenu aria-labelledby="dropdownSelect" class="shadow">
+          <button ngbDropdownItem [disabled]="awaitingDownload" (click)="downloadSelected()" i18n>
+            Download
+            <div *ngIf="awaitingDownload" class="spinner-border spinner-border-sm" role="status">
+              <span class="visually-hidden">Preparing download...</span>
+            </div>
+          </button>
+          <button ngbDropdownItem [disabled]="awaitingDownload" (click)="downloadSelected('originals')" i18n>
+            Download originals
+            <div *ngIf="awaitingDownload" class="spinner-border spinner-border-sm" role="status">
+              <span class="visually-hidden">Preparing download...</span>
+            </div>
+          </button>
+          <button ngbDropdownItem (click)="redoOcrSelected()" i18n>Redo OCR</button>
         </div>
       </div>
-    </div>
 
     <button type="button" class="btn btn-sm btn-outline-danger" (click)="applyDelete()">
       <svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">

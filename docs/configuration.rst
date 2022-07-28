@@ -31,7 +31,7 @@ PAPERLESS_REDIS=<url>
 
 PAPERLESS_DBHOST=<hostname>
     By default, sqlite is used as the database backend. This can be changed here.
-    Set PAPERLESS_DBHOST and PostgreSQL will be used instead of mysql.
+    Set PAPERLESS_DBHOST and PostgreSQL will be used instead of sqlite.
 
 PAPERLESS_DBPORT=<port>
     Adjust port if necessary.
@@ -59,6 +59,13 @@ PAPERLESS_DBSSLMODE=<mode>
     See `the official documentation about sslmode <https://www.postgresql.org/docs/current/libpq-ssl.html>`_.
 
     Default is ``prefer``.
+
+PAPERLESS_DB_TIMEOUT=<float>
+    Amount of time for a database connection to wait for the database to unlock.
+    Mostly applicable for an sqlite based installation, consider changing to postgresql
+    if you need to increase this.
+
+    Defaults to unset, keeping the Django defaults.
 
 Paths and folders
 #################
@@ -110,6 +117,14 @@ PAPERLESS_FILENAME_FORMAT=<format>
     See :ref:`advanced-file_name_handling` for details.
 
     Default is none, which disables this feature.
+
+PAPERLESS_FILENAME_FORMAT_REMOVE_NONE=<bool>
+    Tells paperless to replace placeholders in `PAPERLESS_FILENAME_FORMAT` that would resolve
+    to 'none' to be omitted from the resulting filename. This also holds true for directory
+    names.
+    See :ref:`advanced-file_name_handling` for details.
+
+    Defaults to `false` which disables this feature.
 
 PAPERLESS_LOGGING_DIR=<path>
     This is where paperless will store log files.
@@ -416,14 +431,23 @@ PAPERLESS_OCR_IMAGE_DPI=<num>
     the produced PDF documents are A4 sized.
 
 PAPERLESS_OCR_MAX_IMAGE_PIXELS=<num>
-    Paperless will not OCR images that have more pixels than this limit.
-    This is intended to prevent decompression bombs from overloading paperless.
-    Increasing this limit is desired if you face a DecompressionBombError despite
-    the concerning file not being malicious; this could e.g. be caused by invalidly
-    recognized metadata.
-    If you have enough resources or if you are certain that your uploaded files
-    are not malicious you can increase this value to your needs.
-    The default value is 256000000, an image with more pixels than that would not be parsed.
+    Paperless will raise a warning when OCRing images which are over this limit and
+    will not OCR images which are more than twice this limit.  Note this does not
+    prevent the document from being consumed, but could result in missing text content.
+
+    If unset, will default to the value determined by
+    `Pillow <https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.MAX_IMAGE_PIXELS>`_.
+
+    .. note::
+
+        Increasing this limit could cause Paperless to consume additional resources
+        when consuming a file.  Be sure you have sufficient system resources.
+
+    .. caution::
+
+        The limit is intended to prevent malicious files from consuming system resources
+        and causing crashes and other errors.  Only increase this value if you are certain
+        your documents are not malicious and you need the text which was not OCRed
 
 PAPERLESS_OCR_USER_ARGS=<json>
     OCRmyPDF offers many more options. Use this parameter to specify any
@@ -519,6 +543,8 @@ PAPERLESS_TASK_WORKERS=<num>
     maintain the automatic matching algorithm, check emails, consume documents,
     etc. This variable specifies how many things it will do in parallel.
 
+    Defaults to 1
+
 
 PAPERLESS_THREADS_PER_WORKER=<num>
     Furthermore, paperless uses multiple threads when consuming documents to
@@ -590,6 +616,28 @@ PAPERLESS_CONSUMER_POLLING=<num>
 
     Defaults to 0, which disables polling and uses filesystem notifications.
 
+PAPERLESS_CONSUMER_POLLING_RETRY_COUNT=<num>
+    If consumer polling is enabled, sets the number of times paperless will check for a
+    file to remain unmodified.
+
+    Defaults to 5.
+
+PAPERLESS_CONSUMER_POLLING_DELAY=<num>
+    If consumer polling is enabled, sets the delay in seconds between each check (above) paperless
+    will do while waiting for a file to remain unmodified.
+
+    Defaults to 5.
+
+.. _configuration-inotify:
+
+PAPERLESS_CONSUMER_INOTIFY_DELAY=<num>
+    Sets the time in seconds the consumer will wait for additional events
+    from inotify before the consumer will consider a file ready and begin consumption.
+    Certain scanners or network setups may generate multiple events for a single file,
+    leading to multiple consumers working on the same file.  Configure this to
+    prevent that.
+
+    Defaults to 0.5 seconds.
 
 PAPERLESS_CONSUMER_DELETE_DUPLICATES=<bool>
     When the consumer detects a duplicate document, it will not touch the
@@ -650,7 +698,6 @@ PAPERLESS_CONSUMER_BARCODE_STRING=PATCHT
 
   Defaults to "PATCHT"
 
-
 PAPERLESS_CONVERT_MEMORY_LIMIT=<num>
     On smaller systems, or even in the case of Very Large Documents, the consumer
     may explode, complaining about how it's "unable to extend pixel cache".  In
@@ -674,13 +721,6 @@ PAPERLESS_CONVERT_TMPDIR=<path>
 
     Default is none, which disables the temporary directory.
 
-PAPERLESS_OPTIMIZE_THUMBNAILS=<bool>
-    Use optipng to optimize thumbnails. This usually reduces the size of
-    thumbnails by about 20%, but uses considerable compute time during
-    consumption.
-
-    Defaults to true.
-
 PAPERLESS_POST_CONSUME_SCRIPT=<filename>
     After a document is consumed, Paperless can trigger an arbitrary script if
     you like.  This script will be passed a number of arguments for you to work
@@ -695,6 +735,9 @@ PAPERLESS_FILENAME_DATE_ORDER=<format>
     https://dateparser.readthedocs.io/en/latest/settings.html#date-order.
     The filename will be checked first, and if nothing is found, the document
     text will be checked as normal.
+
+    A date in a filename must have some separators (`.`, `-`, `/`, etc)
+    for it to be parsed.
 
     Defaults to none, which disables this feature.
 
@@ -713,10 +756,7 @@ PAPERLESS_IGNORE_DATES=<string>
     this process. This is useful for special dates (like date of birth) that appear
     in documents regularly but are very unlikely to be the documents creation date.
 
-    You may specify dates in a multitude of formats supported by dateparser (see
-    https://dateparser.readthedocs.io/en/latest/#popular-formats) but as the dates
-    need to be comma separated, the options are limited.
-    Example: "2020-12-02,22.04.1999"
+    The date is parsed using the order specified in PAPERLESS_DATE_ORDER
 
     Defaults to an empty string to not ignore any dates.
 
@@ -751,9 +791,6 @@ PAPERLESS_CONVERT_BINARY=<path>
 PAPERLESS_GS_BINARY=<path>
     Defaults to "/usr/bin/gs".
 
-PAPERLESS_OPTIPNG_BINARY=<path>
-    Defaults to "/usr/bin/optipng".
-
 
 .. _configuration-docker:
 
@@ -769,9 +806,7 @@ PAPERLESS_WEBSERVER_WORKERS=<num>
     also loads the entire application into memory separately, so increasing this value
     will increase RAM usage.
 
-    Consider configuring this to 1 on low power devices with limited amount of RAM.
-
-    Defaults to 2.
+    Defaults to 1.
 
 PAPERLESS_PORT=<port>
     The port number the webserver will listen on inside the container. There are

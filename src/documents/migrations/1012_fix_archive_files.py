@@ -83,7 +83,7 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
     path = ""
 
     try:
-        if settings.PAPERLESS_FILENAME_FORMAT is not None:
+        if settings.FILENAME_FORMAT is not None:
             tags = defaultdictNoStr(lambda: slugify(None), many_to_dictionary(doc.tags))
 
             tag_list = pathvalidate.sanitize_filename(
@@ -105,7 +105,7 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
             else:
                 document_type = "none"
 
-            path = settings.PAPERLESS_FILENAME_FORMAT.format(
+            path = settings.FILENAME_FORMAT.format(
                 title=pathvalidate.sanitize_filename(doc.title, replacement_text="-"),
                 correspondent=correspondent,
                 document_type=document_type,
@@ -128,7 +128,7 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
     except (ValueError, KeyError, IndexError):
         logger.warning(
             f"Invalid PAPERLESS_FILENAME_FORMAT: "
-            f"{settings.PAPERLESS_FILENAME_FORMAT}, falling back to default"
+            f"{settings.FILENAME_FORMAT}, falling back to default"
         )
 
     counter_str = f"_{counter:02}" if counter else ""

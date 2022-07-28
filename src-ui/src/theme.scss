@@ -39,7 +39,7 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
     background-image: escape-svg($form-check-radio-checked-bg-image-dark);
   }
 
-  .btn-close {
+  .toast .btn-close {
     filter: none !important;
   }
 }
@@ -186,7 +186,8 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
 
   .toast,
   .toast .toast-header,
-  .toast .btn-close {
+  .toast .btn,
+  .toast .btn-close, {
     color: var(--pngx-primary-text-contrast);
   }
 }

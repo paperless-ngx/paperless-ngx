@@ -190,7 +190,7 @@ class TestExportImport(DirectoriesMixin, TestCase):
             self.assertEqual(Document.objects.get(id=self.d4.id).title, "wow_dec")
             messages = check_sanity()
             # everything is alright after the test
-            self.assertEqual(len(messages), 0, str([str(m) for m in messages]))
+            self.assertEqual(len(messages), 0)
 
     def test_exporter_with_filename_format(self):
         shutil.rmtree(os.path.join(self.dirs.media_dir, "documents"))
@@ -200,7 +200,7 @@ class TestExportImport(DirectoriesMixin, TestCase):
         )
 
         with override_settings(
-            PAPERLESS_FILENAME_FORMAT="{created_year}/{correspondent}/{title}",
+            FILENAME_FORMAT="{created_year}/{correspondent}/{title}",
         ):
             self.test_exporter(use_filename_format=True)
 
@@ -309,7 +309,7 @@ class TestExportImport(DirectoriesMixin, TestCase):
 
         self.assertTrue(len(manifest), 6)
 
-    @override_settings(PAPERLESS_FILENAME_FORMAT="{title}/{correspondent}")
+    @override_settings(FILENAME_FORMAT="{title}/{correspondent}")
     def test_update_export_changed_location(self):
         shutil.rmtree(os.path.join(self.dirs.media_dir, "documents"))
         shutil.copytree(

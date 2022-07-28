@@ -1,5 +1,4 @@
 import {
-  AfterViewInit,
   Component,
   OnDestroy,
   OnInit,
@@ -20,10 +19,7 @@ import {
 } from 'src/app/directives/sortable.directive'
 import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import {
-  filterRulesFromQueryParams,
-  QueryParamsService,
-} from 'src/app/services/query-params.service'
+import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import {
   DOCUMENT_SORT_FIELDS,
   DOCUMENT_SORT_FIELDS_FULLTEXT,
@@ -38,7 +34,7 @@ import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-vi
   templateUrl: './document-list.component.html',
   styleUrls: ['./document-list.component.scss'],
 })
-export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
+export class DocumentListComponent implements OnInit, OnDestroy {
   constructor(
     public list: DocumentListViewService,
     public savedViewService: SavedViewService,
@@ -47,7 +43,7 @@ export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
     private toastService: ToastService,
     private modalService: NgbModal,
     private consumerStatusService: ConsumerStatusService,
-    private queryParamsService: QueryParamsService
+    public openDocumentsService: OpenDocumentsService
   ) {}
 
   @ViewChild('filterEditor')
@@ -75,26 +71,24 @@ export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
       : DOCUMENT_SORT_FIELDS
   }
 
-  set listSort(reverse: boolean) {
+  set listSortReverse(reverse: boolean) {
     this.list.sortReverse = reverse
-    this.queryParamsService.sortField = this.list.sortField
-    this.queryParamsService.sortReverse = reverse
   }
 
-  get listSort(): boolean {
+  get listSortReverse(): boolean {
     return this.list.sortReverse
   }
 
   setSortField(field: string) {
     this.list.sortField = field
-    this.queryParamsService.sortField = field
-    this.queryParamsService.sortReverse = this.listSort
   }
 
   onSort(event: SortEvent) {
     this.list.setSort(event.column, event.reverse)
-    this.queryParamsService.sortField = event.column
-    this.queryParamsService.sortReverse = event.reverse
+  }
+
+  setPage(page: number) {
+    this.list.currentPage = page
   }
 
   get isBulkEditing(): boolean {
@@ -134,7 +128,6 @@ export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
         }
         this.list.activateSavedView(view)
         this.list.reload()
-        this.queryParamsService.updateFromView(view)
         this.unmodifiedFilterRules = view.filter_rules
       })
 
@@ -149,19 +142,9 @@ export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
           this.loadViewConfig(parseInt(queryParams.get('view')))
         } else {
           this.list.activateSavedView(null)
-          this.queryParamsService.parseQueryParams(queryParams)
+          this.list.loadFromQueryParams(queryParams)
           this.unmodifiedFilterRules = []
         }
-      })
-  }
-
-  ngAfterViewInit(): void {
-    this.filterEditor.filterRulesChange
-      .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe({
-        next: (filterRules) => {
-          this.queryParamsService.updateFilterRules(filterRules)
-        },
       })
   }
 
@@ -176,9 +159,8 @@ export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
       .getCached(viewId)
       .pipe(first())
       .subscribe((view) => {
-        this.list.loadSavedView(view)
+        this.list.activateSavedView(view)
         this.list.reload()
-        this.queryParamsService.updateFromView(view)
       })
   }
 
@@ -247,27 +229,26 @@ export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
 
   clickTag(tagID: number) {
     this.list.selectNone()
-    setTimeout(() => {
-      this.filterEditor.addTag(tagID)
-    })
+    this.filterEditor.toggleTag(tagID)
   }
 
   clickCorrespondent(correspondentID: number) {
     this.list.selectNone()
-    setTimeout(() => {
-      this.filterEditor.addCorrespondent(correspondentID)
-    })
+    this.filterEditor.toggleCorrespondent(correspondentID)
   }
 
   clickDocumentType(documentTypeID: number) {
     this.list.selectNone()
-    setTimeout(() => {
-      this.filterEditor.addDocumentType(documentTypeID)
-    })
+    this.filterEditor.toggleDocumentType(documentTypeID)
+  }
+
+  clickStoragePath(storagePathID: number) {
+    this.list.selectNone()
+    this.filterEditor.toggleStoragePath(storagePathID)
   }
 
   clickMoreLike(documentID: number) {
-    this.queryParamsService.navigateWithFilterRules([
+    this.list.quickFilter([
       { rule_type: FILTER_FULLTEXT_MORELIKE, value: documentID.toString() },
     ])
   }

@@ -1,0 +1,147 @@
+# This workflow will run to update the installer library of
+# Docker images.  These are the images which provide updated wheels
+# .deb installation packages or maybe just some compiled library
+
+name: Build Image Library
+
+on:
+  push:
+    # Must match one of these branches AND one of the paths
+    # to be triggered
+    branches:
+      - "main"
+      - "dev"
+      - "library-*"
+      - "feature-*"
+    paths:
+      # Trigger the workflow if a Dockerfile changed
+      - "docker-builders/**"
+      # Trigger if a package was updated
+      - ".build-config.json"
+      - "Pipfile.lock"
+      # Also trigger on workflow changes related to the library
+      - ".github/workflows/installer-library.yml"
+      - ".github/workflows/reusable-workflow-builder.yml"
+      - ".github/scripts/**"
+
+# Set a workflow level concurrency group so primary workflow
+# can wait for this to complete if needed
+# DO NOT CHANGE without updating main workflow group
+concurrency:
+  group: build-installer-library
+  cancel-in-progress: false
+
+jobs:
+  prepare-docker-build:
+    name: Prepare Docker Image Version Data
+    runs-on: ubuntu-20.04
+    steps:
+      -
+        name: Set ghcr repository name
+        id: set-ghcr-repository
+        run: |
+          ghcr_name=$(echo "${GITHUB_REPOSITORY}" | awk '{ print tolower($0) }')
+          echo ::set-output name=repository::${ghcr_name}
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+      -
+        name: Setup qpdf image
+        id: qpdf-setup
+        run: |
+          build_json=$(python ${GITHUB_WORKSPACE}/.github/scripts/get-build-json.py qpdf)
+
+          echo ${build_json}
+
+          echo ::set-output name=qpdf-json::${build_json}
+      -
+        name: Setup psycopg2 image
+        id: psycopg2-setup
+        run: |
+          build_json=$(python ${GITHUB_WORKSPACE}/.github/scripts/get-build-json.py psycopg2)
+
+          echo ${build_json}
+
+          echo ::set-output name=psycopg2-json::${build_json}
+      -
+        name: Setup pikepdf image
+        id: pikepdf-setup
+        run: |
+          build_json=$(python ${GITHUB_WORKSPACE}/.github/scripts/get-build-json.py pikepdf)
+
+          echo ${build_json}
+
+          echo ::set-output name=pikepdf-json::${build_json}
+      -
+        name: Setup jbig2enc image
+        id: jbig2enc-setup
+        run: |
+          build_json=$(python ${GITHUB_WORKSPACE}/.github/scripts/get-build-json.py jbig2enc)
+
+          echo ${build_json}
+
+          echo ::set-output name=jbig2enc-json::${build_json}
+
+    outputs:
+
+      ghcr-repository: ${{ steps.set-ghcr-repository.outputs.repository }}
+
+      qpdf-json: ${{ steps.qpdf-setup.outputs.qpdf-json }}
+
+      pikepdf-json: ${{ steps.pikepdf-setup.outputs.pikepdf-json }}
+
+      psycopg2-json: ${{ steps.psycopg2-setup.outputs.psycopg2-json }}
+
+      jbig2enc-json: ${{ steps.jbig2enc-setup.outputs.jbig2enc-json}}
+
+  build-qpdf-debs:
+    name: qpdf
+    needs:
+      - prepare-docker-build
+    uses: ./.github/workflows/reusable-workflow-builder.yml
+    with:
+      dockerfile: ./docker-builders/Dockerfile.qpdf
+      build-json: ${{ needs.prepare-docker-build.outputs.qpdf-json }}
+      build-args: |
+        QPDF_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.qpdf-json).version }}
+
+  build-jbig2enc:
+    name: jbig2enc
+    needs:
+      - prepare-docker-build
+    uses: ./.github/workflows/reusable-workflow-builder.yml
+    with:
+      dockerfile: ./docker-builders/Dockerfile.jbig2enc
+      build-json: ${{ needs.prepare-docker-build.outputs.jbig2enc-json }}
+      build-args: |
+        JBIG2ENC_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.jbig2enc-json).version }}
+
+  build-psycopg2-wheel:
+    name: psycopg2
+    needs:
+      - prepare-docker-build
+    uses: ./.github/workflows/reusable-workflow-builder.yml
+    with:
+      dockerfile: ./docker-builders/Dockerfile.psycopg2
+      build-json: ${{ needs.prepare-docker-build.outputs.psycopg2-json }}
+      build-args: |
+        PSYCOPG2_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.psycopg2-json).version }}
+
+  build-pikepdf-wheel:
+    name: pikepdf
+    needs:
+      - prepare-docker-build
+      - build-qpdf-debs
+    uses: ./.github/workflows/reusable-workflow-builder.yml
+    with:
+      dockerfile: ./docker-builders/Dockerfile.pikepdf
+      build-json: ${{ needs.prepare-docker-build.outputs.pikepdf-json }}
+      build-args: |
+        REPO=${{ needs.prepare-docker-build.outputs.ghcr-repository }}
+        QPDF_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.qpdf-json).version }}
+        PIKEPDF_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.pikepdf-json).version }}

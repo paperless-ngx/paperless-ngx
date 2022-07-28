@@ -6,12 +6,13 @@ import { HttpClient, HttpParams } from '@angular/common/http'
 import { Observable } from 'rxjs'
 import { Results } from 'src/app/data/results'
 import { FilterRule } from 'src/app/data/filter-rule'
-import { map } from 'rxjs/operators'
+import { map, tap } from 'rxjs/operators'
 import { CorrespondentService } from './correspondent.service'
 import { DocumentTypeService } from './document-type.service'
 import { TagService } from './tag.service'
 import { PaperlessDocumentSuggestions } from 'src/app/data/paperless-document-suggestions'
-import { filterRulesToQueryParams } from '../query-params.service'
+import { queryParamsFromFilterRules } from '../../utils/query-params'
+import { StoragePathService } from './storage-path.service'
 
 export const DOCUMENT_SORT_FIELDS = [
   { field: 'archive_serial_number', name: $localize`ASN` },
@@ -37,6 +38,7 @@ export interface SelectionDataItem {
 }
 
 export interface SelectionData {
+  selected_storage_paths: SelectionDataItem[]
   selected_correspondents: SelectionDataItem[]
   selected_tags: SelectionDataItem[]
   selected_document_types: SelectionDataItem[]
@@ -52,7 +54,8 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
     http: HttpClient,
     private correspondentService: CorrespondentService,
     private documentTypeService: DocumentTypeService,
-    private tagService: TagService
+    private tagService: TagService,
+    private storagePathService: StoragePathService
   ) {
     super(http, 'documents')
   }
@@ -67,7 +70,16 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
       doc.document_type$ = this.documentTypeService.getCached(doc.document_type)
     }
     if (doc.tags) {
-      doc.tags$ = this.tagService.getCachedMany(doc.tags)
+      doc.tags$ = this.tagService
+        .getCachedMany(doc.tags)
+        .pipe(
+          tap((tags) =>
+            tags.sort((tagA, tagB) => tagA.name.localeCompare(tagB.name))
+          )
+        )
+    }
+    if (doc.storage_path) {
+      doc.storage_path$ = this.storagePathService.getCached(doc.storage_path)
     }
     return doc
   }
@@ -85,7 +97,7 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
       pageSize,
       sortField,
       sortReverse,
-      Object.assign(extraParams, filterRulesToQueryParams(filterRules))
+      Object.assign(extraParams, queryParamsFromFilterRules(filterRules))
     ).pipe(
       map((results) => {
         results.results.forEach((doc) => this.addObservablesToDocument(doc))
@@ -119,6 +131,12 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
       url += '?original=true'
     }
     return url
+  }
+
+  update(o: PaperlessDocument): Observable<PaperlessDocument> {
+    // we want to only set created_date
+    o.created = undefined
+    return super.update(o)
   }
 
   uploadDocument(formData) {

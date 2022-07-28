@@ -87,31 +87,6 @@ def fake_get_thumbnail(self, path, mimetype, file_name):
     return os.path.join(os.path.dirname(__file__), "examples", "no-text.png")
 
 
-class TestBaseParser(TestCase):
-    def setUp(self) -> None:
-
-        self.scratch = tempfile.mkdtemp()
-        override_settings(SCRATCH_DIR=self.scratch).enable()
-
-    def tearDown(self) -> None:
-        shutil.rmtree(self.scratch)
-
-    @mock.patch("documents.parsers.DocumentParser.get_thumbnail", fake_get_thumbnail)
-    @override_settings(OPTIMIZE_THUMBNAILS=True)
-    def test_get_optimised_thumbnail(self):
-        parser = DocumentParser(None)
-
-        parser.get_optimised_thumbnail("any", "not important", "document.pdf")
-
-    @mock.patch("documents.parsers.DocumentParser.get_thumbnail", fake_get_thumbnail)
-    @override_settings(OPTIMIZE_THUMBNAILS=False)
-    def test_get_optimised_thumb_disabled(self):
-        parser = DocumentParser(None)
-
-        path = parser.get_optimised_thumbnail("any", "not important", "document.pdf")
-        self.assertEqual(path, fake_get_thumbnail(None, None, None, None))
-
-
 class TestParserAvailability(TestCase):
     def test_file_extensions(self):
 
