@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-07-08 14:11-0700\n"
-"PO-Revision-Date: 2022-07-08 22:07\n"
+"PO-Revision-Date: 2022-07-28 11:11\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -80,7 +80,7 @@ msgstr "gelen kutu etiketidir"
 
 #: documents/models.py:72
 msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
-msgstr "Bu etiketi, gelen kutusu etiketi olarak işaretle: Tüm yeni olarak tüketilen dökümanlar gelen kutusu etiketi ile etiketlendirileceklerdir."
+msgstr "Bu etiketi, gelen kutusu etiketi olarak işaretle: Yeni aktarılan tüm dokümanlar gelen kutusu etiketi ile etiketlendirileceklerdir."
 
 #: documents/models.py:78
 msgid "tag"
@@ -376,7 +376,7 @@ msgstr "filtreleme kuralları"
 
 #: documents/models.py:521
 msgid "started"
-msgstr ""
+msgstr "başladı"
 
 #: documents/serialisers.py:70
 #, python-format
@@ -394,7 +394,7 @@ msgstr "Dosya türü %(type)s desteklenmiyor"
 
 #: documents/serialisers.py:596
 msgid "Invalid variable detected."
-msgstr ""
+msgstr "Geçersiz değişken algılandı."
 
 #: documents/templates/index.html:78
 msgid "Paperless-ngx is loading..."
@@ -402,7 +402,7 @@ msgstr "Paperless-ngx yükleniyor..."
 
 #: documents/templates/index.html:79
 msgid "Still here?! Hmm, something might be wrong."
-msgstr ""
+msgstr "Hâlâ burada mısınız? Hmm, bir şeyler yanlış olabilir."
 
 #: documents/templates/index.html:79
 msgid "Here's a link to the docs."
@@ -450,7 +450,7 @@ msgstr "İngilizce (Birleşik Devletler)"
 
 #: paperless/settings.py:340
 msgid "Belarusian"
-msgstr ""
+msgstr "Belarusça"
 
 #: paperless/settings.py:341
 msgid "Czech"
@@ -510,11 +510,11 @@ msgstr "Rusça"
 
 #: paperless/settings.py:355
 msgid "Slovenian"
-msgstr ""
+msgstr "Slovakça"
 
 #: paperless/settings.py:356
 msgid "Serbian"
-msgstr ""
+msgstr "Sırpça"
 
 #: paperless/settings.py:357
 msgid "Swedish"
@@ -522,11 +522,11 @@ msgstr "İsveççe"
 
 #: paperless/settings.py:358
 msgid "Turkish"
-msgstr ""
+msgstr "Türkçe"
 
 #: paperless/settings.py:359
 msgid "Chinese Simplified"
-msgstr ""
+msgstr "Basitleştirilmiş Çince"
 
 #: paperless/urls.py:161
 msgid "Paperless-ngx administration"
