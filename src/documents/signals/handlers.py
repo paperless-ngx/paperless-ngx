@@ -11,6 +11,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import DatabaseError
 from django.db import models
 from django.db.models import Q
+from django.db.utils import OperationalError
 from django.dispatch import receiver
 from django.utils import termcolors
 from django.utils import timezone
@@ -506,21 +507,28 @@ def add_to_index(sender, document, **kwargs):
 @receiver(django_q.signals.pre_enqueue)
 def init_paperless_task(sender, task, **kwargs):
     if task["func"] == "documents.tasks.consume_file":
-        paperless_task, created = PaperlessTask.objects.get_or_create(
-            task_id=task["id"],
-        )
-        paperless_task.name = task["name"]
-        paperless_task.created = task["started"]
-        paperless_task.save()
+        try:
+            paperless_task, created = PaperlessTask.objects.get_or_create(
+                task_id=task["id"],
+            )
+            paperless_task.name = task["name"]
+            paperless_task.created = task["started"]
+            paperless_task.save()
+        except OperationalError as e:
+            logger.error(f"Creating PaperlessTask failed: {e}")
 
 
 @receiver(django_q.signals.pre_execute)
 def paperless_task_started(sender, task, **kwargs):
     try:
         if task["func"] == "documents.tasks.consume_file":
-            paperless_task = PaperlessTask.objects.get(task_id=task["id"])
+            paperless_task, created = PaperlessTask.objects.get_or_create(
+                task_id=task["id"],
+            )
             paperless_task.started = timezone.now()
             paperless_task.save()
+    except OperationalError as e:
+        logger.error(f"Creating PaperlessTask failed: {e}")
     except PaperlessTask.DoesNotExist:
         pass
 
@@ -529,8 +537,12 @@ def paperless_task_started(sender, task, **kwargs):
 def update_paperless_task(sender, instance, **kwargs):
     try:
         if instance.func == "documents.tasks.consume_file":
-            paperless_task = PaperlessTask.objects.get(task_id=instance.id)
+            paperless_task, created = PaperlessTask.objects.get_or_create(
+                task_id=instance.id,
+            )
             paperless_task.attempted_task = instance
             paperless_task.save()
+    except OperationalError as e:
+        logger.error(f"Creating PaperlessTask failed: {e}")
     except PaperlessTask.DoesNotExist:
         pass
