@@ -56,34 +56,62 @@ class TestDocument(TestCase):
         doc = Document(
             mime_type="application/pdf",
             title="test",
-            created=timezone.datetime(2020, 12, 25),
+            created=timezone.datetime(2020, 12, 25, tzinfo=zoneinfo.ZoneInfo("UTC")),
         )
         self.assertEqual(doc.get_public_filename(), "2020-12-25 test.pdf")
 
+    @override_settings(
+        TIME_ZONE="Europe/Berlin",
+    )
     def test_file_name_with_timezone(self):
+
+        # See https://docs.djangoproject.com/en/4.0/ref/utils/#django.utils.timezone.now
+        # The default for created is an aware datetime in UTC
+        # This does that, just manually, with a fixed date
+        local_create_date = timezone.datetime(
+            2020,
+            12,
+            25,
+            tzinfo=zoneinfo.ZoneInfo("Europe/Berlin"),
+        )
+
+        utc_create_date = local_create_date.astimezone(zoneinfo.ZoneInfo("UTC"))
 
         doc = Document(
             mime_type="application/pdf",
             title="test",
-            created=timezone.datetime(
-                2020,
-                12,
-                25,
-                0,
-                0,
-                0,
-                0,
-                zoneinfo.ZoneInfo("Europe/Berlin"),
-            ),
+            created=utc_create_date,
         )
+
+        # Ensure the create date would cause an off by 1 if not properly created above
+        self.assertEqual(utc_create_date.date().day, 24)
         self.assertEqual(doc.get_public_filename(), "2020-12-25 test.pdf")
+
+        local_create_date = timezone.datetime(
+            2020,
+            1,
+            1,
+            tzinfo=zoneinfo.ZoneInfo("Europe/Berlin"),
+        )
+
+        utc_create_date = local_create_date.astimezone(zoneinfo.ZoneInfo("UTC"))
+
+        doc = Document(
+            mime_type="application/pdf",
+            title="test",
+            created=utc_create_date,
+        )
+
+        # Ensure the create date would cause an off by 1 in the year if not properly created above
+        self.assertEqual(utc_create_date.date().year, 2019)
+        self.assertEqual(doc.get_public_filename(), "2020-01-01 test.pdf")
 
     def test_file_name_jpg(self):
 
         doc = Document(
             mime_type="image/jpeg",
             title="test",
-            created=timezone.datetime(2020, 12, 25),
+            created=timezone.datetime(2020, 12, 25, tzinfo=zoneinfo.ZoneInfo("UTC")),
         )
         self.assertEqual(doc.get_public_filename(), "2020-12-25 test.jpg")
 
@@ -92,7 +120,7 @@ class TestDocument(TestCase):
         doc = Document(
             mime_type="application/zip",
             title="test",
-            created=timezone.datetime(2020, 12, 25),
+            created=timezone.datetime(2020, 12, 25, tzinfo=zoneinfo.ZoneInfo("UTC")),
         )
         self.assertEqual(doc.get_public_filename(), "2020-12-25 test.zip")
 
@@ -101,6 +129,6 @@ class TestDocument(TestCase):
         doc = Document(
             mime_type="image/jpegasd",
             title="test",
-            created=timezone.datetime(2020, 12, 25),
+            created=timezone.datetime(2020, 12, 25, tzinfo=zoneinfo.ZoneInfo("UTC")),
         )
         self.assertEqual(doc.get_public_filename(), "2020-12-25 test")

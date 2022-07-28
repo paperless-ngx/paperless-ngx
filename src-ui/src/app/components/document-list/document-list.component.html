@@ -1,10 +1,11 @@
 <app-page-header [title]="getTitle()">
 
-  <div ngbDropdown class="me-2 flex-fill d-flex">
-    <button class="btn btn-sm btn-outline-primary flex-fill" id="dropdownSelect" ngbDropdownToggle>
+  <div ngbDropdown class="me-2 d-flex">
+    <button class="btn btn-sm btn-outline-primary" id="dropdownSelect" ngbDropdownToggle>
       <svg class="toolbaricon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#text-indent-left" />
-      </svg>&nbsp;<ng-container i18n>Select</ng-container>
+      </svg>
+      <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Select</ng-container></div>
     </button>
     <div ngbDropdownMenu aria-labelledby="dropdownSelect" class="shadow">
       <button ngbDropdownItem (click)="list.selectNone()" i18n>Select none</button>
@@ -12,23 +13,21 @@
       <button ngbDropdownItem (click)="list.selectAll()" i18n>Select all</button>
     </div>
   </div>
-
-  <div class="btn-group btn-group-toggle flex-fill" ngbRadioGroup [(ngModel)]="displayMode"
-    (ngModelChange)="saveDisplayMode()">
-    <label ngbButtonLabel class="btn-outline-primary btn-sm">
-      <input ngbButton type="radio" class="btn-check btn-sm" value="details">
+  <div class="btn-group flex-fill" role="group">
+    <input type="radio" class="btn-check" [(ngModel)]="displayMode" value="details" (ngModelChange)="saveDisplayMode()" id="displayModeDetails">
+    <label for="displayModeDetails" class="btn btn-outline-primary btn-sm">
       <svg class="toolbaricon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#list-ul" />
       </svg>
     </label>
-    <label ngbButtonLabel class="btn-outline-primary btn-sm">
-      <input ngbButton type="radio" class="btn-check btn-sm" value="smallCards">
+    <input type="radio" class="btn-check" [(ngModel)]="displayMode" value="smallCards" (ngModelChange)="saveDisplayMode()" id="displayModeSmall">
+    <label for="displayModeSmall" class="btn btn-outline-primary btn-sm">
       <svg class="toolbaricon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#grid" />
       </svg>
     </label>
-    <label ngbButtonLabel class="btn-outline-primary btn-sm">
-      <input ngbButton type="radio" class="btn-check btn-sm" value="largeCards">
+    <input type="radio" class="btn-check" [(ngModel)]="displayMode" value="largeCards" (ngModelChange)="saveDisplayMode()" id="displayModeLarge">
+    <label for="displayModeLarge" class="btn btn-outline-primary btn-sm">
       <svg class="toolbaricon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#hdd-stack" />
       </svg>
@@ -38,15 +37,15 @@
   <div ngbDropdown class="btn-group ms-2 flex-fill">
     <button class="btn btn-outline-primary btn-sm" id="dropdownBasic1" ngbDropdownToggle i18n>Sort</button>
     <div ngbDropdownMenu aria-labelledby="dropdownBasic1" class="shadow dropdown-menu-right">
-      <div class="w-100 d-flex btn-group-toggle pb-2 mb-1 border-bottom" ngbRadioGroup [(ngModel)]="listSort">
-        <label ngbButtonLabel class="btn-outline-primary btn-sm mx-2 flex-fill">
-          <input ngbButton type="radio" class="btn btn-check btn-sm" [value]="false">
+      <div class="w-100 d-flex pb-2 mb-1 border-bottom">
+        <input type="radio" class="btn-check" [value]="false" [(ngModel)]="listSortReverse" id="listSortReverseFalse">
+        <label class="btn btn-outline-primary btn-sm mx-2 flex-fill" for="listSortReverseFalse">
           <svg class="toolbaricon" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#sort-alpha-down" />
           </svg>
         </label>
-        <label ngbButtonLabel class="btn-outline-primary btn-sm me-2 flex-fill">
-          <input ngbButton type="radio" class="btn btn-check btn-sm" [value]="true">
+        <input type="radio" class="btn-check" [value]="true" [(ngModel)]="listSortReverse" id="listSortReverseTrue">
+        <label class="btn btn-outline-primary btn-sm me-2 flex-fill" for="listSortReverseTrue">
           <svg class="toolbaricon" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#sort-alpha-up-alt" />
           </svg>
@@ -75,7 +74,7 @@
 
 </app-page-header>
 
-<div class="row sticky-top pt-4 pb-2 pb-lg-4 bg-body">
+<div class="row sticky-top pt-3 pt-sm-4 pb-2 pb-lg-4 bg-body">
   <app-filter-editor [hidden]="isBulkEditing" [(filterRules)]="list.filterRules" [unmodifiedFilterRules]="unmodifiedFilterRules" #filterEditor></app-filter-editor>
   <app-bulk-editor [hidden]="!isBulkEditing"></app-bulk-editor>
 </div>
@@ -92,7 +91,7 @@
         <span i18n *ngIf="list.selected.size == 0">{list.collectionSize, plural, =1 {One document} other {{{list.collectionSize || 0}} documents}}</span>&nbsp;<span i18n *ngIf="isFiltered">(filtered)</span>
       </ng-container>
     </p>
-    <ngb-pagination [pageSize]="list.currentPageSize" [collectionSize]="list.collectionSize" [(page)]="list.currentPage" [maxSize]="5"
+    <ngb-pagination [pageSize]="list.currentPageSize" [collectionSize]="list.collectionSize" (pageChange)="setPage($event)" [page]="list.currentPage" [maxSize]="5"
     [rotate]="true" aria-label="Default pagination"></ngb-pagination>
   </div>
 </ng-template>
@@ -106,7 +105,7 @@
 <ng-template #documentListNoError>
 
   <div *ngIf="displayMode == 'largeCards'">
-    <app-document-card-large [selected]="list.isSelected(d)" (toggleSelected)="toggleSelected(d, $event)" *ngFor="let d of list.documents; trackBy: trackByDocumentId" [document]="d" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)" (clickDocumentType)="clickDocumentType($event)" (clickMoreLike)="clickMoreLike(d.id)">
+    <app-document-card-large [selected]="list.isSelected(d)" (toggleSelected)="toggleSelected(d, $event)" *ngFor="let d of list.documents; trackBy: trackByDocumentId" [document]="d" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)" (clickDocumentType)="clickDocumentType($event)" (clickStoragePath)="clickStoragePath($event)" (clickMoreLike)="clickMoreLike(d.id)">
     </app-document-card-large>
   </div>
 
@@ -137,6 +136,12 @@
         [currentSortReverse]="list.sortReverse"
         (sort)="onSort($event)"
         i18n>Document type</th>
+      <th class="d-none d-xl-table-cell"
+        sortable="storage_path__name"
+        [currentSortField]="list.sortField"
+        [currentSortReverse]="list.sortReverse"
+        (sort)="onSort($event)"
+        i18n>Storage path</th>
       <th
         sortable="created"
         [currentSortField]="list.sortField"
@@ -163,20 +168,25 @@
         </td>
         <td class="d-none d-md-table-cell">
           <ng-container *ngIf="d.correspondent">
-            <a (click)="clickCorrespondent(d.correspondent);$event.stopPropagation()" title="Filter by correspondent">{{(d.correspondent$ | async)?.name}}</a>
+            <a (click)="clickCorrespondent(d.correspondent);$event.stopPropagation()" title="Filter by correspondent" i18n-title>{{(d.correspondent$ | async)?.name}}</a>
           </ng-container>
         </td>
         <td>
-          <a routerLink="/documents/{{d.id}}" title="Edit document" style="overflow-wrap: anywhere;">{{d.title | documentTitle}}</a>
-          <app-tag [tag]="t" *ngFor="let t of d.tags$ | async" class="ms-1" clickable="true" linkTitle="Filter by tag" (click)="clickTag(t.id);$event.stopPropagation()"></app-tag>
+          <a (click)="openDocumentsService.openDocument(d)" title="Edit document" i18n-title style="overflow-wrap: anywhere;">{{d.title | documentTitle}}</a>
+          <app-tag [tag]="t" *ngFor="let t of d.tags$ | async" class="ms-1" clickable="true" linkTitle="Filter by tag" i18n-linkTitle (click)="clickTag(t.id);$event.stopPropagation()"></app-tag>
         </td>
         <td class="d-none d-xl-table-cell">
           <ng-container *ngIf="d.document_type">
-            <a (click)="clickDocumentType(d.document_type);$event.stopPropagation()" title="Filter by document type">{{(d.document_type$ | async)?.name}}</a>
+            <a (click)="clickDocumentType(d.document_type);$event.stopPropagation()" title="Filter by document type" i18n-title>{{(d.document_type$ | async)?.name}}</a>
+          </ng-container>
+        </td>
+        <td class="d-none d-xl-table-cell">
+          <ng-container *ngIf="d.storage_path">
+            <a (click)="clickStoragePath(d.storage_path);$event.stopPropagation()" title="Filter by storage path" i18n-title>{{(d.storage_path$ | async)?.name}}</a>
           </ng-container>
         </td>
         <td>
-          {{d.created | customDate}}
+          {{d.created_date | customDate}}
         </td>
         <td class="d-none d-xl-table-cell">
           {{d.added | customDate}}
@@ -186,7 +196,7 @@
   </table>
 
   <div class="row row-cols-paperless-cards" *ngIf="displayMode == 'smallCards'">
-    <app-document-card-small class="p-0" [selected]="list.isSelected(d)" (toggleSelected)="toggleSelected(d, $event)" [document]="d" *ngFor="let d of list.documents; trackBy: trackByDocumentId" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)" (clickDocumentType)="clickDocumentType($event)"></app-document-card-small>
+    <app-document-card-small class="p-0" [selected]="list.isSelected(d)" (toggleSelected)="toggleSelected(d, $event)" [document]="d" *ngFor="let d of list.documents; trackBy: trackByDocumentId" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)" (clickStoragePath)="clickStoragePath($event)" (clickDocumentType)="clickDocumentType($event)"></app-document-card-small>
   </div>
   <div *ngIf="list.documents?.length > 15" class="mt-3">
     <ng-container *ngTemplateOutlet="pagination"></ng-container>

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'
 import { FormControl } from '@angular/forms'
 import { ActivatedRoute, Router, Params } from '@angular/router'
-import { from, Observable, Subscription, BehaviorSubject } from 'rxjs'
+import { from, Observable } from 'rxjs'
 import {
   debounceTime,
   distinctUntilChanged,
@@ -15,14 +15,14 @@ import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SearchService } from 'src/app/services/rest/search.service'
 import { environment } from 'src/environments/environment'
 import { DocumentDetailComponent } from '../document-detail/document-detail.component'
-import { Meta } from '@angular/platform-browser'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { FILTER_FULLTEXT_QUERY } from 'src/app/data/filter-rule-type'
 import {
   RemoteVersionService,
   AppRemoteVersion,
 } from 'src/app/services/rest/remote-version.service'
-import { QueryParamsService } from 'src/app/services/query-params.service'
+import { SettingsService } from 'src/app/services/settings.service'
+import { TasksService } from 'src/app/services/tasks.service'
 
 @Component({
   selector: 'app-app-frame',
@@ -36,16 +36,17 @@ export class AppFrameComponent {
     private openDocumentsService: OpenDocumentsService,
     private searchService: SearchService,
     public savedViewService: SavedViewService,
-    private list: DocumentListViewService,
-    private meta: Meta,
     private remoteVersionService: RemoteVersionService,
-    private queryParamsService: QueryParamsService
+    private list: DocumentListViewService,
+    public settingsService: SettingsService,
+    public tasksService: TasksService
   ) {
     this.remoteVersionService
       .checkForUpdates()
       .subscribe((appRemoteVersion: AppRemoteVersion) => {
         this.appRemoteVersion = appRemoteVersion
       })
+    tasksService.reload()
   }
 
   versionString = `${environment.appTitle} ${environment.version}`
@@ -94,7 +95,7 @@ export class AppFrameComponent {
 
   search() {
     this.closeMenu()
-    this.queryParamsService.navigateWithFilterRules([
+    this.list.quickFilter([
       {
         rule_type: FILTER_FULLTEXT_QUERY,
         value: (this.searchField.value as string).trim(),
@@ -142,18 +143,5 @@ export class AppFrameComponent {
           }
         }
       })
-  }
-
-  get displayName() {
-    // TODO: taken from dashboard component, is this the best way to pass around username?
-    let tagFullName = this.meta.getTag('name=full_name')
-    let tagUsername = this.meta.getTag('name=username')
-    if (tagFullName && tagFullName.content) {
-      return tagFullName.content
-    } else if (tagUsername && tagUsername.content) {
-      return tagUsername.content
-    } else {
-      return null
-    }
   }
 }

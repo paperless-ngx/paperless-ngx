@@ -1,4 +1,4 @@
-<app-widget-frame [title]="savedView.name">
+<app-widget-frame [title]="savedView.name" [loading]="loading">
 
   <a class="btn-link" header-buttons [routerLink]="[]" (click)="showAll()" i18n>Show all</a>
 
@@ -11,8 +11,8 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let doc of documents" [routerLink]="['/', 'documents', doc.id]">
-        <td>{{doc.created | customDate}}</td>
+      <tr *ngFor="let doc of documents" (click)="openDocumentsService.openDocument(doc)">
+        <td>{{doc.created_date | customDate}}</td>
         <td>{{doc.title | documentTitle}}<app-tag [tag]="t" *ngFor="let t of doc.tags$ | async" class="ms-1" (click)="clickTag(t); $event.stopPropagation();"></app-tag></td>
       </tr>
     </tbody>

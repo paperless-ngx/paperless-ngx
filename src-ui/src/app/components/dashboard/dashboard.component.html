@@ -21,9 +21,14 @@
 
 <div class='row'>
   <div class="col-lg-8">
-    <app-welcome-widget *ngIf="savedViews.length == 0"></app-welcome-widget>
+    <ng-container *ngIf="savedViewService.loading">
+      <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+      <ng-container i18n>Loading...</ng-container>
+    </ng-container>
 
-    <ng-container *ngFor="let v of savedViews">
+    <app-welcome-widget *ngIf="!savedViewService.loading && savedViewService.dashboardViews.length == 0"></app-welcome-widget>
+
+    <ng-container *ngFor="let v of savedViewService.dashboardViews">
       <app-saved-view-widget [savedView]="v"></app-saved-view-widget>
     </ng-container>
 

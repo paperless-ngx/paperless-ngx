@@ -3,19 +3,24 @@ import logging
 import os
 import shutil
 from contextlib import contextmanager
+from pathlib import Path
 
 import tqdm
 from django.conf import settings
+from django.core.exceptions import FieldDoesNotExist
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.core.management.base import CommandError
+from django.core.serializers.base import DeserializationError
 from django.db.models.signals import m2m_changed
 from django.db.models.signals import post_save
 from documents.models import Document
+from documents.parsers import run_convert
 from documents.settings import EXPORTER_ARCHIVE_NAME
 from documents.settings import EXPORTER_FILE_NAME
 from documents.settings import EXPORTER_THUMBNAIL_NAME
 from filelock import FileLock
+from paperless import version
 
 from ...file_handling import create_source_path_directory
 from ...signals.handlers import update_filename_and_move_files
@@ -53,6 +58,7 @@ class Command(BaseCommand):
         BaseCommand.__init__(self, *args, **kwargs)
         self.source = None
         self.manifest = None
+        self.version = None
 
     def handle(self, *args, **options):
 
@@ -66,11 +72,29 @@ class Command(BaseCommand):
         if not os.access(self.source, os.R_OK):
             raise CommandError("That path doesn't appear to be readable")
 
-        manifest_path = os.path.join(self.source, "manifest.json")
+        manifest_path = os.path.normpath(os.path.join(self.source, "manifest.json"))
         self._check_manifest_exists(manifest_path)
 
         with open(manifest_path) as f:
             self.manifest = json.load(f)
+
+        version_path = os.path.normpath(os.path.join(self.source, "version.json"))
+        if os.path.exists(version_path):
+            with open(version_path) as f:
+                self.version = json.load(f)["version"]
+                # Provide an initial warning if needed to the user
+                if self.version != version.__full_version_str__:
+                    self.stdout.write(
+                        self.style.WARNING(
+                            "Version mismatch: "
+                            f"Currently {version.__full_version_str__},"
+                            f" importing {self.version}."
+                            " Continuing, but import may fail.",
+                        ),
+                    )
+
+        else:
+            self.stdout.write(self.style.NOTICE("No version.json file located"))
 
         self._check_manifest()
         with disable_signal(
@@ -84,12 +108,36 @@ class Command(BaseCommand):
                 sender=Document.tags.through,
             ):
                 # Fill up the database with whatever is in the manifest
-                call_command("loaddata", manifest_path)
+                try:
+                    call_command("loaddata", manifest_path)
+                except (FieldDoesNotExist, DeserializationError) as e:
+                    self.stdout.write(self.style.ERROR("Database import failed"))
+                    if (
+                        self.version is not None
+                        and self.version != version.__full_version_str__
+                    ):
+                        self.stdout.write(
+                            self.style.ERROR(
+                                "Version mismatch: "
+                                f"Currently {version.__full_version_str__},"
+                                f" importing {self.version}",
+                            ),
+                        )
+                        raise e
+                    else:
+                        self.stdout.write(
+                            self.style.ERROR("No version information present"),
+                        )
+                        raise e
 
                 self._import_files_from_manifest(options["no_progress_bar"])
 
-        print("Updating search index...")
-        call_command("document_index", "reindex")
+        self.stdout.write("Updating search index...")
+        call_command(
+            "document_index",
+            "reindex",
+            no_progress_bar=options["no_progress_bar"],
+        )
 
     @staticmethod
     def _check_manifest_exists(path):
@@ -132,7 +180,7 @@ class Command(BaseCommand):
         os.makedirs(settings.THUMBNAIL_DIR, exist_ok=True)
         os.makedirs(settings.ARCHIVE_DIR, exist_ok=True)
 
-        print("Copy files into paperless...")
+        self.stdout.write("Copy files into paperless...")
 
         manifest_documents = list(
             filter(lambda r: r["model"] == "documents.document", self.manifest),
@@ -146,7 +194,7 @@ class Command(BaseCommand):
             document_path = os.path.join(self.source, doc_file)
 
             thumb_file = record[EXPORTER_THUMBNAIL_NAME]
-            thumbnail_path = os.path.join(self.source, thumb_file)
+            thumbnail_path = Path(os.path.join(self.source, thumb_file)).resolve()
 
             if EXPORTER_ARCHIVE_NAME in record:
                 archive_file = record[EXPORTER_ARCHIVE_NAME]
@@ -163,7 +211,20 @@ class Command(BaseCommand):
                 create_source_path_directory(document.source_path)
 
                 shutil.copy2(document_path, document.source_path)
-                shutil.copy2(thumbnail_path, document.thumbnail_path)
+
+                if thumbnail_path.suffix in {".png", ".PNG"}:
+                    run_convert(
+                        density=300,
+                        scale="500x5000>",
+                        alpha="remove",
+                        strip=True,
+                        trim=False,
+                        auto_orient=True,
+                        input_file=f"{thumbnail_path}[0]",
+                        output_file=str(document.thumbnail_path),
+                    )
+                else:
+                    shutil.copy2(thumbnail_path, document.thumbnail_path)
                 if archive_path:
                     create_source_path_directory(document.archive_path)
                     # TODO: this assumes that the export is valid and

@@ -1,7 +1,7 @@
 import { DatePipe } from '@angular/common'
 import { Inject, LOCALE_ID, Pipe, PipeTransform } from '@angular/core'
-import { SettingsService, SETTINGS_KEYS } from '../services/settings.service'
-import { normalizeDateStr } from '../utils/date'
+import { SETTINGS_KEYS } from '../data/paperless-uisettings'
+import { SettingsService } from '../services/settings.service'
 
 const FORMAT_TO_ISO_FORMAT = {
   longDate: 'y-MM-dd',
@@ -34,7 +34,6 @@ export class CustomDatePipe implements PipeTransform {
       this.settings.get(SETTINGS_KEYS.DATE_LOCALE) ||
       this.defaultLocale
     let f = format || this.settings.get(SETTINGS_KEYS.DATE_FORMAT)
-    if (typeof value == 'string') value = normalizeDateStr(value)
     if (l == 'iso-8601') {
       return this.datePipe.transform(value, FORMAT_TO_ISO_FORMAT[f], timezone)
     } else {

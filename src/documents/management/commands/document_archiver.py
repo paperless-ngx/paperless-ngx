@@ -41,7 +41,7 @@ def handle_document(document_id):
     try:
         parser.parse(document.source_path, mime_type, document.get_public_filename())
 
-        thumbnail = parser.get_optimised_thumbnail(
+        thumbnail = parser.get_thumbnail(
             document.source_path,
             mime_type,
             document.get_public_filename(),
@@ -152,4 +152,4 @@ class Command(BaseCommand):
                     ),
                 )
         except KeyboardInterrupt:
-            print("Aborting...")
+            self.stdout.write(self.style.NOTICE("Aborting..."))

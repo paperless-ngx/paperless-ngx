@@ -8,7 +8,7 @@
     <button type="button" class="btn btn-sm btn-outline-danger me-2 ms-auto" (click)="delete()">
         <svg class="buttonicon" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#trash" />
-        </svg>&nbsp;<span class="d-none d-lg-inline" i18n>Delete</span>
+        </svg><span class="d-none d-lg-inline ps-1" i18n>Delete</span>
     </button>
 
     <div class="btn-group me-2">
@@ -16,7 +16,7 @@
         <a [href]="downloadUrl" class="btn btn-sm btn-outline-primary">
             <svg class="buttonicon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#download" />
-            </svg>&nbsp;<span class="d-none d-lg-inline" i18n>Download</span>
+            </svg><span class="d-none d-lg-inline ps-1" i18n>Download</span>
         </a>
 
         <div class="btn-group" ngbDropdown role="group" *ngIf="metadata?.has_archive_version">
@@ -28,10 +28,16 @@
 
     </div>
 
+    <button type="button" class="btn btn-sm btn-outline-primary me-2" (click)="redoOcr()">
+        <svg class="buttonicon" fill="currentColor">
+            <use xlink:href="assets/bootstrap-icons.svg#arrow-counterclockwise" />
+        </svg><span class="d-none d-lg-inline ps-1" i18n>Redo OCR</span>
+    </button>
+
     <button type="button" class="btn btn-sm btn-outline-primary me-2" (click)="moreLike()">
         <svg class="buttonicon" fill="currentColor">
-            <use xlink:href="assets/bootstrap-icons.svg#three-dots" />
-        </svg>&nbsp;<span class="d-none d-lg-inline" i18n>More like this</span>
+            <use xlink:href="assets/bootstrap-icons.svg#diagram-3" />
+        </svg><span class="d-none d-lg-inline ps-1" i18n>More like this</span>
     </button>
 
     <button type="button" class="btn btn-sm btn-outline-primary me-2" i18n-title title="Close" (click)="close()">
@@ -68,11 +74,13 @@
 
                         <app-input-text #inputTitle i18n-title title="Title" formControlName="title" (keyup)="titleKeyUp($event)" [error]="error?.title"></app-input-text>
                         <app-input-number i18n-title title="Archive serial number" [error]="error?.archive_serial_number" formControlName='archive_serial_number'></app-input-number>
-                        <app-input-date i18n-title title="Date created" formControlName="created" [error]="error?.created"></app-input-date>
+                        <app-input-date i18n-title title="Date created" formControlName="created_date" [error]="error?.created_date"></app-input-date>
                         <app-input-select [items]="correspondents" i18n-title title="Correspondent" formControlName="correspondent" [allowNull]="true"
                             (createNew)="createCorrespondent($event)" [suggestions]="suggestions?.correspondents"></app-input-select>
                         <app-input-select [items]="documentTypes" i18n-title title="Document type" formControlName="document_type" [allowNull]="true"
                             (createNew)="createDocumentType($event)" [suggestions]="suggestions?.document_types"></app-input-select>
+                        <app-input-select [items]="storagePaths" i18n-title title="Storage path" formControlName="storage_path" [allowNull]="true"
+                            (createNew)="createStoragePath($event)" [suggestions]="suggestions?.storage_paths" i18n-placeholder placeholder="Default"></app-input-select>
                         <app-input-tags formControlName="tags" [suggestions]="suggestions?.tags"></app-input-tags>
 
                     </ng-template>

@@ -6,6 +6,7 @@ from collections import defaultdict
 import pathvalidate
 from django.conf import settings
 from django.template.defaultfilters import slugify
+from django.utils import timezone
 
 
 logger = logging.getLogger("paperless.filehandling")
@@ -127,13 +128,26 @@ def generate_unique_filename(doc, archive_filename=False):
 
 def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
     path = ""
+    filename_format = settings.FILENAME_FORMAT
 
     try:
-        if settings.PAPERLESS_FILENAME_FORMAT is not None:
-            tags = defaultdictNoStr(lambda: slugify(None), many_to_dictionary(doc.tags))
+        if doc.storage_path is not None:
+            logger.debug(
+                f"Document has storage_path {doc.storage_path.id} "
+                f"({doc.storage_path.path}) set",
+            )
+            filename_format = doc.storage_path.path
+
+        if filename_format is not None:
+            tags = defaultdictNoStr(
+                lambda: slugify(None),
+                many_to_dictionary(doc.tags),
+            )
 
             tag_list = pathvalidate.sanitize_filename(
-                ",".join(sorted(tag.name for tag in doc.tags.all())),
+                ",".join(
+                    sorted(tag.name for tag in doc.tags.all()),
+                ),
                 replacement_text="-",
             )
 
@@ -143,7 +157,7 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
                     replacement_text="-",
                 )
             else:
-                correspondent = "none"
+                correspondent = "-none-"
 
             if doc.document_type:
                 document_type = pathvalidate.sanitize_filename(
@@ -151,36 +165,45 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
                     replacement_text="-",
                 )
             else:
-                document_type = "none"
+                document_type = "-none-"
 
             if doc.archive_serial_number:
                 asn = str(doc.archive_serial_number)
             else:
-                asn = "none"
+                asn = "-none-"
 
-            path = settings.PAPERLESS_FILENAME_FORMAT.format(
+            # Convert UTC database date to localized date
+            local_added = timezone.localdate(doc.added)
+            local_created = timezone.localdate(doc.created)
+
+            path = filename_format.format(
                 title=pathvalidate.sanitize_filename(doc.title, replacement_text="-"),
                 correspondent=correspondent,
                 document_type=document_type,
-                created=datetime.date.isoformat(doc.created),
-                created_year=doc.created.year if doc.created else "none",
-                created_month=f"{doc.created.month:02}" if doc.created else "none",
-                created_day=f"{doc.created.day:02}" if doc.created else "none",
-                added=datetime.date.isoformat(doc.added),
-                added_year=doc.added.year if doc.added else "none",
-                added_month=f"{doc.added.month:02}" if doc.added else "none",
-                added_day=f"{doc.added.day:02}" if doc.added else "none",
+                created=datetime.date.isoformat(local_created),
+                created_year=local_created.year,
+                created_month=f"{local_created.month:02}",
+                created_day=f"{local_created.day:02}",
+                added=datetime.date.isoformat(local_added),
+                added_year=local_added.year,
+                added_month=f"{local_added.month:02}",
+                added_day=f"{local_added.day:02}",
                 asn=asn,
                 tags=tags,
                 tag_list=tag_list,
             ).strip()
 
+            if settings.FILENAME_FORMAT_REMOVE_NONE:
+                path = path.replace("-none-/", "")  # remove empty directories
+                path = path.replace(" -none-", "")  # remove when spaced, with space
+                path = path.replace("-none-", "")  # remove rest of the occurences
+
+            path = path.replace("-none-", "none")  # backward compatibility
             path = path.strip(os.sep)
 
     except (ValueError, KeyError, IndexError):
         logger.warning(
-            f"Invalid PAPERLESS_FILENAME_FORMAT: "
-            f"{settings.PAPERLESS_FILENAME_FORMAT}, falling back to default",
+            f"Invalid filename_format '{filename_format}', falling back to default",
         )
 
     counter_str = f"_{counter:02}" if counter else ""

@@ -21,17 +21,17 @@
   </div>
   <ul ngbNav class="order-sm-3">
     <li ngbDropdown class="nav-item dropdown">
-      <button class="btn text-light" id="userDropdown" ngbDropdownToggle>
-        <span *ngIf="displayName" class="navbar-text small me-2 text-light d-none d-sm-inline">
-          {{displayName}}
+      <button class="btn" id="userDropdown" ngbDropdownToggle>
+        <span class="small me-2 d-none d-sm-inline">
+          {{this.settingsService.displayName}}
         </span>
         <svg width="1.3em" height="1.3em" fill="currentColor">
           <use xlink:href="assets/bootstrap-icons.svg#person-circle"/>
         </svg>
       </button>
       <div ngbDropdownMenu class="dropdown-menu-end shadow me-2" aria-labelledby="userDropdown">
-        <div *ngIf="displayName" class="d-sm-none">
-          <p class="small mb-0 px-3 text-muted" i18n>Logged in as {{displayName}}</p>
+        <div class="d-sm-none">
+          <p class="small mb-0 px-3 text-muted" i18n>Logged in as {{this.settingsService.displayName}}</p>
           <div class="dropdown-divider"></div>
         </div>
         <a ngbDropdownItem class="nav-link" routerLink="settings" (click)="closeMenu()">
@@ -70,8 +70,9 @@
           </li>
         </ul>
 
-        <h6 class="sidebar-heading px-3 mt-4 mb-1 text-muted" *ngIf='savedViewService.sidebarViews.length > 0'>
+        <h6 class="sidebar-heading px-3 mt-4 mb-1 text-muted" *ngIf='savedViewService.loading || savedViewService.sidebarViews.length > 0'>
           <ng-container i18n>Saved views</ng-container>
+          <div *ngIf="savedViewService.loading" class="spinner-border spinner-border-sm fw-normal ms-2" role="status"></div>
         </h6>
         <ul class="nav flex-column mb-2">
           <li class="nav-item w-100" *ngFor="let view of savedViewService.sidebarViews">
@@ -134,6 +135,20 @@
             </a>
           </li>
           <li class="nav-item">
+            <a class="nav-link" routerLink="storagepaths" routerLinkActive="active" (click)="closeMenu()">
+              <svg class="sidebaricon" fill="currentColor">
+                <use xlink:href="assets/bootstrap-icons.svg#folder"/>
+              </svg>&nbsp;<ng-container i18n>Storage paths</ng-container>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="tasks" routerLinkActive="active" (click)="closeMenu()">
+              <svg class="sidebaricon" fill="currentColor">
+                <use xlink:href="assets/bootstrap-icons.svg#list-task"/>
+              </svg>&nbsp;<ng-container i18n>File Tasks<ng-container *ngIf="tasksService.failedFileTasks.length > 0"><span class="badge bg-danger ms-2">{{tasksService.failedFileTasks.length}}</span></ng-container></ng-container>
+            </a>
+          </li>
+          <li class="nav-item">
             <a class="nav-link" routerLink="logs" routerLinkActive="active" (click)="closeMenu()">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#text-left"/>
@@ -187,7 +202,7 @@
               <div class="me-3">{{ versionString }}</div>
               <div *ngIf="appRemoteVersion" class="version-check">
                 <ng-template #updateAvailablePopContent>
-                  <span class="small">Paperless-ngx v{{ appRemoteVersion.version }} <ng-container i18n>is available.</ng-container><br/><ng-container i18n>Click to view.</ng-container></span>
+                  <span class="small">Paperless-ngx {{ appRemoteVersion.version }} <ng-container i18n>is available.</ng-container><br/><ng-container i18n>Click to view.</ng-container></span>
                 </ng-template>
                 <ng-template #updateCheckingNotEnabledPopContent>
                   <span class="small"><ng-container i18n>Checking for updates is disabled.</ng-container><br/><ng-container i18n>Click for more information.</ng-container></span>

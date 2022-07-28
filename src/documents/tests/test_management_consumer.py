@@ -98,6 +98,9 @@ class ConsumerMixin:
             print("file completed.")
 
 
+@override_settings(
+    CONSUMER_INOTIFY_DELAY=0.01,
+)
 class TestConsumer(DirectoriesMixin, ConsumerMixin, TransactionTestCase):
     def test_consume_file(self):
         self.t_start()
@@ -286,7 +289,7 @@ class TestConsumerPolling(TestConsumer):
     pass
 
 
-@override_settings(CONSUMER_RECURSIVE=True)
+@override_settings(CONSUMER_INOTIFY_DELAY=0.01, CONSUMER_RECURSIVE=True)
 class TestConsumerRecursive(TestConsumer):
     # just do all the tests with recursive
     pass

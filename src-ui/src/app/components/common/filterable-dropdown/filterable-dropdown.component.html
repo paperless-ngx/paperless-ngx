@@ -16,13 +16,11 @@
   <div class="dropdown-menu py-0 shadow" ngbDropdownMenu attr.aria-labelledby="dropdown{{title}}">
     <div class="list-group list-group-flush">
       <div *ngIf="!editing && multiple" class="list-group-item d-flex">
-        <div class="btn-group btn-group-xs btn-group-toggle flex-fill" ngbRadioGroup [(ngModel)]="selectionModel.logicalOperator" (change)="selectionModel.toggleOperator()" [disabled]="!operatorToggleEnabled">
-          <label ngbButtonLabel class="btn btn-outline-primary">
-            <input ngbButton type="radio" class="btn-check" name="logicalOperator" value="and" i18n> All
-          </label>
-          <label ngbButtonLabel class="btn btn-outline-primary">
-            <input ngbButton type="radio" class="btn-check" name="logicalOperator" value="or" i18n> Any
-          </label>
+        <div class="btn-group btn-group-xs flex-fill">
+          <input [(ngModel)]="selectionModel.logicalOperator" [disabled]="!operatorToggleEnabled" (ngModelChange)="selectionModel.toggleOperator()" type="radio" class="btn-check" id="logicalOperatorAnd" value="and">
+          <label class="btn btn-outline-primary" for="logicalOperatorAnd" i18n>All</label>
+          <input [(ngModel)]="selectionModel.logicalOperator" [disabled]="!operatorToggleEnabled" (ngModelChange)="selectionModel.toggleOperator()" type="radio" class="btn-check" id="logicalOperatorOr" value="or">
+          <label class="btn btn-outline-primary" for="logicalOperatorOr" i18n>Any</label>
         </div>
       </div>
       <div class="list-group-item">
