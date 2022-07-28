@@ -1,5 +1,18 @@
 # Changelog
 
+## paperless-ngx 1.8.0
+
+### Features
+
+- [Beta] Paperless-ngx v1.8.0 Release Candidate 1 [@qcasey](https://github.com/qcasey) ([#1240](https://github.com/paperless-ngx/paperless-ngx/pull/1240))
+
+### Bug Fixes
+
+- Fix: dropdown selected items not visible again [@shamoon](https://github.com/shamoon) ([#1261](https://github.com/paperless-ngx/paperless-ngx/pull/1261))
+- [CI] Fix automatic changelog generation on release [@qcasey](https://github.com/qcasey) ([#1249](https://github.com/paperless-ngx/paperless-ngx/pull/1249))
+
+
+
 ## paperless-ngx 1.7.1
 
 ### Features
