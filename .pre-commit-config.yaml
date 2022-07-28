@@ -74,13 +74,6 @@ repos:
     rev: v2.10.0
     hooks:
       - id: hadolint
-        args:
-          - --ignore
-          - DL3008      # https://github.com/hadolint/hadolint/wiki/DL3008  (should probably do this at some point)
-          - --ignore
-          - DL3013      # https://github.com/hadolint/hadolint/wiki/DL3013  (should probably do this too at some point)
-          - --ignore
-          - DL3003      # https://github.com/hadolint/hadolint/wiki/DL3003  (seems excessive to use WORKDIR so much)
   # Shell script hooks
   - repo: https://github.com/lovesegfault/beautysh
     rev: v6.2.1

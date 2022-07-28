@@ -8,7 +8,7 @@
     <button type="button" class="btn btn-sm btn-outline-danger me-2 ms-auto" (click)="delete()">
         <svg class="buttonicon" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#trash" />
-        </svg>&nbsp;<span class="d-none d-lg-inline" i18n>Delete</span>
+        </svg><span class="d-none d-lg-inline ps-1" i18n>Delete</span>
     </button>
 
     <div class="btn-group me-2">
@@ -16,7 +16,7 @@
         <a [href]="downloadUrl" class="btn btn-sm btn-outline-primary">
             <svg class="buttonicon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#download" />
-            </svg>&nbsp;<span class="d-none d-lg-inline" i18n>Download</span>
+            </svg><span class="d-none d-lg-inline ps-1" i18n>Download</span>
         </a>
 
         <div class="btn-group" ngbDropdown role="group" *ngIf="metadata?.has_archive_version">
@@ -28,10 +28,16 @@
 
     </div>
 
+    <button type="button" class="btn btn-sm btn-outline-primary me-2" (click)="redoOcr()">
+        <svg class="buttonicon" fill="currentColor">
+            <use xlink:href="assets/bootstrap-icons.svg#arrow-counterclockwise" />
+        </svg><span class="d-none d-lg-inline ps-1" i18n>Redo OCR</span>
+    </button>
+
     <button type="button" class="btn btn-sm btn-outline-primary me-2" (click)="moreLike()">
         <svg class="buttonicon" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#diagram-3" />
-        </svg>&nbsp;<span class="d-none d-lg-inline" i18n>More like this</span>
+        </svg><span class="d-none d-lg-inline ps-1" i18n>More like this</span>
     </button>
 
     <button type="button" class="btn btn-sm btn-outline-primary me-2" i18n-title title="Close" (click)="close()">
