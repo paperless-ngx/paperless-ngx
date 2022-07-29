@@ -5,28 +5,28 @@
 ### Features
 
 - Feature use env vars in pre post scripts [@ziprandom](https://github.com/ziprandom) ([#1154](https://github.com/paperless-ngx/paperless-ngx/pull/1154))
--  frontend task queue [@shamoon](https://github.com/shamoon) ([#1020](https://github.com/paperless-ngx/paperless-ngx/pull/1020))
--  Fearless scikit-learn updates [@stumpylog](https://github.com/stumpylog) ([#1082](https://github.com/paperless-ngx/paperless-ngx/pull/1082))
--  Adds support for Docker secrets [@stumpylog](https://github.com/stumpylog) ([#1034](https://github.com/paperless-ngx/paperless-ngx/pull/1034))
--  make frontend timezone un-aware [@shamoon](https://github.com/shamoon) ([#957](https://github.com/paperless-ngx/paperless-ngx/pull/957))
--  Change document thumbnails to WebP [@stumpylog](https://github.com/stumpylog) ([#1127](https://github.com/paperless-ngx/paperless-ngx/pull/1127))
--  Fork django-q to update dependencies [@stumpylog](https://github.com/stumpylog) ([#1014](https://github.com/paperless-ngx/paperless-ngx/pull/1014))
+- frontend task queue [@shamoon](https://github.com/shamoon) ([#1020](https://github.com/paperless-ngx/paperless-ngx/pull/1020))
+- Fearless scikit-learn updates [@stumpylog](https://github.com/stumpylog) ([#1082](https://github.com/paperless-ngx/paperless-ngx/pull/1082))
+- Adds support for Docker secrets [@stumpylog](https://github.com/stumpylog) ([#1034](https://github.com/paperless-ngx/paperless-ngx/pull/1034))
+- make frontend timezone un-aware [@shamoon](https://github.com/shamoon) ([#957](https://github.com/paperless-ngx/paperless-ngx/pull/957))
+- Change document thumbnails to WebP [@stumpylog](https://github.com/stumpylog) ([#1127](https://github.com/paperless-ngx/paperless-ngx/pull/1127))
+- Fork django-q to update dependencies [@stumpylog](https://github.com/stumpylog) ([#1014](https://github.com/paperless-ngx/paperless-ngx/pull/1014))
 - Fix: Rework query params logic [@shamoon](https://github.com/shamoon) ([#1000](https://github.com/paperless-ngx/paperless-ngx/pull/1000))
 - Enhancement: show note on language change and offer reload [@shamoon](https://github.com/shamoon) ([#1030](https://github.com/paperless-ngx/paperless-ngx/pull/1030))
--  Include error information when Redis connection fails [@stumpylog](https://github.com/stumpylog) ([#1016](https://github.com/paperless-ngx/paperless-ngx/pull/1016))
--  frontend settings saved to database [@shamoon](https://github.com/shamoon) ([#919](https://github.com/paperless-ngx/paperless-ngx/pull/919))
-- Add "Created" as additional (optional) parameter for post\_documents  [@eingemaischt](https://github.com/eingemaischt) ([#965](https://github.com/paperless-ngx/paperless-ngx/pull/965))
+- Include error information when Redis connection fails [@stumpylog](https://github.com/stumpylog) ([#1016](https://github.com/paperless-ngx/paperless-ngx/pull/1016))
+- frontend settings saved to database [@shamoon](https://github.com/shamoon) ([#919](https://github.com/paperless-ngx/paperless-ngx/pull/919))
+- Add "Created" as additional (optional) parameter for post_documents [@eingemaischt](https://github.com/eingemaischt) ([#965](https://github.com/paperless-ngx/paperless-ngx/pull/965))
 - Convert Changelog to markdown, auto-commit future changelogs [@qcasey](https://github.com/qcasey) ([#935](https://github.com/paperless-ngx/paperless-ngx/pull/935))
--  allow all ASN filtering functions [@shamoon](https://github.com/shamoon) ([#920](https://github.com/paperless-ngx/paperless-ngx/pull/920))
+- allow all ASN filtering functions [@shamoon](https://github.com/shamoon) ([#920](https://github.com/paperless-ngx/paperless-ngx/pull/920))
 - gunicorn: Allow IPv6 sockets [@vlcty](https://github.com/vlcty) ([#924](https://github.com/paperless-ngx/paperless-ngx/pull/924))
--  initial app loading indicators [@shamoon](https://github.com/shamoon) ([#899](https://github.com/paperless-ngx/paperless-ngx/pull/899))
+- initial app loading indicators [@shamoon](https://github.com/shamoon) ([#899](https://github.com/paperless-ngx/paperless-ngx/pull/899))
 
 ### Bug Fixes
 
 - Fix: dropdown selected items not visible again [@shamoon](https://github.com/shamoon) ([#1261](https://github.com/paperless-ngx/paperless-ngx/pull/1261))
 - [CI] Fix automatic changelog generation on release [@qcasey](https://github.com/qcasey) ([#1249](https://github.com/paperless-ngx/paperless-ngx/pull/1249))
 - Fix: Prevent duplicate api calls on text filtering [@shamoon](https://github.com/shamoon) ([#1133](https://github.com/paperless-ngx/paperless-ngx/pull/1133))
--  make frontend timezone un-aware [@shamoon](https://github.com/shamoon) ([#957](https://github.com/paperless-ngx/paperless-ngx/pull/957))
+- make frontend timezone un-aware [@shamoon](https://github.com/shamoon) ([#957](https://github.com/paperless-ngx/paperless-ngx/pull/957))
 - Feature / fix quick toggleable filters [@shamoon](https://github.com/shamoon) ([#1122](https://github.com/paperless-ngx/paperless-ngx/pull/1122))
 - Chore: Manually downgrade reportlab (and update everything else) [@stumpylog](https://github.com/stumpylog) ([#1116](https://github.com/paperless-ngx/paperless-ngx/pull/1116))
 - Bugfix: Don't assume default Docker folders [@stumpylog](https://github.com/stumpylog) ([#1088](https://github.com/paperless-ngx/paperless-ngx/pull/1088))
@@ -35,7 +35,7 @@
 - Bugfix: Pass debug setting on to django-q [@stumpylog](https://github.com/stumpylog) ([#1058](https://github.com/paperless-ngx/paperless-ngx/pull/1058))
 - Bugfix: Don't assume the document has a title set [@stumpylog](https://github.com/stumpylog) ([#1057](https://github.com/paperless-ngx/paperless-ngx/pull/1057))
 - Bugfix: Corrects the setting of max pixel size for OCR [@stumpylog](https://github.com/stumpylog) ([#1008](https://github.com/paperless-ngx/paperless-ngx/pull/1008))
--  better date pasting [@shamoon](https://github.com/shamoon) ([#1007](https://github.com/paperless-ngx/paperless-ngx/pull/1007))
+- better date pasting [@shamoon](https://github.com/shamoon) ([#1007](https://github.com/paperless-ngx/paperless-ngx/pull/1007))
 - Enhancement: Alphabetize tags by default [@shamoon](https://github.com/shamoon) ([#1017](https://github.com/paperless-ngx/paperless-ngx/pull/1017))
 - Fix: Rework query params logic [@shamoon](https://github.com/shamoon) ([#1000](https://github.com/paperless-ngx/paperless-ngx/pull/1000))
 - Fix: add translation for some un-translated tooltips [@shamoon](https://github.com/shamoon) ([#995](https://github.com/paperless-ngx/paperless-ngx/pull/995))
@@ -61,7 +61,7 @@
 
 - Feature use env vars in pre post scripts [@ziprandom](https://github.com/ziprandom) ([#1154](https://github.com/paperless-ngx/paperless-ngx/pull/1154))
 - Add `myst-parser` to fix readthedocs [@qcasey](https://github.com/qcasey) ([#982](https://github.com/paperless-ngx/paperless-ngx/pull/982))
-- Add "Created" as additional (optional) parameter for post\_documents  [@eingemaischt](https://github.com/eingemaischt) ([#965](https://github.com/paperless-ngx/paperless-ngx/pull/965))
+- Add "Created" as additional (optional) parameter for post_documents [@eingemaischt](https://github.com/eingemaischt) ([#965](https://github.com/paperless-ngx/paperless-ngx/pull/965))
 - Bugfix: Adds configurable intoify debounce time [@stumpylog](https://github.com/stumpylog) ([#953](https://github.com/paperless-ngx/paperless-ngx/pull/953))
 - docs: fix some typos [@Berjou](https://github.com/Berjou) ([#948](https://github.com/paperless-ngx/paperless-ngx/pull/948))
 - [Docs] Fix 2 small typos [@tooomm](https://github.com/tooomm) ([#946](https://github.com/paperless-ngx/paperless-ngx/pull/946))
@@ -70,9 +70,9 @@
 
 ### Maintenance
 
--  Adds support for Docker secrets [@stumpylog](https://github.com/stumpylog) ([#1034](https://github.com/paperless-ngx/paperless-ngx/pull/1034))
+- Adds support for Docker secrets [@stumpylog](https://github.com/stumpylog) ([#1034](https://github.com/paperless-ngx/paperless-ngx/pull/1034))
 - Bugfix: Don't assume default Docker folders [@stumpylog](https://github.com/stumpylog) ([#1088](https://github.com/paperless-ngx/paperless-ngx/pull/1088))
--  Include error information when Redis connection fails [@stumpylog](https://github.com/stumpylog) ([#1016](https://github.com/paperless-ngx/paperless-ngx/pull/1016))
+- Include error information when Redis connection fails [@stumpylog](https://github.com/stumpylog) ([#1016](https://github.com/paperless-ngx/paperless-ngx/pull/1016))
 - Fix: add translation for some un-translated tooltips [@shamoon](https://github.com/shamoon) ([#995](https://github.com/paperless-ngx/paperless-ngx/pull/995))
 - gunicorn: Allow IPv6 sockets [@vlcty](https://github.com/vlcty) ([#924](https://github.com/paperless-ngx/paperless-ngx/pull/924))
 
@@ -81,7 +81,7 @@
 <details>
 <summary>34 changes</summary>
 
--  Fearless scikit-learn updates [@stumpylog](https://github.com/stumpylog) ([#1082](https://github.com/paperless-ngx/paperless-ngx/pull/1082))
+- Fearless scikit-learn updates [@stumpylog](https://github.com/stumpylog) ([#1082](https://github.com/paperless-ngx/paperless-ngx/pull/1082))
 - Bump pillow from 9.1.1 to 9.2.0 [@dependabot](https://github.com/dependabot) ([#1193](https://github.com/paperless-ngx/paperless-ngx/pull/1193))
 - Bump watchdog from 2.1.8 to 2.1.9 [@dependabot](https://github.com/dependabot) ([#1132](https://github.com/paperless-ngx/paperless-ngx/pull/1132))
 - Bump scikit-learn from 1.0.2 to 1.1.1 [@dependabot](https://github.com/dependabot) ([#992](https://github.com/paperless-ngx/paperless-ngx/pull/992))
@@ -116,7 +116,6 @@
 - Chore: Manually update dependencies [@stumpylog](https://github.com/stumpylog) ([#1013](https://github.com/paperless-ngx/paperless-ngx/pull/1013))
 - Chore: Manually update all Python dependencies [@stumpylog](https://github.com/stumpylog) ([#973](https://github.com/paperless-ngx/paperless-ngx/pull/973))
 </details>
-
 
 ## paperless-ngx 1.7.1
 
