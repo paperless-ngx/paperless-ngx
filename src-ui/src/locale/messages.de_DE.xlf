@@ -522,7 +522,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">148</context>
         </context-group>
-        <target state="needs-translation">File Tasks<x id="START_TAG_NG_CONTAINER" ctype="x-ng_container" equiv-text="&lt;ng-container *ngIf=&quot;tasksService.failedFileTasks.length &gt; 0&quot;&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-danger ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_NG_CONTAINER" ctype="x-ng_container" equiv-text="&lt;/ng-container&gt;"/></target>
+        <target state="translated">Dokument Aufgaben<x id="START_TAG_NG_CONTAINER" ctype="x-ng_container" equiv-text="&lt;ng-container *ngIf=&quot;tasksService.failedFileTasks.length &gt; 0&quot;&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-danger ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_NG_CONTAINER" ctype="x-ng_container" equiv-text="&lt;/ng-container&gt;"/></target>
       </trans-unit>
       <trans-unit id="4804785061014590286" datatype="html" approved="yes">
         <source>Logs</source>
@@ -1547,7 +1547,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">90</context>
         </context-group>
-        <target state="translated">OCR wiederholen</target>
+        <target state="translated">Texterkennung erneut durchführen</target>
       </trans-unit>
       <trans-unit id="1418444397960583910" datatype="html" approved="yes">
         <source>More like this</source>
@@ -1867,7 +1867,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">387</context>
         </context-group>
-        <target state="translated">OCR wiederholen</target>
+        <target state="translated">Texterkennung erneut durchführen</target>
       </trans-unit>
       <trans-unit id="9197453786953646058" datatype="html">
         <source>This operation will permanently redo OCR for this document.</source>
@@ -1875,7 +1875,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">480</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently redo OCR for this document.</target>
+        <target state="translated">Diese Aktion wird die Texterkennung für das Dokument wiederholen.</target>
       </trans-unit>
       <trans-unit id="5641451190833696892" datatype="html" approved="yes">
         <source>This operation cannot be undone.</source>
@@ -1911,7 +1911,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">491</context>
         </context-group>
-        <target state="needs-translation">Redo OCR operation will begin in the background.</target>
+        <target state="translated">Die Texterkennung wird im Hintergrund gestartet.</target>
       </trans-unit>
       <trans-unit id="8008978164775353960" datatype="html">
         <source>Error executing operation: <x id="PH" equiv-text="JSON.stringify(                 error.error               )"/></source>
@@ -1919,7 +1919,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">502,504</context>
         </context-group>
-        <target state="needs-translation">Error executing operation: <x id="PH" equiv-text="JSON.stringify(                 error.error               )"/></target>
+        <target state="translated">Fehler beim Ausführen der Aktion: <x id="PH" equiv-text="JSON.stringify(                 error.error               )"/></target>
       </trans-unit>
       <trans-unit id="6857598786757174736" datatype="html" approved="yes">
         <source>Select:</source>
@@ -2023,7 +2023,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">78,82</context>
         </context-group>
-        <target state="translated"> Originale herunterladen <x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div *ngIf=&quot;awaitingDownload&quot; class=&quot;spinner-border spinner-border-sm&quot; role=&quot;status&quot;&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;visually-hidden&quot;&gt;"/>Download wird vorbereitet...<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/></target>
+        <target state="translated"> Herunterladen <x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div *ngIf=&quot;awaitingDownload&quot; class=&quot;spinner-border spinner-border-sm&quot; role=&quot;status&quot;&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;visually-hidden&quot;&gt;"/>Herunterladen wird vorbereitet...<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/></target>
       </trans-unit>
       <trans-unit id="9202029122138685465" datatype="html">
         <source> Download originals <x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div *ngIf=&quot;awaitingDownload&quot; class=&quot;spinner-border spinner-border-sm&quot; role=&quot;status&quot;&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;visually-hidden&quot;&gt;"/>Preparing download...<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/></source>
@@ -2093,7 +2093,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">209,211</context>
         </context-group>
-        <target state="translated">Dieser Vorgang wird die folgenden Tags hinzufügen <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> zu <x id="PH_1" equiv-text="this.list.selected.size"/> ausgewählten Dokument(en).</target>
+        <target state="translated">Diese Aktion wird die folgenden Tags hinzufügen <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> zu <x id="PH_1" equiv-text="this.list.selected.size"/> ausgewählten Dokument(en).</target>
       </trans-unit>
       <trans-unit id="7181166515756808573" datatype="html" approved="yes">
         <source>This operation will remove the tag &quot;<x id="PH" equiv-text="tag.name"/>&quot; from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -2109,7 +2109,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">222,224</context>
         </context-group>
-        <target state="translated">Dieser Vorgang wird die folgenden Tags entfernen <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> von <x id="PH_1" equiv-text="this.list.selected.size"/> ausgewählten Dokument(en).</target>
+        <target state="translated">Diese Aktion wird die folgenden Tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> von <x id="PH_1" equiv-text="this.list.selected.size"/> ausgewählten Dokument(en) entfernen.</target>
       </trans-unit>
       <trans-unit id="2739066218579571288" datatype="html">
         <source>This operation will add the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> and remove the tags <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> on <x id="PH_2" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -2117,7 +2117,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">226,230</context>
         </context-group>
-        <target state="translated">Dieser Vorgang wird die folgenden Tags hinzufügen <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> und die folgenden entfernen <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> von <x id="PH_2" equiv-text="this.list.selected.size"/> ausgewählten Dokumenten(en).</target>
+        <target state="translated">Diese Aktion wird die Tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> hinzufügen und die Tags <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> ertfernen von <x id="PH_2" equiv-text="this.list.selected.size"/> ausgewählten Dokument(en).</target>
       </trans-unit>
       <trans-unit id="2996713129519325161" datatype="html" approved="yes">
         <source>Confirm correspondent assignment</source>
@@ -2221,7 +2221,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">388</context>
         </context-group>
-        <target state="translated">Diese Aktion wird OCR permanent für <x id="PH" equiv-text="this.list.selected.size"/> ausgewählte(s) Dokument(e) wiederholen.</target>
+        <target state="translated">Diese Aktion wird die Texterkennung für <x id="PH" equiv-text="this.list.selected.size"/> ausgewählte(s) Dokument(e) wiederholen.</target>
       </trans-unit>
       <trans-unit id="8076495233090006322" datatype="html" approved="yes">
         <source>Filter by correspondent</source>
@@ -3391,7 +3391,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">102</context>
         </context-group>
-        <target state="needs-translation">Complete <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.completedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.completedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
+        <target state="translated">Erledigt <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.completedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.completedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
       </trans-unit>
       <trans-unit id="1697296301417588213" datatype="html">
         <source>Started <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.startedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.startedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
