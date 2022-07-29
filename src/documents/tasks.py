@@ -87,6 +87,8 @@ def consume_file(
     override_created=None,
 ):
 
+    path = Path(path).resolve()
+
     # check for separators in current document
     if settings.CONSUMER_ENABLE_BARCODES:
 
@@ -122,7 +124,11 @@ def consume_file(
                         newname = f"{str(n)}_" + override_filename
                     else:
                         newname = None
-                    barcodes.save_to_dir(document, newname=newname)
+                    barcodes.save_to_dir(
+                        document,
+                        newname=newname,
+                        target_dir=path.parent,
+                    )
 
                 # if we got here, the document was successfully split
                 # and can safely be deleted
