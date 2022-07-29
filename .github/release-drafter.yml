@@ -25,6 +25,7 @@ include-labels:
   - 'deployment'
   - 'translation'
   - 'dependencies'
+  - 'documentation'
 replacers: # Changes "Feature: Update checker" to "Update checker"
   - search: '/Feature:|Feat:|\[feature\]/gi'
     replace: ''
