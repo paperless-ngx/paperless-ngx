@@ -1683,7 +1683,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">83</context>
         </context-group>
-        <target state="needs-translation">Default</target>
+        <target state="translated">Standaard</target>
       </trans-unit>
       <trans-unit id="6205355627445317276" datatype="html" approved="yes">
         <source>Content</source>
