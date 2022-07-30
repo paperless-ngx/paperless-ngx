@@ -57,7 +57,7 @@
           <context context-type="sourcefile">node_modules/src/datepicker/datepicker-navigation-select.ts</context>
           <context context-type="linenumber">41,42</context>
         </context-group>
-        <target state="needs-translation">Select year</target>
+        <target state="translated">Velg år</target>
       </trans-unit>
       <trans-unit id="ngb.datepicker.previous-month" datatype="html">
         <source>Previous month</source>
