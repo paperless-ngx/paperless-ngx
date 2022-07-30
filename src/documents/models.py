@@ -221,7 +221,7 @@ class Document(models.Model):
         default=None,
         unique=False,
         null=True,
-        help_text=_("The original name of the file when it was uploaded")
+        help_text=_("The original name of the file when it was uploaded"),
     )
 
     archive_serial_number = models.IntegerField(
