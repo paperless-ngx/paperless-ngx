@@ -6,13 +6,20 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('documents', '1022_paperlesstask'),
+        ("documents", "1022_paperlesstask"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='document',
-            name='original_filename',
-            field=models.CharField(default=None, editable=False, help_text='The original name of the file when it was uploaded', max_length=1024, null=True, verbose_name='original filename'),
+            model_name="document",
+            name="original_filename",
+            field=models.CharField(
+                default=None,
+                editable=False,
+                help_text="The original name of the file when it was uploaded",
+                max_length=1024,
+                null=True,
+                verbose_name="original filename",
+            ),
         ),
     ]
