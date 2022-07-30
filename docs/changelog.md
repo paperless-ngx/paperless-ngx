@@ -23,6 +23,8 @@
 
 ### Bug Fixes
 
+- Fix: dropdown selected items not visible again [@shamoon](https://github.com/shamoon) ([#1261](https://github.com/paperless-ngx/paperless-ngx/pull/1261))
+- [CI] Fix automatic changelog generation on release [@qcasey](https://github.com/qcasey) ([#1249](https://github.com/paperless-ngx/paperless-ngx/pull/1249))
 - Fix: Prevent duplicate api calls on text filtering [@shamoon](https://github.com/shamoon) ([#1133](https://github.com/paperless-ngx/paperless-ngx/pull/1133))
 - make frontend timezone un-aware [@shamoon](https://github.com/shamoon) ([#957](https://github.com/paperless-ngx/paperless-ngx/pull/957))
 - Feature / fix quick toggleable filters [@shamoon](https://github.com/shamoon) ([#1122](https://github.com/paperless-ngx/paperless-ngx/pull/1122))
