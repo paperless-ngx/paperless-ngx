@@ -50,4 +50,4 @@ jobs:
         # Only run if the token is not empty
         if: "${{ env.TOKEN != '' }}"
         run: |
-          python ${GITHUB_WORKSPACE}/.github/scripts/cleanup-tags.py --loglevel info --untagged --delete
+          python ${GITHUB_WORKSPACE}/.github/scripts/cleanup-tags.py --loglevel info --delete
