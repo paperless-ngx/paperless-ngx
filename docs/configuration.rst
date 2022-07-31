@@ -521,9 +521,6 @@ requires are as follows:
         gotenberg:
             image: gotenberg/gotenberg:7.4
             restart: unless-stopped
-            command:
-                - "gotenberg"
-                - "--chromium-disable-routes=true"
 
         tika:
             image: ghcr.io/paperless-ngx/tika:latest

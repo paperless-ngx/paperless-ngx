@@ -239,7 +239,7 @@ class MailAccountHandler(LoggingMixin):
 
         return total_processed_files
 
-    def handle_mail_rule(self, M: MailBox, rule):
+    def handle_mail_rule(self, M: MailBox, rule: MailRule):
 
         self.log("debug", f"Rule {rule}: Selecting folder {rule.folder}")
 
@@ -324,8 +324,11 @@ class MailAccountHandler(LoggingMixin):
 
         return total_processed_files
 
-    def handle_message(self, message, rule) -> int:
-        if not message.attachments:
+    def handle_message(self, message, rule: MailRule) -> int:
+        if (
+            not message.attachments
+            and rule.consumption_scope == MailRule.ConsumptionScope.ATTACHMENTS_ONLY
+        ):
             return 0
 
         self.log(
@@ -341,76 +344,132 @@ class MailAccountHandler(LoggingMixin):
 
         processed_attachments = 0
 
-        for att in message.attachments:
+        if (
+            rule.consumption_scope == MailRule.ConsumptionScope.EML_ONLY
+            or rule.consumption_scope == MailRule.ConsumptionScope.EVERYTHING
+        ):
+            os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
+            _, temp_filename = tempfile.mkstemp(
+                prefix="paperless-mail-",
+                dir=settings.SCRATCH_DIR,
+                suffix=".eml",
+            )
+            with open(temp_filename, "wb") as f:
+                # Move "From"-header to beginning of file
+                # TODO: This ugly workaround is needed because the parser is
+                #   chosen only by the mime_type detected via magic
+                #   (see documents/consumer.py "mime_type = magic.from_file")
+                #   Unfortunately magic sometimes fails to detect the mime
+                #   type of .eml files correctly as message/rfc822 and instead
+                #   detects text/plain.
+                #   This also effects direct file consumption of .eml files
+                #   which are not treated with this workaround.
+                from_element = None
+                for i, header in enumerate(message.obj._headers):
+                    if header[0] == "From":
+                        from_element = i
+                if from_element:
+                    new_headers = [message.obj._headers.pop(from_element)]
+                    new_headers += message.obj._headers
+                    message.obj._headers = new_headers
 
-            if (
-                not att.content_disposition == "attachment"
-                and rule.attachment_type
-                == MailRule.AttachmentProcessing.ATTACHMENTS_ONLY
-            ):
-                self.log(
-                    "debug",
-                    f"Rule {rule}: "
-                    f"Skipping attachment {att.filename} "
-                    f"with content disposition {att.content_disposition}",
-                )
-                continue
+                f.write(message.obj.as_bytes())
 
-            if rule.filter_attachment_filename:
-                # Force the filename and pattern to the lowercase
-                # as this is system dependent otherwise
-                if not fnmatch(
-                    att.filename.lower(),
-                    rule.filter_attachment_filename.lower(),
+            self.log(
+                "info",
+                f"Rule {rule}: "
+                f"Consuming eml from mail "
+                f"{message.subject} from {message.from_}",
+            )
+
+            async_task(
+                "documents.tasks.consume_file",
+                path=temp_filename,
+                override_filename=pathvalidate.sanitize_filename(
+                    message.subject + ".eml",
+                ),
+                override_title=message.subject,
+                override_correspondent_id=correspondent.id if correspondent else None,
+                override_document_type_id=doc_type.id if doc_type else None,
+                override_tag_ids=tag_ids,
+                task_name=message.subject[:100],
+            )
+            processed_attachments += 1
+
+        if (
+            rule.consumption_scope == MailRule.ConsumptionScope.ATTACHMENTS_ONLY
+            or rule.consumption_scope == MailRule.ConsumptionScope.EVERYTHING
+        ):
+            for att in message.attachments:
+
+                if (
+                    not att.content_disposition == "attachment"
+                    and rule.attachment_type
+                    == MailRule.AttachmentProcessing.ATTACHMENTS_ONLY
                 ):
+                    self.log(
+                        "debug",
+                        f"Rule {rule}: "
+                        f"Skipping attachment {att.filename} "
+                        f"with content disposition {att.content_disposition}",
+                    )
                     continue
 
-            title = self.get_title(message, att, rule)
+                if rule.filter_attachment_filename:
+                    # Force the filename and pattern to the lowercase
+                    # as this is system dependent otherwise
+                    if not fnmatch(
+                        att.filename.lower(),
+                        rule.filter_attachment_filename.lower(),
+                    ):
+                        continue
 
-            # don't trust the content type of the attachment. Could be
-            # generic application/octet-stream.
-            mime_type = magic.from_buffer(att.payload, mime=True)
+                title = self.get_title(message, att, rule)
 
-            if is_mime_type_supported(mime_type):
+                # don't trust the content type of the attachment. Could be
+                # generic application/octet-stream.
+                mime_type = magic.from_buffer(att.payload, mime=True)
 
-                os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
-                _, temp_filename = tempfile.mkstemp(
-                    prefix="paperless-mail-",
-                    dir=settings.SCRATCH_DIR,
-                )
-                with open(temp_filename, "wb") as f:
-                    f.write(att.payload)
+                if is_mime_type_supported(mime_type):
 
-                self.log(
-                    "info",
-                    f"Rule {rule}: "
-                    f"Consuming attachment {att.filename} from mail "
-                    f"{message.subject} from {message.from_}",
-                )
+                    os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
+                    _, temp_filename = tempfile.mkstemp(
+                        prefix="paperless-mail-",
+                        dir=settings.SCRATCH_DIR,
+                    )
+                    with open(temp_filename, "wb") as f:
+                        f.write(att.payload)
 
-                async_task(
-                    "documents.tasks.consume_file",
-                    path=temp_filename,
-                    override_filename=pathvalidate.sanitize_filename(
-                        att.filename,
-                    ),
-                    override_title=title,
-                    override_correspondent_id=correspondent.id
-                    if correspondent
-                    else None,
-                    override_document_type_id=doc_type.id if doc_type else None,
-                    override_tag_ids=tag_ids,
-                    task_name=att.filename[:100],
-                )
+                    self.log(
+                        "info",
+                        f"Rule {rule}: "
+                        f"Consuming attachment {att.filename} from mail "
+                        f"{message.subject} from {message.from_}",
+                    )
 
-                processed_attachments += 1
-            else:
-                self.log(
-                    "debug",
-                    f"Rule {rule}: "
-                    f"Skipping attachment {att.filename} "
-                    f"since guessed mime type {mime_type} is not supported "
-                    f"by paperless",
-                )
+                    async_task(
+                        "documents.tasks.consume_file",
+                        path=temp_filename,
+                        override_filename=pathvalidate.sanitize_filename(
+                            att.filename,
+                        ),
+                        override_title=title,
+                        override_correspondent_id=correspondent.id
+                        if correspondent
+                        else None,
+                        override_document_type_id=doc_type.id if doc_type else None,
+                        override_tag_ids=tag_ids,
+                        task_name=att.filename[:100],
+                    )
+
+                    processed_attachments += 1
+                else:
+                    self.log(
+                        "debug",
+                        f"Rule {rule}: "
+                        f"Skipping attachment {att.filename} "
+                        f"since guessed mime type {mime_type} is not supported "
+                        f"by paperless",
+                    )
 
         return processed_attachments
