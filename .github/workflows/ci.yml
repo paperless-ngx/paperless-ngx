@@ -234,6 +234,15 @@ jobs:
         with:
           name: frontend-compiled
           path: src/documents/static/frontend/
+      -
+        name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.6.1
+        with:
+          image-ref: '${{ fromJSON(steps.docker-meta.outputs.json).tags[0] }}'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: 'CRITICAL,HIGH'
 
   build-release:
     needs:
