@@ -25,7 +25,7 @@ jobs:
     if: github.event_name == 'issues' && (github.event.action == 'opened' || github.event.action == 'reopened')
     steps:
       - name: Set issue status to ${{ env.todo }}
-        uses: leonsteinhaeuser/project-beta-automations@v1.2.1
+        uses: leonsteinhaeuser/project-beta-automations@v1.3.0
         with:
           gh_token: ${{ secrets.GH_TOKEN }}
           organization: paperless-ngx
@@ -38,7 +38,7 @@ jobs:
     if: github.event_name == 'pull_request_target' && (github.event.action == 'opened' || github.event.action == 'reopened')
     steps:
       - name: Set PR status to ${{ env.in_progress }}
-        uses: leonsteinhaeuser/project-beta-automations@v1.2.1
+        uses: leonsteinhaeuser/project-beta-automations@v1.3.0
         with:
           gh_token: ${{ secrets.GH_TOKEN }}
           organization: paperless-ngx
