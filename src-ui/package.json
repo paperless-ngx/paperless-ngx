@@ -28,7 +28,7 @@
     "bootstrap": "^5.2.0",
     "file-saver": "^2.0.5",
     "ng2-pdf-viewer": "^9.1.0",
-    "ngx-color": "^7.3.3",
+    "ngx-color": "^8.0.1",
     "ngx-cookie-service": "^14.0.1",
     "ngx-file-drop": "^14.0.1",
     "rxjs": "~7.5.6",
