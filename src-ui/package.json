@@ -30,7 +30,7 @@
     "ng2-pdf-viewer": "^9.0.0",
     "ngx-color": "^7.3.3",
     "ngx-cookie-service": "^14.0.1",
-    "ngx-file-drop": "^13.0.0",
+    "ngx-file-drop": "^14.0.1",
     "rxjs": "~7.5.6",
     "tslib": "^2.3.1",
     "uuid": "^8.3.1",
