@@ -7,4 +7,3 @@
 /src/ @paperless-ngx/backend
 Pipfile* @paperless-ngx/backend
 *.py @paperless-ngx/backend
-requirements.txt @paperless-ngx/backend
