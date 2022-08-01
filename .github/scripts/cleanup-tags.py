@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 import functools
+import json
 import logging
 import os
 import re
+import shutil
+import subprocess
 from argparse import ArgumentParser
+from platform import platform
 from typing import Dict
 from typing import Final
 from typing import List
@@ -17,8 +21,8 @@ logger = logging.getLogger("cleanup-tags")
 
 class ContainerPackage:
     def __init__(self, data: Dict):
-        super().__init__(data)
         self._data = data
+        self.name = self._data["name"]
         self.id = self._data["id"]
         self.url = self._data["url"]
         self.tags = self._data["metadata"]["container"]["tags"]
@@ -33,6 +37,9 @@ class ContainerPackage:
             if re.match(pattern, tag) is not None:
                 return True
         return False
+
+    def __repr__(self):
+        return f"Package {self.name}"
 
 
 class GithubContainerRegistry:
@@ -187,7 +194,7 @@ class GithubContainerRegistry:
         resp = self._session.delete(package_data.url)
         if resp.status_code != 204:
             logger.warning(
-                f"Request to delete {ackage_data.url} returned HTTP {resp.status_code}",
+                f"Request to delete {package_data.url} returned HTTP {resp.status_code}",
             )
 
 
@@ -252,6 +259,10 @@ def _main():
 
                 # Step 3.1 - Location all versions of the given package
                 all_package_versions = gh_api.get_package_versions(package_name)
+                all_pkgs_tags_to_version = {}
+                for pkg in all_package_versions:
+                    for tag in pkg.tags:
+                        all_pkgs_tags_to_version[tag] = pkg
                 logger.info(
                     f"Located {len(all_package_versions)} versions of package {package_name}",
                 )
@@ -270,13 +281,13 @@ def _main():
                     for tag in pkg.tags:
                         feature_pkgs_tags_to_versions[tag] = pkg
 
-                # Step 3.3 - Determine which package versions have no matching branch
+                # Step 3.3 - Determine which package versions have no matching branch and which tags we're keeping
                 tags_to_delete = list(
                     set(feature_pkgs_tags_to_versions.keys())
                     - set(feature_branches.keys()),
                 )
                 tags_to_keep = list(
-                    set(feature_pkgs_tags_to_versions.keys()) - set(tags_to_delete),
+                    set(all_pkgs_tags_to_version.keys()) - set(tags_to_delete),
                 )
                 logger.info(
                     f"Located {len(tags_to_delete)} versions of package {package_name} to delete",
@@ -288,33 +299,74 @@ def _main():
 
                     if args.delete:
                         logger.info(
-                            f"Deleting {tag_to_delete} (id {package_version_info['id']})",
+                            f"Deleting {tag_to_delete} (id {package_version_info.id})",
                         )
                         gh_api.delete_package_version(
-                            package_name,
                             package_version_info,
                         )
 
                     else:
                         logger.info(
-                            f"Would delete {tag_to_delete} (id {package_version_info['id']})",
+                            f"Would delete {tag_to_delete} (id {package_version_info.id})",
                         )
 
                 # Step 4 - Deal with untagged and dangling packages
                 if args.untagged:
+
+                    untagged_versions = {}
+                    for x in all_package_versions:
+                        if x.untagged:
+                            untagged_versions[x.name] = x
+
+                    for tag in tags_to_keep:
+                        full_name = f"ghcr.io/{repo_owner}/{package_name}:{tag}"
+                        logger.info(f"Checking manifest for {full_name}")
+                        try:
+                            proc = subprocess.run(
+                                [
+                                    shutil.which("docker"),
+                                    "manifest",
+                                    "inspect",
+                                    full_name,
+                                ],
+                                capture_output=True,
+                            )
+                            manifest_list = json.loads(proc.stdout)
+                            for manifest in manifest_list["manifests"]:
+                                digest = manifest["digest"]
+                                platform_data = manifest["platform"]
+                                platform = (
+                                    platform_data["os"]
+                                    + "/"
+                                    + platform_data["architecture"]
+                                    + platform_data["architecture"]["variant"]
+                                    if "variant" in platform_data["architecture"]
+                                    else ""
+                                )
+                                if digest in untagged_versions:
+                                    logger.debug(
+                                        f"Skipping deletion of {digest}, referred to by {full_name} for {platform}",
+                                    )
+                                    del untagged_versions[digest]
+                        except json.decoder.JSONDecodeError as err:
+                            logger.debug(f"{err} on {full_name}")
+                            continue
+                        except Exception as err:
+                            logger.exception(err)
+                            continue
+
                     logger.info(f"Deleting untagged packages of {package_name}")
-                    for to_delete_name in untagged_packages:
-                        to_delete_version = untagged_packages[to_delete_name]
+                    for to_delete_name in untagged_versions:
+                        to_delete_version = untagged_versions[to_delete_name]
 
                         if args.delete:
-                            logger.info(f"Deleting id {to_delete_version['id']}")
+                            logger.info(f"Deleting id {to_delete_version.id}")
                             gh_api.delete_package_version(
-                                package_name,
                                 to_delete_version,
                             )
                         else:
                             logger.info(
-                                f"Would delete {to_delete_name} (id {to_delete_version['id']})",
+                                f"Would delete {to_delete_name} (id {to_delete_version.id})",
                             )
                 else:
                     logger.info("Leaving untagged images untouched")
