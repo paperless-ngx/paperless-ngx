@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
+import functools
 import logging
 import os
+import re
 from argparse import ArgumentParser
+from typing import Dict
 from typing import Final
 from typing import List
 from urllib.parse import quote
@@ -10,6 +13,26 @@ import requests
 from common import get_log_level
 
 logger = logging.getLogger("cleanup-tags")
+
+
+class ContainerPackage:
+    def __init__(self, data: Dict):
+        super().__init__(data)
+        self._data = data
+        self.id = self._data["id"]
+        self.url = self._data["url"]
+        self.tags = self._data["metadata"]["container"]["tags"]
+
+    @functools.cached_property
+    def untagged(self) -> bool:
+        return len(self.tags) == 0
+
+    @functools.cache
+    def tag_matches(self, pattern: str) -> bool:
+        for tag in self.tags:
+            if re.match(pattern, tag) is not None:
+                return True
+        return False
 
 
 class GithubContainerRegistry:
@@ -105,7 +128,7 @@ class GithubContainerRegistry:
         self,
         package_name: str,
         package_type: str = "container",
-    ) -> List:
+    ) -> List[ContainerPackage]:
         """
         Returns all the versions of a given package (container images) from
         the API
@@ -117,26 +140,27 @@ class GithubContainerRegistry:
             PACKAGE_NAME=package_name,
         )
 
-        internal_data = self._read_all_pages(endpoint)
+        pkgs = []
 
-        return internal_data
+        for data in self._read_all_pages(endpoint):
+            pkgs.append(ContainerPackage(data))
 
-    def filter_packages_by_tag_pattern(self, package_data, pattern: str):
+        return pkgs
+
+    def filter_packages_by_tag_pattern(
+        self,
+        package_data: List[ContainerPackage],
+        pattern: str,
+    ) -> List[ContainerPackage]:
         """
         Filters the given package version info to those where the tags of the image
         containers at least 1 tag which starts with the given pattern.
         """
-        matches = {}
+        matches = []
 
         for package in package_data:
-            if "metadata" in package and "container" in package["metadata"]:
-                container_metadata = package["metadata"]["container"]
-                if "tags" in container_metadata:
-                    container_tags = container_metadata["tags"]
-                    for tag in container_tags:
-                        if tag.startswith(pattern):
-                            matches[tag] = package
-                            break
+            if package.tag_matches(pattern):
+                matches.append(package)
 
         return matches
 
@@ -156,15 +180,14 @@ class GithubContainerRegistry:
 
         return matches
 
-    def delete_package_version(self, package_name, package_data):
+    def delete_package_version(self, package_data: ContainerPackage):
         """
         Deletes the given package version from the GHCR
         """
-        endpoint = package_data["url"]
-        resp = self._session.delete(endpoint)
+        resp = self._session.delete(package_data.url)
         if resp.status_code != 204:
             logger.warning(
-                f"Request to delete {endpoint} returned HTTP {resp.status_code}",
+                f"Request to delete {ackage_data.url} returned HTTP {resp.status_code}",
             )
 
 
@@ -242,25 +265,25 @@ def _main():
                     f'Located {len(packages_tagged_feature)} versions of package {package_name} tagged "feature-"',
                 )
 
-                # Step 3.3 - Location package versions with no tags at all
-                # TODO: What exactly are these?  Leftovers?
-                untagged_packages = gh_api.filter_packages_untagged(
-                    all_package_versions,
+                feature_pkgs_tags_to_versions = {}
+                for pkg in packages_tagged_feature:
+                    for tag in pkg.tags:
+                        feature_pkgs_tags_to_versions[tag] = pkg
+
+                # Step 3.3 - Determine which package versions have no matching branch
+                tags_to_delete = list(
+                    set(feature_pkgs_tags_to_versions.keys())
+                    - set(feature_branches.keys()),
+                )
+                tags_to_keep = list(
+                    set(feature_pkgs_tags_to_versions.keys()) - set(tags_to_delete),
                 )
                 logger.info(
-                    f"Located {len(untagged_packages)} untagged versions of package {package_name}",
+                    f"Located {len(tags_to_delete)} versions of package {package_name} to delete",
                 )
 
-                # Step 3.4 - Determine which package versions have no matching branch
-                to_delete = list(
-                    set(packages_tagged_feature.keys()) - set(feature_branches.keys()),
-                )
-                logger.info(
-                    f"Located {len(to_delete)} versions of package {package_name} to delete",
-                )
-
-                # Step 3.5 - Delete certain package versions
-                for tag_to_delete in to_delete:
+                # Step 3.4 - Delete certain package versions
+                for tag_to_delete in tags_to_delete:
                     package_version_info = packages_tagged_feature[tag_to_delete]
 
                     if args.delete:
@@ -277,7 +300,7 @@ def _main():
                             f"Would delete {tag_to_delete} (id {package_version_info['id']})",
                         )
 
-                # Step 3.6 - Delete untagged package versions
+                # Step 4 - Deal with untagged and dangling packages
                 if args.untagged:
                     logger.info(f"Deleting untagged packages of {package_name}")
                     for to_delete_name in untagged_packages:
