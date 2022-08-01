@@ -51,3 +51,8 @@ jobs:
         if: "${{ env.TOKEN != '' }}"
         run: |
           python ${GITHUB_WORKSPACE}/.github/scripts/cleanup-tags.py --loglevel info --untagged --delete
+      -
+        name: Check all tags still pull
+        run: |
+          ghcr_name=$(echo "${GITHUB_REPOSITORY}" | awk '{ print tolower($0) }')
+          docker pull --quiet --all-tags ghcr.io/${ghcr_name}
