@@ -244,17 +244,26 @@ jobs:
         name: Checkout
         uses: actions/checkout@v3
       -
+        name: Install pipenv
+        run: |
+          pip3 install --upgrade pip setuptools wheel pipx
+          pipx install pipenv
+      -
         name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: 3.9
+          cache: "pipenv"
+          cache-dependency-path: 'Pipfile.lock'
       -
-        name: Install dependencies
+        name: Install Python dependencies
+        run: |
+          pipenv sync --dev
+      -
+        name: Install system dependencies
         run: |
           sudo apt-get update -qq
           sudo apt-get install -qq --no-install-recommends gettext liblept5
-          pip3 install --upgrade pip setuptools wheel
-          pip3 install -r requirements.txt
       -
         name: Download frontend artifact
         uses: actions/download-artifact@v3
@@ -268,33 +277,37 @@ jobs:
           name: documentation
           path: docs/_build/html/
       -
+        name: Generate requirements file
+        run: |
+          pipenv requirements > requirements.txt
+      -
+        name: Compile messages
+        run: |
+          cd src/
+          pipenv run python3 manage.py compilemessages
+      -
+        name: Collect static files
+        run: |
+          cd src/
+          pipenv run python3 manage.py collectstatic --no-input
+      -
         name: Move files
         run: |
           mkdir dist
           mkdir dist/paperless-ngx
           mkdir dist/paperless-ngx/scripts
-          cp .dockerignore .env Dockerfile Pipfile Pipfile.lock LICENSE README.md requirements.txt dist/paperless-ngx/
+          cp .dockerignore .env Dockerfile Pipfile Pipfile.lock requirements.txt LICENSE README.md dist/paperless-ngx/
           cp paperless.conf.example dist/paperless-ngx/paperless.conf
           cp gunicorn.conf.py dist/paperless-ngx/gunicorn.conf.py
-          cp docker/ dist/paperless-ngx/docker -r
+          cp -r docker/ dist/paperless-ngx/docker
           cp scripts/*.service scripts/*.sh dist/paperless-ngx/scripts/
-          cp src/ dist/paperless-ngx/src -r
-          cp docs/_build/html/ dist/paperless-ngx/docs -r
-      -
-        name: Compile messages
-        run: |
-          cd dist/paperless-ngx/src
-          python3 manage.py compilemessages
-      -
-        name: Collect static files
-        run: |
-          cd dist/paperless-ngx/src
-          python3 manage.py collectstatic --no-input
+          cp -r src/ dist/paperless-ngx/src
+          cp -r docs/_build/html/ dist/paperless-ngx/docs
+          mv static dist/paperless-ngx
       -
         name: Make release package
         run: |
           cd dist
-          find . -name __pycache__ | xargs rm -r
           tar -cJf paperless-ngx.tar.xz paperless-ngx/
       -
         name: Upload release artifact
