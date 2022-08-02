@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-07-08 14:11-0700\n"
-"PO-Revision-Date: 2022-07-08 22:07\n"
+"PO-Revision-Date: 2022-08-02 19:18\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -100,11 +100,11 @@ msgstr "типы документов"
 
 #: documents/models.py:90
 msgid "path"
-msgstr ""
+msgstr "путь"
 
 #: documents/models.py:96 documents/models.py:124
 msgid "storage path"
-msgstr ""
+msgstr "путь к хранилищу"
 
 #: documents/models.py:97
 msgid "storage paths"
@@ -450,7 +450,7 @@ msgstr "Английский (США)"
 
 #: paperless/settings.py:340
 msgid "Belarusian"
-msgstr ""
+msgstr "Белорусский"
 
 #: paperless/settings.py:341
 msgid "Czech"
@@ -510,11 +510,11 @@ msgstr "Русский"
 
 #: paperless/settings.py:355
 msgid "Slovenian"
-msgstr ""
+msgstr "Словенский"
 
 #: paperless/settings.py:356
 msgid "Serbian"
-msgstr ""
+msgstr "Сербский"
 
 #: paperless/settings.py:357
 msgid "Swedish"
@@ -522,7 +522,7 @@ msgstr "Шведский"
 
 #: paperless/settings.py:358
 msgid "Turkish"
-msgstr ""
+msgstr "Турецкий"
 
 #: paperless/settings.py:359
 msgid "Chinese Simplified"
