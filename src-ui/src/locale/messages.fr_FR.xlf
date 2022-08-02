@@ -1010,7 +1010,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.ts</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="needs-translation">See &lt;a target="_blank" href="https://paperless-ngx.readthedocs.io/en/latest/advanced_usage.html#file-name-handling"&gt;documentation&lt;/a&gt; for full list.</target>
+        <target state="translated">Voir &lt;a target="_blank" href="https://paperless-ngx.readthedocs.io/en/latest/advanced_usage.html#file-name-handling"&gt;documentation&lt;/a&gt; pour une liste complète.</target>
       </trans-unit>
       <trans-unit id="6898961890896270754" datatype="html">
         <source>Create new storage path</source>
@@ -2377,7 +2377,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="needs-translation">Toggle tag filter</target>
+        <target state="translated">(Dés)activer filtre d'étiquette</target>
       </trans-unit>
       <trans-unit id="4648526799630820486" datatype="html">
         <source>Toggle correspondent filter</source>
@@ -2385,7 +2385,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="needs-translation">Toggle correspondent filter</target>
+        <target state="translated">(Dés)activer le filtre correspondant</target>
       </trans-unit>
       <trans-unit id="5319701482646590642" datatype="html">
         <source>Toggle document type filter</source>
@@ -3277,7 +3277,7 @@
           <context context-type="sourcefile">src/app/components/manage/storage-path-list/storage-path-list.component.ts</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="needs-translation">storage path</target>
+        <target state="translated">chemin de stockage</target>
       </trans-unit>
       <trans-unit id="22235115124223314" datatype="html">
         <source>storage paths</source>
@@ -3285,7 +3285,7 @@
           <context context-type="sourcefile">src/app/components/manage/storage-path-list/storage-path-list.component.ts</context>
           <context context-type="linenumber">31</context>
         </context-group>
-        <target state="needs-translation">storage paths</target>
+        <target state="translated">chemins de stockage</target>
       </trans-unit>
       <trans-unit id="1569070683025071137" datatype="html">
         <source>Do you really want to delete the storage path &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
