@@ -197,12 +197,14 @@ class MailAccountHandler(LoggingMixin):
 
                         # Need to transition out of AUTH state to SELECTED
                         M.folder.set("INBOX")
-                    except Exception:
+                    except Exception as err:
                         self.log(
                             "error",
                             "Unable to authenticate with mail server using AUTH=PLAIN",
                         )
-                        raise MailError(f"Error while authenticating account {account}")
+                        raise MailError(
+                            f"Error while authenticating account {account}",
+                        ) from err
                 except Exception as e:
                     self.log(
                         "error",
@@ -245,7 +247,7 @@ class MailAccountHandler(LoggingMixin):
 
         try:
             M.folder.set(rule.folder)
-        except MailboxFolderSelectError:
+        except MailboxFolderSelectError as err:
 
             self.log(
                 "error",
@@ -264,7 +266,7 @@ class MailAccountHandler(LoggingMixin):
             raise MailError(
                 f"Rule {rule}: Folder {rule.folder} "
                 f"does not exist in account {rule.account}",
-            )
+            ) from err
 
         criterias = make_criterias(rule)
 
@@ -279,8 +281,10 @@ class MailAccountHandler(LoggingMixin):
                 mark_seen=False,
                 charset=rule.account.character_set,
             )
-        except Exception:
-            raise MailError(f"Rule {rule}: Error while fetching folder {rule.folder}")
+        except Exception as err:
+            raise MailError(
+                f"Rule {rule}: Error while fetching folder {rule.folder}",
+            ) from err
 
         post_consume_messages = []
 
@@ -320,7 +324,7 @@ class MailAccountHandler(LoggingMixin):
         except Exception as e:
             raise MailError(
                 f"Rule {rule}: Error while processing post-consume actions: " f"{e}",
-            )
+            ) from e
 
         return total_processed_files
 
