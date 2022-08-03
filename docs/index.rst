@@ -44,7 +44,7 @@ resources in the documentation:
     learn about how paperless automates all tagging using machine learning.
 *   Paperless now comes with a :ref:`proper email consumer <usage-email>`
     that's fully tested and production ready.
-*   Paperless creates searchable PDF/A documents from whatever you you put into
+*   Paperless creates searchable PDF/A documents from whatever you put into
     the consumption directory. This means that you can select text in
     image-only documents coming from your scanner.
 *   See :ref:`this note <utilities-encyption>` about GnuPG encryption in
