@@ -323,11 +323,11 @@ class RasterisedDocumentParser(DocumentParser):
 
             except Exception as e:
                 # If this fails, we have a serious issue at hand.
-                raise ParseError(f"{e.__class__.__name__}: {str(e)}")
+                raise ParseError(f"{e.__class__.__name__}: {str(e)}") from e
 
         except Exception as e:
             # Anything else is probably serious.
-            raise ParseError(f"{e.__class__.__name__}: {str(e)}")
+            raise ParseError(f"{e.__class__.__name__}: {str(e)}") from e
 
         # As a last resort, if we still don't have any text for any reason,
         # try to extract the text from the original document.

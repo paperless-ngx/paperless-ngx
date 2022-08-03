@@ -101,8 +101,8 @@ class DocumentClassifier:
                         self.correspondent_classifier = pickle.load(f)
                         self.document_type_classifier = pickle.load(f)
                         self.storage_path_classifier = pickle.load(f)
-                    except Exception:
-                        raise ClassifierModelCorruptError()
+                    except Exception as err:
+                        raise ClassifierModelCorruptError() from err
 
             # Check for the warning about unpickling from differing versions
             # and consider it incompatible
