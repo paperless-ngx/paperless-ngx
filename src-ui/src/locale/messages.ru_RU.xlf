@@ -2313,7 +2313,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">180</context>
         </context-group>
-        <target state="needs-translation">Filter by document type</target>
+        <target state="translated">Фильтр по типу документа</target>
       </trans-unit>
       <trans-unit id="157572966557284263" datatype="html">
         <source>Filter by storage path</source>
@@ -2529,7 +2529,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">175</context>
         </context-group>
-        <target state="needs-translation">Edit document</target>
+        <target state="translated">Изменить документ</target>
       </trans-unit>
       <trans-unit id="2155249406916744630" datatype="html" approved="yes">
         <source>View &quot;<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>&quot; saved successfully.</source>
@@ -2561,7 +2561,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">72,74</context>
         </context-group>
-        <target state="needs-translation">Correspondent: <x id="PH" equiv-text="this.correspondents.find((c) =&gt; c.id == +rule.value)?.name"/></target>
+        <target state="translated">Корреспондент: <x id="PH" equiv-text="this.correspondents.find((c) =&gt; c.id == +rule.value)?.name"/></target>
       </trans-unit>
       <trans-unit id="8170755470576301659" datatype="html" approved="yes">
         <source>Without correspondent</source>
@@ -2745,7 +2745,7 @@
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.ts</context>
           <context context-type="linenumber">34</context>
         </context-group>
-        <target state="needs-translation">correspondents</target>
+        <target state="translated">корреспонденты</target>
       </trans-unit>
       <trans-unit id="6360600151505327572" datatype="html">
         <source>Last used</source>
@@ -2769,7 +2769,7 @@
           <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.ts</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="needs-translation">document type</target>
+        <target state="translated">тип документа</target>
       </trans-unit>
       <trans-unit id="2992451138146293104" datatype="html">
         <source>document types</source>
@@ -2777,7 +2777,7 @@
           <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.ts</context>
           <context context-type="linenumber">31</context>
         </context-group>
-        <target state="needs-translation">document types</target>
+        <target state="translated">типы документов</target>
       </trans-unit>
       <trans-unit id="4990731724078522539" datatype="html" approved="yes">
         <source>Do you really want to delete the document type &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
@@ -2885,7 +2885,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
           <context context-type="linenumber">44</context>
         </context-group>
-        <target state="needs-translation">Filter Documents</target>
+        <target state="translated">Фильтр документов</target>
       </trans-unit>
       <trans-unit id="8095412801504464756" datatype="html">
         <source>{VAR_PLURAL, plural, =1 {One <x id="INTERPOLATION"/>} other {<x id="INTERPOLATION_1"/> total <x id="INTERPOLATION_2"/>}}</source>
@@ -3085,7 +3085,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">105</context>
         </context-group>
-        <target state="needs-translation">Theme Color</target>
+        <target state="translated">Цветовая тема</target>
       </trans-unit>
       <trans-unit id="7808756054397155068" datatype="html">
         <source>Reset</source>
@@ -3093,7 +3093,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">114</context>
         </context-group>
-        <target state="needs-translation">Reset</target>
+        <target state="translated">Сбросить</target>
       </trans-unit>
       <trans-unit id="8508424367627989968" datatype="html" approved="yes">
         <source>Bulk editing</source>
@@ -3213,7 +3213,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">247</context>
         </context-group>
-        <target state="needs-translation">Settings saved</target>
+        <target state="translated">Сохранено</target>
       </trans-unit>
       <trans-unit id="7217000812750597833" datatype="html">
         <source>Settings were saved successfully.</source>
@@ -3221,7 +3221,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">248</context>
         </context-group>
-        <target state="needs-translation">Settings were saved successfully.</target>
+        <target state="translated">Настройки успешно сохранены.</target>
       </trans-unit>
       <trans-unit id="525012668859298131" datatype="html">
         <source>Settings were saved successfully. Reload is required to apply some changes.</source>
@@ -3237,7 +3237,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">253</context>
         </context-group>
-        <target state="needs-translation">Reload now</target>
+        <target state="translated">Перезагрузить</target>
       </trans-unit>
       <trans-unit id="3011185103048412841" datatype="html">
         <source>An error occurred while saving settings.</source>
@@ -3301,7 +3301,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.ts</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="needs-translation">tag</target>
+        <target state="translated">тег</target>
       </trans-unit>
       <trans-unit id="4975748273657042999" datatype="html">
         <source>tags</source>
@@ -3309,7 +3309,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.ts</context>
           <context context-type="linenumber">31</context>
         </context-group>
-        <target state="needs-translation">tags</target>
+        <target state="translated">теги</target>
       </trans-unit>
       <trans-unit id="93754014749412887" datatype="html" approved="yes">
         <source>Do you really want to delete the tag &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
@@ -3325,7 +3325,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="needs-translation">File Tasks</target>
+        <target state="translated">Файловые Задачи</target>
       </trans-unit>
       <trans-unit id="103921551219467537" datatype="html">
         <source>Clear selection</source>
@@ -3333,7 +3333,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">6</context>
         </context-group>
-        <target state="needs-translation">Clear selection</target>
+        <target state="translated">Отменить выбор</target>
       </trans-unit>
       <trans-unit id="187187500641108332" datatype="html">
         <source>
@@ -3351,7 +3351,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Refresh</target>
+        <target state="translated">Обновить</target>
       </trans-unit>
       <trans-unit id="5968132631442328843" datatype="html">
         <source>Results</source>
@@ -3359,7 +3359,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">42</context>
         </context-group>
-        <target state="needs-translation">Results</target>
+        <target state="translated">Результаты</target>
       </trans-unit>
       <trans-unit id="8958063833276423847" datatype="html">
         <source>click for full output</source>
@@ -3367,7 +3367,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">66</context>
         </context-group>
-        <target state="needs-translation">click for full output</target>
+        <target state="translated">нажать для полного вывода</target>
       </trans-unit>
       <trans-unit id="1536087519743707362" datatype="html">
         <source>Dismiss</source>
@@ -3379,7 +3379,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.ts</context>
           <context context-type="linenumber">54</context>
         </context-group>
-        <target state="needs-translation">Dismiss</target>
+        <target state="translated">Отклонить</target>
       </trans-unit>
       <trans-unit id="6798650225457993016" datatype="html">
         <source>Failed <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.failedFileTasks.length &gt; 0&quot; class=&quot;badge bg-danger ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
@@ -3419,7 +3419,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.ts</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="needs-translation">Dismiss selected</target>
+        <target state="translated">Отменить выбранное</target>
       </trans-unit>
       <trans-unit id="8829078752502782653" datatype="html">
         <source>Dismiss all</source>
@@ -3431,7 +3431,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.ts</context>
           <context context-type="linenumber">52</context>
         </context-group>
-        <target state="needs-translation">Dismiss all</target>
+        <target state="translated">Отменить все</target>
       </trans-unit>
       <trans-unit id="1323591410517879795" datatype="html">
         <source>Confirm Dismiss All</source>
@@ -3439,7 +3439,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.ts</context>
           <context context-type="linenumber">50</context>
         </context-group>
-        <target state="needs-translation">Confirm Dismiss All</target>
+        <target state="translated">Подтвердить отмену всех</target>
       </trans-unit>
       <trans-unit id="6566358716882976903" datatype="html">
         <source>tasks?</source>
@@ -3447,7 +3447,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.ts</context>
           <context context-type="linenumber">52</context>
         </context-group>
-        <target state="needs-translation">tasks?</target>
+        <target state="translated">задачи?</target>
       </trans-unit>
       <trans-unit id="181464970911903082" datatype="html" approved="yes">
         <source>404 Not Found</source>
@@ -3727,7 +3727,7 @@
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
           <context context-type="linenumber">113</context>
         </context-group>
-        <target state="needs-translation">You have unsaved changes to the document</target>
+        <target state="translated">У вас есть несохраненные изменения в документе</target>
       </trans-unit>
       <trans-unit id="2089045849587358256" datatype="html">
         <source>Are you sure you want to close this document?</source>
@@ -3960,7 +3960,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">372</context>
         </context-group>
-        <target state="needs-translation">Successfully completed one-time migratration of settings to the database!</target>
+        <target state="translated">Одноразовая миграция настроек в базу данных завершена!</target>
       </trans-unit>
       <trans-unit id="5558341108007064934" datatype="html">
         <source>Unable to migrate settings to the database, please try saving manually.</source>
@@ -3968,7 +3968,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">373</context>
         </context-group>
-        <target state="needs-translation">Unable to migrate settings to the database, please try saving manually.</target>
+        <target state="translated">Не удается перенести настройки в базу данных, пожалуйста, попробуйте сохранить вручную.</target>
       </trans-unit>
       <trans-unit id="1519954996184640001" datatype="html" approved="yes">
         <source>Error</source>
