@@ -95,7 +95,7 @@ initialize() {
 	done
 	set -e
 
-	${gosu_cmd[@]} /sbin/docker-prepare.sh
+	"${gosu_cmd[@]}" /sbin/docker-prepare.sh
 }
 
 install_languages() {
@@ -138,7 +138,7 @@ install_languages() {
 echo "Paperless-ngx docker container starting..."
 
 gosu_cmd=(gosu paperless)
-if [ $(id -u) == $(id -u paperless) ]; then
+if [ "$(id -u)" == "$(id -u paperless)" ]; then
 	gosu_cmd=()
 fi
 
@@ -151,7 +151,7 @@ initialize
 
 if [[ "$1" != "/"* ]]; then
 	echo Executing management command "$@"
-	exec ${gosu_cmd[@]} python3 manage.py "$@"
+	exec "${gosu_cmd[@]}" python3 manage.py "$@"
 else
 	echo Executing "$@"
 	exec "$@"
