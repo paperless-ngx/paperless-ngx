@@ -57,7 +57,7 @@ class TikaDocumentParser(DocumentParser):
             raise ParseError(
                 f"Could not parse {document_path} with tika server at "
                 f"{tika_server}: {err}",
-            )
+            ) from err
 
         self.text = parsed["content"].strip()
 
@@ -90,7 +90,9 @@ class TikaDocumentParser(DocumentParser):
                 response = requests.post(url, files=files, headers=headers)
                 response.raise_for_status()  # ensure we notice bad responses
             except Exception as err:
-                raise ParseError(f"Error while converting document to PDF: {err}")
+                raise ParseError(
+                    f"Error while converting document to PDF: {err}",
+                ) from err
 
         with open(pdf_path, "wb") as file:
             file.write(response.content)
