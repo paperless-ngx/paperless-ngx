@@ -18,13 +18,18 @@ jobs:
     name: Linting Checks
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      -
+        name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Install tools
-        uses: actions/setup-python@v3
+      -
+        name: Install tools
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
 
-      - name: Check files
+      -
+        name: Check files
         uses: pre-commit/action@v3.0.0
 
   documentation:
@@ -125,7 +130,7 @@ jobs:
           pipenv run coveralls --service=github
 
   tests-frontend:
-    name: "Tests"
+    name: "Tests Frontend"
     runs-on: ubuntu-20.04
     needs:
       - pre-commit
@@ -134,7 +139,8 @@ jobs:
         node-version: [16.x]
     steps:
       - uses: actions/checkout@v3
-      - name: Use Node.js ${{ matrix.node-version }}
+      -
+        name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
