@@ -1,6 +1,6 @@
 import os
 
-bind = f'[::]:{os.getenv("PAPERLESS_PORT", 8000)}'
+bind = f'{os.getenv("PAPERLESS_BIND_ADDR", "[::]")}:{os.getenv("PAPERLESS_PORT", 8000)}'
 workers = int(os.getenv("PAPERLESS_WEBSERVER_WORKERS", 1))
 worker_class = "paperless.workers.ConfigurableWorker"
 timeout = 120
