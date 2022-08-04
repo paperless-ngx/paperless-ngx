@@ -808,6 +808,13 @@ PAPERLESS_WEBSERVER_WORKERS=<num>
 
     Defaults to 1.
 
+PAPERLESS_BIND_ADDR=<ip address>
+    The IP address the webserver will listen on inside the container. There are
+    special setups where you may need to configure this value to restrict the
+    Ip address or interface the webserver listens on.
+
+    Defaults to [::], meaning all interfaces, including IPv6.
+
 PAPERLESS_PORT=<port>
     The port number the webserver will listen on inside the container. There are
     special setups where you may need this to avoid collisions with other
