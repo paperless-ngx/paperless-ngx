@@ -1975,7 +1975,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">38</context>
         </context-group>
-        <target state="translated">Filtriraj tipove dokumenata</target>
+        <target state="translated">Filtriraj tip dokumenata</target>
       </trans-unit>
       <trans-unit id="8816999377397522522" datatype="html">
         <source>Filter storage paths</source>
