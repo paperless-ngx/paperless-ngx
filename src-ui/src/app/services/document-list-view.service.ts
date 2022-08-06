@@ -147,6 +147,15 @@ export class DocumentListViewService {
     }
   }
 
+  activateSavedViewWithQueryParams(
+    view: PaperlessSavedView,
+    queryParams: ParamMap
+  ) {
+    let params = parseParams(queryParams)
+    this.activateSavedView(view)
+    this.activeListViewState.currentPage = params.currentPage
+  }
+
   loadSavedView(view: PaperlessSavedView, closeCurrentView: boolean = false) {
     if (closeCurrentView) {
       this._activeSavedViewId = null
@@ -212,11 +221,15 @@ export class DocumentListViewService {
           this.isReloading = false
           activeListViewState.collectionSize = result.count
           activeListViewState.documents = result.results
-
           if (updateQueryParams && !this._activeSavedViewId) {
             let base = ['/documents']
             this.router.navigate(base, {
               queryParams: generateParams(activeListViewState),
+            })
+          } else if (this._activeSavedViewId) {
+            this.router.navigate([], {
+              queryParams: generateParams(activeListViewState, true),
+              queryParamsHandling: 'merge',
             })
           }
 
@@ -305,7 +318,6 @@ export class DocumentListViewService {
 
   set currentPage(page: number) {
     if (this.activeListViewState.currentPage == page) return
-    this._activeSavedViewId = null
     this.activeListViewState.currentPage = page
     this.reload()
     this.saveDocumentListView()

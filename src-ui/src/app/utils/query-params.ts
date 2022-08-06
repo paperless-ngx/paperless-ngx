@@ -7,13 +7,18 @@ const SORT_FIELD_PARAMETER = 'sort'
 const SORT_REVERSE_PARAMETER = 'reverse'
 const PAGE_PARAMETER = 'page'
 
-export function generateParams(viewState: ListViewState): Params {
+export function generateParams(
+  viewState: ListViewState,
+  pageOnly: boolean = false
+): Params {
   let params = queryParamsFromFilterRules(viewState.filterRules)
   params[SORT_FIELD_PARAMETER] = viewState.sortField
   params[SORT_REVERSE_PARAMETER] = viewState.sortReverse ? 1 : undefined
+  if (pageOnly) params = {}
   params[PAGE_PARAMETER] = isNaN(viewState.currentPage)
     ? 1
     : viewState.currentPage
+  if (pageOnly && viewState.currentPage == 1) params[PAGE_PARAMETER] = null
   return params
 }
 
