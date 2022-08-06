@@ -6,4 +6,6 @@ export interface PaperlessDocumentSuggestions {
   document_types?: number[]
 
   storage_paths?: number[]
+
+  dates?: Date[]
 }
