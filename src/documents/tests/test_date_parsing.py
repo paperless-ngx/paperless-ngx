@@ -163,15 +163,22 @@ class TestDate(TestCase):
         self.assertIsNone(parse_date("", "20 408000l 2475"))
 
     def test_multiple_dates(self):
-        text = "This text has multiple dates. For example the 02.02.2018 or the 2022/08/22."
+        text = """This text has multiple dates.
+                  For example 02.02.2018, 22 July 2022 and Dezember 2021.
+                  But not 24-12-9999 because its in the future..."""
         dates = list(parse_date_generator("", text))
+        self.assertEqual(len(dates), 3)
         self.assertEqual(
             dates[0],
             datetime.datetime(2018, 2, 2, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
         )
         self.assertEqual(
             dates[1],
-            datetime.datetime(2022, 8, 22, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
+            datetime.datetime(2022, 7, 22, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
+        )
+        self.assertEqual(
+            dates[2],
+            datetime.datetime(2021, 12, 1, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
         )
 
     @override_settings(FILENAME_DATE_ORDER="YMD")
