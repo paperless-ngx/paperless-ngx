@@ -7,6 +7,7 @@ import shutil
 import subprocess
 import tempfile
 from typing import Iterator
+from typing import Match
 from typing import Optional
 from typing import Set
 
@@ -252,7 +253,7 @@ def parse_date_generator(filename, text) -> Iterator[datetime.datetime]:
         return None
 
     def __process_match(
-        match: re.Match[str],
+        match: Match[str],
         date_order: str,
     ) -> Optional[datetime.datetime]:
         date_string = match.group(0)

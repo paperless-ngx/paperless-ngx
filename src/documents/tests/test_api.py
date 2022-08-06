@@ -1119,6 +1119,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
     @mock.patch("documents.views.match_document_types")
     @mock.patch("documents.views.match_tags")
     @mock.patch("documents.views.match_correspondents")
+    @override_settings(NUMBER_OF_SUGGESTED_DATES=10)
     def test_get_suggestions(
         self,
         match_correspondents,
