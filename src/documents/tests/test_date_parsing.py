@@ -8,6 +8,7 @@ from django.conf import settings
 from django.test import override_settings
 from django.test import TestCase
 from documents.parsers import parse_date
+from documents.parsers import parse_date_generator
 from paperless.settings import DATE_ORDER
 
 
@@ -160,6 +161,18 @@ class TestDate(TestCase):
 
     def test_crazy_date_with_spaces(self, *args):
         self.assertIsNone(parse_date("", "20 408000l 2475"))
+
+    def test_multiple_dates(self):
+        text = "This text has multiple dates. For example the 02.02.2018 or the 2022/08/22."
+        dates = list(parse_date_generator("", text))
+        self.assertEqual(
+            dates[0],
+            datetime.datetime(2018, 2, 2, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
+        )
+        self.assertEqual(
+            dates[1],
+            datetime.datetime(2022, 8, 22, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
+        )
 
     @override_settings(FILENAME_DATE_ORDER="YMD")
     def test_filename_date_parse_valid_ymd(self, *args):
