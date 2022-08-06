@@ -1107,6 +1107,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
                 "tags": [],
                 "document_types": [],
                 "storage_paths": [],
+                "dates": [],
             },
         )
 
@@ -1128,7 +1129,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         doc = Document.objects.create(
             title="test",
             mime_type="application/pdf",
-            content="this is an invoice!",
+            content="this is an invoice from 12.04.2022!",
         )
 
         match_correspondents.return_value = [Correspondent(id=88), Correspondent(id=2)]
@@ -1144,6 +1145,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
                 "tags": [56, 123],
                 "document_types": [23],
                 "storage_paths": [99, 77],
+                "dates": ["2022-04-12"],
             },
         )
 
