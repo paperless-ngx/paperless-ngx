@@ -1,8 +1,8 @@
 import { Component, forwardRef, Input, OnInit } from '@angular/core'
 import { NG_VALUE_ACCESSOR } from '@angular/forms'
 import {
+  NgbDateAdapter,
   NgbDateParserFormatter,
-  NgbDateStruct,
 } from '@ng-bootstrap/ng-bootstrap'
 import { SettingsService } from 'src/app/services/settings.service'
 import { AbstractInputComponent } from '../abstract-input'
@@ -25,36 +25,31 @@ export class DateComponent
 {
   constructor(
     private settings: SettingsService,
-    private ngbDateParserFormatter: NgbDateParserFormatter
+    private ngbDateParserFormatter: NgbDateParserFormatter,
+    private isoDateAdapter: NgbDateAdapter<string>
   ) {
     super()
   }
 
   @Input()
-  suggestions: Date[]
+  suggestions: string[]
 
   getSuggestions() {
-    if (this.suggestions == null) return []
-
-    return this.suggestions
-      .map((s) => new Date(s)) // required to call the date functions below
-      .filter(
-        (d) =>
-          this.value === null || // if value is not set, take all suggestions
-          d.toISOString().slice(0, 10) != this.value // otherwise filter out the current value
-      )
-      .map((s) =>
-        this.ngbDateParserFormatter.format({
-          year: s.getFullYear(),
-          month: s.getMonth() + 1, // month of Date is zero based
-          day: s.getDate(),
-        })
-      )
+    return this.suggestions == null
+      ? []
+      : this.suggestions
+          .map((s) => this.ngbDateParserFormatter.parse(s))
+          .filter(
+            (d) =>
+              this.value === null || // if value is not set, take all suggestions
+              this.value != this.isoDateAdapter.toModel(d) // otherwise filter out current date
+          )
+          .map((s) => this.ngbDateParserFormatter.format(s))
   }
 
   onSuggestionClick(dateString: string) {
     const parsedDate = this.ngbDateParserFormatter.parse(dateString)
-    this.writeValue(`${parsedDate.year}-${parsedDate.month}-${parsedDate.day}`)
+    this.writeValue(this.isoDateAdapter.toModel(parsedDate))
     this.onChange(this.value)
   }
 

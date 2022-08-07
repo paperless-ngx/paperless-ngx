@@ -7,5 +7,5 @@ export interface PaperlessDocumentSuggestions {
 
   storage_paths?: number[]
 
-  dates?: Date[]
+  dates?: string[] // ISO-formatted date string e.g. 2022-11-03
 }
