@@ -22,7 +22,6 @@ from django.http import Http404
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
 from django.http import HttpResponseNotAllowed
-from django.http import HttpResponseNotFound
 from django.utils.decorators import method_decorator
 from django.utils.translation import get_language
 from django.views.decorators.cache import cache_control
@@ -385,21 +384,22 @@ class DocumentViewSet(
     def getComments(self, doc):
         return [
             {
-                "id":c.id, 
-                "comment":c.comment, 
-                "created":c.created, 
-                "user":{ 
-                    "id":c.user.id, 
+                "id": c.id,
+                "comment": c.comment,
+                "created": c.created,
+                "user": {
+                    "id": c.user.id,
                     "username": c.user.username,
-                    "firstname":c.user.first_name, 
-                    "lastname":c.user.last_name
-                }
-            } for c in Comment.objects.filter(document=doc).order_by('-created')
-        ];
+                    "firstname": c.user.first_name,
+                    "lastname": c.user.last_name,
+                },
+            }
+            for c in Comment.objects.filter(document=doc).order_by("-created")
+        ]
 
-    @action(methods=['get', 'post', 'delete'], detail=True)
+    @action(methods=["get", "post", "delete"], detail=True)
     def comments(self, request, pk=None):
-        if settings.PAPERLESS_COMMENTS_ENABLED != True:
+        if settings.PAPERLESS_COMMENTS_ENABLED is not True:
             return HttpResponseNotAllowed("comment function is disabled")
 
         try:
@@ -407,35 +407,39 @@ class DocumentViewSet(
         except Document.DoesNotExist:
             raise Http404()
 
-        currentUser = request.user;
+        currentUser = request.user
 
-        if request.method == 'GET': 
+        if request.method == "GET":
             try:
-                return Response(self.getComments(doc));
+                return Response(self.getComments(doc))
             except Exception as e:
-                return Response({"error": str(e)});
-        elif request.method == 'POST':
+                return Response({"error": str(e)})
+        elif request.method == "POST":
             try:
                 c = Comment.objects.create(
-                    document = doc,
+                    document=doc,
                     comment=request.data["payload"],
-                    user=currentUser
-                );
-                c.save();
+                    user=currentUser,
+                )
+                c.save()
 
-                return Response(self.getComments(doc));
+                return Response(self.getComments(doc))
             except Exception as e:
-                return Response({
-                    "error": str(e)
-                });
-        elif request.method == 'DELETE':
-            comment = Comment.objects.get(id=int(request.GET.get("commentId")));
-            comment.delete();
-            return Response(self.getComments(doc));
+                return Response(
+                    {
+                        "error": str(e),
+                    },
+                )
+        elif request.method == "DELETE":
+            comment = Comment.objects.get(id=int(request.GET.get("commentId")))
+            comment.delete()
+            return Response(self.getComments(doc))
 
-        return Response({
-            "error": "error"
-        });
+        return Response(
+            {
+                "error": "error",
+            },
+        )
 
 
 class SearchResultSerializer(DocumentSerializer):
@@ -893,32 +897,3 @@ class AcknowledgeTasksView(GenericAPIView):
             return Response({"result": result})
         except Exception:
             return HttpResponseBadRequest()
-
-class EnvironmentView(APIView):
-
-    permission_classes = (IsAuthenticated,)
-
-    def get(self, request, format=None):
-        if 'name' in request.query_params:
-            name = request.query_params['name']
-        else:
-            return HttpResponseBadRequest("name required")
-
-        if(name not in settings.PAPERLESS_FRONTEND_ALLOWED_ENVIRONMENTS and settings.PAPERLESS_DISABLED_FRONTEND_ENVIRONMENT_CHECK == False):
-            return HttpResponseNotAllowed("environment not allowed to request")
-
-        value = None
-        try:
-            value = getattr(settings, name)
-        except:
-            try:
-                value = os.getenv(name)
-            except:
-                value = None
-
-        if value == None: 
-            return HttpResponseNotFound("environment not found")    
-
-        return Response({
-            "value": str(value)
-        }); 
