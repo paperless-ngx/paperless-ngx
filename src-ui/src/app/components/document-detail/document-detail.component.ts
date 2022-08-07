@@ -35,7 +35,6 @@ import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
 import { StoragePathEditDialogComponent } from '../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
 import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
-import { EnvironmentService } from 'src/app/services/rest/environment.service'
 
 @Component({
   selector: 'app-document-detail',
@@ -84,8 +83,6 @@ export class DocumentDetailComponent
   previewCurrentPage: number = 1
   previewNumPages: number = 1
 
-  isCommentsEnabled:boolean = false
-
   store: BehaviorSubject<any>
   isDirty$: Observable<boolean>
   unsubscribeNotifier: Subject<any> = new Subject()
@@ -121,8 +118,7 @@ export class DocumentDetailComponent
     private documentTitlePipe: DocumentTitlePipe,
     private toastService: ToastService,
     private settings: SettingsService,
-    private storagePathService: StoragePathService,
-    private environment: EnvironmentService
+    private storagePathService: StoragePathService
   ) {}
 
   titleKeyUp(event) {
@@ -278,12 +274,6 @@ export class DocumentDetailComponent
           this.suggestions = null
         },
       })
-    
-    this.environment.get("PAPERLESS_COMMENTS_ENABLED").subscribe(result => {
-      this.isCommentsEnabled = (result.value.toString().toLowerCase() === "true"?true:false);
-    }, error => {
-      this.isCommentsEnabled = false;
-    })
 
     this.title = this.documentTitlePipe.transform(doc.title)
     this.documentForm.patchValue(doc)
@@ -561,5 +551,9 @@ export class DocumentDetailComponent
     if ('Enter' == event.key) {
       this.password = (event.target as HTMLInputElement).value
     }
+  }
+
+  get commentsEnabled(): boolean {
+    return this.settings.get(SETTINGS_KEYS.COMMENTS_ENABLED)
   }
 }
