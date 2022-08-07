@@ -53,15 +53,9 @@ export class DateComponent
   }
 
   onSuggestionClick(dateString: string) {
-    const parsedNgDate = this.ngbDateParserFormatter.parse(dateString)
-    this.writeValue(this.formatDateAsYYYYMMDD(parsedNgDate))
+    const parsedDate = this.ngbDateParserFormatter.parse(dateString)
+    this.writeValue(`${parsedDate.year}-${parsedDate.month}-${parsedDate.day}`)
     this.onChange(this.value)
-  }
-
-  formatDateAsYYYYMMDD(date: NgbDateStruct) {
-    const monthPrefix = date.month > 9 ? '' : '0'
-    const dayPrefix = date.day > 9 ? '' : '0'
-    return `${date.year}-${monthPrefix}${date.month}-${dayPrefix}${date.day}`
   }
 
   ngOnInit(): void {
