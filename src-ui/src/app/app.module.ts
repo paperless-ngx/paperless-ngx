@@ -67,6 +67,7 @@ import { ApiVersionInterceptor } from './interceptors/api-version.interceptor'
 import { ColorSliderModule } from 'ngx-color/slider'
 import { ColorComponent } from './components/common/input/color/color.component'
 import { DocumentAsnComponent } from './components/document-asn/document-asn.component'
+import { DirtyDocGuard } from './guards/dirty-doc.guard'
 
 import localeBe from '@angular/common/locales/be'
 import localeCs from '@angular/common/locales/cs'
@@ -209,6 +210,7 @@ function initializeApp(settings: SettingsService) {
     DocumentTitlePipe,
     { provide: NgbDateAdapter, useClass: ISODateAdapter },
     { provide: NgbDateParserFormatter, useClass: LocalizedDateParserFormatter },
+    DirtyDocGuard,
   ],
   bootstrap: [AppComponent],
 })
