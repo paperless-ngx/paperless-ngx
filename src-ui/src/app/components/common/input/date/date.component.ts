@@ -1,8 +1,10 @@
 import { Component, forwardRef, OnInit } from '@angular/core'
 import { NG_VALUE_ACCESSOR } from '@angular/forms'
-import { NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap'
+import {
+  NgbDateAdapter,
+  NgbDateParserFormatter,
+} from '@ng-bootstrap/ng-bootstrap'
 import { SettingsService } from 'src/app/services/settings.service'
-import { LocalizedDateParserFormatter } from 'src/app/utils/ngb-date-parser-formatter'
 import { AbstractInputComponent } from '../abstract-input'
 
 @Component({
@@ -23,7 +25,8 @@ export class DateComponent
 {
   constructor(
     private settings: SettingsService,
-    private ngbDateParserFormatter: NgbDateParserFormatter
+    private ngbDateParserFormatter: NgbDateParserFormatter,
+    private isoDateAdapter: NgbDateAdapter<string>
   ) {
     super()
   }
@@ -43,9 +46,10 @@ export class DateComponent
       let pastedText = clipboardData.getData('text')
       pastedText = pastedText.replace(/[\sa-z#!$%\^&\*;:{}=\-_`~()]+/g, '')
       const parsedDate = this.ngbDateParserFormatter.parse(pastedText)
-      const formattedDate = this.ngbDateParserFormatter.format(parsedDate)
-      this.writeValue(formattedDate)
-      this.onChange(formattedDate)
+      if (parsedDate) {
+        this.writeValue(this.isoDateAdapter.toModel(parsedDate))
+        this.onChange(this.value)
+      }
     }
   }
 
