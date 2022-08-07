@@ -169,6 +169,13 @@
                         </div>
                     </ng-template>
                 </li>
+                <li [ngbNavItem]="5" *ngIf="isCommentsEnabled">
+                    <a ngbNavLink i18n>Comments</a>
+                    <ng-template ngbNavContent>
+                        <app-document-comment #commentComponent></app-document-comment>
+                    </ng-template>
+
+                </li>
             </ul>
 
             <div [ngbNavOutlet]="nav" class="mt-2"></div>
