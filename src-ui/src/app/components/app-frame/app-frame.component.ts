@@ -1,6 +1,6 @@
-import { Component } from '@angular/core'
+import { Component, HostListener } from '@angular/core'
 import { FormControl } from '@angular/forms'
-import { ActivatedRoute, Router, Params } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
 import { from, Observable } from 'rxjs'
 import {
   debounceTime,
@@ -23,13 +23,14 @@ import {
 } from 'src/app/services/rest/remote-version.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { TasksService } from 'src/app/services/tasks.service'
+import { ComponentCanDeactivate } from 'src/app/guards/dirty-doc.guard'
 
 @Component({
   selector: 'app-app-frame',
   templateUrl: './app-frame.component.html',
   styleUrls: ['./app-frame.component.scss'],
 })
-export class AppFrameComponent {
+export class AppFrameComponent implements ComponentCanDeactivate {
   constructor(
     public router: Router,
     private activatedRoute: ActivatedRoute,
@@ -62,6 +63,11 @@ export class AppFrameComponent {
 
   get openDocuments(): PaperlessDocument[] {
     return this.openDocumentsService.getOpenDocuments()
+  }
+
+  @HostListener('window:beforeunload')
+  canDeactivate(): Observable<boolean> | boolean {
+    return !this.openDocumentsService.hasDirty()
   }
 
   searchAutoComplete = (text$: Observable<string>) =>
