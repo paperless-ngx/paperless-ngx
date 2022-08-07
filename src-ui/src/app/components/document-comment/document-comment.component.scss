@@ -1,0 +1,22 @@
+.comment-card-body {
+    padding-top: .8rem !important;
+    padding-bottom: .8rem !important;
+    max-height: 10rem;
+    overflow: scroll;
+    white-space: pre-wrap;
+}
+
+.comment-card-header a {
+    border: none;
+    background: none;
+    padding: 5px;
+    border-radius: 50%;
+}
+
+.comment-card-header a:hover {
+    background: #FFF;
+}
+
+.comment-card-header a:hover svg {
+    fill: var(--primary);
+} 
