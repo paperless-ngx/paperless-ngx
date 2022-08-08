@@ -87,10 +87,6 @@ export class DocumentListComponent implements OnInit, OnDestroy {
     this.list.setSort(event.column, event.reverse)
   }
 
-  setPage(page: number) {
-    this.list.currentPage = page
-  }
-
   get isBulkEditing(): boolean {
     return this.list.selected.size > 0
   }
