@@ -21,7 +21,6 @@ from django.db.models.functions import Lower
 from django.http import Http404
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
-from django.http import HttpResponseNotAllowed
 from django.utils.decorators import method_decorator
 from django.utils.translation import get_language
 from django.views.decorators.cache import cache_control
@@ -399,9 +398,6 @@ class DocumentViewSet(
 
     @action(methods=["get", "post", "delete"], detail=True)
     def comments(self, request, pk=None):
-        if settings.PAPERLESS_COMMENTS_ENABLED is not True:
-            return HttpResponseNotAllowed("comment function is disabled")
-
         try:
             doc = Document.objects.get(pk=pk)
         except Document.DoesNotExist:
