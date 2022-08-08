@@ -12,11 +12,12 @@ import { ToastService } from 'src/app/services/toast.service'
 })
 export class DocumentCommentsComponent implements OnInit {
   commentForm: FormGroup = new FormGroup({
-    newcomment: new FormControl(''),
+    newComment: new FormControl(''),
   })
 
   networkActive = false
   comments: PaperlessDocumentComment[] = []
+  newCommentError: boolean = false
 
   @Input()
   documentId: number
@@ -33,27 +34,30 @@ export class DocumentCommentsComponent implements OnInit {
       .subscribe((comments) => (this.comments = comments))
   }
 
-  commentId(index, comment: PaperlessDocumentComment) {
-    return comment.id
-  }
-
   addComment() {
+    const comment: string = this.commentForm
+      .get('newComment')
+      .value.toString()
+      .trim()
+    if (comment.length == 0) {
+      this.newCommentError = true
+      return
+    }
+    this.newCommentError = false
     this.networkActive = true
-    this.commentsService
-      .addComment(this.documentId, this.commentForm.get('newcomment').value)
-      .subscribe({
-        next: (result) => {
-          this.comments = result
-          this.commentForm.get('newcomment').reset()
-          this.networkActive = false
-        },
-        error: (e) => {
-          this.networkActive = false
-          this.toastService.showError(
-            $localize`Error saving comment: ${e.toString()}`
-          )
-        },
-      })
+    this.commentsService.addComment(this.documentId, comment).subscribe({
+      next: (result) => {
+        this.comments = result
+        this.commentForm.get('newComment').reset()
+        this.networkActive = false
+      },
+      error: (e) => {
+        this.networkActive = false
+        this.toastService.showError(
+          $localize`Error saving comment: ${e.toString()}`
+        )
+      },
+    })
   }
 
   deleteComment(commentId: number) {
@@ -69,5 +73,18 @@ export class DocumentCommentsComponent implements OnInit {
         )
       },
     })
+  }
+
+  displayName(comment: PaperlessDocumentComment): string {
+    if (!comment.user) return ''
+    let nameComponents = []
+    if (comment.user.firstname) nameComponents.unshift(comment.user.firstname)
+    if (comment.user.lastname) nameComponents.unshift(comment.user.lastname)
+    if (comment.user.username) {
+      if (nameComponents.length > 0)
+        nameComponents.push(`(${comment.user.username})`)
+      else nameComponents.push(comment.user.username)
+    }
+    return nameComponents.join(' ')
   }
 }
