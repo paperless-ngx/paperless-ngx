@@ -395,7 +395,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">150</context>
+          <context context-type="linenumber">158</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6988090220128974198" datatype="html">
@@ -701,7 +701,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">157</context>
+          <context context-type="linenumber">165</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
@@ -816,7 +816,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">178</context>
+          <context context-type="linenumber">184</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/save-view-config-dialog/save-view-config-dialog.component.html</context>
@@ -824,7 +824,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">189</context>
+          <context context-type="linenumber">197</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6457471243969293847" datatype="html">
@@ -1304,6 +1304,41 @@
           <context context-type="linenumber">1</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="2122666445936087317" datatype="html">
+        <source>Enter comment</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-comments/document-comments.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4025397324401332794" datatype="html">
+        <source> Please enter a comment. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-comments/document-comments.component.html</context>
+          <context context-type="linenumber">5,7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2337485514607640701" datatype="html">
+        <source>Add comment</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-comments/document-comments.component.html</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5438997040668245251" datatype="html">
+        <source>Error saving comment: <x id="PH" equiv-text="e.toString()"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-comments/document-comments.component.ts</context>
+          <context context-type="linenumber">57</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7593210124183303626" datatype="html">
+        <source>Error deleting comment: <x id="PH" equiv-text="e.toString()"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-comments/document-comments.component.ts</context>
+          <context context-type="linenumber">72</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="1407560924967345762" datatype="html">
         <source>Page</source>
         <context-group purpose="location">
@@ -1370,7 +1405,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">175</context>
+          <context context-type="linenumber">183</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3099741642167775297" datatype="html">
@@ -1634,21 +1669,32 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">196</context>
+          <context context-type="linenumber">202</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3807699453257291879" datatype="html">
+        <source>Comments</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
+          <context context-type="linenumber">173</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">128</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3823219296477075982" datatype="html">
         <source>Discard</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">176</context>
+          <context context-type="linenumber">182</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5129524307369213584" datatype="html">
         <source>Save &amp; next</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">177</context>
+          <context context-type="linenumber">183</context>
         </context-group>
       </trans-unit>
       <trans-unit id="9021887951960049161" datatype="html">
@@ -1832,7 +1878,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">174</context>
+          <context context-type="linenumber">182</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
@@ -2310,14 +2356,14 @@
         <source>View &quot;<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>&quot; saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">180</context>
+          <context context-type="linenumber">176</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6837554170707123455" datatype="html">
         <source>View &quot;<x id="PH" equiv-text="savedView.name"/>&quot; created successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">210</context>
+          <context context-type="linenumber">206</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6849725902312323996" datatype="html">
@@ -2454,7 +2500,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">169</context>
+          <context context-type="linenumber">177</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4104807402967139762" datatype="html">
@@ -2465,7 +2511,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">165</context>
+          <context context-type="linenumber">173</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6965614903949668392" datatype="html">
@@ -2840,123 +2886,130 @@
           <context context-type="linenumber">124</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="4666858503087488647" datatype="html">
+        <source>Enable comments</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">132</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="5851560788527570644" datatype="html">
         <source>Notifications</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">132</context>
+          <context context-type="linenumber">140</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8545554728558600606" datatype="html">
         <source>Document processing</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">135</context>
+          <context context-type="linenumber">143</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3656786776644872398" datatype="html">
         <source>Show notifications when new documents are detected</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">139</context>
+          <context context-type="linenumber">147</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6057053428592387613" datatype="html">
         <source>Show notifications when document processing completes successfully</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">140</context>
+          <context context-type="linenumber">148</context>
         </context-group>
       </trans-unit>
       <trans-unit id="370315664367425513" datatype="html">
         <source>Show notifications when document processing fails</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">141</context>
+          <context context-type="linenumber">149</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6838309441164918531" datatype="html">
         <source>Suppress notifications on dashboard</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">142</context>
+          <context context-type="linenumber">150</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2741919327232918179" datatype="html">
         <source>This will suppress all messages about document processing status on the dashboard.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">142</context>
+          <context context-type="linenumber">150</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6925788033494878061" datatype="html">
         <source>Appears on</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">162</context>
+          <context context-type="linenumber">170</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7877440816920439876" datatype="html">
         <source>No saved views defined.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">179</context>
+          <context context-type="linenumber">187</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5610279464668232148" datatype="html">
         <source>Saved view &quot;<x id="PH" equiv-text="savedView.name"/>&quot; deleted.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">174</context>
+          <context context-type="linenumber">176</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3891152409365583719" datatype="html">
         <source>Settings saved</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">247</context>
+          <context context-type="linenumber">253</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7217000812750597833" datatype="html">
         <source>Settings were saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">248</context>
+          <context context-type="linenumber">254</context>
         </context-group>
       </trans-unit>
       <trans-unit id="525012668859298131" datatype="html">
         <source>Settings were saved successfully. Reload is required to apply some changes.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">252</context>
+          <context context-type="linenumber">258</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8491974984518503778" datatype="html">
         <source>Reload now</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">253</context>
+          <context context-type="linenumber">259</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3011185103048412841" datatype="html">
         <source>An error occurred while saving settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">263</context>
+          <context context-type="linenumber">269</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6839066544204061364" datatype="html">
         <source>Use system language</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">271</context>
+          <context context-type="linenumber">277</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7729897675462249787" datatype="html">
         <source>Use date format of display language</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">278</context>
+          <context context-type="linenumber">284</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8488620293789898901" datatype="html">
@@ -2965,7 +3018,7 @@
             )"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">298,300</context>
+          <context context-type="linenumber">304,306</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5101757640976222639" datatype="html">
@@ -3211,7 +3264,7 @@
         <source>Warning: You have unsaved changes to your document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/guards/dirty-doc.guard.ts</context>
-          <context context-type="linenumber">18</context>
+          <context context-type="linenumber">17</context>
         </context-group>
       </trans-unit>
       <trans-unit id="159901853873315050" datatype="html">
