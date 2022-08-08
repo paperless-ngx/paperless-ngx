@@ -274,7 +274,6 @@ export class DocumentDetailComponent
           this.suggestions = null
         },
       })
-
     this.title = this.documentTitlePipe.transform(doc.title)
     this.documentForm.patchValue(doc)
   }
