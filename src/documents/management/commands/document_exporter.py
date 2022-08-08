@@ -127,8 +127,11 @@ class Command(BaseCommand):
                 serializers.serialize("json", DocumentType.objects.all()),
             )
 
-            manifest += json.loads(
-                serializers.serialize("json", Comment.objects.all())),
+            manifest += (
+                json.loads(
+                    serializers.serialize("json", Comment.objects.all()),
+                ),
+            )
 
             documents = Document.objects.order_by("id")
             document_map = {d.pk: d for d in documents}
