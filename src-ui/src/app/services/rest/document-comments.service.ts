@@ -7,14 +7,14 @@ import { Observable } from 'rxjs'
 @Injectable({
   providedIn: 'root',
 })
-export class DocumentCommentService extends AbstractPaperlessService<PaperlessDocumentComment> {
+export class DocumentCommentsService extends AbstractPaperlessService<PaperlessDocumentComment> {
   constructor(http: HttpClient) {
     super(http, 'documents')
   }
 
-  getComments(id: number): Observable<PaperlessDocumentComment[]> {
+  getComments(documentId: number): Observable<PaperlessDocumentComment[]> {
     return this.http.get<PaperlessDocumentComment[]>(
-      this.getResourceUrl(id, 'comments')
+      this.getResourceUrl(documentId, 'comments')
     )
   }
 
