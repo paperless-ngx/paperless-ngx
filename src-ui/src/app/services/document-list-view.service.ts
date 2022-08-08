@@ -225,6 +225,7 @@ export class DocumentListViewService {
             let base = ['/documents']
             this.router.navigate(base, {
               queryParams: paramsFromViewState(activeListViewState),
+              replaceUrl: !this.router.routerState.snapshot.url.includes('?'), // in case navigating from params-less /documents
             })
           } else if (this._activeSavedViewId) {
             this.router.navigate([], {
