@@ -538,16 +538,19 @@ class PaperlessTask(models.Model):
     )
     acknowledged = models.BooleanField(default=False)
 
+
 class Comment(models.Model):
     comment = models.TextField(
         _("content"),
         blank=True,
-        help_text=_("Comment for the document")
+        help_text=_("Comment for the document"),
     )
 
     created = models.DateTimeField(
         _("created"),
-        default=timezone.now, db_index=True)
+        default=timezone.now,
+        db_index=True,
+    )
 
     document = models.ForeignKey(
         Document,
@@ -555,7 +558,7 @@ class Comment(models.Model):
         null=True,
         related_name="documents",
         on_delete=models.CASCADE,
-        verbose_name=_("document")
+        verbose_name=_("document"),
     )
 
     user = models.ForeignKey(
@@ -564,7 +567,7 @@ class Comment(models.Model):
         null=True,
         related_name="users",
         on_delete=models.SET_NULL,
-        verbose_name=_("user")
+        verbose_name=_("user"),
     )
 
     class Meta:
