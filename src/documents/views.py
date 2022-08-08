@@ -414,7 +414,7 @@ class DocumentViewSet(
             try:
                 c = Comment.objects.create(
                     document=doc,
-                    comment=request.data["payload"],
+                    comment=request.data["comment"],
                     user=currentUser,
                 )
                 c.save()
@@ -427,7 +427,7 @@ class DocumentViewSet(
                     },
                 )
         elif request.method == "DELETE":
-            comment = Comment.objects.get(id=int(request.GET.get("commentId")))
+            comment = Comment.objects.get(id=int(request.GET.get("id")))
             comment.delete()
             return Response(self.getComments(doc))
 

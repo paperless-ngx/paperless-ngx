@@ -1,8 +1,8 @@
 import { ObjectWithId } from './object-with-id'
-import { CommentUser } from './user-type'
+import { User } from './user'
 
 export interface PaperlessDocumentComment extends ObjectWithId {
-    created?: Date
-    comment?: string
-    user?: CommentUser
-} 
+  created?: Date
+  comment?: string
+  user?: User
+}

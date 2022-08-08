@@ -21,7 +21,7 @@ export class DocumentCommentsService extends AbstractPaperlessService<PaperlessD
   addComment(id: number, comment): Observable<PaperlessDocumentComment[]> {
     return this.http.post<PaperlessDocumentComment[]>(
       this.getResourceUrl(id, 'comments'),
-      { payload: comment }
+      { comment: comment }
     )
   }
 
@@ -29,11 +29,9 @@ export class DocumentCommentsService extends AbstractPaperlessService<PaperlessD
     documentId: number,
     commentId: number
   ): Observable<PaperlessDocumentComment[]> {
-    let httpParams = new HttpParams()
-    httpParams = httpParams.set('commentId', commentId.toString())
     return this.http.delete<PaperlessDocumentComment[]>(
       this.getResourceUrl(documentId, 'comments'),
-      { params: httpParams }
+      { params: new HttpParams({ fromString: `id=${commentId}` }) }
     )
   }
 }
