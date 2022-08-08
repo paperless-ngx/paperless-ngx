@@ -11,7 +11,7 @@ import { PaperlessDocument } from '../data/paperless-document'
 import { PaperlessSavedView } from '../data/paperless-saved-view'
 import { SETTINGS_KEYS } from '../data/paperless-uisettings'
 import { DOCUMENT_LIST_SERVICE } from '../data/storage-keys'
-import { generateParams, parseParams } from '../utils/query-params'
+import { paramsFromViewState, paramsToViewState } from '../utils/query-params'
 import { DocumentService, DOCUMENT_SORT_FIELDS } from './rest/document.service'
 import { SettingsService } from './settings.service'
 
@@ -151,9 +151,9 @@ export class DocumentListViewService {
     view: PaperlessSavedView,
     queryParams: ParamMap
   ) {
-    let params = parseParams(queryParams)
+    const viewState = paramsToViewState(queryParams)
     this.activateSavedView(view)
-    this.activeListViewState.currentPage = params.currentPage
+    this.currentPage = viewState.currentPage
   }
 
   loadSavedView(view: PaperlessSavedView, closeCurrentView: boolean = false) {
@@ -180,7 +180,7 @@ export class DocumentListViewService {
   loadFromQueryParams(queryParams: ParamMap) {
     const paramsEmpty: boolean = queryParams.keys.length == 0
     let newState: ListViewState = this.listViewStates.get(null)
-    if (!paramsEmpty) newState = parseParams(queryParams)
+    if (!paramsEmpty) newState = paramsToViewState(queryParams)
     if (newState == undefined) newState = this.defaultListViewState() // if nothing in local storage
 
     // only reload if things have changed
@@ -224,11 +224,11 @@ export class DocumentListViewService {
           if (updateQueryParams && !this._activeSavedViewId) {
             let base = ['/documents']
             this.router.navigate(base, {
-              queryParams: generateParams(activeListViewState),
+              queryParams: paramsFromViewState(activeListViewState),
             })
           } else if (this._activeSavedViewId) {
             this.router.navigate([], {
-              queryParams: generateParams(activeListViewState, true),
+              queryParams: paramsFromViewState(activeListViewState, true),
               queryParamsHandling: 'merge',
             })
           }

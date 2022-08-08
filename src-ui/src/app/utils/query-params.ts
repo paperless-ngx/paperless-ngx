@@ -7,7 +7,7 @@ const SORT_FIELD_PARAMETER = 'sort'
 const SORT_REVERSE_PARAMETER = 'reverse'
 const PAGE_PARAMETER = 'page'
 
-export function generateParams(
+export function paramsFromViewState(
   viewState: ListViewState,
   pageOnly: boolean = false
 ): Params {
@@ -22,7 +22,7 @@ export function generateParams(
   return params
 }
 
-export function parseParams(queryParams: ParamMap): ListViewState {
+export function paramsToViewState(queryParams: ParamMap): ListViewState {
   let filterRules = filterRulesFromQueryParams(queryParams)
   let sortField = queryParams.get(SORT_FIELD_PARAMETER)
   let sortReverse =
