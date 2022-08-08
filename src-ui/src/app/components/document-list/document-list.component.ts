@@ -6,7 +6,7 @@ import {
   ViewChild,
   ViewChildren,
 } from '@angular/core'
-import { ActivatedRoute, Router } from '@angular/router'
+import { ActivatedRoute, convertToParamMap, Router } from '@angular/router'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { filter, first, map, Subject, switchMap, takeUntil } from 'rxjs'
 import { FilterRule, isFullTextFilterRule } from 'src/app/data/filter-rule'
@@ -87,10 +87,6 @@ export class DocumentListComponent implements OnInit, OnDestroy {
     this.list.setSort(event.column, event.reverse)
   }
 
-  setPage(page: number) {
-    this.list.currentPage = page
-  }
-
   get isBulkEditing(): boolean {
     return this.list.selected.size > 0
   }
@@ -126,7 +122,11 @@ export class DocumentListComponent implements OnInit, OnDestroy {
           this.router.navigate(['404'])
           return
         }
-        this.list.activateSavedView(view)
+
+        this.list.activateSavedViewWithQueryParams(
+          view,
+          convertToParamMap(this.route.snapshot.queryParams)
+        )
         this.list.reload()
         this.unmodifiedFilterRules = view.filter_rules
       })
@@ -139,7 +139,13 @@ export class DocumentListComponent implements OnInit, OnDestroy {
       .subscribe((queryParams) => {
         if (queryParams.has('view')) {
           // loading a saved view on /documents
-          this.loadViewConfig(parseInt(queryParams.get('view')))
+          this.savedViewService
+            .getCached(parseInt(queryParams.get('view')))
+            .pipe(first())
+            .subscribe((view) => {
+              this.list.activateSavedView(view)
+              this.list.reload()
+            })
         } else {
           this.list.activateSavedView(null)
           this.list.loadFromQueryParams(queryParams)
@@ -152,16 +158,6 @@ export class DocumentListComponent implements OnInit, OnDestroy {
     // unsubscribes all
     this.unsubscribeNotifier.next(this)
     this.unsubscribeNotifier.complete()
-  }
-
-  loadViewConfig(viewId: number) {
-    this.savedViewService
-      .getCached(viewId)
-      .pipe(first())
-      .subscribe((view) => {
-        this.list.activateSavedView(view)
-        this.list.reload()
-      })
   }
 
   saveViewConfig() {
