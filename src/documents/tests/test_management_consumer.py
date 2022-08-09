@@ -2,6 +2,7 @@ import filecmp
 import os
 import shutil
 from threading import Thread
+from time import monotonic
 from time import sleep
 from unittest import mock
 
@@ -20,13 +21,14 @@ class ConsumerThread(Thread):
     def __init__(self):
         super().__init__()
         self.cmd = document_consumer.Command()
+        self.cmd.stop_flag.clear()
 
     def run(self) -> None:
-        self.cmd.handle(directory=settings.CONSUMPTION_DIR, oneshot=False)
+        self.cmd.handle(directory=settings.CONSUMPTION_DIR, oneshot=False, testing=True)
 
     def stop(self):
         # Consumer checks this every second.
-        self.cmd.stop_flag = True
+        self.cmd.stop_flag.set()
 
 
 def chunked(size, source):
@@ -59,13 +61,14 @@ class ConsumerMixin:
             self.t.stop()
             # wait for the consumer to exit.
             self.t.join()
+            self.t = None
 
         super().tearDown()
 
-    def wait_for_task_mock_call(self, excpeted_call_count=1):
+    def wait_for_task_mock_call(self, expected_call_count=1):
         n = 0
-        while n < 100:
-            if self.task_mock.call_count >= excpeted_call_count:
+        while n < 50:
+            if self.task_mock.call_count >= expected_call_count:
                 # give task_mock some time to finish and raise errors
                 sleep(1)
                 return
@@ -234,7 +237,7 @@ class TestConsumer(DirectoriesMixin, ConsumerMixin, TransactionTestCase):
 
         sleep(5)
 
-        self.wait_for_task_mock_call(excpeted_call_count=2)
+        self.wait_for_task_mock_call(expected_call_count=2)
 
         self.assertEqual(2, self.task_mock.call_count)
 
@@ -281,7 +284,7 @@ class TestConsumer(DirectoriesMixin, ConsumerMixin, TransactionTestCase):
 
 @override_settings(
     CONSUMER_POLLING=1,
-    CONSUMER_POLLING_DELAY=3,
+    CONSUMER_POLLING_DELAY=1,
     CONSUMER_POLLING_RETRY_COUNT=20,
 )
 class TestConsumerPolling(TestConsumer):
@@ -298,7 +301,7 @@ class TestConsumerRecursive(TestConsumer):
 @override_settings(
     CONSUMER_RECURSIVE=True,
     CONSUMER_POLLING=1,
-    CONSUMER_POLLING_DELAY=3,
+    CONSUMER_POLLING_DELAY=1,
     CONSUMER_POLLING_RETRY_COUNT=20,
 )
 class TestConsumerRecursivePolling(TestConsumer):
@@ -307,8 +310,7 @@ class TestConsumerRecursivePolling(TestConsumer):
 
 
 class TestConsumerTags(DirectoriesMixin, ConsumerMixin, TransactionTestCase):
-    @override_settings(CONSUMER_RECURSIVE=True)
-    @override_settings(CONSUMER_SUBDIRS_AS_TAGS=True)
+    @override_settings(CONSUMER_RECURSIVE=True, CONSUMER_SUBDIRS_AS_TAGS=True)
     def test_consume_file_with_path_tags(self):
 
         tag_names = ("existingTag", "Space Tag")
