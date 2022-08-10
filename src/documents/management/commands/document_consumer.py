@@ -248,7 +248,7 @@ class Command(BaseCommand):
 
         while not finished:
             try:
-                for event in inotify.read(timeout):
+                for event in inotify.read(timeout=timeout):
                     if recursive:
                         path = inotify.get_path(event.wd)
                     else:
@@ -280,6 +280,15 @@ class Command(BaseCommand):
 
                 # These files are still waiting to hit the timeout
                 notified_files = still_waiting
+
+                # If files are waiting, need to exit read() to check them
+                # Otherwise, go back to infinite sleep time, but only if not testing
+                if len(notified_files) > 0:
+                    timeout = inotify_debounce
+                elif is_testing:
+                    timeout = self.testing_timeout_ms
+                else:
+                    timeout = None
 
                 if self.stop_flag.is_set():
                     logger.debug("Finishing because event is set")
