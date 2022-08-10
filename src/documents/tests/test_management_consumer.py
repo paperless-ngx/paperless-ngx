@@ -2,7 +2,6 @@ import filecmp
 import os
 import shutil
 from threading import Thread
-from time import monotonic
 from time import sleep
 from unittest import mock
 
