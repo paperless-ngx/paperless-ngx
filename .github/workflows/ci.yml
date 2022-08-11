@@ -332,7 +332,7 @@ jobs:
       -
         name: Create Release and Changelog
         id: create-release
-        uses: release-drafter/release-drafter@v5
+        uses: paperless-ngx/release-drafter@master
         with:
           name: Paperless-ngx ${{ steps.get_version.outputs.version }}
           tag: ${{ steps.get_version.outputs.version }}
