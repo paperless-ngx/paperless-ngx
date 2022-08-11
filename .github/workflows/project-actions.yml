@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'issues' && (github.event.action == 'opened' || github.event.action == 'reopened')
     steps:
-      - name: Set issue status to ${{ env.todo }}
+      - name: Add issue to project and set status to ${{ env.todo }}
         uses: leonsteinhaeuser/project-beta-automations@v1.2.1
         with:
           gh_token: ${{ secrets.GH_TOKEN }}
@@ -43,14 +43,14 @@ jobs:
       pull-requests: write
     if: github.event_name == 'pull_request_target' && (github.event.action == 'opened' || github.event.action == 'reopened') && github.event.pull_request.user.login != "dependabot"
     steps:
-      - name: Set PR status to ${{ env.in_progress }}
+      - name: Add PR to project and set status to "Needs Review"
         uses: leonsteinhaeuser/project-beta-automations@v1.2.1
         with:
           gh_token: ${{ secrets.GH_TOKEN }}
           organization: paperless-ngx
           project_id: 2
           resource_node_id: ${{ github.event.pull_request.node_id }}
-          status_value: ${{ env.in_progress }} # Target status
+          status_value: "Needs Review" # Target status
       - name: Label PR with release-drafter
         uses: release-drafter/release-drafter@v5
         env:
