@@ -13,6 +13,9 @@ on:
       - main
       - dev
 
+permissions:
+  contents: read
+
 env:
   todo: Todo
   done: Done
@@ -35,6 +38,9 @@ jobs:
   pr_opened_or_reopened:
     name: pr_opened_or_reopened
     runs-on: ubuntu-latest
+    permissions:
+      # write permission is required for autolabeler
+      pull-requests: write
     if: github.event_name == 'pull_request_target' && (github.event.action == 'opened' || github.event.action == 'reopened')
     steps:
       - name: Set PR status to ${{ env.in_progress }}
@@ -45,3 +51,7 @@ jobs:
           project_id: 2
           resource_node_id: ${{ github.event.pull_request.node_id }}
           status_value: ${{ env.in_progress }} # Target status
+      - name: Label PR with release-drafter
+        uses: release-drafter/release-drafter@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
