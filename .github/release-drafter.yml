@@ -15,9 +15,15 @@ categories:
       - 'chore'
       - 'deployment'
       - 'translation'
+      - 'ci-cd'
   - title: 'Dependencies'
     collapse-after: 3
     label: 'dependencies'
+  - title: 'All App Changes'
+    labels:
+      - 'frontend'
+      - 'backend'
+    collapse-after: 0
 include-labels:
   - 'enhancement'
   - 'bug'
@@ -26,8 +32,11 @@ include-labels:
   - 'translation'
   - 'dependencies'
   - 'documentation'
+  - 'frontend'
+  - 'backend'
+  - 'ci-cd'
 replacers: # Changes "Feature: Update checker" to "Update checker"
-  - search: '/Feature:|Feat:|\[feature\]/gi'
+  - search: '/Feature:?|Feat:?|\[feature\]/gi'
     replace: ''
 category-template: '### $TITLE'
 change-template: '- $TITLE [@$AUTHOR](https://github.com/$AUTHOR) ([#$NUMBER]($URL))'
