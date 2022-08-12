@@ -2225,7 +2225,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">388</context>
         </context-group>
-        <target state="translated">Cette opération va remplacer définitivement l’OCR pour les <x id="PH" equiv-text="this.list.selected.size"/> document(s) sélectionné(s).</target>
+        <target state="translated">Cette opération écrasera l’OCR pour les <x id="PH" equiv-text="this.list.selected.size"/> document(s) sélectionné(s).</target>
       </trans-unit>
       <trans-unit id="8076495233090006322" datatype="html" approved="yes">
         <source>Filter by correspondent</source>
