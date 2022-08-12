@@ -62,7 +62,8 @@ initialize() {
 		PAPERLESS_AUTO_LOGIN_USERNAME \
 		PAPERLESS_ADMIN_USER \
 		PAPERLESS_ADMIN_MAIL \
-		PAPERLESS_ADMIN_PASSWORD; do
+		PAPERLESS_ADMIN_PASSWORD \
+		PAPERLESS_REDIS; do
 		# Check for a version of this var with _FILE appended
 		# and convert the contents to the env var value
 		file_env ${env_var}
