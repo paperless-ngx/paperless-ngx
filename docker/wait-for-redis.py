@@ -7,6 +7,7 @@ a certain number of times, waiting a little bit in between
 import os
 import sys
 import time
+import re
 from typing import Final
 
 from redis import Redis
@@ -17,8 +18,14 @@ if __name__ == "__main__":
     RETRY_SLEEP_SECONDS: Final[int] = 5
 
     REDIS_URL: Final[str] = os.getenv("PAPERLESS_REDIS", "redis://localhost:6379")
+    matches = re.match(r"(?P<protocol>.*//)(?P<credentials>.*\@)?(?P<host>.*)", REDIS_URL)
 
-    print(f"Waiting for Redis: {REDIS_URL}", flush=True)
+    credentials=""
+    if (matches.group("credentials") is not None):
+        credentials="xxx:xxx@"
+    redisurl="{0}{1}{2}".format(matches.group("protocol"), credentials, matches.group("host"))
+
+    print(f"Waiting for Redis: {redisurl}", flush=True)
 
     attempt = 0
     with Redis.from_url(url=REDIS_URL) as client:
@@ -37,8 +44,8 @@ if __name__ == "__main__":
                 attempt += 1
 
     if attempt >= MAX_RETRY_COUNT:
-        print(f"Failed to connect to: {REDIS_URL}")
+        print(f"Failed to connect to: {redisurl}")
         sys.exit(os.EX_UNAVAILABLE)
     else:
-        print(f"Connected to Redis broker: {REDIS_URL}")
+        print(f"Connected to Redis broker: {redisurl}")
         sys.exit(os.EX_OK)
