@@ -240,7 +240,8 @@ class DocumentSerializer(DynamicFieldsModelSerializer):
             )
             instance.created = new_datetime
             instance.save()
-        validated_data.pop("created_date")
+        if "created_date" in validated_data:
+            validated_data.pop("created_date")
         super().update(instance, validated_data)
         return instance
 
