@@ -41,7 +41,7 @@ jobs:
     permissions:
       # write permission is required for autolabeler
       pull-requests: write
-    if: github.event_name == 'pull_request_target' && (github.event.action == 'opened' || github.event.action == 'reopened') && github.event.pull_request.user.login != "dependabot"
+    if: github.event_name == 'pull_request_target' && (github.event.action == 'opened' || github.event.action == 'reopened') && github.event.pull_request.user.login != 'dependabot'
     steps:
       - name: Add PR to project and set status to "Needs Review"
         uses: leonsteinhaeuser/project-beta-automations@v1.2.1
