@@ -54,7 +54,7 @@ Physical scanners
 +---------+-------------------+-----+------+-----+----------+------+----------+----------------+
 | Doxie   | `Q2`_             |     |      |     |          |      | yes      |`Unkn0wnCat`_   |
 +---------+-------------------+-----+------+-----+----------+------+----------+----------------+
-| HP      | `MFP M277 dw `    | yes |      |     | yes      |      | yes      |`glassbox_sco`  |
+| HP      | `MFP M277 dw`_    | yes |      |     | yes      |      | yes      |`glassbox_sco`_ |
 +---------+-------------------+-----+------+-----+----------+------+----------+----------------+
 
 .. _MFC-L5850DW: https://www.brother-usa.com/products/mfcl5850dw
@@ -75,7 +75,7 @@ Physical scanners
 .. _ix500: http://www.fujitsu.com/us/products/computing/peripheral/scanners/scansnap/ix500/
 .. _S1300i: https://www.fujitsu.com/global/products/computing/peripheral/scanners/soho/s1300i/
 .. _Q2: https://www.getdoxie.com/product/doxie-q/
-.. MFP M277 dw https://support.hp.com/us-en/drivers/selfservice/hp-color-laserjet-mfp-m277-series/7089945/model/7089949
+.. _MFP M277 dw: https://support.hp.com/us-en/drivers/selfservice/hp-color-laserjet-mfp-m277-series/7089945/model/7089949
 
 .. _ayounggun: https://github.com/ayounggun
 .. _bmsleight: https://github.com/bmsleight
@@ -92,6 +92,7 @@ Physical scanners
 .. _philpagel: https://github.com/philpagel
 .. _eingemaischt: https://github.com/eingemaischt
 .. _derlucas: https://github.com/derlucas
+.. _glassbox_sco: https://github.com/glassbox_sco
 
 .. [1] Scanners with API Integration allow to push scanned documents directly to :ref:`Paperless API <api-file_uploads>`, sometimes referred to as Webhook or Document POST.
 .. [2] Canon Multi Function Printers show strange behavior over SMB. They close and reopen the file after every page. It's recommended to tune the
