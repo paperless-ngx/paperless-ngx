@@ -1,4 +1,5 @@
 import os
+import re
 import tempfile
 from datetime import date
 from datetime import timedelta
@@ -70,7 +71,11 @@ class TagMailAction(BaseMailAction):
         return {"no_keyword": self.keyword}
 
     def post_consume(self, M: MailBox, message_uids, parameter):
-        M.flag(message_uids, [self.keyword], True)
+        if re.search(r"gmail\.com$|googlemail\.com$", M._host):
+            for uid in message_uids:
+                M.client.uid("STORE", uid, 'X-GM-LABELS', self.keyword)
+        else:
+            M.flag(message_uids, [self.keyword], True)
 
 
 def get_rule_action(rule):
