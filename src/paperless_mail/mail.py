@@ -73,7 +73,7 @@ class TagMailAction(BaseMailAction):
     def post_consume(self, M: MailBox, message_uids, parameter):
         if re.search(r"gmail\.com$|googlemail\.com$", M._host):
             for uid in message_uids:
-                M.client.uid("STORE", uid, 'X-GM-LABELS', self.keyword)
+                M.client.uid("STORE", uid, "X-GM-LABELS", self.keyword)
         else:
             M.flag(message_uids, [self.keyword], True)
 
