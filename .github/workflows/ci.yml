@@ -372,6 +372,8 @@ jobs:
           git branch ${{ needs.publish-release.outputs.version }}-changelog
           git checkout ${{ needs.publish-release.outputs.version }}-changelog
           echo -e "# Changelog\n\n${{ needs.publish-release.outputs.changelog }}\n" > changelog-new.md
+          echo "Manually linking usernames"
+          sed -i -r 's|@(.+?) \(\[#|[@\1](https://github.com/\1) ([#|ig' changelog-new.md
           CURRENT_CHANGELOG=`tail --lines +2 changelog.md`
           echo -e "$CURRENT_CHANGELOG" >> changelog-new.md
           mv changelog-new.md changelog.md
