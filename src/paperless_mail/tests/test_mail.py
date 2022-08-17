@@ -65,6 +65,7 @@ class BogusMailBox(ContextManager):
         self.messages_spam: List[MailMessage] = []
         self.folder = BogusFolderManager()
         self.client = BogusClient()
+        self._host = ""
 
     def login(self, username, password):
         # This will raise a UnicodeEncodeError if the password is not ASCII only
