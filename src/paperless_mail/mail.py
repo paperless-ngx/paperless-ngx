@@ -20,6 +20,7 @@ from imap_tools import MailboxFolderSelectError
 from imap_tools import MailBoxUnencrypted
 from imap_tools import MailMessage
 from imap_tools import MailMessageFlags
+from imap_tools import NOT
 from imap_tools.mailbox import MailBoxTls
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
@@ -68,7 +69,7 @@ class TagMailAction(BaseMailAction):
         self.keyword = parameter
 
     def get_criteria(self):
-        return {"no_keyword": self.keyword}
+        return {"no_keyword": self.keyword, "gmail_label": self.keyword}
 
     def post_consume(self, M: MailBox, message_uids, parameter):
         if re.search(r"gmail\.com$|googlemail\.com$", M._host):
@@ -274,6 +275,11 @@ class MailAccountHandler(LoggingMixin):
             ) from err
 
         criterias = make_criterias(rule)
+        criterias_imap = AND(**criterias)
+        if "gmail_label" in criterias:
+            gmail_label = criterias["gmail_label"]
+            del criterias["gmail_label"]
+            criterias_imap = AND(NOT(gmail_label=gmail_label), **criterias)
 
         self.log(
             "debug",
@@ -282,7 +288,7 @@ class MailAccountHandler(LoggingMixin):
 
         try:
             messages = M.fetch(
-                criteria=AND(**criterias),
+                criteria=criterias_imap,
                 mark_seen=False,
                 charset=rule.account.character_set,
             )
