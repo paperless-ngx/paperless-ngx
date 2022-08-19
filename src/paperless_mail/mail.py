@@ -283,7 +283,7 @@ class MailAccountHandler(LoggingMixin):
 
         self.log(
             "debug",
-            f"Rule {rule}: Searching folder with criteria " f"{str(AND(**criterias))}",
+            f"Rule {rule}: Searching folder with criteria " f"{str(criterias_imap)}",
         )
 
         try:
