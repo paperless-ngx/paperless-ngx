@@ -20,6 +20,7 @@ from imap_tools import MailboxFolderSelectError
 from imap_tools import MailboxLoginError
 from imap_tools import MailMessage
 from imap_tools import MailMessageFlags
+from imap_tools import NOT
 from paperless_mail import tasks
 from paperless_mail.mail import MailAccountHandler
 from paperless_mail.mail import MailError
@@ -120,6 +121,9 @@ class BogusMailBox(ContextManager):
 
         if "UNKEYWORD" in criteria:
             tag = criteria[criteria.index("UNKEYWORD") + 1].strip("'")
+            msg = filter(lambda m: "processed" not in m.flags, msg)
+
+        if "(X-GM-LABELS" in criteria:  # ['NOT', '(X-GM-LABELS', '"processed"']
             msg = filter(lambda m: "processed" not in m.flags, msg)
 
         return list(msg)
@@ -630,7 +634,7 @@ class TestMail(DirectoriesMixin, TestCase):
         self.assertEqual(len(self.bogus_mailbox.fetch("UNKEYWORD processed", False)), 0)
         self.assertEqual(len(self.bogus_mailbox.messages), 3)
 
-    def test_handle_mail_mail_account_tag_gmail(self):
+    def test_handle_mail_account_tag_gmail(self):
         self.bogus_mailbox._host = "imap.gmail.com"
 
         account = MailAccount.objects.create(
@@ -649,10 +653,11 @@ class TestMail(DirectoriesMixin, TestCase):
 
         self.assertEqual(len(self.bogus_mailbox.messages), 3)
         self.assertEqual(self.async_task.call_count, 0)
-        self.assertEqual(len(self.bogus_mailbox.fetch("UNKEYWORD processed", False)), 2)
+        criteria = NOT(gmail_label="processed")
+        self.assertEqual(len(self.bogus_mailbox.fetch(criteria, False)), 2)
         self.mail_account_handler.handle_mail_account(account)
         self.assertEqual(self.async_task.call_count, 2)
-        self.assertEqual(len(self.bogus_mailbox.fetch("UNKEYWORD processed", False)), 0)
+        self.assertEqual(len(self.bogus_mailbox.fetch(criteria, False)), 0)
         self.assertEqual(len(self.bogus_mailbox.messages), 3)
 
     def test_error_login(self):
