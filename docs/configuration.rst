@@ -29,7 +29,7 @@ PAPERLESS_REDIS=<url>
     
     * If your Redis server needs login credentials ``PAPERLESS_REDIS=redis://<username>:<password>@<ip>:<port>``
     
-    * With the requirepass option use: ``PAPERLESS_REDIS=redis://:<password>@<ip>:<port>``
+    * With the requirepass option ``PAPERLESS_REDIS=redis://:<password>@<ip>:<port>``
     
     `More information on securing your Redis Instance <https://redis.io/docs/getting-started/>`_.
 
