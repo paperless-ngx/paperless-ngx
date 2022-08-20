@@ -276,7 +276,10 @@ class RasterisedDocumentParser(DocumentParser):
             self.log("debug", f"Calling OCRmyPDF with args: {args}")
             ocrmypdf.ocr(**args)
 
-            self.archive_path = archive_path
+            # Only create archive file if archiving isn't being skipped
+            if settings.OCR_MODE != "skip_noarchive":
+                self.archive_path = archive_path
+
             self.text = self.extract_text(sidecar_file, archive_path)
 
             if not self.text:
