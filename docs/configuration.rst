@@ -27,14 +27,11 @@ PAPERLESS_REDIS=<url>
     This is required for processing scheduled tasks such as email fetching, index
     optimization and for training the automatic document matcher.
     
-    If the Redis server needs login credentials
-    PAPERLESS_REDIS=redis://<username>:<password>@<ip>:<port>
+    * If your Redis server needs login credentials ``PAPERLESS_REDIS=redis://<username>:<password>@<ip>:<port>``
     
-    If the Redis server is password protected via the requirepass option
-    use: PAPERLESS_REDIS=redis://:<password>@<ip>:<port>
+    * With the requirepass option use: ``PAPERLESS_REDIS=redis://:<password>@<ip>:<port>``
     
-    requirepass Post Arguments for Docker:
-    redis-server --requirepass <password>
+    `More information on securing your Redis Instance <https://redis.io/docs/getting-started/>`_.
 
     Defaults to redis://localhost:6379.
 
