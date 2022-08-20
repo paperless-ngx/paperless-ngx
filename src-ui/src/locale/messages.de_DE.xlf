@@ -3551,7 +3551,7 @@
           <context context-type="sourcefile">src/app/guards/dirty-doc.guard.ts</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="needs-translation">Warning: You have unsaved changes to your document(s).</target>
+        <target state="translated">Warnung: Sie haben nicht gespeicherte Änderungen an Ihren Dokument(en).</target>
       </trans-unit>
       <trans-unit id="159901853873315050" datatype="html">
         <source>Unsaved Changes</source>
