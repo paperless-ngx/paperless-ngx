@@ -364,6 +364,16 @@ class TestParser(DirectoriesMixin, TestCase):
 
     @override_settings(OCR_MODE="skip_noarchive")
     def test_skip_noarchive_withtext(self):
+        """
+        GIVEN:
+            - File with existing text layer
+            - OCR mode set to skip_noarchive
+        WHEN:
+            - Document is parsed
+        THEN:
+            - Text from images is extracted
+            - No archive file is created
+        """
         parser = RasterisedDocumentParser(None)
         parser.parse(
             os.path.join(self.SAMPLE_FILES, "multi-page-digital.pdf"),
@@ -377,16 +387,28 @@ class TestParser(DirectoriesMixin, TestCase):
 
     @override_settings(OCR_MODE="skip_noarchive")
     def test_skip_noarchive_notext(self):
+        """
+        GIVEN:
+            - File with text contained in images but no text layer
+            - OCR mode set to skip_noarchive
+        WHEN:
+            - Document is parsed
+        THEN:
+            - Text from images is extracted
+            - No archive file is created
+        """
         parser = RasterisedDocumentParser(None)
         parser.parse(
             os.path.join(self.SAMPLE_FILES, "multi-page-images.pdf"),
             "application/pdf",
         )
-        self.assertTrue(os.path.isfile(parser.archive_path))
+
         self.assertContainsStrings(
             parser.get_text().lower(),
             ["page 1", "page 2", "page 3"],
         )
+
+        self.assertIsNone(parser.archive_path)
 
     @override_settings(OCR_MODE="skip")
     def test_multi_page_mixed(self):
@@ -408,6 +430,16 @@ class TestParser(DirectoriesMixin, TestCase):
 
     @override_settings(OCR_MODE="skip_noarchive")
     def test_multi_page_mixed_no_archive(self):
+        """
+        GIVEN:
+            - File with some text contained in images and some in text layer
+            - OCR mode set to skip_noarchive
+        WHEN:
+            - Document is parsed
+        THEN:
+            - Text from images is extracted
+            - No archive file is created
+        """
         parser = RasterisedDocumentParser(None)
         parser.parse(
             os.path.join(self.SAMPLE_FILES, "multi-page-mixed.pdf"),
