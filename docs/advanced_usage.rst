@@ -171,6 +171,7 @@ into paperless. It receives the following environment variables:
 * ``DOCUMENT_THUMBNAIL_URL``
 * ``DOCUMENT_CORRESPONDENT``
 * ``DOCUMENT_TAGS``
+* ``DOCUMENT_ORIGINAL_FILENAME``
 
 The script can be in any language, but for a simple shell script
 example, you can take a look at `post-consumption-example.sh`_ in this project.
