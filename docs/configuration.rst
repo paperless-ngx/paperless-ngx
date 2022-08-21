@@ -27,9 +27,9 @@ PAPERLESS_REDIS=<url>
     This is required for processing scheduled tasks such as email fetching, index
     optimization and for training the automatic document matcher.
     
-    * If your Redis server needs login credentials ``PAPERLESS_REDIS=redis://<username>:<password>@<ip>:<port>``
+    * If your Redis server needs login credentials PAPERLESS_REDIS = ``redis://<username>:<password>@<host>:<port>``
     
-    * With the requirepass option ``PAPERLESS_REDIS=redis://:<password>@<ip>:<port>``
+    * With the requirepass option PAPERLESS_REDIS = ``redis://:<password>@<host>:<port>``
     
     `More information on securing your Redis Instance <https://redis.io/docs/getting-started/>`_.
 
