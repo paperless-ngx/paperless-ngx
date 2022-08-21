@@ -31,7 +31,7 @@ PAPERLESS_REDIS=<url>
     
     * With the requirepass option PAPERLESS_REDIS = ``redis://:<password>@<host>:<port>``
     
-    `More information on securing your Redis Instance <https://redis.io/docs/getting-started/>`_.
+    `More information on securing your Redis Instance <https://redis.io/docs/getting-started/#securing-redis>`_.
 
     Defaults to redis://localhost:6379.
 
