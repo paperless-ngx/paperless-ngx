@@ -3141,7 +3141,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">135</context>
         </context-group>
-        <target state="translated">Obrada dokumenata</target>
+        <target state="translated">Procesiranje dokumenata</target>
       </trans-unit>
       <trans-unit id="3656786776644872398" datatype="html">
         <source>Show notifications when new documents are detected</source>
