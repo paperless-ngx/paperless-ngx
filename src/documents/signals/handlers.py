@@ -291,7 +291,7 @@ def set_storage_path(
                     )
                     + f" [{document.pk}]",
                 )
-            print(f"Sugest storage directory {selected}")
+            print(f"Suggest storage directory {selected}")
         else:
             logger.info(
                 f"Assigning storage path {selected} to {document}",
