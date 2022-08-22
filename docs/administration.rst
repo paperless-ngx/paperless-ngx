@@ -310,6 +310,7 @@ there are tools for it.
     -c, --correspondent
     -T, --tags
     -t, --document_type
+    -s, --storage_path
     -i, --inbox-only
     --use-first
     -f, --overwrite
@@ -318,7 +319,7 @@ Run this after changing or adding matching rules. It'll loop over all
 of the documents in your database and attempt to match documents
 according to the new rules.
 
-Specify any combination of ``-c``, ``-T`` and ``-t`` to have the
+Specify any combination of ``-c``, ``-T``, ``-t`` and ``-s`` to have the
 retagger perform matching of the specified metadata type. If you don't
 specify any of these options, the document retagger won't do anything.
 
