@@ -900,7 +900,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">174</context>
+          <context context-type="linenumber">178</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/save-view-config-dialog/save-view-config-dialog.component.html</context>
@@ -1733,11 +1733,19 @@
         </context-group>
         <target state="final">اسم ملف الوسائط</target>
       </trans-unit>
+      <trans-unit id="4500855521601039868" datatype="html">
+        <source>Original filename</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
+          <context context-type="linenumber">117</context>
+        </context-group>
+        <target state="needs-translation">Original filename</target>
+      </trans-unit>
       <trans-unit id="7985558498848210210" datatype="html" approved="yes">
         <source>Original MD5 checksum</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">117</context>
+          <context context-type="linenumber">121</context>
         </context-group>
         <target state="final">مجموع MD5 الاختباري للأصل</target>
       </trans-unit>
@@ -1745,7 +1753,7 @@
         <source>Original file size</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">121</context>
+          <context context-type="linenumber">125</context>
         </context-group>
         <target state="final">حجم الملف الأصلي</target>
       </trans-unit>
@@ -1753,7 +1761,7 @@
         <source>Original mime type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">125</context>
+          <context context-type="linenumber">129</context>
         </context-group>
         <target state="final">نوع mime الأصلي</target>
       </trans-unit>
@@ -1761,7 +1769,7 @@
         <source>Archive MD5 checksum</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">129</context>
+          <context context-type="linenumber">133</context>
         </context-group>
         <target state="final">مجموع MD5 الاختباري للأرشيف</target>
       </trans-unit>
@@ -1769,7 +1777,7 @@
         <source>Archive file size</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">133</context>
+          <context context-type="linenumber">137</context>
         </context-group>
         <target state="final">حجم ملف الأرشيف</target>
       </trans-unit>
@@ -1777,7 +1785,7 @@
         <source>Original document metadata</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">139</context>
+          <context context-type="linenumber">143</context>
         </context-group>
         <target state="final">بيانات التعريف للمستند الأصلي</target>
       </trans-unit>
@@ -1785,7 +1793,7 @@
         <source>Archived document metadata</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">140</context>
+          <context context-type="linenumber">144</context>
         </context-group>
         <target state="final">بيانات التعريف للمستند الأصلي</target>
       </trans-unit>
@@ -1793,11 +1801,11 @@
         <source>Enter Password</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">162</context>
+          <context context-type="linenumber">166</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">192</context>
+          <context context-type="linenumber">196</context>
         </context-group>
         <target state="needs-translation">Enter Password</target>
       </trans-unit>
@@ -1805,7 +1813,7 @@
         <source>Discard</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">172</context>
+          <context context-type="linenumber">176</context>
         </context-group>
         <target state="final">تجاهل</target>
       </trans-unit>
@@ -1813,7 +1821,7 @@
         <source>Save &amp; next</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">173</context>
+          <context context-type="linenumber">177</context>
         </context-group>
         <target state="final">حفظ &amp; التالي</target>
       </trans-unit>
