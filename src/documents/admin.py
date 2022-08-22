@@ -42,6 +42,7 @@ class DocumentAdmin(admin.ModelAdmin):
         "checksum",
         "archive_filename",
         "archive_checksum",
+        "original_filename",
     )
 
     list_display_links = ("title",)
