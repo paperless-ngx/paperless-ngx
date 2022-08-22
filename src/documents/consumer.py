@@ -203,6 +203,7 @@ class Consumer(LoggingMixin):
         script_env["DOCUMENT_TAGS"] = str(
             ",".join(document.tags.all().values_list("name", flat=True)),
         )
+        script_env["DOCUMENT_ORIGINAL_FILENAME"] = str(document.original_filename)
 
         try:
             Popen(
@@ -475,6 +476,7 @@ class Consumer(LoggingMixin):
                 created=create_date,
                 modified=create_date,
                 storage_type=storage_type,
+                original_filename=self.filename,
             )
 
         self.apply_overrides(document)

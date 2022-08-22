@@ -313,6 +313,7 @@ class DocumentViewSet(
             "original_metadata": self.get_metadata(doc.source_path, doc.mime_type),
             "archive_checksum": doc.archive_checksum,
             "archive_media_filename": doc.archive_filename,
+            "original_filename": doc.original_filename,
         }
 
         if doc.has_archive_version:
