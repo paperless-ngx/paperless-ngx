@@ -30,6 +30,8 @@ Physical scanners
 +---------+-------------------+-----+------+-----+----------+------+----------+----------------+
 | Brother | `ADS-4300N`_      | yes | yes  |     | yes      | yes  |          |`derlucas`_     |
 +---------+-------------------+-----+------+-----+----------+------+----------+----------------+
+| Brother | `ADS-4700W`_      | yes | yes  |     | yes      | yes  |          |`ocelotsloth`_  |
++---------+-------------------+-----+------+-----+----------+------+----------+----------------+
 | Brother | `MFC-J6930DW`_    | yes |      |     |          |      |          |`ayounggun`_    |
 +---------+-------------------+-----+------+-----+----------+------+----------+----------------+
 | Brother | `MFC-L5850DW`_    | yes |      |     |          | yes  |          |`holzhannes`_   |
@@ -65,6 +67,7 @@ Physical scanners
 .. _ADS-1100W: https://support.brother.com/g/b/downloadtop.aspx?c=fr&lang=fr&prod=ads1100w_eu_as_cn
 .. _ADS-2800W: https://www.brother-usa.com/products/ads2800w
 .. _ADS-4300N: https://www.brother-usa.com/products/ads4300n
+.. _ADS-4700W: https://www.brother-usa.com/products/ads4700w
 .. _Maxify MB 5350: https://www.canon.de/printers/inkjet/maxify/maxify_mb5350/specification.html
 .. _MFC-J6930DW: https://www.brother.ca/en/p/MFCJ6930DW
 .. _MFC-J5910DW: https://www.brother.co.uk/printers/inkjet-printers/mfcj5910dw
@@ -93,6 +96,7 @@ Physical scanners
 .. _eingemaischt: https://github.com/eingemaischt
 .. _derlucas: https://github.com/derlucas
 .. _glassbox_sco: https://github.com/glassbox_sco
+.. _ocelotsloth: https://github.com/ocelotsloth
 
 .. [1] Scanners with API Integration allow to push scanned documents directly to :ref:`Paperless API <api-file_uploads>`, sometimes referred to as Webhook or Document POST.
 .. [2] Canon Multi Function Printers show strange behavior over SMB. They close and reopen the file after every page. It's recommended to tune the
