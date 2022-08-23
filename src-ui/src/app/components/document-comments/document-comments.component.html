@@ -1,4 +1,16 @@
 <div *ngIf="comments">
+    <form [formGroup]="commentForm" class="needs-validation mt-3" novalidate>
+        <div class="form-group">
+            <textarea class="form-control form-control-sm" [class.is-invalid]="newCommentError" rows="3" formControlName="newComment" placeholder="Enter comment" i18n-placeholder required></textarea>
+            <div class="invalid-feedback" i18n>
+                Please enter a comment.
+            </div>
+        </div>
+        <div class="form-group mt-2 d-flex justify-content-end">
+            <button type="button" class="btn btn-primary btn-sm" [disabled]="networkActive" (click)="addComment()" i18n>Add comment</button>
+        </div>
+    </form>
+    <hr>
     <div *ngFor="let comment of comments" class="card border mb-3">
         <div class="card-body text-dark">
             <p class="card-text">{{comment.comment}}</p>
@@ -12,17 +24,4 @@
             </btn>
         </div>
     </div>
-    <hr>
-    <form [formGroup]="commentForm" class="needs-validation" novalidate>
-        <div class="form-group">
-            <textarea class="form-control form-control-sm" [class.is-invalid]="newCommentError" rows="3" formControlName="newComment" placeholder="Enter comment" i18n-placeholder required></textarea>
-            <div class="invalid-feedback" i18n>
-                Please enter a comment.
-            </div>
-        </div>
-        <div class="form-group mt-2 d-flex justify-content-end">
-            <button type="button" class="btn btn-primary btn-sm" [disabled]="networkActive" (click)="addComment()" i18n>Add comment</button>
-        </div>
-    </form>
-    <hr>
 </div>
