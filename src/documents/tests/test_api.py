@@ -32,6 +32,7 @@ from documents.models import SavedView
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import UiSettings
+from documents.models import Comment
 from documents.models import StoragePath
 from documents.tests.utils import DirectoriesMixin
 from paperless import version
@@ -1353,6 +1354,132 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
             self.client.get(f"/api/tags/{tag.id}/", format="json").data["colour"],
             1,
         )
+
+    def test_get_existing_comments(self):
+        """
+        GIVEN:
+            - A document with a single comment
+        WHEN:
+            - API reuqest for document comments is made
+        THEN:
+            - The associated comment is returned
+        """
+        doc = Document.objects.create(
+            title="test",
+            mime_type="application/pdf",
+            content="this is a document which will have comments!",
+        )
+        comment = Comment.objects.create(
+            comment="This is a comment.",
+            document=doc,
+            user=self.user,
+        )
+
+        response = self.client.get(
+            f"/api/documents/{doc.pk}/comments/",
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        resp_data = response.json()
+
+        self.assertEqual(len(resp_data), 1)
+
+        resp_data = resp_data[0]
+        del resp_data["created"]
+
+        self.assertDictEqual(
+            resp_data,
+            {
+                "id": comment.id,
+                "comment": comment.comment,
+                "user": {
+                    "id": comment.user.id,
+                    "username": comment.user.username,
+                    "firstname": comment.user.first_name,
+                    "lastname": comment.user.last_name,
+                },
+            },
+        )
+
+    def test_create_comment(self):
+        """
+        GIVEN:
+            - Existing document
+        WHEN:
+            - API request is made to add a comment
+        THEN:
+            - Comment is created and associated with document
+        """
+        doc = Document.objects.create(
+            title="test",
+            mime_type="application/pdf",
+            content="this is a document which will have comments added",
+        )
+        resp = self.client.post(
+            f"/api/documents/{doc.pk}/comments/",
+            data={"comment": "this is a posted comment"},
+        )
+        self.assertEqual(resp.status_code, 200)
+
+        response = self.client.get(
+            f"/api/documents/{doc.pk}/comments/",
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        resp_data = response.json()
+
+        self.assertEqual(len(resp_data), 1)
+
+        resp_data = resp_data[0]
+
+        self.assertEqual(resp_data["comment"], "this is a posted comment")
+
+    def test_delete_comment(self):
+        """
+        GIVEN:
+            - Existing document
+        WHEN:
+            - API request is made to add a comment
+        THEN:
+            - Comment is created and associated with document
+        """
+        doc = Document.objects.create(
+            title="test",
+            mime_type="application/pdf",
+            content="this is a document which will have comments!",
+        )
+        comment = Comment.objects.create(
+            comment="This is a comment.",
+            document=doc,
+            user=self.user,
+        )
+
+        response = self.client.delete(
+            f"/api/documents/{doc.pk}/comments/",
+            data={"id": f"{comment.pk}"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_comments_no_doc(self):
+        """
+        GIVEN:
+            - A request to get comments from a non-existent document
+        WHEN:
+            - API request for document comments is made
+        THEN:
+            - HTTP 404 is returned
+        """
+        response = self.client.get(
+            "/api/documents/500/comments/",
+            format="json",
+        )
+        self.assertEqual(response.status_code, 404)
 
 
 class TestDocumentApiV2(DirectoriesMixin, APITestCase):
