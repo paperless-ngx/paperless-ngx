@@ -1459,12 +1459,13 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         )
 
         response = self.client.delete(
-            f"/api/documents/{doc.pk}/comments/",
-            data={"id": f"{comment.pk}"},
+            f"/api/documents/{doc.pk}/comments/?id={comment.pk}",
             format="json",
         )
 
         self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(len(Comment.objects.all()), 0)
 
     def test_get_comments_no_doc(self):
         """
