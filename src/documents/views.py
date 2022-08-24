@@ -409,7 +409,10 @@ class DocumentViewSet(
             try:
                 return Response(self.getComments(doc))
             except Exception as e:
-                return Response({"error": str(e)})
+                logger.warning(f"An error occurred retrieving comments: {str(e)}")
+                return Response(
+                    {"error": "Error retreiving comments, check logs for more detail."},
+                )
         elif request.method == "POST":
             try:
                 c = Comment.objects.create(
@@ -421,9 +424,10 @@ class DocumentViewSet(
 
                 return Response(self.getComments(doc))
             except Exception as e:
+                logger.warning(f"An error occurred saving comment: {str(e)}")
                 return Response(
                     {
-                        "error": str(e),
+                        "error": "Error saving comment, check logs for more detail.",
                     },
                 )
         elif request.method == "DELETE":
