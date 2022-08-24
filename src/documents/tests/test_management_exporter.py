@@ -10,10 +10,12 @@ from django.core.management import call_command
 from django.test import override_settings
 from django.test import TestCase
 from documents.management.commands import document_exporter
+from documents.models import Comment
 from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import Tag
+from documents.models import User
 from documents.sanity_checker import check_sanity
 from documents.settings import EXPORTER_FILE_NAME
 from documents.tests.utils import DirectoriesMixin
@@ -24,6 +26,8 @@ class TestExportImport(DirectoriesMixin, TestCase):
     def setUp(self) -> None:
         self.target = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, self.target)
+
+        self.user = User.objects.create(username="temp_admin")
 
         self.d1 = Document.objects.create(
             content="Content",
@@ -55,6 +59,12 @@ class TestExportImport(DirectoriesMixin, TestCase):
             filename="0000004.pdf.gpg",
             mime_type="application/pdf",
             storage_type=Document.STORAGE_TYPE_GPG,
+        )
+
+        self.comment = Comment.objects.create(
+            comment="This is a comment. amaze.",
+            document=self.d1,
+            user=self.user,
         )
 
         self.t1 = Tag.objects.create(name="t")
@@ -110,7 +120,7 @@ class TestExportImport(DirectoriesMixin, TestCase):
 
         manifest = self._do_export(use_filename_format=use_filename_format)
 
-        self.assertEqual(len(manifest), 8)
+        self.assertEqual(len(manifest), 10)
         self.assertEqual(
             len(list(filter(lambda e: e["model"] == "documents.document", manifest))),
             4,
@@ -170,6 +180,11 @@ class TestExportImport(DirectoriesMixin, TestCase):
                     with open(fname, "rb") as f:
                         checksum = hashlib.md5(f.read()).hexdigest()
                     self.assertEqual(checksum, element["fields"]["archive_checksum"])
+
+            elif element["model"] == "documents.comment":
+                self.assertEqual(element["fields"]["comment"], self.comment.comment)
+                self.assertEqual(element["fields"]["document"], self.d1.id)
+                self.assertEqual(element["fields"]["user"], self.user.id)
 
         with paperless_environment() as dirs:
             self.assertEqual(Document.objects.count(), 4)
