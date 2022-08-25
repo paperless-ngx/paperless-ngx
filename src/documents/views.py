@@ -1,3 +1,4 @@
+import itertools
 import json
 import logging
 import os
@@ -21,6 +22,7 @@ from django.db.models.functions import Lower
 from django.http import Http404
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
+from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.utils.translation import get_language
 from django.views.decorators.cache import cache_control
@@ -70,6 +72,7 @@ from .models import SavedView
 from .models import StoragePath
 from .models import Tag
 from .parsers import get_parser_class_for_mime_type
+from .parsers import parse_date_generator
 from .serialisers import AcknowledgeTasksViewSerializer
 from .serialisers import BulkDownloadSerializer
 from .serialisers import BulkEditSerializer
@@ -330,12 +333,14 @@ class DocumentViewSet(
 
     @action(methods=["get"], detail=True)
     def suggestions(self, request, pk=None):
-        try:
-            doc = Document.objects.get(pk=pk)
-        except Document.DoesNotExist:
-            raise Http404()
+        doc = get_object_or_404(Document, pk=pk)
 
         classifier = load_classifier()
+
+        gen = parse_date_generator(doc.filename, doc.content)
+        dates = sorted(
+            {i for i in itertools.islice(gen, settings.NUMBER_OF_SUGGESTED_DATES)},
+        )
 
         return Response(
             {
@@ -345,6 +350,9 @@ class DocumentViewSet(
                     dt.id for dt in match_document_types(doc, classifier)
                 ],
                 "storage_paths": [dt.id for dt in match_storage_paths(doc, classifier)],
+                "dates": [
+                    date.strftime("%Y-%m-%d") for date in dates if date is not None
+                ],
             },
         )
 

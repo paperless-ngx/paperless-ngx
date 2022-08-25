@@ -1,4 +1,4 @@
-import { Component, forwardRef, OnInit } from '@angular/core'
+import { Component, forwardRef, Input, OnInit } from '@angular/core'
 import { NG_VALUE_ACCESSOR } from '@angular/forms'
 import {
   NgbDateAdapter,
@@ -29,6 +29,28 @@ export class DateComponent
     private isoDateAdapter: NgbDateAdapter<string>
   ) {
     super()
+  }
+
+  @Input()
+  suggestions: string[]
+
+  getSuggestions() {
+    return this.suggestions == null
+      ? []
+      : this.suggestions
+          .map((s) => this.ngbDateParserFormatter.parse(s))
+          .filter(
+            (d) =>
+              this.value === null || // if value is not set, take all suggestions
+              this.value != this.isoDateAdapter.toModel(d) // otherwise filter out current date
+          )
+          .map((s) => this.ngbDateParserFormatter.format(s))
+  }
+
+  onSuggestionClick(dateString: string) {
+    const parsedDate = this.ngbDateParserFormatter.parse(dateString)
+    this.writeValue(this.isoDateAdapter.toModel(parsedDate))
+    this.onChange(this.value)
   }
 
   ngOnInit(): void {
