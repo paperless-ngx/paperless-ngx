@@ -10,7 +10,7 @@ name = "piwheels"
 
 [packages]
 dateparser = "~=1.1"
-django = "~=4.0"
+django = "~=4.1"
 django-cors-headers = "*"
 django-extensions = "*"
 django-filter = "~=22.1"
