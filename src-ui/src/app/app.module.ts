@@ -67,6 +67,7 @@ import { ApiVersionInterceptor } from './interceptors/api-version.interceptor'
 import { ColorSliderModule } from 'ngx-color/slider'
 import { ColorComponent } from './components/common/input/color/color.component'
 import { DocumentAsnComponent } from './components/document-asn/document-asn.component'
+import { DocumentCommentsComponent } from './components/document-comments/document-comments.component'
 import { DirtyDocGuard } from './guards/dirty-doc.guard'
 
 import localeBe from '@angular/common/locales/be'
@@ -173,6 +174,7 @@ function initializeApp(settings: SettingsService) {
     DateComponent,
     ColorComponent,
     DocumentAsnComponent,
+    DocumentCommentsComponent,
     TasksComponent,
   ],
   imports: [
