@@ -64,6 +64,7 @@ from .matching import match_correspondents
 from .matching import match_document_types
 from .matching import match_storage_paths
 from .matching import match_tags
+from .models import Comment
 from .models import Correspondent
 from .models import Document
 from .models import DocumentType
@@ -386,6 +387,67 @@ class DocumentViewSet(
             return self.file_response(pk, request, "attachment")
         except (FileNotFoundError, Document.DoesNotExist):
             raise Http404()
+
+    def getComments(self, doc):
+        return [
+            {
+                "id": c.id,
+                "comment": c.comment,
+                "created": c.created,
+                "user": {
+                    "id": c.user.id,
+                    "username": c.user.username,
+                    "firstname": c.user.first_name,
+                    "lastname": c.user.last_name,
+                },
+            }
+            for c in Comment.objects.filter(document=doc).order_by("-created")
+        ]
+
+    @action(methods=["get", "post", "delete"], detail=True)
+    def comments(self, request, pk=None):
+        try:
+            doc = Document.objects.get(pk=pk)
+        except Document.DoesNotExist:
+            raise Http404()
+
+        currentUser = request.user
+
+        if request.method == "GET":
+            try:
+                return Response(self.getComments(doc))
+            except Exception as e:
+                logger.warning(f"An error occurred retrieving comments: {str(e)}")
+                return Response(
+                    {"error": "Error retreiving comments, check logs for more detail."},
+                )
+        elif request.method == "POST":
+            try:
+                c = Comment.objects.create(
+                    document=doc,
+                    comment=request.data["comment"],
+                    user=currentUser,
+                )
+                c.save()
+
+                return Response(self.getComments(doc))
+            except Exception as e:
+                logger.warning(f"An error occurred saving comment: {str(e)}")
+                return Response(
+                    {
+                        "error": "Error saving comment, check logs for more detail.",
+                    },
+                )
+        elif request.method == "DELETE":
+            comment = Comment.objects.get(id=int(request.GET.get("id")))
+            comment.delete()
+            return Response(self.getComments(doc))
+
+        return Response(
+            {
+                "error": "error",
+            },
+        )
 
 
 class SearchResultSerializer(DocumentSerializer):

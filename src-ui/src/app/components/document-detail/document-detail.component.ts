@@ -551,4 +551,8 @@ export class DocumentDetailComponent
       this.password = (event.target as HTMLInputElement).value
     }
   }
+
+  get commentsEnabled(): boolean {
+    return this.settings.get(SETTINGS_KEYS.COMMENTS_ENABLED)
+  }
 }
