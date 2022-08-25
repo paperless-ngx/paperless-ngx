@@ -742,18 +742,17 @@ PAPERLESS_FILENAME_DATE_ORDER=<format>
     Defaults to none, which disables this feature.
 
 PAPERLESS_NUMBER_OF_SUGGESTED_DATES=<num>
-    Paperless will search the entire document for any date. The first date found will
-    be used as a default value for the created date. With this setting in place,
-    paperless will suggestion other dates found in the document.
+    Paperless searches an entire document for dates. The first date found will
+    be used as the initial value for the created date. When this variable is
+    greater than 0 (or left to it's default value), paperless will also suggest
+    other dates found in the document, up to a maximum of this setting. Note that
+    duplicates will be removed, which can result in fewer dates displayed in the
+    frontend than this setting value.
 
-    Regarding the size of the document, the task to find all dates can consuming much time.
-    Therefore the number of found dates can be limited with this setting.
+    The task to find all dates can be time-consuming and increases with a higher
+    (maximum) number of suggested dates and slower hardware.
 
-    If 10 dates should be suggested, paperless will grab every date from the top of the
-    document to the bottom until it has reached 10 dates. After this, duplicates will
-    be removed, which can lead to less than 10 dates displayed in the frontend.
-
-    Set the number to 0 to disable this feature (default)
+    Defaults to 3. Set to 0 to disable this feature.
 
 PAPERLESS_THUMBNAIL_FONT_NAME=<filename>
     Paperless creates thumbnails for plain text files by rendering the content
