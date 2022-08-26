@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("documents", "1022_paperlesstask"),
+        ("documents", "1023_add_comments"),
     ]
 
     operations = [
