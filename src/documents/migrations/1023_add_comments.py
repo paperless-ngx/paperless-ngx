@@ -1,4 +1,6 @@
 from django.db import migrations, models
+import django.utils.timezone
+from django.conf import settings
 
 
 class Migration(migrations.Migration):
@@ -19,10 +21,49 @@ class Migration(migrations.Migration):
                         verbose_name="ID",
                     ),
                 ),
-                ("comment", models.TextField()),
-                ("created", models.DateTimeField(auto_now_add=True)),
-                ("document_id", models.PositiveIntegerField()),
-                ("user_id", models.PositiveIntegerField()),
+                (
+                    "comment",
+                    models.TextField(
+                        blank=True,
+                        help_text="Comment for the document",
+                        verbose_name="content",
+                    ),
+                ),
+                (
+                    "created",
+                    models.DateTimeField(
+                        db_index=True,
+                        default=django.utils.timezone.now,
+                        verbose_name="created",
+                    ),
+                ),
+                (
+                    "document",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="documents",
+                        to="documents.document",
+                        verbose_name="document",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="users",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="user",
+                    ),
+                ),
             ],
-        )
+            options={
+                "verbose_name": "comment",
+                "verbose_name_plural": "comments",
+                "ordering": ("created",),
+            },
+        ),
     ]
