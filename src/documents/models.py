@@ -404,6 +404,9 @@ class SavedViewFilterRule(models.Model):
         (20, _("fulltext query")),
         (21, _("more like this")),
         (22, _("has tags in")),
+        (23, _("ASN greater than")),
+        (24, _("ASN less than")),
+        (25, _("storage path is")),
     ]
 
     saved_view = models.ForeignKey(
