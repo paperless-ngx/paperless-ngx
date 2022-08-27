@@ -1451,7 +1451,7 @@
           <context context-type="sourcefile">src/app/components/document-comments/document-comments.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="needs-translation">Enter comment</target>
+        <target state="translated">Kommentar eingeben</target>
       </trans-unit>
       <trans-unit id="4025397324401332794" datatype="html">
         <source> Please enter a comment. </source>
@@ -1467,7 +1467,7 @@
           <context context-type="sourcefile">src/app/components/document-comments/document-comments.component.html</context>
           <context context-type="linenumber">10</context>
         </context-group>
-        <target state="needs-translation">Add comment</target>
+        <target state="translated">Kommentar hinzufügen</target>
       </trans-unit>
       <trans-unit id="5438997040668245251" datatype="html">
         <source>Error saving comment: <x id="PH" equiv-text="e.toString()"/></source>
@@ -1859,7 +1859,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">128</context>
         </context-group>
-        <target state="needs-translation">Comments</target>
+        <target state="translated">Kommentare</target>
       </trans-unit>
       <trans-unit id="3823219296477075982" datatype="html" approved="yes">
         <source>Discard</source>
