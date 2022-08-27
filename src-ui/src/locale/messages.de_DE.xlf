@@ -3193,7 +3193,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">132</context>
         </context-group>
-        <target state="needs-translation">Enable comments</target>
+        <target state="translated">Kommentare aktivieren</target>
       </trans-unit>
       <trans-unit id="5851560788527570644" datatype="html" approved="yes">
         <source>Notifications</source>
