@@ -56,7 +56,9 @@ Physical scanners
 +---------+-------------------+-----+------+-----+----------+------+----------+-----------------+
 | Fujitsu | `S1300i`_         | yes |      |     | yes      |      |          | `jonaswinkler`_ |
 +---------+-------------------+-----+------+-----+----------+------+----------+-----------------+
-| HP      | `MFP M277 dw`_    | yes |      |     | yes      |      | yes      | `glassbox_sco`_ |
+| HP      | `MFP M277dw`_     | yes |      |     | yes      |      | yes      | `glassbox_sco`_ |
++---------+-------------------+-----+------+-----+----------+------+----------+-----------------+
+| Lexmark | `MB2442adwe`_     | yes |      |     | yes      | yes  |          | `tooomm`_       |
 +---------+-------------------+-----+------+-----+----------+------+----------+-----------------+
 
 .. _ADS-1100W: https://support.brother.com/g/b/downloadtop.aspx?c=fr&lang=fr&prod=ads1100w_eu_as_cn
@@ -69,13 +71,14 @@ Physical scanners
 .. _ES-580W: https://epson.com/Support/Scanners/ES-Series/Epson-WorkForce-ES-580W/s/SPT_B11B258201
 .. _ix500: http://www.fujitsu.com/us/products/computing/peripheral/scanners/scansnap/ix500/
 .. _Maxify MB 5350: https://www.canon.de/printers/inkjet/maxify/maxify_mb5350/specification.html
+.. _MB2442adwe: https://www.lexmark.com/en_us/printer/11844/Lexmark-MB2442adwe
 .. _MFC-J5910DW: https://www.brother.co.uk/printers/inkjet-printers/mfcj5910dw
 .. _MFC-J6930DW: https://www.brother.ca/en/p/MFCJ6930DW
 .. _MFC-L2750DW: https://www.brother.de/drucker/laserdrucker/mfc-l2750dw
 .. _MFC-L5850DW: https://www.brother-usa.com/products/mfcl5850dw
 .. _MFC-8950DW: https://www.brother-usa.com/products/mfc8950dw
 .. _MFC-9142CDN: https://www.brother.co.uk/printers/laser-printers/mfc9140cdn
-.. _MFP M277 dw: https://support.hp.com/us-en/drivers/selfservice/hp-color-laserjet-mfp-m277-series/7089945/model/7089949
+.. _MFP M277dw: https://support.hp.com/us-en/drivers/selfservice/hp-color-laserjet-mfp-m277-series/7089945/model/7089949
 .. _Q2: https://www.getdoxie.com/product/doxie-q/
 .. _S1300i: https://www.fujitsu.com/global/products/computing/peripheral/scanners/soho/s1300i/
 .. _WF-7710DWF: https://www.epson.de/en/products/printers/inkjet-printers/for-home/workforce-wf-7710dwf
@@ -95,6 +98,7 @@ Physical scanners
 .. _philpagel: https://github.com/philpagel
 .. _REOLDEV: https://github.com/REOLDEV
 .. _Skylinar: https://github.com/Skylinar
+.. _tooomm: https://github.com/tooomm
 .. _Unkn0wnCat: https://github.com/Unkn0wnCat
 .. _ytzelf: https://github.com/ytzelf
 
