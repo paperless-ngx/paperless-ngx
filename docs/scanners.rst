@@ -112,24 +112,24 @@ You can use your phone to "scan" documents. The regular camera app will work, bu
 +-----------------------------+----------------+-----+-----+-----+-------+--------+------------------+
 |                             |                | FTP | NFS | SMB | Email | WebDAV |                  |
 +=============================+================+=====+=====+=====+=======+========+==================+
-| `Office Lens`_              | Android        | ?   | ?   | ?   | ?     | ?      | `jonaswinkler`_  |
+| `Microsoft Lens`_           | Android, iOS   | ?   | ?   | ?   | ?     | ?      | `jonaswinkler`_  |
 +-----------------------------+----------------+-----+-----+-----+-------+--------+------------------+
-| `Genius Scan`_              | Android        | yes | no  | yes | yes   | yes    | `hannahswain`_   |
+| `Genius Scan`_              | Android, iOS   | yes | no  | yes | yes   | yes    | `hannahswain`_   |
 +-----------------------------+----------------+-----+-----+-----+-------+--------+------------------+
 | `OpenScan`_                 | Android        | no  | no  | no  | no    | no     | `benjaminfrank`_ |
 +-----------------------------+----------------+-----+-----+-----+-------+--------+------------------+
-| `OCR Scanner - QuickScan`_  | iOS            | no  | no  | no  | no    | yes    | `holzhannes`_    |
+| `QuickScan`_                | iOS            | no  | no  | no  | no    | yes    | `holzhannes`_    |
 +-----------------------------+----------------+-----+-----+-----+-------+--------+------------------+
 
-On Android, you can use these applications in combination with one of the :ref:`Paperless-ngx compatible apps <usage-mobile_upload>` to "Share" the documents produced by these scanner apps with paperless. On iOS, you can share the scanned documents via iOS-Sharing to other mail, WebDav or FTP apps.
+On **Android**, you can use these applications in combination with one of the :ref:`Paperless-ngx compatible apps <usage-mobile_upload>` to "Share" the documents produced by these scanner apps with paperless. On iOS, you can share the scanned documents via iOS-Sharing to other mail, WebDav or FTP apps.
 
-There is also an iOS Shortcut that allows you to directly upload text, PDF and image documents available here: https://www.icloud.com/shortcuts/d234abc0885040129d9d75fa45fe1154
+There is also an **iOS** Shortcut that allows you to directly upload text, PDF and image documents available here: https://www.icloud.com/shortcuts/d234abc0885040129d9d75fa45fe1154
 Please note this only works for documents downloaded to iCloud / the device, in other words not directly from a URL.
 
-.. _Office Lens: https://play.google.com/store/apps/details?id=com.microsoft.office.officelens
-.. _Genius Scan: https://play.google.com/store/apps/details?id=com.thegrizzlylabs.geniusscan.free
-.. _OCR Scanner - QuickScan: https://apps.apple.com/us/app/quickscan-scanner-text-ocr/id1513790291
+.. _Microsoft Lens: https://play.google.com/store/apps/details?id=com.microsoft.office.officelens
+.. _Genius Scan: https://www.thegrizzlylabs.com/genius-scan
 .. _OpenScan: https://github.com/Ethereal-Developers-Inc/OpenScan
+.. _QuickScan: https://apps.apple.com/us/app/quickscan-scanner-text-ocr/id1513790291
 
 .. _hannahswain: https://github.com/hannahswain
 .. _benjaminfrank: https://github.com/benjaminfrank
