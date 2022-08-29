@@ -32,7 +32,7 @@ psycopg2 = "*"
 redis = "*"
 scikit-learn = "~=1.1"
 # Pin this until piwheels is building 1.9 (see https://www.piwheels.org/project/scipy/)
-scipy = "==1.8.1"
+scipy = "==1.9.1"
 whitenoise = "~=6.2"
 watchdog = "~=2.1"
 whoosh="~=2.7"
