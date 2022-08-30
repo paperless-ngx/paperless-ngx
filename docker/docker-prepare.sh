@@ -37,7 +37,7 @@ wait_for_mariadb() {
 	attempt_num=1
 	max_attempts=5
 
-	while ! </dev/tcp/$host/$port; do
+	while ! true > /dev/tcp/$host/$port; do
 
 		if [ $attempt_num -eq $max_attempts ]; then
 			echo "Unable to connect to database."
@@ -47,7 +47,7 @@ wait_for_mariadb() {
 
 		fi
 
-		attempt_num=$(expr "$attempt_num" + 1)
+		attempt_num=$(("$attempt_num" + 1))
 		sleep 5
 	done
 }
