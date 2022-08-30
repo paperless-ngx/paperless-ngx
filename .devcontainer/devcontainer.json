@@ -1,0 +1,27 @@
+{
+	"name": "Paperless-ngx",
+
+	// Config for plain docker
+	// "build": {
+		// "dockerfile": "Dockerfile",
+		// "context": ".."
+	// },
+
+	// Config for docker-compose
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "webserver",
+	"workspaceFolder": "/workspace",
+
+	// Other configs
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-python.python",
+				"ms-python.vscode-pylance"
+			]
+		}
+	},
+
+	 // Setup environment
+	 "postCreateCommand": ".devcontainer/setup.sh"
+}
