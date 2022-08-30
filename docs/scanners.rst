@@ -44,6 +44,8 @@ Physical scanners
 +---------+-------------------+-----+------+-----+----------+------+----------+----------------+
 | Brother | `MFC-9142CDN`_    | yes |      |     | yes      |      |          |`REOLDEV`_      |
 +---------+-------------------+-----+------+-----+----------+------+----------+----------------+
+| Brother | `MFC-9140CDN`_    | yes |      |     | yes      |      |          |`Obidose`_      |
++---------+-------------------+-----+------+-----+----------+------+----------+----------------+
 | Canon   | `Maxify MB 5350`_ |     |      |     | yes [2]_ | yes  |          |`eingemaischt`_ |
 +---------+-------------------+-----+------+-----+----------+------+----------+----------------+
 | Fujitsu | `ix500`_          | yes |      |     | yes      |      |          |`eonist`_       |
@@ -73,6 +75,7 @@ Physical scanners
 .. _MFC-J5910DW: https://www.brother.co.uk/printers/inkjet-printers/mfcj5910dw
 .. _MFC-8950DW: https://www.brother-usa.com/products/mfc8950dw
 .. _MFC-9142CDN: https://www.brother.co.uk/printers/laser-printers/mfc9140cdn
+.. _MFC-9140CDN: https://www.brother.co.uk/printers/laser-printers/mfc9140cdn
 .. _ES-580W: https://epson.com/Support/Scanners/ES-Series/Epson-WorkForce-ES-580W/s/SPT_B11B258201
 .. _WF-7710DWF: https://www.epson.de/en/products/printers/inkjet-printers/for-home/workforce-wf-7710dwf
 .. _ix500: http://www.fujitsu.com/us/products/computing/peripheral/scanners/scansnap/ix500/
@@ -97,6 +100,8 @@ Physical scanners
 .. _derlucas: https://github.com/derlucas
 .. _glassbox_sco: https://github.com/glassbox_sco
 .. _ocelotsloth: https://github.com/ocelotsloth
+.. _obidose: https://github.com/obidose
+
 
 .. [1] Scanners with API Integration allow to push scanned documents directly to :ref:`Paperless API <api-file_uploads>`, sometimes referred to as Webhook or Document POST.
 .. [2] Canon Multi Function Printers show strange behavior over SMB. They close and reopen the file after every page. It's recommended to tune the
