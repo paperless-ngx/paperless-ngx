@@ -29,13 +29,13 @@
 version: "3.4"
 services:
   broker:
-    image: redis:6.0
+    image: docker.io/library/redis:7
     restart: unless-stopped
     volumes:
       - redisdata:/data
 
   db:
-    image: mariadb:10
+    image: docker.io/library/mariadb:10
     restart: unless-stopped
     volumes:
       - dbdata:/var/lib/mysql
