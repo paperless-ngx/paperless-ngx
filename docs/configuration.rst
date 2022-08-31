@@ -215,18 +215,16 @@ PAPERLESS_FORCE_SCRIPT_NAME=<path>
 PAPERLESS_STATIC_URL=<path>
     Override the STATIC_URL here.  Unless you're hosting Paperless off a
     subdomain like /paperless/, you probably don't need to change this.
-    When you do, change it for e.g. to /paperless/static/  Trailing slash!
+    If you do change it, be sure to include the trailing slash.
 
     Defaults to "/static/".
-.. note::
-    When hosting paperless behind a reverse proxy like Traefik or Nginx at 
-    the root of a subdomain like paperless.example.com/ one needs not to change 
-    the config. However using a subpath for example paperless.example.com/paperlessngx
-    you will need to change
-      PAPERLESS_FORCE_SCRIPT_NAME=/paperlessngx
 
-      PAPERLESS_STATIC_URL=/paperlessngx/static/
-    
+    .. note::
+
+        When hosting paperless behind a reverse proxy like Traefik or Nginx at a subpath e.g.
+        example.com/paperlessngx you will also need to set ``PAPERLESS_FORCE_SCRIPT_NAME``
+        (see above).
+
 PAPERLESS_AUTO_LOGIN_USERNAME=<username>
     Specify a username here so that paperless will automatically perform login
     with the selected user.
