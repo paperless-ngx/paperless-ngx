@@ -501,10 +501,12 @@
         "imap-tools": {
             "hashes": [
                 "sha256:4fe4c07c4cc4aab83492d126e221c39118ff530268149b721296fc0fb87de3c2",
-                "sha256:56942853be2125d509365b84eacf0f3a87ae58ea8f82bca7a6943634a60cfb60"
+                "sha256:56942853be2125d509365b84eacf0f3a87ae58ea8f82bca7a6943634a60cfb60",
+                "sha256:6f5572b2e747a81a607438e0ef61ff28f323f6697820493c8ca4467465baeb76",
+                "sha256:9e2658f267311051e04d437aca06d5b4c7c091fc4f411f7d13ca610e0cead5cb"
             ],
             "index": "pypi",
-            "version": "==0.56.0"
+            "version": "==0.57.0"
         },
         "img2pdf": {
             "hashes": [
@@ -1754,9 +1756,6 @@
             "version": "==0.4.5"
         },
         "coverage": {
-            "extras": [
-                "toml"
-            ],
             "hashes": [
                 "sha256:01778769097dbd705a24e221f42be885c544bb91251747a8a3efdec6eb4788f2",
                 "sha256:08002f9251f51afdcc5e3adf5d5d66bb490ae893d9e21359b085f0e03390a820",
@@ -2320,7 +2319,7 @@
                 "sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc",
                 "sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f"
             ],
-            "markers": "python_version >= '3.7'",
+            "markers": "python_full_version < '3.11.0a7'",
             "version": "==2.0.1"
         },
         "tornado": {
