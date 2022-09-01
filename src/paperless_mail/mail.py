@@ -9,10 +9,10 @@ import magic
 import pathvalidate
 from django.conf import settings
 from django.db import DatabaseError
-from django_q.tasks import async_task
 from documents.loggers import LoggingMixin
 from documents.models import Correspondent
 from documents.parsers import is_mime_type_supported
+from documents.tasks import consume_file
 from imap_tools import AND
 from imap_tools import MailBox
 from imap_tools import MailboxFolderSelectError
@@ -389,8 +389,7 @@ class MailAccountHandler(LoggingMixin):
                     f"{message.subject} from {message.from_}",
                 )
 
-                async_task(
-                    "documents.tasks.consume_file",
+                consume_file.delay(
                     path=temp_filename,
                     override_filename=pathvalidate.sanitize_filename(
                         att.filename,

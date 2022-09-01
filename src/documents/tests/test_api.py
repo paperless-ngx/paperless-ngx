@@ -10,6 +10,8 @@ import zipfile
 from unittest import mock
 from unittest.mock import MagicMock
 
+import celery
+
 try:
     import zoneinfo
 except ImportError:
@@ -32,6 +34,7 @@ from documents.models import SavedView
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import UiSettings
+from django_celery_results.models import TaskResult
 from documents.models import Comment
 from documents.models import StoragePath
 from documents.tests.utils import DirectoriesMixin
@@ -790,7 +793,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["documents_inbox"], None)
 
-    @mock.patch("documents.views.async_task")
+    @mock.patch("documents.views.consume_file.delay")
     def test_upload(self, m):
 
         with open(
@@ -813,7 +816,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertIsNone(kwargs["override_document_type_id"])
         self.assertIsNone(kwargs["override_tag_ids"])
 
-    @mock.patch("documents.views.async_task")
+    @mock.patch("documents.views.consume_file.delay")
     def test_upload_empty_metadata(self, m):
 
         with open(
@@ -836,7 +839,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertIsNone(kwargs["override_document_type_id"])
         self.assertIsNone(kwargs["override_tag_ids"])
 
-    @mock.patch("documents.views.async_task")
+    @mock.patch("documents.views.consume_file.delay")
     def test_upload_invalid_form(self, m):
 
         with open(
@@ -850,7 +853,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, 400)
         m.assert_not_called()
 
-    @mock.patch("documents.views.async_task")
+    @mock.patch("documents.views.consume_file.delay")
     def test_upload_invalid_file(self, m):
 
         with open(
@@ -864,7 +867,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, 400)
         m.assert_not_called()
 
-    @mock.patch("documents.views.async_task")
+    @mock.patch("documents.views.consume_file.delay")
     def test_upload_with_title(self, async_task):
         with open(
             os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"),
@@ -882,7 +885,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
         self.assertEqual(kwargs["override_title"], "my custom title")
 
-    @mock.patch("documents.views.async_task")
+    @mock.patch("documents.views.consume_file.delay")
     def test_upload_with_correspondent(self, async_task):
         c = Correspondent.objects.create(name="test-corres")
         with open(
@@ -901,7 +904,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
         self.assertEqual(kwargs["override_correspondent_id"], c.id)
 
-    @mock.patch("documents.views.async_task")
+    @mock.patch("documents.views.consume_file.delay")
     def test_upload_with_invalid_correspondent(self, async_task):
         with open(
             os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"),
@@ -915,7 +918,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
         async_task.assert_not_called()
 
-    @mock.patch("documents.views.async_task")
+    @mock.patch("documents.views.consume_file.delay")
     def test_upload_with_document_type(self, async_task):
         dt = DocumentType.objects.create(name="invoice")
         with open(
@@ -934,7 +937,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
         self.assertEqual(kwargs["override_document_type_id"], dt.id)
 
-    @mock.patch("documents.views.async_task")
+    @mock.patch("documents.views.consume_file.delay")
     def test_upload_with_invalid_document_type(self, async_task):
         with open(
             os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"),
@@ -948,7 +951,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
         async_task.assert_not_called()
 
-    @mock.patch("documents.views.async_task")
+    @mock.patch("documents.views.consume_file.delay")
     def test_upload_with_tags(self, async_task):
         t1 = Tag.objects.create(name="tag1")
         t2 = Tag.objects.create(name="tag2")
@@ -968,7 +971,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
         self.assertCountEqual(kwargs["override_tag_ids"], [t1.id, t2.id])
 
-    @mock.patch("documents.views.async_task")
+    @mock.patch("documents.views.consume_file.delay")
     def test_upload_with_invalid_tags(self, async_task):
         t1 = Tag.objects.create(name="tag1")
         t2 = Tag.objects.create(name="tag2")
@@ -984,7 +987,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
         async_task.assert_not_called()
 
-    @mock.patch("documents.views.async_task")
+    @mock.patch("documents.views.consume_file.delay")
     def test_upload_with_created(self, async_task):
         created = datetime.datetime(
             2022,
@@ -1615,7 +1618,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
         user = User.objects.create_superuser(username="temp_admin")
         self.client.force_authenticate(user=user)
 
-        patcher = mock.patch("documents.bulk_edit.async_task")
+        patcher = mock.patch("documents.bulk_edit.bulk_update_documents.delay")
         self.async_task = patcher.start()
         self.addCleanup(patcher.stop)
         self.c1 = Correspondent.objects.create(name="c1")
@@ -2783,7 +2786,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
 
 class TestTasks(APITestCase):
     ENDPOINT = "/api/tasks/"
-    ENDPOINT_ACKOWLEDGE = "/api/acknowledge_tasks/"
+    ENDPOINT_ACKNOWLEDGE = "/api/acknowledge_tasks/"
 
     def setUp(self):
         super().setUp()
@@ -2792,39 +2795,60 @@ class TestTasks(APITestCase):
         self.client.force_authenticate(user=self.user)
 
     def test_get_tasks(self):
-        task_id1 = str(uuid.uuid4())
-        PaperlessTask.objects.create(task_id=task_id1)
-        Task.objects.create(
-            id=task_id1,
-            started=timezone.now() - datetime.timedelta(seconds=30),
-            stopped=timezone.now(),
-            func="documents.tasks.consume_file",
+        """
+        GIVEN:
+            - Attempted celery tasks
+        WHEN:
+            - API call is made to get tasks
+        THEN:
+            - Attempting and pending tasks are serialized and provided
+        """
+        result1 = TaskResult.objects.create(
+            task_id=str(uuid.uuid4()),
+            task_name="documents.tasks.some_task",
+            status=celery.states.PENDING,
         )
-        task_id2 = str(uuid.uuid4())
-        PaperlessTask.objects.create(task_id=task_id2)
+        PaperlessTask.objects.create(attempted_task=result1)
+
+        result2 = TaskResult.objects.create(
+            task_id=str(uuid.uuid4()),
+            task_name="documents.tasks.other_task",
+            status=celery.states.STARTED,
+        )
+        PaperlessTask.objects.create(attempted_task=result2)
 
         response = self.client.get(self.ENDPOINT)
+        from pprint import pprint
+
+        for x in response.data:
+            pprint(x)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 2)
         returned_task1 = response.data[1]
         returned_task2 = response.data[0]
-        self.assertEqual(returned_task1["task_id"], task_id1)
-        self.assertEqual(returned_task1["status"], "complete")
-        self.assertIsNotNone(returned_task1["attempted_task"])
-        self.assertEqual(returned_task2["task_id"], task_id2)
-        self.assertEqual(returned_task2["status"], "queued")
-        self.assertIsNone(returned_task2["attempted_task"])
+
+        self.assertEqual(returned_task1["task_id"], result1.task_id)
+        self.assertEqual(returned_task1["status"], celery.states.PENDING)
+        self.assertEqual(returned_task1["task_name"], result1.task_name)
+
+        self.assertEqual(returned_task2["task_id"], result2.task_id)
+        self.assertEqual(returned_task2["status"], celery.states.STARTED)
+        self.assertEqual(returned_task2["task_name"], result2.task_name)
 
     def test_acknowledge_tasks(self):
-        task_id = str(uuid.uuid4())
-        task = PaperlessTask.objects.create(task_id=task_id)
+        result1 = TaskResult.objects.create(
+            task_id=str(uuid.uuid4()),
+            task_name="documents.tasks.some_task",
+            status=celery.states.PENDING,
+        )
+        task = PaperlessTask.objects.create(attempted_task=result1)
 
         response = self.client.get(self.ENDPOINT)
         self.assertEqual(len(response.data), 1)
 
         response = self.client.post(
-            self.ENDPOINT_ACKOWLEDGE,
+            self.ENDPOINT_ACKNOWLEDGE,
             {"tasks": [task.id]},
         )
         self.assertEqual(response.status_code, 200)

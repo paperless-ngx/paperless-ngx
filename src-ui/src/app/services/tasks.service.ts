@@ -27,7 +27,7 @@ export class TasksService {
   }
 
   public get queuedFileTasks(): PaperlessTask[] {
-    return this.fileTasks.filter((t) => t.status == PaperlessTaskStatus.Queued)
+    return this.fileTasks.filter((t) => t.status == PaperlessTaskStatus.Pending)
   }
 
   public get startedFileTasks(): PaperlessTask[] {

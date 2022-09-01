@@ -10,6 +10,7 @@ from typing import Optional
 from typing import Set
 from urllib.parse import urlparse
 
+from celery.schedules import crontab
 from concurrent_log_handler.queue import setup_logging_queues
 from django.utils.translation import gettext_lazy as _
 from dotenv import load_dotenv
@@ -128,7 +129,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "django_filters",
-    "django_q",
+    "django_celery_results",
 ] + env_apps
 
 if DEBUG:
@@ -179,6 +180,8 @@ ASGI_APPLICATION = "paperless.asgi.application"
 STATIC_URL = os.getenv("PAPERLESS_STATIC_URL", BASE_URL + "static/")
 WHITENOISE_STATIC_PREFIX = "/static/"
 
+_REDIS_URL = os.getenv("PAPERLESS_REDIS", "redis://localhost:6379")
+
 # TODO: what is this used for?
 TEMPLATES = [
     {
@@ -200,7 +203,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [os.getenv("PAPERLESS_REDIS", "redis://localhost:6379")],
+            "hosts": [_REDIS_URL],
             "capacity": 2000,  # default 100
             "expiry": 15,  # default 60
         },
@@ -458,24 +461,48 @@ TASK_WORKERS = __get_int("PAPERLESS_TASK_WORKERS", 1)
 
 WORKER_TIMEOUT: Final[int] = __get_int("PAPERLESS_WORKER_TIMEOUT", 1800)
 
-# Per django-q docs, timeout must be smaller than retry
-# We default retry to 10s more than the timeout to silence the
-# warning, as retry functionality isn't used.
-WORKER_RETRY: Final[int] = __get_int(
-    "PAPERLESS_WORKER_RETRY",
-    WORKER_TIMEOUT + 10,
-)
+CELERY_BROKER_URL = _REDIS_URL
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_WORKER_HIJACK_ROOT_LOGGER = False
+CELERY_WORKER_CONCURRENCY = TASK_WORKERS
+CELERY_WORKER_MAX_TASKS_PER_CHILD = 1
+CELERY_TASK_TRACK_STARTED = True
+CELERY_RESULT_EXTENDED = True
+CELERY_SEND_TASK_SENT_EVENT = True
+CELERY_TASK_TIME_LIMIT = WORKER_TIMEOUT
+CELERY_RESULT_BACKEND = "django-db"
+CELERY_CACHE_BACKEND = "default"
 
-Q_CLUSTER = {
-    "name": "paperless",
-    "guard_cycle": 5,
-    "catch_up": False,
-    "recycle": 1,
-    "retry": WORKER_RETRY,
-    "timeout": WORKER_TIMEOUT,
-    "workers": TASK_WORKERS,
-    "redis": os.getenv("PAPERLESS_REDIS", "redis://localhost:6379"),
-    "log_level": "DEBUG" if DEBUG else "INFO",
+CELERY_BEAT_SCHEDULE = {
+    # Every ten minutes
+    "Check all e-mail accounts": {
+        "task": "paperless_mail.tasks.process_mail_accounts",
+        "schedule": crontab(minute="*/10"),
+    },
+    # Hourly at 5 minutes past the hour
+    "Train the classifier": {
+        "task": "documents.tasks.train_classifier",
+        "schedule": crontab(minute="5", hour="*/1"),
+    },
+    # Daily at midnight
+    "Optimize the index": {
+        "task": "documents.tasks.index_optimize",
+        "schedule": crontab(minute=0, hour=0),
+    },
+    # Weekly, Sunday at 00:30
+    "Perform sanity check": {
+        "task": "documents.tasks.sanity_check",
+        "schedule": crontab(minute=30, hour=0, day_of_week="sun"),
+    },
+}
+CELERY_BEAT_SCHEDULE_FILENAME = os.path.join(DATA_DIR, "celerybeat-schedule.db")
+
+# django setting.
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": _REDIS_URL,
+    },
 }
 
 
