@@ -73,6 +73,13 @@ class BogusClient:
 
 
 class BogusMailBox(ContextManager):
+
+    # Common values so tests don't need to remember an accepted login
+    USERNAME: str = "admin"
+    ASCII_PASSWORD: str = "secret"
+    # Note the non-ascii characters here
+    UTF_PASSWORD: str = "w57äöüw4b6huwb6nhu"
+
     def __enter__(self):
         return self
 
@@ -93,7 +100,12 @@ class BogusMailBox(ContextManager):
         # This will raise a UnicodeEncodeError if the password is not ASCII only
         password.encode("ascii")
         # Otherwise, check for correct values
-        if username != "admin" or password not in {"secret"}:
+        if username != self.USERNAME or password != self.ASCII_PASSWORD:
+            raise MailboxLoginError("BAD", "OK")
+
+    def login_utf8(self, username, password):
+        # Expected to only be called with the UTF-8 password
+        if username != self.USERNAME or password != self.UTF_PASSWORD:
             raise MailboxLoginError("BAD", "OK")
 
     def fetch(self, criteria, mark_seen, charset=""):
@@ -931,9 +943,9 @@ class TestMail(DirectoriesMixin, TestCase):
         account = MailAccount.objects.create(
             name="test",
             imap_server="",
-            username="admin",
+            username=BogusMailBox.USERNAME,
             # Note the non-ascii characters here
-            password="w57äöüw4b6huwb6nhu",
+            password=BogusMailBox.UTF_PASSWORD,
         )
 
         _ = MailRule.objects.create(
@@ -963,7 +975,7 @@ class TestMail(DirectoriesMixin, TestCase):
         account = MailAccount.objects.create(
             name="test",
             imap_server="",
-            username="admin",
+            username=BogusMailBox.USERNAME,
             # Note the non-ascii characters here
             # Passes the check in login, not in authenticate
             password="réception",
