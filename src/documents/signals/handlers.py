@@ -2,7 +2,6 @@ import logging
 import os
 import shutil
 
-import django_q
 from django.conf import settings
 from django.contrib.admin.models import ADDITION
 from django.contrib.admin.models import LogEntry
@@ -14,6 +13,7 @@ from django.db.models import Q
 from django.dispatch import receiver
 from django.utils import termcolors
 from django.utils import timezone
+from django_celery_results.models import TaskResult
 from filelock import FileLock
 
 from .. import matching
@@ -24,7 +24,6 @@ from ..models import Document
 from ..models import MatchingModel
 from ..models import PaperlessTask
 from ..models import Tag
-
 
 logger = logging.getLogger("paperless.handlers")
 
@@ -503,47 +502,16 @@ def add_to_index(sender, document, **kwargs):
     index.add_or_update_document(document)
 
 
-@receiver(django_q.signals.pre_enqueue)
-def init_paperless_task(sender, task, **kwargs):
-    if task["func"] == "documents.tasks.consume_file":
-        try:
-            paperless_task, created = PaperlessTask.objects.get_or_create(
-                task_id=task["id"],
-            )
-            paperless_task.name = task["name"]
-            paperless_task.created = task["started"]
-            paperless_task.save()
-        except Exception as e:
-            # Don't let an exception in the signal handlers prevent
-            # a document from being consumed.
-            logger.error(f"Creating PaperlessTask failed: {e}")
-
-
-@receiver(django_q.signals.pre_execute)
-def paperless_task_started(sender, task, **kwargs):
+@receiver(models.signals.post_save, sender=TaskResult)
+def update_paperless_task(sender, instance: TaskResult, **kwargs):
     try:
-        if task["func"] == "documents.tasks.consume_file":
-            paperless_task, created = PaperlessTask.objects.get_or_create(
-                task_id=task["id"],
-            )
-            paperless_task.started = timezone.now()
-            paperless_task.save()
-    except PaperlessTask.DoesNotExist:
-        pass
-    except Exception as e:
-        logger.error(f"Creating PaperlessTask failed: {e}")
-
-
-@receiver(models.signals.post_save, sender=django_q.models.Task)
-def update_paperless_task(sender, instance, **kwargs):
-    try:
-        if instance.func == "documents.tasks.consume_file":
-            paperless_task, created = PaperlessTask.objects.get_or_create(
-                task_id=instance.id,
+        if instance.task_name == "documents.tasks.consume_file":
+            paperless_task, _ = PaperlessTask.objects.get_or_create(
+                task_id=instance.task_id,
             )
             paperless_task.attempted_task = instance
             paperless_task.save()
-    except PaperlessTask.DoesNotExist:
-        pass
     except Exception as e:
+        # Don't let an exception in the signal handlers prevent
+        # a document from being consumed.
         logger.error(f"Creating PaperlessTask failed: {e}")

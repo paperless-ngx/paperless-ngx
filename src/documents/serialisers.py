@@ -18,12 +18,12 @@ from .models import Correspondent
 from .models import Document
 from .models import DocumentType
 from .models import MatchingModel
-from .models import PaperlessTask
 from .models import SavedView
 from .models import SavedViewFilterRule
 from .models import StoragePath
 from .models import Tag
 from .models import UiSettings
+from .models import PaperlessTask
 from .parsers import is_mime_type_supported
 
 
@@ -620,7 +620,17 @@ class TasksViewSerializer(serializers.ModelSerializer):
     class Meta:
         model = PaperlessTask
         depth = 1
-        fields = "__all__"
+        fields = (
+            "id",
+            "type",
+            "status",
+            "result",
+            "acknowledged",
+            "date_created",
+            "date_done",
+            "task_name",
+            "task_id",
+        )
 
     type = serializers.SerializerMethodField()
 
@@ -639,17 +649,42 @@ class TasksViewSerializer(serializers.ModelSerializer):
     status = serializers.SerializerMethodField()
 
     def get_status(self, obj):
-        if obj.attempted_task is None:
-            if obj.started:
-                return "started"
-            else:
-                return "queued"
-        elif obj.attempted_task.success:
-            return "complete"
-        elif not obj.attempted_task.success:
-            return "failed"
-        else:
-            return "unknown"
+        result = "unknown"
+        if hasattr(obj, "attempted_task") and obj.attempted_task:
+            result = obj.attempted_task.status
+        return result
+
+    date_created = serializers.SerializerMethodField()
+
+    def get_date_created(self, obj):
+        result = ""
+        if hasattr(obj, "attempted_task") and obj.attempted_task:
+            result = obj.attempted_task.date_created
+        return result
+
+    date_done = serializers.SerializerMethodField()
+
+    def get_date_done(self, obj):
+        result = ""
+        if hasattr(obj, "attempted_task") and obj.attempted_task:
+            result = obj.attempted_task.date_done
+        return result
+
+    task_name = serializers.SerializerMethodField()
+
+    def get_task_name(self, obj):
+        result = ""
+        if hasattr(obj, "attempted_task") and obj.attempted_task:
+            result = obj.attempted_task.task_name
+        return result
+
+    task_id = serializers.SerializerMethodField()
+
+    def get_task_id(self, obj):
+        result = ""
+        if hasattr(obj, "attempted_task") and obj.attempted_task:
+            result = obj.attempted_task.task_id
+        return result
 
 
 class AcknowledgeTasksViewSerializer(serializers.Serializer):
