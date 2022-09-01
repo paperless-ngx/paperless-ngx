@@ -4,7 +4,6 @@ import tempfile
 from datetime import date
 from datetime import timedelta
 from fnmatch import fnmatch
-from imaplib import IMAP4
 
 import magic
 import pathvalidate
@@ -187,22 +186,9 @@ class MailAccountHandler(LoggingMixin):
 
                 except UnicodeEncodeError:
                     self.log("debug", "Falling back to AUTH=PLAIN")
-                    try:
-                        # rfc2595 section 6 - PLAIN SASL mechanism
-                        client: IMAP4 = M.client
-                        encoded = (
-                            b"\0"
-                            + account.username.encode("utf8")
-                            + b"\0"
-                            + account.password.encode("utf8")
-                        )
-                        # Assumption is the server supports AUTH=PLAIN capability
-                        # Could check the list with client.capability(), but then what?
-                        # We're failing anyway then
-                        client.authenticate("PLAIN", lambda x: encoded)
 
-                        # Need to transition out of AUTH state to SELECTED
-                        M.folder.set("INBOX")
+                    try:
+                        M.login_utf8(account.username, account.password)
                     except Exception as err:
                         self.log(
                             "error",
