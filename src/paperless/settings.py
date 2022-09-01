@@ -285,7 +285,7 @@ SECRET_KEY = os.getenv(
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",  # noqa: E501
     },
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
@@ -445,13 +445,14 @@ LOGGING = {
 
 TASK_WORKERS = __get_int("PAPERLESS_TASK_WORKERS", 1)
 
-PAPERLESS_WORKER_TIMEOUT: Final[int] = __get_int("PAPERLESS_WORKER_TIMEOUT", 1800)
+WORKER_TIMEOUT: Final[int] = __get_int("PAPERLESS_WORKER_TIMEOUT", 1800)
 
 # Per django-q docs, timeout must be smaller than retry
-# We default retry to 10s more than the timeout
-PAPERLESS_WORKER_RETRY: Final[int] = __get_int(
+# We default retry to 10s more than the timeout to silence the
+# warning, as retry functionality isn't used.
+WORKER_RETRY: Final[int] = __get_int(
     "PAPERLESS_WORKER_RETRY",
-    PAPERLESS_WORKER_TIMEOUT + 10,
+    WORKER_TIMEOUT + 10,
 )
 
 Q_CLUSTER = {
@@ -459,8 +460,8 @@ Q_CLUSTER = {
     "guard_cycle": 5,
     "catch_up": False,
     "recycle": 1,
-    "retry": PAPERLESS_WORKER_RETRY,
-    "timeout": PAPERLESS_WORKER_TIMEOUT,
+    "retry": WORKER_RETRY,
+    "timeout": WORKER_TIMEOUT,
     "workers": TASK_WORKERS,
     "redis": os.getenv("PAPERLESS_REDIS", "redis://localhost:6379"),
     "log_level": "DEBUG" if DEBUG else "INFO",
@@ -507,7 +508,7 @@ CONSUMER_IGNORE_PATTERNS = list(
     json.loads(
         os.getenv(
             "PAPERLESS_CONSUMER_IGNORE_PATTERNS",
-            '[".DS_STORE/*", "._*", ".stfolder/*", ".stversions/*", ".localized/*", "desktop.ini"]',
+            '[".DS_STORE/*", "._*", ".stfolder/*", ".stversions/*", ".localized/*", "desktop.ini"]',  # noqa: E501
         ),
     ),
 )
@@ -589,7 +590,8 @@ DATE_ORDER = os.getenv("PAPERLESS_DATE_ORDER", "DMY")
 FILENAME_DATE_ORDER = os.getenv("PAPERLESS_FILENAME_DATE_ORDER")
 
 # Maximum number of dates taken from document start to end to show as suggestions for
-# `created` date in the frontend. Duplicates are removed, which can result in fewer dates shown.
+# `created` date in the frontend. Duplicates are removed, which can result in
+# fewer dates shown.
 NUMBER_OF_SUGGESTED_DATES = __get_int("PAPERLESS_NUMBER_OF_SUGGESTED_DATES", 3)
 
 # Transformations applied before filename parsing
@@ -600,7 +602,8 @@ for t in json.loads(os.getenv("PAPERLESS_FILENAME_PARSE_TRANSFORMS", "[]")):
 # Specify the filename format for out files
 FILENAME_FORMAT = os.getenv("PAPERLESS_FILENAME_FORMAT")
 
-# If this is enabled, variables in filename format will resolve to empty-string instead of 'none'.
+# If this is enabled, variables in filename format will resolve to
+# empty-string instead of 'none'.
 # Directories with 'empty names' are omitted, too.
 FILENAME_FORMAT_REMOVE_NONE = __get_boolean(
     "PAPERLESS_FILENAME_FORMAT_REMOVE_NONE",
@@ -612,16 +615,15 @@ THUMBNAIL_FONT_NAME = os.getenv(
     "/usr/share/fonts/liberation/LiberationSerif-Regular.ttf",
 )
 
-# TODO: this should not have a prefix.
 # Tika settings
-PAPERLESS_TIKA_ENABLED = __get_boolean("PAPERLESS_TIKA_ENABLED", "NO")
-PAPERLESS_TIKA_ENDPOINT = os.getenv("PAPERLESS_TIKA_ENDPOINT", "http://localhost:9998")
-PAPERLESS_TIKA_GOTENBERG_ENDPOINT = os.getenv(
+TIKA_ENABLED = __get_boolean("PAPERLESS_TIKA_ENABLED", "NO")
+TIKA_ENDPOINT = os.getenv("PAPERLESS_TIKA_ENDPOINT", "http://localhost:9998")
+TIKA_GOTENBERG_ENDPOINT = os.getenv(
     "PAPERLESS_TIKA_GOTENBERG_ENDPOINT",
     "http://localhost:3000",
 )
 
-if PAPERLESS_TIKA_ENABLED:
+if TIKA_ENABLED:
     INSTALLED_APPS.append("paperless_tika.apps.PaperlessTikaConfig")
 
 
@@ -634,8 +636,9 @@ def _parse_ignore_dates(
     user provided string(s) into dates
 
     Args:
-        env_ignore (str): The value of the environment variable, comma seperated dates
-        date_order (str, optional): The format of the date strings. Defaults to DATE_ORDER.
+        env_ignore (str): The value of the environment variable, comma separated dates
+        date_order (str, optional): The format of the date strings.
+                                    Defaults to DATE_ORDER.
 
     Returns:
         Set[datetime.datetime]: The set of parsed date objects
