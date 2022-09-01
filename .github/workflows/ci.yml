@@ -141,24 +141,24 @@ jobs:
           cd src/
           pipenv run coveralls --service=github
 
-  tests-frontend:
-    name: "Tests Frontend"
-    runs-on: ubuntu-20.04
-    needs:
-      - pre-commit
-    strategy:
-      matrix:
-        node-version: [16.x]
-    steps:
-      - uses: actions/checkout@v3
-      -
-        name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-      - run: cd src-ui && npm ci
-      - run: cd src-ui && npm run test
-      - run: cd src-ui && npm run e2e:ci
+  # tests-frontend:
+  #   name: "Tests Frontend"
+  #   runs-on: ubuntu-20.04
+  #   needs:
+  #     - pre-commit
+  #   strategy:
+  #     matrix:
+  #       node-version: [16.x]
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     -
+  #       name: Use Node.js ${{ matrix.node-version }}
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: ${{ matrix.node-version }}
+  #     - run: cd src-ui && npm ci
+  #     - run: cd src-ui && npm run test
+  #     - run: cd src-ui && npm run e2e:ci
 
   prepare-docker-build:
     name: Prepare Docker Pipeline Data
@@ -173,7 +173,7 @@ jobs:
     needs:
       - documentation
       - tests-backend
-      - tests-frontend
+      #- tests-frontend
     steps:
       -
         name: Set ghcr repository name
