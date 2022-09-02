@@ -14,7 +14,7 @@
   "private": true,
   "dependencies": {
     "@angular/common": "~14.1.0",
-    "@angular/compiler": "~14.1.0",
+    "@angular/compiler": "~14.2.0",
     "@angular/core": "~14.1.0",
     "@angular/forms": "~14.1.0",
     "@angular/localize": "~14.1.0",
@@ -55,6 +55,6 @@
   },
   "optionalDependencies": {
     "@cypress/schematic": "^2.1.1",
-    "cypress": "~10.3.1"
+    "cypress": "~10.7.0"
   }
 }
