@@ -42,7 +42,7 @@
     "@angular/cli": "~14.1.0",
     "@angular/compiler-cli": "~14.1.0",
     "@types/jest": "28.1.6",
-    "@types/node": "^18.6.3",
+    "@types/node": "^18.7.14",
     "codelyzer": "^6.0.2",
     "concurrently": "7.3.0",
     "jest": "28.1.3",
