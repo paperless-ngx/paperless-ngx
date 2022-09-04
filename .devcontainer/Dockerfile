@@ -10,7 +10,7 @@ RUN npm install -g @angular/cli
 RUN pip3 install pipenv
 
 # Comment this when it is used with docker compose
-# RUN apt-get update && apt-get -y install redis
+RUN apt-get update && apt-get -y install redis
 
 
 
