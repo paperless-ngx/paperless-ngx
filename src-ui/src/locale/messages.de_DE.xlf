@@ -1459,7 +1459,7 @@
           <context context-type="sourcefile">src/app/components/document-comments/document-comments.component.html</context>
           <context context-type="linenumber">5,7</context>
         </context-group>
-        <target state="needs-translation"> Please enter a comment. </target>
+        <target state="translated"> Bitte geben Sie einen Kommentar ein. </target>
       </trans-unit>
       <trans-unit id="2337485514607640701" datatype="html">
         <source>Add comment</source>
@@ -1483,7 +1483,7 @@
           <context context-type="sourcefile">src/app/components/document-comments/document-comments.component.ts</context>
           <context context-type="linenumber">72</context>
         </context-group>
-        <target state="needs-translation">Error deleting comment: <x id="PH" equiv-text="e.toString()"/></target>
+        <target state="translated">Fehler beim Löschen des Kommentars: <x id="PH" equiv-text="e.toString()"/></target>
       </trans-unit>
       <trans-unit id="1407560924967345762" datatype="html" approved="yes">
         <source>Page</source>
@@ -2285,7 +2285,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">388</context>
         </context-group>
-        <target state="translated">Diese Aktion wird OCR permanent für <x id="PH" equiv-text="this.list.selected.size"/> ausgewählte(s) Dokument(e) wiederholen.</target>
+        <target state="translated">Diese Aktion wird die Texterkennung für <x id="PH" equiv-text="this.list.selected.size"/> ausgewählte(s) Dokument(e) wiederholen.</target>
       </trans-unit>
       <trans-unit id="8076495233090006322" datatype="html" approved="yes">
         <source>Filter by correspondent</source>
