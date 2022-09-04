@@ -2,15 +2,15 @@
 	"name": "Paperless-ngx",
 
 	// Config for plain docker
-	// "build": {
-		// "dockerfile": "Dockerfile",
-		// "context": ".."
-	// },
+	"build": {
+		"dockerfile": "Dockerfile",
+		"context": ".."
+	},
 
 	// Config for docker-compose
-	"dockerComposeFile": "docker-compose.yml",
-	"service": "webserver",
-	"workspaceFolder": "/workspace",
+	// "dockerComposeFile": "docker-compose.yml",
+	// "service": "webserver",
+	// "workspaceFolder": "/workspace",
 
 	// Other configs
 	"customizations": {

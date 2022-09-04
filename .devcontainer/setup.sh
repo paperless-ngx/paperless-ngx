@@ -1,6 +1,6 @@
-# Uncomment this when it is used with plain docker
-# echo "START REDIS SERVER --------------------------------"
-# redis-server &
+# Comment this when it is used with docker compose
+echo "START REDIS SERVER --------------------------------"
+redis-server &
 
 echo "INSTALL DEVELOPER TOOLS ---------------------------"
 pre-commit install
