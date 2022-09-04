@@ -799,10 +799,10 @@ the program doesn't automatically execute it (ie. the program isn't in your
 $PATH), then you'll need to specify the literal path for that program.
 
 PAPERLESS_CONVERT_BINARY=<path>
-    Defaults to "/usr/bin/convert".
+    Defaults to "convert".
 
 PAPERLESS_GS_BINARY=<path>
-    Defaults to "/usr/bin/gs".
+    Defaults to "gs".
 
 
 .. _configuration-docker:
