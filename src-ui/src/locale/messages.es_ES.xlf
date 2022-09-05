@@ -918,7 +918,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component.ts</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="final">Crear nuevo tipo de documento</target>
+        <target state="final">Crear nuevo interlocutor</target>
       </trans-unit>
       <trans-unit id="2059822531169388684" datatype="html" approved="yes">
         <source>Edit correspondent</source>
@@ -926,7 +926,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component.ts</context>
           <context context-type="linenumber">28</context>
         </context-group>
-        <target state="final">Editar tipo de documento</target>
+        <target state="final">Editar interlocutor</target>
       </trans-unit>
       <trans-unit id="6672809941092516947" datatype="html" approved="yes">
         <source>Create new document type</source>
@@ -1675,7 +1675,7 @@
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">19</context>
         </context-group>
-        <target state="final">Correspondencia</target>
+        <target state="final">Interlocutor</target>
       </trans-unit>
       <trans-unit id="5066119607229701477" datatype="html" approved="yes">
         <source>Document type</source>
@@ -2023,7 +2023,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">31</context>
         </context-group>
-        <target state="final">Filtrar tipos de documento</target>
+        <target state="final">Filtrar interlocutores</target>
       </trans-unit>
       <trans-unit id="2947613869920454977" datatype="html" approved="yes">
         <source>Filter document types</source>
@@ -2189,7 +2189,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">265</context>
         </context-group>
-        <target state="final">Confirmar asignación correspondiente</target>
+        <target state="final">Confirmar asignación interlocutor</target>
       </trans-unit>
       <trans-unit id="6900893559485781849" datatype="html" approved="yes">
         <source>This operation will assign the correspondent &quot;<x id="PH" equiv-text="correspondent.name"/>&quot; to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -2197,7 +2197,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">267</context>
         </context-group>
-        <target state="final">Esta operacion asignará el tipo de documento "<x id="PH" equiv-text="correspondent.name"/>" a <x id="PH_1" equiv-text="this.list.selected.size"/> documento(s) seleccionado(s).</target>
+        <target state="final">Esta operación asignará el interlocutor "<x id="PH" equiv-text="correspondent.name"/>" a <x id="PH_1" equiv-text="this.list.selected.size"/> documento(s) seleccionado(s).</target>
       </trans-unit>
       <trans-unit id="1257522660364398440" datatype="html" approved="yes">
         <source>This operation will remove the correspondent from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -2205,7 +2205,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">269</context>
         </context-group>
-        <target state="final">Esta operación eliminará el tipo de documento de <x id="PH" equiv-text="this.list.selected.size"/> documento(s) seleccionado(s).</target>
+        <target state="final">Esta operación eliminará el interlocutor de <x id="PH" equiv-text="this.list.selected.size"/> documento(s) seleccionado(s).</target>
       </trans-unit>
       <trans-unit id="5393409374423140648" datatype="html" approved="yes">
         <source>Confirm document type assignment</source>
@@ -2297,7 +2297,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">171</context>
         </context-group>
-        <target state="final">Filtrar por tipo de documento</target>
+        <target state="final">Filtrar por interlocutor</target>
       </trans-unit>
       <trans-unit id="2784168796433474565" datatype="html" approved="yes">
         <source>Filter by tag</source>
@@ -2629,7 +2629,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">76</context>
         </context-group>
-        <target state="final">Sin tipo de documento</target>
+        <target state="final">Sin interlocutor</target>
       </trans-unit>
       <trans-unit id="8705701325879965907" datatype="html">
         <source>Type: <x id="PH" equiv-text="this.documentTypes.find((dt) =&gt; dt.id == +rule.value)?.name"/></source>
@@ -2821,7 +2821,7 @@
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.ts</context>
           <context context-type="linenumber">48</context>
         </context-group>
-        <target state="final">¿Estás seguro de querer borrar el tipo de documento "<x id="PH" equiv-text="object.name"/>"?</target>
+        <target state="final">¿Estás seguro de querer borrar el interlocutor "<x id="PH" equiv-text="object.name"/>"?</target>
       </trans-unit>
       <trans-unit id="8084492669582894778" datatype="html">
         <source>document type</source>
