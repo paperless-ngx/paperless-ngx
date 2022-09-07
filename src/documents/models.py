@@ -214,6 +214,16 @@ class Document(models.Model):
         help_text=_("Current archive filename in storage"),
     )
 
+    original_filename = models.CharField(
+        _("original filename"),
+        max_length=1024,
+        editable=False,
+        default=None,
+        unique=False,
+        null=True,
+        help_text=_("The original name of the file when it was uploaded"),
+    )
+
     archive_serial_number = models.IntegerField(
         _("archive serial number"),
         blank=True,
@@ -394,6 +404,9 @@ class SavedViewFilterRule(models.Model):
         (20, _("fulltext query")),
         (21, _("more like this")),
         (22, _("has tags in")),
+        (23, _("ASN greater than")),
+        (24, _("ASN less than")),
+        (25, _("storage path is")),
     ]
 
     saved_view = models.ForeignKey(
@@ -527,3 +540,43 @@ class PaperlessTask(models.Model):
         blank=True,
     )
     acknowledged = models.BooleanField(default=False)
+
+
+class Comment(models.Model):
+    comment = models.TextField(
+        _("content"),
+        blank=True,
+        help_text=_("Comment for the document"),
+    )
+
+    created = models.DateTimeField(
+        _("created"),
+        default=timezone.now,
+        db_index=True,
+    )
+
+    document = models.ForeignKey(
+        Document,
+        blank=True,
+        null=True,
+        related_name="documents",
+        on_delete=models.CASCADE,
+        verbose_name=_("document"),
+    )
+
+    user = models.ForeignKey(
+        User,
+        blank=True,
+        null=True,
+        related_name="users",
+        on_delete=models.SET_NULL,
+        verbose_name=_("user"),
+    )
+
+    class Meta:
+        ordering = ("created",)
+        verbose_name = _("comment")
+        verbose_name_plural = _("comments")
+
+    def __str__(self):
+        return self.content

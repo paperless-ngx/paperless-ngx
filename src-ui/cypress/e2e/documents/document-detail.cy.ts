@@ -17,6 +17,32 @@ describe('document-detail', () => {
       req.reply({ result: 'OK' })
     }).as('saveDoc')
 
+    cy.fixture('documents/1/comments.json').then((commentsJson) => {
+      cy.intercept(
+        'GET',
+        'http://localhost:8000/api/documents/1/comments/',
+        (req) => {
+          req.reply(commentsJson.filter((c) => c.id != 10)) // 3
+        }
+      )
+
+      cy.intercept(
+        'DELETE',
+        'http://localhost:8000/api/documents/1/comments/?id=9',
+        (req) => {
+          req.reply(commentsJson.filter((c) => c.id != 9 && c.id != 10)) // 2
+        }
+      )
+
+      cy.intercept(
+        'POST',
+        'http://localhost:8000/api/documents/1/comments/',
+        (req) => {
+          req.reply(commentsJson) // 4
+        }
+      )
+    })
+
     cy.viewport(1024, 1024)
     cy.visit('/documents/1/')
   })
@@ -38,5 +64,31 @@ describe('document-detail', () => {
     cy.contains('button', 'Cancel').click().wait(150)
     cy.contains('button', 'Save').click().wait('@saveDoc').wait(2000) // navigates away after saving
     cy.contains('You have unsaved changes').should('not.exist')
+  })
+
+  it('should show a list of comments', () => {
+    cy.wait(1000).get('a').contains('Comments').click().wait(1000)
+    cy.get('app-document-comments').find('.card').its('length').should('eq', 3)
+  })
+
+  it('should support comment deletion', () => {
+    cy.wait(1000).get('a').contains('Comments').click().wait(1000)
+    cy.get('app-document-comments')
+      .find('.card')
+      .first()
+      .find('button')
+      .click({ force: true })
+      .wait(500)
+    cy.get('app-document-comments').find('.card').its('length').should('eq', 2)
+  })
+
+  it('should support comment insertion', () => {
+    cy.wait(1000).get('a').contains('Comments').click().wait(1000)
+    cy.get('app-document-comments')
+      .find('form textarea')
+      .type('Testing new comment')
+      .wait(500)
+    cy.get('app-document-comments').find('form button').click().wait(1500)
+    cy.get('app-document-comments').find('.card').its('length').should('eq', 4)
   })
 })

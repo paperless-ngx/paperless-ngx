@@ -2095,7 +2095,15 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">84,88</context>
         </context-group>
-        <target state="translated">Télécharger les originaux<x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div *ngIf=&quot;awaitingDownload&quot; class=&quot;spinner-border spinner-border-sm&quot; role=&quot;status&quot;&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;visually-hidden&quot;&gt;"/>Préparation du téléchargement…<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/></target>
+        <target state="translated">Télécharger les originaux<x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div *ngIf=&quot;awaitingDownload&quot; class=&quot;spinner-border spinner-border-sm&quot; role=&quot;status&quot;&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;visually-hidden&quot;&gt;"/>Préparation du téléchargement…<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/></
+      </trans-unit>
+      <trans-unit id="8312409092917397847" datatype="html">
+        <source>Redo OCR</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
+          <context context-type="linenumber">90</context>
+        </context-group>
+        <target state="translated">Refaire l’OCR</target>
       </trans-unit>
       <trans-unit id="7985804062689412812" datatype="html">
         <source>Error executing bulk operation: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></source>
@@ -2279,6 +2287,14 @@
         </context-group>
         <target state="final">Supprimer le(s) document(s)</target>
       </trans-unit>
+      <trans-unit id="7362691899087997122" datatype="html">
+        <source>Redo OCR confirm</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+          <context context-type="linenumber">387</context>
+        </context-group>
+        <target state="translated">Confirmer le relancement de l’OCR</target>
+      </trans-unit>
       <trans-unit id="8968869182645922415" datatype="html">
         <source>This operation will permanently redo OCR for <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
@@ -2286,6 +2302,14 @@
           <context context-type="linenumber">388</context>
         </context-group>
         <target state="translated">Cette opération écrasera la ROC pour les <x id="PH" equiv-text="this.list.selected.size"/> document(s) sélectionné(s).</target>
+      </trans-unit>
+      <trans-unit id="1181910457994920507" datatype="html">
+        <source>Proceed</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+          <context context-type="linenumber">391</context>
+        </context-group>
+        <target state="needs-translation">Proceed</target>
       </trans-unit>
       <trans-unit id="8076495233090006322" datatype="html" approved="yes">
         <source>Filter by correspondent</source>

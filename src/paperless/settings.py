@@ -4,6 +4,7 @@ import math
 import multiprocessing
 import os
 import re
+import tempfile
 from typing import Final
 from typing import Optional
 from typing import Set
@@ -56,6 +57,13 @@ def __get_float(key: str, default: float) -> float:
     return float(os.getenv(key, default))
 
 
+def __get_path(key: str, default: str) -> str:
+    """
+    Return a normalized, absolute path based on the environment variable or a default
+    """
+    return os.path.abspath(os.path.normpath(os.environ.get(key, default)))
+
+
 # NEVER RUN WITH DEBUG IN PRODUCTION.
 DEBUG = __get_boolean("PAPERLESS_DEBUG", "NO")
 
@@ -66,14 +74,14 @@ DEBUG = __get_boolean("PAPERLESS_DEBUG", "NO")
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-STATIC_ROOT = os.getenv("PAPERLESS_STATICDIR", os.path.join(BASE_DIR, "..", "static"))
+STATIC_ROOT = __get_path("PAPERLESS_STATICDIR", os.path.join(BASE_DIR, "..", "static"))
 
-MEDIA_ROOT = os.getenv("PAPERLESS_MEDIA_ROOT", os.path.join(BASE_DIR, "..", "media"))
+MEDIA_ROOT = __get_path("PAPERLESS_MEDIA_ROOT", os.path.join(BASE_DIR, "..", "media"))
 ORIGINALS_DIR = os.path.join(MEDIA_ROOT, "documents", "originals")
 ARCHIVE_DIR = os.path.join(MEDIA_ROOT, "documents", "archive")
 THUMBNAIL_DIR = os.path.join(MEDIA_ROOT, "documents", "thumbnails")
 
-DATA_DIR = os.getenv("PAPERLESS_DATA_DIR", os.path.join(BASE_DIR, "..", "data"))
+DATA_DIR = __get_path("PAPERLESS_DATA_DIR", os.path.join(BASE_DIR, "..", "data"))
 
 TRASH_DIR = os.getenv("PAPERLESS_TRASH_DIR")
 
@@ -83,15 +91,18 @@ MEDIA_LOCK = os.path.join(MEDIA_ROOT, "media.lock")
 INDEX_DIR = os.path.join(DATA_DIR, "index")
 MODEL_FILE = os.path.join(DATA_DIR, "classification_model.pickle")
 
-LOGGING_DIR = os.getenv("PAPERLESS_LOGGING_DIR", os.path.join(DATA_DIR, "log"))
+LOGGING_DIR = __get_path("PAPERLESS_LOGGING_DIR", os.path.join(DATA_DIR, "log"))
 
-CONSUMPTION_DIR = os.getenv(
+CONSUMPTION_DIR = __get_path(
     "PAPERLESS_CONSUMPTION_DIR",
     os.path.join(BASE_DIR, "..", "consume"),
 )
 
 # This will be created if it doesn't exist
-SCRATCH_DIR = os.getenv("PAPERLESS_SCRATCH_DIR", "/tmp/paperless")
+SCRATCH_DIR = __get_path(
+    "PAPERLESS_SCRATCH_DIR",
+    os.path.join(tempfile.gettempdir(), "paperless"),
+)
 
 ###############################################################################
 # Application Definition                                                      #
@@ -326,6 +337,13 @@ if os.getenv("PAPERLESS_DBHOST"):
     }
     if os.getenv("PAPERLESS_DBPORT"):
         DATABASES["default"]["PORT"] = os.getenv("PAPERLESS_DBPORT")
+
+if os.getenv("PAPERLESS_DB_TIMEOUT") is not None:
+    _new_opts = {"timeout": float(os.getenv("PAPERLESS_DB_TIMEOUT"))}
+    if "OPTIONS" in DATABASES["default"]:
+        DATABASES["default"]["OPTIONS"].update(_new_opts)
+    else:
+        DATABASES["default"]["OPTIONS"] = _new_opts
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
@@ -569,6 +587,10 @@ POST_CONSUME_SCRIPT = os.getenv("PAPERLESS_POST_CONSUME_SCRIPT")
 # Specify the default date order (for autodetected dates)
 DATE_ORDER = os.getenv("PAPERLESS_DATE_ORDER", "DMY")
 FILENAME_DATE_ORDER = os.getenv("PAPERLESS_FILENAME_DATE_ORDER")
+
+# Maximum number of dates taken from document start to end to show as suggestions for
+# `created` date in the frontend. Duplicates are removed, which can result in fewer dates shown.
+NUMBER_OF_SUGGESTED_DATES = __get_int("PAPERLESS_NUMBER_OF_SUGGESTED_DATES", 3)
 
 # Transformations applied before filename parsing
 FILENAME_PARSE_TRANSFORMS = []

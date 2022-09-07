@@ -2287,6 +2287,14 @@
         </context-group>
         <target state="translated">Questa operazione riesegue in modo permanente l'OCR per <x id="PH" equiv-text="this.list.selected.size"/> documento/i selezionato/i.</target>
       </trans-unit>
+      <trans-unit id="1181910457994920507" datatype="html">
+        <source>Proceed</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+          <context context-type="linenumber">391</context>
+        </context-group>
+        <target state="translated">Procedi</target>
+      </trans-unit>
       <trans-unit id="8076495233090006322" datatype="html" approved="yes">
         <source>Filter by correspondent</source>
         <context-group purpose="location">

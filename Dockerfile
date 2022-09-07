@@ -90,6 +90,10 @@ ARG RUNTIME_PACKAGES="\
   tesseract-ocr-fra \
   tesseract-ocr-ita \
   tesseract-ocr-spa \
+  # Suggested for OCRmyPDF
+  pngquant \
+  # Suggested for pikepdf
+  jbig2dec \
   tzdata \
   unpaper \
   # Mime type detection
@@ -117,19 +121,18 @@ COPY gunicorn.conf.py .
 # setup docker-specific things
 # Use mounts to avoid copying installer files into the image
 # These change sometimes, but rarely
-ARG DOCKER_SRC=/usr/src/paperless/src/docker/
-WORKDIR ${DOCKER_SRC}
+WORKDIR /usr/src/paperless/src/docker/
 
 COPY [ \
-	"docker/imagemagick-policy.xml", \
-	"docker/supervisord.conf", \
-	"docker/docker-entrypoint.sh", \
-	"docker/docker-prepare.sh", \
-	"docker/paperless_cmd.sh", \
-	"docker/wait-for-redis.py", \
-	"docker/management_script.sh", \
-	"docker/install_management_commands.sh", \
-	"${DOCKER_SRC}" \
+  "docker/imagemagick-policy.xml", \
+  "docker/supervisord.conf", \
+  "docker/docker-entrypoint.sh", \
+  "docker/docker-prepare.sh", \
+  "docker/paperless_cmd.sh", \
+  "docker/wait-for-redis.py", \
+  "docker/management_script.sh", \
+  "docker/install_management_commands.sh", \
+  "/usr/src/paperless/src/docker/" \
 ]
 
 RUN set -eux \
@@ -162,19 +165,21 @@ RUN --mount=type=bind,from=qpdf-builder,target=/qpdf \
     && apt-get install --yes --no-install-recommends /qpdf/usr/src/qpdf/libqpdf28_*.deb \
     && apt-get install --yes --no-install-recommends /qpdf/usr/src/qpdf/qpdf_*.deb \
   && echo "Installing pikepdf and dependencies" \
+    && python3 -m pip install --no-cache-dir /pikepdf/usr/src/wheels/pyparsing*.whl \
     && python3 -m pip install --no-cache-dir /pikepdf/usr/src/wheels/packaging*.whl \
     && python3 -m pip install --no-cache-dir /pikepdf/usr/src/wheels/lxml*.whl \
     && python3 -m pip install --no-cache-dir /pikepdf/usr/src/wheels/Pillow*.whl \
-    && python3 -m pip install --no-cache-dir /pikepdf/usr/src/wheels/pyparsing*.whl \
     && python3 -m pip install --no-cache-dir /pikepdf/usr/src/wheels/pikepdf*.whl \
-    && python -m pip list \
+    && python3 -m pip list \
   && echo "Installing psycopg2" \
     && python3 -m pip install --no-cache-dir /psycopg2/usr/src/wheels/psycopg2*.whl \
-    && python -m pip list
+    && python3 -m pip list
+
+WORKDIR /usr/src/paperless/src/
 
 # Python dependencies
 # Change pretty frequently
-COPY requirements.txt ../
+COPY Pipfile* ./
 
 # Packages needed only for building a few quick Python
 # dependencies
@@ -188,19 +193,29 @@ RUN set -eux \
     && apt-get update \
     && apt-get install --yes --quiet --no-install-recommends ${BUILD_PACKAGES} \
     && python3 -m pip install --no-cache-dir --upgrade wheel \
+  && echo "Installing pipenv" \
+    && python3 -m pip install --no-cache-dir --upgrade pipenv \
   && echo "Installing Python requirements" \
-    && python3 -m pip install --default-timeout=1000 --no-cache-dir -r ../requirements.txt \
+    # pipenv tries to be too fancy and prints so much junk
+    && pipenv requirements > requirements.txt \
+    && python3 -m pip install --default-timeout=1000 --no-cache-dir --requirement requirements.txt \
+    && rm requirements.txt \
   && echo "Cleaning up image" \
     && apt-get -y purge ${BUILD_PACKAGES} \
     && apt-get -y autoremove --purge \
     && apt-get clean --yes \
+    # Remove pipenv and its unique packages
+    && python3 -m pip uninstall --yes \
+      pipenv \
+      distlib \
+      platformdirs \
+      virtualenv \
+      virtualenv-clone \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /tmp/* \
     && rm -rf /var/tmp/* \
     && rm -rf /var/cache/apt/archives/* \
     && truncate -s 0 /var/log/*log
-
-WORKDIR /usr/src/paperless/src/
 
 # copy backend
 COPY ./src ./

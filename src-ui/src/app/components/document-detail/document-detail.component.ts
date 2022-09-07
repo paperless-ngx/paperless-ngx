@@ -206,7 +206,7 @@ export class DocumentDetailComponent
                   this.store.getValue().title !==
                   this.documentForm.get('title').value
                 ) {
-                  this.openDocumentService.setDirty(doc.id, true)
+                  this.openDocumentService.setDirty(doc, true)
                 }
               },
             })
@@ -228,12 +228,15 @@ export class DocumentDetailComponent
             this.store.asObservable()
           )
 
-          return this.isDirty$.pipe(map((dirty) => ({ doc, dirty })))
+          return this.isDirty$.pipe(
+            takeUntil(this.unsubscribeNotifier),
+            map((dirty) => ({ doc, dirty }))
+          )
         })
       )
       .subscribe({
         next: ({ doc, dirty }) => {
-          this.openDocumentService.setDirty(doc.id, dirty)
+          this.openDocumentService.setDirty(doc, dirty)
         },
         error: (error) => {
           this.router.navigate(['404'])
@@ -349,7 +352,7 @@ export class DocumentDetailComponent
           Object.assign(this.document, doc)
           this.title = doc.title
           this.documentForm.patchValue(doc)
-          this.openDocumentService.setDirty(doc.id, false)
+          this.openDocumentService.setDirty(doc, false)
         },
         error: () => {
           this.router.navigate(['404'])
@@ -472,6 +475,42 @@ export class DocumentDetailComponent
     ])
   }
 
+  redoOcr() {
+    let modal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.title = $localize`Redo OCR confirm`
+    modal.componentInstance.messageBold = $localize`This operation will permanently redo OCR for this document.`
+    modal.componentInstance.message = $localize`This operation cannot be undone.`
+    modal.componentInstance.btnClass = 'btn-danger'
+    modal.componentInstance.btnCaption = $localize`Proceed`
+    modal.componentInstance.confirmClicked.subscribe(() => {
+      modal.componentInstance.buttonsEnabled = false
+      this.documentsService
+        .bulkEdit([this.document.id], 'redo_ocr', {})
+        .subscribe({
+          next: () => {
+            this.toastService.showInfo(
+              $localize`Redo OCR operation will begin in the background.`
+            )
+            if (modal) {
+              modal.close()
+            }
+          },
+          error: (error) => {
+            if (modal) {
+              modal.componentInstance.buttonsEnabled = true
+            }
+            this.toastService.showError(
+              $localize`Error executing operation: ${JSON.stringify(
+                error.error
+              )}`
+            )
+          },
+        })
+    })
+  }
+
   hasNext() {
     return this.documentListViewService.hasNext(this.documentId)
   }
@@ -511,5 +550,9 @@ export class DocumentDetailComponent
     if ('Enter' == event.key) {
       this.password = (event.target as HTMLInputElement).value
     }
+  }
+
+  get commentsEnabled(): boolean {
+    return this.settings.get(SETTINGS_KEYS.COMMENTS_ENABLED)
   }
 }

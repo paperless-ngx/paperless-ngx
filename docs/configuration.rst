@@ -31,7 +31,7 @@ PAPERLESS_REDIS=<url>
 
 PAPERLESS_DBHOST=<hostname>
     By default, sqlite is used as the database backend. This can be changed here.
-    Set PAPERLESS_DBHOST and PostgreSQL will be used instead of mysql.
+    Set PAPERLESS_DBHOST and PostgreSQL will be used instead of sqlite.
 
 PAPERLESS_DBPORT=<port>
     Adjust port if necessary.
@@ -59,6 +59,13 @@ PAPERLESS_DBSSLMODE=<mode>
     See `the official documentation about sslmode <https://www.postgresql.org/docs/current/libpq-ssl.html>`_.
 
     Default is ``prefer``.
+
+PAPERLESS_DB_TIMEOUT=<float>
+    Amount of time for a database connection to wait for the database to unlock.
+    Mostly applicable for an sqlite based installation, consider changing to postgresql
+    if you need to increase this.
+
+    Defaults to unset, keeping the Django defaults.
 
 Paths and folders
 #################
@@ -734,6 +741,19 @@ PAPERLESS_FILENAME_DATE_ORDER=<format>
 
     Defaults to none, which disables this feature.
 
+PAPERLESS_NUMBER_OF_SUGGESTED_DATES=<num>
+    Paperless searches an entire document for dates. The first date found will
+    be used as the initial value for the created date. When this variable is
+    greater than 0 (or left to it's default value), paperless will also suggest
+    other dates found in the document, up to a maximum of this setting. Note that
+    duplicates will be removed, which can result in fewer dates displayed in the
+    frontend than this setting value.
+
+    The task to find all dates can be time-consuming and increases with a higher
+    (maximum) number of suggested dates and slower hardware.
+
+    Defaults to 3. Set to 0 to disable this feature.
+
 PAPERLESS_THUMBNAIL_FONT_NAME=<filename>
     Paperless creates thumbnails for plain text files by rendering the content
     of the file on an image and uses a predefined font for that. This
@@ -800,6 +820,13 @@ PAPERLESS_WEBSERVER_WORKERS=<num>
     will increase RAM usage.
 
     Defaults to 1.
+
+PAPERLESS_BIND_ADDR=<ip address>
+    The IP address the webserver will listen on inside the container. There are
+    special setups where you may need to configure this value to restrict the
+    Ip address or interface the webserver listens on.
+
+    Defaults to [::], meaning all interfaces, including IPv6.
 
 PAPERLESS_PORT=<port>
     The port number the webserver will listen on inside the container. There are

@@ -62,7 +62,8 @@ initialize() {
 		PAPERLESS_AUTO_LOGIN_USERNAME \
 		PAPERLESS_ADMIN_USER \
 		PAPERLESS_ADMIN_MAIL \
-		PAPERLESS_ADMIN_PASSWORD; do
+		PAPERLESS_ADMIN_PASSWORD \
+		PAPERLESS_REDIS; do
 		# Check for a version of this var with _FILE appended
 		# and convert the contents to the env var value
 		file_env ${env_var}
@@ -95,7 +96,7 @@ initialize() {
 	done
 	set -e
 
-	${gosu_cmd[@]} /sbin/docker-prepare.sh
+	"${gosu_cmd[@]}" /sbin/docker-prepare.sh
 }
 
 install_languages() {
@@ -138,7 +139,7 @@ install_languages() {
 echo "Paperless-ngx docker container starting..."
 
 gosu_cmd=(gosu paperless)
-if [ $(id -u) == $(id -u paperless) ]; then
+if [ "$(id -u)" == "$(id -u paperless)" ]; then
 	gosu_cmd=()
 fi
 
@@ -151,7 +152,7 @@ initialize
 
 if [[ "$1" != "/"* ]]; then
 	echo Executing management command "$@"
-	exec ${gosu_cmd[@]} python3 manage.py "$@"
+	exec "${gosu_cmd[@]}" python3 manage.py "$@"
 else
 	echo Executing "$@"
 	exec "$@"

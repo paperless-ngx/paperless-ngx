@@ -291,7 +291,7 @@ def set_storage_path(
                     )
                     + f" [{document.pk}]",
                 )
-            print(f"Sugest storage directory {selected}")
+            print(f"Suggest storage directory {selected}")
         else:
             logger.info(
                 f"Assigning storage path {selected} to {document}",
@@ -506,31 +506,44 @@ def add_to_index(sender, document, **kwargs):
 @receiver(django_q.signals.pre_enqueue)
 def init_paperless_task(sender, task, **kwargs):
     if task["func"] == "documents.tasks.consume_file":
-        paperless_task, created = PaperlessTask.objects.get_or_create(
-            task_id=task["id"],
-        )
-        paperless_task.name = task["name"]
-        paperless_task.created = task["started"]
-        paperless_task.save()
+        try:
+            paperless_task, created = PaperlessTask.objects.get_or_create(
+                task_id=task["id"],
+            )
+            paperless_task.name = task["name"]
+            paperless_task.created = task["started"]
+            paperless_task.save()
+        except Exception as e:
+            # Don't let an exception in the signal handlers prevent
+            # a document from being consumed.
+            logger.error(f"Creating PaperlessTask failed: {e}")
 
 
 @receiver(django_q.signals.pre_execute)
 def paperless_task_started(sender, task, **kwargs):
     try:
         if task["func"] == "documents.tasks.consume_file":
-            paperless_task = PaperlessTask.objects.get(task_id=task["id"])
+            paperless_task, created = PaperlessTask.objects.get_or_create(
+                task_id=task["id"],
+            )
             paperless_task.started = timezone.now()
             paperless_task.save()
     except PaperlessTask.DoesNotExist:
         pass
+    except Exception as e:
+        logger.error(f"Creating PaperlessTask failed: {e}")
 
 
 @receiver(models.signals.post_save, sender=django_q.models.Task)
 def update_paperless_task(sender, instance, **kwargs):
     try:
         if instance.func == "documents.tasks.consume_file":
-            paperless_task = PaperlessTask.objects.get(task_id=instance.id)
+            paperless_task, created = PaperlessTask.objects.get_or_create(
+                task_id=instance.id,
+            )
             paperless_task.attempted_task = instance
             paperless_task.save()
     except PaperlessTask.DoesNotExist:
         pass
+    except Exception as e:
+        logger.error(f"Creating PaperlessTask failed: {e}")

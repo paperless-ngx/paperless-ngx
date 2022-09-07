@@ -6,6 +6,8 @@ import re
 import shutil
 import subprocess
 import tempfile
+from typing import Iterator
+from typing import Match
 from typing import Optional
 from typing import Set
 
@@ -216,6 +218,10 @@ def make_thumbnail_from_pdf(in_path, temp_dir, logging_group=None) -> str:
 
 
 def parse_date(filename, text) -> Optional[datetime.datetime]:
+    return next(parse_date_generator(filename, text), None)
+
+
+def parse_date_generator(filename, text) -> Iterator[datetime.datetime]:
     """
     Returns the date of the document.
     """
@@ -246,38 +252,32 @@ def parse_date(filename, text) -> Optional[datetime.datetime]:
             return date
         return None
 
-    date = None
+    def __process_match(
+        match: Match[str],
+        date_order: str,
+    ) -> Optional[datetime.datetime]:
+        date_string = match.group(0)
+
+        try:
+            date = __parser(date_string, date_order)
+        except (TypeError, ValueError):
+            # Skip all matches that do not parse to a proper date
+            date = None
+
+        return __filter(date)
+
+    def __process_content(content: str, date_order: str) -> Iterator[datetime.datetime]:
+        for m in re.finditer(DATE_REGEX, content):
+            date = __process_match(m, date_order)
+            if date is not None:
+                yield date
 
     # if filename date parsing is enabled, search there first:
     if settings.FILENAME_DATE_ORDER:
-        for m in re.finditer(DATE_REGEX, filename):
-            date_string = m.group(0)
-
-            try:
-                date = __parser(date_string, settings.FILENAME_DATE_ORDER)
-            except (TypeError, ValueError):
-                # Skip all matches that do not parse to a proper date
-                continue
-
-            date = __filter(date)
-            if date is not None:
-                return date
+        yield from __process_content(filename, settings.FILENAME_DATE_ORDER)
 
     # Iterate through all regex matches in text and try to parse the date
-    for m in re.finditer(DATE_REGEX, text):
-        date_string = m.group(0)
-
-        try:
-            date = __parser(date_string, settings.DATE_ORDER)
-        except (TypeError, ValueError):
-            # Skip all matches that do not parse to a proper date
-            continue
-
-        date = __filter(date)
-        if date is not None:
-            return date
-
-    return date
+    yield from __process_content(text, settings.DATE_ORDER)
 
 
 class ParseError(Exception):
