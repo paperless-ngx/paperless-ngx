@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-07-08 14:11-0700\n"
-"PO-Revision-Date: 2022-08-02 17:44\n"
+"PO-Revision-Date: 2022-09-07 21:41\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -376,7 +376,7 @@ msgstr "règles de filtrage"
 
 #: documents/models.py:521
 msgid "started"
-msgstr "commencé"
+msgstr "démarré"
 
 #: documents/serialisers.py:70
 #, python-format
