@@ -7,6 +7,7 @@ FROM debian:bullseye-slim as main
 LABEL org.opencontainers.image.description="A intermediate image with jbig2enc built"
 
 ARG DEBIAN_FRONTEND=noninteractive
+ARG JBIG2ENC_VERSION
 
 ARG BUILD_PACKAGES="\
   build-essential \
@@ -19,21 +20,16 @@ ARG BUILD_PACKAGES="\
 
 WORKDIR /usr/src/jbig2enc
 
-# As this is an base image for a multi-stage final image
-# the added size of the install is basically irrelevant
-RUN apt-get update --quiet \
-  && apt-get install --yes --quiet --no-install-recommends ${BUILD_PACKAGES} \
-  && rm -rf /var/lib/apt/lists/*
-
-# Layers after this point change according to required version
-# For better caching, seperate the basic installs from
-# the building
-
-ARG JBIG2ENC_VERSION
-
 RUN set -eux \
-  && git clone --quiet --branch $JBIG2ENC_VERSION https://github.com/agl/jbig2enc .
-RUN set -eux \
-  && ./autogen.sh
-RUN set -eux \
-  && ./configure && make
+  && echo "Installing build tools" \
+    && apt-get update --quiet \
+    && apt-get install --yes --quiet --no-install-recommends ${BUILD_PACKAGES} \
+  && echo "Building jbig2enc" \
+    && git clone --quiet --branch $JBIG2ENC_VERSION https://github.com/agl/jbig2enc . \
+    && ./autogen.sh \
+    && ./configure \
+    && make \
+  && echo "Cleaning up image" \
+    && apt-get -y purge ${BUILD_PACKAGES} \
+    && apt-get -y autoremove --purge \
+    && rm -rf /var/lib/apt/lists/*
