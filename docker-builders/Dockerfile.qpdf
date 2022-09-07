@@ -1,8 +1,15 @@
+# This Dockerfile compiles the jbig2enc library
+# Inputs:
+#    - QPDF_VERSION - the version of qpdf to build a .deb.
+#                     Must be preset as a deb-src
+
 FROM debian:bullseye-slim as main
 
 LABEL org.opencontainers.image.description="A intermediate image with qpdf built"
 
 ARG DEBIAN_FRONTEND=noninteractive
+# This must match to pikepdf's minimum at least
+ARG QPDF_VERSION
 
 ARG BUILD_PACKAGES="\
   build-essential \
@@ -23,31 +30,23 @@ WORKDIR /usr/src
 # the added size of the install is basically irrelevant
 
 RUN set -eux \
-  && apt-get update --quiet \
-  && apt-get install --yes --quiet --no-install-recommends $BUILD_PACKAGES \
-  && rm -rf /var/lib/apt/lists/*
-
-# Layers after this point change according to required version
-# For better caching, seperate the basic installs from
-# the building
-
-# This must match to pikepdf's minimum at least
-ARG QPDF_VERSION
-
-# In order to get the required version of qpdf, it is backported from bookwork
-# and then built from source
-RUN set -eux \
+  && echo "Installing build tools" \
+    && apt-get update --quiet \
+    && apt-get install --yes --quiet --no-install-recommends $BUILD_PACKAGES \
   && echo "Building qpdf" \
-  && echo "deb-src http://deb.debian.org/debian/ bookworm main" > /etc/apt/sources.list.d/bookworm-src.list \
-  && apt-get update \
-  && mkdir qpdf \
-  && cd qpdf \
-  && apt-get source --yes --quiet qpdf=${QPDF_VERSION}-1/bookworm \
-  && rm -rf /var/lib/apt/lists/* \
-  && cd qpdf-$QPDF_VERSION \
-  # We don't need to build the tests (also don't run them)
-  && rm -rf libtests \
-  && DEBEMAIL=hello@paperless-ngx.com debchange --bpo \
-  && export DEB_BUILD_OPTIONS="terse nocheck nodoc parallel=2" \
-  && dpkg-buildpackage --build=binary --unsigned-source --unsigned-changes \
-  && ls -ahl ../*.deb
+    && echo "deb-src http://deb.debian.org/debian/ bookworm main" > /etc/apt/sources.list.d/bookworm-src.list \
+    && apt-get update \
+    && mkdir qpdf \
+    && cd qpdf \
+    && apt-get source --yes --quiet qpdf=${QPDF_VERSION}-1/bookworm \
+    && cd qpdf-$QPDF_VERSION \
+    # We don't need to build the tests (also don't run them)
+    && rm -rf libtests \
+    && DEBEMAIL=hello@paperless-ngx.com debchange --bpo \
+    && export DEB_BUILD_OPTIONS="terse nocheck nodoc parallel=2" \
+    && dpkg-buildpackage --build=binary --unsigned-source --unsigned-changes --post-clean \
+    && ls -ahl ../*.deb \
+  && echo "Cleaning up image" \
+    && apt-get -y purge ${BUILD_PACKAGES} \
+    && apt-get -y autoremove --purge \
+    && rm -rf /var/lib/apt/lists/*
