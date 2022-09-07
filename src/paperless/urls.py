@@ -134,6 +134,8 @@ urlpatterns = [
             ),
         ),
     ),
+    # Prometheus metrics
+    path("", include("django_prometheus.urls")),
     # Frontend assets TODO: this is pretty bad, but it works.
     path(
         "assets/<path:path>",
