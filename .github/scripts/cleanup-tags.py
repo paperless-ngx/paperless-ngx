@@ -174,6 +174,8 @@ def _main():
         # Deal with untagged package versions
         if args.untagged:
 
+            logger.info("Handling untagged image packages")
+
             if not args.is_manifest:
                 # If the package is not a multi-arch manifest, images without tags are safe to delete.
                 # They are not referred to by anything.  This will leave all with at least 1 tag
@@ -192,7 +194,9 @@ def _main():
                                 f"Would delete {package.name} (id {package.id})",
                             )
                     else:
-                        logger.info(f"Not deleting {package.tags[0]}")
+                        logger.info(
+                            f"Not deleting tag {package.tags[0]} of package {args.package}",
+                        )
             else:
 
                 """
