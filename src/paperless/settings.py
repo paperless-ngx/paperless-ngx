@@ -532,11 +532,9 @@ OCR_PAGES = int(os.getenv("PAPERLESS_OCR_PAGES", 0))
 OCR_LANGUAGE = os.getenv("PAPERLESS_OCR_LANGUAGE", "eng")
 
 # OCRmyPDF --output-type options are available.
-# TODO: validate this setting.
 OCR_OUTPUT_TYPE = os.getenv("PAPERLESS_OCR_OUTPUT_TYPE", "pdfa")
 
 # skip. redo, force
-# TODO: validate this.
 OCR_MODE = os.getenv("PAPERLESS_OCR_MODE", "skip")
 
 OCR_IMAGE_DPI = os.getenv("PAPERLESS_OCR_IMAGE_DPI")
