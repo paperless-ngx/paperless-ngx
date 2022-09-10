@@ -17,7 +17,7 @@
           <context context-type="linenumber">157,166</context>
         </context-group>
         <note priority="1" from="description">Currently selected slide number read by screen reader</note>
-        <target state="needs-translation"> Slide <x id="INTERPOLATION" equiv-text="ing when mouse"/> of <x id="INTERPOLATION_1" equiv-text="e.    *    * @s"/> </target>
+        <target state="translated"> Folie <x id="INTERPOLATION" equiv-text="ing when mouse"/> von <x id="INTERPOLATION_1" equiv-text="e.    *    * @s"/> </target>
       </trans-unit>
       <trans-unit id="ngb.carousel.previous" datatype="html">
         <source>Previous</source>
@@ -1475,7 +1475,7 @@
           <context context-type="sourcefile">src/app/components/document-comments/document-comments.component.ts</context>
           <context context-type="linenumber">57</context>
         </context-group>
-        <target state="needs-translation">Error saving comment: <x id="PH" equiv-text="e.toString()"/></target>
+        <target state="translated">Fehler beim Speichern des Kommentars: <x id="PH" equiv-text="e.toString()"/></target>
       </trans-unit>
       <trans-unit id="7593210124183303626" datatype="html">
         <source>Error deleting comment: <x id="PH" equiv-text="e.toString()"/></source>
