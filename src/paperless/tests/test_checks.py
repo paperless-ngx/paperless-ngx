@@ -1,12 +1,12 @@
 import os
-import shutil
 
 from django.test import override_settings
 from django.test import TestCase
 from documents.tests.utils import DirectoriesMixin
-from paperless import binaries_check
-from paperless import paths_check
+from paperless.checks import binaries_check
 from paperless.checks import debug_mode_check
+from paperless.checks import paths_check
+from paperless.checks import settings_values_check
 
 
 class TestChecks(DirectoriesMixin, TestCase):
@@ -54,3 +54,89 @@ class TestChecks(DirectoriesMixin, TestCase):
     @override_settings(DEBUG=True)
     def test_debug_enabled(self):
         self.assertEqual(len(debug_mode_check(None)), 1)
+
+
+class TestSettingsChecks(DirectoriesMixin, TestCase):
+    def test_all_valid(self):
+        """
+        GIVEN:
+            - Default settings
+        WHEN:
+            - Settings are validated
+        THEN:
+            - No system check errors reported
+        """
+        msgs = settings_values_check(None)
+        self.assertEqual(len(msgs), 0)
+
+    @override_settings(OCR_OUTPUT_TYPE="notapdf")
+    def test_invalid_output_type(self):
+        """
+        GIVEN:
+            - Default settings
+            - OCR output type is invalid
+        WHEN:
+            - Settings are validated
+        THEN:
+            - system check error reported for OCR output type
+        """
+        msgs = settings_values_check(None)
+        self.assertEqual(len(msgs), 1)
+
+        msg = msgs[0]
+
+        self.assertIn('OCR output type "notapdf"', msg.msg)
+
+    @override_settings(OCR_MODE="makeitso")
+    def test_invalid_ocr_type(self):
+        """
+        GIVEN:
+            - Default settings
+            - OCR type is invalid
+        WHEN:
+            - Settings are validated
+        THEN:
+            - system check error reported for OCR type
+        """
+        msgs = settings_values_check(None)
+        self.assertEqual(len(msgs), 1)
+
+        msg = msgs[0]
+
+        self.assertIn('OCR output mode "makeitso"', msg.msg)
+
+    @override_settings(OCR_CLEAN="cleanme")
+    def test_invalid_ocr_clean(self):
+        """
+        GIVEN:
+            - Default settings
+            - OCR cleaning type is invalid
+        WHEN:
+            - Settings are validated
+        THEN:
+            - system check error reported for OCR cleaning type
+        """
+        msgs = settings_values_check(None)
+        self.assertEqual(len(msgs), 1)
+
+        msg = msgs[0]
+
+        self.assertIn('OCR clean mode "cleanme"', msg.msg)
+
+    @override_settings(TIME_ZONE="TheMoon\\MyCrater")
+    def test_invalid_timezone(self):
+        """
+        GIVEN:
+            - Default settings
+            - Timezone is invalid
+        WHEN:
+            - Settings are validated
+        THEN:
+            - system check error reported for timezone
+        """
+        msgs = settings_values_check(None)
+        self.assertEqual(len(msgs), 1)
+
+        msg = msgs[0]
+
+        self.assertIn('Timezone "TheMoon\\MyCrater"', msg.msg)
