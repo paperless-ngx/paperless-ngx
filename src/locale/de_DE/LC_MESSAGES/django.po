@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-07-08 14:11-0700\n"
-"PO-Revision-Date: 2022-07-18 16:55\n"
+"PO-Revision-Date: 2022-09-04 11:44\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -402,7 +402,7 @@ msgstr "Paperless-ngx wird geladen..."
 
 #: documents/templates/index.html:79
 msgid "Still here?! Hmm, something might be wrong."
-msgstr "Du bist noch hier?! Hmm, da muss wohl etwas schief gelaufen sein."
+msgstr "Du bist noch hier? Hmm, da muss wohl etwas schiefgelaufen sein."
 
 #: documents/templates/index.html:79
 msgid "Here's a link to the docs."
