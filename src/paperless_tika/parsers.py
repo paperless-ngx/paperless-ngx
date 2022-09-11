@@ -27,7 +27,7 @@ class TikaDocumentParser(DocumentParser):
         )
 
     def extract_metadata(self, document_path, mime_type):
-        tika_server = settings.PAPERLESS_TIKA_ENDPOINT
+        tika_server = settings.TIKA_ENDPOINT
         try:
             parsed = parser.from_file(document_path, tika_server)
         except Exception as e:
@@ -49,7 +49,7 @@ class TikaDocumentParser(DocumentParser):
 
     def parse(self, document_path, mime_type, file_name=None):
         self.log("info", f"Sending {document_path} to Tika server")
-        tika_server = settings.PAPERLESS_TIKA_ENDPOINT
+        tika_server = settings.TIKA_ENDPOINT
 
         try:
             parsed = parser.from_file(document_path, tika_server)
@@ -73,7 +73,7 @@ class TikaDocumentParser(DocumentParser):
 
     def convert_to_pdf(self, document_path, file_name):
         pdf_path = os.path.join(self.tempdir, "convert.pdf")
-        gotenberg_server = settings.PAPERLESS_TIKA_GOTENBERG_ENDPOINT
+        gotenberg_server = settings.TIKA_GOTENBERG_ENDPOINT
         url = gotenberg_server + "/forms/libreoffice/convert"
 
         self.log("info", f"Converting {document_path} to PDF as {pdf_path}")
