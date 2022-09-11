@@ -27,6 +27,12 @@ PAPERLESS_REDIS=<url>
     This is required for processing scheduled tasks such as email fetching, index
     optimization and for training the automatic document matcher.
 
+    * If your Redis server needs login credentials PAPERLESS_REDIS = ``redis://<username>:<password>@<host>:<port>``
+
+    * With the requirepass option PAPERLESS_REDIS = ``redis://:<password>@<host>:<port>``
+
+    `More information on securing your Redis Instance <https://redis.io/docs/getting-started/#securing-redis>`_.
+
     Defaults to redis://localhost:6379.
 
 PAPERLESS_DBENGINE=<engine_name>
@@ -215,8 +221,15 @@ PAPERLESS_FORCE_SCRIPT_NAME=<path>
 PAPERLESS_STATIC_URL=<path>
     Override the STATIC_URL here.  Unless you're hosting Paperless off a
     subdomain like /paperless/, you probably don't need to change this.
+    If you do change it, be sure to include the trailing slash.
 
     Defaults to "/static/".
+
+    .. note::
+
+        When hosting paperless behind a reverse proxy like Traefik or Nginx at a subpath e.g.
+        example.com/paperlessngx you will also need to set ``PAPERLESS_FORCE_SCRIPT_NAME``
+        (see above).
 
 PAPERLESS_AUTO_LOGIN_USERNAME=<username>
     Specify a username here so that paperless will automatically perform login
@@ -805,10 +818,10 @@ the program doesn't automatically execute it (ie. the program isn't in your
 $PATH), then you'll need to specify the literal path for that program.
 
 PAPERLESS_CONVERT_BINARY=<path>
-    Defaults to "/usr/bin/convert".
+    Defaults to "convert".
 
 PAPERLESS_GS_BINARY=<path>
-    Defaults to "/usr/bin/gs".
+    Defaults to "gs".
 
 
 .. _configuration-docker:
