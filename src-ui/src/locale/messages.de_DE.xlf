@@ -1963,7 +1963,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">90</context>
         </context-group>
-        <target state="translated">PCR wiederholen</target>
+        <target state="translated">OCR wiederholen</target>
       </trans-unit>
       <trans-unit id="7985804062689412812" datatype="html">
         <source>Error executing bulk operation: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></source>
