@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-07-08 14:11-0700\n"
-"PO-Revision-Date: 2022-07-08 22:07\n"
+"PO-Revision-Date: 2022-09-06 20:21\n"
 "Last-Translator: \n"
 "Language-Team: Finnish\n"
 "Language: fi_FI\n"
@@ -376,7 +376,7 @@ msgstr "suodatussäännöt"
 
 #: documents/models.py:521
 msgid "started"
-msgstr ""
+msgstr "aloitettu"
 
 #: documents/serialisers.py:70
 #, python-format
@@ -638,11 +638,11 @@ msgstr "Prosessoi kaikki tiedostot, sisältäen \"inline\"-liitteet."
 
 #: paperless_mail/models.py:64
 msgid "Delete"
-msgstr ""
+msgstr "Poista"
 
 #: paperless_mail/models.py:65
 msgid "Move to specified folder"
-msgstr ""
+msgstr "Siirrä määritettyyn kansioon"
 
 #: paperless_mail/models.py:66
 msgid "Mark as read, don't process read mails"
@@ -650,117 +650,117 @@ msgstr "Merkitse luetuksi, älä prosessoi luettuja sähköposteja"
 
 #: paperless_mail/models.py:67
 msgid "Flag the mail, don't process flagged mails"
-msgstr ""
+msgstr "Liputa sähköposti, älä käsittele liputettuja sähköposteja"
 
 #: paperless_mail/models.py:68
 msgid "Tag the mail with specified tag, don't process tagged mails"
-msgstr ""
+msgstr "Merkitse viesti määrätyllä tagilla, älä käsittele tageja"
 
 #: paperless_mail/models.py:71
 msgid "Use subject as title"
-msgstr ""
+msgstr "Käytä aihetta otsikkona"
 
 #: paperless_mail/models.py:72
 msgid "Use attachment filename as title"
-msgstr ""
+msgstr "Käytä liitteen tiedostonimeä otsikkona"
 
 #: paperless_mail/models.py:75
 msgid "Do not assign a correspondent"
-msgstr ""
+msgstr "Älä määritä yhteyshenkilöä"
 
 #: paperless_mail/models.py:76
 msgid "Use mail address"
-msgstr ""
+msgstr "Käytä sähköpostiosoitetta"
 
 #: paperless_mail/models.py:77
 msgid "Use name (or mail address if not available)"
-msgstr ""
+msgstr "Käytä nimeä (tai sähköpostiosoitetta, jos ei ole saatavilla)"
 
 #: paperless_mail/models.py:78
 msgid "Use correspondent selected below"
-msgstr ""
+msgstr "Käytä alla valittua yhteyshenkilöä"
 
 #: paperless_mail/models.py:82
 msgid "order"
-msgstr ""
+msgstr "järjestys"
 
 #: paperless_mail/models.py:88
 msgid "account"
-msgstr ""
+msgstr "tili"
 
 #: paperless_mail/models.py:92
 msgid "folder"
-msgstr ""
+msgstr "kansio"
 
 #: paperless_mail/models.py:96
 msgid "Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server."
-msgstr ""
+msgstr "Alikansiot on erotettava erottimella, usein pisteellä ('.') tai kauttaviivalla ('/'), mutta se vaihtelee postipalvelimen mukaan."
 
 #: paperless_mail/models.py:102
 msgid "filter from"
-msgstr ""
+msgstr "suodata lähettäjä-kenttä"
 
 #: paperless_mail/models.py:108
 msgid "filter subject"
-msgstr ""
+msgstr "suodata aihe"
 
 #: paperless_mail/models.py:114
 msgid "filter body"
-msgstr ""
+msgstr "suodata runko"
 
 #: paperless_mail/models.py:121
 msgid "filter attachment filename"
-msgstr ""
+msgstr "suodata liitteen tiedostonimi"
 
 #: paperless_mail/models.py:126
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr ""
+msgstr "Tuo vain dokumentit jotka täsmäävät täysin tiedostonimen suhteen. Jokerimerkit kuten *.pdf tai *lasku* ovat sallittuja. Kirjainkoko ei merkitse."
 
 #: paperless_mail/models.py:133
 msgid "maximum age"
-msgstr ""
+msgstr "ikä enintään"
 
 #: paperless_mail/models.py:135
 msgid "Specified in days."
-msgstr ""
+msgstr "Määritetty päivinä."
 
 #: paperless_mail/models.py:139
 msgid "attachment type"
-msgstr ""
+msgstr "liitteen tyyppi"
 
 #: paperless_mail/models.py:143
 msgid "Inline attachments include embedded images, so it's best to combine this option with a filename filter."
-msgstr ""
+msgstr "Sisäiset liitteet sisältävät upotettuja kuvia, joten on parasta yhdistää tämä vaihtoehto tiedostonimen suodattimeen."
 
 #: paperless_mail/models.py:149
 msgid "action"
-msgstr ""
+msgstr "toiminto"
 
 #: paperless_mail/models.py:155
 msgid "action parameter"
-msgstr ""
+msgstr "toiminnon parametrit"
 
 #: paperless_mail/models.py:160
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
-msgstr ""
+msgstr "Yllä valitun toiminnon lisäparametri eli siirrä hakemistoon -toiminnon kohdehakemisto. Alikansiot on erotettava toisistaan pisteillä."
 
 #: paperless_mail/models.py:168
 msgid "assign title from"
-msgstr ""
+msgstr "aseta otsikko kohteesta"
 
 #: paperless_mail/models.py:176
 msgid "assign this tag"
-msgstr ""
+msgstr "määritä tämä tunniste"
 
 #: paperless_mail/models.py:184
 msgid "assign this document type"
-msgstr ""
+msgstr "määritä tämä asiakirjatyyppi"
 
 #: paperless_mail/models.py:188
 msgid "assign correspondent from"
-msgstr ""
+msgstr "määritä kirjeenvaihtaja kohteesta"
 
 #: paperless_mail/models.py:198
 msgid "assign this correspondent"
-msgstr ""
+msgstr "määritä tämä kirjeenvaihtaja"
 
