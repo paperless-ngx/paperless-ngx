@@ -1,3 +1,14 @@
+autolabeler:
+  - label: "bug"
+    branch:
+      - '/^fix/'
+    title:
+      - "/^fix/i"
+  - label: "enhancement"
+    branch:
+      - '/^feature/'
+    title:
+      - "/^feature/i"
 categories:
   - title: 'Breaking Changes'
     labels:
@@ -15,9 +26,15 @@ categories:
       - 'chore'
       - 'deployment'
       - 'translation'
+      - 'ci-cd'
   - title: 'Dependencies'
     collapse-after: 3
     label: 'dependencies'
+  - title: 'All App Changes'
+    labels:
+      - 'frontend'
+      - 'backend'
+    collapse-after: 0
 include-labels:
   - 'enhancement'
   - 'bug'
@@ -25,11 +42,12 @@ include-labels:
   - 'deployment'
   - 'translation'
   - 'dependencies'
-replacers: # Changes "Feature: Update checker" to "Update checker"
-  - search: '/Feature:|Feat:|\[feature\]/gi'
-    replace: ''
+  - 'documentation'
+  - 'frontend'
+  - 'backend'
+  - 'ci-cd'
 category-template: '### $TITLE'
-change-template: '- $TITLE [@$AUTHOR](https://github.com/$AUTHOR) ([#$NUMBER]($URL))'
+change-template: '- $TITLE @$AUTHOR ([#$NUMBER]($URL))'
 change-title-escapes: '\<*_&#@'
 template: |
   ## paperless-ngx $RESOLVED_VERSION
