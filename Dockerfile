@@ -81,6 +81,7 @@ ARG RUNTIME_PACKAGES="\
   python3-pip \
   python3-setuptools \
   postgresql-client \
+  mariadb-client \
   # For Numpy
   libatlas3-base \
   # OCRmyPDF dependencies
@@ -186,6 +187,7 @@ COPY Pipfile* ./
 ARG BUILD_PACKAGES="\
   build-essential \
   git \
+  default-libmysqlclient-dev \
   python3-dev"
 
 RUN set -eux \
