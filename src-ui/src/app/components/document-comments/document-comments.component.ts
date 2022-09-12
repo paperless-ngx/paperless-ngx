@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core'
+import { Component, Input } from '@angular/core'
 import { DocumentCommentsService } from 'src/app/services/rest/document-comments.service'
 import { PaperlessDocumentComment } from 'src/app/data/paperless-document-comment'
 import { FormControl, FormGroup } from '@angular/forms'
@@ -10,7 +10,7 @@ import { ToastService } from 'src/app/services/toast.service'
   templateUrl: './document-comments.component.html',
   styleUrls: ['./document-comments.component.scss'],
 })
-export class DocumentCommentsComponent implements OnInit {
+export class DocumentCommentsComponent {
   commentForm: FormGroup = new FormGroup({
     newComment: new FormControl(''),
   })
@@ -19,19 +19,30 @@ export class DocumentCommentsComponent implements OnInit {
   comments: PaperlessDocumentComment[] = []
   newCommentError: boolean = false
 
+  private _documentId: number
+
   @Input()
-  documentId: number
+  set documentId(id: number) {
+    if (id != this._documentId) {
+      this._documentId = id
+      this.update()
+    }
+  }
 
   constructor(
     private commentsService: DocumentCommentsService,
     private toastService: ToastService
   ) {}
 
-  ngOnInit(): void {
+  update(): void {
+    this.networkActive = true
     this.commentsService
-      .getComments(this.documentId)
+      .getComments(this._documentId)
       .pipe(first())
-      .subscribe((comments) => (this.comments = comments))
+      .subscribe((comments) => {
+        this.comments = comments
+        this.networkActive = false
+      })
   }
 
   addComment() {
@@ -45,7 +56,7 @@ export class DocumentCommentsComponent implements OnInit {
     }
     this.newCommentError = false
     this.networkActive = true
-    this.commentsService.addComment(this.documentId, comment).subscribe({
+    this.commentsService.addComment(this._documentId, comment).subscribe({
       next: (result) => {
         this.comments = result
         this.commentForm.get('newComment').reset()
@@ -61,7 +72,7 @@ export class DocumentCommentsComponent implements OnInit {
   }
 
   deleteComment(commentId: number) {
-    this.commentsService.deleteComment(this.documentId, commentId).subscribe({
+    this.commentsService.deleteComment(this._documentId, commentId).subscribe({
       next: (result) => {
         this.comments = result
         this.networkActive = false
