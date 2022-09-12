@@ -24,6 +24,8 @@ import {
 import { SettingsService } from 'src/app/services/settings.service'
 import { TasksService } from 'src/app/services/tasks.service'
 import { ComponentCanDeactivate } from 'src/app/guards/dirty-doc.guard'
+import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
+import { ToastService } from 'src/app/services/toast.service'
 
 @Component({
   selector: 'app-app-frame',
@@ -40,7 +42,8 @@ export class AppFrameComponent implements ComponentCanDeactivate {
     private remoteVersionService: RemoteVersionService,
     private list: DocumentListViewService,
     public settingsService: SettingsService,
-    public tasksService: TasksService
+    public tasksService: TasksService,
+    private toastService: ToastService
   ) {
     this.remoteVersionService
       .checkForUpdates()
@@ -54,6 +57,27 @@ export class AppFrameComponent implements ComponentCanDeactivate {
   appRemoteVersion
 
   isMenuCollapsed: boolean = true
+
+  get slimSidebarEnabled(): boolean {
+    return this.settingsService.get(SETTINGS_KEYS.SLIM_SIDEBAR)
+  }
+
+  set slimSidebarEnabled(enabled: boolean) {
+    console.log('set slimSidebarEnabled', enabled)
+
+    this.settingsService.set(SETTINGS_KEYS.SLIM_SIDEBAR, enabled)
+    this.settingsService
+      .storeSettings()
+      .pipe(first())
+      .subscribe({
+        error: (error) => {
+          this.toastService.showError(
+            $localize`An error occurred while saving settings.`
+          )
+          console.log(error)
+        },
+      })
+  }
 
   closeMenu() {
     this.isMenuCollapsed = true
