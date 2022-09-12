@@ -53,6 +53,7 @@ zipp = {version = "*", markers = "python_version < '3.9'"}
 pyzbar = "*"
 pdf2image = "*"
 mysqlclient = "*"
+setproctitle = "*"
 
 [dev-packages]
 coveralls = "*"
