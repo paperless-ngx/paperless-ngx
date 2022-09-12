@@ -1,11 +1,4 @@
-import {
-  Component,
-  Inject,
-  LOCALE_ID,
-  OnInit,
-  OnDestroy,
-  Renderer2,
-} from '@angular/core'
+import { Component, Inject, LOCALE_ID, OnInit, OnDestroy } from '@angular/core'
 import { FormControl, FormGroup } from '@angular/forms'
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
@@ -18,6 +11,7 @@ import { Toast, ToastService } from 'src/app/services/toast.service'
 import { dirtyCheck, DirtyComponent } from '@ngneat/dirty-check-forms'
 import { Observable, Subscription, BehaviorSubject, first } from 'rxjs'
 import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
+import { ForwardRefHandling } from '@angular/compiler'
 
 @Component({
   selector: 'app-settings',
@@ -31,6 +25,7 @@ export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
     bulkEditConfirmationDialogs: new FormControl(null),
     bulkEditApplyOnClose: new FormControl(null),
     documentListItemPerPage: new FormControl(null),
+    slimSidebarEnabled: new FormControl(null),
     darkModeUseSystem: new FormControl(null),
     darkModeEnabled: new FormControl(null),
     darkModeInvertThumbs: new FormControl(null),
@@ -75,50 +70,61 @@ export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
     private toastService: ToastService,
     private settings: SettingsService,
     @Inject(LOCALE_ID) public currentLocale: string
-  ) {}
+  ) {
+    this.settings.changed.subscribe({
+      next: () => {
+        this.settingsForm.patchValue(this.getCurrentSettings(), {
+          emitEvent: false,
+        })
+      },
+    })
+  }
+
+  private getCurrentSettings() {
+    return {
+      bulkEditConfirmationDialogs: this.settings.get(
+        SETTINGS_KEYS.BULK_EDIT_CONFIRMATION_DIALOGS
+      ),
+      bulkEditApplyOnClose: this.settings.get(
+        SETTINGS_KEYS.BULK_EDIT_APPLY_ON_CLOSE
+      ),
+      documentListItemPerPage: this.settings.get(
+        SETTINGS_KEYS.DOCUMENT_LIST_SIZE
+      ),
+      slimSidebarEnabled: this.settings.get(SETTINGS_KEYS.SLIM_SIDEBAR),
+      darkModeUseSystem: this.settings.get(SETTINGS_KEYS.DARK_MODE_USE_SYSTEM),
+      darkModeEnabled: this.settings.get(SETTINGS_KEYS.DARK_MODE_ENABLED),
+      darkModeInvertThumbs: this.settings.get(
+        SETTINGS_KEYS.DARK_MODE_THUMB_INVERTED
+      ),
+      themeColor: this.settings.get(SETTINGS_KEYS.THEME_COLOR),
+      useNativePdfViewer: this.settings.get(
+        SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER
+      ),
+      savedViews: {},
+      displayLanguage: this.settings.getLanguage(),
+      dateLocale: this.settings.get(SETTINGS_KEYS.DATE_LOCALE),
+      dateFormat: this.settings.get(SETTINGS_KEYS.DATE_FORMAT),
+      notificationsConsumerNewDocument: this.settings.get(
+        SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_NEW_DOCUMENT
+      ),
+      notificationsConsumerSuccess: this.settings.get(
+        SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUCCESS
+      ),
+      notificationsConsumerFailed: this.settings.get(
+        SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_FAILED
+      ),
+      notificationsConsumerSuppressOnDashboard: this.settings.get(
+        SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUPPRESS_ON_DASHBOARD
+      ),
+      commentsEnabled: this.settings.get(SETTINGS_KEYS.COMMENTS_ENABLED),
+    }
+  }
 
   ngOnInit() {
     this.savedViewService.listAll().subscribe((r) => {
       this.savedViews = r.results
-      let storeData = {
-        bulkEditConfirmationDialogs: this.settings.get(
-          SETTINGS_KEYS.BULK_EDIT_CONFIRMATION_DIALOGS
-        ),
-        bulkEditApplyOnClose: this.settings.get(
-          SETTINGS_KEYS.BULK_EDIT_APPLY_ON_CLOSE
-        ),
-        documentListItemPerPage: this.settings.get(
-          SETTINGS_KEYS.DOCUMENT_LIST_SIZE
-        ),
-        darkModeUseSystem: this.settings.get(
-          SETTINGS_KEYS.DARK_MODE_USE_SYSTEM
-        ),
-        darkModeEnabled: this.settings.get(SETTINGS_KEYS.DARK_MODE_ENABLED),
-        darkModeInvertThumbs: this.settings.get(
-          SETTINGS_KEYS.DARK_MODE_THUMB_INVERTED
-        ),
-        themeColor: this.settings.get(SETTINGS_KEYS.THEME_COLOR),
-        useNativePdfViewer: this.settings.get(
-          SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER
-        ),
-        savedViews: {},
-        displayLanguage: this.settings.getLanguage(),
-        dateLocale: this.settings.get(SETTINGS_KEYS.DATE_LOCALE),
-        dateFormat: this.settings.get(SETTINGS_KEYS.DATE_FORMAT),
-        notificationsConsumerNewDocument: this.settings.get(
-          SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_NEW_DOCUMENT
-        ),
-        notificationsConsumerSuccess: this.settings.get(
-          SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUCCESS
-        ),
-        notificationsConsumerFailed: this.settings.get(
-          SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_FAILED
-        ),
-        notificationsConsumerSuppressOnDashboard: this.settings.get(
-          SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUPPRESS_ON_DASHBOARD
-        ),
-        commentsEnabled: this.settings.get(SETTINGS_KEYS.COMMENTS_ENABLED),
-      }
+      let storeData = this.getCurrentSettings()
 
       for (let view of this.savedViews) {
         storeData.savedViews[view.id.toString()] = {
@@ -191,6 +197,10 @@ export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
     this.settings.set(
       SETTINGS_KEYS.DOCUMENT_LIST_SIZE,
       this.settingsForm.value.documentListItemPerPage
+    )
+    this.settings.set(
+      SETTINGS_KEYS.SLIM_SIDEBAR,
+      this.settingsForm.value.slimSidebarEnabled
     )
     this.settings.set(
       SETTINGS_KEYS.DARK_MODE_USE_SYSTEM,
