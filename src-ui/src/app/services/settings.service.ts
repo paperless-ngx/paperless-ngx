@@ -1,6 +1,7 @@
 import { DOCUMENT } from '@angular/common'
 import { HttpClient } from '@angular/common/http'
 import {
+  EventEmitter,
   Inject,
   Injectable,
   LOCALE_ID,
@@ -45,6 +46,8 @@ export class SettingsService {
   private settings: Object = {}
 
   public displayName: string
+
+  public changed = new EventEmitter()
 
   constructor(
     rendererFactory: RendererFactory2,
@@ -360,7 +363,9 @@ export class SettingsService {
   }
 
   storeSettings(): Observable<any> {
-    return this.http.post(this.baseUrl, { settings: this.settings })
+    return this.http
+      .post(this.baseUrl, { settings: this.settings })
+      .pipe(tap((result) => this.changed.emit(!!result.success)))
   }
 
   maybeMigrateSettings() {
