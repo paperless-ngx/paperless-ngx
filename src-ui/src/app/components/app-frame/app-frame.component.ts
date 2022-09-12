@@ -63,8 +63,6 @@ export class AppFrameComponent implements ComponentCanDeactivate {
   }
 
   set slimSidebarEnabled(enabled: boolean) {
-    console.log('set slimSidebarEnabled', enabled)
-
     this.settingsService.set(SETTINGS_KEYS.SLIM_SIDEBAR, enabled)
     this.settingsService
       .storeSettings()
