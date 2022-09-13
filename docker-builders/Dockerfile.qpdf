@@ -1,7 +1,7 @@
 # This Dockerfile compiles the jbig2enc library
 # Inputs:
 #    - QPDF_VERSION - the version of qpdf to build a .deb.
-#                     Must be preset as a deb-src
+#                     Must be present as a deb-src in bookworm
 
 FROM debian:bullseye-slim as main
 
@@ -22,27 +22,23 @@ ARG BUILD_PACKAGES="\
   libjpeg62-turbo-dev \
   libgnutls28-dev \
   packaging-dev \
+  cmake \
   zlib1g-dev"
 
 WORKDIR /usr/src
-
-# As this is an base image for a multi-stage final image
-# the added size of the install is basically irrelevant
 
 RUN set -eux \
   && echo "Installing build tools" \
     && apt-get update --quiet \
     && apt-get install --yes --quiet --no-install-recommends $BUILD_PACKAGES \
-  && echo "Building qpdf" \
+  && echo "Getting qpdf src" \
     && echo "deb-src http://deb.debian.org/debian/ bookworm main" > /etc/apt/sources.list.d/bookworm-src.list \
     && apt-get update \
     && mkdir qpdf \
     && cd qpdf \
     && apt-get source --yes --quiet qpdf=${QPDF_VERSION}-1/bookworm \
+  && echo "Building qpdf" \
     && cd qpdf-$QPDF_VERSION \
-    # We don't need to build the tests (also don't run them)
-    && rm -rf libtests \
-    && DEBEMAIL=hello@paperless-ngx.com debchange --bpo \
     && export DEB_BUILD_OPTIONS="terse nocheck nodoc parallel=2" \
     && dpkg-buildpackage --build=binary --unsigned-source --unsigned-changes --post-clean \
     && ls -ahl ../*.deb \
