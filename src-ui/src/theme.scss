@@ -79,6 +79,15 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
     }
   }
 
+  .btn-dark {
+    --bs-btn-color: $text-color-dark-bg;
+    --bs-btn-bg: var(--pngx-bg-alt);
+    --bs-btn-border-color: var(--pngx-bg-alt);
+    --bs-btn-hover-bg: var(--bs-light);
+    --bs-btn-hover-border-color: var(--pngx-bg-darker);
+    --bs-btn-active-bg: var(--pngx-bg-alt);
+  }
+
   .btn-outline-primary {
     &:hover, &:focus, &.active, &:active {
       color: var(--bs-light) !important;
