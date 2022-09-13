@@ -1,3 +1,6 @@
+@import "node_modules/bootstrap/scss/functions";
+@import "node_modules/bootstrap/scss/variables";
+
 /*
  * Sidebar
  */
@@ -15,7 +18,6 @@
     height: 0.8em;
   }
 
-
   // These come from the col-md-3 col-lg-2 classes for regular sidebar, needed for animation
   @media (min-width: 768px) {
     max-width: 25%;
@@ -25,12 +27,16 @@
     max-width: 16.66666667%;
   }
 
-  transition: all .3s ease;
+  transition: all .2s ease;
 }
 @media (max-width: 767.98px) {
   .sidebar {
     top: 3.5rem;
   }
+}
+
+main {
+  transition: all .2s ease;
 }
 
 .sidebar-slim-toggler {
@@ -45,8 +51,8 @@
     }
   }
 
-  .col.slim {
-    margin-left: 50px !important;
+  .col-slim {
+    padding-left: calc(50px + $grid-gutter-width) !important;
   }
 
   .sidebar-slim-toggler {

@@ -46,7 +46,7 @@ describe('settings', () => {
       })
     })
 
-    cy.viewport(1024, 1024)
+    cy.viewport(1024, 1600)
     cy.visit('/settings')
     cy.wait('@savedViews')
   })
