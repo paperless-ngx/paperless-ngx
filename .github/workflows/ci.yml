@@ -82,6 +82,17 @@ jobs:
       matrix:
         python-version: ['3.8', '3.9', '3.10']
       fail-fast: false
+    services:
+      tika:
+        image: ghcr.io/paperless-ngx/tika:latest
+        ports:
+          - "9998:9998/tcp"
+      gotenberg:
+        image: docker.io/gotenberg/gotenberg:7.4
+        ports:
+          - "3000:3000/tcp"
+    env:
+      TIKA_LIVE: 1
     steps:
       -
         name: Checkout
@@ -91,7 +102,7 @@ jobs:
       -
         name: Install pipenv
         run: |
-          pipx install pipenv==2022.8.5
+          pipx install pipenv
           pipenv --version
       -
         name: Set up Python
@@ -117,7 +128,7 @@ jobs:
         name: Tests
         run: |
           cd src/
-          pipenv run pytest
+          pipenv run pytest -rfEp
       -
         name: Get changed files
         id: changed-files-specific
