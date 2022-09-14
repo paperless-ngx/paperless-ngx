@@ -287,6 +287,26 @@ class TestBarcode(DirectoriesMixin, TestCase):
             "patch-code-t-middle.pdf",
         )
         pages = barcodes.separate_pages(test_file, [1])
+
+        self.assertEqual(len(pages), 2)
+
+    def test_separate_pages_double_code(self):
+        """
+        GIVEN:
+            - Input PDF with two patch code pages in a row
+        WHEN:
+            - The input file is split
+        THEN:
+            - Only two files are output
+        """
+        test_file = os.path.join(
+            os.path.dirname(__file__),
+            "samples",
+            "barcodes",
+            "patch-code-t-double.pdf",
+        )
+        pages = barcodes.separate_pages(test_file, [1, 2])
+
         self.assertEqual(len(pages), 2)
 
     def test_separate_pages_no_list(self):
