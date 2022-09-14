@@ -3,13 +3,15 @@ import os
 import shutil
 import tempfile
 from functools import lru_cache
-from typing import List  # for type hinting. Can be removed, if only Python >3.8 is used
+from typing import List
+from typing import Optional
+from typing import Tuple
 
 import magic
 from django.conf import settings
-from pdf2image import convert_from_path
 from pikepdf import Page
 from pikepdf import Pdf
+from pikepdf import PdfImage
 from PIL import Image
 from PIL import ImageSequence
 from pyzbar import pyzbar
@@ -32,7 +34,7 @@ def supported_file_type(mime_type) -> bool:
     return mime_type in supported_mime
 
 
-def barcode_reader(image) -> List[str]:
+def barcode_reader(image: Image) -> List[str]:
     """
     Read any barcodes contained in image
     Returns a list containing all found barcodes
@@ -99,21 +101,39 @@ def convert_from_tiff_to_pdf(filepath: str) -> str:
     return newpath
 
 
-def scan_file_for_separating_barcodes(filepath: str) -> List[int]:
+def scan_file_for_separating_barcodes(filepath: str) -> Tuple[Optional[str], List[int]]:
     """
     Scan the provided pdf file for page separating barcodes
-    Returns a list of pagenumbers, which separate the file
+    Returns a the PDF filepath and a list of pagenumbers,
+    which separate the file into new files
     """
+
     separator_page_numbers = []
-    separator_barcode = str(settings.CONSUMER_BARCODE_STRING)
-    # use a temporary directory in case the file os too big to handle in memory
-    with tempfile.TemporaryDirectory() as path:
-        pages_from_path = convert_from_path(filepath, output_folder=path)
-        for current_page_number, page in enumerate(pages_from_path):
-            current_barcodes = barcode_reader(page)
-            if separator_barcode in current_barcodes:
-                separator_page_numbers.append(current_page_number)
-    return separator_page_numbers
+    pdf_filepath = None
+
+    mime_type = get_file_mime_type(filepath)
+
+    if supported_file_type(mime_type):
+        pdf_filepath = filepath
+        if mime_type == "image/tiff":
+            pdf_filepath = convert_from_tiff_to_pdf(filepath)
+
+        pdf = Pdf.open(pdf_filepath)
+
+        for page_num, page in enumerate(pdf.pages):
+            for image_key in page.images:
+                pdfimage = PdfImage(page.images[image_key])
+                pillow_img = pdfimage.as_pil_image()
+
+                detected_barcodes = barcode_reader(pillow_img)
+
+                if settings.CONSUMER_BARCODE_STRING in detected_barcodes:
+                    separator_page_numbers.append(page_num)
+    else:
+        logger.warning(
+            f"Unsupported file format for barcode reader: {str(mime_type)}",
+        )
+    return pdf_filepath, separator_page_numbers
 
 
 def separate_pages(filepath: str, pages_to_split_on: List[int]) -> List[str]:

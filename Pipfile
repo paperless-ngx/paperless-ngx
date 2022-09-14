@@ -53,7 +53,6 @@ concurrent-log-handler = "*"
 "importlib-resources" = {version = "*", markers = "python_version < '3.9'"}
 zipp = {version = "*", markers = "python_version < '3.9'"}
 pyzbar = "*"
-pdf2image = "*"
 mysqlclient = "*"
 setproctitle = "*"
 
