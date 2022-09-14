@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 import dateutil.parser
 import requests
@@ -28,6 +29,11 @@ class TikaDocumentParser(DocumentParser):
 
     def extract_metadata(self, document_path, mime_type):
         tika_server = settings.TIKA_ENDPOINT
+
+        # tika does not support a PathLike, only strings
+        # ensure this is a string
+        document_path = str(document_path)
+
         try:
             parsed = parser.from_file(document_path, tika_server)
         except Exception as e:
@@ -47,9 +53,13 @@ class TikaDocumentParser(DocumentParser):
             for key in parsed["metadata"]
         ]
 
-    def parse(self, document_path, mime_type, file_name=None):
+    def parse(self, document_path: Path, mime_type, file_name=None):
         self.log("info", f"Sending {document_path} to Tika server")
         tika_server = settings.TIKA_ENDPOINT
+
+        # tika does not support a PathLike, only strings
+        # ensure this is a string
+        document_path = str(document_path)
 
         try:
             parsed = parser.from_file(document_path, tika_server)
