@@ -56,6 +56,7 @@ mysqlclient = "*"
 celery = {extras = ["redis"], version = "*"}
 django-celery-results = "*"
 setproctitle = "*"
+nltk = "*"
 
 [dev-packages]
 coveralls = "*"
