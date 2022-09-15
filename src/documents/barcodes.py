@@ -8,6 +8,7 @@ from typing import List  # for type hinting. Can be removed, if only Python >3.8
 import magic
 from django.conf import settings
 from pdf2image import convert_from_path
+from pikepdf import Page
 from pikepdf import Pdf
 from PIL import Image
 from PIL import ImageSequence
@@ -122,47 +123,56 @@ def separate_pages(filepath: str, pages_to_split_on: List[int]) -> List[str]:
     Returns a list of (temporary) filepaths to consume.
     These will need to be deleted later.
     """
+
+    document_paths = []
+
+    if not pages_to_split_on:
+        logger.warning("No pages to split on!")
+        return document_paths
+
     os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
     tempdir = tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR)
     fname = os.path.splitext(os.path.basename(filepath))[0]
     pdf = Pdf.open(filepath)
-    document_paths = []
-    logger.debug(f"Temp dir is {str(tempdir)}")
-    if not pages_to_split_on:
-        logger.warning("No pages to split on!")
-    else:
-        # go from the first page to the first separator page
+
+    # A list of documents, ie a list of lists of pages
+    documents: List[List[Page]] = []
+    # A single document, ie a list of pages
+    document: List[Page] = []
+
+    for idx, page in enumerate(pdf.pages):
+        # Keep building the new PDF as long as it is not a
+        # separator index
+        if idx not in pages_to_split_on:
+            document.append(page)
+            # Make sure to append the very last document to the documents
+            if idx == (len(pdf.pages) - 1):
+                documents.append(document)
+                document = []
+        else:
+            # This is a split index, save the current PDF pages, and restart
+            # a new destination page listing
+            logger.debug(f"Starting new document at idx {idx}")
+            documents.append(document)
+            document = []
+
+    documents = [x for x in documents if len(x)]
+
+    logger.debug(f"Split into {len(documents)} new documents")
+
+    # Write the new documents out
+    for doc_idx, document in enumerate(documents):
         dst = Pdf.new()
-        for n, page in enumerate(pdf.pages):
-            if n < pages_to_split_on[0]:
-                dst.pages.append(page)
-        output_filename = f"{fname}_document_0.pdf"
+        dst.pages.extend(document)
+
+        output_filename = f"{fname}_document_{doc_idx}.pdf"
+
+        logger.debug(f"pdf no:{doc_idx} has {len(dst.pages)} pages")
         savepath = os.path.join(tempdir, output_filename)
         with open(savepath, "wb") as out:
             dst.save(out)
-        document_paths = [savepath]
+        document_paths.append(savepath)
 
-        # iterate through the rest of the document
-        for count, page_number in enumerate(pages_to_split_on):
-            logger.debug(f"Count: {str(count)} page_number: {str(page_number)}")
-            dst = Pdf.new()
-            try:
-                next_page = pages_to_split_on[count + 1]
-            except IndexError:
-                next_page = len(pdf.pages)
-            # skip the first page_number. This contains the barcode page
-            for page in range(page_number + 1, next_page):
-                logger.debug(
-                    f"page_number: {str(page_number)} next_page: {str(next_page)}",
-                )
-                dst.pages.append(pdf.pages[page])
-            output_filename = f"{fname}_document_{str(count + 1)}.pdf"
-            logger.debug(f"pdf no:{str(count)} has {str(len(dst.pages))} pages")
-            savepath = os.path.join(tempdir, output_filename)
-            with open(savepath, "wb") as out:
-                dst.save(out)
-            document_paths.append(savepath)
-    logger.debug(f"Temp files are {str(document_paths)}")
     return document_paths
 
 
