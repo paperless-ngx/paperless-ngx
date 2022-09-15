@@ -889,6 +889,14 @@
             "index": "pypi",
             "version": "==2.1.1"
         },
+        "nltk": {
+            "hashes": [
+                "sha256:ba3de02490308b248f9b94c8bc1ac0683e9aa2ec49ee78536d8667afb5e3eec8",
+                "sha256:d6507d6460cec76d70afea4242a226a7542f85c669177b9c7f562b7cf1b05502"
+            ],
+            "index": "pypi",
+            "version": "==3.7"
+        },
         "numpy": {
             "hashes": [
                 "sha256:07a8c89a04997625236c5ecb7afe35a02af3896c8aa01890a849913a2309c676",
