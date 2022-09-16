@@ -320,10 +320,9 @@ class DocumentClassifier:
         # Get only the letters (remove punctuation too)
         content = re.sub(r"[^\w\s]", " ", content)
         # Tokenize
-        # TODO configurable language
-        words: List[str] = word_tokenize(content, language="english")
+        words: List[str] = word_tokenize(content, language=settings.NLTK_LANGUAGE)
         # Remove stop words
-        stops = set(stopwords.words("english"))
+        stops = set(stopwords.words(settings.NLTK_LANGUAGE))
         meaningful_words = [w for w in words if w not in stops]
         # Stem words
         meaningful_words = [self.stemmer.stem(w) for w in meaningful_words]

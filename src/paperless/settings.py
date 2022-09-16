@@ -708,3 +708,5 @@ if os.getenv("PAPERLESS_IGNORE_DATES") is not None:
 ENABLE_UPDATE_CHECK = os.getenv("PAPERLESS_ENABLE_UPDATE_CHECK", "default")
 if ENABLE_UPDATE_CHECK != "default":
     ENABLE_UPDATE_CHECK = __get_boolean("PAPERLESS_ENABLE_UPDATE_CHECK")
+
+NLTK_LANGUAGE = os.getenv("PAPERLESS_NLTK_LANG", "english").lower()
