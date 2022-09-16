@@ -1,4 +1,6 @@
+import grp
 import os
+import pwd
 import shutil
 import stat
 
@@ -32,12 +34,15 @@ def path_check(var, directory):
                 with open(test_file, "w"):
                     pass
             except PermissionError:
+                dir_stat = os.stat(directory)
+                dir_mode = stat.filemode(dir_stat.st_mode)
+                dir_owner = pwd.getpwuid(dir_stat.st_uid).pw_name
+                dir_group = grp.getgrgid(dir_stat.st_gid).gr_name
                 messages.append(
                     Error(
                         writeable_message.format(var),
                         writeable_hint.format(
-                            f"\n{stat.filemode(os.stat(directory).st_mode)} "
-                            f"{directory}\n",
+                            f"\n{dir_mode} {dir_owner} {dir_group} " f"{directory}\n",
                         ),
                     ),
                 )
