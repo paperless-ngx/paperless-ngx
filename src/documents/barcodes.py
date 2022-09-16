@@ -104,7 +104,7 @@ def convert_from_tiff_to_pdf(filepath: str) -> str:
 def scan_file_for_separating_barcodes(filepath: str) -> Tuple[Optional[str], List[int]]:
     """
     Scan the provided pdf file for page separating barcodes
-    Returns a the PDF filepath and a list of pagenumbers,
+    Returns a PDF filepath and a list of pagenumbers,
     which separate the file into new files
     """
 
