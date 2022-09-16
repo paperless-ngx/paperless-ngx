@@ -125,9 +125,6 @@ jobs:
         name: Install Python dependencies
         run: |
           pipenv sync --dev
-          pipenv run python3 -m nltk.downloader snowball_data
-          pipenv run python3 -m nltk.downloader stopwords
-          pipenv run python3 -m nltk.downloader punkt
       -
         name: List installed Python dependencies
         run: |
