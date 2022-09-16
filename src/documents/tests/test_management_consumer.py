@@ -283,7 +283,9 @@ class TestConsumer(DirectoriesMixin, ConsumerMixin, TransactionTestCase):
 
 @override_settings(
     CONSUMER_POLLING=1,
-    CONSUMER_POLLING_DELAY=1,
+    # please leave the delay here and down below
+    # see https://github.com/paperless-ngx/paperless-ngx/pull/66
+    CONSUMER_POLLING_DELAY=3,
     CONSUMER_POLLING_RETRY_COUNT=20,
 )
 class TestConsumerPolling(TestConsumer):
@@ -300,7 +302,7 @@ class TestConsumerRecursive(TestConsumer):
 @override_settings(
     CONSUMER_RECURSIVE=True,
     CONSUMER_POLLING=1,
-    CONSUMER_POLLING_DELAY=1,
+    CONSUMER_POLLING_DELAY=3,
     CONSUMER_POLLING_RETRY_COUNT=20,
 )
 class TestConsumerRecursivePolling(TestConsumer):
@@ -345,7 +347,7 @@ class TestConsumerTags(DirectoriesMixin, ConsumerMixin, TransactionTestCase):
 
     @override_settings(
         CONSUMER_POLLING=1,
-        CONSUMER_POLLING_DELAY=1,
+        CONSUMER_POLLING_DELAY=3,
         CONSUMER_POLLING_RETRY_COUNT=20,
     )
     def test_consume_file_with_path_tags_polling(self):
