@@ -53,6 +53,21 @@ map_folders() {
 	export CONSUME_DIR="${PAPERLESS_CONSUMPTION_DIR:-/usr/src/paperless/consume}"
 }
 
+nltk_data () {
+	# Store the NLTK data outside the Docker container
+	local nltk_data_dir="${DATA_DIR}/nltk"
+
+	# Download or update the snowball stemmer data
+	python3 -W ignore::RuntimeWarning -m nltk.downloader -d "${nltk_data_dir}" snowball_data
+
+	# Download or update the stopwords corpus
+	python3 -W ignore::RuntimeWarning -m nltk.downloader -d "${nltk_data_dir}" stopwords
+
+	# Download or update the punkt tokenizer data
+	python3 -W ignore::RuntimeWarning -m nltk.downloader -d "${nltk_data_dir}" punkt
+
+}
+
 initialize() {
 
 	# Setup environment from secrets before anything else
@@ -92,6 +107,8 @@ initialize() {
 	local tmp_dir="/tmp/paperless"
 	echo "Creating directory ${tmp_dir}"
 	mkdir -p "${tmp_dir}"
+
+	nltk_data
 
 	set +e
 	echo "Adjusting permissions of paperless files. This may take a while."
