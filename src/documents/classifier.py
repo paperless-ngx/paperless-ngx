@@ -306,6 +306,12 @@ class DocumentClassifier:
         from nltk.corpus import stopwords
         from nltk.stem import SnowballStemmer
 
+        import nltk
+
+        # Not really hacky, since it isn't private and is documented, but
+        # set the search path for NLTK data to the single location it should be in
+        nltk.data.path = [settings.NLTK_DIR]
+
         if self.stemmer is None:
             self.stemmer = SnowballStemmer("english")
 
