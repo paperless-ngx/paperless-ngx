@@ -1,9 +1,9 @@
 import os
+import re
 import tempfile
 from pathlib import Path
 from unittest import mock
 
-import documents
 import pytest
 from django.conf import settings
 from django.test import override_settings
@@ -20,10 +20,19 @@ from documents.models import Tag
 from documents.tests.utils import DirectoriesMixin
 
 
+def dummy_preprocess(content: str):
+    content = content.lower().strip()
+    content = re.sub(r"\s+", " ", content)
+    return content
+
+
 class TestClassifier(DirectoriesMixin, TestCase):
     def setUp(self):
         super().setUp()
         self.classifier = DocumentClassifier()
+        self.classifier.preprocess_content = mock.MagicMock(
+            side_effect=dummy_preprocess,
+        )
 
     def generate_test_data(self):
         self.c1 = Correspondent.objects.create(
@@ -192,6 +201,8 @@ class TestClassifier(DirectoriesMixin, TestCase):
 
         new_classifier = DocumentClassifier()
         new_classifier.load()
+        new_classifier.preprocess_content = mock.MagicMock(side_effect=dummy_preprocess)
+
         self.assertFalse(new_classifier.train())
 
     # @override_settings(
@@ -215,6 +226,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
 
         new_classifier = DocumentClassifier()
         new_classifier.load()
+        new_classifier.preprocess_content = mock.MagicMock(side_effect=dummy_preprocess)
 
         self.assertCountEqual(new_classifier.predict_tags(self.doc2.content), [45, 12])
 
