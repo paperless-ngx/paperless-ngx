@@ -75,7 +75,8 @@ class DocumentClassifier:
         self.document_type_classifier = None
         self.storage_path_classifier = None
 
-        self.stemmer = None
+        self._stemmer = None
+        self._stop_words = None
 
     def load(self):
         # Catch warnings for processing
@@ -302,32 +303,43 @@ class DocumentClassifier:
         Process to contents of a document, distilling it down into
         words which are meaningful to the content
         """
-        from nltk.tokenize import word_tokenize
-        from nltk.corpus import stopwords
-        from nltk.stem import SnowballStemmer
-
-        import nltk
-
-        # Not really hacky, since it isn't private and is documented, but
-        # set the search path for NLTK data to the single location it should be in
-        nltk.data.path = [settings.NLTK_DIR]
-
-        if self.stemmer is None:
-            self.stemmer = SnowballStemmer("english")
 
         # Lower case the document
         content = content.lower().strip()
-        # Get only the letters (remove punctuation too)
+        # Reduce spaces
+        content = re.sub(r"\s+", " ", content)
+        # Get only the letters
         content = re.sub(r"[^\w\s]", " ", content)
-        # Tokenize
-        words: List[str] = word_tokenize(content, language=settings.NLTK_LANGUAGE)
-        # Remove stop words
-        stops = set(stopwords.words(settings.NLTK_LANGUAGE))
-        meaningful_words = [w for w in words if w not in stops]
-        # Stem words
-        meaningful_words = [self.stemmer.stem(w) for w in meaningful_words]
 
-        return " ".join(meaningful_words)
+        # If the NLTK language is supported, do further processing
+        if settings.NLTK_LANGUAGE is not None:
+
+            import nltk
+
+            from nltk.tokenize import word_tokenize
+            from nltk.corpus import stopwords
+            from nltk.stem import SnowballStemmer
+
+            # Not really hacky, since it isn't private and is documented, but
+            # set the search path for NLTK data to the single location it should be in
+            nltk.data.path = [settings.NLTK_DIR]
+
+            # Do some one time setup
+            if self._stemmer is None:
+                self._stemmer = SnowballStemmer(settings.NLTK_LANGUAGE)
+            if self._stop_words is None:
+                self._stop_words = set(stopwords.words(settings.NLTK_LANGUAGE))
+
+            # Tokenize
+            words: List[str] = word_tokenize(content, language=settings.NLTK_LANGUAGE)
+            # Remove stop words
+            meaningful_words = [w for w in words if w not in self._stop_words]
+            # Stem words
+            meaningful_words = [self._stemmer.stem(w) for w in meaningful_words]
+
+            return " ".join(meaningful_words)
+
+        return content
 
     def predict_correspondent(self, content):
         if self.correspondent_classifier:
