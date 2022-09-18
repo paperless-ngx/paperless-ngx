@@ -709,4 +709,30 @@ ENABLE_UPDATE_CHECK = os.getenv("PAPERLESS_ENABLE_UPDATE_CHECK", "default")
 if ENABLE_UPDATE_CHECK != "default":
     ENABLE_UPDATE_CHECK = __get_boolean("PAPERLESS_ENABLE_UPDATE_CHECK")
 
-NLTK_LANGUAGE = os.getenv("PAPERLESS_NLTK_LANG", "english").lower()
+
+def _get_nltk_language_setting(ocr_lang: str) -> Optional[str]:
+    """
+    Maps an ISO-639-1 language code supported by Tesseract into
+    an optional NLTK language name.  This is the set of common supported
+    languages for all the NLTK data used.
+    """
+    iso_code_to_nltk = {
+        "dan": "danish",
+        "nld": "dutch",
+        "eng": "english",
+        "fin": "finnish",
+        "fra": "french",
+        "deu": "german",
+        "ita": "italian",
+        "nor": "norwegian",
+        "por": "portuguese",
+        "rus": "russian",
+        "spa": "spanish",
+        "swe": "swedish",
+        "tur": "turkish",
+    }
+
+    return iso_code_to_nltk.get(ocr_lang, None)
+
+
+NLTK_LANGUAGE: Optional[str] = _get_nltk_language_setting(OCR_LANGUAGE)
