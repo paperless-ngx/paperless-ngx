@@ -12,4 +12,4 @@ if [ "$(id -u)" == "$(id -u paperless)" ]; then
 	)
 fi
 
-/usr/local/bin/supervisord -c /etc/supervisord.conf "${rootless_args[@]}"
+exec /usr/local/bin/supervisord -c /etc/supervisord.conf "${rootless_args[@]}"
