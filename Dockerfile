@@ -30,6 +30,25 @@ RUN set -eux \
 RUN set -eux \
   && ./node_modules/.bin/ng build --configuration production
 
+FROM --platform=$BUILDPLATFORM python:3.9-slim-bullseye as pipenv-base
+
+# This stage generates the requirements.txt file using pipenv
+# This stage runs once for the native platform, as the outputs are not
+# dependent on target arch
+# This way, pipenv dependencies are not left in the final image
+# nor can pipenv mess up the final image somehow
+# Inputs: None
+
+WORKDIR /usr/src/pipenv
+
+COPY Pipfile* ./
+
+RUN set -eux \
+  && echo "Installing pipenv" \
+    && python3 -m pip install --no-cache-dir --upgrade pipenv \
+  && echo "Generating requirement.txt" \
+    && pipenv requirements > requirements.txt
+
 FROM python:3.9-slim-bullseye as main-app
 
 LABEL org.opencontainers.image.authors="paperless-ngx team <hello@paperless-ngx.com>"
@@ -180,7 +199,7 @@ WORKDIR /usr/src/paperless/src/
 
 # Python dependencies
 # Change pretty frequently
-COPY Pipfile* ./
+COPY --from=pipenv-base /usr/src/pipenv/requirements.txt ./
 
 # Packages needed only for building a few quick Python
 # dependencies
@@ -195,24 +214,12 @@ RUN set -eux \
     && apt-get update \
     && apt-get install --yes --quiet --no-install-recommends ${BUILD_PACKAGES} \
     && python3 -m pip install --no-cache-dir --upgrade wheel \
-  && echo "Installing pipenv" \
-    && python3 -m pip install --no-cache-dir --upgrade pipenv \
   && echo "Installing Python requirements" \
-    # pipenv tries to be too fancy and prints so much junk
-    && pipenv requirements > requirements.txt \
     && python3 -m pip install --default-timeout=1000 --no-cache-dir --requirement requirements.txt \
-    && rm requirements.txt \
   && echo "Cleaning up image" \
     && apt-get -y purge ${BUILD_PACKAGES} \
     && apt-get -y autoremove --purge \
     && apt-get clean --yes \
-    # Remove pipenv and its unique packages
-    && python3 -m pip uninstall --yes \
-      pipenv \
-      distlib \
-      platformdirs \
-      virtualenv \
-      virtualenv-clone \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /tmp/* \
     && rm -rf /var/tmp/* \
