@@ -217,7 +217,7 @@ using the identifier which it has assigned to each document. You will end up get
 files like ``0000123.pdf`` in your media directory. This isn't necessarily a bad
 thing, because you normally don't have to access these files manually. However, if
 you wish to name your files differently, you can do that by adjusting the
-``PAPERLESS_FILENAME_FORMAT`` configuration option.
+``PAPERLESS_FILENAME_FORMAT`` configuration option. Paperless adds the ending for example ``pdf``automatically. 
 
 This variable allows you to configure the filename (folders are allowed) using
 placeholders. For example, configuring this to
