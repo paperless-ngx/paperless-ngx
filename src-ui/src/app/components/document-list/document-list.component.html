@@ -98,6 +98,7 @@
   </div>
 </ng-template>
 
+<div tourAnchor="tour.documents"></div>
 <ng-container *ngTemplateOutlet="pagination"></ng-container>
 
 <ng-container *ngIf="list.error ; else documentListNoError">
@@ -105,7 +106,6 @@
 </ng-container>
 
 <ng-template #documentListNoError>
-  <div tourAnchor="tour.documents"></div>
   <div *ngIf="displayMode == 'largeCards'">
     <app-document-card-large [selected]="list.isSelected(d)" (toggleSelected)="toggleSelected(d, $event)" *ngFor="let d of list.documents; trackBy: trackByDocumentId" [document]="d" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)" (clickDocumentType)="clickDocumentType($event)" (clickStoragePath)="clickStoragePath($event)" (clickMoreLike)="clickMoreLike(d.id)">
     </app-document-card-large>
