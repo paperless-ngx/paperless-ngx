@@ -1,16 +1,10 @@
-<app-widget-frame title="First steps" i18n-title>
-
-  <ng-container content>
-    <img src="assets/save-filter.png" class="float-right">
-    <p i18n>Paperless is running! :)</p>
-    <p i18n>You can start uploading documents by dropping them in the file upload box to the right or by dropping them in the configured consumption folder and they'll start showing up in the documents list.
-      After you've added some metadata to your documents, use the filtering mechanisms of paperless to create custom views (such as 'Recently added', 'Tagged TODO') and they will appear on the dashboard instead of this message.</p>
-    <p i18n>Paperless offers some more features that try to make your life easier:</p>
-    <ul>
-      <li i18n>Once you've got a couple documents in paperless and added metadata to them, paperless can assign that metadata to new documents automatically.</li>
-      <li i18n>You can configure paperless to read your mails and add documents from attached files.</li>
-    </ul>
-    <p i18n>Consult the documentation on how to use these features. The section on basic usage also has some information on how to use paperless in general.</p>
-  </ng-container>
-
-</app-widget-frame>
+<ngb-alert type="primary" [dismissible]="false">
+  <!-- [dismissible]="isFinished(status)" (closed)="dismiss(status)" -->
+  <h4 class="alert-heading" i18n>Paperless-ngx is running!</h4>
+  <p i18n>You're ready to start uploading documents! Feel free to explore the various features or start a quick tour using the button below.</p>
+  <p i18n>More detail on how to use and configure paperless is always available in the <a href="https://paperless-ngx.readthedocs.io" target="_blank">documentation</a>.</p>
+  <hr>
+  <div class="btn-toolbar" role="toolbar" aria-label="Controls">
+    <button class="btn btn-primary ms-auto" (click)="tourService.start()"><ng-container i18n>Start Tour</ng-container> &rarr;</button>
+  </div>
+</ngb-alert>
