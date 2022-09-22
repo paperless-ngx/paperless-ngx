@@ -446,4 +446,9 @@ export class SettingsService {
   get updateCheckingIsSet(): boolean {
     return this.settingIsSet(SETTINGS_KEYS.UPDATE_CHECKING_ENABLED)
   }
+
+  offerTour(): boolean {
+    return true
+    // !savedViewService.loading && savedViewService.dashboardViews.length == 0
+  }
 }

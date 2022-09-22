@@ -1,6 +1,6 @@
 import { SettingsService } from './services/settings.service'
 import { SETTINGS_KEYS } from './data/paperless-uisettings'
-import { Component, OnDestroy, OnInit } from '@angular/core'
+import { Component, OnDestroy, OnInit, Renderer2 } from '@angular/core'
 import { Router } from '@angular/router'
 import { Subscription } from 'rxjs'
 import { ConsumerStatusService } from './services/consumer-status.service'
@@ -8,6 +8,7 @@ import { ToastService } from './services/toast.service'
 import { NgxFileDropEntry } from 'ngx-file-drop'
 import { UploadDocumentsService } from './services/upload-documents.service'
 import { TasksService } from './services/tasks.service'
+import { TourService } from 'ngx-ui-tour-ng-bootstrap'
 
 @Component({
   selector: 'app-root',
@@ -29,7 +30,9 @@ export class AppComponent implements OnInit, OnDestroy {
     private toastService: ToastService,
     private router: Router,
     private uploadDocumentsService: UploadDocumentsService,
-    private tasksService: TasksService
+    private tasksService: TasksService,
+    public tourService: TourService,
+    private renderer: Renderer2
   ) {
     let anyWindow = window as any
     anyWindow.pdfWorkerSrc = 'assets/js/pdf.worker.min.js'
@@ -112,6 +115,40 @@ export class AppComponent implements OnInit, OnDestroy {
           })
         }
       })
+
+    this.tourService.initialize([
+      {
+        anchorId: 'tour.intro',
+        title: `Hello ${this.settings.displayName}, welcome to Paperless-ngx!`,
+        content:
+          "Here's a tutorial to guide you around some of Paperless-ngx's most useful features.",
+        route: '/dashboard',
+      },
+      {
+        anchorId: 'tour.dashboard',
+        title: 'The Dashboard',
+        content: "Here's some dashboard info",
+        route: '/dashboard',
+      },
+      {
+        anchorId: 'tour.documents',
+        title: 'Documents List',
+        content: "Here's some dashboard info",
+        route: '/documents',
+        delayAfterNavigation: 500,
+      },
+    ])
+
+    this.tourService.start$.subscribe(() => {
+      this.renderer.addClass(document.body, 'tour-active')
+    })
+
+    this.tourService.end$.subscribe(() => {
+      // animation time
+      setTimeout(() => {
+        this.renderer.removeClass(document.body, 'tour-active')
+      }, 500)
+    })
   }
 
   public get dragDropEnabled(): boolean {
