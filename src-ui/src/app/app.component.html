@@ -11,3 +11,27 @@
         </div>
     </ng-template>
 </ngx-file-drop>
+
+<tour-step-template>
+    <ng-template #tourStep let-step="step">
+        <p class="tour-step-content" [innerHTML]="step?.content"></p>
+        <div class="d-flex justify-content-between align-items-end">
+            <span class="badge bg-secondary">{{ tourService.steps?.indexOf(step) + 1 }}/{{ tourService.steps?.length }}</span>
+            <div class="tour-step-navigation btn-toolbar" role="toolbar" aria-label="Controls">
+                <div class="btn-group me-2" role="group" aria-label="Dismiss">
+                    <button class="btn btn-outline-danger btn-sm" (click)="tourService.end()">
+                        {{ step?.endBtnTitle }}
+                    </button>
+                </div>
+                <div class="btn-group align-self-end" role="group" aria-label="Previous / Next">
+                    <button *ngIf="tourService.hasPrev(step)" class="btn btn-outline-primary btn-sm" (click)="tourService.prev()">
+                        « {{ step?.prevBtnTitle }}
+                    </button>
+                    <button *ngIf="tourService.hasNext(step)" class="btn btn-outline-primary btn-sm" (click)="tourService.next()">
+                        {{ step?.nextBtnTitle }} »
+                    </button>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+</tour-step-template>

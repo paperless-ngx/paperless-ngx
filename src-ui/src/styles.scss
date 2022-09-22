@@ -479,6 +479,12 @@ table.table {
   user-select: none !important;
 }
 
+.alert-primary {
+  --bs-alert-color: var(--bs-primary);
+  --bs-alert-bg: var(--pngx-primary-faded);
+  --bs-alert-border-color: var(--bs-primary);
+}
+
 .alert-danger {
   color: var(--bs-body-color);
   background-color: var(--bs-danger);
@@ -496,12 +502,21 @@ table.table {
 }
 
 .popover {
+  background-color: var(--pngx-bg-alt);
+  .popover-header {
+    background-color: var(--pngx-bg-alt);
+  }
   .popover-header,
   .popover-body {
-    background-color: var(--pngx-bg-alt);
     border-color: var(--bs-border-color);
     color: var(--bs-body-color);
   }
+}
+
+// Tour popovers
+.tour-active .popover {
+  min-width: 400px;
+  margin: 0 .25rem .25rem !important;
 }
 
 // fix popover carat colors

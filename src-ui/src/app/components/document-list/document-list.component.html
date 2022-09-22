@@ -75,9 +75,11 @@
 </app-page-header>
 
 <div class="row sticky-top pt-3 pt-sm-4 pb-2 pb-lg-4 bg-body">
+  <div tourAnchor="tour.documents"></div>
   <app-filter-editor [hidden]="isBulkEditing" [(filterRules)]="list.filterRules" [unmodifiedFilterRules]="unmodifiedFilterRules" #filterEditor></app-filter-editor>
   <app-bulk-editor [hidden]="!isBulkEditing"></app-bulk-editor>
 </div>
+
 
 <ng-template #pagination>
   <div class="d-flex justify-content-between align-items-center">
@@ -103,7 +105,6 @@
 </ng-container>
 
 <ng-template #documentListNoError>
-
   <div *ngIf="displayMode == 'largeCards'">
     <app-document-card-large [selected]="list.isSelected(d)" (toggleSelected)="toggleSelected(d, $event)" *ngFor="let d of list.documents; trackBy: trackByDocumentId" [document]="d" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)" (clickDocumentType)="clickDocumentType($event)" (clickStoragePath)="clickStoragePath($event)" (clickMoreLike)="clickMoreLike(d.id)">
     </app-document-card-large>
