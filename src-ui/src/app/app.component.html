@@ -15,6 +15,7 @@
 <tour-step-template>
     <ng-template #tourStep let-step="step">
         <p class="tour-step-content" [innerHTML]="step?.content"></p>
+        <hr/>
         <div class="d-flex justify-content-between align-items-center">
             <span class="badge bg-light text-dark">{{ tourService.steps?.indexOf(step) + 1 }} / {{ tourService.steps?.length }}</span>
             <div class="tour-step-navigation btn-toolbar" role="toolbar" aria-label="Controls">
