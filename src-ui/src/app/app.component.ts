@@ -121,6 +121,7 @@ export class AppComponent implements OnInit, OnDestroy {
         anchorId: 'tour.dashboard',
         content: $localize`The dashboard can be used to show saved views, such as an 'Inbox'. Those settings are found under Settings > Saved Views once you have created some.`,
         route: '/dashboard',
+        placement: 'bottom',
       },
       {
         anchorId: 'tour.upload-widget',
@@ -130,20 +131,20 @@ export class AppComponent implements OnInit, OnDestroy {
       {
         anchorId: 'tour.documents',
         content: $localize`The documents list shows all of your documents and allows for filtering as well as bulk-editing. There are three different view styles: list, small cards and large cards. A list of documents currently opened for editing is shown in the sidebar.`,
-        route: '/documents',
+        route: '/documents?sort=created&reverse=1&page=1',
         delayAfterNavigation: 500,
         placement: 'bottom',
       },
       {
         anchorId: 'tour.documents-filter-editor',
         content: $localize`The filtering tools allow you to quickly find documents using various searches, dates, tags, etc.`,
-        route: '/documents',
+        route: '/documents?sort=created&reverse=1&page=1',
         placement: 'bottom',
       },
       {
         anchorId: 'tour.documents-views',
         content: $localize`Any combination of filters can be saved as a 'view' which can then be displayed on the dashboard and / or sidebar.`,
-        route: '/documents',
+        route: '/documents?sort=created&reverse=1&page=1',
       },
       {
         anchorId: 'tour.tags',
