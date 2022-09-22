@@ -1,10 +1,11 @@
-<ngb-alert type="primary" [dismissible]="false">
+<ngb-alert type="primary" [dismissible]="false" tourAnchor="tour.dashboard">
   <!-- [dismissible]="isFinished(status)" (closed)="dismiss(status)" -->
-  <h4 class="alert-heading" i18n>Paperless-ngx is running!</h4>
-  <p i18n>You're ready to start uploading documents! Feel free to explore the various features or start a quick tour using the button below.</p>
-  <p i18n>More detail on how to use and configure paperless is always available in the <a href="https://paperless-ngx.readthedocs.io" target="_blank">documentation</a>.</p>
+  <h4 class="alert-heading"><ng-container i18n>Paperless-ngx is running!</ng-container> 🎉</h4>
+  <p i18n>You're ready to start uploading documents! Explore the various features of this web app on your own, or start a quick tour using the button below.</p>
+  <p i18n>More detail on how to use and configure Paperless-ngx is always available in the <a href="https://paperless-ngx.readthedocs.io" target="_blank">documentation</a>.</p>
   <hr>
-  <div class="btn-toolbar" role="toolbar" aria-label="Controls">
-    <button class="btn btn-primary ms-auto" (click)="tourService.start()"><ng-container i18n>Start Tour</ng-container> &rarr;</button>
+  <div class="d-flex align-items-end">
+    <p class="lead fs-6 m-0"><em i18n>Thanks for being a part of the Paperless-ngx community!</em></p>
+    <button class="btn btn-primary ms-auto flex-shrink-0" (click)="tourService.start()"><ng-container i18n>Start the tour</ng-container> &rarr;</button>
   </div>
 </ngb-alert>

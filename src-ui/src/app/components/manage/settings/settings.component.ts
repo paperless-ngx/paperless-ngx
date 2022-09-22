@@ -28,7 +28,7 @@ import {
 import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 import { ActivatedRoute } from '@angular/router'
 import { ViewportScroller } from '@angular/common'
-import { ForwardRefHandling } from '@angular/compiler'
+import { TourService } from 'ngx-ui-tour-ng-bootstrap'
 
 @Component({
   selector: 'app-settings',
@@ -86,7 +86,8 @@ export class SettingsComponent
     private settings: SettingsService,
     @Inject(LOCALE_ID) public currentLocale: string,
     private viewportScroller: ViewportScroller,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    public readonly tourService: TourService,
   ) {
     this.settings.settingsSaved.subscribe(() => {
       if (!this.savePending) this.initialize()
