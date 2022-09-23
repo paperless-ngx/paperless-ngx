@@ -312,7 +312,7 @@ class DocumentClassifier:
         content = re.sub(r"[^\w\s]", " ", content)
 
         # If the NLTK language is supported, do further processing
-        if settings.NLTK_LANGUAGE is not None:
+        if settings.NLTK_LANGUAGE is not None and settings.NLTK_ENABLED:
 
             import nltk
 
