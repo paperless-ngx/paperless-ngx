@@ -774,6 +774,8 @@ configuring some options in paperless can help improve performance immensely:
     OCR results.
 *   If using docker, consider setting ``PAPERLESS_WEBSERVER_WORKERS`` to
     1. This will save some memory.
+*   Consider setting ``PAPERLESS_ENABLE_NLTK`` to false, to disable the more
+    advanced language processing, which can take more memory and processing time.
 
 For details, refer to :ref:`configuration`.
 

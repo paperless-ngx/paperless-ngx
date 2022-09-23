@@ -709,6 +709,10 @@ ENABLE_UPDATE_CHECK = os.getenv("PAPERLESS_ENABLE_UPDATE_CHECK", "default")
 if ENABLE_UPDATE_CHECK != "default":
     ENABLE_UPDATE_CHECK = __get_boolean("PAPERLESS_ENABLE_UPDATE_CHECK")
 
+###############################################################################
+# Machine Learning                                                            #
+###############################################################################
+
 
 def _get_nltk_language_setting(ocr_lang: str) -> Optional[str]:
     """
@@ -734,5 +738,7 @@ def _get_nltk_language_setting(ocr_lang: str) -> Optional[str]:
 
     return iso_code_to_nltk.get(ocr_lang, None)
 
+
+NLTK_ENABLED: Final[bool] = __get_boolean("PAPERLESS_ENABLE_NLTK", "yes")
 
 NLTK_LANGUAGE: Optional[str] = _get_nltk_language_setting(OCR_LANGUAGE)
