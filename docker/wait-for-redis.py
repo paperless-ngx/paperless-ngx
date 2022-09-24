@@ -8,8 +8,11 @@ import os
 import sys
 import time
 from typing import Final
+from urllib.parse import parse_qs
+from urllib.parse import urlparse
 
 from redis import Redis
+from redis import Sentinel
 
 if __name__ == "__main__":
 
@@ -20,8 +23,38 @@ if __name__ == "__main__":
 
     print(f"Waiting for Redis...", flush=True)
 
+    url = urlparse(REDIS_URL)
+    scheme_split = url.scheme.split("+")
+    if "sentinel" in scheme_split:
+        query = parse_qs(url.query)
+        connection_kwargs = {
+            "username": url.username,  # redis node username
+            "password": url.password,  # redis node password
+            "ssl": ("rediss" in scheme_split),
+            "db": url.path[1:],
+        }
+        if "rediss" in scheme_split:
+            connection_kwargs["ssl_cert_reqs"] = query.get(
+                "ssl_cert_reqs",
+                ["required"],
+            )[0]
+
+        sentinel = Sentinel(
+            [(url.hostname, url.port)],
+            sentinel_kwargs={
+                "username": query.get("sentinelusername", [""])[0],
+                "password": query.get("sentinelpassword", [""])[0],
+                "ssl": ("rediss" in scheme_split),
+                "ssl_cert_reqs": query.get("ssl_cert_reqs", ["required"])[0],
+            },
+            **connection_kwargs,
+        )
+        client = sentinel.master_for(query.get("mastername", ["mymaster"])[0])
+    else:
+        client = Redis.from_url(url=REDIS_URL)
+
     attempt = 0
-    with Redis.from_url(url=REDIS_URL) as client:
+    with client:
         while attempt < MAX_RETRY_COUNT:
             try:
                 client.ping()

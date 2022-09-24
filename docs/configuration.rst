@@ -27,6 +27,9 @@ PAPERLESS_REDIS=<url>
     This is required for processing scheduled tasks such as email fetching, index
     optimization and for training the automatic document matcher.
 
+    Sentinel is supported, using `redis+sentinel` scheme, for example
+    `redis+sentinel://localhost:26379/0?mastername=mymaster&sentinelusername=user&sentinelpassword=pass`
+
     Defaults to redis://localhost:6379.
 
 PAPERLESS_DBENGINE=<engine_name>

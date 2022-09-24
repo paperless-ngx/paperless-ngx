@@ -4,10 +4,12 @@ import math
 import multiprocessing
 import os
 import re
+import ssl
 import tempfile
 from typing import Final
 from typing import Optional
 from typing import Set
+from urllib.parse import parse_qs
 from urllib.parse import urlparse
 
 from concurrent_log_handler.queue import setup_logging_queues
@@ -196,14 +198,62 @@ TEMPLATES = [
     },
 ]
 
+_redis_url = os.getenv("PAPERLESS_REDIS", "redis://localhost:6379")
+_redis_url_parsed = urlparse(_redis_url)
+_scheme_split = _redis_url_parsed.scheme.split("+")
+
+if "sentinel" in _scheme_split:
+    _redis_url_query = parse_qs(_redis_url_parsed.query)
+    _redis_ssl = None
+    if "rediss" in _scheme_split:
+        _redis_ssl = ssl.create_default_context()
+        _redis_ssl_cert_reqs = (_redis_url_query.get("ssl_cert_reqs", ["required"])[0],)
+        if _redis_ssl_cert_reqs == "optional":
+            _redis_ssl.check_hostname = False
+            _redis_ssl.verify_mode = ssl.CERT_OPTIONAL
+        elif _redis_ssl_cert_reqs == "none":
+            _redis_ssl.check_hostname = False
+            _redis_ssl.verify_mode = ssl.CERT_NONE
+        else:
+            _redis_ssl.check_hostname = True
+            _redis_ssl.verify_mode = ssl.CERT_REQUIRED
+
+    _redis_config = {
+        "hosts": [
+            {
+                "sentinels": [
+                    {
+                        "host": _redis_url_parsed.hostname,
+                        "port": _redis_url_parsed.port,
+                        "username": _redis_url_query.get("sentinelusername", [""])[0],
+                        "password": _redis_url_query.get("sentinelpassword", [""])[0],
+                        "ssl": ("rediss" in _scheme_split),
+                        "ssl_cert_reqs": _redis_url_query.get(
+                            "ssl_cert_reqs",
+                            ["required"],
+                        )[0],
+                    },
+                ],
+                "master_name": _redis_url_query.get("mastername", ["mymaster"])[0],
+                "db": _redis_url_parsed.path[1:],
+                "username": _redis_url_parsed.username,
+                "password": _redis_url_parsed.password,
+                "ssl": _redis_ssl,
+            },
+        ],
+    }
+else:
+    _redis_config = {
+        "hosts": [_redis_url],
+        "capacity": 2000,  # default 100
+        "expiry": 15,  # default 60
+    }
+
+
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [os.getenv("PAPERLESS_REDIS", "redis://localhost:6379")],
-            "capacity": 2000,  # default 100
-            "expiry": 15,  # default 60
-        },
+        "CONFIG": _redis_config,
     },
 }
 
@@ -476,6 +526,7 @@ Q_CLUSTER = {
     "workers": TASK_WORKERS,
     "redis": os.getenv("PAPERLESS_REDIS", "redis://localhost:6379"),
     "log_level": "DEBUG" if DEBUG else "INFO",
+    "broker_class": "paperless.brokers.RedisSentinelBroker",
 }
 
 

@@ -231,6 +231,7 @@ Install Paperless from Docker Hub
           * PAPERLESS_ADMIN_USER
           * PAPERLESS_ADMIN_MAIL
           * PAPERLESS_ADMIN_PASSWORD
+          * PAPERLESS_REDIS
 
     .. caution::
 
