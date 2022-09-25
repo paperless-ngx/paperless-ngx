@@ -27,10 +27,33 @@ PAPERLESS_REDIS=<url>
     This is required for processing scheduled tasks such as email fetching, index
     optimization and for training the automatic document matcher.
 
-    Sentinel is supported, using `redis+sentinel` scheme, for example
-    `redis+sentinel://localhost:26379/0?mastername=mymaster&sentinelusername=user&sentinelpassword=pass`
+    Sentinel is supported, using `sentinel` scheme, with hosts separated by
+    semicolon, for example:
+    `sentinel://localhost:26379;sentinel://localhost:26380;sentinel://localhost:26381`
 
     Defaults to redis://localhost:6379.
+
+PAPERLESS_REDIS_SENTINEL=<query params formatted string>
+
+    This are extra options for sentinel configuration, formatted as query
+    string, for example:
+    `master_name=mymaster&ssl=true&sentinel_password=mypass&ssl_cert_reqs=none`
+
+    Supported parameters are:
+
+    * `master_name` - sentinel master name, defaults to `mymaster`
+    * `redis_db` - db number for underlying redis instances, defaults to `0`
+    * `redis_password` - password for underlying redis instances, empty by
+      default
+    * `redis_username` - username for underlying redis instances, empty by
+      default
+    * `sentinel_password` - password for sentinel, empty by default
+    * `sentinel_username` - username for sentinel, empty by default
+    * `ssl` - use SSL when connecting to both redis and sentinel, every value
+      different than `false` expands to `true` - default is `true`
+    * `ssl_cert_reqs` - for ssl only, strict certificate verification config -
+      allowed options are `required`, `optional` or `none` - default is
+      `required`
 
 PAPERLESS_DBENGINE=<engine_name>
     Optional, gives the ability to choose Postgres or MariaDB for database engine.

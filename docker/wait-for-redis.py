@@ -11,47 +11,31 @@ from typing import Final
 from urllib.parse import parse_qs
 from urllib.parse import urlparse
 
-from redis import Redis
-from redis import Sentinel
+for path in [
+    "/usr/src/paperless",
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+]:
+    helpers_lib = path + "/src/paperless/helpers.py"
+    if os.path.exists(helpers_lib):
+        with open(helpers_lib, "rb") as source_file:
+            code = compile(source_file.read(), helpers_lib, "exec")
+        exec(code)
+        break
 
 if __name__ == "__main__":
 
     MAX_RETRY_COUNT: Final[int] = 5
     RETRY_SLEEP_SECONDS: Final[int] = 5
 
-    REDIS_URL: Final[str] = os.getenv("PAPERLESS_REDIS", "redis://localhost:6379")
+    PAPERLESS_REDIS: Final[str] = os.getenv("PAPERLESS_REDIS", "redis://localhost:6379")
+    PAPERLESS_REDIS_SENTINEL: Final[str] = os.getenv(
+        "PAPERLESS_REDIS_SENTINEL",
+        "master_name=mymaster",
+    )
 
     print(f"Waiting for Redis...", flush=True)
 
-    url = urlparse(REDIS_URL)
-    scheme_split = url.scheme.split("+")
-    if "sentinel" in scheme_split:
-        query = parse_qs(url.query)
-        connection_kwargs = {
-            "username": url.username,  # redis node username
-            "password": url.password,  # redis node password
-            "ssl": ("rediss" in scheme_split),
-            "db": url.path[1:],
-        }
-        if "rediss" in scheme_split:
-            connection_kwargs["ssl_cert_reqs"] = query.get(
-                "ssl_cert_reqs",
-                ["required"],
-            )[0]
-
-        sentinel = Sentinel(
-            [(url.hostname, url.port)],
-            sentinel_kwargs={
-                "username": query.get("sentinelusername", [""])[0],
-                "password": query.get("sentinelpassword", [""])[0],
-                "ssl": ("rediss" in scheme_split),
-                "ssl_cert_reqs": query.get("ssl_cert_reqs", ["required"])[0],
-            },
-            **connection_kwargs,
-        )
-        client = sentinel.master_for(query.get("mastername", ["mymaster"])[0])
-    else:
-        client = Redis.from_url(url=REDIS_URL)
+    client = build_redis_client(PAPERLESS_REDIS, PAPERLESS_REDIS_SENTINEL)
 
     attempt = 0
     with client:

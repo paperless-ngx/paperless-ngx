@@ -1,11 +1,9 @@
-from urllib.parse import parse_qs
-from urllib.parse import urlparse
-
 import redis
+from django.conf import settings
 from django_q.brokers.redis_broker import Redis as RedisBroker
 from django_q.conf import Conf
+from paperless.helpers import build_redis_client
 from redis import Redis
-from redis import Sentinel
 
 
 class RedisSentinelBroker(RedisBroker):
@@ -84,32 +82,7 @@ class RedisSentinelBroker(RedisBroker):
         if not isinstance(Conf.REDIS, str):
             return RedisBroker.get_connection(list_key)
 
-        url = urlparse(Conf.REDIS)
-        scheme_split = url.scheme.split("+")
-        if "sentinel" not in scheme_split:
-            return RedisBroker.get_connection(list_key)
-
-        query = parse_qs(url.query)
-        connection_kwargs = {
-            "username": url.username,  # redis node username
-            "password": url.password,  # redis node password
-            "ssl": ("rediss" in scheme_split),
-            "db": url.path[1:],
-        }
-        if "rediss" in scheme_split:
-            connection_kwargs["ssl_cert_reqs"] = query.get(
-                "ssl_cert_reqs",
-                ["required"],
-            )[0]
-
-        sentinel = Sentinel(
-            [(url.hostname, url.port)],
-            sentinel_kwargs={
-                "username": query.get("sentinelusername", [""])[0],
-                "password": query.get("sentinelpassword", [""])[0],
-                "ssl": ("rediss" in scheme_split),
-                "ssl_cert_reqs": query.get("ssl_cert_reqs", ["required"])[0],
-            },
-            **connection_kwargs,
+        return build_redis_client(
+            Conf.REDIS,
+            settings.Q_CLUSTER.get("sentinel", "master_name=mymaster"),
         )
-        return sentinel.master_for(query.get("mastername", ["mymaster"])[0])
