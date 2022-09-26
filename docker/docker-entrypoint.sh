@@ -50,6 +50,7 @@ map_folders() {
 	# Export these so they can be used in docker-prepare.sh
 	export DATA_DIR="${PAPERLESS_DATA_DIR:-/usr/src/paperless/data}"
 	export MEDIA_ROOT_DIR="${PAPERLESS_MEDIA_ROOT:-/usr/src/paperless/media}"
+	export CONSUME_DIR="${PAPERLESS_CONSUMPTION_DIR:-/usr/src/paperless/consume}"
 }
 
 initialize() {
@@ -77,7 +78,11 @@ initialize() {
 
 	local export_dir="/usr/src/paperless/export"
 
-	for dir in "${export_dir}" "${DATA_DIR}" "${DATA_DIR}/index" "${MEDIA_ROOT_DIR}" "${MEDIA_ROOT_DIR}/documents" "${MEDIA_ROOT_DIR}/documents/originals" "${MEDIA_ROOT_DIR}/documents/thumbnails"; do
+	for dir in \
+		"${export_dir}" \
+		"${DATA_DIR}" "${DATA_DIR}/index" \
+		"${MEDIA_ROOT_DIR}" "${MEDIA_ROOT_DIR}/documents" "${MEDIA_ROOT_DIR}/documents/originals" "${MEDIA_ROOT_DIR}/documents/thumbnails" \
+		"${CONSUME_DIR}"; do
 		if [[ ! -d "${dir}" ]]; then
 			echo "Creating directory ${dir}"
 			mkdir "${dir}"
@@ -91,7 +96,11 @@ initialize() {
 	set +e
 	echo "Adjusting permissions of paperless files. This may take a while."
 	chown -R paperless:paperless ${tmp_dir}
-	for dir in "${export_dir}" "${DATA_DIR}" "${MEDIA_ROOT_DIR}"; do
+	for dir in \
+		"${export_dir}" \
+		"${DATA_DIR}" \
+		"${MEDIA_ROOT_DIR}" \
+		"${CONSUME_DIR}"; do
 		find "${dir}" -not \( -user paperless -and -group paperless \) -exec chown paperless:paperless {} +
 	done
 	set -e
