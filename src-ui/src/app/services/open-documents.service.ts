@@ -92,9 +92,14 @@ export class OpenDocumentsService {
     }
   }
 
-  setDirty(documentId: number, dirty: boolean) {
-    if (dirty) this.dirtyDocuments.add(documentId)
-    else this.dirtyDocuments.delete(documentId)
+  setDirty(doc: PaperlessDocument, dirty: boolean) {
+    if (!this.openDocuments.find((d) => d.id == doc.id)) return
+    if (dirty) this.dirtyDocuments.add(doc.id)
+    else this.dirtyDocuments.delete(doc.id)
+  }
+
+  hasDirty(): boolean {
+    return this.dirtyDocuments.size > 0
   }
 
   closeDocument(doc: PaperlessDocument): Observable<boolean> {

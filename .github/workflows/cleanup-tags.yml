@@ -1,3 +1,8 @@
+# This workflow runs on certain conditions to check for and potentially
+# delete container images from the GHCR which no longer have an associated
+# code branch.
+# Requires a PAT with the correct scope set in the secrets
+
 name: Cleanup Image Tags
 
 on:
@@ -11,17 +16,16 @@ on:
     paths:
       - ".github/workflows/cleanup-tags.yml"
       - ".github/scripts/cleanup-tags.py"
+      - ".github/scripts/github.py"
       - ".github/scripts/common.py"
-
-env:
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   cleanup:
     name: Cleanup Image Tags
     runs-on: ubuntu-20.04
-    permissions:
-      packages: write
+    env:
+      # Requires a personal access token with the OAuth scope delete:packages
+      TOKEN: ${{ secrets.GHA_CONTAINER_DELETE_TOKEN }}
     steps:
       -
         name: Checkout
@@ -37,12 +41,68 @@ jobs:
         name: Set up Python
         uses: actions/setup-python@v3
         with:
-          python-version: "3.9"
+          python-version: "3.10"
       -
         name: Install requests
         run: |
           python -m pip install requests
+      # Clean up primary packages
       -
-        name: Cleanup feature tags
+        name: Cleanup for package "paperless-ngx"
+        if: "${{ env.TOKEN != '' }}"
         run: |
-          python ${GITHUB_WORKSPACE}/.github/scripts/cleanup-tags.py --loglevel info --delete
+          python ${GITHUB_WORKSPACE}/.github/scripts/cleanup-tags.py --loglevel info --untagged --is-manifest --delete "paperless-ngx"
+      -
+        name: Cleanup for package "qpdf"
+        if: "${{ env.TOKEN != '' }}"
+        run: |
+          python ${GITHUB_WORKSPACE}/.github/scripts/cleanup-tags.py --loglevel info --untagged --is-manifest --delete "paperless-ngx/builder/qpdf"
+      -
+        name: Cleanup for package "pikepdf"
+        if: "${{ env.TOKEN != '' }}"
+        run: |
+          python ${GITHUB_WORKSPACE}/.github/scripts/cleanup-tags.py --loglevel info --untagged --is-manifest --delete "paperless-ngx/builder/pikepdf"
+      -
+        name: Cleanup for package "jbig2enc"
+        if: "${{ env.TOKEN != '' }}"
+        run: |
+          python ${GITHUB_WORKSPACE}/.github/scripts/cleanup-tags.py --loglevel info --untagged --is-manifest --delete "paperless-ngx/builder/jbig2enc"
+      -
+        name: Cleanup for package "psycopg2"
+        if: "${{ env.TOKEN != '' }}"
+        run: |
+          python ${GITHUB_WORKSPACE}/.github/scripts/cleanup-tags.py --loglevel info --untagged --is-manifest --delete "paperless-ngx/builder/psycopg2"
+      #
+      # Clean up registry cache packages
+      #
+      -
+        name: Cleanup for package "builder/cache/app"
+        if: "${{ env.TOKEN != '' }}"
+        run: |
+          python ${GITHUB_WORKSPACE}/.github/scripts/cleanup-tags.py --loglevel info --untagged --delete "paperless-ngx/builder/cache/app"
+      -
+        name: Cleanup for package "builder/cache/qpdf"
+        if: "${{ env.TOKEN != '' }}"
+        run: |
+          python ${GITHUB_WORKSPACE}/.github/scripts/cleanup-tags.py --loglevel info --untagged --delete "paperless-ngx/builder/cache/qpdf"
+      -
+        name: Cleanup for package "builder/cache/psycopg2"
+        if: "${{ env.TOKEN != '' }}"
+        run: |
+          python ${GITHUB_WORKSPACE}/.github/scripts/cleanup-tags.py --loglevel info --untagged --delete "paperless-ngx/builder/cache/psycopg2"
+      -
+        name: Cleanup for package "builder/cache/jbig2enc"
+        if: "${{ env.TOKEN != '' }}"
+        run: |
+          python ${GITHUB_WORKSPACE}/.github/scripts/cleanup-tags.py --loglevel info --untagged --delete "paperless-ngx/builder/cache/jbig2enc"
+      -
+        name: Cleanup for package "builder/cache/pikepdf"
+        if: "${{ env.TOKEN != '' }}"
+        run: |
+          python ${GITHUB_WORKSPACE}/.github/scripts/cleanup-tags.py --loglevel info --untagged --delete "paperless-ngx/builder/cache/pikepdf"
+      -
+        name: Check all tags still pull
+        run: |
+          ghcr_name=$(echo "${GITHUB_REPOSITORY}" | awk '{ print tolower($0) }')
+          echo "Pulling all tags of ghcr.io/${ghcr_name}"
+          docker pull --quiet --all-tags ghcr.io/${ghcr_name}

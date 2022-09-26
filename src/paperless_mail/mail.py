@@ -1,9 +1,9 @@
 import os
+import re
 import tempfile
 from datetime import date
 from datetime import timedelta
 from fnmatch import fnmatch
-from imaplib import IMAP4
 
 import magic
 import pathvalidate
@@ -19,6 +19,7 @@ from imap_tools import MailboxFolderSelectError
 from imap_tools import MailBoxUnencrypted
 from imap_tools import MailMessage
 from imap_tools import MailMessageFlags
+from imap_tools import NOT
 from imap_tools.mailbox import MailBoxTls
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
@@ -67,10 +68,14 @@ class TagMailAction(BaseMailAction):
         self.keyword = parameter
 
     def get_criteria(self):
-        return {"no_keyword": self.keyword}
+        return {"no_keyword": self.keyword, "gmail_label": self.keyword}
 
     def post_consume(self, M: MailBox, message_uids, parameter):
-        M.flag(message_uids, [self.keyword], True)
+        if re.search(r"gmail\.com$|googlemail\.com$", M._host):
+            for uid in message_uids:
+                M.client.uid("STORE", uid, "X-GM-LABELS", self.keyword)
+        else:
+            M.flag(message_uids, [self.keyword], True)
 
 
 def get_rule_action(rule):
@@ -181,28 +186,17 @@ class MailAccountHandler(LoggingMixin):
 
                 except UnicodeEncodeError:
                     self.log("debug", "Falling back to AUTH=PLAIN")
-                    try:
-                        # rfc2595 section 6 - PLAIN SASL mechanism
-                        client: IMAP4 = M.client
-                        encoded = (
-                            b"\0"
-                            + account.username.encode("utf8")
-                            + b"\0"
-                            + account.password.encode("utf8")
-                        )
-                        # Assumption is the server supports AUTH=PLAIN capability
-                        # Could check the list with client.capability(), but then what?
-                        # We're failing anyway then
-                        client.authenticate("PLAIN", lambda x: encoded)
 
-                        # Need to transition out of AUTH state to SELECTED
-                        M.folder.set("INBOX")
-                    except Exception:
+                    try:
+                        M.login_utf8(account.username, account.password)
+                    except Exception as err:
                         self.log(
                             "error",
                             "Unable to authenticate with mail server using AUTH=PLAIN",
                         )
-                        raise MailError(f"Error while authenticating account {account}")
+                        raise MailError(
+                            f"Error while authenticating account {account}",
+                        ) from err
                 except Exception as e:
                     self.log(
                         "error",
@@ -245,7 +239,7 @@ class MailAccountHandler(LoggingMixin):
 
         try:
             M.folder.set(rule.folder)
-        except MailboxFolderSelectError:
+        except MailboxFolderSelectError as err:
 
             self.log(
                 "error",
@@ -264,23 +258,30 @@ class MailAccountHandler(LoggingMixin):
             raise MailError(
                 f"Rule {rule}: Folder {rule.folder} "
                 f"does not exist in account {rule.account}",
-            )
+            ) from err
 
         criterias = make_criterias(rule)
+        criterias_imap = AND(**criterias)
+        if "gmail_label" in criterias:
+            gmail_label = criterias["gmail_label"]
+            del criterias["gmail_label"]
+            criterias_imap = AND(NOT(gmail_label=gmail_label), **criterias)
 
         self.log(
             "debug",
-            f"Rule {rule}: Searching folder with criteria " f"{str(AND(**criterias))}",
+            f"Rule {rule}: Searching folder with criteria " f"{str(criterias_imap)}",
         )
 
         try:
             messages = M.fetch(
-                criteria=AND(**criterias),
+                criteria=criterias_imap,
                 mark_seen=False,
                 charset=rule.account.character_set,
             )
-        except Exception:
-            raise MailError(f"Rule {rule}: Error while fetching folder {rule.folder}")
+        except Exception as err:
+            raise MailError(
+                f"Rule {rule}: Error while fetching folder {rule.folder}",
+            ) from err
 
         post_consume_messages = []
 
@@ -320,7 +321,7 @@ class MailAccountHandler(LoggingMixin):
         except Exception as e:
             raise MailError(
                 f"Rule {rule}: Error while processing post-consume actions: " f"{e}",
-            )
+            ) from e
 
         return total_processed_files
 

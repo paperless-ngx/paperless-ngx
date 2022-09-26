@@ -206,7 +206,7 @@ export class DocumentDetailComponent
                   this.store.getValue().title !==
                   this.documentForm.get('title').value
                 ) {
-                  this.openDocumentService.setDirty(doc.id, true)
+                  this.openDocumentService.setDirty(doc, true)
                 }
               },
             })
@@ -228,12 +228,15 @@ export class DocumentDetailComponent
             this.store.asObservable()
           )
 
-          return this.isDirty$.pipe(map((dirty) => ({ doc, dirty })))
+          return this.isDirty$.pipe(
+            takeUntil(this.unsubscribeNotifier),
+            map((dirty) => ({ doc, dirty }))
+          )
         })
       )
       .subscribe({
         next: ({ doc, dirty }) => {
-          this.openDocumentService.setDirty(doc.id, dirty)
+          this.openDocumentService.setDirty(doc, dirty)
         },
         error: (error) => {
           this.router.navigate(['404'])
@@ -349,7 +352,7 @@ export class DocumentDetailComponent
           Object.assign(this.document, doc)
           this.title = doc.title
           this.documentForm.patchValue(doc)
-          this.openDocumentService.setDirty(doc.id, false)
+          this.openDocumentService.setDirty(doc, false)
         },
         error: () => {
           this.router.navigate(['404'])
@@ -547,5 +550,9 @@ export class DocumentDetailComponent
     if ('Enter' == event.key) {
       this.password = (event.target as HTMLInputElement).value
     }
+  }
+
+  get commentsEnabled(): boolean {
+    return this.settings.get(SETTINGS_KEYS.COMMENTS_ENABLED)
   }
 }

@@ -276,7 +276,10 @@ class RasterisedDocumentParser(DocumentParser):
             self.log("debug", f"Calling OCRmyPDF with args: {args}")
             ocrmypdf.ocr(**args)
 
-            self.archive_path = archive_path
+            # Only create archive file if archiving isn't being skipped
+            if settings.OCR_MODE != "skip_noarchive":
+                self.archive_path = archive_path
+
             self.text = self.extract_text(sidecar_file, archive_path)
 
             if not self.text:
@@ -323,11 +326,11 @@ class RasterisedDocumentParser(DocumentParser):
 
             except Exception as e:
                 # If this fails, we have a serious issue at hand.
-                raise ParseError(f"{e.__class__.__name__}: {str(e)}")
+                raise ParseError(f"{e.__class__.__name__}: {str(e)}") from e
 
         except Exception as e:
             # Anything else is probably serious.
-            raise ParseError(f"{e.__class__.__name__}: {str(e)}")
+            raise ParseError(f"{e.__class__.__name__}: {str(e)}") from e
 
         # As a last resort, if we still don't have any text for any reason,
         # try to extract the text from the original document.

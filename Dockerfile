@@ -81,6 +81,7 @@ ARG RUNTIME_PACKAGES="\
   python3-pip \
   python3-setuptools \
   postgresql-client \
+  mariadb-client \
   # For Numpy
   libatlas3-base \
   # OCRmyPDF dependencies
@@ -175,15 +176,18 @@ RUN --mount=type=bind,from=qpdf-builder,target=/qpdf \
     && python3 -m pip install --no-cache-dir /psycopg2/usr/src/wheels/psycopg2*.whl \
     && python3 -m pip list
 
+WORKDIR /usr/src/paperless/src/
+
 # Python dependencies
 # Change pretty frequently
-COPY requirements.txt ../
+COPY Pipfile* ./
 
 # Packages needed only for building a few quick Python
 # dependencies
 ARG BUILD_PACKAGES="\
   build-essential \
   git \
+  default-libmysqlclient-dev \
   python3-dev"
 
 RUN set -eux \
@@ -191,19 +195,29 @@ RUN set -eux \
     && apt-get update \
     && apt-get install --yes --quiet --no-install-recommends ${BUILD_PACKAGES} \
     && python3 -m pip install --no-cache-dir --upgrade wheel \
+  && echo "Installing pipenv" \
+    && python3 -m pip install --no-cache-dir --upgrade pipenv \
   && echo "Installing Python requirements" \
-    && python3 -m pip install --default-timeout=1000 --no-cache-dir -r ../requirements.txt \
+    # pipenv tries to be too fancy and prints so much junk
+    && pipenv requirements > requirements.txt \
+    && python3 -m pip install --default-timeout=1000 --no-cache-dir --requirement requirements.txt \
+    && rm requirements.txt \
   && echo "Cleaning up image" \
     && apt-get -y purge ${BUILD_PACKAGES} \
     && apt-get -y autoremove --purge \
     && apt-get clean --yes \
+    # Remove pipenv and its unique packages
+    && python3 -m pip uninstall --yes \
+      pipenv \
+      distlib \
+      platformdirs \
+      virtualenv \
+      virtualenv-clone \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /tmp/* \
     && rm -rf /var/tmp/* \
     && rm -rf /var/cache/apt/archives/* \
     && truncate -s 0 /var/log/*log
-
-WORKDIR /usr/src/paperless/src/
 
 # copy backend
 COPY ./src ./

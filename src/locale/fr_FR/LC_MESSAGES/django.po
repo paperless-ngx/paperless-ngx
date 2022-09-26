@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-07-08 14:11-0700\n"
-"PO-Revision-Date: 2022-07-27 17:57\n"
+"PO-Revision-Date: 2022-09-07 21:41\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -376,7 +376,7 @@ msgstr "règles de filtrage"
 
 #: documents/models.py:521
 msgid "started"
-msgstr "commencé"
+msgstr "démarré"
 
 #: documents/serialisers.py:70
 #, python-format
@@ -394,7 +394,7 @@ msgstr "Type de fichier %(type)s non pris en charge"
 
 #: documents/serialisers.py:596
 msgid "Invalid variable detected."
-msgstr "Variable invalide détectée."
+msgstr "Variable non valide détectée."
 
 #: documents/templates/index.html:78
 msgid "Paperless-ngx is loading..."
@@ -406,7 +406,7 @@ msgstr "Toujours ici ? Hum, quelque chose a dû mal se passer."
 
 #: documents/templates/index.html:79
 msgid "Here's a link to the docs."
-msgstr "Voici un lien vers la documentation."
+msgstr "Lien vers la documentation."
 
 #: documents/templates/registration/logged_out.html:14
 msgid "Paperless-ngx signed out"

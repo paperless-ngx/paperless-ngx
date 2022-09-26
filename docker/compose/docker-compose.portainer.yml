@@ -31,7 +31,7 @@
 version: "3.4"
 services:
   broker:
-    image: docker.io/library/redis:6.0
+    image: docker.io/library/redis:7
     restart: unless-stopped
     volumes:
       - redisdata:/data

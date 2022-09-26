@@ -11,7 +11,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import DatabaseError
 from django.db import models
 from django.db.models import Q
-from django.db.utils import OperationalError
 from django.dispatch import receiver
 from django.utils import termcolors
 from django.utils import timezone
@@ -292,7 +291,7 @@ def set_storage_path(
                     )
                     + f" [{document.pk}]",
                 )
-            print(f"Sugest storage directory {selected}")
+            print(f"Suggest storage directory {selected}")
         else:
             logger.info(
                 f"Assigning storage path {selected} to {document}",
@@ -514,7 +513,9 @@ def init_paperless_task(sender, task, **kwargs):
             paperless_task.name = task["name"]
             paperless_task.created = task["started"]
             paperless_task.save()
-        except OperationalError as e:
+        except Exception as e:
+            # Don't let an exception in the signal handlers prevent
+            # a document from being consumed.
             logger.error(f"Creating PaperlessTask failed: {e}")
 
 
@@ -527,10 +528,10 @@ def paperless_task_started(sender, task, **kwargs):
             )
             paperless_task.started = timezone.now()
             paperless_task.save()
-    except OperationalError as e:
-        logger.error(f"Creating PaperlessTask failed: {e}")
     except PaperlessTask.DoesNotExist:
         pass
+    except Exception as e:
+        logger.error(f"Creating PaperlessTask failed: {e}")
 
 
 @receiver(models.signals.post_save, sender=django_q.models.Task)
@@ -542,7 +543,7 @@ def update_paperless_task(sender, instance, **kwargs):
             )
             paperless_task.attempted_task = instance
             paperless_task.save()
-    except OperationalError as e:
-        logger.error(f"Creating PaperlessTask failed: {e}")
     except PaperlessTask.DoesNotExist:
         pass
+    except Exception as e:
+        logger.error(f"Creating PaperlessTask failed: {e}")

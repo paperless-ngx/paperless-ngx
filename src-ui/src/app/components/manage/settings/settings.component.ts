@@ -44,6 +44,7 @@ export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
     notificationsConsumerSuccess: new FormControl(null),
     notificationsConsumerFailed: new FormControl(null),
     notificationsConsumerSuppressOnDashboard: new FormControl(null),
+    commentsEnabled: new FormControl(null),
   })
 
   savedViews: PaperlessSavedView[]
@@ -116,6 +117,7 @@ export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
         notificationsConsumerSuppressOnDashboard: this.settings.get(
           SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUPPRESS_ON_DASHBOARD
         ),
+        commentsEnabled: this.settings.get(SETTINGS_KEYS.COMMENTS_ENABLED),
       }
 
       for (let view of this.savedViews) {
@@ -233,6 +235,10 @@ export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
     this.settings.set(
       SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUPPRESS_ON_DASHBOARD,
       this.settingsForm.value.notificationsConsumerSuppressOnDashboard
+    )
+    this.settings.set(
+      SETTINGS_KEYS.COMMENTS_ENABLED,
+      this.settingsForm.value.commentsEnabled
     )
     this.settings.setLanguage(this.settingsForm.value.displayLanguage)
     this.settings
