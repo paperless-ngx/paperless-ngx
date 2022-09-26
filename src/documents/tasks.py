@@ -96,29 +96,13 @@ def consume_file(
     # check for separators in current document
     if settings.CONSUMER_ENABLE_BARCODES:
 
-        mime_type = barcodes.get_file_mime_type(path)
+        pdf_filepath, separators = barcodes.scan_file_for_separating_barcodes(path)
 
-        if not barcodes.supported_file_type(mime_type):
-            # if not supported, skip this routine
-            logger.warning(
-                f"Unsupported file format for barcode reader: {str(mime_type)}",
+        if separators:
+            logger.debug(
+                f"Pages with separators found in: {str(path)}",
             )
-        else:
-            separators = []
-            document_list = []
-
-            if mime_type == "image/tiff":
-                file_to_process = barcodes.convert_from_tiff_to_pdf(path)
-            else:
-                file_to_process = path
-
-            separators = barcodes.scan_file_for_separating_barcodes(file_to_process)
-
-            if separators:
-                logger.debug(
-                    f"Pages with separators found in: {str(path)}",
-                )
-                document_list = barcodes.separate_pages(file_to_process, separators)
+            document_list = barcodes.separate_pages(pdf_filepath, separators)
 
             if document_list:
                 for n, document in enumerate(document_list):
@@ -134,15 +118,13 @@ def consume_file(
                         target_dir=path.parent,
                     )
 
-                # if we got here, the document was successfully split
-                # and can safely be deleted
-                if mime_type == "image/tiff":
-                    # Remove the TIFF converted to PDF file
-                    logger.debug(f"Deleting file {file_to_process}")
-                    os.unlink(file_to_process)
-                # Remove the original file (new file is saved above)
-                logger.debug(f"Deleting file {path}")
-                os.unlink(path)
+                # Delete the PDF file which was split
+                os.remove(pdf_filepath)
+
+                # If the original was a TIFF, remove the original file as well
+                if str(pdf_filepath) != str(path):
+                    logger.debug(f"Deleting file {path}")
+                    os.unlink(path)
 
                 # notify the sender, otherwise the progress bar
                 # in the UI stays stuck

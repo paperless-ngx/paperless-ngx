@@ -224,6 +224,7 @@ Install Paperless from Docker Hub
         You can utilize Docker secrets for some configuration settings by
         appending `_FILE` to some configuration values.  This is supported currently
         only by:
+
           * PAPERLESS_DBUSER
           * PAPERLESS_DBPASS
           * PAPERLESS_SECRET_KEY
