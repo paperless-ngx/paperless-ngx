@@ -1,3 +1,4 @@
+import itertools
 import json
 import logging
 import os
@@ -21,6 +22,7 @@ from django.db.models.functions import Lower
 from django.http import Http404
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
+from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.utils.translation import get_language
 from django.views.decorators.cache import cache_control
@@ -62,6 +64,7 @@ from .matching import match_correspondents
 from .matching import match_document_types
 from .matching import match_storage_paths
 from .matching import match_tags
+from .models import Comment
 from .models import Correspondent
 from .models import Document
 from .models import DocumentType
@@ -70,6 +73,7 @@ from .models import SavedView
 from .models import StoragePath
 from .models import Tag
 from .parsers import get_parser_class_for_mime_type
+from .parsers import parse_date_generator
 from .serialisers import AcknowledgeTasksViewSerializer
 from .serialisers import BulkDownloadSerializer
 from .serialisers import BulkEditSerializer
@@ -313,6 +317,7 @@ class DocumentViewSet(
             "original_metadata": self.get_metadata(doc.source_path, doc.mime_type),
             "archive_checksum": doc.archive_checksum,
             "archive_media_filename": doc.archive_filename,
+            "original_filename": doc.original_filename,
         }
 
         if doc.has_archive_version:
@@ -329,12 +334,14 @@ class DocumentViewSet(
 
     @action(methods=["get"], detail=True)
     def suggestions(self, request, pk=None):
-        try:
-            doc = Document.objects.get(pk=pk)
-        except Document.DoesNotExist:
-            raise Http404()
+        doc = get_object_or_404(Document, pk=pk)
 
         classifier = load_classifier()
+
+        gen = parse_date_generator(doc.filename, doc.content)
+        dates = sorted(
+            {i for i in itertools.islice(gen, settings.NUMBER_OF_SUGGESTED_DATES)},
+        )
 
         return Response(
             {
@@ -344,6 +351,9 @@ class DocumentViewSet(
                     dt.id for dt in match_document_types(doc, classifier)
                 ],
                 "storage_paths": [dt.id for dt in match_storage_paths(doc, classifier)],
+                "dates": [
+                    date.strftime("%Y-%m-%d") for date in dates if date is not None
+                ],
             },
         )
 
@@ -377,6 +387,67 @@ class DocumentViewSet(
             return self.file_response(pk, request, "attachment")
         except (FileNotFoundError, Document.DoesNotExist):
             raise Http404()
+
+    def getComments(self, doc):
+        return [
+            {
+                "id": c.id,
+                "comment": c.comment,
+                "created": c.created,
+                "user": {
+                    "id": c.user.id,
+                    "username": c.user.username,
+                    "firstname": c.user.first_name,
+                    "lastname": c.user.last_name,
+                },
+            }
+            for c in Comment.objects.filter(document=doc).order_by("-created")
+        ]
+
+    @action(methods=["get", "post", "delete"], detail=True)
+    def comments(self, request, pk=None):
+        try:
+            doc = Document.objects.get(pk=pk)
+        except Document.DoesNotExist:
+            raise Http404()
+
+        currentUser = request.user
+
+        if request.method == "GET":
+            try:
+                return Response(self.getComments(doc))
+            except Exception as e:
+                logger.warning(f"An error occurred retrieving comments: {str(e)}")
+                return Response(
+                    {"error": "Error retreiving comments, check logs for more detail."},
+                )
+        elif request.method == "POST":
+            try:
+                c = Comment.objects.create(
+                    document=doc,
+                    comment=request.data["comment"],
+                    user=currentUser,
+                )
+                c.save()
+
+                return Response(self.getComments(doc))
+            except Exception as e:
+                logger.warning(f"An error occurred saving comment: {str(e)}")
+                return Response(
+                    {
+                        "error": "Error saving comment, check logs for more detail.",
+                    },
+                )
+        elif request.method == "DELETE":
+            comment = Comment.objects.get(id=int(request.GET.get("id")))
+            comment.delete()
+            return Response(self.getComments(doc))
+
+        return Response(
+            {
+                "error": "error",
+            },
+        )
 
 
 class SearchResultSerializer(DocumentSerializer):

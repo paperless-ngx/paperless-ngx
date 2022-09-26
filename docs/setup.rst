@@ -73,7 +73,7 @@ Paperless consists of the following components:
     for getting the tasks from the webserver and the consumer to the task scheduler. These run in a different
     process (maybe even on different machines!), and therefore, this is necessary.
 
-*   Optional: A database server. Paperless supports both PostgreSQL and SQLite for storing its data.
+*   Optional: A database server. Paperless supports PostgreSQL, MariaDB and SQLite for storing its data.
 
 
 Installation
@@ -317,11 +317,13 @@ writing. Windows is not and will never be supported.
     *   ``python3-pip``
     *   ``python3-dev``
 
+    *   ``default-libmysqlclient-dev`` for MariaDB
     *   ``fonts-liberation`` for generating thumbnails for plain text files
     *   ``imagemagick`` >= 6 for PDF conversion
     *   ``gnupg`` for handling encrypted documents
     *   ``libpq-dev`` for PostgreSQL
     *   ``libmagic-dev`` for mime type detection
+    *   ``mariadb-client`` for MariaDB compile time
     *   ``mime-support`` for mime type detection
     *   ``libzbar0`` for barcode detection
     *   ``poppler-utils`` for barcode detection
@@ -362,7 +364,7 @@ writing. Windows is not and will never be supported.
 2.  Install ``redis`` >= 5.0 and configure it to start automatically.
 
 3.  Optional. Install ``postgresql`` and configure a database, user and password for paperless. If you do not wish
-    to use PostgreSQL, SQLite is available as well.
+    to use PostgreSQL, MariaDB and SQLite are available as well.
 
     .. note::
 
@@ -378,6 +380,7 @@ writing. Windows is not and will never be supported.
     settings to your needs. Required settings for getting paperless running are:
 
     *   ``PAPERLESS_REDIS`` should point to your redis server, such as redis://localhost:6379.
+    *   ``PAPERLESS_DBENGINE`` optional, and should be one of `postgres, mariadb, or sqlite`
     *   ``PAPERLESS_DBHOST`` should be the hostname on which your PostgreSQL server is running. Do not configure this
         to use SQLite instead. Also configure port, database name, user and password as necessary.
     *   ``PAPERLESS_CONSUMPTION_DIR`` should point to a folder which paperless should watch for documents. You might

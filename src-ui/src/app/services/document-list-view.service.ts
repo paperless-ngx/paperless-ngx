@@ -11,7 +11,7 @@ import { PaperlessDocument } from '../data/paperless-document'
 import { PaperlessSavedView } from '../data/paperless-saved-view'
 import { SETTINGS_KEYS } from '../data/paperless-uisettings'
 import { DOCUMENT_LIST_SERVICE } from '../data/storage-keys'
-import { generateParams, parseParams } from '../utils/query-params'
+import { paramsFromViewState, paramsToViewState } from '../utils/query-params'
 import { DocumentService, DOCUMENT_SORT_FIELDS } from './rest/document.service'
 import { SettingsService } from './settings.service'
 
@@ -147,6 +147,15 @@ export class DocumentListViewService {
     }
   }
 
+  activateSavedViewWithQueryParams(
+    view: PaperlessSavedView,
+    queryParams: ParamMap
+  ) {
+    const viewState = paramsToViewState(queryParams)
+    this.activateSavedView(view)
+    this.currentPage = viewState.currentPage
+  }
+
   loadSavedView(view: PaperlessSavedView, closeCurrentView: boolean = false) {
     if (closeCurrentView) {
       this._activeSavedViewId = null
@@ -171,7 +180,7 @@ export class DocumentListViewService {
   loadFromQueryParams(queryParams: ParamMap) {
     const paramsEmpty: boolean = queryParams.keys.length == 0
     let newState: ListViewState = this.listViewStates.get(null)
-    if (!paramsEmpty) newState = parseParams(queryParams)
+    if (!paramsEmpty) newState = paramsToViewState(queryParams)
     if (newState == undefined) newState = this.defaultListViewState() // if nothing in local storage
 
     // only reload if things have changed
@@ -212,11 +221,16 @@ export class DocumentListViewService {
           this.isReloading = false
           activeListViewState.collectionSize = result.count
           activeListViewState.documents = result.results
-
           if (updateQueryParams && !this._activeSavedViewId) {
             let base = ['/documents']
             this.router.navigate(base, {
-              queryParams: generateParams(activeListViewState),
+              queryParams: paramsFromViewState(activeListViewState),
+              replaceUrl: !this.router.routerState.snapshot.url.includes('?'), // in case navigating from params-less /documents
+            })
+          } else if (this._activeSavedViewId) {
+            this.router.navigate([], {
+              queryParams: paramsFromViewState(activeListViewState, true),
+              queryParamsHandling: 'merge',
             })
           }
 
@@ -305,7 +319,6 @@ export class DocumentListViewService {
 
   set currentPage(page: number) {
     if (this.activeListViewState.currentPage == page) return
-    this._activeSavedViewId = null
     this.activeListViewState.currentPage = page
     this.reload()
     this.saveDocumentListView()

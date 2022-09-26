@@ -26,18 +26,24 @@ Required services
 PAPERLESS_REDIS=<url>
     This is required for processing scheduled tasks such as email fetching, index
     optimization and for training the automatic document matcher.
-    
+
     * If your Redis server needs login credentials PAPERLESS_REDIS = ``redis://<username>:<password>@<host>:<port>``
-    
+
     * With the requirepass option PAPERLESS_REDIS = ``redis://:<password>@<host>:<port>``
-    
+
     `More information on securing your Redis Instance <https://redis.io/docs/getting-started/#securing-redis>`_.
 
     Defaults to redis://localhost:6379.
 
+PAPERLESS_DBENGINE=<engine_name>
+    Optional, gives the ability to choose Postgres or MariaDB for database engine.
+    Available options are `postgresql` and `mariadb`.
+    Default is `postgresql`.
+
 PAPERLESS_DBHOST=<hostname>
     By default, sqlite is used as the database backend. This can be changed here.
-    Set PAPERLESS_DBHOST and PostgreSQL will be used instead of sqlite.
+
+    Set PAPERLESS_DBHOST and another database will be used instead of sqlite.
 
 PAPERLESS_DBPORT=<port>
     Adjust port if necessary.
@@ -45,17 +51,17 @@ PAPERLESS_DBPORT=<port>
     Default is 5432.
 
 PAPERLESS_DBNAME=<name>
-    Database name in PostgreSQL.
+    Database name in PostgreSQL or MariaDB.
 
     Defaults to "paperless".
 
 PAPERLESS_DBUSER=<name>
-    Database user in PostgreSQL.
+    Database user in PostgreSQL or MariaDB.
 
     Defaults to "paperless".
 
 PAPERLESS_DBPASS=<password>
-    Database password for PostgreSQL.
+    Database password for PostgreSQL or MariaDB.
 
     Defaults to "paperless".
 
@@ -754,6 +760,19 @@ PAPERLESS_FILENAME_DATE_ORDER=<format>
 
     Defaults to none, which disables this feature.
 
+PAPERLESS_NUMBER_OF_SUGGESTED_DATES=<num>
+    Paperless searches an entire document for dates. The first date found will
+    be used as the initial value for the created date. When this variable is
+    greater than 0 (or left to it's default value), paperless will also suggest
+    other dates found in the document, up to a maximum of this setting. Note that
+    duplicates will be removed, which can result in fewer dates displayed in the
+    frontend than this setting value.
+
+    The task to find all dates can be time-consuming and increases with a higher
+    (maximum) number of suggested dates and slower hardware.
+
+    Defaults to 3. Set to 0 to disable this feature.
+
 PAPERLESS_THUMBNAIL_FONT_NAME=<filename>
     Paperless creates thumbnails for plain text files by rendering the content
     of the file on an image and uses a predefined font for that. This
@@ -820,6 +839,13 @@ PAPERLESS_WEBSERVER_WORKERS=<num>
     will increase RAM usage.
 
     Defaults to 1.
+
+PAPERLESS_BIND_ADDR=<ip address>
+    The IP address the webserver will listen on inside the container. There are
+    special setups where you may need to configure this value to restrict the
+    Ip address or interface the webserver listens on.
+
+    Defaults to [::], meaning all interfaces, including IPv6.
 
 PAPERLESS_PORT=<port>
     The port number the webserver will listen on inside the container. There are

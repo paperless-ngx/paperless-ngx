@@ -1,6 +1,8 @@
+import hashlib
 import logging
 import os
 import shutil
+import uuid
 from pathlib import Path
 from typing import Type
 
@@ -8,7 +10,7 @@ import tqdm
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
+from django.db import transaction
 from django.db.models.signals import post_save
 from documents import barcodes
 from documents import index
@@ -17,6 +19,8 @@ from documents.classifier import DocumentClassifier
 from documents.classifier import load_classifier
 from documents.consumer import Consumer
 from documents.consumer import ConsumerError
+from documents.file_handling import create_source_path_directory
+from documents.file_handling import generate_unique_filename
 from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
@@ -24,8 +28,8 @@ from documents.models import StoragePath
 from documents.models import Tag
 from documents.parsers import DocumentParser
 from documents.parsers import get_parser_class_for_mime_type
-from documents.parsers import ParseError
 from documents.sanity_checker import SanityCheckFailedException
+from filelock import FileLock
 from whoosh.writing import AsyncWriter
 
 
@@ -87,32 +91,18 @@ def consume_file(
     override_created=None,
 ):
 
+    path = Path(path).resolve()
+
     # check for separators in current document
     if settings.CONSUMER_ENABLE_BARCODES:
 
-        mime_type = barcodes.get_file_mime_type(path)
+        pdf_filepath, separators = barcodes.scan_file_for_separating_barcodes(path)
 
-        if not barcodes.supported_file_type(mime_type):
-            # if not supported, skip this routine
-            logger.warning(
-                f"Unsupported file format for barcode reader: {str(mime_type)}",
+        if separators:
+            logger.debug(
+                f"Pages with separators found in: {str(path)}",
             )
-        else:
-            separators = []
-            document_list = []
-
-            if mime_type == "image/tiff":
-                file_to_process = barcodes.convert_from_tiff_to_pdf(path)
-            else:
-                file_to_process = path
-
-            separators = barcodes.scan_file_for_separating_barcodes(file_to_process)
-
-            if separators:
-                logger.debug(
-                    f"Pages with separators found in: {str(path)}",
-                )
-                document_list = barcodes.separate_pages(file_to_process, separators)
+            document_list = barcodes.separate_pages(pdf_filepath, separators)
 
             if document_list:
                 for n, document in enumerate(document_list):
@@ -122,17 +112,19 @@ def consume_file(
                         newname = f"{str(n)}_" + override_filename
                     else:
                         newname = None
-                    barcodes.save_to_dir(document, newname=newname)
+                    barcodes.save_to_dir(
+                        document,
+                        newname=newname,
+                        target_dir=path.parent,
+                    )
 
-                # if we got here, the document was successfully split
-                # and can safely be deleted
-                if mime_type == "image/tiff":
-                    # Remove the TIFF converted to PDF file
-                    logger.debug(f"Deleting file {file_to_process}")
-                    os.unlink(file_to_process)
-                # Remove the original file (new file is saved above)
-                logger.debug(f"Deleting file {path}")
-                os.unlink(path)
+                # Delete the PDF file which was split
+                os.remove(pdf_filepath)
+
+                # If the original was a TIFF, remove the original file as well
+                if str(pdf_filepath) != str(path):
+                    logger.debug(f"Deleting file {path}")
+                    os.unlink(path)
 
                 # notify the sender, otherwise the progress bar
                 # in the UI stays stuck
@@ -207,44 +199,62 @@ def bulk_update_documents(document_ids):
             index.update_document(writer, doc)
 
 
-def redo_ocr(document_ids):
-    all_docs = Document.objects.all()
+def update_document_archive_file(document_id):
+    """
+    Re-creates the archive file of a document, including new OCR content and thumbnail
+    """
+    document = Document.objects.get(id=document_id)
 
-    for doc_pk in document_ids:
-        try:
-            logger.info(f"Parsing document {doc_pk}")
-            doc: Document = all_docs.get(pk=doc_pk)
-        except ObjectDoesNotExist:
-            logger.error(f"Document {doc_pk} does not exist")
-            continue
+    mime_type = document.mime_type
 
-        # Get the correct parser for this mime type
-        parser_class: Type[DocumentParser] = get_parser_class_for_mime_type(
-            doc.mime_type,
+    parser_class: Type[DocumentParser] = get_parser_class_for_mime_type(mime_type)
+
+    if not parser_class:
+        logger.error(
+            f"No parser found for mime type {mime_type}, cannot "
+            f"archive document {document} (ID: {document_id})",
         )
-        document_parser: DocumentParser = parser_class(
-            "redo-ocr",
+        return
+
+    parser: DocumentParser = parser_class(logging_group=uuid.uuid4())
+
+    try:
+        parser.parse(document.source_path, mime_type, document.get_public_filename())
+
+        thumbnail = parser.get_thumbnail(
+            document.source_path,
+            mime_type,
+            document.get_public_filename(),
         )
 
-        # Create a file path to copy the original file to for working on
-        temp_file = (Path(document_parser.tempdir) / Path("new-ocr-file")).resolve()
+        if parser.get_archive_path():
+            with transaction.atomic():
+                with open(parser.get_archive_path(), "rb") as f:
+                    checksum = hashlib.md5(f.read()).hexdigest()
+                # I'm going to save first so that in case the file move
+                # fails, the database is rolled back.
+                # We also don't use save() since that triggers the filehandling
+                # logic, and we don't want that yet (file not yet in place)
+                document.archive_filename = generate_unique_filename(
+                    document,
+                    archive_filename=True,
+                )
+                Document.objects.filter(pk=document.pk).update(
+                    archive_checksum=checksum,
+                    content=parser.get_text(),
+                    archive_filename=document.archive_filename,
+                )
+                with FileLock(settings.MEDIA_LOCK):
+                    create_source_path_directory(document.archive_path)
+                    shutil.move(parser.get_archive_path(), document.archive_path)
+                    shutil.move(thumbnail, document.thumbnail_path)
 
-        shutil.copy(doc.source_path, temp_file)
+            with index.open_index_writer() as writer:
+                index.update_document(writer, document)
 
-        try:
-            logger.info(
-                f"Using {type(document_parser).__name__} for document",
-            )
-            # Try to re-parse the document into text
-            document_parser.parse(str(temp_file), doc.mime_type)
-
-            doc.content = document_parser.get_text()
-            doc.save()
-            logger.info("Document OCR updated")
-
-        except ParseError as e:
-            logger.error(f"Error parsing document: {e}")
-        finally:
-            # Remove the file path if it was created
-            if temp_file.exists() and temp_file.is_file():
-                temp_file.unlink()
+    except Exception:
+        logger.exception(
+            f"Error while parsing document {document} " f"(ID: {document_id})",
+        )
+    finally:
+        parser.cleanup()

@@ -78,10 +78,16 @@ class Consumer(LoggingMixin):
             {"type": "status_update", "data": payload},
         )
 
-    def _fail(self, message, log_message=None, exc_info=None):
+    def _fail(
+        self,
+        message,
+        log_message=None,
+        exc_info=None,
+        exception: Optional[Exception] = None,
+    ):
         self._send_progress(100, 100, "FAILED", message)
         self.log("error", log_message or message, exc_info=exc_info)
-        raise ConsumerError(f"{self.filename}: {log_message or message}")
+        raise ConsumerError(f"{self.filename}: {log_message or message}") from exception
 
     def __init__(self):
         super().__init__()
@@ -152,6 +158,7 @@ class Consumer(LoggingMixin):
                 MESSAGE_PRE_CONSUME_SCRIPT_ERROR,
                 f"Error while executing pre-consume script: {e}",
                 exc_info=True,
+                exception=e,
             )
 
     def run_post_consume_script(self, document):
@@ -196,6 +203,7 @@ class Consumer(LoggingMixin):
         script_env["DOCUMENT_TAGS"] = str(
             ",".join(document.tags.all().values_list("name", flat=True)),
         )
+        script_env["DOCUMENT_ORIGINAL_FILENAME"] = str(document.original_filename)
 
         try:
             Popen(
@@ -217,6 +225,7 @@ class Consumer(LoggingMixin):
                 MESSAGE_POST_CONSUME_SCRIPT_ERROR,
                 f"Error while executing post-consume script: {e}",
                 exc_info=True,
+                exception=e,
             )
 
     def try_consume_file(
@@ -331,6 +340,7 @@ class Consumer(LoggingMixin):
                 str(e),
                 f"Error while consuming document {self.filename}: {e}",
                 exc_info=True,
+                exception=e,
             )
 
         # Prepare the document classifier.
@@ -415,6 +425,7 @@ class Consumer(LoggingMixin):
                 f"The following error occurred while consuming "
                 f"{self.filename}: {e}",
                 exc_info=True,
+                exception=e,
             )
         finally:
             document_parser.cleanup()
@@ -465,6 +476,7 @@ class Consumer(LoggingMixin):
                 created=create_date,
                 modified=create_date,
                 storage_type=storage_type,
+                original_filename=self.filename,
             )
 
         self.apply_overrides(document)

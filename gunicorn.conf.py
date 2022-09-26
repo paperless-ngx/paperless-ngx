@@ -1,9 +1,17 @@
 import os
 
-bind = f'[::]:{os.getenv("PAPERLESS_PORT", 8000)}'
+# See https://docs.gunicorn.org/en/stable/settings.html for
+# explanations of settings
+
+bind = f'{os.getenv("PAPERLESS_BIND_ADDR", "[::]")}:{os.getenv("PAPERLESS_PORT", 8000)}'
+
 workers = int(os.getenv("PAPERLESS_WEBSERVER_WORKERS", 1))
 worker_class = "paperless.workers.ConfigurableWorker"
 timeout = 120
+preload_app = True
+
+# https://docs.gunicorn.org/en/stable/faq.html#blocking-os-fchmod
+worker_tmp_dir = "/dev/shm"
 
 
 def pre_fork(server, worker):

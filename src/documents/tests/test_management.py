@@ -10,8 +10,8 @@ from django.core.management import call_command
 from django.test import override_settings
 from django.test import TestCase
 from documents.file_handling import generate_filename
-from documents.management.commands.document_archiver import handle_document
 from documents.models import Document
+from documents.tasks import update_document_archive_file
 from documents.tests.utils import DirectoriesMixin
 
 
@@ -46,7 +46,7 @@ class TestArchiver(DirectoriesMixin, TestCase):
             os.path.join(self.dirs.originals_dir, f"{doc.id:07}.pdf"),
         )
 
-        handle_document(doc.pk)
+        update_document_archive_file(doc.pk)
 
         doc = Document.objects.get(id=doc.id)
 
@@ -63,7 +63,7 @@ class TestArchiver(DirectoriesMixin, TestCase):
         doc.save()
         shutil.copy(sample_file, doc.source_path)
 
-        handle_document(doc.pk)
+        update_document_archive_file(doc.pk)
 
         doc = Document.objects.get(id=doc.id)
 
@@ -94,8 +94,8 @@ class TestArchiver(DirectoriesMixin, TestCase):
             os.path.join(self.dirs.originals_dir, f"document_01.pdf"),
         )
 
-        handle_document(doc2.pk)
-        handle_document(doc1.pk)
+        update_document_archive_file(doc2.pk)
+        update_document_archive_file(doc1.pk)
 
         doc1 = Document.objects.get(id=doc1.id)
         doc2 = Document.objects.get(id=doc2.id)
