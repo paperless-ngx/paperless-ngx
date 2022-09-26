@@ -345,7 +345,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">146</context>
         </context-group>
-        <target state="translated">Début de l'envoi …</target>
+        <target state="translated">Début du téléversement...</target>
       </trans-unit>
       <trans-unit id="2173456130768795374" datatype="html">
         <source>Paperless-ngx</source>

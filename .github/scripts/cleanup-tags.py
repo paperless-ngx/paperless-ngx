@@ -1,167 +1,41 @@
 #!/usr/bin/env python3
-import functools
 import json
 import logging
 import os
-import re
 import shutil
 import subprocess
 from argparse import ArgumentParser
 from typing import Dict
 from typing import Final
 from typing import List
-from urllib.parse import quote
 
-import requests
 from common import get_log_level
+from github import ContainerPackage
+from github import GithubBranchApi
+from github import GithubContainerRegistryApi
 
 logger = logging.getLogger("cleanup-tags")
 
 
-class ContainerPackage:
-    def __init__(self, data: Dict):
+class DockerManifest2:
+    """
+    Data class wrapping the Docker Image Manifest Version 2.
+
+    See https://docs.docker.com/registry/spec/manifest-v2-2/
+    """
+
+    def __init__(self, data: Dict) -> None:
         self._data = data
-        self.name = self._data["name"]
-        self.id = self._data["id"]
-        self.url = self._data["url"]
-        self.tags = self._data["metadata"]["container"]["tags"]
-
-    @functools.cached_property
-    def untagged(self) -> bool:
-        return len(self.tags) == 0
-
-    @functools.cache
-    def tag_matches(self, pattern: str) -> bool:
-        for tag in self.tags:
-            if re.match(pattern, tag) is not None:
-                return True
-        return False
-
-    def __repr__(self):
-        return f"Package {self.name}"
-
-
-class GithubContainerRegistry:
-    def __init__(
-        self,
-        session: requests.Session,
-        token: str,
-        owner_or_org: str,
-    ):
-        self._session: requests.Session = session
-        self._token = token
-        self._owner_or_org = owner_or_org
-        # https://docs.github.com/en/rest/branches/branches
-        self._BRANCHES_ENDPOINT = "https://api.github.com/repos/{OWNER}/{REPO}/branches"
-        if self._owner_or_org == "paperless-ngx":
-            # https://docs.github.com/en/rest/packages#get-all-package-versions-for-a-package-owned-by-an-organization
-            self._PACKAGES_VERSIONS_ENDPOINT = "https://api.github.com/orgs/{ORG}/packages/{PACKAGE_TYPE}/{PACKAGE_NAME}/versions"
-            # https://docs.github.com/en/rest/packages#delete-package-version-for-an-organization
-            self._PACKAGE_VERSION_DELETE_ENDPOINT = "https://api.github.com/orgs/{ORG}/packages/{PACKAGE_TYPE}/{PACKAGE_NAME}/versions/{PACKAGE_VERSION_ID}"
-        else:
-            # https://docs.github.com/en/rest/packages#get-all-package-versions-for-a-package-owned-by-the-authenticated-user
-            self._PACKAGES_VERSIONS_ENDPOINT = "https://api.github.com/user/packages/{PACKAGE_TYPE}/{PACKAGE_NAME}/versions"
-            # https://docs.github.com/en/rest/packages#delete-a-package-version-for-the-authenticated-user
-            self._PACKAGE_VERSION_DELETE_ENDPOINT = "https://api.github.com/user/packages/{PACKAGE_TYPE}/{PACKAGE_NAME}/versions/{PACKAGE_VERSION_ID}"
-
-    def __enter__(self):
-        """
-        Sets up the required headers for auth and response
-        type from the API
-        """
-        self._session.headers.update(
-            {
-                "Accept": "application/vnd.github.v3+json",
-                "Authorization": f"token {self._token}",
-            },
+        # This is the sha256: digest string.  Corresponds to Github API name
+        # if the package is an untagged package
+        self.digest = self._data["digest"]
+        platform_data_os = self._data["platform"]["os"]
+        platform_arch = self._data["platform"]["architecture"]
+        platform_variant = self._data["platform"].get(
+            "variant",
+            "",
         )
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        """
-        Ensures the authorization token is cleaned up no matter
-        the reason for the exit
-        """
-        if "Accept" in self._session.headers:
-            del self._session.headers["Accept"]
-        if "Authorization" in self._session.headers:
-            del self._session.headers["Authorization"]
-
-    def _read_all_pages(self, endpoint):
-        """
-        Internal function to read all pages of an endpoint, utilizing the
-        next.url until exhausted
-        """
-        internal_data = []
-
-        while True:
-            resp = self._session.get(endpoint)
-            if resp.status_code == 200:
-                internal_data += resp.json()
-                if "next" in resp.links:
-                    endpoint = resp.links["next"]["url"]
-                else:
-                    logger.debug("Exiting pagination loop")
-                    break
-            else:
-                logger.warning(f"Request to {endpoint} return HTTP {resp.status_code}")
-                break
-
-        return internal_data
-
-    def get_branches(self, repo: str):
-        """
-        Returns all current branches of the given repository
-        """
-        endpoint = self._BRANCHES_ENDPOINT.format(OWNER=self._owner_or_org, REPO=repo)
-        internal_data = self._read_all_pages(endpoint)
-        return internal_data
-
-    def filter_branches_by_name_pattern(self, branch_data, pattern: str):
-        """
-        Filters the given list of branches to those which start with the given
-        pattern.  Future enhancement could use regex patterns instead.
-        """
-        matches = {}
-
-        for branch in branch_data:
-            if branch["name"].startswith(pattern):
-                matches[branch["name"]] = branch
-
-        return matches
-
-    def get_package_versions(
-        self,
-        package_name: str,
-        package_type: str = "container",
-    ) -> List[ContainerPackage]:
-        """
-        Returns all the versions of a given package (container images) from
-        the API
-        """
-        package_name = quote(package_name, safe="")
-        endpoint = self._PACKAGES_VERSIONS_ENDPOINT.format(
-            ORG=self._owner_or_org,
-            PACKAGE_TYPE=package_type,
-            PACKAGE_NAME=package_name,
-        )
-
-        pkgs = []
-
-        for data in self._read_all_pages(endpoint):
-            pkgs.append(ContainerPackage(data))
-
-        return pkgs
-
-    def delete_package_version(self, package_data: ContainerPackage):
-        """
-        Deletes the given package version from the GHCR
-        """
-        resp = self._session.delete(package_data.url)
-        if resp.status_code != 204:
-            logger.warning(
-                f"Request to delete {package_data.url} returned HTTP {resp.status_code}",
-            )
+        self.platform = f"{platform_data_os}/{platform_arch}{platform_variant}"
 
 
 def _main():
@@ -187,11 +61,26 @@ def _main():
         help="If provided, delete untagged containers as well",
     )
 
+    # If given, the package is assumed to be a multi-arch manifest.  Cache packages are
+    # not multi-arch, all other types are
+    parser.add_argument(
+        "--is-manifest",
+        action="store_true",
+        default=False,
+        help="If provided, the package is assumed to be a multi-arch manifest following schema v2",
+    )
+
     # Allows configuration of log level for debugging
     parser.add_argument(
         "--loglevel",
         default="info",
         help="Configures the logging level",
+    )
+
+    # Get the name of the package being processed this round
+    parser.add_argument(
+        "package",
+        help="The package to process",
     )
 
     args = parser.parse_args()
@@ -207,181 +96,194 @@ def _main():
     repo: Final[str] = os.environ["GITHUB_REPOSITORY"]
     gh_token: Final[str] = os.environ["TOKEN"]
 
-    with requests.session() as sess:
-        with GithubContainerRegistry(sess, gh_token, repo_owner) as gh_api:
+    # Find all branches named feature-*
+    # Note: Only relevant to the main application, but simpler to
+    # leave in for all packages
+    with GithubBranchApi(gh_token) as branch_api:
+        feature_branches = {}
+        for branch in branch_api.get_branches(
+            repo=repo,
+        ):
+            if branch.name.startswith("feature-"):
+                logger.debug(f"Found feature branch {branch.name}")
+                feature_branches[branch.name] = branch
 
-            # Step 1 - Get branch information
+        logger.info(f"Located {len(feature_branches)} feature branches")
 
-            # Step 1.1 - Locate all branches of the repo
-            all_branches = gh_api.get_branches("paperless-ngx")
-            logger.info(f"Located {len(all_branches)} branches of {repo_owner}/{repo} ")
+    with GithubContainerRegistryApi(gh_token, repo_owner) as container_api:
+        # Get the information about all versions of the given package
+        all_package_versions: List[
+            ContainerPackage
+        ] = container_api.get_package_versions(args.package)
 
-            # Step 1.2 - Filter branches to those starting with "feature-"
-            feature_branches = gh_api.filter_branches_by_name_pattern(
-                all_branches,
-                "feature-",
-            )
-            logger.info(f"Located {len(feature_branches)} feature branches")
+        all_pkgs_tags_to_version: Dict[str, ContainerPackage] = {}
+        for pkg in all_package_versions:
+            for tag in pkg.tags:
+                all_pkgs_tags_to_version[tag] = pkg
+        logger.info(
+            f"Located {len(all_package_versions)} versions of package {args.package}",
+        )
 
-            # Step 2 - Deal with package information
-            for package_name in ["paperless-ngx", "paperless-ngx/builder/cache/app"]:
+        # Filter to packages which are tagged with feature-*
+        packages_tagged_feature: List[ContainerPackage] = []
+        for package in all_package_versions:
+            if package.tag_matches("feature-"):
+                packages_tagged_feature.append(package)
 
-                # Step 2.1 - Location all versions of the given package
-                all_package_versions = gh_api.get_package_versions(package_name)
+        feature_pkgs_tags_to_versions: Dict[str, ContainerPackage] = {}
+        for pkg in packages_tagged_feature:
+            for tag in pkg.tags:
+                feature_pkgs_tags_to_versions[tag] = pkg
 
-                # Faster lookup, map the tag to their container
-                all_pkgs_tags_to_version = {}
-                for pkg in all_package_versions:
-                    for tag in pkg.tags:
-                        all_pkgs_tags_to_version[tag] = pkg
+        logger.info(
+            f'Located {len(feature_pkgs_tags_to_versions)} versions of package {args.package} tagged "feature-"',
+        )
+
+        # All the feature tags minus all the feature branches leaves us feature tags
+        # with no corresponding branch
+        tags_to_delete = list(
+            set(feature_pkgs_tags_to_versions.keys()) - set(feature_branches.keys()),
+        )
+
+        # All the tags minus the set of going to be deleted tags leaves us the
+        # tags which will be kept around
+        tags_to_keep = list(
+            set(all_pkgs_tags_to_version.keys()) - set(tags_to_delete),
+        )
+        logger.info(
+            f"Located {len(tags_to_delete)} versions of package {args.package} to delete",
+        )
+
+        # Delete certain package versions for which no branch existed
+        for tag_to_delete in tags_to_delete:
+            package_version_info = feature_pkgs_tags_to_versions[tag_to_delete]
+
+            if args.delete:
                 logger.info(
-                    f"Located {len(all_package_versions)} versions of package {package_name}",
+                    f"Deleting {tag_to_delete} (id {package_version_info.id})",
+                )
+                container_api.delete_package_version(
+                    package_version_info,
                 )
 
-                # Step 2.2 - Location package versions which have a tag of "feature-"
-                packages_tagged_feature = []
+            else:
+                logger.info(
+                    f"Would delete {tag_to_delete} (id {package_version_info.id})",
+                )
+
+        # Deal with untagged package versions
+        if args.untagged:
+
+            logger.info("Handling untagged image packages")
+
+            if not args.is_manifest:
+                # If the package is not a multi-arch manifest, images without tags are safe to delete.
+                # They are not referred to by anything.  This will leave all with at least 1 tag
+
                 for package in all_package_versions:
-                    if package.tag_matches("feature-"):
-                        packages_tagged_feature.append(package)
-
-                logger.info(
-                    f'Located {len(packages_tagged_feature)} versions of package {package_name} tagged "feature-"',
-                )
-
-                # Faster lookup, map feature- tags to their container
-                feature_pkgs_tags_to_versions = {}
-                for pkg in packages_tagged_feature:
-                    for tag in pkg.tags:
-                        feature_pkgs_tags_to_versions[tag] = pkg
-
-                # Step 2.3 - Determine which package versions have no matching branch and which tags we're keeping
-                tags_to_delete = list(
-                    set(feature_pkgs_tags_to_versions.keys())
-                    - set(feature_branches.keys()),
-                )
-                tags_to_keep = list(
-                    set(all_pkgs_tags_to_version.keys()) - set(tags_to_delete),
-                )
-                logger.info(
-                    f"Located {len(tags_to_delete)} versions of package {package_name} to delete",
-                )
-
-                # Step 2.4 - Delete certain package versions
-                for tag_to_delete in tags_to_delete:
-                    package_version_info = feature_pkgs_tags_to_versions[tag_to_delete]
-
-                    if args.delete:
-                        logger.info(
-                            f"Deleting {tag_to_delete} (id {package_version_info.id})",
-                        )
-                        gh_api.delete_package_version(
-                            package_version_info,
-                        )
-
-                    else:
-                        logger.info(
-                            f"Would delete {tag_to_delete} (id {package_version_info.id})",
-                        )
-
-                # Step 3 - Deal with untagged and dangling packages
-                if args.untagged:
-
-                    """
-                    Ok, bear with me, these are annoying.
-
-                    Our images are multi-arch, so the manifest is more like a pointer to a sha256 digest.
-                    These images are untagged, but pointed to, and so should not be removed (or every pull fails).
-
-                    So for each image getting kept, parse the manifest to find the digest(s) it points to.  Then
-                    remove those from the list of untagged images.  The final result is the untagged, not pointed to
-                    version which should be safe to remove.
-
-                    Example:
-                        Tag: ghcr.io/paperless-ngx/paperless-ngx:1.7.1 refers to
-                            amd64: sha256:b9ed4f8753bbf5146547671052d7e91f68cdfc9ef049d06690b2bc866fec2690
-                            armv7: sha256:81605222df4ba4605a2ba4893276e5d08c511231ead1d5da061410e1bbec05c3
-                            arm64: sha256:374cd68db40734b844705bfc38faae84cc4182371de4bebd533a9a365d5e8f3b
-                        each of which appears as untagged image
-
-                    """
-
-                    # Step 3.1 - Simplify the untagged data, mapping name (which is a digest) to the version
-                    untagged_versions = {}
-                    for x in all_package_versions:
-                        if x.untagged:
-                            untagged_versions[x.name] = x
-
-                    skips = 0
-                    # Extra security to not delete on an unexpected error
-                    actually_delete = True
-
-                    logger.info(
-                        f"Located {len(tags_to_keep)} tags of package {package_name} to keep",
-                    )
-
-                    # Step 3.2 - Parse manifests to locate digests pointed to
-                    for tag in tags_to_keep:
-                        full_name = f"ghcr.io/{repo_owner}/{package_name}:{tag}"
-                        logger.info(f"Checking manifest for {full_name}")
-                        try:
-                            proc = subprocess.run(
-                                [
-                                    shutil.which("docker"),
-                                    "manifest",
-                                    "inspect",
-                                    full_name,
-                                ],
-                                capture_output=True,
-                            )
-
-                            manifest_list = json.loads(proc.stdout)
-                            for manifest in manifest_list["manifests"]:
-                                digest = manifest["digest"]
-                                platform_data_os = manifest["platform"]["os"]
-                                platform_arch = manifest["platform"]["architecture"]
-                                platform_variant = manifest["platform"].get(
-                                    "variant",
-                                    "",
-                                )
-                                platform = f"{platform_data_os}/{platform_arch}{platform_variant}"
-
-                                if digest in untagged_versions:
-                                    logger.debug(
-                                        f"Skipping deletion of {digest}, referred to by {full_name} for {platform}",
-                                    )
-                                    del untagged_versions[digest]
-                                    skips += 1
-
-                        except json.decoder.JSONDecodeError as err:
-                            # This is probably for a cache image, which isn't a multi-arch digest
-                            # These are ok to delete all on
-                            logger.debug(f"{err} on {full_name}")
-                            continue
-                        except Exception as err:
-                            actually_delete = False
-                            logger.exception(err)
-                            continue
-
-                    logger.info(f"Skipping deletion of {skips} packages")
-
-                    # Step 3.3 - Delete the untagged and not pointed at packages
-                    logger.info(f"Deleting untagged packages of {package_name}")
-                    for to_delete_name in untagged_versions:
-                        to_delete_version = untagged_versions[to_delete_name]
-
-                        if args.delete and actually_delete:
+                    if package.untagged:
+                        if args.delete:
                             logger.info(
-                                f"Deleting id {to_delete_version.id} named {to_delete_version.name}",
+                                f"Deleting id {package.id} named {package.name}",
                             )
-                            gh_api.delete_package_version(
-                                to_delete_version,
+                            container_api.delete_package_version(
+                                package,
                             )
                         else:
                             logger.info(
-                                f"Would delete {to_delete_name} (id {to_delete_version.id})",
+                                f"Would delete {package.name} (id {package.id})",
                             )
-                else:
-                    logger.info("Leaving untagged images untouched")
+                    else:
+                        logger.info(
+                            f"Not deleting tag {package.tags[0]} of package {args.package}",
+                        )
+            else:
+
+                """
+                Ok, bear with me, these are annoying.
+
+                Our images are multi-arch, so the manifest is more like a pointer to a sha256 digest.
+                These images are untagged, but pointed to, and so should not be removed (or every pull fails).
+
+                So for each image getting kept, parse the manifest to find the digest(s) it points to.  Then
+                remove those from the list of untagged images.  The final result is the untagged, not pointed to
+                version which should be safe to remove.
+
+                Example:
+                    Tag: ghcr.io/paperless-ngx/paperless-ngx:1.7.1 refers to
+                        amd64: sha256:b9ed4f8753bbf5146547671052d7e91f68cdfc9ef049d06690b2bc866fec2690
+                        armv7: sha256:81605222df4ba4605a2ba4893276e5d08c511231ead1d5da061410e1bbec05c3
+                        arm64: sha256:374cd68db40734b844705bfc38faae84cc4182371de4bebd533a9a365d5e8f3b
+                    each of which appears as untagged image, but isn't really.
+
+                    So from the list of untagged packages, remove those digests.  Once all tags which
+                    are being kept are checked, the remaining untagged packages are actually untagged
+                    with no referrals in a manifest to them.
+
+                """
+
+                # Simplify the untagged data, mapping name (which is a digest) to the version
+                untagged_versions = {}
+                for x in all_package_versions:
+                    if x.untagged:
+                        untagged_versions[x.name] = x
+
+                skips = 0
+                # Extra security to not delete on an unexpected error
+                actually_delete = True
+
+                # Parse manifests to locate digests pointed to
+                for tag in sorted(tags_to_keep):
+                    full_name = f"ghcr.io/{repo_owner}/{args.package}:{tag}"
+                    logger.info(f"Checking manifest for {full_name}")
+                    try:
+                        proc = subprocess.run(
+                            [
+                                shutil.which("docker"),
+                                "manifest",
+                                "inspect",
+                                full_name,
+                            ],
+                            capture_output=True,
+                        )
+
+                        manifest_list = json.loads(proc.stdout)
+                        for manifest_data in manifest_list["manifests"]:
+                            manifest = DockerManifest2(manifest_data)
+
+                            if manifest.digest in untagged_versions:
+                                logger.debug(
+                                    f"Skipping deletion of {manifest.digest}, referred to by {full_name} for {manifest.platform}",
+                                )
+                                del untagged_versions[manifest.digest]
+                                skips += 1
+
+                    except Exception as err:
+                        actually_delete = False
+                        logger.exception(err)
+
+                logger.info(
+                    f"Skipping deletion of {skips} packages referred to by a manifest",
+                )
+
+                # Step 3.3 - Delete the untagged and not pointed at packages
+                logger.info(f"Deleting untagged packages of {args.package}")
+                for to_delete_name in untagged_versions:
+                    to_delete_version = untagged_versions[to_delete_name]
+
+                    if args.delete and actually_delete:
+                        logger.info(
+                            f"Deleting id {to_delete_version.id} named {to_delete_version.name}",
+                        )
+                        container_api.delete_package_version(
+                            to_delete_version,
+                        )
+                    else:
+                        logger.info(
+                            f"Would delete {to_delete_name} (id {to_delete_version.id})",
+                        )
+        else:
+            logger.info("Leaving untagged images untouched")
 
 
 if __name__ == "__main__":
