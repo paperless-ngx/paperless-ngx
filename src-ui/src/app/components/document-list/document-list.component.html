@@ -77,12 +77,11 @@
 <div class="row sticky-top pt-3 pt-sm-4 pb-2 pb-lg-4 bg-body">
   <app-filter-editor [hidden]="isBulkEditing" [(filterRules)]="list.filterRules" [unmodifiedFilterRules]="unmodifiedFilterRules" #filterEditor></app-filter-editor>
   <app-bulk-editor [hidden]="!isBulkEditing"></app-bulk-editor>
-  <div tourAnchor="tour.documents-filter-editor"></div>
 </div>
 
 
 <ng-template #pagination>
-  <div class="d-flex justify-content-between align-items-center">
+  <div class="d-flex justify-content-between align-items-center" tourAnchor="tour.documents">
     <p>
       <ng-container *ngIf="list.isReloading">
         <div class="spinner-border spinner-border-sm me-2" role="status"></div>
@@ -98,7 +97,6 @@
   </div>
 </ng-template>
 
-<div tourAnchor="tour.documents"></div>
 <ng-container *ngTemplateOutlet="pagination"></ng-container>
 
 <ng-container *ngIf="list.error ; else documentListNoError">
