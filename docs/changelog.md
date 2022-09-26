@@ -1,5 +1,24 @@
 # Changelog
 
+## paperless-ngx 1.9.1
+
+### Bug Fixes
+
+- Bugfix: Fixes missing OCR mode skip\_noarchive [@stumpylog](https://github.com/stumpylog) ([#1645](https://github.com/paperless-ngx/paperless-ngx/pull/1645))
+- Fix reset button padding on small screens [@shamoon](https://github.com/shamoon) ([#1646](https://github.com/paperless-ngx/paperless-ngx/pull/1646))
+
+### Documentation
+
+- Improve docs re  [@janis-ax](https://github.com/janis-ax) ([#1625](https://github.com/paperless-ngx/paperless-ngx/pull/1625))
+- [Documentation] Add v1.9.0 changelog [@github-actions](https://github.com/github-actions) ([#1639](https://github.com/paperless-ngx/paperless-ngx/pull/1639))
+
+### All App Changes
+
+- Bugfix: Fixes missing OCR mode skip\_noarchive [@stumpylog](https://github.com/stumpylog) ([#1645](https://github.com/paperless-ngx/paperless-ngx/pull/1645))
+- Fix reset button padding on small screens [@shamoon](https://github.com/shamoon) ([#1646](https://github.com/paperless-ngx/paperless-ngx/pull/1646))
+
+
+
 ## paperless-ngx 1.9.0
 
 ### Features
