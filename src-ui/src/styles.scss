@@ -513,10 +513,20 @@ table.table {
   }
 }
 
-// Tour popovers
+// Tour
 .tour-active .popover {
   min-width: 360px;
   margin: 0 .25rem .25rem !important;
+}
+
+body.tour-active .row.sticky-top,
+body.tour-active .sidebar {
+  z-index: inherit !important;
+}
+
+.nav-link.touranchor--is-active {
+  font-weight: bold !important;
+  color: var(--bs-primary);
 }
 
 // fix popover carat colors
