@@ -16,11 +16,11 @@
 - Feature: Preserve original filename in metadata [@GwynHannay](https://github.com/GwynHannay) ([#1440](https://github.com/paperless-ngx/paperless-ngx/pull/1440))
 - Handle tags for gmail email accounts [@sisao](https://github.com/sisao) ([#1433](https://github.com/paperless-ngx/paperless-ngx/pull/1433))
 - Update redis image [@tribut](https://github.com/tribut) ([#1436](https://github.com/paperless-ngx/paperless-ngx/pull/1436))
-- PAPERLESS\_REDIS may be set via docker secrets [@DennisGaida](https://github.com/DennisGaida) ([#1405](https://github.com/paperless-ngx/paperless-ngx/pull/1405))
+- PAPERLESS_REDIS may be set via docker secrets [@DennisGaida](https://github.com/DennisGaida) ([#1405](https://github.com/paperless-ngx/paperless-ngx/pull/1405))
 
 ### Bug Fixes
 
-- paperless\_cmd.sh: use exec to run supervisord [@lemmi](https://github.com/lemmi) ([#1617](https://github.com/paperless-ngx/paperless-ngx/pull/1617))
+- paperless_cmd.sh: use exec to run supervisord [@lemmi](https://github.com/lemmi) ([#1617](https://github.com/paperless-ngx/paperless-ngx/pull/1617))
 - Fix: Double barcode separation creates empty file [@stumpylog](https://github.com/stumpylog) ([#1596](https://github.com/paperless-ngx/paperless-ngx/pull/1596))
 - Fix: Resolve issue with slow classifier [@stumpylog](https://github.com/stumpylog) ([#1576](https://github.com/paperless-ngx/paperless-ngx/pull/1576))
 - Fix document comments not updating on document navigation [@shamoon](https://github.com/shamoon) ([#1566](https://github.com/paperless-ngx/paperless-ngx/pull/1566))
@@ -31,7 +31,7 @@
 - Fix: Add missing filter rule types to SavedViewFilterRule model \& fix migrations [@shamoon](https://github.com/shamoon) ([#1463](https://github.com/paperless-ngx/paperless-ngx/pull/1463))
 - Fix paperless.conf.example typo [@qcasey](https://github.com/qcasey) ([#1460](https://github.com/paperless-ngx/paperless-ngx/pull/1460))
 - Bugfix: Fixes the creation of an archive file, even if noarchive was specified [@stumpylog](https://github.com/stumpylog) ([#1442](https://github.com/paperless-ngx/paperless-ngx/pull/1442))
-- Fix:  should not be required [@shamoon](https://github.com/shamoon) ([#1412](https://github.com/paperless-ngx/paperless-ngx/pull/1412))
+- Fix: created_date should not be required [@shamoon](https://github.com/shamoon) ([#1412](https://github.com/paperless-ngx/paperless-ngx/pull/1412))
 - Fix: dev backend testing [@stumpylog](https://github.com/stumpylog) ([#1420](https://github.com/paperless-ngx/paperless-ngx/pull/1420))
 - Bugfix: Catch all exceptions during the task signals [@stumpylog](https://github.com/stumpylog) ([#1387](https://github.com/paperless-ngx/paperless-ngx/pull/1387))
 - Fix: saved view page parameter [@shamoon](https://github.com/shamoon) ([#1376](https://github.com/paperless-ngx/paperless-ngx/pull/1376))
@@ -62,7 +62,7 @@
 ### Maintenance
 
 - [Beta] Paperless-ngx v1.9.0 Release Candidate [@stumpylog](https://github.com/stumpylog) ([#1560](https://github.com/paperless-ngx/paperless-ngx/pull/1560))
-- paperless\_cmd.sh: use exec to run supervisord [@lemmi](https://github.com/lemmi) ([#1617](https://github.com/paperless-ngx/paperless-ngx/pull/1617))
+- paperless_cmd.sh: use exec to run supervisord [@lemmi](https://github.com/lemmi) ([#1617](https://github.com/paperless-ngx/paperless-ngx/pull/1617))
 - Chore: Extended container image cleanup [@stumpylog](https://github.com/stumpylog) ([#1556](https://github.com/paperless-ngx/paperless-ngx/pull/1556))
 - Chore: Smaller library images [@stumpylog](https://github.com/stumpylog) ([#1546](https://github.com/paperless-ngx/paperless-ngx/pull/1546))
 - Bump tj-actions/changed-files from 24 to 29.0.2 [@dependabot](https://github.com/dependabot) ([#1493](https://github.com/paperless-ngx/paperless-ngx/pull/1493))
@@ -70,7 +70,7 @@
 - [CI] Fix release drafter issues [@qcasey](https://github.com/qcasey) ([#1301](https://github.com/paperless-ngx/paperless-ngx/pull/1301))
 - Fix: dev backend testing [@stumpylog](https://github.com/stumpylog) ([#1420](https://github.com/paperless-ngx/paperless-ngx/pull/1420))
 - Chore: Exclude dependabot PRs from Project, set status to Needs Review [@qcasey](https://github.com/qcasey) ([#1397](https://github.com/paperless-ngx/paperless-ngx/pull/1397))
-- Chore: Add  to label PRs based on  and title [@qcasey](https://github.com/qcasey) ([#1396](https://github.com/paperless-ngx/paperless-ngx/pull/1396))
+- Chore: Add to label PRs based on and title [@qcasey](https://github.com/qcasey) ([#1396](https://github.com/paperless-ngx/paperless-ngx/pull/1396))
 - Chore: use pre-commit in the Ci workflow [@stumpylog](https://github.com/stumpylog) ([#1362](https://github.com/paperless-ngx/paperless-ngx/pull/1362))
 - Chore: Fixes permissions for image tag cleanup [@stumpylog](https://github.com/stumpylog) ([#1315](https://github.com/paperless-ngx/paperless-ngx/pull/1315))
 - Bump leonsteinhaeuser/project-beta-automations from 1.2.1 to 1.3.0 [@dependabot](https://github.com/dependabot) ([#1328](https://github.com/paperless-ngx/paperless-ngx/pull/1328))
@@ -156,7 +156,7 @@
 - Feature: Adds storage paths to re-tagger command [@stumpylog](https://github.com/stumpylog) ([#1446](https://github.com/paperless-ngx/paperless-ngx/pull/1446))
 - Feature: Preserve original filename in metadata [@GwynHannay](https://github.com/GwynHannay) ([#1440](https://github.com/paperless-ngx/paperless-ngx/pull/1440))
 - Handle tags for gmail email accounts [@sisao](https://github.com/sisao) ([#1433](https://github.com/paperless-ngx/paperless-ngx/pull/1433))
-- Fix:  should not be required [@shamoon](https://github.com/shamoon) ([#1412](https://github.com/paperless-ngx/paperless-ngx/pull/1412))
+- Fix: should not be required [@shamoon](https://github.com/shamoon) ([#1412](https://github.com/paperless-ngx/paperless-ngx/pull/1412))
 - Bugfix: Catch all exceptions during the task signals [@stumpylog](https://github.com/stumpylog) ([#1387](https://github.com/paperless-ngx/paperless-ngx/pull/1387))
 - Fix: saved view page parameter [@shamoon](https://github.com/shamoon) ([#1376](https://github.com/paperless-ngx/paperless-ngx/pull/1376))
 - Fix: Correct browser unsaved changes warning [@shamoon](https://github.com/shamoon) ([#1369](https://github.com/paperless-ngx/paperless-ngx/pull/1369))
@@ -181,8 +181,6 @@
 - Fix: missing tooltip translation \& filter editor wrapping [@shamoon](https://github.com/shamoon) ([#1305](https://github.com/paperless-ngx/paperless-ngx/pull/1305))
 - Feature: Remove requirements.txt and use pipenv everywhere [@stumpylog](https://github.com/stumpylog) ([#1316](https://github.com/paperless-ngx/paperless-ngx/pull/1316))
 - Bugfix: Interaction between barcode and directories as tags [@stumpylog](https://github.com/stumpylog) ([#1303](https://github.com/paperless-ngx/paperless-ngx/pull/1303))
-
-
 
 ## paperless-ngx 1.8.0
 
