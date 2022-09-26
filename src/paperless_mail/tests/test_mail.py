@@ -20,6 +20,7 @@ from imap_tools import MailboxFolderSelectError
 from imap_tools import MailboxLoginError
 from imap_tools import MailMessage
 from imap_tools import MailMessageFlags
+from imap_tools import NOT
 from paperless_mail import tasks
 from paperless_mail.mail import MailAccountHandler
 from paperless_mail.mail import MailError
@@ -46,14 +47,39 @@ class BogusFolderManager:
 
 
 class BogusClient:
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
+
+    def __init__(self, messages):
+        self.messages: List[MailMessage] = messages
+
     def authenticate(self, mechanism, authobject):
         # authobject must be a callable object
         auth_bytes = authobject(None)
         if auth_bytes != b"\x00admin\x00w57\xc3\xa4\xc3\xb6\xc3\xbcw4b6huwb6nhu":
             raise MailboxLoginError("BAD", "OK")
 
+    def uid(self, command, *args):
+        if command == "STORE":
+            for message in self.messages:
+                if message.uid == args[0]:
+                    flag = args[2]
+                    if flag == "processed":
+                        message._raw_flag_data.append(f"+FLAGS (processed)".encode())
+                        MailMessage.flags.fget.cache_clear()
+
 
 class BogusMailBox(ContextManager):
+
+    # Common values so tests don't need to remember an accepted login
+    USERNAME: str = "admin"
+    ASCII_PASSWORD: str = "secret"
+    # Note the non-ascii characters here
+    UTF_PASSWORD: str = "w57äöüw4b6huwb6nhu"
+
     def __enter__(self):
         return self
 
@@ -64,13 +90,22 @@ class BogusMailBox(ContextManager):
         self.messages: List[MailMessage] = []
         self.messages_spam: List[MailMessage] = []
         self.folder = BogusFolderManager()
-        self.client = BogusClient()
+        self.client = BogusClient(self.messages)
+        self._host = ""
+
+    def updateClient(self):
+        self.client = BogusClient(self.messages)
 
     def login(self, username, password):
         # This will raise a UnicodeEncodeError if the password is not ASCII only
         password.encode("ascii")
         # Otherwise, check for correct values
-        if username != "admin" or password not in {"secret"}:
+        if username != self.USERNAME or password != self.ASCII_PASSWORD:
+            raise MailboxLoginError("BAD", "OK")
+
+    def login_utf8(self, username, password):
+        # Expected to only be called with the UTF-8 password
+        if username != self.USERNAME or password != self.UTF_PASSWORD:
             raise MailboxLoginError("BAD", "OK")
 
     def fetch(self, criteria, mark_seen, charset=""):
@@ -98,6 +133,9 @@ class BogusMailBox(ContextManager):
 
         if "UNKEYWORD" in criteria:
             tag = criteria[criteria.index("UNKEYWORD") + 1].strip("'")
+            msg = filter(lambda m: "processed" not in m.flags, msg)
+
+        if "(X-GM-LABELS" in criteria:  # ['NOT', '(X-GM-LABELS', '"processed"']
             msg = filter(lambda m: "processed" not in m.flags, msg)
 
         return list(msg)
@@ -247,6 +285,7 @@ class TestMail(DirectoriesMixin, TestCase):
                 seen=False,
             ),
         )
+        self.bogus_mailbox.updateClient()
 
     def test_get_correspondent(self):
         message = namedtuple("MailMessage", [])
@@ -607,6 +646,32 @@ class TestMail(DirectoriesMixin, TestCase):
         self.assertEqual(len(self.bogus_mailbox.fetch("UNKEYWORD processed", False)), 0)
         self.assertEqual(len(self.bogus_mailbox.messages), 3)
 
+    def test_handle_mail_account_tag_gmail(self):
+        self.bogus_mailbox._host = "imap.gmail.com"
+
+        account = MailAccount.objects.create(
+            name="test",
+            imap_server="",
+            username="admin",
+            password="secret",
+        )
+
+        _ = MailRule.objects.create(
+            name="testrule",
+            account=account,
+            action=MailRule.MailAction.TAG,
+            action_parameter="processed",
+        )
+
+        self.assertEqual(len(self.bogus_mailbox.messages), 3)
+        self.assertEqual(self.async_task.call_count, 0)
+        criteria = NOT(gmail_label="processed")
+        self.assertEqual(len(self.bogus_mailbox.fetch(criteria, False)), 2)
+        self.mail_account_handler.handle_mail_account(account)
+        self.assertEqual(self.async_task.call_count, 2)
+        self.assertEqual(len(self.bogus_mailbox.fetch(criteria, False)), 0)
+        self.assertEqual(len(self.bogus_mailbox.messages), 3)
+
     def test_error_login(self):
         account = MailAccount.objects.create(
             name="test",
@@ -878,9 +943,9 @@ class TestMail(DirectoriesMixin, TestCase):
         account = MailAccount.objects.create(
             name="test",
             imap_server="",
-            username="admin",
+            username=BogusMailBox.USERNAME,
             # Note the non-ascii characters here
-            password="w57äöüw4b6huwb6nhu",
+            password=BogusMailBox.UTF_PASSWORD,
         )
 
         _ = MailRule.objects.create(
@@ -910,7 +975,7 @@ class TestMail(DirectoriesMixin, TestCase):
         account = MailAccount.objects.create(
             name="test",
             imap_server="",
-            username="admin",
+            username=BogusMailBox.USERNAME,
             # Note the non-ascii characters here
             # Passes the check in login, not in authenticate
             password="réception",

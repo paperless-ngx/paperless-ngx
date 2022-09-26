@@ -17,6 +17,7 @@ FROM python:3.9-slim-bullseye as main
 LABEL org.opencontainers.image.description="A intermediate image with pikepdf wheel built"
 
 ARG DEBIAN_FRONTEND=noninteractive
+ARG PIKEPDF_VERSION
 
 ARG BUILD_PACKAGES="\
   build-essential \
@@ -55,34 +56,33 @@ COPY --from=qpdf-builder /usr/src/qpdf/*.deb ./
 # the added size of the install is basically irrelevant
 
 RUN set -eux \
-  && apt-get update --quiet \
-  && apt-get install --yes --quiet --no-install-recommends $BUILD_PACKAGES \
-  && dpkg --install libqpdf28_*.deb \
-  && dpkg --install libqpdf-dev_*.deb \
-  && python3 -m pip install --no-cache-dir --upgrade \
-    pip \
-    wheel \
-    # https://pikepdf.readthedocs.io/en/latest/installation.html#requirements
-    pybind11 \
-  && rm -rf /var/lib/apt/lists/*
-
-# Layers after this point change according to required version
-# For better caching, seperate the basic installs from
-# the building
-
-ARG PIKEPDF_VERSION
-
-RUN set -eux \
+  && echo "Installing build tools" \
+    && apt-get update --quiet \
+    && apt-get install --yes --quiet --no-install-recommends ${BUILD_PACKAGES} \
+  && echo "Installing qpdf" \
+    && dpkg --install libqpdf28_*.deb \
+    && dpkg --install libqpdf-dev_*.deb \
+  && echo "Installing Python tools" \
+    && python3 -m pip install --no-cache-dir --upgrade \
+      pip \
+      wheel \
+      # https://pikepdf.readthedocs.io/en/latest/installation.html#requirements
+      pybind11 \
   && echo "Building pikepdf wheel ${PIKEPDF_VERSION}" \
-  && mkdir wheels \
-  && python3 -m pip wheel \
-    # Build the package at the required version
-    pikepdf==${PIKEPDF_VERSION} \
-    # Output the *.whl into this directory
-    --wheel-dir wheels \
-    # Do not use a binary packge for the package being built
-    --no-binary=pikepdf \
-    # Do use binary packages for dependencies
-    --prefer-binary \
-    --no-cache-dir \
-  && ls -ahl wheels
+    && mkdir wheels \
+    && python3 -m pip wheel \
+      # Build the package at the required version
+      pikepdf==${PIKEPDF_VERSION} \
+      # Output the *.whl into this directory
+      --wheel-dir wheels \
+      # Do not use a binary packge for the package being built
+      --no-binary=pikepdf \
+      # Do use binary packages for dependencies
+      --prefer-binary \
+      # Don't cache build files
+      --no-cache-dir \
+    && ls -ahl wheels \
+  && echo "Cleaning up image" \
+    && apt-get -y purge ${BUILD_PACKAGES} \
+    && apt-get -y autoremove --purge \
+    && rm -rf /var/lib/apt/lists/*

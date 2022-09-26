@@ -37,12 +37,12 @@ repos:
         exclude: "(^Pipfile\\.lock$)"
   # Python hooks
   - repo: https://github.com/asottile/reorder_python_imports
-    rev: v3.8.1
+    rev: v3.8.2
     hooks:
       - id: reorder-python-imports
         exclude: "(migrations)"
   - repo: https://github.com/asottile/yesqa
-    rev: "v1.3.0"
+    rev: "v1.4.0"
     hooks:
       - id: yesqa
         exclude: "(migrations)"
@@ -63,7 +63,7 @@ repos:
     hooks:
       - id: black
   - repo: https://github.com/asottile/pyupgrade
-    rev: v2.37.1
+    rev: v2.37.3
     hooks:
       - id: pyupgrade
         exclude: "(migrations)"

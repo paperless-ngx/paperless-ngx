@@ -6,6 +6,7 @@ FROM python:3.9-slim-bullseye as main
 
 LABEL org.opencontainers.image.description="A intermediate image with psycopg2 wheel built"
 
+ARG PSYCOPG2_VERSION
 ARG DEBIAN_FRONTEND=noninteractive
 
 ARG BUILD_PACKAGES="\
@@ -21,29 +22,27 @@ WORKDIR /usr/src
 # the added size of the install is basically irrelevant
 
 RUN set -eux \
-  && apt-get update --quiet \
-  && apt-get install --yes --quiet --no-install-recommends $BUILD_PACKAGES \
-  && rm -rf /var/lib/apt/lists/* \
-  && python3 -m pip install --no-cache-dir --upgrade pip wheel
-
-# Layers after this point change according to required version
-# For better caching, seperate the basic installs from
-# the building
-
-ARG PSYCOPG2_VERSION
-
-RUN set -eux \
+  && echo "Installing build tools" \
+    && apt-get update --quiet \
+    && apt-get install --yes --quiet --no-install-recommends ${BUILD_PACKAGES} \
+  && echo "Installing Python tools" \
+    && python3 -m pip install --no-cache-dir --upgrade pip wheel \
   && echo "Building psycopg2 wheel ${PSYCOPG2_VERSION}" \
-  && cd /usr/src \
-  && mkdir wheels \
-  && python3 -m pip wheel \
-    # Build the package at the required version
-    psycopg2==${PSYCOPG2_VERSION} \
-    # Output the *.whl into this directory
-    --wheel-dir wheels \
-    # Do not use a binary packge for the package being built
-    --no-binary=psycopg2 \
-    # Do use binary packages for dependencies
-    --prefer-binary \
-    --no-cache-dir \
-  && ls -ahl wheels/
+    && cd /usr/src \
+    && mkdir wheels \
+    && python3 -m pip wheel \
+      # Build the package at the required version
+      psycopg2==${PSYCOPG2_VERSION} \
+      # Output the *.whl into this directory
+      --wheel-dir wheels \
+      # Do not use a binary packge for the package being built
+      --no-binary=psycopg2 \
+      # Do use binary packages for dependencies
+      --prefer-binary \
+      # Don't cache build files
+      --no-cache-dir \
+    && ls -ahl wheels/ \
+  && echo "Cleaning up image" \
+    && apt-get -y purge ${BUILD_PACKAGES} \
+    && apt-get -y autoremove --purge \
+    && rm -rf /var/lib/apt/lists/*

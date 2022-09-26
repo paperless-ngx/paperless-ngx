@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import logging
-from argparse import ArgumentError
 
 
 def get_image_tag(

@@ -122,6 +122,10 @@ def delete(doc_ids):
 
 def redo_ocr(doc_ids):
 
-    async_task("documents.tasks.redo_ocr", document_ids=doc_ids)
+    for document_id in doc_ids:
+        async_task(
+            "documents.tasks.update_document_archive_file",
+            document_id=document_id,
+        )
 
     return "OK"
