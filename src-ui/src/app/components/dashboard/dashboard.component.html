@@ -19,8 +19,6 @@
   </svg>
 </app-page-header>
 
-<div tourAnchor="tour.dashboard"></div>
-
 <div class="row">
   <div class="col-lg-8">
     <ng-container *ngIf="savedViewService.loading">
@@ -28,10 +26,13 @@
       <ng-container i18n>Loading...</ng-container>
     </ng-container>
 
-    <app-welcome-widget *ngIf="settingsService.offerTour()"></app-welcome-widget>
+    <app-welcome-widget *ngIf="settingsService.offerTour()" tourAnchor="tour.dashboard"></app-welcome-widget>
 
-    <ng-container *ngFor="let v of savedViewService.dashboardViews">
-      <app-saved-view-widget [savedView]="v"></app-saved-view-widget>
+    <ng-container *ngFor="let v of savedViewService.dashboardViews; first as isFirst">
+      <app-saved-view-widget *ngIf="isFirst; else noTour" [savedView]="v" tourAnchor="tour.dashboard"></app-saved-view-widget>
+      <ng-template #noTour>
+        <app-saved-view-widget [savedView]="v"></app-saved-view-widget>
+      </ng-template>
     </ng-container>
 
   </div>
