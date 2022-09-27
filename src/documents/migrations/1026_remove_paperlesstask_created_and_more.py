@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("django_celery_results", "0011_taskresult_periodic_task_name"),
-        ("documents", "1026_drop_django_q"),
+        ("documents", "1025_alter_savedviewfilterrule_rule_type"),
     ]
 
     operations = [
