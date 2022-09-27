@@ -4,20 +4,17 @@
 
 ### Bug Fixes
 
-- Bugfix: Allow PAPERLESS\_OCR\_CLEAN=none [@shamoon](https://github.com/shamoon) ([#1670](https://github.com/paperless-ngx/paperless-ngx/pull/1670))
-
-### Documentation
-
-- [Documentation] Add v1.9.1 changelog [@github-actions](https://github.com/github-actions) ([#1649](https://github.com/paperless-ngx/paperless-ngx/pull/1649))
+- Bugfix: Allow PAPERLESS_OCR_CLEAN=none [@shamoon](https://github.com/shamoon) ([#1670](https://github.com/paperless-ngx/paperless-ngx/pull/1670))
 
 ### All App Changes
 
 - Chore: Bumps version numbers to 1.9.2 [@stumpylog](https://github.com/stumpylog) ([#1666](https://github.com/paperless-ngx/paperless-ngx/pull/1666))
-- Bugfix: Allow PAPERLESS\_OCR\_CLEAN=none [@shamoon](https://github.com/shamoon) ([#1670](https://github.com/paperless-ngx/paperless-ngx/pull/1670))
-
-
 
 ## paperless-ngx 1.9.1
+
+### Notes
+
+- Version 1.9.1 incorrectly displays the version string as 1.9.0
 
 ### Bug Fixes
 
