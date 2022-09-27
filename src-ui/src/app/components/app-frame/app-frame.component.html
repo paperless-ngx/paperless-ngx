@@ -51,8 +51,8 @@
 
 <div class="container-fluid">
   <div class="row">
-    <nav id="sidebarMenu" class="d-md-block bg-light sidebar collapse" [ngClass]="slimSidebarEnabled ? 'slim' : 'col-md-3 col-lg-2'" [ngbCollapse]="isMenuCollapsed">
-      <button class="btn btn-sm btn-dark sidebar-slim-toggler" (click)="slimSidebarEnabled = !slimSidebarEnabled">
+    <nav id="sidebarMenu" class="d-md-block bg-light sidebar collapse" [ngClass]="slimSidebarEnabled ? 'slim' : 'col-md-3 col-lg-2'" [class.animating]="slimSidebarAnimating" [ngbCollapse]="isMenuCollapsed">
+      <button class="btn btn-sm btn-dark sidebar-slim-toggler" (click)="toggleSlimSidebar()">
         <svg class="sidebaricon-sm" fill="currentColor">
           <use *ngIf="slimSidebarEnabled" xlink:href="assets/bootstrap-icons.svg#chevron-double-right"/>
           <use *ngIf="!slimSidebarEnabled" xlink:href="assets/bootstrap-icons.svg#chevron-double-left"/>
@@ -77,7 +77,7 @@
         </ul>
 
         <h6 class="sidebar-heading px-3 mt-4 mb-1 text-muted" *ngIf='savedViewService.loading || savedViewService.sidebarViews.length > 0'>
-          <span [class.visually-hidden]="slimSidebarEnabled" i18n>Saved views</span>
+          <span i18n>Saved views</span>
           <div *ngIf="savedViewService.loading" class="spinner-border spinner-border-sm fw-normal ms-2" role="status"></div>
         </h6>
         <ul class="nav flex-column mb-2">
@@ -91,7 +91,7 @@
         </ul>
 
         <h6 class="sidebar-heading px-3 mt-4 mb-1 text-muted" *ngIf='openDocuments.length > 0'>
-          <span [class.visually-hidden]="slimSidebarEnabled" i18n>Open documents</span>
+          <span i18n>Open documents</span>
         </h6>
         <ul class="nav flex-column mb-2">
           <li class="nav-item w-100" *ngFor='let d of openDocuments'>
@@ -116,7 +116,7 @@
         </ul>
 
         <h6 class="sidebar-heading px-3 mt-4 mb-1 text-muted">
-          <span [class.visually-hidden]="slimSidebarEnabled" i18n>Manage</span>
+          <span i18n>Manage</span>
         </h6>
         <ul class="nav flex-column mb-2">
           <li class="nav-item">
@@ -149,6 +149,7 @@
           </li>
           <li class="nav-item">
             <a class="nav-link" routerLink="tasks" routerLinkActive="active" (click)="closeMenu()" ngbPopover="File Tasks" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
+              <span *ngIf="tasksService.failedFileTasks.length > 0 && slimSidebarEnabled" class="badge bg-danger position-absolute top-0 end-0">{{tasksService.failedFileTasks.length}}</span>
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#list-task"/>
               </svg><span>&nbsp;<ng-container i18n>File Tasks<span *ngIf="tasksService.failedFileTasks.length > 0"><span class="badge bg-danger ms-2">{{tasksService.failedFileTasks.length}}</span></span></ng-container></span>
@@ -178,7 +179,7 @@
         </ul>
 
         <h6 class="sidebar-heading px-3 mt-auto pt-4 mb-1 text-muted">
-          <span [class.visually-hidden]="slimSidebarEnabled" i18n>Info</span>
+          <span i18n>Info</span>
         </h6>
         <ul class="nav flex-column mb-2">
           <li class="nav-item">
