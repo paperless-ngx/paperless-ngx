@@ -622,14 +622,14 @@ class TasksViewSerializer(serializers.ModelSerializer):
         depth = 1
         fields = (
             "id",
+            "task_id",
+            "date_created",
+            "date_done",
             "type",
             "status",
             "result",
             "acknowledged",
-            "date_created",
-            "date_done",
             "task_name",
-            "task_id",
         )
 
     type = serializers.SerializerMethodField()
@@ -670,20 +670,20 @@ class TasksViewSerializer(serializers.ModelSerializer):
             result = obj.attempted_task.date_done
         return result
 
-    task_name = serializers.SerializerMethodField()
-
-    def get_task_name(self, obj):
-        result = ""
-        if hasattr(obj, "attempted_task") and obj.attempted_task:
-            result = obj.attempted_task.task_name
-        return result
-
     task_id = serializers.SerializerMethodField()
 
     def get_task_id(self, obj):
         result = ""
         if hasattr(obj, "attempted_task") and obj.attempted_task:
             result = obj.attempted_task.task_id
+        return result
+
+    task_name = serializers.SerializerMethodField()
+
+    def get_task_name(self, obj):
+        result = ""
+        if hasattr(obj, "attempted_task") and obj.attempted_task:
+            result = obj.attempted_task.task_name
         return result
 
 

@@ -22,7 +22,6 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import override_settings
 from django.utils import timezone
-from django_q.models import Task
 from documents import bulk_edit
 from documents import index
 from documents.models import Correspondent
@@ -33,7 +32,6 @@ from documents.models import PaperlessTask
 from documents.models import SavedView
 from documents.models import StoragePath
 from documents.models import Tag
-from documents.models import UiSettings
 from django_celery_results.models import TaskResult
 from documents.models import Comment
 from documents.models import StoragePath
@@ -2805,23 +2803,19 @@ class TestTasks(APITestCase):
         """
         result1 = TaskResult.objects.create(
             task_id=str(uuid.uuid4()),
-            task_name="documents.tasks.some_task",
+            task_name="documents.tasks.some_great_task",
             status=celery.states.PENDING,
         )
         PaperlessTask.objects.create(attempted_task=result1)
 
         result2 = TaskResult.objects.create(
             task_id=str(uuid.uuid4()),
-            task_name="documents.tasks.other_task",
+            task_name="documents.tasks.some_awesome_task",
             status=celery.states.STARTED,
         )
         PaperlessTask.objects.create(attempted_task=result2)
 
         response = self.client.get(self.ENDPOINT)
-        from pprint import pprint
-
-        for x in response.data:
-            pprint(x)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 2)

@@ -509,6 +509,9 @@ def update_paperless_task(sender, instance: TaskResult, **kwargs):
             paperless_task, _ = PaperlessTask.objects.get_or_create(
                 task_id=instance.task_id,
             )
+            paperless_task.name = instance.task_name
+            paperless_task.created = instance.date_created
+            paperless_task.completed = instance.date_done
             paperless_task.attempted_task = instance
             paperless_task.save()
     except Exception as e:
