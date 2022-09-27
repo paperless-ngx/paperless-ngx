@@ -319,6 +319,7 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": os.path.join(DATA_DIR, "db.sqlite3"),
+        "OPTIONS": {},
     },
 }
 
@@ -340,21 +341,18 @@ if os.getenv("PAPERLESS_DBHOST"):
     # Leave room for future extensibility
     if os.getenv("PAPERLESS_DBENGINE") == "mariadb":
         engine = "django.db.backends.mysql"
-        options = {"read_default_file": "/etc/mysql/my.cnf"}
+        options = {"read_default_file": "/etc/mysql/my.cnf", "charset": "utf8mb4"}
     else:  # Default to PostgresDB
         engine = "django.db.backends.postgresql_psycopg2"
         options = {"sslmode": os.getenv("PAPERLESS_DBSSLMODE", "prefer")}
 
     DATABASES["default"]["ENGINE"] = engine
-    for key, value in options.items():
-        DATABASES["default"]["OPTIONS"][key] = value
+    DATABASES["default"]["OPTIONS"].update(options)
 
 if os.getenv("PAPERLESS_DB_TIMEOUT") is not None:
-    _new_opts = {"timeout": float(os.getenv("PAPERLESS_DB_TIMEOUT"))}
-    if "OPTIONS" in DATABASES["default"]:
-        DATABASES["default"]["OPTIONS"].update(_new_opts)
-    else:
-        DATABASES["default"]["OPTIONS"] = _new_opts
+    DATABASES["default"]["OPTIONS"].update(
+        {"timeout": float(os.getenv("PAPERLESS_DB_TIMEOUT"))},
+    )
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
