@@ -4,6 +4,17 @@ from django.db import migrations, models
 import django.db.models.deletion
 
 
+def _attempted_task(apps, schema_editor):
+    """
+    Remove any existing attempted_task one to one fields.
+    """
+    task_model = apps.get_model("documents", "PaperlessTask")
+
+    for task in task_model.objects.all():
+        task.attempted_task = None
+        task.save()
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -12,6 +23,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RunPython(
+            code=_attempted_task,
+            reverse_code=migrations.RunPython.noop,
+        ),
         migrations.RemoveField(
             model_name="paperlesstask",
             name="created",
