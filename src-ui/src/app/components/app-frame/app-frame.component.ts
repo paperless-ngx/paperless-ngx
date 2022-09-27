@@ -58,6 +58,16 @@ export class AppFrameComponent implements ComponentCanDeactivate {
 
   isMenuCollapsed: boolean = true
 
+  slimSidebarAnimating: boolean = false
+
+  toggleSlimSidebar(): void {
+    this.slimSidebarAnimating = true
+    this.slimSidebarEnabled = !this.slimSidebarEnabled
+    setTimeout(() => {
+      this.slimSidebarAnimating = false
+    }, 200) // slightly longer than css animation for slim sidebar
+  }
+
   get slimSidebarEnabled(): boolean {
     return this.settingsService.get(SETTINGS_KEYS.SLIM_SIDEBAR)
   }

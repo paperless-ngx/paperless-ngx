@@ -43,11 +43,59 @@ main {
   display: none; // hide on mobile
 }
 
+.sidebar li.nav-item span,
+.sidebar .sidebar-heading span {
+  transition: all .1s ease;
+}
+
 @media(min-width: 768px) {
   .sidebar.slim {
     max-width: 50px;
-    li.nav-item span {
+
+    li.nav-item span.badge {
+      display: inline-block;
+      margin-right: 2px;
+    }
+  }
+
+  .sidebar.slim:not(.animating) {
+    li.nav-item span,
+    .sidebar-heading span {
       display: none;
+    }
+  }
+
+  .sidebar.animating {
+    li.nav-item span,
+    .sidebar-heading span {
+      display: unset;
+      position: absolute;
+      opacity: 0;
+      overflow: hidden;
+    }
+  }
+
+  .sidebar:not(.slim):not(.animating) {
+    li.nav-item span,
+    .sidebar-heading span {
+      position: unset;
+      opacity: 1;
+      overflow: auto;
+    }
+  }
+
+  .sidebar.slim,
+  .sidebar.animating {
+    .text-truncate {
+      text-overflow: unset !important;
+      word-wrap: break-word !important;
+    }
+  }
+
+  .sidebar.slim {
+    li.nav-item span.badge {
+      display: inline-block;
+      margin-right: 2px;
     }
   }
 
