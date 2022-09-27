@@ -527,6 +527,7 @@ class UiSettings(models.Model):
 
 
 class PaperlessTask(models.Model):
+    task_id = models.CharField(max_length=128)
     acknowledged = models.BooleanField(default=False)
 
     attempted_task = models.OneToOneField(

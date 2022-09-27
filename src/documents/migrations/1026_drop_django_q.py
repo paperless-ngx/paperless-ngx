@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("documents", "1026_remove_paperlesstask_created_and_more"),
+        ("documents", "1025_alter_savedviewfilterrule_rule_type"),
     ]
 
     # Manual SQL commands to drop the django_q related tables
