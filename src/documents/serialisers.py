@@ -1,5 +1,7 @@
 import datetime
+import json
 import math
+import os
 import re
 
 try:
@@ -630,6 +632,7 @@ class TasksViewSerializer(serializers.ModelSerializer):
             "result",
             "acknowledged",
             "task_name",
+            "name",
         )
 
     type = serializers.SerializerMethodField()
@@ -643,7 +646,15 @@ class TasksViewSerializer(serializers.ModelSerializer):
     def get_result(self, obj):
         result = ""
         if hasattr(obj, "attempted_task") and obj.attempted_task:
-            result = obj.attempted_task.result
+            try:
+                result_json = json.loads(obj.attempted_task.result)
+            except Exception:
+                pass
+
+            if result_json and "exc_message" in result_json:
+                result = result_json["exc_message"]
+            else:
+                result = obj.attempted_task.result.strip('"')
         return result
 
     status = serializers.SerializerMethodField()
@@ -684,6 +695,35 @@ class TasksViewSerializer(serializers.ModelSerializer):
         result = ""
         if hasattr(obj, "attempted_task") and obj.attempted_task:
             result = obj.attempted_task.task_name
+        return result
+
+    name = serializers.SerializerMethodField()
+
+    def get_name(self, obj):
+        result = ""
+        if hasattr(obj, "attempted_task") and obj.attempted_task:
+            try:
+                # We have to make this a valid JSON object string
+                kwargs_json = json.loads(
+                    obj.attempted_task.task_kwargs.strip('"')
+                    .replace("'", '"')
+                    .replace("None", '""'),
+                )
+            except Exception:
+                pass
+
+            if kwargs_json and "override_filename" in kwargs_json:
+                result = kwargs_json["override_filename"]
+            else:
+                filepath = (
+                    obj.attempted_task.task_args.replace('"', "")
+                    .replace("'", "")
+                    .replace("(", "")
+                    .replace(")", "")
+                    .replace(",", "")
+                )
+                result = os.path.split(filepath)[1]
+
         return result
 
 
