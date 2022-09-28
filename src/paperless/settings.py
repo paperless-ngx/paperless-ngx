@@ -719,7 +719,10 @@ def _get_nltk_language_setting(ocr_lang: str) -> Optional[str]:
     Maps an ISO-639-1 language code supported by Tesseract into
     an optional NLTK language name.  This is the set of common supported
     languages for all the NLTK data used.
+
+    Assumption: The primary language is first
     """
+    ocr_lang = ocr_lang.split("+")[0]
     iso_code_to_nltk = {
         "dan": "danish",
         "nld": "dutch",
