@@ -733,7 +733,7 @@ class TasksViewSerializer(serializers.ModelSerializer):
                     result = filepath.name
             except Exception as e:  # pragma: no cover
                 # Extra security if something is malformed
-                logger.warn(f"Error getting task result: {e}", exc_info=True)
+                logger.warn(f"Error getting file name from task: {e}", exc_info=True)
 
         return result
 
