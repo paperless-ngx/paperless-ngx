@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
-import { takeUntil, Subject, first } from 'rxjs'
+import { Subject, first } from 'rxjs'
 import { PaperlessTask } from 'src/app/data/paperless-task'
 import { TasksService } from 'src/app/services/tasks.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
@@ -77,16 +77,16 @@ export class TasksComponent implements OnInit, OnDestroy {
   get currentTasks(): PaperlessTask[] {
     let tasks: PaperlessTask[]
     switch (this.activeTab) {
-      case 'PENDING':
+      case 'queued':
         tasks = this.tasksService.queuedFileTasks
         break
-      case 'STARTED':
+      case 'started':
         tasks = this.tasksService.startedFileTasks
         break
-      case 'SUCCESS':
+      case 'completed':
         tasks = this.tasksService.completedFileTasks
         break
-      case 'FAILURE':
+      case 'failed':
         tasks = this.tasksService.failedFileTasks
         break
       default:
