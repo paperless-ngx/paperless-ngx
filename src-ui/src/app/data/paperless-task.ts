@@ -28,4 +28,6 @@ export interface PaperlessTask extends ObjectWithId {
   done?: Date
 
   result: string
+
+  related_document?: number
 }

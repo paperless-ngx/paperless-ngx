@@ -74,11 +74,18 @@
           </button>
         </td>
         <td scope="row">
-          <button class="btn btn-sm btn-outline-secondary" (click)="dismissTask(task); $event.stopPropagation();">
-            <svg class="sidebaricon" fill="currentColor">
-              <use xlink:href="assets/bootstrap-icons.svg#check"/>
-            </svg>&nbsp;<ng-container i18n>Dismiss</ng-container>
-          </button>
+          <div class="btn-group" role="group">
+            <button class="btn btn-sm btn-outline-secondary" (click)="dismissTask(task); $event.stopPropagation();">
+              <svg class="sidebaricon" fill="currentColor">
+                <use xlink:href="assets/bootstrap-icons.svg#check"/>
+              </svg>&nbsp;<ng-container i18n>Dismiss</ng-container>
+            </button>
+            <button *ngIf="task.related_document" class="btn btn-sm btn-outline-primary" (click)="dismissAndGo(task); $event.stopPropagation();">
+              <svg class="sidebaricon" fill="currentColor">
+                <use xlink:href="assets/bootstrap-icons.svg#file-text"/>
+              </svg>&nbsp;<ng-container i18n>Open Document</ng-container>
+            </button>
+          </div>
         </td>
       </tr>
       <tr>

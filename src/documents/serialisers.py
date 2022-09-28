@@ -633,6 +633,7 @@ class TasksViewSerializer(serializers.ModelSerializer):
             "acknowledged",
             "task_name",
             "name",
+            "related_document",
         )
 
     type = serializers.SerializerMethodField()
@@ -723,6 +724,23 @@ class TasksViewSerializer(serializers.ModelSerializer):
                     .replace(",", "")
                 )
                 result = os.path.split(filepath)[1]
+
+        return result
+
+    related_document = serializers.SerializerMethodField()
+
+    def get_related_document(self, obj):
+        result = ""
+        regexp = r"New document id (\d+) created"
+        if (
+            hasattr(obj, "attempted_task")
+            and obj.attempted_task
+            and obj.attempted_task.status == "SUCCESS"
+        ):
+            try:
+                result = re.search(regexp, obj.attempted_task.result).group(1)
+            except Exception:
+                pass
 
         return result
 
