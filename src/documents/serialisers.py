@@ -1,8 +1,14 @@
 import datetime
-import json
 import math
-import os
 import re
+from ast import literal_eval
+from asyncio.log import logger
+from pathlib import Path
+from typing import Dict
+from typing import Optional
+from typing import Tuple
+
+from celery import states
 
 try:
     import zoneinfo
@@ -646,16 +652,21 @@ class TasksViewSerializer(serializers.ModelSerializer):
 
     def get_result(self, obj):
         result = ""
-        if hasattr(obj, "attempted_task") and obj.attempted_task:
+        if (
+            hasattr(obj, "attempted_task")
+            and obj.attempted_task
+            and obj.attempted_task.result
+        ):
             try:
-                result_json = json.loads(obj.attempted_task.result)
-            except Exception:
-                pass
-
-            if result_json and "exc_message" in result_json:
-                result = result_json["exc_message"]
-            else:
-                result = obj.attempted_task.result.strip('"')
+                result: str = obj.attempted_task.result
+                if "exc_message" in result:
+                    # This is a dict in this case
+                    result: Dict = literal_eval(result)
+                    # This is a list, grab the first item (most recent)
+                    result = result["exc_message"][0]
+            except Exception as e:  # pragma: no cover
+                # Extra security if something is malformed
+                logger.warn(f"Error getting task result: {e}", exc_info=True)
         return result
 
     status = serializers.SerializerMethodField()
@@ -704,26 +715,25 @@ class TasksViewSerializer(serializers.ModelSerializer):
         result = ""
         if hasattr(obj, "attempted_task") and obj.attempted_task:
             try:
-                # We have to make this a valid JSON object string
-                kwargs_json = json.loads(
-                    obj.attempted_task.task_kwargs.strip('"')
-                    .replace("'", '"')
-                    .replace("None", '""'),
-                )
-            except Exception:
-                pass
+                task_kwargs: Optional[str] = obj.attempted_task.task_kwargs
+                # Try the override filename first (this is a webui created task?)
+                if task_kwargs is not None:
+                    # It's a string, string of a dict.  Who knows why...
+                    kwargs = literal_eval(literal_eval(task_kwargs))
+                    if "override_filename" in kwargs:
+                        result = kwargs["override_filename"]
 
-            if kwargs_json and "override_filename" in kwargs_json:
-                result = kwargs_json["override_filename"]
-            else:
-                filepath = (
-                    obj.attempted_task.task_args.replace('"', "")
-                    .replace("'", "")
-                    .replace("(", "")
-                    .replace(")", "")
-                    .replace(",", "")
-                )
-                result = os.path.split(filepath)[1]
+                # Nothing was found, report the task first argument
+                if not len(result):
+                    # There are always some arguments to the consume
+                    task_args: Tuple = literal_eval(
+                        literal_eval(obj.attempted_task.task_args),
+                    )
+                    filepath = Path(task_args[0])
+                    result = filepath.name
+            except Exception as e:  # pragma: no cover
+                # Extra security if something is malformed
+                logger.warn(f"Error getting task result: {e}", exc_info=True)
 
         return result
 
@@ -735,7 +745,8 @@ class TasksViewSerializer(serializers.ModelSerializer):
         if (
             hasattr(obj, "attempted_task")
             and obj.attempted_task
-            and obj.attempted_task.status == "SUCCESS"
+            and obj.attempted_task.result
+            and obj.attempted_task.status == states.SUCCESS
         ):
             try:
                 result = re.search(regexp, obj.attempted_task.result).group(1)
