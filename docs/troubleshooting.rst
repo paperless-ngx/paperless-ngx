@@ -19,7 +19,7 @@ Check for the following issues:
 
     .. code:: shell-session
 
-        $ python3 manage.py qcluster
+        $ celery --app paperless worker
 
 *   Look at the output of paperless and inspect it for any errors.
 *   Go to the admin interface, and check if there are failed tasks. If so, the
