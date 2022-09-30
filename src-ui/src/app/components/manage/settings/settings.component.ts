@@ -4,7 +4,7 @@ import {
   LOCALE_ID,
   OnInit,
   OnDestroy,
-  Renderer2,
+  AfterViewInit,
 } from '@angular/core'
 import { FormControl, FormGroup } from '@angular/forms'
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
@@ -18,13 +18,17 @@ import { Toast, ToastService } from 'src/app/services/toast.service'
 import { dirtyCheck, DirtyComponent } from '@ngneat/dirty-check-forms'
 import { Observable, Subscription, BehaviorSubject, first } from 'rxjs'
 import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
+import { ActivatedRoute } from '@angular/router'
+import { ViewportScroller } from '@angular/common'
 
 @Component({
   selector: 'app-settings',
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss'],
 })
-export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
+export class SettingsComponent
+  implements OnInit, AfterViewInit, OnDestroy, DirtyComponent
+{
   savedViewGroup = new FormGroup({})
 
   settingsForm = new FormGroup({
@@ -45,6 +49,7 @@ export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
     notificationsConsumerFailed: new FormControl(null),
     notificationsConsumerSuppressOnDashboard: new FormControl(null),
     commentsEnabled: new FormControl(null),
+    updateCheckingEnabled: new FormControl(null),
   })
 
   savedViews: PaperlessSavedView[]
@@ -74,8 +79,18 @@ export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
     private documentListViewService: DocumentListViewService,
     private toastService: ToastService,
     private settings: SettingsService,
-    @Inject(LOCALE_ID) public currentLocale: string
+    @Inject(LOCALE_ID) public currentLocale: string,
+    private viewportScroller: ViewportScroller,
+    private activatedRoute: ActivatedRoute
   ) {}
+
+  ngAfterViewInit(): void {
+    if (this.activatedRoute.snapshot.fragment) {
+      this.viewportScroller.scrollToAnchor(
+        this.activatedRoute.snapshot.fragment
+      )
+    }
+  }
 
   ngOnInit() {
     this.savedViewService.listAll().subscribe((r) => {
@@ -118,6 +133,9 @@ export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
           SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUPPRESS_ON_DASHBOARD
         ),
         commentsEnabled: this.settings.get(SETTINGS_KEYS.COMMENTS_ENABLED),
+        updateCheckingEnabled: this.settings.get(
+          SETTINGS_KEYS.UPDATE_CHECKING_ENABLED
+        ),
       }
 
       for (let view of this.savedViews) {
@@ -239,6 +257,10 @@ export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
     this.settings.set(
       SETTINGS_KEYS.COMMENTS_ENABLED,
       this.settingsForm.value.commentsEnabled
+    )
+    this.settings.set(
+      SETTINGS_KEYS.UPDATE_CHECKING_ENABLED,
+      this.settingsForm.value.updateCheckingEnabled
     )
     this.settings.setLanguage(this.settingsForm.value.displayLanguage)
     this.settings

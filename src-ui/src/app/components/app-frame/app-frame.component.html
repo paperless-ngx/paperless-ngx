@@ -200,14 +200,25 @@
           <li class="nav-item mt-2">
             <div class="px-3 py-2 text-muted small d-flex align-items-center flex-wrap">
               <div class="me-3">{{ versionString }}</div>
-              <div *ngIf="appRemoteVersion" class="version-check">
+              <div *ngIf="!settingsService.updateCheckingIsSet || appRemoteVersion" class="version-check">
                 <ng-template #updateAvailablePopContent>
                   <span class="small">Paperless-ngx {{ appRemoteVersion.version }} <ng-container i18n>is available.</ng-container><br/><ng-container i18n>Click to view.</ng-container></span>
                 </ng-template>
                 <ng-template #updateCheckingNotEnabledPopContent>
-                  <span class="small"><ng-container i18n>Checking for updates is disabled.</ng-container><br/><ng-container i18n>Click for more information.</ng-container></span>
+                  <p class="small mb-2">
+                    <ng-container i18n>Paperless-ngx can automatically check for updates</ng-container>
+                  </p>
+                  <div class="btn-group btn-group-xs flex-fill w-100">
+                    <button class="btn btn-outline-primary" (click)="setUpdateChecking(true)">Enable</button>
+                    <button class="btn btn-outline-secondary" (click)="setUpdateChecking(false)">Disable</button>
+                  </div>
+                  <p class="small mb-0 mt-2">
+                    <a class="small text-decoration-none fst-italic" routerLink="/settings" fragment="update-checking" i18n>
+                      How does this work?
+                    </a>
+                  </p>
                 </ng-template>
-                <ng-container *ngIf="appRemoteVersion.feature_is_set; else updateCheckNotSet">
+                <ng-container *ngIf="settingsService.updateCheckingIsSet; else updateCheckNotSet">
                   <a *ngIf="appRemoteVersion.update_available" class="small text-decoration-none" target="_blank" rel="noopener noreferrer" href="https://github.com/paperless-ngx/paperless-ngx/releases"
                   [ngbPopover]="updateAvailablePopContent" popoverClass="shadow" triggers="mouseenter:mouseleave" container="body">
                     <svg fill="currentColor" class="me-1" width="1.2em" height="1.2em" style="vertical-align: text-top;" viewBox="0 0 16 16">
@@ -217,8 +228,8 @@
                   </a>
                 </ng-container>
                 <ng-template #updateCheckNotSet>
-                  <a class="small text-decoration-none" target="_blank" rel="noopener noreferrer" href="https://paperless-ngx.readthedocs.io/en/latest/configuration.html#update-checking"
-                  [ngbPopover]="updateCheckingNotEnabledPopContent" popoverClass="shadow" triggers="mouseenter:mouseleave" container="body">
+                  <a class="small text-decoration-none" routerLink="/settings" fragment="update-checking"
+                  [ngbPopover]="updateCheckingNotEnabledPopContent" popoverClass="shadow" triggers="mouseenter" container="body">
                     <svg fill="currentColor" class="me-1" width="1.2em" height="1.2em" style="vertical-align: text-top;" viewBox="0 0 16 16">
                       <use xlink:href="assets/bootstrap-icons.svg#info-circle" />
                     </svg>
