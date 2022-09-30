@@ -410,30 +410,31 @@ export class SettingsService {
           },
         })
     }
-  }
-
-  get updateCheckingEnabled(): boolean {
-    const backendSetting = this.get(
-      SETTINGS_KEYS.UPDATE_CHECKING_BACKEND_SETTING
-    )
 
     if (
       !this.settingIsSet(SETTINGS_KEYS.UPDATE_CHECKING_ENABLED) &&
-      backendSetting != 'default'
+      this.get(SETTINGS_KEYS.UPDATE_CHECKING_BACKEND_SETTING) != 'default'
     ) {
-      this.set(SETTINGS_KEYS.UPDATE_CHECKING_ENABLED, backendSetting === 'true')
+      this.set(
+        SETTINGS_KEYS.UPDATE_CHECKING_ENABLED,
+        this.get(SETTINGS_KEYS.UPDATE_CHECKING_BACKEND_SETTING).toString() ===
+          'true'
+      )
+
+      this.storeSettings()
+        .pipe(first())
+        .subscribe({
+          error: (e) => {
+            this.toastService.showError(
+              'Error migrating update checking setting'
+            )
+            console.log(e)
+          },
+        })
     }
-    return (
-      this.get(SETTINGS_KEYS.UPDATE_CHECKING_ENABLED) ||
-      (!this.settingIsSet(SETTINGS_KEYS.UPDATE_CHECKING_ENABLED) &&
-        backendSetting == 'true')
-    )
   }
 
   get updateCheckingIsSet(): boolean {
-    return (
-      this.settingIsSet(SETTINGS_KEYS.UPDATE_CHECKING_ENABLED) ||
-      this.get(SETTINGS_KEYS.UPDATE_CHECKING_BACKEND_SETTING) != 'default'
-    )
+    return this.settingIsSet(SETTINGS_KEYS.UPDATE_CHECKING_ENABLED)
   }
 }
