@@ -847,7 +847,7 @@ class UiSettingsView(GenericAPIView):
         ui_settings = {}
         if hasattr(user, "ui_settings"):
             ui_settings = user.ui_settings.settings
-        if ui_settings["update_checking"]:
+        if "update_checking" in ui_settings:
             ui_settings["update_checking"][
                 "backend_setting"
             ] = settings.ENABLE_UPDATE_CHECK
