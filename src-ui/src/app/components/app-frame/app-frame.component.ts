@@ -24,6 +24,8 @@ import {
 import { SettingsService } from 'src/app/services/settings.service'
 import { TasksService } from 'src/app/services/tasks.service'
 import { ComponentCanDeactivate } from 'src/app/guards/dirty-doc.guard'
+import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
+import { ToastService } from 'src/app/services/toast.service'
 
 @Component({
   selector: 'app-app-frame',
@@ -40,13 +42,12 @@ export class AppFrameComponent implements ComponentCanDeactivate {
     private remoteVersionService: RemoteVersionService,
     private list: DocumentListViewService,
     public settingsService: SettingsService,
-    public tasksService: TasksService
+    public tasksService: TasksService,
+    private readonly toastService: ToastService
   ) {
-    this.remoteVersionService
-      .checkForUpdates()
-      .subscribe((appRemoteVersion: AppRemoteVersion) => {
-        this.appRemoteVersion = appRemoteVersion
-      })
+    if (settingsService.updateCheckingEnabled) {
+      this.checkForUpdates()
+    }
     tasksService.reload()
   }
 
@@ -149,5 +150,31 @@ export class AppFrameComponent implements ComponentCanDeactivate {
           }
         }
       })
+  }
+
+  private checkForUpdates() {
+    this.remoteVersionService
+      .checkForUpdates()
+      .subscribe((appRemoteVersion: AppRemoteVersion) => {
+        this.appRemoteVersion = appRemoteVersion
+      })
+  }
+
+  setUpdateChecking(enable: boolean) {
+    this.settingsService.set(SETTINGS_KEYS.UPDATE_CHECKING_ENABLED, enable)
+    this.settingsService
+      .storeSettings()
+      .pipe(first())
+      .subscribe({
+        error: (error) => {
+          this.toastService.showError(
+            $localize`An error occurred while saving update checking settings.`
+          )
+          console.log(error)
+        },
+      })
+    if (enable) {
+      this.checkForUpdates()
+    }
   }
 }

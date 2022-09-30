@@ -313,13 +313,7 @@ export class SettingsService {
     )
   }
 
-  get(key: string): any {
-    let setting = SETTINGS.find((s) => s.key == key)
-
-    if (!setting) {
-      return null
-    }
-
+  private getSettingRawValue(key: string): any {
     let value = null
     // parse key:key:key into nested object
     const keys = key.replace('general-settings:', '').split(':')
@@ -330,6 +324,17 @@ export class SettingsService {
       if (index == keys.length - 1) value = settingObj[keyPart]
       else settingObj = settingObj[keyPart]
     })
+    return value
+  }
+
+  get(key: string): any {
+    let setting = SETTINGS.find((s) => s.key == key)
+
+    if (!setting) {
+      return null
+    }
+
+    let value = this.getSettingRawValue(key)
 
     if (value != null) {
       switch (setting.type) {
@@ -357,6 +362,11 @@ export class SettingsService {
       if (index == keys.length - 1) settingObj[keyPart] = value
       else settingObj = settingObj[keyPart]
     })
+  }
+
+  private settingIsSet(key: string): boolean {
+    let value = this.getSettingRawValue(key)
+    return value != null
   }
 
   storeSettings(): Observable<any> {
@@ -400,5 +410,30 @@ export class SettingsService {
           },
         })
     }
+  }
+
+  get updateCheckingEnabled(): boolean {
+    const backendSetting = this.get(
+      SETTINGS_KEYS.UPDATE_CHECKING_BACKEND_SETTING
+    )
+
+    if (
+      !this.settingIsSet(SETTINGS_KEYS.UPDATE_CHECKING_ENABLED) &&
+      backendSetting != 'default'
+    ) {
+      this.set(SETTINGS_KEYS.UPDATE_CHECKING_ENABLED, backendSetting === 'true')
+    }
+    return (
+      this.get(SETTINGS_KEYS.UPDATE_CHECKING_ENABLED) ||
+      (!this.settingIsSet(SETTINGS_KEYS.UPDATE_CHECKING_ENABLED) &&
+        backendSetting == 'true')
+    )
+  }
+
+  get updateCheckingIsSet(): boolean {
+    return (
+      this.settingIsSet(SETTINGS_KEYS.UPDATE_CHECKING_ENABLED) ||
+      this.get(SETTINGS_KEYS.UPDATE_CHECKING_BACKEND_SETTING) != 'default'
+    )
   }
 }
