@@ -1,4 +1,4 @@
-import { Component, HostListener } from '@angular/core'
+import { Component, HostListener, OnInit } from '@angular/core'
 import { FormControl } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { from, Observable } from 'rxjs'
@@ -32,7 +32,7 @@ import { ToastService } from 'src/app/services/toast.service'
   templateUrl: './app-frame.component.html',
   styleUrls: ['./app-frame.component.scss'],
 })
-export class AppFrameComponent implements ComponentCanDeactivate {
+export class AppFrameComponent implements OnInit, ComponentCanDeactivate {
   constructor(
     public router: Router,
     private activatedRoute: ActivatedRoute,
@@ -44,11 +44,13 @@ export class AppFrameComponent implements ComponentCanDeactivate {
     public settingsService: SettingsService,
     public tasksService: TasksService,
     private readonly toastService: ToastService
-  ) {
-    if (settingsService.updateCheckingEnabled) {
+  ) {}
+
+  ngOnInit(): void {
+    if (this.settingsService.get(SETTINGS_KEYS.UPDATE_CHECKING_ENABLED)) {
       this.checkForUpdates()
     }
-    tasksService.reload()
+    this.tasksService.reload()
   }
 
   versionString = `${environment.appTitle} ${environment.version}`

@@ -67,13 +67,6 @@ export class SettingsComponent
     )
   }
 
-  get displayLanguageIsDirty(): boolean {
-    return (
-      this.settingsForm.get('displayLanguage').value !=
-      this.store?.getValue()['displayLanguage']
-    )
-  }
-
   constructor(
     public savedViewService: SavedViewService,
     private documentListViewService: DocumentListViewService,
@@ -197,7 +190,13 @@ export class SettingsComponent
   }
 
   private saveLocalSettings() {
-    const reloadRequired = this.displayLanguageIsDirty // just this one, for now
+    const reloadRequired =
+      this.settingsForm.value.displayLanguage !=
+        this.store?.getValue()['displayLanguage'] || // displayLanguage is dirty
+      (this.settingsForm.value.updateCheckingEnabled !=
+        this.store?.getValue()['updateCheckingEnabled'] &&
+        this.settingsForm.value.updateCheckingEnabled) // update checking was turned on
+
     this.settings.set(
       SETTINGS_KEYS.BULK_EDIT_APPLY_ON_CLOSE,
       this.settingsForm.value.bulkEditApplyOnClose
