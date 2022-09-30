@@ -908,18 +908,9 @@ Update Checking
 ###############
 
 PAPERLESS_ENABLE_UPDATE_CHECK=<bool>
-    Enable (or disable) the automatic check for available updates. This feature is disabled
-    by default but if it is not explicitly set Paperless-ngx will show a message about this.
 
-    If enabled, the feature works by pinging the the Github API for the latest release e.g.
-    https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest
-    to determine whether a new version is available.
+    .. note::
 
-    Actual updating of the app must still be performed manually.
-
-    Note that for users of thirdy-party containers e.g. linuxserver.io this notification
-    may be 'ahead' of a new release from the third-party maintainers.
-
-    In either case, no tracking data is collected by the app in any way.
-
-    Defaults to none, which disables the feature.
+            This setting was deprecated in favor of a frontend setting after v1.9.2. A one-time
+            migration is performed for users who have this setting set. This setting is always
+            ignored if the corresponding frontend setting has been set.
