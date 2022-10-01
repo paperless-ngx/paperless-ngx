@@ -111,14 +111,16 @@ class Consumer(LoggingMixin):
     def pre_check_duplicate(self):
         with open(self.path, "rb") as f:
             checksum = hashlib.md5(f.read()).hexdigest()
-        if Document.objects.filter(
+        existing_doc = Document.objects.filter(
             Q(checksum=checksum) | Q(archive_checksum=checksum),
-        ).exists():
+        )
+        if existing_doc.exists():
             if settings.CONSUMER_DELETE_DUPLICATES:
                 os.unlink(self.path)
             self._fail(
                 MESSAGE_DOCUMENT_ALREADY_EXISTS,
-                f"Not consuming {self.filename}: It is a duplicate.",
+                f"Not consuming {self.filename}: It is a duplicate of"
+                f" {existing_doc.get().title}",
             )
 
     def pre_check_directories(self):
