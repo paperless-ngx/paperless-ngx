@@ -14,7 +14,7 @@
   "private": true,
   "dependencies": {
     "@angular/common": "~14.2.0",
-    "@angular/compiler": "~14.2.0",
+    "@angular/compiler": "~14.2.4",
     "@angular/core": "~14.2.0",
     "@angular/forms": "~14.2.0",
     "@angular/localize": "~14.2.0",
