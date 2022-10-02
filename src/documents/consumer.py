@@ -120,7 +120,7 @@ class Consumer(LoggingMixin):
             self._fail(
                 MESSAGE_DOCUMENT_ALREADY_EXISTS,
                 f"Not consuming {self.filename}: It is a duplicate of"
-                f" {existing_doc.get().title}",
+                f" {existing_doc.get().title} (#{existing_doc.get().pk})",
             )
 
     def pre_check_directories(self):
