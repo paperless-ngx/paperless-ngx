@@ -27,7 +27,7 @@
     "@popperjs/core": "^2.11.6",
     "bootstrap": "^5.2.1",
     "file-saver": "^2.0.5",
-    "ng2-pdf-viewer": "^9.1.0",
+    "ng2-pdf-viewer": "^9.1.2",
     "ngx-color": "^8.0.3",
     "ngx-cookie-service": "^14.0.1",
     "ngx-file-drop": "^14.0.1",
