@@ -398,11 +398,6 @@
             "markers": "python_version >= '3'",
             "version": "==3.1"
         },
-        "django-q": {
-            "editable": true,
-            "git": "https://github.com/paperless-ngx/django-q.git",
-            "ref": "8b5289d8caf36f67fb99448e76ead20d5b498c1b"
-        },
         "django-timezone-field": {
             "hashes": [
                 "sha256:15746ed367a5a32eda76cfa2886eeec1de8cda79f519b7c5e12f87ed7cdbd663",
