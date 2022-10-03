@@ -11,8 +11,9 @@ def _attempted_task(apps, schema_editor):
     task_model = apps.get_model("documents", "PaperlessTask")
 
     for task in task_model.objects.all():
-        task.attempted_task = None
-        task.save()
+        if hasattr(task, "attempted_task"):
+            task.attempted_task = None
+            task.save()
 
 
 class Migration(migrations.Migration):
@@ -23,10 +24,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(
-            code=_attempted_task,
-            reverse_code=migrations.RunPython.noop,
-        ),
         migrations.RemoveField(
             model_name="paperlesstask",
             name="created",
@@ -39,7 +36,21 @@ class Migration(migrations.Migration):
             model_name="paperlesstask",
             name="started",
         ),
-        migrations.AlterField(
+        # Ensure any existing PaperlessTask.attempted_task are nulled
+        # This ensures nothing is pointing to a django-q model
+        migrations.RunPython(
+            code=_attempted_task,
+            reverse_code=migrations.RunPython.noop,
+        ),
+        # Remove the field from the model
+        migrations.RemoveField(
+            model_name="paperlesstask",
+            name="attempted_task",
+        ),
+        # Add the field back, pointing to the correct model
+        # This resolves a problem where the temporary change in 1022
+        # results in a type mismatch
+        migrations.AddField(
             model_name="paperlesstask",
             name="attempted_task",
             field=models.OneToOneField(
@@ -49,5 +60,15 @@ class Migration(migrations.Migration):
                 related_name="attempted_task",
                 to="django_celery_results.taskresult",
             ),
+        ),
+        # Drop the django-q tables entirely
+        migrations.RunSQL(
+            "DROP TABLE IF EXISTS django_q_ormq", reverse_sql=migrations.RunSQL.noop
+        ),
+        migrations.RunSQL(
+            "DROP TABLE IF EXISTS django_q_schedule", reverse_sql=migrations.RunSQL.noop
+        ),
+        migrations.RunSQL(
+            "DROP TABLE IF EXISTS django_q_task", reverse_sql=migrations.RunSQL.noop
         ),
     ]
