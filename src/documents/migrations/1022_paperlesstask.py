@@ -41,7 +41,7 @@ class Migration(migrations.Migration):
                         null=True,
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="attempted_task",
-                        # This is a dummy field, AlterField in 1026 will set to correct value
+                        # This is a dummy field, 1026 will fix up the column
                         # This manual change is required, as django doesn't django doesn't really support
                         # removing an app which has migration deps like this
                         to="documents.document",
