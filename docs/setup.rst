@@ -648,7 +648,7 @@ are translatable to Docker commands as well.
     a)  If ``REDIS_URL`` is already set, change it to ``PAPERLESS_REDIS`` and continue
         to step 4.
     b)  Otherwise, in the ``docker-compose.yml`` add a new service for Redis,
-        following `the example compose files <https://github.com/paperless-ngx/paperless-ngx/tree/main/docker/compose>`
+        following `the example compose files <https://github.com/paperless-ngx/paperless-ngx/tree/main/docker/compose>`_
     b)  Set the environment variable ``PAPERLESS_REDIS`` so it points to the new Redis container
 
 4.  Update user mapping
