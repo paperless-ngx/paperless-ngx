@@ -57,6 +57,7 @@ celery = {extras = ["redis"], version = "*"}
 django-celery-results = "*"
 setproctitle = "*"
 nltk = "*"
+pdf2image = "*"
 
 [dev-packages]
 coveralls = "*"
