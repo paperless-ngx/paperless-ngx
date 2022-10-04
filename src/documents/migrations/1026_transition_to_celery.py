@@ -4,18 +4,6 @@ from django.db import migrations, models
 import django.db.models.deletion
 
 
-def _attempted_task(apps, schema_editor):
-    """
-    Remove any existing attempted_task one to one fields.
-    """
-    task_model = apps.get_model("documents", "PaperlessTask")
-
-    for task in task_model.objects.all():
-        if hasattr(task, "attempted_task"):
-            task.attempted_task = None
-            task.save()
-
-
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -35,12 +23,6 @@ class Migration(migrations.Migration):
         migrations.RemoveField(
             model_name="paperlesstask",
             name="started",
-        ),
-        # Ensure any existing PaperlessTask.attempted_task are nulled
-        # This ensures nothing is pointing to a django-q model
-        migrations.RunPython(
-            code=_attempted_task,
-            reverse_code=migrations.RunPython.noop,
         ),
         # Remove the field from the model
         migrations.RemoveField(
@@ -62,6 +44,7 @@ class Migration(migrations.Migration):
             ),
         ),
         # Drop the django-q tables entirely
+        # Must be done last or there could be references here
         migrations.RunSQL(
             "DROP TABLE IF EXISTS django_q_ormq", reverse_sql=migrations.RunSQL.noop
         ),
