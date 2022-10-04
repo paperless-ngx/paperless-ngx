@@ -182,7 +182,7 @@ RUN --mount=type=bind,from=qpdf-builder,target=/qpdf \
     --mount=type=bind,from=pikepdf-builder,target=/pikepdf \
   set -eux \
   && echo "Installing qpdf" \
-    && apt-get install --yes --no-install-recommends /qpdf/usr/src/qpdf/libqpdf28_*.deb \
+    && apt-get install --yes --no-install-recommends /qpdf/usr/src/qpdf/libqpdf29_*.deb \
     && apt-get install --yes --no-install-recommends /qpdf/usr/src/qpdf/qpdf_*.deb \
   && echo "Installing pikepdf and dependencies" \
     && python3 -m pip install --no-cache-dir /pikepdf/usr/src/wheels/pyparsing*.whl \
