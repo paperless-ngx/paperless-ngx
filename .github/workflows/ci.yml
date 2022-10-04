@@ -121,7 +121,7 @@ jobs:
       -
         name: Get changed files
         id: changed-files-specific
-        uses: tj-actions/changed-files@v29.0.2
+        uses: tj-actions/changed-files@v31.0.2
         with:
           files: |
             src/**
@@ -485,6 +485,18 @@ jobs:
         with:
           ref: main
       -
+        name: Install pipenv
+        run: |
+          pip3 install --upgrade pip setuptools wheel pipx
+          pipx install pipenv
+      -
+        name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+          cache: "pipenv"
+          cache-dependency-path: 'Pipfile.lock'
+      -
         name: Append Changelog to docs
         id: append-Changelog
         working-directory: docs
@@ -497,9 +509,10 @@ jobs:
           CURRENT_CHANGELOG=`tail --lines +2 changelog.md`
           echo -e "$CURRENT_CHANGELOG" >> changelog-new.md
           mv changelog-new.md changelog.md
+          pipenv run pre-commit --files changelog.md
           git config --global user.name "github-actions"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -am "Changelog ${{ steps.get_version.outputs.version }} - GHA"
+          git commit -am "Changelog ${{ needs.publish-release.outputs.version }} - GHA"
           git push origin ${{ needs.publish-release.outputs.version }}-changelog
       -
         name: Create Pull Request
