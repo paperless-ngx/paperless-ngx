@@ -261,6 +261,9 @@ class DocumentViewSet(
             file_handle = doc.source_file
             filename = doc.get_public_filename()
             mime_type = doc.mime_type
+            # Support browser previewing csv files by using text mime type
+            if mime_type in {"application/csv", "text/csv"} and disposition == "inline":
+                mime_type = "text/plain"
 
         if doc.storage_type == Document.STORAGE_TYPE_GPG:
             file_handle = GnuPG.decrypted(file_handle)
