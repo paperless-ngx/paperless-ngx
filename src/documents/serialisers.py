@@ -608,6 +608,15 @@ class UiSettingsViewSerializer(serializers.ModelSerializer):
             "settings",
         ]
 
+    def validate_settings(self, settings):
+        # we never save update checking backend setting
+        if "update_checking" in settings:
+            try:
+                settings["update_checking"].pop("backend_setting")
+            except KeyError:
+                pass
+        return settings
+
     def create(self, validated_data):
         ui_settings = UiSettings.objects.update_or_create(
             user=validated_data.get("user"),

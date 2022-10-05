@@ -1581,7 +1581,11 @@ class TestApiUiSettings(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertDictEqual(
             response.data["settings"],
-            {},
+            {
+                "update_checking": {
+                    "backend_setting": "default",
+                },
+            },
         )
 
     def test_api_set_ui_settings(self):
@@ -2542,38 +2546,6 @@ class TestApiRemoteVersion(DirectoriesMixin, APITestCase):
     def setUp(self):
         super().setUp()
 
-    def test_remote_version_default(self):
-        response = self.client.get(self.ENDPOINT)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertDictEqual(
-            response.data,
-            {
-                "version": "0.0.0",
-                "update_available": False,
-                "feature_is_set": False,
-            },
-        )
-
-    @override_settings(
-        ENABLE_UPDATE_CHECK=False,
-    )
-    def test_remote_version_disabled(self):
-        response = self.client.get(self.ENDPOINT)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertDictEqual(
-            response.data,
-            {
-                "version": "0.0.0",
-                "update_available": False,
-                "feature_is_set": True,
-            },
-        )
-
-    @override_settings(
-        ENABLE_UPDATE_CHECK=True,
-    )
     @mock.patch("urllib.request.urlopen")
     def test_remote_version_enabled_no_update_prefix(self, urlopen_mock):
 
@@ -2591,13 +2563,9 @@ class TestApiRemoteVersion(DirectoriesMixin, APITestCase):
             {
                 "version": "1.6.0",
                 "update_available": False,
-                "feature_is_set": True,
             },
         )
 
-    @override_settings(
-        ENABLE_UPDATE_CHECK=True,
-    )
     @mock.patch("urllib.request.urlopen")
     def test_remote_version_enabled_no_update_no_prefix(self, urlopen_mock):
 
@@ -2617,13 +2585,9 @@ class TestApiRemoteVersion(DirectoriesMixin, APITestCase):
             {
                 "version": version.__full_version_str__,
                 "update_available": False,
-                "feature_is_set": True,
             },
         )
 
-    @override_settings(
-        ENABLE_UPDATE_CHECK=True,
-    )
     @mock.patch("urllib.request.urlopen")
     def test_remote_version_enabled_update(self, urlopen_mock):
 
@@ -2650,13 +2614,9 @@ class TestApiRemoteVersion(DirectoriesMixin, APITestCase):
             {
                 "version": new_version_str,
                 "update_available": True,
-                "feature_is_set": True,
             },
         )
 
-    @override_settings(
-        ENABLE_UPDATE_CHECK=True,
-    )
     @mock.patch("urllib.request.urlopen")
     def test_remote_version_bad_json(self, urlopen_mock):
 
@@ -2674,13 +2634,9 @@ class TestApiRemoteVersion(DirectoriesMixin, APITestCase):
             {
                 "version": "0.0.0",
                 "update_available": False,
-                "feature_is_set": True,
             },
         )
 
-    @override_settings(
-        ENABLE_UPDATE_CHECK=True,
-    )
     @mock.patch("urllib.request.urlopen")
     def test_remote_version_exception(self, urlopen_mock):
 
@@ -2698,7 +2654,6 @@ class TestApiRemoteVersion(DirectoriesMixin, APITestCase):
             {
                 "version": "0.0.0",
                 "update_available": False,
-                "feature_is_set": True,
             },
         )
 
