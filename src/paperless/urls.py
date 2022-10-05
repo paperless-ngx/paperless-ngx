@@ -58,7 +58,11 @@ urlpatterns = [
                     SearchAutoCompleteView.as_view(),
                     name="autocomplete",
                 ),
-                re_path(r"^statistics/", StatisticsView.as_view(), name="statistics"),
+                re_path(
+                    r"^statistics/",
+                    StatisticsView.as_view(),
+                    name="statistics",
+                ),
                 re_path(
                     r"^documents/post_document/",
                     PostDocumentView.as_view(),
@@ -108,7 +112,8 @@ urlpatterns = [
                 re_path(
                     r"^doc/(?P<pk>\d+)$",
                     RedirectView.as_view(
-                        url=settings.BASE_URL + "api/documents/%(pk)s/download/",
+                        url=settings.BASE_URL
+                        + "api/documents/%(pk)s/download/",
                     ),
                 ),
                 re_path(
@@ -120,7 +125,8 @@ urlpatterns = [
                 re_path(
                     r"^preview/(?P<pk>\d+)$",
                     RedirectView.as_view(
-                        url=settings.BASE_URL + "api/documents/%(pk)s/preview/",
+                        url=settings.BASE_URL
+                        + "api/documents/%(pk)s/preview/",
                     ),
                 ),
             ],
@@ -143,7 +149,14 @@ urlpatterns = [
     ),
     # TODO: with localization, this is even worse! :/
     # login, logout
-    path("accounts/", include("django.contrib.auth.urls")),
+    path(
+        "accounts/",
+        include(
+            "allauth.urls"
+            if settings.ALLAUTH_ENABLED
+            else "django.contrib.auth.urls",
+        ),
+    ),
     # Root of the Frontent
     re_path(r".*", login_required(IndexView.as_view()), name="base"),
 ]

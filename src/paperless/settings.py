@@ -6,6 +6,7 @@ import os
 import re
 import tempfile
 from typing import Final
+from typing import List
 from typing import Optional
 from typing import Set
 from urllib.parse import urlparse
@@ -40,7 +41,9 @@ def __get_boolean(key: str, default: str = "NO") -> bool:
     Return a boolean value based on whatever the user has supplied in the
     environment based on whether the value "looks like" it's True or not.
     """
-    return bool(os.getenv(key, default).lower() in ("yes", "y", "1", "t", "true"))
+    return bool(
+        os.getenv(key, default).lower() in ("yes", "y", "1", "t", "true"),
+    )
 
 
 def __get_int(key: str, default: int) -> int:
@@ -64,6 +67,13 @@ def __get_path(key: str, default: str) -> str:
     return os.path.abspath(os.path.normpath(os.environ.get(key, default)))
 
 
+def __get_list(key: str, default: Optional[List[str]] = None) -> List[str]:
+    """
+    Return a list of strings based on the environment variable or an empty list
+    """
+    return os.getenv(key).split(",") if os.getenv(key) else []
+
+
 # NEVER RUN WITH DEBUG IN PRODUCTION.
 DEBUG = __get_boolean("PAPERLESS_DEBUG", "NO")
 
@@ -74,14 +84,23 @@ DEBUG = __get_boolean("PAPERLESS_DEBUG", "NO")
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-STATIC_ROOT = __get_path("PAPERLESS_STATICDIR", os.path.join(BASE_DIR, "..", "static"))
+STATIC_ROOT = __get_path(
+    "PAPERLESS_STATICDIR",
+    os.path.join(BASE_DIR, "..", "static"),
+)
 
-MEDIA_ROOT = __get_path("PAPERLESS_MEDIA_ROOT", os.path.join(BASE_DIR, "..", "media"))
+MEDIA_ROOT = __get_path(
+    "PAPERLESS_MEDIA_ROOT",
+    os.path.join(BASE_DIR, "..", "media"),
+)
 ORIGINALS_DIR = os.path.join(MEDIA_ROOT, "documents", "originals")
 ARCHIVE_DIR = os.path.join(MEDIA_ROOT, "documents", "archive")
 THUMBNAIL_DIR = os.path.join(MEDIA_ROOT, "documents", "thumbnails")
 
-DATA_DIR = __get_path("PAPERLESS_DATA_DIR", os.path.join(BASE_DIR, "..", "data"))
+DATA_DIR = __get_path(
+    "PAPERLESS_DATA_DIR",
+    os.path.join(BASE_DIR, "..", "data"),
+)
 
 TRASH_DIR = os.getenv("PAPERLESS_TRASH_DIR")
 
@@ -91,7 +110,10 @@ MEDIA_LOCK = os.path.join(MEDIA_ROOT, "media.lock")
 INDEX_DIR = os.path.join(DATA_DIR, "index")
 MODEL_FILE = os.path.join(DATA_DIR, "classification_model.pickle")
 
-LOGGING_DIR = __get_path("PAPERLESS_LOGGING_DIR", os.path.join(DATA_DIR, "log"))
+LOGGING_DIR = __get_path(
+    "PAPERLESS_LOGGING_DIR",
+    os.path.join(DATA_DIR, "log"),
+)
 
 CONSUMPTION_DIR = __get_path(
     "PAPERLESS_CONSUMPTION_DIR",
@@ -108,7 +130,12 @@ SCRATCH_DIR = __get_path(
 # Application Definition                                                      #
 ###############################################################################
 
-env_apps = os.getenv("PAPERLESS_APPS").split(",") if os.getenv("PAPERLESS_APPS") else []
+env_apps = __get_list("PAPERLESS_APPS")
+allauth_providers = __get_list("PAPERLESS_ALLAUTH_PROVIDERS")
+ALLAUTH_ENABLED = __get_boolean(
+    "PAPERLESS_ALLAUTH_ENABLE",
+    str(bool(allauth_providers)),
+)
 
 INSTALLED_APPS = [
     "whitenoise.runserver_nostatic",
@@ -129,7 +156,16 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     "django_filters",
     "django_q",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
 ] + env_apps
+
+if ALLAUTH_ENABLED:
+    INSTALLED_APPS += [
+        f"allauth.socialaccount.providers.{provider}"
+        for provider in allauth_providers
+    ]
 
 if DEBUG:
     INSTALLED_APPS.append("channels")
@@ -214,7 +250,9 @@ CHANNEL_LAYERS = {
 AUTO_LOGIN_USERNAME = os.getenv("PAPERLESS_AUTO_LOGIN_USERNAME")
 
 if AUTO_LOGIN_USERNAME:
-    _index = MIDDLEWARE.index("django.contrib.auth.middleware.AuthenticationMiddleware")
+    _index = MIDDLEWARE.index(
+        "django.contrib.auth.middleware.AuthenticationMiddleware",
+    )
     # This overrides everything the auth middleware is doing but still allows
     # regular login in case the provided user does not exist.
     MIDDLEWARE.insert(_index + 1, "paperless.auth.AutoLoginMiddleware")
@@ -231,6 +269,10 @@ if ENABLE_HTTP_REMOTE_USER:
         "django.contrib.auth.backends.RemoteUserBackend",
         "django.contrib.auth.backends.ModelBackend",
     ]
+    if ALLAUTH_ENABLED:
+        AUTHENTICATION_BACKENDS.append(
+            "allauth.account.auth_backends.AuthenticationBackend",
+        )
     REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"].append(
         "rest_framework.authentication.RemoteUserAuthentication",
     )
@@ -251,7 +293,9 @@ else:
 
 # We allow CORS from localhost:8000
 CORS_ALLOWED_ORIGINS = tuple(
-    os.getenv("PAPERLESS_CORS_ALLOWED_HOSTS", "http://localhost:8000").split(","),
+    os.getenv("PAPERLESS_CORS_ALLOWED_HOSTS", "http://localhost:8000").split(
+        ",",
+    ),
 )
 
 if DEBUG:
@@ -341,7 +385,10 @@ if os.getenv("PAPERLESS_DBHOST"):
     # Leave room for future extensibility
     if os.getenv("PAPERLESS_DBENGINE") == "mariadb":
         engine = "django.db.backends.mysql"
-        options = {"read_default_file": "/etc/mysql/my.cnf", "charset": "utf8mb4"}
+        options = {
+            "read_default_file": "/etc/mysql/my.cnf",
+            "charset": "utf8mb4",
+        }
     else:  # Default to PostgresDB
         engine = "django.db.backends.postgresql_psycopg2"
         options = {"sslmode": os.getenv("PAPERLESS_DBSSLMODE", "prefer")}
@@ -363,7 +410,10 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 LANGUAGE_CODE = "en-us"
 
 LANGUAGES = [
-    ("en-us", _("English (US)")),  # needs to be first to act as fallback language
+    (
+        "en-us",
+        _("English (US)"),
+    ),  # needs to be first to act as fallback language
     ("be-by", _("Belarusian")),
     ("cs-cz", _("Czech")),
     ("da-dk", _("Danish")),
@@ -508,7 +558,9 @@ CONSUMER_INOTIFY_DELAY: Final[float] = __get_float(
     0.5,
 )
 
-CONSUMER_DELETE_DUPLICATES = __get_boolean("PAPERLESS_CONSUMER_DELETE_DUPLICATES")
+CONSUMER_DELETE_DUPLICATES = __get_boolean(
+    "PAPERLESS_CONSUMER_DELETE_DUPLICATES",
+)
 
 CONSUMER_RECURSIVE = __get_boolean("PAPERLESS_CONSUMER_RECURSIVE")
 
@@ -532,7 +584,10 @@ CONSUMER_BARCODE_TIFF_SUPPORT = __get_boolean(
     "PAPERLESS_CONSUMER_BARCODE_TIFF_SUPPORT",
 )
 
-CONSUMER_BARCODE_STRING = os.getenv("PAPERLESS_CONSUMER_BARCODE_STRING", "PATCHT")
+CONSUMER_BARCODE_STRING = os.getenv(
+    "PAPERLESS_CONSUMER_BARCODE_STRING",
+    "PATCHT",
+)
 
 OCR_PAGES = int(os.getenv("PAPERLESS_OCR_PAGES", 0))
 
@@ -560,7 +615,9 @@ OCR_ROTATE_PAGES_THRESHOLD = float(
 
 OCR_MAX_IMAGE_PIXELS: Optional[int] = None
 if os.environ.get("PAPERLESS_OCR_MAX_IMAGE_PIXELS") is not None:
-    OCR_MAX_IMAGE_PIXELS: int = int(os.environ.get("PAPERLESS_OCR_MAX_IMAGE_PIXELS"))
+    OCR_MAX_IMAGE_PIXELS: int = int(
+        os.environ.get("PAPERLESS_OCR_MAX_IMAGE_PIXELS"),
+    )
 
 OCR_USER_ARGS = os.getenv("PAPERLESS_OCR_USER_ARGS", "{}")
 
@@ -674,3 +731,20 @@ if os.getenv("PAPERLESS_IGNORE_DATES") is not None:
 ENABLE_UPDATE_CHECK = os.getenv("PAPERLESS_ENABLE_UPDATE_CHECK", "default")
 if ENABLE_UPDATE_CHECK != "default":
     ENABLE_UPDATE_CHECK = __get_boolean("PAPERLESS_ENABLE_UPDATE_CHECK")
+
+
+if ALLAUTH_ENABLED:
+    ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
+    ACCOUNT_LOGOUT_ON_GET = True
+    ACCOUNT_ADAPTER = "paperless.allauth_adapter.CustomAccountAdapter"
+    ACCOUNT_EMAIL_VERIFICATION = "none"
+    SOCIALACCOUNT_ADAPTER = (
+        "paperless.allauth_adapter.CustomSocialAccountAdapter"
+    )
+    ACCOUNT_HIDE_PASSWORD_FORM = __get_boolean(
+        "PAPERLESS_HIDE_PASSWORD_FORM",
+        "no",
+    )
+    SOCIALACCOUNT_PROVIDERS = json.loads(
+        os.environ.get("PAPERLESS_ALLAUTH_SOCIALACCOUNT_PROVIDERS", "{}"),
+    )
