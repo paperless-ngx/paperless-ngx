@@ -134,32 +134,25 @@ SCRATCH_DIR = __get_path(
 _allauth_providers = set(__get_list("PAPERLESS_ALLAUTH_PROVIDERS"))
 
 
-def _get_oidc_servers():
-    servers = __get_list("PAPERLESS_OIDC_SERVERS")
-    if not servers:
-        return
-    _allauth_providers.add("openid_connect")
-    it = iter(servers)
-    ret = []
-    for next_pair_name in it:
-        server_url = next(it)
-        client_id = next(it)
-        secret = next(it)
-        ret.append(
-            {
-                "id": slugify(next_pair_name)[:35],
-                "name": next_pair_name,
-                "server_url": server_url,
-                "APP": {
-                    "client_id": client_id,
-                    "secret": secret,
-                },
+def _get_oidc_server():
+    config_id = os.environ.get("PAPERLESS_SSO_OIDC_ID")
+    name = os.environ.get("PAPERLESS_SSO_OIDC_NAME")
+    url = os.environ.get("PAPERLESS_SSO_OIDC_URL")
+    client_id = os.environ.get("PAPERLESS_SSO_OIDC_CLIENT_ID")
+    secret = os.environ.get("PAPERLESS_SSO_OIDC_SECRET")
+    if name and url and client_id and secret:
+        return {
+            "id": config_id or slugify(name)[:35],
+            "name": name,
+            "server_url": url,
+            "APP": {
+                "client_id": client_id,
+                "secret": secret,
             },
-        )
-    return ret
+        }
 
 
-_oidc_servers = _get_oidc_servers()
+_oidc_server = _get_oidc_server()
 
 ALLAUTH_ENABLED = __get_boolean(
     "PAPERLESS_ALLAUTH_ENABLE",
@@ -801,7 +794,7 @@ if ALLAUTH_ENABLED:
     SOCIALACCOUNT_PROVIDERS = json.loads(
         os.environ.get("PAPERLESS_ALLAUTH_SOCIALACCOUNT_PROVIDERS", "{}"),
     )
-    if _oidc_servers:
+    if _oidc_server:
         SOCIALACCOUNT_PROVIDERS.setdefault("openid-connect", {})
         SOCIALACCOUNT_PROVIDERS["openid-connect"].setdefault("SERVERS", [])
-        SOCIALACCOUNT_PROVIDERS["openid-connect"]["SERVERS"] += _oidc_servers
+        SOCIALACCOUNT_PROVIDERS["openid-connect"]["SERVERS"] += [_oidc_server]
