@@ -1,0 +1,14 @@
+{% load i18n %}
+<html lang="en">
+  <head>
+    <title>{% translate "Redirecting" %}</title>
+    <meta http-equiv="refresh" content="0;URL='{% url "base" %}'" />
+    <style type="text/css">
+      body { background-color: #fff; }
+      a { color: #ccc; }
+    </style>
+  </head>
+  <body>
+    <a href="{% url "base" %}">{% translate "Redirecting" %}...</a>
+  </body>
+</html>
