@@ -791,9 +791,7 @@ if SSO_ENABLED:
         login="allauth.account.forms.LoginForm",
     )
 
-    SOCIALACCOUNT_ADAPTER = (
-        "paperless.allauth_custom.CustomSocialAccountAdapter"
-    )
+    SOCIALACCOUNT_ADAPTER = "paperless.allauth_custom.CustomSocialAccountAdapter"
     SOCIALACCOUNT_LOGIN_ON_GET = __get_boolean(
         "PAPERLESS_SSO_LOGIN_ON_GET",
     )

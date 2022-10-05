@@ -112,8 +112,7 @@ urlpatterns = [
                 re_path(
                     r"^doc/(?P<pk>\d+)$",
                     RedirectView.as_view(
-                        url=settings.BASE_URL
-                        + "api/documents/%(pk)s/download/",
+                        url=settings.BASE_URL + "api/documents/%(pk)s/download/",
                     ),
                 ),
                 re_path(
@@ -125,8 +124,7 @@ urlpatterns = [
                 re_path(
                     r"^preview/(?P<pk>\d+)$",
                     RedirectView.as_view(
-                        url=settings.BASE_URL
-                        + "api/documents/%(pk)s/preview/",
+                        url=settings.BASE_URL + "api/documents/%(pk)s/preview/",
                     ),
                 ),
             ],
