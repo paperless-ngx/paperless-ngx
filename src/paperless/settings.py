@@ -755,6 +755,9 @@ if ALLAUTH_ENABLED:
     SOCIALACCOUNT_ADAPTER = (
         "paperless.allauth_custom.CustomSocialAccountAdapter"
     )
+    SOCIALACCOUNT_LOGIN_ON_GET = __get_boolean(
+        "PAPERLESS_SOCIALACCOUNT_LOGIN_ON_GET",
+    )
     SOCIALACCOUNT_PROVIDERS = json.loads(
         os.environ.get("PAPERLESS_ALLAUTH_SOCIALACCOUNT_PROVIDERS", "{}"),
     )
