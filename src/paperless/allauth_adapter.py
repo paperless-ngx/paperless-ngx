@@ -3,9 +3,14 @@ import logging
 from allauth.account.adapter import DefaultAccountAdapter
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from django.conf import settings
+from django.http import Http404
 from django.urls import reverse
 
 logger = logging.getLogger("paperless.handlers")
+
+
+def raise_404(*args, **kwargs):
+    raise Http404
 
 
 class CustomAccountAdapter(DefaultAccountAdapter):
@@ -17,11 +22,6 @@ class CustomAccountAdapter(DefaultAccountAdapter):
 
 
 class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
-    def is_open_for_signup(self, request, sociallogin):
-        # True indicates a user should be automatically created on successful
-        # login via configured external provider
-        return getattr(settings, "SOCIALACCOUNT_ENABLE_SIGNUP", True)
-
     def authentication_error(
         self,
         request,
@@ -38,3 +38,8 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             exception,
             extra_context,
         )
+
+    def is_open_for_signup(self, request, sociallogin):
+        # True indicates a user should be automatically created on successful
+        # login via configured external provider
+        return getattr(settings, "SOCIALACCOUNT_ENABLE_SIGNUP", True)

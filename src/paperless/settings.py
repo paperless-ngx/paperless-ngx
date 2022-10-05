@@ -734,16 +734,26 @@ if ENABLE_UPDATE_CHECK != "default":
 
 
 if ALLAUTH_ENABLED:
-    ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
-    ACCOUNT_LOGOUT_ON_GET = True
     ACCOUNT_ADAPTER = "paperless.allauth_adapter.CustomAccountAdapter"
+    ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
     ACCOUNT_EMAIL_VERIFICATION = "none"
-    SOCIALACCOUNT_ADAPTER = (
-        "paperless.allauth_adapter.CustomSocialAccountAdapter"
-    )
     ACCOUNT_HIDE_PASSWORD_FORM = __get_boolean(
         "PAPERLESS_HIDE_PASSWORD_FORM",
         "no",
+    )
+    ACCOUNT_LOGOUT_ON_GET = True
+
+    # Disable all allauth forms except for the login form
+    class AllauthFormsOverride(dict):
+        def get(self, key, default=None):
+            return super().get(key, "paperless.allauth_adapter.raise_404")
+
+    ACCOUNT_FORMS = AllauthFormsOverride(
+        login="allauth.account.forms.LoginForm",
+    )
+
+    SOCIALACCOUNT_ADAPTER = (
+        "paperless.allauth_adapter.CustomSocialAccountAdapter"
     )
     SOCIALACCOUNT_PROVIDERS = json.loads(
         os.environ.get("PAPERLESS_ALLAUTH_SOCIALACCOUNT_PROVIDERS", "{}"),
