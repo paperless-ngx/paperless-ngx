@@ -12,6 +12,7 @@ from typing import Set
 from urllib.parse import urlparse
 
 from concurrent_log_handler.queue import setup_logging_queues
+from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from dotenv import load_dotenv
 
@@ -127,15 +128,50 @@ SCRATCH_DIR = __get_path(
 )
 
 ###############################################################################
+# SSO Configuration
+###############################################################################
+
+_allauth_providers = set(__get_list("PAPERLESS_ALLAUTH_PROVIDERS"))
+
+
+def _get_oidc_servers():
+    servers = __get_list("PAPERLESS_OIDC_SERVERS")
+    if not servers:
+        return
+    _allauth_providers.add("openid_connect")
+    it = iter(servers)
+    ret = []
+    for next_pair_name in it:
+        server_url = next(it)
+        client_id = next(it)
+        secret = next(it)
+        ret.append(
+            {
+                "id": slugify(next_pair_name)[:35],
+                "name": next_pair_name,
+                "server_url": server_url,
+                "APP": {
+                    "client_id": client_id,
+                    "secret": secret,
+                },
+            },
+        )
+    return ret
+
+
+_oidc_servers = _get_oidc_servers()
+
+ALLAUTH_ENABLED = __get_boolean(
+    "PAPERLESS_ALLAUTH_ENABLE",
+    str(bool(_allauth_providers)),
+)
+
+
+###############################################################################
 # Application Definition                                                      #
 ###############################################################################
 
 env_apps = __get_list("PAPERLESS_APPS")
-allauth_providers = __get_list("PAPERLESS_ALLAUTH_PROVIDERS")
-ALLAUTH_ENABLED = __get_boolean(
-    "PAPERLESS_ALLAUTH_ENABLE",
-    str(bool(allauth_providers)),
-)
 
 INSTALLED_APPS = [
     "whitenoise.runserver_nostatic",
@@ -164,7 +200,7 @@ INSTALLED_APPS = [
 if ALLAUTH_ENABLED:
     INSTALLED_APPS += [
         f"allauth.socialaccount.providers.{provider}"
-        for provider in allauth_providers
+        for provider in _allauth_providers
     ]
 
 if DEBUG:
@@ -761,3 +797,7 @@ if ALLAUTH_ENABLED:
     SOCIALACCOUNT_PROVIDERS = json.loads(
         os.environ.get("PAPERLESS_ALLAUTH_SOCIALACCOUNT_PROVIDERS", "{}"),
     )
+    if _oidc_servers:
+        SOCIALACCOUNT_PROVIDERS.setdefault("openid-connect", {})
+        SOCIALACCOUNT_PROVIDERS["openid-connect"].setdefault("SERVERS", [])
+        SOCIALACCOUNT_PROVIDERS["openid-connect"]["SERVERS"] += _oidc_servers
