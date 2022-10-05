@@ -26,7 +26,7 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         return self.get_login_redirect_url(request)
 
     def is_open_for_signup(self, request):
-        return getattr(settings, "ACCOUNT_ENABLE_SIGNUP", False)
+        return getattr(settings, "LOGIN_ENABLE_SIGNUP", False)
 
 
 class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
@@ -58,7 +58,7 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
     def is_open_for_signup(self, request, sociallogin):
         # True indicates a user should be automatically created on successful
         # login via configured external provider
-        return getattr(settings, "SOCIALACCOUNT_ENABLE_SIGNUP", True)
+        return getattr(settings, "SSO_AUTO_LINK", True)
 
 
 base_url = reverse_lazy("base")

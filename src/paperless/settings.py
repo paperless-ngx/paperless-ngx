@@ -131,8 +131,6 @@ SCRATCH_DIR = __get_path(
 # SSO Configuration
 ###############################################################################
 
-_allauth_providers = set(__get_list("PAPERLESS_ALLAUTH_PROVIDERS"))
-
 
 def _get_oidc_server():
     config_id = os.environ.get("PAPERLESS_SSO_OIDC_ID")
@@ -152,13 +150,15 @@ def _get_oidc_server():
         }
 
 
+_allauth_provider_modules = set(__get_list("PAPERLESS_SSO_MODULES"))
 _oidc_server = _get_oidc_server()
+if _oidc_server:
+    _allauth_provider_modules.add("openid_connect")
 
-ALLAUTH_ENABLED = __get_boolean(
-    "PAPERLESS_ALLAUTH_ENABLE",
-    str(bool(_allauth_providers)),
+SSO_ENABLED = __get_boolean(
+    "PAPERLESS_SSO_ENABLED",
+    str(bool(_allauth_provider_modules)),
 )
-
 
 ###############################################################################
 # Application Definition                                                      #
@@ -190,10 +190,10 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
 ] + env_apps
 
-if ALLAUTH_ENABLED:
+if SSO_ENABLED:
     INSTALLED_APPS += [
         f"allauth.socialaccount.providers.{provider}"
-        for provider in _allauth_providers
+        for provider in _allauth_provider_modules
     ]
 
 if DEBUG:
@@ -298,7 +298,7 @@ if ENABLE_HTTP_REMOTE_USER:
         "django.contrib.auth.backends.RemoteUserBackend",
         "django.contrib.auth.backends.ModelBackend",
     ]
-    if ALLAUTH_ENABLED:
+    if SSO_ENABLED:
         AUTHENTICATION_BACKENDS.append(
             "allauth.account.auth_backends.AuthenticationBackend",
         )
@@ -762,16 +762,22 @@ if ENABLE_UPDATE_CHECK != "default":
     ENABLE_UPDATE_CHECK = __get_boolean("PAPERLESS_ENABLE_UPDATE_CHECK")
 
 
-if ALLAUTH_ENABLED:
+if SSO_ENABLED:
+    SSO_AUTO_LINK = __get_boolean("PAPERLESS_SSO_AUTO_LINK", "yes")
     SSO_AUTO_LINK_MULTIPLE = __get_boolean(
         "PAPERLESS_SSO_AUTO_LINK_MULTIPLE",
+        "yes",
+    )
+    SSO_SIGNUP_ONLY = __get_boolean(
+        "PAPERLESS_SSO_SIGNUP_ONLY",
         "yes",
     )
     ACCOUNT_ADAPTER = "paperless.allauth_custom.CustomAccountAdapter"
     ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
     ACCOUNT_EMAIL_VERIFICATION = "none"
-    ACCOUNT_HIDE_PASSWORD_FORM = __get_boolean(
-        "PAPERLESS_HIDE_PASSWORD_FORM",
+    LOGIN_ENABLE_SIGNUP = __get_boolean("PAPERLESS_LOGIN_ENABLE_SIGNUP", "no")
+    LOGIN_HIDE_PASSWORD_FORM = __get_boolean(
+        "PAPERLESS_LOGIN_HIDE_PASSWORD_FORM",
         "no",
     )
     ACCOUNT_LOGOUT_ON_GET = True
@@ -789,10 +795,10 @@ if ALLAUTH_ENABLED:
         "paperless.allauth_custom.CustomSocialAccountAdapter"
     )
     SOCIALACCOUNT_LOGIN_ON_GET = __get_boolean(
-        "PAPERLESS_SOCIALACCOUNT_LOGIN_ON_GET",
+        "PAPERLESS_SSO_LOGIN_ON_GET",
     )
     SOCIALACCOUNT_PROVIDERS = json.loads(
-        os.environ.get("PAPERLESS_ALLAUTH_SOCIALACCOUNT_PROVIDERS", "{}"),
+        os.environ.get("PAPERLESS_SSO_PROVIDERS", "{}"),
     )
     if _oidc_server:
         SOCIALACCOUNT_PROVIDERS.setdefault("openid-connect", {})

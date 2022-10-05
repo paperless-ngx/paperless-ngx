@@ -153,7 +153,7 @@ urlpatterns = [
         "accounts/",
         include(
             "paperless.allauth_custom"
-            if settings.ALLAUTH_ENABLED
+            if settings.SSO_ENABLED
             else "django.contrib.auth.urls",
         ),
     ),
