@@ -56,15 +56,24 @@ map_folders() {
 nltk_data () {
 	# Store the NLTK data outside the Docker container
 	local nltk_data_dir="${DATA_DIR}/nltk"
+	readonly truthy_things=("yes y 1 t true")
 
-	# Download or update the snowball stemmer data
-	python3 -W ignore::RuntimeWarning -m nltk.downloader -d "${nltk_data_dir}" snowball_data
+	# If not set, or it looks truthy
+	if [[ -z "${PAPERLESS_ENABLE_NLTK}" ]] || [[ "${truthy_things[*]}" =~ ${PAPERLESS_ENABLE_NLTK,} ]]; then
 
-	# Download or update the stopwords corpus
-	python3 -W ignore::RuntimeWarning -m nltk.downloader -d "${nltk_data_dir}" stopwords
+		# Download or update the snowball stemmer data
+		python3 -W ignore::RuntimeWarning -m nltk.downloader -d "${nltk_data_dir}" snowball_data
 
-	# Download or update the punkt tokenizer data
-	python3 -W ignore::RuntimeWarning -m nltk.downloader -d "${nltk_data_dir}" punkt
+		# Download or update the stopwords corpus
+		python3 -W ignore::RuntimeWarning -m nltk.downloader -d "${nltk_data_dir}" stopwords
+
+		# Download or update the punkt tokenizer data
+		python3 -W ignore::RuntimeWarning -m nltk.downloader -d "${nltk_data_dir}" punkt
+
+	else
+		echo "Skipping NLTK data download"
+
+	fi
 
 }
 
