@@ -770,6 +770,10 @@ if ENABLE_UPDATE_CHECK != "default":
 
 
 if ALLAUTH_ENABLED:
+    SSO_AUTO_LINK_MULTIPLE = __get_boolean(
+        "PAPERLESS_SSO_AUTO_LINK_MULTIPLE",
+        "yes",
+    )
     ACCOUNT_ADAPTER = "paperless.allauth_custom.CustomAccountAdapter"
     ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
     ACCOUNT_EMAIL_VERIFICATION = "none"

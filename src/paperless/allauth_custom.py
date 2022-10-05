@@ -47,6 +47,14 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             extra_context,
         )
 
+    def is_auto_signup_allowed(self, *args, **kwargs):
+        if getattr(settings, "SSO_AUTO_LINK_MULTIPLE", True):
+            # Skip allauth default logic of checkign for an existing user with
+            # the same email address. This requires paperless administrators to
+            # trust the SSO providers connected to paperless.
+            return True
+        return super().is_auto_signup_allowed(*args, **kwargs)
+
     def is_open_for_signup(self, request, sociallogin):
         # True indicates a user should be automatically created on successful
         # login via configured external provider
