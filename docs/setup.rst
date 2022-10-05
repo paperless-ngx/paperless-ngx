@@ -520,6 +520,13 @@ writing. Windows is not and will never be supported.
     to compile this by yourself, because this software has been patented until around 2017 and
     binary packages are not available for most distributions.
 
+15. Optional: If using the NLTK machine learning processing (see ``PAPERLESS_ENABLE_NLTK`` in
+    :ref:`configuration` for details), download the NLTK data for the Snowball Stemmer, Stopwords
+    and Punkt tokenizer to your ``PAPERLESS_DATA_DIR/nltk``.  Refer to
+    the `NLTK instructions <https://www.nltk.org/data.html>`_ for details on how to
+    download the data.
+
+
 Migrating to Paperless-ngx
 ##########################
 
