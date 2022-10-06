@@ -20,6 +20,10 @@ from pyzbar import pyzbar
 logger = logging.getLogger("paperless.barcodes")
 
 
+class BarcodeImageFormatError(Exception):
+    pass
+
+
 @lru_cache(maxsize=8)
 def supported_file_type(mime_type) -> bool:
     """
@@ -114,6 +118,9 @@ def scan_file_for_separating_barcodes(filepath: str) -> Tuple[Optional[str], Lis
             for page_num, page in enumerate(pdf.pages):
                 for image_key in page.images:
                     pdfimage = PdfImage(page.images[image_key])
+
+                    if "/CCITTFaxDecode" in pdfimage.filters:
+                        raise BarcodeImageFormatError()
 
                     # Not all images can be transcoded to a PIL image, which
                     # is what pyzbar expects to receive
