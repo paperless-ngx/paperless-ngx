@@ -226,7 +226,7 @@ class TestBarcode(DirectoriesMixin, TestCase):
         WHEN:
             - The image tries to be transcoded to a PIL image, but fails
         THEN:
-            - The barcode reader is still called, as
+            - The barcode reader is still called
         """
 
         def _build_device_n_pdf(self, save_path: str):
@@ -278,6 +278,26 @@ class TestBarcode(DirectoriesMixin, TestCase):
                 )
 
                 reader.assert_called()
+
+    def test_scan_file_for_separating_barcodes_fax_decode(self):
+        """
+        GIVEN:
+            - A PDF containing an image encoded as CCITT Group 4 encoding
+        WHEN:
+            - Barcode processing happens with the file
+        THEN:
+            - The barcode is still detected
+        """
+        test_file = os.path.join(
+            self.BARCODE_SAMPLE_DIR,
+            "barcode-fax-image.pdf",
+        )
+        pdf_file, separator_page_numbers = barcodes.scan_file_for_separating_barcodes(
+            test_file,
+        )
+
+        self.assertEqual(pdf_file, test_file)
+        self.assertListEqual(separator_page_numbers, [1])
 
     def test_scan_file_for_separating_qr_barcodes(self):
         test_file = os.path.join(
