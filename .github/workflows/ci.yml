@@ -92,7 +92,12 @@ jobs:
         ports:
           - "3000:3000/tcp"
     env:
+      # Enable Tika end to end testing
       TIKA_LIVE: 1
+      # Enable paperless_mail testing against real server
+      PAPERLESS_MAIL_TEST_HOST: ${{ secrets.TEST_MAIL_HOST }}
+      PAPERLESS_MAIL_TEST_USER: ${{ secrets.TEST_MAIL_USER }}
+      PAPERLESS_MAIL_TEST_PASSWD: ${{ secrets.TEST_MAIL_PASSWD }}
     steps:
       -
         name: Checkout
