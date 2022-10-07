@@ -6,7 +6,7 @@ import { PaperlessTag } from 'src/app/data/paperless-tag'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { randomColor } from 'src/app/utils/color'
-import {DEFAULT_MATCHING_ALGORITHM} from "../../../../data/matching-model";
+import { DEFAULT_MATCHING_ALGORITHM } from 'src/app/data/matching-model'
 
 @Component({
   selector: 'app-tag-edit-dialog',
