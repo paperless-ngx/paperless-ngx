@@ -664,7 +664,7 @@ are translatable to Docker commands as well.
 6.  Update media paths
 
     a) Set the environment variable ``PAPERLESS_MEDIA_ROOT``
-       to ``/data``
+       to ``/data/media``
 
 7.  Update timezone
 
