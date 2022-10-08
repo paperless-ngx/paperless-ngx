@@ -117,9 +117,11 @@ def consume_file(
                     # Move it to consume directory to be picked up
                     # Otherwise, use the current parent to keep possible tags
                     # from subdirectories
-                    if path.is_relative_to(settings.SCRATCH_DIR):
+                    try:
+                        # is_relative_to would be nicer, but new in 3.9
+                        _ = path.relative_to(settings.SCRATCH_DIR)
                         save_to_dir = settings.CONSUMPTION_DIR
-                    else:
+                    except ValueError:
                         save_to_dir = path.parent
 
                     barcodes.save_to_dir(
