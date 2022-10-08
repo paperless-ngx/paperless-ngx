@@ -112,10 +112,20 @@ def consume_file(
                         newname = f"{str(n)}_" + override_filename
                     else:
                         newname = None
+
+                    # If the file is an upload, it's in the scratch directory
+                    # Move it to consume directory to be picked up
+                    # Otherwise, use the current parent to keep possible tags
+                    # from subdirectories
+                    if path.is_relative_to(settings.SCRATCH_DIR):
+                        save_to_dir = settings.CONSUMPTION_DIR
+                    else:
+                        save_to_dir = path.parent
+
                     barcodes.save_to_dir(
                         document,
                         newname=newname,
-                        target_dir=path.parent,
+                        target_dir=save_to_dir,
                     )
 
                 # Delete the PDF file which was split
