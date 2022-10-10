@@ -47,7 +47,7 @@ export class SettingsService {
 
   public displayName: string
 
-  public changed = new EventEmitter()
+  public settingsSaved: EventEmitter<any> = new EventEmitter()
 
   constructor(
     rendererFactory: RendererFactory2,
@@ -316,13 +316,7 @@ export class SettingsService {
     )
   }
 
-  get(key: string): any {
-    let setting = SETTINGS.find((s) => s.key == key)
-
-    if (!setting) {
-      return null
-    }
-
+  private getSettingRawValue(key: string): any {
     let value = null
     // parse key:key:key into nested object
     const keys = key.replace('general-settings:', '').split(':')
@@ -333,6 +327,17 @@ export class SettingsService {
       if (index == keys.length - 1) value = settingObj[keyPart]
       else settingObj = settingObj[keyPart]
     })
+    return value
+  }
+
+  get(key: string): any {
+    let setting = SETTINGS.find((s) => s.key == key)
+
+    if (!setting) {
+      return null
+    }
+
+    let value = this.getSettingRawValue(key)
 
     if (value != null) {
       switch (setting.type) {
@@ -362,10 +367,19 @@ export class SettingsService {
     })
   }
 
+  private settingIsSet(key: string): boolean {
+    let value = this.getSettingRawValue(key)
+    return value != null
+  }
+
   storeSettings(): Observable<any> {
-    return this.http
-      .post(this.baseUrl, { settings: this.settings })
-      .pipe(tap((result) => this.changed.emit(!!result.success)))
+    return this.http.post(this.baseUrl, { settings: this.settings }).pipe(
+      tap((results) => {
+        if (results.success) {
+          this.settingsSaved.emit()
+        }
+      })
+    )
   }
 
   maybeMigrateSettings() {
@@ -405,5 +419,31 @@ export class SettingsService {
           },
         })
     }
+
+    if (
+      !this.settingIsSet(SETTINGS_KEYS.UPDATE_CHECKING_ENABLED) &&
+      this.get(SETTINGS_KEYS.UPDATE_CHECKING_BACKEND_SETTING) != 'default'
+    ) {
+      this.set(
+        SETTINGS_KEYS.UPDATE_CHECKING_ENABLED,
+        this.get(SETTINGS_KEYS.UPDATE_CHECKING_BACKEND_SETTING).toString() ===
+          'true'
+      )
+
+      this.storeSettings()
+        .pipe(first())
+        .subscribe({
+          error: (e) => {
+            this.toastService.showError(
+              'Error migrating update checking setting'
+            )
+            console.log(e)
+          },
+        })
+    }
+  }
+
+  get updateCheckingIsSet(): boolean {
+    return this.settingIsSet(SETTINGS_KEYS.UPDATE_CHECKING_ENABLED)
   }
 }

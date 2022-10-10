@@ -6,6 +6,7 @@ export const MATCH_LITERAL = 3
 export const MATCH_REGEX = 4
 export const MATCH_FUZZY = 5
 export const MATCH_AUTO = 6
+export const DEFAULT_MATCHING_ALGORITHM = MATCH_AUTO
 
 export const MATCHING_ALGORITHMS = [
   {
