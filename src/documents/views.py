@@ -28,7 +28,7 @@ from django.utils.translation import get_language
 from django.views.decorators.cache import cache_control
 from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
-from django_q.tasks import async_task
+from documents.tasks import consume_file
 from packaging import version as packaging_version
 from paperless import version
 from paperless.db import GnuPG
@@ -615,8 +615,7 @@ class PostDocumentView(GenericAPIView):
 
         task_id = str(uuid.uuid4())
 
-        async_task(
-            "documents.tasks.consume_file",
+        consume_file.delay(
             temp_filename,
             override_filename=doc_name,
             override_title=title,
@@ -624,7 +623,6 @@ class PostDocumentView(GenericAPIView):
             override_document_type_id=document_type_id,
             override_tag_ids=tag_ids,
             task_id=task_id,
-            task_name=os.path.basename(doc_name)[:100],
             override_created=created,
         )
 
@@ -888,8 +886,9 @@ class TasksViewSet(ReadOnlyModelViewSet):
     queryset = (
         PaperlessTask.objects.filter(
             acknowledged=False,
+            attempted_task__isnull=False,
         )
-        .order_by("created")
+        .order_by("attempted_task__date_created")
         .reverse()
     )
 

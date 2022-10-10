@@ -14,7 +14,6 @@ django = "~=4.0"
 django-cors-headers = "*"
 django-extensions = "*"
 django-filter = "~=22.1"
-django-q = {editable = true, ref = "paperless-main", git = "https://github.com/paperless-ngx/django-q.git"}
 djangorestframework = "~=3.13"
 filelock = "*"
 fuzzywuzzy = {extras = ["speedup"], version = "*"}
@@ -54,6 +53,8 @@ concurrent-log-handler = "*"
 zipp = {version = "*", markers = "python_version < '3.9'"}
 pyzbar = "*"
 mysqlclient = "*"
+celery = {extras = ["redis"], version = "*"}
+django-celery-results = "*"
 setproctitle = "*"
 
 [dev-packages]

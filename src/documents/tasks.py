@@ -8,6 +8,7 @@ from typing import Type
 
 import tqdm
 from asgiref.sync import async_to_sync
+from celery import shared_task
 from channels.layers import get_channel_layer
 from django.conf import settings
 from django.db import transaction
@@ -36,6 +37,7 @@ from whoosh.writing import AsyncWriter
 logger = logging.getLogger("paperless.tasks")
 
 
+@shared_task
 def index_optimize():
     ix = index.open_index()
     writer = AsyncWriter(ix)
@@ -52,6 +54,7 @@ def index_reindex(progress_bar_disable=False):
             index.update_document(writer, document)
 
 
+@shared_task
 def train_classifier():
     if (
         not Tag.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
@@ -80,6 +83,7 @@ def train_classifier():
         logger.warning("Classifier error: " + str(e))
 
 
+@shared_task
 def consume_file(
     path,
     override_filename=None,
@@ -183,6 +187,7 @@ def consume_file(
         )
 
 
+@shared_task
 def sanity_check():
     messages = sanity_checker.check_sanity()
 
@@ -198,6 +203,7 @@ def sanity_check():
         return "No issues detected."
 
 
+@shared_task
 def bulk_update_documents(document_ids):
     documents = Document.objects.filter(id__in=document_ids)
 
@@ -211,6 +217,7 @@ def bulk_update_documents(document_ids):
             index.update_document(writer, doc)
 
 
+@shared_task
 def update_document_archive_file(document_id):
     """
     Re-creates the archive file of a document, including new OCR content and thumbnail

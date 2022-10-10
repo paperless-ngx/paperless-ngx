@@ -2,28 +2,12 @@
 
 from django.db import migrations
 from django.db.migrations import RunPython
-from django_q.models import Schedule
-from django_q.tasks import schedule
-
-
-def add_schedules(apps, schema_editor):
-    schedule(
-        "paperless_mail.tasks.process_mail_accounts",
-        name="Check all e-mail accounts",
-        schedule_type=Schedule.MINUTES,
-        minutes=10,
-    )
-
-
-def remove_schedules(apps, schema_editor):
-    Schedule.objects.filter(func="paperless_mail.tasks.process_mail_accounts").delete()
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
         ("paperless_mail", "0001_initial"),
-        ("django_q", "0013_task_attempt_count"),
     ]
 
-    operations = [RunPython(add_schedules, remove_schedules)]
+    operations = [RunPython(migrations.RunPython.noop, migrations.RunPython.noop)]
