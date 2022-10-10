@@ -26,7 +26,6 @@ import { TasksService } from 'src/app/services/tasks.service'
 import { ComponentCanDeactivate } from 'src/app/guards/dirty-doc.guard'
 import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 import { ToastService } from 'src/app/services/toast.service'
-import { TourService } from 'ngx-ui-tour-ng-bootstrap'
 
 @Component({
   selector: 'app-app-frame',
@@ -44,8 +43,7 @@ export class AppFrameComponent implements OnInit, ComponentCanDeactivate {
     private list: DocumentListViewService,
     public settingsService: SettingsService,
     public tasksService: TasksService,
-    private readonly toastService: ToastService,
-    private tourService: TourService
+    private readonly toastService: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -87,10 +85,6 @@ export class AppFrameComponent implements OnInit, ComponentCanDeactivate {
           console.log(error)
         },
       })
-  }
-
-  get tourIsActive(): boolean {
-    return this.tourService.getStatus() == 1
   }
 
   closeMenu() {
