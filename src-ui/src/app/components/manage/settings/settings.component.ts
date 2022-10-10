@@ -112,6 +112,7 @@ export class SettingsComponent
       documentListItemPerPage: this.settings.get(
         SETTINGS_KEYS.DOCUMENT_LIST_SIZE
       ),
+      slimSidebarEnabled: this.settings.get(SETTINGS_KEYS.SLIM_SIDEBAR),
       darkModeUseSystem: this.settings.get(SETTINGS_KEYS.DARK_MODE_USE_SYSTEM),
       darkModeEnabled: this.settings.get(SETTINGS_KEYS.DARK_MODE_ENABLED),
       darkModeInvertThumbs: this.settings.get(
