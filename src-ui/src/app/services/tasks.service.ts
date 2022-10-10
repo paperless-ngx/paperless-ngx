@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { first, map } from 'rxjs/operators'
+import { first } from 'rxjs/operators'
 import {
   PaperlessTask,
   PaperlessTaskStatus,
@@ -27,7 +27,7 @@ export class TasksService {
   }
 
   public get queuedFileTasks(): PaperlessTask[] {
-    return this.fileTasks.filter((t) => t.status == PaperlessTaskStatus.Queued)
+    return this.fileTasks.filter((t) => t.status == PaperlessTaskStatus.Pending)
   }
 
   public get startedFileTasks(): PaperlessTask[] {

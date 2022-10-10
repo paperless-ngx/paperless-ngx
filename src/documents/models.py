@@ -12,7 +12,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from django_q.tasks import Task
+from django_celery_results.models import TaskResult
 from documents.parsers import get_default_file_extension
 
 
@@ -527,19 +527,16 @@ class UiSettings(models.Model):
 
 
 class PaperlessTask(models.Model):
-
     task_id = models.CharField(max_length=128)
-    name = models.CharField(max_length=256)
-    created = models.DateTimeField(_("created"), auto_now=True)
-    started = models.DateTimeField(_("started"), null=True)
+    acknowledged = models.BooleanField(default=False)
+
     attempted_task = models.OneToOneField(
-        Task,
+        TaskResult,
         on_delete=models.CASCADE,
         related_name="attempted_task",
         null=True,
         blank=True,
     )
-    acknowledged = models.BooleanField(default=False)
 
 
 class Comment(models.Model):
