@@ -107,7 +107,7 @@ jobs:
       -
         name: Install pipenv
         run: |
-          pipx install pipenv
+          pipx install pipenv==2022.10.4
           pipenv --version
       -
         name: Set up Python
