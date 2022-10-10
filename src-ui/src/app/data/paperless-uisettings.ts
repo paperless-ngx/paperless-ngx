@@ -37,6 +37,7 @@ export const SETTINGS_KEYS = {
   NOTIFICATIONS_CONSUMER_SUPPRESS_ON_DASHBOARD:
     'general-settings:notifications:consumer-suppress-on-dashboard',
   COMMENTS_ENABLED: 'general-settings:comments-enabled',
+  SLIM_SIDEBAR: 'general-settings:slim-sidebar',
   UPDATE_CHECKING_ENABLED: 'general-settings:update-checking:enabled',
   UPDATE_CHECKING_BACKEND_SETTING:
     'general-settings:update-checking:backend-setting',
@@ -55,6 +56,11 @@ export const SETTINGS: PaperlessUiSetting[] = [
   },
   {
     key: SETTINGS_KEYS.BULK_EDIT_APPLY_ON_CLOSE,
+    type: 'boolean',
+    default: false,
+  },
+  {
+    key: SETTINGS_KEYS.SLIM_SIDEBAR,
     type: 'boolean',
     default: false,
   },
