@@ -69,6 +69,11 @@ import { ColorComponent } from './components/common/input/color/color.component'
 import { DocumentAsnComponent } from './components/document-asn/document-asn.component'
 import { DocumentCommentsComponent } from './components/document-comments/document-comments.component'
 import { DirtyDocGuard } from './guards/dirty-doc.guard'
+import { StoragePathListComponent } from './components/manage/storage-path-list/storage-path-list.component'
+import { StoragePathEditDialogComponent } from './components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
+import { SettingsService } from './services/settings.service'
+import { TasksComponent } from './components/manage/tasks/tasks.component'
+import { TourNgBootstrapModule } from 'ngx-ui-tour-ng-bootstrap'
 
 import localeBe from '@angular/common/locales/be'
 import localeCs from '@angular/common/locales/cs'
@@ -89,10 +94,6 @@ import localeSr from '@angular/common/locales/sr'
 import localeSv from '@angular/common/locales/sv'
 import localeTr from '@angular/common/locales/tr'
 import localeZh from '@angular/common/locales/zh'
-import { StoragePathListComponent } from './components/manage/storage-path-list/storage-path-list.component'
-import { StoragePathEditDialogComponent } from './components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
-import { SettingsService } from './services/settings.service'
-import { TasksComponent } from './components/manage/tasks/tasks.component'
 
 registerLocaleData(localeBe)
 registerLocaleData(localeCs)
@@ -188,6 +189,7 @@ function initializeApp(settings: SettingsService) {
     PdfViewerModule,
     NgSelectModule,
     ColorSliderModule,
+    TourNgBootstrapModule.forRoot(),
   ],
   providers: [
     {
