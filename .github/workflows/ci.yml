@@ -88,7 +88,7 @@ jobs:
         ports:
           - "9998:9998/tcp"
       gotenberg:
-        image: docker.io/gotenberg/gotenberg:7.4
+        image: docker.io/gotenberg/gotenberg:7.6
         ports:
           - "3000:3000/tcp"
     env:
