@@ -397,7 +397,8 @@ class TestBarcode(DirectoriesMixin, TestCase):
         dst = os.path.join(settings.SCRATCH_DIR, "patch-code-t-middle.pdf")
         shutil.copy(test_file, dst)
 
-        self.assertEqual(tasks.consume_file(dst), "File successfully split")
+        with mock.patch("documents.tasks.async_to_sync"):
+            self.assertEqual(tasks.consume_file(dst), "File successfully split")
 
     @override_settings(
         CONSUMER_ENABLE_BARCODES=True,
@@ -411,7 +412,8 @@ class TestBarcode(DirectoriesMixin, TestCase):
         dst = os.path.join(settings.SCRATCH_DIR, "patch-code-t-middle.tiff")
         shutil.copy(test_file, dst)
 
-        self.assertEqual(tasks.consume_file(dst), "File successfully split")
+        with mock.patch("documents.tasks.async_to_sync"):
+            self.assertEqual(tasks.consume_file(dst), "File successfully split")
 
     @override_settings(
         CONSUMER_ENABLE_BARCODES=True,
@@ -465,4 +467,5 @@ class TestBarcode(DirectoriesMixin, TestCase):
         dst = os.path.join(settings.SCRATCH_DIR, "patch-code-t-middle")
         shutil.copy(test_file, dst)
 
-        self.assertEqual(tasks.consume_file(dst), "File successfully split")
+        with mock.patch("documents.tasks.async_to_sync"):
+            self.assertEqual(tasks.consume_file(dst), "File successfully split")

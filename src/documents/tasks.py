@@ -31,6 +31,7 @@ from documents.parsers import DocumentParser
 from documents.parsers import get_parser_class_for_mime_type
 from documents.sanity_checker import SanityCheckFailedException
 from filelock import FileLock
+from redis.exceptions import ConnectionError
 from whoosh.writing import AsyncWriter
 
 
@@ -157,11 +158,8 @@ def consume_file(
                         "status_updates",
                         {"type": "status_update", "data": payload},
                     )
-                except OSError as e:
-                    logger.warning(
-                        "OSError. It could be, the broker cannot be reached.",
-                    )
-                    logger.warning(str(e))
+                except ConnectionError as e:
+                    logger.warning(f"ConnectionError on status send: {str(e)}")
                 # consuming stops here, since the original document with
                 # the barcodes has been split and will be consumed separately
                 return "File successfully split"
