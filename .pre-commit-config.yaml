@@ -47,7 +47,7 @@ repos:
       - id: yesqa
         exclude: "(migrations)"
   - repo: https://github.com/asottile/add-trailing-comma
-    rev: "v2.2.3"
+    rev: "v2.3.0"
     hooks:
       - id: add-trailing-comma
         exclude: "(migrations)"
@@ -59,11 +59,11 @@ repos:
         args:
           - "--config=./src/setup.cfg"
   - repo: https://github.com/psf/black
-    rev: 22.8.0
+    rev: 22.10.0
     hooks:
       - id: black
   - repo: https://github.com/asottile/pyupgrade
-    rev: v2.38.1
+    rev: v3.0.0
     hooks:
       - id: pyupgrade
         exclude: "(migrations)"
