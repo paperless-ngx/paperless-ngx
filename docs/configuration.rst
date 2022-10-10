@@ -538,7 +538,7 @@ requires are as follows:
         # ...
 
         gotenberg:
-            image: gotenberg/gotenberg:7.4
+            image: gotenberg/gotenberg:7.6
             restart: unless-stopped
             command:
                 - "gotenberg"
