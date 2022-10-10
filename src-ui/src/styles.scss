@@ -524,7 +524,7 @@ body.tour-active .sidebar {
   z-index: inherit !important;
 }
 
-.nav-link.touranchor--is-active {
+.nav-item.touranchor--is-active a {
   font-weight: bold !important;
   color: var(--bs-primary);
 }
