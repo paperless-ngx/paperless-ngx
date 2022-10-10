@@ -58,6 +58,35 @@ export class AppFrameComponent implements OnInit, ComponentCanDeactivate {
 
   isMenuCollapsed: boolean = true
 
+  slimSidebarAnimating: boolean = false
+
+  toggleSlimSidebar(): void {
+    this.slimSidebarAnimating = true
+    this.slimSidebarEnabled = !this.slimSidebarEnabled
+    setTimeout(() => {
+      this.slimSidebarAnimating = false
+    }, 200) // slightly longer than css animation for slim sidebar
+  }
+
+  get slimSidebarEnabled(): boolean {
+    return this.settingsService.get(SETTINGS_KEYS.SLIM_SIDEBAR)
+  }
+
+  set slimSidebarEnabled(enabled: boolean) {
+    this.settingsService.set(SETTINGS_KEYS.SLIM_SIDEBAR, enabled)
+    this.settingsService
+      .storeSettings()
+      .pipe(first())
+      .subscribe({
+        error: (error) => {
+          this.toastService.showError(
+            $localize`An error occurred while saving settings.`
+          )
+          console.log(error)
+        },
+      })
+  }
+
   closeMenu() {
     this.isMenuCollapsed = true
   }

@@ -28,6 +28,7 @@ import {
 import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 import { ActivatedRoute } from '@angular/router'
 import { ViewportScroller } from '@angular/common'
+import { ForwardRefHandling } from '@angular/compiler'
 
 @Component({
   selector: 'app-settings',
@@ -43,6 +44,7 @@ export class SettingsComponent
     bulkEditConfirmationDialogs: new FormControl(null),
     bulkEditApplyOnClose: new FormControl(null),
     documentListItemPerPage: new FormControl(null),
+    slimSidebarEnabled: new FormControl(null),
     darkModeUseSystem: new FormControl(null),
     darkModeEnabled: new FormControl(null),
     darkModeInvertThumbs: new FormControl(null),
@@ -99,17 +101,8 @@ export class SettingsComponent
     }
   }
 
-  ngOnInit() {
-    this.savedViewService.listAll().subscribe((r) => {
-      this.savedViews = r.results
-      this.initialize()
-    })
-  }
-
-  initialize() {
-    this.unsubscribeNotifier.next(true)
-
-    let storeData = {
+  private getCurrentSettings() {
+    return {
       bulkEditConfirmationDialogs: this.settings.get(
         SETTINGS_KEYS.BULK_EDIT_CONFIRMATION_DIALOGS
       ),
@@ -119,6 +112,7 @@ export class SettingsComponent
       documentListItemPerPage: this.settings.get(
         SETTINGS_KEYS.DOCUMENT_LIST_SIZE
       ),
+      slimSidebarEnabled: this.settings.get(SETTINGS_KEYS.SLIM_SIDEBAR),
       darkModeUseSystem: this.settings.get(SETTINGS_KEYS.DARK_MODE_USE_SYSTEM),
       darkModeEnabled: this.settings.get(SETTINGS_KEYS.DARK_MODE_ENABLED),
       darkModeInvertThumbs: this.settings.get(
@@ -149,6 +143,19 @@ export class SettingsComponent
         SETTINGS_KEYS.UPDATE_CHECKING_ENABLED
       ),
     }
+  }
+
+  ngOnInit() {
+    this.savedViewService.listAll().subscribe((r) => {
+      this.savedViews = r.results
+      this.initialize()
+    })
+  }
+
+  initialize() {
+    this.unsubscribeNotifier.next(true)
+
+    let storeData = this.getCurrentSettings()
 
     for (let view of this.savedViews) {
       storeData.savedViews[view.id.toString()] = {
@@ -231,6 +238,10 @@ export class SettingsComponent
     this.settings.set(
       SETTINGS_KEYS.DOCUMENT_LIST_SIZE,
       this.settingsForm.value.documentListItemPerPage
+    )
+    this.settings.set(
+      SETTINGS_KEYS.SLIM_SIDEBAR,
+      this.settingsForm.value.slimSidebarEnabled
     )
     this.settings.set(
       SETTINGS_KEYS.DARK_MODE_USE_SYSTEM,
