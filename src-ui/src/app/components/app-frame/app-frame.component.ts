@@ -1,4 +1,4 @@
-import { Component, HostListener } from '@angular/core'
+import { Component, HostListener, OnInit } from '@angular/core'
 import { FormControl } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { from, Observable } from 'rxjs'
@@ -32,7 +32,7 @@ import { ToastService } from 'src/app/services/toast.service'
   templateUrl: './app-frame.component.html',
   styleUrls: ['./app-frame.component.scss'],
 })
-export class AppFrameComponent implements ComponentCanDeactivate {
+export class AppFrameComponent implements OnInit, ComponentCanDeactivate {
   constructor(
     public router: Router,
     private activatedRoute: ActivatedRoute,
@@ -43,14 +43,14 @@ export class AppFrameComponent implements ComponentCanDeactivate {
     private list: DocumentListViewService,
     public settingsService: SettingsService,
     public tasksService: TasksService,
-    private toastService: ToastService
-  ) {
-    this.remoteVersionService
-      .checkForUpdates()
-      .subscribe((appRemoteVersion: AppRemoteVersion) => {
-        this.appRemoteVersion = appRemoteVersion
-      })
-    tasksService.reload()
+    private readonly toastService: ToastService
+  ) {}
+
+  ngOnInit(): void {
+    if (this.settingsService.get(SETTINGS_KEYS.UPDATE_CHECKING_ENABLED)) {
+      this.checkForUpdates()
+    }
+    this.tasksService.reload()
   }
 
   versionString = `${environment.appTitle} ${environment.version}`
@@ -181,5 +181,31 @@ export class AppFrameComponent implements ComponentCanDeactivate {
           }
         }
       })
+  }
+
+  private checkForUpdates() {
+    this.remoteVersionService
+      .checkForUpdates()
+      .subscribe((appRemoteVersion: AppRemoteVersion) => {
+        this.appRemoteVersion = appRemoteVersion
+      })
+  }
+
+  setUpdateChecking(enable: boolean) {
+    this.settingsService.set(SETTINGS_KEYS.UPDATE_CHECKING_ENABLED, enable)
+    this.settingsService
+      .storeSettings()
+      .pipe(first())
+      .subscribe({
+        error: (error) => {
+          this.toastService.showError(
+            $localize`An error occurred while saving update checking settings.`
+          )
+          console.log(error)
+        },
+      })
+    if (enable) {
+      this.checkForUpdates()
+    }
   }
 }

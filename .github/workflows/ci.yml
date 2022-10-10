@@ -82,6 +82,22 @@ jobs:
       matrix:
         python-version: ['3.8', '3.9', '3.10']
       fail-fast: false
+    services:
+      tika:
+        image: ghcr.io/paperless-ngx/tika:latest
+        ports:
+          - "9998:9998/tcp"
+      gotenberg:
+        image: docker.io/gotenberg/gotenberg:7.4
+        ports:
+          - "3000:3000/tcp"
+    env:
+      # Enable Tika end to end testing
+      TIKA_LIVE: 1
+      # Enable paperless_mail testing against real server
+      PAPERLESS_MAIL_TEST_HOST: ${{ secrets.TEST_MAIL_HOST }}
+      PAPERLESS_MAIL_TEST_USER: ${{ secrets.TEST_MAIL_USER }}
+      PAPERLESS_MAIL_TEST_PASSWD: ${{ secrets.TEST_MAIL_PASSWD }}
     steps:
       -
         name: Checkout
@@ -91,7 +107,7 @@ jobs:
       -
         name: Install pipenv
         run: |
-          pipx install pipenv==2022.8.5
+          pipx install pipenv==2022.10.4
           pipenv --version
       -
         name: Set up Python
@@ -117,11 +133,11 @@ jobs:
         name: Tests
         run: |
           cd src/
-          pipenv run pytest
+          pipenv run pytest -rfEp
       -
         name: Get changed files
         id: changed-files-specific
-        uses: tj-actions/changed-files@v29.0.2
+        uses: tj-actions/changed-files@v31.0.2
         with:
           files: |
             src/**
@@ -485,6 +501,18 @@ jobs:
         with:
           ref: main
       -
+        name: Install pipenv
+        run: |
+          pip3 install --upgrade pip setuptools wheel pipx
+          pipx install pipenv
+      -
+        name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+          cache: "pipenv"
+          cache-dependency-path: 'Pipfile.lock'
+      -
         name: Append Changelog to docs
         id: append-Changelog
         working-directory: docs
@@ -497,9 +525,10 @@ jobs:
           CURRENT_CHANGELOG=`tail --lines +2 changelog.md`
           echo -e "$CURRENT_CHANGELOG" >> changelog-new.md
           mv changelog-new.md changelog.md
+          pipenv run pre-commit --files changelog.md
           git config --global user.name "github-actions"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -am "Changelog ${{ steps.get_version.outputs.version }} - GHA"
+          git commit -am "Changelog ${{ needs.publish-release.outputs.version }} - GHA"
           git push origin ${{ needs.publish-release.outputs.version }}-changelog
       -
         name: Create Pull Request
