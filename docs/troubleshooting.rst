@@ -125,7 +125,7 @@ If using docker-compose, this is achieved by the following configuration change 
 .. code:: yaml
 
     gotenberg:
-        image: gotenberg/gotenberg:7.4
+        image: gotenberg/gotenberg:7.6
         restart: unless-stopped
         command:
             - "gotenberg"
