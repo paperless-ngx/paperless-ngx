@@ -1,9 +1,9 @@
 // bs options
 $enable-negative-margins: true;
 
+@import "theme";
 @import "node_modules/bootstrap/scss/bootstrap";
 @import "~@ng-select/ng-select/themes/default.theme.css";
-@import "theme";
 @import "print";
 
 // Paperless-ngx styles
@@ -82,6 +82,15 @@ svg.logo {
     background-color: var(--pngx-primary-darken-5) !important;
     border-color: var(--pngx-primary-darken-5) !important;
   }
+}
+
+.btn-dark {
+  --bs-btn-color: var(--bs-gray-600);
+  --bs-btn-bg: var(--bs-gray-200);
+  --bs-btn-border-color: var(--bs-gray-200);
+  --bs-btn-hover-bg: var(--bs-gray-400);
+  --bs-btn-hover-border-color: var(--bs-gray-500);
+  --bs-btn-active-bg: var(--bs-gray-200);
 }
 
 .text-primary {
@@ -403,6 +412,11 @@ textarea,
   width: 16px;
   height: 16px;
   vertical-align: text-bottom;
+}
+
+.sidebaricon-sm {
+  width: 12px;
+  height: 12px;
 }
 
 table.table {
