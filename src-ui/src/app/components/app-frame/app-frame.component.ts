@@ -52,7 +52,7 @@ export class AppFrameComponent implements OnInit, ComponentCanDeactivate {
     }
     this.tasksService.reload()
   }
-  
+
   versionString = `${environment.appTitle} ${environment.version}`
   appRemoteVersion
 
