@@ -81,7 +81,7 @@
 
 
 <ng-template #pagination>
-  <div class="d-flex justify-content-between align-items-center" tourAnchor="tour.documents">
+  <div class="d-flex justify-content-between align-items-center">
     <p>
       <ng-container *ngIf="list.isReloading">
         <div class="spinner-border spinner-border-sm me-2" role="status"></div>
@@ -97,7 +97,9 @@
   </div>
 </ng-template>
 
-<ng-container *ngTemplateOutlet="pagination"></ng-container>
+<div tourAnchor="tour.documents">
+  <ng-container *ngTemplateOutlet="pagination"></ng-container>
+</div>
 
 <ng-container *ngIf="list.error ; else documentListNoError">
   <div class="alert alert-danger" role="alert"><ng-container i18n>Error while loading documents</ng-container>: {{list.error}}</div>
