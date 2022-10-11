@@ -28,7 +28,7 @@ python-dotenv = "*"
 python-dateutil = "*"
 python-magic = "*"
 psycopg2 = "*"
-redis = "*"
+redis = {extras = ["hiredis"], version = "*"}
 scikit-learn = "~=1.1"
 # Pin this until piwheels is building 1.9 (see https://www.piwheels.org/project/scipy/)
 scipy = "==1.8.1"
