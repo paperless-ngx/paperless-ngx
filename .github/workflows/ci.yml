@@ -196,7 +196,7 @@ jobs:
         id: set-ghcr-repository
         run: |
           ghcr_name=$(echo "${GITHUB_REPOSITORY}" | awk '{ print tolower($0) }')
-          echo ::set-output name=repository::${ghcr_name}
+          echo "repository=${ghcr_name}" >> $GITHUB_OUTPUT
       -
         name: Checkout
         uses: actions/checkout@v3
@@ -213,7 +213,7 @@ jobs:
 
           echo ${build_json}
 
-          echo ::set-output name=qpdf-json::${build_json}
+          echo "qpdf-json=${build_json}" >> $GITHUB_OUTPUT
       -
         name: Setup psycopg2 image
         id: psycopg2-setup
@@ -222,7 +222,7 @@ jobs:
 
           echo ${build_json}
 
-          echo ::set-output name=psycopg2-json::${build_json}
+          echo "psycopg2-json=${build_json}" >> $GITHUB_OUTPUT
       -
         name: Setup pikepdf image
         id: pikepdf-setup
@@ -231,7 +231,7 @@ jobs:
 
           echo ${build_json}
 
-          echo ::set-output name=pikepdf-json::${build_json}
+          echo "pikepdf-json=${build_json}" >> $GITHUB_OUTPUT
       -
         name: Setup jbig2enc image
         id: jbig2enc-setup
@@ -240,7 +240,7 @@ jobs:
 
           echo ${build_json}
 
-          echo ::set-output name=jbig2enc-json::${build_json}
+          echo "jbig2enc-json=${build_json}" >> $GITHUB_OUTPUT
 
     outputs:
 
@@ -275,10 +275,10 @@ jobs:
         run: |
           if [[ ${{ needs.prepare-docker-build.outputs.ghcr-repository }} == "paperless-ngx/paperless-ngx" && ( ${{ github.ref_name }} == "main" || ${{ github.ref_name }} == "dev" || ${{ github.ref_name }} == "beta" || ${{ startsWith(github.ref, 'refs/tags/v') }} == "true" ) ]] ; then
             echo "Enabling DockerHub image push"
-            echo ::set-output name=enable::"true"
+            echo "enable=true" >> $GITHUB_OUTPUT
           else
             echo "Not pushing to DockerHub"
-            echo ::set-output name=enable::"false"
+            echo "enable=false" >> $GITHUB_OUTPUT
           fi
       -
         name: Gather Docker metadata
@@ -459,11 +459,11 @@ jobs:
         name: Get version
         id: get_version
         run: |
-          echo ::set-output name=version::${{ github.ref_name }}
+          echo "version=${{ github.ref_name }}" >> $GITHUB_OUTPUT
           if [[ ${{ contains(github.ref_name, '-beta.rc') }} == 'true' ]]; then
-            echo ::set-output name=prerelease::true
+            echo "prerelease=true" >> $GITHUB_OUTPUT
           else
-            echo ::set-output name=prerelease::false
+            echo "prerelease=false" >> $GITHUB_OUTPUT
           fi
       -
         name: Create Release and Changelog
