@@ -337,7 +337,7 @@ export class DocumentDetailComponent
         })
       )
       .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe(({ newStoragePath, documentTypes: storagePaths }) => {
+      .subscribe(({ newStoragePath, storagePaths }) => {
         this.storagePaths = storagePaths.results
         this.documentForm.get('storage_path').setValue(newStoragePath.id)
       })
