@@ -15,7 +15,7 @@ on:
   push:
     paths:
       - ".github/workflows/cleanup-tags.yml"
-      - ".github/scripts/cleanup-images.py"
+      - ".github/scripts/cleanup-tags.py"
       - ".github/scripts/github.py"
       - ".github/scripts/common.py"
 
@@ -74,7 +74,7 @@ jobs:
         name: Cleanup for package "${{ matrix.primary-name }}"
         if: "${{ env.TOKEN != '' }}"
         run: |
-          python ${GITHUB_WORKSPACE}/.github/scripts/cleanup-images.py --untagged --is-manifest "${{ matrix.primary-name }}"
+          python ${GITHUB_WORKSPACE}/.github/scripts/cleanup-tags.py --untagged --is-manifest --delete "${{ matrix.primary-name }}"
       #
       # Clean up registry cache package
       #
@@ -82,7 +82,7 @@ jobs:
         name: Cleanup for package "${{ matrix.cache-name }}"
         if: "${{ env.TOKEN != '' }}"
         run: |
-          python ${GITHUB_WORKSPACE}/.github/scripts/cleanup-images.py --untagged "${{ matrix.cache-name }}"
+          python ${GITHUB_WORKSPACE}/.github/scripts/cleanup-tags.py --untagged --delete "${{ matrix.cache-name }}"
       #
       # Verify tags which are left still pull
       #
