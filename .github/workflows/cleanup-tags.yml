@@ -15,7 +15,7 @@ on:
   push:
     paths:
       - ".github/workflows/cleanup-tags.yml"
-      - ".github/scripts/cleanup-tags.py"
+      - ".github/scripts/cleanup-images.py"
       - ".github/scripts/github.py"
       - ".github/scripts/common.py"
 
@@ -24,9 +24,26 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  cleanup:
-    name: Cleanup Image Tags
-    runs-on: ubuntu-20.04
+  cleanup-images:
+    name: Cleanup Image Tags for ${{ matrix.primary-name }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - primary-name: "paperless-ngx"
+            cache-name: "paperless-ngx/builder/cache/app"
+
+          - primary-name: "paperless-ngx/builder/qpdf"
+            cache-name: "paperless-ngx/builder/cache/qpdf"
+
+          - primary-name: "paperless-ngx/builder/pikepdf"
+            cache-name: "paperless-ngx/builder/cache/pikepdf"
+
+          - primary-name: "paperless-ngx/builder/jbig2enc"
+            cache-name: "paperless-ngx/builder/cache/jbig2enc"
+
+          - primary-name: "paperless-ngx/builder/psycopg2"
+            cache-name: "paperless-ngx/builder/cache/psycopg2"
     env:
       # Requires a personal access token with the OAuth scope delete:packages
       TOKEN: ${{ secrets.GHA_CONTAINER_DELETE_TOKEN }}
@@ -50,63 +67,29 @@ jobs:
         name: Install requests
         run: |
           python -m pip install requests
-      # Clean up primary packages
-      -
-        name: Cleanup for package "paperless-ngx"
-        if: "${{ env.TOKEN != '' }}"
-        run: |
-          python ${GITHUB_WORKSPACE}/.github/scripts/cleanup-tags.py --loglevel info --untagged --is-manifest --delete "paperless-ngx"
-      -
-        name: Cleanup for package "qpdf"
-        if: "${{ env.TOKEN != '' }}"
-        run: |
-          python ${GITHUB_WORKSPACE}/.github/scripts/cleanup-tags.py --loglevel info --untagged --is-manifest --delete "paperless-ngx/builder/qpdf"
-      -
-        name: Cleanup for package "pikepdf"
-        if: "${{ env.TOKEN != '' }}"
-        run: |
-          python ${GITHUB_WORKSPACE}/.github/scripts/cleanup-tags.py --loglevel info --untagged --is-manifest --delete "paperless-ngx/builder/pikepdf"
-      -
-        name: Cleanup for package "jbig2enc"
-        if: "${{ env.TOKEN != '' }}"
-        run: |
-          python ${GITHUB_WORKSPACE}/.github/scripts/cleanup-tags.py --loglevel info --untagged --is-manifest --delete "paperless-ngx/builder/jbig2enc"
-      -
-        name: Cleanup for package "psycopg2"
-        if: "${{ env.TOKEN != '' }}"
-        run: |
-          python ${GITHUB_WORKSPACE}/.github/scripts/cleanup-tags.py --loglevel info --untagged --is-manifest --delete "paperless-ngx/builder/psycopg2"
       #
-      # Clean up registry cache packages
+      # Clean up primary package
       #
       -
-        name: Cleanup for package "builder/cache/app"
+        name: Cleanup for package "${{ matrix.primary-name }}"
         if: "${{ env.TOKEN != '' }}"
         run: |
-          python ${GITHUB_WORKSPACE}/.github/scripts/cleanup-tags.py --loglevel info --untagged --delete "paperless-ngx/builder/cache/app"
+          python ${GITHUB_WORKSPACE}/.github/scripts/cleanup-images.py --untagged --is-manifest "${{ matrix.primary-name }}"
+      #
+      # Clean up registry cache package
+      #
       -
-        name: Cleanup for package "builder/cache/qpdf"
+        name: Cleanup for package "${{ matrix.cache-name }}"
         if: "${{ env.TOKEN != '' }}"
         run: |
-          python ${GITHUB_WORKSPACE}/.github/scripts/cleanup-tags.py --loglevel info --untagged --delete "paperless-ngx/builder/cache/qpdf"
-      -
-        name: Cleanup for package "builder/cache/psycopg2"
-        if: "${{ env.TOKEN != '' }}"
-        run: |
-          python ${GITHUB_WORKSPACE}/.github/scripts/cleanup-tags.py --loglevel info --untagged --delete "paperless-ngx/builder/cache/psycopg2"
-      -
-        name: Cleanup for package "builder/cache/jbig2enc"
-        if: "${{ env.TOKEN != '' }}"
-        run: |
-          python ${GITHUB_WORKSPACE}/.github/scripts/cleanup-tags.py --loglevel info --untagged --delete "paperless-ngx/builder/cache/jbig2enc"
-      -
-        name: Cleanup for package "builder/cache/pikepdf"
-        if: "${{ env.TOKEN != '' }}"
-        run: |
-          python ${GITHUB_WORKSPACE}/.github/scripts/cleanup-tags.py --loglevel info --untagged --delete "paperless-ngx/builder/cache/pikepdf"
+          python ${GITHUB_WORKSPACE}/.github/scripts/cleanup-images.py --untagged "${{ matrix.cache-name }}"
+      #
+      # Verify tags which are left still pull
+      #
       -
         name: Check all tags still pull
         run: |
-          ghcr_name=$(echo "${GITHUB_REPOSITORY}" | awk '{ print tolower($0) }')
-          echo "Pulling all tags of ghcr.io/${ghcr_name}"
-          docker pull --quiet --all-tags ghcr.io/${ghcr_name}
+          ghcr_name=$(echo "ghcr.io/${GITHUB_REPOSITORY_OWNER}/${{ matrix.primary-name }}" | awk '{ print tolower($0) }')
+          echo "Pulling all tags of ${ghcr_name}"
+          docker pull --quiet --all-tags ${ghcr_name}
+          docker image list
