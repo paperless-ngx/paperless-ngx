@@ -1,12 +1,4 @@
 #!/usr/bin/env python3
-"""
-This script cleans up the untagged images of the main image.  It checks for "feature-"
-branches, correlates them to the images, and removes images which have no branch
-related to them.
-
-After removing the image, it looks at untagged images, removing those which are
-not pointed to by a manifest.
-"""
 import json
 import logging
 import os
@@ -48,6 +40,14 @@ class DockerManifest2:
 
 
 class RegistryTagsCleaner:
+    """
+    This is the base class for the image registry cleaning.  Given a package
+    name, it will keep all images which are tagged and all untagged images
+    referred to by a manifest.  This results in only images which have been untagged
+    and cannot be referenced except by their SHA in being removed.  None of these
+    images should be referenced, so it is fine to delete them.
+    """
+
     def __init__(
         self,
         package_name: str,
@@ -84,6 +84,9 @@ class RegistryTagsCleaner:
         self.decide_what_tags_to_keep()
 
     def clean(self):
+        """
+        This method will delete image versions, based on the selected tags to delete
+        """
         for tag_to_delete in self.tags_to_delete:
             package_version_info = self.all_pkgs_tags_to_version[tag_to_delete]
 
@@ -103,6 +106,12 @@ class RegistryTagsCleaner:
             logger.info("No tags to delete")
 
     def clean_untagged(self, is_manifest_image: bool):
+        """
+        This method will delete untagged images, that is those which are not named.  It
+        handles if the image tag is actually a manifest, which points to images that look otherwise
+        untagged.
+        """
+
         def _clean_untagged_manifest():
             """
 
@@ -193,8 +202,9 @@ class RegistryTagsCleaner:
                     )
 
         def _clean_untagged_non_manifest():
-            # If the package is not a multi-arch manifest, images without tags are safe to delete.
-            # They are not referred to by anything.  This will leave all with at least 1 tag
+            """
+            If the package is not a multi-arch manifest, images without tags are safe to delete.
+            """
 
             for package in self.all_package_versions:
                 if package.untagged:
@@ -222,12 +232,22 @@ class RegistryTagsCleaner:
             _clean_untagged_non_manifest()
 
     def decide_what_tags_to_keep(self):
+        """
+        This method holds the logic to delete what tags to keep and there fore
+        what tags to delete.
+
+        By default, any image with at least 1 tag will be kept
+        """
         # By default, keep anything which is tagged
         self.tags_to_keep = list(set(self.all_pkgs_tags_to_version.keys()))
 
 
 class MainImageTagsCleaner(RegistryTagsCleaner):
     def decide_what_tags_to_keep(self):
+        """
+        Overrides the default logic for deciding what images to keep.  Images tagged as "feature-"
+        will be removed, if the corresponding branch no longer exists.
+        """
 
         # Locate the feature branches
         feature_branches = {}
@@ -274,6 +294,11 @@ class MainImageTagsCleaner(RegistryTagsCleaner):
 
 
 class LibraryTagsCleaner(RegistryTagsCleaner):
+    """
+    Exists for the off change that someday, the installer library images
+    will need their own logic
+    """
+
     pass
 
 
@@ -357,10 +382,13 @@ def _main():
                     None,
                 )
 
+            # Set if actually doing a delete vs dry run
             cleaner.actually_delete = args.delete
 
+            # Clean images with tags
             cleaner.clean()
 
+            # Clean images which are untagged
             cleaner.clean_untagged(args.is_manifest)
 
 
