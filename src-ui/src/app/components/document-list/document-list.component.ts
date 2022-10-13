@@ -139,13 +139,7 @@ export class DocumentListComponent implements OnInit, OnDestroy {
       .subscribe((queryParams) => {
         if (queryParams.has('view')) {
           // loading a saved view on /documents
-          this.savedViewService
-            .getCached(parseInt(queryParams.get('view')))
-            .pipe(first())
-            .subscribe((view) => {
-              this.list.activateSavedView(view)
-              this.list.reload()
-            })
+          this.loadViewConfig(parseInt(queryParams.get('view')))
         } else {
           this.list.activateSavedView(null)
           this.list.loadFromQueryParams(queryParams)
@@ -178,6 +172,16 @@ export class DocumentListComponent implements OnInit, OnDestroy {
           this.unmodifiedFilterRules = this.list.filterRules
         })
     }
+  }
+
+  loadViewConfig(viewID: number) {
+    this.savedViewService
+      .getCached(viewID)
+      .pipe(first())
+      .subscribe((view) => {
+        this.list.activateSavedView(view)
+        this.list.reload()
+      })
   }
 
   saveViewConfigAs() {
