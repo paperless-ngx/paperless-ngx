@@ -44,7 +44,9 @@ tika = "*"
 # TODO: This will sadly also install daphne+dependencies,
 #  which an ASGI server we don't need. Adds about 15MB image size.
 channels = "~=3.0"
-channels-redis = "*"
+# Locked version until https://github.com/django/channels_redis/issues/332
+# is resolved
+channels-redis = "==3.4.1"
 uvicorn = {extras = ["standard"], version = "*"}
 concurrent-log-handler = "*"
 "pdfminer.six" = "*"

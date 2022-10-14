@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "05abab8d7e71367fddfd9e7a10f40d55689ff4424969a3eb916eca3897508c41"
+            "sha256": "91a00f3941172f541e45d764727a12280c0be0898ec0e294c6d1283208f9bc92"
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -19,6 +19,13 @@
         ]
     },
     "default": {
+        "aioredis": {
+            "hashes": [
+                "sha256:15f8af30b044c771aee6787e5ec24694c048184c7b9e54c3b60c750a4b93273a",
+                "sha256:b61808d7e97b7cd5a92ed574937a079c9387fdadd22bfbfa7ad2fd319ecc26e3"
+            ],
+            "version": "==1.3.1"
+        },
         "amqp": {
             "hashes": [
                 "sha256:2c1b13fecc0893e946c65cbd5f36427861cffa4ea2201d8f6fca22e2a373b5e2",
@@ -200,11 +207,11 @@
         },
         "channels-redis": {
             "hashes": [
-                "sha256:122414f29f525f7b9e0c9d59cdcfc4dc1b0eecba16fbb6a1c23f1d9b58f49dcb",
-                "sha256:81b59d68f53313e1aa891f23591841b684abb936b42e4d1a966d9e4dc63a95ec"
+                "sha256:78e4a2f2b2a744fe5a87848ec36b5ee49f522c6808cefe6c583663d0d531faa8",
+                "sha256:ba7e2ad170f273c372812dd32aaac102d68d4e508172abb1cfda3160b7333890"
             ],
             "index": "pypi",
-            "version": "==4.0.0"
+            "version": "==3.4.1"
         },
         "charset-normalizer": {
             "hashes": [
