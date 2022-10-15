@@ -1,3 +1,4 @@
+import datetime
 import hashlib
 import os
 from unittest import mock
@@ -5,8 +6,8 @@ from unittest import mock
 import pytest
 from django.test import TestCase
 from documents.parsers import ParseError
+from documents.parsers import run_convert
 from paperless_mail.parsers import MailDocumentParser
-from paperless_mail.parsers import settings
 
 
 class TestParser(TestCase):
@@ -38,25 +39,26 @@ class TestParser(TestCase):
         parsed2 = parser.get_parsed(os.path.join(os.path.join(self.SAMPLE_FILES, "na")))
         self.assertEqual(parsed1, parsed2)
 
-    def test_get_thumbnail(self):
-        def hashfile(file):
-            buf_size = 65536  # An arbitrary (but fixed) buffer
-            sha256 = hashlib.sha256()
-            with open(file, "rb") as f:
-                while True:
-                    data = f.read(buf_size)
-                    if not data:
-                        break
-                    sha256.update(data)
-            return sha256.hexdigest()
+    @staticmethod
+    def hashfile(file):
+        buf_size = 65536  # An arbitrary (but fixed) buffer
+        sha256 = hashlib.sha256()
+        with open(file, "rb") as f:
+            while True:
+                data = f.read(buf_size)
+                if not data:
+                    break
+                sha256.update(data)
+        return sha256.hexdigest()
 
+    def test_get_thumbnail(self):
         parser = MailDocumentParser(None)
         thumb = parser.get_thumbnail(
             os.path.join(self.SAMPLE_FILES, "simple_text.eml"),
             "message/rfc822",
         )
         self.assertTrue(os.path.isfile(thumb))
-        thumb_hash = hashfile(thumb)
+        thumb_hash = self.hashfile(thumb)
 
         # The created intermediary pdf is not reproducible. But the thumbnail image should always look the same.
         expected_hash = (
@@ -201,6 +203,61 @@ class TestParser(TestCase):
                 "value": "TLSv1.3",
             }
             in metadata,
+        )
+
+    @mock.patch("documents.loggers.LoggingMixin.log")  # Disable log output
+    def test_parse(self, m):
+        parser = MailDocumentParser(None)
+
+        # Check if exception is raised when parsing fails.
+        with pytest.raises(ParseError):
+            parser.parse(
+                os.path.join(os.path.join(self.SAMPLE_FILES, "na")),
+                "message/rfc822",
+            )
+
+        # Validate parsing returns the expected results
+        parser.parse(os.path.join(self.SAMPLE_FILES, "html.eml"), "message/rfc822")
+
+        text_expected = "Some Text\nand an embedded image.\n\nSubject: HTML Message\n\nFrom: Name <someone@example.de>\n\nTo: someone@example.de\n\nAttachments: IntM6gnXFm00FEV5.png (6.89 KiB)\n\nHTML content: Some Text\nand an embedded image.Attachments: IntM6gnXFm00FEV5.png (6.89 KiB)\n\n"
+        self.assertEqual(text_expected, parser.text)
+        self.assertEqual(
+            datetime.datetime(
+                2022,
+                10,
+                15,
+                11,
+                23,
+                19,
+                tzinfo=datetime.timezone(datetime.timedelta(seconds=7200)),
+            ),
+            parser.date,
+        )
+        self.assertTrue(os.path.isfile(parser.archive_path))
+
+        converted = os.path.join(parser.tempdir, "converted.webp")
+        run_convert(
+            density=300,
+            scale="500x5000>",
+            alpha="remove",
+            strip=True,
+            trim=False,
+            auto_orient=True,
+            input_file=f"{parser.archive_path}",  # Do net define an index to convert all pages.
+            output_file=converted,
+            logging_group=None,
+        )
+        self.assertTrue(os.path.isfile(converted))
+        thumb_hash = self.hashfile(converted)
+
+        # The created pdf is not reproducible. But the converted image should always look the same.
+        expected_hash = (
+            "174f9c81f9aeda63b64375fa2fe675fd542677c1ba7a32fc19e09ffc4d461e12"
+        )
+        self.assertEqual(
+            thumb_hash,
+            expected_hash,
+            "PDF looks look different.",
         )
 
     @mock.patch("documents.loggers.LoggingMixin.log")  # Disable log output
