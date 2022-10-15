@@ -6,6 +6,7 @@ import pytest
 from django.test import TestCase
 from documents.parsers import ParseError
 from paperless_mail.parsers import MailDocumentParser
+from paperless_mail.parsers import settings
 
 
 class TestParser(TestCase):
@@ -201,3 +202,26 @@ class TestParser(TestCase):
             }
             in metadata,
         )
+
+    @mock.patch("documents.loggers.LoggingMixin.log")  # Disable log output
+    def test_tika_parse(self, m):
+        html = '<html><head><meta http-equiv="content-type" content="text/html; charset=UTF-8"></head><body><p>Some Text</p></body></html>'
+        expected_text = "\n\n\n\n\n\n\n\n\nSome Text\n"
+
+        parser = MailDocumentParser(None)
+        tika_server_original = parser.tika_server
+
+        # Check if exception is raised when Tika cannot be reached.
+        with pytest.raises(ParseError):
+            parser.tika_server = ""
+            parser.tika_parse(html)
+
+        # Check unsuccessful parsing
+        parser.tika_server = tika_server_original
+
+        parsed = parser.tika_parse(None)
+        self.assertEqual("", parsed)
+
+        # Check successful parsing
+        parsed = parser.tika_parse(html)
+        self.assertEqual(expected_text, parsed)
