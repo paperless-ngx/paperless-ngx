@@ -21,6 +21,7 @@ class MailDocumentParser(DocumentParser):
     """
 
     gotenberg_server = settings.PAPERLESS_TIKA_GOTENBERG_ENDPOINT
+    tika_server = settings.PAPERLESS_TIKA_ENDPOINT
 
     logging_name = "paperless.parsing.mail"
     _parsed = None
@@ -133,13 +134,13 @@ class MailDocumentParser(DocumentParser):
 
     def tika_parse(self, html: str):
         self.log("info", "Sending content to Tika server")
-        tika_server = settings.PAPERLESS_TIKA_ENDPOINT
 
         try:
-            parsed = parser.from_buffer(html, tika_server)
+            parsed = parser.from_buffer(html, self.tika_server)
         except Exception as err:
             raise ParseError(
-                f"Could not parse content with tika server at " f"{tika_server}: {err}",
+                f"Could not parse content with tika server at "
+                f"{self.tika_server}: {err}",
             )
         if parsed["content"]:
             return parsed["content"]
@@ -246,7 +247,7 @@ class MailDocumentParser(DocumentParser):
 
         html = StringIO()
 
-        with open(html_file, "r") as html_template_handle:
+        with open(html_file) as html_template_handle:
             for line in html_template_handle.readlines():
                 for placeholder in placeholder_pattern.findall(line):
                     line = re.sub(
