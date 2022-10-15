@@ -364,3 +364,25 @@ For simplicity, `By Year` defines the same structure as in the previous example 
 
     If you adjust the format of an existing storage path, old documents don't get relocated automatically.
     You need to run the :ref:`document renamer <utilities-renamer>` to adjust their pathes.
+
+.. _advanced-celery-monitoring:
+
+Celery Monitoring
+#################
+
+The monitoring tool `Flower <https://flower.readthedocs.io/en/latest/index.html>`_ can be used to view more
+detailed information about the health of the celery workers used for asynchronous tasks.  This includes details
+on currently running, queued and completed tasks, timing and more.  Flower can also be used with Prometheus, as it
+exports metrics.  For details on its capabilities, refer to the Flower documentation.
+
+To configure Flower further, create a `flowerconfig.py` and place it into the `src/paperless` directory.  For
+a Docker installation, you can use volumes to accomplish this:
+
+.. code:: yaml
+
+    services:
+      # ...
+      webserver:
+        # ...
+        volumes:
+          - /path/to/my/flowerconfig.py:/usr/src/paperless/src/paperless/flowerconfig.py:ro
