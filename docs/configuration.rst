@@ -901,6 +901,14 @@ PAPERLESS_OCR_LANGUAGES=<list>
 
     Defaults to none, which does not install any additional languages.
 
+PAPERLESS_ENABLE_FLOWER=<defined>
+    If this environment variable is defined, the Celery monitoring tool
+    `Flower <https://flower.readthedocs.io/en/latest/index.html>`_ will
+    be started by the container.
+
+    You can read more about this in the :ref:`advanced setup <advanced-celery-monitoring>`
+    documentation.
+
 
 .. _configuration-update-checking:
 

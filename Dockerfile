@@ -151,6 +151,7 @@ COPY [ \
   "docker/paperless_cmd.sh", \
   "docker/wait-for-redis.py", \
   "docker/management_script.sh", \
+  "docker/flower-conditional.sh", \
   "docker/install_management_commands.sh", \
   "/usr/src/paperless/src/docker/" \
 ]
@@ -170,6 +171,8 @@ RUN set -eux \
     && chmod 755 /sbin/wait-for-redis.py \
     && mv paperless_cmd.sh /usr/local/bin/paperless_cmd.sh \
     && chmod 755 /usr/local/bin/paperless_cmd.sh \
+    && mv flower-conditional.sh /usr/local/bin/flower-conditional.sh \
+    && chmod 755 /usr/local/bin/flower-conditional.sh \
   && echo "Installing managment commands" \
     && chmod +x install_management_commands.sh \
     && ./install_management_commands.sh
