@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-07-08 14:11-0700\n"
-"PO-Revision-Date: 2022-07-29 20:44\n"
+"PO-Revision-Date: 2022-10-16 12:44\n"
 "Last-Translator: \n"
 "Language-Team: Belarusian\n"
 "Language: be_BY\n"
@@ -104,11 +104,11 @@ msgstr "шлях"
 
 #: documents/models.py:96 documents/models.py:124
 msgid "storage path"
-msgstr ""
+msgstr "шлях захоўвання"
 
 #: documents/models.py:97
 msgid "storage paths"
-msgstr ""
+msgstr "шляхі захоўвання"
 
 #: documents/models.py:105
 msgid "Unencrypted"
@@ -376,7 +376,7 @@ msgstr "правілы фільтрацыі"
 
 #: documents/models.py:521
 msgid "started"
-msgstr ""
+msgstr "пачата"
 
 #: documents/serialisers.py:70
 #, python-format
@@ -394,7 +394,7 @@ msgstr "Тып файла %(type)s не падтрымліваецца"
 
 #: documents/serialisers.py:596
 msgid "Invalid variable detected."
-msgstr ""
+msgstr "Выяўлена няправільная зменная."
 
 #: documents/templates/index.html:78
 msgid "Paperless-ngx is loading..."
@@ -402,7 +402,7 @@ msgstr "Paperless-ngx загружаецца..."
 
 #: documents/templates/index.html:79
 msgid "Still here?! Hmm, something might be wrong."
-msgstr ""
+msgstr "Яшчэ тут?! Хм, можа нешта не так."
 
 #: documents/templates/index.html:79
 msgid "Here's a link to the docs."
