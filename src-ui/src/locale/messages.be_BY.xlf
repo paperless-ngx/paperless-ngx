@@ -1583,7 +1583,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">5</context>
         </context-group>
-        <target state="needs-translation">More detail on how to use and configure Paperless-ngx is always available in the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://paperless-ngx.readthedocs.io&quot; target=&quot;_blank&quot;&gt;"/>documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</target>
+        <target state="translated">Больш падрабязную інфармацыю аб выкарыстанні і наладзе Paperless-ngx заўсёды можна знайсці ў <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://paperless-ngx.readthedocs. io&quot; target=&quot;_blank&quot;&gt;"/>дакументацыі<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</target>
       </trans-unit>
       <trans-unit id="4294899532887357745" datatype="html">
         <source>Thanks for being a part of the Paperless-ngx community!</source>
@@ -1591,7 +1591,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">8</context>
         </context-group>
-        <target state="needs-translation">Thanks for being a part of the Paperless-ngx community!</target>
+        <target state="translated">Дзякуй за ўдзел у супольнасці Paperless-ngx!</target>
       </trans-unit>
       <trans-unit id="1415832194529539652" datatype="html">
         <source>Start the tour</source>
@@ -1599,7 +1599,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">9</context>
         </context-group>
-        <target state="needs-translation">Start the tour</target>
+        <target state="translated">Пачаць тур</target>
       </trans-unit>
       <trans-unit id="7822640317427130239" datatype="html">
         <source>Searching document with asn <x id="INTERPOLATION" equiv-text="{{asn}}"/></source>
@@ -1615,7 +1615,7 @@
           <context context-type="sourcefile">src/app/components/document-comments/document-comments.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="needs-translation">Enter comment</target>
+        <target state="translated">Тэкст каментарыя</target>
       </trans-unit>
       <trans-unit id="4025397324401332794" datatype="html">
         <source> Please enter a comment. </source>
@@ -1623,7 +1623,7 @@
           <context context-type="sourcefile">src/app/components/document-comments/document-comments.component.html</context>
           <context context-type="linenumber">5,7</context>
         </context-group>
-        <target state="needs-translation"> Please enter a comment. </target>
+        <target state="translated"> Калі ласка, увядзіце каментар. </target>
       </trans-unit>
       <trans-unit id="2337485514607640701" datatype="html">
         <source>Add comment</source>
@@ -1631,7 +1631,7 @@
           <context context-type="sourcefile">src/app/components/document-comments/document-comments.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="needs-translation">Add comment</target>
+        <target state="translated">Дадаць каментар</target>
       </trans-unit>
       <trans-unit id="5438997040668245251" datatype="html">
         <source>Error saving comment: <x id="PH" equiv-text="e.toString()"/></source>
@@ -1639,7 +1639,7 @@
           <context context-type="sourcefile">src/app/components/document-comments/document-comments.component.ts</context>
           <context context-type="linenumber">68</context>
         </context-group>
-        <target state="needs-translation">Error saving comment: <x id="PH" equiv-text="e.toString()"/></target>
+        <target state="translated">Памылка захавання каментарыя: <x id="PH" equiv-text="e.toString()"/></target>
       </trans-unit>
       <trans-unit id="7593210124183303626" datatype="html">
         <source>Error deleting comment: <x id="PH" equiv-text="e.toString()"/></source>
@@ -1647,7 +1647,7 @@
           <context context-type="sourcefile">src/app/components/document-comments/document-comments.component.ts</context>
           <context context-type="linenumber">83</context>
         </context-group>
-        <target state="needs-translation">Error deleting comment: <x id="PH" equiv-text="e.toString()"/></target>
+        <target state="translated">Памылка пры выдаленні каментара: <x id="PH" equiv-text="e.toString()"/></target>
       </trans-unit>
       <trans-unit id="1407560924967345762" datatype="html">
         <source>Page</source>
@@ -1755,7 +1755,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">90</context>
         </context-group>
-        <target state="needs-translation">Redo OCR</target>
+        <target state="translated">Паўтарыць OCR</target>
       </trans-unit>
       <trans-unit id="1418444397960583910" datatype="html">
         <source>More like this</source>
@@ -1783,7 +1783,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">50</context>
         </context-group>
-        <target state="needs-translation">Previous</target>
+        <target state="translated">Папярэдняя</target>
       </trans-unit>
       <trans-unit id="3885497195825665706" datatype="html">
         <source>Next</source>
@@ -1791,7 +1791,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">55</context>
         </context-group>
-        <target state="needs-translation">Next</target>
+        <target state="translated">Наступная</target>
       </trans-unit>
       <trans-unit id="5028777105388019087" datatype="html">
         <source>Details</source>
@@ -1883,7 +1883,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">44</context>
         </context-group>
-        <target state="needs-translation">Storage path</target>
+        <target state="translated">Шлях захоўвання</target>
       </trans-unit>
       <trans-unit id="5607669932062416162" datatype="html">
         <source>Default</source>
@@ -1891,7 +1891,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">84</context>
         </context-group>
-        <target state="needs-translation">Default</target>
+        <target state="translated">Па змаўчанні</target>
       </trans-unit>
       <trans-unit id="6205355627445317276" datatype="html">
         <source>Content</source>
@@ -1943,7 +1943,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">118</context>
         </context-group>
-        <target state="needs-translation">Original filename</target>
+        <target state="translated">Арыгінальная назва файла</target>
       </trans-unit>
       <trans-unit id="7985558498848210210" datatype="html">
         <source>Original MD5 checksum</source>
@@ -2011,7 +2011,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">203</context>
         </context-group>
-        <target state="needs-translation">Enter Password</target>
+        <target state="translated">Увядзіце пароль</target>
       </trans-unit>
       <trans-unit id="3807699453257291879" datatype="html">
         <source>Comments</source>
@@ -2023,7 +2023,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">154</context>
         </context-group>
-        <target state="needs-translation">Comments</target>
+        <target state="translated">Каментарыі</target>
       </trans-unit>
       <trans-unit id="3823219296477075982" datatype="html">
         <source>Discard</source>
@@ -2095,7 +2095,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">387</context>
         </context-group>
-        <target state="needs-translation">Redo OCR confirm</target>
+        <target state="translated">Паўтарыць пацверджанне OCR</target>
       </trans-unit>
       <trans-unit id="9197453786953646058" datatype="html">
         <source>This operation will permanently redo OCR for this document.</source>
@@ -2103,7 +2103,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">483</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently redo OCR for this document.</target>
+        <target state="translated">Гэтая аперацыя назаўсёды паўторыць OCR для гэтага дакумента.</target>
       </trans-unit>
       <trans-unit id="5641451190833696892" datatype="html">
         <source>This operation cannot be undone.</source>
@@ -2131,7 +2131,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">391</context>
         </context-group>
-        <target state="needs-translation">Proceed</target>
+        <target state="translated">Працягнуць</target>
       </trans-unit>
       <trans-unit id="7662620858973651688" datatype="html">
         <source>Redo OCR operation will begin in the background.</source>
@@ -2139,7 +2139,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">494</context>
         </context-group>
-        <target state="needs-translation">Redo OCR operation will begin in the background.</target>
+        <target state="translated">Паўтор аперацыі OCR пачнецца ў фонавым рэжыме.</target>
       </trans-unit>
       <trans-unit id="8008978164775353960" datatype="html">
         <source>Error executing operation: <x id="PH" equiv-text="JSON.stringify(                 error.error               )"/></source>
@@ -2147,7 +2147,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">505,507</context>
         </context-group>
-        <target state="needs-translation">Error executing operation: <x id="PH" equiv-text="JSON.stringify(                 error.error               )"/></target>
+        <target state="translated">Памылка выканання аперацыі: <x id="PH" equiv-text="JSON.stringify( error.error )"/></target>
       </trans-unit>
       <trans-unit id="6857598786757174736" datatype="html">
         <source>Select:</source>
@@ -2211,7 +2211,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="needs-translation">Filter storage paths</target>
+        <target state="translated">Фільтраваць шляхі захоўвання</target>
       </trans-unit>
       <trans-unit id="3193976279273491157" datatype="html">
         <source>Actions</source>
@@ -2251,7 +2251,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">78,82</context>
         </context-group>
-        <target state="needs-translation"> Download <x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div *ngIf=&quot;awaitingDownload&quot; class=&quot;spinner-border spinner-border-sm&quot; role=&quot;status&quot;&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;visually-hidden&quot;&gt;"/>Preparing download...<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/></target>
+        <target state="translated"> Спампаваць <x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div *ngIf=&quot;awaitingDownload&quot; class=&quot;spinner-border spinner-border-sm&quot; role=&quot;status&quot;&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;visually-hidden&quot;&gt;"/>Падрыхтоўка да спампоўкі...<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/></target>
       </trans-unit>
       <trans-unit id="9202029122138685465" datatype="html">
         <source> Download originals <x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div *ngIf=&quot;awaitingDownload&quot; class=&quot;spinner-border spinner-border-sm&quot; role=&quot;status&quot;&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;visually-hidden&quot;&gt;"/>Preparing download...<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/></source>
@@ -2259,7 +2259,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">84,88</context>
         </context-group>
-        <target state="needs-translation"> Download originals <x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div *ngIf=&quot;awaitingDownload&quot; class=&quot;spinner-border spinner-border-sm&quot; role=&quot;status&quot;&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;visually-hidden&quot;&gt;"/>Preparing download...<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/></target>
+        <target state="translated"> Спампаваць арыгіналы <x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div *ngIf=&quot;awaitingDownload&quot; class=&quot;spinner-border spinner-border-sm&quot; role=&quot;status&quot;&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;visually-hidden&quot;&gt;"/>Падрыхтоўка да спампоўкі...<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/></target>
       </trans-unit>
       <trans-unit id="7985804062689412812" datatype="html">
         <source>Error executing bulk operation: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></source>
@@ -2267,7 +2267,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">103,105</context>
         </context-group>
-        <target state="needs-translation">Error executing bulk operation: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></target>
+        <target state="translated">Памылка выканання масавай аперацыі: <x id="PH" equiv-text="JSON.stringify( error.error )"/></target>
       </trans-unit>
       <trans-unit id="7894972847287473517" datatype="html">
         <source>&quot;<x id="PH" equiv-text="items[0].name"/>&quot;</source>
@@ -2321,7 +2321,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">209,211</context>
         </context-group>
-        <target state="needs-translation">This operation will add the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Гэтая аперацыя дадасць тэгі "<x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/>" да выбраных <x id="PH_1" equiv-text="this.list.selected.size"/> дакументаў.</target>
       </trans-unit>
       <trans-unit id="7181166515756808573" datatype="html">
         <source>This operation will remove the tag &quot;<x id="PH" equiv-text="tag.name"/>&quot; from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -2337,7 +2337,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">222,224</context>
         </context-group>
-        <target state="needs-translation">This operation will remove the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Гэтая аперацыя выдаліць тэгі "<x id="PH" equiv-text="tag.name"/>" з выбраных <x id="PH_1" equiv-text="this.list.selected.size"/> дакументаў.</target>
       </trans-unit>
       <trans-unit id="2739066218579571288" datatype="html">
         <source>This operation will add the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> and remove the tags <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> on <x id="PH_2" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -2345,7 +2345,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">226,230</context>
         </context-group>
-        <target state="needs-translation">This operation will add the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> and remove the tags <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> on <x id="PH_2" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Гэтая аперацыя дадасць тэгі <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> і выдаліць тэгі <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> на <x id="PH_2" equiv-text="this.list.selected.size"/> выбраных дакументах.</target>
       </trans-unit>
       <trans-unit id="2996713129519325161" datatype="html">
         <source>Confirm correspondent assignment</source>
@@ -2401,7 +2401,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">337</context>
         </context-group>
-        <target state="needs-translation">Confirm storage path assignment</target>
+        <target state="translated">Пацвердзіце прызначэнне шляху захоўвання</target>
       </trans-unit>
       <trans-unit id="8750527458618415924" datatype="html">
         <source>This operation will assign the storage path &quot;<x id="PH" equiv-text="storagePath.name"/>&quot; to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -2409,7 +2409,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">339</context>
         </context-group>
-        <target state="needs-translation">This operation will assign the storage path "<x id="PH" equiv-text="storagePath.name"/>" to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Гэтая аперацыя прызначыць шлях захоўвання "<x id="PH" equiv-text="storagePath.name"/>" да <x id="PH_1" equiv-text="this.list.selected.size"/> выбраных дакументаў.</target>
       </trans-unit>
       <trans-unit id="60728365335056946" datatype="html">
         <source>This operation will remove the storage path from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -2417,7 +2417,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">341</context>
         </context-group>
-        <target state="needs-translation">This operation will remove the storage path from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Гэтая аперацыя выдаліць шлях захоўвання з <x id="PH" equiv-text="this.list.selected.size"/> выбраных дакументаў.</target>
       </trans-unit>
       <trans-unit id="749430623564850405" datatype="html">
         <source>Delete confirm</source>
@@ -2449,7 +2449,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">388</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently redo OCR for <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Гэта аперацыя назаўсёды паўторыць OCR для <x id="PH" equiv-text="this.list.selected.size"/> выбраных дакументаў.</target>
       </trans-unit>
       <trans-unit id="8076495233090006322" datatype="html">
         <source>Filter by correspondent</source>
@@ -2537,7 +2537,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">182</context>
         </context-group>
-        <target state="needs-translation">Filter by document type</target>
+        <target state="translated">Фільтраваць па тыпе дакумента</target>
       </trans-unit>
       <trans-unit id="157572966557284263" datatype="html">
         <source>Filter by storage path</source>
@@ -2549,7 +2549,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">187</context>
         </context-group>
-        <target state="needs-translation">Filter by storage path</target>
+        <target state="translated">Фільтраваць па шляху захавання</target>
       </trans-unit>
       <trans-unit id="3727324658595204357" datatype="html">
         <source>Created: <x id="INTERPOLATION" equiv-text="{{ document.created | customDate }}"/></source>
