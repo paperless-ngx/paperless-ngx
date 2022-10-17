@@ -1,12 +1,6 @@
 import datetime
 import math
 import re
-from ast import literal_eval
-from asyncio.log import logger
-from pathlib import Path
-from typing import Dict
-from typing import Optional
-from typing import Tuple
 
 from celery import states
 
@@ -640,14 +634,13 @@ class TasksViewSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "task_id",
+            "task_file_name",
             "date_created",
             "date_done",
             "type",
             "status",
             "result",
             "acknowledged",
-            "task_name",
-            "name",
             "related_document",
         )
 
@@ -657,108 +650,14 @@ class TasksViewSerializer(serializers.ModelSerializer):
         # just file tasks, for now
         return "file"
 
-    result = serializers.SerializerMethodField()
-
-    def get_result(self, obj):
-        result = ""
-        if (
-            hasattr(obj, "attempted_task")
-            and obj.attempted_task
-            and obj.attempted_task.result
-        ):
-            try:
-                result: str = obj.attempted_task.result
-                if "exc_message" in result:
-                    # This is a dict in this case
-                    result: Dict = literal_eval(result)
-                    # This is a list, grab the first item (most recent)
-                    result = result["exc_message"][0]
-            except Exception as e:  # pragma: no cover
-                # Extra security if something is malformed
-                logger.warn(f"Error getting task result: {e}", exc_info=True)
-        return result
-
-    status = serializers.SerializerMethodField()
-
-    def get_status(self, obj):
-        result = "unknown"
-        if hasattr(obj, "attempted_task") and obj.attempted_task:
-            result = obj.attempted_task.status
-        return result
-
-    date_created = serializers.SerializerMethodField()
-
-    def get_date_created(self, obj):
-        result = ""
-        if hasattr(obj, "attempted_task") and obj.attempted_task:
-            result = obj.attempted_task.date_created
-        return result
-
-    date_done = serializers.SerializerMethodField()
-
-    def get_date_done(self, obj):
-        result = ""
-        if hasattr(obj, "attempted_task") and obj.attempted_task:
-            result = obj.attempted_task.date_done
-        return result
-
-    task_id = serializers.SerializerMethodField()
-
-    def get_task_id(self, obj):
-        result = ""
-        if hasattr(obj, "attempted_task") and obj.attempted_task:
-            result = obj.attempted_task.task_id
-        return result
-
-    task_name = serializers.SerializerMethodField()
-
-    def get_task_name(self, obj):
-        result = ""
-        if hasattr(obj, "attempted_task") and obj.attempted_task:
-            result = obj.attempted_task.task_name
-        return result
-
-    name = serializers.SerializerMethodField()
-
-    def get_name(self, obj):
-        result = ""
-        if hasattr(obj, "attempted_task") and obj.attempted_task:
-            try:
-                task_kwargs: Optional[str] = obj.attempted_task.task_kwargs
-                # Try the override filename first (this is a webui created task?)
-                if task_kwargs is not None:
-                    # It's a string, string of a dict.  Who knows why...
-                    kwargs = literal_eval(literal_eval(task_kwargs))
-                    if "override_filename" in kwargs:
-                        result = kwargs["override_filename"]
-
-                # Nothing was found, report the task first argument
-                if not len(result):
-                    # There are always some arguments to the consume
-                    task_args: Tuple = literal_eval(
-                        literal_eval(obj.attempted_task.task_args),
-                    )
-                    filepath = Path(task_args[0])
-                    result = filepath.name
-            except Exception as e:  # pragma: no cover
-                # Extra security if something is malformed
-                logger.warning(f"Error getting file name from task: {e}", exc_info=True)
-
-        return result
-
     related_document = serializers.SerializerMethodField()
+    related_doc_re = re.compile(r"New document id (\d+) created")
 
     def get_related_document(self, obj):
-        result = ""
-        regexp = r"New document id (\d+) created"
-        if (
-            hasattr(obj, "attempted_task")
-            and obj.attempted_task
-            and obj.attempted_task.result
-            and obj.attempted_task.status == states.SUCCESS
-        ):
+        result = None
+        if obj.status is not None and obj.status == states.SUCCESS:
             try:
-                result = re.search(regexp, obj.attempted_task.result).group(1)
+                result = self.related_doc_re.search(obj.result).group(1)
             except Exception:
                 pass
 
