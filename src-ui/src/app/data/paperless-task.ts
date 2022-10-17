@@ -21,7 +21,7 @@ export interface PaperlessTask extends ObjectWithId {
 
   task_id: string
 
-  name: string
+  task_file_name: string
 
   date_created: Date
 
