@@ -73,8 +73,8 @@ svg.logo {
   border-color: var(--bs-primary);
 
   &:hover, &:focus {
-    background-color: var(--pngx-primary-darken-5);
-    border-color: var(--pngx-primary-darken-5);
+    background-color: var(--pngx-primary-darken-5) !important;
+    border-color: var(--pngx-primary-darken-5) !important;
   }
 
   &:disabled, &.disabled {
@@ -164,8 +164,14 @@ a.navbar-brand:focus-visible {
   }
 }
 
-a, a:hover, .btn-link, .btn-link:hover {
+a, a:hover,
+.btn-link {
   color: var(--bs-primary);
+}
+
+.btn-link:hover,
+.btn-link:active {
+  color: var(--pngx-primary-darken-15) !important;
 }
 
 .form-control-dark {
