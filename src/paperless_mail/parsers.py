@@ -296,22 +296,26 @@ class MailDocumentParser(DocumentParser):
 
         return response.content
 
-    def transform_inline_html(self, orig_html, attachments):
+    @staticmethod
+    def transform_inline_html(html, attachments):
         def clean_html_script(text: str):
-            text = text.replace("<script", "<div hidden ")
-            text = text.replace("</script", "</div")
+            compiled_open = re.compile(re.escape("<script"), re.IGNORECASE)
+            text = compiled_open.sub("<div hidden ", text)
+
+            compiled_close = re.compile(re.escape("</script"), re.IGNORECASE)
+            text = compiled_close.sub("</div", text)
             return text
 
-        orig_html = clean_html_script(orig_html)
+        html_clean = clean_html_script(html)
         files = []
 
         for a in attachments:
             name_cid = "cid:" + a.content_id
             name_clean = "".join(e for e in name_cid if e.isalnum())
             files.append((name_clean, BytesIO(a.payload)))
-            orig_html = orig_html.replace(name_cid, name_clean)
+            html_clean = html_clean.replace(name_cid, name_clean)
 
-        files.append(("index.html", StringIO(orig_html)))
+        files.append(("index.html", StringIO(html_clean)))
 
         return files
 

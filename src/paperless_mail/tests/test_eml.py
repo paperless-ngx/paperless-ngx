@@ -282,3 +282,27 @@ class TestParser(TestCase):
         # Check successful parsing
         parsed = parser.tika_parse(html)
         self.assertEqual(expected_text, parsed)
+
+    def test_transform_inline_html(self):
+        class MailAttachmentMock:
+            def __init__(self, payload, content_id):
+                self.payload = payload
+                self.content_id = content_id
+
+        parser = MailDocumentParser(None)
+
+        result = None
+
+        with open(os.path.join(self.SAMPLE_FILES, "sample.html")) as html_file:
+            with open(os.path.join(self.SAMPLE_FILES, "sample.png"), "rb") as png_file:
+                html = html_file.read()
+                png = png_file.read()
+                attachments = [
+                    MailAttachmentMock(png, "part1.pNdUSz0s.D3NqVtPg@example.de"),
+                ]
+                result = parser.transform_inline_html(html, attachments)
+
+        resulting_html = result[-1][1].read()
+        self.assertTrue(result[-1][0] == "index.html")
+        self.assertTrue(result[0][0] in resulting_html)
+        self.assertFalse("<script" in resulting_html.lower())
