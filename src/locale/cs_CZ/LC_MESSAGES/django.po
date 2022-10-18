@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-07-08 14:11-0700\n"
-"PO-Revision-Date: 2022-07-08 22:07\n"
+"PO-Revision-Date: 2022-10-18 20:06\n"
 "Last-Translator: \n"
 "Language-Team: Czech\n"
 "Language: cs_CZ\n"
@@ -84,7 +84,7 @@ msgstr "Označí tento tag jako tag pro příchozí: Všechny nově zkonzumovan�
 
 #: documents/models.py:78
 msgid "tag"
-msgstr ""
+msgstr "tagy"
 
 #: documents/models.py:79 documents/models.py:153
 msgid "tags"
@@ -100,15 +100,15 @@ msgstr "typy dokumentu"
 
 #: documents/models.py:90
 msgid "path"
-msgstr ""
+msgstr "cesta"
 
 #: documents/models.py:96 documents/models.py:124
 msgid "storage path"
-msgstr ""
+msgstr "cesta k úložišti"
 
 #: documents/models.py:97
 msgid "storage paths"
-msgstr ""
+msgstr "cesta k úložišti"
 
 #: documents/models.py:105
 msgid "Unencrypted"
@@ -200,7 +200,7 @@ msgstr "dokumenty"
 
 #: documents/models.py:318
 msgid "debug"
-msgstr ""
+msgstr "ladění"
 
 #: documents/models.py:319
 msgid "information"
@@ -356,7 +356,7 @@ msgstr "Podobné"
 
 #: documents/models.py:396
 msgid "has tags in"
-msgstr ""
+msgstr "má značky v"
 
 #: documents/models.py:406
 msgid "rule type"
@@ -376,7 +376,7 @@ msgstr "filtrovací pravidla"
 
 #: documents/models.py:521
 msgid "started"
-msgstr ""
+msgstr "zahájeno"
 
 #: documents/serialisers.py:70
 #, python-format
@@ -394,23 +394,23 @@ msgstr "Typ souboru %(type)s není podporován"
 
 #: documents/serialisers.py:596
 msgid "Invalid variable detected."
-msgstr ""
+msgstr "Zjištěna neplatná proměnná."
 
 #: documents/templates/index.html:78
 msgid "Paperless-ngx is loading..."
-msgstr ""
+msgstr "Paperless-ngx se načítá..."
 
 #: documents/templates/index.html:79
 msgid "Still here?! Hmm, something might be wrong."
-msgstr ""
+msgstr "Stále tady?! Hmm, možná se něco pokazilo."
 
 #: documents/templates/index.html:79
 msgid "Here's a link to the docs."
-msgstr ""
+msgstr "Zde je odkaz na dokumenty."
 
 #: documents/templates/registration/logged_out.html:14
 msgid "Paperless-ngx signed out"
-msgstr ""
+msgstr "Odhlášeno z Paperless-ngx"
 
 #: documents/templates/registration/logged_out.html:59
 msgid "You have been successfully logged out. Bye!"
@@ -422,7 +422,7 @@ msgstr "Přihlašte se znovu"
 
 #: documents/templates/registration/login.html:15
 msgid "Paperless-ngx sign in"
-msgstr ""
+msgstr "Paperless-ngx přihlášení"
 
 #: documents/templates/registration/login.html:61
 msgid "Please sign in."
@@ -450,15 +450,15 @@ msgstr "Angličtina (US)"
 
 #: paperless/settings.py:340
 msgid "Belarusian"
-msgstr ""
+msgstr "Běloruština"
 
 #: paperless/settings.py:341
 msgid "Czech"
-msgstr ""
+msgstr "Čeština"
 
 #: paperless/settings.py:342
 msgid "Danish"
-msgstr ""
+msgstr "Dánština"
 
 #: paperless/settings.py:343
 msgid "German"
@@ -482,7 +482,7 @@ msgstr "Italština"
 
 #: paperless/settings.py:348
 msgid "Luxembourgish"
-msgstr ""
+msgstr "Lucemburština"
 
 #: paperless/settings.py:349
 msgid "Dutch"
@@ -510,11 +510,11 @@ msgstr "Ruština"
 
 #: paperless/settings.py:355
 msgid "Slovenian"
-msgstr ""
+msgstr "Slovinština"
 
 #: paperless/settings.py:356
 msgid "Serbian"
-msgstr ""
+msgstr "Srbština"
 
 #: paperless/settings.py:357
 msgid "Swedish"
@@ -522,15 +522,15 @@ msgstr "Švédština"
 
 #: paperless/settings.py:358
 msgid "Turkish"
-msgstr ""
+msgstr "Turečtina"
 
 #: paperless/settings.py:359
 msgid "Chinese Simplified"
-msgstr ""
+msgstr "Čínština (zjednodušená)"
 
 #: paperless/urls.py:161
 msgid "Paperless-ngx administration"
-msgstr ""
+msgstr "Správa Paperless-ngx"
 
 #: paperless_mail/admin.py:29
 msgid "Authentication"
@@ -558,7 +558,7 @@ msgstr "Akce provedena na emailu. Tato akce je provedena jen pokud byly dokument
 
 #: paperless_mail/admin.py:75
 msgid "Metadata"
-msgstr ""
+msgstr "Metadata"
 
 #: paperless_mail/admin.py:78
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
@@ -590,11 +590,11 @@ msgstr "Používat STARTTLS"
 
 #: paperless_mail/models.py:18
 msgid "IMAP server"
-msgstr ""
+msgstr "IMAP server"
 
 #: paperless_mail/models.py:21
 msgid "IMAP port"
-msgstr ""
+msgstr "IMAP port"
 
 #: paperless_mail/models.py:25
 msgid "This is usually 143 for unencrypted and STARTTLS connections, and 993 for SSL connections."
@@ -654,7 +654,7 @@ msgstr "Označit email, nezpracovávat označené emaily"
 
 #: paperless_mail/models.py:68
 msgid "Tag the mail with specified tag, don't process tagged mails"
-msgstr ""
+msgstr "Označit e-mail zadaným štítkem, nezpracovávat označené e-maily"
 
 #: paperless_mail/models.py:71
 msgid "Use subject as title"
@@ -694,7 +694,7 @@ msgstr "složka"
 
 #: paperless_mail/models.py:96
 msgid "Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server."
-msgstr ""
+msgstr "Podsložky musí být odděleny oddělovačem, nejčastěji tečkou ('.') nebo lomítkem ('/'), ale závisí to na e-mailovém serveru."
 
 #: paperless_mail/models.py:102
 msgid "filter from"
