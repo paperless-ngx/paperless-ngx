@@ -257,7 +257,7 @@ class TestParser(TestCase):
         self.assertEqual(
             thumb_hash,
             expected_hash,
-            "PDF looks look different.",
+            "PDF looks different.",
         )
 
     @mock.patch("documents.loggers.LoggingMixin.log")  # Disable log output
@@ -306,3 +306,54 @@ class TestParser(TestCase):
         self.assertTrue(result[-1][0] == "index.html")
         self.assertTrue(result[0][0] in resulting_html)
         self.assertFalse("<script" in resulting_html.lower())
+
+    @mock.patch("documents.loggers.LoggingMixin.log")  # Disable log output
+    def test_generate_pdf_from_html(self, m):
+        class MailAttachmentMock:
+            def __init__(self, payload, content_id):
+                self.payload = payload
+                self.content_id = content_id
+
+        parser = MailDocumentParser(None)
+
+        result = None
+
+        with open(os.path.join(self.SAMPLE_FILES, "sample.html")) as html_file:
+            with open(os.path.join(self.SAMPLE_FILES, "sample.png"), "rb") as png_file:
+                html = html_file.read()
+                png = png_file.read()
+                attachments = [
+                    MailAttachmentMock(png, "part1.pNdUSz0s.D3NqVtPg@example.de"),
+                ]
+                result = parser.generate_pdf_from_html(html, attachments)
+
+        pdf_path = os.path.join(parser.tempdir, "test_generate_pdf_from_html.pdf")
+
+        with open(pdf_path, "wb") as file:
+            file.write(result)
+            file.close()
+
+        converted = os.path.join(parser.tempdir, "test_generate_pdf_from_html.webp")
+        run_convert(
+            density=300,
+            scale="500x5000>",
+            alpha="remove",
+            strip=True,
+            trim=False,
+            auto_orient=True,
+            input_file=f"{pdf_path}",  # Do net define an index to convert all pages.
+            output_file=converted,
+            logging_group=None,
+        )
+        self.assertTrue(os.path.isfile(converted))
+        thumb_hash = self.hashfile(converted)
+
+        # The created pdf is not reproducible. But the converted image should always look the same.
+        expected_hash = (
+            "88dee024ec77b1139b77913547717bd7e94f53651d489c54a7084d30a82e389e"
+        )
+        self.assertEqual(
+            thumb_hash,
+            expected_hash,
+            "PDF looks different.",
+        )
