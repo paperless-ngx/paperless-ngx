@@ -392,3 +392,28 @@ a Docker installation, you can use volumes to accomplish this:
         # ...
         volumes:
           - /path/to/my/flowerconfig.py:/usr/src/paperless/src/paperless/flowerconfig.py:ro
+
+Custom Container Initialization
+###############################
+
+The Docker image includes the ability to run custom user scripts during startup.  This could be
+utilized for installing additional tools or Python packages, for example.
+
+To utilize this, mount a folder containing your scripts to the custom initialization directory, `/custom-cont-init.d`
+and place scripts you wish to run inside.  For security, the folder and its contents must be owned by `root`.
+Additionally, scripts must only be writable by `root`.
+
+Your scripts will be run directly before the webserver completes startup.  Scripts will be run by the `root` user.
+This is an advanced functionality with which you could break functionality or lose data.
+
+For example, using Docker Compose:
+
+
+.. code:: yaml
+
+    services:
+      # ...
+      webserver:
+        # ...
+        volumes:
+          - /path/to/my/scripts:/custom-cont-init.d:ro
