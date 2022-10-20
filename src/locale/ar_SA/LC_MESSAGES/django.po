@@ -3,9 +3,9 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-07-08 14:11-0700\n"
-"PO-Revision-Date: 2022-07-08 22:07\n"
+"PO-Revision-Date: 2022-10-20 22:28\n"
 "Last-Translator: \n"
-"Language-Team: Arabic, Saudi Arabia\n"
+"Language-Team: Arabic\n"
 "Language: ar_SA\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5);\n"
 "X-Crowdin-Project: paperless-ngx\n"
 "X-Crowdin-Project-ID: 500308\n"
-"X-Crowdin-Language: ar-SA\n"
+"X-Crowdin-Language: ar\n"
 "X-Crowdin-File: /dev/src/locale/en_US/LC_MESSAGES/django.po\n"
 "X-Crowdin-File-ID: 14\n"
 
@@ -470,7 +470,7 @@ msgstr ""
 
 #: paperless/settings.py:345
 msgid "Spanish"
-msgstr "الإسبانية"
+msgstr ""
 
 #: paperless/settings.py:346
 msgid "French"
@@ -490,7 +490,7 @@ msgstr ""
 
 #: paperless/settings.py:350
 msgid "Polish"
-msgstr "البولندية"
+msgstr ""
 
 #: paperless/settings.py:351
 msgid "Portuguese (Brazil)"
@@ -498,7 +498,7 @@ msgstr ""
 
 #: paperless/settings.py:352
 msgid "Portuguese"
-msgstr "البرتغالية"
+msgstr ""
 
 #: paperless/settings.py:353
 msgid "Romanian"
@@ -506,7 +506,7 @@ msgstr ""
 
 #: paperless/settings.py:354
 msgid "Russian"
-msgstr "الروسية"
+msgstr ""
 
 #: paperless/settings.py:355
 msgid "Slovenian"
@@ -518,7 +518,7 @@ msgstr ""
 
 #: paperless/settings.py:357
 msgid "Swedish"
-msgstr "السويدية"
+msgstr ""
 
 #: paperless/settings.py:358
 msgid "Turkish"
