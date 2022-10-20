@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
-  <file source-language="en" datatype="plaintext" original="ng2.template" target-language="ar-SA">
+  <file source-language="en" datatype="plaintext" original="ng2.template" target-language="ar">
     <body>
       <trans-unit id="ngb.alert.close" datatype="html">
         <source>Close</source>
@@ -89,7 +89,7 @@
           <context context-type="sourcefile">node_modules/src/pagination/pagination.ts</context>
           <context context-type="linenumber">224,225</context>
         </context-group>
-        <target state="translated">««</target>
+        <target state="needs-translation">««</target>
       </trans-unit>
       <trans-unit id="ngb.pagination.previous" datatype="html">
         <source>«</source>
@@ -97,7 +97,7 @@
           <context context-type="sourcefile">node_modules/src/pagination/pagination.ts</context>
           <context context-type="linenumber">224,225</context>
         </context-group>
-        <target state="translated">«</target>
+        <target state="needs-translation">«</target>
       </trans-unit>
       <trans-unit id="ngb.pagination.next" datatype="html">
         <source>»</source>
@@ -105,7 +105,7 @@
           <context context-type="sourcefile">node_modules/src/pagination/pagination.ts</context>
           <context context-type="linenumber">224,225</context>
         </context-group>
-        <target state="translated">»</target>
+        <target state="needs-translation">»</target>
       </trans-unit>
       <trans-unit id="ngb.pagination.last" datatype="html">
         <source>»»</source>
@@ -113,7 +113,7 @@
           <context context-type="sourcefile">node_modules/src/pagination/pagination.ts</context>
           <context context-type="linenumber">224,225</context>
         </context-group>
-        <target state="translated">»»</target>
+        <target state="needs-translation">»»</target>
       </trans-unit>
       <trans-unit id="ngb.pagination.first-aria" datatype="html">
         <source>First</source>
@@ -287,23 +287,23 @@
         </context-group>
         <target state="needs-translation">Drop files to begin upload</target>
       </trans-unit>
-      <trans-unit id="9103526311244275943" datatype="html" approved="yes">
+      <trans-unit id="9103526311244275943" datatype="html">
         <source>Document added</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">78</context>
         </context-group>
-        <target state="final">أُضيف المستند</target>
+        <target state="needs-translation">Document added</target>
       </trans-unit>
-      <trans-unit id="9204248378636247318" datatype="html" approved="yes">
+      <trans-unit id="9204248378636247318" datatype="html">
         <source>Document <x id="PH" equiv-text="status.filename"/> was added to paperless.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">80</context>
         </context-group>
-        <target state="final">أضيف المستند <x id="PH" equiv-text="status.filename"/> إلى paperless.</target>
+        <target state="needs-translation">Document <x id="PH" equiv-text="status.filename"/> was added to paperless.</target>
       </trans-unit>
-      <trans-unit id="1931214133925051574" datatype="html" approved="yes">
+      <trans-unit id="1931214133925051574" datatype="html">
         <source>Open document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
@@ -313,7 +313,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="final">فتح مستند</target>
+        <target state="needs-translation">Open document</target>
       </trans-unit>
       <trans-unit id="8582620835547864448" datatype="html">
         <source>Could not add <x id="PH" equiv-text="status.filename"/>: <x id="PH_1" equiv-text="status.message"/></source>
@@ -323,13 +323,13 @@
         </context-group>
         <target state="needs-translation">Could not add <x id="PH" equiv-text="status.filename"/>: <x id="PH_1" equiv-text="status.message"/></target>
       </trans-unit>
-      <trans-unit id="1710712016675379662" datatype="html" approved="yes">
+      <trans-unit id="1710712016675379662" datatype="html">
         <source>New document detected</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">112</context>
         </context-group>
-        <target state="final">عُثر على مستند جديد</target>
+        <target state="needs-translation">New document detected</target>
       </trans-unit>
       <trans-unit id="587031278561344416" datatype="html">
         <source>Document <x id="PH" equiv-text="status.filename"/> is being processed by paperless.</source>
@@ -452,13 +452,13 @@
         <note priority="1" from="description">app title</note>
         <target state="needs-translation">Paperless-ngx</target>
       </trans-unit>
-      <trans-unit id="7100953725264790651" datatype="html" approved="yes">
+      <trans-unit id="7100953725264790651" datatype="html">
         <source>Search documents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="final">البحث في المستندات</target>
+        <target state="needs-translation">Search documents</target>
       </trans-unit>
       <trans-unit id="2448391510242468907" datatype="html">
         <source>Logged in as <x id="INTERPOLATION" equiv-text="{{this.settingsService.displayName}}"/></source>
@@ -468,7 +468,7 @@
         </context-group>
         <target state="needs-translation">Logged in as <x id="INTERPOLATION" equiv-text="{{this.settingsService.displayName}}"/></target>
       </trans-unit>
-      <trans-unit id="4930506384627295710" datatype="html" approved="yes">
+      <trans-unit id="4930506384627295710" datatype="html">
         <source>Settings</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
@@ -486,17 +486,17 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="final">الإعدادات</target>
+        <target state="needs-translation">Settings</target>
       </trans-unit>
-      <trans-unit id="3797778920049399855" datatype="html" approved="yes">
+      <trans-unit id="3797778920049399855" datatype="html">
         <source>Logout</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="final">خروج</target>
+        <target state="needs-translation">Logout</target>
       </trans-unit>
-      <trans-unit id="6570363013146073520" datatype="html" approved="yes">
+      <trans-unit id="6570363013146073520" datatype="html">
         <source>Dashboard</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
@@ -510,7 +510,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="final">لوحة التحكم</target>
+        <target state="needs-translation">Dashboard</target>
       </trans-unit>
       <trans-unit id="4733307402565258070" datatype="html">
         <source>Documents</source>
@@ -544,7 +544,7 @@
         </context-group>
         <target state="needs-translation">Documents</target>
       </trans-unit>
-      <trans-unit id="472206565520537964" datatype="html" approved="yes">
+      <trans-unit id="472206565520537964" datatype="html">
         <source>Saved views</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
@@ -554,17 +554,17 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">184</context>
         </context-group>
-        <target state="final">طرق العرض المحفوظة</target>
+        <target state="needs-translation">Saved views</target>
       </trans-unit>
-      <trans-unit id="6988090220128974198" datatype="html" approved="yes">
+      <trans-unit id="6988090220128974198" datatype="html">
         <source>Open documents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">94</context>
         </context-group>
-        <target state="final">فتح مستندات</target>
+        <target state="needs-translation">Open documents</target>
       </trans-unit>
-      <trans-unit id="5687256342387781369" datatype="html" approved="yes">
+      <trans-unit id="5687256342387781369" datatype="html">
         <source>Close all</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
@@ -574,15 +574,15 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">113</context>
         </context-group>
-        <target state="final">إغلاق الكل</target>
+        <target state="needs-translation">Close all</target>
       </trans-unit>
-      <trans-unit id="3897348120591552265" datatype="html" approved="yes">
+      <trans-unit id="3897348120591552265" datatype="html">
         <source>Manage</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">119</context>
         </context-group>
-        <target state="final">إدارة</target>
+        <target state="needs-translation">Manage</target>
       </trans-unit>
       <trans-unit id="7437910965833684826" datatype="html">
         <source>Correspondents</source>
@@ -596,7 +596,7 @@
         </context-group>
         <target state="needs-translation">Correspondents</target>
       </trans-unit>
-      <trans-unit id="7886570921510760899" datatype="html" approved="yes">
+      <trans-unit id="7886570921510760899" datatype="html">
         <source>Tags</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
@@ -618,9 +618,9 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="final">علامات</target>
+        <target state="needs-translation">Tags</target>
       </trans-unit>
-      <trans-unit id="3079652255369035" datatype="html" approved="yes">
+      <trans-unit id="3079652255369035" datatype="html">
         <source>Document types</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
@@ -630,7 +630,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">140</context>
         </context-group>
-        <target state="final">أنواع المستندات</target>
+        <target state="needs-translation">Document types</target>
       </trans-unit>
       <trans-unit id="8835528846812581148" datatype="html">
         <source>Storage paths</source>
@@ -664,7 +664,7 @@
         </context-group>
         <target state="needs-translation">File Tasks<x id="START_TAG_SPAN_1" ctype="x-span_1" equiv-text="&lt;span *ngIf=&quot;tasksService.failedFileTasks.length &gt; 0&quot;&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-danger ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
       </trans-unit>
-      <trans-unit id="4804785061014590286" datatype="html" approved="yes">
+      <trans-unit id="4804785061014590286" datatype="html">
         <source>Logs</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
@@ -678,9 +678,9 @@
           <context context-type="sourcefile">src/app/components/manage/logs/logs.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="final">السجلات</target>
+        <target state="needs-translation">Logs</target>
       </trans-unit>
-      <trans-unit id="5041354590769758251" datatype="html" approved="yes">
+      <trans-unit id="5041354590769758251" datatype="html">
         <source>Admin</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
@@ -690,9 +690,9 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">176</context>
         </context-group>
-        <target state="final">المسئول</target>
+        <target state="needs-translation">Admin</target>
       </trans-unit>
-      <trans-unit id="314315645942131479" datatype="html" approved="yes">
+      <trans-unit id="314315645942131479" datatype="html">
         <source>Info</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
@@ -702,9 +702,9 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">43</context>
         </context-group>
-        <target state="final">معلومات</target>
+        <target state="needs-translation">Info</target>
       </trans-unit>
-      <trans-unit id="4895326106573044490" datatype="html" approved="yes">
+      <trans-unit id="4895326106573044490" datatype="html">
         <source>Documentation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
@@ -714,7 +714,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">189</context>
         </context-group>
-        <target state="final">الوثائق</target>
+        <target state="needs-translation">Documentation</target>
       </trans-unit>
       <trans-unit id="1534029177398918729" datatype="html">
         <source>GitHub</source>
@@ -728,7 +728,7 @@
         </context-group>
         <target state="needs-translation">GitHub</target>
       </trans-unit>
-      <trans-unit id="5612903193691847840" datatype="html" approved="yes">
+      <trans-unit id="5612903193691847840" datatype="html">
         <source>Suggest an idea</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
@@ -738,7 +738,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">203</context>
         </context-group>
-        <target state="final">اقترح فكرة</target>
+        <target state="needs-translation">Suggest an idea</target>
       </trans-unit>
       <trans-unit id="4112664765954374539" datatype="html">
         <source>is available.</source>
@@ -900,7 +900,7 @@
         </context-group>
         <target state="needs-translation">Last year</target>
       </trans-unit>
-      <trans-unit id="8953033926734869941" datatype="html" approved="yes">
+      <trans-unit id="8953033926734869941" datatype="html">
         <source>Name</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component.html</context>
@@ -962,7 +962,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">40</context>
         </context-group>
-        <target state="final">اسم</target>
+        <target state="needs-translation">Name</target>
       </trans-unit>
       <trans-unit id="8743659855412792665" datatype="html">
         <source>Matching algorithm</source>
@@ -1056,7 +1056,7 @@
         </context-group>
         <target state="needs-translation">Cancel</target>
       </trans-unit>
-      <trans-unit id="3768927257183755959" datatype="html" approved="yes">
+      <trans-unit id="3768927257183755959" datatype="html">
         <source>Save</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component.html</context>
@@ -1086,7 +1086,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">223</context>
         </context-group>
-        <target state="final">حفظ</target>
+        <target state="needs-translation">Save</target>
       </trans-unit>
       <trans-unit id="6457471243969293847" datatype="html">
         <source>Create new correspondent</source>
@@ -1104,37 +1104,37 @@
         </context-group>
         <target state="needs-translation">Edit correspondent</target>
       </trans-unit>
-      <trans-unit id="6672809941092516947" datatype="html" approved="yes">
+      <trans-unit id="6672809941092516947" datatype="html">
         <source>Create new document type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component.ts</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="final">إنشاء نوع مستند جديد</target>
+        <target state="needs-translation">Create new document type</target>
       </trans-unit>
-      <trans-unit id="36335016091244220" datatype="html" approved="yes">
+      <trans-unit id="36335016091244220" datatype="html">
         <source>Edit document type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component.ts</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="final">تحرير نوع المستند</target>
+        <target state="needs-translation">Edit document type</target>
       </trans-unit>
-      <trans-unit id="4561076822163447092" datatype="html" approved="yes">
+      <trans-unit id="4561076822163447092" datatype="html">
         <source>Create new item</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/edit-dialog.component.ts</context>
           <context context-type="linenumber">52</context>
         </context-group>
-        <target state="final">إنشاء عنصر جديد</target>
+        <target state="needs-translation">Create new item</target>
       </trans-unit>
-      <trans-unit id="5324147361912094446" datatype="html" approved="yes">
+      <trans-unit id="5324147361912094446" datatype="html">
         <source>Edit item</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/edit-dialog.component.ts</context>
           <context context-type="linenumber">56</context>
         </context-group>
-        <target state="final">تعديل عنصر</target>
+        <target state="needs-translation">Edit item</target>
       </trans-unit>
       <trans-unit id="1699589597032579396" datatype="html">
         <source>Could not save element: <x id="PH" equiv-text="error"/></source>
@@ -1204,7 +1204,7 @@
         </context-group>
         <target state="needs-translation">Edit storage path</target>
       </trans-unit>
-      <trans-unit id="9011959596901584887" datatype="html" approved="yes">
+      <trans-unit id="9011959596901584887" datatype="html">
         <source>Color</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component.html</context>
@@ -1214,23 +1214,23 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.ts</context>
           <context context-type="linenumber">35</context>
         </context-group>
-        <target state="final">لون</target>
+        <target state="needs-translation">Color</target>
       </trans-unit>
-      <trans-unit id="1426037806946650347" datatype="html" approved="yes">
+      <trans-unit id="1426037806946650347" datatype="html">
         <source>Inbox tag</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="final">علامة علبة الوارد</target>
+        <target state="needs-translation">Inbox tag</target>
       </trans-unit>
-      <trans-unit id="8566220514470905459" datatype="html" approved="yes">
+      <trans-unit id="8566220514470905459" datatype="html">
         <source>Inbox tags are automatically assigned to all consumed documents.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="final">تُعيَّن علامات علبة الوارد تلقائياً لجميع المستندات المستهلكة.</target>
+        <target state="needs-translation">Inbox tags are automatically assigned to all consumed documents.</target>
       </trans-unit>
       <trans-unit id="9153094873118985366" datatype="html">
         <source>Create new tag</source>
@@ -1293,13 +1293,13 @@
         <note priority="1" from="description">Filter drop down element to filter for documents with no correspondent/type/tag assigned</note>
         <target state="needs-translation">Not assigned</target>
       </trans-unit>
-      <trans-unit id="445302259125375799" datatype="html" approved="yes">
+      <trans-unit id="445302259125375799" datatype="html">
         <source>Invalid date.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/date/date.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="final">تاريخ غير صالح.</target>
+        <target state="needs-translation">Invalid date.</target>
       </trans-unit>
       <trans-unit id="524422427194414813" datatype="html">
         <source>Suggestions:</source>
@@ -1334,7 +1334,7 @@
         </context-group>
         <target state="needs-translation">Add tag</target>
       </trans-unit>
-      <trans-unit id="3797570084942068182" datatype="html" approved="yes">
+      <trans-unit id="3797570084942068182" datatype="html">
         <source>Select</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/select-dialog/select-dialog.component.html</context>
@@ -1348,15 +1348,15 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">8</context>
         </context-group>
-        <target state="final">تحديد</target>
+        <target state="needs-translation">Select</target>
       </trans-unit>
-      <trans-unit id="7103181924469214926" datatype="html" approved="yes">
+      <trans-unit id="7103181924469214926" datatype="html">
         <source>Please select an object</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/select-dialog/select-dialog.component.ts</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="final">الرجاء تحديد كائن</target>
+        <target state="needs-translation">Please select an object</target>
       </trans-unit>
       <trans-unit id="3894950702316166331" datatype="html">
         <source>Loading...</source>
@@ -1410,7 +1410,7 @@
         </context-group>
         <target state="needs-translation">Show all</target>
       </trans-unit>
-      <trans-unit id="4207916966377787111" datatype="html" approved="yes">
+      <trans-unit id="4207916966377787111" datatype="html">
         <source>Created</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/saved-view-widget/saved-view-widget.component.html</context>
@@ -1432,9 +1432,9 @@
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="final">أُنشئ</target>
+        <target state="needs-translation">Created</target>
       </trans-unit>
-      <trans-unit id="5701618810648052610" datatype="html" approved="yes">
+      <trans-unit id="5701618810648052610" datatype="html">
         <source>Title</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/saved-view-widget/saved-view-widget.component.html</context>
@@ -1456,7 +1456,7 @@
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="final">عنوان</target>
+        <target state="needs-translation">Title</target>
       </trans-unit>
       <trans-unit id="1069523139277190436" datatype="html">
         <source>Statistics</source>
@@ -1649,7 +1649,7 @@
         </context-group>
         <target state="needs-translation">Error deleting comment: <x id="PH" equiv-text="e.toString()"/></target>
       </trans-unit>
-      <trans-unit id="1407560924967345762" datatype="html" approved="yes">
+      <trans-unit id="1407560924967345762" datatype="html">
         <source>Page</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
@@ -1659,15 +1659,15 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="final">صفحة</target>
+        <target state="needs-translation">Page</target>
       </trans-unit>
-      <trans-unit id="2266163016683537825" datatype="html" approved="yes">
+      <trans-unit id="2266163016683537825" datatype="html">
         <source>of <x id="INTERPOLATION" equiv-text="{{previewNumPages}}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">5</context>
         </context-group>
-        <target state="final">من <x id="INTERPOLATION" equiv-text="{{previewNumPages}}"/></target>
+        <target state="needs-translation">of <x id="INTERPOLATION" equiv-text="{{previewNumPages}}"/></target>
       </trans-unit>
       <trans-unit id="7022070615528435141" datatype="html">
         <source>Delete</source>
@@ -1721,7 +1721,7 @@
         </context-group>
         <target state="needs-translation">Delete</target>
       </trans-unit>
-      <trans-unit id="3099741642167775297" datatype="html" approved="yes">
+      <trans-unit id="3099741642167775297" datatype="html">
         <source>Download</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
@@ -1735,15 +1735,15 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">86</context>
         </context-group>
-        <target state="final">تحميل</target>
+        <target state="needs-translation">Download</target>
       </trans-unit>
-      <trans-unit id="8659635229098859487" datatype="html" approved="yes">
+      <trans-unit id="8659635229098859487" datatype="html">
         <source>Download original</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="final">تحميل النسخة الأصلية</target>
+        <target state="needs-translation">Download original</target>
       </trans-unit>
       <trans-unit id="8312409092917397847" datatype="html">
         <source>Redo OCR</source>
@@ -1757,7 +1757,7 @@
         </context-group>
         <target state="needs-translation">Redo OCR</target>
       </trans-unit>
-      <trans-unit id="1418444397960583910" datatype="html" approved="yes">
+      <trans-unit id="1418444397960583910" datatype="html">
         <source>More like this</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
@@ -1767,15 +1767,15 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
           <context context-type="linenumber">38</context>
         </context-group>
-        <target state="final">مزيدا من هذا</target>
+        <target state="needs-translation">More like this</target>
       </trans-unit>
-      <trans-unit id="7819314041543176992" datatype="html" approved="yes">
+      <trans-unit id="7819314041543176992" datatype="html">
         <source>Close</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">43</context>
         </context-group>
-        <target state="final">إغلاق</target>
+        <target state="needs-translation">Close</target>
       </trans-unit>
       <trans-unit id="4452427314943113135" datatype="html">
         <source>Previous</source>
@@ -1793,29 +1793,29 @@
         </context-group>
         <target state="needs-translation">Next</target>
       </trans-unit>
-      <trans-unit id="5028777105388019087" datatype="html" approved="yes">
+      <trans-unit id="5028777105388019087" datatype="html">
         <source>Details</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">72</context>
         </context-group>
-        <target state="final">تفاصيل</target>
+        <target state="needs-translation">Details</target>
       </trans-unit>
-      <trans-unit id="1379170675585571971" datatype="html" approved="yes">
+      <trans-unit id="1379170675585571971" datatype="html">
         <source>Archive serial number</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">76</context>
         </context-group>
-        <target state="final">الرقم التسلسلي للأرشيف</target>
+        <target state="needs-translation">Archive serial number</target>
       </trans-unit>
-      <trans-unit id="5114742157723900905" datatype="html" approved="yes">
+      <trans-unit id="5114742157723900905" datatype="html">
         <source>Date created</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">77</context>
         </context-group>
-        <target state="final">تاريخ الإنشاء</target>
+        <target state="needs-translation">Date created</target>
       </trans-unit>
       <trans-unit id="2691296884221415710" datatype="html">
         <source>Correspondent</source>
@@ -1841,7 +1841,7 @@
         </context-group>
         <target state="needs-translation">Correspondent</target>
       </trans-unit>
-      <trans-unit id="5066119607229701477" datatype="html" approved="yes">
+      <trans-unit id="5066119607229701477" datatype="html">
         <source>Document type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
@@ -1863,7 +1863,7 @@
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="final">نوع المستند</target>
+        <target state="needs-translation">Document type</target>
       </trans-unit>
       <trans-unit id="2091353339965748767" datatype="html">
         <source>Storage path</source>
@@ -1893,13 +1893,13 @@
         </context-group>
         <target state="needs-translation">Default</target>
       </trans-unit>
-      <trans-unit id="6205355627445317276" datatype="html" approved="yes">
+      <trans-unit id="6205355627445317276" datatype="html">
         <source>Content</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">91</context>
         </context-group>
-        <target state="final">محتوى</target>
+        <target state="needs-translation">Content</target>
       </trans-unit>
       <trans-unit id="218403386307979629" datatype="html">
         <source>Metadata</source>
@@ -1913,29 +1913,29 @@
         </context-group>
         <target state="needs-translation">Metadata</target>
       </trans-unit>
-      <trans-unit id="1826652001816486190" datatype="html" approved="yes">
+      <trans-unit id="1826652001816486190" datatype="html">
         <source>Date modified</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">106</context>
         </context-group>
-        <target state="final">تاريخ التعديل</target>
+        <target state="needs-translation">Date modified</target>
       </trans-unit>
-      <trans-unit id="6392918669949841614" datatype="html" approved="yes">
+      <trans-unit id="6392918669949841614" datatype="html">
         <source>Date added</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">110</context>
         </context-group>
-        <target state="final">تاريخ الإضافة</target>
+        <target state="needs-translation">Date added</target>
       </trans-unit>
-      <trans-unit id="146828917013192897" datatype="html" approved="yes">
+      <trans-unit id="146828917013192897" datatype="html">
         <source>Media filename</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">114</context>
         </context-group>
-        <target state="final">اسم ملف الوسائط</target>
+        <target state="needs-translation">Media filename</target>
       </trans-unit>
       <trans-unit id="4500855521601039868" datatype="html">
         <source>Original filename</source>
@@ -1945,61 +1945,61 @@
         </context-group>
         <target state="needs-translation">Original filename</target>
       </trans-unit>
-      <trans-unit id="7985558498848210210" datatype="html" approved="yes">
+      <trans-unit id="7985558498848210210" datatype="html">
         <source>Original MD5 checksum</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">122</context>
         </context-group>
-        <target state="final">مجموع MD5 الاختباري للأصل</target>
+        <target state="needs-translation">Original MD5 checksum</target>
       </trans-unit>
-      <trans-unit id="5888243105821763422" datatype="html" approved="yes">
+      <trans-unit id="5888243105821763422" datatype="html">
         <source>Original file size</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">126</context>
         </context-group>
-        <target state="final">حجم الملف الأصلي</target>
+        <target state="needs-translation">Original file size</target>
       </trans-unit>
-      <trans-unit id="2696647325713149563" datatype="html" approved="yes">
+      <trans-unit id="2696647325713149563" datatype="html">
         <source>Original mime type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">130</context>
         </context-group>
-        <target state="final">نوع mime الأصلي</target>
+        <target state="needs-translation">Original mime type</target>
       </trans-unit>
-      <trans-unit id="342875990758166588" datatype="html" approved="yes">
+      <trans-unit id="342875990758166588" datatype="html">
         <source>Archive MD5 checksum</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">134</context>
         </context-group>
-        <target state="final">مجموع MD5 الاختباري للأرشيف</target>
+        <target state="needs-translation">Archive MD5 checksum</target>
       </trans-unit>
-      <trans-unit id="6033581412811562084" datatype="html" approved="yes">
+      <trans-unit id="6033581412811562084" datatype="html">
         <source>Archive file size</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">138</context>
         </context-group>
-        <target state="final">حجم ملف الأرشيف</target>
+        <target state="needs-translation">Archive file size</target>
       </trans-unit>
-      <trans-unit id="6992781481378431874" datatype="html" approved="yes">
+      <trans-unit id="6992781481378431874" datatype="html">
         <source>Original document metadata</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">144</context>
         </context-group>
-        <target state="final">بيانات التعريف للمستند الأصلي</target>
+        <target state="needs-translation">Original document metadata</target>
       </trans-unit>
-      <trans-unit id="2846565152091361585" datatype="html" approved="yes">
+      <trans-unit id="2846565152091361585" datatype="html">
         <source>Archived document metadata</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">145</context>
         </context-group>
-        <target state="final">بيانات التعريف للمستند الأصلي</target>
+        <target state="needs-translation">Archived document metadata</target>
       </trans-unit>
       <trans-unit id="8191371354890763172" datatype="html">
         <source>Enter Password</source>
@@ -2025,23 +2025,23 @@
         </context-group>
         <target state="needs-translation">Comments</target>
       </trans-unit>
-      <trans-unit id="3823219296477075982" datatype="html" approved="yes">
+      <trans-unit id="3823219296477075982" datatype="html">
         <source>Discard</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">183</context>
         </context-group>
-        <target state="final">تجاهل</target>
+        <target state="needs-translation">Discard</target>
       </trans-unit>
-      <trans-unit id="5129524307369213584" datatype="html" approved="yes">
+      <trans-unit id="5129524307369213584" datatype="html">
         <source>Save &amp; next</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">184</context>
         </context-group>
-        <target state="final">حفظ &amp; التالي</target>
+        <target state="needs-translation">Save &amp; next</target>
       </trans-unit>
-      <trans-unit id="9021887951960049161" datatype="html" approved="yes">
+      <trans-unit id="9021887951960049161" datatype="html">
         <source>Confirm delete</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
@@ -2051,39 +2051,39 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">153</context>
         </context-group>
-        <target state="final">تأكيد الحذف</target>
+        <target state="needs-translation">Confirm delete</target>
       </trans-unit>
-      <trans-unit id="5382975254277698192" datatype="html" approved="yes">
+      <trans-unit id="5382975254277698192" datatype="html">
         <source>Do you really want to delete document &quot;<x id="PH" equiv-text="this.document.title"/>&quot;?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">443</context>
         </context-group>
-        <target state="final">هل تريد حقاً حذف المستند "<x id="PH" equiv-text="this.document.title"/>"؟</target>
+        <target state="needs-translation">Do you really want to delete document "<x id="PH" equiv-text="this.document.title"/>"?</target>
       </trans-unit>
-      <trans-unit id="6691075929777935948" datatype="html" approved="yes">
+      <trans-unit id="6691075929777935948" datatype="html">
         <source>The files for this document will be deleted permanently. This operation cannot be undone.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">444</context>
         </context-group>
-        <target state="final">ستحذف ملفات هذا المستند بشكل دائم. لا يمكن التراجع عن هذه العملية.</target>
+        <target state="needs-translation">The files for this document will be deleted permanently. This operation cannot be undone.</target>
       </trans-unit>
-      <trans-unit id="719892092227206532" datatype="html" approved="yes">
+      <trans-unit id="719892092227206532" datatype="html">
         <source>Delete document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">446</context>
         </context-group>
-        <target state="final">حذف مستند</target>
+        <target state="needs-translation">Delete document</target>
       </trans-unit>
-      <trans-unit id="1844801255494293730" datatype="html" approved="yes">
+      <trans-unit id="1844801255494293730" datatype="html">
         <source>Error deleting document: <x id="PH" equiv-text="JSON.stringify(error)"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">462</context>
         </context-group>
-        <target state="final">حدث خطأ أثناء حذف الوثيقة: <x id="PH" equiv-text="JSON.stringify(error)"/></target>
+        <target state="needs-translation">Error deleting document: <x id="PH" equiv-text="JSON.stringify(error)"/></target>
       </trans-unit>
       <trans-unit id="7362691899087997122" datatype="html">
         <source>Redo OCR confirm</source>
@@ -2475,7 +2475,7 @@
         </context-group>
         <target state="needs-translation">Filter by tag</target>
       </trans-unit>
-      <trans-unit id="7585826646011739428" datatype="html" approved="yes">
+      <trans-unit id="7585826646011739428" datatype="html">
         <source>Edit</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
@@ -2517,7 +2517,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
           <context context-type="linenumber">59</context>
         </context-group>
-        <target state="final">تحرير</target>
+        <target state="needs-translation">Edit</target>
       </trans-unit>
       <trans-unit id="2509141182388535183" datatype="html">
         <source>View</source>
@@ -2627,45 +2627,45 @@
         </context-group>
         <target state="needs-translation">Toggle storage path filter</target>
       </trans-unit>
-      <trans-unit id="5145213156408463657" datatype="html" approved="yes">
+      <trans-unit id="5145213156408463657" datatype="html">
         <source>Select none</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="final">بدون تحديد</target>
+        <target state="needs-translation">Select none</target>
       </trans-unit>
-      <trans-unit id="1512866475468373520" datatype="html" approved="yes">
+      <trans-unit id="1512866475468373520" datatype="html">
         <source>Select page</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="final">تحديد صفحة</target>
+        <target state="needs-translation">Select page</target>
       </trans-unit>
-      <trans-unit id="1494518490116523821" datatype="html" approved="yes">
+      <trans-unit id="1494518490116523821" datatype="html">
         <source>Select all</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="final">تحديد الكل</target>
+        <target state="needs-translation">Select all</target>
       </trans-unit>
-      <trans-unit id="5146398958364876914" datatype="html" approved="yes">
+      <trans-unit id="5146398958364876914" datatype="html">
         <source>Sort</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">38</context>
         </context-group>
-        <target state="final">ترتيب</target>
+        <target state="needs-translation">Sort</target>
       </trans-unit>
-      <trans-unit id="2123659921722214537" datatype="html" approved="yes">
+      <trans-unit id="2123659921722214537" datatype="html">
         <source>Views</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">63</context>
         </context-group>
-        <target state="final">طرق عرض</target>
+        <target state="needs-translation">Views</target>
       </trans-unit>
       <trans-unit id="1233494216161906927" datatype="html">
         <source>Save &quot;<x id="INTERPOLATION" equiv-text="{{list.activeSavedViewTitle}}"/>&quot;</source>
@@ -2675,13 +2675,13 @@
         </context-group>
         <target state="needs-translation">Save "<x id="INTERPOLATION" equiv-text="{{list.activeSavedViewTitle}}"/>"</target>
       </trans-unit>
-      <trans-unit id="2276119452079372898" datatype="html" approved="yes">
+      <trans-unit id="2276119452079372898" datatype="html">
         <source>Save as...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">71</context>
         </context-group>
-        <target state="final">حفظ باسم...</target>
+        <target state="needs-translation">Save as...</target>
       </trans-unit>
       <trans-unit id="8786996283897742947" datatype="html">
         <source>{VAR_PLURAL, plural, =1 {Selected <x id="INTERPOLATION"/> of one document} other {Selected <x id="INTERPOLATION"/> of <x id="INTERPOLATION_1"/> documents}}</source>
@@ -2699,13 +2699,13 @@
         </context-group>
         <target state="needs-translation">{VAR_PLURAL, plural, =1 {One document} other {<x id="INTERPOLATION"/> documents}}</target>
       </trans-unit>
-      <trans-unit id="2243770355958919528" datatype="html" approved="yes">
+      <trans-unit id="2243770355958919528" datatype="html">
         <source>(filtered)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">92</context>
         </context-group>
-        <target state="final">(مصفاة)</target>
+        <target state="needs-translation">(filtered)</target>
       </trans-unit>
       <trans-unit id="1559883523769732271" datatype="html">
         <source>Error while loading documents</source>
@@ -2731,7 +2731,7 @@
         </context-group>
         <target state="needs-translation">ASN</target>
       </trans-unit>
-      <trans-unit id="231679111972850796" datatype="html" approved="yes">
+      <trans-unit id="231679111972850796" datatype="html">
         <source>Added</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
@@ -2745,7 +2745,7 @@
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="final">أضيف</target>
+        <target state="needs-translation">Added</target>
       </trans-unit>
       <trans-unit id="2179847500064178686" datatype="html">
         <source>Edit document</source>
@@ -2787,13 +2787,13 @@
         </context-group>
         <target state="needs-translation">Correspondent: <x id="PH" equiv-text="this.correspondents.find((c) =&gt; c.id == +rule.value)?.name"/></target>
       </trans-unit>
-      <trans-unit id="8170755470576301659" datatype="html" approved="yes">
+      <trans-unit id="8170755470576301659" datatype="html">
         <source>Without correspondent</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">76</context>
         </context-group>
-        <target state="final">بدون مراسل</target>
+        <target state="needs-translation">Without correspondent</target>
       </trans-unit>
       <trans-unit id="8705701325879965907" datatype="html">
         <source>Type: <x id="PH" equiv-text="this.documentTypes.find((dt) =&gt; dt.id == +rule.value)?.name"/></source>
@@ -2803,13 +2803,13 @@
         </context-group>
         <target state="needs-translation">Type: <x id="PH" equiv-text="this.documentTypes.find((dt) =&gt; dt.id == +rule.value)?.name"/></target>
       </trans-unit>
-      <trans-unit id="4362173610367509215" datatype="html" approved="yes">
+      <trans-unit id="4362173610367509215" datatype="html">
         <source>Without document type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">85</context>
         </context-group>
-        <target state="final">بدون نوع المستند</target>
+        <target state="needs-translation">Without document type</target>
       </trans-unit>
       <trans-unit id="8180755793012580465" datatype="html">
         <source>Tag: <x id="PH" equiv-text="this.tags.find((t) =&gt; t.id == +rule.value)?.name"/></source>
@@ -2819,13 +2819,13 @@
         </context-group>
         <target state="needs-translation">Tag: <x id="PH" equiv-text="this.tags.find((t) =&gt; t.id == +rule.value)?.name"/></target>
       </trans-unit>
-      <trans-unit id="6494566478302448576" datatype="html" approved="yes">
+      <trans-unit id="6494566478302448576" datatype="html">
         <source>Without any tag</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">95</context>
         </context-group>
-        <target state="final">بدون أي علامة</target>
+        <target state="needs-translation">Without any tag</target>
       </trans-unit>
       <trans-unit id="6523384805359286307" datatype="html">
         <source>Title: <x id="PH" equiv-text="rule.value"/></source>
@@ -3003,15 +3003,15 @@
         </context-group>
         <target state="needs-translation">document types</target>
       </trans-unit>
-      <trans-unit id="4990731724078522539" datatype="html" approved="yes">
+      <trans-unit id="4990731724078522539" datatype="html">
         <source>Do you really want to delete the document type &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.ts</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="final">هل ترغب حقاً في حذف نوع المستند "<x id="PH" equiv-text="object.name"/>"؟</target>
+        <target state="needs-translation">Do you really want to delete the document type "<x id="PH" equiv-text="object.name"/>"?</target>
       </trans-unit>
-      <trans-unit id="5674286808255988565" datatype="html" approved="yes">
+      <trans-unit id="5674286808255988565" datatype="html">
         <source>Create</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
@@ -3029,9 +3029,9 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
           <context context-type="linenumber">2</context>
         </context-group>
-        <target state="final">إنشاء</target>
+        <target state="needs-translation">Create</target>
       </trans-unit>
-      <trans-unit id="4010735610815226758" datatype="html" approved="yes">
+      <trans-unit id="4010735610815226758" datatype="html">
         <source>Filter by:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
@@ -3049,9 +3049,9 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
           <context context-type="linenumber">8</context>
         </context-group>
-        <target state="final">تصفية حسب:</target>
+        <target state="needs-translation">Filter by:</target>
       </trans-unit>
-      <trans-unit id="1383365546483928780" datatype="html" approved="yes">
+      <trans-unit id="1383365546483928780" datatype="html">
         <source>Matching</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
@@ -3069,9 +3069,9 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="final">مطابقة</target>
+        <target state="needs-translation">Matching</target>
       </trans-unit>
-      <trans-unit id="1488347670280290838" datatype="html" approved="yes">
+      <trans-unit id="1488347670280290838" datatype="html">
         <source>Document count</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
@@ -3089,7 +3089,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="final">عدد المستندات</target>
+        <target state="needs-translation">Document count</target>
       </trans-unit>
       <trans-unit id="7376880254267897616" datatype="html">
         <source>Filter Documents</source>
@@ -3183,21 +3183,21 @@
         </context-group>
         <target state="needs-translation">General</target>
       </trans-unit>
-      <trans-unit id="8671234314555525900" datatype="html" approved="yes">
+      <trans-unit id="8671234314555525900" datatype="html">
         <source>Appearance</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="final">المظهر</target>
+        <target state="needs-translation">Appearance</target>
       </trans-unit>
-      <trans-unit id="3777637051272512093" datatype="html" approved="yes">
+      <trans-unit id="3777637051272512093" datatype="html">
         <source>Display language</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="final">لغة العرض</target>
+        <target state="needs-translation">Display language</target>
       </trans-unit>
       <trans-unit id="53523152145406584" datatype="html">
         <source>You need to reload the page after applying a new language.</source>
@@ -3423,13 +3423,13 @@
         </context-group>
         <target state="needs-translation">Enable comments</target>
       </trans-unit>
-      <trans-unit id="5851560788527570644" datatype="html" approved="yes">
+      <trans-unit id="5851560788527570644" datatype="html">
         <source>Notifications</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">166</context>
         </context-group>
-        <target state="final">الإشعارات</target>
+        <target state="needs-translation">Notifications</target>
       </trans-unit>
       <trans-unit id="8545554728558600606" datatype="html">
         <source>Document processing</source>
@@ -3535,21 +3535,21 @@
         </context-group>
         <target state="needs-translation">Reload now</target>
       </trans-unit>
-      <trans-unit id="6839066544204061364" datatype="html" approved="yes">
+      <trans-unit id="6839066544204061364" datatype="html">
         <source>Use system language</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">334</context>
         </context-group>
-        <target state="final">استخدم لغة النظام</target>
+        <target state="needs-translation">Use system language</target>
       </trans-unit>
-      <trans-unit id="7729897675462249787" datatype="html" approved="yes">
+      <trans-unit id="7729897675462249787" datatype="html">
         <source>Use date format of display language</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">341</context>
         </context-group>
-        <target state="final">استخدم تنسيق تاريخ لغة العرض</target>
+        <target state="needs-translation">Use date format of display language</target>
       </trans-unit>
       <trans-unit id="8488620293789898901" datatype="html">
         <source>Error while storing settings on server: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></source>
@@ -3599,13 +3599,13 @@
         </context-group>
         <target state="needs-translation">tags</target>
       </trans-unit>
-      <trans-unit id="93754014749412887" datatype="html" approved="yes">
+      <trans-unit id="93754014749412887" datatype="html">
         <source>Do you really want to delete the tag &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.ts</context>
           <context context-type="linenumber">46</context>
         </context-group>
-        <target state="final">هل ترغب حقاً في حذف العلامة "<x id="PH" equiv-text="object.name"/>"؟</target>
+        <target state="needs-translation">Do you really want to delete the tag "<x id="PH" equiv-text="object.name"/>"?</target>
       </trans-unit>
       <trans-unit id="103921551219467537" datatype="html">
         <source>Clear selection</source>
@@ -3885,45 +3885,45 @@
         </context-group>
         <target state="needs-translation">Leave page</target>
       </trans-unit>
-      <trans-unit id="7536524521722799066" datatype="html" approved="yes">
+      <trans-unit id="7536524521722799066" datatype="html">
         <source>(no title)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/pipes/document-title.pipe.ts</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="final">(بدون عنوان)</target>
+        <target state="needs-translation">(no title)</target>
       </trans-unit>
-      <trans-unit id="2807800733729323332" datatype="html" approved="yes">
+      <trans-unit id="2807800733729323332" datatype="html">
         <source>Yes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/pipes/yes-no.pipe.ts</context>
           <context context-type="linenumber">8</context>
         </context-group>
-        <target state="final">نعم</target>
+        <target state="needs-translation">Yes</target>
       </trans-unit>
-      <trans-unit id="3542042671420335679" datatype="html" approved="yes">
+      <trans-unit id="3542042671420335679" datatype="html">
         <source>No</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/pipes/yes-no.pipe.ts</context>
           <context context-type="linenumber">8</context>
         </context-group>
-        <target state="final">لا</target>
+        <target state="needs-translation">No</target>
       </trans-unit>
-      <trans-unit id="2119857572761283468" datatype="html" approved="yes">
+      <trans-unit id="2119857572761283468" datatype="html">
         <source>Document already exists.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="final">المستند موجود مسبقاً.</target>
+        <target state="needs-translation">Document already exists.</target>
       </trans-unit>
-      <trans-unit id="148389968432135849" datatype="html" approved="yes">
+      <trans-unit id="148389968432135849" datatype="html">
         <source>File not found.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="final">لم يعثر على الملف.</target>
+        <target state="needs-translation">File not found.</target>
       </trans-unit>
       <trans-unit id="1520671543092565667" datatype="html">
         <source>Pre-consume script does not exist.</source>
@@ -3961,61 +3961,61 @@
         <note priority="1" from="description">Post-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
         <target state="needs-translation">Error while executing post-consume script.</target>
       </trans-unit>
-      <trans-unit id="6252258095055634191" datatype="html" approved="yes">
+      <trans-unit id="6252258095055634191" datatype="html">
         <source>Received new file.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="final">استلم ملف جديد.</target>
+        <target state="needs-translation">Received new file.</target>
       </trans-unit>
-      <trans-unit id="7337565919209746135" datatype="html" approved="yes">
+      <trans-unit id="7337565919209746135" datatype="html">
         <source>File type not supported.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="final">نوع الملف غير مدعوم.</target>
+        <target state="needs-translation">File type not supported.</target>
       </trans-unit>
-      <trans-unit id="5002399167376099234" datatype="html" approved="yes">
+      <trans-unit id="5002399167376099234" datatype="html">
         <source>Processing document...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="final">معالجة الوثيقة...</target>
+        <target state="needs-translation">Processing document...</target>
       </trans-unit>
-      <trans-unit id="1085975194762600381" datatype="html" approved="yes">
+      <trans-unit id="1085975194762600381" datatype="html">
         <source>Generating thumbnail...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="final">إنشاء مصغرات...</target>
+        <target state="needs-translation">Generating thumbnail...</target>
       </trans-unit>
-      <trans-unit id="3280851677698431426" datatype="html" approved="yes">
+      <trans-unit id="3280851677698431426" datatype="html">
         <source>Retrieving date from document...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="final">استرداد التاريخ من المستند...</target>
+        <target state="needs-translation">Retrieving date from document...</target>
       </trans-unit>
-      <trans-unit id="7162102384876037296" datatype="html" approved="yes">
+      <trans-unit id="7162102384876037296" datatype="html">
         <source>Saving document...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="final">حفظ المستند...</target>
+        <target state="needs-translation">Saving document...</target>
       </trans-unit>
-      <trans-unit id="4550450765009165976" datatype="html" approved="yes">
+      <trans-unit id="4550450765009165976" datatype="html">
         <source>Finished.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">27</context>
         </context-group>
-        <target state="final">انتهى.</target>
+        <target state="needs-translation">Finished.</target>
       </trans-unit>
       <trans-unit id="5523607037798226031" datatype="html">
         <source>You have unsaved changes to the document</source>
@@ -4057,22 +4057,22 @@
         </context-group>
         <target state="needs-translation">Close documents</target>
       </trans-unit>
-      <trans-unit id="3553216189604488439" datatype="html" approved="yes">
+      <trans-unit id="3553216189604488439" datatype="html">
         <source>Modified</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="final">تعديل</target>
+        <target state="needs-translation">Modified</target>
       </trans-unit>
-      <trans-unit id="4460262093225954455" datatype="html" approved="yes">
+      <trans-unit id="4460262093225954455" datatype="html">
         <source>Search score</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">31</context>
         </context-group>
         <note priority="1" from="description">Score is a value returned by the full text search engine and specifies how well a result matches the given query</note>
-        <target state="final">نقاط البحث</target>
+        <target state="needs-translation">Search score</target>
       </trans-unit>
       <trans-unit id="1206520795340730278" datatype="html">
         <source>English (US)</source>
@@ -4122,13 +4122,13 @@
         </context-group>
         <target state="needs-translation">English (GB)</target>
       </trans-unit>
-      <trans-unit id="5190825892106392539" datatype="html" approved="yes">
+      <trans-unit id="5190825892106392539" datatype="html">
         <source>Spanish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">181</context>
         </context-group>
-        <target state="final">الإسبانية</target>
+        <target state="needs-translation">Spanish</target>
       </trans-unit>
       <trans-unit id="7633754075223722162" datatype="html">
         <source>French</source>
@@ -4162,13 +4162,13 @@
         </context-group>
         <target state="needs-translation">Dutch</target>
       </trans-unit>
-      <trans-unit id="792060551707690640" datatype="html" approved="yes">
+      <trans-unit id="792060551707690640" datatype="html">
         <source>Polish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">211</context>
         </context-group>
-        <target state="final">البولندية</target>
+        <target state="needs-translation">Polish</target>
       </trans-unit>
       <trans-unit id="9184513005098760425" datatype="html">
         <source>Portuguese (Brazil)</source>
@@ -4178,13 +4178,13 @@
         </context-group>
         <target state="needs-translation">Portuguese (Brazil)</target>
       </trans-unit>
-      <trans-unit id="153799456510623899" datatype="html" approved="yes">
+      <trans-unit id="153799456510623899" datatype="html">
         <source>Portuguese</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">223</context>
         </context-group>
-        <target state="final">البرتغالية</target>
+        <target state="needs-translation">Portuguese</target>
       </trans-unit>
       <trans-unit id="8118856427047826368" datatype="html">
         <source>Romanian</source>
@@ -4194,13 +4194,13 @@
         </context-group>
         <target state="needs-translation">Romanian</target>
       </trans-unit>
-      <trans-unit id="7137419789978325708" datatype="html" approved="yes">
+      <trans-unit id="7137419789978325708" datatype="html">
         <source>Russian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">235</context>
         </context-group>
-        <target state="final">الروسية</target>
+        <target state="needs-translation">Russian</target>
       </trans-unit>
       <trans-unit id="4287008301409320881" datatype="html">
         <source>Slovenian</source>
@@ -4218,13 +4218,13 @@
         </context-group>
         <target state="needs-translation">Serbian</target>
       </trans-unit>
-      <trans-unit id="499386805970351976" datatype="html" approved="yes">
+      <trans-unit id="499386805970351976" datatype="html">
         <source>Swedish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">253</context>
         </context-group>
-        <target state="final">السويدية</target>
+        <target state="needs-translation">Swedish</target>
       </trans-unit>
       <trans-unit id="5682359291233237791" datatype="html">
         <source>Turkish</source>
@@ -4266,21 +4266,21 @@
         </context-group>
         <target state="needs-translation">Unable to migrate settings to the database, please try saving manually.</target>
       </trans-unit>
-      <trans-unit id="1519954996184640001" datatype="html" approved="yes">
+      <trans-unit id="1519954996184640001" datatype="html">
         <source>Error</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/toast.service.ts</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="final">خطأ</target>
+        <target state="needs-translation">Error</target>
       </trans-unit>
-      <trans-unit id="5037437391296624618" datatype="html" approved="yes">
+      <trans-unit id="5037437391296624618" datatype="html">
         <source>Information</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/toast.service.ts</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="final">معلومات</target>
+        <target state="needs-translation">Information</target>
       </trans-unit>
       <trans-unit id="3852289441366561594" datatype="html">
         <source>Connecting...</source>
