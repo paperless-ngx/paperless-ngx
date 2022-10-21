@@ -89,7 +89,7 @@ superuser() {
 	fi
 }
 
-customer_container_init() {
+custom_container_init() {
 	# Mostly borrowed from the LinuxServer.io base image
 	# https://github.com/linuxserver/docker-baseimage-ubuntu/tree/bionic/root/etc/cont-init.d
 	readonly custom_script_dir="/custom-cont-init.d"
@@ -145,7 +145,7 @@ do_work() {
 	superuser
 
 	# Leave this last thing
-	customer_container_init
+	custom_container_init
 
 }
 
