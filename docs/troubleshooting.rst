@@ -127,9 +127,14 @@ If using docker-compose, this is achieved by the following configuration change 
     gotenberg:
         image: gotenberg/gotenberg:7.4
         restart: unless-stopped
+
+        # The gotenberg chromium route is used to convert .eml files. We do not
+        # want to allow external content like tracking pixels or even javascript.
         command:
-            - "gotenberg"
-            - "--api-timeout=60"
+          - "gotenberg"
+          - "--chromium-disable-javascript=true"
+          - "--chromium-allow-list=file:///tmp/.*"
+          - "--api-timeout=60"
 
 Permission denied errors in the consumption directory
 #####################################################
