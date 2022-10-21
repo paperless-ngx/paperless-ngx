@@ -515,6 +515,13 @@ requires are as follows:
             image: gotenberg/gotenberg:7.4
             restart: unless-stopped
 
+            # The gotenberg chromium route is used to convert .eml files. We do not
+            # want to allow external content like tracking pixels or even javascript.
+            command:
+              - "gotenberg"
+              - "--chromium-disable-javascript=true"
+              - "--chromium-allow-list=file:///tmp/.*"
+
         tika:
             image: ghcr.io/paperless-ngx/tika:latest
             restart: unless-stopped

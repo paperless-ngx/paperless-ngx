@@ -2,6 +2,8 @@ import datetime
 import hashlib
 import os
 from unittest import mock
+from urllib.error import HTTPError
+from urllib.request import urlopen
 
 import pytest
 from django.test import TestCase
@@ -350,10 +352,24 @@ class TestParser(TestCase):
 
         # The created pdf is not reproducible. But the converted image should always look the same.
         expected_hash = (
-            "88dee024ec77b1139b77913547717bd7e94f53651d489c54a7084d30a82e389e"
+            "267d61f0ab8f128a037002a424b2cb4bfe18a81e17f0b70f15d241688ed47d1a"
         )
         self.assertEqual(
             thumb_hash,
             expected_hash,
-            "PDF looks different.",
+            f"PDF looks different. Check if {converted} looks weird. "
+            f"If Rick Astley is shown, Gotenberg loads from web which is bad for Mail content.",
         )
+
+    def test_is_online_image_still_available(self):
+        """
+        A public image is used in the html sample file. We have no control
+        whether this image stays online forever, so here we check if it is still there
+        """
+
+        # Start by Testing if nonexistent URL really throws an Exception
+        with pytest.raises(HTTPError):
+            urlopen("https://upload.wikimedia.org/wikipedia/en/f/f7/nonexistent.png")
+
+        # Now check the URL used in samples/sample.html
+        urlopen("https://upload.wikimedia.org/wikipedia/en/f/f7/RickRoll.png")
