@@ -142,7 +142,8 @@ While installing, the pre-configured shortcut will ask multiple information:
 Those information are not shared and stay in your Shortcuts App. Beware that your credentials
 are store in the shortcut. So do not share your shortcut to anyone.
 
-On iOS/iPadOS, you will be able to access the shortcut in the share sheet of a PDF file.
+On iOS/iPadOS, you will be able to access the shortcut in the share sheet of a PDF file. In the share
+sheet you can define favorite actions by hitting the *Modify Actions* button at the bottom of the sheet.
 
 On MacOS, you can configure to the shortcut to appear on right click of every PDF file. To configure this,
 go to System *Settings* > *Privacy & Security* > *Extensions* > *Finder* > Enable *Upload to Paperless*
