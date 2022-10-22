@@ -123,6 +123,30 @@ scanning apps out there, such as Office Lens.
 Furthermore, there is the  `Paperless App <https://github.com/bauerj/paperless_app>`_ as well,
 which not only has document upload, but also document browsing and download features.
 
+Apple Shortcuts
+===============
+
+On Apple devices, the `Shortcuts App <https://apps.apple.com/us/app/shortcuts/id915249334>`_ gives
+you the ability to configure small workflows and to integrate them wisely into Apple ecosystem.
+Uploading a PDF file is a very good use case for a shortcut.
+
+There is a `pre-configured shortcut <https://www.icloud.com/shortcuts/880ef5e6fd874a20965cff8f6c4134d7>`_
+that you can install on your Apple devices. If iCloud is enabled, it will be installed on all
+your devices. When installing shortcuts from the Internet, **always** check what it does first
+before launch it.
+
+While installing, the pre-configured shortcut will ask multiple information:
+* Paperless instance url.
+* Username
+* Password
+Those information are not shared and stay in your Shortcuts App. Beware that your credentials
+are store in the shortcut. So do not share your shortcut to anyone.
+
+On iOS/iPadOS, you will be able to access the shortcut in the share sheet of a PDF file.
+
+On MacOS, you can configure to the shortcut to appear on right click of every PDF file. To configure this,
+go to System *Settings* > *Privacy & Security* > *Extensions* > *Finder* > Enable *Upload to Paperless*
+
 .. _usage-email:
 
 IMAP (Email)
