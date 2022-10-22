@@ -35,6 +35,11 @@ class MailDocumentParser(DocumentParser):
                 raise ParseError(
                     f"Could not parse {document_path}: {err}",
                 )
+            if not self._parsed.from_values:
+                self._parsed = None
+                raise ParseError(
+                    f"Could not parse {document_path}: Missing 'from'",
+                )
 
         return self._parsed
 
@@ -185,7 +190,8 @@ class MailDocumentParser(DocumentParser):
 
         return pdf_path
 
-    def mail_to_html(self, mail):
+    @staticmethod
+    def mail_to_html(mail):
         data = {}
 
         def clean_html(text: str):
@@ -229,15 +235,6 @@ class MailDocumentParser(DocumentParser):
         data["attachments"] = clean_html(", ".join(att))
         if data["attachments"] != "":
             data["attachments_label"] = "Attachments"
-
-        if len(mail.attachments) >= 1:
-            att = []
-            for a in mail.attachments:
-                if a.size >= 1024 * 600:
-                    att.append(f"{a.filename} ({(a.size / 1024 / 1024):.2f} MiB)")
-                else:
-                    att.append(f"{a.filename} ({(a.size / 1024):.2f} KiB)")
-            self.text += f"Attachments: {', '.join(att)}\n\n"
 
         data["date"] = clean_html(mail.date.astimezone().strftime("%Y-%m-%d %H:%M"))
         data["content"] = clean_html(mail.text.strip())

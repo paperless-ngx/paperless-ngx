@@ -20,7 +20,11 @@ class TestParser(TestCase):
 
         # Check if exception is raised when parsing fails.
         with pytest.raises(ParseError):
-            parser.get_parsed(os.path.join(os.path.join(self.SAMPLE_FILES, "na")))
+            parser.get_parsed(os.path.join(self.SAMPLE_FILES, "na"))
+
+        # Check if exception is raised when the mail is faulty.
+        with pytest.raises(ParseError):
+            parser.get_parsed(os.path.join(self.SAMPLE_FILES, "broken.eml"))
 
         # Parse Test file and check relevant content
         parsed1 = parser.get_parsed(os.path.join(self.SAMPLE_FILES, "simple_text.eml"))
@@ -53,7 +57,8 @@ class TestParser(TestCase):
                 sha256.update(data)
         return sha256.hexdigest()
 
-    def test_get_thumbnail(self):
+    @mock.patch("documents.loggers.LoggingMixin.log")  # Disable log output
+    def test_get_thumbnail(self, m):
         parser = MailDocumentParser(None)
         thumb = parser.get_thumbnail(
             os.path.join(self.SAMPLE_FILES, "simple_text.eml"),
@@ -221,7 +226,7 @@ class TestParser(TestCase):
         # Validate parsing returns the expected results
         parser.parse(os.path.join(self.SAMPLE_FILES, "html.eml"), "message/rfc822")
 
-        text_expected = "Some Text\nand an embedded image.\n\nSubject: HTML Message\n\nFrom: Name <someone@example.de>\n\nTo: someone@example.de\n\nAttachments: IntM6gnXFm00FEV5.png (6.89 KiB)\n\nHTML content: Some Text\nand an embedded image.Attachments: IntM6gnXFm00FEV5.png (6.89 KiB)\n\n"
+        text_expected = "Some Text\nand an embedded image.\n\nSubject: HTML Message\n\nFrom: Name <someone@example.de>\n\nTo: someone@example.de\n\nAttachments: IntM6gnXFm00FEV5.png (6.89 KiB)\n\nHTML content: Some Text\nand an embedded image.\nParagraph unchanged."
         self.assertEqual(text_expected, parser.text)
         self.assertEqual(
             datetime.datetime(
@@ -235,32 +240,9 @@ class TestParser(TestCase):
             ),
             parser.date,
         )
+
+        # Just check if file exists, the unittest for generate_pdf() goes deeper.
         self.assertTrue(os.path.isfile(parser.archive_path))
-
-        converted = os.path.join(parser.tempdir, "converted.webp")
-        run_convert(
-            density=300,
-            scale="500x5000>",
-            alpha="remove",
-            strip=True,
-            trim=False,
-            auto_orient=True,
-            input_file=f"{parser.archive_path}",  # Do net define an index to convert all pages.
-            output_file=converted,
-            logging_group=None,
-        )
-        self.assertTrue(os.path.isfile(converted))
-        thumb_hash = self.hashfile(converted)
-
-        # The created pdf is not reproducible. But the converted image should always look the same.
-        expected_hash = (
-            "174f9c81f9aeda63b64375fa2fe675fd542677c1ba7a32fc19e09ffc4d461e12"
-        )
-        self.assertEqual(
-            thumb_hash,
-            expected_hash,
-            "PDF looks different.",
-        )
 
     @mock.patch("documents.loggers.LoggingMixin.log")  # Disable log output
     def test_tika_parse(self, m):
@@ -284,6 +266,42 @@ class TestParser(TestCase):
         # Check successful parsing
         parsed = parser.tika_parse(html)
         self.assertEqual(expected_text, parsed)
+
+    @mock.patch("documents.loggers.LoggingMixin.log")  # Disable log output
+    def test_generate_pdf(self, m):
+        parser = MailDocumentParser(None)
+
+        # Check if exception is raised when the mail can not be parsed.
+        with pytest.raises(ParseError):
+            parser.generate_pdf(os.path.join(self.SAMPLE_FILES, "broken.eml"))
+
+        pdf_path = parser.generate_pdf(os.path.join(self.SAMPLE_FILES, "html.eml"))
+        self.assertTrue(os.path.isfile(pdf_path))
+
+        converted = os.path.join(parser.tempdir, "test_generate_pdf.webp")
+        run_convert(
+            density=300,
+            scale="500x5000>",
+            alpha="remove",
+            strip=True,
+            trim=False,
+            auto_orient=True,
+            input_file=f"{pdf_path}",  # Do net define an index to convert all pages.
+            output_file=converted,
+            logging_group=None,
+        )
+        self.assertTrue(os.path.isfile(converted))
+        thumb_hash = self.hashfile(converted)
+
+        # The created pdf is not reproducible. But the converted image should always look the same.
+        expected_hash = (
+            "23468c4597d63bbefd38825e27c7f05ac666573fc35447d9ddf1784c9c31c6ea"
+        )
+        self.assertEqual(
+            thumb_hash,
+            expected_hash,
+            f"PDF looks different. Check if {converted} looks weird.",
+        )
 
     def test_transform_inline_html(self):
         class MailAttachmentMock:
