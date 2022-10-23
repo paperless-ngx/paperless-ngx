@@ -6,7 +6,7 @@ import {
   ViewChild,
   ViewChildren,
 } from '@angular/core'
-import { ActivatedRoute, Router } from '@angular/router'
+import { ActivatedRoute, convertToParamMap, Router } from '@angular/router'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { filter, first, map, Subject, switchMap, takeUntil } from 'rxjs'
 import { FilterRule, isFullTextFilterRule } from 'src/app/data/filter-rule'
@@ -87,10 +87,6 @@ export class DocumentListComponent implements OnInit, OnDestroy {
     this.list.setSort(event.column, event.reverse)
   }
 
-  setPage(page: number) {
-    this.list.currentPage = page
-  }
-
   get isBulkEditing(): boolean {
     return this.list.selected.size > 0
   }
@@ -126,7 +122,11 @@ export class DocumentListComponent implements OnInit, OnDestroy {
           this.router.navigate(['404'])
           return
         }
-        this.list.activateSavedView(view)
+
+        this.list.activateSavedViewWithQueryParams(
+          view,
+          convertToParamMap(this.route.snapshot.queryParams)
+        )
         this.list.reload()
         this.unmodifiedFilterRules = view.filter_rules
       })
@@ -154,16 +154,6 @@ export class DocumentListComponent implements OnInit, OnDestroy {
     this.unsubscribeNotifier.complete()
   }
 
-  loadViewConfig(viewId: number) {
-    this.savedViewService
-      .getCached(viewId)
-      .pipe(first())
-      .subscribe((view) => {
-        this.list.activateSavedView(view)
-        this.list.reload()
-      })
-  }
-
   saveViewConfig() {
     if (this.list.activeSavedViewId != null) {
       let savedView: PaperlessSavedView = {
@@ -182,6 +172,16 @@ export class DocumentListComponent implements OnInit, OnDestroy {
           this.unmodifiedFilterRules = this.list.filterRules
         })
     }
+  }
+
+  loadViewConfig(viewID: number) {
+    this.savedViewService
+      .getCached(viewID)
+      .pipe(first())
+      .subscribe((view) => {
+        this.list.activateSavedView(view)
+        this.list.reload()
+      })
   }
 
   saveViewConfigAs() {

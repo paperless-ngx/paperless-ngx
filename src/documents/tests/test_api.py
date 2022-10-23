@@ -10,6 +10,8 @@ import zipfile
 from unittest import mock
 from unittest.mock import MagicMock
 
+import celery
+
 try:
     import zoneinfo
 except ImportError:
@@ -20,7 +22,6 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import override_settings
 from django.utils import timezone
-from django_q.models import Task
 from documents import bulk_edit
 from documents import index
 from documents.models import Correspondent
@@ -31,7 +32,8 @@ from documents.models import PaperlessTask
 from documents.models import SavedView
 from documents.models import StoragePath
 from documents.models import Tag
-from documents.models import UiSettings
+from django_celery_results.models import TaskResult
+from documents.models import Comment
 from documents.models import StoragePath
 from documents.tests.utils import DirectoriesMixin
 from paperless import version
@@ -789,7 +791,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["documents_inbox"], None)
 
-    @mock.patch("documents.views.async_task")
+    @mock.patch("documents.views.consume_file.delay")
     def test_upload(self, m):
 
         with open(
@@ -812,7 +814,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertIsNone(kwargs["override_document_type_id"])
         self.assertIsNone(kwargs["override_tag_ids"])
 
-    @mock.patch("documents.views.async_task")
+    @mock.patch("documents.views.consume_file.delay")
     def test_upload_empty_metadata(self, m):
 
         with open(
@@ -835,7 +837,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertIsNone(kwargs["override_document_type_id"])
         self.assertIsNone(kwargs["override_tag_ids"])
 
-    @mock.patch("documents.views.async_task")
+    @mock.patch("documents.views.consume_file.delay")
     def test_upload_invalid_form(self, m):
 
         with open(
@@ -849,7 +851,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, 400)
         m.assert_not_called()
 
-    @mock.patch("documents.views.async_task")
+    @mock.patch("documents.views.consume_file.delay")
     def test_upload_invalid_file(self, m):
 
         with open(
@@ -863,7 +865,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, 400)
         m.assert_not_called()
 
-    @mock.patch("documents.views.async_task")
+    @mock.patch("documents.views.consume_file.delay")
     def test_upload_with_title(self, async_task):
         with open(
             os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"),
@@ -881,7 +883,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
         self.assertEqual(kwargs["override_title"], "my custom title")
 
-    @mock.patch("documents.views.async_task")
+    @mock.patch("documents.views.consume_file.delay")
     def test_upload_with_correspondent(self, async_task):
         c = Correspondent.objects.create(name="test-corres")
         with open(
@@ -900,7 +902,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
         self.assertEqual(kwargs["override_correspondent_id"], c.id)
 
-    @mock.patch("documents.views.async_task")
+    @mock.patch("documents.views.consume_file.delay")
     def test_upload_with_invalid_correspondent(self, async_task):
         with open(
             os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"),
@@ -914,7 +916,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
         async_task.assert_not_called()
 
-    @mock.patch("documents.views.async_task")
+    @mock.patch("documents.views.consume_file.delay")
     def test_upload_with_document_type(self, async_task):
         dt = DocumentType.objects.create(name="invoice")
         with open(
@@ -933,7 +935,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
         self.assertEqual(kwargs["override_document_type_id"], dt.id)
 
-    @mock.patch("documents.views.async_task")
+    @mock.patch("documents.views.consume_file.delay")
     def test_upload_with_invalid_document_type(self, async_task):
         with open(
             os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"),
@@ -947,7 +949,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
         async_task.assert_not_called()
 
-    @mock.patch("documents.views.async_task")
+    @mock.patch("documents.views.consume_file.delay")
     def test_upload_with_tags(self, async_task):
         t1 = Tag.objects.create(name="tag1")
         t2 = Tag.objects.create(name="tag2")
@@ -967,7 +969,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
         self.assertCountEqual(kwargs["override_tag_ids"], [t1.id, t2.id])
 
-    @mock.patch("documents.views.async_task")
+    @mock.patch("documents.views.consume_file.delay")
     def test_upload_with_invalid_tags(self, async_task):
         t1 = Tag.objects.create(name="tag1")
         t2 = Tag.objects.create(name="tag2")
@@ -983,7 +985,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
         async_task.assert_not_called()
 
-    @mock.patch("documents.views.async_task")
+    @mock.patch("documents.views.consume_file.delay")
     def test_upload_with_created(self, async_task):
         created = datetime.datetime(
             2022,
@@ -1107,6 +1109,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
                 "tags": [],
                 "document_types": [],
                 "storage_paths": [],
+                "dates": [],
             },
         )
 
@@ -1118,6 +1121,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
     @mock.patch("documents.views.match_document_types")
     @mock.patch("documents.views.match_tags")
     @mock.patch("documents.views.match_correspondents")
+    @override_settings(NUMBER_OF_SUGGESTED_DATES=10)
     def test_get_suggestions(
         self,
         match_correspondents,
@@ -1128,7 +1132,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         doc = Document.objects.create(
             title="test",
             mime_type="application/pdf",
-            content="this is an invoice!",
+            content="this is an invoice from 12.04.2022!",
         )
 
         match_correspondents.return_value = [Correspondent(id=88), Correspondent(id=2)]
@@ -1144,6 +1148,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
                 "tags": [56, 123],
                 "document_types": [23],
                 "storage_paths": [99, 77],
+                "dates": ["2022-04-12"],
             },
         )
 
@@ -1354,6 +1359,133 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
             1,
         )
 
+    def test_get_existing_comments(self):
+        """
+        GIVEN:
+            - A document with a single comment
+        WHEN:
+            - API reuqest for document comments is made
+        THEN:
+            - The associated comment is returned
+        """
+        doc = Document.objects.create(
+            title="test",
+            mime_type="application/pdf",
+            content="this is a document which will have comments!",
+        )
+        comment = Comment.objects.create(
+            comment="This is a comment.",
+            document=doc,
+            user=self.user,
+        )
+
+        response = self.client.get(
+            f"/api/documents/{doc.pk}/comments/",
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        resp_data = response.json()
+
+        self.assertEqual(len(resp_data), 1)
+
+        resp_data = resp_data[0]
+        del resp_data["created"]
+
+        self.assertDictEqual(
+            resp_data,
+            {
+                "id": comment.id,
+                "comment": comment.comment,
+                "user": {
+                    "id": comment.user.id,
+                    "username": comment.user.username,
+                    "firstname": comment.user.first_name,
+                    "lastname": comment.user.last_name,
+                },
+            },
+        )
+
+    def test_create_comment(self):
+        """
+        GIVEN:
+            - Existing document
+        WHEN:
+            - API request is made to add a comment
+        THEN:
+            - Comment is created and associated with document
+        """
+        doc = Document.objects.create(
+            title="test",
+            mime_type="application/pdf",
+            content="this is a document which will have comments added",
+        )
+        resp = self.client.post(
+            f"/api/documents/{doc.pk}/comments/",
+            data={"comment": "this is a posted comment"},
+        )
+        self.assertEqual(resp.status_code, 200)
+
+        response = self.client.get(
+            f"/api/documents/{doc.pk}/comments/",
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        resp_data = response.json()
+
+        self.assertEqual(len(resp_data), 1)
+
+        resp_data = resp_data[0]
+
+        self.assertEqual(resp_data["comment"], "this is a posted comment")
+
+    def test_delete_comment(self):
+        """
+        GIVEN:
+            - Existing document
+        WHEN:
+            - API request is made to add a comment
+        THEN:
+            - Comment is created and associated with document
+        """
+        doc = Document.objects.create(
+            title="test",
+            mime_type="application/pdf",
+            content="this is a document which will have comments!",
+        )
+        comment = Comment.objects.create(
+            comment="This is a comment.",
+            document=doc,
+            user=self.user,
+        )
+
+        response = self.client.delete(
+            f"/api/documents/{doc.pk}/comments/?id={comment.pk}",
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(len(Comment.objects.all()), 0)
+
+    def test_get_comments_no_doc(self):
+        """
+        GIVEN:
+            - A request to get comments from a non-existent document
+        WHEN:
+            - API request for document comments is made
+        THEN:
+            - HTTP 404 is returned
+        """
+        response = self.client.get(
+            "/api/documents/500/comments/",
+            format="json",
+        )
+        self.assertEqual(response.status_code, 404)
+
 
 class TestDocumentApiV2(DirectoriesMixin, APITestCase):
     def setUp(self):
@@ -1450,7 +1582,11 @@ class TestApiUiSettings(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertDictEqual(
             response.data["settings"],
-            {},
+            {
+                "update_checking": {
+                    "backend_setting": "default",
+                },
+            },
         )
 
     def test_api_set_ui_settings(self):
@@ -1484,7 +1620,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
         user = User.objects.create_superuser(username="temp_admin")
         self.client.force_authenticate(user=user)
 
-        patcher = mock.patch("documents.bulk_edit.async_task")
+        patcher = mock.patch("documents.bulk_edit.bulk_update_documents.delay")
         self.async_task = patcher.start()
         self.addCleanup(patcher.stop)
         self.c1 = Correspondent.objects.create(name="c1")
@@ -2411,38 +2547,6 @@ class TestApiRemoteVersion(DirectoriesMixin, APITestCase):
     def setUp(self):
         super().setUp()
 
-    def test_remote_version_default(self):
-        response = self.client.get(self.ENDPOINT)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertDictEqual(
-            response.data,
-            {
-                "version": "0.0.0",
-                "update_available": False,
-                "feature_is_set": False,
-            },
-        )
-
-    @override_settings(
-        ENABLE_UPDATE_CHECK=False,
-    )
-    def test_remote_version_disabled(self):
-        response = self.client.get(self.ENDPOINT)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertDictEqual(
-            response.data,
-            {
-                "version": "0.0.0",
-                "update_available": False,
-                "feature_is_set": True,
-            },
-        )
-
-    @override_settings(
-        ENABLE_UPDATE_CHECK=True,
-    )
     @mock.patch("urllib.request.urlopen")
     def test_remote_version_enabled_no_update_prefix(self, urlopen_mock):
 
@@ -2460,13 +2564,9 @@ class TestApiRemoteVersion(DirectoriesMixin, APITestCase):
             {
                 "version": "1.6.0",
                 "update_available": False,
-                "feature_is_set": True,
             },
         )
 
-    @override_settings(
-        ENABLE_UPDATE_CHECK=True,
-    )
     @mock.patch("urllib.request.urlopen")
     def test_remote_version_enabled_no_update_no_prefix(self, urlopen_mock):
 
@@ -2486,13 +2586,9 @@ class TestApiRemoteVersion(DirectoriesMixin, APITestCase):
             {
                 "version": version.__full_version_str__,
                 "update_available": False,
-                "feature_is_set": True,
             },
         )
 
-    @override_settings(
-        ENABLE_UPDATE_CHECK=True,
-    )
     @mock.patch("urllib.request.urlopen")
     def test_remote_version_enabled_update(self, urlopen_mock):
 
@@ -2519,13 +2615,9 @@ class TestApiRemoteVersion(DirectoriesMixin, APITestCase):
             {
                 "version": new_version_str,
                 "update_available": True,
-                "feature_is_set": True,
             },
         )
 
-    @override_settings(
-        ENABLE_UPDATE_CHECK=True,
-    )
     @mock.patch("urllib.request.urlopen")
     def test_remote_version_bad_json(self, urlopen_mock):
 
@@ -2543,13 +2635,9 @@ class TestApiRemoteVersion(DirectoriesMixin, APITestCase):
             {
                 "version": "0.0.0",
                 "update_available": False,
-                "feature_is_set": True,
             },
         )
 
-    @override_settings(
-        ENABLE_UPDATE_CHECK=True,
-    )
     @mock.patch("urllib.request.urlopen")
     def test_remote_version_exception(self, urlopen_mock):
 
@@ -2567,7 +2655,6 @@ class TestApiRemoteVersion(DirectoriesMixin, APITestCase):
             {
                 "version": "0.0.0",
                 "update_available": False,
-                "feature_is_set": True,
             },
         )
 
@@ -2652,7 +2739,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
 
 class TestTasks(APITestCase):
     ENDPOINT = "/api/tasks/"
-    ENDPOINT_ACKOWLEDGE = "/api/acknowledge_tasks/"
+    ENDPOINT_ACKNOWLEDGE = "/api/acknowledge_tasks/"
 
     def setUp(self):
         super().setUp()
@@ -2661,16 +2748,27 @@ class TestTasks(APITestCase):
         self.client.force_authenticate(user=self.user)
 
     def test_get_tasks(self):
-        task_id1 = str(uuid.uuid4())
-        PaperlessTask.objects.create(task_id=task_id1)
-        Task.objects.create(
-            id=task_id1,
-            started=timezone.now() - datetime.timedelta(seconds=30),
-            stopped=timezone.now(),
-            func="documents.tasks.consume_file",
+        """
+        GIVEN:
+            - Attempted celery tasks
+        WHEN:
+            - API call is made to get tasks
+        THEN:
+            - Attempting and pending tasks are serialized and provided
+        """
+        result1 = TaskResult.objects.create(
+            task_id=str(uuid.uuid4()),
+            task_name="documents.tasks.some_great_task",
+            status=celery.states.PENDING,
         )
-        task_id2 = str(uuid.uuid4())
-        PaperlessTask.objects.create(task_id=task_id2)
+        PaperlessTask.objects.create(attempted_task=result1)
+
+        result2 = TaskResult.objects.create(
+            task_id=str(uuid.uuid4()),
+            task_name="documents.tasks.some_awesome_task",
+            status=celery.states.STARTED,
+        )
+        PaperlessTask.objects.create(attempted_task=result2)
 
         response = self.client.get(self.ENDPOINT)
 
@@ -2678,25 +2776,155 @@ class TestTasks(APITestCase):
         self.assertEqual(len(response.data), 2)
         returned_task1 = response.data[1]
         returned_task2 = response.data[0]
-        self.assertEqual(returned_task1["task_id"], task_id1)
-        self.assertEqual(returned_task1["status"], "complete")
-        self.assertIsNotNone(returned_task1["attempted_task"])
-        self.assertEqual(returned_task2["task_id"], task_id2)
-        self.assertEqual(returned_task2["status"], "queued")
-        self.assertIsNone(returned_task2["attempted_task"])
+
+        self.assertEqual(returned_task1["task_id"], result1.task_id)
+        self.assertEqual(returned_task1["status"], celery.states.PENDING)
+        self.assertEqual(returned_task1["task_name"], result1.task_name)
+
+        self.assertEqual(returned_task2["task_id"], result2.task_id)
+        self.assertEqual(returned_task2["status"], celery.states.STARTED)
+        self.assertEqual(returned_task2["task_name"], result2.task_name)
 
     def test_acknowledge_tasks(self):
-        task_id = str(uuid.uuid4())
-        task = PaperlessTask.objects.create(task_id=task_id)
+        """
+        GIVEN:
+            - Attempted celery tasks
+        WHEN:
+            - API call is made to get mark task as acknowledged
+        THEN:
+            - Task is marked as acknowledged
+        """
+        result1 = TaskResult.objects.create(
+            task_id=str(uuid.uuid4()),
+            task_name="documents.tasks.some_task",
+            status=celery.states.PENDING,
+        )
+        task = PaperlessTask.objects.create(attempted_task=result1)
 
         response = self.client.get(self.ENDPOINT)
         self.assertEqual(len(response.data), 1)
 
         response = self.client.post(
-            self.ENDPOINT_ACKOWLEDGE,
+            self.ENDPOINT_ACKNOWLEDGE,
             {"tasks": [task.id]},
         )
         self.assertEqual(response.status_code, 200)
 
         response = self.client.get(self.ENDPOINT)
         self.assertEqual(len(response.data), 0)
+
+    def test_task_result_no_error(self):
+        """
+        GIVEN:
+            - A celery task completed without error
+        WHEN:
+            - API call is made to get tasks
+        THEN:
+            - The returned data includes the task result
+        """
+        result1 = TaskResult.objects.create(
+            task_id=str(uuid.uuid4()),
+            task_name="documents.tasks.some_task",
+            status=celery.states.SUCCESS,
+            result="Success. New document id 1 created",
+        )
+        _ = PaperlessTask.objects.create(attempted_task=result1)
+
+        response = self.client.get(self.ENDPOINT)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+
+        returned_data = response.data[0]
+
+        self.assertEqual(returned_data["result"], "Success. New document id 1 created")
+        self.assertEqual(returned_data["related_document"], "1")
+
+    def test_task_result_with_error(self):
+        """
+        GIVEN:
+            - A celery task completed with an exception
+        WHEN:
+            - API call is made to get tasks
+        THEN:
+            - The returned result is the exception info
+        """
+        result1 = TaskResult.objects.create(
+            task_id=str(uuid.uuid4()),
+            task_name="documents.tasks.some_task",
+            status=celery.states.SUCCESS,
+            result={
+                "exc_type": "ConsumerError",
+                "exc_message": ["test.pdf: Not consuming test.pdf: It is a duplicate."],
+                "exc_module": "documents.consumer",
+            },
+        )
+        _ = PaperlessTask.objects.create(attempted_task=result1)
+
+        response = self.client.get(self.ENDPOINT)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+
+        returned_data = response.data[0]
+
+        self.assertEqual(
+            returned_data["result"],
+            "test.pdf: Not consuming test.pdf: It is a duplicate.",
+        )
+
+    def test_task_name_webui(self):
+        """
+        GIVEN:
+            - Attempted celery task
+            - Task was created through the webui
+        WHEN:
+            - API call is made to get tasks
+        THEN:
+            - Returned data include the filename
+        """
+        result1 = TaskResult.objects.create(
+            task_id=str(uuid.uuid4()),
+            task_name="documents.tasks.some_task",
+            status=celery.states.SUCCESS,
+            task_args="\"('/tmp/paperless/paperless-upload-5iq7skzc',)\"",
+            task_kwargs="\"{'override_filename': 'test.pdf', 'override_title': None, 'override_correspondent_id': None, 'override_document_type_id': None, 'override_tag_ids': None, 'task_id': '466e8fe7-7193-4698-9fff-72f0340e2082', 'override_created': None}\"",
+        )
+        _ = PaperlessTask.objects.create(attempted_task=result1)
+
+        response = self.client.get(self.ENDPOINT)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+
+        returned_data = response.data[0]
+
+        self.assertEqual(returned_data["name"], "test.pdf")
+
+    def test_task_name_consume_folder(self):
+        """
+        GIVEN:
+            - Attempted celery task
+            - Task was created through the consume folder
+        WHEN:
+            - API call is made to get tasks
+        THEN:
+            - Returned data include the filename
+        """
+        result1 = TaskResult.objects.create(
+            task_id=str(uuid.uuid4()),
+            task_name="documents.tasks.some_task",
+            status=celery.states.SUCCESS,
+            task_args="\"('/consume/anothertest.pdf',)\"",
+            task_kwargs="\"{'override_tag_ids': None}\"",
+        )
+        _ = PaperlessTask.objects.create(attempted_task=result1)
+
+        response = self.client.get(self.ENDPOINT)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+
+        returned_data = response.data[0]
+
+        self.assertEqual(returned_data["name"], "anothertest.pdf")

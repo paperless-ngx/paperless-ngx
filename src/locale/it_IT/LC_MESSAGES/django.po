@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-07-08 14:11-0700\n"
-"PO-Revision-Date: 2022-07-08 22:07\n"
+"PO-Revision-Date: 2022-08-03 11:24\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -376,7 +376,7 @@ msgstr "regole filtro"
 
 #: documents/models.py:521
 msgid "started"
-msgstr ""
+msgstr "avviato"
 
 #: documents/serialisers.py:70
 #, python-format
@@ -654,7 +654,7 @@ msgstr "Contrassegna la email, non elaborare le email elaborate."
 
 #: paperless_mail/models.py:68
 msgid "Tag the mail with specified tag, don't process tagged mails"
-msgstr ""
+msgstr "Etichetta la posta con il tag specificato, non processare le email etichettate"
 
 #: paperless_mail/models.py:71
 msgid "Use subject as title"

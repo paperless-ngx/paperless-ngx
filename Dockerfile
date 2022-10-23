@@ -30,6 +30,25 @@ RUN set -eux \
 RUN set -eux \
   && ./node_modules/.bin/ng build --configuration production
 
+FROM --platform=$BUILDPLATFORM python:3.9-slim-bullseye as pipenv-base
+
+# This stage generates the requirements.txt file using pipenv
+# This stage runs once for the native platform, as the outputs are not
+# dependent on target arch
+# This way, pipenv dependencies are not left in the final image
+# nor can pipenv mess up the final image somehow
+# Inputs: None
+
+WORKDIR /usr/src/pipenv
+
+COPY Pipfile* ./
+
+RUN set -eux \
+  && echo "Installing pipenv" \
+    && python3 -m pip install --no-cache-dir --upgrade pipenv \
+  && echo "Generating requirement.txt" \
+    && pipenv requirements > requirements.txt
+
 FROM python:3.9-slim-bullseye as main-app
 
 LABEL org.opencontainers.image.authors="paperless-ngx team <hello@paperless-ngx.com>"
@@ -81,6 +100,7 @@ ARG RUNTIME_PACKAGES="\
   python3-pip \
   python3-setuptools \
   postgresql-client \
+  mariadb-client \
   # For Numpy
   libatlas3-base \
   # OCRmyPDF dependencies
@@ -90,6 +110,10 @@ ARG RUNTIME_PACKAGES="\
   tesseract-ocr-fra \
   tesseract-ocr-ita \
   tesseract-ocr-spa \
+  # Suggested for OCRmyPDF
+  pngquant \
+  # Suggested for pikepdf
+  jbig2dec \
   tzdata \
   unpaper \
   # Mime type detection
@@ -119,20 +143,33 @@ COPY gunicorn.conf.py .
 # These change sometimes, but rarely
 WORKDIR /usr/src/paperless/src/docker/
 
-RUN --mount=type=bind,readwrite,source=docker,target=./ \
-  set -eux \
+COPY [ \
+  "docker/imagemagick-policy.xml", \
+  "docker/supervisord.conf", \
+  "docker/docker-entrypoint.sh", \
+  "docker/docker-prepare.sh", \
+  "docker/paperless_cmd.sh", \
+  "docker/wait-for-redis.py", \
+  "docker/management_script.sh", \
+  "docker/install_management_commands.sh", \
+  "/usr/src/paperless/src/docker/" \
+]
+
+RUN set -eux \
   && echo "Configuring ImageMagick" \
-    && cp imagemagick-policy.xml /etc/ImageMagick-6/policy.xml \
+    && mv imagemagick-policy.xml /etc/ImageMagick-6/policy.xml \
   && echo "Configuring supervisord" \
     && mkdir /var/log/supervisord /var/run/supervisord \
-    && cp supervisord.conf /etc/supervisord.conf \
+    && mv supervisord.conf /etc/supervisord.conf \
   && echo "Setting up Docker scripts" \
-    && cp docker-entrypoint.sh /sbin/docker-entrypoint.sh \
+    && mv docker-entrypoint.sh /sbin/docker-entrypoint.sh \
     && chmod 755 /sbin/docker-entrypoint.sh \
-    && cp docker-prepare.sh /sbin/docker-prepare.sh \
+    && mv docker-prepare.sh /sbin/docker-prepare.sh \
     && chmod 755 /sbin/docker-prepare.sh \
-    && cp wait-for-redis.py /sbin/wait-for-redis.py \
+    && mv wait-for-redis.py /sbin/wait-for-redis.py \
     && chmod 755 /sbin/wait-for-redis.py \
+    && mv paperless_cmd.sh /usr/local/bin/paperless_cmd.sh \
+    && chmod 755 /usr/local/bin/paperless_cmd.sh \
   && echo "Installing managment commands" \
     && chmod +x install_management_commands.sh \
     && ./install_management_commands.sh
@@ -145,28 +182,31 @@ RUN --mount=type=bind,from=qpdf-builder,target=/qpdf \
     --mount=type=bind,from=pikepdf-builder,target=/pikepdf \
   set -eux \
   && echo "Installing qpdf" \
-    && apt-get install --yes --no-install-recommends /qpdf/usr/src/qpdf/libqpdf28_*.deb \
+    && apt-get install --yes --no-install-recommends /qpdf/usr/src/qpdf/libqpdf29_*.deb \
     && apt-get install --yes --no-install-recommends /qpdf/usr/src/qpdf/qpdf_*.deb \
   && echo "Installing pikepdf and dependencies" \
+    && python3 -m pip install --no-cache-dir /pikepdf/usr/src/wheels/pyparsing*.whl \
     && python3 -m pip install --no-cache-dir /pikepdf/usr/src/wheels/packaging*.whl \
     && python3 -m pip install --no-cache-dir /pikepdf/usr/src/wheels/lxml*.whl \
     && python3 -m pip install --no-cache-dir /pikepdf/usr/src/wheels/Pillow*.whl \
-    && python3 -m pip install --no-cache-dir /pikepdf/usr/src/wheels/pyparsing*.whl \
     && python3 -m pip install --no-cache-dir /pikepdf/usr/src/wheels/pikepdf*.whl \
-    && python -m pip list \
+    && python3 -m pip list \
   && echo "Installing psycopg2" \
     && python3 -m pip install --no-cache-dir /psycopg2/usr/src/wheels/psycopg2*.whl \
-    && python -m pip list
+    && python3 -m pip list
+
+WORKDIR /usr/src/paperless/src/
 
 # Python dependencies
 # Change pretty frequently
-COPY requirements.txt ../
+COPY --from=pipenv-base /usr/src/pipenv/requirements.txt ./
 
 # Packages needed only for building a few quick Python
 # dependencies
 ARG BUILD_PACKAGES="\
   build-essential \
   git \
+  default-libmysqlclient-dev \
   python3-dev"
 
 RUN set -eux \
@@ -175,7 +215,7 @@ RUN set -eux \
     && apt-get install --yes --quiet --no-install-recommends ${BUILD_PACKAGES} \
     && python3 -m pip install --no-cache-dir --upgrade wheel \
   && echo "Installing Python requirements" \
-    && python3 -m pip install --default-timeout=1000 --no-cache-dir -r ../requirements.txt \
+    && python3 -m pip install --default-timeout=1000 --no-cache-dir --requirement requirements.txt \
   && echo "Cleaning up image" \
     && apt-get -y purge ${BUILD_PACKAGES} \
     && apt-get -y autoremove --purge \
@@ -185,8 +225,6 @@ RUN set -eux \
     && rm -rf /var/tmp/* \
     && rm -rf /var/cache/apt/archives/* \
     && truncate -s 0 /var/log/*log
-
-WORKDIR /usr/src/paperless/src/
 
 # copy backend
 COPY ./src ./
@@ -211,4 +249,4 @@ ENTRYPOINT ["/sbin/docker-entrypoint.sh"]
 
 EXPOSE 8000
 
-CMD ["/usr/local/bin/supervisord", "-c", "/etc/supervisord.conf"]
+CMD ["/usr/local/bin/paperless_cmd.sh"]

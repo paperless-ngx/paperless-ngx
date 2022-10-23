@@ -249,15 +249,21 @@ class RasterisedDocumentParser(DocumentParser):
 
         if mime_type == "application/pdf":
             text_original = self.extract_text(None, document_path)
-            original_has_text = text_original and len(text_original) > 50
+            original_has_text = text_original is not None and len(text_original) > 50
         else:
             text_original = None
             original_has_text = False
 
+        # If the original has text, and the user doesn't want an archive,
+        # we're done here
         if settings.OCR_MODE == "skip_noarchive" and original_has_text:
             self.log("debug", "Document has text, skipping OCRmyPDF entirely.")
             self.text = text_original
             return
+
+        # Either no text was in the original or there should be an archive
+        # file created, so OCR the file and create an archive with any
+        # test located via OCR
 
         import ocrmypdf
         from ocrmypdf import InputFileError, EncryptedPdfError
@@ -277,6 +283,7 @@ class RasterisedDocumentParser(DocumentParser):
             ocrmypdf.ocr(**args)
 
             self.archive_path = archive_path
+
             self.text = self.extract_text(sidecar_file, archive_path)
 
             if not self.text:
@@ -323,11 +330,11 @@ class RasterisedDocumentParser(DocumentParser):
 
             except Exception as e:
                 # If this fails, we have a serious issue at hand.
-                raise ParseError(f"{e.__class__.__name__}: {str(e)}")
+                raise ParseError(f"{e.__class__.__name__}: {str(e)}") from e
 
         except Exception as e:
             # Anything else is probably serious.
-            raise ParseError(f"{e.__class__.__name__}: {str(e)}")
+            raise ParseError(f"{e.__class__.__name__}: {str(e)}") from e
 
         # As a last resort, if we still don't have any text for any reason,
         # try to extract the text from the original document.

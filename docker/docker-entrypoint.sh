@@ -50,6 +50,31 @@ map_folders() {
 	# Export these so they can be used in docker-prepare.sh
 	export DATA_DIR="${PAPERLESS_DATA_DIR:-/usr/src/paperless/data}"
 	export MEDIA_ROOT_DIR="${PAPERLESS_MEDIA_ROOT:-/usr/src/paperless/media}"
+	export CONSUME_DIR="${PAPERLESS_CONSUMPTION_DIR:-/usr/src/paperless/consume}"
+}
+
+nltk_data () {
+	# Store the NLTK data outside the Docker container
+	local nltk_data_dir="${DATA_DIR}/nltk"
+	readonly truthy_things=("yes y 1 t true")
+
+	# If not set, or it looks truthy
+	if [[ -z "${PAPERLESS_ENABLE_NLTK}" ]] || [[ "${truthy_things[*]}" =~ ${PAPERLESS_ENABLE_NLTK,} ]]; then
+
+		# Download or update the snowball stemmer data
+		python3 -W ignore::RuntimeWarning -m nltk.downloader -d "${nltk_data_dir}" snowball_data
+
+		# Download or update the stopwords corpus
+		python3 -W ignore::RuntimeWarning -m nltk.downloader -d "${nltk_data_dir}" stopwords
+
+		# Download or update the punkt tokenizer data
+		python3 -W ignore::RuntimeWarning -m nltk.downloader -d "${nltk_data_dir}" punkt
+
+	else
+		echo "Skipping NLTK data download"
+
+	fi
+
 }
 
 initialize() {
@@ -62,7 +87,8 @@ initialize() {
 		PAPERLESS_AUTO_LOGIN_USERNAME \
 		PAPERLESS_ADMIN_USER \
 		PAPERLESS_ADMIN_MAIL \
-		PAPERLESS_ADMIN_PASSWORD; do
+		PAPERLESS_ADMIN_PASSWORD \
+		PAPERLESS_REDIS; do
 		# Check for a version of this var with _FILE appended
 		# and convert the contents to the env var value
 		file_env ${env_var}
@@ -76,7 +102,11 @@ initialize() {
 
 	local export_dir="/usr/src/paperless/export"
 
-	for dir in "${export_dir}" "${DATA_DIR}" "${DATA_DIR}/index" "${MEDIA_ROOT_DIR}" "${MEDIA_ROOT_DIR}/documents" "${MEDIA_ROOT_DIR}/documents/originals" "${MEDIA_ROOT_DIR}/documents/thumbnails"; do
+	for dir in \
+		"${export_dir}" \
+		"${DATA_DIR}" "${DATA_DIR}/index" \
+		"${MEDIA_ROOT_DIR}" "${MEDIA_ROOT_DIR}/documents" "${MEDIA_ROOT_DIR}/documents/originals" "${MEDIA_ROOT_DIR}/documents/thumbnails" \
+		"${CONSUME_DIR}"; do
 		if [[ ! -d "${dir}" ]]; then
 			echo "Creating directory ${dir}"
 			mkdir "${dir}"
@@ -87,15 +117,21 @@ initialize() {
 	echo "Creating directory ${tmp_dir}"
 	mkdir -p "${tmp_dir}"
 
+	nltk_data
+
 	set +e
 	echo "Adjusting permissions of paperless files. This may take a while."
 	chown -R paperless:paperless ${tmp_dir}
-	for dir in "${export_dir}" "${DATA_DIR}" "${MEDIA_ROOT_DIR}"; do
+	for dir in \
+		"${export_dir}" \
+		"${DATA_DIR}" \
+		"${MEDIA_ROOT_DIR}" \
+		"${CONSUME_DIR}"; do
 		find "${dir}" -not \( -user paperless -and -group paperless \) -exec chown paperless:paperless {} +
 	done
 	set -e
 
-	gosu paperless /sbin/docker-prepare.sh
+	"${gosu_cmd[@]}" /sbin/docker-prepare.sh
 }
 
 install_languages() {
@@ -137,6 +173,11 @@ install_languages() {
 
 echo "Paperless-ngx docker container starting..."
 
+gosu_cmd=(gosu paperless)
+if [ "$(id -u)" == "$(id -u paperless)" ]; then
+	gosu_cmd=()
+fi
+
 # Install additional languages if specified
 if [[ -n "$PAPERLESS_OCR_LANGUAGES" ]]; then
 	install_languages "$PAPERLESS_OCR_LANGUAGES"
@@ -146,7 +187,7 @@ initialize
 
 if [[ "$1" != "/"* ]]; then
 	echo Executing management command "$@"
-	exec gosu paperless python3 manage.py "$@"
+	exec "${gosu_cmd[@]}" python3 manage.py "$@"
 else
 	echo Executing "$@"
 	exec "$@"

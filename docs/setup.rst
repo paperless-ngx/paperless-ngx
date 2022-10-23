@@ -39,7 +39,7 @@ Paperless consists of the following components:
 
     .. _setup-task_processor:
 
-*   **The task processor:** Paperless relies on `Django Q <https://django-q.readthedocs.io/en/latest/>`_
+*   **The task processor:** Paperless relies on `Celery - Distributed Task Queue <https://docs.celeryq.dev/en/stable/index.html>`_
     for doing most of the heavy lifting. This is a task queue that accepts tasks from
     multiple sources and processes these in parallel. It also comes with a scheduler that executes
     certain commands periodically.
@@ -62,18 +62,11 @@ Paperless consists of the following components:
     tasks fail and inspect the errors (i.e., wrong email credentials, errors during consuming a specific
     file, etc).
 
-    You may start the task processor by executing:
-
-    .. code:: shell-session
-
-        $ cd /path/to/paperless/src/
-        $ python3 manage.py qcluster
-
 *   A `redis <https://redis.io/>`_ message broker: This is a really lightweight service that is responsible
     for getting the tasks from the webserver and the consumer to the task scheduler. These run in a different
     process (maybe even on different machines!), and therefore, this is necessary.
 
-*   Optional: A database server. Paperless supports both PostgreSQL and SQLite for storing its data.
+*   Optional: A database server. Paperless supports PostgreSQL, MariaDB and SQLite for storing its data.
 
 
 Installation
@@ -184,6 +177,25 @@ Install Paperless from Docker Hub
     port 8000. Modifying the part before the colon will map requests on another
     port to the webserver running on the default port.
 
+    **Rootless**
+
+    If you want to run Paperless as a rootless container, you will need to do the
+    following in your ``docker-compose.yml``:
+
+    - set the ``user`` running the container to map to the ``paperless`` user in the
+      container.
+      This value (``user_id`` below), should be the same id that ``USERMAP_UID`` and
+      ``USERMAP_GID`` are set to in the next step.
+      See ``USERMAP_UID`` and ``USERMAP_GID`` :ref:`here <configuration-docker>`.
+
+    Your entry for Paperless should contain something like:
+
+     .. code::
+
+        webserver:
+          image: ghcr.io/paperless-ngx/paperless-ngx:latest
+          user: <user_id>
+
 5.  Modify ``docker-compose.env``, following the comments in the file. The
     most important change is to set ``USERMAP_UID`` and ``USERMAP_GID``
     to the uid and gid of your user on the host system. Use ``id -u`` and
@@ -205,6 +217,7 @@ Install Paperless from Docker Hub
         You can utilize Docker secrets for some configuration settings by
         appending `_FILE` to some configuration values.  This is supported currently
         only by:
+
           * PAPERLESS_DBUSER
           * PAPERLESS_DBPASS
           * PAPERLESS_SECRET_KEY
@@ -271,7 +284,20 @@ Build the Docker image yourself
     .. code:: yaml
 
         webserver:
-            build: .
+            build:
+              context: .
+              args:
+                QPDF_VERSION: x.y.x
+                PIKEPDF_VERSION: x.y.z
+                PSYCOPG2_VERSION: x.y.z
+                JBIG2ENC_VERSION: 0.29
+
+    .. note::
+
+        You should match the build argument versions to the version for the release you have
+        checked out.  These are pre-built images with certain, more updated software.
+        If you want to build these images your self, that is possible, but beyond
+        the scope of these steps.
 
 4.  Follow steps 3 to 8 of :ref:`setup-docker_hub`. When asked to run
     ``docker-compose pull`` to pull the image, do
@@ -297,11 +323,13 @@ writing. Windows is not and will never be supported.
     *   ``python3-pip``
     *   ``python3-dev``
 
+    *   ``default-libmysqlclient-dev`` for MariaDB
     *   ``fonts-liberation`` for generating thumbnails for plain text files
     *   ``imagemagick`` >= 6 for PDF conversion
     *   ``gnupg`` for handling encrypted documents
     *   ``libpq-dev`` for PostgreSQL
     *   ``libmagic-dev`` for mime type detection
+    *   ``mariadb-client`` for MariaDB compile time
     *   ``mime-support`` for mime type detection
     *   ``libzbar0`` for barcode detection
     *   ``poppler-utils`` for barcode detection
@@ -310,7 +338,7 @@ writing. Windows is not and will never be supported.
 
     .. code::
 
-        python3 python3-pip python3-dev imagemagick fonts-liberation gnupg libpq-dev libmagic-dev mime-support libzbar0 poppler-utils
+        python3 python3-pip python3-dev imagemagick fonts-liberation gnupg libpq-dev default-libmysqlclient-dev libmagic-dev mime-support libzbar0 poppler-utils
 
     These dependencies are required for OCRmyPDF, which is used for text recognition.
 
@@ -320,7 +348,7 @@ writing. Windows is not and will never be supported.
     *   ``qpdf``
     *   ``liblept5``
     *   ``libxml2``
-    *   ``pngquant``
+    *   ``pngquant`` (suggested for certain PDF image optimizations)
     *   ``zlib1g``
     *   ``tesseract-ocr`` >= 4.0.0 for OCR
     *   ``tesseract-ocr`` language packs (``tesseract-ocr-eng``, ``tesseract-ocr-deu``, etc)
@@ -339,10 +367,10 @@ writing. Windows is not and will never be supported.
     You will also need ``build-essential``, ``python3-setuptools`` and ``python3-wheel``
     for installing some of the python dependencies.
 
-2.  Install ``redis`` >= 5.0 and configure it to start automatically.
+2.  Install ``redis`` >= 6.0 and configure it to start automatically.
 
 3.  Optional. Install ``postgresql`` and configure a database, user and password for paperless. If you do not wish
-    to use PostgreSQL, SQLite is available as well.
+    to use PostgreSQL, MariaDB and SQLite are available as well.
 
     .. note::
 
@@ -358,6 +386,7 @@ writing. Windows is not and will never be supported.
     settings to your needs. Required settings for getting paperless running are:
 
     *   ``PAPERLESS_REDIS`` should point to your redis server, such as redis://localhost:6379.
+    *   ``PAPERLESS_DBENGINE`` optional, and should be one of `postgres, mariadb, or sqlite`
     *   ``PAPERLESS_DBHOST`` should be the hostname on which your PostgreSQL server is running. Do not configure this
         to use SQLite instead. Also configure port, database name, user and password as necessary.
     *   ``PAPERLESS_CONSUMPTION_DIR`` should point to a folder which paperless should watch for documents. You might
@@ -438,8 +467,9 @@ writing. Windows is not and will never be supported.
     as a starting point.
 
     Paperless needs the ``webserver`` script to run the webserver, the
-    ``consumer`` script to watch the input folder, and the ``scheduler``
-    script to run tasks such as email checking and document consumption.
+    ``consumer`` script to watch the input folder, ``taskqueue`` for the background workers
+    used to handle things like document consumption and the ``scheduler`` script to run tasks such as
+    email checking at certain times .
 
 		The ``socket`` script enables ``gunicorn`` to run on port 80 without
 		root privileges. For this you need to uncomment the ``Require=paperless-webserver.socket``
@@ -489,6 +519,13 @@ writing. Windows is not and will never be supported.
     encoder. This will reduce the size of generated PDF documents. You'll most likely need
     to compile this by yourself, because this software has been patented until around 2017 and
     binary packages are not available for most distributions.
+
+15. Optional: If using the NLTK machine learning processing (see ``PAPERLESS_ENABLE_NLTK`` in
+    :ref:`configuration` for details), download the NLTK data for the Snowball Stemmer, Stopwords
+    and Punkt tokenizer to your ``PAPERLESS_DATA_DIR/nltk``.  Refer to
+    the `NLTK instructions <https://www.nltk.org/data.html>`_ for details on how to
+    download the data.
+
 
 Migrating to Paperless-ngx
 ##########################
@@ -744,6 +781,8 @@ configuring some options in paperless can help improve performance immensely:
     OCR results.
 *   If using docker, consider setting ``PAPERLESS_WEBSERVER_WORKERS`` to
     1. This will save some memory.
+*   Consider setting ``PAPERLESS_ENABLE_NLTK`` to false, to disable the more
+    advanced language processing, which can take more memory and processing time.
 
 For details, refer to :ref:`configuration`.
 

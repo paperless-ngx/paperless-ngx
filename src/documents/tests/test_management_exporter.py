@@ -10,10 +10,13 @@ from django.core.management import call_command
 from django.test import override_settings
 from django.test import TestCase
 from documents.management.commands import document_exporter
+from documents.models import Comment
 from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import StoragePath
 from documents.models import Tag
+from documents.models import User
 from documents.sanity_checker import check_sanity
 from documents.settings import EXPORTER_FILE_NAME
 from documents.tests.utils import DirectoriesMixin
@@ -24,6 +27,8 @@ class TestExportImport(DirectoriesMixin, TestCase):
     def setUp(self) -> None:
         self.target = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, self.target)
+
+        self.user = User.objects.create(username="temp_admin")
 
         self.d1 = Document.objects.create(
             content="Content",
@@ -57,14 +62,23 @@ class TestExportImport(DirectoriesMixin, TestCase):
             storage_type=Document.STORAGE_TYPE_GPG,
         )
 
+        self.comment = Comment.objects.create(
+            comment="This is a comment. amaze.",
+            document=self.d1,
+            user=self.user,
+        )
+
         self.t1 = Tag.objects.create(name="t")
         self.dt1 = DocumentType.objects.create(name="dt")
         self.c1 = Correspondent.objects.create(name="c")
+        self.sp1 = StoragePath.objects.create(path="{created_year}-{title}")
 
         self.d1.tags.add(self.t1)
         self.d1.correspondent = self.c1
         self.d1.document_type = self.dt1
         self.d1.save()
+        self.d4.storage_path = self.sp1
+        self.d4.save()
         super().setUp()
 
     def _get_document_from_manifest(self, manifest, id):
@@ -110,7 +124,7 @@ class TestExportImport(DirectoriesMixin, TestCase):
 
         manifest = self._do_export(use_filename_format=use_filename_format)
 
-        self.assertEqual(len(manifest), 8)
+        self.assertEqual(len(manifest), 11)
         self.assertEqual(
             len(list(filter(lambda e: e["model"] == "documents.document", manifest))),
             4,
@@ -171,6 +185,11 @@ class TestExportImport(DirectoriesMixin, TestCase):
                         checksum = hashlib.md5(f.read()).hexdigest()
                     self.assertEqual(checksum, element["fields"]["archive_checksum"])
 
+            elif element["model"] == "documents.comment":
+                self.assertEqual(element["fields"]["comment"], self.comment.comment)
+                self.assertEqual(element["fields"]["document"], self.d1.id)
+                self.assertEqual(element["fields"]["user"], self.user.id)
+
         with paperless_environment() as dirs:
             self.assertEqual(Document.objects.count(), 4)
             Document.objects.all().delete()
@@ -184,6 +203,7 @@ class TestExportImport(DirectoriesMixin, TestCase):
             self.assertEqual(Tag.objects.count(), 1)
             self.assertEqual(Correspondent.objects.count(), 1)
             self.assertEqual(DocumentType.objects.count(), 1)
+            self.assertEqual(StoragePath.objects.count(), 1)
             self.assertEqual(Document.objects.get(id=self.d1.id).title, "wow1")
             self.assertEqual(Document.objects.get(id=self.d2.id).title, "wow2")
             self.assertEqual(Document.objects.get(id=self.d3.id).title, "wow2")

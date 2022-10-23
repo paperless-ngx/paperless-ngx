@@ -1,24 +1,26 @@
 import os
+import re
 import tempfile
 from datetime import date
 from datetime import timedelta
 from fnmatch import fnmatch
-from imaplib import IMAP4
+from typing import Dict
 
 import magic
 import pathvalidate
 from django.conf import settings
 from django.db import DatabaseError
-from django_q.tasks import async_task
 from documents.loggers import LoggingMixin
 from documents.models import Correspondent
 from documents.parsers import is_mime_type_supported
+from documents.tasks import consume_file
 from imap_tools import AND
 from imap_tools import MailBox
 from imap_tools import MailboxFolderSelectError
 from imap_tools import MailBoxUnencrypted
 from imap_tools import MailMessage
 from imap_tools import MailMessageFlags
+from imap_tools import NOT
 from imap_tools.mailbox import MailBoxTls
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
@@ -29,7 +31,7 @@ class MailError(Exception):
 
 
 class BaseMailAction:
-    def get_criteria(self):
+    def get_criteria(self) -> Dict:
         return {}
 
     def post_consume(self, M, message_uids, parameter):
@@ -67,13 +69,17 @@ class TagMailAction(BaseMailAction):
         self.keyword = parameter
 
     def get_criteria(self):
-        return {"no_keyword": self.keyword}
+        return {"no_keyword": self.keyword, "gmail_label": self.keyword}
 
     def post_consume(self, M: MailBox, message_uids, parameter):
-        M.flag(message_uids, [self.keyword], True)
+        if re.search(r"gmail\.com$|googlemail\.com$", M._host):
+            for uid in message_uids:
+                M.client.uid("STORE", uid, "X-GM-LABELS", self.keyword)
+        else:
+            M.flag(message_uids, [self.keyword], True)
 
 
-def get_rule_action(rule):
+def get_rule_action(rule) -> BaseMailAction:
     if rule.action == MailRule.MailAction.FLAG:
         return FlagMailAction()
     elif rule.action == MailRule.MailAction.DELETE:
@@ -103,7 +109,7 @@ def make_criterias(rule):
     return {**criterias, **get_rule_action(rule).get_criteria()}
 
 
-def get_mailbox(server, port, security):
+def get_mailbox(server, port, security) -> MailBox:
     if security == MailAccount.ImapSecurity.NONE:
         mailbox = MailBoxUnencrypted(server, port)
     elif security == MailAccount.ImapSecurity.STARTTLS:
@@ -162,7 +168,7 @@ class MailAccountHandler(LoggingMixin):
                 "Unknown correspondent selector",
             )  # pragma: nocover
 
-    def handle_mail_account(self, account):
+    def handle_mail_account(self, account: MailAccount):
 
         self.renew_logging_group()
 
@@ -176,33 +182,29 @@ class MailAccountHandler(LoggingMixin):
                 account.imap_security,
             ) as M:
 
+                supports_gmail_labels = "X-GM-EXT-1" in M.client.capabilities
+                supports_auth_plain = "AUTH=PLAIN" in M.client.capabilities
+
+                self.log("debug", f"GMAIL Label Support: {supports_gmail_labels}")
+                self.log("debug", f"AUTH=PLAIN Support: {supports_auth_plain}")
+
                 try:
+
                     M.login(account.username, account.password)
 
                 except UnicodeEncodeError:
                     self.log("debug", "Falling back to AUTH=PLAIN")
-                    try:
-                        # rfc2595 section 6 - PLAIN SASL mechanism
-                        client: IMAP4 = M.client
-                        encoded = (
-                            b"\0"
-                            + account.username.encode("utf8")
-                            + b"\0"
-                            + account.password.encode("utf8")
-                        )
-                        # Assumption is the server supports AUTH=PLAIN capability
-                        # Could check the list with client.capability(), but then what?
-                        # We're failing anyway then
-                        client.authenticate("PLAIN", lambda x: encoded)
 
-                        # Need to transition out of AUTH state to SELECTED
-                        M.folder.set("INBOX")
-                    except Exception:
+                    try:
+                        M.login_utf8(account.username, account.password)
+                    except Exception as err:
                         self.log(
                             "error",
                             "Unable to authenticate with mail server using AUTH=PLAIN",
                         )
-                        raise MailError(f"Error while authenticating account {account}")
+                        raise MailError(
+                            f"Error while authenticating account {account}",
+                        ) from err
                 except Exception as e:
                     self.log(
                         "error",
@@ -221,7 +223,11 @@ class MailAccountHandler(LoggingMixin):
 
                 for rule in account.rules.order_by("order"):
                     try:
-                        total_processed_files += self.handle_mail_rule(M, rule)
+                        total_processed_files += self.handle_mail_rule(
+                            M,
+                            rule,
+                            supports_gmail_labels,
+                        )
                     except Exception as e:
                         self.log(
                             "error",
@@ -239,13 +245,18 @@ class MailAccountHandler(LoggingMixin):
 
         return total_processed_files
 
-    def handle_mail_rule(self, M: MailBox, rule: MailRule):
+    def handle_mail_rule(
+        self,
+        M: MailBox,
+        rule: MailRule,
+        supports_gmail_labels: bool = False,
+    ):
 
         self.log("debug", f"Rule {rule}: Selecting folder {rule.folder}")
 
         try:
             M.folder.set(rule.folder)
-        except MailboxFolderSelectError:
+        except MailboxFolderSelectError as err:
 
             self.log(
                 "error",
@@ -264,23 +275,38 @@ class MailAccountHandler(LoggingMixin):
             raise MailError(
                 f"Rule {rule}: Folder {rule.folder} "
                 f"does not exist in account {rule.account}",
-            )
+            ) from err
 
         criterias = make_criterias(rule)
 
+        # Deal with the Gmail label extension
+        if "gmail_label" in criterias:
+
+            gmail_label = criterias["gmail_label"]
+            del criterias["gmail_label"]
+
+            if not supports_gmail_labels:
+                criterias_imap = AND(**criterias)
+            else:
+                criterias_imap = AND(NOT(gmail_label=gmail_label), **criterias)
+        else:
+            criterias_imap = AND(**criterias)
+
         self.log(
             "debug",
-            f"Rule {rule}: Searching folder with criteria " f"{str(AND(**criterias))}",
+            f"Rule {rule}: Searching folder with criteria " f"{str(criterias_imap)}",
         )
 
         try:
             messages = M.fetch(
-                criteria=AND(**criterias),
+                criteria=criterias_imap,
                 mark_seen=False,
                 charset=rule.account.character_set,
             )
-        except Exception:
-            raise MailError(f"Rule {rule}: Error while fetching folder {rule.folder}")
+        except Exception as err:
+            raise MailError(
+                f"Rule {rule}: Error while fetching folder {rule.folder}",
+            ) from err
 
         post_consume_messages = []
 
@@ -320,7 +346,7 @@ class MailAccountHandler(LoggingMixin):
         except Exception as e:
             raise MailError(
                 f"Rule {rule}: Error while processing post-consume actions: " f"{e}",
-            )
+            ) from e
 
         return total_processed_files
 
@@ -382,8 +408,7 @@ class MailAccountHandler(LoggingMixin):
                 f"{message.subject} from {message.from_}",
             )
 
-            async_task(
-                "documents.tasks.consume_file",
+            consume_file.delay(
                 path=temp_filename,
                 override_filename=pathvalidate.sanitize_filename(
                     message.subject + ".eml",
@@ -447,8 +472,7 @@ class MailAccountHandler(LoggingMixin):
                         f"{message.subject} from {message.from_}",
                     )
 
-                    async_task(
-                        "documents.tasks.consume_file",
+                    consume_file.delay(
                         path=temp_filename,
                         override_filename=pathvalidate.sanitize_filename(
                             att.filename,

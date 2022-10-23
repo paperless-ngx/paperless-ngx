@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 import dateutil.parser
 import requests
@@ -27,7 +28,12 @@ class TikaDocumentParser(DocumentParser):
         )
 
     def extract_metadata(self, document_path, mime_type):
-        tika_server = settings.PAPERLESS_TIKA_ENDPOINT
+        tika_server = settings.TIKA_ENDPOINT
+
+        # tika does not support a PathLike, only strings
+        # ensure this is a string
+        document_path = str(document_path)
+
         try:
             parsed = parser.from_file(document_path, tika_server)
         except Exception as e:
@@ -47,9 +53,13 @@ class TikaDocumentParser(DocumentParser):
             for key in parsed["metadata"]
         ]
 
-    def parse(self, document_path, mime_type, file_name=None):
+    def parse(self, document_path: Path, mime_type, file_name=None):
         self.log("info", f"Sending {document_path} to Tika server")
-        tika_server = settings.PAPERLESS_TIKA_ENDPOINT
+        tika_server = settings.TIKA_ENDPOINT
+
+        # tika does not support a PathLike, only strings
+        # ensure this is a string
+        document_path = str(document_path)
 
         try:
             parsed = parser.from_file(document_path, tika_server)
@@ -57,7 +67,7 @@ class TikaDocumentParser(DocumentParser):
             raise ParseError(
                 f"Could not parse {document_path} with tika server at "
                 f"{tika_server}: {err}",
-            )
+            ) from err
 
         self.text = parsed["content"].strip()
 
@@ -73,7 +83,7 @@ class TikaDocumentParser(DocumentParser):
 
     def convert_to_pdf(self, document_path, file_name):
         pdf_path = os.path.join(self.tempdir, "convert.pdf")
-        gotenberg_server = settings.PAPERLESS_TIKA_GOTENBERG_ENDPOINT
+        gotenberg_server = settings.TIKA_GOTENBERG_ENDPOINT
         url = gotenberg_server + "/forms/libreoffice/convert"
 
         self.log("info", f"Converting {document_path} to PDF as {pdf_path}")
@@ -90,7 +100,9 @@ class TikaDocumentParser(DocumentParser):
                 response = requests.post(url, files=files, headers=headers)
                 response.raise_for_status()  # ensure we notice bad responses
             except Exception as err:
-                raise ParseError(f"Error while converting document to PDF: {err}")
+                raise ParseError(
+                    f"Error while converting document to PDF: {err}",
+                ) from err
 
         with open(pdf_path, "wb") as file:
             file.write(response.content)

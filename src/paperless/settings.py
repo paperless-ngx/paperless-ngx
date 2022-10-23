@@ -4,11 +4,13 @@ import math
 import multiprocessing
 import os
 import re
+import tempfile
 from typing import Final
 from typing import Optional
 from typing import Set
 from urllib.parse import urlparse
 
+from celery.schedules import crontab
 from concurrent_log_handler.queue import setup_logging_queues
 from django.utils.translation import gettext_lazy as _
 from dotenv import load_dotenv
@@ -56,6 +58,13 @@ def __get_float(key: str, default: float) -> float:
     return float(os.getenv(key, default))
 
 
+def __get_path(key: str, default: str) -> str:
+    """
+    Return a normalized, absolute path based on the environment variable or a default
+    """
+    return os.path.abspath(os.path.normpath(os.environ.get(key, default)))
+
+
 # NEVER RUN WITH DEBUG IN PRODUCTION.
 DEBUG = __get_boolean("PAPERLESS_DEBUG", "NO")
 
@@ -66,14 +75,16 @@ DEBUG = __get_boolean("PAPERLESS_DEBUG", "NO")
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-STATIC_ROOT = os.getenv("PAPERLESS_STATICDIR", os.path.join(BASE_DIR, "..", "static"))
+STATIC_ROOT = __get_path("PAPERLESS_STATICDIR", os.path.join(BASE_DIR, "..", "static"))
 
-MEDIA_ROOT = os.getenv("PAPERLESS_MEDIA_ROOT", os.path.join(BASE_DIR, "..", "media"))
+MEDIA_ROOT = __get_path("PAPERLESS_MEDIA_ROOT", os.path.join(BASE_DIR, "..", "media"))
 ORIGINALS_DIR = os.path.join(MEDIA_ROOT, "documents", "originals")
 ARCHIVE_DIR = os.path.join(MEDIA_ROOT, "documents", "archive")
 THUMBNAIL_DIR = os.path.join(MEDIA_ROOT, "documents", "thumbnails")
 
-DATA_DIR = os.getenv("PAPERLESS_DATA_DIR", os.path.join(BASE_DIR, "..", "data"))
+DATA_DIR = __get_path("PAPERLESS_DATA_DIR", os.path.join(BASE_DIR, "..", "data"))
+
+NLTK_DIR = os.path.join(DATA_DIR, "nltk")
 
 TRASH_DIR = os.getenv("PAPERLESS_TRASH_DIR")
 
@@ -83,15 +94,18 @@ MEDIA_LOCK = os.path.join(MEDIA_ROOT, "media.lock")
 INDEX_DIR = os.path.join(DATA_DIR, "index")
 MODEL_FILE = os.path.join(DATA_DIR, "classification_model.pickle")
 
-LOGGING_DIR = os.getenv("PAPERLESS_LOGGING_DIR", os.path.join(DATA_DIR, "log"))
+LOGGING_DIR = __get_path("PAPERLESS_LOGGING_DIR", os.path.join(DATA_DIR, "log"))
 
-CONSUMPTION_DIR = os.getenv(
+CONSUMPTION_DIR = __get_path(
     "PAPERLESS_CONSUMPTION_DIR",
     os.path.join(BASE_DIR, "..", "consume"),
 )
 
 # This will be created if it doesn't exist
-SCRATCH_DIR = os.getenv("PAPERLESS_SCRATCH_DIR", "/tmp/paperless")
+SCRATCH_DIR = __get_path(
+    "PAPERLESS_SCRATCH_DIR",
+    os.path.join(tempfile.gettempdir(), "paperless"),
+)
 
 ###############################################################################
 # Application Definition                                                      #
@@ -117,7 +131,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "django_filters",
-    "django_q",
+    "django_celery_results",
 ] + env_apps
 
 if DEBUG:
@@ -168,6 +182,8 @@ ASGI_APPLICATION = "paperless.asgi.application"
 STATIC_URL = os.getenv("PAPERLESS_STATIC_URL", BASE_URL + "static/")
 WHITENOISE_STATIC_PREFIX = "/static/"
 
+_REDIS_URL = os.getenv("PAPERLESS_REDIS", "redis://localhost:6379")
+
 # TODO: what is this used for?
 TEMPLATES = [
     {
@@ -189,7 +205,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [os.getenv("PAPERLESS_REDIS", "redis://localhost:6379")],
+            "hosts": [_REDIS_URL],
             "capacity": 2000,  # default 100
             "expiry": 15,  # default 60
         },
@@ -274,7 +290,7 @@ SECRET_KEY = os.getenv(
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",  # noqa: E501
     },
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
@@ -308,6 +324,7 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": os.path.join(DATA_DIR, "db.sqlite3"),
+        "OPTIONS": {},
     },
 }
 
@@ -317,15 +334,30 @@ if os.getenv("PAPERLESS_DBHOST"):
     DATABASES["sqlite"] = DATABASES["default"].copy()
 
     DATABASES["default"] = {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
         "HOST": os.getenv("PAPERLESS_DBHOST"),
         "NAME": os.getenv("PAPERLESS_DBNAME", "paperless"),
         "USER": os.getenv("PAPERLESS_DBUSER", "paperless"),
         "PASSWORD": os.getenv("PAPERLESS_DBPASS", "paperless"),
-        "OPTIONS": {"sslmode": os.getenv("PAPERLESS_DBSSLMODE", "prefer")},
+        "OPTIONS": {},
     }
     if os.getenv("PAPERLESS_DBPORT"):
         DATABASES["default"]["PORT"] = os.getenv("PAPERLESS_DBPORT")
+
+    # Leave room for future extensibility
+    if os.getenv("PAPERLESS_DBENGINE") == "mariadb":
+        engine = "django.db.backends.mysql"
+        options = {"read_default_file": "/etc/mysql/my.cnf", "charset": "utf8mb4"}
+    else:  # Default to PostgresDB
+        engine = "django.db.backends.postgresql_psycopg2"
+        options = {"sslmode": os.getenv("PAPERLESS_DBSSLMODE", "prefer")}
+
+    DATABASES["default"]["ENGINE"] = engine
+    DATABASES["default"]["OPTIONS"].update(options)
+
+if os.getenv("PAPERLESS_DB_TIMEOUT") is not None:
+    DATABASES["default"]["OPTIONS"].update(
+        {"timeout": float(os.getenv("PAPERLESS_DB_TIMEOUT"))},
+    )
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
@@ -425,47 +457,57 @@ LOGGING = {
 # Task queue                                                                  #
 ###############################################################################
 
+TASK_WORKERS = __get_int("PAPERLESS_TASK_WORKERS", 1)
 
-# Sensible defaults for multitasking:
-# use a fair balance between worker processes and threads epr worker so that
-# both consuming many documents in parallel and consuming large documents is
-# reasonably fast.
-# Favors threads per worker on smaller systems and never exceeds cpu_count()
-# in total.
+WORKER_TIMEOUT: Final[int] = __get_int("PAPERLESS_WORKER_TIMEOUT", 1800)
 
+CELERY_BROKER_URL = _REDIS_URL
+CELERY_TIMEZONE = TIME_ZONE
 
-def default_task_workers() -> int:
-    # always leave one core open
-    available_cores = max(multiprocessing.cpu_count(), 1)
-    try:
-        if available_cores < 4:
-            return available_cores
-        return max(math.floor(math.sqrt(available_cores)), 1)
-    except NotImplementedError:
-        return 1
+CELERY_WORKER_HIJACK_ROOT_LOGGER = False
+CELERY_WORKER_CONCURRENCY = TASK_WORKERS
+CELERY_WORKER_MAX_TASKS_PER_CHILD = 1
+CELERY_WORKER_SEND_TASK_EVENTS = True
 
+CELERY_SEND_TASK_SENT_EVENT = True
 
-TASK_WORKERS = __get_int("PAPERLESS_TASK_WORKERS", default_task_workers())
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = WORKER_TIMEOUT
 
-PAPERLESS_WORKER_TIMEOUT: Final[int] = __get_int("PAPERLESS_WORKER_TIMEOUT", 1800)
+CELERY_RESULT_EXTENDED = True
+CELERY_RESULT_BACKEND = "django-db"
+CELERY_CACHE_BACKEND = "default"
 
-# Per django-q docs, timeout must be smaller than retry
-# We default retry to 10s more than the timeout
-PAPERLESS_WORKER_RETRY: Final[int] = __get_int(
-    "PAPERLESS_WORKER_RETRY",
-    PAPERLESS_WORKER_TIMEOUT + 10,
-)
+CELERY_BEAT_SCHEDULE = {
+    # Every ten minutes
+    "Check all e-mail accounts": {
+        "task": "paperless_mail.tasks.process_mail_accounts",
+        "schedule": crontab(minute="*/10"),
+    },
+    # Hourly at 5 minutes past the hour
+    "Train the classifier": {
+        "task": "documents.tasks.train_classifier",
+        "schedule": crontab(minute="5", hour="*/1"),
+    },
+    # Daily at midnight
+    "Optimize the index": {
+        "task": "documents.tasks.index_optimize",
+        "schedule": crontab(minute=0, hour=0),
+    },
+    # Weekly, Sunday at 00:30
+    "Perform sanity check": {
+        "task": "documents.tasks.sanity_check",
+        "schedule": crontab(minute=30, hour=0, day_of_week="sun"),
+    },
+}
+CELERY_BEAT_SCHEDULE_FILENAME = os.path.join(DATA_DIR, "celerybeat-schedule.db")
 
-Q_CLUSTER = {
-    "name": "paperless",
-    "guard_cycle": 5,
-    "catch_up": False,
-    "recycle": 1,
-    "retry": PAPERLESS_WORKER_RETRY,
-    "timeout": PAPERLESS_WORKER_TIMEOUT,
-    "workers": TASK_WORKERS,
-    "redis": os.getenv("PAPERLESS_REDIS", "redis://localhost:6379"),
-    "log_level": "DEBUG" if DEBUG else "INFO",
+# django setting.
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": _REDIS_URL,
+    },
 }
 
 
@@ -509,7 +551,7 @@ CONSUMER_IGNORE_PATTERNS = list(
     json.loads(
         os.getenv(
             "PAPERLESS_CONSUMER_IGNORE_PATTERNS",
-            '[".DS_STORE/*", "._*", ".stfolder/*", ".stversions/*", ".localized/*", "desktop.ini"]',
+            '[".DS_STORE/*", "._*", ".stfolder/*", ".stversions/*", ".localized/*", "desktop.ini"]',  # noqa: E501
         ),
     ),
 )
@@ -533,11 +575,9 @@ OCR_PAGES = int(os.getenv("PAPERLESS_OCR_PAGES", 0))
 OCR_LANGUAGE = os.getenv("PAPERLESS_OCR_LANGUAGE", "eng")
 
 # OCRmyPDF --output-type options are available.
-# TODO: validate this setting.
 OCR_OUTPUT_TYPE = os.getenv("PAPERLESS_OCR_OUTPUT_TYPE", "pdfa")
 
 # skip. redo, force
-# TODO: validate this.
 OCR_MODE = os.getenv("PAPERLESS_OCR_MODE", "skip")
 
 OCR_IMAGE_DPI = os.getenv("PAPERLESS_OCR_IMAGE_DPI")
@@ -590,6 +630,11 @@ POST_CONSUME_SCRIPT = os.getenv("PAPERLESS_POST_CONSUME_SCRIPT")
 DATE_ORDER = os.getenv("PAPERLESS_DATE_ORDER", "DMY")
 FILENAME_DATE_ORDER = os.getenv("PAPERLESS_FILENAME_DATE_ORDER")
 
+# Maximum number of dates taken from document start to end to show as suggestions for
+# `created` date in the frontend. Duplicates are removed, which can result in
+# fewer dates shown.
+NUMBER_OF_SUGGESTED_DATES = __get_int("PAPERLESS_NUMBER_OF_SUGGESTED_DATES", 3)
+
 # Transformations applied before filename parsing
 FILENAME_PARSE_TRANSFORMS = []
 for t in json.loads(os.getenv("PAPERLESS_FILENAME_PARSE_TRANSFORMS", "[]")):
@@ -598,7 +643,8 @@ for t in json.loads(os.getenv("PAPERLESS_FILENAME_PARSE_TRANSFORMS", "[]")):
 # Specify the filename format for out files
 FILENAME_FORMAT = os.getenv("PAPERLESS_FILENAME_FORMAT")
 
-# If this is enabled, variables in filename format will resolve to empty-string instead of 'none'.
+# If this is enabled, variables in filename format will resolve to
+# empty-string instead of 'none'.
 # Directories with 'empty names' are omitted, too.
 FILENAME_FORMAT_REMOVE_NONE = __get_boolean(
     "PAPERLESS_FILENAME_FORMAT_REMOVE_NONE",
@@ -610,16 +656,15 @@ THUMBNAIL_FONT_NAME = os.getenv(
     "/usr/share/fonts/liberation/LiberationSerif-Regular.ttf",
 )
 
-# TODO: this should not have a prefix.
 # Tika settings
-PAPERLESS_TIKA_ENABLED = __get_boolean("PAPERLESS_TIKA_ENABLED", "NO")
-PAPERLESS_TIKA_ENDPOINT = os.getenv("PAPERLESS_TIKA_ENDPOINT", "http://localhost:9998")
-PAPERLESS_TIKA_GOTENBERG_ENDPOINT = os.getenv(
+TIKA_ENABLED = __get_boolean("PAPERLESS_TIKA_ENABLED", "NO")
+TIKA_ENDPOINT = os.getenv("PAPERLESS_TIKA_ENDPOINT", "http://localhost:9998")
+TIKA_GOTENBERG_ENDPOINT = os.getenv(
     "PAPERLESS_TIKA_GOTENBERG_ENDPOINT",
     "http://localhost:3000",
 )
 
-if PAPERLESS_TIKA_ENABLED:
+if TIKA_ENABLED:
     INSTALLED_APPS.append("paperless_tika.apps.PaperlessTikaConfig")
 
 
@@ -632,8 +677,9 @@ def _parse_ignore_dates(
     user provided string(s) into dates
 
     Args:
-        env_ignore (str): The value of the environment variable, comma seperated dates
-        date_order (str, optional): The format of the date strings. Defaults to DATE_ORDER.
+        env_ignore (str): The value of the environment variable, comma separated dates
+        date_order (str, optional): The format of the date strings.
+                                    Defaults to DATE_ORDER.
 
     Returns:
         Set[datetime.datetime]: The set of parsed date objects
@@ -662,3 +708,40 @@ if os.getenv("PAPERLESS_IGNORE_DATES") is not None:
 ENABLE_UPDATE_CHECK = os.getenv("PAPERLESS_ENABLE_UPDATE_CHECK", "default")
 if ENABLE_UPDATE_CHECK != "default":
     ENABLE_UPDATE_CHECK = __get_boolean("PAPERLESS_ENABLE_UPDATE_CHECK")
+
+###############################################################################
+# Machine Learning                                                            #
+###############################################################################
+
+
+def _get_nltk_language_setting(ocr_lang: str) -> Optional[str]:
+    """
+    Maps an ISO-639-1 language code supported by Tesseract into
+    an optional NLTK language name.  This is the set of common supported
+    languages for all the NLTK data used.
+
+    Assumption: The primary language is first
+    """
+    ocr_lang = ocr_lang.split("+")[0]
+    iso_code_to_nltk = {
+        "dan": "danish",
+        "nld": "dutch",
+        "eng": "english",
+        "fin": "finnish",
+        "fra": "french",
+        "deu": "german",
+        "ita": "italian",
+        "nor": "norwegian",
+        "por": "portuguese",
+        "rus": "russian",
+        "spa": "spanish",
+        "swe": "swedish",
+        "tur": "turkish",
+    }
+
+    return iso_code_to_nltk.get(ocr_lang, None)
+
+
+NLTK_ENABLED: Final[bool] = __get_boolean("PAPERLESS_ENABLE_NLTK", "yes")
+
+NLTK_LANGUAGE: Optional[str] = _get_nltk_language_setting(OCR_LANGUAGE)

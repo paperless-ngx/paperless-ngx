@@ -19,7 +19,7 @@ Check for the following issues:
 
     .. code:: shell-session
 
-        $ python3 manage.py qcluster
+        $ celery --app paperless worker
 
 *   Look at the output of paperless and inspect it for any errors.
 *   Go to the admin interface, and check if there are failed tasks. If so, the
@@ -125,7 +125,7 @@ If using docker-compose, this is achieved by the following configuration change 
 .. code:: yaml
 
     gotenberg:
-        image: gotenberg/gotenberg:7.4
+        image: gotenberg/gotenberg:7.6
         restart: unless-stopped
 
         # The gotenberg chromium route is used to convert .eml files. We do not
@@ -305,3 +305,19 @@ try adjusting the :ref:`polling configuration <configuration-polling>`.
 
     The user will need to manually move the file out of the consume folder and
     back in, for the initial failing file to be consumed.
+
+Log reports "Creating PaperlessTask failed".
+#########################################################
+
+You might find messages like these in your log files:
+
+.. code::
+
+    [ERROR] [paperless.management.consumer] Creating PaperlessTask failed: db locked
+
+You are likely using an sqlite based installation, with an increased number of workers and are running into sqlite's concurrency limitations.
+Uploading or consuming multiple files at once results in many workers attempting to access the database simultaneously.
+
+Consider changing to the PostgreSQL database if you will be processing many documents at once often.  Otherwise,
+try tweaking the ``PAPERLESS_DB_TIMEOUT`` setting to allow more time for the database to unlock.  This may have
+minor performance implications.
