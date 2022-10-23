@@ -439,7 +439,8 @@ a.image-reference img {
 }
 
 .rst-content code.literal,
-.rst-content tt.literal {
+.rst-content tt.literal,
+html.writer-html5 .rst-content dl.footnote code {
   border-color: var(--color-border);
   background-color: var(--color-border);
   color: var(--color-text-code-inline)

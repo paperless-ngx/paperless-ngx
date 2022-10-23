@@ -12,11 +12,13 @@ from django.core import serializers
 from django.core.management.base import BaseCommand
 from django.core.management.base import CommandError
 from django.db import transaction
+from documents.models import Comment
 from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import SavedView
 from documents.models import SavedViewFilterRule
+from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import UiSettings
 from documents.settings import EXPORTER_ARCHIVE_NAME
@@ -113,8 +115,8 @@ class Command(BaseCommand):
                 map(lambda f: os.path.abspath(os.path.join(root, f)), files),
             )
 
-        # 2. Create manifest, containing all correspondents, types, tags,
-        # documents and ui_settings
+        # 2. Create manifest, containing all correspondents, types, tags, storage paths
+        # comments, documents and ui_settings
         with transaction.atomic():
             manifest = json.loads(
                 serializers.serialize("json", Correspondent.objects.all()),
@@ -124,6 +126,14 @@ class Command(BaseCommand):
 
             manifest += json.loads(
                 serializers.serialize("json", DocumentType.objects.all()),
+            )
+
+            manifest += json.loads(
+                serializers.serialize("json", StoragePath.objects.all()),
+            )
+
+            manifest += json.loads(
+                serializers.serialize("json", Comment.objects.all()),
             )
 
             documents = Document.objects.order_by("id")

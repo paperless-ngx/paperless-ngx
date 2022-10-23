@@ -1,4 +1,6 @@
+import grp
 import os
+import pwd
 import shutil
 import stat
 
@@ -32,12 +34,15 @@ def path_check(var, directory):
                 with open(test_file, "w"):
                     pass
             except PermissionError:
+                dir_stat = os.stat(directory)
+                dir_mode = stat.filemode(dir_stat.st_mode)
+                dir_owner = pwd.getpwuid(dir_stat.st_uid).pw_name
+                dir_group = grp.getgrgid(dir_stat.st_gid).gr_name
                 messages.append(
                     Error(
                         writeable_message.format(var),
                         writeable_hint.format(
-                            f"\n{stat.filemode(os.stat(directory).st_mode)} "
-                            f"{directory}\n",
+                            f"\n{dir_mode} {dir_owner} {dir_group} " f"{directory}\n",
                         ),
                     ),
                 )
@@ -96,3 +101,52 @@ def debug_mode_check(app_configs, **kwargs):
         ]
     else:
         return []
+
+
+@register()
+def settings_values_check(app_configs, **kwargs):
+    """
+    Validates at least some of the user provided settings
+    """
+
+    def _ocrmypdf_settings_check():
+        """
+        Validates some of the arguments which will be provided to ocrmypdf
+        against the valid options.  Use "ocrmypdf --help" to see the valid
+        inputs
+        """
+        msgs = []
+        if settings.OCR_OUTPUT_TYPE not in {
+            "pdfa",
+            "pdf",
+            "pdfa-1",
+            "pdfa-2",
+            "pdfa-3",
+        }:
+            msgs.append(
+                Error(f'OCR output type "{settings.OCR_OUTPUT_TYPE}" is not valid'),
+            )
+
+        if settings.OCR_MODE not in {"force", "skip", "redo", "skip_noarchive"}:
+            msgs.append(Error(f'OCR output mode "{settings.OCR_MODE}" is not valid'))
+
+        if settings.OCR_CLEAN not in {"clean", "clean-final", "none"}:
+            msgs.append(Error(f'OCR clean mode "{settings.OCR_CLEAN}" is not valid'))
+        return msgs
+
+    def _timezone_validate():
+        """
+        Validates the user provided timezone is a valid timezone
+        """
+        try:
+            import zoneinfo
+        except ImportError:  # pragma: nocover
+            import backports.zoneinfo as zoneinfo
+        msgs = []
+        if settings.TIME_ZONE not in zoneinfo.available_timezones():
+            msgs.append(
+                Error(f'Timezone "{settings.TIME_ZONE}" is not a valid timezone'),
+            )
+        return msgs
+
+    return _ocrmypdf_settings_check() + _timezone_validate()

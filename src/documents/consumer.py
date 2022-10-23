@@ -78,10 +78,16 @@ class Consumer(LoggingMixin):
             {"type": "status_update", "data": payload},
         )
 
-    def _fail(self, message, log_message=None, exc_info=None):
+    def _fail(
+        self,
+        message,
+        log_message=None,
+        exc_info=None,
+        exception: Optional[Exception] = None,
+    ):
         self._send_progress(100, 100, "FAILED", message)
         self.log("error", log_message or message, exc_info=exc_info)
-        raise ConsumerError(f"{self.filename}: {log_message or message}")
+        raise ConsumerError(f"{self.filename}: {log_message or message}") from exception
 
     def __init__(self):
         super().__init__()
@@ -105,14 +111,16 @@ class Consumer(LoggingMixin):
     def pre_check_duplicate(self):
         with open(self.path, "rb") as f:
             checksum = hashlib.md5(f.read()).hexdigest()
-        if Document.objects.filter(
+        existing_doc = Document.objects.filter(
             Q(checksum=checksum) | Q(archive_checksum=checksum),
-        ).exists():
+        )
+        if existing_doc.exists():
             if settings.CONSUMER_DELETE_DUPLICATES:
                 os.unlink(self.path)
             self._fail(
                 MESSAGE_DOCUMENT_ALREADY_EXISTS,
-                f"Not consuming {self.filename}: It is a duplicate.",
+                f"Not consuming {self.filename}: It is a duplicate of"
+                f" {existing_doc.get().title} (#{existing_doc.get().pk})",
             )
 
     def pre_check_directories(self):
@@ -134,13 +142,25 @@ class Consumer(LoggingMixin):
 
         self.log("info", f"Executing pre-consume script {settings.PRE_CONSUME_SCRIPT}")
 
+        filepath_arg = os.path.normpath(self.path)
+
+        script_env = os.environ.copy()
+        script_env["DOCUMENT_SOURCE_PATH"] = filepath_arg
+
         try:
-            Popen((settings.PRE_CONSUME_SCRIPT, self.path)).wait()
+            Popen(
+                (
+                    settings.PRE_CONSUME_SCRIPT,
+                    filepath_arg,
+                ),
+                env=script_env,
+            ).wait()
         except Exception as e:
             self._fail(
                 MESSAGE_PRE_CONSUME_SCRIPT_ERROR,
                 f"Error while executing pre-consume script: {e}",
                 exc_info=True,
+                exception=e,
             )
 
     def run_post_consume_script(self, document):
@@ -159,6 +179,34 @@ class Consumer(LoggingMixin):
             f"Executing post-consume script {settings.POST_CONSUME_SCRIPT}",
         )
 
+        script_env = os.environ.copy()
+
+        script_env["DOCUMENT_ID"] = str(document.pk)
+        script_env["DOCUMENT_CREATED"] = str(document.created)
+        script_env["DOCUMENT_MODIFIED"] = str(document.modified)
+        script_env["DOCUMENT_ADDED"] = str(document.added)
+        script_env["DOCUMENT_FILE_NAME"] = document.get_public_filename()
+        script_env["DOCUMENT_SOURCE_PATH"] = os.path.normpath(document.source_path)
+        script_env["DOCUMENT_ARCHIVE_PATH"] = os.path.normpath(
+            str(document.archive_path),
+        )
+        script_env["DOCUMENT_THUMBNAIL_PATH"] = os.path.normpath(
+            document.thumbnail_path,
+        )
+        script_env["DOCUMENT_DOWNLOAD_URL"] = reverse(
+            "document-download",
+            kwargs={"pk": document.pk},
+        )
+        script_env["DOCUMENT_THUMBNAIL_URL"] = reverse(
+            "document-thumb",
+            kwargs={"pk": document.pk},
+        )
+        script_env["DOCUMENT_CORRESPONDENT"] = str(document.correspondent)
+        script_env["DOCUMENT_TAGS"] = str(
+            ",".join(document.tags.all().values_list("name", flat=True)),
+        )
+        script_env["DOCUMENT_ORIGINAL_FILENAME"] = str(document.original_filename)
+
         try:
             Popen(
                 (
@@ -172,12 +220,14 @@ class Consumer(LoggingMixin):
                     str(document.correspondent),
                     str(",".join(document.tags.all().values_list("name", flat=True))),
                 ),
+                env=script_env,
             ).wait()
         except Exception as e:
             self._fail(
                 MESSAGE_POST_CONSUME_SCRIPT_ERROR,
                 f"Error while executing post-consume script: {e}",
                 exc_info=True,
+                exception=e,
             )
 
     def try_consume_file(
@@ -292,6 +342,7 @@ class Consumer(LoggingMixin):
                 str(e),
                 f"Error while consuming document {self.filename}: {e}",
                 exc_info=True,
+                exception=e,
             )
 
         # Prepare the document classifier.
@@ -376,6 +427,7 @@ class Consumer(LoggingMixin):
                 f"The following error occurred while consuming "
                 f"{self.filename}: {e}",
                 exc_info=True,
+                exception=e,
             )
         finally:
             document_parser.cleanup()
@@ -426,6 +478,7 @@ class Consumer(LoggingMixin):
                 created=create_date,
                 modified=create_date,
                 storage_type=storage_type,
+                original_filename=self.filename,
             )
 
         self.apply_overrides(document)

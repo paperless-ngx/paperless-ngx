@@ -1,7 +1,9 @@
 import datetime
+from unittest import mock
 from unittest import TestCase
 
 from paperless.settings import _parse_ignore_dates
+from paperless.settings import default_threads_per_worker
 
 
 class TestIgnoreDateParsing(TestCase):
@@ -56,3 +58,27 @@ class TestIgnoreDateParsing(TestCase):
         ]
 
         self._parse_checker(test_cases)
+
+    def test_workers_threads(self):
+        """
+        GIVEN:
+            - Certain CPU counts
+        WHEN:
+            - Threads per worker is calculated
+        THEN:
+            - Threads per worker less than or equal to CPU count
+            - At least 1 thread per worker
+        """
+        default_workers = 1
+
+        for i in range(1, 64):
+            with mock.patch(
+                "paperless.settings.multiprocessing.cpu_count",
+            ) as cpu_count:
+                cpu_count.return_value = i
+
+                default_threads = default_threads_per_worker(default_workers)
+
+                self.assertGreaterEqual(default_threads, 1)
+
+                self.assertLessEqual(default_workers * default_threads, i)

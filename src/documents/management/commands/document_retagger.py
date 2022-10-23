@@ -7,6 +7,7 @@ from documents.models import Document
 
 from ...signals.handlers import set_correspondent
 from ...signals.handlers import set_document_type
+from ...signals.handlers import set_storage_path
 from ...signals.handlers import set_tags
 
 
@@ -29,6 +30,7 @@ class Command(BaseCommand):
         parser.add_argument("-c", "--correspondent", default=False, action="store_true")
         parser.add_argument("-T", "--tags", default=False, action="store_true")
         parser.add_argument("-t", "--document_type", default=False, action="store_true")
+        parser.add_argument("-s", "--storage_path", default=False, action="store_true")
         parser.add_argument("-i", "--inbox-only", default=False, action="store_true")
         parser.add_argument(
             "--use-first",
@@ -108,6 +110,17 @@ class Command(BaseCommand):
                     document=document,
                     classifier=classifier,
                     replace=options["overwrite"],
+                    suggest=options["suggest"],
+                    base_url=options["base_url"],
+                    color=color,
+                )
+            if options["storage_path"]:
+                set_storage_path(
+                    sender=None,
+                    document=document,
+                    classifier=classifier,
+                    replace=options["overwrite"],
+                    use_first=options["use_first"],
                     suggest=options["suggest"],
                     base_url=options["base_url"],
                     color=color,

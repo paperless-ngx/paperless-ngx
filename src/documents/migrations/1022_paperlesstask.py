@@ -4,28 +4,9 @@ from django.db import migrations, models
 import django.db.models.deletion
 
 
-def init_paperless_tasks(apps, schema_editor):
-    PaperlessTask = apps.get_model("documents", "PaperlessTask")
-    Task = apps.get_model("django_q", "Task")
-
-    for task in Task.objects.filter(func="documents.tasks.consume_file"):
-        if not hasattr(task, "paperlesstask"):
-            paperlesstask = PaperlessTask.objects.create(
-                attempted_task=task,
-                task_id=task.id,
-                name=task.name,
-                created=task.started,
-                started=task.started,
-                acknowledged=True,
-            )
-            task.paperlesstask = paperlesstask
-            task.save()
-
-
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("django_q", "0014_schedule_cluster"),
         ("documents", "1021_webp_thumbnail_conversion"),
     ]
 
@@ -60,10 +41,12 @@ class Migration(migrations.Migration):
                         null=True,
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="attempted_task",
-                        to="django_q.task",
+                        # This is a dummy field, 1026 will fix up the column
+                        # This manual change is required, as django doesn't django doesn't really support
+                        # removing an app which has migration deps like this
+                        to="documents.document",
                     ),
                 ),
             ],
-        ),
-        migrations.RunPython(init_paperless_tasks, migrations.RunPython.noop),
+        )
     ]

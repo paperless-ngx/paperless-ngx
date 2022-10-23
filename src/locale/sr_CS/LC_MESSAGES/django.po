@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-07-08 14:11-0700\n"
-"PO-Revision-Date: 2022-07-08 22:07\n"
+"PO-Revision-Date: 2022-08-04 23:55\n"
 "Last-Translator: \n"
 "Language-Team: Serbian (Latin)\n"
 "Language: sr_CS\n"
@@ -60,15 +60,15 @@ msgstr "algoritam podudaranja"
 
 #: documents/models.py:47
 msgid "is insensitive"
-msgstr ""
+msgstr "bez razlike veliko/malo slovo"
 
 #: documents/models.py:60 documents/models.py:115
 msgid "correspondent"
-msgstr "dopisnik"
+msgstr "korespodent"
 
 #: documents/models.py:61
 msgid "correspondents"
-msgstr "dopisnici"
+msgstr "korespodenti"
 
 #: documents/models.py:66
 msgid "color"
@@ -80,7 +80,7 @@ msgstr "je oznaka prijemnog sandučeta"
 
 #: documents/models.py:72
 msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
-msgstr ""
+msgstr "Označava ovu oznaku kao oznaku prijemnog sandučeta (inbox): Svi novoobrađeni dokumenti će biti označeni oznakama prijemnog sandučeta (inbox)."
 
 #: documents/models.py:78
 msgid "tag"
@@ -100,23 +100,23 @@ msgstr "tipovi dokumenta"
 
 #: documents/models.py:90
 msgid "path"
-msgstr ""
+msgstr "putanja"
 
 #: documents/models.py:96 documents/models.py:124
 msgid "storage path"
-msgstr ""
+msgstr "putanja skladišta"
 
 #: documents/models.py:97
 msgid "storage paths"
-msgstr ""
+msgstr "putanja skladišta"
 
 #: documents/models.py:105
 msgid "Unencrypted"
-msgstr ""
+msgstr "Nešifrovano"
 
 #: documents/models.py:106
 msgid "Encrypted with GNU Privacy Guard"
-msgstr ""
+msgstr "Šifrovano pomoću GNU Privacy Guard"
 
 #: documents/models.py:127
 msgid "title"
@@ -128,7 +128,7 @@ msgstr "sadržaj"
 
 #: documents/models.py:142
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
-msgstr ""
+msgstr "Neobrađeni tekstualni podaci dokumenta. Ovo se polje koristi prvenstveno za pretraživanje."
 
 #: documents/models.py:147
 msgid "mime type"
@@ -172,7 +172,7 @@ msgstr "naziv fajla"
 
 #: documents/models.py:204
 msgid "Current filename in storage"
-msgstr ""
+msgstr "Trenutni naziv sačuvane datoteke"
 
 #: documents/models.py:208
 msgid "archive filename"
@@ -180,7 +180,7 @@ msgstr "naziv fajla arhive"
 
 #: documents/models.py:214
 msgid "Current archive filename in storage"
-msgstr ""
+msgstr "Trenutni naziv arhivirane sačuvane datoteke"
 
 #: documents/models.py:218
 msgid "archive serial number"
@@ -188,7 +188,7 @@ msgstr "arhivski serijski broj"
 
 #: documents/models.py:224
 msgid "The position of this document in your physical document archive."
-msgstr ""
+msgstr "Položaj ovog dokumenta u vašoj fizičkoj arhivi dokumenata."
 
 #: documents/models.py:230
 msgid "document"
@@ -264,7 +264,7 @@ msgstr "polje za sortiranje"
 
 #: documents/models.py:369
 msgid "sort reverse"
-msgstr ""
+msgstr "obrnuto sortiranje"
 
 #: documents/models.py:374
 msgid "title contains"
@@ -280,7 +280,7 @@ msgstr "ASN je"
 
 #: documents/models.py:377
 msgid "correspondent is"
-msgstr "dopisnik je"
+msgstr "korespodent je"
 
 #: documents/models.py:378
 msgid "document type is"
@@ -348,7 +348,7 @@ msgstr "naslov i sadržaj sadrži"
 
 #: documents/models.py:394
 msgid "fulltext query"
-msgstr ""
+msgstr "upit za ceo tekst"
 
 #: documents/models.py:395
 msgid "more like this"
@@ -376,12 +376,12 @@ msgstr "filter pravila"
 
 #: documents/models.py:521
 msgid "started"
-msgstr ""
+msgstr "pokrenuto"
 
 #: documents/serialisers.py:70
 #, python-format
 msgid "Invalid regular expression: %(error)s"
-msgstr ""
+msgstr "Nevažeći regularni izraz: %(error)s"
 
 #: documents/serialisers.py:191
 msgid "Invalid color."
@@ -390,11 +390,11 @@ msgstr "Nevažeća boja."
 #: documents/serialisers.py:515
 #, python-format
 msgid "File type %(type)s not supported"
-msgstr ""
+msgstr "Vrsta datoteke %(type)s nije podržana"
 
 #: documents/serialisers.py:596
 msgid "Invalid variable detected."
-msgstr ""
+msgstr "Otkrivena je nevažeća promenljiva."
 
 #: documents/templates/index.html:78
 msgid "Paperless-ngx is loading..."
@@ -402,19 +402,19 @@ msgstr "Paperless-ngx se učitava..."
 
 #: documents/templates/index.html:79
 msgid "Still here?! Hmm, something might be wrong."
-msgstr ""
+msgstr "Još uvek si ovde?! Hmm, možda nešto nije u redu."
 
 #: documents/templates/index.html:79
 msgid "Here's a link to the docs."
-msgstr ""
+msgstr "Veze ka dokumentima."
 
 #: documents/templates/registration/logged_out.html:14
 msgid "Paperless-ngx signed out"
-msgstr ""
+msgstr "Paperless-ngx odjavljen"
 
 #: documents/templates/registration/logged_out.html:59
 msgid "You have been successfully logged out. Bye!"
-msgstr ""
+msgstr "Uspešno ste se odjavili!"
 
 #: documents/templates/registration/logged_out.html:60
 msgid "Sign in again"
@@ -422,7 +422,7 @@ msgstr "Prijavitе sе ponovo"
 
 #: documents/templates/registration/login.html:15
 msgid "Paperless-ngx sign in"
-msgstr ""
+msgstr "Paperless-ngx prijava"
 
 #: documents/templates/registration/login.html:61
 msgid "Please sign in."
@@ -430,7 +430,7 @@ msgstr "Prijavite se."
 
 #: documents/templates/registration/login.html:64
 msgid "Your username and password didn't match. Please try again."
-msgstr ""
+msgstr "Vaše korisničko ime i lozinka ne odgovaraju. Molimo pokušajte ponovo."
 
 #: documents/templates/registration/login.html:67
 msgid "Username"
@@ -450,7 +450,7 @@ msgstr "Engleski (US)"
 
 #: paperless/settings.py:340
 msgid "Belarusian"
-msgstr ""
+msgstr "Beloruski"
 
 #: paperless/settings.py:341
 msgid "Czech"
@@ -510,11 +510,11 @@ msgstr "Ruski"
 
 #: paperless/settings.py:355
 msgid "Slovenian"
-msgstr ""
+msgstr "Slovenački"
 
 #: paperless/settings.py:356
 msgid "Serbian"
-msgstr ""
+msgstr "Srpski"
 
 #: paperless/settings.py:357
 msgid "Swedish"
@@ -522,11 +522,11 @@ msgstr "Švedski"
 
 #: paperless/settings.py:358
 msgid "Turkish"
-msgstr ""
+msgstr "Turski"
 
 #: paperless/settings.py:359
 msgid "Chinese Simplified"
-msgstr ""
+msgstr "Kineski pojednostavljen"
 
 #: paperless/urls.py:161
 msgid "Paperless-ngx administration"
@@ -534,7 +534,7 @@ msgstr "Paperless-ngx administracija"
 
 #: paperless_mail/admin.py:29
 msgid "Authentication"
-msgstr ""
+msgstr "Autentifikacija"
 
 #: paperless_mail/admin.py:30
 msgid "Advanced settings"
@@ -546,7 +546,7 @@ msgstr "Filter"
 
 #: paperless_mail/admin.py:50
 msgid "Paperless will only process mails that match ALL of the filters given below."
-msgstr ""
+msgstr "Paperless-ngx će obrađivati samo e-poštu koja odgovara SVIM filterima navedenim u nastavku."
 
 #: paperless_mail/admin.py:64
 msgid "Actions"
@@ -554,7 +554,7 @@ msgstr "Radnje"
 
 #: paperless_mail/admin.py:67
 msgid "The action applied to the mail. This action is only performed when documents were consumed from the mail. Mails without attachments will remain entirely untouched."
-msgstr ""
+msgstr "Akcija se odnosi na e-poštu. Ova se radnja izvodi samo ako su dokumenti konzumirani iz e-pošte. E-pošta bez priloga ostat će u potpunosti netaknuta."
 
 #: paperless_mail/admin.py:75
 msgid "Metadata"
@@ -562,7 +562,7 @@ msgstr "Metapodaci"
 
 #: paperless_mail/admin.py:78
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
-msgstr ""
+msgstr "Automatski dodelite metapodatke dokumentima koji se koriste iz ovog pravila. Ako ne dodelite oznaku, vrstu ili korespodenta, Paperless-ngx će i dalje obraditi sva pravila podudaranja koja ste definisali."
 
 #: paperless_mail/apps.py:8
 msgid "Paperless mail"
@@ -578,7 +578,7 @@ msgstr "mejl nalozi"
 
 #: paperless_mail/models.py:12
 msgid "No encryption"
-msgstr ""
+msgstr "Nema enkripcije"
 
 #: paperless_mail/models.py:13
 msgid "Use SSL"
@@ -598,7 +598,7 @@ msgstr "IMAP port"
 
 #: paperless_mail/models.py:25
 msgid "This is usually 143 for unencrypted and STARTTLS connections, and 993 for SSL connections."
-msgstr ""
+msgstr "Uobičajno 143 za nešifrovane i STARTTLS veze, a 993 za SSL veze."
 
 #: paperless_mail/models.py:31
 msgid "IMAP security"
@@ -618,23 +618,23 @@ msgstr "karakter set"
 
 #: paperless_mail/models.py:45
 msgid "The character set to use when communicating with the mail server, such as 'UTF-8' or 'US-ASCII'."
-msgstr ""
+msgstr "Skup znakova koji se koristi pri komunikaciji sa mejl serverom, poput 'UTF-8' ili 'US-ASCII'."
 
 #: paperless_mail/models.py:56
 msgid "mail rule"
-msgstr ""
+msgstr "pravilo e-pošte"
 
 #: paperless_mail/models.py:57
 msgid "mail rules"
-msgstr ""
+msgstr "pravila e-pošte"
 
 #: paperless_mail/models.py:60
 msgid "Only process attachments."
-msgstr ""
+msgstr "Obradi samo priloge."
 
 #: paperless_mail/models.py:61
 msgid "Process all files, including 'inline' attachments."
-msgstr ""
+msgstr "Obradite sve datoteke, uključujući \"umetnute\" priloge."
 
 #: paperless_mail/models.py:64
 msgid "Delete"
@@ -642,31 +642,31 @@ msgstr "Obriši"
 
 #: paperless_mail/models.py:65
 msgid "Move to specified folder"
-msgstr ""
+msgstr "Premesti u određen folder"
 
 #: paperless_mail/models.py:66
 msgid "Mark as read, don't process read mails"
-msgstr ""
+msgstr "Označi kao pročitano. Ne obrađuj pročitanu e-poštu"
 
 #: paperless_mail/models.py:67
 msgid "Flag the mail, don't process flagged mails"
-msgstr ""
+msgstr "Označi poštu zastavicom. Ne obrađuj e-poštu sa zastavicom"
 
 #: paperless_mail/models.py:68
 msgid "Tag the mail with specified tag, don't process tagged mails"
-msgstr ""
+msgstr "Označite poštu specifičnom oznakom. Ne obrađuj e-poštu s specifičnom oznakom"
 
 #: paperless_mail/models.py:71
 msgid "Use subject as title"
-msgstr ""
+msgstr "Koristi predmet kao naziv"
 
 #: paperless_mail/models.py:72
 msgid "Use attachment filename as title"
-msgstr ""
+msgstr "Koristi naziv datoteke priloga kao naziv"
 
 #: paperless_mail/models.py:75
 msgid "Do not assign a correspondent"
-msgstr "Ne dodeljuj dopisnika"
+msgstr "Ne dodeljuj korespodenta"
 
 #: paperless_mail/models.py:76
 msgid "Use mail address"
@@ -678,7 +678,7 @@ msgstr "Koristi naziv (ili mejl adresu ako nije dostupno)"
 
 #: paperless_mail/models.py:78
 msgid "Use correspondent selected below"
-msgstr "Koristi dopisnika ispod"
+msgstr "Koristi koreespodenta ispod"
 
 #: paperless_mail/models.py:82
 msgid "order"
@@ -694,7 +694,7 @@ msgstr "folder"
 
 #: paperless_mail/models.py:96
 msgid "Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server."
-msgstr ""
+msgstr "Podfolderi moraju biti odvojeni separatorom, često tačkom ('.') ili kosom crtom ('/'), ali to se razlikuje zavisno od servera e-pošte."
 
 #: paperless_mail/models.py:102
 msgid "filter from"
@@ -714,15 +714,15 @@ msgstr "filter naziv fajla priloga"
 
 #: paperless_mail/models.py:126
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr ""
+msgstr "Konzumirajte samo dokumente koji u potpunosti odgovaraju ovom nazivu datoteke ako je navedeno. Dopušteni su zamenski znakovi kao što su *.pdf ili *faktura*. Neosetljivo je na mala i mala slova."
 
 #: paperless_mail/models.py:133
 msgid "maximum age"
-msgstr ""
+msgstr "maksimalna starost"
 
 #: paperless_mail/models.py:135
 msgid "Specified in days."
-msgstr ""
+msgstr "Navedeno u danima."
 
 #: paperless_mail/models.py:139
 msgid "attachment type"
@@ -730,7 +730,7 @@ msgstr "tip priloga"
 
 #: paperless_mail/models.py:143
 msgid "Inline attachments include embedded images, so it's best to combine this option with a filename filter."
-msgstr ""
+msgstr "Ugrađeni prilozi uključuju ugrađene slike, pa je najbolje kombinovati ovu opciju s filterom naziva datoteke."
 
 #: paperless_mail/models.py:149
 msgid "action"
@@ -738,11 +738,11 @@ msgstr "radnja"
 
 #: paperless_mail/models.py:155
 msgid "action parameter"
-msgstr ""
+msgstr "parametar akcije"
 
 #: paperless_mail/models.py:160
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
-msgstr ""
+msgstr "Dodatni parametar za gore odabranu akciju, tj. ciljani folder za premeštanje u folder akcije. Podfolderi moraju biti odvojeni tačkama."
 
 #: paperless_mail/models.py:168
 msgid "assign title from"
@@ -758,9 +758,9 @@ msgstr "dodeli ovaj tip dokumenta"
 
 #: paperless_mail/models.py:188
 msgid "assign correspondent from"
-msgstr "dodeli dopisnika iz"
+msgstr "dodeli korespodenta iz"
 
 #: paperless_mail/models.py:198
 msgid "assign this correspondent"
-msgstr "dodeli ovog dopisnika"
+msgstr "dodeli ovog korspodenta"
 

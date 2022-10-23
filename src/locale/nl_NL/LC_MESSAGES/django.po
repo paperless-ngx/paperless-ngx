@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-07-08 14:11-0700\n"
-"PO-Revision-Date: 2022-07-08 22:07\n"
+"PO-Revision-Date: 2022-08-26 20:54\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
@@ -100,15 +100,15 @@ msgstr "documenttypen"
 
 #: documents/models.py:90
 msgid "path"
-msgstr ""
+msgstr "pad"
 
 #: documents/models.py:96 documents/models.py:124
 msgid "storage path"
-msgstr ""
+msgstr "opslag pad"
 
 #: documents/models.py:97
 msgid "storage paths"
-msgstr ""
+msgstr "opslag paden"
 
 #: documents/models.py:105
 msgid "Unencrypted"
@@ -376,7 +376,7 @@ msgstr "filterregels"
 
 #: documents/models.py:521
 msgid "started"
-msgstr ""
+msgstr "gestart"
 
 #: documents/serialisers.py:70
 #, python-format
@@ -394,7 +394,7 @@ msgstr "Bestandstype %(type)s niet ondersteund"
 
 #: documents/serialisers.py:596
 msgid "Invalid variable detected."
-msgstr ""
+msgstr "Ongeldige variabele ontdekt."
 
 #: documents/templates/index.html:78
 msgid "Paperless-ngx is loading..."
@@ -402,7 +402,7 @@ msgstr "Paperless-ngx is aan het laden..."
 
 #: documents/templates/index.html:79
 msgid "Still here?! Hmm, something might be wrong."
-msgstr ""
+msgstr "Nog steeds hier?! Hmm, er kan iets mis zijn."
 
 #: documents/templates/index.html:79
 msgid "Here's a link to the docs."
@@ -450,7 +450,7 @@ msgstr "Engels (US)"
 
 #: paperless/settings.py:340
 msgid "Belarusian"
-msgstr ""
+msgstr "Wit-Russisch"
 
 #: paperless/settings.py:341
 msgid "Czech"
@@ -510,11 +510,11 @@ msgstr "Russisch"
 
 #: paperless/settings.py:355
 msgid "Slovenian"
-msgstr ""
+msgstr "Sloveens"
 
 #: paperless/settings.py:356
 msgid "Serbian"
-msgstr ""
+msgstr "Servisch"
 
 #: paperless/settings.py:357
 msgid "Swedish"
@@ -522,11 +522,11 @@ msgstr "Zweeds"
 
 #: paperless/settings.py:358
 msgid "Turkish"
-msgstr ""
+msgstr "Turks"
 
 #: paperless/settings.py:359
 msgid "Chinese Simplified"
-msgstr ""
+msgstr "Chinees (vereenvoudigd)"
 
 #: paperless/urls.py:161
 msgid "Paperless-ngx administration"
@@ -654,7 +654,7 @@ msgstr "Markeer de mail, verwerk geen mails met markering"
 
 #: paperless_mail/models.py:68
 msgid "Tag the mail with specified tag, don't process tagged mails"
-msgstr ""
+msgstr "Tag de mail met de opgegeven tag, verwerk geen getagde mails"
 
 #: paperless_mail/models.py:71
 msgid "Use subject as title"
@@ -694,7 +694,7 @@ msgstr "map"
 
 #: paperless_mail/models.py:96
 msgid "Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server."
-msgstr ""
+msgstr "Submappen moeten gescheiden worden door een scheidingsteken, vaak een punt ('.') of slash ('/'), maar het varieert per mailserver."
 
 #: paperless_mail/models.py:102
 msgid "filter from"

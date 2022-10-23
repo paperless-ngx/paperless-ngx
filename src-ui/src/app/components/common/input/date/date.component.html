@@ -12,4 +12,10 @@
   </div>
   <div class="invalid-feedback" i18n>Invalid date.</div>
   <small *ngIf="hint" class="form-text text-muted">{{hint}}</small>
+  <small *ngIf="getSuggestions().length > 0">
+    <span i18n>Suggestions:</span>&nbsp;
+    <ng-container *ngFor="let s of getSuggestions()">
+      <a (click)="onSuggestionClick(s)" [routerLink]="[]">{{s}}</a>&nbsp;
+    </ng-container>
+  </small>
 </div>
