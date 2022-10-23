@@ -191,7 +191,7 @@ class MailDocumentParser(DocumentParser):
         return pdf_path
 
     @staticmethod
-    def mail_to_html(mail):
+    def mail_to_html(mail) -> StringIO:
         data = {}
 
         def clean_html(text: str):

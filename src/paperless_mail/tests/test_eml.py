@@ -303,6 +303,52 @@ class TestParser(TestCase):
             f"PDF looks different. Check if {converted} looks weird.",
         )
 
+    def test_mail_to_html(self):
+        parser = MailDocumentParser(None)
+        mail = parser.get_parsed(os.path.join(self.SAMPLE_FILES, "html.eml"))
+        html_handle = parser.mail_to_html(mail)
+
+        with open(
+            os.path.join(self.SAMPLE_FILES, "html.eml.html"),
+        ) as html_expected_handle:
+            self.assertHTMLEqual(html_expected_handle.read(), html_handle.read())
+
+    @mock.patch("documents.loggers.LoggingMixin.log")  # Disable log output
+    def test_generate_pdf_from_mail(self, m):
+        parser = MailDocumentParser(None)
+        mail = parser.get_parsed(os.path.join(self.SAMPLE_FILES, "html.eml"))
+
+        pdf_path = os.path.join(parser.tempdir, "test_generate_pdf_from_mail.pdf")
+
+        with open(pdf_path, "wb") as file:
+            file.write(parser.generate_pdf_from_mail(mail))
+            file.close()
+
+        converted = os.path.join(parser.tempdir, "test_generate_pdf_from_mail.webp")
+        run_convert(
+            density=300,
+            scale="500x5000>",
+            alpha="remove",
+            strip=True,
+            trim=False,
+            auto_orient=True,
+            input_file=f"{pdf_path}",  # Do net define an index to convert all pages.
+            output_file=converted,
+            logging_group=None,
+        )
+        self.assertTrue(os.path.isfile(converted))
+        thumb_hash = self.hashfile(converted)
+
+        # The created pdf is not reproducible. But the converted image should always look the same.
+        expected_hash = (
+            "635bda532707faf69f06b040660445b656abcc7d622cc29c24a5c7fd2c713c5f"
+        )
+        self.assertEqual(
+            thumb_hash,
+            expected_hash,
+            f"PDF looks different. Check if {converted} looks weird.",
+        )
+
     def test_transform_inline_html(self):
         class MailAttachmentMock:
             def __init__(self, payload, content_id):
