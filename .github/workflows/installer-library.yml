@@ -37,6 +37,12 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       -
+        name: Set ghcr repository name
+        id: set-ghcr-repository
+        run: |
+          ghcr_name=$(echo "${GITHUB_REPOSITORY}" | awk '{ print tolower($0) }')
+          echo "repository=${ghcr_name}" >> $GITHUB_OUTPUT
+      -
         name: Checkout
         uses: actions/checkout@v3
       -
@@ -52,7 +58,7 @@ jobs:
 
           echo ${build_json}
 
-          echo ::set-output name=qpdf-json::${build_json}
+          echo "qpdf-json=${build_json}" >> $GITHUB_OUTPUT
       -
         name: Setup psycopg2 image
         id: psycopg2-setup
@@ -61,7 +67,7 @@ jobs:
 
           echo ${build_json}
 
-          echo ::set-output name=psycopg2-json::${build_json}
+          echo "psycopg2-json=${build_json}" >> $GITHUB_OUTPUT
       -
         name: Setup pikepdf image
         id: pikepdf-setup
@@ -70,7 +76,7 @@ jobs:
 
           echo ${build_json}
 
-          echo ::set-output name=pikepdf-json::${build_json}
+          echo "pikepdf-json=${build_json}" >> $GITHUB_OUTPUT
       -
         name: Setup jbig2enc image
         id: jbig2enc-setup
@@ -79,9 +85,11 @@ jobs:
 
           echo ${build_json}
 
-          echo ::set-output name=jbig2enc-json::${build_json}
+          echo "jbig2enc-json=${build_json}" >> $GITHUB_OUTPUT
 
     outputs:
+
+      ghcr-repository: ${{ steps.set-ghcr-repository.outputs.repository }}
 
       qpdf-json: ${{ steps.qpdf-setup.outputs.qpdf-json }}
 
@@ -134,6 +142,6 @@ jobs:
       dockerfile: ./docker-builders/Dockerfile.pikepdf
       build-json: ${{ needs.prepare-docker-build.outputs.pikepdf-json }}
       build-args: |
-        REPO=${{ github.repository }}
+        REPO=${{ needs.prepare-docker-build.outputs.ghcr-repository }}
         QPDF_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.qpdf-json).version }}
         PIKEPDF_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.pikepdf-json).version }}

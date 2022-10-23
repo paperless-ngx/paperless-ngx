@@ -3,6 +3,7 @@ import logging
 import os
 import shutil
 from contextlib import contextmanager
+from pathlib import Path
 
 import tqdm
 from django.conf import settings
@@ -14,6 +15,7 @@ from django.core.serializers.base import DeserializationError
 from django.db.models.signals import m2m_changed
 from django.db.models.signals import post_save
 from documents.models import Document
+from documents.parsers import run_convert
 from documents.settings import EXPORTER_ARCHIVE_NAME
 from documents.settings import EXPORTER_FILE_NAME
 from documents.settings import EXPORTER_THUMBNAIL_NAME
@@ -192,7 +194,7 @@ class Command(BaseCommand):
             document_path = os.path.join(self.source, doc_file)
 
             thumb_file = record[EXPORTER_THUMBNAIL_NAME]
-            thumbnail_path = os.path.join(self.source, thumb_file)
+            thumbnail_path = Path(os.path.join(self.source, thumb_file)).resolve()
 
             if EXPORTER_ARCHIVE_NAME in record:
                 archive_file = record[EXPORTER_ARCHIVE_NAME]
@@ -209,7 +211,20 @@ class Command(BaseCommand):
                 create_source_path_directory(document.source_path)
 
                 shutil.copy2(document_path, document.source_path)
-                shutil.copy2(thumbnail_path, document.thumbnail_path)
+
+                if thumbnail_path.suffix in {".png", ".PNG"}:
+                    run_convert(
+                        density=300,
+                        scale="500x5000>",
+                        alpha="remove",
+                        strip=True,
+                        trim=False,
+                        auto_orient=True,
+                        input_file=f"{thumbnail_path}[0]",
+                        output_file=str(document.thumbnail_path),
+                    )
+                else:
+                    shutil.copy2(thumbnail_path, document.thumbnail_path)
                 if archive_path:
                     create_source_path_directory(document.archive_path)
                     # TODO: this assumes that the export is valid and

@@ -27,11 +27,23 @@ PAPERLESS_REDIS=<url>
     This is required for processing scheduled tasks such as email fetching, index
     optimization and for training the automatic document matcher.
 
+    * If your Redis server needs login credentials PAPERLESS_REDIS = ``redis://<username>:<password>@<host>:<port>``
+
+    * With the requirepass option PAPERLESS_REDIS = ``redis://:<password>@<host>:<port>``
+
+    `More information on securing your Redis Instance <https://redis.io/docs/getting-started/#securing-redis>`_.
+
     Defaults to redis://localhost:6379.
+
+PAPERLESS_DBENGINE=<engine_name>
+    Optional, gives the ability to choose Postgres or MariaDB for database engine.
+    Available options are `postgresql` and `mariadb`.
+    Default is `postgresql`.
 
 PAPERLESS_DBHOST=<hostname>
     By default, sqlite is used as the database backend. This can be changed here.
-    Set PAPERLESS_DBHOST and PostgreSQL will be used instead of mysql.
+
+    Set PAPERLESS_DBHOST and another database will be used instead of sqlite.
 
 PAPERLESS_DBPORT=<port>
     Adjust port if necessary.
@@ -39,17 +51,17 @@ PAPERLESS_DBPORT=<port>
     Default is 5432.
 
 PAPERLESS_DBNAME=<name>
-    Database name in PostgreSQL.
+    Database name in PostgreSQL or MariaDB.
 
     Defaults to "paperless".
 
 PAPERLESS_DBUSER=<name>
-    Database user in PostgreSQL.
+    Database user in PostgreSQL or MariaDB.
 
     Defaults to "paperless".
 
 PAPERLESS_DBPASS=<password>
-    Database password for PostgreSQL.
+    Database password for PostgreSQL or MariaDB.
 
     Defaults to "paperless".
 
@@ -59,6 +71,13 @@ PAPERLESS_DBSSLMODE=<mode>
     See `the official documentation about sslmode <https://www.postgresql.org/docs/current/libpq-ssl.html>`_.
 
     Default is ``prefer``.
+
+PAPERLESS_DB_TIMEOUT=<float>
+    Amount of time for a database connection to wait for the database to unlock.
+    Mostly applicable for an sqlite based installation, consider changing to postgresql
+    if you need to increase this.
+
+    Defaults to unset, keeping the Django defaults.
 
 Paths and folders
 #################
@@ -202,8 +221,15 @@ PAPERLESS_FORCE_SCRIPT_NAME=<path>
 PAPERLESS_STATIC_URL=<path>
     Override the STATIC_URL here.  Unless you're hosting Paperless off a
     subdomain like /paperless/, you probably don't need to change this.
+    If you do change it, be sure to include the trailing slash.
 
     Defaults to "/static/".
+
+    .. note::
+
+        When hosting paperless behind a reverse proxy like Traefik or Nginx at a subpath e.g.
+        example.com/paperlessngx you will also need to set ``PAPERLESS_FORCE_SCRIPT_NAME``
+        (see above).
 
 PAPERLESS_AUTO_LOGIN_USERNAME=<username>
     Specify a username here so that paperless will automatically perform login
@@ -512,7 +538,7 @@ requires are as follows:
         # ...
 
         gotenberg:
-            image: gotenberg/gotenberg:7.4
+            image: gotenberg/gotenberg:7.6
             restart: unless-stopped
 
             # The gotenberg chromium route is used to convert .eml files. We do not
@@ -539,6 +565,8 @@ PAPERLESS_TASK_WORKERS=<num>
     Paperless does multiple things in the background: Maintain the search index,
     maintain the automatic matching algorithm, check emails, consume documents,
     etc. This variable specifies how many things it will do in parallel.
+
+    Defaults to 1
 
 
 PAPERLESS_THREADS_PER_WORKER=<num>
@@ -736,6 +764,19 @@ PAPERLESS_FILENAME_DATE_ORDER=<format>
 
     Defaults to none, which disables this feature.
 
+PAPERLESS_NUMBER_OF_SUGGESTED_DATES=<num>
+    Paperless searches an entire document for dates. The first date found will
+    be used as the initial value for the created date. When this variable is
+    greater than 0 (or left to it's default value), paperless will also suggest
+    other dates found in the document, up to a maximum of this setting. Note that
+    duplicates will be removed, which can result in fewer dates displayed in the
+    frontend than this setting value.
+
+    The task to find all dates can be time-consuming and increases with a higher
+    (maximum) number of suggested dates and slower hardware.
+
+    Defaults to 3. Set to 0 to disable this feature.
+
 PAPERLESS_THUMBNAIL_FONT_NAME=<filename>
     Paperless creates thumbnails for plain text files by rendering the content
     of the file on an image and uses a predefined font for that. This
@@ -781,10 +822,10 @@ the program doesn't automatically execute it (ie. the program isn't in your
 $PATH), then you'll need to specify the literal path for that program.
 
 PAPERLESS_CONVERT_BINARY=<path>
-    Defaults to "/usr/bin/convert".
+    Defaults to "convert".
 
 PAPERLESS_GS_BINARY=<path>
-    Defaults to "/usr/bin/gs".
+    Defaults to "gs".
 
 
 .. _configuration-docker:
@@ -801,9 +842,14 @@ PAPERLESS_WEBSERVER_WORKERS=<num>
     also loads the entire application into memory separately, so increasing this value
     will increase RAM usage.
 
-    Consider configuring this to 1 on low power devices with limited amount of RAM.
+    Defaults to 1.
 
-    Defaults to 2.
+PAPERLESS_BIND_ADDR=<ip address>
+    The IP address the webserver will listen on inside the container. There are
+    special setups where you may need to configure this value to restrict the
+    Ip address or interface the webserver listens on.
+
+    Defaults to [::], meaning all interfaces, including IPv6.
 
 PAPERLESS_PORT=<port>
     The port number the webserver will listen on inside the container. There are
@@ -866,18 +912,9 @@ Update Checking
 ###############
 
 PAPERLESS_ENABLE_UPDATE_CHECK=<bool>
-    Enable (or disable) the automatic check for available updates. This feature is disabled
-    by default but if it is not explicitly set Paperless-ngx will show a message about this.
 
-    If enabled, the feature works by pinging the the Github API for the latest release e.g.
-    https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest
-    to determine whether a new version is available.
+    .. note::
 
-    Actual updating of the app must still be performed manually.
-
-    Note that for users of thirdy-party containers e.g. linuxserver.io this notification
-    may be 'ahead' of a new release from the third-party maintainers.
-
-    In either case, no tracking data is collected by the app in any way.
-
-    Defaults to none, which disables the feature.
+            This setting was deprecated in favor of a frontend setting after v1.9.2. A one-time
+            migration is performed for users who have this setting set. This setting is always
+            ignored if the corresponding frontend setting has been set.

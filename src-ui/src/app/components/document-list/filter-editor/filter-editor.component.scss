@@ -17,3 +17,7 @@
 .d-flex.flex-wrap {
   column-gap: 0.7rem;
 }
+
+input[type="text"] {
+  min-width: 120px;
+}

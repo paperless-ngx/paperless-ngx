@@ -1,12 +1,12 @@
 [Unit]
-Description=Paperless scheduler
+Description=Paperless Celery Beat
 Requires=redis.service
 
 [Service]
 User=paperless
 Group=paperless
 WorkingDirectory=/opt/paperless/src
-ExecStart=python3 manage.py qcluster
+ExecStart=celery --app paperless beat --loglevel INFO
 
 [Install]
 WantedBy=multi-user.target
