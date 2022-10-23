@@ -20,8 +20,8 @@ class MailDocumentParser(DocumentParser):
     gotenbergs and sends the html part to a local tika server for text extraction.
     """
 
-    gotenberg_server = settings.PAPERLESS_TIKA_GOTENBERG_ENDPOINT
-    tika_server = settings.PAPERLESS_TIKA_ENDPOINT
+    gotenberg_server = settings.TIKA_GOTENBERG_ENDPOINT
+    tika_server = settings.TIKA_ENDPOINT
 
     logging_name = "paperless.parsing.mail"
     _parsed = None
