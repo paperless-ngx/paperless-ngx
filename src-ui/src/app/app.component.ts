@@ -126,7 +126,7 @@ export class AppComponent implements OnInit, OnDestroy {
       },
       {
         anchorId: 'tour.upload-widget',
-        content: $localize`Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Paperless-ngx will start training it's machine learning algorithms.`,
+        content: $localize`Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Paperless-ngx will start training its machine learning algorithms.`,
         route: '/dashboard',
         enableBackdrop: true,
       },

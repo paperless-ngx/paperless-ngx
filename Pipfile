@@ -60,6 +60,7 @@ django-celery-results = "*"
 setproctitle = "*"
 nltk = "*"
 pdf2image = "*"
+flower = "*"
 bleach = "*"
 
 [dev-packages]
