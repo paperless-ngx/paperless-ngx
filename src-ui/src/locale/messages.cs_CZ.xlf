@@ -347,13 +347,13 @@
         </context-group>
         <target state="needs-translation">The dashboard can be used to show saved views, such as an 'Inbox'. Those settings are found under Settings &gt; Saved Views once you have created some.</target>
       </trans-unit>
-      <trans-unit id="4790329864704781883" datatype="html">
-        <source>Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Paperless-ngx will start training it&apos;s machine learning algorithms.</source>
+      <trans-unit id="9075755296812854717" datatype="html">
+        <source>Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Paperless-ngx will start training its machine learning algorithms.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">129</context>
         </context-group>
-        <target state="needs-translation">Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Paperless-ngx will start training it's machine learning algorithms.</target>
+        <target state="needs-translation">Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Paperless-ngx will start training its machine learning algorithms.</target>
       </trans-unit>
       <trans-unit id="7495498057594070122" datatype="html">
         <source>The documents list shows all of your documents and allows for filtering as well as bulk-editing. There are three different view styles: list, small cards and large cards. A list of documents currently opened for editing is shown in the sidebar.</source>
@@ -2759,7 +2759,7 @@
         <source>View &quot;<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>&quot; saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">176</context>
+          <context context-type="linenumber">170</context>
         </context-group>
         <target state="final">Zobrazení "<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>" bylo úspěšně uloženo.</target>
       </trans-unit>
@@ -2767,7 +2767,7 @@
         <source>View &quot;<x id="PH" equiv-text="savedView.name"/>&quot; created successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">206</context>
+          <context context-type="linenumber">210</context>
         </context-group>
         <target state="final">Zobrazení "<x id="PH" equiv-text="savedView.name"/>" bylo úspěšně vytvořeno.</target>
       </trans-unit>
