@@ -32,7 +32,6 @@ from documents.models import PaperlessTask
 from documents.models import SavedView
 from documents.models import StoragePath
 from documents.models import Tag
-from django_celery_results.models import TaskResult
 from documents.models import Comment
 from documents.models import StoragePath
 from documents.tests.utils import DirectoriesMixin
@@ -2756,19 +2755,16 @@ class TestTasks(APITestCase):
         THEN:
             - Attempting and pending tasks are serialized and provided
         """
-        result1 = TaskResult.objects.create(
-            task_id=str(uuid.uuid4()),
-            task_name="documents.tasks.some_great_task",
-            status=celery.states.PENDING,
-        )
-        PaperlessTask.objects.create(attempted_task=result1)
 
-        result2 = TaskResult.objects.create(
+        task1 = PaperlessTask.objects.create(
             task_id=str(uuid.uuid4()),
-            task_name="documents.tasks.some_awesome_task",
-            status=celery.states.STARTED,
+            task_file_name="task_one.pdf",
         )
-        PaperlessTask.objects.create(attempted_task=result2)
+
+        task2 = PaperlessTask.objects.create(
+            task_id=str(uuid.uuid4()),
+            task_file_name="task_two.pdf",
+        )
 
         response = self.client.get(self.ENDPOINT)
 
@@ -2777,13 +2773,18 @@ class TestTasks(APITestCase):
         returned_task1 = response.data[1]
         returned_task2 = response.data[0]
 
-        self.assertEqual(returned_task1["task_id"], result1.task_id)
-        self.assertEqual(returned_task1["status"], celery.states.PENDING)
-        self.assertEqual(returned_task1["task_name"], result1.task_name)
+        from pprint import pprint
 
-        self.assertEqual(returned_task2["task_id"], result2.task_id)
-        self.assertEqual(returned_task2["status"], celery.states.STARTED)
-        self.assertEqual(returned_task2["task_name"], result2.task_name)
+        pprint(returned_task1)
+        pprint(returned_task2)
+
+        self.assertEqual(returned_task1["task_id"], task1.task_id)
+        self.assertEqual(returned_task1["status"], celery.states.PENDING)
+        self.assertEqual(returned_task1["task_file_name"], task1.task_file_name)
+
+        self.assertEqual(returned_task2["task_id"], task2.task_id)
+        self.assertEqual(returned_task2["status"], celery.states.PENDING)
+        self.assertEqual(returned_task2["task_file_name"], task2.task_file_name)
 
     def test_acknowledge_tasks(self):
         """
@@ -2794,12 +2795,10 @@ class TestTasks(APITestCase):
         THEN:
             - Task is marked as acknowledged
         """
-        result1 = TaskResult.objects.create(
+        task = PaperlessTask.objects.create(
             task_id=str(uuid.uuid4()),
-            task_name="documents.tasks.some_task",
-            status=celery.states.PENDING,
+            task_file_name="task_one.pdf",
         )
-        task = PaperlessTask.objects.create(attempted_task=result1)
 
         response = self.client.get(self.ENDPOINT)
         self.assertEqual(len(response.data), 1)
@@ -2822,13 +2821,12 @@ class TestTasks(APITestCase):
         THEN:
             - The returned data includes the task result
         """
-        result1 = TaskResult.objects.create(
+        task = PaperlessTask.objects.create(
             task_id=str(uuid.uuid4()),
-            task_name="documents.tasks.some_task",
+            task_file_name="task_one.pdf",
             status=celery.states.SUCCESS,
             result="Success. New document id 1 created",
         )
-        _ = PaperlessTask.objects.create(attempted_task=result1)
 
         response = self.client.get(self.ENDPOINT)
 
@@ -2849,17 +2847,12 @@ class TestTasks(APITestCase):
         THEN:
             - The returned result is the exception info
         """
-        result1 = TaskResult.objects.create(
+        task = PaperlessTask.objects.create(
             task_id=str(uuid.uuid4()),
-            task_name="documents.tasks.some_task",
-            status=celery.states.SUCCESS,
-            result={
-                "exc_type": "ConsumerError",
-                "exc_message": ["test.pdf: Not consuming test.pdf: It is a duplicate."],
-                "exc_module": "documents.consumer",
-            },
+            task_file_name="task_one.pdf",
+            status=celery.states.FAILURE,
+            result="test.pdf: Not consuming test.pdf: It is a duplicate.",
         )
-        _ = PaperlessTask.objects.create(attempted_task=result1)
 
         response = self.client.get(self.ENDPOINT)
 
@@ -2883,14 +2876,22 @@ class TestTasks(APITestCase):
         THEN:
             - Returned data include the filename
         """
-        result1 = TaskResult.objects.create(
+        task = PaperlessTask.objects.create(
             task_id=str(uuid.uuid4()),
+            task_file_name="test.pdf",
             task_name="documents.tasks.some_task",
             status=celery.states.SUCCESS,
-            task_args="\"('/tmp/paperless/paperless-upload-5iq7skzc',)\"",
-            task_kwargs="\"{'override_filename': 'test.pdf', 'override_title': None, 'override_correspondent_id': None, 'override_document_type_id': None, 'override_tag_ids': None, 'task_id': '466e8fe7-7193-4698-9fff-72f0340e2082', 'override_created': None}\"",
+            task_args=("/tmp/paperless/paperless-upload-5iq7skzc",),
+            task_kwargs={
+                "override_filename": "test.pdf",
+                "override_title": None,
+                "override_correspondent_id": None,
+                "override_document_type_id": None,
+                "override_tag_ids": None,
+                "task_id": "466e8fe7-7193-4698-9fff-72f0340e2082",
+                "override_created": None,
+            },
         )
-        _ = PaperlessTask.objects.create(attempted_task=result1)
 
         response = self.client.get(self.ENDPOINT)
 
@@ -2899,7 +2900,7 @@ class TestTasks(APITestCase):
 
         returned_data = response.data[0]
 
-        self.assertEqual(returned_data["name"], "test.pdf")
+        self.assertEqual(returned_data["task_file_name"], "test.pdf")
 
     def test_task_name_consume_folder(self):
         """
@@ -2911,14 +2912,14 @@ class TestTasks(APITestCase):
         THEN:
             - Returned data include the filename
         """
-        result1 = TaskResult.objects.create(
+        task = PaperlessTask.objects.create(
             task_id=str(uuid.uuid4()),
+            task_file_name="anothertest.pdf",
             task_name="documents.tasks.some_task",
             status=celery.states.SUCCESS,
-            task_args="\"('/consume/anothertest.pdf',)\"",
-            task_kwargs="\"{'override_tag_ids': None}\"",
+            task_args=("/consume/anothertest.pdf",),
+            task_kwargs={"override_tag_ids": None},
         )
-        _ = PaperlessTask.objects.create(attempted_task=result1)
 
         response = self.client.get(self.ENDPOINT)
 
@@ -2927,4 +2928,4 @@ class TestTasks(APITestCase):
 
         returned_data = response.data[0]
 
-        self.assertEqual(returned_data["name"], "anothertest.pdf")
+        self.assertEqual(returned_data["task_file_name"], "anothertest.pdf")
