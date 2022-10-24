@@ -150,16 +150,20 @@ def scan_file_for_separating_barcodes(filepath: str) -> Tuple[Optional[str], Lis
         if mime_type == "image/tiff":
             pdf_filepath = convert_from_tiff_to_pdf(filepath)
 
-        try:
-            _pikepdf_barcode_scan(pdf_filepath)
-        except Exception as e:
-
-            logger.warning(
-                f"Exception using pikepdf for barcodes, falling back to pdf2image: {e}",
-            )
-            # Reset this incase pikepdf got part way through
-            separator_page_numbers = []
+        if settings.CONSUMER_USE_LEGACY_DETECTION:
             _pdf2image_barcode_scan(pdf_filepath)
+        else:
+            try:
+                _pikepdf_barcode_scan(pdf_filepath)
+            except Exception as e:
+
+                logger.warning(
+                    f"Exception using pikepdf for barcodes,"
+                    f" falling back to pdf2image: {e}",
+                )
+                # Reset this incase pikepdf got part way through
+                separator_page_numbers = []
+                _pdf2image_barcode_scan(pdf_filepath)
 
     else:
         logger.warning(
