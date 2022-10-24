@@ -886,9 +886,8 @@ class TasksViewSet(ReadOnlyModelViewSet):
     queryset = (
         PaperlessTask.objects.filter(
             acknowledged=False,
-            attempted_task__isnull=False,
         )
-        .order_by("attempted_task__date_created")
+        .order_by("date_created")
         .reverse()
     )
 
