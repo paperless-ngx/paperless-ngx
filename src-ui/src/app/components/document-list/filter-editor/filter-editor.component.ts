@@ -44,6 +44,7 @@ import { DocumentService } from 'src/app/services/rest/document.service'
 import { PaperlessDocument } from 'src/app/data/paperless-document'
 import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
+import { RelativeDate } from '../../common/date-dropdown/date-dropdown.component'
 
 const TEXT_FILTER_TARGET_TITLE = 'title'
 const TEXT_FILTER_TARGET_TITLE_CONTENT = 'title-content'
@@ -59,6 +60,24 @@ const TEXT_FILTER_MODIFIER_LT = 'less'
 
 const RELATIVE_DATE_QUERY_REGEXP_CREATED = /created:\[([^\]]+)\]/g
 const RELATIVE_DATE_QUERY_REGEXP_ADDED = /added:\[([^\]]+)\]/g
+const RELATIVE_DATE_QUERYSTRINGS = [
+  {
+    relativeDate: RelativeDate.LAST_7_DAYS,
+    dateQuery: '-1 week to now',
+  },
+  {
+    relativeDate: RelativeDate.LAST_MONTH,
+    dateQuery: '-1 month to now',
+  },
+  {
+    relativeDate: RelativeDate.LAST_3_MONTHS,
+    dateQuery: '-3 month to now',
+  },
+  {
+    relativeDate: RelativeDate.LAST_YEAR,
+    dateQuery: '-1 year to now',
+  },
+]
 
 @Component({
   selector: 'app-filter-editor',
@@ -200,8 +219,8 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   dateCreatedAfter: string
   dateAddedBefore: string
   dateAddedAfter: string
-  dateCreatedQuery: string
-  dateAddedQuery: string
+  dateCreatedRelativeDate: RelativeDate
+  dateAddedRelativeDate: RelativeDate
 
   _unmodifiedFilterRules: FilterRule[] = []
   _filterRules: FilterRule[] = []
@@ -233,8 +252,8 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     this.dateAddedAfter = null
     this.dateCreatedBefore = null
     this.dateCreatedAfter = null
-    this.dateCreatedQuery = null
-    this.dateAddedQuery = null
+    this.dateCreatedRelativeDate = null
+    this.dateAddedRelativeDate = null
     this.textFilterModifier = TEXT_FILTER_MODIFIER_EQUALS
 
     value.forEach((rule) => {
@@ -258,7 +277,10 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
               ;[...arg.matchAll(RELATIVE_DATE_QUERY_REGEXP_CREATED)].forEach(
                 (match) => {
                   if (match[1]?.length) {
-                    this.dateCreatedQuery = match[1]
+                    this.dateCreatedRelativeDate =
+                      RELATIVE_DATE_QUERYSTRINGS.find(
+                        (qS) => qS.dateQuery == match[1]
+                      )?.relativeDate
                   }
                 }
               )
@@ -268,7 +290,10 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
               ;[...arg.matchAll(RELATIVE_DATE_QUERY_REGEXP_ADDED)].forEach(
                 (match) => {
                   if (match[1]?.length) {
-                    this.dateAddedQuery = match[1]
+                    this.dateAddedRelativeDate =
+                      RELATIVE_DATE_QUERYSTRINGS.find(
+                        (qS) => qS.dateQuery == match[1]
+                      )?.relativeDate
                   }
                 }
               )
@@ -501,26 +526,45 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
         value: this.dateAddedAfter,
       })
     }
-    if (this.dateAddedQuery || this.dateCreatedQuery) {
+    if (
+      this.dateAddedRelativeDate !== null ||
+      this.dateCreatedRelativeDate !== null
+    ) {
       let queryArgs: Array<string> = []
-      if (this.dateCreatedQuery)
-        queryArgs.push(`created:[${this.dateCreatedQuery}]`)
-      if (this.dateAddedQuery) queryArgs.push(`added:[${this.dateAddedQuery}]`)
       const existingRule = filterRules.find(
         (fr) => fr.rule_type == FILTER_FULLTEXT_QUERY
       )
+      let existingRuleArgs = existingRule?.value.split(',')
+      if (this.dateCreatedRelativeDate !== null) {
+        queryArgs.push(
+          `created:[${
+            RELATIVE_DATE_QUERYSTRINGS.find(
+              (qS) => qS.relativeDate == this.dateCreatedRelativeDate
+            ).dateQuery
+          }]`
+        )
+        if (existingRule) {
+          queryArgs = existingRuleArgs
+            .filter((arg) => !arg.match(RELATIVE_DATE_QUERY_REGEXP_CREATED))
+            .concat(queryArgs)
+        }
+      }
+      if (this.dateAddedRelativeDate !== null) {
+        queryArgs.push(
+          `added:[${
+            RELATIVE_DATE_QUERYSTRINGS.find(
+              (qS) => qS.relativeDate == this.dateAddedRelativeDate
+            ).dateQuery
+          }]`
+        )
+        if (existingRule) {
+          queryArgs = existingRuleArgs
+            .filter((arg) => !arg.match(RELATIVE_DATE_QUERY_REGEXP_ADDED))
+            .concat(queryArgs)
+        }
+      }
+
       if (existingRule) {
-        let existingRuleArgs = existingRule.value.split(',')
-        if (this.dateCreatedQuery) {
-          queryArgs = existingRuleArgs
-            .filter((arg) => !arg.includes('created:'))
-            .concat(queryArgs)
-        }
-        if (this.dateAddedQuery) {
-          queryArgs = existingRuleArgs
-            .filter((arg) => !arg.includes('added:'))
-            .concat(queryArgs)
-        }
         existingRule.value = queryArgs.join(',')
       } else {
         filterRules.push({
@@ -529,13 +573,16 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
         })
       }
     }
-    if (!this.dateAddedQuery && !this.dateCreatedQuery) {
+    if (
+      this.dateCreatedRelativeDate == null &&
+      this.dateAddedRelativeDate == null
+    ) {
       const existingRule = filterRules.find(
         (fr) => fr.rule_type == FILTER_FULLTEXT_QUERY
       )
       if (
-        existingRule?.value.includes('created:') ||
-        existingRule?.value.includes('added:')
+        existingRule?.value.match(RELATIVE_DATE_QUERY_REGEXP_CREATED) ||
+        existingRule?.value.match(RELATIVE_DATE_QUERY_REGEXP_ADDED)
       ) {
         // remove any existing date query
         existingRule.value = existingRule.value
@@ -660,8 +707,6 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
       target != TEXT_FILTER_TARGET_FULLTEXT_MORELIKE
     ) {
       this._textFilter = ''
-      this.dateAddedQuery = ''
-      this.dateCreatedQuery = ''
     }
     this.textFilterTarget = target
     this.textFilterInput.nativeElement.focus()
