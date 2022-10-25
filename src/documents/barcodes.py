@@ -10,9 +10,12 @@ from typing import Tuple
 import magic
 from django.conf import settings
 from pdf2image import convert_from_path
+from pdf2image.exceptions import PDFPageCountError
 from pikepdf import Page
+from pikepdf import PasswordError
 from pikepdf import Pdf
 from pikepdf import PdfImage
+from pikepdf.models.image import HifiPrintImageNotTranscodableError
 from PIL import Image
 from PIL import ImageSequence
 from pyzbar import pyzbar
@@ -120,7 +123,9 @@ def scan_file_for_separating_barcodes(filepath: str) -> Tuple[Optional[str], Lis
                     pdfimage = PdfImage(page.images[image_key])
 
                     if "/CCITTFaxDecode" in pdfimage.filters:
-                        raise BarcodeImageFormatError()
+                        raise BarcodeImageFormatError(
+                            "Unable to decode CCITTFaxDecode images",
+                        )
 
                     # Not all images can be transcoded to a PIL image, which
                     # is what pyzbar expects to receive
@@ -132,7 +137,7 @@ def scan_file_for_separating_barcodes(filepath: str) -> Tuple[Optional[str], Lis
                         separator_page_numbers.append(page_num)
 
     def _pdf2image_barcode_scan(pdf_filepath: str):
-        # use a temporary directory in case the file os too big to handle in memory
+        # use a temporary directory in case the file is too big to handle in memory
         with tempfile.TemporaryDirectory() as path:
             pages_from_path = convert_from_path(pdf_filepath, output_folder=path)
             for current_page_number, page in enumerate(pages_from_path):
@@ -150,20 +155,42 @@ def scan_file_for_separating_barcodes(filepath: str) -> Tuple[Optional[str], Lis
         if mime_type == "image/tiff":
             pdf_filepath = convert_from_tiff_to_pdf(filepath)
 
+        # Chose the scanner
         if settings.CONSUMER_USE_LEGACY_DETECTION:
-            _pdf2image_barcode_scan(pdf_filepath)
+            logger.debug("Using pdf2image for barcodes")
+            scanner_function = _pdf2image_barcode_scan
         else:
-            try:
-                _pikepdf_barcode_scan(pdf_filepath)
-            except Exception as e:
+            logger.debug("Using pikepdf for barcodes")
+            scanner_function = _pikepdf_barcode_scan
 
-                logger.warning(
-                    f"Exception using pikepdf for barcodes,"
-                    f" falling back to pdf2image: {e}",
-                )
-                # Reset this incase pikepdf got part way through
+        # Run the scanner
+        try:
+            scanner_function(pdf_filepath)
+        # Neither method can handle password protected PDFs without it being
+        # provided.  Log it and continue
+        except (PasswordError, PDFPageCountError) as e:
+            logger.warning(
+                f"File is likely password protected, not splitting: {e}",
+            )
+        # Handle pikepdf related image decoding issues with a fallback
+        except (BarcodeImageFormatError, HifiPrintImageNotTranscodableError) as e:
+            logger.warning(
+                f"Falling back to pdf2image because: {e}",
+            )
+            try:
                 separator_page_numbers = []
                 _pdf2image_barcode_scan(pdf_filepath)
+            # This file is really borked, allow the consumption to continue
+            # but it may fail further on
+            except Exception as e:  # pragma: no cover
+                logger.warning(
+                    f"Exception during barcode scanning: {e}",
+                )
+        # We're not sure what happened, but allow the consumption to continue
+        except Exception as e:  # pragma: no cover
+            logger.warning(
+                f"Exception during barcode scanning: {e}",
+            )
 
     else:
         logger.warning(
