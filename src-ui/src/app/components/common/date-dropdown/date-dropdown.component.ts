@@ -16,19 +16,15 @@ import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
 export interface DateSelection {
   before?: string
   after?: string
-  dateQuery?: string
+  relativeDateID?: number
 }
 
-interface QuickFilter {
-  id: number
-  name: string
-  dateQuery: string
+export enum RelativeDate {
+  LAST_7_DAYS = 0,
+  LAST_MONTH = 1,
+  LAST_3_MONTHS = 2,
+  LAST_YEAR = 3,
 }
-
-const LAST_7_DAYS = 0
-const LAST_MONTH = 1
-const LAST_3_MONTHS = 2
-const LAST_YEAR = 3
 
 @Component({
   selector: 'app-date-dropdown',
@@ -41,23 +37,23 @@ export class DateDropdownComponent implements OnInit, OnDestroy {
     this.datePlaceHolder = settings.getLocalizedDateInputFormat()
   }
 
-  quickFilters: Array<QuickFilter> = [
+  relativeDates = [
     {
-      id: LAST_7_DAYS,
+      date: RelativeDate.LAST_7_DAYS,
       name: $localize`Last 7 days`,
-      dateQuery: '-1 week to now',
     },
     {
-      id: LAST_MONTH,
+      date: RelativeDate.LAST_MONTH,
       name: $localize`Last month`,
-      dateQuery: '-1 month to now',
     },
     {
-      id: LAST_3_MONTHS,
+      date: RelativeDate.LAST_3_MONTHS,
       name: $localize`Last 3 months`,
-      dateQuery: '-3 month to now',
     },
-    { id: LAST_YEAR, name: $localize`Last year`, dateQuery: '-1 year to now' },
+    {
+      date: RelativeDate.LAST_YEAR,
+      name: $localize`Last year`,
+    },
   ]
 
   datePlaceHolder: string
@@ -74,21 +70,11 @@ export class DateDropdownComponent implements OnInit, OnDestroy {
   @Output()
   dateAfterChange = new EventEmitter<string>()
 
-  quickFilter: number
-
   @Input()
-  set dateQuery(query: string) {
-    this.quickFilter = this.quickFilters.find((qf) => qf.dateQuery == query)?.id
-  }
-
-  get dateQuery(): string {
-    return (
-      this.quickFilters.find((qf) => qf.id == this.quickFilter)?.dateQuery ?? ''
-    )
-  }
+  relativeDate: RelativeDate
 
   @Output()
-  dateQueryChange = new EventEmitter<string>()
+  relativeDateChange = new EventEmitter<number>()
 
   @Input()
   title: string
@@ -98,7 +84,7 @@ export class DateDropdownComponent implements OnInit, OnDestroy {
 
   get isActive(): boolean {
     return (
-      this.quickFilter > -1 ||
+      this.relativeDate !== null ||
       this.dateAfter?.length > 0 ||
       this.dateBefore?.length > 0
     )
@@ -120,30 +106,26 @@ export class DateDropdownComponent implements OnInit, OnDestroy {
     }
   }
 
-  setDateQuickFilter(qf: number) {
+  setRelativeDate(rd: RelativeDate) {
     this.dateBefore = null
     this.dateAfter = null
-    this.quickFilter = this.quickFilter == qf ? null : qf
+    this.relativeDate = this.relativeDate == rd ? null : rd
     this.onChange()
-  }
-
-  qfIsSelected(qf: number) {
-    return this.quickFilter == qf
   }
 
   onChange() {
     this.dateBeforeChange.emit(this.dateBefore)
     this.dateAfterChange.emit(this.dateAfter)
-    this.dateQueryChange.emit(this.dateQuery)
+    this.relativeDateChange.emit(this.relativeDate)
     this.datesSet.emit({
       after: this.dateAfter,
       before: this.dateBefore,
-      dateQuery: this.dateQuery,
+      relativeDateID: this.relativeDate,
     })
   }
 
   onChangeDebounce() {
-    this.dateQuery = null
+    this.relativeDate = null
     this.datesSetDebounce$.next({
       after: this.dateAfter,
       before: this.dateBefore,
