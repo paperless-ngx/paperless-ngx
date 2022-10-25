@@ -97,12 +97,12 @@ custom_container_init() {
 	# Don't run files which are owned by anyone except root
 	# Don't run files which are writeable by others
 	if [ -d "${custom_script_dir}" ]; then
-		if [ -n "$(/usr/bin/find "${custom_script_dir}" ! -user root)" ]; then
+		if [ -n "$(/usr/bin/find "${custom_script_dir}" -maxdepth 1 ! -user root)" ]; then
 			echo "**** Potential tampering with custom scripts detected ****"
 			echo "**** The folder '${custom_script_dir}' must be owned by root ****"
 			return 0
 		fi
-		if [ -n "$(/usr/bin/find "${custom_script_dir}" -perm -o+w)" ]; then
+		if [ -n "$(/usr/bin/find "${custom_script_dir}" -maxdepth 1 -perm -o+w)" ]; then
 			echo "**** The folder '${custom_script_dir}' or some of contents have write permissions for others, which is a security risk. ****"
 			echo "**** Please review the permissions and their contents to make sure they are owned by root, and can only be modified by root. ****"
 			return 0
