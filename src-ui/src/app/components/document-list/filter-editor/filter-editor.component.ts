@@ -300,8 +300,10 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
               queryArgs.splice(queryArgs.indexOf(arg), 1)
             }
           })
-          this._textFilter = queryArgs.join(',')
-          this.textFilterTarget = TEXT_FILTER_TARGET_FULLTEXT_QUERY
+          if (queryArgs.length) {
+            this._textFilter = queryArgs.join(',')
+            this.textFilterTarget = TEXT_FILTER_TARGET_FULLTEXT_QUERY
+          }
           break
         case FILTER_FULLTEXT_MORELIKE:
           this._moreLikeId = +rule.value
