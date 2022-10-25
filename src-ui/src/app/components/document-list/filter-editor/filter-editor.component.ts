@@ -271,8 +271,9 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
           this.textFilterTarget = TEXT_FILTER_TARGET_ASN
           break
         case FILTER_FULLTEXT_QUERY:
-          let queryArgs = rule.value.split(',')
-          queryArgs.forEach((arg) => {
+          let allQueryArgs = rule.value.split(',')
+          let textQueryArgs = []
+          allQueryArgs.forEach((arg) => {
             if (arg.match(RELATIVE_DATE_QUERY_REGEXP_CREATED)) {
               ;[...arg.matchAll(RELATIVE_DATE_QUERY_REGEXP_CREATED)].forEach(
                 (match) => {
@@ -284,9 +285,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
                   }
                 }
               )
-              queryArgs.splice(queryArgs.indexOf(arg), 1)
-            }
-            if (arg.match(RELATIVE_DATE_QUERY_REGEXP_ADDED)) {
+            } else if (arg.match(RELATIVE_DATE_QUERY_REGEXP_ADDED)) {
               ;[...arg.matchAll(RELATIVE_DATE_QUERY_REGEXP_ADDED)].forEach(
                 (match) => {
                   if (match[1]?.length) {
@@ -297,11 +296,12 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
                   }
                 }
               )
-              queryArgs.splice(queryArgs.indexOf(arg), 1)
+            } else {
+              textQueryArgs.push(arg)
             }
           })
-          if (queryArgs.length) {
-            this._textFilter = queryArgs.join(',')
+          if (textQueryArgs.length) {
+            this._textFilter = textQueryArgs.join(',')
             this.textFilterTarget = TEXT_FILTER_TARGET_FULLTEXT_QUERY
           }
           break
@@ -533,9 +533,24 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
       this.dateCreatedRelativeDate !== null
     ) {
       let queryArgs: Array<string> = []
-      const existingRule = filterRules.find(
+      let existingRule = filterRules.find(
         (fr) => fr.rule_type == FILTER_FULLTEXT_QUERY
       )
+
+      // if had a title / content search and added a relative date we need to carry it over...
+      if (
+        !existingRule &&
+        this._textFilter?.length > 0 &&
+        (this.textFilterTarget == TEXT_FILTER_TARGET_TITLE_CONTENT ||
+          this.textFilterTarget == TEXT_FILTER_TARGET_TITLE)
+      ) {
+        existingRule = filterRules.find(
+          (fr) =>
+            fr.rule_type == FILTER_TITLE_CONTENT || fr.rule_type == FILTER_TITLE
+        )
+        existingRule.rule_type = FILTER_FULLTEXT_QUERY
+      }
+
       let existingRuleArgs = existingRule?.value.split(',')
       if (this.dateCreatedRelativeDate !== null) {
         queryArgs.push(
