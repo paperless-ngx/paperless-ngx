@@ -57,6 +57,9 @@ const TEXT_FILTER_MODIFIER_NOTNULL = 'not null'
 const TEXT_FILTER_MODIFIER_GT = 'greater'
 const TEXT_FILTER_MODIFIER_LT = 'less'
 
+const RELATIVE_DATE_QUERY_REGEXP_CREATED = /created:\[([^\]]+)\]/g
+const RELATIVE_DATE_QUERY_REGEXP_ADDED = /added:\[([^\]]+)\]/g
+
 @Component({
   selector: 'app-filter-editor',
   templateUrl: './filter-editor.component.html',
@@ -197,6 +200,8 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   dateCreatedAfter: string
   dateAddedBefore: string
   dateAddedAfter: string
+  dateCreatedQuery: string
+  dateAddedQuery: string
 
   _unmodifiedFilterRules: FilterRule[] = []
   _filterRules: FilterRule[] = []
@@ -228,6 +233,8 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     this.dateAddedAfter = null
     this.dateCreatedBefore = null
     this.dateCreatedAfter = null
+    this.dateCreatedQuery = null
+    this.dateAddedQuery = null
     this.textFilterModifier = TEXT_FILTER_MODIFIER_EQUALS
 
     value.forEach((rule) => {
@@ -245,7 +252,30 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
           this.textFilterTarget = TEXT_FILTER_TARGET_ASN
           break
         case FILTER_FULLTEXT_QUERY:
-          this._textFilter = rule.value
+          let queryArgs = rule.value.split(',')
+          queryArgs.forEach((arg) => {
+            if (arg.match(RELATIVE_DATE_QUERY_REGEXP_CREATED)) {
+              ;[...arg.matchAll(RELATIVE_DATE_QUERY_REGEXP_CREATED)].forEach(
+                (match) => {
+                  if (match[1]?.length) {
+                    this.dateCreatedQuery = match[1]
+                  }
+                }
+              )
+              queryArgs.splice(queryArgs.indexOf(arg), 1)
+            }
+            if (arg.match(RELATIVE_DATE_QUERY_REGEXP_ADDED)) {
+              ;[...arg.matchAll(RELATIVE_DATE_QUERY_REGEXP_ADDED)].forEach(
+                (match) => {
+                  if (match[1]?.length) {
+                    this.dateAddedQuery = match[1]
+                  }
+                }
+              )
+              queryArgs.splice(queryArgs.indexOf(arg), 1)
+            }
+          })
+          this._textFilter = queryArgs.join(',')
           this.textFilterTarget = TEXT_FILTER_TARGET_FULLTEXT_QUERY
           break
         case FILTER_FULLTEXT_MORELIKE:
@@ -471,6 +501,52 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
         value: this.dateAddedAfter,
       })
     }
+    if (this.dateAddedQuery || this.dateCreatedQuery) {
+      let queryArgs: Array<string> = []
+      if (this.dateCreatedQuery)
+        queryArgs.push(`created:[${this.dateCreatedQuery}]`)
+      if (this.dateAddedQuery) queryArgs.push(`added:[${this.dateAddedQuery}]`)
+      const existingRule = filterRules.find(
+        (fr) => fr.rule_type == FILTER_FULLTEXT_QUERY
+      )
+      if (existingRule) {
+        let existingRuleArgs = existingRule.value.split(',')
+        if (this.dateCreatedQuery) {
+          queryArgs = existingRuleArgs
+            .filter((arg) => !arg.includes('created:'))
+            .concat(queryArgs)
+        }
+        if (this.dateAddedQuery) {
+          queryArgs = existingRuleArgs
+            .filter((arg) => !arg.includes('added:'))
+            .concat(queryArgs)
+        }
+        existingRule.value = queryArgs.join(',')
+      } else {
+        filterRules.push({
+          rule_type: FILTER_FULLTEXT_QUERY,
+          value: queryArgs.join(','),
+        })
+      }
+    }
+    if (!this.dateAddedQuery && !this.dateCreatedQuery) {
+      const existingRule = filterRules.find(
+        (fr) => fr.rule_type == FILTER_FULLTEXT_QUERY
+      )
+      if (
+        existingRule?.value.includes('created:') ||
+        existingRule?.value.includes('added:')
+      ) {
+        // remove any existing date query
+        existingRule.value = existingRule.value
+          .replace(RELATIVE_DATE_QUERY_REGEXP_CREATED, '')
+          .replace(RELATIVE_DATE_QUERY_REGEXP_ADDED, '')
+        if (existingRule.value.replace(',', '').trim() === '') {
+          // if its empty now, remove it entirely
+          filterRules.splice(filterRules.indexOf(existingRule), 1)
+        }
+      }
+    }
     return filterRules
   }
 
@@ -584,6 +660,8 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
       target != TEXT_FILTER_TARGET_FULLTEXT_MORELIKE
     ) {
       this._textFilter = ''
+      this.dateAddedQuery = ''
+      this.dateCreatedQuery = ''
     }
     this.textFilterTarget = target
     this.textFilterInput.nativeElement.focus()
