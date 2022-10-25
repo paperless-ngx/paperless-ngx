@@ -16,6 +16,13 @@ import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
 export interface DateSelection {
   before?: string
   after?: string
+  dateQuery?: string
+}
+
+interface QuickFilter {
+  id: number
+  name: string
+  dateQuery: string
 }
 
 const LAST_7_DAYS = 0
@@ -34,11 +41,23 @@ export class DateDropdownComponent implements OnInit, OnDestroy {
     this.datePlaceHolder = settings.getLocalizedDateInputFormat()
   }
 
-  quickFilters = [
-    { id: LAST_7_DAYS, name: $localize`Last 7 days` },
-    { id: LAST_MONTH, name: $localize`Last month` },
-    { id: LAST_3_MONTHS, name: $localize`Last 3 months` },
-    { id: LAST_YEAR, name: $localize`Last year` },
+  quickFilters: Array<QuickFilter> = [
+    {
+      id: LAST_7_DAYS,
+      name: $localize`Last 7 days`,
+      dateQuery: '-1 week to now',
+    },
+    {
+      id: LAST_MONTH,
+      name: $localize`Last month`,
+      dateQuery: '-1 month to now',
+    },
+    {
+      id: LAST_3_MONTHS,
+      name: $localize`Last 3 months`,
+      dateQuery: '-3 month to now',
+    },
+    { id: LAST_YEAR, name: $localize`Last year`, dateQuery: '-1 year to now' },
   ]
 
   datePlaceHolder: string
@@ -55,11 +74,35 @@ export class DateDropdownComponent implements OnInit, OnDestroy {
   @Output()
   dateAfterChange = new EventEmitter<string>()
 
+  quickFilter: number
+
+  @Input()
+  set dateQuery(query: string) {
+    this.quickFilter = this.quickFilters.find((qf) => qf.dateQuery == query)?.id
+  }
+
+  get dateQuery(): string {
+    return (
+      this.quickFilters.find((qf) => qf.id == this.quickFilter)?.dateQuery ?? ''
+    )
+  }
+
+  @Output()
+  dateQueryChange = new EventEmitter<string>()
+
   @Input()
   title: string
 
   @Output()
   datesSet = new EventEmitter<DateSelection>()
+
+  get isActive(): boolean {
+    return (
+      this.quickFilter > -1 ||
+      this.dateAfter?.length > 0 ||
+      this.dateBefore?.length > 0
+    )
+  }
 
   private datesSetDebounce$ = new Subject()
 
@@ -79,35 +122,28 @@ export class DateDropdownComponent implements OnInit, OnDestroy {
 
   setDateQuickFilter(qf: number) {
     this.dateBefore = null
-    let date = new Date()
-    switch (qf) {
-      case LAST_7_DAYS:
-        date.setDate(date.getDate() - 7)
-        break
-
-      case LAST_MONTH:
-        date.setMonth(date.getMonth() - 1)
-        break
-
-      case LAST_3_MONTHS:
-        date.setMonth(date.getMonth() - 3)
-        break
-
-      case LAST_YEAR:
-        date.setFullYear(date.getFullYear() - 1)
-        break
-    }
-    this.dateAfter = formatDate(date, 'yyyy-MM-dd', 'en-us', 'UTC')
+    this.dateAfter = null
+    this.quickFilter = this.quickFilter == qf ? null : qf
     this.onChange()
   }
 
+  qfIsSelected(qf: number) {
+    return this.quickFilter == qf
+  }
+
   onChange() {
-    this.dateAfterChange.emit(this.dateAfter)
     this.dateBeforeChange.emit(this.dateBefore)
-    this.datesSet.emit({ after: this.dateAfter, before: this.dateBefore })
+    this.dateAfterChange.emit(this.dateAfter)
+    this.dateQueryChange.emit(this.dateQuery)
+    this.datesSet.emit({
+      after: this.dateAfter,
+      before: this.dateBefore,
+      dateQuery: this.dateQuery,
+    })
   }
 
   onChangeDebounce() {
+    this.dateQuery = null
     this.datesSetDebounce$.next({
       after: this.dateAfter,
       before: this.dateBefore,

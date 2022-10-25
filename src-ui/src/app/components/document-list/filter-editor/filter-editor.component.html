@@ -54,12 +54,14 @@
             title="Created" i18n-title
             (datesSet)="updateRules()"
             [(dateBefore)]="dateCreatedBefore"
-            [(dateAfter)]="dateCreatedAfter"></app-date-dropdown>
+            [(dateAfter)]="dateCreatedAfter"
+            [(dateQuery)]="dateCreatedQuery"></app-date-dropdown>
           <app-date-dropdown class="mb-2 mb-xl-0"
+            title="Added" i18n-title
+            (datesSet)="updateRules()"
             [(dateBefore)]="dateAddedBefore"
             [(dateAfter)]="dateAddedAfter"
-            title="Added" i18n-title
-            (datesSet)="updateRules()"></app-date-dropdown>
+            [(dateQuery)]="dateAddedQuery"></app-date-dropdown>
         </div>
      </div>
    </div>
