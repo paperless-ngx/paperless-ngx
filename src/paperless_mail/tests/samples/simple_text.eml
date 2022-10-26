@@ -14,6 +14,8 @@ User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.3.1
 Content-Language: en-US
 To: some@one.de
+Cc: asdasd@æsdasd.de, asdadasdasdasda.asdasd@æsdasd.de
+Bcc: fdf@fvf.de
 From: Some One <mail@someserver.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
