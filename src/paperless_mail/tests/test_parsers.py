@@ -69,7 +69,7 @@ class TestParser(TestCase):
 
         # The created intermediary pdf is not reproducible. But the thumbnail image should always look the same.
         expected_hash = (
-            "18a2513c80584e538c4a129e8a2b0ce19bf0276eab9c95b72fa93e941db38d12"
+            "eeb2cf861f4873d2e569d0dfbfd385c2ac11722accf0fd3a32a54e3b115317a9"
         )
         self.assertEqual(
             thumb_hash,
@@ -226,7 +226,7 @@ class TestParser(TestCase):
         # Validate parsing returns the expected results
         parser.parse(os.path.join(self.SAMPLE_FILES, "html.eml"), "message/rfc822")
 
-        text_expected = "Some Text\nand an embedded image.\n\nSubject: HTML Message\n\nFrom: Name <someone@example.de>\n\nTo: someone@example.de\n\nAttachments: IntM6gnXFm00FEV5.png (6.89 KiB)\n\nHTML content: Some Text\nand an embedded image.\nParagraph unchanged."
+        text_expected = "Some Text\r\n\r\nand an embedded image.\n\nSubject: HTML Message\n\nFrom: Name <someone@example.de>\n\nTo: someone@example.de\n\nAttachments: IntM6gnXFm00FEV5.png (6.89 KiB), 600+kbfile.txt (0.59 MiB)\n\nHTML content: Some Text\nand an embedded image.\nParagraph unchanged."
         self.assertEqual(text_expected, parser.text)
         self.assertEqual(
             datetime.datetime(
@@ -236,6 +236,27 @@ class TestParser(TestCase):
                 11,
                 23,
                 19,
+                tzinfo=datetime.timezone(datetime.timedelta(seconds=7200)),
+            ),
+            parser.date,
+        )
+
+        # Validate parsing returns the expected results
+        parser = MailDocumentParser(None)
+        parser.parse(
+            os.path.join(self.SAMPLE_FILES, "simple_text.eml"),
+            "message/rfc822",
+        )
+        text_expected = "This is just a simple Text Mail.\n\nSubject: Simple Text Mail\n\nFrom: Some One <mail@someserver.de>\n\nTo: some@one.de\n\nCC: asdasd@æsdasd.de, asdadasdasdasda.asdasd@æsdasd.de\n\nBCC: fdf@fvf.de\n\n"
+        self.assertEqual(text_expected, parser.text)
+        self.assertEqual(
+            datetime.datetime(
+                2022,
+                10,
+                12,
+                21,
+                40,
+                43,
                 tzinfo=datetime.timezone(datetime.timedelta(seconds=7200)),
             ),
             parser.date,
@@ -267,6 +288,18 @@ class TestParser(TestCase):
         parsed = parser.tika_parse(html)
         self.assertEqual(expected_text, parsed)
 
+    @mock.patch("paperless_mail.parsers.MailDocumentParser.generate_pdf_from_mail")
+    @mock.patch("paperless_mail.parsers.MailDocumentParser.generate_pdf_from_html")
+    def test_generate_pdf_parse_error(self, m: mock.MagicMock, n: mock.MagicMock):
+        m.return_value = b""
+        n.return_value = b""
+        parser = MailDocumentParser(None)
+
+        # Check if exception is raised when the pdf can not be created.
+        parser.gotenberg_server = ""
+        with pytest.raises(ParseError):
+            parser.generate_pdf(os.path.join(self.SAMPLE_FILES, "html.eml"))
+
     @mock.patch("documents.loggers.LoggingMixin.log")  # Disable log output
     def test_generate_pdf(self, m):
         parser = MailDocumentParser(None)
@@ -295,7 +328,7 @@ class TestParser(TestCase):
 
         # The created pdf is not reproducible. But the converted image should always look the same.
         expected_hash = (
-            "23468c4597d63bbefd38825e27c7f05ac666573fc35447d9ddf1784c9c31c6ea"
+            "4f338619575a21c5227de003a14216b07ba00a372ca5f132745e974a1f990e09"
         )
         self.assertEqual(
             thumb_hash,
@@ -341,7 +374,7 @@ class TestParser(TestCase):
 
         # The created pdf is not reproducible. But the converted image should always look the same.
         expected_hash = (
-            "635bda532707faf69f06b040660445b656abcc7d622cc29c24a5c7fd2c713c5f"
+            "8734a3f0a567979343824e468cd737bf29c02086bbfd8773e94feb986968ad32"
         )
         self.assertEqual(
             thumb_hash,
