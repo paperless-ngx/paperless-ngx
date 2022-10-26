@@ -67,7 +67,7 @@
         <div class="dropdown-divider" *ngIf="savedViewService.allViews.length > 0"></div>
       </ng-container>
 
-      <button ngbDropdownItem (click)="saveViewConfig()" *ngIf="list.activeSavedViewId" i18n>Save "{{list.activeSavedViewTitle}}"</button>
+      <button ngbDropdownItem (click)="saveViewConfig()" *ngIf="list.activeSavedViewId" [disabled]="!savedViewIsModified" i18n>Save "{{list.activeSavedViewTitle}}"</button>
       <button ngbDropdownItem (click)="saveViewConfigAs()" i18n>Save as...</button>
     </div>
   </div>
