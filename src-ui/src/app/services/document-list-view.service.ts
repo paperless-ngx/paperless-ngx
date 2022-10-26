@@ -171,15 +171,15 @@ export class DocumentListViewService {
     this.reduceSelectionToFilter()
 
     if (!this.router.routerState.snapshot.url.includes('/view/')) {
-      this.router.navigate([], {
-        queryParams: { view: view.id },
-      })
+      this.router.navigate(['view', view.id])
     }
   }
 
   loadFromQueryParams(queryParams: ParamMap) {
     const paramsEmpty: boolean = queryParams.keys.length == 0
-    let newState: ListViewState = this.listViewStates.get(null)
+    let newState: ListViewState = this.listViewStates.get(
+      this._activeSavedViewId
+    )
     if (!paramsEmpty) newState = paramsToViewState(queryParams)
     if (newState == undefined) newState = this.defaultListViewState() // if nothing in local storage
 
@@ -225,7 +225,10 @@ export class DocumentListViewService {
             let base = ['/documents']
             this.router.navigate(base, {
               queryParams: paramsFromViewState(activeListViewState),
-              replaceUrl: !this.router.routerState.snapshot.url.includes('?'), // in case navigating from params-less /documents
+              replaceUrl: !(
+                this.router.routerState.snapshot.url.includes('?') ||
+                this.router.routerState.snapshot.url.includes('/view/')
+              ), // in case navigating from params-less /documents or /view
             })
           } else if (this._activeSavedViewId) {
             this.router.navigate([], {
@@ -288,9 +291,9 @@ export class DocumentListViewService {
   }
 
   set sortField(field: string) {
-    this._activeSavedViewId = null
     this.activeListViewState.sortField = field
     this.reload()
+    this._activeSavedViewId = null
     this.saveDocumentListView()
   }
 
@@ -299,9 +302,9 @@ export class DocumentListViewService {
   }
 
   set sortReverse(reverse: boolean) {
-    this._activeSavedViewId = null
     this.activeListViewState.sortReverse = reverse
     this.reload()
+    this._activeSavedViewId = null
     this.saveDocumentListView()
   }
 
