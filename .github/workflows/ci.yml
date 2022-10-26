@@ -44,8 +44,7 @@ jobs:
       -
         name: Install pipenv
         run: |
-          pipx install pipenv==2022.8.5
-          pipenv --version
+          pipx install pipenv==2022.10.12
       -
         name: Set up Python
         uses: actions/setup-python@v4
@@ -107,8 +106,7 @@ jobs:
       -
         name: Install pipenv
         run: |
-          pipx install pipenv==2022.10.4
-          pipenv --version
+          pipx install pipenv==2022.10.12
       -
         name: Set up Python
         uses: actions/setup-python@v4
