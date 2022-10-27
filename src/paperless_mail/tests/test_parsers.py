@@ -8,8 +8,8 @@ from urllib.request import urlopen
 import pytest
 from django.test import TestCase
 from documents.parsers import ParseError
-from documents.parsers import run_convert
 from paperless_mail.parsers import MailDocumentParser
+from pdfminer.high_level import extract_text
 
 
 class TestParser(TestCase):
@@ -311,30 +311,9 @@ class TestParser(TestCase):
         pdf_path = parser.generate_pdf(os.path.join(self.SAMPLE_FILES, "html.eml"))
         self.assertTrue(os.path.isfile(pdf_path))
 
-        converted = os.path.join(parser.tempdir, "test_generate_pdf.webp")
-        run_convert(
-            density=300,
-            scale="500x5000>",
-            alpha="remove",
-            strip=True,
-            trim=False,
-            auto_orient=True,
-            input_file=f"{pdf_path}",  # Do net define an index to convert all pages.
-            output_file=converted,
-            logging_group=None,
-        )
-        self.assertTrue(os.path.isfile(converted))
-        thumb_hash = self.hashfile(converted)
-
-        # The created pdf is not reproducible. But the converted image should always look the same.
-        expected_hash = (
-            "4f338619575a21c5227de003a14216b07ba00a372ca5f132745e974a1f990e09"
-        )
-        self.assertEqual(
-            thumb_hash,
-            expected_hash,
-            f"PDF looks different. Check if {converted} looks weird.",
-        )
+        extracted = extract_text(pdf_path)
+        expected = "From Name <someone@example.de>\n\n2022-10-15 09:23\n\nSubject HTML Message\n\nTo someone@example.de\n\nAttachments IntM6gnXFm00FEV5.png (6.89 KiB), 600+kbﬁle.txt (0.59 MiB)\n\nSome Text \n\nand an embedded image.\n\n\x0cSome Text\n\n  This image should not be shown.\n\nand an embedded image.\n\nParagraph unchanged.\n\n\x0c"
+        self.assertEqual(expected, extracted)
 
     def test_mail_to_html(self):
         parser = MailDocumentParser(None)
@@ -357,30 +336,9 @@ class TestParser(TestCase):
             file.write(parser.generate_pdf_from_mail(mail))
             file.close()
 
-        converted = os.path.join(parser.tempdir, "test_generate_pdf_from_mail.webp")
-        run_convert(
-            density=300,
-            scale="500x5000>",
-            alpha="remove",
-            strip=True,
-            trim=False,
-            auto_orient=True,
-            input_file=f"{pdf_path}",  # Do net define an index to convert all pages.
-            output_file=converted,
-            logging_group=None,
-        )
-        self.assertTrue(os.path.isfile(converted))
-        thumb_hash = self.hashfile(converted)
-
-        # The created pdf is not reproducible. But the converted image should always look the same.
-        expected_hash = (
-            "8734a3f0a567979343824e468cd737bf29c02086bbfd8773e94feb986968ad32"
-        )
-        self.assertEqual(
-            thumb_hash,
-            expected_hash,
-            f"PDF looks different. Check if {converted} looks weird.",
-        )
+        extracted = extract_text(pdf_path)
+        expected = "From Name <someone@example.de>\n\n2022-10-15 09:23\n\nSubject HTML Message\n\nTo someone@example.de\n\nAttachments IntM6gnXFm00FEV5.png (6.89 KiB), 600+kbﬁle.txt (0.59 MiB)\n\nSome Text \n\nand an embedded image.\n\n\x0c"
+        self.assertEqual(expected, extracted)
 
     def test_transform_inline_html(self):
         class MailAttachmentMock:
@@ -432,31 +390,9 @@ class TestParser(TestCase):
             file.write(result)
             file.close()
 
-        converted = os.path.join(parser.tempdir, "test_generate_pdf_from_html.webp")
-        run_convert(
-            density=300,
-            scale="500x5000>",
-            alpha="remove",
-            strip=True,
-            trim=False,
-            auto_orient=True,
-            input_file=f"{pdf_path}",  # Do net define an index to convert all pages.
-            output_file=converted,
-            logging_group=None,
-        )
-        self.assertTrue(os.path.isfile(converted))
-        thumb_hash = self.hashfile(converted)
-
-        # The created pdf is not reproducible. But the converted image should always look the same.
-        expected_hash = (
-            "267d61f0ab8f128a037002a424b2cb4bfe18a81e17f0b70f15d241688ed47d1a"
-        )
-        self.assertEqual(
-            thumb_hash,
-            expected_hash,
-            f"PDF looks different. Check if {converted} looks weird. "
-            f"If Rick Astley is shown, Gotenberg loads from web which is bad for Mail content.",
-        )
+        extracted = extract_text(pdf_path)
+        expected = "Some Text\n\n  This image should not be shown.\n\nand an embedded image.\n\nParagraph unchanged.\n\n\x0c"
+        self.assertEqual(expected, extracted)
 
     def test_is_online_image_still_available(self):
         """
