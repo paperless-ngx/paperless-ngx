@@ -57,24 +57,21 @@ class TestParser(TestCase):
                 sha256.update(data)
         return sha256.hexdigest()
 
+    @mock.patch("paperless_mail.parsers.make_thumbnail_from_pdf")
     @mock.patch("documents.loggers.LoggingMixin.log")  # Disable log output
-    def test_get_thumbnail(self, m):
+    def test_get_thumbnail(self, m, mock_make_thumbnail_from_pdf: mock.MagicMock):
         parser = MailDocumentParser(None)
         thumb = parser.get_thumbnail(
             os.path.join(self.SAMPLE_FILES, "simple_text.eml"),
             "message/rfc822",
         )
-        self.assertTrue(os.path.isfile(thumb))
-        thumb_hash = self.hashfile(thumb)
-
-        # The created intermediary pdf is not reproducible. But the thumbnail image should always look the same.
-        expected_hash = (
-            "eeb2cf861f4873d2e569d0dfbfd385c2ac11722accf0fd3a32a54e3b115317a9"
+        self.assertEqual(
+            parser.archive_path,
+            mock_make_thumbnail_from_pdf.call_args_list[0].args[0],
         )
         self.assertEqual(
-            thumb_hash,
-            expected_hash,
-            "Thumbnail file hash not as expected.",
+            parser.tempdir,
+            mock_make_thumbnail_from_pdf.call_args_list[0].args[1],
         )
 
     @mock.patch("documents.loggers.LoggingMixin.log")
