@@ -223,7 +223,7 @@ class TestParser(TestCase):
         # Validate parsing returns the expected results
         parser.parse(os.path.join(self.SAMPLE_FILES, "html.eml"), "message/rfc822")
 
-        text_expected = "Some Text\r\n\r\nand an embedded image.\n\nSubject: HTML Message\n\nFrom: Name <someone@example.de>\n\nTo: someone@example.de\n\nAttachments: IntM6gnXFm00FEV5.png (6.89 KiB), 600+kbfile.txt (0.59 MiB)\n\nHTML content: Some Text\nand an embedded image.\nParagraph unchanged."
+        text_expected = "Some Text\nand an embedded image.\n\nSubject: HTML Message\n\nFrom: Name <someone@example.de>\n\nTo: someone@example.de\n\nAttachments: IntM6gnXFm00FEV5.png (6.89 KiB), 600+kbfile.txt (0.59 MiB)\n\nHTML content: Some Text\nand an embedded image.\nParagraph unchanged."
         self.assertEqual(text_expected, parser.text)
         self.assertEqual(
             datetime.datetime(
