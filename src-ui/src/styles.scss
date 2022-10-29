@@ -583,7 +583,7 @@ a.badge {
     border-radius: 0.15rem;
   }
 
-  > .btn:not(:first-child) {
+  > .btn:not(:first-child):not(:nth-child(2)) {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
   }
