@@ -1,6 +1,6 @@
 .badge {
-    width: 20px;
-    height: 20px;
+    min-width: 20px;
+    min-height: 20px;
 }
 
 .x {
@@ -8,18 +8,21 @@
 }
 
 .number {
-    width: 1em;
-    height: 1em;
+    min-width: 1em;
+    min-height: 1em;
     display: inline-block;
 }
 
 button:hover {
     .check,
     .number {
-        display: none;
+        opacity: 0 !important;
     }
 
     .x {
         display: inline-block;
+        position: absolute;
+        top: 5px;
+        left: calc(50% - 4px);
     }
 }
