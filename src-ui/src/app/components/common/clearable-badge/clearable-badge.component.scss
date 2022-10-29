@@ -1,0 +1,25 @@
+.badge {
+    width: 20px;
+    height: 20px;
+}
+
+.x {
+    display: none;
+}
+
+.number {
+    width: 1em;
+    height: 1em;
+    display: inline-block;
+}
+
+button:hover {
+    .check,
+    .number {
+        display: none;
+    }
+
+    .x {
+        display: inline-block;
+    }
+}

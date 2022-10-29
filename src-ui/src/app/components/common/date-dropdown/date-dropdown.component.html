@@ -1,11 +1,7 @@
   <div class="btn-group w-100" ngbDropdown role="group">
   <button class="btn btn-sm" id="dropdown{{title}}" ngbDropdownToggle [ngClass]="dateBefore || dateAfter ? 'btn-primary' : 'btn-outline-primary'">
     {{title}}
-    <div *ngIf="isActive" class="position-absolute top-0 start-100 p-1 translate-middle badge bg-secondary border border-light rounded-circle">
-      <svg width="1em" height="1em" class="m-0 p-0 opacity-75" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-        <use xlink:href="assets/bootstrap-icons.svg#check-lg"/>
-      </svg><span class="visually-hidden">selected</span>
-    </div>
+    <app-clearable-badge [selected]="isActive" (cleared)="reset()"></app-clearable-badge><span class="visually-hidden">selected</span>
   </button>
   <div class="dropdown-menu date-dropdown shadow pt-0" ngbDropdownMenu attr.aria-labelledby="dropdown{{title}}">
     <div class="list-group list-group-flush">
