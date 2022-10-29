@@ -106,6 +106,13 @@ export class DateDropdownComponent implements OnInit, OnDestroy {
     }
   }
 
+  reset() {
+    this.dateBefore = null
+    this.dateAfter = null
+    this.relativeDate = null
+    this.onChange()
+  }
+
   setRelativeDate(rd: RelativeDate) {
     this.dateBefore = null
     this.dateAfter = null
