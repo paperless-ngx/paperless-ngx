@@ -709,13 +709,21 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     this.updateRules()
   }
 
-  textFilterEnter() {
-    const filterString = (
-      this.textFilterInput.nativeElement as HTMLInputElement
-    ).value
-    if (filterString.length) {
-      this.updateTextFilter(filterString)
+  textFilterKeyup(event: KeyboardEvent) {
+    if (event.key == 'Enter') {
+      const filterString = (
+        this.textFilterInput.nativeElement as HTMLInputElement
+      ).value
+      if (filterString.length) {
+        this.updateTextFilter(filterString)
+      }
+    } else if (event.key == 'Escape') {
+      this.resetTextField()
     }
+  }
+
+  resetTextField() {
+    this.updateTextFilter('')
   }
 
   changeTextFilterTarget(target) {
