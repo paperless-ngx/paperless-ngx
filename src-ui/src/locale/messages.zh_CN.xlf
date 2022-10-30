@@ -524,7 +524,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">65</context>
+          <context context-type="linenumber">88</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
@@ -812,7 +812,7 @@
         <source>Confirmation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/confirm-dialog.component.ts</context>
-          <context context-type="linenumber">17</context>
+          <context context-type="linenumber">20</context>
         </context-group>
         <target state="translated">确认</target>
       </trans-unit>
@@ -820,7 +820,7 @@
         <source>Confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/confirm-dialog.component.ts</context>
-          <context context-type="linenumber">29</context>
+          <context context-type="linenumber">32</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -844,7 +844,7 @@
         <source>After</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.html</context>
-          <context context-type="linenumber">13</context>
+          <context context-type="linenumber">21</context>
         </context-group>
         <target state="translated">之后</target>
       </trans-unit>
@@ -852,11 +852,11 @@
         <source>Clear</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.html</context>
-          <context context-type="linenumber">18</context>
+          <context context-type="linenumber">26</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.html</context>
-          <context context-type="linenumber">41</context>
+          <context context-type="linenumber">49</context>
         </context-group>
         <target state="translated">清除</target>
       </trans-unit>
@@ -864,7 +864,7 @@
         <source>Before</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.html</context>
-          <context context-type="linenumber">36</context>
+          <context context-type="linenumber">44</context>
         </context-group>
         <target state="translated">之前</target>
       </trans-unit>
@@ -872,7 +872,7 @@
         <source>Last 7 days</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.ts</context>
-          <context context-type="linenumber">38</context>
+          <context context-type="linenumber">43</context>
         </context-group>
         <target state="translated">过去7天</target>
       </trans-unit>
@@ -880,7 +880,7 @@
         <source>Last month</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.ts</context>
-          <context context-type="linenumber">39</context>
+          <context context-type="linenumber">47</context>
         </context-group>
         <target state="translated">上个月</target>
       </trans-unit>
@@ -888,7 +888,7 @@
         <source>Last 3 months</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.ts</context>
-          <context context-type="linenumber">40</context>
+          <context context-type="linenumber">51</context>
         </context-group>
         <target state="translated">过去3个月</target>
       </trans-unit>
@@ -896,7 +896,7 @@
         <source>Last year</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.ts</context>
-          <context context-type="linenumber">41</context>
+          <context context-type="linenumber">55</context>
         </context-group>
         <target state="translated">去年</target>
       </trans-unit>
@@ -1370,7 +1370,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">88</context>
+          <context context-type="linenumber">93</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
@@ -1418,7 +1418,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">152</context>
+          <context context-type="linenumber">157</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
@@ -1446,11 +1446,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">134</context>
+          <context context-type="linenumber">139</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">131</context>
+          <context context-type="linenumber">153</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
@@ -1775,6 +1775,10 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">43</context>
         </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
         <target state="translated">关闭</target>
       </trans-unit>
       <trans-unit id="4452427314943113135" datatype="html">
@@ -1829,7 +1833,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">128</context>
+          <context context-type="linenumber">133</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
@@ -1853,7 +1857,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">140</context>
+          <context context-type="linenumber">145</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
@@ -1877,7 +1881,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">146</context>
+          <context context-type="linenumber">151</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
@@ -2459,7 +2463,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">173</context>
+          <context context-type="linenumber">178</context>
         </context-group>
         <target state="translated">按联系人过滤</target>
       </trans-unit>
@@ -2471,7 +2475,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">178</context>
+          <context context-type="linenumber">183</context>
         </context-group>
         <target state="translated">按标签过滤</target>
       </trans-unit>
@@ -2535,7 +2539,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">182</context>
+          <context context-type="linenumber">187</context>
         </context-group>
         <target state="translated">按文档类型筛选</target>
       </trans-unit>
@@ -2547,7 +2551,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">187</context>
+          <context context-type="linenumber">192</context>
         </context-group>
         <target state="translated">按存储路径筛选</target>
       </trans-unit>
@@ -2663,7 +2667,7 @@
         <source>Views</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">63</context>
+          <context context-type="linenumber">64</context>
         </context-group>
         <target state="translated">视图</target>
       </trans-unit>
@@ -2671,7 +2675,7 @@
         <source>Save &quot;<x id="INTERPOLATION" equiv-text="{{list.activeSavedViewTitle}}"/>&quot;</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">70</context>
+          <context context-type="linenumber">75</context>
         </context-group>
         <target state="translated">保存 <x id="INTERPOLATION" equiv-text="{{list.activeSavedViewTitle}}"/></target>
       </trans-unit>
@@ -2679,7 +2683,7 @@
         <source>Save as...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">71</context>
+          <context context-type="linenumber">76</context>
         </context-group>
         <target state="translated">另存为...</target>
       </trans-unit>
@@ -2687,7 +2691,7 @@
         <source>{VAR_PLURAL, plural, =1 {Selected <x id="INTERPOLATION"/> of one document} other {Selected <x id="INTERPOLATION"/> of <x id="INTERPOLATION_1"/> documents}}</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">90</context>
+          <context context-type="linenumber">95</context>
         </context-group>
         <target state="translated">{VAR_PLURAL, plural, =1 {已选择<x id="INTERPOLATION"/> 一个文档} other {已选择<x id="INTERPOLATION"/> 共 <x id="INTERPOLATION_1"/> 文档}}</target>
       </trans-unit>
@@ -2695,7 +2699,7 @@
         <source>{VAR_PLURAL, plural, =1 {One document} other {<x id="INTERPOLATION"/> documents}}</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">92</context>
+          <context context-type="linenumber">97</context>
         </context-group>
         <target state="translated">{VAR_PLURAL, plural, =1 {一个文档} other {<x id="INTERPOLATION"/> 文档}}</target>
       </trans-unit>
@@ -2703,7 +2707,7 @@
         <source>(filtered)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">92</context>
+          <context context-type="linenumber">97</context>
         </context-group>
         <target state="translated">(已过滤)</target>
       </trans-unit>
@@ -2711,7 +2715,7 @@
         <source>Error while loading documents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">105</context>
+          <context context-type="linenumber">110</context>
         </context-group>
         <target state="translated">加载文档时出错</target>
       </trans-unit>
@@ -2719,11 +2723,11 @@
         <source>ASN</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">122</context>
+          <context context-type="linenumber">127</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">136</context>
+          <context context-type="linenumber">158</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
@@ -2735,11 +2739,11 @@
         <source>Added</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">158</context>
+          <context context-type="linenumber">163</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
-          <context context-type="linenumber">61</context>
+          <context context-type="linenumber">60</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
@@ -2751,7 +2755,7 @@
         <source>Edit document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">177</context>
+          <context context-type="linenumber">182</context>
         </context-group>
         <target state="translated">编辑文档</target>
       </trans-unit>
@@ -2759,7 +2763,7 @@
         <source>View &quot;<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>&quot; saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">170</context>
+          <context context-type="linenumber">196</context>
         </context-group>
         <target state="translated">视图<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>保存成功。</target>
       </trans-unit>
@@ -2767,7 +2771,7 @@
         <source>View &quot;<x id="PH" equiv-text="savedView.name"/>&quot; created successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">210</context>
+          <context context-type="linenumber">237</context>
         </context-group>
         <target state="translated">视图：<x id="PH" equiv-text="savedView.name"/>创建成功。</target>
       </trans-unit>
@@ -2775,7 +2779,7 @@
         <source>Reset filters</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
-          <context context-type="linenumber">71</context>
+          <context context-type="linenumber">73</context>
         </context-group>
         <target state="translated">重置过滤器</target>
       </trans-unit>
@@ -2783,7 +2787,7 @@
         <source>Correspondent: <x id="PH" equiv-text="this.correspondents.find((c) =&gt; c.id == +rule.value)?.name"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">72,74</context>
+          <context context-type="linenumber">94,96</context>
         </context-group>
         <target state="translated">联系人: <x id="PH" equiv-text="this.correspondents.find((c) =&gt; c.id == +rule.value)?.name"/></target>
       </trans-unit>
@@ -2791,7 +2795,7 @@
         <source>Without correspondent</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">76</context>
+          <context context-type="linenumber">98</context>
         </context-group>
         <target state="translated">没有联系人</target>
       </trans-unit>
@@ -2799,7 +2803,7 @@
         <source>Type: <x id="PH" equiv-text="this.documentTypes.find((dt) =&gt; dt.id == +rule.value)?.name"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">81,83</context>
+          <context context-type="linenumber">103,105</context>
         </context-group>
         <target state="translated">类型: <x id="PH" equiv-text="this.documentTypes.find((dt) =&gt; dt.id == +rule.value)?.name"/></target>
       </trans-unit>
@@ -2807,7 +2811,7 @@
         <source>Without document type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">85</context>
+          <context context-type="linenumber">107</context>
         </context-group>
         <target state="translated">没有文档类型</target>
       </trans-unit>
@@ -2815,7 +2819,7 @@
         <source>Tag: <x id="PH" equiv-text="this.tags.find((t) =&gt; t.id == +rule.value)?.name"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">89,91</context>
+          <context context-type="linenumber">111,113</context>
         </context-group>
         <target state="translated">标签: <x id="PH" equiv-text="this.tags.find((t) =&gt; t.id == +rule.value)?.name"/></target>
       </trans-unit>
@@ -2823,7 +2827,7 @@
         <source>Without any tag</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">95</context>
+          <context context-type="linenumber">117</context>
         </context-group>
         <target state="translated">没有任何标签</target>
       </trans-unit>
@@ -2831,7 +2835,7 @@
         <source>Title: <x id="PH" equiv-text="rule.value"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">99</context>
+          <context context-type="linenumber">121</context>
         </context-group>
         <target state="translated">标题：<x id="PH" equiv-text="rule.value"/></target>
       </trans-unit>
@@ -2839,7 +2843,7 @@
         <source>ASN: <x id="PH" equiv-text="rule.value"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">102</context>
+          <context context-type="linenumber">124</context>
         </context-group>
         <target state="translated">ASN：<x id="PH" equiv-text="rule.value"/></target>
       </trans-unit>
@@ -2847,7 +2851,7 @@
         <source>Title &amp; content</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">134</context>
+          <context context-type="linenumber">156</context>
         </context-group>
         <target state="translated">标题 &amp; 内容</target>
       </trans-unit>
@@ -2855,7 +2859,7 @@
         <source>Advanced search</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">139</context>
+          <context context-type="linenumber">161</context>
         </context-group>
         <target state="translated">高级搜索</target>
       </trans-unit>
@@ -2863,7 +2867,7 @@
         <source>More like</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">145</context>
+          <context context-type="linenumber">167</context>
         </context-group>
         <target state="translated">更多</target>
       </trans-unit>
@@ -2871,7 +2875,7 @@
         <source>equals</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">164</context>
+          <context context-type="linenumber">186</context>
         </context-group>
         <target state="translated">等于</target>
       </trans-unit>
@@ -2879,7 +2883,7 @@
         <source>is empty</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">168</context>
+          <context context-type="linenumber">190</context>
         </context-group>
         <target state="translated">为空</target>
       </trans-unit>
@@ -2887,7 +2891,7 @@
         <source>is not empty</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">172</context>
+          <context context-type="linenumber">194</context>
         </context-group>
         <target state="translated">不为空</target>
       </trans-unit>
@@ -2895,7 +2899,7 @@
         <source>greater than</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">176</context>
+          <context context-type="linenumber">198</context>
         </context-group>
         <target state="translated">高于</target>
       </trans-unit>
@@ -2903,7 +2907,7 @@
         <source>less than</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">180</context>
+          <context context-type="linenumber">202</context>
         </context-group>
         <target state="translated">低于</target>
       </trans-unit>
@@ -3848,6 +3852,10 @@
           <context context-type="linenumber">18</context>
         </context-group>
         <context-group purpose="location">
+          <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+        <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
           <context context-type="linenumber">116</context>
         </context-group>
@@ -3884,6 +3892,30 @@
           <context context-type="linenumber">22</context>
         </context-group>
         <target state="translated">离开页面</target>
+      </trans-unit>
+      <trans-unit id="1649285023712919370" datatype="html">
+        <source>You have unsaved changes to the saved view</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+        <target state="needs-translation">You have unsaved changes to the saved view</target>
+      </trans-unit>
+      <trans-unit id="7282050913165342352" datatype="html">
+        <source>Are you sure you want to close this saved view?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
+          <context context-type="linenumber">30</context>
+        </context-group>
+        <target state="needs-translation">Are you sure you want to close this saved view?</target>
+      </trans-unit>
+      <trans-unit id="856284624775342512" datatype="html">
+        <source>Save and close</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+        <target state="needs-translation">Save and close</target>
       </trans-unit>
       <trans-unit id="7536524521722799066" datatype="html">
         <source>(no title)</source>
