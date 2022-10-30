@@ -397,6 +397,10 @@ textarea,
       background-color: var(--bs-primary);
       color: var(--pngx-primary-text-contrast);
     }
+
+    &.disabled, &:disabled {
+      opacity: 50%;
+    }
   }
 }
 
