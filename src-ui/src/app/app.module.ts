@@ -69,6 +69,7 @@ import { ColorComponent } from './components/common/input/color/color.component'
 import { DocumentAsnComponent } from './components/document-asn/document-asn.component'
 import { DocumentCommentsComponent } from './components/document-comments/document-comments.component'
 import { DirtyDocGuard } from './guards/dirty-doc.guard'
+import { DirtySavedViewGuard } from './guards/dirty-saved-view.guard'
 import { StoragePathListComponent } from './components/manage/storage-path-list/storage-path-list.component'
 import { StoragePathEditDialogComponent } from './components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
 import { SettingsService } from './services/settings.service'
@@ -215,6 +216,7 @@ function initializeApp(settings: SettingsService) {
     { provide: NgbDateAdapter, useClass: ISODateAdapter },
     { provide: NgbDateParserFormatter, useClass: LocalizedDateParserFormatter },
     DirtyDocGuard,
+    DirtySavedViewGuard,
   ],
   bootstrap: [AppComponent],
 })
