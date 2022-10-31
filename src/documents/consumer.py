@@ -405,6 +405,7 @@ class Consumer(LoggingMixin):
 
                 # Don't save with the lock active. Saving will cause the file
                 # renaming logic to acquire the lock as well.
+                # This triggers things like file renaming
                 document.save()
 
                 # Delete the file only if it was successfully consumed
@@ -437,6 +438,9 @@ class Consumer(LoggingMixin):
         self.log("info", f"Document {document} consumption finished")
 
         self._send_progress(100, 100, "SUCCESS", MESSAGE_FINISHED, document.id)
+
+        # Return the most up to date fields
+        document.refresh_from_db()
 
         return document
 
