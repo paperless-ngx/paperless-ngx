@@ -109,14 +109,14 @@ custom_container_init() {
 		fi
 
 		# Make sure custom init directory has files in it
-		if [ -n "$(/usr/bin/ls -A "${custom_script_dir}" 2>/dev/null)" ]; then
+		if [ -n "$(/bin/ls -A "${custom_script_dir}" 2>/dev/null)" ]; then
 			echo "[custom-init] files found in ${custom_script_dir} executing"
 			# Loop over files in the directory
 			for SCRIPT in "${custom_script_dir}"/*; do
 				NAME="$(basename "${SCRIPT}")"
 				if [ -f "${SCRIPT}" ]; then
 					echo "[custom-init] ${NAME}: executing..."
-					/usr/bin/bash "${SCRIPT}"
+					/bin/bash "${SCRIPT}"
 					echo "[custom-init] ${NAME}: exited $?"
 				elif [ ! -f "${SCRIPT}" ]; then
 					echo "[custom-init] ${NAME}: is not a file"
