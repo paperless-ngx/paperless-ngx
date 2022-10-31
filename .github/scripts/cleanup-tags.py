@@ -249,10 +249,12 @@ class MainImageTagsCleaner(RegistryTagsCleaner):
         will be removed, if the corresponding branch no longer exists.
         """
 
+        # Default to everything gets kept still
+        super().decide_what_tags_to_keep()
+
         # Locate the feature branches
         feature_branches = {}
         for branch in self.branch_api.get_branches(
-            owner=self.repo_owner,
             repo=self.repo_name,
         ):
             if branch.name.startswith("feature-"):
@@ -260,6 +262,10 @@ class MainImageTagsCleaner(RegistryTagsCleaner):
                 feature_branches[branch.name] = branch
 
         logger.info(f"Located {len(feature_branches)} feature branches")
+
+        if not len(feature_branches):
+            # Our work here is done, delete nothing
+            return
 
         # Filter to packages which are tagged with feature-*
         packages_tagged_feature: List[ContainerPackage] = []
