@@ -16,7 +16,6 @@ django-extensions = "*"
 django-filter = "~=22.1"
 djangorestframework = "~=3.13"
 filelock = "*"
-fuzzywuzzy = {extras = ["speedup"], version = "*"}
 gunicorn = "*"
 imap-tools = "*"
 langdetect = "*"
@@ -28,6 +27,7 @@ python-dotenv = "*"
 python-dateutil = "*"
 python-magic = "*"
 psycopg2 = "*"
+rapidfuzz = "*"
 redis = {extras = ["hiredis"], version = "*"}
 scikit-learn = "~=1.1"
 # Pin this until piwheels is building 1.9 (see https://www.piwheels.org/project/scipy/)
