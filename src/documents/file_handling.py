@@ -1,4 +1,3 @@
-import datetime
 import logging
 import os
 from collections import defaultdict
@@ -172,7 +171,7 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
             else:
                 asn = "-none-"
 
-            # Convert UTC database date to localized date
+            # Convert UTC database datetime to localized date
             local_added = timezone.localdate(doc.added)
             local_created = timezone.localdate(doc.created)
 
@@ -180,14 +179,14 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
                 title=pathvalidate.sanitize_filename(doc.title, replacement_text="-"),
                 correspondent=correspondent,
                 document_type=document_type,
-                created=datetime.date.isoformat(local_created),
+                created=local_created.isoformat(),
                 created_year=local_created.strftime("%Y"),
                 created_year_short=local_created.strftime("%y"),
                 created_month=local_created.strftime("%m"),
                 created_month_name=local_created.strftime("%B"),
                 created_month_name_short=local_created.strftime("%b"),
                 created_day=local_created.strftime("%d"),
-                added=datetime.date.isoformat(local_added),
+                added=local_added.isoformat(),
                 added_year=local_added.strftime("%Y"),
                 added_year_short=local_added.strftime("%y"),
                 added_month=local_added.strftime("%m"),
