@@ -18,7 +18,7 @@ LABEL org.opencontainers.image.description="A intermediate image with pikepdf wh
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG PIKEPDF_VERSION
-# These not not used, but will still bust the cache if one changes
+# These are not used, but will still bust the cache if one changes
 # Otherwise, the main image will try to build thing (and fail)
 ARG PILLOW_VERSION
 ARG LXML_VERSION
