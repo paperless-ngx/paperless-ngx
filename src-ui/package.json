@@ -19,7 +19,7 @@
     "@angular/forms": "~14.2.4",
     "@angular/localize": "~14.2.4",
     "@angular/platform-browser": "~14.2.4",
-    "@angular/platform-browser-dynamic": "~14.2.4",
+    "@angular/platform-browser-dynamic": "~14.2.8",
     "@angular/router": "~14.2.4",
     "@ng-bootstrap/ng-bootstrap": "^13.0.0",
     "@ng-select/ng-select": "^9.0.2",
