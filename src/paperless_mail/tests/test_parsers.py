@@ -1,9 +1,6 @@
 import datetime
-import hashlib
 import os
 from unittest import mock
-from urllib.error import HTTPError
-from urllib.request import urlopen
 
 import pytest
 from django.test import TestCase
@@ -15,19 +12,25 @@ from pdfminer.high_level import extract_text
 class TestParser(TestCase):
     SAMPLE_FILES = os.path.join(os.path.dirname(__file__), "samples")
 
-    def test_get_parsed(self):
-        parser = MailDocumentParser(None)
+    def setUp(self) -> None:
+        self.parser = MailDocumentParser(logging_group=None)
 
+    def tearDown(self) -> None:
+        self.parser.cleanup()
+
+    def test_get_parsed(self):
         # Check if exception is raised when parsing fails.
         with pytest.raises(ParseError):
-            parser.get_parsed(os.path.join(self.SAMPLE_FILES, "na"))
+            self.parser.get_parsed(os.path.join(self.SAMPLE_FILES, "na"))
 
         # Check if exception is raised when the mail is faulty.
         with pytest.raises(ParseError):
-            parser.get_parsed(os.path.join(self.SAMPLE_FILES, "broken.eml"))
+            self.parser.get_parsed(os.path.join(self.SAMPLE_FILES, "broken.eml"))
 
         # Parse Test file and check relevant content
-        parsed1 = parser.get_parsed(os.path.join(self.SAMPLE_FILES, "simple_text.eml"))
+        parsed1 = self.parser.get_parsed(
+            os.path.join(self.SAMPLE_FILES, "simple_text.eml"),
+        )
 
         self.assertEqual(parsed1.date.year, 2022)
         self.assertEqual(parsed1.date.month, 10)
@@ -42,48 +45,45 @@ class TestParser(TestCase):
         self.assertEqual(parsed1.to, ("some@one.de",))
 
         # Check if same parsed object as before is returned, even if another file is given.
-        parsed2 = parser.get_parsed(os.path.join(os.path.join(self.SAMPLE_FILES, "na")))
+        parsed2 = self.parser.get_parsed(
+            os.path.join(os.path.join(self.SAMPLE_FILES, "na")),
+        )
         self.assertEqual(parsed1, parsed2)
 
-    @staticmethod
-    def hashfile(file):
-        buf_size = 65536  # An arbitrary (but fixed) buffer
-        sha256 = hashlib.sha256()
-        with open(file, "rb") as f:
-            while True:
-                data = f.read(buf_size)
-                if not data:
-                    break
-                sha256.update(data)
-        return sha256.hexdigest()
-
+    @mock.patch("paperless_mail.parsers.MailDocumentParser.generate_pdf")
     @mock.patch("paperless_mail.parsers.make_thumbnail_from_pdf")
-    @mock.patch("documents.loggers.LoggingMixin.log")  # Disable log output
-    def test_get_thumbnail(self, m, mock_make_thumbnail_from_pdf: mock.MagicMock):
-        parser = MailDocumentParser(None)
-        thumb = parser.get_thumbnail(
+    def test_get_thumbnail(
+        self,
+        mock_make_thumbnail_from_pdf: mock.MagicMock,
+        mock_generate_pdf: mock.MagicMock,
+    ):
+        mocked_return = "Passing the return value through.."
+        mock_make_thumbnail_from_pdf.return_value = mocked_return
+
+        mock_generate_pdf.return_value = "Mocked return value.."
+
+        thumb = self.parser.get_thumbnail(
             os.path.join(self.SAMPLE_FILES, "simple_text.eml"),
             "message/rfc822",
         )
         self.assertEqual(
-            parser.archive_path,
+            self.parser.archive_path,
             mock_make_thumbnail_from_pdf.call_args_list[0].args[0],
         )
         self.assertEqual(
-            parser.tempdir,
+            self.parser.tempdir,
             mock_make_thumbnail_from_pdf.call_args_list[0].args[1],
         )
+        self.assertEqual(mocked_return, thumb)
 
     @mock.patch("documents.loggers.LoggingMixin.log")
     def test_extract_metadata(self, m: mock.MagicMock):
-        parser = MailDocumentParser(None)
-
         # Validate if warning is logged when parsing fails
-        self.assertEqual([], parser.extract_metadata("na", "message/rfc822"))
+        self.assertEqual([], self.parser.extract_metadata("na", "message/rfc822"))
         self.assertEqual("warning", m.call_args[0][0])
 
         # Validate Metadata parsing returns the expected results
-        metadata = parser.extract_metadata(
+        metadata = self.parser.extract_metadata(
             os.path.join(self.SAMPLE_FILES, "simple_text.eml"),
             "message/rfc822",
         )
@@ -209,22 +209,22 @@ class TestParser(TestCase):
             in metadata,
         )
 
-    @mock.patch("documents.loggers.LoggingMixin.log")  # Disable log output
-    def test_parse(self, m):
-        parser = MailDocumentParser(None)
-
+    def test_parse_na(self):
         # Check if exception is raised when parsing fails.
         with pytest.raises(ParseError):
-            parser.parse(
+            self.parser.parse(
                 os.path.join(os.path.join(self.SAMPLE_FILES, "na")),
                 "message/rfc822",
             )
 
+    @mock.patch("paperless_mail.parsers.MailDocumentParser.generate_pdf")
+    @mock.patch("documents.loggers.LoggingMixin.log")  # Disable log output
+    def test_parse_html_eml(self, m, n):
         # Validate parsing returns the expected results
-        parser.parse(os.path.join(self.SAMPLE_FILES, "html.eml"), "message/rfc822")
+        self.parser.parse(os.path.join(self.SAMPLE_FILES, "html.eml"), "message/rfc822")
 
         text_expected = "Some Text\nand an embedded image.\n\nSubject: HTML Message\n\nFrom: Name <someone@example.de>\n\nTo: someone@example.de\n\nAttachments: IntM6gnXFm00FEV5.png (6.89 KiB), 600+kbfile.txt (0.59 MiB)\n\nHTML content: Some Text\nand an embedded image.\nParagraph unchanged."
-        self.assertEqual(text_expected, parser.text)
+        self.assertEqual(text_expected, self.parser.text)
         self.assertEqual(
             datetime.datetime(
                 2022,
@@ -235,17 +235,20 @@ class TestParser(TestCase):
                 19,
                 tzinfo=datetime.timezone(datetime.timedelta(seconds=7200)),
             ),
-            parser.date,
+            self.parser.date,
         )
 
+    @mock.patch("paperless_mail.parsers.MailDocumentParser.generate_pdf")
+    @mock.patch("documents.loggers.LoggingMixin.log")  # Disable log output
+    def test_parse_simple_eml(self, m, n):
         # Validate parsing returns the expected results
-        parser = MailDocumentParser(None)
-        parser.parse(
+
+        self.parser.parse(
             os.path.join(self.SAMPLE_FILES, "simple_text.eml"),
             "message/rfc822",
         )
         text_expected = "This is just a simple Text Mail.\n\nSubject: Simple Text Mail\n\nFrom: Some One <mail@someserver.de>\n\nTo: some@one.de\n\nCC: asdasd@æsdasd.de, asdadasdasdasda.asdasd@æsdasd.de\n\nBCC: fdf@fvf.de\n\n"
-        self.assertEqual(text_expected, parser.text)
+        self.assertEqual(text_expected, self.parser.text)
         self.assertEqual(
             datetime.datetime(
                 2022,
@@ -256,33 +259,32 @@ class TestParser(TestCase):
                 43,
                 tzinfo=datetime.timezone(datetime.timedelta(seconds=7200)),
             ),
-            parser.date,
+            self.parser.date,
         )
 
         # Just check if file exists, the unittest for generate_pdf() goes deeper.
-        self.assertTrue(os.path.isfile(parser.archive_path))
+        self.assertTrue(os.path.isfile(self.parser.archive_path))
 
     @mock.patch("documents.loggers.LoggingMixin.log")  # Disable log output
     def test_tika_parse(self, m):
         html = '<html><head><meta http-equiv="content-type" content="text/html; charset=UTF-8"></head><body><p>Some Text</p></body></html>'
         expected_text = "\n\n\n\n\n\n\n\n\nSome Text\n"
 
-        parser = MailDocumentParser(None)
-        tika_server_original = parser.tika_server
+        tika_server_original = self.parser.tika_server
 
         # Check if exception is raised when Tika cannot be reached.
         with pytest.raises(ParseError):
-            parser.tika_server = ""
-            parser.tika_parse(html)
+            self.parser.tika_server = ""
+            self.parser.tika_parse(html)
 
         # Check unsuccessful parsing
-        parser.tika_server = tika_server_original
+        self.parser.tika_server = tika_server_original
 
-        parsed = parser.tika_parse(None)
+        parsed = self.parser.tika_parse(None)
         self.assertEqual("", parsed)
 
         # Check successful parsing
-        parsed = parser.tika_parse(html)
+        parsed = self.parser.tika_parse(html)
         self.assertEqual(expected_text, parsed)
 
     @mock.patch("paperless_mail.parsers.MailDocumentParser.generate_pdf_from_mail")
@@ -290,32 +292,63 @@ class TestParser(TestCase):
     def test_generate_pdf_parse_error(self, m: mock.MagicMock, n: mock.MagicMock):
         m.return_value = b""
         n.return_value = b""
-        parser = MailDocumentParser(None)
 
         # Check if exception is raised when the pdf can not be created.
-        parser.gotenberg_server = ""
+        self.parser.gotenberg_server = ""
         with pytest.raises(ParseError):
-            parser.generate_pdf(os.path.join(self.SAMPLE_FILES, "html.eml"))
+            self.parser.generate_pdf(os.path.join(self.SAMPLE_FILES, "html.eml"))
 
-    @mock.patch("documents.loggers.LoggingMixin.log")  # Disable log output
-    def test_generate_pdf(self, m):
-        parser = MailDocumentParser(None)
-
+    @mock.patch("paperless_mail.parsers.requests.post")
+    @mock.patch("paperless_mail.parsers.MailDocumentParser.generate_pdf_from_mail")
+    @mock.patch("paperless_mail.parsers.MailDocumentParser.generate_pdf_from_html")
+    def test_generate_pdf(
+        self,
+        mock_generate_pdf_from_html: mock.MagicMock,
+        mock_generate_pdf_from_mail: mock.MagicMock,
+        mock_post: mock.MagicMock,
+    ):
         # Check if exception is raised when the mail can not be parsed.
         with pytest.raises(ParseError):
-            parser.generate_pdf(os.path.join(self.SAMPLE_FILES, "broken.eml"))
+            self.parser.generate_pdf(os.path.join(self.SAMPLE_FILES, "broken.eml"))
 
-        pdf_path = parser.generate_pdf(os.path.join(self.SAMPLE_FILES, "html.eml"))
+        mock_generate_pdf_from_mail.return_value = b"Mail Return"
+        mock_generate_pdf_from_html.return_value = b"HTML Return"
+
+        mock_response = mock.MagicMock()
+        mock_response.content = b"Content"
+        mock_post.return_value = mock_response
+        pdf_path = self.parser.generate_pdf(os.path.join(self.SAMPLE_FILES, "html.eml"))
         self.assertTrue(os.path.isfile(pdf_path))
 
-        extracted = extract_text(pdf_path)
-        expected = "From Name <someone@example.de>\n\n2022-10-15 09:23\n\nSubject HTML Message\n\nTo someone@example.de\n\nAttachments IntM6gnXFm00FEV5.png (6.89 KiB), 600+kbﬁle.txt (0.59 MiB)\n\nSome Text \n\nand an embedded image.\n\n\x0cSome Text\n\n  This image should not be shown.\n\nand an embedded image.\n\nParagraph unchanged.\n\n\x0c"
-        self.assertEqual(expected, extracted)
+        mock_generate_pdf_from_mail.assert_called_once_with(
+            self.parser.get_parsed(None),
+        )
+        mock_generate_pdf_from_html.assert_called_once_with(
+            self.parser.get_parsed(None).html,
+            self.parser.get_parsed(None).attachments,
+        )
+        self.assertEqual(
+            self.parser.gotenberg_server + "/forms/pdfengines/merge",
+            mock_post.call_args.args[0],
+        )
+        self.assertEqual({}, mock_post.call_args.kwargs["headers"])
+        self.assertEqual(
+            b"Mail Return",
+            mock_post.call_args.kwargs["files"]["1_mail.pdf"][1].read(),
+        )
+        self.assertEqual(
+            b"HTML Return",
+            mock_post.call_args.kwargs["files"]["2_html.pdf"][1].read(),
+        )
+
+        mock_response.raise_for_status.assert_called_once()
+
+        with open(pdf_path, "rb") as file:
+            self.assertEqual(b"Content", file.read())
 
     def test_mail_to_html(self):
-        parser = MailDocumentParser(None)
-        mail = parser.get_parsed(os.path.join(self.SAMPLE_FILES, "html.eml"))
-        html_handle = parser.mail_to_html(mail)
+        mail = self.parser.get_parsed(os.path.join(self.SAMPLE_FILES, "html.eml"))
+        html_handle = self.parser.mail_to_html(mail)
 
         with open(
             os.path.join(self.SAMPLE_FILES, "html.eml.html"),
@@ -324,13 +357,12 @@ class TestParser(TestCase):
 
     @mock.patch("documents.loggers.LoggingMixin.log")  # Disable log output
     def test_generate_pdf_from_mail(self, m):
-        parser = MailDocumentParser(None)
-        mail = parser.get_parsed(os.path.join(self.SAMPLE_FILES, "html.eml"))
+        mail = self.parser.get_parsed(os.path.join(self.SAMPLE_FILES, "html.eml"))
 
-        pdf_path = os.path.join(parser.tempdir, "test_generate_pdf_from_mail.pdf")
+        pdf_path = os.path.join(self.parser.tempdir, "test_generate_pdf_from_mail.pdf")
 
         with open(pdf_path, "wb") as file:
-            file.write(parser.generate_pdf_from_mail(mail))
+            file.write(self.parser.generate_pdf_from_mail(mail))
             file.close()
 
         extracted = extract_text(pdf_path)
@@ -343,8 +375,6 @@ class TestParser(TestCase):
                 self.payload = payload
                 self.content_id = content_id
 
-        parser = MailDocumentParser(None)
-
         result = None
 
         with open(os.path.join(self.SAMPLE_FILES, "sample.html")) as html_file:
@@ -354,7 +384,7 @@ class TestParser(TestCase):
                 attachments = [
                     MailAttachmentMock(png, "part1.pNdUSz0s.D3NqVtPg@example.de"),
                 ]
-                result = parser.transform_inline_html(html, attachments)
+                result = self.parser.transform_inline_html(html, attachments)
 
         resulting_html = result[-1][1].read()
         self.assertTrue(result[-1][0] == "index.html")
@@ -368,8 +398,6 @@ class TestParser(TestCase):
                 self.payload = payload
                 self.content_id = content_id
 
-        parser = MailDocumentParser(None)
-
         result = None
 
         with open(os.path.join(self.SAMPLE_FILES, "sample.html")) as html_file:
@@ -379,9 +407,9 @@ class TestParser(TestCase):
                 attachments = [
                     MailAttachmentMock(png, "part1.pNdUSz0s.D3NqVtPg@example.de"),
                 ]
-                result = parser.generate_pdf_from_html(html, attachments)
+                result = self.parser.generate_pdf_from_html(html, attachments)
 
-        pdf_path = os.path.join(parser.tempdir, "test_generate_pdf_from_html.pdf")
+        pdf_path = os.path.join(self.parser.tempdir, "test_generate_pdf_from_html.pdf")
 
         with open(pdf_path, "wb") as file:
             file.write(result)
@@ -390,16 +418,3 @@ class TestParser(TestCase):
         extracted = extract_text(pdf_path)
         expected = "Some Text\n\n  This image should not be shown.\n\nand an embedded image.\n\nParagraph unchanged.\n\n\x0c"
         self.assertEqual(expected, extracted)
-
-    def test_is_online_image_still_available(self):
-        """
-        A public image is used in the html sample file. We have no control
-        whether this image stays online forever, so here we check if it is still there
-        """
-
-        # Start by Testing if nonexistent URL really throws an Exception
-        with pytest.raises(HTTPError):
-            urlopen("https://upload.wikimedia.org/wikipedia/en/f/f7/nonexistent.png")
-
-        # Now check the URL used in samples/sample.html
-        urlopen("https://upload.wikimedia.org/wikipedia/en/f/f7/RickRoll.png")
