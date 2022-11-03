@@ -13,6 +13,9 @@ export class ConfirmDialogComponent {
   @Output()
   public confirmClicked = new EventEmitter()
 
+  @Output()
+  public alternativeClicked = new EventEmitter()
+
   @Input()
   title = $localize`Confirmation`
 
@@ -29,13 +32,21 @@ export class ConfirmDialogComponent {
   btnCaption = $localize`Confirm`
 
   @Input()
+  alternativeBtnClass = 'btn-secondary'
+
+  @Input()
+  alternativeBtnCaption
+
+  @Input()
   buttonsEnabled = true
 
   confirmButtonEnabled = true
+  alternativeButtonEnabled = true
   seconds = 0
   secondsTotal = 0
 
   confirmSubject: Subject<boolean>
+  alternativeSubject: Subject<boolean>
 
   delayConfirm(seconds: number) {
     const refreshInterval = 0.15 // s
@@ -67,5 +78,11 @@ export class ConfirmDialogComponent {
     this.confirmClicked.emit()
     this.confirmSubject?.next(true)
     this.confirmSubject?.complete()
+  }
+
+  alternative() {
+    this.alternativeClicked.emit()
+    this.alternativeSubject?.next(true)
+    this.alternativeSubject?.complete()
   }
 }

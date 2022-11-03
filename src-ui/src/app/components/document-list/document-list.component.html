@@ -60,14 +60,19 @@
   </div>
 
   <div class="btn-group ms-2 flex-fill" ngbDropdown role="group">
-    <button class="btn btn-sm btn-outline-primary dropdown-toggle flex-fill" tourAnchor="tour.documents-views" ngbDropdownToggle i18n>Views</button>
+    <button class="btn btn-sm btn-outline-primary dropdown-toggle flex-fill" tourAnchor="tour.documents-views" ngbDropdownToggle>
+      <ng-container i18n>Views</ng-container>
+      <div *ngIf="savedViewIsModified" class="position-absolute top-0 start-100 p-2 translate-middle badge bg-secondary border border-light rounded-circle">
+        <span class="visually-hidden">selected</span>
+      </div>
+    </button>
     <div class="dropdown-menu shadow dropdown-menu-right" ngbDropdownMenu>
       <ng-container *ngIf="!list.activeSavedViewId">
         <button ngbDropdownItem *ngFor="let view of savedViewService.allViews" (click)="loadViewConfig(view.id)">{{view.name}}</button>
         <div class="dropdown-divider" *ngIf="savedViewService.allViews.length > 0"></div>
       </ng-container>
 
-      <button ngbDropdownItem (click)="saveViewConfig()" *ngIf="list.activeSavedViewId" i18n>Save "{{list.activeSavedViewTitle}}"</button>
+      <button ngbDropdownItem (click)="saveViewConfig()" *ngIf="list.activeSavedViewId" [disabled]="!savedViewIsModified" i18n>Save "{{list.activeSavedViewTitle}}"</button>
       <button ngbDropdownItem (click)="saveViewConfigAs()" i18n>Save as...</button>
     </div>
   </div>

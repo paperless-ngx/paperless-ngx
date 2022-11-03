@@ -258,12 +258,18 @@ Paperless provides the following placeholders within filenames:
 * ``{tag_list}``: A comma separated list of all tags assigned to the document.
 * ``{title}``: The title of the document.
 * ``{created}``: The full date (ISO format) the document was created.
-* ``{created_year}``: Year created only.
+* ``{created_year}``: Year created only, formatted as the year with century.
+* ``{created_year_short}``: Year created only, formatted as the year without century, zero padded.
 * ``{created_month}``: Month created only (number 01-12).
+* ``{created_month_name}``: Month created name, as per locale
+* ``{created_month_name_short}``: Month created abbreviated name, as per locale
 * ``{created_day}``: Day created only (number 01-31).
 * ``{added}``: The full date (ISO format) the document was added to paperless.
 * ``{added_year}``: Year added only.
+* ``{added_year_short}``: Year added only, formatted as the year without century, zero padded.
 * ``{added_month}``: Month added only (number 01-12).
+* ``{added_month_name}``: Month added name, as per locale
+* ``{added_month_name_short}``: Month added abbreviated name, as per locale
 * ``{added_day}``: Day added only (number 01-31).
 
 

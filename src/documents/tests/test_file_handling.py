@@ -1036,6 +1036,34 @@ class TestFilenameGeneration(TestCase):
         self.assertEqual(generate_filename(doc_a), "0000002.pdf")
         self.assertEqual(generate_filename(doc_b), "SomeImportantNone/2020-07-25.pdf")
 
+    @override_settings(
+        FILENAME_FORMAT="{created_year_short}/{created_month_name_short}/{created_month_name}/{title}",
+    )
+    def test_short_names_created(self):
+        doc = Document.objects.create(
+            title="The Title",
+            created=timezone.make_aware(
+                datetime.datetime(1989, 12, 21, 7, 36, 51, 153),
+            ),
+            mime_type="application/pdf",
+            pk=2,
+            checksum="2",
+        )
+        self.assertEqual(generate_filename(doc), "89/Dec/December/The Title.pdf")
+
+    @override_settings(
+        FILENAME_FORMAT="{added_year_short}/{added_month_name}/{added_month_name_short}/{title}",
+    )
+    def test_short_names_added(self):
+        doc = Document.objects.create(
+            title="The Title",
+            added=timezone.make_aware(datetime.datetime(1984, 8, 21, 7, 36, 51, 153)),
+            mime_type="application/pdf",
+            pk=2,
+            checksum="2",
+        )
+        self.assertEqual(generate_filename(doc), "84/August/Aug/The Title.pdf")
+
 
 def run():
     doc = Document.objects.create(

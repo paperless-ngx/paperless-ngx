@@ -347,6 +347,13 @@ if os.getenv("PAPERLESS_DBHOST"):
     if os.getenv("PAPERLESS_DBENGINE") == "mariadb":
         engine = "django.db.backends.mysql"
         options = {"read_default_file": "/etc/mysql/my.cnf", "charset": "utf8mb4"}
+
+        # Silence Django error on old MariaDB versions.
+        # VARCHAR can support > 255 in modern versions
+        # https://docs.djangoproject.com/en/4.1/ref/checks/#database
+        # https://mariadb.com/kb/en/innodb-system-variables/#innodb_large_prefix
+        SILENCED_SYSTEM_CHECKS = ["mysql.W003"]
+
     else:  # Default to PostgresDB
         engine = "django.db.backends.postgresql_psycopg2"
         options = {"sslmode": os.getenv("PAPERLESS_DBSSLMODE", "prefer")}

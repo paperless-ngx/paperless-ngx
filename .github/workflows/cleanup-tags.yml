@@ -64,9 +64,9 @@ jobs:
         with:
           python-version: "3.10"
       -
-        name: Install requests
+        name: Install httpx
         run: |
-          python -m pip install requests
+          python -m pip install httpx
       #
       # Clean up primary package
       #
