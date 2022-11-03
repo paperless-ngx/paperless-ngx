@@ -93,6 +93,20 @@ export class AppFrameComponent implements OnInit, ComponentCanDeactivate {
 
   searchField = new FormControl('')
 
+  get searchFieldEmpty(): boolean {
+    return this.searchField.value.trim().length == 0
+  }
+
+  resetSearchField() {
+    this.searchField.reset('')
+  }
+
+  searchFieldKeyup(event: KeyboardEvent) {
+    if (event.key == 'Escape') {
+      this.resetSearchField()
+    }
+  }
+
   get openDocuments(): PaperlessDocument[] {
     return this.openDocumentsService.getOpenDocuments()
   }
