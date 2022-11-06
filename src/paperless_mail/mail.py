@@ -425,7 +425,6 @@ class MailAccountHandler(LoggingMixin):
                     else None,
                     override_document_type_id=doc_type.id if doc_type else None,
                     override_tag_ids=tag_ids,
-                    task_name=att.filename[:100],
                 )
 
                 processed_attachments += 1
