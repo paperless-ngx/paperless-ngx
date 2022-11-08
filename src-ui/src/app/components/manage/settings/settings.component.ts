@@ -36,6 +36,7 @@ import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { MailAccountEditDialogComponent } from '../../common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component'
 import { MailRuleEditDialogComponent } from '../../common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component'
+import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 
 @Component({
   selector: 'app-settings',
@@ -500,6 +501,21 @@ export class SettingsComponent
     //   })
   }
 
+  deleteMailAccount(account: PaperlessMailAccount) {
+    let modal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.title = $localize`Confirm delete mail account`
+    modal.componentInstance.messageBold = $localize`This operation will permanently this mail account.`
+    modal.componentInstance.message = $localize`This operation cannot be undone.`
+    modal.componentInstance.btnClass = 'btn-danger'
+    modal.componentInstance.btnCaption = $localize`Proceed`
+    modal.componentInstance.confirmClicked.subscribe(() => {
+      modal.componentInstance.buttonsEnabled = false
+      this.mailAccountService.delete(account)
+    })
+  }
+
   editMailRule(rule: PaperlessMailRule) {
     console.log(rule)
 
@@ -523,5 +539,20 @@ export class SettingsComponent
     //     this.storagePaths = storagePaths.results
     //     this.documentForm.get('storage_path').setValue(newStoragePath.id)
     //   })
+  }
+
+  deleteMailRule(rule: PaperlessMailRule) {
+    let modal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.title = $localize`Confirm delete mail rule`
+    modal.componentInstance.messageBold = $localize`This operation will permanently this mail rule.`
+    modal.componentInstance.message = $localize`This operation cannot be undone.`
+    modal.componentInstance.btnClass = 'btn-danger'
+    modal.componentInstance.btnCaption = $localize`Proceed`
+    modal.componentInstance.confirmClicked.subscribe(() => {
+      modal.componentInstance.buttonsEnabled = false
+      this.mailRuleService.delete(rule)
+    })
   }
 }
