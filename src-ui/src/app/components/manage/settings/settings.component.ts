@@ -33,6 +33,8 @@ import { PaperlessMailAccount } from 'src/app/data/paperless-mail-account'
 import { PaperlessMailRule } from 'src/app/data/paperless-mail-rule'
 import { MailAccountService as MailAccountService } from 'src/app/services/rest/mail-account.service'
 import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
+import { MailAccountEditDialogComponent } from '../../common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component'
 
 @Component({
   selector: 'app-settings',
@@ -104,7 +106,8 @@ export class SettingsComponent
     @Inject(LOCALE_ID) public currentLocale: string,
     private viewportScroller: ViewportScroller,
     private activatedRoute: ActivatedRoute,
-    public readonly tourService: TourService
+    public readonly tourService: TourService,
+    private modalService: NgbModal
   ) {
     this.settings.settingsSaved.subscribe(() => {
       if (!this.savePending) this.initialize()
@@ -469,5 +472,33 @@ export class SettingsComponent
 
   clearThemeColor() {
     this.settingsForm.get('themeColor').patchValue('')
+  }
+
+  editMailAccount(account: PaperlessMailAccount) {
+    console.log(account)
+
+    var modal = this.modalService.open(MailAccountEditDialogComponent, {
+      backdrop: 'static',
+      size: 'xl',
+    })
+    modal.componentInstance.dialogMode = 'edit'
+    modal.componentInstance.object = account
+    // modal.componentInstance.success
+    //   .pipe(
+    //     switchMap((newStoragePath) => {
+    //       return this.storagePathService
+    //         .listAll()
+    //         .pipe(map((storagePaths) => ({ newStoragePath, storagePaths })))
+    //     })
+    //   )
+    //   .pipe(takeUntil(this.unsubscribeNotifier))
+    //   .subscribe(({ newStoragePath, storagePaths }) => {
+    //     this.storagePaths = storagePaths.results
+    //     this.documentForm.get('storage_path').setValue(newStoragePath.id)
+    //   })
+  }
+
+  editMailRule(rule: PaperlessMailRule) {
+    console.log(rule)
   }
 }

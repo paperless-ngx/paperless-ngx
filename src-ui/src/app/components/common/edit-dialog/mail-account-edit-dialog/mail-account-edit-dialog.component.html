@@ -1,0 +1,26 @@
+<form [formGroup]="objectForm" (ngSubmit)="save()">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">{{getTitle()}}</h4>
+    <button type="button" [disabled]="!closeEnabled" class="btn-close" aria-label="Close" (click)="cancel()">
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+      <div class="col">
+        <app-input-text i18n-title title="Name" formControlName="name" [error]="error?.name"></app-input-text>
+        <app-input-text i18n-title title="IMAP Server" formControlName="imap_server" [error]="error?.imap_server"></app-input-text>
+        <app-input-text i18n-title title="IMAP Port" formControlName="imap_server" [error]="error?.imap_port"></app-input-text>
+        <app-input-select i18n-title title="IMAP Security" [items]="imapSecurityOptions" formControlName="imap_security"></app-input-select>
+      </div>
+      <div class="col">
+        <app-input-text i18n-title title="Username" formControlName="username" [error]="error?.username"></app-input-text>
+        <app-input-password i18n-title title="Password" formControlName="password" [error]="error?.password"></app-input-password>
+        <app-input-text i18n-title title="Character Set" formControlName="character_set" [error]="error?.character_set"></app-input-text>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="cancel()" i18n [disabled]="networkActive">Cancel</button>
+    <button type="submit" class="btn btn-primary" i18n [disabled]="networkActive">Save</button>
+  </div>
+</form>
