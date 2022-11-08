@@ -33,6 +33,8 @@ from packaging import version as packaging_version
 from paperless import version
 from paperless.db import GnuPG
 from paperless.views import StandardPagination
+from paperless_mail.models import MailAccount
+from paperless_mail.models import MailRule
 from rest_framework import parsers
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
@@ -81,6 +83,8 @@ from .serialisers import CorrespondentSerializer
 from .serialisers import DocumentListSerializer
 from .serialisers import DocumentSerializer
 from .serialisers import DocumentTypeSerializer
+from .serialisers import MailAccountSerializer
+from .serialisers import MailRuleSerializer
 from .serialisers import PostDocumentSerializer
 from .serialisers import SavedViewSerializer
 from .serialisers import StoragePathSerializer
@@ -910,3 +914,37 @@ class AcknowledgeTasksView(GenericAPIView):
             return Response({"result": result})
         except Exception:
             return HttpResponseBadRequest()
+
+
+class MailAccountViewSet(ModelViewSet):
+    model = MailAccount
+
+    queryset = MailAccount.objects.all()
+    serializer_class = MailAccountSerializer
+    pagination_class = StandardPagination
+    permission_classes = (IsAuthenticated,)
+
+    # TODO: user-scoped
+    # def get_queryset(self):
+    #     user = self.request.user
+    #     return MailAccount.objects.filter(user=user)
+
+    # def perform_create(self, serializer):
+    #     serializer.save(user=self.request.user)
+
+
+class MailRuleViewSet(ModelViewSet):
+    model = MailRule
+
+    queryset = MailRule.objects.all()
+    serializer_class = MailRuleSerializer
+    pagination_class = StandardPagination
+    permission_classes = (IsAuthenticated,)
+
+    # TODO: user-scoped
+    # def get_queryset(self):
+    #     user = self.request.user
+    #     return MailRule.objects.filter(user=user)
+
+    # def perform_create(self, serializer):
+    #     serializer.save(user=self.request.user)
