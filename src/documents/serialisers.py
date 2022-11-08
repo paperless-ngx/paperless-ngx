@@ -716,7 +716,17 @@ class MailAccountSerializer(serializers.ModelSerializer):
         return mail_account
 
 
+class AccountField(serializers.PrimaryKeyRelatedField):
+    def get_queryset(self):
+        return MailAccount.objects.all()
+
+
 class MailRuleSerializer(serializers.ModelSerializer):
+    account = AccountField(allow_null=True)
+    assign_correspondent = CorrespondentField(allow_null=True)
+    assign_tags = TagsField(many=True)
+    assign_document_type = DocumentTypeField(allow_null=True)
+
     class Meta:
         model = MailRule
         depth = 1
