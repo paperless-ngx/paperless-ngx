@@ -28,6 +28,8 @@ from .models import UiSettings
 from .models import PaperlessTask
 from .parsers import is_mime_type_supported
 
+from paperless_mail.models import MailAccount, MailRule
+
 
 # https://www.django-rest-framework.org/api-guide/serializers/#example
 class DynamicFieldsModelSerializer(serializers.ModelSerializer):
@@ -688,3 +690,61 @@ class AcknowledgeTasksViewSerializer(serializers.Serializer):
     def validate_tasks(self, tasks):
         self._validate_task_id_list(tasks)
         return tasks
+
+
+class MailAccountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MailAccount
+        depth = 1
+        fields = [
+            "id",
+            "name",
+            "imap_server",
+            "imap_port",
+            "imap_security",
+            "username",
+            "password",
+            "character_set",
+        ]
+
+    def update(self, instance, validated_data):
+        super().update(instance, validated_data)
+        return instance
+
+    def create(self, validated_data):
+        mail_account = MailAccount.objects.create(**validated_data)
+        return mail_account
+
+
+class MailRuleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MailRule
+        depth = 1
+        fields = [
+            "id",
+            "name",
+            "account",
+            "folder",
+            "filter_from",
+            "filter_subject",
+            "filter_body",
+            "filter_attachment_filename",
+            "maximum_age",
+            "action",
+            "action_parameter",
+            "assign_title_from",
+            "assign_tags",
+            "assign_correspondent_from",
+            "assign_correspondent",
+            "assign_document_type",
+            "order",
+            "attachment_type",
+        ]
+
+    def update(self, instance, validated_data):
+        super().update(instance, validated_data)
+        return instance
+
+    def create(self, validated_data):
+        mail_rule = MailRule.objects.create(**validated_data)
+        return mail_rule
