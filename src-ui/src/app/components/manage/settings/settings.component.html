@@ -222,21 +222,26 @@
       <ng-template ngbNavContent>
 
         <h4 i18n>Mail accounts</h4>
-        <ul formGroupName="mailAccounts">
+        <ul class="list-group" formGroupName="mailAccounts">
 
-            <li class="row mb-1">
+            <li class="list-group-item">
               <div class="row">
                 <div class="col" i18n>Name</div>
                 <div class="col" i18n>Server</div>
-                <div class="col">&nbsp;</div>
+                <div class="col" i18n>Actions</div>
               </div>
             </li>
 
-            <li *ngFor="let account of mailAccounts" [formGroupName]="account.id" class="row mb-1">
+            <li *ngFor="let account of mailAccounts" class="list-group-item" [formGroupName]="account.id">
               <div class="row">
                 <div class="col"><button class="btn btn-link p-0" type="button" (click)="editMailAccount(account)">{{account.name}}</button></div>
                 <div class="col">{{account.imap_server}}</div>
-                <div class="col"><button class="btn btn-primary" type="button" (click)="editMailAccount(account)" i18n>Edit</button></div>
+                <div class="col">
+                  <div class="btn-group">
+                    <button class="btn btn-primary" type="button" (click)="editMailAccount(account)" i18n>Edit</button>
+                    <button class="btn btn-outline-danger" type="button" (click)="deleteMailAccount(account)" i18n>Delete</button>
+                  </div>
+                </div>
               </div>
             </li>
 
@@ -244,21 +249,26 @@
         </ul>
 
         <h4 class="mt-4" i18n>Mail rules</h4>
-        <ul formGroupName="mailRules">
+        <ul class="list-group" formGroupName="mailRules">
 
-            <li class="row mb-1">
+            <li class="list-group-item">
               <div class="row">
                 <div class="col" i18n>Name</div>
                 <div class="col" i18n>Account</div>
-                <div class="col">&nbsp;</div>
+                <div class="col" i18n>Actions</div>
               </div>
             </li>
 
-            <li *ngFor="let rule of mailRules" [formGroupName]="rule.id" class="row">
+            <li *ngFor="let rule of mailRules" class="list-group-item" [formGroupName]="rule.id">
               <div class="row">
                 <div class="col"><button class="btn btn-link p-0" type="button" (click)="editMailRule(rule)">{{rule.name}}</button></div>
                 <div class="col">{{rule.account.name}}</div>
-                <div class="col"><button class="btn btn-primary" type="button" (click)="editMailRule(rule)" i18n>Edit</button></div>
+                <div class="col">
+                  <div class="btn-group">
+                    <button class="btn btn-primary" type="button" (click)="editMailRule(rule)" i18n>Edit</button>
+                    <button class="btn btn-outline-danger" type="button" (click)="deleteMailRule(rule)" i18n>Delete</button>
+                  </div>
+                </div>
               </div>
             </li>
 
