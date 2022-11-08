@@ -234,8 +234,8 @@
 
             <li *ngFor="let account of mailAccounts" class="list-group-item" [formGroupName]="account.id">
               <div class="row">
-                <div class="col"><button class="btn btn-link p-0" type="button" (click)="editMailAccount(account)">{{account.name}}</button></div>
-                <div class="col">{{account.imap_server}}</div>
+                <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editMailAccount(account)">{{account.name}}</button></div>
+                <div class="col d-flex align-items-center">{{account.imap_server}}</div>
                 <div class="col">
                   <div class="btn-group">
                     <button class="btn btn-primary" type="button" (click)="editMailAccount(account)" i18n>Edit</button>
@@ -261,8 +261,8 @@
 
             <li *ngFor="let rule of mailRules" class="list-group-item" [formGroupName]="rule.id">
               <div class="row">
-                <div class="col"><button class="btn btn-link p-0" type="button" (click)="editMailRule(rule)">{{rule.name}}</button></div>
-                <div class="col">{{rule.account.name}}</div>
+                <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editMailRule(rule)">{{rule.name}}</button></div>
+                <div class="col d-flex align-items-center">{{(mailAccountService.getCached(rule.account) | async)?.name}}</div>
                 <div class="col">
                   <div class="btn-group">
                     <button class="btn btn-primary" type="button" (click)="editMailRule(rule)" i18n>Edit</button>

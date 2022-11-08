@@ -9,15 +9,16 @@
       <div class="col">
         <app-input-text i18n-title title="Name" formControlName="name" [error]="error?.name"></app-input-text>
         <app-input-text i18n-title title="Order" formControlName="order" [error]="error?.order"></app-input-text>
-        <app-input-text i18n-title title="Account" formControlName="account" [error]="error?.account"></app-input-text>
+        <app-input-select i18n-title title="Account" [items]="accounts" formControlName="account"></app-input-select>
         <app-input-text i18n-title title="Folder" formControlName="folder" [error]="error?.folder"></app-input-text>
-        <app-input-text i18n-title title="Filter from" formControlName="filter_from" [error]="error?.filter_from"></app-input-text>
-        <app-input-text i18n-title title="Filter body" formControlName="filter_body" [error]="error?.filter_body"></app-input-text>
-        <app-input-text i18n-title title="Filter attachment filename" formControlName="filter_attachment_filename" [error]="error?.filter_attachment_filename"></app-input-text>
-      </div>
-      <div class="col">
         <app-input-number i18n-title title="Maximum age" formControlName="maximum_age" [error]="error?.maximum_age"></app-input-number>
         <app-input-select i18n-title title="Attachment type" [items]="attachmentTypeOptions" formControlName="attachment_type"></app-input-select>
+      </div>
+      <div class="col">
+        <app-input-text i18n-title title="Filter from" formControlName="filter_from" [error]="error?.filter_from"></app-input-text>
+        <app-input-text i18n-title title="Filter subject" formControlName="filter_subject" [error]="error?.filter_subject"></app-input-text>
+        <app-input-text i18n-title title="Filter body" formControlName="filter_body" [error]="error?.filter_body"></app-input-text>
+        <app-input-text i18n-title title="Filter attachment filename" formControlName="filter_attachment_filename" [error]="error?.filter_attachment_filename"></app-input-text>
         <app-input-select i18n-title title="Action" [items]="actionOptions" formControlName="attachment_type"></app-input-select>
         <app-input-text i18n-title title="Action parameter" formControlName="action_parameter" [error]="error?.action_parameter"></app-input-text>
       </div>

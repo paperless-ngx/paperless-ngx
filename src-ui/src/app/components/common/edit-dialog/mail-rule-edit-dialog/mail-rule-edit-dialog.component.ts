@@ -5,6 +5,7 @@ import { first } from 'rxjs'
 import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-dialog.component'
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent'
 import { PaperlessDocumentType } from 'src/app/data/paperless-document-type'
+import { PaperlessMailAccount } from 'src/app/data/paperless-mail-account'
 import {
   MailAction,
   MailActionOptions,
@@ -18,6 +19,7 @@ import {
 } from 'src/app/data/paperless-mail-rule'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
+import { MailAccountService } from 'src/app/services/rest/mail-account.service'
 import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
 
 @Component({
@@ -26,16 +28,23 @@ import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
   styleUrls: ['./mail-rule-edit-dialog.component.scss'],
 })
 export class MailRuleEditDialogComponent extends EditDialogComponent<PaperlessMailRule> {
+  accounts: PaperlessMailAccount[]
   correspondents: PaperlessCorrespondent[]
   documentTypes: PaperlessDocumentType[]
 
   constructor(
     service: MailRuleService,
     activeModal: NgbActiveModal,
+    accountService: MailAccountService,
     correspondentService: CorrespondentService,
     documentTypeService: DocumentTypeService
   ) {
     super(service, activeModal)
+
+    accountService
+      .listAll()
+      .pipe(first())
+      .subscribe((result) => (this.accounts = result.results))
 
     correspondentService
       .listAll()
