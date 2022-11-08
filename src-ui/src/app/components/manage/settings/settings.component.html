@@ -222,28 +222,48 @@
       <ng-template ngbNavContent>
 
         <h4 i18n>Mail accounts</h4>
-        <div formGroupName="mailAccounts">
+        <ul formGroupName="mailAccounts">
 
-            <div *ngFor="let account of mailAccounts" [formGroupName]="account.id" class="row">
-              <div class="mb-3 col">
-                {{account.name}}
+            <li class="row mb-1">
+              <div class="row">
+                <div class="col" i18n>Name</div>
+                <div class="col" i18n>Server</div>
+                <div class="col">&nbsp;</div>
               </div>
-            </div>
+            </li>
+
+            <li *ngFor="let account of mailAccounts" [formGroupName]="account.id" class="row mb-1">
+              <div class="row">
+                <div class="col"><button class="btn btn-link p-0" type="button" (click)="editMailAccount(account)">{{account.name}}</button></div>
+                <div class="col">{{account.imap_server}}</div>
+                <div class="col"><button class="btn btn-primary" type="button" (click)="editMailAccount(account)" i18n>Edit</button></div>
+              </div>
+            </li>
 
             <div *ngIf="mailAccounts.length == 0" i18n>No mail accounts defined.</div>
-        </div>
+        </ul>
 
-        <h4 i18n>Mail rules</h4>
-        <div formGroupName="mailRules">
+        <h4 class="mt-4" i18n>Mail rules</h4>
+        <ul formGroupName="mailRules">
 
-            <div *ngFor="let rule of mailRules" [formGroupName]="rule.id" class="row">
-              <div class="mb-3 col">
-                {{rule.name}}
+            <li class="row mb-1">
+              <div class="row">
+                <div class="col" i18n>Name</div>
+                <div class="col" i18n>Account</div>
+                <div class="col">&nbsp;</div>
               </div>
-            </div>
+            </li>
+
+            <li *ngFor="let rule of mailRules" [formGroupName]="rule.id" class="row">
+              <div class="row">
+                <div class="col"><button class="btn btn-link p-0" type="button" (click)="editMailRule(rule)">{{rule.name}}</button></div>
+                <div class="col">{{rule.account.name}}</div>
+                <div class="col"><button class="btn btn-primary" type="button" (click)="editMailRule(rule)" i18n>Edit</button></div>
+              </div>
+            </li>
 
             <div *ngIf="mailRules.length == 0" i18n>No mail rules defined.</div>
-        </div>
+        </ul>
 
       </ng-template>
     </li>
