@@ -216,6 +216,37 @@
 
       </ng-template>
     </li>
+
+    <li [ngbNavItem]="4">
+      <a ngbNavLink i18n>Paperless Mail</a>
+      <ng-template ngbNavContent>
+
+        <h4 i18n>Mail accounts</h4>
+        <div formGroupName="mailAccounts">
+
+            <div *ngFor="let account of mailAccounts" [formGroupName]="account.id" class="row">
+              <div class="mb-3 col">
+                {{account.name}}
+              </div>
+            </div>
+
+            <div *ngIf="mailAccounts.length == 0" i18n>No mail accounts defined.</div>
+        </div>
+
+        <h4 i18n>Mail rules</h4>
+        <div formGroupName="mailRules">
+
+            <div *ngFor="let rule of mailRules" [formGroupName]="rule.id" class="row">
+              <div class="mb-3 col">
+                {{rule.name}}
+              </div>
+            </div>
+
+            <div *ngIf="mailRules.length == 0" i18n>No mail rules defined.</div>
+        </div>
+
+      </ng-template>
+    </li>
   </ul>
 
   <div [ngbNavOutlet]="nav" class="border-start border-end border-bottom p-3 mb-3 shadow-sm"></div>

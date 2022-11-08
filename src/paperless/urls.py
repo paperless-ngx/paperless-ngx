@@ -14,6 +14,8 @@ from documents.views import CorrespondentViewSet
 from documents.views import DocumentTypeViewSet
 from documents.views import IndexView
 from documents.views import LogViewSet
+from documents.views import MailAccountViewSet
+from documents.views import MailRuleViewSet
 from documents.views import PostDocumentView
 from documents.views import RemoteVersionView
 from documents.views import SavedViewViewSet
@@ -39,6 +41,8 @@ api_router.register(r"tags", TagViewSet)
 api_router.register(r"saved_views", SavedViewViewSet)
 api_router.register(r"storage_paths", StoragePathViewSet)
 api_router.register(r"tasks", TasksViewSet, basename="tasks")
+api_router.register(r"mail_accounts", MailAccountViewSet)
+api_router.register(r"mail_rules", MailRuleViewSet)
 
 
 urlpatterns = [
