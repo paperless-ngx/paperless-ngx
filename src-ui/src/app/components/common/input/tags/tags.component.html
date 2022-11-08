@@ -7,7 +7,7 @@
       [closeOnSelect]="false"
       [clearSearchOnAdd]="true"
       [hideSelected]="true"
-      [addTag]="createTagRef"
+      [addTag]="allowCreate ? createTagRef : false"
       addTagText="Add tag"
       i18n-addTagText
       (change)="onChange(value)"
@@ -31,7 +31,7 @@
       </ng-template>
     </ng-select>
 
-    <button class="btn btn-outline-secondary" type="button" (click)="createTag()">
+    <button *ngIf="allowCreate" class="btn btn-outline-secondary" type="button" (click)="createTag()">
       <svg class="buttonicon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#plus" />
       </svg>
