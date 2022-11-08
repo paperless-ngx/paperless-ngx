@@ -1,0 +1,26 @@
+env:
+  PAPERLESS_REDIS: redis://paperless-redis-headless:6379
+
+persistence:
+  data:
+    enabled: true
+    type: emptyDir
+  media:
+    enabled: true
+    type: emptyDir
+  consume:
+    enabled: true
+    type: emptyDir
+  export:
+    enabled: true
+    type: emptyDir
+
+redis:
+  enabled: true
+  architecture: standalone
+  auth:
+    enabled: false
+  master:
+    persistence:
+      enabled: false
+  fullnameOverride: paperless-redis
