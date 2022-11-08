@@ -31,7 +31,7 @@ import { ViewportScroller } from '@angular/common'
 import { TourService } from 'ngx-ui-tour-ng-bootstrap'
 import { PaperlessMailAccount } from 'src/app/data/paperless-mail-account'
 import { PaperlessMailRule } from 'src/app/data/paperless-mail-rule'
-import { MailAccountService as MailAccountService } from 'src/app/services/rest/mail-account.service'
+import { MailAccountService } from 'src/app/services/rest/mail-account.service'
 import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { MailAccountEditDialogComponent } from '../../common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component'
@@ -477,28 +477,30 @@ export class SettingsComponent
   }
 
   editMailAccount(account: PaperlessMailAccount) {
-    console.log(account)
-
     var modal = this.modalService.open(MailAccountEditDialogComponent, {
       backdrop: 'static',
       size: 'xl',
     })
     modal.componentInstance.dialogMode = 'edit'
     modal.componentInstance.object = account
-    // TODO: saving
-    // modal.componentInstance.success
-    //   .pipe(
-    //     switchMap((newStoragePath) => {
-    //       return this.storagePathService
-    //         .listAll()
-    //         .pipe(map((storagePaths) => ({ newStoragePath, storagePaths })))
-    //     })
-    //   )
-    //   .pipe(takeUntil(this.unsubscribeNotifier))
-    //   .subscribe(({ newStoragePath, storagePaths }) => {
-    //     this.storagePaths = storagePaths.results
-    //     this.documentForm.get('storage_path').setValue(newStoragePath.id)
-    //   })
+    modal.componentInstance.success
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe({
+        next: (newMailAccount) => {
+          this.toastService.showInfo(
+            $localize`Saved account "${newMailAccount.name}".`
+          )
+          this.mailAccountService.listAll().subscribe((r) => {
+            this.mailAccounts = r.results
+            this.initialize()
+          })
+        },
+        error: (e) => {
+          this.toastService.showError(
+            $localize`Error saving account: ${e.toString()}.`
+          )
+        },
+      })
   }
 
   deleteMailAccount(account: PaperlessMailAccount) {
@@ -517,28 +519,31 @@ export class SettingsComponent
   }
 
   editMailRule(rule: PaperlessMailRule) {
-    console.log(rule)
-
     var modal = this.modalService.open(MailRuleEditDialogComponent, {
       backdrop: 'static',
       size: 'xl',
     })
     modal.componentInstance.dialogMode = 'edit'
     modal.componentInstance.object = rule
-    // TODO: saving
-    // modal.componentInstance.success
-    //   .pipe(
-    //     switchMap((newStoragePath) => {
-    //       return this.storagePathService
-    //         .listAll()
-    //         .pipe(map((storagePaths) => ({ newStoragePath, storagePaths })))
-    //     })
-    //   )
-    //   .pipe(takeUntil(this.unsubscribeNotifier))
-    //   .subscribe(({ newStoragePath, storagePaths }) => {
-    //     this.storagePaths = storagePaths.results
-    //     this.documentForm.get('storage_path').setValue(newStoragePath.id)
-    //   })
+    modal.componentInstance.success
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe({
+        next: (newMailRule) => {
+          this.toastService.showInfo(
+            $localize`Saved rule "${newMailRule.name}".`
+          )
+          this.mailRuleService.listAll().subscribe((r) => {
+            this.mailRules = r.results
+
+            this.initialize()
+          })
+        },
+        error: (e) => {
+          this.toastService.showError(
+            $localize`Error saving rule: ${e.toString()}.`
+          )
+        },
+      })
   }
 
   deleteMailRule(rule: PaperlessMailRule) {

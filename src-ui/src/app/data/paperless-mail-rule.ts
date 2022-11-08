@@ -101,7 +101,7 @@ export interface PaperlessMailRule extends ObjectWithId {
 
   order: number
 
-  account: PaperlessMailAccount
+  account: number // PaperlessMailAccount.id
 
   folder: string
 
@@ -123,11 +123,11 @@ export interface PaperlessMailRule extends ObjectWithId {
 
   assign_title_from: MailMetadataTitleOption
 
-  assign_tags?: PaperlessTag[]
+  assign_tags?: number[] // PaperlessTag.id
 
-  assign_document_type?: PaperlessDocumentType
+  assign_document_type?: number // PaperlessDocumentType.id
 
   assign_correspondent_from?: MailMetadataCorrespondentOption
 
-  assign_correspondent?: PaperlessCorrespondent
+  assign_correspondent?: number // PaperlessCorrespondent.id
 }
