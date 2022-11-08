@@ -78,6 +78,7 @@ import { SettingsService } from './services/settings.service'
 import { TasksComponent } from './components/manage/tasks/tasks.component'
 import { TourNgBootstrapModule } from 'ngx-ui-tour-ng-bootstrap'
 import { MailAccountEditDialogComponent } from './components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component'
+import { MailRuleEditDialogComponent } from './components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component'
 
 import localeBe from '@angular/common/locales/be'
 import localeCs from '@angular/common/locales/cs'
@@ -144,7 +145,6 @@ function initializeApp(settings: SettingsService) {
     TagEditDialogComponent,
     DocumentTypeEditDialogComponent,
     StoragePathEditDialogComponent,
-    MailAccountEditDialogComponent,
     TagComponent,
     ClearableBadge,
     PageHeaderComponent,
@@ -184,6 +184,8 @@ function initializeApp(settings: SettingsService) {
     DocumentAsnComponent,
     DocumentCommentsComponent,
     TasksComponent,
+    MailAccountEditDialogComponent,
+    MailRuleEditDialogComponent,
   ],
   imports: [
     BrowserModule,

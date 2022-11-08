@@ -35,6 +35,7 @@ import { MailAccountService as MailAccountService } from 'src/app/services/rest/
 import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { MailAccountEditDialogComponent } from '../../common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component'
+import { MailRuleEditDialogComponent } from '../../common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component'
 
 @Component({
   selector: 'app-settings',
@@ -483,6 +484,7 @@ export class SettingsComponent
     })
     modal.componentInstance.dialogMode = 'edit'
     modal.componentInstance.object = account
+    // TODO: saving
     // modal.componentInstance.success
     //   .pipe(
     //     switchMap((newStoragePath) => {
@@ -500,5 +502,26 @@ export class SettingsComponent
 
   editMailRule(rule: PaperlessMailRule) {
     console.log(rule)
+
+    var modal = this.modalService.open(MailRuleEditDialogComponent, {
+      backdrop: 'static',
+      size: 'xl',
+    })
+    modal.componentInstance.dialogMode = 'edit'
+    modal.componentInstance.object = rule
+    // TODO: saving
+    // modal.componentInstance.success
+    //   .pipe(
+    //     switchMap((newStoragePath) => {
+    //       return this.storagePathService
+    //         .listAll()
+    //         .pipe(map((storagePaths) => ({ newStoragePath, storagePaths })))
+    //     })
+    //   )
+    //   .pipe(takeUntil(this.unsubscribeNotifier))
+    //   .subscribe(({ newStoragePath, storagePaths }) => {
+    //     this.storagePaths = storagePaths.results
+    //     this.documentForm.get('storage_path').setValue(newStoragePath.id)
+    //   })
   }
 }
