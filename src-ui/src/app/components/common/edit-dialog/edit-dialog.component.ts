@@ -92,16 +92,16 @@ export abstract class EditDialogComponent<T extends ObjectWithId>
         break
     }
     this.networkActive = true
-    serverResponse.subscribe(
-      (result) => {
+    serverResponse.subscribe({
+      next: (result) => {
         this.activeModal.close()
         this.success.emit(result)
       },
-      (error) => {
+      error: (error) => {
         this.error = error.error
         this.networkActive = false
-      }
-    )
+      },
+    })
   }
 
   cancel() {
