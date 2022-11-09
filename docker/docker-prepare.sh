@@ -4,12 +4,12 @@ set -e
 
 wait_for_postgres() {
 	local attempt_num=1
-	local max_attempts=5
+	local -r max_attempts=5
 
 	echo "Waiting for PostgreSQL to start..."
 
-	local host="${PAPERLESS_DBHOST:-localhost}"
-	local port="${PAPERLESS_DBPORT:-5432}"
+	local -r host="${PAPERLESS_DBHOST:-localhost}"
+	local -r port="${PAPERLESS_DBPORT:-5432}"
 
 	# Disable warning, host and port can't have spaces
 	# shellcheck disable=SC2086
@@ -31,11 +31,11 @@ wait_for_postgres() {
 wait_for_mariadb() {
 	echo "Waiting for MariaDB to start..."
 
-	host="${PAPERLESS_DBHOST:=localhost}"
-	port="${PAPERLESS_DBPORT:=3306}"
+	local -r host="${PAPERLESS_DBHOST:=localhost}"
+	local -r port="${PAPERLESS_DBPORT:=3306}"
 
-	attempt_num=1
-	max_attempts=5
+	local attempt_num=1
+	local -r max_attempts=5
 
 	while ! true > /dev/tcp/$host/$port; do
 
@@ -73,8 +73,8 @@ migrations() {
 
 search_index() {
 
-	local index_version=1
-	local index_version_file=${DATA_DIR}/.index_version
+	local -r index_version=1
+	local -r index_version_file=${DATA_DIR}/.index_version
 
 	if [[ (! -f "${index_version_file}") || $(<"${index_version_file}") != "$index_version" ]]; then
 		echo "Search index out of date. Updating..."
@@ -86,6 +86,46 @@ search_index() {
 superuser() {
 	if [[ -n "${PAPERLESS_ADMIN_USER}" ]]; then
 		python3 manage.py manage_superuser
+	fi
+}
+
+custom_container_init() {
+	# Mostly borrowed from the LinuxServer.io base image
+	# https://github.com/linuxserver/docker-baseimage-ubuntu/tree/bionic/root/etc/cont-init.d
+	local -r custom_script_dir="/custom-cont-init.d"
+	# Tamper checking.
+	# Don't run files which are owned by anyone except root
+	# Don't run files which are writeable by others
+	if [ -d "${custom_script_dir}" ]; then
+		if [ -n "$(/usr/bin/find "${custom_script_dir}" -maxdepth 1 ! -user root)" ]; then
+			echo "**** Potential tampering with custom scripts detected ****"
+			echo "**** The folder '${custom_script_dir}' must be owned by root ****"
+			return 0
+		fi
+		if [ -n "$(/usr/bin/find "${custom_script_dir}" -maxdepth 1 -perm -o+w)" ]; then
+			echo "**** The folder '${custom_script_dir}' or some of contents have write permissions for others, which is a security risk. ****"
+			echo "**** Please review the permissions and their contents to make sure they are owned by root, and can only be modified by root. ****"
+			return 0
+		fi
+
+		# Make sure custom init directory has files in it
+		if [ -n "$(/bin/ls -A "${custom_script_dir}" 2>/dev/null)" ]; then
+			echo "[custom-init] files found in ${custom_script_dir} executing"
+			# Loop over files in the directory
+			for SCRIPT in "${custom_script_dir}"/*; do
+				NAME="$(basename "${SCRIPT}")"
+				if [ -f "${SCRIPT}" ]; then
+					echo "[custom-init] ${NAME}: executing..."
+					/bin/bash "${SCRIPT}"
+					echo "[custom-init] ${NAME}: exited $?"
+				elif [ ! -f "${SCRIPT}" ]; then
+					echo "[custom-init] ${NAME}: is not a file"
+				fi
+			done
+		else
+			echo "[custom-init] no custom files found exiting..."
+		fi
+
 	fi
 }
 
@@ -103,6 +143,9 @@ do_work() {
 	search_index
 
 	superuser
+
+	# Leave this last thing
+	custom_container_init
 
 }
 

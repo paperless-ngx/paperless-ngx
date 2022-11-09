@@ -29,6 +29,11 @@ def get_cache_image_tag(
 
 
 def get_log_level(args) -> int:
+    """
+    Returns a logging level, based
+    :param args:
+    :return:
+    """
     levels = {
         "critical": logging.CRITICAL,
         "error": logging.ERROR,

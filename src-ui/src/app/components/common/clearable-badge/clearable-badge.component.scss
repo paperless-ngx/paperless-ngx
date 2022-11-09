@@ -1,0 +1,28 @@
+.badge {
+    min-width: 20px;
+    min-height: 20px;
+}
+
+.x {
+    display: none;
+}
+
+.number {
+    min-width: 1em;
+    min-height: 1em;
+    display: inline-block;
+}
+
+button:hover {
+    .check,
+    .number {
+        opacity: 0 !important;
+    }
+
+    .x {
+        display: inline-block;
+        position: absolute;
+        top: 5px;
+        left: calc(50% - 4px);
+    }
+}

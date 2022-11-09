@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core'
+import { TourService } from 'ngx-ui-tour-ng-bootstrap'
 
 @Component({
   selector: 'app-welcome-widget',
@@ -6,7 +7,7 @@ import { Component, OnInit } from '@angular/core'
   styleUrls: ['./welcome-widget.component.scss'],
 })
 export class WelcomeWidgetComponent implements OnInit {
-  constructor() {}
+  constructor(public readonly tourService: TourService) {}
 
   ngOnInit(): void {}
 }

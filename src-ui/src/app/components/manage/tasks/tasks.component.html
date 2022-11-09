@@ -53,8 +53,8 @@
             <label class="form-check-label" for="task{{task.id}}"></label>
           </div>
         </th>
-        <td class="overflow-auto">{{ task.name }}</td>
-        <td class="d-none d-lg-table-cell">{{ task.created | customDate:'short' }}</td>
+        <td class="overflow-auto">{{ task.task_file_name }}</td>
+        <td class="d-none d-lg-table-cell">{{ task.date_created | customDate:'short' }}</td>
         <td class="d-none d-lg-table-cell" *ngIf="activeTab != 'started' && activeTab != 'queued'">
           <div *ngIf="task.result.length > 50" class="result" (click)="expandTask(task); $event.stopPropagation();"
             [ngbPopover]="resultPopover" popoverClass="shadow small mobile" triggers="mouseenter:mouseleave" container="body">
@@ -74,11 +74,18 @@
           </button>
         </td>
         <td scope="row">
-          <button class="btn btn-sm btn-outline-secondary" (click)="dismissTask(task); $event.stopPropagation();">
-            <svg class="sidebaricon" fill="currentColor">
-              <use xlink:href="assets/bootstrap-icons.svg#check"/>
-            </svg>&nbsp;<ng-container i18n>Dismiss</ng-container>
-          </button>
+          <div class="btn-group" role="group">
+            <button class="btn btn-sm btn-outline-secondary" (click)="dismissTask(task); $event.stopPropagation();">
+              <svg class="sidebaricon" fill="currentColor">
+                <use xlink:href="assets/bootstrap-icons.svg#check"/>
+              </svg>&nbsp;<ng-container i18n>Dismiss</ng-container>
+            </button>
+            <button *ngIf="task.related_document" class="btn btn-sm btn-outline-primary" (click)="dismissAndGo(task); $event.stopPropagation();">
+              <svg class="sidebaricon" fill="currentColor">
+                <use xlink:href="assets/bootstrap-icons.svg#file-text"/>
+              </svg>&nbsp;<ng-container i18n>Open Document</ng-container>
+            </button>
+          </div>
         </td>
       </tr>
       <tr>

@@ -11,6 +11,7 @@ from documents.models import DocumentType
 from documents.models import Tag
 from documents.sanity_checker import SanityCheckFailedException
 from documents.sanity_checker import SanityCheckMessages
+from documents.tests.test_classifier import dummy_preprocess
 from documents.tests.utils import DirectoriesMixin
 
 
@@ -75,21 +76,26 @@ class TestClassifier(DirectoriesMixin, TestCase):
         doc = Document.objects.create(correspondent=c, content="test", title="test")
         self.assertFalse(os.path.isfile(settings.MODEL_FILE))
 
-        tasks.train_classifier()
-        self.assertTrue(os.path.isfile(settings.MODEL_FILE))
-        mtime = os.stat(settings.MODEL_FILE).st_mtime
+        with mock.patch(
+            "documents.classifier.DocumentClassifier.preprocess_content",
+        ) as pre_proc_mock:
+            pre_proc_mock.side_effect = dummy_preprocess
 
-        tasks.train_classifier()
-        self.assertTrue(os.path.isfile(settings.MODEL_FILE))
-        mtime2 = os.stat(settings.MODEL_FILE).st_mtime
-        self.assertEqual(mtime, mtime2)
+            tasks.train_classifier()
+            self.assertTrue(os.path.isfile(settings.MODEL_FILE))
+            mtime = os.stat(settings.MODEL_FILE).st_mtime
 
-        doc.content = "test2"
-        doc.save()
-        tasks.train_classifier()
-        self.assertTrue(os.path.isfile(settings.MODEL_FILE))
-        mtime3 = os.stat(settings.MODEL_FILE).st_mtime
-        self.assertNotEqual(mtime2, mtime3)
+            tasks.train_classifier()
+            self.assertTrue(os.path.isfile(settings.MODEL_FILE))
+            mtime2 = os.stat(settings.MODEL_FILE).st_mtime
+            self.assertEqual(mtime, mtime2)
+
+            doc.content = "test2"
+            doc.save()
+            tasks.train_classifier()
+            self.assertTrue(os.path.isfile(settings.MODEL_FILE))
+            mtime3 = os.stat(settings.MODEL_FILE).st_mtime
+            self.assertNotEqual(mtime2, mtime3)
 
 
 class TestSanityCheck(DirectoriesMixin, TestCase):
