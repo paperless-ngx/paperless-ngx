@@ -111,14 +111,16 @@ class Consumer(LoggingMixin):
     def pre_check_duplicate(self):
         with open(self.path, "rb") as f:
             checksum = hashlib.md5(f.read()).hexdigest()
-        if Document.objects.filter(
+        existing_doc = Document.objects.filter(
             Q(checksum=checksum) | Q(archive_checksum=checksum),
-        ).exists():
+        )
+        if existing_doc.exists():
             if settings.CONSUMER_DELETE_DUPLICATES:
                 os.unlink(self.path)
             self._fail(
                 MESSAGE_DOCUMENT_ALREADY_EXISTS,
-                f"Not consuming {self.filename}: It is a duplicate.",
+                f"Not consuming {self.filename}: It is a duplicate of"
+                f" {existing_doc.get().title} (#{existing_doc.get().pk})",
             )
 
     def pre_check_directories(self):
@@ -403,6 +405,7 @@ class Consumer(LoggingMixin):
 
                 # Don't save with the lock active. Saving will cause the file
                 # renaming logic to acquire the lock as well.
+                # This triggers things like file renaming
                 document.save()
 
                 # Delete the file only if it was successfully consumed
@@ -435,6 +438,9 @@ class Consumer(LoggingMixin):
         self.log("info", f"Document {document} consumption finished")
 
         self._send_progress(100, 100, "SUCCESS", MESSAGE_FINISHED, document.id)
+
+        # Return the most up to date fields
+        document.refresh_from_db()
 
         return document
 

@@ -41,7 +41,7 @@ jobs:
         id: set-ghcr-repository
         run: |
           ghcr_name=$(echo "${GITHUB_REPOSITORY}" | awk '{ print tolower($0) }')
-          echo ::set-output name=repository::${ghcr_name}
+          echo "repository=${ghcr_name}" >> $GITHUB_OUTPUT
       -
         name: Checkout
         uses: actions/checkout@v3
@@ -51,6 +51,11 @@ jobs:
         with:
           python-version: "3.9"
       -
+        name: Install jq
+        run: |
+          sudo apt-get update
+          sudo apt-get install jq
+      -
         name: Setup qpdf image
         id: qpdf-setup
         run: |
@@ -58,7 +63,7 @@ jobs:
 
           echo ${build_json}
 
-          echo ::set-output name=qpdf-json::${build_json}
+          echo "qpdf-json=${build_json}" >> $GITHUB_OUTPUT
       -
         name: Setup psycopg2 image
         id: psycopg2-setup
@@ -67,7 +72,7 @@ jobs:
 
           echo ${build_json}
 
-          echo ::set-output name=psycopg2-json::${build_json}
+          echo "psycopg2-json=${build_json}" >> $GITHUB_OUTPUT
       -
         name: Setup pikepdf image
         id: pikepdf-setup
@@ -76,7 +81,7 @@ jobs:
 
           echo ${build_json}
 
-          echo ::set-output name=pikepdf-json::${build_json}
+          echo "pikepdf-json=${build_json}" >> $GITHUB_OUTPUT
       -
         name: Setup jbig2enc image
         id: jbig2enc-setup
@@ -85,7 +90,19 @@ jobs:
 
           echo ${build_json}
 
-          echo ::set-output name=jbig2enc-json::${build_json}
+          echo "jbig2enc-json=${build_json}" >> $GITHUB_OUTPUT
+      -
+        name: Setup other versions
+        id: cache-bust-setup
+        run: |
+          pillow_version=$(jq ".default.pillow.version" Pipfile.lock | sed 's/=//g' | sed 's/"//g')
+          lxml_version=$(jq ".default.lxml.version" Pipfile.lock | sed 's/=//g' | sed 's/"//g')
+
+          echo "Pillow is ${pillow_version}"
+          echo "lxml is ${lxml_version}"
+
+          echo "pillow-version=${pillow_version}" >> $GITHUB_OUTPUT
+          echo "lxml-version=${lxml_version}" >> $GITHUB_OUTPUT
 
     outputs:
 
@@ -97,7 +114,11 @@ jobs:
 
       psycopg2-json: ${{ steps.psycopg2-setup.outputs.psycopg2-json }}
 
-      jbig2enc-json: ${{ steps.jbig2enc-setup.outputs.jbig2enc-json}}
+      jbig2enc-json: ${{ steps.jbig2enc-setup.outputs.jbig2enc-json }}
+
+      pillow-version: ${{ steps.cache-bust-setup.outputs.pillow-version }}
+
+      lxml-version: ${{ steps.cache-bust-setup.outputs.lxml-version }}
 
   build-qpdf-debs:
     name: qpdf
@@ -145,3 +166,5 @@ jobs:
         REPO=${{ needs.prepare-docker-build.outputs.ghcr-repository }}
         QPDF_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.qpdf-json).version }}
         PIKEPDF_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.pikepdf-json).version }}
+        PILLOW_VERSION=${{ needs.prepare-docker-build.outputs.pillow-version }}
+        LXML_VERSION=${{ needs.prepare-docker-build.outputs.lxml-version }}
