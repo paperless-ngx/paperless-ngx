@@ -23,6 +23,8 @@ fi
 # Parse what we can from Pipfile.lock
 pikepdf_version=$(jq ".default.pikepdf.version" Pipfile.lock  | sed 's/=//g' | sed 's/"//g')
 psycopg2_version=$(jq ".default.psycopg2.version" Pipfile.lock | sed 's/=//g' | sed 's/"//g')
+pillow_version=$(jq ".default.pillow.version" Pipfile.lock | sed 's/=//g' | sed 's/"//g')
+lxml_version=$(jq ".default.lxml.version" Pipfile.lock | sed 's/=//g' | sed 's/"//g')
 # Read this from the other config file
 qpdf_version=$(jq ".qpdf.version" .build-config.json | sed 's/"//g')
 jbig2enc_version=$(jq ".jbig2enc.version" .build-config.json | sed 's/"//g')
@@ -40,4 +42,6 @@ docker build --file "$1" \
 	--build-arg JBIG2ENC_VERSION="${jbig2enc_version}" \
 	--build-arg QPDF_VERSION="${qpdf_version}" \
 	--build-arg PIKEPDF_VERSION="${pikepdf_version}" \
+	--build-arg PILLOW_VERSION="${pillow_version}" \
+	--build-arg LXML_VERSION="${lxml_version}" \
 	--build-arg PSYCOPG2_VERSION="${psycopg2_version}" "${@:2}" .

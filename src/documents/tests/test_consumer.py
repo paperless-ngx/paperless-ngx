@@ -14,6 +14,7 @@ except ImportError:
     import backports.zoneinfo as zoneinfo
 
 from django.conf import settings
+from django.utils import timezone
 from django.test import override_settings
 from django.test import TestCase
 
@@ -326,6 +327,12 @@ class TestConsumer(DirectoriesMixin, TestCase):
     def testNormalOperation(self):
 
         filename = self.get_test_file()
+
+        # Get the local time, as an aware datetime
+        # Roughly equal to file modification time
+        rough_create_date_local = timezone.localtime(timezone.now())
+
+        # Consume the file
         document = self.consumer.try_consume_file(filename)
 
         self.assertEqual(document.content, "The Text")
@@ -351,7 +358,20 @@ class TestConsumer(DirectoriesMixin, TestCase):
 
         self._assert_first_last_send_progress()
 
-        self.assertEqual(document.created.tzinfo, zoneinfo.ZoneInfo("America/Chicago"))
+        # Convert UTC time from DB to local time
+        document_date_local = timezone.localtime(document.created)
+
+        self.assertEqual(
+            document_date_local.tzinfo,
+            zoneinfo.ZoneInfo("America/Chicago"),
+        )
+        self.assertEqual(document_date_local.tzinfo, rough_create_date_local.tzinfo)
+        self.assertEqual(document_date_local.year, rough_create_date_local.year)
+        self.assertEqual(document_date_local.month, rough_create_date_local.month)
+        self.assertEqual(document_date_local.day, rough_create_date_local.day)
+        self.assertEqual(document_date_local.hour, rough_create_date_local.hour)
+        self.assertEqual(document_date_local.minute, rough_create_date_local.minute)
+        # Skipping seconds and more precise
 
     @override_settings(FILENAME_FORMAT=None)
     def testDeleteMacFiles(self):

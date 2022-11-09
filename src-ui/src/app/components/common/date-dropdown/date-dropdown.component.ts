@@ -16,12 +16,15 @@ import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
 export interface DateSelection {
   before?: string
   after?: string
+  relativeDateID?: number
 }
 
-const LAST_7_DAYS = 0
-const LAST_MONTH = 1
-const LAST_3_MONTHS = 2
-const LAST_YEAR = 3
+export enum RelativeDate {
+  LAST_7_DAYS = 0,
+  LAST_MONTH = 1,
+  LAST_3_MONTHS = 2,
+  LAST_YEAR = 3,
+}
 
 @Component({
   selector: 'app-date-dropdown',
@@ -34,11 +37,23 @@ export class DateDropdownComponent implements OnInit, OnDestroy {
     this.datePlaceHolder = settings.getLocalizedDateInputFormat()
   }
 
-  quickFilters = [
-    { id: LAST_7_DAYS, name: $localize`Last 7 days` },
-    { id: LAST_MONTH, name: $localize`Last month` },
-    { id: LAST_3_MONTHS, name: $localize`Last 3 months` },
-    { id: LAST_YEAR, name: $localize`Last year` },
+  relativeDates = [
+    {
+      date: RelativeDate.LAST_7_DAYS,
+      name: $localize`Last 7 days`,
+    },
+    {
+      date: RelativeDate.LAST_MONTH,
+      name: $localize`Last month`,
+    },
+    {
+      date: RelativeDate.LAST_3_MONTHS,
+      name: $localize`Last 3 months`,
+    },
+    {
+      date: RelativeDate.LAST_YEAR,
+      name: $localize`Last year`,
+    },
   ]
 
   datePlaceHolder: string
@@ -56,10 +71,24 @@ export class DateDropdownComponent implements OnInit, OnDestroy {
   dateAfterChange = new EventEmitter<string>()
 
   @Input()
+  relativeDate: RelativeDate
+
+  @Output()
+  relativeDateChange = new EventEmitter<number>()
+
+  @Input()
   title: string
 
   @Output()
   datesSet = new EventEmitter<DateSelection>()
+
+  get isActive(): boolean {
+    return (
+      this.relativeDate !== null ||
+      this.dateAfter?.length > 0 ||
+      this.dateBefore?.length > 0
+    )
+  }
 
   private datesSetDebounce$ = new Subject()
 
@@ -77,37 +106,33 @@ export class DateDropdownComponent implements OnInit, OnDestroy {
     }
   }
 
-  setDateQuickFilter(qf: number) {
+  reset() {
     this.dateBefore = null
-    let date = new Date()
-    switch (qf) {
-      case LAST_7_DAYS:
-        date.setDate(date.getDate() - 7)
-        break
+    this.dateAfter = null
+    this.relativeDate = null
+    this.onChange()
+  }
 
-      case LAST_MONTH:
-        date.setMonth(date.getMonth() - 1)
-        break
-
-      case LAST_3_MONTHS:
-        date.setMonth(date.getMonth() - 3)
-        break
-
-      case LAST_YEAR:
-        date.setFullYear(date.getFullYear() - 1)
-        break
-    }
-    this.dateAfter = formatDate(date, 'yyyy-MM-dd', 'en-us', 'UTC')
+  setRelativeDate(rd: RelativeDate) {
+    this.dateBefore = null
+    this.dateAfter = null
+    this.relativeDate = this.relativeDate == rd ? null : rd
     this.onChange()
   }
 
   onChange() {
-    this.dateAfterChange.emit(this.dateAfter)
     this.dateBeforeChange.emit(this.dateBefore)
-    this.datesSet.emit({ after: this.dateAfter, before: this.dateBefore })
+    this.dateAfterChange.emit(this.dateAfter)
+    this.relativeDateChange.emit(this.relativeDate)
+    this.datesSet.emit({
+      after: this.dateAfter,
+      before: this.dateBefore,
+      relativeDateID: this.relativeDate,
+    })
   }
 
   onChangeDebounce() {
+    this.relativeDate = null
     this.datesSetDebounce$.next({
       after: this.dateAfter,
       before: this.dateBefore,
