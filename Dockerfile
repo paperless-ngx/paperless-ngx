@@ -151,6 +151,7 @@ COPY [ \
   "docker/paperless_cmd.sh", \
   "docker/wait-for-redis.py", \
   "docker/management_script.sh", \
+  "docker/flower-conditional.sh", \
   "docker/install_management_commands.sh", \
   "/usr/src/paperless/src/docker/" \
 ]
@@ -170,6 +171,8 @@ RUN set -eux \
     && chmod 755 /sbin/wait-for-redis.py \
     && mv paperless_cmd.sh /usr/local/bin/paperless_cmd.sh \
     && chmod 755 /usr/local/bin/paperless_cmd.sh \
+    && mv flower-conditional.sh /usr/local/bin/flower-conditional.sh \
+    && chmod 755 /usr/local/bin/flower-conditional.sh \
   && echo "Installing managment commands" \
     && chmod +x install_management_commands.sh \
     && ./install_management_commands.sh
@@ -182,7 +185,7 @@ RUN --mount=type=bind,from=qpdf-builder,target=/qpdf \
     --mount=type=bind,from=pikepdf-builder,target=/pikepdf \
   set -eux \
   && echo "Installing qpdf" \
-    && apt-get install --yes --no-install-recommends /qpdf/usr/src/qpdf/libqpdf28_*.deb \
+    && apt-get install --yes --no-install-recommends /qpdf/usr/src/qpdf/libqpdf29_*.deb \
     && apt-get install --yes --no-install-recommends /qpdf/usr/src/qpdf/qpdf_*.deb \
   && echo "Installing pikepdf and dependencies" \
     && python3 -m pip install --no-cache-dir /pikepdf/usr/src/wheels/pyparsing*.whl \

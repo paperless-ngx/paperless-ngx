@@ -11,9 +11,9 @@ from typing import Final
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.core.management.base import CommandError
-from django_q.tasks import async_task
 from documents.models import Tag
 from documents.parsers import is_file_ext_supported
+from documents.tasks import consume_file
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers.polling import PollingObserver
 
@@ -92,11 +92,9 @@ def _consume(filepath):
 
     try:
         logger.info(f"Adding {filepath} to the task queue.")
-        async_task(
-            "documents.tasks.consume_file",
+        consume_file.delay(
             filepath,
-            override_tag_ids=tag_ids if tag_ids else None,
-            task_name=os.path.basename(filepath)[:100],
+            override_tag_ids=list(tag_ids) if tag_ids else None,
         )
     except Exception:
         # Catch all so that the consumer won't crash.

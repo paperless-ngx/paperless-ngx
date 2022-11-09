@@ -1,5 +1,5 @@
 <app-page-header title="Settings" i18n-title>
-
+  <button class="btn btn-sm btn-outline-primary" (click)="tourService.start()"><ng-container i18n>Start tour</ng-container></button>
 </app-page-header>
 
 <!-- <p>items per page, documents per view type</p> -->
@@ -91,6 +91,17 @@
 
         <div class="row mb-3">
           <div class="col-md-3 col-form-label">
+            <span i18n>Sidebar</span>
+          </div>
+          <div class="col">
+
+            <app-input-check i18n-title title="Use 'slim' sidebar (icons only)" formControlName="slimSidebarEnabled"></app-input-check>
+
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-3 col-form-label">
             <span i18n>Dark mode</span>
           </div>
           <div class="col">
@@ -113,6 +124,21 @@
                 <path fill-rule="evenodd" d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
               </svg><ng-container i18n>Reset</ng-container>
             </button>
+          </div>
+        </div>
+
+        <h4 class="mt-4" id="update-checking" i18n>Update checking</h4>
+
+        <div class="row mb-3">
+          <div class="offset-md-3 col">
+            <p i18n>
+              Update checking works by pinging the the public <a href="https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest" target="_blank" rel="noopener noreferrer">Github API</a> for the latest release to determine whether a new version is available.<br/>
+              Actual updating of the app must still be performed manually.
+            </p>
+            <p i18n>
+              <em>No tracking data is collected by the app in any way.</em>
+            </p>
+            <app-input-check i18n-title title="Enable update checking" formControlName="updateCheckingEnabled" i18n-hint hint="Note that for users of thirdy-party containers e.g. linuxserver.io this notification may be 'ahead' of the current third-party release."></app-input-check>
           </div>
         </div>
 
@@ -194,5 +220,5 @@
 
   <div [ngbNavOutlet]="nav" class="border-start border-end border-bottom p-3 mb-3 shadow-sm"></div>
 
-  <button type="submit" class="btn btn-primary" [disabled]="!(isDirty$ | async)" i18n>Save</button>
+  <button type="submit" class="btn btn-primary mb-2" [disabled]="!(isDirty$ | async)" i18n>Save</button>
 </form>
