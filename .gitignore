@@ -93,3 +93,6 @@ scripts/nuke
 
 # mac os
 .DS_Store
+
+# celery schedule file
+celerybeat-schedule*

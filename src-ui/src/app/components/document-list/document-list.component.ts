@@ -9,7 +9,11 @@ import {
 import { ActivatedRoute, convertToParamMap, Router } from '@angular/router'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { filter, first, map, Subject, switchMap, takeUntil } from 'rxjs'
-import { FilterRule, isFullTextFilterRule } from 'src/app/data/filter-rule'
+import {
+  FilterRule,
+  filterRulesDiffer,
+  isFullTextFilterRule,
+} from 'src/app/data/filter-rule'
 import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type'
 import { PaperlessDocument } from 'src/app/data/paperless-document'
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
@@ -54,15 +58,36 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   displayMode = 'smallCards' // largeCards, smallCards, details
 
   unmodifiedFilterRules: FilterRule[] = []
+  private unmodifiedSavedView: PaperlessSavedView
 
   private unsubscribeNotifier: Subject<any> = new Subject()
+
+  get savedViewIsModified(): boolean {
+    if (!this.list.activeSavedViewId || !this.unmodifiedSavedView) return false
+    else {
+      return (
+        this.unmodifiedSavedView.sort_field !== this.list.sortField ||
+        this.unmodifiedSavedView.sort_reverse !== this.list.sortReverse ||
+        filterRulesDiffer(
+          this.unmodifiedSavedView.filter_rules,
+          this.list.filterRules
+        )
+      )
+    }
+  }
 
   get isFiltered() {
     return this.list.filterRules?.length > 0
   }
 
   getTitle() {
-    return this.list.activeSavedViewTitle || $localize`Documents`
+    let title = this.list.activeSavedViewTitle
+    if (title && this.savedViewIsModified) {
+      title += '*'
+    } else if (!title) {
+      title = $localize`Documents`
+    }
+    return title
   }
 
   getSortFields() {
@@ -122,7 +147,7 @@ export class DocumentListComponent implements OnInit, OnDestroy {
           this.router.navigate(['404'])
           return
         }
-
+        this.unmodifiedSavedView = view
         this.list.activateSavedViewWithQueryParams(
           view,
           convertToParamMap(this.route.snapshot.queryParams)
@@ -139,13 +164,7 @@ export class DocumentListComponent implements OnInit, OnDestroy {
       .subscribe((queryParams) => {
         if (queryParams.has('view')) {
           // loading a saved view on /documents
-          this.savedViewService
-            .getCached(parseInt(queryParams.get('view')))
-            .pipe(first())
-            .subscribe((view) => {
-              this.list.activateSavedView(view)
-              this.list.reload()
-            })
+          this.loadViewConfig(parseInt(queryParams.get('view')))
         } else {
           this.list.activateSavedView(null)
           this.list.loadFromQueryParams(queryParams)
@@ -171,13 +190,25 @@ export class DocumentListComponent implements OnInit, OnDestroy {
       this.savedViewService
         .patch(savedView)
         .pipe(first())
-        .subscribe((result) => {
+        .subscribe((view) => {
+          this.unmodifiedSavedView = view
           this.toastService.showInfo(
             $localize`View "${this.list.activeSavedViewTitle}" saved successfully.`
           )
           this.unmodifiedFilterRules = this.list.filterRules
         })
     }
+  }
+
+  loadViewConfig(viewID: number) {
+    this.savedViewService
+      .getCached(viewID)
+      .pipe(first())
+      .subscribe((view) => {
+        this.unmodifiedSavedView = view
+        this.list.activateSavedView(view)
+        this.list.reload()
+      })
   }
 
   saveViewConfigAs() {

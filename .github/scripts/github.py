@@ -15,7 +15,7 @@ from typing import Dict
 from typing import List
 from typing import Optional
 
-import requests
+import httpx
 
 logger = logging.getLogger("github-api")
 
@@ -28,15 +28,15 @@ class _GithubApiBase:
 
     def __init__(self, token: str) -> None:
         self._token = token
-        self._session: Optional[requests.Session] = None
+        self._client: Optional[httpx.Client] = None
 
     def __enter__(self) -> "_GithubApiBase":
         """
         Sets up the required headers for auth and response
         type from the API
         """
-        self._session = requests.Session()
-        self._session.headers.update(
+        self._client = httpx.Client()
+        self._client.headers.update(
             {
                 "Accept": "application/vnd.github.v3+json",
                 "Authorization": f"token {self._token}",
@@ -49,14 +49,14 @@ class _GithubApiBase:
         Ensures the authorization token is cleaned up no matter
         the reason for the exit
         """
-        if "Accept" in self._session.headers:
-            del self._session.headers["Accept"]
-        if "Authorization" in self._session.headers:
-            del self._session.headers["Authorization"]
+        if "Accept" in self._client.headers:
+            del self._client.headers["Accept"]
+        if "Authorization" in self._client.headers:
+            del self._client.headers["Authorization"]
 
         # Close the session as well
-        self._session.close()
-        self._session = None
+        self._client.close()
+        self._client = None
 
     def _read_all_pages(self, endpoint):
         """
@@ -66,7 +66,7 @@ class _GithubApiBase:
         internal_data = []
 
         while True:
-            resp = self._session.get(endpoint)
+            resp = self._client.get(endpoint)
             if resp.status_code == 200:
                 internal_data += resp.json()
                 if "next" in resp.links:
@@ -76,7 +76,7 @@ class _GithubApiBase:
                     break
             else:
                 logger.warning(f"Request to {endpoint} return HTTP {resp.status_code}")
-                break
+                resp.raise_for_status()
 
         return internal_data
 
@@ -120,6 +120,7 @@ class GithubBranchApi(_GithubApiBase):
         Returns all current branches of the given repository owned by the given
         owner or organization.
         """
+        # The environment GITHUB_REPOSITORY already contains the owner in the correct location
         endpoint = self._ENDPOINT.format(REPO=repo)
         internal_data = self._read_all_pages(endpoint)
         return [GithubBranch(branch) for branch in internal_data]
@@ -189,8 +190,11 @@ class GithubContainerRegistryApi(_GithubApiBase):
             self._PACKAGES_VERSIONS_ENDPOINT = "https://api.github.com/user/packages/{PACKAGE_TYPE}/{PACKAGE_NAME}/versions"
             # https://docs.github.com/en/rest/packages#delete-a-package-version-for-the-authenticated-user
             self._PACKAGE_VERSION_DELETE_ENDPOINT = "https://api.github.com/user/packages/{PACKAGE_TYPE}/{PACKAGE_NAME}/versions/{PACKAGE_VERSION_ID}"
+        self._PACKAGE_VERSION_RESTORE_ENDPOINT = (
+            f"{self._PACKAGE_VERSION_DELETE_ENDPOINT}/restore"
+        )
 
-    def get_package_versions(
+    def get_active_package_versions(
         self,
         package_name: str,
     ) -> List[ContainerPackage]:
@@ -216,12 +220,55 @@ class GithubContainerRegistryApi(_GithubApiBase):
 
         return pkgs
 
+    def get_deleted_package_versions(
+        self,
+        package_name: str,
+    ) -> List[ContainerPackage]:
+        package_type: str = "container"
+        # Need to quote this for slashes in the name
+        package_name = urllib.parse.quote(package_name, safe="")
+
+        endpoint = (
+            self._PACKAGES_VERSIONS_ENDPOINT.format(
+                ORG=self._owner_or_org,
+                PACKAGE_TYPE=package_type,
+                PACKAGE_NAME=package_name,
+            )
+            + "?state=deleted"
+        )
+
+        pkgs = []
+
+        for data in self._read_all_pages(endpoint):
+            pkgs.append(ContainerPackage(data))
+
+        return pkgs
+
     def delete_package_version(self, package_data: ContainerPackage):
         """
         Deletes the given package version from the GHCR
         """
-        resp = self._session.delete(package_data.url)
+        resp = self._client.delete(package_data.url)
         if resp.status_code != 204:
             logger.warning(
                 f"Request to delete {package_data.url} returned HTTP {resp.status_code}",
+            )
+
+    def restore_package_version(
+        self,
+        package_name: str,
+        package_data: ContainerPackage,
+    ):
+        package_type: str = "container"
+        endpoint = self._PACKAGE_VERSION_RESTORE_ENDPOINT.format(
+            ORG=self._owner_or_org,
+            PACKAGE_TYPE=package_type,
+            PACKAGE_NAME=package_name,
+            PACKAGE_VERSION_ID=package_data.id,
+        )
+
+        resp = self._client.post(endpoint)
+        if resp.status_code != 204:
+            logger.warning(
+                f"Request to delete {endpoint} returned HTTP {resp.status_code}",
             )

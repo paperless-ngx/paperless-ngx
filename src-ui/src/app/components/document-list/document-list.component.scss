@@ -11,7 +11,7 @@ tr {
 }
 
 $paperless-card-breakpoints: (
-  0: 2, // xs
+  // 0: 2, // xs is manual for slim-sidebar
   768px: 3, //md
   992px: 4, //lg
   1200px: 5, //xl
@@ -22,11 +22,28 @@ $paperless-card-breakpoints: (
 );
 
 .row-cols-paperless-cards {
+  // xs, we dont want in .col-slim block
+  > * {
+    flex: 0 0 auto;
+    width: calc(100% / 2);
+  }
+
   @each $width, $n_cols in $paperless-card-breakpoints {
     @media(min-width: $width) {
       > * {
         flex: 0 0 auto;
         width: calc(100% / $n-cols);
+      }
+    }
+  }
+}
+
+::ng-deep .col-slim .row-cols-paperless-cards {
+  @each $width, $n_cols in $paperless-card-breakpoints {
+    @media(min-width: $width) {
+      > * {
+        flex: 0 0 auto;
+        width: calc(100% / ($n-cols + 1)) !important;
       }
     }
   }
