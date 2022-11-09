@@ -10,12 +10,10 @@ from typing import Tuple
 import magic
 from django.conf import settings
 from pdf2image import convert_from_path
-from pdf2image.exceptions import PDFPageCountError
 from pikepdf import Page
 from pikepdf import PasswordError
 from pikepdf import Pdf
 from pikepdf import PdfImage
-from pikepdf.models.image import HifiPrintImageNotTranscodableError
 from PIL import Image
 from PIL import ImageSequence
 from pyzbar import pyzbar
@@ -101,7 +99,7 @@ def convert_from_tiff_to_pdf(filepath: str) -> str:
                 images[0].save(newpath)
             else:
                 images[0].save(newpath, save_all=True, append_images=images[1:])
-        except OSError as e:
+        except OSError as e:  # pragma: no cover
             logger.warning(
                 f"Could not save the file as pdf. Error: {str(e)}",
             )
@@ -122,13 +120,16 @@ def scan_file_for_separating_barcodes(filepath: str) -> Tuple[Optional[str], Lis
                 for image_key in page.images:
                     pdfimage = PdfImage(page.images[image_key])
 
+                    # This type is known to have issues:
+                    # https://github.com/pikepdf/pikepdf/issues/401
                     if "/CCITTFaxDecode" in pdfimage.filters:
                         raise BarcodeImageFormatError(
                             "Unable to decode CCITTFaxDecode images",
                         )
 
                     # Not all images can be transcoded to a PIL image, which
-                    # is what pyzbar expects to receive
+                    # is what pyzbar expects to receive, so this may
+                    # raise an exception, triggering fallback
                     pillow_img = pdfimage.as_pil_image()
 
                     detected_barcodes = barcode_reader(pillow_img)
@@ -155,29 +156,23 @@ def scan_file_for_separating_barcodes(filepath: str) -> Tuple[Optional[str], Lis
         if mime_type == "image/tiff":
             pdf_filepath = convert_from_tiff_to_pdf(filepath)
 
-        # Chose the scanner
-        if settings.CONSUMER_USE_LEGACY_DETECTION:
-            logger.debug("Using pdf2image for barcodes")
-            scanner_function = _pdf2image_barcode_scan
-        else:
-            logger.debug("Using pikepdf for barcodes")
-            scanner_function = _pikepdf_barcode_scan
-
-        # Run the scanner
+        # Always try pikepdf first, it's usually fine, faster and
+        # uses less memory
         try:
-            scanner_function(pdf_filepath)
-        # Neither method can handle password protected PDFs without it being
-        # provided.  Log it and continue
-        except (PasswordError, PDFPageCountError) as e:
+            _pikepdf_barcode_scan(pdf_filepath)
+        # Password protected files can't be checked
+        except PasswordError as e:
             logger.warning(
-                f"File is likely password protected, not splitting: {e}",
+                f"File is likely password protected, not checking for barcodes: {e}",
             )
-        # Handle pikepdf related image decoding issues with a fallback
-        except (BarcodeImageFormatError, HifiPrintImageNotTranscodableError) as e:
+        # Handle pikepdf related image decoding issues with a fallback to page
+        # by page conversion to images in a temporary directory
+        except Exception as e:
             logger.warning(
                 f"Falling back to pdf2image because: {e}",
             )
             try:
+                # Clear the list in case some processing worked
                 separator_page_numbers = []
                 _pdf2image_barcode_scan(pdf_filepath)
             # This file is really borked, allow the consumption to continue
@@ -186,11 +181,6 @@ def scan_file_for_separating_barcodes(filepath: str) -> Tuple[Optional[str], Lis
                 logger.warning(
                     f"Exception during barcode scanning: {e}",
                 )
-        # We're not sure what happened, but allow the consumption to continue
-        except Exception as e:  # pragma: no cover
-            logger.warning(
-                f"Exception during barcode scanning: {e}",
-            )
 
     else:
         logger.warning(
