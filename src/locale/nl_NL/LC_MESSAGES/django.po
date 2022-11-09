@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-07-08 14:11-0700\n"
-"PO-Revision-Date: 2022-08-26 20:54\n"
+"PO-Revision-Date: 2022-10-27 09:51\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
@@ -406,7 +406,7 @@ msgstr "Nog steeds hier?! Hmm, er kan iets mis zijn."
 
 #: documents/templates/index.html:79
 msgid "Here's a link to the docs."
-msgstr ""
+msgstr "Dit is een link naar de documentatie."
 
 #: documents/templates/registration/logged_out.html:14
 msgid "Paperless-ngx signed out"
