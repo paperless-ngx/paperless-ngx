@@ -221,8 +221,12 @@
       <a ngbNavLink i18n>Paperless Mail</a>
       <ng-template ngbNavContent>
 
-        <h4 i18n>Mail accounts</h4>
-        <ul class="list-group" formGroupName="mailAccounts">
+        <ng-container *ngIf="mailAccounts && mailRules">
+          <h4>
+            <ng-container i18n>Mail accounts</ng-container>
+            <button type="button" class="btn btn-sm btn-primary ms-4" (click)="editMailAccount()" i18n>Add Account</button>
+          </h4>
+          <ul class="list-group" formGroupName="mailAccounts">
 
             <li class="list-group-item">
               <div class="row">
@@ -232,14 +236,15 @@
               </div>
             </li>
 
-            <li *ngFor="let account of mailAccounts" class="list-group-item" [formGroupName]="account.id">
-              <div class="row">
-                <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editMailAccount(account)">{{account.name}}</button></div>
-                <div class="col d-flex align-items-center">{{account.imap_server}}</div>
-                <div class="col">
-                  <div class="btn-group">
-                    <button class="btn btn-primary" type="button" (click)="editMailAccount(account)" i18n>Edit</button>
-                    <button class="btn btn-outline-danger" type="button" (click)="deleteMailAccount(account)" i18n>Delete</button>
+              <li *ngFor="let account of mailAccounts" class="list-group-item" [formGroupName]="account.id">
+                <div class="row">
+                  <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editMailAccount(account)">{{account.name}}</button></div>
+                  <div class="col d-flex align-items-center">{{account.imap_server}}</div>
+                  <div class="col">
+                    <div class="btn-group">
+                      <button class="btn btn-sm btn-primary" type="button" (click)="editMailAccount(account)" i18n>Edit</button>
+                      <button class="btn btn-sm btn-outline-danger" type="button" (click)="deleteMailAccount(account)" i18n>Delete</button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -248,8 +253,11 @@
             <div *ngIf="mailAccounts.length == 0" i18n>No mail accounts defined.</div>
         </ul>
 
-        <h4 class="mt-4" i18n>Mail rules</h4>
-        <ul class="list-group" formGroupName="mailRules">
+          <h4 class="mt-4">
+            <ng-container i18n>Mail rules</ng-container>
+            <button type="button" class="btn btn-sm btn-primary ms-4" (click)="editMailRule()" i18n>Add Rule</button>
+          </h4>
+          <ul class="list-group" formGroupName="mailRules">
 
             <li class="list-group-item">
               <div class="row">
@@ -259,14 +267,15 @@
               </div>
             </li>
 
-            <li *ngFor="let rule of mailRules" class="list-group-item" [formGroupName]="rule.id">
-              <div class="row">
-                <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editMailRule(rule)">{{rule.name}}</button></div>
-                <div class="col d-flex align-items-center">{{(mailAccountService.getCached(rule.account) | async)?.name}}</div>
-                <div class="col">
-                  <div class="btn-group">
-                    <button class="btn btn-primary" type="button" (click)="editMailRule(rule)" i18n>Edit</button>
-                    <button class="btn btn-outline-danger" type="button" (click)="deleteMailRule(rule)" i18n>Delete</button>
+              <li *ngFor="let rule of mailRules" class="list-group-item" [formGroupName]="rule.id">
+                <div class="row">
+                  <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editMailRule(rule)">{{rule.name}}</button></div>
+                  <div class="col d-flex align-items-center">{{(mailAccountService.getCached(rule.account) | async)?.name}}</div>
+                  <div class="col">
+                    <div class="btn-group">
+                      <button class="btn btn-sm btn-primary" type="button" (click)="editMailRule(rule)" i18n>Edit</button>
+                      <button class="btn btn-sm btn-outline-danger" type="button" (click)="deleteMailRule(rule)" i18n>Delete</button>
+                    </div>
                   </div>
                 </div>
               </div>

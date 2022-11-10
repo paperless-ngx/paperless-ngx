@@ -10,24 +10,25 @@
         <app-input-text i18n-title title="Name" formControlName="name" [error]="error?.name"></app-input-text>
         <app-input-text i18n-title title="Order" formControlName="order" [error]="error?.order"></app-input-text>
         <app-input-select i18n-title title="Account" [items]="accounts" formControlName="account"></app-input-select>
-        <app-input-text i18n-title title="Folder" formControlName="folder" [error]="error?.folder"></app-input-text>
-        <app-input-number i18n-title title="Maximum age" formControlName="maximum_age" [error]="error?.maximum_age"></app-input-number>
+        <app-input-text i18n-title title="Folder" formControlName="folder" i18n-hint hint="Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server." [error]="error?.folder"></app-input-text>
+        <app-input-number i18n-title title="Maximum age (days)" formControlName="maximum_age" [showAdd]="false" [error]="error?.maximum_age"></app-input-number>
         <app-input-select i18n-title title="Attachment type" [items]="attachmentTypeOptions" formControlName="attachment_type"></app-input-select>
       </div>
       <div class="col">
+        <p class="small" i18n>Paperless will only process mails that match <em>all</em> of the filters specified below.</p>
         <app-input-text i18n-title title="Filter from" formControlName="filter_from" [error]="error?.filter_from"></app-input-text>
         <app-input-text i18n-title title="Filter subject" formControlName="filter_subject" [error]="error?.filter_subject"></app-input-text>
         <app-input-text i18n-title title="Filter body" formControlName="filter_body" [error]="error?.filter_body"></app-input-text>
-        <app-input-text i18n-title title="Filter attachment filename" formControlName="filter_attachment_filename" [error]="error?.filter_attachment_filename"></app-input-text>
-        <app-input-select i18n-title title="Action" [items]="actionOptions" formControlName="attachment_type"></app-input-select>
-        <app-input-text i18n-title title="Action parameter" formControlName="action_parameter" [error]="error?.action_parameter"></app-input-text>
+        <app-input-text i18n-title title="Filter attachment filename" formControlName="filter_attachment_filename" i18n-hint hint="Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive." [error]="error?.filter_attachment_filename"></app-input-text>
       </div>
       <div class="col">
+        <app-input-select i18n-title title="Action" [items]="actionOptions" formControlName="attachment_type" i18n-hint hint="Action is only performed when documents are consumed from the mail. Mails without attachments remain entirely untouched."></app-input-select>
+        <app-input-text i18n-title title="Action parameter" formControlName="action_parameter" [error]="error?.action_parameter"></app-input-text>
         <app-input-select i18n-title title="Assign title from" [items]="metadataTitleOptions" formControlName="assign_title_from"></app-input-select>
         <app-input-tags [allowCreate]="false" formControlName="assign_tags"></app-input-tags>
-        <app-input-select i18n-title title="Assign document type" [items]="documentTypes" formControlName="assign_document_type"></app-input-select>
+        <app-input-select i18n-title title="Assign document type" [items]="documentTypes" [allowNull]="true" formControlName="assign_document_type"></app-input-select>
         <app-input-select i18n-title title="Assign correspondent from" [items]="metadataCorrespondentOptions" formControlName="assign_correspondent_from"></app-input-select>
-        <app-input-select i18n-title title="Assign correspondent" [items]="correspondents" formControlName="assign_correspondent"></app-input-select>
+        <app-input-select *ngIf="showCorrespondentField" i18n-title title="Assign correspondent" [items]="correspondents" [allowNull]="true" formControlName="assign_correspondent"></app-input-select>
       </div>
     </div>
   </div>

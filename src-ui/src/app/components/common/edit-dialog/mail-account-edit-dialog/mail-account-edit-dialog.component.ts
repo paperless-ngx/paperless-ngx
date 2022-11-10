@@ -4,7 +4,6 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-dialog.component'
 import {
   IMAPSecurity,
-  IMAPSecurityLabels,
   PaperlessMailAccount,
 } from 'src/app/data/paperless-mail-account'
 import { MailAccountService } from 'src/app/services/rest/mail-account.service'
@@ -40,6 +39,10 @@ export class MailAccountEditDialogComponent extends EditDialogComponent<Paperles
   }
 
   get imapSecurityOptions() {
-    return IMAPSecurityLabels
+    return [
+      { id: IMAPSecurity.None, name: $localize`No encryption` },
+      { id: IMAPSecurity.SSL, name: $localize`SSL` },
+      { id: IMAPSecurity.STARTTLS, name: $localize`STARTTLS` },
+    ]
   }
 }
