@@ -34,7 +34,7 @@ repos:
           - javascript
           - ts
           - markdown
-        exclude: "(^Pipfile\\.lock$)"
+        exclude: "(^Pipfile\\.lock$)|(^charts/paperless-ngx/README.md$)"
   # Python hooks
   - repo: https://github.com/asottile/reorder_python_imports
     rev: v3.9.0
