@@ -481,7 +481,7 @@ export class SettingsComponent
       backdrop: 'static',
       size: 'xl',
     })
-    modal.componentInstance.dialogMode = 'edit'
+    modal.componentInstance.dialogMode = account ? 'edit' : 'create'
     modal.componentInstance.object = account
     modal.componentInstance.success
       .pipe(takeUntil(this.unsubscribeNotifier))
@@ -523,7 +523,7 @@ export class SettingsComponent
       backdrop: 'static',
       size: 'xl',
     })
-    modal.componentInstance.dialogMode = 'edit'
+    modal.componentInstance.dialogMode = rule ? 'edit' : 'create'
     modal.componentInstance.object = rule
     modal.componentInstance.success
       .pipe(takeUntil(this.unsubscribeNotifier))
