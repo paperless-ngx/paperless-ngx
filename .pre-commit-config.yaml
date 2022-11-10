@@ -18,7 +18,7 @@ repos:
         exclude_types:
           - svg
           - pofile
-        exclude: "(^LICENSE$)"
+        exclude: "^(LICENSE|charts/paperless-ngx/README.md)$"
       - id: mixed-line-ending
         args:
           - "--fix=lf"
