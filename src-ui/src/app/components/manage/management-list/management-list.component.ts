@@ -46,6 +46,7 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
     protected filterRuleType: number,
     public typeName: string,
     public typeNamePlural: string,
+    public permissionName: string,
     public extraColumns: ManagementListColumn[]
   ) {}
 
@@ -59,12 +60,6 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
 
   public sortField: string
   public sortReverse: boolean
-
-  // TODO - Getter used to automatically build a permission name from typeName
-  // Will basically break if permission name is different than typeName
-  public typeNameWithoutWhitespace(): string {
-    return this.typeName.replace(/\s/g, '')
-  }
 
   private nameFilterDebounce: Subject<string>
   private subscription: Subscription
