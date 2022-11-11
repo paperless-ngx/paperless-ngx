@@ -11,7 +11,7 @@ import {
 } from '@angular/core'
 import { Meta } from '@angular/platform-browser'
 import { CookieService } from 'ngx-cookie-service'
-import { first, Observable, tap } from 'rxjs'
+import { first, Observable, of, tap } from 'rxjs'
 import {
   BRIGHTNESS,
   estimateBrightnessForColor,
@@ -45,6 +45,7 @@ export class SettingsService {
   protected baseUrl: string = environment.apiBaseUrl + 'ui_settings/'
 
   private settings: Object = {}
+  private _permissions: string[]
 
   public displayName: string
 
@@ -74,6 +75,7 @@ export class SettingsService {
         if (this.settings['language']?.length)
           this.setLanguage(this.settings['language'])
         this.displayName = uisettings.display_name.trim()
+        this._permissions = uisettings.permissions
       })
     )
   }
@@ -454,5 +456,9 @@ export class SettingsService {
       !this.savedViewService.loading &&
       this.savedViewService.dashboardViews.length == 0
     )
+  }
+
+  public permissions(): Observable<string[]> {
+    return of(this._permissions)
   }
 }
