@@ -74,12 +74,7 @@ export class AppComponent implements OnInit, OnDestroy {
         if (
           this.showNotification(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUCCESS)
         ) {
-          // TODO - Is this the only way to allow/disallow from permissions?
-          var canOpenDocuments = false
-          this.settings.permissions().subscribe((perm) => {
-            canOpenDocuments = perm.includes('documents.view_document')
-          })
-          if (canOpenDocuments)
+          if (this.settings.currentUserCan('documents.view_document')) {
             this.toastService.show({
               title: $localize`Document added`,
               delay: 10000,
@@ -89,12 +84,13 @@ export class AppComponent implements OnInit, OnDestroy {
                 this.router.navigate(['documents', status.documentId])
               },
             })
-          else
+          } else {
             this.toastService.show({
               title: $localize`Document added`,
               delay: 10000,
               content: $localize`Document ${status.filename} was added to paperless.`,
             })
+          }
         }
       })
 
@@ -211,12 +207,10 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   public get dragDropEnabled(): boolean {
-    // TODO - Is this the only way to allow/disallow from permissions?
-    var canAddDocuments = false
-    this.settings.permissions().subscribe((perm) => {
-      canAddDocuments = perm.includes('documents.add_document')
-    })
-    return !this.router.url.includes('dashboard') && canAddDocuments
+    return (
+      !this.router.url.includes('dashboard') &&
+      this.settings.currentUserCan('documents.add_document')
+    )
   }
 
   public fileOver() {

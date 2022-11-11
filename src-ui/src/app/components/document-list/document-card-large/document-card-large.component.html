@@ -37,7 +37,7 @@
                 <use xlink:href="assets/bootstrap-icons.svg#diagram-3"/>
               </svg>&nbsp;<span class="d-none d-md-inline" i18n>More like this</span>
             </a>
-            <a (click)="openDocumentsService.openDocument(document)" class="btn btn-sm btn-outline-secondary" *ifPermissions='["documents.change_document"]'>
+            <a (click)="openDocumentsService.openDocument(document)" class="btn btn-sm btn-outline-secondary" *ifPermissions="'documents.change_document'">
               <svg class="sidebaricon" fill="currentColor" class="sidebaricon">
                 <use xlink:href="assets/bootstrap-icons.svg#pencil"/>
               </svg>&nbsp;<span class="d-none d-md-inline" i18n>Edit</span>
