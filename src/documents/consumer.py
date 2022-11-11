@@ -537,11 +537,19 @@ class Consumer(LoggingMixin):
         )
 
         # Decode the output (if any)
-        stdout_str = completed_process.stdout.decode("utf8", errors="ignore").split(
-            "\n",
+        stdout_str = (
+            completed_process.stdout.decode("utf8", errors="ignore")
+            .strip()
+            .split(
+                "\n",
+            )
         )
-        stderr_str = completed_process.stderr.decode("utf8", errors="ignore").split(
-            "\n",
+        stderr_str = (
+            completed_process.stderr.decode("utf8", errors="ignore")
+            .strip()
+            .split(
+                "\n",
+            )
         )
 
         if len(stdout_str):
