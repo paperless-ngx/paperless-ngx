@@ -137,8 +137,7 @@ initialize() {
 install_languages() {
 	echo "Installing languages..."
 
-	local -r langs="$1"
-	read -ra langs <<<"$langs"
+	read -ra langs <<<"$1"
 
 	# Check that it is not empty
 	if [ ${#langs[@]} -eq 0 ]; then
