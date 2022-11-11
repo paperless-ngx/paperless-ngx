@@ -1,8 +1,13 @@
 <app-page-header title="Settings" i18n-title>
   <button class="btn btn-sm btn-outline-primary" (click)="tourService.start()"><ng-container i18n>Start tour</ng-container></button>
+  <a class="btn btn-sm btn-primary ms-3" href="admin/" target="_blank">
+      <ng-container i18n>Open Django Admin</ng-container>
+      <svg class="sidebaricon ms-1" fill="currentColor">
+        <use xlink:href="assets/bootstrap-icons.svg#arrow-up-right"/>
+      </svg>
+  </a>
 </app-page-header>
 
-<!-- <p>items per page, documents per view type</p> -->
 <form [formGroup]="settingsForm" (ngSubmit)="saveSettings()">
 
   <ul ngbNav #nav="ngbNav" class="nav-tabs">
@@ -218,7 +223,7 @@
     </li>
 
     <li [ngbNavItem]="4">
-      <a ngbNavLink i18n>Paperless Mail</a>
+      <a ngbNavLink i18n>Mail</a>
       <ng-template ngbNavContent>
 
         <ng-container *ngIf="mailAccounts && mailRules">
