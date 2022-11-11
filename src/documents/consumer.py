@@ -163,7 +163,7 @@ class Consumer(LoggingMixin):
             # Raises exception on non-zero output
             completed_proc.check_returncode()
 
-        except Exception as e:  # pragma: nocover
+        except Exception as e:
             self._fail(
                 MESSAGE_PRE_CONSUME_SCRIPT_ERROR,
                 f"Error while executing pre-consume script: {e}",
@@ -237,7 +237,7 @@ class Consumer(LoggingMixin):
             # Raises exception on non-zero output
             completed_proc.check_returncode()
 
-        except Exception as e:  # pragma: nocover
+        except Exception as e:
             self._fail(
                 MESSAGE_POST_CONSUME_SCRIPT_ERROR,
                 f"Error while executing post-consume script: {e}",
