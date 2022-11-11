@@ -844,22 +844,6 @@
         </context-group>
         <target state="translated">Očisti</target>
       </trans-unit>
-      <trans-unit id="8700121026680200191" datatype="html">
-        <source>Clear</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/common/clearable-badge/clearable-badge.component.html</context>
-          <context context-type="linenumber">1</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.html</context>
-          <context context-type="linenumber">24</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.html</context>
-          <context context-type="linenumber">47</context>
-        </context-group>
-        <target state="translated">Očisti</target>
-      </trans-unit>
       <trans-unit id="5000042972069710005" datatype="html">
         <source><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;d-inline-block&quot; style=&quot;padding-bottom: 1px;&quot; &gt;"/>Cancel<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
         <context-group purpose="location">
