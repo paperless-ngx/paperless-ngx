@@ -537,27 +537,27 @@ class Consumer(LoggingMixin):
         )
 
         # Decode the output (if any)
-        stdout_str = (
-            completed_process.stdout.decode("utf8", errors="ignore")
-            .strip()
-            .split(
-                "\n",
+        if len(completed_process.stdout):
+            stdout_str = (
+                completed_process.stdout.decode("utf8", errors="ignore")
+                .strip()
+                .split(
+                    "\n",
+                )
             )
-        )
-        stderr_str = (
-            completed_process.stderr.decode("utf8", errors="ignore")
-            .strip()
-            .split(
-                "\n",
-            )
-        )
-
-        if len(stdout_str):
             self.log("info", "Script stdout:")
             for line in stdout_str:
                 self.log("info", line)
 
-        if len(stderr_str):
+        if len(completed_process.stderr):
+            stderr_str = (
+                completed_process.stderr.decode("utf8", errors="ignore")
+                .strip()
+                .split(
+                    "\n",
+                )
+            )
+
             self.log("warning", "Script stderr:")
             for line in stderr_str:
                 self.log("warning", line)
