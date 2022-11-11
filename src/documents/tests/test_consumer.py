@@ -803,6 +803,15 @@ class TestConsumerCreatedDate(DirectoriesMixin, TestCase):
 
 
 class PreConsumeTestCase(TestCase):
+    def setUp(self) -> None:
+
+        # this prevents websocket message reports during testing.
+        patcher = mock.patch("documents.consumer.Consumer._send_progress")
+        self._send_progress = patcher.start()
+        self.addCleanup(patcher.stop)
+
+        return super().setUp()
+
     @mock.patch("documents.consumer.run")
     @override_settings(PRE_CONSUME_SCRIPT=None)
     def test_no_pre_consume_script(self, m):
@@ -868,8 +877,41 @@ class PreConsumeTestCase(TestCase):
                 mocked_log.assert_any_call("info", "This message goes to stdout")
                 mocked_log.assert_any_call("warning", "This message goes to stderr")
 
+    def test_script_exit_non_zero(self):
+        """
+        GIVEN:
+            - A script which exits with a non-zero exit code
+        WHEN:
+            - The script is executed as a pre-consume script
+        THEN:
+            - A ConsumerError is raised
+        """
+        with tempfile.NamedTemporaryFile(mode="w") as script:
+            # Write up a little script
+            with script.file as outfile:
+                outfile.write("#!/usr/bin/env bash\n")
+                outfile.write("exit 100\n")
+
+            # Make the file executable
+            st = os.stat(script.name)
+            os.chmod(script.name, st.st_mode | stat.S_IEXEC)
+
+            with override_settings(PRE_CONSUME_SCRIPT=script.name):
+                c = Consumer()
+                c.path = "path-to-file"
+                self.assertRaises(ConsumerError, c.run_pre_consume_script)
+
 
 class PostConsumeTestCase(TestCase):
+    def setUp(self) -> None:
+
+        # this prevents websocket message reports during testing.
+        patcher = mock.patch("documents.consumer.Consumer._send_progress")
+        self._send_progress = patcher.start()
+        self.addCleanup(patcher.stop)
+
+        return super().setUp()
+
     @mock.patch("documents.consumer.run")
     @override_settings(POST_CONSUME_SCRIPT=None)
     def test_no_post_consume_script(self, m):
@@ -930,3 +972,29 @@ class PostConsumeTestCase(TestCase):
                 self.assertEqual(command[6], f"/api/documents/{doc.pk}/thumb/")
                 self.assertEqual(command[7], "my_bank")
                 self.assertCountEqual(command[8].split(","), ["a", "b"])
+
+    def test_script_exit_non_zero(self):
+        """
+        GIVEN:
+            - A script which exits with a non-zero exit code
+        WHEN:
+            - The script is executed as a post-consume script
+        THEN:
+            - A ConsumerError is raised
+        """
+        with tempfile.NamedTemporaryFile(mode="w") as script:
+            # Write up a little script
+            with script.file as outfile:
+                outfile.write("#!/usr/bin/env bash\n")
+                outfile.write("exit -500\n")
+
+            # Make the file executable
+            st = os.stat(script.name)
+            os.chmod(script.name, st.st_mode | stat.S_IEXEC)
+
+            with override_settings(POST_CONSUME_SCRIPT=script.name):
+                c = Consumer()
+                doc = Document.objects.create(title="Test", mime_type="application/pdf")
+                c.path = "path-to-file"
+                with self.assertRaises(ConsumerError):
+                    c.run_post_consume_script(doc)
