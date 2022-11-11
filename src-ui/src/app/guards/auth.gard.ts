@@ -14,10 +14,6 @@ export class AuthGard implements CanActivate {
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): boolean {
-    var canActivate = false
-    this.settingsService.permissions().subscribe((perm) => {
-      canActivate = perm.includes(route.data.requiredPermission)
-    })
-    return canActivate
+    return this.settingsService.currentUserCan(route.data.requiredPermission)
   }
 }

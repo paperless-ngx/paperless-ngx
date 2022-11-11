@@ -5,7 +5,7 @@
       <div class="input-group-text" i18n>of {{previewNumPages}}</div>
     </div>
 
-    <button type="button" class="btn btn-sm btn-outline-danger me-2 ms-auto" (click)="delete()" *ifPermissions='["documents.delete_document"]'>
+    <button type="button" class="btn btn-sm btn-outline-danger me-2 ms-auto" (click)="delete()" *ifPermissions="'documents.delete_document'">
         <svg class="buttonicon" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#trash" />
         </svg><span class="d-none d-lg-inline ps-1" i18n>Delete</span>
@@ -182,7 +182,7 @@
 
             <button type="button" class="btn btn-outline-secondary" (click)="discard()" i18n [disabled]="networkActive || !(isDirty$ | async)">Discard</button>&nbsp;
             <button type="button" class="btn btn-outline-primary" (click)="saveEditNext()" *ngIf="hasNext()" i18n [disabled]="networkActive || !(isDirty$ | async) || error">Save & next</button>&nbsp;
-            <button type="submit" class="btn btn-primary" *ifPermissions='["documents.change_document"]' i18n [disabled]="networkActive || !(isDirty$ | async) || error">Save</button>&nbsp;
+            <button type="submit" class="btn btn-primary" *ifPermissions="'documents.change_document'" i18n [disabled]="networkActive || !(isDirty$ | async) || error">Save</button>&nbsp;
         </form>
     </div>
 

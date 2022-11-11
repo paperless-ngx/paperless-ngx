@@ -206,7 +206,7 @@
 
               <div class="mb-2 col-auto">
                 <label class="form-label" for="name_{{view.id}}" i18n>Actions</label>
-                <button type="button" class="btn btn-sm btn-outline-danger form-control" (click)="deleteSavedView(view)" *ifPermissions='["documents.delete_savedview"]' i18n>Delete</button>
+                <button type="button" class="btn btn-sm btn-outline-danger form-control" (click)="deleteSavedView(view)" *ifPermissions="'documents.delete_savedview'" i18n>Delete</button>
               </div>
             </div>
 
@@ -220,5 +220,5 @@
 
   <div [ngbNavOutlet]="nav" class="border-start border-end border-bottom p-3 mb-3 shadow-sm"></div>
 
-  <button type="submit" class="btn btn-primary mb-2" *ifPermissions='["documents.change_uisettings"]' [disabled]="!(isDirty$ | async)" i18n>Save</button>
+  <button type="submit" class="btn btn-primary mb-2" *ifPermissions="'documents.change_uisettings'" [disabled]="!(isDirty$ | async)" i18n>Save</button>
 </form>

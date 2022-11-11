@@ -59,7 +59,7 @@
     </div>
   </div>
 
-  <div class="btn-group ms-2 flex-fill" *ifPermissions='["documents.view_savedview"]' ngbDropdown role="group">
+  <div class="btn-group ms-2 flex-fill" *ifPermissions="'documents.view_savedview'" ngbDropdown role="group">
     <button class="btn btn-sm btn-outline-primary dropdown-toggle flex-fill" tourAnchor="tour.documents-views" ngbDropdownToggle>
       <ng-container i18n>Views</ng-container>
       <div *ngIf="savedViewIsModified" class="position-absolute top-0 start-100 p-2 translate-middle badge bg-secondary border border-light rounded-circle">
@@ -72,10 +72,10 @@
         <div class="dropdown-divider" *ngIf="savedViewService.allViews.length > 0"></div>
       </ng-container>
 
-      <div *ifPermissions='["documents.change_savedviewfilterrule"]'>
+      <div *ifPermissions="'documents.change_savedviewfilterrule'">
         <button ngbDropdownItem (click)="saveViewConfig()" *ngIf="list.activeSavedViewId" [disabled]="!savedViewIsModified" i18n>Save "{{list.activeSavedViewTitle}}"</button>
       </div>
-      <button ngbDropdownItem (click)="saveViewConfigAs()" *ifPermissions='["documents.add_savedview"]' i18n>Save as...</button>
+      <button ngbDropdownItem (click)="saveViewConfigAs()" *ifPermissions="'documents.add_savedview'" i18n>Save as...</button>
     </div>
   </div>
 

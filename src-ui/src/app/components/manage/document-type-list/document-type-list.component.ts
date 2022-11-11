@@ -29,6 +29,7 @@ export class DocumentTypeListComponent extends ManagementListComponent<Paperless
       FILTER_DOCUMENT_TYPE,
       $localize`document type`,
       $localize`document types`,
+      'documenttype',
       []
     )
   }
