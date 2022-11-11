@@ -856,12 +856,14 @@ class UiSettingsView(GenericAPIView):
             ui_settings["update_checking"] = {
                 "backend_setting": settings.ENABLE_UPDATE_CHECK,
             }
+        roles = user.get_all_permissions()
         return Response(
             {
                 "user_id": user.id,
                 "username": user.username,
                 "display_name": displayname,
                 "settings": ui_settings,
+                "permissions": roles,
             },
         )
 
