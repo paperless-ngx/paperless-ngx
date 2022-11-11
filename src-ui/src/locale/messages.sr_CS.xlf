@@ -373,7 +373,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">126</context>
         </context-group>
-        <target state="translated">Kontrolna tabla se može koristiti za prikazivanje sačuvanih pogleda, kao što je 'Inbox'. Kada kreirate neke poglede ta podešavanja će se nalazati pod Podešavanja &gt; Sačuvani pogledi.</target>
+        <target state="translated">Kontrolna tabla se može koristiti za prikazivanje sačuvanih pogleda, kao što je 'Inbox'. Ta podešavanja se nalaze pod Podešavanja &gt; Sačuvani pogledi kada budete kreirali neke.</target>
       </trans-unit>
       <trans-unit id="9075755296812854717" datatype="html">
         <source>Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Paperless-ngx will start training its machine learning algorithms.</source>
@@ -827,6 +827,22 @@
           <context context-type="linenumber">216</context>
         </context-group>
         <target state="translated">Došlo je do greške prilikom čuvanja podešavanja.</target>
+      </trans-unit>
+      <trans-unit id="8700121026680200191" datatype="html">
+        <source>Clear</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/clearable-badge/clearable-badge.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.html</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.html</context>
+          <context context-type="linenumber">47</context>
+        </context-group>
+        <target state="translated">Očisti</target>
       </trans-unit>
       <trans-unit id="8700121026680200191" datatype="html">
         <source>Clear</source>
