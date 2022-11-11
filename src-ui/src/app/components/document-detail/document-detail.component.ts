@@ -553,6 +553,11 @@ export class DocumentDetailComponent
   }
 
   get commentsEnabled(): boolean {
-    return this.settings.get(SETTINGS_KEYS.COMMENTS_ENABLED)
+    // TODO - Is this the only way to allow/disallow from permissions?
+    var canViewComments = false
+    this.settings.permissions().subscribe((perm) => {
+      canViewComments = perm.includes('documents.view_comment')
+    })
+    return this.settings.get(SETTINGS_KEYS.COMMENTS_ENABLED) && canViewComments
   }
 }

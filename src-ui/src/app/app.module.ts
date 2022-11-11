@@ -41,6 +41,7 @@ import { SelectComponent } from './components/common/input/select/select.compone
 import { CheckComponent } from './components/common/input/check/check.component'
 import { SaveViewConfigDialogComponent } from './components/document-list/save-view-config-dialog/save-view-config-dialog.component'
 import { TagsComponent } from './components/common/input/tags/tags.component'
+import { IfPermissionsDirective } from './directives/if-permissions.directive'
 import { SortableDirective } from './directives/sortable.directive'
 import { CookieService } from 'ngx-cookie-service'
 import { CsrfInterceptor } from './interceptors/csrf.interceptor'
@@ -69,6 +70,7 @@ import { ColorSliderModule } from 'ngx-color/slider'
 import { ColorComponent } from './components/common/input/color/color.component'
 import { DocumentAsnComponent } from './components/document-asn/document-asn.component'
 import { DocumentCommentsComponent } from './components/document-comments/document-comments.component'
+import { AuthGard } from './guards/auth.gard'
 import { DirtyDocGuard } from './guards/dirty-doc.guard'
 import { DirtySavedViewGuard } from './guards/dirty-saved-view.guard'
 import { StoragePathListComponent } from './components/manage/storage-path-list/storage-path-list.component'
@@ -159,6 +161,7 @@ function initializeApp(settings: SettingsService) {
     CheckComponent,
     SaveViewConfigDialogComponent,
     TagsComponent,
+    IfPermissionsDirective,
     SortableDirective,
     SavedViewWidgetComponent,
     StatisticsWidgetComponent,
@@ -217,6 +220,7 @@ function initializeApp(settings: SettingsService) {
     DocumentTitlePipe,
     { provide: NgbDateAdapter, useClass: ISODateAdapter },
     { provide: NgbDateParserFormatter, useClass: LocalizedDateParserFormatter },
+    AuthGard,
     DirtyDocGuard,
     DirtySavedViewGuard,
   ],

@@ -14,6 +14,7 @@ import { DocumentAsnComponent } from './components/document-asn/document-asn.com
 import { DirtyFormGuard } from './guards/dirty-form.guard'
 import { StoragePathListComponent } from './components/manage/storage-path-list/storage-path-list.component'
 import { TasksComponent } from './components/manage/tasks/tasks.component'
+import { AuthGard } from './guards/auth.gard'
 import { DirtyDocGuard } from './guards/dirty-doc.guard'
 import { DirtySavedViewGuard } from './guards/dirty-saved-view.guard'
 
@@ -29,25 +30,71 @@ const routes: Routes = [
         path: 'documents',
         component: DocumentListComponent,
         canDeactivate: [DirtySavedViewGuard],
+        canActivate: [AuthGard],
+        data: { requiredPermission: 'documents.view_document' },
       },
       {
         path: 'view/:id',
         component: DocumentListComponent,
         canDeactivate: [DirtySavedViewGuard],
+        canActivate: [AuthGard],
+        data: { requiredPermission: 'documents.view_savedview' },
       },
-      { path: 'documents/:id', component: DocumentDetailComponent },
-      { path: 'asn/:id', component: DocumentAsnComponent },
-      { path: 'tags', component: TagListComponent },
-      { path: 'documenttypes', component: DocumentTypeListComponent },
-      { path: 'correspondents', component: CorrespondentListComponent },
-      { path: 'storagepaths', component: StoragePathListComponent },
-      { path: 'logs', component: LogsComponent },
+      {
+        path: 'documents/:id',
+        component: DocumentDetailComponent,
+        canActivate: [AuthGard],
+        data: { requiredPermission: 'documents.view_document' },
+      },
+      {
+        path: 'asn/:id',
+        component: DocumentAsnComponent,
+        canActivate: [AuthGard],
+        data: { requiredPermission: 'documents.view_document' },
+      },
+      {
+        path: 'tags',
+        component: TagListComponent,
+        canActivate: [AuthGard],
+        data: { requiredPermission: 'documents.view_tag' },
+      },
+      {
+        path: 'documenttypes',
+        component: DocumentTypeListComponent,
+        canActivate: [AuthGard],
+        data: { requiredPermission: 'documents.view_documenttype' },
+      },
+      {
+        path: 'correspondents',
+        component: CorrespondentListComponent,
+        canActivate: [AuthGard],
+        data: { requiredPermission: 'documents.view_correspondent' },
+      },
+      {
+        path: 'storagepaths',
+        component: StoragePathListComponent,
+        canActivate: [AuthGard],
+        data: { requiredPermission: 'documents.view_storagepath' },
+      },
+      {
+        path: 'logs',
+        component: LogsComponent,
+        canActivate: [AuthGard],
+        data: { requiredPermission: 'documents.view_log' },
+      },
       {
         path: 'settings',
         component: SettingsComponent,
         canDeactivate: [DirtyFormGuard],
+        canActivate: [AuthGard],
+        data: { requiredPermission: 'documents.view_uisettings' },
       },
-      { path: 'tasks', component: TasksComponent },
+      {
+        path: 'tasks',
+        component: TasksComponent,
+        canActivate: [AuthGard],
+        data: { requiredPermission: 'documents.view_paperlesstask' },
+      },
     ],
   },
 
