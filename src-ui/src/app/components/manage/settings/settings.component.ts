@@ -196,6 +196,18 @@ export class SettingsComponent
         this.savedViews = r.results
         this.initialize()
       })
+    } else if (
+      (navID == SettingsNavIDs.Mail && !this.mailAccounts) ||
+      !this.mailRules
+    ) {
+      this.mailAccountService.listAll().subscribe((r) => {
+        this.mailAccounts = r.results
+
+        this.mailRuleService.listAll().subscribe((r) => {
+          this.mailRules = r.results
+          this.initialize()
+        })
+      })
     }
   }
 
@@ -224,74 +236,76 @@ export class SettingsComponent
       }
     }
 
-    for (let account of this.mailAccounts) {
-      storeData.mailAccounts[account.id.toString()] = {
-        id: account.id,
-        name: account.name,
-        imap_server: account.imap_server,
-        imap_port: account.imap_port,
-        imap_security: account.imap_security,
-        username: account.username,
-        password: account.password,
-        character_set: account.character_set,
+    if (this.mailAccounts && this.mailRules) {
+      for (let account of this.mailAccounts) {
+        storeData.mailAccounts[account.id.toString()] = {
+          id: account.id,
+          name: account.name,
+          imap_server: account.imap_server,
+          imap_port: account.imap_port,
+          imap_security: account.imap_security,
+          username: account.username,
+          password: account.password,
+          character_set: account.character_set,
+        }
+        this.mailAccountGroup.addControl(
+          account.id.toString(),
+          new FormGroup({
+            id: new FormControl(null),
+            name: new FormControl(null),
+            imap_server: new FormControl(null),
+            imap_port: new FormControl(null),
+            imap_security: new FormControl(null),
+            username: new FormControl(null),
+            password: new FormControl(null),
+            character_set: new FormControl(null),
+          })
+        )
       }
-      this.mailAccountGroup.addControl(
-        account.id.toString(),
-        new FormGroup({
-          id: new FormControl(null),
-          name: new FormControl(null),
-          imap_server: new FormControl(null),
-          imap_port: new FormControl(null),
-          imap_security: new FormControl(null),
-          username: new FormControl(null),
-          password: new FormControl(null),
-          character_set: new FormControl(null),
-        })
-      )
-    }
 
-    for (let rule of this.mailRules) {
-      storeData.mailRules[rule.id.toString()] = {
-        name: rule.name,
-        order: rule.order,
-        account: rule.account,
-        folder: rule.folder,
-        filter_from: rule.filter_from,
-        filter_subject: rule.filter_subject,
-        filter_body: rule.filter_body,
-        filter_attachment_filename: rule.filter_attachment_filename,
-        maximum_age: rule.maximum_age,
-        attachment_type: rule.attachment_type,
-        action: rule.action,
-        action_parameter: rule.action_parameter,
-        assign_title_from: rule.assign_title_from,
-        assign_tags: rule.assign_tags,
-        assign_document_type: rule.assign_document_type,
-        assign_correspondent_from: rule.assign_correspondent_from,
-        assign_correspondent: rule.assign_correspondent,
+      for (let rule of this.mailRules) {
+        storeData.mailRules[rule.id.toString()] = {
+          name: rule.name,
+          order: rule.order,
+          account: rule.account,
+          folder: rule.folder,
+          filter_from: rule.filter_from,
+          filter_subject: rule.filter_subject,
+          filter_body: rule.filter_body,
+          filter_attachment_filename: rule.filter_attachment_filename,
+          maximum_age: rule.maximum_age,
+          attachment_type: rule.attachment_type,
+          action: rule.action,
+          action_parameter: rule.action_parameter,
+          assign_title_from: rule.assign_title_from,
+          assign_tags: rule.assign_tags,
+          assign_document_type: rule.assign_document_type,
+          assign_correspondent_from: rule.assign_correspondent_from,
+          assign_correspondent: rule.assign_correspondent,
+        }
+        this.mailRuleGroup.addControl(
+          rule.id.toString(),
+          new FormGroup({
+            name: new FormControl(null),
+            order: new FormControl(null),
+            account: new FormControl(null),
+            folder: new FormControl(null),
+            filter_from: new FormControl(null),
+            filter_subject: new FormControl(null),
+            filter_body: new FormControl(null),
+            filter_attachment_filename: new FormControl(null),
+            maximum_age: new FormControl(null),
+            attachment_type: new FormControl(null),
+            action: new FormControl(null),
+            action_parameter: new FormControl(null),
+            assign_title_from: new FormControl(null),
+            assign_tags: new FormControl(null),
+            assign_document_type: new FormControl(null),
+            assign_correspondent_from: new FormControl(null),
+            assign_correspondent: new FormControl(null),
+          })
+        )
       }
-      this.mailRuleGroup.addControl(
-        rule.id.toString(),
-        new FormGroup({
-          name: new FormControl(null),
-          order: new FormControl(null),
-          account: new FormControl(null),
-          folder: new FormControl(null),
-          filter_from: new FormControl(null),
-          filter_subject: new FormControl(null),
-          filter_body: new FormControl(null),
-          filter_attachment_filename: new FormControl(null),
-          maximum_age: new FormControl(null),
-          attachment_type: new FormControl(null),
-          action: new FormControl(null),
-          action_parameter: new FormControl(null),
-          assign_title_from: new FormControl(null),
-          assign_tags: new FormControl(null),
-          assign_document_type: new FormControl(null),
-          assign_correspondent_from: new FormControl(null),
-          assign_correspondent: new FormControl(null),
-        })
-      )
     }
 
     this.store = new BehaviorSubject(storeData)
