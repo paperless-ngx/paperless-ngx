@@ -27,6 +27,8 @@ from documents.views import UiSettingsView
 from documents.views import UnifiedSearchViewSet
 from paperless.consumers import StatusConsumer
 from paperless.views import FaviconView
+from paperless.views import GroupViewSet
+from paperless.views import UserViewSet
 from rest_framework.authtoken import views
 from rest_framework.routers import DefaultRouter
 
@@ -39,6 +41,8 @@ api_router.register(r"tags", TagViewSet)
 api_router.register(r"saved_views", SavedViewViewSet)
 api_router.register(r"storage_paths", StoragePathViewSet)
 api_router.register(r"tasks", TasksViewSet, basename="tasks")
+api_router.register(r"users", UserViewSet, basename="users")
+api_router.register(r"groups", GroupViewSet, basename="groups")
 
 
 urlpatterns = [
