@@ -58,7 +58,6 @@ describe('settings', () => {
 
     cy.viewport(1024, 1600)
     cy.visit('/settings')
-    cy.wait('@mailRules')
   })
 
   it('should activate / deactivate save button when settings change and are saved', () => {
@@ -89,14 +88,14 @@ describe('settings', () => {
   it('should remove saved view from sidebar when unset', () => {
     cy.contains('a', 'Saved views').click().wait(2000)
     cy.get('#show_in_sidebar_1').click()
-    cy.contains('button', 'Save').click().wait('@savedViews')
+    cy.contains('button', 'Save').click().wait('@savedViews').wait(2000)
     cy.contains('li', 'Inbox').should('not.exist')
   })
 
   it('should remove saved view from dashboard when unset', () => {
     cy.contains('a', 'Saved views').click()
     cy.get('#show_on_dashboard_1').click()
-    cy.contains('button', 'Save').click().wait('@savedViews')
+    cy.contains('button', 'Save').click().wait('@savedViews').wait(2000)
     cy.visit('/dashboard')
     cy.get('app-saved-view-widget').contains('Inbox').should('not.exist')
   })
