@@ -227,7 +227,7 @@
       </ng-template>
     </li>
 
-    <li [ngbNavItem]="4">
+    <li [ngbNavItem]="SettingsNavIDs.Mail" (mouseover)="maybeInitializeTab(SettingsNavIDs.Mail)" (focusin)="maybeInitializeTab(SettingsNavIDs.Mail)">
       <a ngbNavLink i18n>Mail</a>
       <ng-template ngbNavContent>
 
@@ -238,13 +238,13 @@
           </h4>
           <ul class="list-group" formGroupName="mailAccounts">
 
-            <li class="list-group-item">
-              <div class="row">
-                <div class="col" i18n>Name</div>
-                <div class="col" i18n>Server</div>
-                <div class="col" i18n>Actions</div>
-              </div>
-            </li>
+              <li class="list-group-item">
+                <div class="row">
+                  <div class="col" i18n>Name</div>
+                  <div class="col" i18n>Server</div>
+                  <div class="col" i18n>Actions</div>
+                </div>
+              </li>
 
               <li *ngFor="let account of mailAccounts" class="list-group-item" [formGroupName]="account.id">
                 <div class="row">
@@ -257,11 +257,10 @@
                     </div>
                   </div>
                 </div>
-              </div>
-            </li>
+              </li>
 
-            <div *ngIf="mailAccounts.length == 0" i18n>No mail accounts defined.</div>
-        </ul>
+              <div *ngIf="mailAccounts.length == 0" i18n>No mail accounts defined.</div>
+          </ul>
 
           <h4 class="mt-4">
             <ng-container i18n>Mail rules</ng-container>
@@ -269,13 +268,13 @@
           </h4>
           <ul class="list-group" formGroupName="mailRules">
 
-            <li class="list-group-item">
-              <div class="row">
-                <div class="col" i18n>Name</div>
-                <div class="col" i18n>Account</div>
-                <div class="col" i18n>Actions</div>
-              </div>
-            </li>
+              <li class="list-group-item">
+                <div class="row">
+                  <div class="col" i18n>Name</div>
+                  <div class="col" i18n>Account</div>
+                  <div class="col" i18n>Actions</div>
+                </div>
+              </li>
 
               <li *ngFor="let rule of mailRules" class="list-group-item" [formGroupName]="rule.id">
                 <div class="row">
@@ -288,11 +287,16 @@
                     </div>
                   </div>
                 </div>
-              </div>
-            </li>
+              </li>
 
-            <div *ngIf="mailRules.length == 0" i18n>No mail rules defined.</div>
-        </ul>
+              <div *ngIf="mailRules.length == 0" i18n>No mail rules defined.</div>
+          </ul>
+        </ng-container>
+
+        <div *ngIf="!mailAccounts || !mailRules">
+          <div class="spinner-border spinner-border-sm fw-normal ms-2 me-auto" role="status"></div>
+          <div class="visually-hidden" i18n>Loading...</div>
+        </div>
 
       </ng-template>
     </li>

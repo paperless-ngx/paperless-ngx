@@ -13,7 +13,6 @@ export class MailRuleService extends AbstractPaperlessService<PaperlessMailRule>
 
   constructor(http: HttpClient) {
     super(http, 'mail_rules')
-    this.reload()
   }
 
   private reload() {
