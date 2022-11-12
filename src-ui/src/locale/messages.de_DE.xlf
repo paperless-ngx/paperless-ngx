@@ -339,11 +339,39 @@
         </context-group>
         <target state="final">Dokument <x id="PH" equiv-text="status.filename"/> wird von Paperless verarbeitet.</target>
       </trans-unit>
+      <trans-unit id="2501522447884928778" datatype="html">
+        <source>Prev</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">119</context>
+        </context-group>
+        <target state="needs-translation">Prev</target>
+      </trans-unit>
+      <trans-unit id="3885497195825665706" datatype="html">
+        <source>Next</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">120</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
+          <context context-type="linenumber">55</context>
+        </context-group>
+        <target state="translated">Weiter</target>
+      </trans-unit>
+      <trans-unit id="1241348629231510663" datatype="html">
+        <source>End</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">121</context>
+        </context-group>
+        <target state="needs-translation">End</target>
+      </trans-unit>
       <trans-unit id="3909462337752654810" datatype="html">
         <source>The dashboard can be used to show saved views, such as an &apos;Inbox&apos;. Those settings are found under Settings &gt; Saved Views once you have created some.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">122</context>
+          <context context-type="linenumber">126</context>
         </context-group>
         <target state="translated">Das Dashboard kann zum Anzeigen von gespeicherten Ansichten verwendet werden, wie zum Beispiel einem 'Posteingang'. Diese Einstellungen werden unter Einstellungen &gt; gespeicherte Ansichten gefunden, sobald Sie mindestens eine eigene Ansicht erstellt haben.</target>
       </trans-unit>
@@ -351,7 +379,7 @@
         <source>Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Paperless-ngx will start training its machine learning algorithms.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">129</context>
+          <context context-type="linenumber">136</context>
         </context-group>
         <target state="translated">Ziehen Sie hier Dokumente hinein, um mit dem Hochladen zu beginnen oder kopieren Sie Dateien in den 'consume' Ordner. Sie können auch Dokumente überall auf allen anderen Seiten der Web-App ziehen. Wenn Sie dies tun, startet Paperless-ngx seine Algorithmen.</target>
       </trans-unit>
@@ -359,7 +387,7 @@
         <source>The documents list shows all of your documents and allows for filtering as well as bulk-editing. There are three different view styles: list, small cards and large cards. A list of documents currently opened for editing is shown in the sidebar.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">135</context>
+          <context context-type="linenumber">145</context>
         </context-group>
         <target state="translated">Die Dokumentenliste zeigt alle Ihre Dokumente an und ermöglicht das Filtern sowie die Massenbearbeitung von mehreren Dokumenten. Es gibt drei verschiedene Ansichtsstile: Liste, kleine Karten und große Karten.</target>
       </trans-unit>
@@ -367,7 +395,7 @@
         <source>The filtering tools allow you to quickly find documents using various searches, dates, tags, etc.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">144</context>
+          <context context-type="linenumber">157</context>
         </context-group>
         <target state="translated">Mit den Filterwerkzeugen können Sie schnell Dokumente finden, die verschiedene Datumsbereiche, Tags und andere Suchbegriffe enthalten.</target>
       </trans-unit>
@@ -375,7 +403,7 @@
         <source>Any combination of filters can be saved as a &apos;view&apos; which can then be displayed on the dashboard and / or sidebar.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">151</context>
+          <context context-type="linenumber">167</context>
         </context-group>
         <target state="translated">Jede Kombination von Filterkriterien kann als 'Ansicht' gespeichert werden, die dann auf dem Dashboard und / oder der Seitenleiste angezeigt werden können.</target>
       </trans-unit>
@@ -383,7 +411,7 @@
         <source>Tags, correspondents, document types and storage paths can all be managed using these pages. They can also be created from the document edit view.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">157</context>
+          <context context-type="linenumber">176</context>
         </context-group>
         <target state="translated">Schlagwörter, Korrespondenten, Dokumententypen und Speicherpfade können über diese Seiten verwaltet werden. Sie können auch aus der Dokumentbearbeitung erstellt werden.</target>
       </trans-unit>
@@ -391,7 +419,7 @@
         <source>File Tasks shows you documents that have been consumed, are waiting to be, or may have failed during the process.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">163</context>
+          <context context-type="linenumber">185</context>
         </context-group>
         <target state="translated">Die Dateiaufgaben zeigen Ihnen Dokumente, die verarbeitet wurden, auf Verarbeitung warten oder während der Verarbeitung fehlgeschlagen sind.</target>
       </trans-unit>
@@ -399,7 +427,7 @@
         <source>Check out the settings for various tweaks to the web app or to toggle settings for saved views.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">169</context>
+          <context context-type="linenumber">194</context>
         </context-group>
         <target state="translated">Hier finden Sie verschiedene globale Einstellungen für die Anwendung und können die gespeicherten Ansichten verwalten.</target>
       </trans-unit>
@@ -407,7 +435,7 @@
         <source>The Admin area contains more advanced controls as well as the settings for automatic e-mail fetching.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">175</context>
+          <context context-type="linenumber">203</context>
         </context-group>
         <target state="translated">Der Adminbereich enthält erweiterte Steuerelemente sowie die Einstellungen für das automatische Abrufen von E-Mails.</target>
       </trans-unit>
@@ -415,7 +443,7 @@
         <source>Thank you! 🙏</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">180</context>
+          <context context-type="linenumber">211</context>
         </context-group>
         <target state="translated">Vielen Dank! 🙏</target>
       </trans-unit>
@@ -423,7 +451,7 @@
         <source>There are &lt;em&gt;tons&lt;/em&gt; more features and info we didn&apos;t cover here, but this should get you started. Check out the documentation or visit the project on GitHub to learn more or to report issues.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">182</context>
+          <context context-type="linenumber">213</context>
         </context-group>
         <target state="translated">Es gibt noch &lt;em&gt;erheblich&lt;/em&gt; mehr Funktionen und Informationen, die nicht in der Tour abgedeckt wurden, nach der Tour sollten Sie jedoch direkt loslegen können. Schauen Sie sich die Dokumentation an oder besuchen Sie das Projekt auf GitHub um mehr zu erfahren oder Probleme zu melden.</target>
       </trans-unit>
@@ -431,7 +459,7 @@
         <source>Lastly, on behalf of every contributor to this community-supported project, thank you for using Paperless-ngx!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">184</context>
+          <context context-type="linenumber">215</context>
         </context-group>
         <target state="translated">Im Namen jedes Beitragenden zu diesem von der Gemeinschaft unterstützten Projekt, sagen wir, Danke, dass Sie Paperless-ngx benutzen!</target>
       </trans-unit>
@@ -439,7 +467,7 @@
         <source>Initiating upload...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">230</context>
+          <context context-type="linenumber">264</context>
         </context-group>
         <target state="translated">Beginne Upload...</target>
       </trans-unit>
@@ -1792,14 +1820,6 @@
           <context context-type="linenumber">50</context>
         </context-group>
         <target state="translated">Zurück</target>
-      </trans-unit>
-      <trans-unit id="3885497195825665706" datatype="html">
-        <source>Next</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">55</context>
-        </context-group>
-        <target state="translated">Weiter</target>
       </trans-unit>
       <trans-unit id="5028777105388019087" datatype="html">
         <source>Details</source>
