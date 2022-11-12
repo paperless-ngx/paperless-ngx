@@ -1,6 +1,7 @@
 import { HttpEventType } from '@angular/common/http'
 import { Component, OnInit } from '@angular/core'
 import { FileSystemFileEntry, NgxFileDropEntry } from 'ngx-file-drop'
+import { ComponentWithPermissions } from 'src/app/components/with-permissions/with-permissions.component'
 import {
   ConsumerStatusService,
   FileStatus,
@@ -15,13 +16,18 @@ const MAX_ALERTS = 5
   templateUrl: './upload-file-widget.component.html',
   styleUrls: ['./upload-file-widget.component.scss'],
 })
-export class UploadFileWidgetComponent implements OnInit {
+export class UploadFileWidgetComponent
+  extends ComponentWithPermissions
+  implements OnInit
+{
   alertsExpanded = false
 
   constructor(
     private consumerStatusService: ConsumerStatusService,
     private uploadDocumentsService: UploadDocumentsService
-  ) {}
+  ) {
+    super()
+  }
 
   getStatus() {
     return this.consumerStatusService.getConsumerStatus().slice(0, MAX_ALERTS)

@@ -9,6 +9,11 @@ import { NgxFileDropEntry } from 'ngx-file-drop'
 import { UploadDocumentsService } from './services/upload-documents.service'
 import { TasksService } from './services/tasks.service'
 import { TourService } from 'ngx-ui-tour-ng-bootstrap'
+import {
+  PermissionAction,
+  PermissionsService,
+  PermissionType,
+} from './services/permissions.service'
 
 @Component({
   selector: 'app-root',
@@ -32,7 +37,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private uploadDocumentsService: UploadDocumentsService,
     private tasksService: TasksService,
     public tourService: TourService,
-    private renderer: Renderer2
+    private renderer: Renderer2,
+    private permissionsService: PermissionsService
   ) {
     let anyWindow = window as any
     anyWindow.pdfWorkerSrc = 'assets/js/pdf.worker.min.js'
@@ -74,7 +80,12 @@ export class AppComponent implements OnInit, OnDestroy {
         if (
           this.showNotification(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUCCESS)
         ) {
-          if (this.settings.currentUserCan('documents.view_document')) {
+          if (
+            this.permissionsService.currentUserCan({
+              action: PermissionAction.View,
+              type: PermissionType.Document,
+            })
+          ) {
             this.toastService.show({
               title: $localize`Document added`,
               delay: 10000,
@@ -209,7 +220,10 @@ export class AppComponent implements OnInit, OnDestroy {
   public get dragDropEnabled(): boolean {
     return (
       !this.router.url.includes('dashboard') &&
-      this.settings.currentUserCan('documents.add_document')
+      this.permissionsService.currentUserCan({
+        action: PermissionAction.Add,
+        type: PermissionType.Document,
+      })
     )
   }
 

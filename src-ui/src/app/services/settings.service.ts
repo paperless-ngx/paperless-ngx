@@ -23,6 +23,7 @@ import {
   SETTINGS,
   SETTINGS_KEYS,
 } from '../data/paperless-uisettings'
+import { PermissionsService } from './permissions.service'
 import { SavedViewService } from './rest/saved-view.service'
 import { ToastService } from './toast.service'
 
@@ -45,7 +46,6 @@ export class SettingsService {
   protected baseUrl: string = environment.apiBaseUrl + 'ui_settings/'
 
   private settings: Object = {}
-  private permissions: string[]
 
   public displayName: string
 
@@ -59,7 +59,8 @@ export class SettingsService {
     @Inject(LOCALE_ID) private localeId: string,
     protected http: HttpClient,
     private toastService: ToastService,
-    private savedViewService: SavedViewService
+    private savedViewService: SavedViewService,
+    private permissionsService: PermissionsService
   ) {
     this.renderer = rendererFactory.createRenderer(null, null)
   }
@@ -75,7 +76,7 @@ export class SettingsService {
         if (this.settings['language']?.length)
           this.setLanguage(this.settings['language'])
         this.displayName = uisettings.display_name.trim()
-        this.permissions = uisettings.permissions
+        this.permissionsService.initialize(uisettings.permissions)
       })
     )
   }
@@ -456,9 +457,5 @@ export class SettingsService {
       !this.savedViewService.loading &&
       this.savedViewService.dashboardViews.length == 0
     )
-  }
-
-  currentUserCan(permission: string): boolean {
-    return this.permissions.includes(permission)
   }
 }

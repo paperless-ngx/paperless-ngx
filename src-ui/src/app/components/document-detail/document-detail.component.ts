@@ -35,6 +35,11 @@ import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
 import { StoragePathEditDialogComponent } from '../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
 import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
+import {
+  PermissionAction,
+  PermissionsService,
+  PermissionType,
+} from 'src/app/services/permissions.service'
 
 @Component({
   selector: 'app-document-detail',
@@ -106,6 +111,9 @@ export class DocumentDetailComponent
     }
   }
 
+  PermissionAction = PermissionAction
+  PermissionType = PermissionType
+
   constructor(
     private documentsService: DocumentService,
     private route: ActivatedRoute,
@@ -118,7 +126,8 @@ export class DocumentDetailComponent
     private documentTitlePipe: DocumentTitlePipe,
     private toastService: ToastService,
     private settings: SettingsService,
-    private storagePathService: StoragePathService
+    private storagePathService: StoragePathService,
+    private permissionsService: PermissionsService
   ) {}
 
   titleKeyUp(event) {
@@ -555,7 +564,10 @@ export class DocumentDetailComponent
   get commentsEnabled(): boolean {
     return (
       this.settings.get(SETTINGS_KEYS.COMMENTS_ENABLED) &&
-      this.settings.currentUserCan('documents.view_comment')
+      this.permissionsService.currentUserCan({
+        action: PermissionAction.View,
+        type: PermissionType.Document,
+      })
     )
   }
 }

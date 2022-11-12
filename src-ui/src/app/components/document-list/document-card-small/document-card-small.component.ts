@@ -2,7 +2,6 @@ import {
   Component,
   EventEmitter,
   Input,
-  OnInit,
   Output,
   ViewChild,
 } from '@angular/core'
@@ -13,6 +12,7 @@ import { SettingsService } from 'src/app/services/settings.service'
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
+import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 
 @Component({
   selector: 'app-document-card-small',
@@ -22,12 +22,14 @@ import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
     '../popover-preview/popover-preview.scss',
   ],
 })
-export class DocumentCardSmallComponent implements OnInit {
+export class DocumentCardSmallComponent extends ComponentWithPermissions {
   constructor(
     private documentService: DocumentService,
     private settingsService: SettingsService,
     public openDocumentsService: OpenDocumentsService
-  ) {}
+  ) {
+    super()
+  }
 
   @Input()
   selected = false
@@ -56,8 +58,6 @@ export class DocumentCardSmallComponent implements OnInit {
 
   mouseOnPreview = false
   popoverHidden = true
-
-  ngOnInit(): void {}
 
   getIsThumbInverted() {
     return this.settingsService.get(SETTINGS_KEYS.DARK_MODE_THUMB_INVERTED)

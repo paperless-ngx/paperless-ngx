@@ -4,6 +4,7 @@ import { FILTER_CORRESPONDENT } from 'src/app/data/filter-rule-type'
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
+import { PermissionType } from 'src/app/services/permissions.service'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { CorrespondentEditDialogComponent } from '../../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
@@ -32,7 +33,7 @@ export class CorrespondentListComponent extends ManagementListComponent<Paperles
       FILTER_CORRESPONDENT,
       $localize`correspondent`,
       $localize`correspondents`,
-      'correspondent',
+      PermissionType.Correspondent,
       [
         {
           key: 'last_correspondence',
