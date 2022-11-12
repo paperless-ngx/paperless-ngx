@@ -25,13 +25,14 @@ import { saveAs } from 'file-saver'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
 import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
+import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 
 @Component({
   selector: 'app-bulk-editor',
   templateUrl: './bulk-editor.component.html',
   styleUrls: ['./bulk-editor.component.scss'],
 })
-export class BulkEditorComponent {
+export class BulkEditorComponent extends ComponentWithPermissions {
   tags: PaperlessTag[]
   correspondents: PaperlessCorrespondent[]
   documentTypes: PaperlessDocumentType[]
@@ -54,7 +55,9 @@ export class BulkEditorComponent {
     private settings: SettingsService,
     private toastService: ToastService,
     private storagePathService: StoragePathService
-  ) {}
+  ) {
+    super()
+  }
 
   applyOnClose: boolean = this.settings.get(
     SETTINGS_KEYS.BULK_EDIT_APPLY_ON_CLOSE

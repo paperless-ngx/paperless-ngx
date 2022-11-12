@@ -4,13 +4,14 @@ import { PaperlessDocumentComment } from 'src/app/data/paperless-document-commen
 import { FormControl, FormGroup } from '@angular/forms'
 import { first } from 'rxjs/operators'
 import { ToastService } from 'src/app/services/toast.service'
+import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 
 @Component({
   selector: 'app-document-comments',
   templateUrl: './document-comments.component.html',
   styleUrls: ['./document-comments.component.scss'],
 })
-export class DocumentCommentsComponent {
+export class DocumentCommentsComponent extends ComponentWithPermissions {
   commentForm: FormGroup = new FormGroup({
     newComment: new FormControl(''),
   })
@@ -32,7 +33,9 @@ export class DocumentCommentsComponent {
   constructor(
     private commentsService: DocumentCommentsService,
     private toastService: ToastService
-  ) {}
+  ) {
+    super()
+  }
 
   update(): void {
     this.networkActive = true

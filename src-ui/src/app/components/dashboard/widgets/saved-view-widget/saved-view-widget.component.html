@@ -1,6 +1,6 @@
 <app-widget-frame [title]="savedView.name" [loading]="loading">
 
-  <a class="btn-link" header-buttons [routerLink]="[]" (click)="showAll()" *ifPermissions="'documents.view_document'" i18n>Show all</a>
+  <a class="btn-link" header-buttons [routerLink]="[]" (click)="showAll()" *ifPermissions="{ action: PermissionAction.View, type: PermissionType.Document }" i18n>Show all</a>
 
 
   <table content class="table table-sm table-hover table-borderless mb-0">
@@ -10,7 +10,7 @@
         <th scope="col" i18n>Title</th>
       </tr>
     </thead>
-    <tbody *ifPermissions="'documents.view_document'">
+    <tbody *ifPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
       <tr *ngFor="let doc of documents" (click)="openDocumentsService.openDocument(doc)">
         <td>{{doc.created_date | customDate}}</td>
         <td>{{doc.title | documentTitle}}<app-tag [tag]="t" *ngFor="let t of doc.tags$ | async" class="ms-1" (click)="clickTag(t); $event.stopPropagation();"></app-tag></td>

@@ -29,6 +29,7 @@ import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 import { ActivatedRoute } from '@angular/router'
 import { ViewportScroller } from '@angular/common'
 import { TourService } from 'ngx-ui-tour-ng-bootstrap'
+import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 
 @Component({
   selector: 'app-settings',
@@ -36,6 +37,7 @@ import { TourService } from 'ngx-ui-tour-ng-bootstrap'
   styleUrls: ['./settings.component.scss'],
 })
 export class SettingsComponent
+  extends ComponentWithPermissions
   implements OnInit, AfterViewInit, OnDestroy, DirtyComponent
 {
   savedViewGroup = new FormGroup({})
@@ -89,6 +91,7 @@ export class SettingsComponent
     private activatedRoute: ActivatedRoute,
     public readonly tourService: TourService
   ) {
+    super()
     this.settings.settingsSaved.subscribe(() => {
       if (!this.savePending) this.initialize()
     })

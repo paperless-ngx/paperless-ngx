@@ -9,13 +9,17 @@ import { PaperlessTag } from 'src/app/data/paperless-tag'
 import { FILTER_HAS_TAGS_ALL } from 'src/app/data/filter-rule-type'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
+import { ComponentWithPermissions } from 'src/app/components/with-permissions/with-permissions.component'
 
 @Component({
   selector: 'app-saved-view-widget',
   templateUrl: './saved-view-widget.component.html',
   styleUrls: ['./saved-view-widget.component.scss'],
 })
-export class SavedViewWidgetComponent implements OnInit, OnDestroy {
+export class SavedViewWidgetComponent
+  extends ComponentWithPermissions
+  implements OnInit, OnDestroy
+{
   loading: boolean = true
 
   constructor(
@@ -24,7 +28,9 @@ export class SavedViewWidgetComponent implements OnInit, OnDestroy {
     private list: DocumentListViewService,
     private consumerStatusService: ConsumerStatusService,
     public openDocumentsService: OpenDocumentsService
-  ) {}
+  ) {
+    super()
+  }
 
   @Input()
   savedView: PaperlessSavedView
