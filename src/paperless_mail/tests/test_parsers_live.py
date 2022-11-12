@@ -62,7 +62,7 @@ class TestParserLive(TestCase):
     @mock.patch("documents.loggers.LoggingMixin.log")  # Disable log output
     def test_tika_parse(self, m):
         html = '<html><head><meta http-equiv="content-type" content="text/html; charset=UTF-8"></head><body><p>Some Text</p></body></html>'
-        expected_text = "\n\n\n\n\n\n\n\n\nSome Text\n"
+        expected_text = "Some Text"
 
         tika_server_original = self.parser.tika_server
 
@@ -79,7 +79,7 @@ class TestParserLive(TestCase):
 
         # Check successful parsing
         parsed = self.parser.tika_parse(html)
-        self.assertEqual(expected_text, parsed)
+        self.assertEqual(expected_text, parsed.strip())
 
     @pytest.mark.skipif(
         "GOTENBERG_LIVE" not in os.environ,
@@ -124,7 +124,10 @@ class TestParserLive(TestCase):
             file.write(self.parser.generate_pdf_from_mail(mail))
             file.close()
 
-        converted = os.path.join(parser.tempdir, "test_generate_pdf_from_mail.webp")
+        converted = os.path.join(
+            self.parser.tempdir,
+            "test_generate_pdf_from_mail.webp",
+        )
         run_convert(
             density=300,
             scale="500x5000>",
@@ -149,14 +152,12 @@ class TestParserLive(TestCase):
             f"PDF looks different. Check if {converted} looks weird.",
         )
 
-    # Only run if convert is available
     @pytest.mark.skipif(
-        "PAPERLESS_TEST_SKIP_CONVERT" in os.environ,
-        reason="PAPERLESS_TEST_SKIP_CONVERT set, skipping Test",
+        "GOTENBERG_LIVE" not in os.environ,
+        reason="No gotenberg server",
     )
     @mock.patch("documents.loggers.LoggingMixin.log")  # Disable log output
-    def test_generate_pdf_from_html(self, m):
-        # TODO
+    def test_generate_pdf_from_html_no_convert(self, m):
         class MailAttachmentMock:
             def __init__(self, payload, content_id):
                 self.payload = payload
@@ -179,7 +180,44 @@ class TestParserLive(TestCase):
             file.write(result)
             file.close()
 
-        converted = os.path.join(parser.tempdir, "test_generate_pdf_from_html.webp")
+        extracted = extract_text(pdf_path)
+        expected = "Some Text\n\n  This image should not be shown.\n\nand an embedded image.\n\nParagraph unchanged.\n\n\x0c"
+        self.assertEqual(expected, extracted)
+
+    @pytest.mark.skipif(
+        "GOTENBERG_LIVE" not in os.environ,
+        reason="No gotenberg server",
+    )
+    # Only run if convert is available
+    @pytest.mark.skipif(
+        "PAPERLESS_TEST_SKIP_CONVERT" in os.environ,
+        reason="PAPERLESS_TEST_SKIP_CONVERT set, skipping Test",
+    )
+    @mock.patch("documents.loggers.LoggingMixin.log")  # Disable log output
+    def test_generate_pdf_from_html(self, m):
+        class MailAttachmentMock:
+            def __init__(self, payload, content_id):
+                self.payload = payload
+                self.content_id = content_id
+
+        result = None
+
+        with open(os.path.join(self.SAMPLE_FILES, "sample.html")) as html_file:
+            with open(os.path.join(self.SAMPLE_FILES, "sample.png"), "rb") as png_file:
+                html = html_file.read()
+                png = png_file.read()
+                attachments = [
+                    MailAttachmentMock(png, "part1.pNdUSz0s.D3NqVtPg@example.de"),
+                ]
+                result = self.parser.generate_pdf_from_html(html, attachments)
+
+        pdf_path = os.path.join(self.parser.tempdir, "sample.html.pdf")
+
+        with open(pdf_path, "wb") as file:
+            file.write(result)
+            file.close()
+
+        converted = os.path.join(self.parser.tempdir, "sample.html.pdf.webp")
         run_convert(
             density=300,
             scale="500x5000>",
@@ -195,9 +233,10 @@ class TestParserLive(TestCase):
         thumb_hash = self.hashfile(converted)
 
         # The created pdf is not reproducible. But the converted image should always look the same.
-        expected_hash = (
-            "267d61f0ab8f128a037002a424b2cb4bfe18a81e17f0b70f15d241688ed47d1a"
+        expected_hash = self.hashfile(
+            os.path.join(self.SAMPLE_FILES, "sample.html.pdf.webp"),
         )
+
         self.assertEqual(
             thumb_hash,
             expected_hash,
@@ -206,6 +245,10 @@ class TestParserLive(TestCase):
         )
 
     @staticmethod
+    @pytest.mark.skipif(
+        "GOTENBERG_LIVE" not in os.environ,
+        reason="No gotenberg server",
+    )
     def test_is_online_image_still_available():
         """
         A public image is used in the html sample file. We have no control

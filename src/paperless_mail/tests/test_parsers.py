@@ -268,7 +268,7 @@ class TestParser(TestCase):
     @mock.patch("documents.loggers.LoggingMixin.log")  # Disable log output
     def test_tika_parse(self, m):
         html = '<html><head><meta http-equiv="content-type" content="text/html; charset=UTF-8"></head><body><p>Some Text</p></body></html>'
-        expected_text = "\n\n\n\n\n\n\n\n\nSome Text\n"
+        expected_text = "Some Text"
 
         tika_server_original = self.parser.tika_server
 
@@ -285,7 +285,7 @@ class TestParser(TestCase):
 
         # Check successful parsing
         parsed = self.parser.tika_parse(html)
-        self.assertEqual(expected_text, parsed)
+        self.assertEqual(expected_text, parsed.strip())
 
     @mock.patch("paperless_mail.parsers.MailDocumentParser.generate_pdf_from_mail")
     @mock.patch("paperless_mail.parsers.MailDocumentParser.generate_pdf_from_html")
@@ -355,19 +355,46 @@ class TestParser(TestCase):
         ) as html_expected_handle:
             self.assertHTMLEqual(html_expected_handle.read(), html_handle.read())
 
-    @mock.patch("documents.loggers.LoggingMixin.log")  # Disable log output
-    def test_generate_pdf_from_mail(self, m):
+    @mock.patch("paperless_mail.parsers.requests.post")
+    @mock.patch("paperless_mail.parsers.MailDocumentParser.mail_to_html")
+    def test_generate_pdf_from_mail(
+        self,
+        mock_mail_to_html: mock.MagicMock,
+        mock_post: mock.MagicMock,
+    ):
+        mock_response = mock.MagicMock()
+        mock_response.content = b"Content"
+        mock_post.return_value = mock_response
+
+        mock_mail_to_html.return_value = "Testresponse"
+
         mail = self.parser.get_parsed(os.path.join(self.SAMPLE_FILES, "html.eml"))
 
-        pdf_path = os.path.join(self.parser.tempdir, "test_generate_pdf_from_mail.pdf")
+        retval = self.parser.generate_pdf_from_mail(mail)
+        self.assertEqual(b"Content", retval)
 
-        with open(pdf_path, "wb") as file:
-            file.write(self.parser.generate_pdf_from_mail(mail))
-            file.close()
+        mock_generate_pdf_from_mail.assert_called_once_with(
+            self.parser.get_parsed(None),
+        )
+        mock_generate_pdf_from_html.assert_called_once_with(
+            self.parser.get_parsed(None).html,
+            self.parser.get_parsed(None).attachments,
+        )
+        self.assertEqual(
+            self.parser.gotenberg_server + "/forms/pdfengines/merge",
+            mock_post.call_args.args[0],
+        )
+        self.assertEqual({}, mock_post.call_args.kwargs["headers"])
+        self.assertEqual(
+            b"Mail Return",
+            mock_post.call_args.kwargs["files"]["1_mail.pdf"][1].read(),
+        )
+        self.assertEqual(
+            b"HTML Return",
+            mock_post.call_args.kwargs["files"]["2_html.pdf"][1].read(),
+        )
 
-        extracted = extract_text(pdf_path)
-        expected = "From Name <someone@example.de>\n\n2022-10-15 09:23\n\nSubject HTML Message\n\nTo someone@example.de\n\nAttachments IntM6gnXFm00FEV5.png (6.89 KiB), 600+kbﬁle.txt (0.59 MiB)\n\nSome Text \n\nand an embedded image.\n\n\x0c"
-        self.assertEqual(expected, extracted)
+        mock_response.raise_for_status.assert_called_once()
 
     def test_transform_inline_html(self):
         class MailAttachmentMock:
@@ -391,12 +418,17 @@ class TestParser(TestCase):
         self.assertTrue(result[0][0] in resulting_html)
         self.assertFalse("<script" in resulting_html.lower())
 
+    @mock.patch("paperless_mail.parsers.requests.post")
     @mock.patch("documents.loggers.LoggingMixin.log")  # Disable log output
-    def test_generate_pdf_from_html(self, m):
+    def test_generate_pdf_from_html(self, m, mock_post: mock.MagicMock):
         class MailAttachmentMock:
             def __init__(self, payload, content_id):
                 self.payload = payload
                 self.content_id = content_id
+
+        mock_response = mock.MagicMock()
+        mock_response.content = b"Content"
+        mock_post.return_value = mock_response
 
         result = None
 
@@ -409,12 +441,30 @@ class TestParser(TestCase):
                 ]
                 result = self.parser.generate_pdf_from_html(html, attachments)
 
-        pdf_path = os.path.join(self.parser.tempdir, "test_generate_pdf_from_html.pdf")
+        self.assertEqual(
+            self.parser.gotenberg_server + "/forms/chromium/convert/html",
+            mock_post.call_args.args[0],
+        )
+        self.assertEqual({}, mock_post.call_args.kwargs["headers"])
+        self.assertEqual(
+            {
+                "marginTop": "0.1",
+                "marginBottom": "0.1",
+                "marginLeft": "0.1",
+                "marginRight": "0.1",
+                "paperWidth": "8.27",
+                "paperHeight": "11.7",
+                "scale": "1.0",
+            },
+            mock_post.call_args.kwargs["data"],
+        )
 
-        with open(pdf_path, "wb") as file:
-            file.write(result)
-            file.close()
+        # read to assert it is a file like object.
+        mock_post.call_args.kwargs["files"]["cidpart1pNdUSz0sD3NqVtPgexamplede"][
+            1
+        ].read()
+        mock_post.call_args.kwargs["files"]["index.html"][1].read()
 
-        extracted = extract_text(pdf_path)
-        expected = "Some Text\n\n  This image should not be shown.\n\nand an embedded image.\n\nParagraph unchanged.\n\n\x0c"
-        self.assertEqual(expected, extracted)
+        mock_response.raise_for_status.assert_called_once()
+
+        self.assertEqual(b"Content", result)
