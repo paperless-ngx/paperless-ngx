@@ -13,7 +13,6 @@ export class MailAccountService extends AbstractPaperlessService<PaperlessMailAc
 
   constructor(http: HttpClient) {
     super(http, 'mail_accounts')
-    this.reload()
   }
 
   private reload() {
