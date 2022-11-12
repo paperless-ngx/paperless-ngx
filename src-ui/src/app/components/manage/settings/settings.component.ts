@@ -37,6 +37,15 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { MailAccountEditDialogComponent } from '../../common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component'
 import { MailRuleEditDialogComponent } from '../../common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
+import { NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap'
+
+enum SettingsNavIDs {
+  General = 1,
+  Notifications = 2,
+  SavedViews = 3,
+  Mail = 4,
+  UsersGroups = 5,
+}
 
 @Component({
   selector: 'app-settings',
@@ -46,6 +55,9 @@ import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dial
 export class SettingsComponent
   implements OnInit, AfterViewInit, OnDestroy, DirtyComponent
 {
+  SettingsNavIDs = SettingsNavIDs
+  activeNavID: number
+
   savedViewGroup = new FormGroup({})
 
   mailAccountGroup = new FormGroup({})
@@ -171,19 +183,20 @@ export class SettingsComponent
   }
 
   ngOnInit() {
-    this.savedViewService.listAll().subscribe((r) => {
-      this.savedViews = r.results
+    this.initialize()
+  }
 
-      this.mailAccountService.listAll().subscribe((r) => {
-        this.mailAccounts = r.results
-
-        this.mailRuleService.listAll().subscribe((r) => {
-          this.mailRules = r.results
-
-          this.initialize()
-        })
+  // Load tab contents 'on demand', either on mouseover or focusin (i.e. before click) or on nav change event
+  maybeInitializeTab(navIDorEvent: number | NgbNavChangeEvent): void {
+    const navID =
+      typeof navIDorEvent == 'number' ? navIDorEvent : navIDorEvent.nextId
+    // initialize saved views
+    if (navID == SettingsNavIDs.SavedViews && !this.savedViews) {
+      this.savedViewService.listAll().subscribe((r) => {
+        this.savedViews = r.results
+        this.initialize()
       })
-    })
+    }
   }
 
   initialize() {
@@ -191,22 +204,24 @@ export class SettingsComponent
 
     let storeData = this.getCurrentSettings()
 
-    for (let view of this.savedViews) {
-      storeData.savedViews[view.id.toString()] = {
-        id: view.id,
-        name: view.name,
-        show_on_dashboard: view.show_on_dashboard,
-        show_in_sidebar: view.show_in_sidebar,
+    if (this.savedViews) {
+      for (let view of this.savedViews) {
+        storeData.savedViews[view.id.toString()] = {
+          id: view.id,
+          name: view.name,
+          show_on_dashboard: view.show_on_dashboard,
+          show_in_sidebar: view.show_in_sidebar,
+        }
+        this.savedViewGroup.addControl(
+          view.id.toString(),
+          new FormGroup({
+            id: new FormControl(null),
+            name: new FormControl(null),
+            show_on_dashboard: new FormControl(null),
+            show_in_sidebar: new FormControl(null),
+          })
+        )
       }
-      this.savedViewGroup.addControl(
-        view.id.toString(),
-        new FormGroup({
-          id: new FormControl(null),
-          name: new FormControl(null),
-          show_on_dashboard: new FormControl(null),
-          show_in_sidebar: new FormControl(null),
-        })
-      )
     }
 
     for (let account of this.mailAccounts) {
