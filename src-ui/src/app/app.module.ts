@@ -70,7 +70,7 @@ import { ColorSliderModule } from 'ngx-color/slider'
 import { ColorComponent } from './components/common/input/color/color.component'
 import { DocumentAsnComponent } from './components/document-asn/document-asn.component'
 import { DocumentCommentsComponent } from './components/document-comments/document-comments.component'
-import { AuthGard } from './guards/auth.gard'
+import { PermissionsGuard } from './guards/permissions.guard'
 import { DirtyDocGuard } from './guards/dirty-doc.guard'
 import { DirtySavedViewGuard } from './guards/dirty-saved-view.guard'
 import { StoragePathListComponent } from './components/manage/storage-path-list/storage-path-list.component'
@@ -220,7 +220,7 @@ function initializeApp(settings: SettingsService) {
     DocumentTitlePipe,
     { provide: NgbDateAdapter, useClass: ISODateAdapter },
     { provide: NgbDateParserFormatter, useClass: LocalizedDateParserFormatter },
-    AuthGard,
+    PermissionsGuard,
     DirtyDocGuard,
     DirtySavedViewGuard,
   ],

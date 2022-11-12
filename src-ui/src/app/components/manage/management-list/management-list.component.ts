@@ -19,9 +19,11 @@ import {
   SortEvent,
 } from 'src/app/directives/sortable.directive'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
+import { PermissionType } from 'src/app/services/permissions.service'
 import { AbstractNameFilterService } from 'src/app/services/rest/abstract-name-filter-service'
 import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
+import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 
 export interface ManagementListColumn {
   key: string
@@ -35,6 +37,7 @@ export interface ManagementListColumn {
 
 @Directive()
 export abstract class ManagementListComponent<T extends ObjectWithId>
+  extends ComponentWithPermissions
   implements OnInit, OnDestroy
 {
   constructor(
@@ -46,9 +49,11 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
     protected filterRuleType: number,
     public typeName: string,
     public typeNamePlural: string,
-    public permissionName: string,
+    public permissionType: PermissionType,
     public extraColumns: ManagementListColumn[]
-  ) {}
+  ) {
+    super()
+  }
 
   @ViewChildren(SortableDirective) headers: QueryList<SortableDirective>
 

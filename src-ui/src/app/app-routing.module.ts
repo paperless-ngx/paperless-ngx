@@ -14,9 +14,13 @@ import { DocumentAsnComponent } from './components/document-asn/document-asn.com
 import { DirtyFormGuard } from './guards/dirty-form.guard'
 import { StoragePathListComponent } from './components/manage/storage-path-list/storage-path-list.component'
 import { TasksComponent } from './components/manage/tasks/tasks.component'
-import { AuthGard } from './guards/auth.gard'
+import { PermissionsGuard } from './guards/permissions.guard'
 import { DirtyDocGuard } from './guards/dirty-doc.guard'
 import { DirtySavedViewGuard } from './guards/dirty-saved-view.guard'
+import {
+  PermissionAction,
+  PermissionType,
+} from './services/permissions.service'
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -30,70 +34,125 @@ const routes: Routes = [
         path: 'documents',
         component: DocumentListComponent,
         canDeactivate: [DirtySavedViewGuard],
-        canActivate: [AuthGard],
-        data: { requiredPermission: 'documents.view_document' },
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.Document,
+          },
+        },
       },
       {
         path: 'view/:id',
         component: DocumentListComponent,
         canDeactivate: [DirtySavedViewGuard],
-        canActivate: [AuthGard],
-        data: { requiredPermission: 'documents.view_savedview' },
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.SavedView,
+          },
+        },
       },
       {
         path: 'documents/:id',
         component: DocumentDetailComponent,
-        canActivate: [AuthGard],
-        data: { requiredPermission: 'documents.view_document' },
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.Document,
+          },
+        },
       },
       {
         path: 'asn/:id',
         component: DocumentAsnComponent,
-        canActivate: [AuthGard],
-        data: { requiredPermission: 'documents.view_document' },
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.Document,
+          },
+        },
       },
       {
         path: 'tags',
         component: TagListComponent,
-        canActivate: [AuthGard],
-        data: { requiredPermission: 'documents.view_tag' },
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.Tag,
+          },
+        },
       },
       {
         path: 'documenttypes',
         component: DocumentTypeListComponent,
-        canActivate: [AuthGard],
-        data: { requiredPermission: 'documents.view_documenttype' },
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.DocumentType,
+          },
+        },
       },
       {
         path: 'correspondents',
         component: CorrespondentListComponent,
-        canActivate: [AuthGard],
-        data: { requiredPermission: 'documents.view_correspondent' },
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.Correspondent,
+          },
+        },
       },
       {
         path: 'storagepaths',
         component: StoragePathListComponent,
-        canActivate: [AuthGard],
-        data: { requiredPermission: 'documents.view_storagepath' },
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.StoragePath,
+          },
+        },
       },
       {
         path: 'logs',
         component: LogsComponent,
-        canActivate: [AuthGard],
-        data: { requiredPermission: 'documents.view_log' },
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.Log,
+          },
+        },
       },
       {
         path: 'settings',
         component: SettingsComponent,
         canDeactivate: [DirtyFormGuard],
-        canActivate: [AuthGard],
-        data: { requiredPermission: 'documents.view_uisettings' },
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.UISettings,
+          },
+        },
       },
       {
         path: 'tasks',
         component: TasksComponent,
-        canActivate: [AuthGard],
-        data: { requiredPermission: 'documents.view_paperlesstask' },
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.PaperlessTask,
+          },
+        },
       },
     ],
   },
