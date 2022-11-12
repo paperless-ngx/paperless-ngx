@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-09 21:50+0000\n"
-"PO-Revision-Date: 2022-11-09 23:11\n"
+"PO-Revision-Date: 2022-11-12 10:50\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -184,11 +184,11 @@ msgstr "Il nome del file nell'archiviazione"
 
 #: documents/models.py:221
 msgid "original filename"
-msgstr ""
+msgstr "nome file originale"
 
 #: documents/models.py:227
 msgid "The original name of the file when it was uploaded"
-msgstr ""
+msgstr "Il nome originale del file quando è stato caricato"
 
 #: documents/models.py:231
 msgid "archive serial number"
@@ -368,15 +368,15 @@ msgstr "ha tag in"
 
 #: documents/models.py:410
 msgid "ASN greater than"
-msgstr ""
+msgstr "ASN maggiore di"
 
 #: documents/models.py:411
 msgid "ASN less than"
-msgstr ""
+msgstr "ASN minore di"
 
 #: documents/models.py:412
 msgid "storage path is"
-msgstr ""
+msgstr "il percorso di archiviazione è"
 
 #: documents/models.py:422
 msgid "rule type"
@@ -396,7 +396,7 @@ msgstr "regole filtro"
 
 #: documents/models.py:536
 msgid "Task ID"
-msgstr ""
+msgstr "ID Attività"
 
 #: documents/models.py:537
 msgid "Celery ID for the Task that was run"
@@ -484,11 +484,11 @@ msgstr ""
 
 #: documents/models.py:642
 msgid "comment"
-msgstr ""
+msgstr "commento"
 
 #: documents/models.py:643
 msgid "comments"
-msgstr ""
+msgstr "commenti"
 
 #: documents/serialisers.py:72
 #, python-format
