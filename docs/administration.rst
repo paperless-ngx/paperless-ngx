@@ -447,6 +447,14 @@ command:
 
 The command takes no arguments and processes all your mail accounts and rules.
 
+ .. note::
+
+    As of October 2022 Microsoft no longer supports IMAP authentication for Exchange
+    servers, thus Exchange is no longer supported until a solution is implemented in
+    the Python IMAP library used by Paperless. See  `learn.microsoft.com`_
+
+.. _learn.microsoft.com: https://learn.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/deprecation-of-basic-authentication-exchange-online
+
 .. _utilities-archiver:
 
 Creating archived documents
