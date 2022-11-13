@@ -5,7 +5,6 @@ import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-
 import { DEFAULT_MATCHING_ALGORITHM } from 'src/app/data/matching-model'
 import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
-import { ToastService } from 'src/app/services/toast.service'
 
 @Component({
   selector: 'app-storage-path-edit-dialog',
@@ -13,12 +12,8 @@ import { ToastService } from 'src/app/services/toast.service'
   styleUrls: ['./storage-path-edit-dialog.component.scss'],
 })
 export class StoragePathEditDialogComponent extends EditDialogComponent<PaperlessStoragePath> {
-  constructor(
-    service: StoragePathService,
-    activeModal: NgbActiveModal,
-    toastService: ToastService
-  ) {
-    super(service, activeModal, toastService)
+  constructor(service: StoragePathService, activeModal: NgbActiveModal) {
+    super(service, activeModal)
   }
 
   get pathHint() {

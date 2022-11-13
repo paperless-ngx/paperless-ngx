@@ -14,8 +14,7 @@ export abstract class EditDialogComponent<T extends ObjectWithId>
 {
   constructor(
     private service: AbstractPaperlessService<T>,
-    private activeModal: NgbActiveModal,
-    private toastService: ToastService
+    private activeModal: NgbActiveModal
   ) {}
 
   @Input()

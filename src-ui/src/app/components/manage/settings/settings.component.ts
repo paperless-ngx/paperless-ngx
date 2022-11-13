@@ -30,8 +30,15 @@ import { ActivatedRoute } from '@angular/router'
 import { ViewportScroller } from '@angular/common'
 import { TourService } from 'ngx-ui-tour-ng-bootstrap'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
-import { NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap'
+import { NgbModal, NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap'
 import { Results } from 'src/app/data/results'
+import { UserService } from 'src/app/services/rest/user.service'
+import { GroupService } from 'src/app/services/rest/group.service'
+import { PaperlessUser } from 'src/app/data/paperless-user'
+import { PaperlessGroup } from 'src/app/data/paperless-group'
+import { UserEditDialogComponent } from '../../common/edit-dialog/user-edit-dialog/user-edit-dialog.component'
+import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
+import { GroupEditDialogComponent } from '../../common/edit-dialog/group-edit-dialog/group-edit-dialog.component'
 
 enum SettingsNavIDs {
   General = 1,
@@ -54,6 +61,8 @@ export class SettingsComponent
   activeNavID: number
 
   savedViewGroup = new FormGroup({})
+  usersGroup = new FormGroup({})
+  groupsGroup = new FormGroup({})
 
   settingsForm = new FormGroup({
     bulkEditConfirmationDialogs: new FormControl(null),
@@ -75,6 +84,8 @@ export class SettingsComponent
     notificationsConsumerSuppressOnDashboard: new FormControl(null),
     commentsEnabled: new FormControl(null),
     updateCheckingEnabled: new FormControl(null),
+    usersGroup: this.usersGroup,
+    groupsGroup: this.groupsGroup,
   })
 
   savedViews: PaperlessSavedView[]
@@ -85,6 +96,9 @@ export class SettingsComponent
   isDirty: boolean = false
   unsubscribeNotifier: Subject<any> = new Subject()
   savePending: boolean = false
+
+  users: PaperlessUser[]
+  groups: PaperlessGroup[]
 
   get computedDateLocale(): string {
     return (
@@ -102,7 +116,10 @@ export class SettingsComponent
     @Inject(LOCALE_ID) public currentLocale: string,
     private viewportScroller: ViewportScroller,
     private activatedRoute: ActivatedRoute,
-    public readonly tourService: TourService
+    public readonly tourService: TourService,
+    private usersService: UserService,
+    private groupsService: GroupService,
+    private modalService: NgbModal
   ) {
     super()
     this.settings.settingsSaved.subscribe(() => {
@@ -159,6 +176,8 @@ export class SettingsComponent
       updateCheckingEnabled: this.settings.get(
         SETTINGS_KEYS.UPDATE_CHECKING_ENABLED
       ),
+      usersGroup: {},
+      groupsGroup: {},
     }
   }
 
@@ -175,6 +194,18 @@ export class SettingsComponent
       this.savedViewService.listAll().subscribe((r) => {
         this.savedViews = r.results
         this.initialize()
+      })
+    } else if (
+      (navID == SettingsNavIDs.UsersGroups && !this.users) ||
+      !this.groups
+    ) {
+      this.usersService.listAll().subscribe((r) => {
+        this.users = r.results
+
+        this.groupsService.listAll().subscribe((r) => {
+          this.groups = r.results
+          this.initialize()
+        })
       })
     }
   }
@@ -199,6 +230,50 @@ export class SettingsComponent
             name: new FormControl(null),
             show_on_dashboard: new FormControl(null),
             show_in_sidebar: new FormControl(null),
+          })
+        )
+      }
+    }
+
+    if (this.users && this.groups) {
+      for (let user of this.users) {
+        storeData.usersGroup[user.id.toString()] = {
+          id: user.id,
+          username: user.username,
+          first_name: user.first_name,
+          last_name: user.last_name,
+          is_active: user.is_active,
+          is_superuser: user.is_superuser,
+          groups: user.groups,
+          permissions: user.permissions,
+        }
+        this.usersGroup.addControl(
+          user.id.toString(),
+          new FormGroup({
+            id: new FormControl(null),
+            username: new FormControl(null),
+            first_name: new FormControl(null),
+            last_name: new FormControl(null),
+            is_active: new FormControl(null),
+            is_superuser: new FormControl(null),
+            groups: new FormControl(null),
+            permissions: new FormControl(null),
+          })
+        )
+      }
+
+      for (let group of this.groups) {
+        storeData.groupsGroup[group.id.toString()] = {
+          id: group.id,
+          name: group.name,
+          permissions: group.permissions,
+        }
+        this.groupsGroup.addControl(
+          group.id.toString(),
+          new FormGroup({
+            id: new FormControl(null),
+            name: new FormControl(null),
+            permissions: new FormControl(null),
           })
         )
       }
@@ -399,5 +474,87 @@ export class SettingsComponent
 
   clearThemeColor() {
     this.settingsForm.get('themeColor').patchValue('')
+  }
+
+  editUser(user: PaperlessUser) {
+    var modal = this.modalService.open(UserEditDialogComponent, {
+      backdrop: 'static',
+      size: 'xl',
+    })
+    modal.componentInstance.dialogMode = user ? 'edit' : 'create'
+    modal.componentInstance.object = user
+    modal.componentInstance.success
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe({
+        next: (newUser) => {
+          this.toastService.showInfo(
+            $localize`Saved user "${newUser.username}".`
+          )
+          this.usersService.listAll().subscribe((r) => {
+            this.users = r.results
+            this.initialize()
+          })
+        },
+        error: (e) => {
+          this.toastService.showError(
+            $localize`Error saving user: ${e.toString()}.`
+          )
+        },
+      })
+  }
+
+  deleteUser(user: PaperlessUser) {
+    let modal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.title = $localize`Confirm delete user account`
+    modal.componentInstance.messageBold = $localize`This operation will permanently this user account.`
+    modal.componentInstance.message = $localize`This operation cannot be undone.`
+    modal.componentInstance.btnClass = 'btn-danger'
+    modal.componentInstance.btnCaption = $localize`Proceed`
+    modal.componentInstance.confirmClicked.subscribe(() => {
+      modal.componentInstance.buttonsEnabled = false
+      this.usersService.delete(user)
+    })
+  }
+
+  editGroup(group: PaperlessGroup) {
+    var modal = this.modalService.open(GroupEditDialogComponent, {
+      backdrop: 'static',
+      size: 'lg',
+    })
+    modal.componentInstance.dialogMode = group ? 'edit' : 'create'
+    modal.componentInstance.object = group
+    modal.componentInstance.success
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe({
+        next: (newGroup) => {
+          this.toastService.showInfo($localize`Saved group "${newGroup.name}".`)
+          this.groupsService.listAll().subscribe((r) => {
+            this.groups = r.results
+            this.initialize()
+          })
+        },
+        error: (e) => {
+          this.toastService.showError(
+            $localize`Error saving group: ${e.toString()}.`
+          )
+        },
+      })
+  }
+
+  deleteGroup(group: PaperlessGroup) {
+    let modal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.title = $localize`Confirm delete user group`
+    modal.componentInstance.messageBold = $localize`This operation will permanently this user group.`
+    modal.componentInstance.message = $localize`This operation cannot be undone.`
+    modal.componentInstance.btnClass = 'btn-danger'
+    modal.componentInstance.btnCaption = $localize`Proceed`
+    modal.componentInstance.confirmClicked.subscribe(() => {
+      modal.componentInstance.buttonsEnabled = false
+      this.groupsService.delete(group)
+    })
   }
 }
