@@ -1,12 +1,11 @@
 from django.contrib.auth.models import Group
+from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
 
 class UserSerializer(serializers.ModelSerializer):
 
-    groups = serializers.SerializerMethodField()
-    permissions = serializers.SerializerMethodField()
     inherited_permissions = serializers.SerializerMethodField()
 
     class Meta:
@@ -16,36 +15,28 @@ class UserSerializer(serializers.ModelSerializer):
             "username",
             "first_name",
             "last_name",
+            "email",
             "date_joined",
-            "is_staff",
+            "last_login",
             "is_active",
+            "is_staff",
             "is_superuser",
             "groups",
-            "permissions",
+            "user_permissions",
             "inherited_permissions",
         )
 
-    def get_groups(self, obj):
-        return list(obj.groups.values_list("name", flat=True))
-
-    def get_permissions(self, obj):
-        # obj.get_user_permissions() returns more permissions than desired
-        permission_natural_keys = []
-        permissions = obj.user_permissions.all()
-        for permission in permissions:
-            permission_natural_keys.append(
-                permission.natural_key()[1] + "." + permission.natural_key()[0],
-            )
-        return permission_natural_keys
-
     def get_inherited_permissions(self, obj):
-        return obj.get_group_permissions()
+        inherited_permissions_ids = []
+        inherited_permissions = obj.get_group_permissions()
+        for permission in inherited_permissions:
+            inherited_permissions_ids.append(
+                perm_to_permission(permission).pk,
+            )
+        return list(set(inherited_permissions_ids))
 
 
 class GroupSerializer(serializers.ModelSerializer):
-
-    permissions = serializers.SerializerMethodField()
-
     class Meta:
         model = Group
         fields = (
@@ -54,11 +45,32 @@ class GroupSerializer(serializers.ModelSerializer):
             "permissions",
         )
 
-    def get_permissions(self, obj):
-        permission_natural_keys = []
-        permissions = obj.permissions.all()
-        for permission in permissions:
-            permission_natural_keys.append(
-                permission.natural_key()[1] + "." + permission.natural_key()[0],
-            )
-        return permission_natural_keys
+
+def perm_to_permission(perm):
+
+    """
+    Convert a identifier string permission format in 'app_label.codename'
+    (teremd as *perm*) to a django permission instance.
+
+    Examples
+    --------
+    >>> permission = perm_to_permission('auth.add_user')
+    >>> permission.content_type.app_label == 'auth'
+    True
+    >>> permission.codename == 'add_user'
+    True
+    """
+
+    try:
+        app_label, codename = perm.split(".", 1)
+    except IndexError:
+        raise AttributeError(
+            "The format of identifier string permission (perm) is wrong. "
+            "It should be in 'app_label.codename'.",
+        )
+    else:
+        permission = Permission.objects.get(
+            content_type__app_label=app_label,
+            codename=codename,
+        )
+        return permission
