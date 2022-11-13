@@ -1,0 +1,18 @@
+<form [formGroup]="form">
+  <label>{{title}}</label>
+  <ul class="list-group">
+    <li class="list-group-item" *ngFor="let type of PermissionType | keyvalue" [formGroupName]="type.key">
+      {{type.key}}:
+
+      <div class="form-check form-check-inline form-switch">
+        <input type="checkbox" class="form-check-input" id="{{type.key}}_all" formControlName="all">
+        <label class="form-check-label" for="{{type.key}}_all" i18n>All</label>
+      </div>
+
+      <div *ngFor="let action of PermissionAction | keyvalue" class="form-check form-check-inline" [disabled]="isAll(type.key)">
+        <input type="checkbox" class="form-check-input" id="{{type.key}}_{{action.key}}" formControlName="{{action.key}}">
+        <label class="form-check-label" for="{{type.key}}_{{action.key}}" i18n>{{action.key}}</label>
+      </div>
+    </li>
+  </ul>
+</form>

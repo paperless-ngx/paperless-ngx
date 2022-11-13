@@ -221,6 +221,82 @@
 
       </ng-template>
     </li>
+
+    <li [ngbNavItem]="SettingsNavIDs.UsersGroups" *ifPermissions="{ action: PermissionAction.Add, type: PermissionType.User }" (mouseover)="maybeInitializeTab(SettingsNavIDs.UsersGroups)" (focusin)="maybeInitializeTab(SettingsNavIDs.UsersGroups)">
+      <a ngbNavLink i18n>Users & Groups</a>
+      <ng-template ngbNavContent>
+
+      <ng-container *ngIf="users && groups">
+        <h4 class="d-flex">
+          <ng-container i18n>Users</ng-container>
+          <button type="button" class="btn btn-sm btn-primary ms-4" (click)="editUser()" i18n>Add User</button>
+        </h4>
+        <ul class="list-group" formGroupName="usersGroup">
+
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col" i18n>Username</div>
+              <div class="col" i18n>Name</div>
+              <div class="col" i18n>Groups</div>
+              <div class="col" i18n>Actions</div>
+            </div>
+          </li>
+
+          <li *ngFor="let user of users" class="list-group-item" [formGroupName]="user.id">
+            <div class="row">
+              <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editUser(user)">{{user.username}}</button></div>
+              <div class="col d-flex align-items-center">{{user.first_name}} {{user.last_name}}</div>
+              <div class="col d-flex align-items-center">{{user.groups}}</div>
+              <div class="col">
+                <div class="btn-group">
+                  <button class="btn btn-sm btn-primary" type="button" (click)="editUser(user)" i18n>Edit</button>
+                  <button class="btn btn-sm btn-outline-danger" type="button" (click)="deleteUser(user)" i18n>Delete</button>
+                </div>
+              </div>
+            </div>
+          </li>
+        </ul>
+
+        <h4 class="mt-4 d-flex">
+          <ng-container i18n>Groups</ng-container>
+          <button type="button" class="btn btn-sm btn-primary ms-4" (click)="editGroup()" i18n>Add Group</button>
+        </h4>
+        <ul *ngIf="groups.length > 0" class="list-group" formGroupName="groupsGroup">
+
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col" i18n>Name</div>
+              <div class="col"></div>
+              <div class="col"></div>
+              <div class="col" i18n>Actions</div>
+            </div>
+          </li>
+
+          <li *ngFor="let group of groups" class="list-group-item" [formGroupName]="group.id">
+            <div class="row">
+              <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editGroup(group)">{{group.name}}</button></div>
+              <div class="col"></div>
+              <div class="col"></div>
+              <div class="col">
+                <div class="btn-group">
+                  <button class="btn btn-sm btn-primary" type="button" (click)="editGroup(group)" i18n>Edit</button>
+                  <button class="btn btn-sm btn-outline-danger" type="button" (click)="deleteGroup(group)" i18n>Delete</button>
+                </div>
+              </div>
+            </div>
+          </li>
+        </ul>
+
+        <div *ngIf="groups.length == 0">No groups defined</div>
+      </ng-container>
+
+      <div *ngIf="!users || !groups">
+        <div class="spinner-border spinner-border-sm fw-normal ms-2 me-auto" role="status"></div>
+        <div class="visually-hidden" i18n>Loading...</div>
+      </div>
+
+      </ng-template>
+    </li>
   </ul>
 
   <div [ngbNavOutlet]="nav" class="border-start border-end border-bottom p-3 mb-3 shadow-sm"></div>

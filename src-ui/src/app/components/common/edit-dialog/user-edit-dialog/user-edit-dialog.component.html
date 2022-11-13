@@ -1,0 +1,34 @@
+<form [formGroup]="objectForm" (ngSubmit)="save()">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">{{getTitle()}}</h4>
+      <button type="button" [disabled]="!closeEnabled" class="btn-close" aria-label="Close" (click)="cancel()">
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="row">
+        <div class="col">
+          <app-input-text i18n-title title="Username" formControlName="username" [error]="error?.username"></app-input-text>
+          <app-input-text i18n-title title="First name" formControlName="first_name" [error]="error?.first_name"></app-input-text>
+          <app-input-text i18n-title title="Last name" formControlName="last_name" [error]="error?.first_name"></app-input-text>
+
+          <div class="form-check form-switch">
+            <input type="checkbox" class="form-check-input" id="is_active" formControlName="is_active">
+            <label class="form-check-label" for="is_active" i18n>Active</label>
+          </div>
+
+          <div class="form-check form-switch">
+            <input type="checkbox" class="form-check-input" id="is_superuser" formControlName="is_superuser">
+            <label class="form-check-label" for="is_superuser" i18n>Superuser</label>
+          </div>
+        </div>
+        <div class="col">
+          <app-input-select i18n-title title="Groups" [items]="groups" multiple="true" formControlName="groups"></app-input-select>
+          <app-permissions-select i18n-title title="Permissions" formControlName="permissions"></app-permissions-select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-secondary" (click)="cancel()" i18n [disabled]="networkActive">Cancel</button>
+      <button type="submit" class="btn btn-primary" i18n [disabled]="networkActive">Save</button>
+    </div>
+  </form>
