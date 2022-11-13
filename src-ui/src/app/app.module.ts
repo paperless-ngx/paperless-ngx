@@ -78,6 +78,9 @@ import { StoragePathEditDialogComponent } from './components/common/edit-dialog/
 import { SettingsService } from './services/settings.service'
 import { TasksComponent } from './components/manage/tasks/tasks.component'
 import { TourNgBootstrapModule } from 'ngx-ui-tour-ng-bootstrap'
+import { UserEditDialogComponent } from './components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component'
+import { GroupEditDialogComponent } from './components/common/edit-dialog/group-edit-dialog/group-edit-dialog.component'
+import { PermissionsSelectComponent } from './components/common/permissions-select/permissions-select.component'
 
 import localeBe from '@angular/common/locales/be'
 import localeCs from '@angular/common/locales/cs'
@@ -183,6 +186,9 @@ function initializeApp(settings: SettingsService) {
     DocumentAsnComponent,
     DocumentCommentsComponent,
     TasksComponent,
+    UserEditDialogComponent,
+    GroupEditDialogComponent,
+    PermissionsSelectComponent,
   ],
   imports: [
     BrowserModule,

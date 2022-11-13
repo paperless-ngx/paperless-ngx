@@ -20,7 +20,7 @@ export enum PermissionType {
   Log = 'admin.%s_logentry',
   MailAccount = 'paperless_mail.%s_mailaccount',
   MailRule = 'paperless_mail.%s_mailrule',
-  Auth = 'auth.%s_user',
+  User = 'auth.%s_user',
   Admin = 'admin.%s_logentry',
 }
 
@@ -45,5 +45,31 @@ export class PermissionsService {
 
   private getPermissionCode(permission: PaperlessPermission): string {
     return permission.type.replace('%s', permission.action)
+  }
+
+  public getPermissionKeys(permissionStr: string): {
+    actionKey: string
+    typeKey: string
+  } {
+    const matches = permissionStr.match(/\.(.+)_/)
+    let typeKey
+    let actionKey
+    if (matches?.length > 0) {
+      const action = matches[1]
+      const actionIndex = Object.values(PermissionAction).indexOf(
+        action as PermissionAction
+      )
+      if (actionIndex > -1) {
+        actionKey = Object.keys(PermissionAction)[actionIndex]
+      }
+      const typeIndex = Object.values(PermissionType).indexOf(
+        permissionStr.replace(action, '%s') as PermissionType
+      )
+      if (typeIndex > -1) {
+        typeKey = Object.keys(PermissionType)[typeIndex]
+      }
+    }
+
+    return { actionKey, typeKey }
   }
 }
