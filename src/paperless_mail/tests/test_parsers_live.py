@@ -59,6 +59,10 @@ class TestParserLive(TestCase):
             f"Created Thumbnail {thumb} differs from expected file {expected}",
         )
 
+    @pytest.mark.skipif(
+        "TIKA_LIVE" not in os.environ,
+        reason="No tika server",
+    )
     @mock.patch("documents.loggers.LoggingMixin.log")  # Disable log output
     def test_tika_parse(self, m):
         html = '<html><head><meta http-equiv="content-type" content="text/html; charset=UTF-8"></head><body><p>Some Text</p></body></html>'
@@ -108,6 +112,28 @@ class TestParserLive(TestCase):
         )
         self.assertEqual(expected, extracted)
 
+    @pytest.mark.skipif(
+        "GOTENBERG_LIVE" not in os.environ,
+        reason="No gotenberg server",
+    )
+    @mock.patch("documents.loggers.LoggingMixin.log")  # Disable log output
+    def test_generate_pdf_from_mail_no_convert(self, m):
+        mail = self.parser.get_parsed(os.path.join(self.SAMPLE_FILES, "html.eml"))
+
+        pdf_path = os.path.join(self.parser.tempdir, "html.eml.pdf")
+
+        with open(pdf_path, "wb") as file:
+            file.write(self.parser.generate_pdf_from_mail(mail))
+            file.close()
+
+        extracted = extract_text(pdf_path)
+        expected = extract_text(os.path.join(self.SAMPLE_FILES, "html.eml.pdf"))
+        self.assertEqual(expected, extracted)
+
+    @pytest.mark.skipif(
+        "GOTENBERG_LIVE" not in os.environ,
+        reason="No gotenberg server",
+    )
     # Only run if convert is available
     @pytest.mark.skipif(
         "PAPERLESS_TEST_SKIP_CONVERT" in os.environ,
@@ -115,10 +141,9 @@ class TestParserLive(TestCase):
     )
     @mock.patch("documents.loggers.LoggingMixin.log")  # Disable log output
     def test_generate_pdf_from_mail(self, m):
-        # TODO
         mail = self.parser.get_parsed(os.path.join(self.SAMPLE_FILES, "html.eml"))
 
-        pdf_path = os.path.join(self.parser.tempdir, "test_generate_pdf_from_mail.pdf")
+        pdf_path = os.path.join(self.parser.tempdir, "html.eml.pdf")
 
         with open(pdf_path, "wb") as file:
             file.write(self.parser.generate_pdf_from_mail(mail))
@@ -126,7 +151,7 @@ class TestParserLive(TestCase):
 
         converted = os.path.join(
             self.parser.tempdir,
-            "test_generate_pdf_from_mail.webp",
+            "html.eml.pdf.webp",
         )
         run_convert(
             density=300,
@@ -143,8 +168,8 @@ class TestParserLive(TestCase):
         thumb_hash = self.hashfile(converted)
 
         # The created pdf is not reproducible. But the converted image should always look the same.
-        expected_hash = (
-            "8734a3f0a567979343824e468cd737bf29c02086bbfd8773e94feb986968ad32"
+        expected_hash = self.hashfile(
+            os.path.join(self.SAMPLE_FILES, "html.eml.pdf.webp"),
         )
         self.assertEqual(
             thumb_hash,
@@ -174,14 +199,14 @@ class TestParserLive(TestCase):
                 ]
                 result = self.parser.generate_pdf_from_html(html, attachments)
 
-        pdf_path = os.path.join(self.parser.tempdir, "test_generate_pdf_from_html.pdf")
+        pdf_path = os.path.join(self.parser.tempdir, "sample.html.pdf")
 
         with open(pdf_path, "wb") as file:
             file.write(result)
             file.close()
 
         extracted = extract_text(pdf_path)
-        expected = "Some Text\n\n  This image should not be shown.\n\nand an embedded image.\n\nParagraph unchanged.\n\n\x0c"
+        expected = extract_text(os.path.join(self.SAMPLE_FILES, "sample.html.pdf"))
         self.assertEqual(expected, extracted)
 
     @pytest.mark.skipif(
