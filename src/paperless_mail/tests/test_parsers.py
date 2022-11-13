@@ -6,7 +6,6 @@ import pytest
 from django.test import TestCase
 from documents.parsers import ParseError
 from paperless_mail.parsers import MailDocumentParser
-from pdfminer.high_level import extract_text
 
 
 class TestParser(TestCase):
@@ -217,13 +216,16 @@ class TestParser(TestCase):
                 "message/rfc822",
             )
 
+    @mock.patch("paperless_mail.parsers.MailDocumentParser.tika_parse")
     @mock.patch("paperless_mail.parsers.MailDocumentParser.generate_pdf")
     @mock.patch("documents.loggers.LoggingMixin.log")  # Disable log output
-    def test_parse_html_eml(self, m, n):
+    def test_parse_html_eml(self, m, n, mock_tika_parse: mock.MagicMock):
         # Validate parsing returns the expected results
+        text_expected = "Some Text\nand an embedded image.\n\nSubject: HTML Message\n\nFrom: Name <someone@example.de>\n\nTo: someone@example.de\n\nAttachments: IntM6gnXFm00FEV5.png (6.89 KiB), 600+kbfile.txt (0.59 MiB)\n\nHTML content: tika return"
+        mock_tika_parse.return_value = "tika return"
+
         self.parser.parse(os.path.join(self.SAMPLE_FILES, "html.eml"), "message/rfc822")
 
-        text_expected = "Some Text\nand an embedded image.\n\nSubject: HTML Message\n\nFrom: Name <someone@example.de>\n\nTo: someone@example.de\n\nAttachments: IntM6gnXFm00FEV5.png (6.89 KiB), 600+kbfile.txt (0.59 MiB)\n\nHTML content: Some Text\nand an embedded image.\nParagraph unchanged."
         self.assertEqual(text_expected, self.parser.text)
         self.assertEqual(
             datetime.datetime(
@@ -265,27 +267,30 @@ class TestParser(TestCase):
         # Just check if file exists, the unittest for generate_pdf() goes deeper.
         self.assertTrue(os.path.isfile(self.parser.archive_path))
 
+    @mock.patch("paperless_mail.parsers.parser.from_buffer")
     @mock.patch("documents.loggers.LoggingMixin.log")  # Disable log output
-    def test_tika_parse(self, m):
+    def test_tika_parse(self, m, mock_from_buffer: mock.MagicMock):
         html = '<html><head><meta http-equiv="content-type" content="text/html; charset=UTF-8"></head><body><p>Some Text</p></body></html>'
         expected_text = "Some Text"
-
-        tika_server_original = self.parser.tika_server
-
-        # Check if exception is raised when Tika cannot be reached.
-        with pytest.raises(ParseError):
-            self.parser.tika_server = ""
-            self.parser.tika_parse(html)
+        mock_from_buffer.return_value = {"content": expected_text}
 
         # Check unsuccessful parsing
-        self.parser.tika_server = tika_server_original
-
+        mock_from_buffer.return_value = {"content": None}
         parsed = self.parser.tika_parse(None)
         self.assertEqual("", parsed)
 
         # Check successful parsing
+        mock_from_buffer.return_value = {"content": expected_text}
         parsed = self.parser.tika_parse(html)
         self.assertEqual(expected_text, parsed.strip())
+        mock_from_buffer.assert_called_with(html, self.parser.tika_server)
+
+        # Check ParseError
+        def my_side_effect():
+            raise Exception("Test")
+
+        mock_from_buffer.side_effect = my_side_effect
+        self.assertRaises(ParseError, self.parser.tika_parse, html)
 
     @mock.patch("paperless_mail.parsers.MailDocumentParser.generate_pdf_from_mail")
     @mock.patch("paperless_mail.parsers.MailDocumentParser.generate_pdf_from_html")
@@ -373,25 +378,31 @@ class TestParser(TestCase):
         retval = self.parser.generate_pdf_from_mail(mail)
         self.assertEqual(b"Content", retval)
 
-        mock_generate_pdf_from_mail.assert_called_once_with(
-            self.parser.get_parsed(None),
-        )
-        mock_generate_pdf_from_html.assert_called_once_with(
-            self.parser.get_parsed(None).html,
-            self.parser.get_parsed(None).attachments,
-        )
+        mock_mail_to_html.assert_called_once_with(mail)
         self.assertEqual(
-            self.parser.gotenberg_server + "/forms/pdfengines/merge",
+            self.parser.gotenberg_server + "/forms/chromium/convert/html",
             mock_post.call_args.args[0],
         )
         self.assertEqual({}, mock_post.call_args.kwargs["headers"])
         self.assertEqual(
-            b"Mail Return",
-            mock_post.call_args.kwargs["files"]["1_mail.pdf"][1].read(),
+            {
+                "marginTop": "0.1",
+                "marginBottom": "0.1",
+                "marginLeft": "0.1",
+                "marginRight": "0.1",
+                "paperWidth": "8.27",
+                "paperHeight": "11.7",
+                "scale": "1.0",
+            },
+            mock_post.call_args.kwargs["data"],
         )
         self.assertEqual(
-            b"HTML Return",
-            mock_post.call_args.kwargs["files"]["2_html.pdf"][1].read(),
+            "Testresponse",
+            mock_post.call_args.kwargs["files"]["html"][1],
+        )
+        self.assertEqual(
+            "output.css",
+            mock_post.call_args.kwargs["files"]["css"][0],
         )
 
         mock_response.raise_for_status.assert_called_once()
