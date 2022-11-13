@@ -705,16 +705,6 @@ PAPERLESS_CONSUMER_ENABLE_BARCODES=<bool>
 
     Defaults to false.
 
-PAPERLESS_CONSUMER_USE_LEGACY_DETECTION=<bool>
-    Enables the legacy method of detecting barcodes.  By default, images are
-    extracted directly from the PDF structure for barcode detection.  If this
-    configuration value is set, images of the whole PDF page will be used instead.
-
-    This is a slower and more memory intensive process, but may be required for
-    certain files, depending on how it is produced and how images are encoded.
-
-    Defaults to false.
-
 
 PAPERLESS_CONSUMER_BARCODE_TIFF_SUPPORT=<bool>
     Whether TIFF image files should be scanned for barcodes.

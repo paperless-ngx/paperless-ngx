@@ -94,7 +94,7 @@ def _consume(filepath):
         logger.info(f"Adding {filepath} to the task queue.")
         consume_file.delay(
             filepath,
-            override_tag_ids=tag_ids if tag_ids else None,
+            override_tag_ids=list(tag_ids) if tag_ids else None,
         )
     except Exception:
         # Catch all so that the consumer won't crash.
