@@ -13,6 +13,7 @@ body:
         - [The troubleshooting documentation](https://paperless-ngx.readthedocs.io/en/latest/troubleshooting.html).
         - [The installation instructions](https://paperless-ngx.readthedocs.io/en/latest/setup.html#installation).
         - [Existing issues and discussions](https://github.com/paperless-ngx/paperless-ngx/search?q=&type=issues).
+        - Disable any customer container initialization scripts, if using any
 
         If you encounter issues while installing or configuring Paperless-ngx, please post in the ["Support" section of the discussions](https://github.com/paperless-ngx/paperless-ngx/discussions/new?category=support).
   - type: textarea

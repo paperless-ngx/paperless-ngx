@@ -10,11 +10,11 @@ name = "piwheels"
 
 [packages]
 dateparser = "~=1.1"
-django = "~=4.0"
+django = "~=4.1"
 django-cors-headers = "*"
 django-extensions = "*"
 django-filter = "~=22.1"
-djangorestframework = "~=3.13"
+djangorestframework = "~=3.14"
 filelock = "*"
 gunicorn = "*"
 imap-tools = "*"
@@ -32,8 +32,7 @@ redis = {extras = ["hiredis"], version = "*"}
 scikit-learn = "~=1.1"
 # Pin this until piwheels is building 1.9 (see https://www.piwheels.org/project/scipy/)
 scipy = "==1.8.1"
-# https://github.com/paperless-ngx/paperless-ngx/issues/1364
-numpy = "==1.22.3"
+numpy = "*"
 whitenoise = "~=6.2"
 watchdog = "~=2.1"
 whoosh="~=2.7"

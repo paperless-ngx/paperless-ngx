@@ -468,41 +468,6 @@ class TestBarcode(DirectoriesMixin, TestCase):
         self.assertTrue(os.path.isfile(target_file1))
         self.assertTrue(os.path.isfile(target_file2))
 
-    @override_settings(CONSUMER_USE_LEGACY_DETECTION=True)
-    def test_barcode_splitter_legacy_fallback(self):
-        """
-        GIVEN:
-            - File containing barcode
-            - Legacy method of detection is enabled
-        WHEN:
-            - File is scanned for barcodes
-        THEN:
-            - Barcodes are properly detected
-        """
-        test_file = os.path.join(
-            self.BARCODE_SAMPLE_DIR,
-            "patch-code-t-middle.pdf",
-        )
-        tempdir = tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR)
-
-        pdf_file, separator_page_numbers = barcodes.scan_file_for_separating_barcodes(
-            test_file,
-        )
-
-        self.assertEqual(test_file, pdf_file)
-        self.assertTrue(len(separator_page_numbers) > 0)
-
-        document_list = barcodes.separate_pages(test_file, separator_page_numbers)
-        self.assertTrue(document_list)
-        for document in document_list:
-            barcodes.save_to_dir(document, target_dir=tempdir)
-
-        target_file1 = os.path.join(tempdir, "patch-code-t-middle_document_0.pdf")
-        target_file2 = os.path.join(tempdir, "patch-code-t-middle_document_1.pdf")
-
-        self.assertTrue(os.path.isfile(target_file1))
-        self.assertTrue(os.path.isfile(target_file2))
-
     @override_settings(CONSUMER_ENABLE_BARCODES=True)
     def test_consume_barcode_file(self):
         test_file = os.path.join(
@@ -586,30 +551,11 @@ class TestBarcode(DirectoriesMixin, TestCase):
         with mock.patch("documents.tasks.async_to_sync"):
             self.assertEqual(tasks.consume_file(dst), "File successfully split")
 
-    def test_scan_file_for_separating_barcodes_password_pikepdf(self):
+    def test_scan_file_for_separating_barcodes_password(self):
         """
         GIVEN:
             - Password protected PDF
             - pikepdf based scanning
-        WHEN:
-            - File is scanned for barcode
-        THEN:
-            - Scanning handle the exception without exception
-        """
-        test_file = os.path.join(self.SAMPLE_DIR, "password-is-test.pdf")
-        pdf_file, separator_page_numbers = barcodes.scan_file_for_separating_barcodes(
-            test_file,
-        )
-
-        self.assertEqual(pdf_file, test_file)
-        self.assertListEqual(separator_page_numbers, [])
-
-    @override_settings(CONSUMER_USE_LEGACY_DETECTION=True)
-    def test_scan_file_for_separating_barcodes_password_pdf2image(self):
-        """
-        GIVEN:
-            - Password protected PDF
-            - pdf2image based scanning
         WHEN:
             - File is scanned for barcode
         THEN:

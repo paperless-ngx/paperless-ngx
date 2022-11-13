@@ -116,6 +116,10 @@ export class AppComponent implements OnInit, OnDestroy {
         }
       })
 
+    const prevBtnTitle = $localize`Prev`
+    const nextBtnTitle = $localize`Next`
+    const endBtnTitle = $localize`End`
+
     this.tourService.initialize([
       {
         anchorId: 'tour.dashboard',
@@ -123,12 +127,18 @@ export class AppComponent implements OnInit, OnDestroy {
         route: '/dashboard',
         enableBackdrop: true,
         delayAfterNavigation: 500,
+        prevBtnTitle,
+        nextBtnTitle,
+        endBtnTitle,
       },
       {
         anchorId: 'tour.upload-widget',
         content: $localize`Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Paperless-ngx will start training its machine learning algorithms.`,
         route: '/dashboard',
         enableBackdrop: true,
+        prevBtnTitle,
+        nextBtnTitle,
+        endBtnTitle,
       },
       {
         anchorId: 'tour.documents',
@@ -138,6 +148,9 @@ export class AppComponent implements OnInit, OnDestroy {
         placement: 'bottom',
         enableBackdrop: true,
         disableScrollToAnchor: true,
+        prevBtnTitle,
+        nextBtnTitle,
+        endBtnTitle,
       },
       {
         anchorId: 'tour.documents-filter-editor',
@@ -145,35 +158,53 @@ export class AppComponent implements OnInit, OnDestroy {
         route: '/documents?sort=created&reverse=1&page=1',
         placement: 'bottom',
         enableBackdrop: true,
+        prevBtnTitle,
+        nextBtnTitle,
+        endBtnTitle,
       },
       {
         anchorId: 'tour.documents-views',
         content: $localize`Any combination of filters can be saved as a 'view' which can then be displayed on the dashboard and / or sidebar.`,
         route: '/documents?sort=created&reverse=1&page=1',
         enableBackdrop: true,
+        prevBtnTitle,
+        nextBtnTitle,
+        endBtnTitle,
       },
       {
         anchorId: 'tour.tags',
         content: $localize`Tags, correspondents, document types and storage paths can all be managed using these pages. They can also be created from the document edit view.`,
         route: '/tags',
         enableBackdrop: true,
+        prevBtnTitle,
+        nextBtnTitle,
+        endBtnTitle,
       },
       {
         anchorId: 'tour.file-tasks',
         content: $localize`File Tasks shows you documents that have been consumed, are waiting to be, or may have failed during the process.`,
         route: '/tasks',
         enableBackdrop: true,
+        prevBtnTitle,
+        nextBtnTitle,
+        endBtnTitle,
       },
       {
         anchorId: 'tour.settings',
         content: $localize`Check out the settings for various tweaks to the web app or to toggle settings for saved views.`,
         route: '/settings',
         enableBackdrop: true,
+        prevBtnTitle,
+        nextBtnTitle,
+        endBtnTitle,
       },
       {
         anchorId: 'tour.admin',
         content: $localize`The Admin area contains more advanced controls as well as the settings for automatic e-mail fetching.`,
         enableBackdrop: true,
+        prevBtnTitle,
+        nextBtnTitle,
+        endBtnTitle,
       },
       {
         anchorId: 'tour.outro',
@@ -183,6 +214,9 @@ export class AppComponent implements OnInit, OnDestroy {
           '<br/><br/>' +
           $localize`Lastly, on behalf of every contributor to this community-supported project, thank you for using Paperless-ngx!`,
         route: '/dashboard',
+        prevBtnTitle,
+        nextBtnTitle,
+        endBtnTitle,
       },
     ])
 
