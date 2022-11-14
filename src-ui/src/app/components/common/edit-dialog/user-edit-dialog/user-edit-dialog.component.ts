@@ -42,10 +42,10 @@ export class UserEditDialogComponent extends EditDialogComponent<PaperlessUser> 
       username: new FormControl(''),
       first_name: new FormControl(''),
       last_name: new FormControl(''),
-      is_active: new FormControl(''),
-      is_superuser: new FormControl(''),
-      groups: new FormControl(''),
-      permissions: new FormControl(''),
+      is_active: new FormControl(null),
+      is_superuser: new FormControl(null),
+      groups: new FormControl(null),
+      user_permissions: new FormControl(null),
     })
   }
 }

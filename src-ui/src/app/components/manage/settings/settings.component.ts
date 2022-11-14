@@ -245,7 +245,7 @@ export class SettingsComponent
           is_active: user.is_active,
           is_superuser: user.is_superuser,
           groups: user.groups,
-          permissions: user.permissions,
+          user_permissions: user.user_permissions,
         }
         this.usersGroup.addControl(
           user.id.toString(),
@@ -257,7 +257,7 @@ export class SettingsComponent
             is_active: new FormControl(null),
             is_superuser: new FormControl(null),
             groups: new FormControl(null),
-            permissions: new FormControl(null),
+            user_permissions: new FormControl(null),
           })
         )
       }
@@ -514,7 +514,21 @@ export class SettingsComponent
     modal.componentInstance.btnCaption = $localize`Proceed`
     modal.componentInstance.confirmClicked.subscribe(() => {
       modal.componentInstance.buttonsEnabled = false
-      this.usersService.delete(user)
+      this.usersService.delete(user).subscribe({
+        next: () => {
+          modal.close()
+          this.toastService.showInfo($localize`Deleted user`)
+          this.usersService.listAll().subscribe((r) => {
+            this.users = r.results
+            this.initialize()
+          })
+        },
+        error: (e) => {
+          this.toastService.showError(
+            $localize`Error deleting user: ${e.toString()}.`
+          )
+        },
+      })
     })
   }
 
@@ -554,7 +568,21 @@ export class SettingsComponent
     modal.componentInstance.btnCaption = $localize`Proceed`
     modal.componentInstance.confirmClicked.subscribe(() => {
       modal.componentInstance.buttonsEnabled = false
-      this.groupsService.delete(group)
+      this.groupsService.delete(group).subscribe({
+        next: () => {
+          modal.close()
+          this.toastService.showInfo($localize`Deleted group`)
+          this.groupsService.listAll().subscribe((r) => {
+            this.groups = r.results
+            this.initialize()
+          })
+        },
+        error: (e) => {
+          this.toastService.showError(
+            $localize`Error deleting group: ${e.toString()}.`
+          )
+        },
+      })
     })
   }
 }

@@ -163,7 +163,7 @@
               </svg><span>&nbsp;<ng-container i18n>File Tasks<span *ngIf="tasksService.failedFileTasks.length > 0"><span class="badge bg-danger ms-2">{{tasksService.failedFileTasks.length}}</span></span></ng-container></span>
             </a>
           </li>
-          <li class="nav-item" *ifPermissions="{ action: PermissionAction.View, type: PermissionType.Log }">
+          <li class="nav-item" *ifPermissions="{ action: PermissionAction.View, type: PermissionType.Admin }">
             <a class="nav-link" routerLink="logs" routerLinkActive="active" (click)="closeMenu()" ngbPopover="Logs" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#text-left"/>

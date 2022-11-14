@@ -26,7 +26,7 @@ export class GroupEditDialogComponent extends EditDialogComponent<PaperlessGroup
   getForm(): FormGroup {
     return new FormGroup({
       name: new FormControl(''),
-      permissions: new FormControl(''),
+      permissions: new FormControl(null),
     })
   }
 }
