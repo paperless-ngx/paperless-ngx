@@ -400,8 +400,8 @@ class DocumentViewSet(
                 "user": {
                     "id": c.user.id,
                     "username": c.user.username,
-                    "firstname": c.user.first_name,
-                    "lastname": c.user.last_name,
+                    "first_name": c.user.first_name,
+                    "last_name": c.user.last_name,
                 },
             }
             for c in Comment.objects.filter(document=doc).order_by("-created")
