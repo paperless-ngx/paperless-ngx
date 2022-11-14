@@ -6,6 +6,7 @@ from django.db.models.functions import Lower
 from django.http import HttpResponse
 from django.views.generic import View
 from django_filters.rest_framework import DjangoFilterBackend
+from documents.permissions import PaperlessModelPermissions
 from paperless.filters import GroupFilterSet
 from paperless.filters import UserFilterSet
 from paperless.serialisers import GroupSerializer
@@ -42,7 +43,7 @@ class UserViewSet(ModelViewSet):
 
     serializer_class = UserSerializer
     pagination_class = StandardPagination
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, PaperlessModelPermissions)
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filterset_class = UserFilterSet
     ordering_fields = ("username",)
@@ -55,7 +56,7 @@ class GroupViewSet(ModelViewSet):
 
     serializer_class = GroupSerializer
     pagination_class = StandardPagination
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, PaperlessModelPermissions)
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filterset_class = GroupFilterSet
     ordering_fields = ("name",)
