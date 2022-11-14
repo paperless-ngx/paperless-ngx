@@ -127,7 +127,7 @@ const routes: Routes = [
         data: {
           requiredPermission: {
             action: PermissionAction.View,
-            type: PermissionType.Log,
+            type: PermissionType.Admin,
           },
         },
       },
