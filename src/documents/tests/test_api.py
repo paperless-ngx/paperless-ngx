@@ -1400,8 +1400,8 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
                 "user": {
                     "id": comment.user.id,
                     "username": comment.user.username,
-                    "firstname": comment.user.first_name,
-                    "lastname": comment.user.last_name,
+                    "first_name": comment.user.first_name,
+                    "last_name": comment.user.last_name,
                 },
             },
         )
