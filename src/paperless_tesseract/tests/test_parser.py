@@ -597,23 +597,34 @@ class TestParserFileTypes(DirectoriesMixin, TestCase):
         parser = RasterisedDocumentParser(None)
         parser.parse(os.path.join(self.SAMPLE_FILES, "simple.bmp"), "image/bmp")
         self.assertTrue(os.path.isfile(parser.archive_path))
-        self.assertTrue("this is a test document" in parser.get_text().lower())
+        self.assertIn("this is a test document", parser.get_text().lower())
 
     def test_jpg(self):
         parser = RasterisedDocumentParser(None)
         parser.parse(os.path.join(self.SAMPLE_FILES, "simple.jpg"), "image/jpeg")
         self.assertTrue(os.path.isfile(parser.archive_path))
-        self.assertTrue("this is a test document" in parser.get_text().lower())
+        self.assertIn("this is a test document", parser.get_text().lower())
 
     @override_settings(OCR_IMAGE_DPI=200)
     def test_gif(self):
         parser = RasterisedDocumentParser(None)
         parser.parse(os.path.join(self.SAMPLE_FILES, "simple.gif"), "image/gif")
         self.assertTrue(os.path.isfile(parser.archive_path))
-        self.assertTrue("this is a test document" in parser.get_text().lower())
+        self.assertIn("this is a test document", parser.get_text().lower())
 
     def test_tiff(self):
         parser = RasterisedDocumentParser(None)
         parser.parse(os.path.join(self.SAMPLE_FILES, "simple.tif"), "image/tiff")
         self.assertTrue(os.path.isfile(parser.archive_path))
-        self.assertTrue("this is a test document" in parser.get_text().lower())
+        self.assertIn("this is a test document", parser.get_text().lower())
+
+    @override_settings(OCR_IMAGE_DPI=72)
+    def test_webp(self):
+        parser = RasterisedDocumentParser(None)
+        parser.parse(os.path.join(self.SAMPLE_FILES, "document.webp"), "image/webp")
+        self.assertTrue(os.path.isfile(parser.archive_path))
+        # OCR consistent mangles this space, oh well
+        self.assertIn(
+            "this is awebp document, created 11/14/2022.",
+            parser.get_text().lower(),
+        )
