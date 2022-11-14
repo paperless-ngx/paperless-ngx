@@ -8,20 +8,19 @@ export enum PermissionAction {
 }
 
 export enum PermissionType {
-  Document = 'documents.%s_document',
-  Tag = 'documents.%s_tag',
-  Correspondent = 'documents.%s_correspondent',
-  DocumentType = 'documents.%s_documenttype',
-  StoragePath = 'documents.%s_storagepath',
-  SavedView = 'documents.%s_savedview',
-  PaperlessTask = 'documents.%s_paperlesstask',
-  UISettings = 'documents.%s_uisettings',
-  Comment = 'documents.%s_comment',
-  Log = 'admin.%s_logentry',
-  MailAccount = 'paperless_mail.%s_mailaccount',
-  MailRule = 'paperless_mail.%s_mailrule',
-  User = 'auth.%s_user',
-  Admin = 'admin.%s_logentry',
+  Document = '%s_document',
+  Tag = '%s_tag',
+  Correspondent = '%s_correspondent',
+  DocumentType = '%s_documenttype',
+  StoragePath = '%s_storagepath',
+  SavedView = '%s_savedview',
+  PaperlessTask = '%s_paperlesstask',
+  UISettings = '%s_uisettings',
+  Comment = '%s_comment',
+  MailAccount = '%s_mailaccount',
+  MailRule = '%s_mailrule',
+  User = '%s_user',
+  Admin = '%s_logentry',
 }
 
 export interface PaperlessPermission {
@@ -51,7 +50,7 @@ export class PermissionsService {
     actionKey: string
     typeKey: string
   } {
-    const matches = permissionStr.match(/\.(.+)_/)
+    const matches = permissionStr.match(/(.+)_/)
     let typeKey
     let actionKey
     if (matches?.length > 0) {

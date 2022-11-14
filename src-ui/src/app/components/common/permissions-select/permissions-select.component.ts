@@ -10,7 +10,6 @@ import {
   PermissionsService,
   PermissionType,
 } from 'src/app/services/permissions.service'
-import { AbstractInputComponent } from '../input/abstract-input'
 
 @Component({
   providers: [
@@ -33,14 +32,18 @@ export class PermissionsSelectComponent
   @Input()
   title: string = 'Permissions'
 
+  @Input()
+  error: string
+
   permissions: string[]
 
   form = new FormGroup({})
 
+  typesWithAllActions: Set<string> = new Set()
+
   constructor(private readonly permissionsService: PermissionsService) {
     for (const type in PermissionType) {
       const control = new FormGroup({})
-      control.addControl('all', new FormControl(null))
       for (const action in PermissionAction) {
         control.addControl(action, new FormControl(null))
       }
@@ -50,7 +53,7 @@ export class PermissionsSelectComponent
 
   writeValue(permissions: string[]): void {
     this.permissions = permissions
-    this.permissions.forEach((permissionStr) => {
+    this.permissions?.forEach((permissionStr) => {
       const { actionKey, typeKey } =
         this.permissionsService.getPermissionKeys(permissionStr)
 
@@ -60,20 +63,70 @@ export class PermissionsSelectComponent
         }
       }
     })
+    Object.keys(PermissionType).forEach((type) => {
+      if (Object.values(this.form.get(type).value).every((val) => val)) {
+        this.typesWithAllActions.add(type)
+      } else {
+        this.typesWithAllActions.delete(type)
+      }
+    })
   }
+
+  onChange = (newValue: string[]) => {}
+
+  onTouched = () => {}
+
+  disabled: boolean = false
+
   registerOnChange(fn: any): void {
-    throw new Error('Method not implemented.')
+    this.onChange = fn
   }
+
   registerOnTouched(fn: any): void {
-    throw new Error('Method not implemented.')
+    this.onTouched = fn
   }
+
   setDisabledState?(isDisabled: boolean): void {
-    throw new Error('Method not implemented.')
+    this.disabled = isDisabled
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.form.valueChanges.subscribe((newValue) => {
+      let permissions = []
+      Object.entries(newValue).forEach(([typeKey, typeValue]) => {
+        // e.g. [Document, { Add: true, View: true ... }]
+        const selectedActions = Object.entries(typeValue).filter(
+          ([actionKey, actionValue]) => actionValue
+        )
 
-  isAll(key: string): boolean {
-    return this.form.get(key).get('all').value == true
+        selectedActions.forEach(([actionKey, actionValue]) => {
+          permissions.push(
+            (PermissionType[typeKey] as string).replace(
+              '%s',
+              PermissionAction[actionKey]
+            )
+          )
+        })
+
+        if (selectedActions.length == Object.entries(typeValue).length) {
+          this.typesWithAllActions.add(typeKey)
+        } else {
+          this.typesWithAllActions.delete(typeKey)
+        }
+      })
+      this.onChange(permissions)
+    })
+  }
+
+  toggleAll(event, type) {
+    const typeGroup = this.form.get(type)
+    if (event.target.checked) {
+      Object.keys(PermissionAction).forEach((action) => {
+        typeGroup.get(action).patchValue(true)
+      })
+      this.typesWithAllActions.add(type)
+    } else {
+      this.typesWithAllActions.delete(type)
+    }
   }
 }

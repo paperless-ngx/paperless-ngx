@@ -8,7 +8,7 @@
       <div class="row">
         <div class="col">
           <app-input-text i18n-title title="Name" formControlName="name" [error]="error?.name"></app-input-text>
-          <app-permissions-select i18n-title title="Permissions" formControlName="permissions"></app-permissions-select>
+          <app-permissions-select i18n-title title="Permissions" formControlName="permissions" [error]="error?.permissions"></app-permissions-select>
         </div>
       </div>
     </div>

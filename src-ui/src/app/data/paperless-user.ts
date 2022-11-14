@@ -10,6 +10,6 @@ export interface PaperlessUser extends ObjectWithId {
   is_active?: boolean
   is_superuser?: boolean
   groups?: PaperlessGroup[]
-  permissions?: string[]
+  user_permissions?: string[]
   inherited_permissions?: string[]
 }
