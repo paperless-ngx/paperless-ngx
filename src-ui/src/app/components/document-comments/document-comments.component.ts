@@ -92,8 +92,8 @@ export class DocumentCommentsComponent extends ComponentWithPermissions {
   displayName(comment: PaperlessDocumentComment): string {
     if (!comment.user) return ''
     let nameComponents = []
-    if (comment.user.firstname) nameComponents.unshift(comment.user.firstname)
-    if (comment.user.lastname) nameComponents.unshift(comment.user.lastname)
+    if (comment.user.first_name) nameComponents.unshift(comment.user.first_name)
+    if (comment.user.last_name) nameComponents.unshift(comment.user.last_name)
     if (comment.user.username) {
       if (nameComponents.length > 0)
         nameComponents.push(`(${comment.user.username})`)
