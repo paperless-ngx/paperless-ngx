@@ -48,4 +48,12 @@ export class UserEditDialogComponent extends EditDialogComponent<PaperlessUser> 
       user_permissions: new FormControl(null),
     })
   }
+
+  onToggleSuperUser() {
+    if (this.objectForm.get('is_superuser').value) {
+      this.objectForm.get('user_permissions').disable()
+    } else {
+      this.objectForm.get('user_permissions').enable()
+    }
+  }
 }
