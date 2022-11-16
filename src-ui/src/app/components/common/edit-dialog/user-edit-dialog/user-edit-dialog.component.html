@@ -25,7 +25,7 @@
           <app-input-select i18n-title title="Groups" [items]="groups" multiple="true" formControlName="groups"></app-input-select>
         </div>
         <div class="col">
-          <app-permissions-select i18n-title title="Permissions" formControlName="user_permissions" [error]="error?.user_permissions"></app-permissions-select>
+          <app-permissions-select i18n-title title="Permissions" formControlName="user_permissions" [error]="error?.user_permissions" [inheritedPermissions]="inheritedPermissions"></app-permissions-select>
         </div>
       </div>
     </div>

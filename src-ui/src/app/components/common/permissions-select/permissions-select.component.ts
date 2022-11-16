@@ -41,6 +41,18 @@ export class PermissionsSelectComponent
 
   typesWithAllActions: Set<string> = new Set()
 
+  _inheritedPermissions: string[] = []
+
+  @Input()
+  set inheritedPermissions(inherited: string[]) {
+    // remove <app_label>. from permission strings
+    this._inheritedPermissions = inherited?.length
+      ? inherited.map((p) => p.replace(/.+\./, ''))
+      : []
+  }
+
+  inheritedWarning: string = $localize`Inerhited from group`
+
   constructor(private readonly permissionsService: PermissionsService) {
     for (const type in PermissionType) {
       const control = new FormGroup({})
@@ -53,18 +65,24 @@ export class PermissionsSelectComponent
 
   writeValue(permissions: string[]): void {
     this.permissions = permissions
-    this.permissions?.forEach((permissionStr) => {
+    const allPerms = this._inheritedPermissions.concat(permissions)
+    allPerms.forEach((permissionStr) => {
       const { actionKey, typeKey } =
         this.permissionsService.getPermissionKeys(permissionStr)
 
       if (actionKey && typeKey) {
         if (this.form.get(typeKey)?.get(actionKey)) {
-          this.form.get(typeKey).get(actionKey).setValue(true)
+          this.form
+            .get(typeKey)
+            .get(actionKey)
+            .patchValue(true, { emitEvent: false })
         }
       }
     })
     Object.keys(PermissionType).forEach((type) => {
-      if (Object.values(this.form.get(type).value).every((val) => val)) {
+      if (
+        Object.values(this.form.get(type).value).every((val) => val == true)
+      ) {
         this.typesWithAllActions.add(type)
       } else {
         this.typesWithAllActions.delete(type)
@@ -96,7 +114,7 @@ export class PermissionsSelectComponent
       Object.entries(newValue).forEach(([typeKey, typeValue]) => {
         // e.g. [Document, { Add: true, View: true ... }]
         const selectedActions = Object.entries(typeValue).filter(
-          ([actionKey, actionValue]) => actionValue
+          ([actionKey, actionValue]) => actionValue == true
         )
 
         selectedActions.forEach(([actionKey, actionValue]) => {
@@ -128,5 +146,35 @@ export class PermissionsSelectComponent
     } else {
       this.typesWithAllActions.delete(type)
     }
+  }
+
+  isInherited(typeKey: string, actionKey: string = null) {
+    if (this._inheritedPermissions.length == 0) return false
+    else if (actionKey) {
+      return this._inheritedPermissions.includes(
+        this.permissionsService.getPermissionCode({
+          action: PermissionAction[actionKey],
+          type: PermissionType[typeKey],
+        })
+      )
+    } else {
+      return Object.values(PermissionAction).every((action) => {
+        return this._inheritedPermissions.includes(
+          this.permissionsService.getPermissionCode({
+            action: action as PermissionAction,
+            type: PermissionType[typeKey],
+          })
+        )
+      })
+    }
+  }
+
+  // if checkbox is disabled either because "All", inhereted or entire component disabled
+  isDisabled(typeKey: string, actionKey: string) {
+    return this.typesWithAllActions.has(typeKey) ||
+      this.isInherited(typeKey, actionKey) ||
+      this.disabled
+      ? true
+      : null
   }
 }
