@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, OnInit } from '@angular/core'
 import { FormControl, FormGroup } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { first } from 'rxjs'
@@ -42,8 +42,8 @@ export class UserEditDialogComponent extends EditDialogComponent<PaperlessUser> 
       username: new FormControl(''),
       first_name: new FormControl(''),
       last_name: new FormControl(''),
-      is_active: new FormControl(null),
-      is_superuser: new FormControl(null),
+      is_active: new FormControl(true),
+      is_superuser: new FormControl(false),
       groups: new FormControl(null),
       user_permissions: new FormControl(null),
     })
@@ -55,5 +55,12 @@ export class UserEditDialogComponent extends EditDialogComponent<PaperlessUser> 
     } else {
       this.objectForm.get('user_permissions').enable()
     }
+  }
+
+  get inheritedPermissions(): string[] {
+    const groupsVal = this.objectForm.get('groups').value
+    return groupsVal !== null
+      ? this.groups.find((g) => g.id == groupsVal)?.permissions
+      : []
   }
 }
