@@ -42,7 +42,7 @@ export class PermissionsService {
     return this.permissions.includes(this.getPermissionCode(permission))
   }
 
-  private getPermissionCode(permission: PaperlessPermission): string {
+  public getPermissionCode(permission: PaperlessPermission): string {
     return permission.type.replace('%s', permission.action)
   }
 

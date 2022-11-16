@@ -6,11 +6,6 @@ from rest_framework import serializers
 
 class UserSerializer(serializers.ModelSerializer):
 
-    groups = serializers.SlugRelatedField(
-        many=True,
-        queryset=Group.objects.all(),
-        slug_field="name",
-    )
     user_permissions = serializers.SlugRelatedField(
         many=True,
         queryset=Permission.objects.all(),
