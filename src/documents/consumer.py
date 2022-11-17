@@ -2,7 +2,8 @@ import datetime
 import hashlib
 import os
 import uuid
-from subprocess import Popen
+from subprocess import CompletedProcess
+from subprocess import run
 from typing import Optional
 from typing import Type
 
@@ -148,13 +149,20 @@ class Consumer(LoggingMixin):
         script_env["DOCUMENT_SOURCE_PATH"] = filepath_arg
 
         try:
-            Popen(
-                (
+            completed_proc = run(
+                args=[
                     settings.PRE_CONSUME_SCRIPT,
                     filepath_arg,
-                ),
+                ],
                 env=script_env,
-            ).wait()
+                capture_output=True,
+            )
+
+            self._log_script_outputs(completed_proc)
+
+            # Raises exception on non-zero output
+            completed_proc.check_returncode()
+
         except Exception as e:
             self._fail(
                 MESSAGE_PRE_CONSUME_SCRIPT_ERROR,
@@ -208,8 +216,8 @@ class Consumer(LoggingMixin):
         script_env["DOCUMENT_ORIGINAL_FILENAME"] = str(document.original_filename)
 
         try:
-            Popen(
-                (
+            completed_proc = run(
+                args=[
                     settings.POST_CONSUME_SCRIPT,
                     str(document.pk),
                     document.get_public_filename(),
@@ -219,9 +227,16 @@ class Consumer(LoggingMixin):
                     reverse("document-thumb", kwargs={"pk": document.pk}),
                     str(document.correspondent),
                     str(",".join(document.tags.all().values_list("name", flat=True))),
-                ),
+                ],
                 env=script_env,
-            ).wait()
+                capture_output=True,
+            )
+
+            self._log_script_outputs(completed_proc)
+
+            # Raises exception on non-zero output
+            completed_proc.check_returncode()
+
         except Exception as e:
             self._fail(
                 MESSAGE_POST_CONSUME_SCRIPT_ERROR,
@@ -510,3 +525,39 @@ class Consumer(LoggingMixin):
         with open(source, "rb") as read_file:
             with open(target, "wb") as write_file:
                 write_file.write(read_file.read())
+
+    def _log_script_outputs(self, completed_process: CompletedProcess):
+        """
+        Decodes a process stdout and stderr streams and logs them to the main log
+        """
+        # Log what the script exited as
+        self.log(
+            "info",
+            f"{completed_process.args[0]} exited {completed_process.returncode}",
+        )
+
+        # Decode the output (if any)
+        if len(completed_process.stdout):
+            stdout_str = (
+                completed_process.stdout.decode("utf8", errors="ignore")
+                .strip()
+                .split(
+                    "\n",
+                )
+            )
+            self.log("info", "Script stdout:")
+            for line in stdout_str:
+                self.log("info", line)
+
+        if len(completed_process.stderr):
+            stderr_str = (
+                completed_process.stderr.decode("utf8", errors="ignore")
+                .strip()
+                .split(
+                    "\n",
+                )
+            )
+
+            self.log("warning", "Script stderr:")
+            for line in stderr_str:
+                self.log("warning", line)
