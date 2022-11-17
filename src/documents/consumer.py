@@ -444,7 +444,12 @@ class Consumer(LoggingMixin):
 
         return document
 
-    def _store(self, text, date, mime_type) -> Document:
+    def _store(
+        self,
+        text: str,
+        date: Optional[datetime.datetime],
+        mime_type: str,
+    ) -> Document:
 
         # If someone gave us the original filename, use it instead of doc.
 
