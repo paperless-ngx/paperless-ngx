@@ -543,7 +543,22 @@ export class SettingsComponent
     modal.componentInstance.btnCaption = $localize`Proceed`
     modal.componentInstance.confirmClicked.subscribe(() => {
       modal.componentInstance.buttonsEnabled = false
-      this.mailAccountService.delete(account)
+      this.mailAccountService.delete(account).subscribe({
+        next: () => {
+          modal.close()
+          this.toastService.showInfo($localize`Deleted mail account`)
+          this.mailAccountService.clearCache()
+          this.mailAccountService.listAll().subscribe((r) => {
+            this.mailAccounts = r.results
+            this.initialize()
+          })
+        },
+        error: (e) => {
+          this.toastService.showError(
+            $localize`Error deleting mail account: ${e.toString()}.`
+          )
+        },
+      })
     })
   }
 
@@ -586,7 +601,22 @@ export class SettingsComponent
     modal.componentInstance.btnCaption = $localize`Proceed`
     modal.componentInstance.confirmClicked.subscribe(() => {
       modal.componentInstance.buttonsEnabled = false
-      this.mailRuleService.delete(rule)
+      this.mailRuleService.delete(rule).subscribe({
+        next: () => {
+          modal.close()
+          this.toastService.showInfo($localize`Deleted mail rule`)
+          this.mailRuleService.clearCache()
+          this.mailRuleService.listAll().subscribe((r) => {
+            this.mailRules = r.results
+            this.initialize()
+          })
+        },
+        error: (e) => {
+          this.toastService.showError(
+            $localize`Error deleting mail rule: ${e.toString()}.`
+          )
+        },
+      })
     })
   }
 }
