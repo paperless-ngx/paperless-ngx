@@ -739,10 +739,15 @@ class AccountField(serializers.PrimaryKeyRelatedField):
 
 
 class MailRuleSerializer(serializers.ModelSerializer):
-    account = AccountField(allow_null=True)
-    assign_correspondent = CorrespondentField(allow_null=True)
-    assign_tags = TagsField(many=True)
-    assign_document_type = DocumentTypeField(allow_null=True)
+    account = AccountField(required=True)
+    action_parameter = serializers.CharField(
+        allow_null=True,
+        required=False,
+        default="",
+    )
+    assign_correspondent = CorrespondentField(allow_null=True, required=False)
+    assign_tags = TagsField(many=True, allow_null=True, required=False)
+    assign_document_type = DocumentTypeField(allow_null=True, required=False)
 
     class Meta:
         model = MailRule
@@ -773,5 +778,9 @@ class MailRuleSerializer(serializers.ModelSerializer):
         return instance
 
     def create(self, validated_data):
+        if "assign_tags" in validated_data:
+            assign_tags = validated_data.pop("assign_tags")
         mail_rule = MailRule.objects.create(**validated_data)
+        if assign_tags:
+            mail_rule.assign_tags.set(assign_tags)
         return mail_rule

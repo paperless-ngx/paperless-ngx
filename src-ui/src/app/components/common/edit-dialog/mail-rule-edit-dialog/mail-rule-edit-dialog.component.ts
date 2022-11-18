@@ -76,7 +76,7 @@ export class MailRuleEditDialogComponent extends EditDialogComponent<PaperlessMa
       action: new FormControl(MailAction.MarkRead),
       action_parameter: new FormControl(null),
       assign_title_from: new FormControl(MailMetadataTitleOption.FromSubject),
-      assign_tags: new FormControl(null),
+      assign_tags: new FormControl([]),
       assign_document_type: new FormControl(null),
       assign_correspondent_from: new FormControl(
         MailMetadataCorrespondentOption.FromNothing
