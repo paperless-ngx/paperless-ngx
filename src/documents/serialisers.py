@@ -692,7 +692,21 @@ class AcknowledgeTasksViewSerializer(serializers.Serializer):
         return tasks
 
 
+class ObfuscatedPasswordField(serializers.Field):
+    """
+    Sends *** string instead of password in the clear
+    """
+
+    def to_representation(self, value):
+        return re.sub(".", "*", value)
+
+    def to_internal_value(self, data):
+        return data
+
+
 class MailAccountSerializer(serializers.ModelSerializer):
+    password = ObfuscatedPasswordField()
+
     class Meta:
         model = MailAccount
         depth = 1
@@ -708,6 +722,9 @@ class MailAccountSerializer(serializers.ModelSerializer):
         ]
 
     def update(self, instance, validated_data):
+        if "password" in validated_data:
+            if len(validated_data.get("password").replace("*", "")) == 0:
+                validated_data.pop("password")
         super().update(instance, validated_data)
         return instance
 
