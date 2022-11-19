@@ -64,7 +64,6 @@ export class MailRuleEditDialogComponent extends EditDialogComponent<PaperlessMa
   getForm(): FormGroup {
     return new FormGroup({
       name: new FormControl(null),
-      order: new FormControl(null),
       account: new FormControl(null),
       folder: new FormControl('INBOX'),
       filter_from: new FormControl(null),
