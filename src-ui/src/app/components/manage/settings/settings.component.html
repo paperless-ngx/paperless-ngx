@@ -234,7 +234,12 @@
         <ng-container *ngIf="mailAccounts && mailRules">
           <h4>
             <ng-container i18n>Mail accounts</ng-container>
-            <button type="button" class="btn btn-sm btn-primary ms-4" (click)="editMailAccount()" i18n>Add Account</button>
+            <button type="button" class="btn btn-sm btn-primary ms-4" (click)="editMailAccount()">
+              <svg class="sidebaricon me-1" fill="currentColor">
+                <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
+              </svg>
+              <ng-container i18n>Add Account</ng-container>
+            </button>
           </h4>
           <ul class="list-group" formGroupName="mailAccounts">
 
@@ -264,7 +269,12 @@
 
           <h4 class="mt-4">
             <ng-container i18n>Mail rules</ng-container>
-            <button type="button" class="btn btn-sm btn-primary ms-4" (click)="editMailRule()" i18n>Add Rule</button>
+            <button type="button" class="btn btn-sm btn-primary ms-4" (click)="editMailRule()">
+              <svg class="sidebaricon me-1" fill="currentColor">
+                <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
+              </svg>
+              <ng-container i18n>Add Rule</ng-container>
+            </button>
           </h4>
           <ul class="list-group" formGroupName="mailRules">
 

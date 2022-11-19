@@ -266,7 +266,6 @@ export class SettingsComponent
       for (let rule of this.mailRules) {
         storeData.mailRules[rule.id.toString()] = {
           name: rule.name,
-          order: rule.order,
           account: rule.account,
           folder: rule.folder,
           filter_from: rule.filter_from,
@@ -287,7 +286,6 @@ export class SettingsComponent
           rule.id.toString(),
           new FormGroup({
             name: new FormControl(null),
-            order: new FormControl(null),
             account: new FormControl(null),
             folder: new FormControl(null),
             filter_from: new FormControl(null),
@@ -519,6 +517,7 @@ export class SettingsComponent
           this.toastService.showInfo(
             $localize`Saved account "${newMailAccount.name}".`
           )
+          this.mailAccountService.clearCache()
           this.mailAccountService.listAll().subscribe((r) => {
             this.mailAccounts = r.results
             this.initialize()
@@ -576,6 +575,7 @@ export class SettingsComponent
           this.toastService.showInfo(
             $localize`Saved rule "${newMailRule.name}".`
           )
+          this.mailRuleService.clearCache()
           this.mailRuleService.listAll().subscribe((r) => {
             this.mailRules = r.results
 

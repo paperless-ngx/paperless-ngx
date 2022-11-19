@@ -748,6 +748,7 @@ class MailRuleSerializer(serializers.ModelSerializer):
     assign_correspondent = CorrespondentField(allow_null=True, required=False)
     assign_tags = TagsField(many=True, allow_null=True, required=False)
     assign_document_type = DocumentTypeField(allow_null=True, required=False)
+    order = serializers.IntegerField(required=False)
 
     class Meta:
         model = MailRule

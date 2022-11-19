@@ -28,8 +28,6 @@ export enum MailMetadataCorrespondentOption {
 export interface PaperlessMailRule extends ObjectWithId {
   name: string
 
-  order: number
-
   account: number // PaperlessMailAccount.id
 
   folder: string
