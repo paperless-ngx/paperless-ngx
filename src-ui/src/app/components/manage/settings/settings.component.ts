@@ -26,7 +26,7 @@ import {
   Subject,
 } from 'rxjs'
 import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
-import { ActivatedRoute } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
 import { ViewportScroller } from '@angular/common'
 import { TourService } from 'ngx-ui-tour-ng-bootstrap'
 import { PaperlessMailAccount } from 'src/app/data/paperless-mail-account'
@@ -120,11 +120,29 @@ export class SettingsComponent
     @Inject(LOCALE_ID) public currentLocale: string,
     private viewportScroller: ViewportScroller,
     private activatedRoute: ActivatedRoute,
+    private router: Router,
     public readonly tourService: TourService,
     private modalService: NgbModal
   ) {
     this.settings.settingsSaved.subscribe(() => {
       if (!this.savePending) this.initialize()
+    })
+  }
+
+  ngOnInit() {
+    this.initialize()
+
+    this.activatedRoute.paramMap.subscribe((paramMap) => {
+      const section = paramMap.get('section')
+      if (section) {
+        const navIDKey: string = Object.keys(SettingsNavIDs).find(
+          (navID) => navID.toLowerCase() == section
+        )
+        if (navIDKey) {
+          this.activeNavID = SettingsNavIDs[navIDKey]
+          this.maybeInitializeTab(this.activeNavID)
+        }
+      }
     })
   }
 
@@ -182,23 +200,25 @@ export class SettingsComponent
     }
   }
 
-  ngOnInit() {
-    this.initialize()
+  onNavChange(navChangeEvent: NgbNavChangeEvent) {
+    this.maybeInitializeTab(navChangeEvent.nextId)
+    const [foundNavIDkey, foundNavIDValue] = Object.entries(
+      SettingsNavIDs
+    ).find(([navIDkey, navIDValue]) => navIDValue == navChangeEvent.nextId)
+    if (foundNavIDkey)
+      this.router.navigate(['settings', foundNavIDkey.toLowerCase()])
   }
 
-  // Load tab contents 'on demand', either on mouseover or focusin (i.e. before click) or on nav change event
-  maybeInitializeTab(navIDorEvent: number | NgbNavChangeEvent): void {
-    const navID =
-      typeof navIDorEvent == 'number' ? navIDorEvent : navIDorEvent.nextId
-    // initialize saved views
+  // Load tab contents 'on demand', either on mouseover or focusin (i.e. before click) or called from nav change event
+  maybeInitializeTab(navID: number): void {
     if (navID == SettingsNavIDs.SavedViews && !this.savedViews) {
       this.savedViewService.listAll().subscribe((r) => {
         this.savedViews = r.results
         this.initialize()
       })
     } else if (
-      (navID == SettingsNavIDs.Mail && !this.mailAccounts) ||
-      !this.mailRules
+      navID == SettingsNavIDs.Mail &&
+      (!this.mailAccounts || !this.mailRules)
     ) {
       this.mailAccountService.listAll().subscribe((r) => {
         this.mailAccounts = r.results
