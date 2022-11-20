@@ -33,6 +33,14 @@ class TestParserLive(TestCase):
     )
     @mock.patch("paperless_mail.parsers.MailDocumentParser.generate_pdf")
     def test_get_thumbnail(self, mock_generate_pdf: mock.MagicMock):
+        """
+        GIVEN:
+            - Fresh start
+        WHEN:
+            - The Thumbnail is requested
+        THEN:
+            - The returned thumbnail image file is as expected
+        """
         mock_generate_pdf.return_value = os.path.join(
             self.SAMPLE_FILES,
             "simple_text.eml.pdf",
@@ -55,25 +63,38 @@ class TestParserLive(TestCase):
         "TIKA_LIVE" not in os.environ,
         reason="No tika server",
     )
-    def test_tika_parse(self):
+    def test_tika_parse_successful(self):
+        """
+        GIVEN:
+            - Fresh start
+        WHEN:
+            - tika parsing is called
+        THEN:
+            - a web request to tika shall be done and the reply es returned
+        """
         html = '<html><head><meta http-equiv="content-type" content="text/html; charset=UTF-8"></head><body><p>Some Text</p></body></html>'
         expected_text = "Some Text"
-
-        tika_server_original = self.parser.tika_server
-
-        # Check if exception is raised when Tika cannot be reached.
-        self.parser.tika_server = ""
-        self.assertRaises(ParseError, self.parser.tika_parse, html)
-
-        # Check unsuccessful parsing
-        self.parser.tika_server = tika_server_original
-
-        parsed = self.parser.tika_parse(None)
-        self.assertEqual("", parsed)
 
         # Check successful parsing
         parsed = self.parser.tika_parse(html)
         self.assertEqual(expected_text, parsed.strip())
+
+    @pytest.mark.skipif(
+        "TIKA_LIVE" not in os.environ,
+        reason="No tika server",
+    )
+    def test_tika_parse_unsuccessful(self):
+        """
+        GIVEN:
+            - Fresh start
+        WHEN:
+            - tika parsing fails
+        THEN:
+            - the parser should return an empty string
+        """
+        # Check unsuccessful parsing
+        parsed = self.parser.tika_parse(None)
+        self.assertEqual("", parsed)
 
     @pytest.mark.skipif(
         "GOTENBERG_LIVE" not in os.environ,
@@ -86,7 +107,14 @@ class TestParserLive(TestCase):
         mock_generate_pdf_from_html: mock.MagicMock,
         mock_generate_pdf_from_mail: mock.MagicMock,
     ):
-
+        """
+        GIVEN:
+            - Intermediary pdfs to be merged
+        WHEN:
+            - pdf generation is requested with html file requiring merging of pdfs
+        THEN:
+            - gotenberg is called to merge files and the resulting file is returned
+        """
         with open(os.path.join(self.SAMPLE_FILES, "first.pdf"), "rb") as first:
             mock_generate_pdf_from_mail.return_value = first.read()
 
@@ -107,6 +135,14 @@ class TestParserLive(TestCase):
         reason="No gotenberg server",
     )
     def test_generate_pdf_from_mail_no_convert(self):
+        """
+        GIVEN:
+            - Fresh start
+        WHEN:
+            - pdf generation from simple eml file is requested
+        THEN:
+            - gotenberg is called and the resulting file is returned and contains the expected text.
+        """
         mail = self.parser.get_parsed(os.path.join(self.SAMPLE_FILES, "html.eml"))
 
         pdf_path = os.path.join(self.parser.tempdir, "html.eml.pdf")
@@ -128,6 +164,14 @@ class TestParserLive(TestCase):
         reason="PAPERLESS_TEST_SKIP_CONVERT set, skipping Test",
     )
     def test_generate_pdf_from_mail(self):
+        """
+        GIVEN:
+            - Fresh start
+        WHEN:
+            - pdf generation from simple eml file is requested
+        THEN:
+            - gotenberg is called and the resulting file is returned and look as expected.
+        """
         mail = self.parser.get_parsed(os.path.join(self.SAMPLE_FILES, "html.eml"))
 
         pdf_path = os.path.join(self.parser.tempdir, "html.eml.pdf")
@@ -168,6 +212,15 @@ class TestParserLive(TestCase):
         reason="No gotenberg server",
     )
     def test_generate_pdf_from_html_no_convert(self):
+        """
+        GIVEN:
+            - Fresh start
+        WHEN:
+            - pdf generation from html eml file is requested
+        THEN:
+            - gotenberg is called and the resulting file is returned and contains the expected text.
+        """
+
         class MailAttachmentMock:
             def __init__(self, payload, content_id):
                 self.payload = payload
@@ -203,6 +256,15 @@ class TestParserLive(TestCase):
         reason="PAPERLESS_TEST_SKIP_CONVERT set, skipping Test",
     )
     def test_generate_pdf_from_html(self):
+        """
+        GIVEN:
+            - Fresh start
+        WHEN:
+            - pdf generation from html eml file is requested
+        THEN:
+            - gotenberg is called and the resulting file is returned and look as expected.
+        """
+
         class MailAttachmentMock:
             def __init__(self, payload, content_id):
                 self.payload = payload
@@ -255,10 +317,19 @@ class TestParserLive(TestCase):
         "GOTENBERG_LIVE" not in os.environ,
         reason="No gotenberg server",
     )
-    def test_is_online_image_still_available(self):
+    def test_online_image_exception_on_not_available(self):
+        """
+        GIVEN:
+            - Fresh start
+        WHEN:
+            - nonexistent image is requested
+        THEN:
+            - An exception shall be thrown
+        """
         """
         A public image is used in the html sample file. We have no control
-        whether this image stays online forever, so here we check if it is still there
+        whether this image stays online forever, so here we check if we can detect if is not
+        available anymore.
         """
 
         # Start by Testing if nonexistent URL really throws an Exception
@@ -267,6 +338,24 @@ class TestParserLive(TestCase):
             urlopen,
             "https://upload.wikimedia.org/wikipedia/en/f/f7/nonexistent.png",
         )
+
+    @pytest.mark.skipif(
+        "GOTENBERG_LIVE" not in os.environ,
+        reason="No gotenberg server",
+    )
+    def test_is_online_image_still_available(self):
+        """
+        GIVEN:
+            - Fresh start
+        WHEN:
+            - A public image used in the html sample file is requested
+        THEN:
+            - No exception shall be thrown
+        """
+        """
+        A public image is used in the html sample file. We have no control
+        whether this image stays online forever, so here we check if it is still there
+        """
 
         # Now check the URL used in samples/sample.html
         urlopen("https://upload.wikimedia.org/wikipedia/en/f/f7/RickRoll.png")
