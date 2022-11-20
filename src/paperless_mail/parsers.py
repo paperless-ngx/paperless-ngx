@@ -10,6 +10,7 @@ from django.conf import settings
 from documents.parsers import DocumentParser
 from documents.parsers import make_thumbnail_from_pdf
 from documents.parsers import ParseError
+from humanfriendly import format_size
 from imap_tools import MailMessage
 from tika import parser
 
@@ -125,10 +126,8 @@ class MailDocumentParser(DocumentParser):
         if len(mail.attachments) >= 1:
             att = []
             for a in mail.attachments:
-                if a.size >= 1024 * 600:
-                    att.append(f"{a.filename} ({(a.size / 1024 / 1024):.2f} MiB)")
-                else:
-                    att.append(f"{a.filename} ({(a.size / 1024):.2f} KiB)")
+                att.append(f"{a.filename} ({format_size(a.size, binary=True)})")
+
             self.text += f"Attachments: {', '.join(att)}\n\n"
 
         if mail.html != "":
@@ -191,7 +190,7 @@ class MailDocumentParser(DocumentParser):
         return pdf_path
 
     @staticmethod
-    def mail_to_html(mail) -> StringIO:
+    def mail_to_html(mail: MailMessage) -> StringIO:
         data = {}
 
         def clean_html(text: str):
@@ -228,10 +227,7 @@ class MailDocumentParser(DocumentParser):
 
         att = []
         for a in mail.attachments:
-            if a.size >= 1024 * 600:
-                att.append(f"{a.filename} ({(a.size / 1024 / 1024):.2f} MiB)")
-            else:
-                att.append(f"{a.filename} ({(a.size / 1024):.2f} KiB)")
+            att.append(f"{a.filename} ({format_size(a.size, binary=True)})")
         data["attachments"] = clean_html(", ".join(att))
         if data["attachments"] != "":
             data["attachments_label"] = "Attachments"
