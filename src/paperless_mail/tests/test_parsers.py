@@ -417,6 +417,21 @@ class TestParser(TestCase):
         mock_from_buffer.side_effect = my_side_effect
         self.assertRaises(ParseError, self.parser.tika_parse, html)
 
+    def test_tika_parse_unreachable(self):
+        """
+        GIVEN:
+            - Fresh start
+        WHEN:
+            - tika parsing is called but tika is not available
+        THEN:
+            - a ParseError Exception is thrown
+        """
+        html = '<html><head><meta http-equiv="content-type" content="text/html; charset=UTF-8"></head><body><p>Some Text</p></body></html>'
+
+        # Check if exception is raised when Tika cannot be reached.
+        self.parser.tika_server = ""
+        self.assertRaises(ParseError, self.parser.tika_parse, html)
+
     @mock.patch("paperless_mail.parsers.MailDocumentParser.generate_pdf_from_mail")
     @mock.patch("paperless_mail.parsers.MailDocumentParser.generate_pdf_from_html")
     def test_generate_pdf_parse_error(self, m: mock.MagicMock, n: mock.MagicMock):
