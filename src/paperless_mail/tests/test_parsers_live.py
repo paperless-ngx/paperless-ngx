@@ -1,4 +1,3 @@
-import hashlib
 import os
 from unittest import mock
 from urllib.error import HTTPError
@@ -8,8 +7,10 @@ import pytest
 from django.test import TestCase
 from documents.parsers import ParseError
 from documents.parsers import run_convert
+from imagehash import average_hash
 from paperless_mail.parsers import MailDocumentParser
 from pdfminer.high_level import extract_text
+from PIL import Image
 
 
 class TestParserLive(TestCase):
@@ -22,16 +23,8 @@ class TestParserLive(TestCase):
         self.parser.cleanup()
 
     @staticmethod
-    def hashfile(file):
-        buf_size = 65536  # An arbitrary (but fixed) buffer
-        sha256 = hashlib.sha256()
-        with open(file, "rb") as f:
-            while True:
-                data = f.read(buf_size)
-                if not data:
-                    break
-                sha256.update(data)
-        return sha256.hexdigest()
+    def imagehash(file, hash_size=18):
+        return f"{average_hash(Image.open(file), hash_size)}"
 
     # Only run if convert is available
     @pytest.mark.skipif(
@@ -53,8 +46,8 @@ class TestParserLive(TestCase):
         expected = os.path.join(self.SAMPLE_FILES, "simple_text.eml.pdf.webp")
 
         self.assertEqual(
-            self.hashfile(thumb),
-            self.hashfile(expected),
+            self.imagehash(thumb),
+            self.imagehash(expected),
             f"Created Thumbnail {thumb} differs from expected file {expected}",
         )
 
@@ -158,10 +151,10 @@ class TestParserLive(TestCase):
             logging_group=None,
         )
         self.assertTrue(os.path.isfile(converted))
-        thumb_hash = self.hashfile(converted)
+        thumb_hash = self.imagehash(converted)
 
         # The created pdf is not reproducible. But the converted image should always look the same.
-        expected_hash = self.hashfile(
+        expected_hash = self.imagehash(
             os.path.join(self.SAMPLE_FILES, "html.eml.pdf.webp"),
         )
         self.assertEqual(
@@ -244,10 +237,10 @@ class TestParserLive(TestCase):
             logging_group=None,
         )
         self.assertTrue(os.path.isfile(converted))
-        thumb_hash = self.hashfile(converted)
+        thumb_hash = self.imagehash(converted)
 
         # The created pdf is not reproducible. But the converted image should always look the same.
-        expected_hash = self.hashfile(
+        expected_hash = self.imagehash(
             os.path.join(self.SAMPLE_FILES, "sample.html.pdf.webp"),
         )
 
