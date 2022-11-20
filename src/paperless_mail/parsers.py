@@ -251,7 +251,7 @@ class MailDocumentParser(DocumentParser):
         with open(css_file, "rb") as css_handle:
 
             files = {
-                "html": ("email_msg_template.html", self.mail_to_html(mail)),
+                "html": ("index.html", self.mail_to_html(mail)),
                 "css": ("output.css", css_handle),
             }
             headers = {}
@@ -296,7 +296,7 @@ class MailDocumentParser(DocumentParser):
             files.append((name_clean, BytesIO(a.payload)))
             html_clean = html_clean.replace(name_cid, name_clean)
 
-        files.append(("email_msg_template.html", StringIO(html_clean)))
+        files.append(("index.html", StringIO(html_clean)))
 
         return files
 
