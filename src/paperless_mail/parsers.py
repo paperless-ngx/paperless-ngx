@@ -159,19 +159,18 @@ class MailDocumentParser(DocumentParser):
 
         pdf_collection.append(("1_mail.pdf", self.generate_pdf_from_mail(mail)))
 
-        if mail.html != "":
+        if mail.html == "":
+            with open(pdf_path, "wb") as file:
+                file.write(pdf_collection[0][1])
+                file.close()
+            return pdf_path
+        else:
             pdf_collection.append(
                 (
                     "2_html.pdf",
                     self.generate_pdf_from_html(mail.html, mail.attachments),
                 ),
             )
-
-        if len(pdf_collection) == 1:
-            with open(pdf_path, "wb") as file:
-                file.write(pdf_collection[0][1])
-                file.close()
-            return pdf_path
 
         files = {}
         for name, content in pdf_collection:
