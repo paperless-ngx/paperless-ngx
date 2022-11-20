@@ -369,6 +369,7 @@ class TestParser(TestCase):
             os.path.join(self.SAMPLE_FILES, "html.eml.html"),
         ) as html_expected_handle:
             html_expected = html_expected_handle.read()
+
             self.assertHTMLEqual(html_expected, html_received)
 
     @mock.patch("paperless_mail.parsers.requests.post")
@@ -436,7 +437,7 @@ class TestParser(TestCase):
                 result = self.parser.transform_inline_html(html, attachments)
 
         resulting_html = result[-1][1].read()
-        self.assertTrue(result[-1][0] == "index.html")
+        self.assertTrue(result[-1][0] == "email_msg_template.html")
         self.assertTrue(result[0][0] in resulting_html)
         self.assertFalse("<script" in resulting_html.lower())
 
@@ -484,7 +485,7 @@ class TestParser(TestCase):
         mock_post.call_args.kwargs["files"]["cidpart1pNdUSz0sD3NqVtPgexamplede"][
             1
         ].read()
-        mock_post.call_args.kwargs["files"]["index.html"][1].read()
+        mock_post.call_args.kwargs["files"]["email_msg_template.html"][1].read()
 
         mock_response.raise_for_status.assert_called_once()
 
