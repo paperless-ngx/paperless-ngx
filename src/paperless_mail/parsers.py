@@ -85,7 +85,8 @@ class MailDocumentParser(DocumentParser):
                 "prefix": "",
                 "key": "attachments",
                 "value": ", ".join(
-                    f"{attachment.filename}({(attachment.size / 1024):.2f} KiB)"
+                    f"{attachment.filename}"
+                    f"({format_size(attachment.size, binary=True)})"
                     for attachment in mail.attachments
                 ),
             },
