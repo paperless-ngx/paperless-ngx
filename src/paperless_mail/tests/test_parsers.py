@@ -231,7 +231,7 @@ class TestParser(TestCase):
     @mock.patch("paperless_mail.parsers.MailDocumentParser.generate_pdf")
     def test_parse_html_eml(self, n, mock_tika_parse: mock.MagicMock):
         # Validate parsing returns the expected results
-        text_expected = "Some Text and an embedded image.\n\nSubject: HTML Message\n\nFrom: Name <someone@example.de>\n\nTo: someone@example.de\n\nAttachments: IntM6gnXFm00FEV5.png (6.89 KiB), 600+kbfile.txt (600.24 KiB)\n\nHTML content: tika return"
+        text_expected = "Subject: HTML Message\n\nFrom: Name <someone@example.de>\n\nTo: someone@example.de\n\nAttachments: IntM6gnXFm00FEV5.png (6.89 KiB), 600+kbfile.txt (600.24 KiB)\n\nHTML content: tika return\n\nSome Text and an embedded image."
         mock_tika_parse.return_value = "tika return"
 
         self.parser.parse(os.path.join(self.SAMPLE_FILES, "html.eml"), "message/rfc822")
@@ -258,7 +258,7 @@ class TestParser(TestCase):
             os.path.join(self.SAMPLE_FILES, "simple_text.eml"),
             "message/rfc822",
         )
-        text_expected = "This is just a simple Text Mail.\n\nSubject: Simple Text Mail\n\nFrom: Some One <mail@someserver.de>\n\nTo: some@one.de\n\nCC: asdasd@æsdasd.de, asdadasdasdasda.asdasd@æsdasd.de\n\nBCC: fdf@fvf.de\n\n"
+        text_expected = "Subject: Simple Text Mail\n\nFrom: Some One <mail@someserver.de>\n\nTo: some@one.de\n\nCC: asdasd@æsdasd.de, asdadasdasdasda.asdasd@æsdasd.de\n\nBCC: fdf@fvf.de\n\n\n\nThis is just a simple Text Mail."
         self.assertEqual(text_expected, self.parser.text)
         self.assertEqual(
             datetime.datetime(
