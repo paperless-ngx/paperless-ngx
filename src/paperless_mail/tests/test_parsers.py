@@ -19,12 +19,18 @@ class TestParser(TestCase):
 
     def test_get_parsed(self):
         # Check if exception is raised when parsing fails.
-        with pytest.raises(ParseError):
-            self.parser.get_parsed(os.path.join(self.SAMPLE_FILES, "na"))
+        self.assertRaises(
+            ParseError,
+            self.parser.get_parsed,
+            os.path.join(self.SAMPLE_FILES, "na"),
+        )
 
         # Check if exception is raised when the mail is faulty.
-        with pytest.raises(ParseError):
-            self.parser.get_parsed(os.path.join(self.SAMPLE_FILES, "broken.eml"))
+        self.assertRaises(
+            ParseError,
+            self.parser.get_parsed,
+            os.path.join(self.SAMPLE_FILES, "broken.eml"),
+        )
 
         # Parse Test file and check relevant content
         parsed1 = self.parser.get_parsed(
@@ -210,18 +216,18 @@ class TestParser(TestCase):
 
     def test_parse_na(self):
         # Check if exception is raised when parsing fails.
-        with pytest.raises(ParseError):
-            self.parser.parse(
-                os.path.join(os.path.join(self.SAMPLE_FILES, "na")),
-                "message/rfc822",
-            )
+        self.assertRaises(
+            ParseError,
+            self.parser.parse,
+            os.path.join(self.SAMPLE_FILES, "na"),
+            "message/rfc822",
+        )
 
     @mock.patch("paperless_mail.parsers.MailDocumentParser.tika_parse")
     @mock.patch("paperless_mail.parsers.MailDocumentParser.generate_pdf")
-    @mock.patch("documents.loggers.LoggingMixin.log")  # Disable log output
-    def test_parse_html_eml(self, m, n, mock_tika_parse: mock.MagicMock):
+    def test_parse_html_eml(self, n, mock_tika_parse: mock.MagicMock):
         # Validate parsing returns the expected results
-        text_expected = "Some Text\nand an embedded image.\n\nSubject: HTML Message\n\nFrom: Name <someone@example.de>\n\nTo: someone@example.de\n\nAttachments: IntM6gnXFm00FEV5.png (6.89 KiB), 600+kbfile.txt (0.59 MiB)\n\nHTML content: tika return"
+        text_expected = "Some Text\nand an embedded image.\n\nSubject: HTML Message\n\nFrom: Name <someone@example.de>\n\nTo: someone@example.de\n\nAttachments: IntM6gnXFm00FEV5.png (6.89 KiB), 600+kbfile.txt (600.24 KiB)\n\nHTML content: tika return"
         mock_tika_parse.return_value = "tika return"
 
         self.parser.parse(os.path.join(self.SAMPLE_FILES, "html.eml"), "message/rfc822")
@@ -241,8 +247,7 @@ class TestParser(TestCase):
         )
 
     @mock.patch("paperless_mail.parsers.MailDocumentParser.generate_pdf")
-    @mock.patch("documents.loggers.LoggingMixin.log")  # Disable log output
-    def test_parse_simple_eml(self, m, n):
+    def test_parse_simple_eml(self, n):
         # Validate parsing returns the expected results
 
         self.parser.parse(
@@ -268,8 +273,7 @@ class TestParser(TestCase):
         self.assertTrue(os.path.isfile(self.parser.archive_path))
 
     @mock.patch("paperless_mail.parsers.parser.from_buffer")
-    @mock.patch("documents.loggers.LoggingMixin.log")  # Disable log output
-    def test_tika_parse(self, m, mock_from_buffer: mock.MagicMock):
+    def test_tika_parse(self, mock_from_buffer: mock.MagicMock):
         html = '<html><head><meta http-equiv="content-type" content="text/html; charset=UTF-8"></head><body><p>Some Text</p></body></html>'
         expected_text = "Some Text"
         mock_from_buffer.return_value = {"content": expected_text}
@@ -300,8 +304,11 @@ class TestParser(TestCase):
 
         # Check if exception is raised when the pdf can not be created.
         self.parser.gotenberg_server = ""
-        with pytest.raises(ParseError):
-            self.parser.generate_pdf(os.path.join(self.SAMPLE_FILES, "html.eml"))
+        self.assertRaises(
+            ParseError,
+            self.parser.generate_pdf,
+            os.path.join(self.SAMPLE_FILES, "html.eml"),
+        )
 
     @mock.patch("paperless_mail.parsers.requests.post")
     @mock.patch("paperless_mail.parsers.MailDocumentParser.generate_pdf_from_mail")
@@ -313,8 +320,11 @@ class TestParser(TestCase):
         mock_post: mock.MagicMock,
     ):
         # Check if exception is raised when the mail can not be parsed.
-        with pytest.raises(ParseError):
-            self.parser.generate_pdf(os.path.join(self.SAMPLE_FILES, "broken.eml"))
+        self.assertRaises(
+            ParseError,
+            self.parser.generate_pdf,
+            os.path.join(self.SAMPLE_FILES, "broken.eml"),
+        )
 
         mock_generate_pdf_from_mail.return_value = b"Mail Return"
         mock_generate_pdf_from_html.return_value = b"HTML Return"
@@ -430,8 +440,7 @@ class TestParser(TestCase):
         self.assertFalse("<script" in resulting_html.lower())
 
     @mock.patch("paperless_mail.parsers.requests.post")
-    @mock.patch("documents.loggers.LoggingMixin.log")  # Disable log output
-    def test_generate_pdf_from_html(self, m, mock_post: mock.MagicMock):
+    def test_generate_pdf_from_html(self, mock_post: mock.MagicMock):
         class MailAttachmentMock:
             def __init__(self, payload, content_id):
                 self.payload = payload

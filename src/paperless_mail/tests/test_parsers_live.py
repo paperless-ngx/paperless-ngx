@@ -39,8 +39,7 @@ class TestParserLive(TestCase):
         reason="PAPERLESS_TEST_SKIP_CONVERT set, skipping Test",
     )
     @mock.patch("paperless_mail.parsers.MailDocumentParser.generate_pdf")
-    @mock.patch("documents.loggers.LoggingMixin.log")  # Disable log output
-    def test_get_thumbnail(self, m, mock_generate_pdf: mock.MagicMock):
+    def test_get_thumbnail(self, mock_generate_pdf: mock.MagicMock):
         mock_generate_pdf.return_value = os.path.join(
             self.SAMPLE_FILES,
             "simple_text.eml.pdf",
@@ -63,17 +62,15 @@ class TestParserLive(TestCase):
         "TIKA_LIVE" not in os.environ,
         reason="No tika server",
     )
-    @mock.patch("documents.loggers.LoggingMixin.log")  # Disable log output
-    def test_tika_parse(self, m):
+    def test_tika_parse(self):
         html = '<html><head><meta http-equiv="content-type" content="text/html; charset=UTF-8"></head><body><p>Some Text</p></body></html>'
         expected_text = "Some Text"
 
         tika_server_original = self.parser.tika_server
 
         # Check if exception is raised when Tika cannot be reached.
-        with pytest.raises(ParseError):
-            self.parser.tika_server = ""
-            self.parser.tika_parse(html)
+        self.parser.tika_server = ""
+        self.assertRaises(ParseError, self.parser.tika_parse, html)
 
         # Check unsuccessful parsing
         self.parser.tika_server = tika_server_original
@@ -116,15 +113,13 @@ class TestParserLive(TestCase):
         "GOTENBERG_LIVE" not in os.environ,
         reason="No gotenberg server",
     )
-    @mock.patch("documents.loggers.LoggingMixin.log")  # Disable log output
-    def test_generate_pdf_from_mail_no_convert(self, m):
+    def test_generate_pdf_from_mail_no_convert(self):
         mail = self.parser.get_parsed(os.path.join(self.SAMPLE_FILES, "html.eml"))
 
         pdf_path = os.path.join(self.parser.tempdir, "html.eml.pdf")
 
         with open(pdf_path, "wb") as file:
             file.write(self.parser.generate_pdf_from_mail(mail))
-            file.close()
 
         extracted = extract_text(pdf_path)
         expected = extract_text(os.path.join(self.SAMPLE_FILES, "html.eml.pdf"))
@@ -139,15 +134,13 @@ class TestParserLive(TestCase):
         "PAPERLESS_TEST_SKIP_CONVERT" in os.environ,
         reason="PAPERLESS_TEST_SKIP_CONVERT set, skipping Test",
     )
-    @mock.patch("documents.loggers.LoggingMixin.log")  # Disable log output
-    def test_generate_pdf_from_mail(self, m):
+    def test_generate_pdf_from_mail(self):
         mail = self.parser.get_parsed(os.path.join(self.SAMPLE_FILES, "html.eml"))
 
         pdf_path = os.path.join(self.parser.tempdir, "html.eml.pdf")
 
         with open(pdf_path, "wb") as file:
             file.write(self.parser.generate_pdf_from_mail(mail))
-            file.close()
 
         converted = os.path.join(
             self.parser.tempdir,
@@ -181,8 +174,7 @@ class TestParserLive(TestCase):
         "GOTENBERG_LIVE" not in os.environ,
         reason="No gotenberg server",
     )
-    @mock.patch("documents.loggers.LoggingMixin.log")  # Disable log output
-    def test_generate_pdf_from_html_no_convert(self, m):
+    def test_generate_pdf_from_html_no_convert(self):
         class MailAttachmentMock:
             def __init__(self, payload, content_id):
                 self.payload = payload
@@ -203,7 +195,6 @@ class TestParserLive(TestCase):
 
         with open(pdf_path, "wb") as file:
             file.write(result)
-            file.close()
 
         extracted = extract_text(pdf_path)
         expected = extract_text(os.path.join(self.SAMPLE_FILES, "sample.html.pdf"))
@@ -218,8 +209,7 @@ class TestParserLive(TestCase):
         "PAPERLESS_TEST_SKIP_CONVERT" in os.environ,
         reason="PAPERLESS_TEST_SKIP_CONVERT set, skipping Test",
     )
-    @mock.patch("documents.loggers.LoggingMixin.log")  # Disable log output
-    def test_generate_pdf_from_html(self, m):
+    def test_generate_pdf_from_html(self):
         class MailAttachmentMock:
             def __init__(self, payload, content_id):
                 self.payload = payload
@@ -240,7 +230,6 @@ class TestParserLive(TestCase):
 
         with open(pdf_path, "wb") as file:
             file.write(result)
-            file.close()
 
         converted = os.path.join(self.parser.tempdir, "sample.html.pdf.webp")
         run_convert(
@@ -269,20 +258,22 @@ class TestParserLive(TestCase):
             f"If Rick Astley is shown, Gotenberg loads from web which is bad for Mail content.",
         )
 
-    @staticmethod
     @pytest.mark.skipif(
         "GOTENBERG_LIVE" not in os.environ,
         reason="No gotenberg server",
     )
-    def test_is_online_image_still_available():
+    def test_is_online_image_still_available(self):
         """
         A public image is used in the html sample file. We have no control
         whether this image stays online forever, so here we check if it is still there
         """
 
         # Start by Testing if nonexistent URL really throws an Exception
-        with pytest.raises(HTTPError):
-            urlopen("https://upload.wikimedia.org/wikipedia/en/f/f7/nonexistent.png")
+        self.assertRaises(
+            HTTPError,
+            urlopen,
+            "https://upload.wikimedia.org/wikipedia/en/f/f7/nonexistent.png",
+        )
 
         # Now check the URL used in samples/sample.html
         urlopen("https://upload.wikimedia.org/wikipedia/en/f/f7/RickRoll.png")
