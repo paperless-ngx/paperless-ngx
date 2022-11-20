@@ -2,7 +2,6 @@ import datetime
 import os
 from unittest import mock
 
-import pytest
 from django.test import TestCase
 from documents.parsers import ParseError
 from paperless_mail.parsers import MailDocumentParser
