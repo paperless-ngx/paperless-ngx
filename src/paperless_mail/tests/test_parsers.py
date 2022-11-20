@@ -92,125 +92,130 @@ class TestParser(TestCase):
             "message/rfc822",
         )
 
-        self.assertTrue(
-            {"namespace": "", "prefix": "", "key": "attachments", "value": ""}
-            in metadata,
+        self.assertIn(
+            {"namespace": "", "prefix": "", "key": "attachments", "value": ""},
+            metadata,
         )
-        self.assertTrue(
+        self.assertIn(
             {
                 "namespace": "",
                 "prefix": "",
                 "key": "date",
                 "value": "2022-10-12 21:40:43 UTC+02:00",
-            }
-            in metadata,
+            },
+            metadata,
         )
-        self.assertTrue(
+        self.assertIn(
             {
                 "namespace": "",
                 "prefix": "header",
                 "key": "content-language",
                 "value": "en-US",
-            }
-            in metadata,
+            },
+            metadata,
         )
-        self.assertTrue(
+        self.assertIn(
             {
                 "namespace": "",
                 "prefix": "header",
                 "key": "content-type",
                 "value": "text/plain; charset=UTF-8; format=flowed",
-            }
-            in metadata,
+            },
+            metadata,
         )
-        self.assertTrue(
+        self.assertIn(
             {
                 "namespace": "",
                 "prefix": "header",
                 "key": "date",
                 "value": "Wed, 12 Oct 2022 21:40:43 +0200",
-            }
-            in metadata,
+            },
+            metadata,
         )
-        self.assertTrue(
+        self.assertIn(
             {
                 "namespace": "",
                 "prefix": "header",
                 "key": "delivered-to",
                 "value": "mail@someserver.de",
-            }
-            in metadata,
+            },
+            metadata,
         )
-        self.assertTrue(
+        self.assertIn(
             {
                 "namespace": "",
                 "prefix": "header",
                 "key": "from",
                 "value": "Some One <mail@someserver.de>",
-            }
-            in metadata,
+            },
+            metadata,
         )
-        self.assertTrue(
+        self.assertIn(
             {
                 "namespace": "",
                 "prefix": "header",
                 "key": "message-id",
                 "value": "<6e99e34d-e20a-80c4-ea61-d8234b612be9@someserver.de>",
-            }
-            in metadata,
+            },
+            metadata,
         )
-        self.assertTrue(
-            {"namespace": "", "prefix": "header", "key": "mime-version", "value": "1.0"}
-            in metadata,
+        self.assertIn(
+            {
+                "namespace": "",
+                "prefix": "header",
+                "key": "mime-version",
+                "value": "1.0",
+            },
+            metadata,
         )
-        self.assertTrue(
+        self.assertIn(
             {
                 "namespace": "",
                 "prefix": "header",
                 "key": "received",
                 "value": "from mail.someserver.org ([::1])\n\tby e1acdba3bd07 with LMTP\n\tid KBKZGD2YR2NTCgQAjubtDA\n\t(envelope-from <mail@someserver.de>)\n\tfor <mail@someserver.de>; Wed, 10 Oct 2022 11:40:46 +0200, from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 2BC9064C1616\n\tfor <some@one.de>; Wed, 12 Oct 2022 21:40:46 +0200 (CEST)",
-            }
-            in metadata,
+            },
+            metadata,
         )
-        self.assertTrue(
+        self.assertIn(
             {
                 "namespace": "",
                 "prefix": "header",
                 "key": "return-path",
                 "value": "<mail@someserver.de>",
-            }
-            in metadata,
+            },
+            metadata,
         )
-        self.assertTrue(
+        self.assertIn(
             {
                 "namespace": "",
                 "prefix": "header",
                 "key": "subject",
                 "value": "Simple Text Mail",
-            }
-            in metadata,
+            },
+            metadata,
         )
-        self.assertTrue(
-            {"namespace": "", "prefix": "header", "key": "to", "value": "some@one.de"}
-            in metadata,
+        self.assertIn(
+            {"namespace": "", "prefix": "header", "key": "to", "value": "some@one.de"},
+            metadata,
         )
-        self.assertTrue(
+        self.assertIn(
             {
                 "namespace": "",
                 "prefix": "header",
                 "key": "user-agent",
                 "value": "Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101\n Thunderbird/102.3.1",
-            }
-            in metadata,
+            },
+            metadata,
         )
-        self.assertTrue(
+        self.assertIn(
             {
                 "namespace": "",
                 "prefix": "header",
                 "key": "x-last-tls-session-version",
                 "value": "TLSv1.3",
-            }
-            in metadata,
+            },
+            metadata,
         )
 
     def test_parse_na(self):
@@ -438,8 +443,8 @@ class TestParser(TestCase):
 
         resulting_html = result[-1][1].read()
         self.assertTrue(result[-1][0] == "index.html")
-        self.assertTrue(result[0][0] in resulting_html)
-        self.assertFalse("<script" in resulting_html.lower())
+        self.assertIn(result[0][0], resulting_html)
+        self.assertNotIn("<script", resulting_html.lower())
 
     @mock.patch("paperless_mail.parsers.requests.post")
     def test_generate_pdf_from_html(self, mock_post: mock.MagicMock):
