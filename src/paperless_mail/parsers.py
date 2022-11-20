@@ -112,8 +112,7 @@ class MailDocumentParser(DocumentParser):
 
         mail = self.get_parsed(document_path)
 
-        self.text = f"{strip_text(mail.text)}\n\n"
-        self.text += f"Subject: {mail.subject}\n\n"
+        self.text = f"Subject: {mail.subject}\n\n"
         self.text += f"From: {mail.from_values.full}\n\n"
         self.text += f"To: {', '.join(address.full for address in mail.to_values)}\n\n"
         if len(mail.cc_values) >= 1:
@@ -133,6 +132,8 @@ class MailDocumentParser(DocumentParser):
 
         if mail.html != "":
             self.text += "HTML content: " + strip_text(self.tika_parse(mail.html))
+
+        self.text += f"\n\n{strip_text(mail.text)}"
 
         self.date = mail.date
         self.archive_path = self.generate_pdf(document_path)
