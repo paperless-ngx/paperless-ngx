@@ -42,7 +42,15 @@ body:
     id: logs
     attributes:
       label: Webserver logs
-      description: If available, post any logs from the web server related to your issue.
+      description: Logs from the web server related to your issue.
+      render: bash
+    validations:
+      required: true
+  - type: textarea
+    id: logs_browser
+    attributes:
+      label: Browser logs
+      description: Logs from the web browser related to your issue, if needed
       render: bash
   - type: input
     id: version
