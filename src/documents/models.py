@@ -287,6 +287,9 @@ class Document(models.Model):
         return open(self.archive_path, "rb")
 
     def get_public_filename(self, archive=False, counter=0, suffix=None) -> str:
+        """
+        Returns a sanitized filename for the document, not including any paths.
+        """
         result = str(self)
 
         if counter:
