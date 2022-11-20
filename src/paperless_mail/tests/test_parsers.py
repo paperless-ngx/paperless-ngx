@@ -16,7 +16,15 @@ class TestParser(TestCase):
     def tearDown(self) -> None:
         self.parser.cleanup()
 
-    def test_get_parsed(self):
+    def test_get_parsed_missing_file(self):
+        """
+        GIVEN:
+            - Fresh parser
+        WHEN:
+            - A nonexistent file should be parsed
+        THEN:
+            - An Exception is thrown
+        """
         # Check if exception is raised when parsing fails.
         self.assertRaises(
             ParseError,
@@ -24,6 +32,15 @@ class TestParser(TestCase):
             os.path.join(self.SAMPLE_FILES, "na"),
         )
 
+    def test_get_parsed_broken_file(self):
+        """
+        GIVEN:
+            - Fresh parser
+        WHEN:
+            - A faulty file should be parsed
+        THEN:
+            - An Exception is thrown
+        """
         # Check if exception is raised when the mail is faulty.
         self.assertRaises(
             ParseError,
@@ -31,6 +48,15 @@ class TestParser(TestCase):
             os.path.join(self.SAMPLE_FILES, "broken.eml"),
         )
 
+    def test_get_parsed_simple_text_mail(self):
+        """
+        GIVEN:
+            - Fresh parser
+        WHEN:
+            - A .eml file should be parsed
+        THEN:
+            - The content of the mail should be available in the parse result.
+        """
         # Parse Test file and check relevant content
         parsed1 = self.parser.get_parsed(
             os.path.join(self.SAMPLE_FILES, "simple_text.eml"),
@@ -48,9 +74,22 @@ class TestParser(TestCase):
         self.assertEqual(parsed1.text, "This is just a simple Text Mail.\n")
         self.assertEqual(parsed1.to, ("some@one.de",))
 
+    def test_get_parsed_reparse(self):
+        """
+        GIVEN:
+            - An E-Mail was parsed
+        WHEN:
+            - Another .eml file should be parsed
+        THEN:
+            - The parser should not retry to parse and return the old results
+        """
+        # Parse Test file and check relevant content
+        parsed1 = self.parser.get_parsed(
+            os.path.join(self.SAMPLE_FILES, "simple_text.eml"),
+        )
         # Check if same parsed object as before is returned, even if another file is given.
         parsed2 = self.parser.get_parsed(
-            os.path.join(os.path.join(self.SAMPLE_FILES, "na")),
+            os.path.join(os.path.join(self.SAMPLE_FILES, "html.eml")),
         )
         self.assertEqual(parsed1, parsed2)
 
@@ -61,6 +100,14 @@ class TestParser(TestCase):
         mock_make_thumbnail_from_pdf: mock.MagicMock,
         mock_generate_pdf: mock.MagicMock,
     ):
+        """
+        GIVEN:
+            - An E-Mail was parsed
+        WHEN:
+            - The Thumbnail is requested
+        THEN:
+            - The parser should call the functions which generate the thumbnail
+        """
         mocked_return = "Passing the return value through.."
         mock_make_thumbnail_from_pdf.return_value = mocked_return
 
@@ -81,11 +128,28 @@ class TestParser(TestCase):
         self.assertEqual(mocked_return, thumb)
 
     @mock.patch("documents.loggers.LoggingMixin.log")
-    def test_extract_metadata(self, m: mock.MagicMock):
+    def test_extract_metadata_fail(self, m: mock.MagicMock):
+        """
+        GIVEN:
+            - Fresh start
+        WHEN:
+            - Metadata extraction is triggered for nonexistent file
+        THEN:
+            - A log warning should be generated
+        """
         # Validate if warning is logged when parsing fails
         self.assertEqual([], self.parser.extract_metadata("na", "message/rfc822"))
         self.assertEqual("warning", m.call_args[0][0])
 
+    def test_extract_metadata(self):
+        """
+        GIVEN:
+            - Fresh start
+        WHEN:
+            - Metadata extraction is triggered
+        THEN:
+            - metadata is returned
+        """
         # Validate Metadata parsing returns the expected results
         metadata = self.parser.extract_metadata(
             os.path.join(self.SAMPLE_FILES, "simple_text.eml"),
@@ -219,6 +283,14 @@ class TestParser(TestCase):
         )
 
     def test_parse_na(self):
+        """
+        GIVEN:
+            - Fresh start
+        WHEN:
+            - parsing is attempted with nonexistent file
+        THEN:
+            - Exception is thrown
+        """
         # Check if exception is raised when parsing fails.
         self.assertRaises(
             ParseError,
@@ -230,6 +302,14 @@ class TestParser(TestCase):
     @mock.patch("paperless_mail.parsers.MailDocumentParser.tika_parse")
     @mock.patch("paperless_mail.parsers.MailDocumentParser.generate_pdf")
     def test_parse_html_eml(self, n, mock_tika_parse: mock.MagicMock):
+        """
+        GIVEN:
+            - Fresh start
+        WHEN:
+            - parsing is done with html mail
+        THEN:
+            - Tika is called, parsed information from non html parts is available
+        """
         # Validate parsing returns the expected results
         text_expected = "Subject: HTML Message\n\nFrom: Name <someone@example.de>\n\nTo: someone@example.de\n\nAttachments: IntM6gnXFm00FEV5.png (6.89 KiB), 600+kbfile.txt (600.24 KiB)\n\nHTML content: tika return\n\nSome Text and an embedded image."
         mock_tika_parse.return_value = "tika return"
@@ -252,6 +332,14 @@ class TestParser(TestCase):
 
     @mock.patch("paperless_mail.parsers.MailDocumentParser.generate_pdf")
     def test_parse_simple_eml(self, n):
+        """
+        GIVEN:
+            - Fresh start
+        WHEN:
+            - parsing is done with non html mail
+        THEN:
+            - parsed information is available
+        """
         # Validate parsing returns the expected results
 
         self.parser.parse(
@@ -277,21 +365,50 @@ class TestParser(TestCase):
         self.assertTrue(os.path.isfile(self.parser.archive_path))
 
     @mock.patch("paperless_mail.parsers.parser.from_buffer")
-    def test_tika_parse(self, mock_from_buffer: mock.MagicMock):
-        html = '<html><head><meta http-equiv="content-type" content="text/html; charset=UTF-8"></head><body><p>Some Text</p></body></html>'
-        expected_text = "Some Text"
-        mock_from_buffer.return_value = {"content": expected_text}
-
+    def test_tika_parse_unsuccessful(self, mock_from_buffer: mock.MagicMock):
+        """
+        GIVEN:
+            - Fresh start
+        WHEN:
+            - tika parsing fails
+        THEN:
+            - the parser should return an empty string
+        """
         # Check unsuccessful parsing
         mock_from_buffer.return_value = {"content": None}
         parsed = self.parser.tika_parse(None)
         self.assertEqual("", parsed)
+
+    @mock.patch("paperless_mail.parsers.parser.from_buffer")
+    def test_tika_parse(self, mock_from_buffer: mock.MagicMock):
+        """
+        GIVEN:
+            - Fresh start
+        WHEN:
+            - tika parsing is called
+        THEN:
+            - a web request to tika shall be done and the reply es returned
+        """
+        html = '<html><head><meta http-equiv="content-type" content="text/html; charset=UTF-8"></head><body><p>Some Text</p></body></html>'
+        expected_text = "Some Text"
 
         # Check successful parsing
         mock_from_buffer.return_value = {"content": expected_text}
         parsed = self.parser.tika_parse(html)
         self.assertEqual(expected_text, parsed.strip())
         mock_from_buffer.assert_called_with(html, self.parser.tika_server)
+
+    @mock.patch("paperless_mail.parsers.parser.from_buffer")
+    def test_tika_parse_exception(self, mock_from_buffer: mock.MagicMock):
+        """
+        GIVEN:
+            - Fresh start
+        WHEN:
+            - tika parsing is called and an exception is thrown on the request
+        THEN:
+            - a ParseError Exception is thrown
+        """
+        html = '<html><head><meta http-equiv="content-type" content="text/html; charset=UTF-8"></head><body><p>Some Text</p></body></html>'
 
         # Check ParseError
         def my_side_effect():
@@ -303,6 +420,14 @@ class TestParser(TestCase):
     @mock.patch("paperless_mail.parsers.MailDocumentParser.generate_pdf_from_mail")
     @mock.patch("paperless_mail.parsers.MailDocumentParser.generate_pdf_from_html")
     def test_generate_pdf_parse_error(self, m: mock.MagicMock, n: mock.MagicMock):
+        """
+        GIVEN:
+            - Fresh start
+        WHEN:
+            - pdf generation is requested but gotenberg can not be reached
+        THEN:
+            - a ParseError Exception is thrown
+        """
         m.return_value = b""
         n.return_value = b""
 
@@ -314,6 +439,22 @@ class TestParser(TestCase):
             os.path.join(self.SAMPLE_FILES, "html.eml"),
         )
 
+    def test_generate_pdf_exception(self):
+        """
+        GIVEN:
+            - Fresh start
+        WHEN:
+            - pdf generation is requested but parsing throws an exception
+        THEN:
+            - a ParseError Exception is thrown
+        """
+        # Check if exception is raised when the mail can not be parsed.
+        self.assertRaises(
+            ParseError,
+            self.parser.generate_pdf,
+            os.path.join(self.SAMPLE_FILES, "broken.eml"),
+        )
+
     @mock.patch("paperless_mail.parsers.requests.post")
     @mock.patch("paperless_mail.parsers.MailDocumentParser.generate_pdf_from_mail")
     @mock.patch("paperless_mail.parsers.MailDocumentParser.generate_pdf_from_html")
@@ -323,13 +464,14 @@ class TestParser(TestCase):
         mock_generate_pdf_from_mail: mock.MagicMock,
         mock_post: mock.MagicMock,
     ):
-        # Check if exception is raised when the mail can not be parsed.
-        self.assertRaises(
-            ParseError,
-            self.parser.generate_pdf,
-            os.path.join(self.SAMPLE_FILES, "broken.eml"),
-        )
-
+        """
+        GIVEN:
+            - Fresh start
+        WHEN:
+            - pdf generation is requested
+        THEN:
+            - gotenberg is called and the resulting file is returned
+        """
         mock_generate_pdf_from_mail.return_value = b"Mail Return"
         mock_generate_pdf_from_html.return_value = b"HTML Return"
 
@@ -366,6 +508,14 @@ class TestParser(TestCase):
             self.assertEqual(b"Content", file.read())
 
     def test_mail_to_html(self):
+        """
+        GIVEN:
+            - Fresh start
+        WHEN:
+            - conversion from eml to html is requested
+        THEN:
+            - html should be returned
+        """
         mail = self.parser.get_parsed(os.path.join(self.SAMPLE_FILES, "html.eml"))
         html_handle = self.parser.mail_to_html(mail)
         html_received = html_handle.read()
@@ -384,6 +534,14 @@ class TestParser(TestCase):
         mock_mail_to_html: mock.MagicMock,
         mock_post: mock.MagicMock,
     ):
+        """
+        GIVEN:
+            - Fresh start
+        WHEN:
+            - conversion of PDF from .eml is requested
+        THEN:
+            - gotenberg should be called with valid intermediary html files, the resulting pdf is returned
+        """
         mock_response = mock.MagicMock()
         mock_response.content = b"Content"
         mock_post.return_value = mock_response
@@ -425,6 +583,15 @@ class TestParser(TestCase):
         mock_response.raise_for_status.assert_called_once()
 
     def test_transform_inline_html(self):
+        """
+        GIVEN:
+            - Fresh start
+        WHEN:
+            - transforming of html content from an email with an inline image attachment is requested
+        THEN:
+            - html is returned and sanitized
+        """
+
         class MailAttachmentMock:
             def __init__(self, payload, content_id):
                 self.payload = payload
@@ -448,6 +615,15 @@ class TestParser(TestCase):
 
     @mock.patch("paperless_mail.parsers.requests.post")
     def test_generate_pdf_from_html(self, mock_post: mock.MagicMock):
+        """
+        GIVEN:
+            - Fresh start
+        WHEN:
+            - generating pdf from html with inline attachments is attempted
+        THEN:
+            - gotenberg is called with the correct parameters and the resulting pdf is returned
+        """
+
         class MailAttachmentMock:
             def __init__(self, payload, content_id):
                 self.payload = payload
