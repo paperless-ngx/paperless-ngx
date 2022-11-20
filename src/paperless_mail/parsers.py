@@ -105,9 +105,8 @@ class MailDocumentParser(DocumentParser):
 
     def parse(self, document_path, mime_type, file_name=None):
         def strip_text(text: str):
-            text = re.sub("\t", " ", text)
-            text = re.sub(" +", " ", text)
-            text = re.sub("(\n *)+", "\n", text)
+            text = re.sub(r"\s+", " ", text)
+            text = re.sub(r"(\n *)+", "\n", text)
             return text.strip()
 
         mail = self.get_parsed(document_path)

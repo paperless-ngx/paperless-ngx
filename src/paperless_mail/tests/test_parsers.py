@@ -227,7 +227,7 @@ class TestParser(TestCase):
     @mock.patch("paperless_mail.parsers.MailDocumentParser.generate_pdf")
     def test_parse_html_eml(self, n, mock_tika_parse: mock.MagicMock):
         # Validate parsing returns the expected results
-        text_expected = "Some Text\nand an embedded image.\n\nSubject: HTML Message\n\nFrom: Name <someone@example.de>\n\nTo: someone@example.de\n\nAttachments: IntM6gnXFm00FEV5.png (6.89 KiB), 600+kbfile.txt (600.24 KiB)\n\nHTML content: tika return"
+        text_expected = "Some Text and an embedded image.\n\nSubject: HTML Message\n\nFrom: Name <someone@example.de>\n\nTo: someone@example.de\n\nAttachments: IntM6gnXFm00FEV5.png (6.89 KiB), 600+kbfile.txt (600.24 KiB)\n\nHTML content: tika return"
         mock_tika_parse.return_value = "tika return"
 
         self.parser.parse(os.path.join(self.SAMPLE_FILES, "html.eml"), "message/rfc822")
