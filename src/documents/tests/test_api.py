@@ -2491,6 +2491,15 @@ class TestBulkDownload(DirectoriesMixin, APITestCase):
 
     @override_settings(FILENAME_FORMAT="{correspondent}/{title}")
     def test_formatted_download_originals(self):
+        """
+        GIVEN:
+            - Defined file naming format
+        WHEN:
+            - Bulk download request for original documents
+            - Bulk download request requests to follow format
+        THEN:
+            - Files defined in resulting zipfile are formatted
+        """
 
         c = Correspondent.objects.create(name="test")
         c2 = Correspondent.objects.create(name="a space name")
@@ -2534,6 +2543,15 @@ class TestBulkDownload(DirectoriesMixin, APITestCase):
 
     @override_settings(FILENAME_FORMAT="somewhere/{title}")
     def test_formatted_download_archive(self):
+        """
+        GIVEN:
+            - Defined file naming format
+        WHEN:
+            - Bulk download request for archive documents
+            - Bulk download request requests to follow format
+        THEN:
+            - Files defined in resulting zipfile are formatted
+        """
 
         self.doc2.title = "This is Doc 2"
         self.doc2.save()
@@ -2570,6 +2588,15 @@ class TestBulkDownload(DirectoriesMixin, APITestCase):
 
     @override_settings(FILENAME_FORMAT="{document_type}/{title}")
     def test_formatted_download_both(self):
+        """
+        GIVEN:
+            - Defined file naming format
+        WHEN:
+            - Bulk download request for original documents and archive documents
+            - Bulk download request requests to follow format
+        THEN:
+            - Files defined in resulting zipfile are formatted
+        """
 
         dc1 = DocumentType.objects.create(name="bill")
         dc2 = DocumentType.objects.create(name="statement")
