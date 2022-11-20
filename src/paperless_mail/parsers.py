@@ -229,21 +229,14 @@ class MailDocumentParser(DocumentParser):
         data["date"] = clean_html(mail.date.astimezone().strftime("%Y-%m-%d %H:%M"))
         data["content"] = clean_html(mail.text.strip())
 
-        html_file = os.path.join(os.path.dirname(__file__), "mail_template/index.html")
-        placeholder_pattern = re.compile(r"{{(.+)}}")
-
         html = StringIO()
 
-        with open(html_file) as html_template_handle:
-            for line in html_template_handle.readlines():
-                for placeholder in placeholder_pattern.findall(line):
-                    line = re.sub(
-                        "{{" + placeholder + "}}",
-                        data.get(placeholder.strip(), ""),
-                        line,
-                    )
-                html.write(line)
-            html.seek(0)
+        from django.template.loader import render_to_string
+
+        rendered = render_to_string("email_msg_template.html", context=data)
+
+        html.write(rendered)
+        html.seek(0)
 
         return html
 
@@ -252,12 +245,12 @@ class MailDocumentParser(DocumentParser):
         url = self.gotenberg_server + "/forms/chromium/convert/html"
         self.log("info", "Converting mail to PDF")
 
-        css_file = os.path.join(os.path.dirname(__file__), "mail_template/output.css")
+        css_file = os.path.join(os.path.dirname(__file__), "templates/output.css")
 
         with open(css_file, "rb") as css_handle:
 
             files = {
-                "html": ("index.html", self.mail_to_html(mail)),
+                "html": ("email_msg_template.html", self.mail_to_html(mail)),
                 "css": ("output.css", css_handle),
             }
             headers = {}
@@ -302,7 +295,7 @@ class MailDocumentParser(DocumentParser):
             files.append((name_clean, BytesIO(a.payload)))
             html_clean = html_clean.replace(name_cid, name_clean)
 
-        files.append(("index.html", StringIO(html_clean)))
+        files.append(("email_msg_template.html", StringIO(html_clean)))
 
         return files
 
