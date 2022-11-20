@@ -1,5 +1,6 @@
 import os
 import re
+from html import escape
 from io import BytesIO
 from io import StringIO
 
@@ -198,12 +199,7 @@ class MailDocumentParser(DocumentParser):
                 text = "\n".join([str(e) for e in text])
             if type(text) != str:
                 text = str(text)
-            text = text.replace("&", "&amp;")
-            text = text.replace("<", "&lt;")
-            text = text.replace(">", "&gt;")
-            text = text.replace("  ", " &nbsp;")
-            text = text.replace("'", "&apos;")
-            text = text.replace('"', "&quot;")
+            text = escape(text)
             text = clean(text)
             text = linkify(text, parse_email=True)
             text = text.replace("\n", "<br>")

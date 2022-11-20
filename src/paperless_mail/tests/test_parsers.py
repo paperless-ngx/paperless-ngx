@@ -364,11 +364,13 @@ class TestParser(TestCase):
     def test_mail_to_html(self):
         mail = self.parser.get_parsed(os.path.join(self.SAMPLE_FILES, "html.eml"))
         html_handle = self.parser.mail_to_html(mail)
+        html_received = html_handle.read()
 
         with open(
             os.path.join(self.SAMPLE_FILES, "html.eml.html"),
         ) as html_expected_handle:
-            self.assertHTMLEqual(html_expected_handle.read(), html_handle.read())
+            html_expected = html_expected_handle.read()
+            self.assertHTMLEqual(html_expected, html_received)
 
     @mock.patch("paperless_mail.parsers.requests.post")
     @mock.patch("paperless_mail.parsers.MailDocumentParser.mail_to_html")
