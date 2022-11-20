@@ -476,6 +476,7 @@ class MailAccountHandler(LoggingMixin):
                     f"since guessed mime type {mime_type} is not supported "
                     f"by paperless",
                 )
+        return processed_attachments
 
     def process_eml(
         self,
