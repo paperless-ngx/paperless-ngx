@@ -497,8 +497,10 @@ Tika settings
 
 Paperless can make use of `Tika <https://tika.apache.org/>`_ and
 `Gotenberg <https://gotenberg.dev/>`_ for parsing and
-converting "Office" documents (such as ".doc", ".xlsx" and ".odt"). If you
-wish to use this, you must provide a Tika server and a Gotenberg server,
+converting "Office" documents (such as ".doc", ".xlsx" and ".odt").
+Tika and Gotenberg are also needed to allow parsing of E-Mails (.eml).
+
+If you wish to use this, you must provide a Tika server and a Gotenberg server,
 configure their endpoints, and enable the feature.
 
 PAPERLESS_TIKA_ENABLED=<bool>
