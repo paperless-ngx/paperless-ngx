@@ -424,3 +424,24 @@ For example, using Docker Compose:
         # ...
         volumes:
           - /path/to/my/scripts:/custom-cont-init.d:ro
+
+.. _advanced-mysql-caveats:
+
+MySQL Caveats
+#############
+
+Case Sensitivity
+================
+
+The database interface does not provide a method to configure a MySQL database to
+be case sensitive.  This would prevent a user from creating a tag ``Name`` and ``NAME``
+as they are considered the same.
+
+Per Django documentation, to enable this requires manual intervention.  To enable
+case sensetive tables, you can execute the following command against each table:
+
+``ALTER TABLE <table_name> CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;``
+
+You can also set the default for new tables (this does NOT affect existing tables) with:
+
+``ALTER DATABASE <db_name> CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;``
