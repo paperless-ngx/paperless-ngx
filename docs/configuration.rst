@@ -38,7 +38,13 @@ PAPERLESS_REDIS=<url>
 PAPERLESS_DBENGINE=<engine_name>
     Optional, gives the ability to choose Postgres or MariaDB for database engine.
     Available options are `postgresql` and `mariadb`.
+
     Default is `postgresql`.
+
+    .. warning::
+
+      Using MariaDB comes with some caveats.  See :ref:`advanced-mysql-caveats` for details.
+
 
 PAPERLESS_DBHOST=<hostname>
     By default, sqlite is used as the database backend. This can be changed here.
