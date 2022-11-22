@@ -2123,7 +2123,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">387</context>
         </context-group>
-        <target state="translated">OCR wiederholen</target>
+        <target state="translated">OCR wiederholen bestätigen</target>
       </trans-unit>
       <trans-unit id="9197453786953646058" datatype="html">
         <source>This operation will permanently redo OCR for this document.</source>
@@ -2477,7 +2477,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">388</context>
         </context-group>
-        <target state="translated">Diese Aktion wird die Texterkennung für <x id="PH" equiv-text="this.list.selected.size"/> ausgewählte(s) Dokument(e) wiederholen.</target>
+        <target state="translated">Diese Aktion wird OCR permanent für <x id="PH" equiv-text="this.list.selected.size"/> ausgewählte(s) Dokument(e) wiederholen.</target>
       </trans-unit>
       <trans-unit id="8076495233090006322" datatype="html" approved="yes">
         <source>Filter by correspondent</source>
@@ -3473,7 +3473,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">173</context>
         </context-group>
-        <target state="final">Zeige Benachrichtigungen wenn neue Dokumente erkannt werden</target>
+        <target state="final">Benachrichtigungen anzeigen, wenn neue Dokumente erkannt werden</target>
       </trans-unit>
       <trans-unit id="6057053428592387613" datatype="html" approved="yes">
         <source>Show notifications when document processing completes successfully</source>
@@ -3481,7 +3481,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">174</context>
         </context-group>
-        <target state="final">Zeige Benachrichtigungen wenn neue Dokumente erfolgreich hinzugefügt wurden</target>
+        <target state="final">Benachrichtigungen anzeigen, wenn die Dokumentenverarbeitung erfolgreich abgeschlossen wurde</target>
       </trans-unit>
       <trans-unit id="370315664367425513" datatype="html" approved="yes">
         <source>Show notifications when document processing fails</source>
@@ -3489,7 +3489,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">175</context>
         </context-group>
-        <target state="final">Zeige Benachrichtigungen wenn Dokumente nicht hinzugefügt werden konnten</target>
+        <target state="final">Benachrichtigungen anzeigen, wenn die Verarbeitung des Dokuments fehlschlägt</target>
       </trans-unit>
       <trans-unit id="6838309441164918531" datatype="html" approved="yes">
         <source>Suppress notifications on dashboard</source>
