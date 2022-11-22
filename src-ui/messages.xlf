@@ -1957,8 +1957,8 @@
           <context context-type="linenumber">391</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="7662620858973651688" datatype="html">
-        <source>Redo OCR operation will begin in the background.</source>
+      <trans-unit id="5729001209753056399" datatype="html">
+        <source>Redo OCR operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">494</context>
