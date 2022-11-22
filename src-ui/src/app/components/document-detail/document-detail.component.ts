@@ -491,7 +491,7 @@ export class DocumentDetailComponent
         .subscribe({
           next: () => {
             this.toastService.showInfo(
-              $localize`Redo OCR operation will begin in the background.`
+              $localize`Redo OCR operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.`
             )
             if (modal) {
               modal.close()
