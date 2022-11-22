@@ -72,7 +72,9 @@ export class SavedViewWidgetComponent implements OnInit, OnDestroy {
     }
   }
 
-  clickTag(tag: PaperlessTag) {
+  clickTag(tag: PaperlessTag, event: MouseEvent) {
+    event.preventDefault()
+
     this.list.quickFilter([
       { rule_type: FILTER_HAS_TAGS_ALL, value: tag.id.toString() },
     ])
