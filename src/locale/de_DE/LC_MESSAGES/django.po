@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-09 21:50+0000\n"
-"PO-Revision-Date: 2022-11-09 23:12\n"
+"PO-Revision-Date: 2022-11-22 22:18\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -184,11 +184,11 @@ msgstr "Aktueller Dateiname im Archiv"
 
 #: documents/models.py:221
 msgid "original filename"
-msgstr ""
+msgstr "Original-Dateiname"
 
 #: documents/models.py:227
 msgid "The original name of the file when it was uploaded"
-msgstr ""
+msgstr "Der Originalname der Datei beim Hochladen"
 
 #: documents/models.py:231
 msgid "archive serial number"
@@ -368,15 +368,15 @@ msgstr "hat Tags in"
 
 #: documents/models.py:410
 msgid "ASN greater than"
-msgstr ""
+msgstr "ASN größer als"
 
 #: documents/models.py:411
 msgid "ASN less than"
-msgstr ""
+msgstr "ASN kleiner als"
 
 #: documents/models.py:412
 msgid "storage path is"
-msgstr ""
+msgstr "Speicherpfad ist"
 
 #: documents/models.py:422
 msgid "rule type"
@@ -396,99 +396,99 @@ msgstr "Filterregeln"
 
 #: documents/models.py:536
 msgid "Task ID"
-msgstr ""
+msgstr "Aufgaben ID"
 
 #: documents/models.py:537
 msgid "Celery ID for the Task that was run"
-msgstr ""
+msgstr "Celery-ID für die ausgeführte Aufgabe"
 
 #: documents/models.py:542
 msgid "Acknowledged"
-msgstr ""
+msgstr "Bestätigt"
 
 #: documents/models.py:543
 msgid "If the task is acknowledged via the frontend or API"
-msgstr ""
+msgstr "Wenn die Aufgabe über das Frontend oder die API bestätigt wird"
 
 #: documents/models.py:549 documents/models.py:556
 msgid "Task Name"
-msgstr ""
+msgstr "Aufgabenname"
 
 #: documents/models.py:550
 msgid "Name of the file which the Task was run for"
-msgstr ""
+msgstr "Name der Datei, für die die Aufgabe ausgeführt wurde"
 
 #: documents/models.py:557
 msgid "Name of the Task which was run"
-msgstr ""
+msgstr "Name der ausgeführten Aufgabe"
 
 #: documents/models.py:562
 msgid "Task Positional Arguments"
-msgstr ""
+msgstr "Positionale Aufgabenargumente"
 
 #: documents/models.py:564
 msgid "JSON representation of the positional arguments used with the task"
-msgstr ""
+msgstr "JSON-Darstellung der Positionsargumente, die für die Aufgabe verwendet werden"
 
 #: documents/models.py:569
 msgid "Task Named Arguments"
-msgstr ""
+msgstr "Benannte Aufgaben Argumente"
 
 #: documents/models.py:571
 msgid "JSON representation of the named arguments used with the task"
-msgstr ""
+msgstr "JSON-Darstellung der Positionsargumente, die für die Aufgabe verwendet werden"
 
 #: documents/models.py:578
 msgid "Task State"
-msgstr ""
+msgstr "Aufgabenstatus"
 
 #: documents/models.py:579
 msgid "Current state of the task being run"
-msgstr ""
+msgstr "Aktueller Status der laufenden Aufgabe"
 
 #: documents/models.py:584
 msgid "Created DateTime"
-msgstr ""
+msgstr "Erstellungsdatum/-zeit"
 
 #: documents/models.py:585
 msgid "Datetime field when the task result was created in UTC"
-msgstr ""
+msgstr "Datum/Zeitfeld, wann das Ergebnis der Aufgabe erstellt wurde (in UTC)"
 
 #: documents/models.py:590
 msgid "Started DateTime"
-msgstr ""
+msgstr "Startdatum/-zeit"
 
 #: documents/models.py:591
 msgid "Datetime field when the task was started in UTC"
-msgstr ""
+msgstr "Datum/Zeitfeld, wann die Aufgabe erstellt wurde (in UTC)"
 
 #: documents/models.py:596
 msgid "Completed DateTime"
-msgstr ""
+msgstr "Abgeschlossen Datum/Zeit"
 
 #: documents/models.py:597
 msgid "Datetime field when the task was completed in UTC"
-msgstr ""
+msgstr "Datum/Zeitfeld, wann die Aufgabe abgeschlossen wurde (in UTC)"
 
 #: documents/models.py:602
 msgid "Result Data"
-msgstr ""
+msgstr "Ergebnisse"
 
 #: documents/models.py:604
 msgid "The data returned by the task"
-msgstr ""
+msgstr "Die von der Aufgabe zurückgegebenen Daten"
 
 #: documents/models.py:613
 msgid "Comment for the document"
-msgstr ""
+msgstr "Kommentar zu diesem Dokument"
 
 #: documents/models.py:642
 msgid "comment"
-msgstr ""
+msgstr "Kommentar"
 
 #: documents/models.py:643
 msgid "comments"
-msgstr ""
+msgstr "Kommentare"
 
 #: documents/serialisers.py:72
 #, python-format
