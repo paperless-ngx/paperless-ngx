@@ -28,6 +28,7 @@ from django.utils.translation import get_language
 from django.views.decorators.cache import cache_control
 from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
+from documents.permissions import PaperlessAdminPermissions
 from documents.permissions import PaperlessModelPermissions
 from documents.tasks import consume_file
 from packaging import version as packaging_version
@@ -523,7 +524,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
 
 class LogViewSet(ViewSet):
 
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, PaperlessAdminPermissions)
 
     log_files = ["paperless", "mail"]
 
