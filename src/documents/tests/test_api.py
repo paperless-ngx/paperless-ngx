@@ -19,6 +19,7 @@ except ImportError:
 
 import pytest
 from django.conf import settings
+from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.test import override_settings
 from django.utils import timezone
@@ -1152,8 +1153,8 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         )
 
     def test_saved_views(self):
-        u1 = User.objects.create_user("user1")
-        u2 = User.objects.create_user("user2")
+        u1 = User.objects.create_superuser("user1")
+        u2 = User.objects.create_superuser("user2")
 
         v1 = SavedView.objects.create(
             user=u1,
@@ -2664,7 +2665,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        user = User.objects.create(username="temp_admin")
+        user = User.objects.create_superuser(username="temp_admin")
         self.client.force_authenticate(user=user)
 
         self.sp1 = StoragePath.objects.create(name="sp1", path="Something/{checksum}")
@@ -2929,3 +2930,262 @@ class TestTasks(APITestCase):
         returned_data = response.data[0]
 
         self.assertEqual(returned_data["task_file_name"], "anothertest.pdf")
+
+
+class TestApiUser(APITestCase):
+    ENDPOINT = "/api/users/"
+
+    def setUp(self):
+        super().setUp()
+
+        self.user = User.objects.create_superuser(username="temp_admin")
+        self.client.force_authenticate(user=self.user)
+
+    def test_get_users(self):
+        """
+        GIVEN:
+            - Configured users
+        WHEN:
+            - API call is made to get users
+        THEN:
+            - Configured users are provided
+        """
+
+        user1 = User.objects.create(
+            username="testuser",
+            password="test",
+            first_name="Test",
+            last_name="User",
+        )
+
+        response = self.client.get(self.ENDPOINT)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["count"], 2)
+        returned_user1 = response.data["results"][1]
+
+        from pprint import pprint
+
+        pprint(returned_user1)
+
+        self.assertEqual(returned_user1["username"], user1.username)
+        self.assertEqual(returned_user1["password"], "**********")
+        self.assertEqual(returned_user1["first_name"], user1.first_name)
+        self.assertEqual(returned_user1["last_name"], user1.last_name)
+
+    def test_create_user(self):
+        """
+        WHEN:
+            - API request is made to add a user account
+        THEN:
+            - A new user account is created
+        """
+
+        user1 = {
+            "username": "testuser",
+            "password": "test",
+            "first_name": "Test",
+            "last_name": "User",
+        }
+
+        response = self.client.post(
+            self.ENDPOINT,
+            data=user1,
+        )
+
+        self.assertEqual(response.status_code, 201)
+
+        returned_user1 = User.objects.get(username="testuser")
+
+        from pprint import pprint
+
+        pprint(returned_user1)
+
+        self.assertEqual(returned_user1.username, user1["username"])
+        self.assertEqual(returned_user1.first_name, user1["first_name"])
+        self.assertEqual(returned_user1.last_name, user1["last_name"])
+
+    def test_delete_user(self):
+        """
+        GIVEN:
+            - Existing user account
+        WHEN:
+            - API request is made to delete a user account
+        THEN:
+            - Account is deleted
+        """
+
+        user1 = User.objects.create(
+            username="testuser",
+            password="test",
+            first_name="Test",
+            last_name="User",
+        )
+
+        nUsers = len(User.objects.all())
+
+        response = self.client.delete(
+            f"{self.ENDPOINT}{user1.pk}/",
+        )
+
+        self.assertEqual(response.status_code, 204)
+
+        self.assertEqual(len(User.objects.all()), nUsers - 1)
+
+    def test_update_user(self):
+        """
+        GIVEN:
+            - Existing user accounts
+        WHEN:
+            - API request is made to update user account
+        THEN:
+            - The user account is updated, password only updated if not '****'
+        """
+
+        user1 = User.objects.create(
+            username="testuser",
+            password="test",
+            first_name="Test",
+            last_name="User",
+        )
+
+        initial_password = user1.password
+
+        response = self.client.patch(
+            f"{self.ENDPOINT}{user1.pk}/",
+            data={
+                "first_name": "Updated Name 1",
+                "password": "******",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        returned_user1 = User.objects.get(pk=user1.pk)
+        self.assertEqual(returned_user1.first_name, "Updated Name 1")
+        self.assertEqual(returned_user1.password, initial_password)
+
+        response = self.client.patch(
+            f"{self.ENDPOINT}{user1.pk}/",
+            data={
+                "first_name": "Updated Name 2",
+                "password": "123xyz",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        returned_user2 = User.objects.get(pk=user1.pk)
+        self.assertEqual(returned_user2.first_name, "Updated Name 2")
+        self.assertNotEqual(returned_user2.password, initial_password)
+
+
+class TestApiGroup(APITestCase):
+    ENDPOINT = "/api/groups/"
+
+    def setUp(self):
+        super().setUp()
+
+        self.user = User.objects.create_superuser(username="temp_admin")
+        self.client.force_authenticate(user=self.user)
+
+    def test_get_groups(self):
+        """
+        GIVEN:
+            - Configured groups
+        WHEN:
+            - API call is made to get groups
+        THEN:
+            - Configured groups are provided
+        """
+
+        group1 = Group.objects.create(
+            name="Test Group",
+        )
+
+        response = self.client.get(self.ENDPOINT)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["count"], 1)
+        returned_group1 = response.data["results"][0]
+
+        from pprint import pprint
+
+        pprint(returned_group1)
+
+        self.assertEqual(returned_group1["name"], group1.name)
+
+    def test_create_group(self):
+        """
+        WHEN:
+            - API request is made to add a group
+        THEN:
+            - A new group is created
+        """
+
+        group1 = {
+            "name": "Test Group",
+        }
+
+        response = self.client.post(
+            self.ENDPOINT,
+            data=group1,
+        )
+
+        self.assertEqual(response.status_code, 201)
+
+        returned_group1 = Group.objects.get(name="Test Group")
+
+        from pprint import pprint
+
+        pprint(returned_group1)
+
+        self.assertEqual(returned_group1.name, group1["name"])
+
+    def test_delete_group(self):
+        """
+        GIVEN:
+            - Existing group
+        WHEN:
+            - API request is made to delete a group
+        THEN:
+            - Group is deleted
+        """
+
+        group1 = Group.objects.create(
+            name="Test Group",
+        )
+
+        response = self.client.delete(
+            f"{self.ENDPOINT}{group1.pk}/",
+        )
+
+        self.assertEqual(response.status_code, 204)
+
+        self.assertEqual(len(Group.objects.all()), 0)
+
+    def test_update_group(self):
+        """
+        GIVEN:
+            - Existing groups
+        WHEN:
+            - API request is made to update group
+        THEN:
+            - The group is updated
+        """
+
+        group1 = Group.objects.create(
+            name="Test Group",
+        )
+
+        response = self.client.patch(
+            f"{self.ENDPOINT}{group1.pk}/",
+            data={
+                "name": "Updated Name 1",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        returned_group1 = Group.objects.get(pk=group1.pk)
+        self.assertEqual(returned_group1.name, "Updated Name 1")
