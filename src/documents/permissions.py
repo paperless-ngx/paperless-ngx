@@ -1,3 +1,4 @@
+from rest_framework.permissions import BasePermission
 from rest_framework.permissions import DjangoModelPermissions
 
 
@@ -11,3 +12,8 @@ class PaperlessModelPermissions(DjangoModelPermissions):
         "PATCH": ["%(app_label)s.change_%(model_name)s"],
         "DELETE": ["%(app_label)s.delete_%(model_name)s"],
     }
+
+
+class PaperlessAdminPermissions(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.has_perm("admin.view_logentry")
