@@ -20,6 +20,7 @@ except ImportError:
 import pytest
 from django.conf import settings
 from django.contrib.auth.models import Group
+from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.test import override_settings
 from django.utils import timezone
@@ -2539,6 +2540,41 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
         response = self.client.get("/api/")
         self.assertIn("X-Api-Version", response)
         self.assertIn("X-Version", response)
+
+    def test_api_insufficient_permissions(self):
+        user = User.objects.create_user(username="test")
+        self.client.force_authenticate(user)
+
+        d = Document.objects.create(title="Test")
+
+        self.assertEqual(self.client.get("/api/documents/").status_code, 403)
+
+        self.assertEqual(self.client.get(f"/api/documents/{d.id}/").status_code, 403)
+
+        self.assertEqual(self.client.get("/api/tags/").status_code, 403)
+        self.assertEqual(self.client.get("/api/correspondents/").status_code, 403)
+        self.assertEqual(self.client.get("/api/document_types/").status_code, 403)
+
+        self.assertEqual(self.client.get("/api/logs/").status_code, 403)
+        self.assertEqual(self.client.get("/api/saved_views/").status_code, 403)
+
+    def test_api_sufficient_permissions(self):
+        user = User.objects.create_user(username="test")
+        user.user_permissions.add(*Permission.objects.all())
+        self.client.force_authenticate(user)
+
+        d = Document.objects.create(title="Test")
+
+        self.assertEqual(self.client.get("/api/documents/").status_code, 200)
+
+        self.assertEqual(self.client.get(f"/api/documents/{d.id}/").status_code, 200)
+
+        self.assertEqual(self.client.get("/api/tags/").status_code, 200)
+        self.assertEqual(self.client.get("/api/correspondents/").status_code, 200)
+        self.assertEqual(self.client.get("/api/document_types/").status_code, 200)
+
+        self.assertEqual(self.client.get("/api/logs/").status_code, 200)
+        self.assertEqual(self.client.get("/api/saved_views/").status_code, 200)
 
 
 class TestApiRemoteVersion(DirectoriesMixin, APITestCase):
