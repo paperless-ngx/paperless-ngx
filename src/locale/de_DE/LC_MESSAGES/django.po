@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-09 21:50+0000\n"
-"PO-Revision-Date: 2022-11-22 22:18\n"
+"PO-Revision-Date: 2022-11-26 17:53\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -424,7 +424,7 @@ msgstr "Name der ausgeführten Aufgabe"
 
 #: documents/models.py:562
 msgid "Task Positional Arguments"
-msgstr "Positionale Aufgabenargumente"
+msgstr "Aufgabe: Positionsargumente"
 
 #: documents/models.py:564
 msgid "JSON representation of the positional arguments used with the task"
@@ -432,15 +432,15 @@ msgstr "JSON-Darstellung der Positionsargumente, die für die Aufgabe verwendet 
 
 #: documents/models.py:569
 msgid "Task Named Arguments"
-msgstr "Benannte Aufgaben Argumente"
+msgstr "Aufgabe: Benannte Argumente"
 
 #: documents/models.py:571
 msgid "JSON representation of the named arguments used with the task"
-msgstr "JSON-Darstellung der Positionsargumente, die für die Aufgabe verwendet werden"
+msgstr "JSON-Darstellung der benannten Argumente, die für die Aufgabe verwendet werden"
 
 #: documents/models.py:578
 msgid "Task State"
-msgstr "Aufgabenstatus"
+msgstr "Aufgabe: Status"
 
 #: documents/models.py:579
 msgid "Current state of the task being run"
