@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-09 21:50+0000\n"
-"PO-Revision-Date: 2022-11-26 17:53\n"
+"PO-Revision-Date: 2022-11-26 20:28\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -452,23 +452,23 @@ msgstr "Erstellungsdatum/-zeit"
 
 #: documents/models.py:585
 msgid "Datetime field when the task result was created in UTC"
-msgstr "Datum/Zeitfeld, wann das Ergebnis der Aufgabe erstellt wurde (in UTC)"
+msgstr "Zeitpunkt, an dem das Ergebnis der Aufgabe erstellt wurde (in UTC)"
 
 #: documents/models.py:590
 msgid "Started DateTime"
-msgstr "Startdatum/-zeit"
+msgstr "Startzeitpunk"
 
 #: documents/models.py:591
 msgid "Datetime field when the task was started in UTC"
-msgstr "Datum/Zeitfeld, wann die Aufgabe erstellt wurde (in UTC)"
+msgstr "Zeitpunkt, als die Aufgabe erstellt wurde (in UTC)"
 
 #: documents/models.py:596
 msgid "Completed DateTime"
-msgstr "Abgeschlossen Datum/Zeit"
+msgstr "Abgeschlossen Zeitpunkt"
 
 #: documents/models.py:597
 msgid "Datetime field when the task was completed in UTC"
-msgstr "Datum/Zeitfeld, wann die Aufgabe abgeschlossen wurde (in UTC)"
+msgstr "Zeitpunkt, an dem die Aufgabe abgeschlossen wurde (in UTC)"
 
 #: documents/models.py:602
 msgid "Result Data"
