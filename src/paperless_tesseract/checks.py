@@ -1,3 +1,4 @@
+import shutil
 import subprocess
 
 from django.conf import settings
@@ -7,10 +8,16 @@ from django.core.checks import Warning
 
 
 def get_tesseract_langs():
-    with subprocess.Popen(["tesseract", "--list-langs"], stdout=subprocess.PIPE) as p:
-        stdout, stderr = p.communicate()
+    proc = subprocess.run(
+        [shutil.which("tesseract"), "--list-langs"],
+        capture_output=True,
+    )
 
-    return stdout.decode().strip().split("\n")[1:]
+    # Decode bytes to string, split on newlines, trim out the header
+    proc_lines = proc.stdout.decode("utf8", errors="ignore").strip().split("\n")[1:]
+
+    # Replace _ with - to convert two part languages to the expected code
+    return [x.replace("_", "-") for x in proc_lines]
 
 
 @register()
