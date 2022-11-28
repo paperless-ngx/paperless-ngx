@@ -149,6 +149,9 @@ which will in turn call `pdf2pdfocr.py`_ on your document, which will then
 overwrite the file with an OCR'd version of the file and exit.  At which point,
 the consumption process will begin with the newly modified file.
 
+The script's stdout and stderr will be logged line by line to the webserver log, along
+with the exit code of the script.
+
 .. _pdf2pdfocr.py: https://github.com/LeoFCardoso/pdf2pdfocr
 
 .. _advanced-post_consume_script:
@@ -177,6 +180,10 @@ The script can be in any language, but for a simple shell script
 example, you can take a look at `post-consumption-example.sh`_ in this project.
 
 The post consumption script cannot cancel the consumption process.
+
+The script's stdout and stderr will be logged line by line to the webserver log, along
+with the exit code of the script.
+
 
 Docker
 ------
@@ -417,3 +424,24 @@ For example, using Docker Compose:
         # ...
         volumes:
           - /path/to/my/scripts:/custom-cont-init.d:ro
+
+.. _advanced-mysql-caveats:
+
+MySQL Caveats
+#############
+
+Case Sensitivity
+================
+
+The database interface does not provide a method to configure a MySQL database to
+be case sensitive.  This would prevent a user from creating a tag ``Name`` and ``NAME``
+as they are considered the same.
+
+Per Django documentation, to enable this requires manual intervention.  To enable
+case sensetive tables, you can execute the following command against each table:
+
+``ALTER TABLE <table_name> CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;``
+
+You can also set the default for new tables (this does NOT affect existing tables) with:
+
+``ALTER DATABASE <db_name> CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;``
