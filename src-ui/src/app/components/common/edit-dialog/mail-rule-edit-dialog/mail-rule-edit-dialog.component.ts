@@ -155,6 +155,13 @@ export class MailRuleEditDialogComponent extends EditDialogComponent<PaperlessMa
     )
   }
 
+  get showActionParamField(): boolean {
+    return (
+      this.objectForm?.get('action')?.value == MailAction.Move ||
+      this.objectForm?.get('action')?.value == MailAction.Tag
+    )
+  }
+
   get attachmentTypeOptions() {
     return ATTACHMENT_TYPE_OPTIONS
   }
