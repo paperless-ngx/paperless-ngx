@@ -18,6 +18,70 @@ import { DocumentTypeService } from 'src/app/services/rest/document-type.service
 import { MailAccountService } from 'src/app/services/rest/mail-account.service'
 import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
 
+const ATTACHMENT_TYPE_OPTIONS = [
+  {
+    id: MailFilterAttachmentType.Attachments,
+    name: $localize`Only process attachments.`,
+  },
+  {
+    id: MailFilterAttachmentType.Everything,
+    name: $localize`Process all files, including 'inline' attachments.`,
+  },
+]
+
+const ACTION_OPTIONS = [
+  {
+    id: MailAction.Delete,
+    name: $localize`Delete`,
+  },
+  {
+    id: MailAction.Move,
+    name: $localize`Move to specified folder`,
+  },
+  {
+    id: MailAction.MarkRead,
+    name: $localize`Mark as read, don't process read mails`,
+  },
+  {
+    id: MailAction.Flag,
+    name: $localize`Flag the mail, don't process flagged mails`,
+  },
+  {
+    id: MailAction.Tag,
+    name: $localize`Tag the mail with specified tag, don't process tagged mails`,
+  },
+]
+
+const METADATA_TITLE_OPTIONS = [
+  {
+    id: MailMetadataTitleOption.FromSubject,
+    name: $localize`Use subject as title`,
+  },
+  {
+    id: MailMetadataTitleOption.FromFilename,
+    name: $localize`Use attachment filename as title`,
+  },
+]
+
+const METADATA_CORRESPONDENT_OPTIONS = [
+  {
+    id: MailMetadataCorrespondentOption.FromNothing,
+    name: $localize`Do not assign a correspondent`,
+  },
+  {
+    id: MailMetadataCorrespondentOption.FromEmail,
+    name: $localize`Use mail address`,
+  },
+  {
+    id: MailMetadataCorrespondentOption.FromName,
+    name: $localize`Use name (or mail address if not available)`,
+  },
+  {
+    id: MailMetadataCorrespondentOption.FromCustom,
+    name: $localize`Use correspondent selected below`,
+  },
+]
+
 @Component({
   selector: 'app-mail-rule-edit-dialog',
   templateUrl: './mail-rule-edit-dialog.component.html',
@@ -92,74 +156,18 @@ export class MailRuleEditDialogComponent extends EditDialogComponent<PaperlessMa
   }
 
   get attachmentTypeOptions() {
-    return [
-      {
-        id: MailFilterAttachmentType.Attachments,
-        name: $localize`Only process attachments.`,
-      },
-      {
-        id: MailFilterAttachmentType.Everything,
-        name: $localize`Process all files, including 'inline' attachments.`,
-      },
-    ]
+    return ATTACHMENT_TYPE_OPTIONS
   }
 
   get actionOptions() {
-    return [
-      {
-        id: MailAction.Delete,
-        name: $localize`Delete`,
-      },
-      {
-        id: MailAction.Move,
-        name: $localize`Move to specified folder`,
-      },
-      {
-        id: MailAction.MarkRead,
-        name: $localize`Mark as read, don't process read mails`,
-      },
-      {
-        id: MailAction.Flag,
-        name: $localize`Flag the mail, don't process flagged mails`,
-      },
-      {
-        id: MailAction.Tag,
-        name: $localize`Tag the mail with specified tag, don't process tagged mails`,
-      },
-    ]
+    return ACTION_OPTIONS
   }
 
   get metadataTitleOptions() {
-    return [
-      {
-        id: MailMetadataTitleOption.FromSubject,
-        name: $localize`Use subject as title`,
-      },
-      {
-        id: MailMetadataTitleOption.FromFilename,
-        name: $localize`Use attachment filename as title`,
-      },
-    ]
+    return METADATA_TITLE_OPTIONS
   }
 
   get metadataCorrespondentOptions() {
-    return [
-      {
-        id: MailMetadataCorrespondentOption.FromNothing,
-        name: $localize`Do not assign a correspondent`,
-      },
-      {
-        id: MailMetadataCorrespondentOption.FromEmail,
-        name: $localize`Use mail address`,
-      },
-      {
-        id: MailMetadataCorrespondentOption.FromName,
-        name: $localize`Use name (or mail address if not available)`,
-      },
-      {
-        id: MailMetadataCorrespondentOption.FromCustom,
-        name: $localize`Use correspondent selected below`,
-      },
-    ]
+    return METADATA_CORRESPONDENT_OPTIONS
   }
 }
