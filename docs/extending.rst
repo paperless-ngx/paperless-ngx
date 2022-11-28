@@ -112,7 +112,7 @@ To do the setup you need to perform the steps from the following chapters in a c
 
     .. code:: shell-session
 
-        python3 manage.py runserver & python3 manage.py document_consumer & python3 manage.py qcluster
+        python3 manage.py runserver & python3 manage.py document_consumer & celery --app paperless worker
 
 11. Login with the superuser credentials provided in step 8 at ``http://localhost:8000`` to create a session that enables you to use the backend.
 
@@ -128,14 +128,14 @@ Configure the IDE to use the src/ folder as the base source folder. Configure th
 launch configurations in your IDE:
 
 *   python3 manage.py runserver
-*   python3 manage.py qcluster
+*   celery --app paperless worker
 *   python3 manage.py document_consumer
 
 To start them all:
 
 .. code:: shell-session
 
-    python3 manage.py runserver & python3 manage.py document_consumer & python3 manage.py qcluster
+    python3 manage.py runserver & python3 manage.py document_consumer & celery --app paperless worker
 
 Testing and code style:
 

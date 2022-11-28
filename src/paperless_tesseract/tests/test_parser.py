@@ -37,6 +37,9 @@ class FakeImageFile(ContextManager):
 
 
 class TestParser(DirectoriesMixin, TestCase):
+
+    SAMPLE_FILES = os.path.join(os.path.dirname(__file__), "samples")
+
     def assertContainsStrings(self, content, strings):
         # Asserts that all strings appear in content, in the given order.
         indices = []
@@ -47,14 +50,18 @@ class TestParser(DirectoriesMixin, TestCase):
                 self.fail(f"'{s}' is not in '{content}'")
         self.assertListEqual(indices, sorted(indices))
 
-    text_cases = [
-        ("simple     string", "simple string"),
-        ("simple    newline\n   testing string", "simple newline\ntesting string"),
-        ("utf-8   строка с пробелами в конце  ", "utf-8 строка с пробелами в конце"),
-    ]
-
     def test_post_process_text(self):
-        for source, result in self.text_cases:
+
+        text_cases = [
+            ("simple     string", "simple string"),
+            ("simple    newline\n   testing string", "simple newline\ntesting string"),
+            (
+                "utf-8   строка с пробелами в конце  ",
+                "utf-8 строка с пробелами в конце",
+            ),
+        ]
+
+        for source, result in text_cases:
             actual_result = post_process_text(source)
             self.assertEqual(
                 result,
@@ -65,8 +72,6 @@ class TestParser(DirectoriesMixin, TestCase):
                     actual_result,
                 ),
             )
-
-    SAMPLE_FILES = os.path.join(os.path.dirname(__file__), "samples")
 
     def test_get_text_from_pdf(self):
         parser = RasterisedDocumentParser(uuid.uuid4())
@@ -341,6 +346,17 @@ class TestParser(DirectoriesMixin, TestCase):
 
     @override_settings(OCR_PAGES=2, OCR_MODE="redo")
     def test_multi_page_analog_pages_redo(self):
+        """
+        GIVEN:
+            - File with text contained in images but no text layer
+            - OCR of only pages 1 and 2 requested
+            - OCR mode set to redo
+        WHEN:
+            - Document is parsed
+        THEN:
+            - Text of page 1 and 2 extracted
+            - An archive file is created
+        """
         parser = RasterisedDocumentParser(None)
         parser.parse(
             os.path.join(self.SAMPLE_FILES, "multi-page-images.pdf"),
@@ -352,6 +368,17 @@ class TestParser(DirectoriesMixin, TestCase):
 
     @override_settings(OCR_PAGES=1, OCR_MODE="force")
     def test_multi_page_analog_pages_force(self):
+        """
+        GIVEN:
+            - File with text contained in images but no text layer
+            - OCR of only page 1 requested
+            - OCR mode set to force
+        WHEN:
+            - Document is parsed
+        THEN:
+            - Only text of page 1 is extracted
+            - An archive file is created
+        """
         parser = RasterisedDocumentParser(None)
         parser.parse(
             os.path.join(self.SAMPLE_FILES, "multi-page-images.pdf"),
@@ -395,7 +422,7 @@ class TestParser(DirectoriesMixin, TestCase):
             - Document is parsed
         THEN:
             - Text from images is extracted
-            - No archive file is created
+            - An archive file is created with the OCRd text
         """
         parser = RasterisedDocumentParser(None)
         parser.parse(
@@ -408,15 +435,26 @@ class TestParser(DirectoriesMixin, TestCase):
             ["page 1", "page 2", "page 3"],
         )
 
-        self.assertIsNone(parser.archive_path)
+        self.assertIsNotNone(parser.archive_path)
 
     @override_settings(OCR_MODE="skip")
     def test_multi_page_mixed(self):
+        """
+        GIVEN:
+            - File with some text contained in images and some in text layer
+            - OCR mode set to skip
+        WHEN:
+            - Document is parsed
+        THEN:
+            - Text from images is extracted
+            - An archive file is created with the OCRd text and the original text
+        """
         parser = RasterisedDocumentParser(None)
         parser.parse(
             os.path.join(self.SAMPLE_FILES, "multi-page-mixed.pdf"),
             "application/pdf",
         )
+        self.assertIsNotNone(parser.archive_path)
         self.assertTrue(os.path.isfile(parser.archive_path))
         self.assertContainsStrings(
             parser.get_text().lower(),
@@ -428,6 +466,45 @@ class TestParser(DirectoriesMixin, TestCase):
 
         self.assertIn("[OCR skipped on page(s) 4-6]", sidecar)
 
+    @override_settings(OCR_MODE="redo")
+    def test_single_page_mixed(self):
+        """
+        GIVEN:
+            - File with some text contained in images and some in text layer
+            - Text and images are mixed on the same page
+            - OCR mode set to redo
+        WHEN:
+            - Document is parsed
+        THEN:
+            - Text from images is extracted
+            - Full content of the file is parsed (not just the image text)
+            - An archive file is created with the OCRd text and the original text
+        """
+        parser = RasterisedDocumentParser(None)
+        parser.parse(
+            os.path.join(self.SAMPLE_FILES, "single-page-mixed.pdf"),
+            "application/pdf",
+        )
+        self.assertIsNotNone(parser.archive_path)
+        self.assertTrue(os.path.isfile(parser.archive_path))
+        self.assertContainsStrings(
+            parser.get_text().lower(),
+            [
+                "this is some normal text, present on page 1 of the document.",
+                "this is some text, but in an image, also on page 1.",
+                "this is further text on page 1.",
+            ],
+        )
+
+        with open(os.path.join(parser.tempdir, "sidecar.txt")) as f:
+            sidecar = f.read().lower()
+
+        self.assertIn("this is some text, but in an image, also on page 1.", sidecar)
+        self.assertNotIn(
+            "this is some normal text, present on page 1 of the document.",
+            sidecar,
+        )
+
     @override_settings(OCR_MODE="skip_noarchive")
     def test_multi_page_mixed_no_archive(self):
         """
@@ -438,7 +515,7 @@ class TestParser(DirectoriesMixin, TestCase):
             - Document is parsed
         THEN:
             - Text from images is extracted
-            - No archive file is created
+            - No archive file is created as original file contains text
         """
         parser = RasterisedDocumentParser(None)
         parser.parse(

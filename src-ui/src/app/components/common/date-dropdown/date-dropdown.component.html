@@ -1,11 +1,17 @@
   <div class="btn-group w-100" ngbDropdown role="group">
   <button class="btn btn-sm" id="dropdown{{title}}" ngbDropdownToggle [ngClass]="dateBefore || dateAfter ? 'btn-primary' : 'btn-outline-primary'">
     {{title}}
+    <app-clearable-badge [selected]="isActive" (cleared)="reset()"></app-clearable-badge><span class="visually-hidden">selected</span>
   </button>
   <div class="dropdown-menu date-dropdown shadow pt-0" ngbDropdownMenu attr.aria-labelledby="dropdown{{title}}">
     <div class="list-group list-group-flush">
-        <button *ngFor="let qf of quickFilters" class="list-group-item small list-goup list-group-item-action d-flex p-2 ps-3" role="menuitem" (click)="setDateQuickFilter(qf.id)">
-          {{qf.name}}
+        <button *ngFor="let rd of relativeDates" class="list-group-item small list-goup list-group-item-action d-flex p-2" role="menuitem" (click)="setRelativeDate(rd.date)">
+          <div _ngcontent-hga-c166="" class="selected-icon me-1">
+            <svg *ngIf="relativeDate === rd.date" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-check" viewBox="0 0 16 16">
+              <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"/>
+            </svg>
+          </div>
+          {{rd.name}}
         </button>
         <div class="list-group-item d-flex flex-column align-items-start" role="menuitem">
 

@@ -15,6 +15,7 @@ import { DirtyFormGuard } from './guards/dirty-form.guard'
 import { StoragePathListComponent } from './components/manage/storage-path-list/storage-path-list.component'
 import { TasksComponent } from './components/manage/tasks/tasks.component'
 import { DirtyDocGuard } from './guards/dirty-doc.guard'
+import { DirtySavedViewGuard } from './guards/dirty-saved-view.guard'
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -24,8 +25,16 @@ const routes: Routes = [
     canDeactivate: [DirtyDocGuard],
     children: [
       { path: 'dashboard', component: DashboardComponent },
-      { path: 'documents', component: DocumentListComponent },
-      { path: 'view/:id', component: DocumentListComponent },
+      {
+        path: 'documents',
+        component: DocumentListComponent,
+        canDeactivate: [DirtySavedViewGuard],
+      },
+      {
+        path: 'view/:id',
+        component: DocumentListComponent,
+        canDeactivate: [DirtySavedViewGuard],
+      },
       { path: 'documents/:id', component: DocumentDetailComponent },
       { path: 'asn/:id', component: DocumentAsnComponent },
       { path: 'tags', component: TagListComponent },

@@ -149,6 +149,9 @@ which will in turn call `pdf2pdfocr.py`_ on your document, which will then
 overwrite the file with an OCR'd version of the file and exit.  At which point,
 the consumption process will begin with the newly modified file.
 
+The script's stdout and stderr will be logged line by line to the webserver log, along
+with the exit code of the script.
+
 .. _pdf2pdfocr.py: https://github.com/LeoFCardoso/pdf2pdfocr
 
 .. _advanced-post_consume_script:
@@ -177,6 +180,10 @@ The script can be in any language, but for a simple shell script
 example, you can take a look at `post-consumption-example.sh`_ in this project.
 
 The post consumption script cannot cancel the consumption process.
+
+The script's stdout and stderr will be logged line by line to the webserver log, along
+with the exit code of the script.
+
 
 Docker
 ------
@@ -258,12 +265,18 @@ Paperless provides the following placeholders within filenames:
 * ``{tag_list}``: A comma separated list of all tags assigned to the document.
 * ``{title}``: The title of the document.
 * ``{created}``: The full date (ISO format) the document was created.
-* ``{created_year}``: Year created only.
+* ``{created_year}``: Year created only, formatted as the year with century.
+* ``{created_year_short}``: Year created only, formatted as the year without century, zero padded.
 * ``{created_month}``: Month created only (number 01-12).
+* ``{created_month_name}``: Month created name, as per locale
+* ``{created_month_name_short}``: Month created abbreviated name, as per locale
 * ``{created_day}``: Day created only (number 01-31).
 * ``{added}``: The full date (ISO format) the document was added to paperless.
 * ``{added_year}``: Year added only.
+* ``{added_year_short}``: Year added only, formatted as the year without century, zero padded.
 * ``{added_month}``: Month added only (number 01-12).
+* ``{added_month_name}``: Month added name, as per locale
+* ``{added_month_name_short}``: Month added abbreviated name, as per locale
 * ``{added_day}``: Day added only (number 01-31).
 
 
@@ -364,3 +377,71 @@ For simplicity, `By Year` defines the same structure as in the previous example 
 
     If you adjust the format of an existing storage path, old documents don't get relocated automatically.
     You need to run the :ref:`document renamer <utilities-renamer>` to adjust their pathes.
+
+.. _advanced-celery-monitoring:
+
+Celery Monitoring
+#################
+
+The monitoring tool `Flower <https://flower.readthedocs.io/en/latest/index.html>`_ can be used to view more
+detailed information about the health of the celery workers used for asynchronous tasks.  This includes details
+on currently running, queued and completed tasks, timing and more.  Flower can also be used with Prometheus, as it
+exports metrics.  For details on its capabilities, refer to the Flower documentation.
+
+To configure Flower further, create a `flowerconfig.py` and place it into the `src/paperless` directory.  For
+a Docker installation, you can use volumes to accomplish this:
+
+.. code:: yaml
+
+    services:
+      # ...
+      webserver:
+        # ...
+        volumes:
+          - /path/to/my/flowerconfig.py:/usr/src/paperless/src/paperless/flowerconfig.py:ro
+
+Custom Container Initialization
+###############################
+
+The Docker image includes the ability to run custom user scripts during startup.  This could be
+utilized for installing additional tools or Python packages, for example.
+
+To utilize this, mount a folder containing your scripts to the custom initialization directory, `/custom-cont-init.d`
+and place scripts you wish to run inside.  For security, the folder and its contents must be owned by `root`.
+Additionally, scripts must only be writable by `root`.
+
+Your scripts will be run directly before the webserver completes startup.  Scripts will be run by the `root` user.
+This is an advanced functionality with which you could break functionality or lose data.
+
+For example, using Docker Compose:
+
+
+.. code:: yaml
+
+    services:
+      # ...
+      webserver:
+        # ...
+        volumes:
+          - /path/to/my/scripts:/custom-cont-init.d:ro
+
+.. _advanced-mysql-caveats:
+
+MySQL Caveats
+#############
+
+Case Sensitivity
+================
+
+The database interface does not provide a method to configure a MySQL database to
+be case sensitive.  This would prevent a user from creating a tag ``Name`` and ``NAME``
+as they are considered the same.
+
+Per Django documentation, to enable this requires manual intervention.  To enable
+case sensetive tables, you can execute the following command against each table:
+
+``ALTER TABLE <table_name> CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;``
+
+You can also set the default for new tables (this does NOT affect existing tables) with:
+
+``ALTER DATABASE <db_name> CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;``

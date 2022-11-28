@@ -7,13 +7,16 @@ from typing import Optional
 
 import dateutil.parser
 import pathvalidate
+from celery import states
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from django_q.tasks import Task
 from documents.parsers import get_default_file_extension
+
+ALL_STATES = sorted(states.ALL_STATES)
+TASK_STATE_CHOICES = sorted(zip(ALL_STATES, ALL_STATES))
 
 
 class MatchingModel(models.Model):
@@ -527,19 +530,80 @@ class UiSettings(models.Model):
 
 
 class PaperlessTask(models.Model):
-
-    task_id = models.CharField(max_length=128)
-    name = models.CharField(max_length=256)
-    created = models.DateTimeField(_("created"), auto_now=True)
-    started = models.DateTimeField(_("started"), null=True)
-    attempted_task = models.OneToOneField(
-        Task,
-        on_delete=models.CASCADE,
-        related_name="attempted_task",
-        null=True,
-        blank=True,
+    task_id = models.CharField(
+        max_length=255,
+        unique=True,
+        verbose_name=_("Task ID"),
+        help_text=_("Celery ID for the Task that was run"),
     )
-    acknowledged = models.BooleanField(default=False)
+
+    acknowledged = models.BooleanField(
+        default=False,
+        verbose_name=_("Acknowledged"),
+        help_text=_("If the task is acknowledged via the frontend or API"),
+    )
+
+    task_file_name = models.CharField(
+        null=True,
+        max_length=255,
+        verbose_name=_("Task Name"),
+        help_text=_("Name of the file which the Task was run for"),
+    )
+
+    task_name = models.CharField(
+        null=True,
+        max_length=255,
+        verbose_name=_("Task Name"),
+        help_text=_("Name of the Task which was run"),
+    )
+
+    task_args = models.JSONField(
+        null=True,
+        verbose_name=_("Task Positional Arguments"),
+        help_text=_(
+            "JSON representation of the positional arguments used with the task",
+        ),
+    )
+    task_kwargs = models.JSONField(
+        null=True,
+        verbose_name=_("Task Named Arguments"),
+        help_text=_(
+            "JSON representation of the named arguments used with the task",
+        ),
+    )
+    status = models.CharField(
+        max_length=30,
+        default=states.PENDING,
+        choices=TASK_STATE_CHOICES,
+        verbose_name=_("Task State"),
+        help_text=_("Current state of the task being run"),
+    )
+    date_created = models.DateTimeField(
+        null=True,
+        default=timezone.now,
+        verbose_name=_("Created DateTime"),
+        help_text=_("Datetime field when the task result was created in UTC"),
+    )
+    date_started = models.DateTimeField(
+        null=True,
+        default=None,
+        verbose_name=_("Started DateTime"),
+        help_text=_("Datetime field when the task was started in UTC"),
+    )
+    date_done = models.DateTimeField(
+        null=True,
+        default=None,
+        verbose_name=_("Completed DateTime"),
+        help_text=_("Datetime field when the task was completed in UTC"),
+    )
+    result = models.TextField(
+        null=True,
+        default=None,
+        verbose_name=_("Result Data"),
+        help_text=_(
+            "The data returned by the task",
+        ),
+    )
 
 
 class Comment(models.Model):

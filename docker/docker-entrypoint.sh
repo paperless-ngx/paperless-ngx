@@ -9,8 +9,8 @@ set -e
 # fill in the value of "$XYZ_DB_PASSWORD" from a file, especially for Docker's
 # secrets feature
 file_env() {
-	local var="$1"
-	local fileVar="${var}_FILE"
+	local -r var="$1"
+	local -r fileVar="${var}_FILE"
 
 	# Basic validation
 	if [ "${!var:-}" ] && [ "${!fileVar:-}" ]; then
@@ -35,14 +35,14 @@ file_env() {
 
 # Source: https://github.com/sameersbn/docker-gitlab/
 map_uidgid() {
-	USERMAP_ORIG_UID=$(id -u paperless)
-	USERMAP_ORIG_GID=$(id -g paperless)
-	USERMAP_NEW_UID=${USERMAP_UID:-$USERMAP_ORIG_UID}
-	USERMAP_NEW_GID=${USERMAP_GID:-${USERMAP_ORIG_GID:-$USERMAP_NEW_UID}}
-	if [[ ${USERMAP_NEW_UID} != "${USERMAP_ORIG_UID}" || ${USERMAP_NEW_GID} != "${USERMAP_ORIG_GID}" ]]; then
-		echo "Mapping UID and GID for paperless:paperless to $USERMAP_NEW_UID:$USERMAP_NEW_GID"
-		usermod -o -u "${USERMAP_NEW_UID}" paperless
-		groupmod -o -g "${USERMAP_NEW_GID}" paperless
+	local -r usermap_original_uid=$(id -u paperless)
+	local -r usermap_original_gid=$(id -g paperless)
+	local -r usermap_new_uid=${USERMAP_UID:-$usermap_original_uid}
+	local -r usermap_new_gid=${USERMAP_GID:-${usermap_original_gid:-$usermap_new_uid}}
+	if [[ ${usermap_new_uid} != "${usermap_original_uid}" || ${usermap_new_gid} != "${usermap_original_gid}" ]]; then
+		echo "Mapping UID and GID for paperless:paperless to $usermap_new_uid:$usermap_new_gid"
+		usermod -o -u "${usermap_new_uid}" paperless
+		groupmod -o -g "${usermap_new_gid}" paperless
 	fi
 }
 
@@ -51,6 +51,30 @@ map_folders() {
 	export DATA_DIR="${PAPERLESS_DATA_DIR:-/usr/src/paperless/data}"
 	export MEDIA_ROOT_DIR="${PAPERLESS_MEDIA_ROOT:-/usr/src/paperless/media}"
 	export CONSUME_DIR="${PAPERLESS_CONSUMPTION_DIR:-/usr/src/paperless/consume}"
+}
+
+nltk_data () {
+	# Store the NLTK data outside the Docker container
+	local -r nltk_data_dir="${DATA_DIR}/nltk"
+	local -r truthy_things=("yes y 1 t true")
+
+	# If not set, or it looks truthy
+	if [[ -z "${PAPERLESS_ENABLE_NLTK}" ]] || [[ "${truthy_things[*]}" =~ ${PAPERLESS_ENABLE_NLTK,} ]]; then
+
+		# Download or update the snowball stemmer data
+		python3 -W ignore::RuntimeWarning -m nltk.downloader -d "${nltk_data_dir}" snowball_data
+
+		# Download or update the stopwords corpus
+		python3 -W ignore::RuntimeWarning -m nltk.downloader -d "${nltk_data_dir}" stopwords
+
+		# Download or update the punkt tokenizer data
+		python3 -W ignore::RuntimeWarning -m nltk.downloader -d "${nltk_data_dir}" punkt
+
+	else
+		echo "Skipping NLTK data download"
+
+	fi
+
 }
 
 initialize() {
@@ -76,7 +100,7 @@ initialize() {
 	# Check for overrides of certain folders
 	map_folders
 
-	local export_dir="/usr/src/paperless/export"
+	local -r export_dir="/usr/src/paperless/export"
 
 	for dir in \
 		"${export_dir}" \
@@ -89,9 +113,11 @@ initialize() {
 		fi
 	done
 
-	local tmp_dir="/tmp/paperless"
+	local -r tmp_dir="/tmp/paperless"
 	echo "Creating directory ${tmp_dir}"
 	mkdir -p "${tmp_dir}"
+
+	nltk_data
 
 	set +e
 	echo "Adjusting permissions of paperless files. This may take a while."
@@ -111,8 +137,7 @@ initialize() {
 install_languages() {
 	echo "Installing languages..."
 
-	local langs="$1"
-	read -ra langs <<<"$langs"
+	read -ra langs <<<"$1"
 
 	# Check that it is not empty
 	if [ ${#langs[@]} -eq 0 ]; then

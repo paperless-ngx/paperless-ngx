@@ -28,7 +28,7 @@ from django.utils.translation import get_language
 from django.views.decorators.cache import cache_control
 from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
-from django_q.tasks import async_task
+from documents.tasks import consume_file
 from packaging import version as packaging_version
 from paperless import version
 from paperless.db import GnuPG
@@ -261,6 +261,9 @@ class DocumentViewSet(
             file_handle = doc.source_file
             filename = doc.get_public_filename()
             mime_type = doc.mime_type
+            # Support browser previewing csv files by using text mime type
+            if mime_type in {"application/csv", "text/csv"} and disposition == "inline":
+                mime_type = "text/plain"
 
         if doc.storage_type == Document.STORAGE_TYPE_GPG:
             file_handle = GnuPG.decrypted(file_handle)
@@ -612,8 +615,7 @@ class PostDocumentView(GenericAPIView):
 
         task_id = str(uuid.uuid4())
 
-        async_task(
-            "documents.tasks.consume_file",
+        consume_file.delay(
             temp_filename,
             override_filename=doc_name,
             override_title=title,
@@ -621,7 +623,6 @@ class PostDocumentView(GenericAPIView):
             override_document_type_id=document_type_id,
             override_tag_ids=tag_ids,
             task_id=task_id,
-            task_name=os.path.basename(doc_name)[:100],
             override_created=created,
         )
 
@@ -780,42 +781,38 @@ class RemoteVersionView(GenericAPIView):
         remote_version = "0.0.0"
         is_greater_than_current = False
         current_version = packaging_version.parse(version.__full_version_str__)
-        # TODO: this can likely be removed when frontend settings are saved to DB
-        feature_is_set = settings.ENABLE_UPDATE_CHECK != "default"
-        if feature_is_set and settings.ENABLE_UPDATE_CHECK:
-            try:
-                req = urllib.request.Request(
-                    "https://api.github.com/repos/paperless-ngx/"
-                    "paperless-ngx/releases/latest",
-                )
-                # Ensure a JSON response
-                req.add_header("Accept", "application/json")
-
-                with urllib.request.urlopen(req) as response:
-                    remote = response.read().decode("utf-8")
-                try:
-                    remote_json = json.loads(remote)
-                    remote_version = remote_json["tag_name"]
-                    # Basically PEP 616 but that only went in 3.9
-                    if remote_version.startswith("ngx-"):
-                        remote_version = remote_version[len("ngx-") :]
-                except ValueError:
-                    logger.debug("An error occurred parsing remote version json")
-            except urllib.error.URLError:
-                logger.debug("An error occurred checking for available updates")
-
-            is_greater_than_current = (
-                packaging_version.parse(
-                    remote_version,
-                )
-                > current_version
+        try:
+            req = urllib.request.Request(
+                "https://api.github.com/repos/paperless-ngx/"
+                "paperless-ngx/releases/latest",
             )
+            # Ensure a JSON response
+            req.add_header("Accept", "application/json")
+
+            with urllib.request.urlopen(req) as response:
+                remote = response.read().decode("utf-8")
+            try:
+                remote_json = json.loads(remote)
+                remote_version = remote_json["tag_name"]
+                # Basically PEP 616 but that only went in 3.9
+                if remote_version.startswith("ngx-"):
+                    remote_version = remote_version[len("ngx-") :]
+            except ValueError:
+                logger.debug("An error occurred parsing remote version json")
+        except urllib.error.URLError:
+            logger.debug("An error occurred checking for available updates")
+
+        is_greater_than_current = (
+            packaging_version.parse(
+                remote_version,
+            )
+            > current_version
+        )
 
         return Response(
             {
                 "version": remote_version,
                 "update_available": is_greater_than_current,
-                "feature_is_set": feature_is_set,
             },
         )
 
@@ -848,15 +845,23 @@ class UiSettingsView(GenericAPIView):
         displayname = user.username
         if user.first_name or user.last_name:
             displayname = " ".join([user.first_name, user.last_name])
-        settings = {}
+        ui_settings = {}
         if hasattr(user, "ui_settings"):
-            settings = user.ui_settings.settings
+            ui_settings = user.ui_settings.settings
+        if "update_checking" in ui_settings:
+            ui_settings["update_checking"][
+                "backend_setting"
+            ] = settings.ENABLE_UPDATE_CHECK
+        else:
+            ui_settings["update_checking"] = {
+                "backend_setting": settings.ENABLE_UPDATE_CHECK,
+            }
         return Response(
             {
                 "user_id": user.id,
                 "username": user.username,
                 "display_name": displayname,
-                "settings": settings,
+                "settings": ui_settings,
             },
         )
 
@@ -882,7 +887,7 @@ class TasksViewSet(ReadOnlyModelViewSet):
         PaperlessTask.objects.filter(
             acknowledged=False,
         )
-        .order_by("created")
+        .order_by("date_created")
         .reverse()
     )
 

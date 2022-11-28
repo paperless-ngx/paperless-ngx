@@ -2,6 +2,7 @@ import { Component } from '@angular/core'
 import { FormControl, FormGroup } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-dialog.component'
+import { DEFAULT_MATCHING_ALGORITHM } from 'src/app/data/matching-model'
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { ToastService } from 'src/app/services/toast.service'
@@ -31,7 +32,7 @@ export class CorrespondentEditDialogComponent extends EditDialogComponent<Paperl
   getForm(): FormGroup {
     return new FormGroup({
       name: new FormControl(''),
-      matching_algorithm: new FormControl(1),
+      matching_algorithm: new FormControl(DEFAULT_MATCHING_ALGORITHM),
       match: new FormControl(''),
       is_insensitive: new FormControl(true),
     })

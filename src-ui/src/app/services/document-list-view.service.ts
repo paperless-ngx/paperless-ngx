@@ -171,15 +171,15 @@ export class DocumentListViewService {
     this.reduceSelectionToFilter()
 
     if (!this.router.routerState.snapshot.url.includes('/view/')) {
-      this.router.navigate([], {
-        queryParams: { view: view.id },
-      })
+      this.router.navigate(['view', view.id])
     }
   }
 
   loadFromQueryParams(queryParams: ParamMap) {
     const paramsEmpty: boolean = queryParams.keys.length == 0
-    let newState: ListViewState = this.listViewStates.get(null)
+    let newState: ListViewState = this.listViewStates.get(
+      this._activeSavedViewId
+    )
     if (!paramsEmpty) newState = paramsToViewState(queryParams)
     if (newState == undefined) newState = this.defaultListViewState() // if nothing in local storage
 
@@ -276,7 +276,6 @@ export class DocumentListViewService {
     ) {
       this.activeListViewState.sortField = 'created'
     }
-    this._activeSavedViewId = null
     this.activeListViewState.filterRules = filterRules
     this.reload()
     this.reduceSelectionToFilter()
@@ -288,7 +287,6 @@ export class DocumentListViewService {
   }
 
   set sortField(field: string) {
-    this._activeSavedViewId = null
     this.activeListViewState.sortField = field
     this.reload()
     this.saveDocumentListView()
@@ -299,7 +297,6 @@ export class DocumentListViewService {
   }
 
   set sortReverse(reverse: boolean) {
-    this._activeSavedViewId = null
     this.activeListViewState.sortReverse = reverse
     this.reload()
     this.saveDocumentListView()

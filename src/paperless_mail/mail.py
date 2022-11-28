@@ -4,15 +4,16 @@ import tempfile
 from datetime import date
 from datetime import timedelta
 from fnmatch import fnmatch
+from typing import Dict
 
 import magic
 import pathvalidate
 from django.conf import settings
 from django.db import DatabaseError
-from django_q.tasks import async_task
 from documents.loggers import LoggingMixin
 from documents.models import Correspondent
 from documents.parsers import is_mime_type_supported
+from documents.tasks import consume_file
 from imap_tools import AND
 from imap_tools import MailBox
 from imap_tools import MailboxFolderSelectError
@@ -30,7 +31,7 @@ class MailError(Exception):
 
 
 class BaseMailAction:
-    def get_criteria(self):
+    def get_criteria(self) -> Dict:
         return {}
 
     def post_consume(self, M, message_uids, parameter):
@@ -78,7 +79,7 @@ class TagMailAction(BaseMailAction):
             M.flag(message_uids, [self.keyword], True)
 
 
-def get_rule_action(rule):
+def get_rule_action(rule) -> BaseMailAction:
     if rule.action == MailRule.MailAction.FLAG:
         return FlagMailAction()
     elif rule.action == MailRule.MailAction.DELETE:
@@ -108,7 +109,7 @@ def make_criterias(rule):
     return {**criterias, **get_rule_action(rule).get_criteria()}
 
 
-def get_mailbox(server, port, security):
+def get_mailbox(server, port, security) -> MailBox:
     if security == MailAccount.ImapSecurity.NONE:
         mailbox = MailBoxUnencrypted(server, port)
     elif security == MailAccount.ImapSecurity.STARTTLS:
@@ -167,7 +168,7 @@ class MailAccountHandler(LoggingMixin):
                 "Unknown correspondent selector",
             )  # pragma: nocover
 
-    def handle_mail_account(self, account):
+    def handle_mail_account(self, account: MailAccount):
 
         self.renew_logging_group()
 
@@ -181,7 +182,14 @@ class MailAccountHandler(LoggingMixin):
                 account.imap_security,
             ) as M:
 
+                supports_gmail_labels = "X-GM-EXT-1" in M.client.capabilities
+                supports_auth_plain = "AUTH=PLAIN" in M.client.capabilities
+
+                self.log("debug", f"GMAIL Label Support: {supports_gmail_labels}")
+                self.log("debug", f"AUTH=PLAIN Support: {supports_auth_plain}")
+
                 try:
+
                     M.login(account.username, account.password)
 
                 except UnicodeEncodeError:
@@ -215,7 +223,11 @@ class MailAccountHandler(LoggingMixin):
 
                 for rule in account.rules.order_by("order"):
                     try:
-                        total_processed_files += self.handle_mail_rule(M, rule)
+                        total_processed_files += self.handle_mail_rule(
+                            M,
+                            rule,
+                            supports_gmail_labels,
+                        )
                     except Exception as e:
                         self.log(
                             "error",
@@ -233,7 +245,12 @@ class MailAccountHandler(LoggingMixin):
 
         return total_processed_files
 
-    def handle_mail_rule(self, M: MailBox, rule):
+    def handle_mail_rule(
+        self,
+        M: MailBox,
+        rule: MailRule,
+        supports_gmail_labels: bool = False,
+    ):
 
         self.log("debug", f"Rule {rule}: Selecting folder {rule.folder}")
 
@@ -261,11 +278,19 @@ class MailAccountHandler(LoggingMixin):
             ) from err
 
         criterias = make_criterias(rule)
-        criterias_imap = AND(**criterias)
+
+        # Deal with the Gmail label extension
         if "gmail_label" in criterias:
+
             gmail_label = criterias["gmail_label"]
             del criterias["gmail_label"]
-            criterias_imap = AND(NOT(gmail_label=gmail_label), **criterias)
+
+            if not supports_gmail_labels:
+                criterias_imap = AND(**criterias)
+            else:
+                criterias_imap = AND(NOT(gmail_label=gmail_label), **criterias)
+        else:
+            criterias_imap = AND(**criterias)
 
         self.log(
             "debug",
@@ -389,8 +414,7 @@ class MailAccountHandler(LoggingMixin):
                     f"{message.subject} from {message.from_}",
                 )
 
-                async_task(
-                    "documents.tasks.consume_file",
+                consume_file.delay(
                     path=temp_filename,
                     override_filename=pathvalidate.sanitize_filename(
                         att.filename,
@@ -401,7 +425,6 @@ class MailAccountHandler(LoggingMixin):
                     else None,
                     override_document_type_id=doc_type.id if doc_type else None,
                     override_tag_ids=tag_ids,
-                    task_name=att.filename[:100],
                 )
 
                 processed_attachments += 1

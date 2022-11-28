@@ -3,11 +3,13 @@ import logging
 import os
 import shutil
 import uuid
+from datetime import datetime
 from pathlib import Path
 from typing import Type
 
 import tqdm
 from asgiref.sync import async_to_sync
+from celery import shared_task
 from channels.layers import get_channel_layer
 from django.conf import settings
 from django.db import transaction
@@ -30,12 +32,14 @@ from documents.parsers import DocumentParser
 from documents.parsers import get_parser_class_for_mime_type
 from documents.sanity_checker import SanityCheckFailedException
 from filelock import FileLock
+from redis.exceptions import ConnectionError
 from whoosh.writing import AsyncWriter
 
 
 logger = logging.getLogger("paperless.tasks")
 
 
+@shared_task
 def index_optimize():
     ix = index.open_index()
     writer = AsyncWriter(ix)
@@ -52,6 +56,7 @@ def index_reindex(progress_bar_disable=False):
             index.update_document(writer, document)
 
 
+@shared_task
 def train_classifier():
     if (
         not Tag.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
@@ -80,6 +85,7 @@ def train_classifier():
         logger.warning("Classifier error: " + str(e))
 
 
+@shared_task
 def consume_file(
     path,
     override_filename=None,
@@ -92,6 +98,14 @@ def consume_file(
 ):
 
     path = Path(path).resolve()
+
+    # Celery converts this to a string, but everything expects a datetime
+    # Long term solution is to not use JSON for the serializer but pickle instead
+    if override_created is not None and isinstance(override_created, str):
+        try:
+            override_created = datetime.fromisoformat(override_created)
+        except Exception:
+            pass
 
     # check for separators in current document
     if settings.CONSUMER_ENABLE_BARCODES:
@@ -112,10 +126,22 @@ def consume_file(
                         newname = f"{str(n)}_" + override_filename
                     else:
                         newname = None
+
+                    # If the file is an upload, it's in the scratch directory
+                    # Move it to consume directory to be picked up
+                    # Otherwise, use the current parent to keep possible tags
+                    # from subdirectories
+                    try:
+                        # is_relative_to would be nicer, but new in 3.9
+                        _ = path.relative_to(settings.SCRATCH_DIR)
+                        save_to_dir = settings.CONSUMPTION_DIR
+                    except ValueError:
+                        save_to_dir = path.parent
+
                     barcodes.save_to_dir(
                         document,
                         newname=newname,
-                        target_dir=path.parent,
+                        target_dir=save_to_dir,
                     )
 
                 # Delete the PDF file which was split
@@ -141,11 +167,8 @@ def consume_file(
                         "status_updates",
                         {"type": "status_update", "data": payload},
                     )
-                except OSError as e:
-                    logger.warning(
-                        "OSError. It could be, the broker cannot be reached.",
-                    )
-                    logger.warning(str(e))
+                except ConnectionError as e:
+                    logger.warning(f"ConnectionError on status send: {str(e)}")
                 # consuming stops here, since the original document with
                 # the barcodes has been split and will be consumed separately
                 return "File successfully split"
@@ -171,6 +194,7 @@ def consume_file(
         )
 
 
+@shared_task
 def sanity_check():
     messages = sanity_checker.check_sanity()
 
@@ -186,6 +210,7 @@ def sanity_check():
         return "No issues detected."
 
 
+@shared_task
 def bulk_update_documents(document_ids):
     documents = Document.objects.filter(id__in=document_ids)
 
@@ -199,6 +224,7 @@ def bulk_update_documents(document_ids):
             index.update_document(writer, doc)
 
 
+@shared_task
 def update_document_archive_file(document_id):
     """
     Re-creates the archive file of a document, including new OCR content and thumbnail

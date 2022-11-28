@@ -142,14 +142,14 @@ def matches(matching_model, document):
         return bool(match)
 
     elif matching_model.matching_algorithm == MatchingModel.MATCH_FUZZY:
-        from fuzzywuzzy import fuzz
+        from rapidfuzz import fuzz
 
         match = re.sub(r"[^\w\s]", "", matching_model.match)
         text = re.sub(r"[^\w\s]", "", document_content)
         if matching_model.is_insensitive:
             match = match.lower()
             text = text.lower()
-        if fuzz.partial_ratio(match, text) >= 90:
+        if fuzz.partial_ratio(match, text, score_cutoff=90):
             # TODO: make this better
             log_reason(
                 matching_model,

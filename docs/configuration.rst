@@ -38,7 +38,13 @@ PAPERLESS_REDIS=<url>
 PAPERLESS_DBENGINE=<engine_name>
     Optional, gives the ability to choose Postgres or MariaDB for database engine.
     Available options are `postgresql` and `mariadb`.
+
     Default is `postgresql`.
+
+    .. warning::
+
+      Using MariaDB comes with some caveats.  See :ref:`advanced-mysql-caveats` for details.
+
 
 PAPERLESS_DBHOST=<hostname>
     By default, sqlite is used as the database backend. This can be changed here.
@@ -538,7 +544,7 @@ requires are as follows:
         # ...
 
         gotenberg:
-            image: gotenberg/gotenberg:7.4
+            image: gotenberg/gotenberg:7.6
             restart: unless-stopped
             command:
                 - "gotenberg"
@@ -700,6 +706,7 @@ PAPERLESS_CONSUMER_ENABLE_BARCODES=<bool>
     saved as pdf.
 
     Defaults to false.
+
 
 PAPERLESS_CONSUMER_BARCODE_TIFF_SUPPORT=<bool>
     Whether TIFF image files should be scanned for barcodes.
@@ -901,6 +908,14 @@ PAPERLESS_OCR_LANGUAGES=<list>
 
     Defaults to none, which does not install any additional languages.
 
+PAPERLESS_ENABLE_FLOWER=<defined>
+    If this environment variable is defined, the Celery monitoring tool
+    `Flower <https://flower.readthedocs.io/en/latest/index.html>`_ will
+    be started by the container.
+
+    You can read more about this in the :ref:`advanced setup <advanced-celery-monitoring>`
+    documentation.
+
 
 .. _configuration-update-checking:
 
@@ -908,18 +923,9 @@ Update Checking
 ###############
 
 PAPERLESS_ENABLE_UPDATE_CHECK=<bool>
-    Enable (or disable) the automatic check for available updates. This feature is disabled
-    by default but if it is not explicitly set Paperless-ngx will show a message about this.
 
-    If enabled, the feature works by pinging the the Github API for the latest release e.g.
-    https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest
-    to determine whether a new version is available.
+    .. note::
 
-    Actual updating of the app must still be performed manually.
-
-    Note that for users of thirdy-party containers e.g. linuxserver.io this notification
-    may be 'ahead' of a new release from the third-party maintainers.
-
-    In either case, no tracking data is collected by the app in any way.
-
-    Defaults to none, which disables the feature.
+            This setting was deprecated in favor of a frontend setting after v1.9.2. A one-time
+            migration is performed for users who have this setting set. This setting is always
+            ignored if the corresponding frontend setting has been set.

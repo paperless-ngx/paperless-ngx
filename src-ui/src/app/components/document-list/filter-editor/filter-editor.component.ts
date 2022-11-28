@@ -44,6 +44,7 @@ import { DocumentService } from 'src/app/services/rest/document.service'
 import { PaperlessDocument } from 'src/app/data/paperless-document'
 import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
+import { RelativeDate } from '../../common/date-dropdown/date-dropdown.component'
 
 const TEXT_FILTER_TARGET_TITLE = 'title'
 const TEXT_FILTER_TARGET_TITLE_CONTENT = 'title-content'
@@ -56,6 +57,27 @@ const TEXT_FILTER_MODIFIER_NULL = 'is null'
 const TEXT_FILTER_MODIFIER_NOTNULL = 'not null'
 const TEXT_FILTER_MODIFIER_GT = 'greater'
 const TEXT_FILTER_MODIFIER_LT = 'less'
+
+const RELATIVE_DATE_QUERY_REGEXP_CREATED = /created:\[([^\]]+)\]/g
+const RELATIVE_DATE_QUERY_REGEXP_ADDED = /added:\[([^\]]+)\]/g
+const RELATIVE_DATE_QUERYSTRINGS = [
+  {
+    relativeDate: RelativeDate.LAST_7_DAYS,
+    dateQuery: '-1 week to now',
+  },
+  {
+    relativeDate: RelativeDate.LAST_MONTH,
+    dateQuery: '-1 month to now',
+  },
+  {
+    relativeDate: RelativeDate.LAST_3_MONTHS,
+    dateQuery: '-3 month to now',
+  },
+  {
+    relativeDate: RelativeDate.LAST_YEAR,
+    dateQuery: '-1 year to now',
+  },
+]
 
 @Component({
   selector: 'app-filter-editor',
@@ -197,6 +219,8 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   dateCreatedAfter: string
   dateAddedBefore: string
   dateAddedAfter: string
+  dateCreatedRelativeDate: RelativeDate
+  dateAddedRelativeDate: RelativeDate
 
   _unmodifiedFilterRules: FilterRule[] = []
   _filterRules: FilterRule[] = []
@@ -228,6 +252,8 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     this.dateAddedAfter = null
     this.dateCreatedBefore = null
     this.dateCreatedAfter = null
+    this.dateCreatedRelativeDate = null
+    this.dateAddedRelativeDate = null
     this.textFilterModifier = TEXT_FILTER_MODIFIER_EQUALS
 
     value.forEach((rule) => {
@@ -245,8 +271,39 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
           this.textFilterTarget = TEXT_FILTER_TARGET_ASN
           break
         case FILTER_FULLTEXT_QUERY:
-          this._textFilter = rule.value
-          this.textFilterTarget = TEXT_FILTER_TARGET_FULLTEXT_QUERY
+          let allQueryArgs = rule.value.split(',')
+          let textQueryArgs = []
+          allQueryArgs.forEach((arg) => {
+            if (arg.match(RELATIVE_DATE_QUERY_REGEXP_CREATED)) {
+              ;[...arg.matchAll(RELATIVE_DATE_QUERY_REGEXP_CREATED)].forEach(
+                (match) => {
+                  if (match[1]?.length) {
+                    this.dateCreatedRelativeDate =
+                      RELATIVE_DATE_QUERYSTRINGS.find(
+                        (qS) => qS.dateQuery == match[1]
+                      )?.relativeDate
+                  }
+                }
+              )
+            } else if (arg.match(RELATIVE_DATE_QUERY_REGEXP_ADDED)) {
+              ;[...arg.matchAll(RELATIVE_DATE_QUERY_REGEXP_ADDED)].forEach(
+                (match) => {
+                  if (match[1]?.length) {
+                    this.dateAddedRelativeDate =
+                      RELATIVE_DATE_QUERYSTRINGS.find(
+                        (qS) => qS.dateQuery == match[1]
+                      )?.relativeDate
+                  }
+                }
+              )
+            } else {
+              textQueryArgs.push(arg)
+            }
+          })
+          if (textQueryArgs.length) {
+            this._textFilter = textQueryArgs.join(',')
+            this.textFilterTarget = TEXT_FILTER_TARGET_FULLTEXT_QUERY
+          }
           break
         case FILTER_FULLTEXT_MORELIKE:
           this._moreLikeId = +rule.value
@@ -471,6 +528,89 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
         value: this.dateAddedAfter,
       })
     }
+    if (
+      this.dateAddedRelativeDate !== null ||
+      this.dateCreatedRelativeDate !== null
+    ) {
+      let queryArgs: Array<string> = []
+      let existingRule = filterRules.find(
+        (fr) => fr.rule_type == FILTER_FULLTEXT_QUERY
+      )
+
+      // if had a title / content search and added a relative date we need to carry it over...
+      if (
+        !existingRule &&
+        this._textFilter?.length > 0 &&
+        (this.textFilterTarget == TEXT_FILTER_TARGET_TITLE_CONTENT ||
+          this.textFilterTarget == TEXT_FILTER_TARGET_TITLE)
+      ) {
+        existingRule = filterRules.find(
+          (fr) =>
+            fr.rule_type == FILTER_TITLE_CONTENT || fr.rule_type == FILTER_TITLE
+        )
+        existingRule.rule_type = FILTER_FULLTEXT_QUERY
+      }
+
+      let existingRuleArgs = existingRule?.value.split(',')
+      if (this.dateCreatedRelativeDate !== null) {
+        queryArgs.push(
+          `created:[${
+            RELATIVE_DATE_QUERYSTRINGS.find(
+              (qS) => qS.relativeDate == this.dateCreatedRelativeDate
+            ).dateQuery
+          }]`
+        )
+        if (existingRule) {
+          queryArgs = existingRuleArgs
+            .filter((arg) => !arg.match(RELATIVE_DATE_QUERY_REGEXP_CREATED))
+            .concat(queryArgs)
+        }
+      }
+      if (this.dateAddedRelativeDate !== null) {
+        queryArgs.push(
+          `added:[${
+            RELATIVE_DATE_QUERYSTRINGS.find(
+              (qS) => qS.relativeDate == this.dateAddedRelativeDate
+            ).dateQuery
+          }]`
+        )
+        if (existingRule) {
+          queryArgs = existingRuleArgs
+            .filter((arg) => !arg.match(RELATIVE_DATE_QUERY_REGEXP_ADDED))
+            .concat(queryArgs)
+        }
+      }
+
+      if (existingRule) {
+        existingRule.value = queryArgs.join(',')
+      } else {
+        filterRules.push({
+          rule_type: FILTER_FULLTEXT_QUERY,
+          value: queryArgs.join(','),
+        })
+      }
+    }
+    if (
+      this.dateCreatedRelativeDate == null &&
+      this.dateAddedRelativeDate == null
+    ) {
+      const existingRule = filterRules.find(
+        (fr) => fr.rule_type == FILTER_FULLTEXT_QUERY
+      )
+      if (
+        existingRule?.value.match(RELATIVE_DATE_QUERY_REGEXP_CREATED) ||
+        existingRule?.value.match(RELATIVE_DATE_QUERY_REGEXP_ADDED)
+      ) {
+        // remove any existing date query
+        existingRule.value = existingRule.value
+          .replace(RELATIVE_DATE_QUERY_REGEXP_CREATED, '')
+          .replace(RELATIVE_DATE_QUERY_REGEXP_ADDED, '')
+        if (existingRule.value.replace(',', '').trim() === '') {
+          // if its empty now, remove it entirely
+          filterRules.splice(filterRules.indexOf(existingRule), 1)
+        }
+      }
+    }
     return filterRules
   }
 
@@ -569,13 +709,21 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     this.updateRules()
   }
 
-  textFilterEnter() {
-    const filterString = (
-      this.textFilterInput.nativeElement as HTMLInputElement
-    ).value
-    if (filterString.length) {
-      this.updateTextFilter(filterString)
+  textFilterKeyup(event: KeyboardEvent) {
+    if (event.key == 'Enter') {
+      const filterString = (
+        this.textFilterInput.nativeElement as HTMLInputElement
+      ).value
+      if (filterString.length) {
+        this.updateTextFilter(filterString)
+      }
+    } else if (event.key == 'Escape') {
+      this.resetTextField()
     }
+  }
+
+  resetTextField() {
+    this.updateTextFilter('')
   }
 
   changeTextFilterTarget(target) {

@@ -6,7 +6,6 @@ import { environment } from 'src/environments/environment'
 export interface AppRemoteVersion {
   version: string
   update_available: boolean
-  feature_is_set: boolean
 }
 
 @Injectable({
