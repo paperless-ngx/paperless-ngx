@@ -260,7 +260,7 @@ def parse_date_generator(filename, text) -> Iterator[datetime.datetime]:
 
         try:
             date = __parser(date_string, date_order)
-        except (TypeError, ValueError):
+        except Exception:
             # Skip all matches that do not parse to a proper date
             date = None
 

@@ -95,7 +95,13 @@ class RasterisedDocumentParser(DocumentParser):
             return None
 
     def extract_text(self, sidecar_file, pdf_file):
-        if sidecar_file and os.path.isfile(sidecar_file):
+        # When re-doing OCR, the sidecar contains ONLY the new text, not
+        # the whole text, so do not utilize it in that case
+        if (
+            sidecar_file is not None
+            and os.path.isfile(sidecar_file)
+            and settings.OCR_MODE != "redo"
+        ):
             with open(sidecar_file) as f:
                 text = f.read()
 
@@ -142,7 +148,7 @@ class RasterisedDocumentParser(DocumentParser):
             "input_file": input_file,
             "output_file": output_file,
             # need to use threads, since this will be run in daemonized
-            # processes by django-q.
+            # processes via the task library.
             "use_threads": True,
             "jobs": settings.THREADS_PER_WORKER,
             "language": settings.OCR_LANGUAGE,
@@ -165,9 +171,11 @@ class RasterisedDocumentParser(DocumentParser):
             if settings.OCR_MODE == "redo":
                 ocrmypdf_args["clean"] = True
             else:
+                # --clean-final is not compatible with --redo-ocr
                 ocrmypdf_args["clean_final"] = True
 
-        if settings.OCR_DESKEW and not settings.OCR_MODE == "redo":
+        if settings.OCR_DESKEW and settings.OCR_MODE != "redo":
+            # --deskew is not compatible with --redo-ocr
             ocrmypdf_args["deskew"] = True
 
         if settings.OCR_ROTATE_PAGES:
@@ -263,7 +271,7 @@ class RasterisedDocumentParser(DocumentParser):
 
         # Either no text was in the original or there should be an archive
         # file created, so OCR the file and create an archive with any
-        # test located via OCR
+        # text located via OCR
 
         import ocrmypdf
         from ocrmypdf import InputFileError, EncryptedPdfError
