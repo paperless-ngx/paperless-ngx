@@ -384,4 +384,9 @@ export class FilterableDropdownComponent {
       this.selectionModel.exclude(itemID)
     }
   }
+
+  reset() {
+    this.selectionModel.reset()
+    this.selectionModelChange.emit(this.selectionModel)
+  }
 }

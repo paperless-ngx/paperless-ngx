@@ -10,42 +10,42 @@ name = "piwheels"
 
 [packages]
 dateparser = "~=1.1"
-django = "~=4.0"
+django = "~=4.1"
 django-cors-headers = "*"
 django-extensions = "*"
 django-filter = "~=22.1"
-django-q = {editable = true, ref = "paperless-main", git = "https://github.com/paperless-ngx/django-q.git"}
-djangorestframework = "~=3.13"
+djangorestframework = "~=3.14"
 filelock = "*"
-fuzzywuzzy = {extras = ["speedup"], version = "*"}
 gunicorn = "*"
 imap-tools = "*"
 langdetect = "*"
 pathvalidate = "*"
-pillow = "~=9.2"
-pikepdf = "~=5.6"
+pillow = "~=9.3"
+pikepdf = "*"
 python-gnupg = "*"
 python-dotenv = "*"
 python-dateutil = "*"
 python-magic = "*"
 psycopg2 = "*"
-redis = "*"
+rapidfuzz = "*"
+redis = {extras = ["hiredis"], version = "*"}
 scikit-learn = "~=1.1"
 # Pin this until piwheels is building 1.9 (see https://www.piwheels.org/project/scipy/)
 scipy = "==1.8.1"
-# https://github.com/paperless-ngx/paperless-ngx/issues/1364
-numpy = "==1.22.3"
+numpy = "*"
 whitenoise = "~=6.2"
 watchdog = "~=2.1"
 whoosh="~=2.7"
 inotifyrecursive = "~=0.3"
-ocrmypdf = "~=13.7"
+ocrmypdf = "~=14.0"
 tqdm = "*"
 tika = "*"
 # TODO: This will sadly also install daphne+dependencies,
 #  which an ASGI server we don't need. Adds about 15MB image size.
 channels = "~=3.0"
-channels-redis = "*"
+# Locked version until https://github.com/django/channels_redis/issues/332
+# is resolved
+channels-redis = "==3.4.1"
 uvicorn = {extras = ["standard"], version = "*"}
 concurrent-log-handler = "*"
 "pdfminer.six" = "*"
@@ -54,7 +54,12 @@ concurrent-log-handler = "*"
 zipp = {version = "*", markers = "python_version < '3.9'"}
 pyzbar = "*"
 mysqlclient = "*"
+celery = {extras = ["redis"], version = "*"}
+django-celery-results = "*"
 setproctitle = "*"
+nltk = "*"
+pdf2image = "*"
+flower = "*"
 
 [dev-packages]
 coveralls = "*"
@@ -66,7 +71,7 @@ pytest-django = "*"
 pytest-env = "*"
 pytest-sugar = "*"
 pytest-xdist = "*"
-sphinx = "~=5.1"
+sphinx = "~=5.3"
 sphinx_rtd_theme = "*"
 tox = "*"
 black = "*"

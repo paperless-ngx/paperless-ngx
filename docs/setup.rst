@@ -39,7 +39,7 @@ Paperless consists of the following components:
 
     .. _setup-task_processor:
 
-*   **The task processor:** Paperless relies on `Django Q <https://django-q.readthedocs.io/en/latest/>`_
+*   **The task processor:** Paperless relies on `Celery - Distributed Task Queue <https://docs.celeryq.dev/en/stable/index.html>`_
     for doing most of the heavy lifting. This is a task queue that accepts tasks from
     multiple sources and processes these in parallel. It also comes with a scheduler that executes
     certain commands periodically.
@@ -61,13 +61,6 @@ Paperless consists of the following components:
     The task processor comes with a built-in admin interface that you can use to check whenever any of the
     tasks fail and inspect the errors (i.e., wrong email credentials, errors during consuming a specific
     file, etc).
-
-    You may start the task processor by executing:
-
-    .. code:: shell-session
-
-        $ cd /path/to/paperless/src/
-        $ python3 manage.py qcluster
 
 *   A `redis <https://redis.io/>`_ message broker: This is a really lightweight service that is responsible
     for getting the tasks from the webserver and the consumer to the task scheduler. These run in a different
@@ -291,7 +284,20 @@ Build the Docker image yourself
     .. code:: yaml
 
         webserver:
-            build: .
+            build:
+              context: .
+              args:
+                QPDF_VERSION: x.y.x
+                PIKEPDF_VERSION: x.y.z
+                PSYCOPG2_VERSION: x.y.z
+                JBIG2ENC_VERSION: 0.29
+
+    .. note::
+
+        You should match the build argument versions to the version for the release you have
+        checked out.  These are pre-built images with certain, more updated software.
+        If you want to build these images your self, that is possible, but beyond
+        the scope of these steps.
 
 4.  Follow steps 3 to 8 of :ref:`setup-docker_hub`. When asked to run
     ``docker-compose pull`` to pull the image, do
@@ -332,7 +338,7 @@ writing. Windows is not and will never be supported.
 
     .. code::
 
-        python3 python3-pip python3-dev imagemagick fonts-liberation gnupg libpq-dev libmagic-dev mime-support libzbar0 poppler-utils
+        python3 python3-pip python3-dev imagemagick fonts-liberation gnupg libpq-dev default-libmysqlclient-dev libmagic-dev mime-support libzbar0 poppler-utils
 
     These dependencies are required for OCRmyPDF, which is used for text recognition.
 
@@ -361,7 +367,7 @@ writing. Windows is not and will never be supported.
     You will also need ``build-essential``, ``python3-setuptools`` and ``python3-wheel``
     for installing some of the python dependencies.
 
-2.  Install ``redis`` >= 5.0 and configure it to start automatically.
+2.  Install ``redis`` >= 6.0 and configure it to start automatically.
 
 3.  Optional. Install ``postgresql`` and configure a database, user and password for paperless. If you do not wish
     to use PostgreSQL, MariaDB and SQLite are available as well.
@@ -461,8 +467,9 @@ writing. Windows is not and will never be supported.
     as a starting point.
 
     Paperless needs the ``webserver`` script to run the webserver, the
-    ``consumer`` script to watch the input folder, and the ``scheduler``
-    script to run tasks such as email checking and document consumption.
+    ``consumer`` script to watch the input folder, ``taskqueue`` for the background workers
+    used to handle things like document consumption and the ``scheduler`` script to run tasks such as
+    email checking at certain times .
 
 		The ``socket`` script enables ``gunicorn`` to run on port 80 without
 		root privileges. For this you need to uncomment the ``Require=paperless-webserver.socket``
@@ -512,6 +519,13 @@ writing. Windows is not and will never be supported.
     encoder. This will reduce the size of generated PDF documents. You'll most likely need
     to compile this by yourself, because this software has been patented until around 2017 and
     binary packages are not available for most distributions.
+
+15. Optional: If using the NLTK machine learning processing (see ``PAPERLESS_ENABLE_NLTK`` in
+    :ref:`configuration` for details), download the NLTK data for the Snowball Stemmer, Stopwords
+    and Punkt tokenizer to your ``PAPERLESS_DATA_DIR/nltk``.  Refer to
+    the `NLTK instructions <https://www.nltk.org/data.html>`_ for details on how to
+    download the data.
+
 
 Migrating to Paperless-ngx
 ##########################
@@ -635,7 +649,7 @@ Migration to paperless-ngx is then performed in a few simple steps:
 
 
 Migrating from LinuxServer.io Docker Image
-========================
+==========================================
 
 As with any upgrades and large changes, it is highly recommended to create a backup before
 starting.  This assumes the image was running using Docker Compose, but the instructions
@@ -649,7 +663,7 @@ are translatable to Docker commands as well.
         to step 4.
     b)  Otherwise, in the ``docker-compose.yml`` add a new service for Redis,
         following `the example compose files <https://github.com/paperless-ngx/paperless-ngx/tree/main/docker/compose>`_
-    b)  Set the environment variable ``PAPERLESS_REDIS`` so it points to the new Redis container
+    c)  Set the environment variable ``PAPERLESS_REDIS`` so it points to the new Redis container
 
 4.  Update user mapping
 
@@ -678,11 +692,12 @@ are translatable to Docker commands as well.
 
 .. _setup-sqlite_to_psql:
 
-Moving data from SQLite to PostgreSQL
-=====================================
+Moving data from SQLite to PostgreSQL or MySQL/MariaDB
+======================================================
 
-Moving your data from SQLite to PostgreSQL is done via executing a series of django
-management commands as below.
+Moving your data from SQLite to PostgreSQL or MySQL/MariaDB is done via executing a series of django
+management commands as below.  The commands below use PostgreSQL, but are applicable to MySQL/MariaDB
+with the
 
 .. caution::
 
@@ -698,6 +713,11 @@ management commands as below.
     (128 characters), names of document types, tags and correspondents (128 characters),
     and filenames (1024 characters). If you have data in these fields that surpasses these
     limits, migration to PostgreSQL is not possible and will fail with an error.
+
+.. warning::
+
+    MySQL is case insensitive by default, treating values like "Name" and "NAME" as identical.
+    See :ref:`advanced-mysql-caveats` for details.
 
 
 1.  Stop paperless, if it is running.
@@ -809,6 +829,8 @@ configuring some options in paperless can help improve performance immensely:
     OCR results.
 *   If using docker, consider setting ``PAPERLESS_WEBSERVER_WORKERS`` to
     1. This will save some memory.
+*   Consider setting ``PAPERLESS_ENABLE_NLTK`` to false, to disable the more
+    advanced language processing, which can take more memory and processing time.
 
 For details, refer to :ref:`configuration`.
 

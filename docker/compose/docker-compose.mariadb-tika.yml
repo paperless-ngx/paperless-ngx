@@ -85,10 +85,11 @@ services:
       PAPERLESS_TIKA_ENDPOINT: http://tika:9998
 
   gotenberg:
-    image: docker.io/gotenberg/gotenberg:7.4
+    image: docker.io/gotenberg/gotenberg:7.6
     restart: unless-stopped
-    environment:
-      CHROMIUM_DISABLE_ROUTES: 1
+    command:
+      - "gotenberg"
+      - "--chromium-disable-routes=true"
 
   tika:
     image: ghcr.io/paperless-ngx/tika:latest
