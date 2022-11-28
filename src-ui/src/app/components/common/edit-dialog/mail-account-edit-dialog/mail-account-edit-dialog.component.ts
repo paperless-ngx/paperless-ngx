@@ -8,6 +8,12 @@ import {
 } from 'src/app/data/paperless-mail-account'
 import { MailAccountService } from 'src/app/services/rest/mail-account.service'
 
+const IMAP_SECURITY_OPTIONS = [
+  { id: IMAPSecurity.None, name: $localize`No encryption` },
+  { id: IMAPSecurity.SSL, name: $localize`SSL` },
+  { id: IMAPSecurity.STARTTLS, name: $localize`STARTTLS` },
+]
+
 @Component({
   selector: 'app-mail-account-edit-dialog',
   templateUrl: './mail-account-edit-dialog.component.html',
@@ -39,10 +45,6 @@ export class MailAccountEditDialogComponent extends EditDialogComponent<Paperles
   }
 
   get imapSecurityOptions() {
-    return [
-      { id: IMAPSecurity.None, name: $localize`No encryption` },
-      { id: IMAPSecurity.SSL, name: $localize`SSL` },
-      { id: IMAPSecurity.STARTTLS, name: $localize`STARTTLS` },
-    ]
+    return IMAP_SECURITY_OPTIONS
   }
 }
