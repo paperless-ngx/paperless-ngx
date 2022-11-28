@@ -735,7 +735,7 @@ class MailAccountSerializer(serializers.ModelSerializer):
 
 class AccountField(serializers.PrimaryKeyRelatedField):
     def get_queryset(self):
-        return MailAccount.objects.all()
+        return MailAccount.objects.all().order_by("-id")
 
 
 class MailRuleSerializer(serializers.ModelSerializer):
