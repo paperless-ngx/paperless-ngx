@@ -524,7 +524,7 @@ export class SettingsComponent
   }
 
   editMailAccount(account: PaperlessMailAccount) {
-    var modal = this.modalService.open(MailAccountEditDialogComponent, {
+    const modal = this.modalService.open(MailAccountEditDialogComponent, {
       backdrop: 'static',
       size: 'xl',
     })
@@ -552,7 +552,7 @@ export class SettingsComponent
   }
 
   deleteMailAccount(account: PaperlessMailAccount) {
-    let modal = this.modalService.open(ConfirmDialogComponent, {
+    const modal = this.modalService.open(ConfirmDialogComponent, {
       backdrop: 'static',
     })
     modal.componentInstance.title = $localize`Confirm delete mail account`
@@ -582,7 +582,7 @@ export class SettingsComponent
   }
 
   editMailRule(rule: PaperlessMailRule) {
-    var modal = this.modalService.open(MailRuleEditDialogComponent, {
+    const modal = this.modalService.open(MailRuleEditDialogComponent, {
       backdrop: 'static',
       size: 'xl',
     })
@@ -611,7 +611,7 @@ export class SettingsComponent
   }
 
   deleteMailRule(rule: PaperlessMailRule) {
-    let modal = this.modalService.open(ConfirmDialogComponent, {
+    const modal = this.modalService.open(ConfirmDialogComponent, {
       backdrop: 'static',
     })
     modal.componentInstance.title = $localize`Confirm delete mail rule`
