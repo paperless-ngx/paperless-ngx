@@ -4,11 +4,11 @@
     (click)="isMenuCollapsed = !isMenuCollapsed">
     <span class="navbar-toggler-icon"></span>
   </button>
-  <a class="navbar-brand col-auto col-md-3 col-lg-2 me-0 px-3 py-3 order-sm-0" routerLink="/dashboard">
+  <a class="navbar-brand col-auto col-md-3 col-lg-2 me-0 px-3 py-3 order-sm-0" [ngClass]="slimSidebarEnabled ? 'slim' : 'col-auto col-md-3 col-lg-2'" routerLink="/dashboard" tourAnchor="tour.intro">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 198.43 238.91" width="1em" class="me-2" fill="currentColor">
       <path d="M194.7,0C164.22,70.94,17.64,79.74,64.55,194.06c.58,1.47-10.85,17-18.47,29.9-1.76-6.45-3.81-13.48-3.52-14.07,38.11-45.14-27.26-70.65-30.78-107.58C-4.64,131.62-10.5,182.92,39,212.53c.3,0,2.64,11.14,3.81,16.71a58.55,58.55,0,0,0-2.93,6.45c-1.17,2.93,7.62,2.64,7.62,3.22.88-.29,21.7-36.93,22.28-37.23C187.67,174.72,208.48,68.6,194.7,0ZM134.61,74.75C79.5,124,70.12,160.64,71.88,178.53,53.41,134.85,107.64,86.77,134.61,74.75ZM28.2,145.11c10.55,9.67,28.14,39.28,13.19,56.57C44.91,193.77,46.08,175.89,28.2,145.11Z" transform="translate(0 0)"/>
     </svg>
-    <ng-container i18n="app title">Paperless-ngx</ng-container>
+    <span class="ms-2" [class.visually-hidden]="slimSidebarEnabled" i18n="app title">Paperless-ngx</span>
   </a>
   <div class="search-form-container flex-grow-1 py-2 pb-3 pb-sm-2 px-3 ps-md-4 me-sm-auto order-3 order-sm-1">
     <form (ngSubmit)="search()" class="form-inline flex-grow-1">
@@ -16,7 +16,12 @@
         <use xlink:href="assets/bootstrap-icons.svg#search"/>
       </svg>
       <input class="form-control form-control-sm" type="text" placeholder="Search documents" aria-label="Search"
-        [formControl]="searchField" [ngbTypeahead]="searchAutoComplete" (selectItem)="itemSelected($event)" i18n-placeholder>
+        [formControl]="searchField" [ngbTypeahead]="searchAutoComplete" (keyup)="searchFieldKeyup($event)" (selectItem)="itemSelected($event)" i18n-placeholder>
+      <button type="button" *ngIf="!searchFieldEmpty" class="btn btn-link btn-sm px-0 position-absolute top-0 end-0" (click)="resetSearchField()">
+        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x me-1" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+        </svg>
+      </button>
     </form>
   </div>
   <ul ngbNav class="order-sm-3">
@@ -51,48 +56,54 @@
 
 <div class="container-fluid">
   <div class="row">
-    <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse" [ngbCollapse]="isMenuCollapsed">
+    <nav id="sidebarMenu" class="d-md-block bg-light sidebar collapse" [ngClass]="slimSidebarEnabled ? 'slim' : 'col-md-3 col-lg-2'" [class.animating]="slimSidebarAnimating" [ngbCollapse]="isMenuCollapsed">
+      <button class="btn btn-sm btn-dark sidebar-slim-toggler" (click)="toggleSlimSidebar()">
+        <svg class="sidebaricon-sm" fill="currentColor">
+          <use *ngIf="slimSidebarEnabled" xlink:href="assets/bootstrap-icons.svg#chevron-double-right"/>
+          <use *ngIf="!slimSidebarEnabled" xlink:href="assets/bootstrap-icons.svg#chevron-double-left"/>
+        </svg>
+      </button>
       <div class="sidebar-sticky pt-3 d-flex flex-column justify-space-around">
         <ul class="nav flex-column">
           <li class="nav-item">
-            <a class="nav-link" routerLink="dashboard" routerLinkActive="active" (click)="closeMenu()">
+            <a class="nav-link" routerLink="dashboard" routerLinkActive="active" (click)="closeMenu()" ngbPopover="Dashboard" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#house"/>
-              </svg>&nbsp;<ng-container i18n>Dashboard</ng-container>
+              </svg><span>&nbsp;<ng-container i18n>Dashboard</ng-container></span>
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" routerLink="documents" routerLinkActive="active" (click)="closeMenu()">
+            <a class="nav-link" routerLink="documents" routerLinkActive="active" (click)="closeMenu()" ngbPopover="Documents" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#files"/>
-              </svg>&nbsp;<ng-container i18n>Documents</ng-container>
+              </svg><span>&nbsp;<ng-container i18n>Documents</ng-container></span>
             </a>
           </li>
         </ul>
 
         <h6 class="sidebar-heading px-3 mt-4 mb-1 text-muted" *ngIf='savedViewService.loading || savedViewService.sidebarViews.length > 0'>
-          <ng-container i18n>Saved views</ng-container>
+          <span i18n>Saved views</span>
           <div *ngIf="savedViewService.loading" class="spinner-border spinner-border-sm fw-normal ms-2" role="status"></div>
         </h6>
         <ul class="nav flex-column mb-2">
           <li class="nav-item w-100" *ngFor="let view of savedViewService.sidebarViews">
-            <a class="nav-link text-truncate" routerLink="view/{{view.id}}" routerLinkActive="active" (click)="closeMenu()">
+            <a class="nav-link" [class.text-truncate]="!slimSidebarEnabled" routerLink="view/{{view.id}}" routerLinkActive="active" (click)="closeMenu()" [ngbPopover]="view.name" [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#funnel"/>
-              </svg>&nbsp;{{view.name}}
+              </svg><span>&nbsp;{{view.name}}</span>
             </a>
           </li>
         </ul>
 
         <h6 class="sidebar-heading px-3 mt-4 mb-1 text-muted" *ngIf='openDocuments.length > 0'>
-          <ng-container i18n>Open documents</ng-container>
+          <span i18n>Open documents</span>
         </h6>
         <ul class="nav flex-column mb-2">
           <li class="nav-item w-100" *ngFor='let d of openDocuments'>
-            <a class="nav-link text-truncate" routerLink="documents/{{d.id}}" routerLinkActive="active" (click)="closeMenu()">
+            <a class="nav-link" [class.text-truncate]="!slimSidebarEnabled" routerLink="documents/{{d.id}}" routerLinkActive="active" (click)="closeMenu()" [ngbPopover]="d.title | documentTitle" [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#file-text"/>
-              </svg>&nbsp;{{d.title | documentTitle}}
+              </svg><span>&nbsp;{{d.title | documentTitle}}</span>
               <span class="close" (click)="closeDocument(d); $event.preventDefault()">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
                   <use xlink:href="assets/bootstrap-icons.svg#x"/>
@@ -101,95 +112,96 @@
             </a>
           </li>
           <li class="nav-item w-100" *ngIf="openDocuments.length >= 1">
-            <a class="nav-link text-truncate" [routerLink]="[]" (click)="closeAll()">
+            <a class="nav-link" [class.text-truncate]="!slimSidebarEnabled" [routerLink]="[]" (click)="closeAll()" ngbPopover="Close all" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#x"/>
-              </svg>&nbsp;<ng-container i18n>Close all</ng-container>
+              </svg><span>&nbsp;<ng-container i18n>Close all</ng-container></span>
             </a>
           </li>
         </ul>
 
         <h6 class="sidebar-heading px-3 mt-4 mb-1 text-muted">
-          <ng-container i18n>Manage</ng-container>
+          <span i18n>Manage</span>
         </h6>
         <ul class="nav flex-column mb-2">
           <li class="nav-item">
-            <a class="nav-link" routerLink="correspondents" routerLinkActive="active" (click)="closeMenu()">
+            <a class="nav-link" routerLink="correspondents" routerLinkActive="active" (click)="closeMenu()" ngbPopover="Correspondents" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#person"/>
-              </svg>&nbsp;<ng-container i18n>Correspondents</ng-container>
+              </svg><span>&nbsp;<ng-container i18n>Correspondents</ng-container></span>
             </a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" routerLink="tags" routerLinkActive="active" (click)="closeMenu()">
+          <li class="nav-item" tourAnchor="tour.tags">
+            <a class="nav-link" routerLink="tags" routerLinkActive="active" (click)="closeMenu()" ngbPopover="Tags" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#tags"/>
-              </svg>&nbsp;<ng-container i18n>Tags</ng-container>
+              </svg><span>&nbsp;<ng-container i18n>Tags</ng-container></span>
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" routerLink="documenttypes" routerLinkActive="active" (click)="closeMenu()">
+            <a class="nav-link" routerLink="documenttypes" routerLinkActive="active" (click)="closeMenu()" ngbPopover="Document types" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#hash"/>
-              </svg>&nbsp;<ng-container i18n>Document types</ng-container>
+              </svg><span>&nbsp;<ng-container i18n>Document types</ng-container></span>
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" routerLink="storagepaths" routerLinkActive="active" (click)="closeMenu()">
+            <a class="nav-link" routerLink="storagepaths" routerLinkActive="active" (click)="closeMenu()" ngbPopover="Storage paths" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#folder"/>
-              </svg>&nbsp;<ng-container i18n>Storage paths</ng-container>
+              </svg><span>&nbsp;<ng-container i18n>Storage paths</ng-container></span>
             </a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" routerLink="tasks" routerLinkActive="active" (click)="closeMenu()">
+          <li class="nav-item" tourAnchor="tour.file-tasks">
+            <a class="nav-link" routerLink="tasks" routerLinkActive="active" (click)="closeMenu()" ngbPopover="File Tasks" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
+              <span *ngIf="tasksService.failedFileTasks.length > 0 && slimSidebarEnabled" class="badge bg-danger position-absolute top-0 end-0">{{tasksService.failedFileTasks.length}}</span>
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#list-task"/>
-              </svg>&nbsp;<ng-container i18n>File Tasks<ng-container *ngIf="tasksService.failedFileTasks.length > 0"><span class="badge bg-danger ms-2">{{tasksService.failedFileTasks.length}}</span></ng-container></ng-container>
+              </svg><span>&nbsp;<ng-container i18n>File Tasks<span *ngIf="tasksService.failedFileTasks.length > 0"><span class="badge bg-danger ms-2">{{tasksService.failedFileTasks.length}}</span></span></ng-container></span>
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" routerLink="logs" routerLinkActive="active" (click)="closeMenu()">
+            <a class="nav-link" routerLink="logs" routerLinkActive="active" (click)="closeMenu()" ngbPopover="Logs" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#text-left"/>
-              </svg>&nbsp;<ng-container i18n>Logs</ng-container>
+              </svg><span>&nbsp;<ng-container i18n>Logs</ng-container></span>
             </a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" routerLink="settings" routerLinkActive="active" (click)="closeMenu()">
+          <li class="nav-item" tourAnchor="tour.settings">
+            <a class="nav-link" routerLink="settings" routerLinkActive="active" (click)="closeMenu()" ngbPopover="Settings" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#gear"/>
-              </svg>&nbsp;<ng-container i18n>Settings</ng-container>
+              </svg><span>&nbsp;<ng-container i18n>Settings</ng-container></span>
             </a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="admin/">
+          <li class="nav-item" tourAnchor="tour.admin">
+            <a class="nav-link" href="admin/" ngbPopover="Admin" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#toggles"/>
-              </svg>&nbsp;<ng-container i18n>Admin</ng-container>
+              </svg><span>&nbsp;<ng-container i18n>Admin</ng-container></span>
             </a>
           </li>
         </ul>
 
         <h6 class="sidebar-heading px-3 mt-auto pt-4 mb-1 text-muted">
-          <ng-container i18n>Info</ng-container>
+          <span i18n>Info</span>
         </h6>
         <ul class="nav flex-column mb-2">
-          <li class="nav-item">
-            <a class="nav-link" target="_blank" rel="noopener noreferrer" href="https://paperless-ngx.readthedocs.io/en/latest/">
+          <li class="nav-item" tourAnchor="tour.outro">
+            <a class="nav-link" target="_blank" rel="noopener noreferrer" href="https://paperless-ngx.readthedocs.io/en/latest/" ngbPopover="Documentation" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#question-circle"/>
-              </svg>&nbsp;<ng-container i18n>Documentation</ng-container>
+              </svg><span>&nbsp;<ng-container i18n>Documentation</ng-container></span>
             </a>
           </li>
           <li class="nav-item">
             <div class="d-flex w-100 flex-wrap">
-              <a class="nav-link pe-2 pb-1" target="_blank" rel="noopener noreferrer" href="https://github.com/paperless-ngx/paperless-ngx">
+              <a class="nav-link pe-2 pb-1" target="_blank" rel="noopener noreferrer" href="https://github.com/paperless-ngx/paperless-ngx" ngbPopover="GitHub" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="sidebaricon" viewBox="0 0 16 16">
                   <use xlink:href="assets/bootstrap-icons.svg#github" />
-                </svg>&nbsp;<ng-container i18n>GitHub</ng-container>
+                </svg><span>&nbsp;<ng-container i18n>GitHub</ng-container></span>
               </a>
-              <a class="nav-link-additional small text-muted ms-3" target="_blank" rel="noopener noreferrer" href="https://github.com/paperless-ngx/paperless-ngx/discussions/categories/feature-requests" title="Suggest an idea" i18n-title>
+              <a class="nav-link-additional small text-muted ms-3" [class.visually-hidden]="slimSidebarEnabled" target="_blank" rel="noopener noreferrer" href="https://github.com/paperless-ngx/paperless-ngx/discussions/categories/feature-requests" title="Suggest an idea" i18n-title>
                 <svg xmlns="http://www.w3.org/2000/svg" width="1.1em" height="1.1em" fill="currentColor" class="me-1" viewBox="0 0 16 16">
                   <use xlink:href="assets/bootstrap-icons.svg#lightbulb" />
                 </svg>
@@ -197,17 +209,28 @@
               </a>
             </div>
           </li>
-          <li class="nav-item mt-2">
+          <li class="nav-item mt-2" [class.visually-hidden]="slimSidebarEnabled">
             <div class="px-3 py-2 text-muted small d-flex align-items-center flex-wrap">
               <div class="me-3">{{ versionString }}</div>
-              <div *ngIf="appRemoteVersion" class="version-check">
+              <div *ngIf="!settingsService.updateCheckingIsSet || appRemoteVersion" class="version-check">
                 <ng-template #updateAvailablePopContent>
                   <span class="small">Paperless-ngx {{ appRemoteVersion.version }} <ng-container i18n>is available.</ng-container><br/><ng-container i18n>Click to view.</ng-container></span>
                 </ng-template>
                 <ng-template #updateCheckingNotEnabledPopContent>
-                  <span class="small"><ng-container i18n>Checking for updates is disabled.</ng-container><br/><ng-container i18n>Click for more information.</ng-container></span>
+                  <p class="small mb-2">
+                    <ng-container i18n>Paperless-ngx can automatically check for updates</ng-container>
+                  </p>
+                  <div class="btn-group btn-group-xs flex-fill w-100">
+                    <button class="btn btn-outline-primary" (click)="setUpdateChecking(true)">Enable</button>
+                    <button class="btn btn-outline-secondary" (click)="setUpdateChecking(false)">Disable</button>
+                  </div>
+                  <p class="small mb-0 mt-2">
+                    <a class="small text-decoration-none fst-italic" routerLink="/settings" fragment="update-checking" i18n>
+                      How does this work?
+                    </a>
+                  </p>
                 </ng-template>
-                <ng-container *ngIf="appRemoteVersion.feature_is_set; else updateCheckNotSet">
+                <ng-container *ngIf="settingsService.updateCheckingIsSet; else updateCheckNotSet">
                   <a *ngIf="appRemoteVersion.update_available" class="small text-decoration-none" target="_blank" rel="noopener noreferrer" href="https://github.com/paperless-ngx/paperless-ngx/releases"
                   [ngbPopover]="updateAvailablePopContent" popoverClass="shadow" triggers="mouseenter:mouseleave" container="body">
                     <svg fill="currentColor" class="me-1" width="1.2em" height="1.2em" style="vertical-align: text-top;" viewBox="0 0 16 16">
@@ -217,8 +240,8 @@
                   </a>
                 </ng-container>
                 <ng-template #updateCheckNotSet>
-                  <a class="small text-decoration-none" target="_blank" rel="noopener noreferrer" href="https://paperless-ngx.readthedocs.io/en/latest/configuration.html#update-checking"
-                  [ngbPopover]="updateCheckingNotEnabledPopContent" popoverClass="shadow" triggers="mouseenter:mouseleave" container="body">
+                  <a class="small text-decoration-none" routerLink="/settings" fragment="update-checking"
+                  [ngbPopover]="updateCheckingNotEnabledPopContent" popoverClass="shadow" triggers="mouseenter" container="body">
                     <svg fill="currentColor" class="me-1" width="1.2em" height="1.2em" style="vertical-align: text-top;" viewBox="0 0 16 16">
                       <use xlink:href="assets/bootstrap-icons.svg#info-circle" />
                     </svg>
@@ -231,7 +254,7 @@
       </div>
     </nav>
 
-    <main role="main" class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+    <main role="main" class="ms-sm-auto px-md-4" [ngClass]="slimSidebarEnabled ? 'col-slim' : 'col-md-9 col-lg-10'">
       <router-outlet></router-outlet>
     </main>
   </div>

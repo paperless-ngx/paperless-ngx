@@ -2,7 +2,9 @@ import datetime
 import os
 import re
 import shutil
+import stat
 import tempfile
+from subprocess import CalledProcessError
 from unittest import mock
 from unittest.mock import MagicMock
 
@@ -14,6 +16,7 @@ except ImportError:
     import backports.zoneinfo as zoneinfo
 
 from django.conf import settings
+from django.utils import timezone
 from django.test import override_settings
 from django.test import TestCase
 
@@ -326,6 +329,12 @@ class TestConsumer(DirectoriesMixin, TestCase):
     def testNormalOperation(self):
 
         filename = self.get_test_file()
+
+        # Get the local time, as an aware datetime
+        # Roughly equal to file modification time
+        rough_create_date_local = timezone.localtime(timezone.now())
+
+        # Consume the file
         document = self.consumer.try_consume_file(filename)
 
         self.assertEqual(document.content, "The Text")
@@ -351,7 +360,20 @@ class TestConsumer(DirectoriesMixin, TestCase):
 
         self._assert_first_last_send_progress()
 
-        self.assertEqual(document.created.tzinfo, zoneinfo.ZoneInfo("America/Chicago"))
+        # Convert UTC time from DB to local time
+        document_date_local = timezone.localtime(document.created)
+
+        self.assertEqual(
+            document_date_local.tzinfo,
+            zoneinfo.ZoneInfo("America/Chicago"),
+        )
+        self.assertEqual(document_date_local.tzinfo, rough_create_date_local.tzinfo)
+        self.assertEqual(document_date_local.year, rough_create_date_local.year)
+        self.assertEqual(document_date_local.month, rough_create_date_local.month)
+        self.assertEqual(document_date_local.day, rough_create_date_local.day)
+        self.assertEqual(document_date_local.hour, rough_create_date_local.hour)
+        self.assertEqual(document_date_local.minute, rough_create_date_local.minute)
+        # Skipping seconds and more precise
 
     @override_settings(FILENAME_FORMAT=None)
     def testDeleteMacFiles(self):
@@ -781,7 +803,16 @@ class TestConsumerCreatedDate(DirectoriesMixin, TestCase):
 
 
 class PreConsumeTestCase(TestCase):
-    @mock.patch("documents.consumer.Popen")
+    def setUp(self) -> None:
+
+        # this prevents websocket message reports during testing.
+        patcher = mock.patch("documents.consumer.Consumer._send_progress")
+        self._send_progress = patcher.start()
+        self.addCleanup(patcher.stop)
+
+        return super().setUp()
+
+    @mock.patch("documents.consumer.run")
     @override_settings(PRE_CONSUME_SCRIPT=None)
     def test_no_pre_consume_script(self, m):
         c = Consumer()
@@ -789,7 +820,7 @@ class PreConsumeTestCase(TestCase):
         c.run_pre_consume_script()
         m.assert_not_called()
 
-    @mock.patch("documents.consumer.Popen")
+    @mock.patch("documents.consumer.run")
     @mock.patch("documents.consumer.Consumer._send_progress")
     @override_settings(PRE_CONSUME_SCRIPT="does-not-exist")
     def test_pre_consume_script_not_found(self, m, m2):
@@ -798,7 +829,7 @@ class PreConsumeTestCase(TestCase):
         c.path = "path-to-file"
         self.assertRaises(ConsumerError, c.run_pre_consume_script)
 
-    @mock.patch("documents.consumer.Popen")
+    @mock.patch("documents.consumer.run")
     def test_pre_consume_script(self, m):
         with tempfile.NamedTemporaryFile() as script:
             with override_settings(PRE_CONSUME_SCRIPT=script.name):
@@ -810,14 +841,78 @@ class PreConsumeTestCase(TestCase):
 
                 args, kwargs = m.call_args
 
-                command = args[0]
+                command = kwargs["args"]
 
                 self.assertEqual(command[0], script.name)
                 self.assertEqual(command[1], "path-to-file")
 
+    @mock.patch("documents.consumer.Consumer.log")
+    def test_script_with_output(self, mocked_log):
+        """
+        GIVEN:
+            - A script which outputs to stdout and stderr
+        WHEN:
+            - The script is executed as a consume script
+        THEN:
+            - The script's outputs are logged
+        """
+        with tempfile.NamedTemporaryFile(mode="w") as script:
+            # Write up a little script
+            with script.file as outfile:
+                outfile.write("#!/usr/bin/env bash\n")
+                outfile.write("echo This message goes to stdout\n")
+                outfile.write("echo This message goes to stderr >&2")
+
+            # Make the file executable
+            st = os.stat(script.name)
+            os.chmod(script.name, st.st_mode | stat.S_IEXEC)
+
+            with override_settings(PRE_CONSUME_SCRIPT=script.name):
+                c = Consumer()
+                c.path = "path-to-file"
+                c.run_pre_consume_script()
+
+                mocked_log.assert_called()
+
+                mocked_log.assert_any_call("info", "This message goes to stdout")
+                mocked_log.assert_any_call("warning", "This message goes to stderr")
+
+    def test_script_exit_non_zero(self):
+        """
+        GIVEN:
+            - A script which exits with a non-zero exit code
+        WHEN:
+            - The script is executed as a pre-consume script
+        THEN:
+            - A ConsumerError is raised
+        """
+        with tempfile.NamedTemporaryFile(mode="w") as script:
+            # Write up a little script
+            with script.file as outfile:
+                outfile.write("#!/usr/bin/env bash\n")
+                outfile.write("exit 100\n")
+
+            # Make the file executable
+            st = os.stat(script.name)
+            os.chmod(script.name, st.st_mode | stat.S_IEXEC)
+
+            with override_settings(PRE_CONSUME_SCRIPT=script.name):
+                c = Consumer()
+                c.path = "path-to-file"
+                self.assertRaises(ConsumerError, c.run_pre_consume_script)
+
 
 class PostConsumeTestCase(TestCase):
-    @mock.patch("documents.consumer.Popen")
+    def setUp(self) -> None:
+
+        # this prevents websocket message reports during testing.
+        patcher = mock.patch("documents.consumer.Consumer._send_progress")
+        self._send_progress = patcher.start()
+        self.addCleanup(patcher.stop)
+
+        return super().setUp()
+
+    @mock.patch("documents.consumer.run")
     @override_settings(POST_CONSUME_SCRIPT=None)
     def test_no_post_consume_script(self, m):
         doc = Document.objects.create(title="Test", mime_type="application/pdf")
@@ -838,7 +933,7 @@ class PostConsumeTestCase(TestCase):
         c.filename = "somefile.pdf"
         self.assertRaises(ConsumerError, c.run_post_consume_script, doc)
 
-    @mock.patch("documents.consumer.Popen")
+    @mock.patch("documents.consumer.run")
     def test_post_consume_script_simple(self, m):
         with tempfile.NamedTemporaryFile() as script:
             with override_settings(POST_CONSUME_SCRIPT=script.name):
@@ -848,7 +943,7 @@ class PostConsumeTestCase(TestCase):
 
                 m.assert_called_once()
 
-    @mock.patch("documents.consumer.Popen")
+    @mock.patch("documents.consumer.run")
     def test_post_consume_script_with_correspondent(self, m):
         with tempfile.NamedTemporaryFile() as script:
             with override_settings(POST_CONSUME_SCRIPT=script.name):
@@ -869,7 +964,7 @@ class PostConsumeTestCase(TestCase):
 
                 args, kwargs = m.call_args
 
-                command = args[0]
+                command = kwargs["args"]
 
                 self.assertEqual(command[0], script.name)
                 self.assertEqual(command[1], str(doc.pk))
@@ -877,3 +972,29 @@ class PostConsumeTestCase(TestCase):
                 self.assertEqual(command[6], f"/api/documents/{doc.pk}/thumb/")
                 self.assertEqual(command[7], "my_bank")
                 self.assertCountEqual(command[8].split(","), ["a", "b"])
+
+    def test_script_exit_non_zero(self):
+        """
+        GIVEN:
+            - A script which exits with a non-zero exit code
+        WHEN:
+            - The script is executed as a post-consume script
+        THEN:
+            - A ConsumerError is raised
+        """
+        with tempfile.NamedTemporaryFile(mode="w") as script:
+            # Write up a little script
+            with script.file as outfile:
+                outfile.write("#!/usr/bin/env bash\n")
+                outfile.write("exit -500\n")
+
+            # Make the file executable
+            st = os.stat(script.name)
+            os.chmod(script.name, st.st_mode | stat.S_IEXEC)
+
+            with override_settings(POST_CONSUME_SCRIPT=script.name):
+                c = Consumer()
+                doc = Document.objects.create(title="Test", mime_type="application/pdf")
+                c.path = "path-to-file"
+                with self.assertRaises(ConsumerError):
+                    c.run_post_consume_script(doc)

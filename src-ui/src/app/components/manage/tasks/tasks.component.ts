@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core'
+import { Router } from '@angular/router'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
-import { takeUntil, Subject, first } from 'rxjs'
+import { Subject, first } from 'rxjs'
 import { PaperlessTask } from 'src/app/data/paperless-task'
 import { TasksService } from 'src/app/services/tasks.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
@@ -24,7 +25,8 @@ export class TasksComponent implements OnInit, OnDestroy {
 
   constructor(
     public tasksService: TasksService,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private readonly router: Router
   ) {}
 
   ngOnInit() {
@@ -62,6 +64,11 @@ export class TasksComponent implements OnInit, OnDestroy {
       this.tasksService.dismissTasks(tasks)
       this.selectedTasks.clear()
     }
+  }
+
+  dismissAndGo(task: PaperlessTask) {
+    this.dismissTask(task)
+    this.router.navigate(['documents', task.related_document])
   }
 
   expandTask(task: PaperlessTask) {

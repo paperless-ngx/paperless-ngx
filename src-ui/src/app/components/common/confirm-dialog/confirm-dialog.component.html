@@ -16,4 +16,7 @@
         <ngb-progressbar *ngIf="!confirmButtonEnabled" style="height: 1px;" type="dark" [max]="secondsTotal" [value]="seconds"></ngb-progressbar>
         <span class="visually-hidden">{{ seconds | number: '1.0-0' }} seconds</span>
       </button>
+      <button *ngIf="alternativeBtnCaption" type="button" class="btn" [class]="alternativeBtnClass" (click)="alternative()" [disabled]="!alternativeButtonEnabled || !buttonsEnabled">
+        {{alternativeBtnCaption}}
+      </button>
     </div>

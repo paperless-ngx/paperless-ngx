@@ -19,7 +19,7 @@ Check for the following issues:
 
     .. code:: shell-session
 
-        $ python3 manage.py qcluster
+        $ celery --app paperless worker
 
 *   Look at the output of paperless and inspect it for any errors.
 *   Go to the admin interface, and check if there are failed tasks. If so, the
@@ -125,7 +125,7 @@ If using docker-compose, this is achieved by the following configuration change 
 .. code:: yaml
 
     gotenberg:
-        image: gotenberg/gotenberg:7.4
+        image: gotenberg/gotenberg:7.6
         restart: unless-stopped
         command:
             - "gotenberg"

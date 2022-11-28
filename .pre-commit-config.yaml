@@ -37,7 +37,7 @@ repos:
         exclude: "(^Pipfile\\.lock$)"
   # Python hooks
   - repo: https://github.com/asottile/reorder_python_imports
-    rev: v3.8.2
+    rev: v3.9.0
     hooks:
       - id: reorder-python-imports
         exclude: "(migrations)"
@@ -47,23 +47,23 @@ repos:
       - id: yesqa
         exclude: "(migrations)"
   - repo: https://github.com/asottile/add-trailing-comma
-    rev: "v2.2.3"
+    rev: "v2.3.0"
     hooks:
       - id: add-trailing-comma
         exclude: "(migrations)"
-  - repo: https://gitlab.com/pycqa/flake8
-    rev: 3.9.2
+  - repo: https://github.com/PyCQA/flake8
+    rev: 5.0.4
     hooks:
       - id: flake8
         files: ^src/
         args:
           - "--config=./src/setup.cfg"
   - repo: https://github.com/psf/black
-    rev: 22.6.0
+    rev: 22.10.0
     hooks:
       - id: black
   - repo: https://github.com/asottile/pyupgrade
-    rev: v2.37.3
+    rev: v3.2.2
     hooks:
       - id: pyupgrade
         exclude: "(migrations)"

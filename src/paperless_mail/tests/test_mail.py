@@ -47,14 +47,15 @@ class BogusFolderManager:
 
 
 class BogusClient:
+    def __init__(self, messages):
+        self.messages: List[MailMessage] = messages
+        self.capabilities: List[str] = []
+
     def __enter__(self):
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         pass
-
-    def __init__(self, messages):
-        self.messages: List[MailMessage] = messages
 
     def authenticate(self, mechanism, authobject):
         # authobject must be a callable object
@@ -80,18 +81,18 @@ class BogusMailBox(ContextManager):
     # Note the non-ascii characters here
     UTF_PASSWORD: str = "w57äöüw4b6huwb6nhu"
 
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        pass
-
     def __init__(self):
         self.messages: List[MailMessage] = []
         self.messages_spam: List[MailMessage] = []
         self.folder = BogusFolderManager()
         self.client = BogusClient(self.messages)
         self._host = ""
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
 
     def updateClient(self):
         self.client = BogusClient(self.messages)
@@ -247,7 +248,7 @@ class TestMail(DirectoriesMixin, TestCase):
         m.return_value = self.bogus_mailbox
         self.addCleanup(patcher.stop)
 
-        patcher = mock.patch("paperless_mail.mail.async_task")
+        patcher = mock.patch("paperless_mail.mail.consume_file.delay")
         self.async_task = patcher.start()
         self.addCleanup(patcher.stop)
 
@@ -648,6 +649,7 @@ class TestMail(DirectoriesMixin, TestCase):
 
     def test_handle_mail_account_tag_gmail(self):
         self.bogus_mailbox._host = "imap.gmail.com"
+        self.bogus_mailbox.client.capabilities = ["X-GM-EXT-1"]
 
         account = MailAccount.objects.create(
             name="test",
@@ -1030,20 +1032,3 @@ class TestTasks(TestCase):
         m.side_effect = lambda account: 0
         result = tasks.process_mail_accounts()
         self.assertIn("No new", result)
-
-    @mock.patch("paperless_mail.tasks.MailAccountHandler.handle_mail_account")
-    def test_single_accounts(self, m):
-        MailAccount.objects.create(
-            name="A",
-            imap_server="A",
-            username="A",
-            password="A",
-        )
-
-        tasks.process_mail_account("A")
-
-        m.assert_called_once()
-        m.reset_mock()
-
-        tasks.process_mail_account("B")
-        m.assert_not_called()

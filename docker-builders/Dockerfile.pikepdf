@@ -18,6 +18,10 @@ LABEL org.opencontainers.image.description="A intermediate image with pikepdf wh
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG PIKEPDF_VERSION
+# These are not used, but will still bust the cache if one changes
+# Otherwise, the main image will try to build thing (and fail)
+ARG PILLOW_VERSION
+ARG LXML_VERSION
 
 ARG BUILD_PACKAGES="\
   build-essential \
@@ -60,7 +64,7 @@ RUN set -eux \
     && apt-get update --quiet \
     && apt-get install --yes --quiet --no-install-recommends ${BUILD_PACKAGES} \
   && echo "Installing qpdf" \
-    && dpkg --install libqpdf28_*.deb \
+    && dpkg --install libqpdf29_*.deb \
     && dpkg --install libqpdf-dev_*.deb \
   && echo "Installing Python tools" \
     && python3 -m pip install --no-cache-dir --upgrade \
