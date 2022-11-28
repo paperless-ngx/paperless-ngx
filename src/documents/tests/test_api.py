@@ -2968,15 +2968,11 @@ class TestAPIMailAccounts(APITestCase):
         self.assertEqual(response.data["count"], 1)
         returned_account1 = response.data["results"][0]
 
-        from pprint import pprint
-
-        pprint(returned_account1)
-
         self.assertEqual(returned_account1["name"], account1.name)
         self.assertEqual(returned_account1["username"], account1.username)
         self.assertEqual(
             returned_account1["password"],
-            re.sub(".", "*", account1.password),
+            "*" * len(account1.password),
         )
         self.assertEqual(returned_account1["imap_server"], account1.imap_server)
         self.assertEqual(returned_account1["imap_port"], account1.imap_port)
@@ -3009,10 +3005,6 @@ class TestAPIMailAccounts(APITestCase):
         self.assertEqual(response.status_code, 201)
 
         returned_account1 = MailAccount.objects.get(name="Email1")
-
-        from pprint import pprint
-
-        pprint(returned_account1)
 
         self.assertEqual(returned_account1.name, account1["name"])
         self.assertEqual(returned_account1.username, account1["username"])
@@ -3150,10 +3142,6 @@ class TestAPIMailRules(APITestCase):
         self.assertEqual(response.data["count"], 1)
         returned_rule1 = response.data["results"][0]
 
-        from pprint import pprint
-
-        pprint(returned_rule1)
-
         self.assertEqual(returned_rule1["name"], rule1.name)
         self.assertEqual(returned_rule1["account"], account1.pk)
         self.assertEqual(returned_rule1["folder"], rule1.folder)
@@ -3238,10 +3226,6 @@ class TestAPIMailRules(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["count"], 1)
         returned_rule1 = response.data["results"][0]
-
-        from pprint import pprint
-
-        pprint(returned_rule1)
 
         self.assertEqual(returned_rule1["name"], rule1["name"])
         self.assertEqual(returned_rule1["account"], account1.pk)
