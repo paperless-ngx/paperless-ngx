@@ -373,7 +373,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">126</context>
         </context-group>
-        <target state="translated">Kontrolna tabla se može koristiti za prikazivanje sačuvanih pogleda, kao što je 'Inbox'. Ta podešavanja se nalaze pod Podešavanja &gt; Sačuvani pogledi kada budete kreirali neke.</target>
+        <target state="translated">Kontrolna tabla se može koristiti za prikazivanje sačuvanih pogleda, kao što je 'Inbox'. Kada kreirate neke poglede ta podešavanja će se nalazati pod Podešavanja &gt; Sačuvani pogledi.</target>
       </trans-unit>
       <trans-unit id="9075755296812854717" datatype="html">
         <source>Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Paperless-ngx will start training its machine learning algorithms.</source>
@@ -2161,13 +2161,13 @@
         </context-group>
         <target state="translated">Nastavi</target>
       </trans-unit>
-      <trans-unit id="7662620858973651688" datatype="html">
-        <source>Redo OCR operation will begin in the background.</source>
+      <trans-unit id="5729001209753056399" datatype="html">
+        <source>Redo OCR operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">494</context>
         </context-group>
-        <target state="translated">Operacija ponovnog OCR će započeti u pozadini.</target>
+        <target state="needs-translation">Redo OCR operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.</target>
       </trans-unit>
       <trans-unit id="8008978164775353960" datatype="html">
         <source>Error executing operation: <x id="PH" equiv-text="JSON.stringify(                 error.error               )"/></source>
