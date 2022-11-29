@@ -14,8 +14,6 @@ from documents.views import CorrespondentViewSet
 from documents.views import DocumentTypeViewSet
 from documents.views import IndexView
 from documents.views import LogViewSet
-from documents.views import MailAccountViewSet
-from documents.views import MailRuleViewSet
 from documents.views import PostDocumentView
 from documents.views import RemoteVersionView
 from documents.views import SavedViewViewSet
@@ -29,6 +27,8 @@ from documents.views import UiSettingsView
 from documents.views import UnifiedSearchViewSet
 from paperless.consumers import StatusConsumer
 from paperless.views import FaviconView
+from paperless_mail.views import MailAccountViewSet
+from paperless_mail.views import MailRuleViewSet
 from rest_framework.authtoken import views
 from rest_framework.routers import DefaultRouter
 
