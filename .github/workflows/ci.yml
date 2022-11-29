@@ -42,35 +42,13 @@ jobs:
         name: Checkout
         uses: actions/checkout@v3
       -
-        name: Install pipenv
-        run: |
-          pipx install pipenv==2022.10.12
-      -
-        name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.9
-          cache: "pipenv"
-          cache-dependency-path: 'Pipfile.lock'
-      -
-        name: Install dependencies
-        run: |
-          pipenv sync --dev
-      -
-        name: List installed Python dependencies
-        run: |
-          pipenv run pip list
-      -
-        name: Make documentation
-        run: |
-          cd docs/
-          pipenv run make html
-      -
-        name: Upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: documentation
-          path: docs/_build/html/
+        name: Deploy docs
+        uses: mhausenblas/mkdocs-deploy-gh-pages@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CUSTOM_DOMAIN: paperless-ngx.com
+          CONFIG_FILE: mkdocs.yml
+          EXTRA_PACKAGES: build-base
 
   tests-backend:
     name: "Tests (${{ matrix.python-version }})"
