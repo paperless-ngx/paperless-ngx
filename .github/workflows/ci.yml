@@ -81,15 +81,6 @@ jobs:
       matrix:
         python-version: ['3.8', '3.9', '3.10']
       fail-fast: false
-    services:
-      tika:
-        image: ghcr.io/paperless-ngx/tika:latest
-        ports:
-          - "9998:9998/tcp"
-      gotenberg:
-        image: docker.io/gotenberg/gotenberg:7.6
-        ports:
-          - "3000:3000/tcp"
     env:
       # Enable Tika end to end testing
       TIKA_LIVE: 1
@@ -103,6 +94,11 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+      -
+        name: Start containers
+        run: |
+          docker compose --file ${GITHUB_WORKSPACE}/docker/compose/docker-compose.ci-test.yml pull --quiet
+          docker compose --file ${GITHUB_WORKSPACE}/docker/compose/docker-compose.ci-test.yml up --detach
       -
         name: Install pipenv
         run: |
@@ -154,6 +150,11 @@ jobs:
         run: |
           cd src/
           pipenv run coveralls --service=github
+      -
+        name: Stop containers
+        if: always()
+        run: |
+          docker compose --file ${GITHUB_WORKSPACE}/docker/compose/docker-compose.ci-test.yml down
 
   tests-frontend:
     name: "Tests Frontend"
