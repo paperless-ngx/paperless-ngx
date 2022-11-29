@@ -206,7 +206,16 @@ export class SettingsComponent
       SettingsNavIDs
     ).find(([navIDkey, navIDValue]) => navIDValue == navChangeEvent.nextId)
     if (foundNavIDkey)
-      this.router.navigate(['settings', foundNavIDkey.toLowerCase()])
+      // if its dirty we need to wait for confirmation
+      this.router
+        .navigate(['settings', foundNavIDkey.toLowerCase()])
+        .then((navigated) => {
+          if (!navigated && this.isDirty) {
+            this.activeNavID = navChangeEvent.activeId
+          } else if (navigated && this.isDirty) {
+            this.initialize()
+          }
+        })
   }
 
   // Load tab contents 'on demand', either on mouseover or focusin (i.e. before click) or called from nav change event
@@ -214,7 +223,7 @@ export class SettingsComponent
     if (navID == SettingsNavIDs.SavedViews && !this.savedViews) {
       this.savedViewService.listAll().subscribe((r) => {
         this.savedViews = r.results
-        this.initialize()
+        this.initialize(false)
       })
     } else if (
       navID == SettingsNavIDs.Mail &&
@@ -225,14 +234,16 @@ export class SettingsComponent
 
         this.mailRuleService.listAll().subscribe((r) => {
           this.mailRules = r.results
-          this.initialize()
+          this.initialize(false)
         })
       })
     }
   }
 
-  initialize() {
+  initialize(resetSettings: boolean = true) {
     this.unsubscribeNotifier.next(true)
+
+    const currentFormValue = this.settingsForm.value
 
     let storeData = this.getCurrentSettings()
 
@@ -352,6 +363,11 @@ export class SettingsComponent
           this.settingsForm.get('themeColor').value
         )
       })
+
+    if (!resetSettings && currentFormValue) {
+      // prevents loss of unsaved changes
+      this.settingsForm.patchValue(currentFormValue)
+    }
   }
 
   ngOnDestroy() {
