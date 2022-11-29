@@ -154,6 +154,7 @@ jobs:
         name: Stop containers
         if: always()
         run: |
+          docker compose --file ${GITHUB_WORKSPACE}/docker/compose/docker-compose.ci-test.yml logs
           docker compose --file ${GITHUB_WORKSPACE}/docker/compose/docker-compose.ci-test.yml down
 
   tests-frontend:
