@@ -35,6 +35,8 @@ from paperless.db import GnuPG
 from paperless.views import StandardPagination
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
+from paperless_mail.serialisers import MailAccountSerializer
+from paperless_mail.serialisers import MailRuleSerializer
 from rest_framework import parsers
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
@@ -83,8 +85,6 @@ from .serialisers import CorrespondentSerializer
 from .serialisers import DocumentListSerializer
 from .serialisers import DocumentSerializer
 from .serialisers import DocumentTypeSerializer
-from .serialisers import MailAccountSerializer
-from .serialisers import MailRuleSerializer
 from .serialisers import PostDocumentSerializer
 from .serialisers import SavedViewSerializer
 from .serialisers import StoragePathSerializer
