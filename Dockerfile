@@ -127,7 +127,9 @@ ARG RUNTIME_PACKAGES="\
   zlib1g \
   # Barcode splitter
   libzbar0 \
-  poppler-utils"
+  poppler-utils \
+  # RapidFuzz on armv7
+  libatomic1"
 
 # Install basic runtime packages.
 # These change very infrequently
