@@ -51,8 +51,8 @@ repos:
     hooks:
       - id: add-trailing-comma
         exclude: "(migrations)"
-  - repo: https://gitlab.com/pycqa/flake8
-    rev: 3.9.2
+  - repo: https://github.com/PyCQA/flake8
+    rev: 5.0.4
     hooks:
       - id: flake8
         files: ^src/
@@ -63,7 +63,7 @@ repos:
     hooks:
       - id: black
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.1.0
+    rev: v3.2.2
     hooks:
       - id: pyupgrade
         exclude: "(migrations)"

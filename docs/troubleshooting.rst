@@ -321,3 +321,12 @@ Uploading or consuming multiple files at once results in many workers attempting
 Consider changing to the PostgreSQL database if you will be processing many documents at once often.  Otherwise,
 try tweaking the ``PAPERLESS_DB_TIMEOUT`` setting to allow more time for the database to unlock.  This may have
 minor performance implications.
+
+
+gunicorn fails to start with "is not a valid port number"
+#########################################################
+
+You are likely running using Kubernetes, which automatically creates an environment variable named `${serviceName}_PORT`.
+This is the same environment variable which is used by Paperless to optionally change the port gunicorn listens on.
+
+To fix this, set `PAPERLESS_PORT` again to your desired port, or the default of 8000.
