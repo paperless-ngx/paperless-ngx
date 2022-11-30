@@ -25,9 +25,9 @@ export interface PaperlessTask extends ObjectWithId {
 
   date_created: Date
 
-  done?: Date
+  date_done?: Date
 
-  result: string
+  result?: string
 
   related_document?: number
 }
