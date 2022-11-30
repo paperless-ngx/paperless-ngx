@@ -648,13 +648,56 @@ Migration to paperless-ngx is then performed in a few simple steps:
 10.  Optionally, follow the instructions below to migrate your existing data to PostgreSQL.
 
 
+Migrating from LinuxServer.io Docker Image
+==========================================
+
+As with any upgrades and large changes, it is highly recommended to create a backup before
+starting.  This assumes the image was running using Docker Compose, but the instructions
+are translatable to Docker commands as well.
+
+1.  Stop and remove the paperless container
+2.  If using an external database, stop the container
+3.  Update Redis configuration
+
+    a)  If ``REDIS_URL`` is already set, change it to ``PAPERLESS_REDIS`` and continue
+        to step 4.
+    b)  Otherwise, in the ``docker-compose.yml`` add a new service for Redis,
+        following `the example compose files <https://github.com/paperless-ngx/paperless-ngx/tree/main/docker/compose>`_
+    c)  Set the environment variable ``PAPERLESS_REDIS`` so it points to the new Redis container
+
+4.  Update user mapping
+
+    a)  If set, change the environment variable ``PUID`` to ``USERMAP_UID``
+    b)  If set, change the environment variable ``PGID`` to ``USERMAP_GID``
+
+5.  Update configuration paths
+
+    a) Set the environment variable ``PAPERLESS_DATA_DIR``
+       to ``/config``
+
+6.  Update media paths
+
+    a) Set the environment variable ``PAPERLESS_MEDIA_ROOT``
+       to ``/data/media``
+
+7.  Update timezone
+
+    a) Set the environment variable ``PAPERLESS_TIME_ZONE``
+       to the same value as ``TZ``
+
+8.  Modify the ``image:`` to point to ``ghcr.io/paperless-ngx/paperless-ngx:latest`` or
+    a specific version if preferred.
+
+9.  Start the containers as before, using ``docker-compose``.
+
 .. _setup-sqlite_to_psql:
 
-Moving data from SQLite to PostgreSQL
-=====================================
+Moving data from SQLite to PostgreSQL or MySQL/MariaDB
+======================================================
 
-Moving your data from SQLite to PostgreSQL is done via executing a series of django
-management commands as below.
+Moving your data from SQLite to PostgreSQL or MySQL/MariaDB is done via executing a series of django
+management commands as below.  The commands below use PostgreSQL, but are applicable to MySQL/MariaDB
+with the
 
 .. caution::
 
@@ -670,6 +713,11 @@ management commands as below.
     (128 characters), names of document types, tags and correspondents (128 characters),
     and filenames (1024 characters). If you have data in these fields that surpasses these
     limits, migration to PostgreSQL is not possible and will fail with an error.
+
+.. warning::
+
+    MySQL is case insensitive by default, treating values like "Name" and "NAME" as identical.
+    See :ref:`advanced-mysql-caveats` for details.
 
 
 1.  Stop paperless, if it is running.
