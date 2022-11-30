@@ -8,6 +8,31 @@
 
         document.documentElement.classList.toggle("dark-mode", darkModeState);
         document.documentElement.classList.toggle("light-mode", !darkModeState);
+
+        const RTD_TO_MKD = {
+            "index.html": "",
+            "setup.html": "setup",
+            "usage_overview.html": "usage",
+            "advanced_usage.html": "advanced_usage",
+            "administration.html": "administration",
+            "configuration.html": "configuration",
+            "api.html": "api",
+            "faq.html": "faq",
+            "troubleshooting.html": "troubleshooting",
+            "extending.html": "development",
+            "scanners.html": "",
+            "screenshots.html": "",
+            "changelog.html": "changelog",
+        }
+
+        const path = RTD_TO_MKD[window.location.pathname.substring(window.location.pathname.lastIndexOf("/") + 1)] + "/";
+        const hash = window.location.hash;
+        const redirectURL = new URL(path + hash, "https://paperless-ngx.com/");
+        console.log(`Redirecting to ${redirectURL} in 3 seconds...`);
+
+        setTimeout(() => {
+            window.location.replace(redirectURL);
+        }, 3000);
     </script>
     {{ super() }}
 {% endblock %}

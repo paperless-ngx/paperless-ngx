@@ -1,9 +1,8 @@
-.. _screenshots:
+.. _changelog:
 
-***********
-Screenshots
-***********
-
+*********
+Changelog
+*********
 
 .. cssclass:: redirect-notice
 

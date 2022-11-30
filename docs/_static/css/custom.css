@@ -595,3 +595,11 @@ html.writer-html5 .rst-content dl.footnote code {
 .wy-nav-content-wrap {
   z-index: 20;
 }
+
+.rst-content .toctree-wrapper {
+  display: none;
+}
+
+.redirect-notice {
+  font-size: 2.5rem;
+}
