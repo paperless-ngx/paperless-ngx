@@ -72,34 +72,37 @@ COPY --from=jbig2enc-builder /usr/src/jbig2enc/src/*.h /usr/local/include/
 
 # Packages need for running
 ARG RUNTIME_PACKAGES="\
+  # Python
+  python3 \
+  python3-pip \
+  python3-setuptools \
+  # General utils
   curl \
-  file \
+  # Docker specific
+  gosu \
+  # Timezones support
+  tzdata \
   # fonts for text file thumbnail generation
   fonts-liberation \
   gettext \
   ghostscript \
   gnupg \
-  gosu \
   icc-profiles-free \
   imagemagick \
-  media-types \
+  # Image processing
   liblept5 \
-  libpq5 \
-  libxml2 \
   liblcms2-2 \
   libtiff5 \
-  libxslt1.1 \
   libfreetype6 \
   libwebp6 \
   libopenjp2-7 \
   libimagequant0 \
   libraqm0 \
-  libgnutls30 \
   libjpeg62-turbo \
-  python3 \
-  python3-pip \
-  python3-setuptools \
+  # PostgreSQL
+  libpq5 \
   postgresql-client \
+  # MySQL / MariaDB
   mariadb-client \
   # For Numpy
   libatlas3-base \
@@ -110,17 +113,23 @@ ARG RUNTIME_PACKAGES="\
   tesseract-ocr-fra \
   tesseract-ocr-ita \
   tesseract-ocr-spa \
-  # Suggested for OCRmyPDF
-  pngquant \
-  # Suggested for pikepdf
-  jbig2dec \
-  tzdata \
   unpaper \
+  pngquant \
+  # pikepdf / qpdf
+  jbig2dec \
+  libxml2 \
+  libxslt1.1 \
+  libgnutls30 \
   # Mime type detection
+  file \
+  libmagic1 \
+  media-types \
   zlib1g \
   # Barcode splitter
   libzbar0 \
-  poppler-utils"
+  poppler-utils \
+  # RapidFuzz on armv7
+  libatomic1"
 
 # Install basic runtime packages.
 # These change very infrequently

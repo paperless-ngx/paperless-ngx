@@ -81,15 +81,6 @@ jobs:
       matrix:
         python-version: ['3.8', '3.9', '3.10']
       fail-fast: false
-    services:
-      tika:
-        image: ghcr.io/paperless-ngx/tika:latest
-        ports:
-          - "9998:9998/tcp"
-      gotenberg:
-        image: ghcr.io/p-h-a-i-l/gotenberg:7.6
-        ports:
-          - "3000:3000/tcp"
     env:
       # Enable Tika end to end testing
       TIKA_LIVE: 1
@@ -107,6 +98,11 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+      -
+        name: Start containers
+        run: |
+          docker compose --file ${GITHUB_WORKSPACE}/docker/compose/docker-compose.ci-test.yml pull --quiet
+          docker compose --file ${GITHUB_WORKSPACE}/docker/compose/docker-compose.ci-test.yml up --detach
       -
         name: Install pipenv
         run: |
@@ -158,6 +154,12 @@ jobs:
         run: |
           cd src/
           pipenv run coveralls --service=github
+      -
+        name: Stop containers
+        if: always()
+        run: |
+          docker compose --file ${GITHUB_WORKSPACE}/docker/compose/docker-compose.ci-test.yml logs
+          docker compose --file ${GITHUB_WORKSPACE}/docker/compose/docker-compose.ci-test.yml down
 
   tests-frontend:
     name: "Tests Frontend"
@@ -482,10 +484,9 @@ jobs:
       -
         name: Upload release archive
         id: upload-release-asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: shogo82148/actions-upload-release-asset@v1
         with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           upload_url: ${{ steps.create-release.outputs.upload_url }}
           asset_path: ./paperless-ngx.tar.xz
           asset_name: paperless-ngx-${{ steps.get_version.outputs.version }}.tar.xz
@@ -527,7 +528,7 @@ jobs:
           CURRENT_CHANGELOG=`tail --lines +2 changelog.md`
           echo -e "$CURRENT_CHANGELOG" >> changelog-new.md
           mv changelog-new.md changelog.md
-          pipenv run pre-commit --files changelog.md
+          pipenv run pre-commit run --files changelog.md
           git config --global user.name "github-actions"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -am "Changelog ${{ needs.publish-release.outputs.version }} - GHA"
