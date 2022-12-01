@@ -44,6 +44,39 @@ describe('tasks', () => {
       })
   })
 
+  it('should correctly switch between task tabs', () => {
+    cy.get('tbody').find('tr:visible').its('length').should('eq', 10) // double because collapsible result tr
+    cy.wait(500) // stabilizes the test, for some reason...
+    cy.get('app-tasks')
+      .find('a:visible')
+      .contains('Queued')
+      .first()
+      .click()
+      .wait(2000)
+      .then(() => {
+        cy.get('tbody').find('tr:visible').should('not.exist')
+      })
+    cy.get('app-tasks')
+      .find('a:visible')
+      .contains('Started')
+      .first()
+      .click()
+      .wait(2000)
+      .then(() => {
+        cy.get('tbody').find('tr:visible').its('length').should('eq', 2) // double because collapsible result tr
+      })
+    cy.get('app-tasks')
+      .find('a:visible')
+      .contains('Complete')
+      .first()
+      .click()
+      .wait('@tasks')
+      .wait(2000)
+      .then(() => {
+        cy.get('tbody').find('tr:visible').its('length').should('eq', 12) // double because collapsible result tr
+      })
+  })
+
   it('should allow toggling all tasks in list and warn on dismiss', () => {
     cy.get('thead').find('input[type="checkbox"]').first().click()
     cy.get('body').find('button').contains('Dismiss selected').first().click()
