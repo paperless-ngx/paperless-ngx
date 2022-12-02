@@ -42,6 +42,46 @@ jobs:
         name: Checkout
         uses: actions/checkout@v3
       -
+        name: Install pipenv
+        run: |
+          pipx install pipenv==2022.10.12
+      -
+        name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.8
+          cache: "pipenv"
+          cache-dependency-path: 'Pipfile.lock'
+      -
+        name: Install dependencies
+        run: |
+          pipenv sync --dev
+      -
+        name: List installed Python dependencies
+        run: |
+          pipenv run pip list
+      -
+        name: Make documentation
+        run: |
+          pipenv run mkdocs build --config-file ./mkdocs.yml
+      -
+        name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: documentation
+          path: site/
+
+  documentation-deploy:
+    name: "Deploy Documentation"
+    runs-on: ubuntu-20.04
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs:
+      - documentation
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
         name: Deploy docs
         uses: mhausenblas/mkdocs-deploy-gh-pages@master
         env:
