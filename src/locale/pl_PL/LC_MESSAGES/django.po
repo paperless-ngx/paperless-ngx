@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-09 21:50+0000\n"
-"PO-Revision-Date: 2022-11-09 23:11\n"
+"PO-Revision-Date: 2022-11-28 16:30\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -184,11 +184,11 @@ msgstr "Aktualna nazwa pliku archiwum w pamięci"
 
 #: documents/models.py:221
 msgid "original filename"
-msgstr ""
+msgstr "oryginalna nazwa pliku"
 
 #: documents/models.py:227
 msgid "The original name of the file when it was uploaded"
-msgstr ""
+msgstr "Oryginalna nazwa pliku, gdy został przesłany"
 
 #: documents/models.py:231
 msgid "archive serial number"
@@ -368,15 +368,15 @@ msgstr "ma znaczniki w"
 
 #: documents/models.py:410
 msgid "ASN greater than"
-msgstr ""
+msgstr "ASN większy niż"
 
 #: documents/models.py:411
 msgid "ASN less than"
-msgstr ""
+msgstr "ASN mniejszy niż"
 
 #: documents/models.py:412
 msgid "storage path is"
-msgstr ""
+msgstr "ścieżką przechowywania jest"
 
 #: documents/models.py:422
 msgid "rule type"
@@ -396,23 +396,23 @@ msgstr "reguły filtrowania"
 
 #: documents/models.py:536
 msgid "Task ID"
-msgstr ""
+msgstr "ID zadania"
 
 #: documents/models.py:537
 msgid "Celery ID for the Task that was run"
-msgstr ""
+msgstr "ID Celery dla zadania, które zostało uruchomione"
 
 #: documents/models.py:542
 msgid "Acknowledged"
-msgstr ""
+msgstr "Potwierdzono"
 
 #: documents/models.py:543
 msgid "If the task is acknowledged via the frontend or API"
-msgstr ""
+msgstr "Jeśli zadanie jest potwierdzone przez frontend lub API"
 
 #: documents/models.py:549 documents/models.py:556
 msgid "Task Name"
-msgstr ""
+msgstr "Nazwa zadania"
 
 #: documents/models.py:550
 msgid "Name of the file which the Task was run for"
@@ -440,7 +440,7 @@ msgstr ""
 
 #: documents/models.py:578
 msgid "Task State"
-msgstr ""
+msgstr "Stan zadania"
 
 #: documents/models.py:579
 msgid "Current state of the task being run"
@@ -476,19 +476,19 @@ msgstr ""
 
 #: documents/models.py:604
 msgid "The data returned by the task"
-msgstr ""
+msgstr "Dane zwrócone przez zadanie"
 
 #: documents/models.py:613
 msgid "Comment for the document"
-msgstr ""
+msgstr "Komentarz do dokumentu"
 
 #: documents/models.py:642
 msgid "comment"
-msgstr ""
+msgstr "komentarz"
 
 #: documents/models.py:643
 msgid "comments"
-msgstr ""
+msgstr "komentarze"
 
 #: documents/serialisers.py:72
 #, python-format
