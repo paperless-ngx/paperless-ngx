@@ -33,7 +33,7 @@
     "ngx-file-drop": "^14.0.2",
     "ngx-ui-tour-ng-bootstrap": "^11.1.0",
     "rxjs": "~7.5.7",
-    "tslib": "^2.3.1",
+    "tslib": "^2.4.1",
     "uuid": "^9.0.0",
     "zone.js": "~0.11.8"
   },
