@@ -1,5 +1,46 @@
 # Changelog
 
+## paperless-ngx 1.10.1
+
+### Features
+
+- Feature: Allows documents in WebP format [@stumpylog](https://github.com/stumpylog) ([#1984](https://github.com/paperless-ngx/paperless-ngx/pull/1984))
+
+### Bug Fixes
+
+- Fix: frontend tasks display in 1.10.0 [@shamoon](https://github.com/shamoon) ([#2073](https://github.com/paperless-ngx/paperless-ngx/pull/2073))
+- Bugfix: Custom startup commands weren't run as root [@stumpylog](https://github.com/stumpylog) ([#2069](https://github.com/paperless-ngx/paperless-ngx/pull/2069))
+- Bugfix: Add libatomic for armv7 compatibility [@stumpylog](https://github.com/stumpylog) ([#2066](https://github.com/paperless-ngx/paperless-ngx/pull/2066))
+- Bugfix: Don't silence an exception when trying to handle file naming [@stumpylog](https://github.com/stumpylog) ([#2062](https://github.com/paperless-ngx/paperless-ngx/pull/2062))
+- Bugfix: Some tesseract languages aren't detected as installed. [@stumpylog](https://github.com/stumpylog) ([#2057](https://github.com/paperless-ngx/paperless-ngx/pull/2057))
+
+### Maintenance
+
+- Chore: Use a maintained upload-release-asset [@stumpylog](https://github.com/stumpylog) ([#2055](https://github.com/paperless-ngx/paperless-ngx/pull/2055))
+
+### Dependencies
+
+  <details>
+  <summary>5 changes</summary>
+
+- Bump tslib from 2.4.0 to 2.4.1 in /src-ui @dependabot ([#2076](https://github.com/paperless-ngx/paperless-ngx/pull/2076))
+- Bump @<!---->angular-builders/jest from 14.0.1 to 14.1.0 in /src-ui @dependabot ([#2079](https://github.com/paperless-ngx/paperless-ngx/pull/2079))
+- Bump jest-preset-angular from 12.2.2 to 12.2.3 in /src-ui @dependabot ([#2078](https://github.com/paperless-ngx/paperless-ngx/pull/2078))
+- Bump ngx-file-drop from 14.0.1 to 14.0.2 in /src-ui @dependabot ([#2080](https://github.com/paperless-ngx/paperless-ngx/pull/2080))
+- Bump @<!---->ngneat/dirty-check-forms from 3.0.2 to 3.0.3 in /src-ui @dependabot ([#2077](https://github.com/paperless-ngx/paperless-ngx/pull/2077))
+</details>
+
+### All App Changes
+
+- Bump tslib from 2.4.0 to 2.4.1 in /src-ui @dependabot ([#2076](https://github.com/paperless-ngx/paperless-ngx/pull/2076))
+- Bump @<!---->angular-builders/jest from 14.0.1 to 14.1.0 in /src-ui @dependabot ([#2079](https://github.com/paperless-ngx/paperless-ngx/pull/2079))
+- Bump jest-preset-angular from 12.2.2 to 12.2.3 in /src-ui @dependabot ([#2078](https://github.com/paperless-ngx/paperless-ngx/pull/2078))
+- Bump ngx-file-drop from 14.0.1 to 14.0.2 in /src-ui @dependabot ([#2080](https://github.com/paperless-ngx/paperless-ngx/pull/2080))
+- Bump @<!---->ngneat/dirty-check-forms from 3.0.2 to 3.0.3 in /src-ui @dependabot ([#2077](https://github.com/paperless-ngx/paperless-ngx/pull/2077))
+- Fix: frontend tasks display in 1.10.0 [@shamoon](https://github.com/shamoon) ([#2073](https://github.com/paperless-ngx/paperless-ngx/pull/2073))
+- Bugfix: Don't silence an exception when trying to handle file naming [@stumpylog](https://github.com/stumpylog) ([#2062](https://github.com/paperless-ngx/paperless-ngx/pull/2062))
+- Bugfix: Some tesseract languages aren't detected as installed. [@stumpylog](https://github.com/stumpylog) ([#2057](https://github.com/paperless-ngx/paperless-ngx/pull/2057))
+
 ## paperless-ngx 1.10.0
 
 ### Features
