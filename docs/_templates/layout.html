@@ -25,9 +25,9 @@
             "changelog.html": "changelog",
         }
 
-        const path = RTD_TO_MKD[window.location.pathname.substring(window.location.pathname.lastIndexOf("/") + 1)] + "/";
+        const path = (RTD_TO_MKD[window.location.pathname.substring(window.location.pathname.lastIndexOf("/") + 1)] ?? "") + "/";
         const hash = window.location.hash;
-        const redirectURL = new URL(path + hash, "https://paperless-ngx.com/");
+        const redirectURL = new URL(path  + hash, "https://paperless-ngx.com/");
         console.log(`Redirecting to ${redirectURL} in 3 seconds...`);
 
         setTimeout(() => {
