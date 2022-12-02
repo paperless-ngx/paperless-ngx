@@ -447,7 +447,8 @@ def update_filename_and_move_files(sender, instance, **kwargs):
                 archive_filename=instance.archive_filename,
             )
 
-        except (OSError, DatabaseError, CannotMoveFilesException):
+        except (OSError, DatabaseError, CannotMoveFilesException) as e:
+            logger.warn(f"Exception during file handling: {e}")
             # This happens when either:
             #  - moving the files failed due to file system errors
             #  - saving to the database failed due to database errors
@@ -456,9 +457,11 @@ def update_filename_and_move_files(sender, instance, **kwargs):
             # Try to move files to their original location.
             try:
                 if move_original and os.path.isfile(instance.source_path):
+                    logger.info("Restoring previous original path")
                     os.rename(instance.source_path, old_source_path)
 
                 if move_archive and os.path.isfile(instance.archive_path):
+                    logger.info("Restoring previous archive path")
                     os.rename(instance.archive_path, old_archive_path)
 
             except Exception:
@@ -468,7 +471,7 @@ def update_filename_and_move_files(sender, instance, **kwargs):
                 #  issue that's going to get caught by the santiy checker.
                 #  All files remain in place and will never be overwritten,
                 #  so this is not the end of the world.
-                # B: if moving the orignal file failed, nothing has changed
+                # B: if moving the original file failed, nothing has changed
                 #  anyway.
                 pass
 

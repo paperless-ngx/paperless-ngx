@@ -407,11 +407,14 @@ The Docker image includes the ability to run custom user scripts during startup.
 utilized for installing additional tools or Python packages, for example.
 
 To utilize this, mount a folder containing your scripts to the custom initialization directory, `/custom-cont-init.d`
-and place scripts you wish to run inside.  For security, the folder and its contents must be owned by `root`.
-Additionally, scripts must only be writable by `root`.
+and place scripts you wish to run inside.  For security, the folder must be owned by `root` and should have permissions
+of `a=rx`.  Additionally, scripts must only be writable by `root`.
 
 Your scripts will be run directly before the webserver completes startup.  Scripts will be run by the `root` user.
-This is an advanced functionality with which you could break functionality or lose data.
+If you would like to switch users, the utility `gosu` is available and preferred over `sudo`.
+
+This is an advanced functionality with which you could break functionality or lose data.  If you experience issues,
+please disable any custom scripts and try again before reporting an issue.
 
 For example, using Docker Compose:
 
@@ -424,6 +427,7 @@ For example, using Docker Compose:
         # ...
         volumes:
           - /path/to/my/scripts:/custom-cont-init.d:ro
+
 
 .. _advanced-mysql-caveats:
 
