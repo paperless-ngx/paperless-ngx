@@ -53,30 +53,6 @@ map_folders() {
 	export CONSUME_DIR="${PAPERLESS_CONSUMPTION_DIR:-/usr/src/paperless/consume}"
 }
 
-nltk_data () {
-	# Store the NLTK data outside the Docker container
-	local -r nltk_data_dir="${DATA_DIR}/nltk"
-	local -r truthy_things=("yes y 1 t true")
-
-	# If not set, or it looks truthy
-	if [[ -z "${PAPERLESS_ENABLE_NLTK}" ]] || [[ "${truthy_things[*]}" =~ ${PAPERLESS_ENABLE_NLTK,} ]]; then
-
-		# Download or update the snowball stemmer data
-		python3 -W ignore::RuntimeWarning -m nltk.downloader -d "${nltk_data_dir}" snowball_data
-
-		# Download or update the stopwords corpus
-		python3 -W ignore::RuntimeWarning -m nltk.downloader -d "${nltk_data_dir}" stopwords
-
-		# Download or update the punkt tokenizer data
-		python3 -W ignore::RuntimeWarning -m nltk.downloader -d "${nltk_data_dir}" punkt
-
-	else
-		echo "Skipping NLTK data download"
-
-	fi
-
-}
-
 custom_container_init() {
 	# Mostly borrowed from the LinuxServer.io base image
 	# https://github.com/linuxserver/docker-baseimage-ubuntu/tree/bionic/root/etc/cont-init.d
@@ -157,8 +133,6 @@ initialize() {
 	echo "Creating directory ${tmp_dir}"
 	mkdir -p "${tmp_dir}"
 
-	nltk_data
-
 	set +e
 	echo "Adjusting permissions of paperless files. This may take a while."
 	chown -R paperless:paperless ${tmp_dir}
@@ -191,10 +165,6 @@ install_languages() {
 
 	for lang in "${langs[@]}"; do
 		pkg="tesseract-ocr-$lang"
-		# English is installed by default
-		#if [[ "$lang" ==  "eng" ]]; then
-		#    continue
-		#fi
 
 		if dpkg -s "$pkg" &>/dev/null; then
 			echo "Package $pkg already installed!"
