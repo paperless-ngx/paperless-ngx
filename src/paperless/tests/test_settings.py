@@ -97,7 +97,9 @@ class TestIgnoreDateParsing(TestCase):
         """
 
         for input, expected in [
+            # Nothing is set
             (None, ("redis://localhost:6379", "redis://localhost:6379")),
+            # celery style
             (
                 "redis+socket:///run/redis/redis.sock",
                 (
@@ -105,11 +107,28 @@ class TestIgnoreDateParsing(TestCase):
                     "unix:///run/redis/redis.sock",
                 ),
             ),
+            # redis-py / channels-redis style
             (
                 "unix:///run/redis/redis.sock",
                 (
                     "redis+socket:///run/redis/redis.sock",
                     "unix:///run/redis/redis.sock",
+                ),
+            ),
+            # celery style with db
+            (
+                "redis+socket:///run/redis/redis.sock?virtual_host=5",
+                (
+                    "redis+socket:///run/redis/redis.sock?virtual_host=5",
+                    "unix:///run/redis/redis.sock?db=5",
+                ),
+            ),
+            # redis-py / channels-redis style with db
+            (
+                "unix:///run/redis/redis.sock?db=10",
+                (
+                    "redis+socket:///run/redis/redis.sock?virtual_host=10",
+                    "unix:///run/redis/redis.sock?db=10",
                 ),
             ),
         ]:
