@@ -162,8 +162,7 @@ specific query parameters cause the API to return full text search
 results:
 
 - `/api/documents/?query=your%20search%20query`: Search for a document
-  using a full text query. For details on the syntax, see
-  `basic-usage_searching`{.interpreted-text role="ref"}.
+  using a full text query. For details on the syntax, see [Basic Usage - Searching](usage#basic-usage_searching).
 - `/api/documents/?more_like=1234`: Search for documents similar to
   the document with id 1234.
 
@@ -232,7 +231,7 @@ Tf/Idf score in the index.
 ["term1", "term3", "term6", "term4"]
 ```
 
-## POSTing documents {#api-file_uploads}
+## POSTing documents {#file-uploads}
 
 The API provides a special endpoint for file uploads:
 

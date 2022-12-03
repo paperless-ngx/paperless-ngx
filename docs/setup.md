@@ -23,8 +23,7 @@ Paperless provides an interactive installation script. This script will
 ask you for a couple configuration options, download and create the
 necessary configuration files, pull the docker image, start paperless
 and create your user account. This script essentially performs all the
-steps described in `setup-docker_hub`{.interpreted-text role="ref"}
-automatically.
+steps described in [Docker setup](#docker_hub) automatically.
 
 1.  Make sure that docker and docker-compose are installed.
 
@@ -36,17 +35,20 @@ automatically.
 
 ### From GHCR / Docker Hub {#docker_hub}
 
-1.  Login with your user and create a folder in your home-directory
-    [mkdir -v \~/paperless-ngx]{.title-ref} to have a place for your
+1.  Login with your user and create a folder in your home-directory to have a place for your
     configuration files and consumption directory.
+
+    ```shell-session
+    $ mkdir -v ~/paperless-ngx
+    ```
 
 2.  Go to the [/docker/compose directory on the project
     page](https://github.com/paperless-ngx/paperless-ngx/tree/master/docker/compose)
-    and download one of the [docker-compose.\*.yml]{.title-ref} files,
+    and download one of the `docker-compose.*.yml` files,
     depending on which database backend you want to use. Rename this
-    file to [docker-compose.yml]{.title-ref}. If you want to enable
+    file to `docker-compose.*.yml`. If you want to enable
     optional support for Office documents, download a file with
-    [-tika]{.title-ref} in the file name. Download the
+    `-tika` in the file name. Download the
     `docker-compose.env` file and the `.env` file as well and store them
     in the same directory.
 
@@ -62,27 +64,27 @@ automatically.
 
         If you want to use the included `docker-compose.*.yml` file, you
         need to have at least Docker version **17.09.0** and docker-compose
-        version **1.17.0**. To check do: [docker-compose -v]{.title-ref} or
-        [docker -v]{.title-ref}
+        version **1.17.0**. To check do: `docker-compose -v` or
+        `docker -v`
 
-        See the [Docker installation guide]() on how to install the current
+        See the [Docker installation guide](https://docs.docker.com/engine/install/) on how to install the current
         version of Docker for your operating system or Linux distribution of
         choice. To get the latest version of docker-compose, follow the
-        [docker-compose installation guide]() if your package repository
+        [docker-compose installation guide](https://docs.docker.com/compose/install/linux/) if your package repository
         doesn't include it.
 
 4.  Modify `docker-compose.yml` to your preferences. You may want to
     change the path to the consumption directory. Find the line that
     specifies where to mount the consumption directory:
 
-    ```
+    ```yaml
     - ./consume:/usr/src/paperless/consume
     ```
 
     Replace the part BEFORE the colon with a local directory of your
     choice:
 
-    ```
+    ```yaml
     - /home/jonaswinkler/paperless-inbox:/usr/src/paperless/consume
     ```
 
@@ -92,17 +94,17 @@ automatically.
     You may also need to change the default port that the webserver will
     use from the default (8000):
 
-    > ```
-    > ports:
-    >   - 8000:8000
-    > ```
+    ```yaml
+    ports:
+      - 8000:8000
+    ```
 
     Replace the part BEFORE the colon with a port of your choice:
 
-    > ```
-    > ports:
-    >   - 8010:8000
-    > ```
+    ```yaml
+    ports:
+      - 8010:8000
+    ```
 
     Don't change the part after the colon or edit other lines that
     refer to port 8000. Modifying the part before the colon will map
@@ -137,27 +139,26 @@ automatically.
     machine have write access to the consumption directory. If your UID
     and GID on the host system is 1000 (the default for the first normal
     user on most systems), it will work out of the box without any
-    modifications. [id "username"]{.title-ref} to check.
+    modifications. `id "username"` to check.
 
     !!! note
 
         You can copy any setting from the file `paperless.conf.example` and
-        paste it here. Have a look at `configuration`{.interpreted-text
-        role="ref"} to see what's available.
+        paste it here. Have a look at [configuration](/configuration] to see what's available.
 
     !!! note
 
         You can utilize Docker secrets for some configuration settings by
-        appending [\_FILE]{.title-ref} to some configuration values. This is
+        appending `_FILE` to some configuration values. This is
         supported currently only by:
 
-        -   PAPERLESS_DBUSER
-        -   PAPERLESS_DBPASS
-        -   PAPERLESS_SECRET_KEY
-        -   PAPERLESS_AUTO_LOGIN_USERNAME
-        -   PAPERLESS_ADMIN_USER
-        -   PAPERLESS_ADMIN_MAIL
-        -   PAPERLESS_ADMIN_PASSWORD
+        - PAPERLESS_DBUSER
+        - PAPERLESS_DBPASS
+        - PAPERLESS_SECRET_KEY
+        - PAPERLESS_AUTO_LOGIN_USERNAME
+        - PAPERLESS_ADMIN_USER
+        - PAPERLESS_ADMIN_MAIL
+        - PAPERLESS_ADMIN_PASSWORD
 
     !!! warning
 
@@ -233,7 +234,7 @@ automatically.
         certain, more updated software. If you want to build these images
         your self, that is possible, but beyond the scope of these steps.
 
-4.  Follow steps 3 to 8 of `setup-docker_hub`{.interpreted-text
+4.  Follow steps 3 to 8 of [Docker Setup](setup#docker_hub)
     role="ref"}. When asked to run `docker-compose pull` to pull the
     image, do
 
@@ -320,9 +321,9 @@ supported.
     by yourself. Extract the archive to a place from where you wish to
     execute it, such as `/opt/paperless`.
 
-5.  Configure paperless. See `configuration`{.interpreted-text
-    role="ref"} for details. Edit the included `paperless.conf` and
-    adjust the settings to your needs. Required settings for getting
+5.  Configure paperless. See [configuration](configuration) for details.
+    Edit the included `paperless.conf` and adjust the settings to your
+    needs. Required settings for getting
     paperless running are:
 
     - `PAPERLESS_REDIS` should point to your redis server, such as
@@ -343,7 +344,7 @@ supported.
       allows third parties to forge authentication credentials.
     - `PAPERLESS_URL` if you are behind a reverse proxy. This should
       point to your domain. Please see
-      `configuration`{.interpreted-text role="ref"} for more
+      [configuration](configuration) for more
       information.
 
     Many more adjustments can be made to paperless, especially the OCR
@@ -479,8 +480,8 @@ supported.
     not available for most distributions.
 
 15. Optional: If using the NLTK machine learning processing (see
-    `PAPERLESS_ENABLE_NLTK` in `configuration`{.interpreted-text
-    role="ref"} for details), download the NLTK data for the Snowball
+    `PAPERLESS_ENABLE_NLTK` in [configuration](configuration#software_tweaks) for details),
+    download the NLTK data for the Snowball
     Stemmer, Stopwords and Punkt tokenizer to your
     `PAPERLESS_DATA_DIR/nltk`. Refer to the [NLTK
     instructions](https://www.nltk.org/data.html) for details on how to
@@ -531,8 +532,8 @@ installation. The important things to keep in mind are as follows:
 - Read the [changelog](/changelog) and
   take note of breaking changes.
 - You should decide if you want to stick with SQLite or want to
-  migrate your database to PostgreSQL. See
-  `setup-sqlite_to_psql`{.interpreted-text role="ref"} for details on
+  migrate your database to PostgreSQL. See [documentation](#sqlite_to_psql)
+  for details on
   how to move your data from SQLite to PostgreSQL. Both work fine with
   paperless. However, if you already have a database server running
   for other services, you might as well use it for paperless as well.
@@ -585,7 +586,7 @@ Migration to paperless-ngx is then performed in a few simple steps:
     after you migrated your existing SQLite database.
 
 5.  Adjust `docker-compose.yml` and `docker-compose.env` to your needs.
-    See `setup-docker_hub`{.interpreted-text role="ref"} for details on
+    See [Docker setup](setup#docker_hub) details on
     which edits are advised.
 
 6.  [Update paperless.](/administration#updating)
@@ -675,8 +676,12 @@ below use PostgreSQL, but are applicable to MySQL/MariaDB with the
 !!! warning
 
     MySQL is case insensitive by default, treating values like "Name" and
-    "NAME" as identical. See `advanced-mysql-caveats`{.interpreted-text
-    role="ref"} for details.
+    "NAME" as identical. See [MySQL caveats](advanced##mysql-caveats) for details.
+
+!!! warning
+
+    MySQL also enforces limits on maximum lengths, but does so differently than
+    PostgreSQL.  It may not be possible to migrate to MySQL due to this.
 
 1.  Stop paperless, if it is running.
 
@@ -686,7 +691,7 @@ below use PostgreSQL, but are applicable to MySQL/MariaDB with the
     file to `docker-compose.yml`. Remember to adjust the consumption
     directory, if necessary.
     b) Without docker, configure the database in your `paperless.conf`
-    file. See `configuration`{.interpreted-text role="ref"} for
+    file. See [configuration](configuration) for
     details.
 
 3.  Open a shell and initialize the database:
@@ -792,7 +797,7 @@ performance immensely:
   more advanced language processing, which can take more memory and
   processing time.
 
-For details, refer to `configuration`{.interpreted-text role="ref"}.
+For details, refer to [configuration](configuration).
 
 !!! note
 
@@ -844,8 +849,7 @@ http {
 ```
 
 The `PAPERLESS_URL` configuration variable is also required when using a
-reverse proxy. Please refer to the
-`hosting-and-security`{.interpreted-text role="ref"} docs.
+reverse proxy. Please refer to the [hosting and security](configuration#hosting-and-security) docs.
 
 Also read
 [this](https://channels.readthedocs.io/en/stable/deploying.html#nginx-supervisor-ubuntu),
