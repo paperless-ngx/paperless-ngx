@@ -86,7 +86,7 @@ jobs:
         uses: mhausenblas/mkdocs-deploy-gh-pages@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CUSTOM_DOMAIN: paperless-ngx.com
+          CUSTOM_DOMAIN: docs.paperless-ngx.com
           CONFIG_FILE: mkdocs.yml
           EXTRA_PACKAGES: build-base
 
