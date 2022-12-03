@@ -41,9 +41,8 @@ elsewhere. Here are a couple notes about that.
 - By default, paperless uses the internal ID of each document as its
   filename. This might not be very convenient for export. However, you
   can adjust the way files are stored in paperless by
-  `configuring the filename format <advanced-file_name_handling>`{.interpreted-text
-  role="ref"}.
-- `The exporter <utilities-exporter>`{.interpreted-text role="ref"} is
+  [configuring the filename format](advanced_usage#file_name_handling).
+- [The exporter](administration#exporter) is
   another easy way to get your files out of paperless with reasonable
   file names.
 
@@ -55,8 +54,7 @@ elsewhere. Here are a couple notes about that.
   are processed with OCR and converted into PDF documents.
 - Plain text documents are supported as well and are added verbatim to
   paperless.
-- With the optional Tika integration enabled (see
-  `Configuration <configuration-tika>`{.interpreted-text role="ref"}),
+- With the optional Tika integration enabled (see [Tika configuration](configuration#tika),
   Paperless also supports various Office documents (.docx, .doc, odt,
   .ppt, .pptx, .odp, .xls, .xlsx, .ods).
 
@@ -75,8 +73,7 @@ has to do much less work to serve the data.
 !!! note
 
     You can adjust some of the settings so that paperless uses less
-    processing power. See `setup-less_powerful_devices`{.interpreted-text
-    role="ref"} for details.
+    processing power. See [setup](setup#less_powerful_devices) for details.
 
 ### _How do I install paperless-ngx on Raspberry Pi?_
 
@@ -108,7 +105,7 @@ see if it works.
 
 ### _How do I proxy this with NGINX?_
 
-**A:** See `here <setup-nginx>`{.interpreted-text role="ref"}.
+**A:** See [here](setup#nginx).
 
 ### _How do I get WebSocket support with Apache mod_wsgi_?
 

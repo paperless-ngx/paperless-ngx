@@ -45,8 +45,7 @@ database engine. Available options are [postgresql]{.title-ref} and
 
     !!! warning
 
-        Using MariaDB comes with some caveats. See
-        `advanced-mysql-caveats`{.interpreted-text role="ref"} for details.
+        Using MariaDB comes with some caveats. See [MySQL Caveats](advanced_usage#mysql-caveats).
 
 `PAPERLESS_DBHOST=<hostname>`
 
@@ -151,8 +150,7 @@ files created using "collectstatic" manager command are stored.
 `PAPERLESS_FILENAME_FORMAT=<format>`
 
 : Changes the filenames paperless uses to store documents in the media
-directory. See `advanced-file_name_handling`{.interpreted-text
-role="ref"} for details.
+directory. See [File name handling](advanced_usage#file_name_handling) for details.
 
     Default is none, which disables this feature.
 
@@ -161,8 +159,7 @@ role="ref"} for details.
 : Tells paperless to replace placeholders in
 [PAPERLESS_FILENAME_FORMAT]{.title-ref} that would resolve to
 'none' to be omitted from the resulting filename. This also holds
-true for directory names. See
-`advanced-file_name_handling`{.interpreted-text role="ref"} for
+true for directory names. See [File name handling](advanced_usage#file_name_handling) for
 details.
 
     Defaults to [false]{.title-ref} which disables this feature.
@@ -630,7 +627,7 @@ for indentation.
 Make sure to use the correct format [PAPERLESS_TIKA_ENABLED =
 1]{.title-ref} so python_dotenv can parse the statement correctly.
 
-## Software tweaks
+## Software tweaks {#software_tweaks}
 
 `PAPERLESS_TASK_WORKERS=<num>`
 
@@ -830,8 +827,7 @@ documents.
 
 : After a document is consumed, Paperless can trigger an arbitrary
 script if you like. This script will be passed a number of arguments
-for you to work with. For more information, take a look at
-`advanced-post_consume_script`{.interpreted-text role="ref"}.
+for you to work with. For more information, take a look at [Post-consumption script](advanced_usage#post_consume_script).
 
     The default is blank, which means nothing will be executed.
 
@@ -1021,9 +1017,7 @@ configuration option:
 [Flower](https://flower.readthedocs.io/en/latest/index.html) will be
 started by the container.
 
-    You can read more about this in the
-    `advanced setup <advanced-celery-monitoring>`{.interpreted-text
-    role="ref"} documentation.
+    You can read more about this in the [advanced documentation](advanced#celery-monitoring).
 
 ## Update Checking {#update-checking}
 
