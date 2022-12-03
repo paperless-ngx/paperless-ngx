@@ -1,9 +1,9 @@
 [![ci](https://github.com/paperless-ngx/paperless-ngx/workflows/ci/badge.svg)](https://github.com/paperless-ngx/paperless-ngx/actions)
 [![Crowdin](https://badges.crowdin.net/paperless-ngx/localized.svg)](https://crowdin.com/project/paperless-ngx)
-[![Documentation Status](https://readthedocs.org/projects/paperless-ngx/badge/?version=latest)](https://paperless-ngx.readthedocs.io/en/latest/?badge=latest)
+[![Documentation Status](https://img.shields.io/github/deployments/paperless-ngx/paperless-ngx/github-pages?label=docs)](https://docs.paperless-ngx.com)
 [![Coverage Status](https://coveralls.io/repos/github/paperless-ngx/paperless-ngx/badge.svg?branch=master)](https://coveralls.io/github/paperless-ngx/paperless-ngx?branch=master)
 [![Chat on Matrix](https://matrix.to/img/matrix-badge.svg)](https://matrix.to/#/%23paperlessngx%3Amatrix.org)
-![demo](https://cronitor.io/badges/ve7ItY/production/W5E_B9jkelG9ZbDiNHUPQEVH3MY.svg)
+[![demo](https://cronitor.io/badges/ve7ItY/production/W5E_B9jkelG9ZbDiNHUPQEVH3MY.svg)](https://demo.paperless-ngx.com)
 
 <p align="center">
 <img src="https://github.com/paperless-ngx/paperless-ngx/raw/main/resources/logo/web/png/Black%20logo%20-%20no%20background.png#gh-light-mode-only" width="50%" />
@@ -33,13 +33,13 @@ A demo is available at [demo.paperless-ngx.com](https://demo.paperless-ngx.com) 
 
 # Features
 
-![Dashboard](https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/docs/_static/screenshots/documents-wchrome.png#gh-light-mode-only)
-![Dashboard](https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/docs/_static/screenshots/documents-wchrome-dark.png#gh-dark-mode-only)
+![Dashboard](https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/docs/assets/screenshots/documents-smallcards.png#gh-light-mode-only)
+![Dashboard](https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/docs/assets/screenshots/documents-smallcards-dark.png#gh-dark-mode-only)
 
 - Organize and index your scanned documents with tags, correspondents, types, and more.
 - Performs OCR on your documents, adds selectable text to image only documents and adds tags, correspondents and document types to your documents.
 - Supports PDF documents, images, plain text files, and Office documents (Word, Excel, Powerpoint, and LibreOffice equivalents).
-  - Office document support is optional and provided by Apache Tika (see [configuration](https://paperless-ngx.readthedocs.io/en/latest/configuration.html#tika-settings))
+  - Office document support is optional and provided by Apache Tika (see [configuration](https://docs.paperless-ngx.com/configuration/#tika))
 - Paperless stores your documents plain on disk. Filenames and folders are managed by paperless and their format can be configured freely.
 - Single page application front end.
   - Includes a dashboard that shows basic statistics and has document upload.
@@ -57,7 +57,7 @@ A demo is available at [demo.paperless-ngx.com](https://demo.paperless-ngx.com) 
   - Paperless-ngx learns from your documents and will be able to automatically assign tags, correspondents and types to documents once you've stored a few documents in paperless.
 - Optimized for multi core systems: Paperless-ngx consumes multiple documents in parallel.
 - The integrated sanity checker makes sure that your document archive is in good health.
-- [More screenshots are available in the documentation](https://paperless-ngx.readthedocs.io/en/latest/screenshots.html).
+- [More screenshots are available in the documentation](https://docs.paperless-ngx.com/#screenshots).
 
 # Getting started
 
@@ -69,19 +69,19 @@ If you'd like to jump right in, you can configure a docker-compose environment w
 bash -c "$(curl -L https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/install-paperless-ngx.sh)"
 ```
 
-Alternatively, you can install the dependencies and setup apache and a database server yourself. The [documentation](https://paperless-ngx.readthedocs.io/en/latest/setup.html#installation) has a step by step guide on how to do it.
+Alternatively, you can install the dependencies and setup apache and a database server yourself. The [documentation](https://docs.paperless-ngx.com/setup/#installation) has a step by step guide on how to do it.
 
-Migrating from Paperless-ng is easy, just drop in the new docker image! See the [documentation on migrating](https://paperless-ngx.readthedocs.io/en/latest/setup.html#migrating-from-paperless-ng) for more details.
+Migrating from Paperless-ng is easy, just drop in the new docker image! See the [documentation on migrating](https://docs.paperless-ngx.com/setup/#migrating-to-paperless-ngx) for more details.
 
 <!-- omit in toc -->
 
 ### Documentation
 
-The documentation for Paperless-ngx is available on [ReadTheDocs](https://paperless-ngx.readthedocs.io/).
+The documentation for Paperless-ngx is available at [https://docs.paperless-ngx.com](https://docs.paperless-ngx.com/).
 
 # Contributing
 
-If you feel like contributing to the project, please do! Bug fixes, enhancements, visual fixes etc. are always welcome. If you want to implement something big: Please start a discussion about that! The [documentation](https://paperless-ngx.readthedocs.io/en/latest/extending.html) has some basic information on how to get started.
+If you feel like contributing to the project, please do! Bug fixes, enhancements, visual fixes etc. are always welcome. If you want to implement something big: Please start a discussion about that! The [documentation](https://docs.paperless-ngx.com/development/) has some basic information on how to get started.
 
 ## Community Support
 
