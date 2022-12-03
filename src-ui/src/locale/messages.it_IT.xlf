@@ -345,7 +345,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">119</context>
         </context-group>
-        <target state="needs-translation">Prev</target>
+        <target state="translated">Prec</target>
       </trans-unit>
       <trans-unit id="3885497195825665706" datatype="html">
         <source>Next</source>
@@ -365,7 +365,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">121</context>
         </context-group>
-        <target state="needs-translation">End</target>
+        <target state="translated">Fine</target>
       </trans-unit>
       <trans-unit id="3909462337752654810" datatype="html">
         <source>The dashboard can be used to show saved views, such as an &apos;Inbox&apos;. Those settings are found under Settings &gt; Saved Views once you have created some.</source>
@@ -3711,7 +3711,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">109</context>
         </context-group>
-        <target state="translated">Completa <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.completedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.completedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
+        <target state="translated">Completato <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.completedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.completedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
       </trans-unit>
       <trans-unit id="1697296301417588213" datatype="html">
         <source>Started <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.startedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.startedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
@@ -3727,7 +3727,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">121</context>
         </context-group>
-        <target state="translated">Accodato <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.queuedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.queuedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
+        <target state="translated">In coda <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.queuedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.queuedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
       </trans-unit>
       <trans-unit id="5404910960991552159" datatype="html">
         <source>Dismiss selected</source>
