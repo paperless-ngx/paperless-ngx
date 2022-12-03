@@ -26,7 +26,7 @@ NOTE: Please check only one box!
 
 - [ ] I have read & agree with the [contributing guidelines](https://github.com/paperless-ngx/paperless-ngx/blob/main/CONTRIBUTING.md).
 - [ ] If applicable, I have tested my code for new features & regressions on both mobile & desktop devices, using the latest version of major browsers.
-- [ ] If applicable, I have checked that all tests pass, see [documentation](https://paperless-ngx.readthedocs.io/en/latest/extending.html#back-end-development).
-- [ ] I have run all `pre-commit` hooks, see [documentation](https://paperless-ngx.readthedocs.io/en/latest/extending.html#code-formatting-with-pre-commit-hooks).
+- [ ] If applicable, I have checked that all tests pass, see [documentation](https://docs.paperless-ngx.com/development/#back-end-development).
+- [ ] I have run all `pre-commit` hooks, see [documentation](https://docs.paperless-ngx.com/development/#code-formatting-with-pre-commit-hooks).
 - [ ] I have made corresponding changes to the documentation as needed.
 - [ ] I have checked my modifications for any breaking changes.
