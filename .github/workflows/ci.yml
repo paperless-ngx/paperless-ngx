@@ -49,7 +49,7 @@ jobs:
         name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.9
+          python-version: 3.8
           cache: "pipenv"
           cache-dependency-path: 'Pipfile.lock'
       -
@@ -63,14 +63,32 @@ jobs:
       -
         name: Make documentation
         run: |
-          cd docs/
-          pipenv run make html
+          pipenv run mkdocs build --config-file ./mkdocs.yml
       -
         name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
           name: documentation
-          path: docs/_build/html/
+          path: site/
+
+  documentation-deploy:
+    name: "Deploy Documentation"
+    runs-on: ubuntu-20.04
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs:
+      - documentation
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Deploy docs
+        uses: mhausenblas/mkdocs-deploy-gh-pages@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CUSTOM_DOMAIN: paperless-ngx.com
+          CONFIG_FILE: mkdocs.yml
+          EXTRA_PACKAGES: build-base
 
   tests-backend:
     name: "Tests (${{ matrix.python-version }})"
