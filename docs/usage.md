@@ -37,7 +37,7 @@ Each document has a couple of fields that you can assign to them:
   date you signed a contract, or the date a letter was sent to you.
 - The _archive serial number_ (short: ASN) of a document is the
   identifier of the document in your physical document binders. See
-  `usage-recommended_workflow`{.interpreted-text role="ref"} below.
+  [recommended workflow](#usage-reccomended_workflow) below.
 - The _content_ of a document is the text that was OCR'ed from the
   document. This text is fed into the search engine and is used for
   matching tags, correspondents and document types.
@@ -195,8 +195,8 @@ configured on the 'Scheduled tasks' page in the admin.
 
 ### REST API
 
-You can also submit a document using the REST API, see
-`api-file_uploads`{.interpreted-text role="ref"} for details.
+You can also submit a document using the REST API, see [docs][api#file-uploads]
+for details.
 
 ## Best practices {#basic-searching}
 
@@ -398,7 +398,7 @@ Once you have scanned in a document, proceed in paperless as follows.
     paperless will assign them automatically. After consuming a couple
     documents, you can even ask paperless to *learn* when to assign tags and
     correspondents by itself. For details on this feature, see
-    `advanced-matching`{.interpreted-text role="ref"}.
+    [advanced matching](advanced_usage#matching).
 
 ### Task management
 
