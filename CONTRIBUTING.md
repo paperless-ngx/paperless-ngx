@@ -27,11 +27,11 @@ Please format and test your code! I know it's a hassle, but it makes sure that y
 
 To test your code, execute `pytest` in the src/ directory. This also generates a html coverage report, which you can use to see if you missed anything important during testing.
 
-Before you can run `pytest`, ensure to [properly set up your local environment](https://paperless-ngx.readthedocs.io/en/latest/extending.html#initial-setup-and-first-start).
+Before you can run `pytest`, ensure to [properly set up your local environment](/development/#initial-setup-and-first-start).
 
 ## More info:
 
-... is available in the documentation. https://paperless-ngx.readthedocs.io/en/latest/extending.html
+... is available [in the documentation](/development).
 
 # Merging PRs
 
