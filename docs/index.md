@@ -52,7 +52,7 @@ Paperless, check out these resources in the documentation:
 - [Some screenshots](#screenshots) of the new UI are available.
 - Read [this section](/advanced_usage/#advanced-automatic_matching) if you want to learn about how paperless automates all
   tagging using machine learning.
-- Paperless now comes with a `[proper email consumer](/usage/#usage-email) that's fully tested and production ready.
+- Paperless now comes with a [proper email consumer](/usage/#usage-email) that's fully tested and production ready.
 - Paperless creates searchable PDF/A documents from whatever you put into the consumption directory. This means
   that you can select text in image-only documents coming from your scanner.
 - See [this note](/administration/#utilities-encyption) about GnuPG encryption in paperless-ngx.
