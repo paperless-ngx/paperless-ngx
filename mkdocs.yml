@@ -25,6 +25,7 @@ theme:
     - toc.integrate
   icon:
     repo: fontawesome/brands/github
+  favicon: assets/favicon.png
 repo_url: https://github.com/paperless-ngx/paperless-ngx
 extra_css:
   - assets/extra.css
