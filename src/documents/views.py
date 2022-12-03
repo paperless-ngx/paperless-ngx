@@ -919,7 +919,7 @@ class AcknowledgeTasksView(GenericAPIView):
 class MailAccountViewSet(ModelViewSet):
     model = MailAccount
 
-    queryset = MailAccount.objects.all()
+    queryset = MailAccount.objects.all().order_by("pk")
     serializer_class = MailAccountSerializer
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated,)
@@ -936,7 +936,7 @@ class MailAccountViewSet(ModelViewSet):
 class MailRuleViewSet(ModelViewSet):
     model = MailRule
 
-    queryset = MailRule.objects.all()
+    queryset = MailRule.objects.all().order_by("pk")
     serializer_class = MailRuleSerializer
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated,)
