@@ -9,7 +9,7 @@ Before making backups, make sure that paperless is not running.
 
 Options available to any installation of paperless:
 
-- Use the [document exporter](/administration#exporter). The document exporter exports all your documents,
+- Use the [document exporter](administration#exporter). The document exporter exports all your documents,
   thumbnails and metadata to a specific folder. You may import your
   documents into a fresh instance of paperless again or store your
   documents in another DMS with this export.
@@ -382,8 +382,7 @@ document_renamer
 The command takes no arguments and processes all your documents at once.
 
 Learn how to use
-`Management Utilities<utilities-management-commands>`{.interpreted-text
-role="ref"}.
+[Management Utilities](#management-commands).
 
 ### Sanity checker {#sanity-checker}
 
