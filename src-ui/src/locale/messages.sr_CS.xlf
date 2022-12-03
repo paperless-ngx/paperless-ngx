@@ -6,24 +6,24 @@
         <source>Close</source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/alert/alert.ts</context>
-          <context context-type="linenumber">42,44</context>
+          <context context-type="linenumber">47,48</context>
         </context-group>
         <target state="translated">Zatvori</target>
       </trans-unit>
       <trans-unit id="ngb.carousel.slide-number" datatype="html">
-        <source> Slide <x id="INTERPOLATION" equiv-text="ing when mouse"/> of <x id="INTERPOLATION_1" equiv-text="e.    *    * @s"/> </source>
+        <source> Slide <x id="INTERPOLATION" equiv-text="@since 2.2.0"/> of <x id="INTERPOLATION_1" equiv-text="eOnHover(value:"/> </source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/carousel/carousel.ts</context>
-          <context context-type="linenumber">157,166</context>
+          <context context-type="linenumber">178,186</context>
         </context-group>
         <note priority="1" from="description">Currently selected slide number read by screen reader</note>
-        <target state="translated"> Slajd <x id="INTERPOLATION" equiv-text="ing when mouse"/> od <x id="INTERPOLATION_1" equiv-text="e.    *    * @s"/> </target>
+        <target state="needs-translation"> Slide <x id="INTERPOLATION" equiv-text="@since 2.2.0"/> of <x id="INTERPOLATION_1" equiv-text="eOnHover(value:"/> </target>
       </trans-unit>
       <trans-unit id="ngb.carousel.previous" datatype="html">
         <source>Previous</source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/carousel/carousel.ts</context>
-          <context context-type="linenumber">188,191</context>
+          <context context-type="linenumber">213,215</context>
         </context-group>
         <target state="translated">Prethodni</target>
       </trans-unit>
@@ -31,7 +31,7 @@
         <source>Next</source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/carousel/carousel.ts</context>
-          <context context-type="linenumber">209,211</context>
+          <context context-type="linenumber">236</context>
         </context-group>
         <target state="translated">Sledeći</target>
       </trans-unit>
@@ -39,11 +39,11 @@
         <source>Select month</source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/datepicker/datepicker-navigation-select.ts</context>
-          <context context-type="linenumber">41,42</context>
+          <context context-type="linenumber">50,51</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/datepicker/datepicker-navigation-select.ts</context>
-          <context context-type="linenumber">41,42</context>
+          <context context-type="linenumber">50,51</context>
         </context-group>
         <target state="translated">Odaberi mesec</target>
       </trans-unit>
@@ -51,11 +51,11 @@
         <source>Select year</source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/datepicker/datepicker-navigation-select.ts</context>
-          <context context-type="linenumber">41,42</context>
+          <context context-type="linenumber">50,51</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/datepicker/datepicker-navigation-select.ts</context>
-          <context context-type="linenumber">41,42</context>
+          <context context-type="linenumber">50,51</context>
         </context-group>
         <target state="translated">Odaberi godinu</target>
       </trans-unit>
@@ -63,11 +63,11 @@
         <source>Previous month</source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/datepicker/datepicker-navigation.ts</context>
-          <context context-type="linenumber">43,46</context>
+          <context context-type="linenumber">60,63</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/datepicker/datepicker-navigation.ts</context>
-          <context context-type="linenumber">43,46</context>
+          <context context-type="linenumber">60,63</context>
         </context-group>
         <target state="translated">Prethodni mesec</target>
       </trans-unit>
@@ -75,11 +75,11 @@
         <source>Next month</source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/datepicker/datepicker-navigation.ts</context>
-          <context context-type="linenumber">43,46</context>
+          <context context-type="linenumber">60,63</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/datepicker/datepicker-navigation.ts</context>
-          <context context-type="linenumber">43,46</context>
+          <context context-type="linenumber">60,63</context>
         </context-group>
         <target state="translated">Naredni mesec</target>
       </trans-unit>
@@ -87,7 +87,7 @@
         <source>««</source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/pagination/pagination.ts</context>
-          <context context-type="linenumber">224,225</context>
+          <context context-type="linenumber">269,270</context>
         </context-group>
         <target state="translated">««</target>
       </trans-unit>
@@ -95,7 +95,7 @@
         <source>«</source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/pagination/pagination.ts</context>
-          <context context-type="linenumber">224,225</context>
+          <context context-type="linenumber">269,270</context>
         </context-group>
         <target state="translated">«</target>
       </trans-unit>
@@ -103,7 +103,7 @@
         <source>»</source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/pagination/pagination.ts</context>
-          <context context-type="linenumber">224,225</context>
+          <context context-type="linenumber">269,270</context>
         </context-group>
         <target state="translated">»</target>
       </trans-unit>
@@ -111,7 +111,7 @@
         <source>»»</source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/pagination/pagination.ts</context>
-          <context context-type="linenumber">224,225</context>
+          <context context-type="linenumber">269,270</context>
         </context-group>
         <target state="translated">»»</target>
       </trans-unit>
@@ -119,7 +119,7 @@
         <source>First</source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/pagination/pagination.ts</context>
-          <context context-type="linenumber">224,226</context>
+          <context context-type="linenumber">269,271</context>
         </context-group>
         <target state="translated">Prvi</target>
       </trans-unit>
@@ -127,7 +127,7 @@
         <source>Previous</source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/pagination/pagination.ts</context>
-          <context context-type="linenumber">224,226</context>
+          <context context-type="linenumber">269,271</context>
         </context-group>
         <target state="translated">Prethodni</target>
       </trans-unit>
@@ -135,7 +135,7 @@
         <source>Next</source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/pagination/pagination.ts</context>
-          <context context-type="linenumber">224,225</context>
+          <context context-type="linenumber">269,271</context>
         </context-group>
         <target state="translated">Sledeći</target>
       </trans-unit>
@@ -143,25 +143,25 @@
         <source>Last</source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/pagination/pagination.ts</context>
-          <context context-type="linenumber">224,225</context>
+          <context context-type="linenumber">269,271</context>
         </context-group>
         <target state="translated">Poslednji</target>
       </trans-unit>
       <trans-unit id="ngb.progressbar.value" datatype="html">
         <source>
-          <x id="INTERPOLATION" equiv-text="* The maxim"/>
+          <x id="INTERPOLATION" equiv-text="* The maximal"/>
         </source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/progressbar/progressbar.ts</context>
-          <context context-type="linenumber">23,26</context>
+          <context context-type="linenumber">30,33</context>
         </context-group>
-        <target state="translated"><x id="INTERPOLATION" equiv-text="* The maxim"/></target>
+        <target state="needs-translation"><x id="INTERPOLATION" equiv-text="* The maximal"/></target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.HH" datatype="html">
         <source>HH</source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
-          <context context-type="linenumber">138,141</context>
+          <context context-type="linenumber">230,231</context>
         </context-group>
         <target state="translated">HH</target>
       </trans-unit>
@@ -169,7 +169,7 @@
         <source>Hours</source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
-          <context context-type="linenumber">161</context>
+          <context context-type="linenumber">255,258</context>
         </context-group>
         <target state="translated">Sati</target>
       </trans-unit>
@@ -177,7 +177,7 @@
         <source>MM</source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
-          <context context-type="linenumber">182</context>
+          <context context-type="linenumber">280,282</context>
         </context-group>
         <target state="translated">MM</target>
       </trans-unit>
@@ -185,7 +185,7 @@
         <source>Minutes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
-          <context context-type="linenumber">199</context>
+          <context context-type="linenumber">298,299</context>
         </context-group>
         <target state="translated">Minuta</target>
       </trans-unit>
@@ -193,7 +193,7 @@
         <source>Increment hours</source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
-          <context context-type="linenumber">218,219</context>
+          <context context-type="linenumber">328,329</context>
         </context-group>
         <target state="translated">Povećaj sate</target>
       </trans-unit>
@@ -201,7 +201,7 @@
         <source>Decrement hours</source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
-          <context context-type="linenumber">239,240</context>
+          <context context-type="linenumber">350,356</context>
         </context-group>
         <target state="translated">Smanji sate</target>
       </trans-unit>
@@ -209,7 +209,7 @@
         <source>Increment minutes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
-          <context context-type="linenumber">264,268</context>
+          <context context-type="linenumber">383,384</context>
         </context-group>
         <target state="translated">Povećaj minute</target>
       </trans-unit>
@@ -217,7 +217,7 @@
         <source>Decrement minutes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
-          <context context-type="linenumber">287,289</context>
+          <context context-type="linenumber">412,416</context>
         </context-group>
         <target state="translated">Smanji minute</target>
       </trans-unit>
@@ -225,7 +225,7 @@
         <source>SS</source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
-          <context context-type="linenumber">295</context>
+          <context context-type="linenumber">429</context>
         </context-group>
         <target state="translated">SS</target>
       </trans-unit>
@@ -233,7 +233,7 @@
         <source>Seconds</source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
-          <context context-type="linenumber">295</context>
+          <context context-type="linenumber">429</context>
         </context-group>
         <target state="translated">Sekundi</target>
       </trans-unit>
@@ -241,7 +241,7 @@
         <source>Increment seconds</source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
-          <context context-type="linenumber">295</context>
+          <context context-type="linenumber">429</context>
         </context-group>
         <target state="translated">Povećaj sekunde</target>
       </trans-unit>
@@ -249,7 +249,7 @@
         <source>Decrement seconds</source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
-          <context context-type="linenumber">295</context>
+          <context context-type="linenumber">429</context>
         </context-group>
         <target state="translated">Smanji sekunde</target>
       </trans-unit>
@@ -259,7 +259,7 @@
         </source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
-          <context context-type="linenumber">295</context>
+          <context context-type="linenumber">429</context>
         </context-group>
       </trans-unit>
       <trans-unit id="ngb.timepicker.AM" datatype="html">
@@ -268,14 +268,14 @@
         </source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
-          <context context-type="linenumber">295</context>
+          <context context-type="linenumber">429</context>
         </context-group>
       </trans-unit>
       <trans-unit id="ngb.toast.close-aria" datatype="html">
         <source>Close</source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/toast/toast.ts</context>
-          <context context-type="linenumber">70,71</context>
+          <context context-type="linenumber">74,75</context>
         </context-group>
         <target state="translated">Zatvori</target>
       </trans-unit>
@@ -1177,12 +1177,12 @@
         <target state="translated">Nije moguće sačuvati elelement: <x id="PH" equiv-text="error"/></target>
       </trans-unit>
       <trans-unit id="6036319582202941456" datatype="html">
-        <source><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>Note that editing a path does not apply changes to stored files until you have run the &apos;document_renamer&apos; utility. See the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a target=&quot;_blank&quot; href=&quot;https://paperless-ngx.readthedocs.io/en/latest/administration.html#utilities-renamer&quot;&gt;"/>documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></source>
+        <source><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>Note that editing a path does not apply changes to stored files until you have run the &apos;document_renamer&apos; utility. See the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a target=&quot;_blank&quot; href=&quot;https://docs.paperless-ngx.com/administration/#renamer&quot;&gt;"/>documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.html</context>
           <context context-type="linenumber">10</context>
         </context-group>
-        <target state="translated"><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>Imajte na umu da se promena uređivanje putanje ne primenjuje na sačuvane datoteke sve dok ne pokrenete uslužni program 'document_renamer'. Pogledajte <x id="START_LINK" ctype="x-a" equiv-text="&lt;a target=&quot;_blank&quot; href=&quot;https://paperless-ngx.readthedocs.io/en/latest/administration.html#utilities-renamer&quot;&gt;"/>dokumentaciju<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></target>
+        <target state="needs-translation"><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>Note that editing a path does not apply changes to stored files until you have run the 'document_renamer' utility. See the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a target=&quot;_blank&quot; href=&quot;https://docs.paperless-ngx.com/administration/#renamer&quot;&gt;"/>documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></target>
       </trans-unit>
       <trans-unit id="8911059720204770105" datatype="html">
         <source>Path</source>
@@ -1212,13 +1212,13 @@
         </context-group>
         <target state="translated">ili koristite kose crte za dodavanje direktorijuma, npr.</target>
       </trans-unit>
-      <trans-unit id="7992597438102889079" datatype="html">
-        <source>See &lt;a target=&quot;_blank&quot; href=&quot;https://paperless-ngx.readthedocs.io/en/latest/advanced_usage.html#file-name-handling&quot;&gt;documentation&lt;/a&gt; for full list.</source>
+      <trans-unit id="7871464228487558644" datatype="html">
+        <source>See &lt;a target=&quot;_blank&quot; href=&quot;https://docs.paperless-ngx.com/advanced_usage/#file-name-handling&quot;&gt;documentation&lt;/a&gt; for full list.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.ts</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="translated">Pogledaj &lt;a target="_blank" href="https://paperless-ngx.readthedocs.io/en/latest/advanced_usage.html#file-name-handling"&gt;dokumentaciju&lt;/a&gt; za kompletnu listu.</target>
+        <target state="needs-translation">See &lt;a target="_blank" href="https://docs.paperless-ngx.com/advanced_usage/#file-name-handling"&gt;documentation&lt;/a&gt; for full list.</target>
       </trans-unit>
       <trans-unit id="6898961890896270754" datatype="html">
         <source>Create new storage path</source>
@@ -1610,12 +1610,12 @@
         <target state="translated">Spremni ste da počnete da otpremate dokumente! Istražite različite funkcije ove veb aplikacije sami ili započnite brzi obilazak koristeći dugme ispod.</target>
       </trans-unit>
       <trans-unit id="4474647174688421179" datatype="html">
-        <source>More detail on how to use and configure Paperless-ngx is always available in the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://paperless-ngx.readthedocs.io&quot; target=&quot;_blank&quot;&gt;"/>documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</source>
+        <source>More detail on how to use and configure Paperless-ngx is always available in the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://docs.paperless-ngx.com&quot; target=&quot;_blank&quot;&gt;"/>documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">5</context>
         </context-group>
-        <target state="translated">Više detalja o tome kako da koristite i konfigurišete Paperless-ngx je uvek dostupno u <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://paperless-ngx.readthedocs.io&quot; target=&quot;_blank&quot;&gt;"/>dokumentaciji<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</target>
+        <target state="needs-translation">More detail on how to use and configure Paperless-ngx is always available in the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://docs.paperless-ngx.com&quot; target=&quot;_blank&quot;&gt;"/>documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</target>
       </trans-unit>
       <trans-unit id="4294899532887357745" datatype="html">
         <source>Thanks for being a part of the Paperless-ngx community!</source>
