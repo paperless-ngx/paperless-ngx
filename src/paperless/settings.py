@@ -78,11 +78,11 @@ def _parse_redis_url(env_redis: Optional[str]) -> Tuple[str]:
     if env_redis is None:
         return ("redis://localhost:6379", "redis://localhost:6379")
 
-    _, path = env_redis.split(":")
-
     if "unix" in env_redis.lower():
         # channels_redis socket format, looks like:
         # "unix:///path/to/redis.sock"
+        _, path = env_redis.split(":")
+        # Optionally setting a db number
         if "?db=" in env_redis:
             path, number = path.split("?db=")
             return (f"redis+socket:{path}?virtual_host={number}", env_redis)
@@ -92,6 +92,7 @@ def _parse_redis_url(env_redis: Optional[str]) -> Tuple[str]:
     elif "+socket" in env_redis.lower():
         # celery socket style, looks like:
         # "redis+socket:///path/to/redis.sock"
+        _, path = env_redis.split(":")
         if "?virtual_host=" in env_redis:
             # Virtual host (aka db number)
             path, number = path.split("?virtual_host=")
