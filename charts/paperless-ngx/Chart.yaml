@@ -1,0 +1,35 @@
+---
+apiVersion: v2
+appVersion: "1.9.2"
+description: Paperless-ngx - Index and archive all of your scanned paper documents
+name: paperless
+version: 10.0.0
+kubeVersion: ">=1.16.0-0"
+keywords:
+  - paperless
+  - paperless-ngx
+  - dms
+  - document
+home: https://github.com/paperless-ngx/paperless-ngx/tree/main/charts/paperless-ngx
+icon: https://github.com/paperless-ngx/paperless-ngx/raw/main/resources/logo/web/svg/square.svg
+sources:
+  - https://github.com/paperless-ngx/paperless-ngx
+maintainers:
+  - name: Paperless-ngx maintainers
+dependencies:
+  - name: common
+    repository: https://library-charts.k8s-at-home.com
+    version: 4.5.2
+  - name: postgresql
+    version: 11.6.12
+    repository: https://charts.bitnami.com/bitnami
+    condition: postgresql.enabled
+  - name: redis
+    version: 16.13.1
+    repository: https://charts.bitnami.com/bitnami
+    condition: redis.enabled
+deprecated: false
+annotations:
+  artifacthub.io/changes: |
+    - kind: changed
+      description: Moved to Paperless-ngx ownership
