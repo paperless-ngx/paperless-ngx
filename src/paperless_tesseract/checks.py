@@ -16,8 +16,7 @@ def get_tesseract_langs():
     # Decode bytes to string, split on newlines, trim out the header
     proc_lines = proc.stdout.decode("utf8", errors="ignore").strip().split("\n")[1:]
 
-    # Replace _ with - to convert two part languages to the expected code
-    return [x.replace("_", "-") for x in proc_lines]
+    return [x.strip() for x in proc_lines]
 
 
 @register()
