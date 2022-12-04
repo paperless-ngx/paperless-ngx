@@ -1,0 +1,36 @@
+:root > * {
+    --md-primary-fg-color: #17541f;
+    --md-primary-fg-color--dark: #17541f;
+    --md-primary-fg-color--light: #17541f;
+    --md-accent-fg-color: #2b8a38;
+    --md-typeset-a-color: #21652a;
+}
+
+[data-md-color-scheme="slate"] {
+    --md-hue: 222;
+}
+
+@media (min-width: 400px) {
+    .grid-left {
+        width: 33%;
+        float: left;
+    }
+    .grid-right {
+        width: 62%;
+        margin-left: 4%;
+        float: left;
+    }
+}
+
+.grid-left > p {
+    margin-bottom: 2rem;
+}
+
+
+.grid-right p {
+    margin: 0;
+}
+
+.index-callout {
+    margin-right: .5rem;
+}

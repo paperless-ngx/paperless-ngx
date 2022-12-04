@@ -52,7 +52,7 @@ RUN set -eux \
 FROM python:3.9-slim-bullseye as main-app
 
 LABEL org.opencontainers.image.authors="paperless-ngx team <hello@paperless-ngx.com>"
-LABEL org.opencontainers.image.documentation="https://paperless-ngx.readthedocs.io/en/latest/"
+LABEL org.opencontainers.image.documentation="https://docs.paperless-ngx.com/"
 LABEL org.opencontainers.image.source="https://github.com/paperless-ngx/paperless-ngx"
 LABEL org.opencontainers.image.url="https://github.com/paperless-ngx/paperless-ngx"
 LABEL org.opencontainers.image.licenses="GPL-3.0-only"

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-09 21:50+0000\n"
-"PO-Revision-Date: 2022-11-09 23:11\n"
+"PO-Revision-Date: 2022-11-29 08:29\n"
 "Last-Translator: \n"
 "Language-Team: Norwegian\n"
 "Language: no_NO\n"
@@ -184,11 +184,11 @@ msgstr "Gjeldende arkiv filnavn i lagring"
 
 #: documents/models.py:221
 msgid "original filename"
-msgstr ""
+msgstr "opprinnelig filnavn"
 
 #: documents/models.py:227
 msgid "The original name of the file when it was uploaded"
-msgstr ""
+msgstr "Det opprinnelige filnavnet da den ble lastet opp"
 
 #: documents/models.py:231
 msgid "archive serial number"
@@ -368,15 +368,15 @@ msgstr "har tags i"
 
 #: documents/models.py:410
 msgid "ASN greater than"
-msgstr ""
+msgstr "ASN større enn"
 
 #: documents/models.py:411
 msgid "ASN less than"
-msgstr ""
+msgstr "ASN mindre enn"
 
 #: documents/models.py:412
 msgid "storage path is"
-msgstr ""
+msgstr "lagringssti er"
 
 #: documents/models.py:422
 msgid "rule type"
@@ -396,31 +396,31 @@ msgstr "filtrer regler"
 
 #: documents/models.py:536
 msgid "Task ID"
-msgstr ""
+msgstr "Oppgave ID"
 
 #: documents/models.py:537
 msgid "Celery ID for the Task that was run"
-msgstr ""
+msgstr "Celery ID for oppgaven som ble kjørt"
 
 #: documents/models.py:542
 msgid "Acknowledged"
-msgstr ""
+msgstr "Bekreftet"
 
 #: documents/models.py:543
 msgid "If the task is acknowledged via the frontend or API"
-msgstr ""
+msgstr "Hvis oppgaven bekreftes via frontend eller API"
 
 #: documents/models.py:549 documents/models.py:556
 msgid "Task Name"
-msgstr ""
+msgstr "Oppgavenavn"
 
 #: documents/models.py:550
 msgid "Name of the file which the Task was run for"
-msgstr ""
+msgstr "Navn på filen som oppgaven ble kjørt for"
 
 #: documents/models.py:557
 msgid "Name of the Task which was run"
-msgstr ""
+msgstr "Navn på Oppgaven som ble kjørt"
 
 #: documents/models.py:562
 msgid "Task Positional Arguments"
