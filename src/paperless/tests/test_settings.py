@@ -131,6 +131,11 @@ class TestIgnoreDateParsing(TestCase):
                     "unix:///run/redis/redis.sock?db=10",
                 ),
             ),
+            # Just a host with a port
+            (
+                "redis://myredishost:6379",
+                ("redis://myredishost:6379", "redis://myredishost:6379"),
+            ),
         ]:
             result = _parse_redis_url(input)
             self.assertTupleEqual(expected, result)
