@@ -8,6 +8,7 @@ import tempfile
 from typing import Final
 from typing import Optional
 from typing import Set
+from typing import Tuple
 from urllib.parse import urlparse
 
 from celery.schedules import crontab
@@ -63,6 +64,44 @@ def __get_path(key: str, default: str) -> str:
     Return a normalized, absolute path based on the environment variable or a default
     """
     return os.path.abspath(os.path.normpath(os.environ.get(key, default)))
+
+
+def _parse_redis_url(env_redis: Optional[str]) -> Tuple[str]:
+    """
+    Gets the Redis information from the environment or a default and handles
+    converting from incompatible django_channels and celery formats.
+
+    Returns a tuple of (celery_url, channels_url)
+    """
+
+    # Not set, return a compatible default
+    if env_redis is None:
+        return ("redis://localhost:6379", "redis://localhost:6379")
+
+    if "unix" in env_redis.lower():
+        # channels_redis socket format, looks like:
+        # "unix:///path/to/redis.sock"
+        _, path = env_redis.split(":")
+        # Optionally setting a db number
+        if "?db=" in env_redis:
+            path, number = path.split("?db=")
+            return (f"redis+socket:{path}?virtual_host={number}", env_redis)
+        else:
+            return (f"redis+socket:{path}", env_redis)
+
+    elif "+socket" in env_redis.lower():
+        # celery socket style, looks like:
+        # "redis+socket:///path/to/redis.sock"
+        _, path = env_redis.split(":")
+        if "?virtual_host=" in env_redis:
+            # Virtual host (aka db number)
+            path, number = path.split("?virtual_host=")
+            return (env_redis, f"unix:{path}?db={number}")
+        else:
+            return (env_redis, f"unix:{path}")
+
+    # Not a socket
+    return (env_redis, env_redis)
 
 
 # NEVER RUN WITH DEBUG IN PRODUCTION.
@@ -182,7 +221,9 @@ ASGI_APPLICATION = "paperless.asgi.application"
 STATIC_URL = os.getenv("PAPERLESS_STATIC_URL", BASE_URL + "static/")
 WHITENOISE_STATIC_PREFIX = "/static/"
 
-_REDIS_URL = os.getenv("PAPERLESS_REDIS", "redis://localhost:6379")
+_CELERY_REDIS_URL, _CHANNELS_REDIS_URL = _parse_redis_url(
+    os.getenv("PAPERLESS_REDIS", None),
+)
 
 # TODO: what is this used for?
 TEMPLATES = [
@@ -205,7 +246,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [_REDIS_URL],
+            "hosts": [_CHANNELS_REDIS_URL],
             "capacity": 2000,  # default 100
             "expiry": 15,  # default 60
         },
@@ -468,7 +509,7 @@ TASK_WORKERS = __get_int("PAPERLESS_TASK_WORKERS", 1)
 
 WORKER_TIMEOUT: Final[int] = __get_int("PAPERLESS_WORKER_TIMEOUT", 1800)
 
-CELERY_BROKER_URL = _REDIS_URL
+CELERY_BROKER_URL = _CELERY_REDIS_URL
 CELERY_TIMEZONE = TIME_ZONE
 
 CELERY_WORKER_HIJACK_ROOT_LOGGER = False
@@ -513,7 +554,7 @@ CELERY_BEAT_SCHEDULE_FILENAME = os.path.join(DATA_DIR, "celerybeat-schedule.db")
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": _REDIS_URL,
+        "LOCATION": _CHANNELS_REDIS_URL,
     },
 }
 
