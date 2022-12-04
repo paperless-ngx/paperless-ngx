@@ -1,0 +1,62 @@
+site_name: Paperless-ngx
+theme:
+  name: material
+  logo: assets/logo.svg
+  font:
+    text: Roboto
+    code: Roboto Mono
+  palette:
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.top
+    - toc.integrate
+  icon:
+    repo: fontawesome/brands/github
+  favicon: assets/favicon.png
+repo_url: https://github.com/paperless-ngx/paperless-ngx
+edit_uri: blob/main/docs/
+extra_css:
+  - assets/extra.css
+markdown_extensions:
+  - attr_list
+  - md_in_html
+  - def_list
+  - admonition
+  - tables
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+nav:
+    - index.md
+    - setup.md
+    - 'Basic Usage': usage.md
+    - configuration.md
+    - administration.md
+    - advanced_usage.md
+    - 'REST API': api.md
+    - development.md
+    - 'FAQs': faq.md
+    - troubleshooting.md
+    - changelog.md
+copyright: Copyright &copy; 2016 - 2022 Daniel Quinn, Jonas Winkler, and the Paperless-ngx team
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/paperless-ngx/paperless-ngx
+    - icon: fontawesome/brands/docker
+      link: https://hub.docker.com/r/paperlessngx/paperless-ngx
+    - icon: material/chat
+      link: https://matrix.to/#/#paperless:matrix.org
