@@ -1,5 +1,35 @@
 # Changelog
 
+## paperless-ngx 1.10.2
+
+### Features
+
+- Take ownership of k8s-at-home Helm chart, [@alexander-bauer](https://github.com/alexander-bauer) ([#1947](https://github.com/paperless-ngx/paperless-ngx/pull/1947))
+
+### Bug Fixes
+
+- Bugfix: Language code checks around two part languages [@stumpylog](https://github.com/stumpylog) ([#2112](https://github.com/paperless-ngx/paperless-ngx/pull/2112))
+- Bugfix: Redis socket compatibility didn't handle URLs with ports [@stumpylog](https://github.com/stumpylog) ([#2109](https://github.com/paperless-ngx/paperless-ngx/pull/2109))
+- Bugfix: Incompatible URL schemes for socket based Redis [@stumpylog](https://github.com/stumpylog) ([#2092](https://github.com/paperless-ngx/paperless-ngx/pull/2092))
+- Fix doc links in contributing [@tooomm](https://github.com/tooomm) ([#2102](https://github.com/paperless-ngx/paperless-ngx/pull/2102))
+
+### Documentation
+
+- Docs: Some more small MkDocs updates [@tooomm](https://github.com/tooomm) ([#2106](https://github.com/paperless-ngx/paperless-ngx/pull/2106))
+- Chore: Cleans up documentation links [@stumpylog](https://github.com/stumpylog) ([#2104](https://github.com/paperless-ngx/paperless-ngx/pull/2104))
+- Feature: Move docs to material-mkdocs [@shamoon](https://github.com/shamoon) ([#2067](https://github.com/paperless-ngx/paperless-ngx/pull/2067))
+- Chore: Add v1.10.1 changelong [@shamoon](https://github.com/shamoon) ([#2082](https://github.com/paperless-ngx/paperless-ngx/pull/2082))
+
+### Maintenance
+
+- Take ownership of k8s-at-home Helm chart, [@alexander-bauer](https://github.com/alexander-bauer) ([#1947](https://github.com/paperless-ngx/paperless-ngx/pull/1947))
+
+### All App Changes
+
+- Bugfix: Language code checks around two part languages [@stumpylog](https://github.com/stumpylog) ([#2112](https://github.com/paperless-ngx/paperless-ngx/pull/2112))
+- Bugfix: Redis socket compatibility didn't handle URLs with ports [@stumpylog](https://github.com/stumpylog) ([#2109](https://github.com/paperless-ngx/paperless-ngx/pull/2109))
+- Bugfix: Incompatible URL schemes for socket based Redis [@stumpylog](https://github.com/stumpylog) ([#2092](https://github.com/paperless-ngx/paperless-ngx/pull/2092))
+
 ## paperless-ngx 1.10.1
 
 ### Features
