@@ -316,10 +316,11 @@ supported.
         enabled. This is usually the case, but not always.
 
 4.  Get the release archive from
-    <https://github.com/paperless-ngx/paperless-ngx/releases>. If you
-    clone the git repo as it is, you also have to compile the front end
-    by yourself. Extract the archive to a place from where you wish to
-    execute it, such as `/opt/paperless`.
+    <https://github.com/paperless-ngx/paperless-ngx/releases>. Extract the
+    archive to a place from where you wish to execute it, such as
+    `/opt/paperless`. If you clone the git repo as it is, you also have to
+    compile the frontend yourself, see [here](/development/#front-end-development)
+    and use the `build` step, not `serve`.
 
 5.  Configure paperless. See [configuration](configuration) for details.
     Edit the included `paperless.conf` and adjust the settings to your
