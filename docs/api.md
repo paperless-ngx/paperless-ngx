@@ -225,7 +225,7 @@ Query parameters:
 
 Results returned by the endpoint are ordered by importance of the term
 in the document index. The first result is the term that has the highest
-Tf/Idf score in the index.
+[Tf/Idf](https://en.wikipedia.org/wiki/Tf%E2%80%93idf) score in the index.
 
 ```json
 ["term1", "term3", "term6", "term4"]

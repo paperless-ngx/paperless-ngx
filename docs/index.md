@@ -50,7 +50,7 @@ If you want to learn about what's different in paperless-ngx from
 Paperless, check out these resources in the documentation:
 
 - [Some screenshots](#screenshots) of the new UI are available.
-- Read [this section](/advanced_usage/#advanced-automatic_matching) if you want to learn about how paperless automates all
+- Read [this section](/advanced_usage/#advanced-automatic-matching) if you want to learn about how paperless automates all
   tagging using machine learning.
 - Paperless now comes with a [proper email consumer](/usage/#usage-email) that's fully tested and production ready.
 - Paperless creates searchable PDF/A documents from whatever you put into the consumption directory. This means
