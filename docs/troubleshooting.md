@@ -125,13 +125,13 @@ using docker-compose, this is achieved by the following configuration
 change in the `docker-compose.yml` file:
 
 ```yaml
-  # The gotenberg chromium route is used to convert .eml files. We do not
-  # want to allow external content like tracking pixels or even javascript.
-  command:
-    - "gotenberg"
-    - "--chromium-disable-javascript=true"
-    - "--chromium-allow-list=file:///tmp/.*"
-    - "--api-timeout=60"
+# The gotenberg chromium route is used to convert .eml files. We do not
+# want to allow external content like tracking pixels or even javascript.
+command:
+  - 'gotenberg'
+  - '--chromium-disable-javascript=true'
+  - '--chromium-allow-list=file:///tmp/.*'
+  - '--api-timeout=60'
 ```
 
 ## Permission denied errors in the consumption directory
