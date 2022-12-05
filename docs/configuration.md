@@ -565,8 +565,10 @@ they use underscores instead of dashes.
 
 Paperless can make use of [Tika](https://tika.apache.org/) and
 [Gotenberg](https://gotenberg.dev/) for parsing and converting
-"Office" documents (such as ".doc", ".xlsx" and ".odt"). If you
-wish to use this, you must provide a Tika server and a Gotenberg server,
+"Office" documents (such as ".doc", ".xlsx" and ".odt").
+Tika and Gotenberg are also needed to allow parsing of E-Mails (.eml).
+
+If you wish to use this, you must provide a Tika server and a Gotenberg server,
 configure their endpoints, and enable the feature.
 
 `PAPERLESS_TIKA_ENABLED=<bool>`
@@ -605,14 +607,17 @@ services:
       PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
       PAPERLESS_TIKA_ENDPOINT: http://tika:9998
 
-  # ...
+    # ...
 
-  gotenberg:
-    image: gotenberg/gotenberg:7.6
-    restart: unless-stopped
-    command:
-      - 'gotenberg'
-      - '--chromium-disable-routes=true'
+    gotenberg:
+      image: gotenberg/gotenberg:7.6
+      restart: unless-stopped
+      # The gotenberg chromium route is used to convert .eml files. We do not
+      # want to allow external content like tracking pixels or even javascript.
+      command:
+        - 'gotenberg'
+        - '--chromium-disable-javascript=true'
+        - '--chromium-allow-list=file:///tmp/.*'
 
   tika:
     image: ghcr.io/paperless-ngx/tika:latest

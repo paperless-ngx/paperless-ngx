@@ -1,0 +1,25 @@
+Return-Path: <mail@someserver.de>
+Delivered-To: mail@someserver.de
+Received: from mail.someserver.org ([::1])
+	by e1acdba3bd07 with LMTP
+	id KBKZGD2YR2NTCgQAjubtDA
+	(envelope-from <mail@someserver.de>)
+	for <mail@someserver.de>; Wed, 10 Oct 2022 11:40:46 +0200
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 2BC9064C1616
+	for <some@one.de>; Wed, 12 Oct 2022 21:40:46 +0200 (CEST)
+Message-ID: <6e99e34d-e20a-80c4-ea61-d8234b612be9@someserver.de>
+Date: Wed, 12 Oct 2022 21:40:43 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.1
+Content-Language: en-US
+To: some@one.de
+Cc: asdasd@æsdasd.de, asdadasdasdasda.asdasd@æsdasd.de
+Bcc: fdf@fvf.de
+From: Some One <mail@someserver.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
+Subject: Simple Text Mail
+
+This is just a simple Text Mail.
