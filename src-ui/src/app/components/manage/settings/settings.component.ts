@@ -246,14 +246,14 @@ export class SettingsComponent
         this.initialize(false)
       })
     } else if (
-      (navID == SettingsNavIDs.UsersGroups && !this.users) ||
-      !this.groups
+      navID == SettingsNavIDs.UsersGroups &&
+      (!this.users || !this.groups)
     ) {
       this.usersService.listAll().subscribe((r) => {
         this.users = r.results
         this.groupsService.listAll().subscribe((r) => {
           this.groups = r.results
-          this.initialize()
+          this.initialize(false)
         })
       })
     } else if (
@@ -722,6 +722,10 @@ export class SettingsComponent
         },
       })
     })
+  }
+
+  getGroupName(id: number): string {
+    return this.groups?.find((g) => g.id === id)?.name ?? ''
   }
 
   editMailAccount(account: PaperlessMailAccount) {

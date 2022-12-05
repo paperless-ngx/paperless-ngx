@@ -1,6 +1,6 @@
 <app-page-header title="Settings" i18n-title>
   <button class="btn btn-sm btn-outline-primary" (click)="tourService.start()"><ng-container i18n>Start tour</ng-container></button>
-  <a class="btn btn-sm btn-primary ms-3" href="admin/" target="_blank">
+  <a *ifPermissions="{ action: PermissionAction.View, type: PermissionType.Admin }" class="btn btn-sm btn-primary ms-3" href="admin/" target="_blank">
       <ng-container i18n>Open Django Admin</ng-container>
       <svg class="sidebaricon ms-1" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#arrow-up-right"/>
@@ -227,80 +227,84 @@
       </ng-template>
     </li>
 
-    <li [ngbNavItem]="SettingsNavIDs.Mail" (mouseover)="maybeInitializeTab(SettingsNavIDs.Mail)" (focusin)="maybeInitializeTab(SettingsNavIDs.Mail)">
+    <li *ifPermissions="{ action: PermissionAction.View, type: PermissionType.MailRule }" [ngbNavItem]="SettingsNavIDs.Mail" (mouseover)="maybeInitializeTab(SettingsNavIDs.Mail)" (focusin)="maybeInitializeTab(SettingsNavIDs.Mail)">
       <a ngbNavLink i18n>Mail</a>
       <ng-template ngbNavContent>
 
         <ng-container *ngIf="mailAccounts && mailRules">
-          <h4>
-            <ng-container i18n>Mail accounts</ng-container>
-            <button type="button" class="btn btn-sm btn-primary ms-4" (click)="editMailAccount()">
-              <svg class="sidebaricon me-1" fill="currentColor">
-                <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
-              </svg>
-              <ng-container i18n>Add Account</ng-container>
-            </button>
-          </h4>
-          <ul class="list-group" formGroupName="mailAccounts">
+          <ng-container *ifPermissions="{ action: PermissionAction.View, type: PermissionType.MailAccount }">
+            <h4>
+              <ng-container i18n>Mail accounts</ng-container>
+              <button type="button" class="btn btn-sm btn-primary ms-4" (click)="editMailAccount()">
+                <svg class="sidebaricon me-1" fill="currentColor">
+                  <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
+                </svg>
+                <ng-container i18n>Add Account</ng-container>
+              </button>
+            </h4>
+            <ul class="list-group" formGroupName="mailAccounts">
 
-              <li class="list-group-item">
-                <div class="row">
-                  <div class="col" i18n>Name</div>
-                  <div class="col" i18n>Server</div>
-                  <div class="col" i18n>Actions</div>
-                </div>
-              </li>
+                <li class="list-group-item">
+                  <div class="row">
+                    <div class="col" i18n>Name</div>
+                    <div class="col" i18n>Server</div>
+                    <div class="col" i18n>Actions</div>
+                  </div>
+                </li>
 
-              <li *ngFor="let account of mailAccounts" class="list-group-item" [formGroupName]="account.id">
-                <div class="row">
-                  <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editMailAccount(account)">{{account.name}}</button></div>
-                  <div class="col d-flex align-items-center">{{account.imap_server}}</div>
-                  <div class="col">
-                    <div class="btn-group">
-                      <button class="btn btn-sm btn-primary" type="button" (click)="editMailAccount(account)" i18n>Edit</button>
-                      <button class="btn btn-sm btn-outline-danger" type="button" (click)="deleteMailAccount(account)" i18n>Delete</button>
+                <li *ngFor="let account of mailAccounts" class="list-group-item" [formGroupName]="account.id">
+                  <div class="row">
+                    <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editMailAccount(account)">{{account.name}}</button></div>
+                    <div class="col d-flex align-items-center">{{account.imap_server}}</div>
+                    <div class="col">
+                      <div class="btn-group">
+                        <button *ifPermissions="{ action: PermissionAction.Change, type: PermissionType.MailAccount }" class="btn btn-sm btn-primary" type="button" (click)="editMailAccount(account)" i18n>Edit</button>
+                        <button *ifPermissions="{ action: PermissionAction.Change, type: PermissionType.MailAccount }" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteMailAccount(account)" i18n>Delete</button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </li>
+                </li>
 
-              <div *ngIf="mailAccounts.length == 0" i18n>No mail accounts defined.</div>
-          </ul>
+                <div *ngIf="mailAccounts.length == 0" i18n>No mail accounts defined.</div>
+            </ul>
+          </ng-container>
 
-          <h4 class="mt-4">
-            <ng-container i18n>Mail rules</ng-container>
-            <button type="button" class="btn btn-sm btn-primary ms-4" (click)="editMailRule()">
-              <svg class="sidebaricon me-1" fill="currentColor">
-                <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
-              </svg>
-              <ng-container i18n>Add Rule</ng-container>
-            </button>
-          </h4>
-          <ul class="list-group" formGroupName="mailRules">
+          <ng-container *ifPermissions="{ action: PermissionAction.View, type: PermissionType.MailRule }">
+            <h4 class="mt-4">
+              <ng-container i18n>Mail rules</ng-container>
+              <button type="button" class="btn btn-sm btn-primary ms-4" (click)="editMailRule()">
+                <svg class="sidebaricon me-1" fill="currentColor">
+                  <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
+                </svg>
+                <ng-container i18n>Add Rule</ng-container>
+              </button>
+            </h4>
+            <ul class="list-group" formGroupName="mailRules">
 
-              <li class="list-group-item">
-                <div class="row">
-                  <div class="col" i18n>Name</div>
-                  <div class="col" i18n>Account</div>
-                  <div class="col" i18n>Actions</div>
-                </div>
-              </li>
+                <li class="list-group-item">
+                  <div class="row">
+                    <div class="col" i18n>Name</div>
+                    <div class="col" i18n>Account</div>
+                    <div class="col" i18n>Actions</div>
+                  </div>
+                </li>
 
-              <li *ngFor="let rule of mailRules" class="list-group-item" [formGroupName]="rule.id">
-                <div class="row">
-                  <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editMailRule(rule)">{{rule.name}}</button></div>
-                  <div class="col d-flex align-items-center">{{(mailAccountService.getCached(rule.account) | async)?.name}}</div>
-                  <div class="col">
-                    <div class="btn-group">
-                      <button class="btn btn-sm btn-primary" type="button" (click)="editMailRule(rule)" i18n>Edit</button>
-                      <button class="btn btn-sm btn-outline-danger" type="button" (click)="deleteMailRule(rule)" i18n>Delete</button>
+                <li *ngFor="let rule of mailRules" class="list-group-item" [formGroupName]="rule.id">
+                  <div class="row">
+                    <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editMailRule(rule)">{{rule.name}}</button></div>
+                    <div class="col d-flex align-items-center">{{(mailAccountService.getCached(rule.account) | async)?.name}}</div>
+                    <div class="col">
+                      <div class="btn-group">
+                        <button *ifPermissions="{ action: PermissionAction.Change, type: PermissionType.MailRule }" class="btn btn-sm btn-primary" type="button" (click)="editMailRule(rule)" i18n>Edit</button>
+                        <button *ifPermissions="{ action: PermissionAction.Change, type: PermissionType.MailRule }" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteMailRule(rule)" i18n>Delete</button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </li>
+                </li>
 
-              <div *ngIf="mailRules.length == 0" i18n>No mail rules defined.</div>
-          </ul>
+                <div *ngIf="mailRules.length == 0" i18n>No mail rules defined.</div>
+            </ul>
+          </ng-container>
         </ng-container>
 
         <div *ngIf="!mailAccounts || !mailRules">
@@ -318,7 +322,12 @@
       <ng-container *ngIf="users && groups">
         <h4 class="d-flex">
           <ng-container i18n>Users</ng-container>
-          <button type="button" class="btn btn-sm btn-primary ms-4" (click)="editUser()" i18n>Add User</button>
+          <button type="button" class="btn btn-sm btn-primary ms-4" (click)="editUser()">
+            <svg class="sidebaricon me-1" fill="currentColor">
+              <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
+            </svg>
+            <ng-container i18n>Add User</ng-container>
+          </button>
         </h4>
         <ul class="list-group" formGroupName="usersGroup">
 
@@ -335,7 +344,7 @@
             <div class="row">
               <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editUser(user)">{{user.username}}</button></div>
               <div class="col d-flex align-items-center">{{user.first_name}} {{user.last_name}}</div>
-              <div class="col d-flex align-items-center">{{user.groups}}</div>
+              <div class="col d-flex align-items-center">{{user.groups?.map(getGroupName, this)}}</div>
               <div class="col">
                 <div class="btn-group">
                   <button class="btn btn-sm btn-primary" type="button" (click)="editUser(user)" i18n>Edit</button>
@@ -348,7 +357,12 @@
 
         <h4 class="mt-4 d-flex">
           <ng-container i18n>Groups</ng-container>
-          <button type="button" class="btn btn-sm btn-primary ms-4" (click)="editGroup()" i18n>Add Group</button>
+          <button type="button" class="btn btn-sm btn-primary ms-4" (click)="editGroup()">
+            <svg class="sidebaricon me-1" fill="currentColor">
+              <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
+            </svg>
+            <ng-container i18n>Add Group</ng-container>
+          </button>
         </h4>
         <ul *ngIf="groups.length > 0" class="list-group" formGroupName="groupsGroup">
 
