@@ -165,7 +165,7 @@ class TestParserLive(TestCase):
 
         pdf_path = self.util_call_with_backoff(
             self.parser.generate_pdf,
-            os.path.join(self.SAMPLE_FILES, "html.eml"),
+            [os.path.join(self.SAMPLE_FILES, "html.eml")],
         )
         self.assertTrue(os.path.isfile(pdf_path))
 
@@ -194,7 +194,7 @@ class TestParserLive(TestCase):
 
         with open(pdf_path, "wb") as file:
             file.write(
-                self.util_call_with_backoff(self.parser.generate_pdf_from_mail, mail),
+                self.util_call_with_backoff(self.parser.generate_pdf_from_mail, [mail]),
             )
 
         extracted = extract_text(pdf_path)
@@ -225,7 +225,7 @@ class TestParserLive(TestCase):
 
         with open(pdf_path, "wb") as file:
             file.write(
-                self.util_call_with_backoff(self.parser.generate_pdf_from_mail, mail),
+                self.util_call_with_backoff(self.parser.generate_pdf_from_mail, [mail]),
             )
 
         converted = os.path.join(
