@@ -3,7 +3,7 @@ apiVersion: v2
 appVersion: "1.9.2"
 description: Paperless-ngx - Index and archive all of your scanned paper documents
 name: paperless
-version: 10.0.1
+version: 10.0.2
 kubeVersion: ">=1.16.0-0"
 keywords:
   - paperless
