@@ -66,9 +66,12 @@ export class UserEditDialogComponent
   }
 
   get inheritedPermissions(): string[] {
-    const groupsVal = this.objectForm.get('groups').value
-    return groupsVal !== null
-      ? this.groups.find((g) => g.id == groupsVal)?.permissions
-      : []
+    const groupsVal: Array<number> = this.objectForm.get('groups').value
+
+    if (!groupsVal) return []
+    else
+      return groupsVal.flatMap(
+        (id) => this.groups.find((g) => g.id == id)?.permissions
+      )
   }
 }

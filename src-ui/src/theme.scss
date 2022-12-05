@@ -157,6 +157,19 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
     background-color: var(--bs-light);
   }
 
+  .ng-select-multiple .ng-select-container .ng-value-container .ng-value {
+    background-color: var(--pngx-bg-alt);
+    color: var(--bs-body-color);
+
+    .ng-value-icon.left {
+      border-color: var(--pngx-bg-alt);
+
+      &:hover {
+        background-color: var(--pngx-primary-lighten-30);
+      }
+    }
+  }
+
   table {
     .des,
     .asc {
