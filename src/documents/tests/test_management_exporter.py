@@ -370,6 +370,15 @@ class TestExportImport(DirectoriesMixin, TestCase):
 
     @override_settings(PASSPHRASE="test")
     def test_export_zipped(self):
+        """
+        GIVEN:
+            - Request to export documents to zipfile
+        WHEN:
+            - Documents are exported
+        THEN:
+            - Zipfile is created
+            - Zipfile contains exported files
+        """
         shutil.rmtree(os.path.join(self.dirs.media_dir, "documents"))
         shutil.copytree(
             os.path.join(os.path.dirname(__file__), "samples", "documents"),
@@ -394,6 +403,16 @@ class TestExportImport(DirectoriesMixin, TestCase):
 
     @override_settings(PASSPHRASE="test")
     def test_export_zipped_format(self):
+        """
+        GIVEN:
+            - Request to export documents to zipfile
+            - Export is following filename formatting
+        WHEN:
+            - Documents are exported
+        THEN:
+            - Zipfile is created
+            - Zipfile contains exported files
+        """
         shutil.rmtree(os.path.join(self.dirs.media_dir, "documents"))
         shutil.copytree(
             os.path.join(os.path.dirname(__file__), "samples", "documents"),
@@ -415,7 +434,6 @@ class TestExportImport(DirectoriesMixin, TestCase):
         self.assertTrue(os.path.isfile(expected_file))
 
         with ZipFile(expected_file) as zip:
-            print(zip.namelist())
             # Extras are from the directories, which also appear in the listing
             self.assertEqual(len(zip.namelist()), 14)
             self.assertIn("manifest.json", zip.namelist())
