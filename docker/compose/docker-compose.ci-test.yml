@@ -11,9 +11,12 @@ services:
     container_name: gotenberg
     network_mode: host
     restart: unless-stopped
+    # The gotenberg chromium route is used to convert .eml files. We do not
+    # want to allow external content like tracking pixels or even javascript.
     command:
       - "gotenberg"
-      - "--chromium-disable-routes=true"
+      - "--chromium-disable-javascript=true"
+      - "--chromium-allow-list=file:///tmp/.*"
   tika:
     image: ghcr.io/paperless-ngx/tika:latest
     hostname: tika

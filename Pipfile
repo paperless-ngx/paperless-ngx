@@ -60,6 +60,9 @@ setproctitle = "*"
 nltk = "*"
 pdf2image = "*"
 flower = "*"
+bleach = "*"
+# https://www.piwheels.org/project/cryptography/ last built version
+cryptography = "==38.0.1"
 
 [dev-packages]
 coveralls = "*"
@@ -76,4 +79,5 @@ black = "*"
 pre-commit = "*"
 sphinx-autobuild = "*"
 myst-parser = "*"
+imagehash = "*"
 mkdocs-material = "*"
