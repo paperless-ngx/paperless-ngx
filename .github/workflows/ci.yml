@@ -49,7 +49,7 @@ jobs:
         name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.9
+          python-version: 3.8
           cache: "pipenv"
           cache-dependency-path: 'Pipfile.lock'
       -
@@ -63,14 +63,32 @@ jobs:
       -
         name: Make documentation
         run: |
-          cd docs/
-          pipenv run make html
+          pipenv run mkdocs build --config-file ./mkdocs.yml
       -
         name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
           name: documentation
-          path: docs/_build/html/
+          path: site/
+
+  documentation-deploy:
+    name: "Deploy Documentation"
+    runs-on: ubuntu-20.04
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs:
+      - documentation
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Deploy docs
+        uses: mhausenblas/mkdocs-deploy-gh-pages@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CUSTOM_DOMAIN: docs.paperless-ngx.com
+          CONFIG_FILE: mkdocs.yml
+          EXTRA_PACKAGES: build-base
 
   tests-backend:
     name: "Tests (${{ matrix.python-version }})"
@@ -81,15 +99,6 @@ jobs:
       matrix:
         python-version: ['3.8', '3.9', '3.10']
       fail-fast: false
-    services:
-      tika:
-        image: ghcr.io/paperless-ngx/tika:latest
-        ports:
-          - "9998:9998/tcp"
-      gotenberg:
-        image: docker.io/gotenberg/gotenberg:7.6
-        ports:
-          - "3000:3000/tcp"
     env:
       # Enable Tika end to end testing
       TIKA_LIVE: 1
@@ -97,12 +106,21 @@ jobs:
       PAPERLESS_MAIL_TEST_HOST: ${{ secrets.TEST_MAIL_HOST }}
       PAPERLESS_MAIL_TEST_USER: ${{ secrets.TEST_MAIL_USER }}
       PAPERLESS_MAIL_TEST_PASSWD: ${{ secrets.TEST_MAIL_PASSWD }}
+      # Skip Tests which require convert
+      PAPERLESS_TEST_SKIP_CONVERT: 1
+      # Enable Gotenberg end to end testing
+      GOTENBERG_LIVE: 1
     steps:
       -
         name: Checkout
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+      -
+        name: Start containers
+        run: |
+          docker compose --file ${GITHUB_WORKSPACE}/docker/compose/docker-compose.ci-test.yml pull --quiet
+          docker compose --file ${GITHUB_WORKSPACE}/docker/compose/docker-compose.ci-test.yml up --detach
       -
         name: Install pipenv
         run: |
@@ -154,6 +172,12 @@ jobs:
         run: |
           cd src/
           pipenv run coveralls --service=github
+      -
+        name: Stop containers
+        if: always()
+        run: |
+          docker compose --file ${GITHUB_WORKSPACE}/docker/compose/docker-compose.ci-test.yml logs
+          docker compose --file ${GITHUB_WORKSPACE}/docker/compose/docker-compose.ci-test.yml down
 
   tests-frontend:
     name: "Tests Frontend"
@@ -478,10 +502,9 @@ jobs:
       -
         name: Upload release archive
         id: upload-release-asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: shogo82148/actions-upload-release-asset@v1
         with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           upload_url: ${{ steps.create-release.outputs.upload_url }}
           asset_path: ./paperless-ngx.tar.xz
           asset_name: paperless-ngx-${{ steps.get_version.outputs.version }}.tar.xz
@@ -523,7 +546,7 @@ jobs:
           CURRENT_CHANGELOG=`tail --lines +2 changelog.md`
           echo -e "$CURRENT_CHANGELOG" >> changelog-new.md
           mv changelog-new.md changelog.md
-          pipenv run pre-commit --files changelog.md
+          pipenv run pre-commit run --files changelog.md || true
           git config --global user.name "github-actions"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -am "Changelog ${{ needs.publish-release.outputs.version }} - GHA"

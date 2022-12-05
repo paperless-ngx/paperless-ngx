@@ -3,6 +3,7 @@ import logging
 import os
 import shutil
 import uuid
+from datetime import datetime
 from pathlib import Path
 from typing import Type
 
@@ -97,6 +98,14 @@ def consume_file(
 ):
 
     path = Path(path).resolve()
+
+    # Celery converts this to a string, but everything expects a datetime
+    # Long term solution is to not use JSON for the serializer but pickle instead
+    if override_created is not None and isinstance(override_created, str):
+        try:
+            override_created = datetime.fromisoformat(override_created)
+        except Exception:
+            pass
 
     # check for separators in current document
     if settings.CONSUMER_ENABLE_BARCODES:

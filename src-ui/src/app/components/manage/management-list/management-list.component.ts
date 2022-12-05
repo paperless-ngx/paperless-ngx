@@ -126,8 +126,20 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
       backdrop: 'static',
     })
     activeModal.componentInstance.dialogMode = 'create'
-    activeModal.componentInstance.success.subscribe((o) => {
-      this.reloadData()
+    activeModal.componentInstance.success.subscribe({
+      next: () => {
+        this.reloadData()
+        this.toastService.showInfo(
+          $localize`Successfully created ${this.typeName}.`
+        )
+      },
+      error: (e) => {
+        this.toastService.showInfo(
+          $localize`Error occurred while creating ${
+            this.typeName
+          } : ${e.toString()}.`
+        )
+      },
     })
   }
 
@@ -137,8 +149,20 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
     })
     activeModal.componentInstance.object = object
     activeModal.componentInstance.dialogMode = 'edit'
-    activeModal.componentInstance.success.subscribe((o) => {
-      this.reloadData()
+    activeModal.componentInstance.success.subscribe({
+      next: () => {
+        this.reloadData()
+        this.toastService.showInfo(
+          $localize`Successfully updated ${this.typeName}.`
+        )
+      },
+      error: (e) => {
+        this.toastService.showInfo(
+          $localize`Error occurred while saving ${
+            this.typeName
+          } : ${e.toString()}.`
+        )
+      },
     })
   }
 

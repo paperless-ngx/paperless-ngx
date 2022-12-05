@@ -2,11 +2,9 @@ import { Directive, EventEmitter, Input, OnInit, Output } from '@angular/core'
 import { FormGroup } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { Observable } from 'rxjs'
-import { map } from 'rxjs/operators'
 import { MATCHING_ALGORITHMS, MATCH_AUTO } from 'src/app/data/matching-model'
 import { ObjectWithId } from 'src/app/data/object-with-id'
 import { AbstractPaperlessService } from 'src/app/services/rest/abstract-paperless-service'
-import { ToastService } from 'src/app/services/toast.service'
 
 @Directive()
 export abstract class EditDialogComponent<T extends ObjectWithId>
@@ -94,16 +92,16 @@ export abstract class EditDialogComponent<T extends ObjectWithId>
         break
     }
     this.networkActive = true
-    serverResponse.subscribe(
-      (result) => {
+    serverResponse.subscribe({
+      next: (result) => {
         this.activeModal.close()
         this.success.emit(result)
       },
-      (error) => {
+      error: (error) => {
         this.error = error.error
         this.networkActive = false
-      }
-    )
+      },
+    })
   }
 
   cancel() {
