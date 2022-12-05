@@ -1,4 +1,4 @@
-import { Component, forwardRef } from '@angular/core'
+import { Component, forwardRef, Input } from '@angular/core'
 import { NG_VALUE_ACCESSOR } from '@angular/forms'
 import { FILTER_ASN_ISNULL } from 'src/app/data/filter-rule-type'
 import { DocumentService } from 'src/app/services/rest/document.service'
@@ -17,6 +17,9 @@ import { AbstractInputComponent } from '../abstract-input'
   styleUrls: ['./number.component.scss'],
 })
 export class NumberComponent extends AbstractInputComponent<number> {
+  @Input()
+  showAdd: boolean = true
+
   constructor(private documentService: DocumentService) {
     super()
   }
