@@ -56,6 +56,7 @@ class MailRuleAdmin(admin.ModelAdmin):
                     "filter_body",
                     "filter_attachment_filename",
                     "maximum_age",
+                    "consumption_scope",
                     "attachment_type",
                 ),
             },
@@ -65,8 +66,8 @@ class MailRuleAdmin(admin.ModelAdmin):
             {
                 "description": _(
                     "The action applied to the mail. This action is only "
-                    "performed when documents were consumed from the mail. "
-                    "Mails without attachments will remain entirely untouched.",
+                    "performed when the mail body or attachments were "
+                    "consumed from the mail.",
                 ),
                 "fields": ("action", "action_parameter"),
             },

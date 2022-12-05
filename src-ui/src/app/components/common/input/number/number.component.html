@@ -2,7 +2,7 @@
   <label class="form-label" [for]="inputId">{{title}}</label>
   <div class="input-group" [class.is-invalid]="error">
     <input type="number" class="form-control" [id]="inputId" [(ngModel)]="value" (change)="onChange(value)" [class.is-invalid]="error">
-    <button class="btn btn-outline-secondary" type="button" id="button-addon1" (click)="nextAsn()" [disabled]="value">+1</button>
+    <button *ngIf="showAdd" class="btn btn-outline-secondary" type="button" id="button-addon1" (click)="nextAsn()" [disabled]="value">+1</button>
   </div>
   <div class="invalid-feedback">
     {{error}}

@@ -154,6 +154,12 @@ const routes: Routes = [
           },
         },
       },
+      {
+        path: 'settings/:section',
+        component: SettingsComponent,
+        canDeactivate: [DirtyFormGuard],
+      },
+      { path: 'tasks', component: TasksComponent },
     ],
   },
 

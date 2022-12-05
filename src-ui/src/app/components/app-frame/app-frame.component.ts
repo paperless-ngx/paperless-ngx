@@ -97,6 +97,15 @@ export class AppFrameComponent
     this.isMenuCollapsed = true
   }
 
+  get openDocuments(): PaperlessDocument[] {
+    return this.openDocumentsService.getOpenDocuments()
+  }
+
+  @HostListener('window:beforeunload')
+  canDeactivate(): Observable<boolean> | boolean {
+    return !this.openDocumentsService.hasDirty()
+  }
+
   searchField = new FormControl('')
 
   get searchFieldEmpty(): boolean {
@@ -111,15 +120,6 @@ export class AppFrameComponent
     if (event.key == 'Escape') {
       this.resetSearchField()
     }
-  }
-
-  get openDocuments(): PaperlessDocument[] {
-    return this.openDocumentsService.getOpenDocuments()
-  }
-
-  @HostListener('window:beforeunload')
-  canDeactivate(): Observable<boolean> | boolean {
-    return !this.openDocumentsService.hasDirty()
   }
 
   searchAutoComplete = (text$: Observable<string>) =>

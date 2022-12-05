@@ -29,6 +29,8 @@ from paperless.consumers import StatusConsumer
 from paperless.views import FaviconView
 from paperless.views import GroupViewSet
 from paperless.views import UserViewSet
+from paperless_mail.views import MailAccountViewSet
+from paperless_mail.views import MailRuleViewSet
 from rest_framework.authtoken import views
 from rest_framework.routers import DefaultRouter
 
@@ -43,6 +45,8 @@ api_router.register(r"storage_paths", StoragePathViewSet)
 api_router.register(r"tasks", TasksViewSet, basename="tasks")
 api_router.register(r"users", UserViewSet, basename="users")
 api_router.register(r"groups", GroupViewSet, basename="groups")
+api_router.register(r"mail_accounts", MailAccountViewSet)
+api_router.register(r"mail_rules", MailRuleViewSet)
 
 
 urlpatterns = [

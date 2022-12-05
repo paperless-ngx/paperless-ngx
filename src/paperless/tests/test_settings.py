@@ -3,6 +3,7 @@ from unittest import mock
 from unittest import TestCase
 
 from paperless.settings import _parse_ignore_dates
+from paperless.settings import _parse_redis_url
 from paperless.settings import default_threads_per_worker
 
 
@@ -82,3 +83,59 @@ class TestIgnoreDateParsing(TestCase):
                 self.assertGreaterEqual(default_threads, 1)
 
                 self.assertLessEqual(default_workers * default_threads, i)
+
+    def test_redis_socket_parsing(self):
+        """
+        GIVEN:
+            - Various Redis connection URI formats
+        WHEN:
+            - The URI is parsed
+        THEN:
+            - Socket based URIs are translated
+            - Non-socket URIs are unchanged
+            - None provided uses default
+        """
+
+        for input, expected in [
+            # Nothing is set
+            (None, ("redis://localhost:6379", "redis://localhost:6379")),
+            # celery style
+            (
+                "redis+socket:///run/redis/redis.sock",
+                (
+                    "redis+socket:///run/redis/redis.sock",
+                    "unix:///run/redis/redis.sock",
+                ),
+            ),
+            # redis-py / channels-redis style
+            (
+                "unix:///run/redis/redis.sock",
+                (
+                    "redis+socket:///run/redis/redis.sock",
+                    "unix:///run/redis/redis.sock",
+                ),
+            ),
+            # celery style with db
+            (
+                "redis+socket:///run/redis/redis.sock?virtual_host=5",
+                (
+                    "redis+socket:///run/redis/redis.sock?virtual_host=5",
+                    "unix:///run/redis/redis.sock?db=5",
+                ),
+            ),
+            # redis-py / channels-redis style with db
+            (
+                "unix:///run/redis/redis.sock?db=10",
+                (
+                    "redis+socket:///run/redis/redis.sock?virtual_host=10",
+                    "unix:///run/redis/redis.sock?db=10",
+                ),
+            ),
+            # Just a host with a port
+            (
+                "redis://myredishost:6379",
+                ("redis://myredishost:6379", "redis://myredishost:6379"),
+            ),
+        ]:
+            result = _parse_redis_url(input)
+            self.assertTupleEqual(expected, result)
