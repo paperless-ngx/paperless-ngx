@@ -54,6 +54,9 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
   @Input()
   suggestions: number[]
 
+  @Input()
+  allowCreate: boolean = true
+
   value: number[]
 
   tags: PaperlessTag[]

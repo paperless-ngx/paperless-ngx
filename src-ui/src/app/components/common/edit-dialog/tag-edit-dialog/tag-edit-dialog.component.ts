@@ -4,7 +4,6 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-dialog.component'
 import { PaperlessTag } from 'src/app/data/paperless-tag'
 import { TagService } from 'src/app/services/rest/tag.service'
-import { ToastService } from 'src/app/services/toast.service'
 import { randomColor } from 'src/app/utils/color'
 import { DEFAULT_MATCHING_ALGORITHM } from 'src/app/data/matching-model'
 
@@ -14,12 +13,8 @@ import { DEFAULT_MATCHING_ALGORITHM } from 'src/app/data/matching-model'
   styleUrls: ['./tag-edit-dialog.component.scss'],
 })
 export class TagEditDialogComponent extends EditDialogComponent<PaperlessTag> {
-  constructor(
-    service: TagService,
-    activeModal: NgbActiveModal,
-    toastService: ToastService
-  ) {
-    super(service, activeModal, toastService)
+  constructor(service: TagService, activeModal: NgbActiveModal) {
+    super(service, activeModal)
   }
 
   getCreateTitle() {
