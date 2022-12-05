@@ -13,7 +13,10 @@ import { UserService } from 'src/app/services/rest/user.service'
   templateUrl: './user-edit-dialog.component.html',
   styleUrls: ['./user-edit-dialog.component.scss'],
 })
-export class UserEditDialogComponent extends EditDialogComponent<PaperlessUser> {
+export class UserEditDialogComponent
+  extends EditDialogComponent<PaperlessUser>
+  implements OnInit
+{
   groups: PaperlessGroup[]
 
   constructor(
@@ -27,6 +30,11 @@ export class UserEditDialogComponent extends EditDialogComponent<PaperlessUser> 
       .listAll()
       .pipe(first())
       .subscribe((result) => (this.groups = result.results))
+  }
+
+  ngOnInit(): void {
+    super.ngOnInit()
+    this.onToggleSuperUser()
   }
 
   getCreateTitle() {
