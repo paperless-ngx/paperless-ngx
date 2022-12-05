@@ -64,8 +64,9 @@ export class PermissionsSelectComponent
   }
 
   writeValue(permissions: string[]): void {
-    this.permissions = permissions
-    const allPerms = this._inheritedPermissions.concat(permissions)
+    this.permissions = permissions ?? []
+    const allPerms = this._inheritedPermissions.concat(this.permissions)
+
     allPerms.forEach((permissionStr) => {
       const { actionKey, typeKey } =
         this.permissionsService.getPermissionKeys(permissionStr)
