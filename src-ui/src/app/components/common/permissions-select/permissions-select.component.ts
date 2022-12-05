@@ -145,6 +145,9 @@ export class PermissionsSelectComponent
       })
       this.typesWithAllActions.add(type)
     } else {
+      Object.keys(PermissionAction).forEach((action) => {
+        typeGroup.get(action).patchValue(false)
+      })
       this.typesWithAllActions.delete(type)
     }
   }
