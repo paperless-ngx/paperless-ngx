@@ -73,7 +73,7 @@ describe('settings', () => {
     cy.contains('a', 'Dashboard').click()
     cy.contains('You have unsaved changes')
     cy.contains('button', 'Cancel').click()
-    cy.contains('button', 'Save').click().wait(2000)
+    cy.contains('button', 'Save').click().wait('@savedViews').wait(2000)
     cy.contains('a', 'Dashboard').click()
     cy.contains('You have unsaved changes').should('not.exist')
   })
