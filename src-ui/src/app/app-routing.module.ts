@@ -158,6 +158,13 @@ const routes: Routes = [
         path: 'settings/:section',
         component: SettingsComponent,
         canDeactivate: [DirtyFormGuard],
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.UISettings,
+          },
+        },
       },
       { path: 'tasks', component: TasksComponent },
     ],
