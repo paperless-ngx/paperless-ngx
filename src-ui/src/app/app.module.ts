@@ -39,6 +39,7 @@ import { NgxFileDropModule } from 'ngx-file-drop'
 import { TextComponent } from './components/common/input/text/text.component'
 import { SelectComponent } from './components/common/input/select/select.component'
 import { CheckComponent } from './components/common/input/check/check.component'
+import { PasswordComponent } from './components/common/input/password/password.component'
 import { SaveViewConfigDialogComponent } from './components/document-list/save-view-config-dialog/save-view-config-dialog.component'
 import { TagsComponent } from './components/common/input/tags/tags.component'
 import { IfPermissionsDirective } from './directives/if-permissions.directive'
@@ -81,6 +82,8 @@ import { TourNgBootstrapModule } from 'ngx-ui-tour-ng-bootstrap'
 import { UserEditDialogComponent } from './components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component'
 import { GroupEditDialogComponent } from './components/common/edit-dialog/group-edit-dialog/group-edit-dialog.component'
 import { PermissionsSelectComponent } from './components/common/permissions-select/permissions-select.component'
+import { MailAccountEditDialogComponent } from './components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component'
+import { MailRuleEditDialogComponent } from './components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component'
 
 import localeBe from '@angular/common/locales/be'
 import localeCs from '@angular/common/locales/cs'
@@ -162,6 +165,7 @@ function initializeApp(settings: SettingsService) {
     TextComponent,
     SelectComponent,
     CheckComponent,
+    PasswordComponent,
     SaveViewConfigDialogComponent,
     TagsComponent,
     IfPermissionsDirective,
@@ -189,6 +193,8 @@ function initializeApp(settings: SettingsService) {
     UserEditDialogComponent,
     GroupEditDialogComponent,
     PermissionsSelectComponent,
+    MailAccountEditDialogComponent,
+    MailRuleEditDialogComponent,
   ],
   imports: [
     BrowserModule,

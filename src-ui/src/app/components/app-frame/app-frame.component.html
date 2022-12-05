@@ -17,7 +17,7 @@
       </svg>
       <input class="form-control form-control-sm" type="text" placeholder="Search documents" aria-label="Search"
         [formControl]="searchField" [ngbTypeahead]="searchAutoComplete" (keyup)="searchFieldKeyup($event)" (selectItem)="itemSelected($event)" i18n-placeholder>
-      <button *ngIf="!searchFieldEmpty" class="btn btn-link btn-sm px-0 position-absolute top-0 end-0" (click)="resetSearchField()">
+      <button type="button" *ngIf="!searchFieldEmpty" class="btn btn-link btn-sm px-0 position-absolute top-0 end-0" (click)="resetSearchField()">
         <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x me-1" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
           <path fill-rule="evenodd" d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
         </svg>
@@ -177,13 +177,6 @@
               </svg><span>&nbsp;<ng-container i18n>Settings</ng-container></span>
             </a>
           </li>
-          <li class="nav-item" *ifPermissions="{ action: PermissionAction.View, type: PermissionType.Admin }" tourAnchor="tour.admin">
-            <a class="nav-link" href="admin/" ngbPopover="Admin" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
-              <svg class="sidebaricon" fill="currentColor">
-                <use xlink:href="assets/bootstrap-icons.svg#toggles"/>
-              </svg><span>&nbsp;<ng-container i18n>Admin</ng-container></span>
-            </a>
-          </li>
         </ul>
 
         <h6 class="sidebar-heading px-3 mt-auto pt-4 mb-1 text-muted">
@@ -191,7 +184,7 @@
         </h6>
         <ul class="nav flex-column mb-2">
           <li class="nav-item" tourAnchor="tour.outro">
-            <a class="nav-link" target="_blank" rel="noopener noreferrer" href="https://paperless-ngx.readthedocs.io/en/latest/" ngbPopover="Documentation" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
+            <a class="nav-link" target="_blank" rel="noopener noreferrer" href="https://docs.paperless-ngx.com" ngbPopover="Documentation" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#question-circle"/>
               </svg><span>&nbsp;<ng-container i18n>Documentation</ng-container></span>

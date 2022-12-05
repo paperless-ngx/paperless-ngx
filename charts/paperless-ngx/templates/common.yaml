@@ -1,0 +1,11 @@
+{{/* Make sure all variables are set properly */}}
+{{- include "common.values.setup" . }}
+
+{{/* Append the hardcoded settings */}}
+{{- define "paperless.harcodedValues" -}}
+env:
+    PAPERLESS_URL: http{{if ne ( len .Values.ingress.main.tls ) 0 }}s{{end}}://{{ (first .Values.ingress.main.hosts).host }}
+{{- end -}}
+{{- $_ := merge .Values (include "paperless.harcodedValues" . | fromYaml) -}}
+
+{{ include "common.all" . }}

@@ -242,10 +242,12 @@ a, a:hover,
   }
 
   .input-group {
-    .ng-select-container {
-      height: 100%;
-      border-top-right-radius: 0;
-      border-bottom-right-radius: 0;
+    ng-select:not(:last-child) {
+      .ng-select-container {
+        height: 100%;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+      }
     }
   }
 }

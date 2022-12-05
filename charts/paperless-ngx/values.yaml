@@ -1,0 +1,107 @@
+#
+# IMPORTANT NOTE
+#
+# This chart inherits from our common library chart. You can check the default values/options here:
+# https://github.com/k8s-at-home/library-charts/tree/main/charts/stable/common/values.yaml
+#
+
+image:
+  # -- image repository
+  repository: ghcr.io/paperless-ngx/paperless-ngx
+  # -- image pull policy
+  pullPolicy: IfNotPresent
+  # -- image tag
+  # @default -- chart.appVersion
+  tag:
+
+# -- See the following files for additional environment variables:
+# https://github.com/paperless-ngx/paperless-ngx/tree/main/docker/compose/
+# https://github.com/paperless-ngx/paperless-ngx/blob/main/paperless.conf.example
+# @default -- See below
+env:
+  # -- Project name
+  COMPOSE_PROJECT_NAME: paperless
+  # -- Redis to use
+  PAPERLESS_REDIS:
+  # -- OCR languages to install
+  PAPERLESS_OCR_LANGUAGE: eng
+  # USERMAP_UID: 1000
+  # USERMAP_GID: 1000
+  # PAPERLESS_TIME_ZONE: Europe/London
+  # -- Database host to use
+  PAPERLESS_DBHOST:
+  # -- Port to use
+  PAPERLESS_PORT: 8000
+  # -- Username for the root user
+  # PAPERLESS_ADMIN_USER: admin
+  # -- Password for the root user
+  # PAPERLESS_ADMIN_PASSWORD: admin
+  # PAPERLESS_URL: <set to main ingress by default>
+
+# -- Configures service settings for the chart.
+# @default -- See values.yaml
+service:
+  main:
+    ports:
+      http:
+        port: 8000
+
+ingress:
+  # -- Enable and configure ingress settings for the chart under this key.
+  # @default -- See values.yaml
+  main:
+    enabled: false
+
+persistence:
+  # -- Configure persistence for data.
+  # @default -- See values.yaml
+  data:
+    enabled: false
+    mountPath: /usr/src/paperless/data
+    accessMode: ReadWriteOnce
+    emptyDir:
+      enabled: false
+  # -- Configure persistence for media.
+  # @default -- See values.yaml
+  media:
+    enabled: false
+    mountPath: /usr/src/paperless/media
+    accessMode: ReadWriteOnce
+    emptyDir:
+      enabled: false
+  # -- Configure volume to monitor for new documents.
+  # @default -- See values.yaml
+  consume:
+    enabled: false
+    mountPath: /usr/src/paperless/consume
+    accessMode: ReadWriteOnce
+    emptyDir:
+      enabled: false
+  # -- Configure export volume.
+  # @default -- See values.yaml
+  export:
+    enabled: false
+    mountPath: /usr/src/paperless/export
+    accessMode: ReadWriteOnce
+    emptyDir:
+      enabled: false
+
+# -- Enable and configure postgresql database subchart under this key.
+#    For more options see [postgresql chart documentation](https://github.com/bitnami/charts/tree/master/bitnami/postgresql)
+# @default -- See values.yaml
+postgresql:
+  enabled: false
+  postgresqlUsername: paperless
+  postgresqlPassword: paperless
+  postgresqlDatabase: paperless
+  persistence:
+    enabled: false
+    # storageClass: ""
+
+# -- Enable and configure redis subchart under this key.
+#    For more options see [redis chart documentation](https://github.com/bitnami/charts/tree/master/bitnami/redis)
+# @default -- See values.yaml
+redis:
+  enabled: false
+  auth:
+    enabled: false
