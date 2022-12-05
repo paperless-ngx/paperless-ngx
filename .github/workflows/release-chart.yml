@@ -3,8 +3,8 @@ name: Release Charts
 
 on:
   push:
-    tags:
-      - v*
+    branches:
+      - main
 
 jobs:
   release_chart:
