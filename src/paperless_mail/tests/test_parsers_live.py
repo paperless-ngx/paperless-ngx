@@ -1,4 +1,5 @@
 import os
+import time
 from unittest import mock
 from urllib.error import HTTPError
 from urllib.request import urlopen
@@ -25,6 +26,47 @@ class TestParserLive(TestCase):
     @staticmethod
     def imagehash(file, hash_size=18):
         return f"{average_hash(Image.open(file), hash_size)}"
+
+    def util_call_with_backoff(self, method_or_callable, args):
+        """
+        For whatever reason, the image started during the test pipeline likes to
+        segfault sometimes, when run with the exact files that usually pass.
+
+        So, this function will retry the parsing up to 3 times, with larger backoff
+        periods between each attempt, in hopes the issue resolves itself during
+        one attempt to parse.
+
+        This will wait the following:
+            - Attempt 1 - 20s following failure
+            - Attempt 2 - 40s following failure
+            - Attempt 3 - 80s following failure
+
+        """
+        result = None
+        succeeded = False
+        retry_time = 20.0
+        retry_count = 0
+        max_retry_count = 3
+
+        while retry_count < max_retry_count and not succeeded:
+            try:
+                result = method_or_callable(*args)
+
+                succeeded = True
+            except Exception as e:
+                print(f"{e} during try #{retry_count}", flush=True)
+
+                retry_count = retry_count + 1
+
+                time.sleep(retry_time)
+                retry_time = retry_time * 2.0
+
+        self.assertTrue(
+            succeeded,
+            "Continued Tika server errors after multiple retries",
+        )
+
+        return result
 
     # Only run if convert is available
     @pytest.mark.skipif(
@@ -121,7 +163,10 @@ class TestParserLive(TestCase):
         with open(os.path.join(self.SAMPLE_FILES, "second.pdf"), "rb") as second:
             mock_generate_pdf_from_html.return_value = second.read()
 
-        pdf_path = self.parser.generate_pdf(os.path.join(self.SAMPLE_FILES, "html.eml"))
+        pdf_path = self.util_call_with_backoff(
+            self.parser.generate_pdf,
+            os.path.join(self.SAMPLE_FILES, "html.eml"),
+        )
         self.assertTrue(os.path.isfile(pdf_path))
 
         extracted = extract_text(pdf_path)
@@ -148,7 +193,9 @@ class TestParserLive(TestCase):
         pdf_path = os.path.join(self.parser.tempdir, "html.eml.pdf")
 
         with open(pdf_path, "wb") as file:
-            file.write(self.parser.generate_pdf_from_mail(mail))
+            file.write(
+                self.util_call_with_backoff(self.parser.generate_pdf_from_mail, mail),
+            )
 
         extracted = extract_text(pdf_path)
         expected = extract_text(os.path.join(self.SAMPLE_FILES, "html.eml.pdf"))
@@ -177,7 +224,9 @@ class TestParserLive(TestCase):
         pdf_path = os.path.join(self.parser.tempdir, "html.eml.pdf")
 
         with open(pdf_path, "wb") as file:
-            file.write(self.parser.generate_pdf_from_mail(mail))
+            file.write(
+                self.util_call_with_backoff(self.parser.generate_pdf_from_mail, mail),
+            )
 
         converted = os.path.join(
             self.parser.tempdir,
@@ -235,7 +284,10 @@ class TestParserLive(TestCase):
                 attachments = [
                     MailAttachmentMock(png, "part1.pNdUSz0s.D3NqVtPg@example.de"),
                 ]
-                result = self.parser.generate_pdf_from_html(html, attachments)
+                result = self.util_call_with_backoff(
+                    self.parser.generate_pdf_from_html,
+                    [html, attachments],
+                )
 
         pdf_path = os.path.join(self.parser.tempdir, "sample.html.pdf")
 
@@ -279,7 +331,10 @@ class TestParserLive(TestCase):
                 attachments = [
                     MailAttachmentMock(png, "part1.pNdUSz0s.D3NqVtPg@example.de"),
                 ]
-                result = self.parser.generate_pdf_from_html(html, attachments)
+                result = self.util_call_with_backoff(
+                    self.parser.generate_pdf_from_html,
+                    [html, attachments],
+                )
 
         pdf_path = os.path.join(self.parser.tempdir, "sample.html.pdf")
 
