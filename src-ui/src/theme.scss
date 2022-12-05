@@ -203,8 +203,12 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
   .toast,
   .toast .toast-header,
   .toast .btn,
-  .toast .btn-close, {
+  .toast .btn-close {
     color: var(--pngx-primary-text-contrast);
+  }
+
+  .dropdown-menu {
+    --bs-dropdown-color: var(--bs-body-color);
   }
 }
 
