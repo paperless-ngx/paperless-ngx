@@ -344,7 +344,7 @@
             <div class="row">
               <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editUser(user)">{{user.username}}</button></div>
               <div class="col d-flex align-items-center">{{user.first_name}} {{user.last_name}}</div>
-              <div class="col d-flex align-items-center">{{user.groups?.map(getGroupName, this)}}</div>
+              <div class="col d-flex align-items-center">{{user.groups?.map(getGroupName, this).join(', ')}}</div>
               <div class="col">
                 <div class="btn-group">
                   <button class="btn btn-sm btn-primary" type="button" (click)="editUser(user)" i18n>Edit</button>
