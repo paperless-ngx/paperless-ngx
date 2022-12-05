@@ -5,7 +5,6 @@ import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-
 import { DEFAULT_MATCHING_ALGORITHM } from 'src/app/data/matching-model'
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
-import { ToastService } from 'src/app/services/toast.service'
 
 @Component({
   selector: 'app-correspondent-edit-dialog',
@@ -13,12 +12,8 @@ import { ToastService } from 'src/app/services/toast.service'
   styleUrls: ['./correspondent-edit-dialog.component.scss'],
 })
 export class CorrespondentEditDialogComponent extends EditDialogComponent<PaperlessCorrespondent> {
-  constructor(
-    service: CorrespondentService,
-    activeModal: NgbActiveModal,
-    toastService: ToastService
-  ) {
-    super(service, activeModal, toastService)
+  constructor(service: CorrespondentService, activeModal: NgbActiveModal) {
+    super(service, activeModal)
   }
 
   getCreateTitle() {

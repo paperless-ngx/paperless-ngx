@@ -1,1 +1,44 @@
-{"count":3,"next":null,"previous":null,"results":[{"id":1,"name":"Inbox","show_on_dashboard":true,"show_in_sidebar":true,"sort_field":"created","sort_reverse":true,"filter_rules":[{"rule_type":6,"value":"18"}]},{"id":2,"name":"Recently Added","show_on_dashboard":true,"show_in_sidebar":false,"sort_field":"created","sort_reverse":true,"filter_rules":[]},{"id":11,"name":"Taxes","show_on_dashboard":false,"show_in_sidebar":true,"sort_field":"created","sort_reverse":true,"filter_rules":[{"rule_type":6,"value":"39"}]}]}
+{
+    "count": 3,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": 1,
+            "name": "Inbox",
+            "show_on_dashboard": true,
+            "show_in_sidebar": true,
+            "sort_field": "created",
+            "sort_reverse": true,
+            "filter_rules": [
+                {
+                    "rule_type": 6,
+                    "value": "18"
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "name": "Recently Added",
+            "show_on_dashboard": true,
+            "show_in_sidebar": false,
+            "sort_field": "created",
+            "sort_reverse": true,
+            "filter_rules": []
+        },
+        {
+            "id": 11,
+            "name": "Taxes",
+            "show_on_dashboard": false,
+            "show_in_sidebar": true,
+            "sort_field": "created",
+            "sort_reverse": true,
+            "filter_rules": [
+                {
+                    "rule_type": 6,
+                    "value": "39"
+                }
+            ]
+        }
+    ]
+}
