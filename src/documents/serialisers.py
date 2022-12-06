@@ -74,7 +74,18 @@ class MatchingModelSerializer(serializers.ModelSerializer):
         return match
 
 
-class CorrespondentSerializer(MatchingModelSerializer):
+class OwnedObjectSerializer(serializers.ModelSerializer):
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop("user", None)
+        return super().__init__(*args, **kwargs)
+
+    def create(self, validated_data):
+        if self.user and validated_data["owner"] is None:
+            validated_data["owner"] = self.user
+        return super().create(validated_data)
+
+
+class CorrespondentSerializer(MatchingModelSerializer, OwnedObjectSerializer):
 
     last_correspondence = serializers.DateTimeField(read_only=True)
 
@@ -89,10 +100,11 @@ class CorrespondentSerializer(MatchingModelSerializer):
             "is_insensitive",
             "document_count",
             "last_correspondence",
+            "owner",
         )
 
 
-class DocumentTypeSerializer(MatchingModelSerializer):
+class DocumentTypeSerializer(MatchingModelSerializer, OwnedObjectSerializer):
     class Meta:
         model = DocumentType
         fields = (
@@ -103,6 +115,7 @@ class DocumentTypeSerializer(MatchingModelSerializer):
             "matching_algorithm",
             "is_insensitive",
             "document_count",
+            "owner",
         )
 
 
@@ -153,10 +166,11 @@ class TagSerializerVersion1(MatchingModelSerializer):
             "is_insensitive",
             "is_inbox_tag",
             "document_count",
+            "owner",
         )
 
 
-class TagSerializer(MatchingModelSerializer):
+class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
     def get_text_color(self, obj):
         try:
             h = obj.color.lstrip("#")
@@ -214,7 +228,7 @@ class StoragePathField(serializers.PrimaryKeyRelatedField):
         return StoragePath.objects.all()
 
 
-class DocumentSerializer(DynamicFieldsModelSerializer):
+class DocumentSerializer(DynamicFieldsModelSerializer, OwnedObjectSerializer):
 
     correspondent = CorrespondentField(allow_null=True)
     tags = TagsField(many=True)
@@ -265,6 +279,7 @@ class DocumentSerializer(DynamicFieldsModelSerializer):
             "archive_serial_number",
             "original_file_name",
             "archived_file_name",
+            "owner",
         )
 
 
@@ -274,7 +289,7 @@ class SavedViewFilterRuleSerializer(serializers.ModelSerializer):
         fields = ["rule_type", "value"]
 
 
-class SavedViewSerializer(serializers.ModelSerializer):
+class SavedViewSerializer(OwnedObjectSerializer):
 
     filter_rules = SavedViewFilterRuleSerializer(many=True)
 
@@ -289,6 +304,7 @@ class SavedViewSerializer(serializers.ModelSerializer):
             "sort_field",
             "sort_reverse",
             "filter_rules",
+            "owner",
         ]
 
     def update(self, instance, validated_data):
@@ -562,7 +578,7 @@ class BulkDownloadSerializer(DocumentListSerializer):
         }[compression]
 
 
-class StoragePathSerializer(MatchingModelSerializer):
+class StoragePathSerializer(MatchingModelSerializer, OwnedObjectSerializer):
     class Meta:
         model = StoragePath
         fields = (
@@ -574,6 +590,7 @@ class StoragePathSerializer(MatchingModelSerializer):
             "matching_algorithm",
             "is_insensitive",
             "document_count",
+            "owner",
         )
 
     def validate_path(self, path):
