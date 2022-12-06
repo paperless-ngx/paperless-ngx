@@ -9,7 +9,7 @@ Before making backups, make sure that paperless is not running.
 
 Options available to any installation of paperless:
 
-- Use the [document exporter](administration#exporter). The document exporter exports all your documents,
+- Use the [document exporter](#exporter). The document exporter exports all your documents,
   thumbnails and metadata to a specific folder. You may import your
   documents into a fresh instance of paperless again or store your
   documents in another DMS with this export.
@@ -52,7 +52,7 @@ Options available to bare-metal and non-docker installations:
 
 ## Updating Paperless {#updating}
 
-### Docker Route
+### Docker Route {#docker-updating}
 
 If a new release of paperless-ngx is available, upgrading depends on how
 you installed paperless-ngx in the first place. The releases are
@@ -70,7 +70,7 @@ After that, [make a backup](#backup).
 
 A. If you pull the image from the docker hub, all you need to do is:
 
-    ``` shell-session
+    ```shell-session
     $ docker-compose pull
     $ docker-compose up
     ```
@@ -80,7 +80,7 @@ A. If you pull the image from the docker hub, all you need to do is:
 
 B. If you built the image yourself, do the following:
 
-    ``` shell-session
+    ```shell-session
     $ git pull
     $ docker-compose build
     $ docker-compose up
@@ -131,7 +131,7 @@ the background.
     image: ghcr.io/paperless-ngx/paperless-ngx:1.7
     ```
 
-### Bare Metal Route
+### Bare Metal Route {#bare-metal-updating}
 
 After grabbing the new release and unpacking the contents, do the
 following:
@@ -158,7 +158,7 @@ following:
     This might not actually do anything. Not every new paperless version
     comes with new database migrations.
 
-## Downgrading Paperless
+## Downgrading Paperless {#downgrade-paperless}
 
 Downgrades are possible. However, some updates also contain database
 migrations (these change the layout of the database and may move data).
@@ -366,7 +366,7 @@ task scheduler.
 ### Managing filenames {#renamer}
 
 If you use paperless' feature to
-[assign custom filenames to your documents](/advanced_usage#file_name_handling), you can use this command to move all your files after
+[assign custom filenames to your documents](/advanced_usage#file-name-handling), you can use this command to move all your files after
 changing the naming scheme.
 
 !!! warning
@@ -430,9 +430,7 @@ rules.
     As of October 2022 Microsoft no longer supports IMAP authentication
     for Exchange servers, thus Exchange is no longer supported until a
     solution is implemented in the Python IMAP library used by Paperless.
-    See
-
-[learn.microsoft.com](https://learn.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/deprecation-of-basic-authentication-exchange-online)
+    See [learn.microsoft.com](https://learn.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/deprecation-of-basic-authentication-exchange-online)
 
 ### Creating archived documents {#archiver}
 
