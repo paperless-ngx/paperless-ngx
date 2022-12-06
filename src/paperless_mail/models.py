@@ -3,7 +3,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
-class MailAccount(models.Model):
+class MailAccount(document_models.ModelWithOwner):
     class Meta:
         verbose_name = _("mail account")
         verbose_name_plural = _("mail accounts")
@@ -51,7 +51,7 @@ class MailAccount(models.Model):
         return self.name
 
 
-class MailRule(models.Model):
+class MailRule(document_models.ModelWithOwner):
     class Meta:
         verbose_name = _("mail rule")
         verbose_name_plural = _("mail rules")

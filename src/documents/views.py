@@ -556,10 +556,10 @@ class SavedViewViewSet(ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        return SavedView.objects.filter(user=user)
+        return SavedView.objects.filter(owner=user)
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        serializer.save(owner=self.request.user)
 
 
 class BulkEditView(GenericAPIView):
