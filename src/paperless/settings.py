@@ -171,6 +171,7 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     "django_filters",
     "django_celery_results",
+    "guardian",
 ] + env_apps
 
 if DEBUG:
@@ -276,6 +277,7 @@ if ENABLE_HTTP_REMOTE_USER:
     AUTHENTICATION_BACKENDS = [
         "django.contrib.auth.backends.RemoteUserBackend",
         "django.contrib.auth.backends.ModelBackend",
+        "guardian.backends.ObjectPermissionBackend",
     ]
     REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"].append(
         "rest_framework.authentication.RemoteUserAuthentication",
