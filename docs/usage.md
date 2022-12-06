@@ -1,9 +1,9 @@
 # Usage Overview
 
 Paperless is an application that manages your personal documents. With
-the help of a document scanner (see [the scanners wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Scanner-&-Software-Recommendations)), paperless transforms your wieldy physical document binders
-into a searchable archive and provides many utilities for finding and
-managing your documents.
+the help of a document scanner (see [the scanners wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Scanner-&-Software-Recommendations)),
+paperless transforms your unwieldy physical document binders into a searchable archive
+and provides many utilities for finding and managing your documents.
 
 ## Terms and definitions
 
@@ -37,7 +37,7 @@ Each document has a couple of fields that you can assign to them:
   date you signed a contract, or the date a letter was sent to you.
 - The _archive serial number_ (short: ASN) of a document is the
   identifier of the document in your physical document binders. See
-  [recommended workflow](#usage-reccomended_workflow) below.
+  [recommended workflow](#usage-recommended-workflow) below.
 - The _content_ of a document is the text that was OCR'ed from the
   document. This text is fed into the search engine and is used for
   matching tags, correspondents and document types.
@@ -74,8 +74,8 @@ following operations on your documents:
 ### The consumption directory
 
 The primary method of getting documents into your database is by putting
-them in the consumption directory. The consumer runs in an infinite
-loop, looking for new additions to this directory. When it finds them,
+them in the consumption directory. The consumer waits patiently, looking
+for new additions to this directory. When it finds them,
 the consumer goes about the process of parsing them with the OCR,
 indexing what it finds, and storing it in the media directory.
 
@@ -99,7 +99,7 @@ dragging-and-dropping files into your browser window.
 
 ### Mobile upload {#usage-mobile_upload}
 
-The mobile app over at <https://github.com/qcasey/paperless_share>
+The mobile app over at [https://github.com/qcasey/paperless_share](https://github.com/qcasey/paperless_share)
 allows Android users to share any documents with paperless. This can be
 combined with any of the mobile scanning apps out there, such as Office
 Lens.
@@ -325,7 +325,7 @@ language](https://whoosh.readthedocs.io/en/latest/querylang.html). For
 details on what date parsing utilities are available, see [Date
 parsing](https://whoosh.readthedocs.io/en/latest/dates.html#parsing-date-queries).
 
-## The recommended workflow {#usage-recommended_workflow}
+## The recommended workflow {#usage-recommended-workflow}
 
 Once you have familiarized yourself with paperless and are ready to use
 it for all your documents, the recommended workflow for managing your

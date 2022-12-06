@@ -767,7 +767,7 @@ After that, you need to clear your cookies (Paperless-ngx comes with
 updated dependencies that do cookie-processing differently) and probably
 your cache as well.
 
-# Considerations for less powerful devices {#less_powerful_devices}
+# Considerations for less powerful devices {#less-powerful-devices}
 
 Paperless runs on Raspberry Pi. However, some things are rather slow on
 the Pi and configuring some options in paperless can help improve
@@ -803,7 +803,7 @@ For details, refer to [configuration](configuration).
 !!! note
 
     Updating the
-    [automatic matching algorithm](/advanced_usage#automatic_matching) takes quite a bit of time. However, the update mechanism
+    [automatic matching algorithm](/advanced_usage#automatic-matching) takes quite a bit of time. However, the update mechanism
     checks if your data has changed before doing the heavy lifting. If you
     experience the algorithm taking too much cpu time, consider changing the
     schedule in the admin interface to daily. You can also manually invoke
