@@ -97,7 +97,7 @@ class RuleInline(admin.TabularInline):
 
 class SavedViewAdmin(admin.ModelAdmin):
 
-    list_display = ("name", "user")
+    list_display = ("name", "owner")
 
     inlines = [RuleInline]
 

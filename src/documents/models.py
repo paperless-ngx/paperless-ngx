@@ -57,14 +57,27 @@ class MatchingModel(models.Model):
         return self.name
 
 
-class Correspondent(MatchingModel):
+class ModelWithOwner(models.Model):
+    owner = models.ForeignKey(
+        User,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        verbose_name=_("owner"),
+    )
+
+    class Meta:
+        abstract = True
+
+
+class Correspondent(MatchingModel, ModelWithOwner):
     class Meta:
         ordering = ("name",)
         verbose_name = _("correspondent")
         verbose_name_plural = _("correspondents")
 
 
-class Tag(MatchingModel):
+class Tag(MatchingModel, ModelWithOwner):
 
     color = models.CharField(_("color"), max_length=7, default="#a6cee3")
 
@@ -82,13 +95,13 @@ class Tag(MatchingModel):
         verbose_name_plural = _("tags")
 
 
-class DocumentType(MatchingModel):
+class DocumentType(MatchingModel, ModelWithOwner):
     class Meta:
         verbose_name = _("document type")
         verbose_name_plural = _("document types")
 
 
-class StoragePath(MatchingModel):
+class StoragePath(MatchingModel, ModelWithOwner):
     path = models.CharField(
         _("path"),
         max_length=512,
@@ -100,7 +113,7 @@ class StoragePath(MatchingModel):
         verbose_name_plural = _("storage paths")
 
 
-class Document(models.Model):
+class Document(ModelWithOwner):
 
     STORAGE_TYPE_UNENCRYPTED = "unencrypted"
     STORAGE_TYPE_GPG = "gpg"
@@ -356,14 +369,13 @@ class Log(models.Model):
         return self.message
 
 
-class SavedView(models.Model):
+class SavedView(ModelWithOwner):
     class Meta:
 
         ordering = ("name",)
         verbose_name = _("saved view")
         verbose_name_plural = _("saved views")
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_("user"))
     name = models.CharField(_("name"), max_length=128)
 
     show_on_dashboard = models.BooleanField(
