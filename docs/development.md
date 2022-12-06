@@ -39,16 +39,16 @@ guidelines](https://github.com/paperless-ngx/paperless-ngx/blob/main/CONTRIBUTIN
 ## Code formatting with pre-commit Hooks
 
 To ensure a consistent style and formatting across the project source,
-the project utilizes a Git [pre-commit]{.title-ref} hook to perform some
-formatting and linting before a commit is allowed. That way, everyone
-uses the same style and some common issues can be caught early on. See
-below for installation instructions.
+the project utilizes a Git [`pre-commit`](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks)
+hook to perform some formatting and linting before a commit is allowed.
+That way, everyone uses the same style and some common issues can be caught
+early on. See below for installation instructions.
 
 Once installed, hooks will run when you commit. If the formatting isn't
 quite right or a linter catches something, the commit will be rejected.
 You'll need to look at the output and fix the issue. Some hooks, such
-as the Python formatting tool [black]{.title-ref}, will format failing
-files, so all you need to do is [git add]{.title-ref} those files again
+as the Python formatting tool `black`, will format failing
+files, so all you need to do is `git add` those files again
 and retry your commit.
 
 ## Initial setup and first start
@@ -58,7 +58,7 @@ first-time setup. To do the setup you need to perform the steps from the
 following chapters in a certain order:
 
 1.  Install prerequisites + pipenv as mentioned in
-    `[Bare metal route](/setup#bare_metal)
+    [Bare metal route](/setup#bare_metal)
 
 2.  Copy `paperless.conf.example` to `paperless.conf` and enable debug
     mode.
@@ -69,7 +69,7 @@ following chapters in a certain order:
     $ npm install -g @angular/cli
     ```
 
-4.  Install pre-commit
+4.  Install pre-commit hooks
 
     ```shell-session
     pre-commit install
@@ -81,7 +81,7 @@ following chapters in a certain order:
     mkdir -p consume media
     ```
 
-6.  You can now either \...
+6.  You can now either ...
 
     - install redis or
 
@@ -91,9 +91,9 @@ following chapters in a certain order:
 
     - spin up a bare redis container
 
-      > ```shell-session
-      > docker run -d -p 6379:6379 --restart unless-stopped redis:latest
-      > ```
+      ```shell-session
+      docker run -d -p 6379:6379 --restart unless-stopped redis:latest
+      ```
 
 7.  Install the python dependencies by performing in the src/ directory.
 
@@ -101,10 +101,12 @@ following chapters in a certain order:
     pipenv install --dev
     ```
 
-> - Make sure you're using python 3.9.x or lower. Otherwise you might
->   get issues with building dependencies. You can use
->   [pyenv](https://github.com/pyenv/pyenv) to install a specific
->   python version.
+!!! note
+
+    Make sure you're using python 3.10.x or lower. Otherwise you might
+    get issues with building dependencies. You can use
+    [pyenv](https://github.com/pyenv/pyenv) to install a specific
+    python version.
 
 8.  Generate the static UI so you can perform a login to get session
     that is required for frontend development (this needs to be done one
@@ -126,9 +128,9 @@ following chapters in a certain order:
     you're developing for, you need to have some or all of them
     running.
 
-> ```shell-session
-> python3 manage.py runserver & python3 manage.py document_consumer & celery --app paperless worker
-> ```
+    ```shell-session
+    python3 manage.py runserver & python3 manage.py document_consumer & celery --app paperless worker
+    ```
 
 11. Login with the superuser credentials provided in step 8 at
     `http://localhost:8000` to create a session that enables you to use
@@ -140,15 +142,15 @@ development go to `/src-ui` and run `ng serve`. From there you can use
 
 ## Back end development
 
-The backend is a django application. PyCharm works well for development,
+The backend is a [Django](https://www.djangoproject.com/) application. PyCharm works well for development,
 but you can use whatever you want.
 
 Configure the IDE to use the src/ folder as the base source folder.
 Configure the following launch configurations in your IDE:
 
-- python3 manage.py runserver
-- celery \--app paperless worker
-- python3 manage.py document_consumer
+- `python3 manage.py runserver`
+- `celery --app paperless worker`
+- `python3 manage.py document_consumer`
 
 To start them all:
 
@@ -158,24 +160,26 @@ python3 manage.py runserver & python3 manage.py document_consumer & celery --app
 
 Testing and code style:
 
-- Run `pytest` in the src/ directory to execute all tests. This also
+- Run `pytest` in the `src/` directory to execute all tests. This also
   generates a HTML coverage report. When runnings test, paperless.conf
   is loaded as well. However: the tests rely on the default
   configuration. This is not ideal. But for now, make sure no settings
   except for DEBUG are overridden when testing.
 
 - Coding style is enforced by the Git pre-commit hooks. These will
-  ensure your code is formatted and do some linting when you do a [git
-  commit]{.title-ref}.
+  ensure your code is formatted and do some linting when you do a `git commit`.
 
 - You can also run `black` manually to format your code
 
-  !!! note
+- The `pre-commit` hooks will modify files and interact with each other.
+  It may take a couple of `git add`, `git commit` cycle to satisfy them.
+
+!!! note
 
       The line length rule E501 is generally useful for getting multiple
       source files next to each other on the screen. However, in some
       cases, its just not possible to make some lines fit, especially
-      complicated IF cases. Append `# NOQA: E501` to disable this check
+      complicated IF cases. Append `# noqa: E501` to disable this check
       for certain lines.
 
 ## Front end development
@@ -353,7 +357,8 @@ LANGUAGES = [
 
 ## Building the documentation
 
-The documentation is built using material-mkdocs, see their [documentation](https://squidfunk.github.io/mkdocs-material/reference/). If you want to build the documentation locally, this is how you do it:
+The documentation is built using material-mkdocs, see their [documentation](https://squidfunk.github.io/mkdocs-material/reference/).
+If you want to build the documentation locally, this is how you do it:
 
 1.  Install python dependencies.
 
@@ -366,7 +371,7 @@ The documentation is built using material-mkdocs, see their [documentation](http
 
     ```shell-session
     $ cd /path/to/paperless
-    $ pipenv mkdocs build
+    $ pipenv mkdocs build --config-file mkdocs.yml
     ```
 
 ## Building the Docker image
@@ -379,9 +384,9 @@ helper script `build-docker-image.sh`.
 
 Building the docker image from source:
 
-> ```shell-session
-> ./build-docker-image.sh Dockerfile -t <your-tag>
-> ```
+```shell-session
+./build-docker-image.sh Dockerfile -t <your-tag>
+```
 
 ## Extending Paperless
 
@@ -428,7 +433,7 @@ class MyCustomParser(DocumentParser):
     def get_thumbnail(self, document_path, mime_type):
         # This should return the path to a thumbnail you created for this
         # document.
-        return os.path.join(self.tempdir, "thumb.png")
+        return os.path.join(self.tempdir, "thumb.webp")
 ```
 
 If you encounter any issues during parsing, raise a
