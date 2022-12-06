@@ -42,6 +42,7 @@ from rest_framework.exceptions import NotFound
 from rest_framework.filters import OrderingFilter
 from rest_framework.filters import SearchFilter
 from rest_framework.generics import GenericAPIView
+from rest_framework.mixins import CreateModelMixin
 from rest_framework.mixins import DestroyModelMixin
 from rest_framework.mixins import ListModelMixin
 from rest_framework.mixins import RetrieveModelMixin
@@ -137,7 +138,17 @@ class IndexView(TemplateView):
         return context
 
 
-class CorrespondentViewSet(ModelViewSet):
+class PassUserMixin(CreateModelMixin):
+    """
+    Pass a user object to serializer
+    """
+
+    def get_serializer(self, *args, **kwargs):
+        kwargs.setdefault("user", self.request.user)
+        return super().get_serializer(*args, **kwargs)
+
+
+class CorrespondentViewSet(ModelViewSet, PassUserMixin):
     model = Correspondent
 
     queryset = Correspondent.objects.annotate(
@@ -163,7 +174,7 @@ class CorrespondentViewSet(ModelViewSet):
     )
 
 
-class TagViewSet(ModelViewSet):
+class TagViewSet(ModelViewSet, PassUserMixin):
     model = Tag
 
     queryset = Tag.objects.annotate(document_count=Count("documents")).order_by(
@@ -183,7 +194,7 @@ class TagViewSet(ModelViewSet):
     ordering_fields = ("name", "matching_algorithm", "match", "document_count")
 
 
-class DocumentTypeViewSet(ModelViewSet):
+class DocumentTypeViewSet(ModelViewSet, PassUserMixin):
     model = DocumentType
 
     queryset = DocumentType.objects.annotate(
@@ -204,6 +215,7 @@ class DocumentViewSet(
     DestroyModelMixin,
     ListModelMixin,
     GenericViewSet,
+    PassUserMixin,
 ):
     model = Document
     queryset = Document.objects.all()
@@ -551,7 +563,7 @@ class LogViewSet(ViewSet):
         return Response(self.log_files)
 
 
-class SavedViewViewSet(ModelViewSet):
+class SavedViewViewSet(ModelViewSet, PassUserMixin):
     model = SavedView
 
     queryset = SavedView.objects.all()
@@ -824,7 +836,7 @@ class RemoteVersionView(GenericAPIView):
         )
 
 
-class StoragePathViewSet(ModelViewSet):
+class StoragePathViewSet(ModelViewSet, PassUserMixin):
     model = StoragePath
 
     queryset = StoragePath.objects.annotate(document_count=Count("documents")).order_by(
