@@ -2,6 +2,7 @@ from django.db.models import Q
 from django_filters.rest_framework import BooleanFilter
 from django_filters.rest_framework import Filter
 from django_filters.rest_framework import FilterSet
+from rest_framework_guardian.filters import ObjectPermissionsFilter
 
 from .models import Correspondent
 from .models import Document
@@ -134,3 +135,17 @@ class StoragePathFilterSet(FilterSet):
             "name": CHAR_KWARGS,
             "path": CHAR_KWARGS,
         }
+
+
+class ObjectOwnedOrGrandtedPermissionsFilter(ObjectPermissionsFilter):
+    """
+    A filter backend that limits results to those where the requesting user
+    has read object level permissions, owns the objects, or objects without
+    an owner (for backwards compat)
+    """
+
+    def filter_queryset(self, request, queryset, view):
+        objects_with_perms = super().filter_queryset(request, queryset, view)
+        objects_owned = queryset.filter(owner=request.user)
+        objects_unowned = queryset.filter(owner__isnull=True)
+        return objects_with_perms | objects_owned | objects_unowned

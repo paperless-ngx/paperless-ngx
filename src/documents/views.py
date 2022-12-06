@@ -28,8 +28,9 @@ from django.utils.translation import get_language
 from django.views.decorators.cache import cache_control
 from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
+from documents.filters import ObjectOwnedOrGrandtedPermissionsFilter
 from documents.permissions import PaperlessAdminPermissions
-from documents.permissions import PaperlessModelPermissions
+from documents.permissions import PaperlessObjectPermissions
 from documents.tasks import consume_file
 from packaging import version as packaging_version
 from paperless import version
@@ -146,8 +147,12 @@ class CorrespondentViewSet(ModelViewSet):
 
     serializer_class = CorrespondentSerializer
     pagination_class = StandardPagination
-    permission_classes = (IsAuthenticated, PaperlessModelPermissions)
-    filter_backends = (DjangoFilterBackend, OrderingFilter)
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+        ObjectOwnedOrGrandtedPermissionsFilter,
+    )
     filterset_class = CorrespondentFilterSet
     ordering_fields = (
         "name",
@@ -172,7 +177,7 @@ class TagViewSet(ModelViewSet):
             return TagSerializer
 
     pagination_class = StandardPagination
-    permission_classes = (IsAuthenticated, PaperlessModelPermissions)
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filterset_class = TagFilterSet
     ordering_fields = ("name", "matching_algorithm", "match", "document_count")
@@ -187,7 +192,7 @@ class DocumentTypeViewSet(ModelViewSet):
 
     serializer_class = DocumentTypeSerializer
     pagination_class = StandardPagination
-    permission_classes = (IsAuthenticated, PaperlessModelPermissions)
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filterset_class = DocumentTypeFilterSet
     ordering_fields = ("name", "matching_algorithm", "match", "document_count")
@@ -204,7 +209,7 @@ class DocumentViewSet(
     queryset = Document.objects.all()
     serializer_class = DocumentSerializer
     pagination_class = StandardPagination
-    permission_classes = (IsAuthenticated, PaperlessModelPermissions)
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
     filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter)
     filterset_class = DocumentFilterSet
     search_fields = ("title", "correspondent__name", "content")
@@ -552,7 +557,7 @@ class SavedViewViewSet(ModelViewSet):
     queryset = SavedView.objects.all()
     serializer_class = SavedViewSerializer
     pagination_class = StandardPagination
-    permission_classes = (IsAuthenticated, PaperlessModelPermissions)
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
 
     def get_queryset(self):
         user = self.request.user
@@ -828,7 +833,7 @@ class StoragePathViewSet(ModelViewSet):
 
     serializer_class = StoragePathSerializer
     pagination_class = StandardPagination
-    permission_classes = (IsAuthenticated, PaperlessModelPermissions)
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filterset_class = StoragePathFilterSet
     ordering_fields = ("name", "path", "matching_algorithm", "match", "document_count")
