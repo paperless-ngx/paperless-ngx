@@ -2549,8 +2549,6 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
 
         self.assertEqual(self.client.get("/api/documents/").status_code, 403)
 
-        self.assertEqual(self.client.get(f"/api/documents/{d.id}/").status_code, 403)
-
         self.assertEqual(self.client.get("/api/tags/").status_code, 403)
         self.assertEqual(self.client.get("/api/correspondents/").status_code, 403)
         self.assertEqual(self.client.get("/api/document_types/").status_code, 403)
@@ -2567,14 +2565,34 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
 
         self.assertEqual(self.client.get("/api/documents/").status_code, 200)
 
-        self.assertEqual(self.client.get(f"/api/documents/{d.id}/").status_code, 200)
-
         self.assertEqual(self.client.get("/api/tags/").status_code, 200)
         self.assertEqual(self.client.get("/api/correspondents/").status_code, 200)
         self.assertEqual(self.client.get("/api/document_types/").status_code, 200)
 
         self.assertEqual(self.client.get("/api/logs/").status_code, 200)
         self.assertEqual(self.client.get("/api/saved_views/").status_code, 200)
+
+    def test_object_permissions(self):
+        user1 = User.objects.create_user(username="test1")
+        user2 = User.objects.create_user(username="test2")
+        user1.user_permissions.add(*Permission.objects.filter(codename="view_document"))
+        self.client.force_authenticate(user1)
+
+        self.assertEqual(self.client.get("/api/documents/").status_code, 200)
+
+        d = Document.objects.create(title="Test", content="the content 1", checksum="1")
+
+        # no owner
+        self.assertEqual(self.client.get(f"/api/documents/{d.id}/").status_code, 200)
+
+        d2 = Document.objects.create(
+            title="Test 2",
+            content="the content 2",
+            checksum="2",
+            owner=user2,
+        )
+
+        self.assertEqual(self.client.get(f"/api/documents/{d2.id}/").status_code, 404)
 
 
 class TestApiRemoteVersion(DirectoriesMixin, APITestCase):
