@@ -258,6 +258,11 @@ CHANNEL_LAYERS = {
 # Security                                                                    #
 ###############################################################################
 
+AUTHENTICATION_BACKENDS = [
+    "guardian.backends.ObjectPermissionBackend",
+    "django.contrib.auth.backends.ModelBackend",
+]
+
 AUTO_LOGIN_USERNAME = os.getenv("PAPERLESS_AUTO_LOGIN_USERNAME")
 
 if AUTO_LOGIN_USERNAME:
@@ -274,11 +279,7 @@ HTTP_REMOTE_USER_HEADER_NAME = os.getenv(
 
 if ENABLE_HTTP_REMOTE_USER:
     MIDDLEWARE.append("paperless.auth.HttpRemoteUserMiddleware")
-    AUTHENTICATION_BACKENDS = [
-        "django.contrib.auth.backends.RemoteUserBackend",
-        "django.contrib.auth.backends.ModelBackend",
-        "guardian.backends.ObjectPermissionBackend",
-    ]
+    AUTHENTICATION_BACKENDS.insert(0, "django.contrib.auth.backends.RemoteUserBackend")
     REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"].append(
         "rest_framework.authentication.RemoteUserAuthentication",
     )
