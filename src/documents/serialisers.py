@@ -28,6 +28,14 @@ from .models import UiSettings
 from .models import PaperlessTask
 from .parsers import is_mime_type_supported
 
+from guardian.models import UserObjectPermission
+from guardian.shortcuts import assign_perm
+from guardian.shortcuts import remove_perm
+
+from django.contrib.contenttypes.models import ContentType
+
+from django.contrib.auth.models import User
+
 
 # https://www.django-rest-framework.org/api-guide/serializers/#example
 class DynamicFieldsModelSerializer(serializers.ModelSerializer):
@@ -75,14 +83,140 @@ class MatchingModelSerializer(serializers.ModelSerializer):
 
 
 class OwnedObjectSerializer(serializers.ModelSerializer):
+    def get_permissions(self, obj):
+        content_type = ContentType.objects.get_for_model(obj)
+        user_object_perms = UserObjectPermission.objects.filter(
+            object_pk=obj.pk,
+            content_type=content_type,
+        ).values("user", "permission__codename")
+        return user_object_perms
+
+    permissions = SerializerMethodField()
+
+    grant_permissions = serializers.DictField(
+        label="Grant permissions",
+        allow_empty=True,
+        required=False,
+        write_only=True,
+    )
+
+    def _validate_user_ids(self, user_ids):
+        users = User.objects.filter(id__in=user_ids)
+        if not users.count() == len(users):
+            raise serializers.ValidationError(
+                "Some users in don't exist or were specified twice.",
+            )
+        return users
+
+    def validate_grant_permissions(self, grant_permissions):
+        user_dict = {
+            "view": User.objects.none(),
+            "change": User.objects.none(),
+        }
+        if grant_permissions is not None:
+            if "view" in grant_permissions:
+                view_list = grant_permissions["view"]
+                user_dict["view"] = self._validate_user_ids(view_list)
+            if "change" in grant_permissions:
+                change_list = grant_permissions["change"]
+                user_dict["change"] = self._validate_user_ids(change_list)
+        return user_dict
+
+    revoke_permissions = serializers.DictField(
+        label="Revoke permissions",
+        allow_empty=True,
+        required=False,
+        write_only=True,
+    )
+
+    def validate_revoke_permissions(self, revoke_permissions):
+        user_dict = {
+            "view": User.objects.none(),
+            "change": User.objects.none(),
+        }
+        if revoke_permissions is not None:
+            if "view" in revoke_permissions:
+                view_list = revoke_permissions["view"]
+                user_dict["view"] = self._validate_user_ids(view_list)
+            if "change" in revoke_permissions:
+                change_list = revoke_permissions["change"]
+                user_dict["change"] = self._validate_user_ids(change_list)
+        return user_dict
+
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user", None)
         return super().__init__(*args, **kwargs)
 
+    def _adjust_permissions(self, users, object, type="view", grant=True):
+        if grant:
+            for user in users:
+                assign_perm(
+                    f"{type}_{object.__class__.__name__.lower()}",
+                    user,
+                    object,
+                )
+        else:
+            for user in users:
+                remove_perm(
+                    f"{type}_{object.__class__.__name__.lower()}",
+                    user,
+                    object,
+                )
+
     def create(self, validated_data):
         if self.user and validated_data["owner"] is None:
             validated_data["owner"] = self.user
-        return super().create(validated_data)
+        instance = super().create(validated_data)
+        if "grant_permissions" in validated_data:
+            self._adjust_permissions(
+                validated_data["grant_permissions"]["view"],
+                instance,
+            )
+            self._adjust_permissions(
+                validated_data["grant_permissions"]["change"],
+                instance,
+                "change",
+            )
+        if "revoke_permissions" in validated_data:
+            self._adjust_permissions(
+                validated_data["revoke_permissions"]["view"],
+                instance,
+                "view",
+                False,
+            )
+            self._adjust_permissions(
+                validated_data["revoke_permissions"]["change"],
+                instance,
+                "change",
+                False,
+            )
+        return instance
+
+    def update(self, instance, validated_data):
+        if "grant_permissions" in validated_data:
+            self._adjust_permissions(
+                validated_data["grant_permissions"]["view"],
+                instance,
+            )
+            self._adjust_permissions(
+                validated_data["grant_permissions"]["change"],
+                instance,
+                "change",
+            )
+        if "revoke_permissions" in validated_data:
+            self._adjust_permissions(
+                validated_data["revoke_permissions"]["view"],
+                instance,
+                "view",
+                False,
+            )
+            self._adjust_permissions(
+                validated_data["revoke_permissions"]["change"],
+                instance,
+                "change",
+                False,
+            )
+        return super().update(instance, validated_data)
 
 
 class CorrespondentSerializer(MatchingModelSerializer, OwnedObjectSerializer):
@@ -101,6 +235,9 @@ class CorrespondentSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             "document_count",
             "last_correspondence",
             "owner",
+            "permissions",
+            "grant_permissions",
+            "revoke_permissions",
         )
 
 
@@ -116,6 +253,9 @@ class DocumentTypeSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             "is_insensitive",
             "document_count",
             "owner",
+            "permissions",
+            "grant_permissions",
+            "revoke_permissions",
         )
 
 
@@ -167,6 +307,9 @@ class TagSerializerVersion1(MatchingModelSerializer):
             "is_inbox_tag",
             "document_count",
             "owner",
+            "permissions",
+            "grant_permissions",
+            "revoke_permissions",
         )
 
 
@@ -280,6 +423,9 @@ class DocumentSerializer(DynamicFieldsModelSerializer, OwnedObjectSerializer):
             "original_file_name",
             "archived_file_name",
             "owner",
+            "permissions",
+            "grant_permissions",
+            "revoke_permissions",
         )
 
 
@@ -305,6 +451,9 @@ class SavedViewSerializer(OwnedObjectSerializer):
             "sort_reverse",
             "filter_rules",
             "owner",
+            "permissions",
+            "grant_permissions",
+            "revoke_permissions",
         ]
 
     def update(self, instance, validated_data):
@@ -591,6 +740,9 @@ class StoragePathSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             "is_insensitive",
             "document_count",
             "owner",
+            "permissions",
+            "grant_permissions",
+            "revoke_permissions",
         )
 
     def validate_path(self, path):
