@@ -19,10 +19,13 @@ class PaperlessObjectPermissions(DjangoObjectPermissions):
     }
 
     def has_object_permission(self, request, view, obj):
-        if hasattr(obj, "owner") and request.user == obj.owner:
-            return True
+        if hasattr(obj, "owner") and obj.owner is not None:
+            if request.user == obj.owner:
+                return True
+            else:
+                return super().has_object_permission(request, view, obj)
         else:
-            return super().has_object_permission(request, view, obj)
+            return True  # no owner
 
 
 class PaperlessAdminPermissions(BasePermission):

@@ -1158,21 +1158,21 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         u2 = User.objects.create_superuser("user2")
 
         v1 = SavedView.objects.create(
-            user=u1,
+            owner=u1,
             name="test1",
             sort_field="",
             show_on_dashboard=False,
             show_in_sidebar=False,
         )
         v2 = SavedView.objects.create(
-            user=u2,
+            owner=u2,
             name="test2",
             sort_field="",
             show_on_dashboard=False,
             show_in_sidebar=False,
         )
         v3 = SavedView.objects.create(
-            user=u2,
+            owner=u2,
             name="test3",
             sort_field="",
             show_on_dashboard=False,
@@ -1219,7 +1219,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         v1 = SavedView.objects.get(name="test")
         self.assertEqual(v1.sort_field, "created2")
         self.assertEqual(v1.filter_rules.count(), 1)
-        self.assertEqual(v1.user, self.user)
+        self.assertEqual(v1.owner, self.user)
 
         response = self.client.patch(
             f"/api/saved_views/{v1.id}/",
@@ -3015,17 +3015,13 @@ class TestApiUser(APITestCase):
         response = self.client.get(self.ENDPOINT)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data["count"], 2)
-        returned_user1 = response.data["results"][1]
+        self.assertEqual(response.data["count"], 3)  # AnonymousUser
+        returned_user2 = response.data["results"][2]
 
-        from pprint import pprint
-
-        pprint(returned_user1)
-
-        self.assertEqual(returned_user1["username"], user1.username)
-        self.assertEqual(returned_user1["password"], "**********")
-        self.assertEqual(returned_user1["first_name"], user1.first_name)
-        self.assertEqual(returned_user1["last_name"], user1.last_name)
+        self.assertEqual(returned_user2["username"], user1.username)
+        self.assertEqual(returned_user2["password"], "**********")
+        self.assertEqual(returned_user2["first_name"], user1.first_name)
+        self.assertEqual(returned_user2["last_name"], user1.last_name)
 
     def test_create_user(self):
         """

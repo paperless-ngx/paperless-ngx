@@ -88,8 +88,8 @@ class OwnedObjectSerializer(serializers.ModelSerializer):
         user_object_perms = UserObjectPermission.objects.filter(
             object_pk=obj.pk,
             content_type=content_type,
-        ).values("user", "permission__codename")
-        return user_object_perms
+        ).values_list("user", "permission__codename")
+        return list(user_object_perms)
 
     permissions = SerializerMethodField()
 
@@ -164,7 +164,9 @@ class OwnedObjectSerializer(serializers.ModelSerializer):
                 )
 
     def create(self, validated_data):
-        if self.user and validated_data["owner"] is None:
+        if self.user and (
+            "owner" not in validated_data or validated_data["owner"] is None
+        ):
             validated_data["owner"] = self.user
         instance = super().create(validated_data)
         if "grant_permissions" in validated_data:
@@ -306,10 +308,6 @@ class TagSerializerVersion1(MatchingModelSerializer):
             "is_insensitive",
             "is_inbox_tag",
             "document_count",
-            "owner",
-            "permissions",
-            "grant_permissions",
-            "revoke_permissions",
         )
 
 
@@ -342,6 +340,10 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             "is_insensitive",
             "is_inbox_tag",
             "document_count",
+            "owner",
+            "permissions",
+            "grant_permissions",
+            "revoke_permissions",
         )
 
     def validate_color(self, color):
@@ -461,6 +463,9 @@ class SavedViewSerializer(OwnedObjectSerializer):
             rules_data = validated_data.pop("filter_rules")
         else:
             rules_data = None
+        if "user" in validated_data:
+            # backwards compatibility
+            validated_data["owner"] = validated_data.pop("user")
         super().update(instance, validated_data)
         if rules_data is not None:
             SavedViewFilterRule.objects.filter(saved_view=instance).delete()
@@ -470,6 +475,9 @@ class SavedViewSerializer(OwnedObjectSerializer):
 
     def create(self, validated_data):
         rules_data = validated_data.pop("filter_rules")
+        if "user" in validated_data:
+            # backwards compatibility
+            validated_data["owner"] = validated_data.pop("user")
         saved_view = SavedView.objects.create(**validated_data)
         for rule_data in rules_data:
             SavedViewFilterRule.objects.create(saved_view=saved_view, **rule_data)

@@ -31,8 +31,8 @@ class TestManageSuperUser(DirectoriesMixin, TestCase):
         out = self.call_command(environ={})
 
         # just the consumer user which is created
-        # during migration
-        self.assertEqual(User.objects.count(), 1)
+        # during migration, and AnonymousUser
+        self.assertEqual(User.objects.count(), 2)
         self.assertTrue(User.objects.filter(username="consumer").exists())
         self.assertEqual(User.objects.filter(is_superuser=True).count(), 0)
         self.assertEqual(
@@ -50,10 +50,10 @@ class TestManageSuperUser(DirectoriesMixin, TestCase):
 
         out = self.call_command(environ={"PAPERLESS_ADMIN_PASSWORD": "123456"})
 
-        # count is 2 as there's the consumer
-        # user already created during migration
+        # count is 3 as there's the consumer
+        # user already created during migration, and AnonymousUser
         user: User = User.objects.get_by_natural_key("admin")
-        self.assertEqual(User.objects.count(), 2)
+        self.assertEqual(User.objects.count(), 3)
         self.assertTrue(user.is_superuser)
         self.assertEqual(user.email, "root@localhost")
         self.assertEqual(out, 'Created superuser "admin" with provided password.\n')
@@ -70,7 +70,7 @@ class TestManageSuperUser(DirectoriesMixin, TestCase):
 
         out = self.call_command(environ={"PAPERLESS_ADMIN_PASSWORD": "123456"})
 
-        self.assertEqual(User.objects.count(), 2)
+        self.assertEqual(User.objects.count(), 3)
         with self.assertRaises(User.DoesNotExist):
             User.objects.get_by_natural_key("admin")
         self.assertEqual(
@@ -91,7 +91,7 @@ class TestManageSuperUser(DirectoriesMixin, TestCase):
 
         out = self.call_command(environ={"PAPERLESS_ADMIN_PASSWORD": "123456"})
 
-        self.assertEqual(User.objects.count(), 2)
+        self.assertEqual(User.objects.count(), 3)
         user: User = User.objects.get_by_natural_key("admin")
         self.assertTrue(user.check_password("password"))
         self.assertEqual(out, "Did not create superuser, a user admin already exists\n")
@@ -110,7 +110,7 @@ class TestManageSuperUser(DirectoriesMixin, TestCase):
 
         out = self.call_command(environ={"PAPERLESS_ADMIN_PASSWORD": "123456"})
 
-        self.assertEqual(User.objects.count(), 2)
+        self.assertEqual(User.objects.count(), 3)
         user: User = User.objects.get_by_natural_key("admin")
         self.assertTrue(user.check_password("password"))
         self.assertFalse(user.is_superuser)
@@ -149,7 +149,7 @@ class TestManageSuperUser(DirectoriesMixin, TestCase):
         )
 
         user: User = User.objects.get_by_natural_key("admin")
-        self.assertEqual(User.objects.count(), 2)
+        self.assertEqual(User.objects.count(), 3)
         self.assertTrue(user.is_superuser)
         self.assertEqual(user.email, "hello@world.com")
         self.assertEqual(user.username, "admin")
@@ -173,7 +173,7 @@ class TestManageSuperUser(DirectoriesMixin, TestCase):
         )
 
         user: User = User.objects.get_by_natural_key("super")
-        self.assertEqual(User.objects.count(), 2)
+        self.assertEqual(User.objects.count(), 3)
         self.assertTrue(user.is_superuser)
         self.assertEqual(user.email, "hello@world.com")
         self.assertEqual(user.username, "super")
