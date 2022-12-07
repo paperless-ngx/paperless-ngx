@@ -4,11 +4,13 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { Observable } from 'rxjs'
 import { MATCHING_ALGORITHMS, MATCH_AUTO } from 'src/app/data/matching-model'
 import { ObjectWithId } from 'src/app/data/object-with-id'
+import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
 import { AbstractPaperlessService } from 'src/app/services/rest/abstract-paperless-service'
 
 @Directive()
-export abstract class EditDialogComponent<T extends ObjectWithId>
-  implements OnInit
+export abstract class EditDialogComponent<
+  T extends ObjectWithPermissions | ObjectWithId
+> implements OnInit
 {
   constructor(
     private service: AbstractPaperlessService<T>,
@@ -36,6 +38,16 @@ export abstract class EditDialogComponent<T extends ObjectWithId>
 
   ngOnInit(): void {
     if (this.object != null) {
+      if (this.object['permissions']) {
+        this.object['set_permissions'] = {
+          view: (this.object as ObjectWithPermissions).permissions
+            .filter((p) => (p[1] as string).includes('view'))
+            .map((p) => p[0]),
+          change: (this.object as ObjectWithPermissions).permissions
+            .filter((p) => (p[1] as string).includes('change'))
+            .map((p) => p[0]),
+        }
+      }
       this.objectForm.patchValue(this.object)
     }
 

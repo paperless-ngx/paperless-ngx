@@ -23,6 +23,7 @@ import {
   SETTINGS,
   SETTINGS_KEYS,
 } from '../data/paperless-uisettings'
+import { PaperlessUser } from '../data/paperless-user'
 import { PermissionsService } from './permissions.service'
 import { SavedViewService } from './rest/saved-view.service'
 import { ToastService } from './toast.service'
@@ -46,8 +47,7 @@ export class SettingsService {
   protected baseUrl: string = environment.apiBaseUrl + 'ui_settings/'
 
   private settings: Object = {}
-
-  public displayName: string
+  currentUser: PaperlessUser
 
   public settingsSaved: EventEmitter<any> = new EventEmitter()
 
@@ -75,10 +75,21 @@ export class SettingsService {
         // to update lang cookie
         if (this.settings['language']?.length)
           this.setLanguage(this.settings['language'])
-        this.displayName = uisettings.display_name.trim()
+        this.currentUser = {
+          id: uisettings['user_id'],
+          username: uisettings['username'],
+        }
         this.permissionsService.initialize(uisettings.permissions)
       })
     )
+  }
+
+  get displayName(): string {
+    return (
+      this.currentUser.first_name ??
+      this.currentUser.username ??
+      ''
+    ).trim()
   }
 
   public updateAppearanceSettings(
