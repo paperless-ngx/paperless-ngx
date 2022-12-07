@@ -31,6 +31,7 @@ from .parsers import is_mime_type_supported
 from guardian.models import UserObjectPermission
 from guardian.shortcuts import assign_perm
 from guardian.shortcuts import remove_perm
+from guardian.shortcuts import get_users_with_perms
 
 from django.contrib.contenttypes.models import ContentType
 
@@ -91,55 +92,36 @@ class OwnedObjectSerializer(serializers.ModelSerializer):
         ).values_list("user", "permission__codename")
         return list(user_object_perms)
 
-    permissions = SerializerMethodField()
+    permissions = SerializerMethodField(read_only=True)
 
-    grant_permissions = serializers.DictField(
-        label="Grant permissions",
+    set_permissions = serializers.DictField(
+        label="Set permissions",
         allow_empty=True,
         required=False,
         write_only=True,
     )
 
     def _validate_user_ids(self, user_ids):
-        users = User.objects.filter(id__in=user_ids)
-        if not users.count() == len(users):
-            raise serializers.ValidationError(
-                "Some users in don't exist or were specified twice.",
-            )
+        users = User.objects.none()
+        if user_ids is not None:
+            users = User.objects.filter(id__in=user_ids)
+            if not users.count() == len(user_ids):
+                raise serializers.ValidationError(
+                    "Some users in don't exist or were specified twice.",
+                )
         return users
 
-    def validate_grant_permissions(self, grant_permissions):
+    def validate_set_permissions(self, set_permissions):
         user_dict = {
             "view": User.objects.none(),
             "change": User.objects.none(),
         }
-        if grant_permissions is not None:
-            if "view" in grant_permissions:
-                view_list = grant_permissions["view"]
+        if set_permissions is not None:
+            if "view" in set_permissions:
+                view_list = set_permissions["view"]
                 user_dict["view"] = self._validate_user_ids(view_list)
-            if "change" in grant_permissions:
-                change_list = grant_permissions["change"]
-                user_dict["change"] = self._validate_user_ids(change_list)
-        return user_dict
-
-    revoke_permissions = serializers.DictField(
-        label="Revoke permissions",
-        allow_empty=True,
-        required=False,
-        write_only=True,
-    )
-
-    def validate_revoke_permissions(self, revoke_permissions):
-        user_dict = {
-            "view": User.objects.none(),
-            "change": User.objects.none(),
-        }
-        if revoke_permissions is not None:
-            if "view" in revoke_permissions:
-                view_list = revoke_permissions["view"]
-                user_dict["view"] = self._validate_user_ids(view_list)
-            if "change" in revoke_permissions:
-                change_list = revoke_permissions["change"]
+            if "change" in set_permissions:
+                change_list = set_permissions["change"]
                 user_dict["change"] = self._validate_user_ids(change_list)
         return user_dict
 
@@ -147,21 +129,25 @@ class OwnedObjectSerializer(serializers.ModelSerializer):
         self.user = kwargs.pop("user", None)
         return super().__init__(*args, **kwargs)
 
-    def _adjust_permissions(self, users, object, type="view", grant=True):
-        if grant:
-            for user in users:
-                assign_perm(
-                    f"{type}_{object.__class__.__name__.lower()}",
-                    user,
-                    object,
-                )
-        else:
-            for user in users:
-                remove_perm(
-                    f"{type}_{object.__class__.__name__.lower()}",
-                    user,
-                    object,
-                )
+    def _set_permissions(self, permissions, object):
+        for action in permissions:
+            permission = f"{action}_{object.__class__.__name__.lower()}"
+            users_to_add = permissions[action]
+            users_to_remove = get_users_with_perms(
+                object,
+                only_with_perms_in=[permission],
+            ).difference(users_to_add)
+            for user in users_to_remove:
+                remove_perm(permission, user, object)
+            for user in users_to_add:
+                assign_perm(permission, user, object)
+                if action == "change":
+                    # change gives view too
+                    assign_perm(
+                        f"view_{object.__class__.__name__.lower()}",
+                        user,
+                        object,
+                    )
 
     def create(self, validated_data):
         if self.user and (
@@ -169,55 +155,13 @@ class OwnedObjectSerializer(serializers.ModelSerializer):
         ):
             validated_data["owner"] = self.user
         instance = super().create(validated_data)
-        if "grant_permissions" in validated_data:
-            self._adjust_permissions(
-                validated_data["grant_permissions"]["view"],
-                instance,
-            )
-            self._adjust_permissions(
-                validated_data["grant_permissions"]["change"],
-                instance,
-                "change",
-            )
-        if "revoke_permissions" in validated_data:
-            self._adjust_permissions(
-                validated_data["revoke_permissions"]["view"],
-                instance,
-                "view",
-                False,
-            )
-            self._adjust_permissions(
-                validated_data["revoke_permissions"]["change"],
-                instance,
-                "change",
-                False,
-            )
+        if "set_permissions" in validated_data:
+            self._set_permissions(validated_data["set_permissions"], instance)
         return instance
 
     def update(self, instance, validated_data):
-        if "grant_permissions" in validated_data:
-            self._adjust_permissions(
-                validated_data["grant_permissions"]["view"],
-                instance,
-            )
-            self._adjust_permissions(
-                validated_data["grant_permissions"]["change"],
-                instance,
-                "change",
-            )
-        if "revoke_permissions" in validated_data:
-            self._adjust_permissions(
-                validated_data["revoke_permissions"]["view"],
-                instance,
-                "view",
-                False,
-            )
-            self._adjust_permissions(
-                validated_data["revoke_permissions"]["change"],
-                instance,
-                "change",
-                False,
-            )
+        if "set_permissions" in validated_data:
+            self._set_permissions(validated_data["set_permissions"], instance)
         return super().update(instance, validated_data)
 
 
@@ -238,8 +182,7 @@ class CorrespondentSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             "last_correspondence",
             "owner",
             "permissions",
-            "grant_permissions",
-            "revoke_permissions",
+            "set_permissions",
         )
 
 
@@ -256,8 +199,7 @@ class DocumentTypeSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             "document_count",
             "owner",
             "permissions",
-            "grant_permissions",
-            "revoke_permissions",
+            "set_permissions",
         )
 
 
@@ -342,8 +284,7 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             "document_count",
             "owner",
             "permissions",
-            "grant_permissions",
-            "revoke_permissions",
+            "set_permissions",
         )
 
     def validate_color(self, color):
@@ -426,8 +367,7 @@ class DocumentSerializer(DynamicFieldsModelSerializer, OwnedObjectSerializer):
             "archived_file_name",
             "owner",
             "permissions",
-            "grant_permissions",
-            "revoke_permissions",
+            "set_permissions",
         )
 
 
@@ -454,8 +394,7 @@ class SavedViewSerializer(OwnedObjectSerializer):
             "filter_rules",
             "owner",
             "permissions",
-            "grant_permissions",
-            "revoke_permissions",
+            "set_permissions",
         ]
 
     def update(self, instance, validated_data):
@@ -749,8 +688,7 @@ class StoragePathSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             "document_count",
             "owner",
             "permissions",
-            "grant_permissions",
-            "revoke_permissions",
+            "set_permissions",
         )
 
     def validate_path(self, path):

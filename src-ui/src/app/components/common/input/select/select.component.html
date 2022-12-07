@@ -12,7 +12,7 @@
         i18n-addTagText="Used for both types, correspondents, storage paths"
         [placeholder]="placeholder"
         [multiple]="multiple"
-        bindLabel="name"
+        [bindLabel]="bindLabel"
         bindValue="id"
         (change)="onChange(value)"
         (search)="onSearch($event)"
