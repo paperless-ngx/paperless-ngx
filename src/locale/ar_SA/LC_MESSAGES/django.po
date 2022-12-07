@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-09 21:50+0000\n"
-"PO-Revision-Date: 2022-12-07 15:39\n"
+"PO-Revision-Date: 2022-12-07 17:49\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -84,139 +84,139 @@ msgstr ""
 
 #: documents/models.py:81
 msgid "tag"
-msgstr ""
+msgstr "وسم"
 
 #: documents/models.py:82 documents/models.py:156
 msgid "tags"
-msgstr ""
+msgstr "وسوم"
 
 #: documents/models.py:87 documents/models.py:138
 msgid "document type"
-msgstr ""
+msgstr "نوع المستند"
 
 #: documents/models.py:88
 msgid "document types"
-msgstr ""
+msgstr "أنواع المستندات"
 
 #: documents/models.py:93
 msgid "path"
-msgstr ""
+msgstr "مسار"
 
 #: documents/models.py:99 documents/models.py:127
 msgid "storage path"
-msgstr ""
+msgstr "مسار التخزين"
 
 #: documents/models.py:100
 msgid "storage paths"
-msgstr ""
+msgstr "مسارات التخزين"
 
 #: documents/models.py:108
 msgid "Unencrypted"
-msgstr ""
+msgstr "دون تشفير"
 
 #: documents/models.py:109
 msgid "Encrypted with GNU Privacy Guard"
-msgstr ""
+msgstr "مشفر باستخدام حارس خصوصية غنو"
 
 #: documents/models.py:130
 msgid "title"
-msgstr ""
+msgstr "عنوان"
 
 #: documents/models.py:142 documents/models.py:611
 msgid "content"
-msgstr ""
+msgstr "محتوى"
 
 #: documents/models.py:145
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
-msgstr ""
+msgstr "الخام, فقط النص من المستند. يستخدم هذا الحقل أساسا للبحث."
 
 #: documents/models.py:150
 msgid "mime type"
-msgstr ""
+msgstr "MIME type"
 
 #: documents/models.py:160
 msgid "checksum"
-msgstr ""
+msgstr "بصمة الملف"
 
 #: documents/models.py:164
 msgid "The checksum of the original document."
-msgstr ""
+msgstr "بصمة الملف للمستند الأصلي."
 
 #: documents/models.py:168
 msgid "archive checksum"
-msgstr ""
+msgstr "بصمة الملف للربيدة"
 
 #: documents/models.py:173
 msgid "The checksum of the archived document."
-msgstr ""
+msgstr "بصمة الملف للمستند الربيدة."
 
 #: documents/models.py:176 documents/models.py:348 documents/models.py:617
 msgid "created"
-msgstr ""
+msgstr "أُنشئ"
 
 #: documents/models.py:179
 msgid "modified"
-msgstr ""
+msgstr "مُعدّل"
 
 #: documents/models.py:186
 msgid "storage type"
-msgstr ""
+msgstr "نوع التخزين"
 
 #: documents/models.py:194
 msgid "added"
-msgstr ""
+msgstr "أضيف"
 
 #: documents/models.py:201
 msgid "filename"
-msgstr ""
+msgstr "اسم الملف"
 
 #: documents/models.py:207
 msgid "Current filename in storage"
-msgstr ""
+msgstr "اسم الملف الحالي في التخزين"
 
 #: documents/models.py:211
 msgid "archive filename"
-msgstr ""
+msgstr "اسم الربيدة"
 
 #: documents/models.py:217
 msgid "Current archive filename in storage"
-msgstr ""
+msgstr "اسم ملف الربيدة الحالي في التخزين"
 
 #: documents/models.py:221
 msgid "original filename"
-msgstr ""
+msgstr "اسم الملف الأصلي"
 
 #: documents/models.py:227
 msgid "The original name of the file when it was uploaded"
-msgstr ""
+msgstr "اسم الملف الأصلي عند تحميله"
 
 #: documents/models.py:231
 msgid "archive serial number"
-msgstr ""
+msgstr "الرقم التسلسلي للربيدة"
 
 #: documents/models.py:237
 msgid "The position of this document in your physical document archive."
-msgstr ""
+msgstr "موقع هذا المستند في ربيدة المستند الفيزيائي."
 
 #: documents/models.py:243 documents/models.py:628
 msgid "document"
-msgstr ""
+msgstr "مستند"
 
 #: documents/models.py:244
 msgid "documents"
-msgstr ""
+msgstr "المستندات"
 
 #: documents/models.py:331
 msgid "debug"
-msgstr ""
+msgstr "تصحيح الأخطاء"
 
 #: documents/models.py:332
 msgid "information"
-msgstr ""
+msgstr "معلومات"
 
 #: documents/models.py:333
 msgid "warning"
-msgstr ""
+msgstr "تحذير"
 
 #: documents/models.py:334
 msgid "error"
@@ -412,15 +412,15 @@ msgstr ""
 
 #: documents/models.py:549 documents/models.py:556
 msgid "Task Name"
-msgstr ""
+msgstr "اسم المهمة"
 
 #: documents/models.py:550
 msgid "Name of the file which the Task was run for"
-msgstr ""
+msgstr "اسم الملف الذي وكل بالمهمة"
 
 #: documents/models.py:557
 msgid "Name of the Task which was run"
-msgstr ""
+msgstr "اسم المهمة التي كانت تعمل"
 
 #: documents/models.py:562
 msgid "Task Positional Arguments"
