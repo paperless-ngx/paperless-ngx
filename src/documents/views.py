@@ -872,9 +872,6 @@ class UiSettingsView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
 
         user = User.objects.get(pk=request.user.id)
-        displayname = user.username
-        if user.first_name or user.last_name:
-            displayname = " ".join([user.first_name, user.last_name])
         ui_settings = {}
         if hasattr(user, "ui_settings"):
             ui_settings = user.ui_settings.settings
@@ -891,7 +888,6 @@ class UiSettingsView(GenericAPIView):
             {
                 "user_id": user.id,
                 "username": user.username,
-                "display_name": displayname,
                 "settings": ui_settings,
                 "permissions": roles,
             },
