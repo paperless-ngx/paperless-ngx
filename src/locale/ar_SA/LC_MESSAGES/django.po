@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-09 21:50+0000\n"
-"PO-Revision-Date: 2022-12-07 14:36\n"
+"PO-Revision-Date: 2022-12-07 15:39\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -31,48 +31,48 @@ msgstr "كل الكلمات"
 
 #: documents/models.py:34
 msgid "Exact match"
-msgstr ""
+msgstr "تطابق تام"
 
 #: documents/models.py:35
 msgid "Regular expression"
-msgstr ""
+msgstr "التعابير النظامية"
 
 #: documents/models.py:36
 msgid "Fuzzy word"
-msgstr ""
+msgstr "كلمة غير واضحة"
 
 #: documents/models.py:37
 msgid "Automatic"
-msgstr ""
+msgstr "تلقائي"
 
 #: documents/models.py:40 documents/models.py:367 paperless_mail/models.py:16
 #: paperless_mail/models.py:80
 msgid "name"
-msgstr ""
+msgstr "اسم"
 
 #: documents/models.py:42
 msgid "match"
-msgstr ""
+msgstr "تطابق"
 
 #: documents/models.py:45
 msgid "matching algorithm"
-msgstr ""
+msgstr "خوارزمية مطابقة"
 
 #: documents/models.py:50
 msgid "is insensitive"
-msgstr ""
+msgstr "غير حساس"
 
 #: documents/models.py:63 documents/models.py:118
 msgid "correspondent"
-msgstr ""
+msgstr "مراسل"
 
 #: documents/models.py:64
 msgid "correspondents"
-msgstr ""
+msgstr "مراسلون"
 
 #: documents/models.py:69
 msgid "color"
-msgstr ""
+msgstr "لون"
 
 #: documents/models.py:72
 msgid "is inbox tag"
