@@ -40,7 +40,6 @@ import {
   PermissionsService,
   PermissionType,
 } from 'src/app/services/permissions.service'
-import { UserService } from 'src/app/services/rest/user.service'
 import { PaperlessUser } from 'src/app/data/paperless-user'
 
 @Component({
@@ -75,7 +74,6 @@ export class DocumentDetailComponent
   correspondents: PaperlessCorrespondent[]
   documentTypes: PaperlessDocumentType[]
   storagePaths: PaperlessStoragePath[]
-  users: PaperlessUser[]
 
   documentForm: FormGroup = new FormGroup({
     title: new FormControl(''),
@@ -134,8 +132,7 @@ export class DocumentDetailComponent
     private toastService: ToastService,
     private settings: SettingsService,
     private storagePathService: StoragePathService,
-    private permissionsService: PermissionsService,
-    private userService: UserService
+    private permissionsService: PermissionsService
   ) {}
 
   titleKeyUp(event) {
@@ -174,11 +171,6 @@ export class DocumentDetailComponent
       .listAll()
       .pipe(first())
       .subscribe((result) => (this.storagePaths = result.results))
-
-    this.userService
-      .listAll()
-      .pipe(first())
-      .subscribe((result) => (this.users = result.results))
 
     this.route.paramMap
       .pipe(
