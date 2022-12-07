@@ -30,6 +30,10 @@ export class CorrespondentEditDialogComponent extends EditDialogComponent<Paperl
       matching_algorithm: new FormControl(DEFAULT_MATCHING_ALGORITHM),
       match: new FormControl(''),
       is_insensitive: new FormControl(true),
+      set_permissions: new FormGroup({
+        view: new FormControl(null),
+        change: new FormControl(null),
+      }),
     })
   }
 }

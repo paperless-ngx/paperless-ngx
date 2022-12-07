@@ -5,10 +5,20 @@
     </button>
   </div>
   <div class="modal-body">
+
     <app-input-text i18n-title title="Name" formControlName="name" [error]="error?.name"></app-input-text>
     <app-input-select i18n-title title="Matching algorithm" [items]="getMatchingAlgorithms()" formControlName="matching_algorithm"></app-input-select>
     <app-input-text *ngIf="patternRequired" i18n-title title="Matching pattern" formControlName="match" [error]="error?.match"></app-input-text>
     <app-input-check *ngIf="patternRequired" i18n-title title="Case insensitive" formControlName="is_insensitive" novalidate></app-input-check>
+
+    <div *ifOwner="object.owner">
+      <h5 i18n>Permissions</h5>
+      <div formGroupName="set_permissions">
+        <app-share-user type="view" formControlName="view"></app-share-user>
+        <app-share-user type="change" formControlName="change"></app-share-user>
+      </div>
+    </div>
+
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-outline-secondary" (click)="cancel()" i18n [disabled]="networkActive">Cancel</button>

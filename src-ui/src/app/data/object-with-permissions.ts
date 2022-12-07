@@ -2,7 +2,7 @@ import { ObjectWithId } from './object-with-id'
 import { PaperlessUser } from './paperless-user'
 
 export interface ObjectWithPermissions extends ObjectWithId {
-  user?: PaperlessUser
+  owner?: PaperlessUser
 
   permissions?: Array<[number, string]>
 }
