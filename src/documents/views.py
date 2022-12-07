@@ -256,6 +256,7 @@ class DocumentViewSet(
         else:
             fields = None
         serializer_class = self.get_serializer_class()
+        kwargs.setdefault("user", self.request.user)  # PassUserMixin
         kwargs.setdefault("context", self.get_serializer_context())
         kwargs.setdefault("fields", fields)
         return serializer_class(*args, **kwargs)

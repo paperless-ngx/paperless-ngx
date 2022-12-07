@@ -170,10 +170,21 @@
                         </div>
                     </ng-template>
                 </li>
+
                 <li [ngbNavItem]="5" *ngIf="commentsEnabled">
                     <a ngbNavLink i18n>Comments</a>
                     <ng-template ngbNavContent>
                         <app-document-comments [documentId]="documentId"></app-document-comments>
+                    </ng-template>
+                </li>
+
+                <li [ngbNavItem]="6">
+                    <a ngbNavLink i18n>Permissions</a>
+                    <ng-template ngbNavContent>
+                        <div formGroupName="set_permissions">
+                            <app-input-select i18n-title title="Users can view" [items]="users" [bindLabel]="'username'" multiple="true" formControlName="view"></app-input-select>
+                            <app-input-select i18n-title title="Users can edit" [items]="users" [bindLabel]="'username'" multiple="true" formControlName="change"></app-input-select>
+                        </div>
                     </ng-template>
                 </li>
             </ul>

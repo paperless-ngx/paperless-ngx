@@ -3015,7 +3015,7 @@ class TestApiUser(APITestCase):
         response = self.client.get(self.ENDPOINT)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data["count"], 3)  # AnonymousUser
+        self.assertEqual(response.data["count"], 2)
         returned_user2 = response.data["results"][2]
 
         self.assertEqual(returned_user2["username"], user1.username)

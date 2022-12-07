@@ -40,6 +40,8 @@ import {
   PermissionsService,
   PermissionType,
 } from 'src/app/services/permissions.service'
+import { UserService } from 'src/app/services/rest/user.service'
+import { PaperlessUser } from 'src/app/data/paperless-user'
 
 @Component({
   selector: 'app-document-detail',
@@ -73,6 +75,7 @@ export class DocumentDetailComponent
   correspondents: PaperlessCorrespondent[]
   documentTypes: PaperlessDocumentType[]
   storagePaths: PaperlessStoragePath[]
+  users: PaperlessUser[]
 
   documentForm: FormGroup = new FormGroup({
     title: new FormControl(''),
@@ -83,6 +86,10 @@ export class DocumentDetailComponent
     storage_path: new FormControl(),
     archive_serial_number: new FormControl(),
     tags: new FormControl([]),
+    set_permissions: new FormGroup({
+      view: new FormControl(null),
+      change: new FormControl(null),
+    }),
   })
 
   previewCurrentPage: number = 1
@@ -127,7 +134,8 @@ export class DocumentDetailComponent
     private toastService: ToastService,
     private settings: SettingsService,
     private storagePathService: StoragePathService,
-    private permissionsService: PermissionsService
+    private permissionsService: PermissionsService,
+    private userService: UserService
   ) {}
 
   titleKeyUp(event) {
@@ -166,6 +174,11 @@ export class DocumentDetailComponent
       .listAll()
       .pipe(first())
       .subscribe((result) => (this.storagePaths = result.results))
+
+    this.userService
+      .listAll()
+      .pipe(first())
+      .subscribe((result) => (this.users = result.results))
 
     this.route.paramMap
       .pipe(
@@ -230,6 +243,14 @@ export class DocumentDetailComponent
             storage_path: doc.storage_path,
             archive_serial_number: doc.archive_serial_number,
             tags: [...doc.tags],
+            set_permissions: {
+              view: doc.permissions
+                .filter((p) => (p[1] as string).includes('view'))
+                .map((p) => p[0]),
+              change: doc.permissions
+                .filter((p) => (p[1] as string).includes('change'))
+                .map((p) => p[0]),
+            },
           })
 
           this.isDirty$ = dirtyCheck(
@@ -284,6 +305,14 @@ export class DocumentDetailComponent
         },
       })
     this.title = this.documentTitlePipe.transform(doc.title)
+    doc['set_permissions'] = {
+      view: doc.permissions
+        .filter((p) => (p[1] as string).includes('view'))
+        .map((p) => p[0]),
+      change: doc.permissions
+        .filter((p) => (p[1] as string).includes('change'))
+        .map((p) => p[0]),
+    }
     this.documentForm.patchValue(doc)
   }
 
@@ -376,7 +405,7 @@ export class DocumentDetailComponent
       .update(this.document)
       .pipe(first())
       .subscribe({
-        next: (result) => {
+        next: () => {
           this.close()
           this.networkActive = false
           this.error = null
