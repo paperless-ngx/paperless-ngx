@@ -174,14 +174,16 @@ class CorrespondentViewSet(ModelViewSet, PassUserMixin):
     )
 
 
-class TagViewSet(ModelViewSet, PassUserMixin):
+class TagViewSet(ModelViewSet):
     model = Tag
 
     queryset = Tag.objects.annotate(document_count=Count("documents")).order_by(
         Lower("name"),
     )
 
-    def get_serializer_class(self):
+    def get_serializer_class(self, *args, **kwargs):
+        # from UserPassMixin
+        kwargs.setdefault("user", self.request.user)
         if int(self.request.version) == 1:
             return TagSerializerVersion1
         else:
@@ -189,7 +191,11 @@ class TagViewSet(ModelViewSet, PassUserMixin):
 
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
-    filter_backends = (DjangoFilterBackend, OrderingFilter)
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+        ObjectOwnedOrGrandtedPermissionsFilter,
+    )
     filterset_class = TagFilterSet
     ordering_fields = ("name", "matching_algorithm", "match", "document_count")
 
@@ -204,7 +210,11 @@ class DocumentTypeViewSet(ModelViewSet, PassUserMixin):
     serializer_class = DocumentTypeSerializer
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
-    filter_backends = (DjangoFilterBackend, OrderingFilter)
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+        ObjectOwnedOrGrandtedPermissionsFilter,
+    )
     filterset_class = DocumentTypeFilterSet
     ordering_fields = ("name", "matching_algorithm", "match", "document_count")
 
