@@ -16,7 +16,7 @@
     <app-input-text *ngIf="patternRequired" i18n-title title="Matching pattern" formControlName="match" [error]="error?.match"></app-input-text>
     <app-input-check *ngIf="patternRequired" i18n-title title="Case insensitive" formControlName="is_insensitive"></app-input-check>
 
-    <div *ifOwner="object.owner">
+    <div *ifOwner="object?.owner">
       <h5 i18n>Permissions</h5>
       <div formGroupName="set_permissions">
         <app-share-user type="view" formControlName="view"></app-share-user>

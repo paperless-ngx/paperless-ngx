@@ -106,6 +106,7 @@ import localeTr from '@angular/common/locales/tr'
 import localeZh from '@angular/common/locales/zh'
 import { ShareUserComponent } from './components/common/input/share-user/share-user.component'
 import { IfOwnerDirective } from './directives/if-owner.directive'
+import { IfObjectPermissionsDirective } from './directives/if-object-permissions.directive'
 
 registerLocaleData(localeBe)
 registerLocaleData(localeCs)
@@ -199,6 +200,7 @@ function initializeApp(settings: SettingsService) {
     MailRuleEditDialogComponent,
     ShareUserComponent,
     IfOwnerDirective,
+    IfObjectPermissionsDirective,
   ],
   imports: [
     BrowserModule,

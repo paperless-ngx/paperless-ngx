@@ -306,6 +306,7 @@ export class DocumentDetailComponent
         .map((p) => p[0]),
     }
     this.documentForm.patchValue(doc)
+    if (!this.userCanEdit) this.documentForm.disable()
   }
 
   createDocumentType(newName: string) {
@@ -589,6 +590,16 @@ export class DocumentDetailComponent
         action: PermissionAction.View,
         type: PermissionType.Document,
       })
+    )
+  }
+
+  get userCanEdit(): boolean {
+    return (
+      !this.document ||
+      this.permissionsService.currentUserHasObjectPermissions(
+        PermissionAction.Change,
+        this.document
+      )
     )
   }
 }

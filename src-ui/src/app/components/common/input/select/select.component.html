@@ -20,7 +20,7 @@
         (clear)="clearLastSearchTerm()"
         (blur)="onBlur()">
       </ng-select>
-      <button *ngIf="allowCreateNew" class="btn btn-outline-secondary" type="button" (click)="addItem()">
+      <button *ngIf="allowCreateNew" class="btn btn-outline-secondary" type="button" (click)="addItem()" [disabled]="disabled">
         <svg class="buttonicon" fill="currentColor">
           <use xlink:href="assets/bootstrap-icons.svg#plus" />
         </svg>

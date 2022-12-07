@@ -74,6 +74,7 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
   }
 
   removeTag(id) {
+    if (this.disabled) return
     let index = this.value.indexOf(id)
     if (index > -1) {
       let oldValue = this.value
