@@ -5,7 +5,7 @@
       <div class="input-group-text" i18n>of {{previewNumPages}}</div>
     </div>
 
-    <button type="button" class="btn btn-sm btn-outline-danger me-2 ms-auto" (click)="delete()" *ifPermissions="{ action: PermissionAction.Delete, type: PermissionType.Document }">
+    <button *ifOwner="document?.owner" type="button" class="btn btn-sm btn-outline-danger me-2 ms-auto" (click)="delete()">
         <svg class="buttonicon" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#trash" />
         </svg><span class="d-none d-lg-inline ps-1" i18n>Delete</span>
@@ -28,7 +28,7 @@
 
     </div>
 
-    <button type="button" class="btn btn-sm btn-outline-primary me-2" (click)="redoOcr()">
+    <button *ifOwner="document?.owner" type="button" class="btn btn-sm btn-outline-primary me-2" (click)="redoOcr()">
         <svg class="buttonicon" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#arrow-counterclockwise" />
         </svg><span class="d-none d-lg-inline ps-1" i18n>Redo OCR</span>
@@ -191,9 +191,11 @@
 
             <div [ngbNavOutlet]="nav" class="mt-2"></div>
 
-            <button type="button" class="btn btn-outline-secondary" (click)="discard()" i18n [disabled]="networkActive || !(isDirty$ | async)">Discard</button>&nbsp;
-            <button type="button" class="btn btn-outline-primary" (click)="saveEditNext()" *ngIf="hasNext()" i18n [disabled]="networkActive || !(isDirty$ | async) || error">Save & next</button>&nbsp;
-            <button type="submit" class="btn btn-primary" *ifPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }" i18n [disabled]="networkActive || !(isDirty$ | async) || error">Save</button>&nbsp;
+            <ng-container action="PermissionAction.Change" *ifObjectPermissions="document">
+                <button type="button" class="btn btn-outline-secondary" (click)="discard()" i18n [disabled]="networkActive || !(isDirty$ | async)">Discard</button>&nbsp;
+                <button type="button" class="btn btn-outline-primary" (click)="saveEditNext()" *ngIf="hasNext()" i18n [disabled]="networkActive || !(isDirty$ | async) || error">Save & next</button>&nbsp;
+                <button type="submit" class="btn btn-primary" *ifPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }" i18n [disabled]="networkActive || !(isDirty$ | async) || error">Save</button>&nbsp;
+            </ng-container>
         </form>
     </div>
 

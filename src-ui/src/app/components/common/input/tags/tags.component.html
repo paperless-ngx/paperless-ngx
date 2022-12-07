@@ -3,6 +3,7 @@
 
   <div class="input-group flex-nowrap">
     <ng-select name="tags" [items]="tags" bindLabel="name" bindValue="id" [(ngModel)]="value"
+      [disabled]="disabled"
       [multiple]="true"
       [closeOnSelect]="false"
       [clearSearchOnAdd]="true"
@@ -31,7 +32,7 @@
       </ng-template>
     </ng-select>
 
-    <button *ngIf="allowCreate" class="btn btn-outline-secondary" type="button" (click)="createTag()">
+    <button *ngIf="allowCreate" class="btn btn-outline-secondary" type="button" (click)="createTag()" [disabled]="disabled">
       <svg class="buttonicon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#plus" />
       </svg>

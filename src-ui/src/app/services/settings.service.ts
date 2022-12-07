@@ -79,7 +79,10 @@ export class SettingsService {
           id: uisettings['user_id'],
           username: uisettings['username'],
         }
-        this.permissionsService.initialize(uisettings.permissions)
+        this.permissionsService.initialize(
+          uisettings.permissions,
+          this.currentUser
+        )
       })
     )
   }

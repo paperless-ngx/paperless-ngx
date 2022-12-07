@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core'
+import { ObjectWithPermissions } from '../data/object-with-permissions'
+import { PaperlessUser } from '../data/paperless-user'
 
 export enum PermissionAction {
   Add = 'add',
@@ -33,13 +35,28 @@ export interface PaperlessPermission {
 })
 export class PermissionsService {
   private permissions: string[]
+  private currentUser: PaperlessUser
 
-  public initialize(permissions: string[]) {
+  public initialize(permissions: string[], currentUser: PaperlessUser) {
     this.permissions = permissions
+    this.currentUser = currentUser
   }
 
   public currentUserCan(permission: PaperlessPermission): boolean {
     return this.permissions.includes(this.getPermissionCode(permission))
+  }
+
+  public currentUserIsOwner(owner: PaperlessUser): boolean {
+    return owner?.id === this.currentUser.id
+  }
+
+  public currentUserHasObjectPermissions(
+    action: string,
+    object: ObjectWithPermissions
+  ): boolean {
+    return (object.permissions[action] as Array<number>)?.includes(
+      this.currentUser.id
+    )
   }
 
   public getPermissionCode(permission: PaperlessPermission): string {
