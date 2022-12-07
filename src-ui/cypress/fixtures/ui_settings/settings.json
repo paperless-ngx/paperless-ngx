@@ -1,7 +1,6 @@
 {
     "user_id": 1,
     "username": "admin",
-    "display_name": "Admin",
     "settings": {
         "language": "",
         "bulk_edit": {
