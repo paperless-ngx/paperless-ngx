@@ -39,7 +39,9 @@ class FaviconView(View):
 class UserViewSet(ModelViewSet):
     model = User
 
-    queryset = User.objects.exclude(username="consumer").order_by(Lower("username"))
+    queryset = User.objects.exclude(
+        username__in=["consumer", "AnonymousUser"],
+    ).order_by(Lower("username"))
 
     serializer_class = UserSerializer
     pagination_class = StandardPagination

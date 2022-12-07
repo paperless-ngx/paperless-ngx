@@ -47,6 +47,9 @@ export class SelectComponent extends AbstractInputComponent<number> {
   @Input()
   multiple: boolean = false
 
+  @Input()
+  bindLabel: string = 'name'
+
   @Output()
   createNew = new EventEmitter<string>()
 
