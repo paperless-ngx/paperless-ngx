@@ -1,7 +1,6 @@
 export interface PaperlessUiSettings {
   user_id: number
   username: string
-  display_name: string
   settings: Object
   permissions: string[]
 }
