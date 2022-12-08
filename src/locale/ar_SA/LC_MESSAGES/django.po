@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-09 21:50+0000\n"
-"PO-Revision-Date: 2022-12-08 12:23\n"
+"PO-Revision-Date: 2022-12-08 14:25\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -76,11 +76,11 @@ msgstr "لون"
 
 #: documents/models.py:72
 msgid "is inbox tag"
-msgstr ""
+msgstr "سمة علبة الوارد"
 
 #: documents/models.py:75
 msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
-msgstr ""
+msgstr "ضع علامة على هذه السمة كعلامة سمة علبة الوارد: سيتم وضع سمة على جميع المستندات المستهلكة حديثا مع وسوم صندوق الواردات."
 
 #: documents/models.py:81
 msgid "tag"
@@ -400,7 +400,7 @@ msgstr "الرمز التعريفي للمهمة"
 
 #: documents/models.py:537
 msgid "Celery ID for the Task that was run"
-msgstr ""
+msgstr "رمز المعرف للمهمة التي كانت تعمل"
 
 #: documents/models.py:542
 msgid "Acknowledged"
@@ -440,145 +440,145 @@ msgstr ""
 
 #: documents/models.py:578
 msgid "Task State"
-msgstr ""
+msgstr "حالة المهمة"
 
 #: documents/models.py:579
 msgid "Current state of the task being run"
-msgstr ""
+msgstr "الحالة الراهنة للمهمة قيد العمل"
 
 #: documents/models.py:584
 msgid "Created DateTime"
-msgstr ""
+msgstr "تاريخ و وقت الإنشاء"
 
 #: documents/models.py:585
 msgid "Datetime field when the task result was created in UTC"
-msgstr ""
+msgstr "حقل التاريخ والوقت عند إنشاء نتيجة المهمة في UTC"
 
 #: documents/models.py:590
 msgid "Started DateTime"
-msgstr ""
+msgstr "تاريخ و وقت البداية"
 
 #: documents/models.py:591
 msgid "Datetime field when the task was started in UTC"
-msgstr ""
+msgstr "حقل التاريخ والوقت عند بدء المهمة في UTC"
 
 #: documents/models.py:596
 msgid "Completed DateTime"
-msgstr ""
+msgstr "التاريخ و الوقت المكتمل"
 
 #: documents/models.py:597
 msgid "Datetime field when the task was completed in UTC"
-msgstr ""
+msgstr "حقل التاريخ و الوقت عند اكتمال المهمة في UTC"
 
 #: documents/models.py:602
 msgid "Result Data"
-msgstr ""
+msgstr "نتائج البيانات"
 
 #: documents/models.py:604
 msgid "The data returned by the task"
-msgstr ""
+msgstr "البيانات المستردة من قبل المهمة"
 
 #: documents/models.py:613
 msgid "Comment for the document"
-msgstr ""
+msgstr "التعليق على المستند"
 
 #: documents/models.py:642
 msgid "comment"
-msgstr ""
+msgstr "تعليق"
 
 #: documents/models.py:643
 msgid "comments"
-msgstr ""
+msgstr "التعليقات"
 
 #: documents/serialisers.py:72
 #, python-format
 msgid "Invalid regular expression: %(error)s"
-msgstr ""
+msgstr "التعبير النظامي خاطىء: %(error)s"
 
 #: documents/serialisers.py:193
 msgid "Invalid color."
-msgstr ""
+msgstr "لون خاطئ."
 
 #: documents/serialisers.py:518
 #, python-format
 msgid "File type %(type)s not supported"
-msgstr ""
+msgstr "نوع الملف %(type)s غير مدعوم"
 
 #: documents/serialisers.py:599
 msgid "Invalid variable detected."
-msgstr ""
+msgstr "اكتشاف متغير خاطئ."
 
 #: documents/templates/index.html:78
 msgid "Paperless-ngx is loading..."
-msgstr ""
+msgstr "تحميل Paperless-ngx..."
 
 #: documents/templates/index.html:79
 msgid "Still here?! Hmm, something might be wrong."
-msgstr ""
+msgstr "مازلت هنا؟! همم، قد يكون هناك خطأ ما."
 
 #: documents/templates/index.html:79
 msgid "Here's a link to the docs."
-msgstr ""
+msgstr "إليك رابط المستندات."
 
 #: documents/templates/registration/logged_out.html:14
 msgid "Paperless-ngx signed out"
-msgstr ""
+msgstr "تسجيل الخروج Paperless-ngx"
 
 #: documents/templates/registration/logged_out.html:59
 msgid "You have been successfully logged out. Bye!"
-msgstr ""
+msgstr "تم تسجيل خروجك بنجاح. مع السلامة!"
 
 #: documents/templates/registration/logged_out.html:60
 msgid "Sign in again"
-msgstr ""
+msgstr "تسجيل الدخول مرة أخرى"
 
 #: documents/templates/registration/login.html:15
 msgid "Paperless-ngx sign in"
-msgstr ""
+msgstr "تسجيل الدخول Paperless-ngx"
 
 #: documents/templates/registration/login.html:61
 msgid "Please sign in."
-msgstr ""
+msgstr "الرجاء تسجيل الدخول."
 
 #: documents/templates/registration/login.html:64
 msgid "Your username and password didn't match. Please try again."
-msgstr ""
+msgstr "اسم المستخدم وكلمة المرور غير متطابقين. حاول مرة أخرى."
 
 #: documents/templates/registration/login.html:67
 msgid "Username"
-msgstr ""
+msgstr "اسم المستخدم"
 
 #: documents/templates/registration/login.html:68
 msgid "Password"
-msgstr ""
+msgstr "كلمة المرور"
 
 #: documents/templates/registration/login.html:73
 msgid "Sign in"
-msgstr ""
+msgstr "تسجيل الدخول"
 
 #: paperless/settings.py:378
 msgid "English (US)"
-msgstr ""
+msgstr "الإنجليزية (الولايات المتحدة)"
 
 #: paperless/settings.py:379
 msgid "Belarusian"
-msgstr ""
+msgstr "البيلاروسية"
 
 #: paperless/settings.py:380
 msgid "Czech"
-msgstr ""
+msgstr "التشيكية"
 
 #: paperless/settings.py:381
 msgid "Danish"
-msgstr ""
+msgstr "الدانماركية"
 
 #: paperless/settings.py:382
 msgid "German"
-msgstr ""
+msgstr "الألمانية"
 
 #: paperless/settings.py:383
 msgid "English (GB)"
-msgstr ""
+msgstr "الإنجليزية (المملكة المتحدة)"
 
 #: paperless/settings.py:384
 msgid "Spanish"
@@ -586,19 +586,19 @@ msgstr "الإسبانية"
 
 #: paperless/settings.py:385
 msgid "French"
-msgstr ""
+msgstr "الفرنسية"
 
 #: paperless/settings.py:386
 msgid "Italian"
-msgstr ""
+msgstr "الإيطالية"
 
 #: paperless/settings.py:387
 msgid "Luxembourgish"
-msgstr ""
+msgstr "اللوكسمبرجية"
 
 #: paperless/settings.py:388
 msgid "Dutch"
-msgstr ""
+msgstr "الهولندية"
 
 #: paperless/settings.py:389
 msgid "Polish"
@@ -606,7 +606,7 @@ msgstr "البولندية"
 
 #: paperless/settings.py:390
 msgid "Portuguese (Brazil)"
-msgstr ""
+msgstr "البرتغالية (البرازيل)"
 
 #: paperless/settings.py:391
 msgid "Portuguese"
@@ -614,7 +614,7 @@ msgstr "البرتغالية"
 
 #: paperless/settings.py:392
 msgid "Romanian"
-msgstr ""
+msgstr "الرومانية"
 
 #: paperless/settings.py:393
 msgid "Russian"
@@ -622,11 +622,11 @@ msgstr "الروسية"
 
 #: paperless/settings.py:394
 msgid "Slovenian"
-msgstr ""
+msgstr "السلوفانية"
 
 #: paperless/settings.py:395
 msgid "Serbian"
-msgstr ""
+msgstr "الصربية"
 
 #: paperless/settings.py:396
 msgid "Swedish"
@@ -694,11 +694,11 @@ msgstr "دون تشفير"
 
 #: paperless_mail/models.py:13
 msgid "Use SSL"
-msgstr "أستخدم SSL"
+msgstr "استخدم SSL"
 
 #: paperless_mail/models.py:14
 msgid "Use STARTTLS"
-msgstr "أستخدم STARTTLS"
+msgstr "استخدم STARTTLS"
 
 #: paperless_mail/models.py:18
 msgid "IMAP server"
@@ -730,91 +730,91 @@ msgstr "نوع ترميز المحارف"
 
 #: paperless_mail/models.py:45
 msgid "The character set to use when communicating with the mail server, such as 'UTF-8' or 'US-ASCII'."
-msgstr ""
+msgstr "ترميز المحارف المستخدمة عند التواصل مع خادم البريد، مثل 'UTF-8' أو 'US-ASCII'."
 
 #: paperless_mail/models.py:56
 msgid "mail rule"
-msgstr ""
+msgstr "قاعدة البريد"
 
 #: paperless_mail/models.py:57
 msgid "mail rules"
-msgstr ""
+msgstr "قواعد البريد"
 
 #: paperless_mail/models.py:60
 msgid "Only process attachments."
-msgstr ""
+msgstr "معالجة المرفقات فقط."
 
 #: paperless_mail/models.py:61
 msgid "Process all files, including 'inline' attachments."
-msgstr ""
+msgstr "معالجة جميع الملفات، بما في ذلك المرفقات المضمنة."
 
 #: paperless_mail/models.py:64
 msgid "Delete"
-msgstr ""
+msgstr "حذف"
 
 #: paperless_mail/models.py:65
 msgid "Move to specified folder"
-msgstr ""
+msgstr "نقل إلى مجلد محدد"
 
 #: paperless_mail/models.py:66
 msgid "Mark as read, don't process read mails"
-msgstr ""
+msgstr "وضع علامة كمقروءة، لا تعالج الرسائل المقروءة"
 
 #: paperless_mail/models.py:67
 msgid "Flag the mail, don't process flagged mails"
-msgstr ""
+msgstr "علم الرسالة، لا تعالج الرسائل المعلمة"
 
 #: paperless_mail/models.py:68
 msgid "Tag the mail with specified tag, don't process tagged mails"
-msgstr ""
+msgstr "وسم الرسالة بوسم محدد، لا تعالج الرسائل الموسومة"
 
 #: paperless_mail/models.py:71
 msgid "Use subject as title"
-msgstr ""
+msgstr "استخدم الموضوع كعنوان"
 
 #: paperless_mail/models.py:72
 msgid "Use attachment filename as title"
-msgstr ""
+msgstr "استخدم اسم الملف المرفق كعنوان"
 
 #: paperless_mail/models.py:75
 msgid "Do not assign a correspondent"
-msgstr ""
+msgstr "لا تعيّن مراسل"
 
 #: paperless_mail/models.py:76
 msgid "Use mail address"
-msgstr ""
+msgstr "استخدم عنوان البريد"
 
 #: paperless_mail/models.py:77
 msgid "Use name (or mail address if not available)"
-msgstr ""
+msgstr "استخدم الاسم (أو عنوان البريد إذا لم يكن متاحا)"
 
 #: paperless_mail/models.py:78
 msgid "Use correspondent selected below"
-msgstr ""
+msgstr "استخدم المراسل المحدد أدناه"
 
 #: paperless_mail/models.py:82
 msgid "order"
-msgstr ""
+msgstr "الطلب"
 
 #: paperless_mail/models.py:88
 msgid "account"
-msgstr ""
+msgstr "الحساب"
 
 #: paperless_mail/models.py:92
 msgid "folder"
-msgstr ""
+msgstr "مجلد"
 
 #: paperless_mail/models.py:96
 msgid "Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server."
-msgstr ""
+msgstr "يجب فصل المجلدات الفرعية باستخدام محدد، غالبا نقطة ('.') أو خط مائل ('/')، لكنها تختلف حسب خادم البريد."
 
 #: paperless_mail/models.py:102
 msgid "filter from"
-msgstr ""
+msgstr "تصفية من"
 
 #: paperless_mail/models.py:108
 msgid "filter subject"
-msgstr ""
+msgstr "تصفية الموضوع"
 
 #: paperless_mail/models.py:114
 msgid "filter body"
@@ -822,15 +822,15 @@ msgstr ""
 
 #: paperless_mail/models.py:121
 msgid "filter attachment filename"
-msgstr ""
+msgstr "تصفية اسم الملف المرفق"
 
 #: paperless_mail/models.py:126
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr ""
+msgstr "فقط المستندات التي تتطابق تماما مع اسم هذا الملف إذا تم تحديدها. المحارف البديلة مثل *.pdf أو *الفواتير* مسموح بها. لأنها غير حساسة."
 
 #: paperless_mail/models.py:133
 msgid "maximum age"
-msgstr ""
+msgstr "أقصى عُمُر"
 
 #: paperless_mail/models.py:135
 msgid "Specified in days."
