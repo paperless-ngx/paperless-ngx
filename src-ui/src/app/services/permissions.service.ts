@@ -25,11 +25,6 @@ export enum PermissionType {
   Admin = '%s_logentry',
 }
 
-export interface PaperlessPermission {
-  action: PermissionAction
-  type: PermissionType
-}
-
 @Injectable({
   providedIn: 'root',
 })
@@ -42,25 +37,34 @@ export class PermissionsService {
     this.currentUser = currentUser
   }
 
-  public currentUserCan(permission: PaperlessPermission): boolean {
-    return this.permissions.includes(this.getPermissionCode(permission))
+  public currentUserCan(
+    action: PermissionAction,
+    type: PermissionType
+  ): boolean {
+    return this.permissions.includes(this.getPermissionCode(action, type))
   }
 
-  public currentUserIsOwner(owner: PaperlessUser): boolean {
-    return owner?.id === this.currentUser.id
+  public currentUserOwnsObject(object: ObjectWithPermissions): boolean {
+    return !object || !object.owner || object.owner.id === this.currentUser.id
   }
 
   public currentUserHasObjectPermissions(
     action: string,
     object: ObjectWithPermissions
   ): boolean {
-    return (object.permissions[action] as Array<number>)?.includes(
-      this.currentUser.id
+    return (
+      this.currentUserOwnsObject(object) ||
+      (object.permissions[action]['users'] as Array<number>)?.includes(
+        this.currentUser.id
+      )
     )
   }
 
-  public getPermissionCode(permission: PaperlessPermission): string {
-    return permission.type.replace('%s', permission.action)
+  public getPermissionCode(
+    action: PermissionAction,
+    type: PermissionType
+  ): string {
+    return type.replace('%s', action)
   }
 
   public getPermissionKeys(permissionStr: string): {

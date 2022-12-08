@@ -5,7 +5,7 @@
       <div class="input-group-text" i18n>of {{previewNumPages}}</div>
     </div>
 
-    <button *ifOwner="document?.owner" type="button" class="btn btn-sm btn-outline-danger me-2 ms-auto" (click)="delete()">
+    <button *ifOwner="document" type="button" class="btn btn-sm btn-outline-danger me-2 ms-auto" (click)="delete()">
         <svg class="buttonicon" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#trash" />
         </svg><span class="d-none d-lg-inline ps-1" i18n>Delete</span>
@@ -28,7 +28,7 @@
 
     </div>
 
-    <button *ifOwner="document?.owner" type="button" class="btn btn-sm btn-outline-primary me-2" (click)="redoOcr()">
+    <button *ifOwner="document" type="button" class="btn btn-sm btn-outline-primary me-2" (click)="redoOcr()">
         <svg class="buttonicon" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#arrow-counterclockwise" />
         </svg><span class="d-none d-lg-inline ps-1" i18n>Redo OCR</span>
@@ -178,12 +178,20 @@
                     </ng-template>
                 </li>
 
-                <li [ngbNavItem]="6" *ifOwner="document?.owner">
+                <li [ngbNavItem]="6" *ifOwner="document">
                     <a ngbNavLink i18n>Permissions</a>
                     <ng-template ngbNavContent>
                         <div formGroupName="set_permissions">
-                            <app-share-user type="view" formControlName="view"></app-share-user>
-                            <app-share-user type="change" formControlName="change"></app-share-user>
+                            <h6 i18n>View</h6>
+                            <div formGroupName="view">
+                                <app-permissions-user type="view" formControlName="users"></app-permissions-user>
+                                <app-permissions-group type="view" formControlName="groups"></app-permissions-group>
+                            </div>
+                            <h6 i18n>Edit</h6>
+                            <div formGroupName="change">
+                                <app-permissions-user type="change" formControlName="users"></app-permissions-user>
+                                <app-permissions-group type="change" formControlName="groups"></app-permissions-group>
+                            </div>
                         </div>
                     </ng-template>
                 </li>
@@ -191,7 +199,7 @@
 
             <div [ngbNavOutlet]="nav" class="mt-2"></div>
 
-            <ng-container action="PermissionAction.Change" *ifObjectPermissions="document">
+            <ng-container *ifObjectPermissions="{ object: document, action: PermissionAction.Change }">
                 <button type="button" class="btn btn-outline-secondary" (click)="discard()" i18n [disabled]="networkActive || !(isDirty$ | async)">Discard</button>&nbsp;
                 <button type="button" class="btn btn-outline-primary" (click)="saveEditNext()" *ngIf="hasNext()" i18n [disabled]="networkActive || !(isDirty$ | async) || error">Save & next</button>&nbsp;
                 <button type="submit" class="btn btn-primary" *ifPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }" i18n [disabled]="networkActive || !(isDirty$ | async) || error">Save</button>&nbsp;

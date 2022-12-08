@@ -84,6 +84,10 @@ import { GroupEditDialogComponent } from './components/common/edit-dialog/group-
 import { PermissionsSelectComponent } from './components/common/permissions-select/permissions-select.component'
 import { MailAccountEditDialogComponent } from './components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component'
 import { MailRuleEditDialogComponent } from './components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component'
+import { PermissionsUserComponent } from './components/common/input/permissions-user/permissions-user.component'
+import { PermissionsGroupComponent } from './components/common/input/permissions-group/permissions-group.component'
+import { IfOwnerDirective } from './directives/if-owner.directive'
+import { IfObjectPermissionsDirective } from './directives/if-object-permissions.directive'
 
 import localeBe from '@angular/common/locales/be'
 import localeCs from '@angular/common/locales/cs'
@@ -104,9 +108,6 @@ import localeSr from '@angular/common/locales/sr'
 import localeSv from '@angular/common/locales/sv'
 import localeTr from '@angular/common/locales/tr'
 import localeZh from '@angular/common/locales/zh'
-import { ShareUserComponent } from './components/common/input/share-user/share-user.component'
-import { IfOwnerDirective } from './directives/if-owner.directive'
-import { IfObjectPermissionsDirective } from './directives/if-object-permissions.directive'
 
 registerLocaleData(localeBe)
 registerLocaleData(localeCs)
@@ -198,7 +199,8 @@ function initializeApp(settings: SettingsService) {
     PermissionsSelectComponent,
     MailAccountEditDialogComponent,
     MailRuleEditDialogComponent,
-    ShareUserComponent,
+    PermissionsUserComponent,
+    PermissionsGroupComponent,
     IfOwnerDirective,
     IfObjectPermissionsDirective,
   ],
