@@ -585,6 +585,13 @@ export class DocumentDetailComponent
     )
   }
 
+  get userIsOwner(): boolean {
+    return (
+      !this.document ||
+      this.permissionsService.currentUserOwnsObject(this.document)
+    )
+  }
+
   get userCanEdit(): boolean {
     return (
       !this.document ||
