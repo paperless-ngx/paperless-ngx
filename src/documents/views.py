@@ -2,6 +2,7 @@ import itertools
 import json
 import logging
 import os
+import re
 import tempfile
 import urllib
 import uuid
@@ -883,7 +884,8 @@ class UiSettingsView(GenericAPIView):
             ui_settings["update_checking"] = {
                 "backend_setting": settings.ENABLE_UPDATE_CHECK,
             }
-        roles = user.user_permissions.values_list("codename", flat=True)
+        # strip <app_label>.
+        roles = map(lambda perm: re.sub(r"^\w+.", "", perm), user.get_all_permissions())
         return Response(
             {
                 "user_id": user.id,
