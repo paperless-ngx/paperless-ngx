@@ -14,12 +14,16 @@ import {
   MATCH_AUTO,
 } from 'src/app/data/matching-model'
 import { ObjectWithId } from 'src/app/data/object-with-id'
+import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
 import {
   SortableDirective,
   SortEvent,
 } from 'src/app/directives/sortable.directive'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import { PermissionType } from 'src/app/services/permissions.service'
+import {
+  PermissionsService,
+  PermissionType,
+} from 'src/app/services/permissions.service'
 import { AbstractNameFilterService } from 'src/app/services/rest/abstract-name-filter-service'
 import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
@@ -46,6 +50,7 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
     private editDialogComponent: any,
     private toastService: ToastService,
     private documentListViewService: DocumentListViewService,
+    private permissionsService: PermissionsService,
     protected filterRuleType: number,
     public typeName: string,
     public typeNamePlural: string,
@@ -214,5 +219,18 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
 
   onNameFilterKeyUp(event: KeyboardEvent) {
     if (event.code == 'Escape') this.nameFilterDebounce.next(null)
+  }
+
+  userCanDelete(object: ObjectWithPermissions): boolean {
+    return (
+      !object.owner || this.permissionsService.currentUserIsOwner(object.owner)
+    )
+  }
+
+  userCanEdit(object: ObjectWithPermissions): boolean {
+    return this.permissionsService.currentUserHasObjectPermissions(
+      this.PermissionAction.Change,
+      object
+    )
   }
 }
