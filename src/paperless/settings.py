@@ -526,9 +526,6 @@ CELERY_RESULT_EXTENDED = True
 CELERY_RESULT_BACKEND = "django-db"
 CELERY_CACHE_BACKEND = "default"
 
-# This allows types to stay types through a .delay
-CELERY_TASK_SERIALIZER = "pickle"
-CELERY_ACCEPT_CONTENT = ["application/x-python-serialize"]
 
 CELERY_BEAT_SCHEDULE = {
     # Every ten minutes
