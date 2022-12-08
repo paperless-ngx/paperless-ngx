@@ -47,7 +47,7 @@ export class PermissionsSelectComponent
   set inheritedPermissions(inherited: string[]) {
     // remove <app_label>. from permission strings
     this._inheritedPermissions = inherited?.length
-      ? inherited.map((p) => p.replace(/.+\./, ''))
+      ? inherited.map((p) => p.replace(/^\w+\./g, ''))
       : []
   }
 
