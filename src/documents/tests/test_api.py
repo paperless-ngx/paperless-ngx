@@ -41,6 +41,8 @@ from paperless import version
 from rest_framework.test import APITestCase
 from whoosh.writing import AsyncWriter
 
+from guardian.shortcuts import get_users_with_perms
+
 
 class TestDocumentApi(DirectoriesMixin, APITestCase):
     def setUp(self):
@@ -2328,6 +2330,31 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
                 {"id": self.c2.id, "document_count": 0},
             ],
         )
+
+    def test_set_permissions(self):
+        user1 = User.objects.create(username="user1")
+        user2 = User.objects.create(username="user2")
+        permissions = {
+            "view": {
+                "users": User.objects.filter(id__in=[user1.id, user2.id]),
+                "groups": Group.objects.none(),
+            },
+            "change": {
+                "users": User.objects.filter(id__in=[user1.id]),
+                "groups": Group.objects.none(),
+            },
+        }
+
+        bulk_edit.set_permissions(
+            [self.doc2.id, self.doc3.id],
+            permissions=permissions,
+        )
+
+        self.assertEqual(get_users_with_perms(self.doc2).count(), 2)
+
+        self.async_task.assert_called_once()
+        args, kwargs = self.async_task.call_args
+        self.assertCountEqual(kwargs["document_ids"], [self.doc2.id, self.doc3.id])
 
 
 class TestBulkDownload(DirectoriesMixin, APITestCase):

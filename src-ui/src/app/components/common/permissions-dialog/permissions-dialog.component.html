@@ -1,0 +1,29 @@
+<div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">{{title}}</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="cancelClicked()">
+    </button>
+  </div>
+  <div class="modal-body">
+
+    <p class="mb-0" *ngIf="message" [innerHTML]="message | safeHtml"></p>
+
+    <form [formGroup]="form">
+      <div formGroupName="set_permissions">
+        <h6 i18n>View</h6>
+        <div formGroupName="view">
+          <app-permissions-user type="view" formControlName="users"></app-permissions-user>
+          <app-permissions-group type="view" formControlName="groups"></app-permissions-group>
+        </div>
+        <h6 i18n>Edit</h6>
+        <div formGroupName="change">
+          <app-permissions-user type="change" formControlName="users"></app-permissions-user>
+          <app-permissions-group type="change" formControlName="groups"></app-permissions-group>
+        </div>
+      </div>
+    </form>
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-primary" (click)="cancelClicked()" i18n>Cancel</button>
+    <button type="button" class="btn btn-primary" (click)="confirmClicked.emit(permissions)" i18n>Confirm</button>
+  </div>
