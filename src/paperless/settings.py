@@ -123,7 +123,7 @@ THUMBNAIL_DIR = os.path.join(MEDIA_ROOT, "documents", "thumbnails")
 
 DATA_DIR = __get_path("PAPERLESS_DATA_DIR", os.path.join(BASE_DIR, "..", "data"))
 
-NLTK_DIR = os.path.join(DATA_DIR, "nltk")
+NLTK_DIR = __get_path("PAPERLESS_NLTK_DIR", "/usr/local/share/nltk_data")
 
 TRASH_DIR = os.getenv("PAPERLESS_TRASH_DIR")
 

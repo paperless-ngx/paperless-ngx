@@ -228,6 +228,10 @@ RUN set -eux \
     && python3 -m pip install --no-cache-dir --upgrade wheel \
   && echo "Installing Python requirements" \
     && python3 -m pip install --default-timeout=1000 --no-cache-dir --requirement requirements.txt \
+  && echo "Installing NLTK data" \
+    && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/local/share/nltk_data" snowball_data \
+    && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/local/share/nltk_data" stopwords \
+    && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/local/share/nltk_data" punkt \
   && echo "Cleaning up image" \
     && apt-get -y purge ${BUILD_PACKAGES} \
     && apt-get -y autoremove --purge \
