@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-09 21:50+0000\n"
-"PO-Revision-Date: 2022-12-08 11:15\n"
+"PO-Revision-Date: 2022-12-08 12:23\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -248,155 +248,155 @@ msgstr "السجلات"
 
 #: documents/models.py:363 documents/models.py:419
 msgid "saved view"
-msgstr ""
+msgstr "العرض المحفوظ"
 
 #: documents/models.py:364
 msgid "saved views"
-msgstr ""
+msgstr "العروض المحفوظة"
 
 #: documents/models.py:366 documents/models.py:637
 msgid "user"
-msgstr ""
+msgstr "المستخدم"
 
 #: documents/models.py:370
 msgid "show on dashboard"
-msgstr ""
+msgstr "عرض على لوحة البيانات"
 
 #: documents/models.py:373
 msgid "show in sidebar"
-msgstr ""
+msgstr "عرض على الشريط الجانبي"
 
 #: documents/models.py:377
 msgid "sort field"
-msgstr ""
+msgstr "فرز الحقل"
 
 #: documents/models.py:382
 msgid "sort reverse"
-msgstr ""
+msgstr "فرز بالعكس"
 
 #: documents/models.py:387
 msgid "title contains"
-msgstr ""
+msgstr "العنوان يحتوي"
 
 #: documents/models.py:388
 msgid "content contains"
-msgstr ""
+msgstr "المحتوى يحتوي"
 
 #: documents/models.py:389
 msgid "ASN is"
-msgstr ""
+msgstr "ASN هو"
 
 #: documents/models.py:390
 msgid "correspondent is"
-msgstr ""
+msgstr "المراسل هو"
 
 #: documents/models.py:391
 msgid "document type is"
-msgstr ""
+msgstr "نوع المستند"
 
 #: documents/models.py:392
 msgid "is in inbox"
-msgstr ""
+msgstr "موجود في علبة الوارد"
 
 #: documents/models.py:393
 msgid "has tag"
-msgstr ""
+msgstr "لديه وسم"
 
 #: documents/models.py:394
 msgid "has any tag"
-msgstr ""
+msgstr "لديه أي وسم"
 
 #: documents/models.py:395
 msgid "created before"
-msgstr ""
+msgstr "أنشئت قبل"
 
 #: documents/models.py:396
 msgid "created after"
-msgstr ""
+msgstr "أنشئت بعد"
 
 #: documents/models.py:397
 msgid "created year is"
-msgstr ""
+msgstr "أنشئت سنة"
 
 #: documents/models.py:398
 msgid "created month is"
-msgstr ""
+msgstr "أنشئت شهر"
 
 #: documents/models.py:399
 msgid "created day is"
-msgstr ""
+msgstr "أنشئت يوم"
 
 #: documents/models.py:400
 msgid "added before"
-msgstr ""
+msgstr "أضيف قبل"
 
 #: documents/models.py:401
 msgid "added after"
-msgstr ""
+msgstr "أضيف بعد"
 
 #: documents/models.py:402
 msgid "modified before"
-msgstr ""
+msgstr "عُدِّل قبل"
 
 #: documents/models.py:403
 msgid "modified after"
-msgstr ""
+msgstr "عُدِّل بعد"
 
 #: documents/models.py:404
 msgid "does not have tag"
-msgstr ""
+msgstr "ليس لديه وسم"
 
 #: documents/models.py:405
 msgid "does not have ASN"
-msgstr ""
+msgstr "ليس لديه ASN"
 
 #: documents/models.py:406
 msgid "title or content contains"
-msgstr ""
+msgstr "العنوان أو المحتوى يحتوي"
 
 #: documents/models.py:407
 msgid "fulltext query"
-msgstr ""
+msgstr "استعلام كامل النص"
 
 #: documents/models.py:408
 msgid "more like this"
-msgstr ""
+msgstr "أخرى مثلها"
 
 #: documents/models.py:409
 msgid "has tags in"
-msgstr ""
+msgstr "لديه وسوم في"
 
 #: documents/models.py:410
 msgid "ASN greater than"
-msgstr ""
+msgstr "ASN أكبر من"
 
 #: documents/models.py:411
 msgid "ASN less than"
-msgstr ""
+msgstr "ASN أقل من"
 
 #: documents/models.py:412
 msgid "storage path is"
-msgstr ""
+msgstr "مسار التخزين"
 
 #: documents/models.py:422
 msgid "rule type"
-msgstr ""
+msgstr "نوع القاعدة"
 
 #: documents/models.py:424
 msgid "value"
-msgstr ""
+msgstr "قيمة"
 
 #: documents/models.py:427
 msgid "filter rule"
-msgstr ""
+msgstr "تصفية القاعدة"
 
 #: documents/models.py:428
 msgid "filter rules"
-msgstr ""
+msgstr "تصفية القواعد"
 
 #: documents/models.py:536
 msgid "Task ID"
-msgstr ""
+msgstr "الرمز التعريفي للمهمة"
 
 #: documents/models.py:537
 msgid "Celery ID for the Task that was run"
@@ -404,11 +404,11 @@ msgstr ""
 
 #: documents/models.py:542
 msgid "Acknowledged"
-msgstr ""
+msgstr "مُعترف"
 
 #: documents/models.py:543
 msgid "If the task is acknowledged via the frontend or API"
-msgstr ""
+msgstr "إذا عرف على المهمة عبر الواجهة الأمامية أو API"
 
 #: documents/models.py:549 documents/models.py:556
 msgid "Task Name"
@@ -634,99 +634,99 @@ msgstr "السويدية"
 
 #: paperless/settings.py:397
 msgid "Turkish"
-msgstr ""
+msgstr "التركية"
 
 #: paperless/settings.py:398
 msgid "Chinese Simplified"
-msgstr ""
+msgstr "الصينية المبسطة"
 
 #: paperless/urls.py:161
 msgid "Paperless-ngx administration"
-msgstr ""
+msgstr "Paperless-ngx الإدارة"
 
 #: paperless_mail/admin.py:29
 msgid "Authentication"
-msgstr ""
+msgstr "المصادقة"
 
 #: paperless_mail/admin.py:30
 msgid "Advanced settings"
-msgstr ""
+msgstr "الإعدادات المتقدمة"
 
 #: paperless_mail/admin.py:47
 msgid "Filter"
-msgstr ""
+msgstr "تصفية"
 
 #: paperless_mail/admin.py:50
 msgid "Paperless will only process mails that match ALL of the filters given below."
-msgstr ""
+msgstr "Paperless يقوم فقط بمعالجة البُرُد التي تتطابق جميع التصفيات المقدمة أدناه."
 
 #: paperless_mail/admin.py:64
 msgid "Actions"
-msgstr ""
+msgstr "إجراءات"
 
 #: paperless_mail/admin.py:67
 msgid "The action applied to the mail. This action is only performed when documents were consumed from the mail. Mails without attachments will remain entirely untouched."
-msgstr ""
+msgstr "الإجراء المطبق على البريد. ينفذ هذا الإجراء فقط عندما تستهلك المستندات من البريد. ستبقى البُرٌد التي لا تحتوي على مرفقات ستبقى كما هي."
 
 #: paperless_mail/admin.py:75
 msgid "Metadata"
-msgstr ""
+msgstr "البيانات الوصفية"
 
 #: paperless_mail/admin.py:78
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
-msgstr ""
+msgstr "تعيين بيانات التعريف للمستندات المستهلكة من هذه القاعدة تِلْقائيًا. إذا لم تعين الوسوم أو الأنواع أو المراسلين هنا، سيظل paperless يعالج جميع قواعد المطابقة التي حددتها."
 
 #: paperless_mail/apps.py:8
 msgid "Paperless mail"
-msgstr ""
+msgstr "بريد paperless"
 
 #: paperless_mail/models.py:8
 msgid "mail account"
-msgstr ""
+msgstr "حساب البريد"
 
 #: paperless_mail/models.py:9
 msgid "mail accounts"
-msgstr ""
+msgstr "حساب البُرُد"
 
 #: paperless_mail/models.py:12
 msgid "No encryption"
-msgstr ""
+msgstr "دون تشفير"
 
 #: paperless_mail/models.py:13
 msgid "Use SSL"
-msgstr ""
+msgstr "أستخدم SSL"
 
 #: paperless_mail/models.py:14
 msgid "Use STARTTLS"
-msgstr ""
+msgstr "أستخدم STARTTLS"
 
 #: paperless_mail/models.py:18
 msgid "IMAP server"
-msgstr ""
+msgstr "خادم IMAP"
 
 #: paperless_mail/models.py:21
 msgid "IMAP port"
-msgstr ""
+msgstr "منفذ IMAP"
 
 #: paperless_mail/models.py:25
 msgid "This is usually 143 for unencrypted and STARTTLS connections, and 993 for SSL connections."
-msgstr ""
+msgstr "عادة ما يكون 143 للغير مشفر و اتصالات STARTTLS و 993 للاتصالات SSL."
 
 #: paperless_mail/models.py:31
 msgid "IMAP security"
-msgstr ""
+msgstr "أمان IMAP"
 
 #: paperless_mail/models.py:36
 msgid "username"
-msgstr ""
+msgstr "اسم المستخدم"
 
 #: paperless_mail/models.py:38
 msgid "password"
-msgstr ""
+msgstr "كلمة المرور"
 
 #: paperless_mail/models.py:41
 msgid "character set"
-msgstr ""
+msgstr "نوع ترميز المحارف"
 
 #: paperless_mail/models.py:45
 msgid "The character set to use when communicating with the mail server, such as 'UTF-8' or 'US-ASCII'."
