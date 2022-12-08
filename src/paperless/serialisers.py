@@ -49,7 +49,6 @@ class UserSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         if "password" in validated_data:
             if len(validated_data.get("password").replace("*", "")) > 0:
-                print("set", validated_data.get("password"))
                 instance.set_password(validated_data.get("password"))
                 instance.save()
             validated_data.pop("password")
