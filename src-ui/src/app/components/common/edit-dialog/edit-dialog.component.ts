@@ -39,14 +39,7 @@ export abstract class EditDialogComponent<
   ngOnInit(): void {
     if (this.object != null) {
       if (this.object['permissions']) {
-        this.object['set_permissions'] = {
-          view: (this.object as ObjectWithPermissions).permissions
-            .filter((p) => (p[1] as string).includes('view'))
-            .map((p) => p[0]),
-          change: (this.object as ObjectWithPermissions).permissions
-            .filter((p) => (p[1] as string).includes('change'))
-            .map((p) => p[0]),
-        }
+        this.object['set_permissions'] = this.object['permissions']
       }
       this.objectForm.patchValue(this.object)
     }

@@ -6,17 +6,19 @@ import {
   TemplateRef,
 } from '@angular/core'
 import {
-  PaperlessPermission,
+  PermissionAction,
   PermissionsService,
+  PermissionType,
 } from '../services/permissions.service'
 
 @Directive({
   selector: '[ifPermissions]',
 })
 export class IfPermissionsDirective implements OnInit {
-  // The role the user must have
   @Input()
-  ifPermissions: Array<PaperlessPermission> | PaperlessPermission
+  ifPermissions:
+    | Array<{ action: PermissionAction; type: PermissionType }>
+    | { action: PermissionAction; type: PermissionType }
 
   /**
    * @param {ViewContainerRef} viewContainerRef -- The location where we need to render the templateRef
@@ -33,8 +35,8 @@ export class IfPermissionsDirective implements OnInit {
     if (
       []
         .concat(this.ifPermissions)
-        .every((perm: PaperlessPermission) =>
-          this.permissionsService.currentUserCan(perm)
+        .every((perm: { action: PermissionAction; type: PermissionType }) =>
+          this.permissionsService.currentUserCan(perm.action, perm.type)
         )
     ) {
       this.viewContainerRef.createEmbeddedView(this.templateRef)

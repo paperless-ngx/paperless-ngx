@@ -3,21 +3,22 @@ import { NG_VALUE_ACCESSOR } from '@angular/forms'
 import { first } from 'rxjs/operators'
 import { PaperlessUser } from 'src/app/data/paperless-user'
 import { UserService } from 'src/app/services/rest/user.service'
+import { SettingsService } from 'src/app/services/settings.service'
 import { AbstractInputComponent } from '../abstract-input'
 
 @Component({
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => ShareUserComponent),
+      useExisting: forwardRef(() => PermissionsUserComponent),
       multi: true,
     },
   ],
-  selector: 'app-share-user',
-  templateUrl: './share-user.component.html',
-  styleUrls: ['./share-user.component.scss'],
+  selector: 'app-permissions-user',
+  templateUrl: './permissions-user.component.html',
+  styleUrls: ['./permissions-user.component.scss'],
 })
-export class ShareUserComponent
+export class PermissionsUserComponent
   extends AbstractInputComponent<PaperlessUser>
   implements OnInit
 {
@@ -26,12 +27,17 @@ export class ShareUserComponent
   @Input()
   type: string
 
-  constructor(userService: UserService) {
+  constructor(userService: UserService, settings: SettingsService) {
     super()
     userService
       .listAll()
       .pipe(first())
-      .subscribe((result) => (this.users = result.results))
+      .subscribe(
+        (result) =>
+          (this.users = result.results.filter(
+            (u) => u.id !== settings.currentUser.id
+          ))
+      )
   }
 
   ngOnInit(): void {

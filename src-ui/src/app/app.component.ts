@@ -81,10 +81,10 @@ export class AppComponent implements OnInit, OnDestroy {
           this.showNotification(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUCCESS)
         ) {
           if (
-            this.permissionsService.currentUserCan({
-              action: PermissionAction.View,
-              type: PermissionType.Document,
-            })
+            this.permissionsService.currentUserCan(
+              PermissionAction.View,
+              PermissionType.Document
+            )
           ) {
             this.toastService.show({
               title: $localize`Document added`,
@@ -246,10 +246,10 @@ export class AppComponent implements OnInit, OnDestroy {
   public get dragDropEnabled(): boolean {
     return (
       !this.router.url.includes('dashboard') &&
-      this.permissionsService.currentUserCan({
-        action: PermissionAction.Add,
-        type: PermissionType.Document,
-      })
+      this.permissionsService.currentUserCan(
+        PermissionAction.Add,
+        PermissionType.Document
+      )
     )
   }
 

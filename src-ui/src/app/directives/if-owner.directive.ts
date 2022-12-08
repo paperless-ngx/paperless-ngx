@@ -1,12 +1,13 @@
 import {
   Directive,
+  EmbeddedViewRef,
   Input,
   OnChanges,
   OnInit,
   TemplateRef,
   ViewContainerRef,
 } from '@angular/core'
-import { PaperlessUser } from '../data/paperless-user'
+import { ObjectWithPermissions } from '../data/object-with-permissions'
 import { PermissionsService } from '../services/permissions.service'
 
 @Directive({
@@ -15,7 +16,9 @@ import { PermissionsService } from '../services/permissions.service'
 export class IfOwnerDirective implements OnInit, OnChanges {
   // The role the user must have
   @Input()
-  ifOwner: PaperlessUser
+  ifOwner: ObjectWithPermissions
+
+  createdView: EmbeddedViewRef<any>
 
   /**
    * @param {ViewContainerRef} viewContainerRef -- The location where we need to render the templateRef
@@ -29,11 +32,11 @@ export class IfOwnerDirective implements OnInit, OnChanges {
   ) {}
 
   public ngOnInit(): void {
-    if (
-      !this.ifOwner ||
-      this.permissionsService.currentUserIsOwner(this.ifOwner)
-    ) {
-      this.viewContainerRef.createEmbeddedView(this.templateRef)
+    if (this.permissionsService.currentUserOwnsObject(this.ifOwner)) {
+      if (!this.createdView)
+        this.createdView = this.viewContainerRef.createEmbeddedView(
+          this.templateRef
+        )
     } else {
       this.viewContainerRef.clear()
     }

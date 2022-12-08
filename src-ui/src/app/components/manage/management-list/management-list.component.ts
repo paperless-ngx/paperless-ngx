@@ -222,9 +222,7 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
   }
 
   userCanDelete(object: ObjectWithPermissions): boolean {
-    return (
-      !object.owner || this.permissionsService.currentUserIsOwner(object.owner)
-    )
+    return this.permissionsService.currentUserOwnsObject(object)
   }
 
   userCanEdit(object: ObjectWithPermissions): boolean {

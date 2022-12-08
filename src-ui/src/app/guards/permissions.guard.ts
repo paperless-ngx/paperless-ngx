@@ -22,7 +22,10 @@ export class PermissionsGuard implements CanActivate {
     state: RouterStateSnapshot
   ): boolean | UrlTree {
     if (
-      !this.permissionsService.currentUserCan(route.data.requiredPermission)
+      !this.permissionsService.currentUserCan(
+        route.data.requiredPermission.action,
+        route.data.requiredPermission.type
+      )
     ) {
       this.toastService.showError(
         $localize`You don't have permissions to do that`
