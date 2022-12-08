@@ -1618,7 +1618,7 @@
           <context context-type="sourcefile">src/app/components/manage/storage-path-list/storage-path-list.component.ts</context>
           <context context-type="linenumber">35</context>
         </context-group>
-        <target state="needs-translation">Path</target>
+        <target state="translated">مسار</target>
       </trans-unit>
       <trans-unit id="6625768491622252297" datatype="html">
         <source>e.g.</source>
@@ -1626,7 +1626,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.ts</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="needs-translation">e.g.</target>
+        <target state="translated">مثال.</target>
       </trans-unit>
       <trans-unit id="1918584360573970155" datatype="html">
         <source>or use slashes to add directories e.g.</source>
@@ -1634,7 +1634,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.ts</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="needs-translation">or use slashes to add directories e.g.</target>
+        <target state="translated">أو استخدم الخطوط المائلة لإضافة مجلدات مثل.</target>
       </trans-unit>
       <trans-unit id="7871464228487558644" datatype="html">
         <source>See &lt;a target=&quot;_blank&quot; href=&quot;https://docs.paperless-ngx.com/advanced_usage/#file-name-handling&quot;&gt;documentation&lt;/a&gt; for full list.</source>
@@ -1642,7 +1642,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.ts</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">See &lt;a target="_blank" href="https://docs.paperless-ngx.com/advanced_usage/#file-name-handling"&gt;documentation&lt;/a&gt; for full list.</target>
+        <target state="translated">راجع المستندات &lt;a target="_blank" href="https://docs.paperless-ngx.com/advanced_usage/#file-name-handling"&gt;&lt;/a&gt; للاطلاع على القائمة الكاملة.</target>
       </trans-unit>
       <trans-unit id="6898961890896270754" datatype="html">
         <source>Create new storage path</source>
@@ -1650,7 +1650,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.ts</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="needs-translation">Create new storage path</target>
+        <target state="translated">إنشاء مسار تخزين جديد</target>
       </trans-unit>
       <trans-unit id="3754859110054016570" datatype="html">
         <source>Edit storage path</source>
@@ -1658,7 +1658,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.ts</context>
           <context context-type="linenumber">34</context>
         </context-group>
-        <target state="needs-translation">Edit storage path</target>
+        <target state="translated">تعديل مسار التخزين</target>
       </trans-unit>
       <trans-unit id="9011959596901584887" datatype="html" approved="yes">
         <source>Color</source>
@@ -1694,7 +1694,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component.ts</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="needs-translation">Create new tag</target>
+        <target state="translated">إنشاء وسم جديد</target>
       </trans-unit>
       <trans-unit id="5872175735754226507" datatype="html">
         <source>Edit tag</source>
@@ -1702,7 +1702,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component.ts</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">Edit tag</target>
+        <target state="translated">تعديل الوسم</target>
       </trans-unit>
       <trans-unit id="1616102757855967475" datatype="html">
         <source>All</source>
@@ -1714,7 +1714,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">All</target>
+        <target state="translated">الكل</target>
       </trans-unit>
       <trans-unit id="3184700926171002527" datatype="html">
         <source>Any</source>
@@ -1722,7 +1722,7 @@
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="needs-translation">Any</target>
+        <target state="translated">أي</target>
       </trans-unit>
       <trans-unit id="4391289919356861627" datatype="html">
         <source>Apply</source>
@@ -1730,7 +1730,7 @@
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="needs-translation">Apply</target>
+        <target state="translated">تطبيق</target>
       </trans-unit>
       <trans-unit id="7780041345210191160" datatype="html">
         <source>Click again to exclude items.</source>
@@ -1738,7 +1738,7 @@
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
           <context context-type="linenumber">38</context>
         </context-group>
-        <target state="needs-translation">Click again to exclude items.</target>
+        <target state="translated">انقر مرة أخرى لاستبعاد العناصر.</target>
       </trans-unit>
       <trans-unit id="7593728289020204896" datatype="html">
         <source>Not assigned</source>
@@ -1747,7 +1747,7 @@
           <context context-type="linenumber">261</context>
         </context-group>
         <note priority="1" from="description">Filter drop down element to filter for documents with no correspondent/type/tag assigned</note>
-        <target state="needs-translation">Not assigned</target>
+        <target state="translated">غير معين</target>
       </trans-unit>
       <trans-unit id="445302259125375799" datatype="html" approved="yes">
         <source>Invalid date.</source>
@@ -1771,7 +1771,7 @@
           <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.html</context>
           <context context-type="linenumber">42</context>
         </context-group>
-        <target state="needs-translation">Suggestions:</target>
+        <target state="translated">الاقتراحات:</target>
       </trans-unit>
       <trans-unit id="2722549756198502062" datatype="html">
         <source>Add item</source>
@@ -1780,7 +1780,7 @@
           <context context-type="linenumber">11</context>
         </context-group>
         <note priority="1" from="description">Used for both types, correspondents, storage paths</note>
-        <target state="needs-translation">Add item</target>
+        <target state="translated">إضافة عنصر</target>
       </trans-unit>
       <trans-unit id="6560126119609945418" datatype="html">
         <source>Add tag</source>
@@ -1788,7 +1788,7 @@
           <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="needs-translation">Add tag</target>
+        <target state="translated">إضافة وسم</target>
       </trans-unit>
       <trans-unit id="3797570084942068182" datatype="html" approved="yes">
         <source>Select</source>
@@ -1844,7 +1844,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">27</context>
         </context-group>
-        <target state="needs-translation">Loading...</target>
+        <target state="translated">تحميل...</target>
       </trans-unit>
       <trans-unit id="1865646076514070962" datatype="html">
         <source>Hello <x id="PH" equiv-text="this.settingsService.displayName"/>, welcome to Paperless-ngx</source>
@@ -2023,7 +2023,7 @@
           <context context-type="linenumber">179</context>
         </context-group>
         <note priority="1" from="description">this string is used to separate processing, failed and added on the file upload widget</note>
-        <target state="needs-translation">, </target>
+        <target state="translated">, </target>
       </trans-unit>
       <trans-unit id="7915903586014997661" datatype="html">
         <source>Paperless-ngx is running!</source>
@@ -2071,7 +2071,7 @@
           <context context-type="sourcefile">src/app/components/document-asn/document-asn.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="needs-translation">Searching document with asn <x id="INTERPOLATION" equiv-text="{{asn}}"/></target>
+        <target state="translated">البحث عن المستند باستخدام asn <x id="INTERPOLATION" equiv-text="{{asn}}"/></target>
       </trans-unit>
       <trans-unit id="2122666445936087317" datatype="html">
         <source>Enter comment</source>
@@ -2079,7 +2079,7 @@
           <context context-type="sourcefile">src/app/components/document-comments/document-comments.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="needs-translation">Enter comment</target>
+        <target state="translated">أدخل تعليق</target>
       </trans-unit>
       <trans-unit id="4025397324401332794" datatype="html">
         <source> Please enter a comment. </source>
@@ -2087,7 +2087,7 @@
           <context context-type="sourcefile">src/app/components/document-comments/document-comments.component.html</context>
           <context context-type="linenumber">5,7</context>
         </context-group>
-        <target state="needs-translation"> Please enter a comment. </target>
+        <target state="translated"> الرجاء إدخال تعليق. </target>
       </trans-unit>
       <trans-unit id="2337485514607640701" datatype="html">
         <source>Add comment</source>
@@ -2095,7 +2095,7 @@
           <context context-type="sourcefile">src/app/components/document-comments/document-comments.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="needs-translation">Add comment</target>
+        <target state="translated">إضافة تعليق</target>
       </trans-unit>
       <trans-unit id="5438997040668245251" datatype="html">
         <source>Error saving comment: <x id="PH" equiv-text="e.toString()"/></source>
@@ -2103,7 +2103,7 @@
           <context context-type="sourcefile">src/app/components/document-comments/document-comments.component.ts</context>
           <context context-type="linenumber">68</context>
         </context-group>
-        <target state="needs-translation">Error saving comment: <x id="PH" equiv-text="e.toString()"/></target>
+        <target state="translated">خطأ في حفظ التعليق: <x id="PH" equiv-text="e.toString()"/></target>
       </trans-unit>
       <trans-unit id="7593210124183303626" datatype="html">
         <source>Error deleting comment: <x id="PH" equiv-text="e.toString()"/></source>
@@ -2111,7 +2111,7 @@
           <context context-type="sourcefile">src/app/components/document-comments/document-comments.component.ts</context>
           <context context-type="linenumber">83</context>
         </context-group>
-        <target state="needs-translation">Error deleting comment: <x id="PH" equiv-text="e.toString()"/></target>
+        <target state="translated">خطأ في حذف التعليق: <x id="PH" equiv-text="e.toString()"/></target>
       </trans-unit>
       <trans-unit id="1407560924967345762" datatype="html" approved="yes">
         <source>Page</source>
@@ -2167,7 +2167,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">90</context>
         </context-group>
-        <target state="needs-translation">Redo OCR</target>
+        <target state="translated">إعادة OCR</target>
       </trans-unit>
       <trans-unit id="1418444397960583910" datatype="html" approved="yes">
         <source>More like this</source>
@@ -2199,7 +2199,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">50</context>
         </context-group>
-        <target state="needs-translation">Previous</target>
+        <target state="translated">السابق</target>
       </trans-unit>
       <trans-unit id="5028777105388019087" datatype="html" approved="yes">
         <source>Details</source>
@@ -2247,7 +2247,7 @@
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">19</context>
         </context-group>
-        <target state="needs-translation">Correspondent</target>
+        <target state="translated">مراسل</target>
       </trans-unit>
       <trans-unit id="5066119607229701477" datatype="html" approved="yes">
         <source>Document type</source>
@@ -3013,7 +3013,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">49</context>
         </context-group>
-        <target state="needs-translation">Added: <x id="INTERPOLATION" equiv-text="{{ document.added | customDate }}"/></target>
+        <target state="translated">أضيف: <x id="INTERPOLATION" equiv-text="{{ document.added | customDate }}"/></target>
       </trans-unit>
       <trans-unit id="4235671847487610290" datatype="html">
         <source>Modified: <x id="INTERPOLATION" equiv-text="{{ document.modified | customDate }}"/></source>
@@ -3025,7 +3025,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">50</context>
         </context-group>
-        <target state="needs-translation">Modified: <x id="INTERPOLATION" equiv-text="{{ document.modified | customDate }}"/></target>
+        <target state="translated">معدل: <x id="INTERPOLATION" equiv-text="{{ document.modified | customDate }}"/></target>
       </trans-unit>
       <trans-unit id="2332107018974972998" datatype="html">
         <source>Score:</source>
@@ -3033,7 +3033,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
           <context context-type="linenumber">98</context>
         </context-group>
-        <target state="needs-translation">Score:</target>
+        <target state="translated">النقاط:</target>
       </trans-unit>
       <trans-unit id="3661756380991326939" datatype="html">
         <source>Toggle tag filter</source>
@@ -3041,7 +3041,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="needs-translation">Toggle tag filter</target>
+        <target state="translated">تبديل تصفية الوسم</target>
       </trans-unit>
       <trans-unit id="4648526799630820486" datatype="html">
         <source>Toggle correspondent filter</source>
@@ -3049,7 +3049,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="needs-translation">Toggle correspondent filter</target>
+        <target state="translated">تبديل تصفية المراسل</target>
       </trans-unit>
       <trans-unit id="5319701482646590642" datatype="html">
         <source>Toggle document type filter</source>
@@ -3057,7 +3057,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">31</context>
         </context-group>
-        <target state="needs-translation">Toggle document type filter</target>
+        <target state="translated">تبديل تصفية نوع المستند</target>
       </trans-unit>
       <trans-unit id="8950368321707344185" datatype="html">
         <source>Toggle storage path filter</source>
@@ -3065,7 +3065,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">38</context>
         </context-group>
-        <target state="needs-translation">Toggle storage path filter</target>
+        <target state="translated">تبديل تصفية مسار التخزين</target>
       </trans-unit>
       <trans-unit id="5145213156408463657" datatype="html" approved="yes">
         <source>Select none</source>
@@ -3113,7 +3113,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">75</context>
         </context-group>
-        <target state="needs-translation">Save "<x id="INTERPOLATION" equiv-text="{{list.activeSavedViewTitle}}"/>"</target>
+        <target state="translated">حفظ "<x id="INTERPOLATION" equiv-text="{{list.activeSavedViewTitle}}"/>"</target>
       </trans-unit>
       <trans-unit id="2276119452079372898" datatype="html" approved="yes">
         <source>Save as...</source>
@@ -3129,7 +3129,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">95</context>
         </context-group>
-        <target state="needs-translation">{VAR_PLURAL, plural, =1 {Selected <x id="INTERPOLATION"/> of one document} other {Selected <x id="INTERPOLATION"/> of <x id="INTERPOLATION_1"/> documents}}</target>
+        <target state="translated">{VAR_PLURAL, plural, zero {} one {تم اختياره <x id="INTERPOLATION"/> من <x id="INTERPOLATION_1"/> مستندات} two {تم اختياره <x id="INTERPOLATION"/> من <x id="INTERPOLATION_1"/> مستندات} few {تم اختياره <x id="INTERPOLATION"/> من <x id="INTERPOLATION_1"/> مستندات} many {تم اختياره <x id="INTERPOLATION"/> من <x id="INTERPOLATION_1"/> مستندات}=1 {تم اختيار <x id="INTERPOLATION"/> لمستند واحد} other {تم اختياره <x id="INTERPOLATION"/> من <x id="INTERPOLATION_1"/> مستندات}}</target>
       </trans-unit>
       <trans-unit id="6600548268163632449" datatype="html">
         <source>{VAR_PLURAL, plural, =1 {One document} other {<x id="INTERPOLATION"/> documents}}</source>
@@ -3137,7 +3137,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">97</context>
         </context-group>
-        <target state="needs-translation">{VAR_PLURAL, plural, =1 {One document} other {<x id="INTERPOLATION"/> documents}}</target>
+        <target state="translated">{VAR_PLURAL, plural, zero {} one {<x id="INTERPOLATION"/> المزيد من المستندات} two {<x id="INTERPOLATION"/> المزيد من المستندات} few {<x id="INTERPOLATION"/> المزيد من المستندات} many {<x id="INTERPOLATION"/> المزيد من المستندات}=1 {مستند واحد آخر} other {<x id="INTERPOLATION"/> المزيد من المستندات}}</target>
       </trans-unit>
       <trans-unit id="2243770355958919528" datatype="html" approved="yes">
         <source>(filtered)</source>
@@ -3153,7 +3153,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">110</context>
         </context-group>
-        <target state="needs-translation">Error while loading documents</target>
+        <target state="translated">خطأ في أثناء تحميل المستندات</target>
       </trans-unit>
       <trans-unit id="7517688192215738656" datatype="html">
         <source>ASN</source>
@@ -3169,7 +3169,7 @@
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="needs-translation">ASN</target>
+        <target state="translated">ASN</target>
       </trans-unit>
       <trans-unit id="231679111972850796" datatype="html" approved="yes">
         <source>Added</source>
@@ -3193,7 +3193,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">182</context>
         </context-group>
-        <target state="needs-translation">Edit document</target>
+        <target state="translated">تعديل المستند</target>
       </trans-unit>
       <trans-unit id="2155249406916744630" datatype="html">
         <source>View &quot;<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>&quot; saved successfully.</source>
@@ -3201,7 +3201,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
           <context context-type="linenumber">196</context>
         </context-group>
-        <target state="needs-translation">View "<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>" saved successfully.</target>
+        <target state="translated">عرض "<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>" حفظ بنجاح.</target>
       </trans-unit>
       <trans-unit id="6837554170707123455" datatype="html">
         <source>View &quot;<x id="PH" equiv-text="savedView.name"/>&quot; created successfully.</source>
@@ -3209,7 +3209,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
           <context context-type="linenumber">237</context>
         </context-group>
-        <target state="needs-translation">View "<x id="PH" equiv-text="savedView.name"/>" created successfully.</target>
+        <target state="translated">عرض "<x id="PH" equiv-text="savedView.name"/>" أنشئ بنجاح.</target>
       </trans-unit>
       <trans-unit id="6849725902312323996" datatype="html">
         <source>Reset filters</source>
@@ -3217,7 +3217,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">78</context>
         </context-group>
-        <target state="needs-translation">Reset filters</target>
+        <target state="translated">إعادة تعيين التصفيات</target>
       </trans-unit>
       <trans-unit id="5195932016807797291" datatype="html">
         <source>Correspondent: <x id="PH" equiv-text="this.correspondents.find((c) =&gt; c.id == +rule.value)?.name"/></source>
@@ -3613,7 +3613,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">155,157</context>
         </context-group>
-        <target state="needs-translation">Error occurred while saving <x id="PH" equiv-text="this.typeName"/> : <x id="PH_1" equiv-text="e.toString()"/>.</target>
+        <target state="translated">حدث خطأ في أثناء حفظ <x id="PH" equiv-text="this.typeName"/> : <x id="PH_1" equiv-text="e.toString()"/>.</target>
       </trans-unit>
       <trans-unit id="4012132330507560812" datatype="html">
         <source>Do you really want to delete the <x id="PH" equiv-text="this.typeName"/>?</source>
@@ -3621,7 +3621,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">164</context>
         </context-group>
-        <target state="needs-translation">Do you really want to delete the <x id="PH" equiv-text="this.typeName"/>?</target>
+        <target state="translated">هل تريد حقاً حذف <x id="PH" equiv-text="this.typeName"/>؟</target>
       </trans-unit>
       <trans-unit id="8371896857609524947" datatype="html">
         <source>Associated documents will not be deleted.</source>
@@ -3629,7 +3629,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">179</context>
         </context-group>
-        <target state="needs-translation">Associated documents will not be deleted.</target>
+        <target state="translated">لن تحذف المستندات المرتبطة بها.</target>
       </trans-unit>
       <trans-unit id="5467489005440577210" datatype="html">
         <source>Error while deleting element: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></source>
@@ -3637,7 +3637,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">192,194</context>
         </context-group>
-        <target state="needs-translation">Error while deleting element: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></target>
+        <target state="translated">حدث خطأ في أثناء حذف العنصر: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></target>
       </trans-unit>
       <trans-unit id="1685061484835793745" datatype="html">
         <source>Start tour</source>
@@ -4069,7 +4069,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">465</context>
         </context-group>
-        <target state="needs-translation">Settings were saved successfully. Reload is required to apply some changes.</target>
+        <target state="translated">حفظت الإعدادات بنجاح. إعادة تحميل مطلوب لتطبيق بعض التغييرات.</target>
       </trans-unit>
       <trans-unit id="8491974984518503778" datatype="html">
         <source>Reload now</source>
@@ -4077,7 +4077,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">466</context>
         </context-group>
-        <target state="needs-translation">Reload now</target>
+        <target state="translated">إعادة تحميل الآن</target>
       </trans-unit>
       <trans-unit id="6839066544204061364" datatype="html" approved="yes">
         <source>Use system language</source>
@@ -4101,7 +4101,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">511,513</context>
         </context-group>
-        <target state="needs-translation">Error while storing settings on server: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></target>
+        <target state="translated">خطأ في أثناء حفظ الإعدادات على الخادم: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></target>
       </trans-unit>
       <trans-unit id="6327501535846658797" datatype="html">
         <source>Saved account &quot;<x id="PH" equiv-text="newMailAccount.name"/>&quot;.</source>
@@ -4109,7 +4109,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">538</context>
         </context-group>
-        <target state="needs-translation">Saved account "<x id="PH" equiv-text="newMailAccount.name"/>".</target>
+        <target state="translated">حفظ الحساب"<x id="PH" equiv-text="newMailAccount.name"/>".</target>
       </trans-unit>
       <trans-unit id="6428427497555765743" datatype="html">
         <source>Error saving account: <x id="PH" equiv-text="e.toString()"/>.</source>
@@ -4117,7 +4117,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">548</context>
         </context-group>
-        <target state="needs-translation">Error saving account: <x id="PH" equiv-text="e.toString()"/>.</target>
+        <target state="translated">خطأ في حفظ الحساب: <x id="PH" equiv-text="e.toString()"/>.</target>
       </trans-unit>
       <trans-unit id="5641934153807844674" datatype="html">
         <source>Confirm delete mail account</source>
@@ -4125,7 +4125,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">558</context>
         </context-group>
-        <target state="needs-translation">Confirm delete mail account</target>
+        <target state="translated">تأكيد حذف حساب البريد</target>
       </trans-unit>
       <trans-unit id="2105352414355663637" datatype="html">
         <source>This operation will permanently this mail account.</source>
@@ -4133,7 +4133,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">559</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently this mail account.</target>
+        <target state="translated">هذه العملية ستحصل بشكل دائم على حساب البريد هذا.</target>
       </trans-unit>
       <trans-unit id="4233826387148482123" datatype="html">
         <source>Deleted mail account</source>
@@ -4141,7 +4141,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">568</context>
         </context-group>
-        <target state="needs-translation">Deleted mail account</target>
+        <target state="translated">تم حذف حساب البريد</target>
       </trans-unit>
       <trans-unit id="7443801450153832973" datatype="html">
         <source>Error deleting mail account: <x id="PH" equiv-text="e.toString()"/>.</source>
@@ -4149,7 +4149,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">577</context>
         </context-group>
-        <target state="needs-translation">Error deleting mail account: <x id="PH" equiv-text="e.toString()"/>.</target>
+        <target state="translated">خطأ في حذف حساب البريد: <x id="PH" equiv-text="e.toString()"/>.</target>
       </trans-unit>
       <trans-unit id="123368655395433699" datatype="html">
         <source>Saved rule &quot;<x id="PH" equiv-text="newMailRule.name"/>&quot;.</source>
@@ -4157,7 +4157,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">596</context>
         </context-group>
-        <target state="needs-translation">Saved rule "<x id="PH" equiv-text="newMailRule.name"/>".</target>
+        <target state="translated">قاعدة محفوظة "<x id="PH" equiv-text="newMailRule.name"/>".</target>
       </trans-unit>
       <trans-unit id="4741216051394823471" datatype="html">
         <source>Error saving rule: <x id="PH" equiv-text="e.toString()"/>.</source>
@@ -4165,7 +4165,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">607</context>
         </context-group>
-        <target state="needs-translation">Error saving rule: <x id="PH" equiv-text="e.toString()"/>.</target>
+        <target state="translated">خطأ في حفظ القاعدة: <x id="PH" equiv-text="e.toString()"/>.</target>
       </trans-unit>
       <trans-unit id="3896080636020672118" datatype="html">
         <source>Confirm delete mail rule</source>
@@ -4173,7 +4173,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">617</context>
         </context-group>
-        <target state="needs-translation">Confirm delete mail rule</target>
+        <target state="translated">تأكيد حذف حساب البريد</target>
       </trans-unit>
       <trans-unit id="6183247517597275616" datatype="html">
         <source>This operation will permanently this mail rule.</source>
@@ -4181,7 +4181,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">618</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently this mail rule.</target>
+        <target state="translated">هذه العملية ستحصل بشكل دائم على حساب البريد هذا.</target>
       </trans-unit>
       <trans-unit id="9077981247971516916" datatype="html">
         <source>Deleted mail rule</source>
@@ -4189,7 +4189,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">627</context>
         </context-group>
-        <target state="needs-translation">Deleted mail rule</target>
+        <target state="translated">تم حذف قاعدة البريد</target>
       </trans-unit>
       <trans-unit id="4740074357089345173" datatype="html">
         <source>Error deleting mail rule: <x id="PH" equiv-text="e.toString()"/>.</source>
@@ -4197,7 +4197,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">636</context>
         </context-group>
-        <target state="needs-translation">Error deleting mail rule: <x id="PH" equiv-text="e.toString()"/>.</target>
+        <target state="translated">خطأ في حذف قاعدة البريد: <x id="PH" equiv-text="e.toString()"/>.</target>
       </trans-unit>
       <trans-unit id="5101757640976222639" datatype="html">
         <source>storage path</source>
@@ -4205,7 +4205,7 @@
           <context context-type="sourcefile">src/app/components/manage/storage-path-list/storage-path-list.component.ts</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="needs-translation">storage path</target>
+        <target state="translated">مسار التخزين</target>
       </trans-unit>
       <trans-unit id="22235115124223314" datatype="html">
         <source>storage paths</source>
@@ -4213,7 +4213,7 @@
           <context context-type="sourcefile">src/app/components/manage/storage-path-list/storage-path-list.component.ts</context>
           <context context-type="linenumber">31</context>
         </context-group>
-        <target state="needs-translation">storage paths</target>
+        <target state="translated">مسارات التخزين</target>
       </trans-unit>
       <trans-unit id="1569070683025071137" datatype="html">
         <source>Do you really want to delete the storage path &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
@@ -4221,7 +4221,7 @@
           <context context-type="sourcefile">src/app/components/manage/storage-path-list/storage-path-list.component.ts</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="needs-translation">Do you really want to delete the storage path "<x id="PH" equiv-text="object.name"/>"?</target>
+        <target state="translated">هل تريد حقاً حذف مسار التخزين "<x id="PH" equiv-text="object.name"/>"؟</target>
       </trans-unit>
       <trans-unit id="6402703264596649214" datatype="html">
         <source>tag</source>
@@ -4229,7 +4229,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.ts</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="needs-translation">tag</target>
+        <target state="translated">وسم</target>
       </trans-unit>
       <trans-unit id="4975748273657042999" datatype="html">
         <source>tags</source>
@@ -4237,7 +4237,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.ts</context>
           <context context-type="linenumber">31</context>
         </context-group>
-        <target state="needs-translation">tags</target>
+        <target state="translated">وسوم</target>
       </trans-unit>
       <trans-unit id="93754014749412887" datatype="html" approved="yes">
         <source>Do you really want to delete the tag &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
@@ -4253,7 +4253,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">6</context>
         </context-group>
-        <target state="needs-translation">Clear selection</target>
+        <target state="translated">إزالة التحديد</target>
       </trans-unit>
       <trans-unit id="187187500641108332" datatype="html">
         <source>
@@ -4263,7 +4263,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="needs-translation"><x id="INTERPOLATION" equiv-text="{{dismissButtonText}}"/></target>
+        <target state="translated"><x id="INTERPOLATION" equiv-text="{{dismissButtonText}}"/></target>
       </trans-unit>
       <trans-unit id="1102717806459547726" datatype="html">
         <source>Refresh</source>
@@ -4271,7 +4271,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Refresh</target>
+        <target state="translated">تحديث</target>
       </trans-unit>
       <trans-unit id="5968132631442328843" datatype="html">
         <source>Results</source>
@@ -4279,7 +4279,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">42</context>
         </context-group>
-        <target state="needs-translation">Results</target>
+        <target state="translated">النتائج</target>
       </trans-unit>
       <trans-unit id="8958063833276423847" datatype="html">
         <source>click for full output</source>
@@ -4299,7 +4299,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.ts</context>
           <context context-type="linenumber">56</context>
         </context-group>
-        <target state="needs-translation">Dismiss</target>
+        <target state="translated">رفض</target>
       </trans-unit>
       <trans-unit id="2134950584701094962" datatype="html">
         <source>Open Document</source>
@@ -4307,7 +4307,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">86</context>
         </context-group>
-        <target state="needs-translation">Open Document</target>
+        <target state="translated">فتح مستند</target>
       </trans-unit>
       <trans-unit id="6798650225457993016" datatype="html">
         <source>Failed <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.failedFileTasks.length &gt; 0&quot; class=&quot;badge bg-danger ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
@@ -4691,7 +4691,7 @@
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
           <context context-type="linenumber">118</context>
         </context-group>
-        <target state="needs-translation">You have unsaved changes to the document</target>
+        <target state="translated">لديك تغييرات في المستند غير محفوظة</target>
       </trans-unit>
       <trans-unit id="2089045849587358256" datatype="html">
         <source>Are you sure you want to close this document?</source>
@@ -4699,7 +4699,7 @@
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
           <context context-type="linenumber">122</context>
         </context-group>
-        <target state="needs-translation">Are you sure you want to close this document?</target>
+        <target state="translated">هل أنت متيقِّن من إغلاق هذا المستند؟</target>
       </trans-unit>
       <trans-unit id="2885986061416655600" datatype="html">
         <source>Close document</source>
@@ -4707,7 +4707,7 @@
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
           <context context-type="linenumber">124</context>
         </context-group>
-        <target state="needs-translation">Close document</target>
+        <target state="translated">إغلاق المستند</target>
       </trans-unit>
       <trans-unit id="6755718693176327396" datatype="html">
         <source>Are you sure you want to close all documents?</source>
@@ -4715,7 +4715,7 @@
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
           <context context-type="linenumber">145</context>
         </context-group>
-        <target state="needs-translation">Are you sure you want to close all documents?</target>
+        <target state="translated">هل أنت متيقِّن من إغلاق كافة المستندات؟</target>
       </trans-unit>
       <trans-unit id="4215561719980781894" datatype="html">
         <source>Close documents</source>
@@ -4723,7 +4723,7 @@
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
           <context context-type="linenumber">147</context>
         </context-group>
-        <target state="needs-translation">Close documents</target>
+        <target state="translated">إغلاق المستندات</target>
       </trans-unit>
       <trans-unit id="3553216189604488439" datatype="html" approved="yes">
         <source>Modified</source>
@@ -4748,7 +4748,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">145</context>
         </context-group>
-        <target state="needs-translation">English (US)</target>
+        <target state="translated">الإنجليزية (الولايات المتحدة)</target>
       </trans-unit>
       <trans-unit id="3098941349689899577" datatype="html">
         <source>Belarusian</source>
@@ -4756,7 +4756,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">151</context>
         </context-group>
-        <target state="needs-translation">Belarusian</target>
+        <target state="translated">البيلاروسية</target>
       </trans-unit>
       <trans-unit id="2719780722934172508" datatype="html">
         <source>Czech</source>
@@ -4764,7 +4764,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">157</context>
         </context-group>
-        <target state="needs-translation">Czech</target>
+        <target state="translated">التشيكية</target>
       </trans-unit>
       <trans-unit id="2924289692679201020" datatype="html">
         <source>Danish</source>
@@ -4772,7 +4772,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">163</context>
         </context-group>
-        <target state="needs-translation">Danish</target>
+        <target state="translated">الدانماركية</target>
       </trans-unit>
       <trans-unit id="1858110241312746425" datatype="html">
         <source>German</source>
@@ -4780,7 +4780,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">169</context>
         </context-group>
-        <target state="needs-translation">German</target>
+        <target state="translated">الألمانية</target>
       </trans-unit>
       <trans-unit id="6987083569809053351" datatype="html">
         <source>English (GB)</source>
@@ -4788,7 +4788,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">175</context>
         </context-group>
-        <target state="needs-translation">English (GB)</target>
+        <target state="translated">الإنجليزية (المملكة المتحدة)</target>
       </trans-unit>
       <trans-unit id="5190825892106392539" datatype="html" approved="yes">
         <source>Spanish</source>
@@ -4804,7 +4804,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">187</context>
         </context-group>
-        <target state="needs-translation">French</target>
+        <target state="translated">الفرنسية</target>
       </trans-unit>
       <trans-unit id="2935232983274991580" datatype="html">
         <source>Italian</source>
@@ -4812,7 +4812,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">193</context>
         </context-group>
-        <target state="needs-translation">Italian</target>
+        <target state="translated">الإيطالية</target>
       </trans-unit>
       <trans-unit id="1334425850005897370" datatype="html">
         <source>Luxembourgish</source>
@@ -4820,7 +4820,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">199</context>
         </context-group>
-        <target state="needs-translation">Luxembourgish</target>
+        <target state="translated">اللوكسمبرجية</target>
       </trans-unit>
       <trans-unit id="3071065188816255493" datatype="html">
         <source>Dutch</source>
@@ -4828,7 +4828,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">205</context>
         </context-group>
-        <target state="needs-translation">Dutch</target>
+        <target state="translated">الهولندية</target>
       </trans-unit>
       <trans-unit id="792060551707690640" datatype="html" approved="yes">
         <source>Polish</source>
@@ -4844,7 +4844,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">217</context>
         </context-group>
-        <target state="needs-translation">Portuguese (Brazil)</target>
+        <target state="translated">البرتغالية (البرازيل)</target>
       </trans-unit>
       <trans-unit id="153799456510623899" datatype="html" approved="yes">
         <source>Portuguese</source>
@@ -4860,7 +4860,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">229</context>
         </context-group>
-        <target state="needs-translation">Romanian</target>
+        <target state="translated">الرومانية</target>
       </trans-unit>
       <trans-unit id="7137419789978325708" datatype="html" approved="yes">
         <source>Russian</source>
@@ -4876,7 +4876,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">241</context>
         </context-group>
-        <target state="needs-translation">Slovenian</target>
+        <target state="translated">السلوفانية</target>
       </trans-unit>
       <trans-unit id="8608389829607915090" datatype="html">
         <source>Serbian</source>
@@ -4884,7 +4884,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">247</context>
         </context-group>
-        <target state="needs-translation">Serbian</target>
+        <target state="translated">الصربية</target>
       </trans-unit>
       <trans-unit id="499386805970351976" datatype="html" approved="yes">
         <source>Swedish</source>
@@ -4900,7 +4900,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">259</context>
         </context-group>
-        <target state="needs-translation">Turkish</target>
+        <target state="translated">التركية</target>
       </trans-unit>
       <trans-unit id="4689443708886954687" datatype="html">
         <source>Chinese Simplified</source>
@@ -4908,7 +4908,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">265</context>
         </context-group>
-        <target state="needs-translation">Chinese Simplified</target>
+        <target state="translated">الصينية المبسطة</target>
       </trans-unit>
       <trans-unit id="4912706592792948707" datatype="html">
         <source>ISO 8601</source>
@@ -4916,7 +4916,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">282</context>
         </context-group>
-        <target state="needs-translation">ISO 8601</target>
+        <target state="translated">ISO 8601</target>
       </trans-unit>
       <trans-unit id="313643372755303297" datatype="html">
         <source>Successfully completed one-time migratration of settings to the database!</source>
@@ -4924,7 +4924,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">393</context>
         </context-group>
-        <target state="needs-translation">Successfully completed one-time migratration of settings to the database!</target>
+        <target state="translated">تم بنجاح ترحيل الإعدادات مرة واحدة إلى قاعدة البيانات!</target>
       </trans-unit>
       <trans-unit id="5558341108007064934" datatype="html">
         <source>Unable to migrate settings to the database, please try saving manually.</source>
@@ -4932,7 +4932,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">394</context>
         </context-group>
-        <target state="needs-translation">Unable to migrate settings to the database, please try saving manually.</target>
+        <target state="translated">غير قادر على ترحيل الإعدادات إلى قاعدة البيانات، الرجاء محاولة الحفظ يدوياً.</target>
       </trans-unit>
       <trans-unit id="1519954996184640001" datatype="html" approved="yes">
         <source>Error</source>
@@ -4956,7 +4956,7 @@
           <context context-type="sourcefile">src/app/services/upload-documents.service.ts</context>
           <context context-type="linenumber">31</context>
         </context-group>
-        <target state="needs-translation">Connecting...</target>
+        <target state="translated">الاتصال...</target>
       </trans-unit>
       <trans-unit id="1245343823699368872" datatype="html">
         <source>Uploading...</source>
@@ -4964,7 +4964,7 @@
           <context context-type="sourcefile">src/app/services/upload-documents.service.ts</context>
           <context context-type="linenumber">43</context>
         </context-group>
-        <target state="needs-translation">Uploading...</target>
+        <target state="translated">التحميل...</target>
       </trans-unit>
       <trans-unit id="7446520539098045935" datatype="html">
         <source>Upload complete, waiting...</source>
@@ -4972,7 +4972,7 @@
           <context context-type="sourcefile">src/app/services/upload-documents.service.ts</context>
           <context context-type="linenumber">46</context>
         </context-group>
-        <target state="needs-translation">Upload complete, waiting...</target>
+        <target state="translated">اكتمل الرفع، انتظر...</target>
       </trans-unit>
       <trans-unit id="1405142710727603568" datatype="html">
         <source>HTTP error: <x id="PH" equiv-text="error.status"/> <x id="PH_1" equiv-text="error.statusText"/></source>
@@ -4980,7 +4980,7 @@
           <context context-type="sourcefile">src/app/services/upload-documents.service.ts</context>
           <context context-type="linenumber">62</context>
         </context-group>
-        <target state="needs-translation">HTTP error: <x id="PH" equiv-text="error.status"/> <x id="PH_1" equiv-text="error.statusText"/></target>
+        <target state="translated">خطأ HTTP: <x id="PH" equiv-text="error.status"/> <x id="PH_1" equiv-text="error.statusText"/></target>
       </trans-unit>
     </body>
   </file>
