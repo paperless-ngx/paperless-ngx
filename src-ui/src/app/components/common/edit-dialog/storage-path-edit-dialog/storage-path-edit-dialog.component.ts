@@ -42,8 +42,14 @@ export class StoragePathEditDialogComponent extends EditDialogComponent<Paperles
       match: new FormControl(''),
       is_insensitive: new FormControl(true),
       set_permissions: new FormGroup({
-        view: new FormControl(null),
-        change: new FormControl(null),
+        view: new FormGroup({
+          users: new FormControl(null),
+          groups: new FormControl(null),
+        }),
+        change: new FormGroup({
+          users: new FormControl(null),
+          groups: new FormControl(null),
+        }),
       }),
     })
   }

@@ -156,18 +156,18 @@ export class PermissionsSelectComponent
     if (this._inheritedPermissions.length == 0) return false
     else if (actionKey) {
       return this._inheritedPermissions.includes(
-        this.permissionsService.getPermissionCode({
-          action: PermissionAction[actionKey],
-          type: PermissionType[typeKey],
-        })
+        this.permissionsService.getPermissionCode(
+          PermissionAction[actionKey],
+          PermissionType[typeKey]
+        )
       )
     } else {
       return Object.values(PermissionAction).every((action) => {
         return this._inheritedPermissions.includes(
-          this.permissionsService.getPermissionCode({
-            action: action as PermissionAction,
-            type: PermissionType[typeKey],
-          })
+          this.permissionsService.getPermissionCode(
+            action as PermissionAction,
+            PermissionType[typeKey]
+          )
         )
       })
     }

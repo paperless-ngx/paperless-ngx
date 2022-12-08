@@ -85,8 +85,14 @@ export class DocumentDetailComponent
     archive_serial_number: new FormControl(),
     tags: new FormControl([]),
     set_permissions: new FormGroup({
-      view: new FormControl(null),
-      change: new FormControl(null),
+      view: new FormGroup({
+        users: new FormControl(null),
+        groups: new FormControl(null),
+      }),
+      change: new FormGroup({
+        users: new FormControl(null),
+        groups: new FormControl(null),
+      }),
     }),
   })
 
@@ -235,14 +241,7 @@ export class DocumentDetailComponent
             storage_path: doc.storage_path,
             archive_serial_number: doc.archive_serial_number,
             tags: [...doc.tags],
-            set_permissions: {
-              view: doc.permissions
-                .filter((p) => (p[1] as string).includes('view'))
-                .map((p) => p[0]),
-              change: doc.permissions
-                .filter((p) => (p[1] as string).includes('change'))
-                .map((p) => p[0]),
-            },
+            set_permissions: doc.permissions,
           })
 
           this.isDirty$ = dirtyCheck(
@@ -297,14 +296,7 @@ export class DocumentDetailComponent
         },
       })
     this.title = this.documentTitlePipe.transform(doc.title)
-    doc['set_permissions'] = {
-      view: doc.permissions
-        .filter((p) => (p[1] as string).includes('view'))
-        .map((p) => p[0]),
-      change: doc.permissions
-        .filter((p) => (p[1] as string).includes('change'))
-        .map((p) => p[0]),
-    }
+    doc['set_permissions'] = doc.permissions
     this.documentForm.patchValue(doc)
     if (!this.userCanEdit) this.documentForm.disable()
   }
@@ -586,10 +578,10 @@ export class DocumentDetailComponent
   get commentsEnabled(): boolean {
     return (
       this.settings.get(SETTINGS_KEYS.COMMENTS_ENABLED) &&
-      this.permissionsService.currentUserCan({
-        action: PermissionAction.View,
-        type: PermissionType.Document,
-      })
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.Document
+      )
     )
   }
 

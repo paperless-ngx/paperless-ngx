@@ -1,5 +1,6 @@
 import {
   Directive,
+  EmbeddedViewRef,
   Input,
   OnChanges,
   OnInit,
@@ -18,10 +19,12 @@ import {
 export class IfObjectPermissionsDirective implements OnInit, OnChanges {
   // The role the user must have
   @Input()
-  ifObjectPermissions: ObjectWithPermissions
+  ifObjectPermissions: {
+    object: ObjectWithPermissions
+    action: PermissionAction
+  }
 
-  @Input()
-  action: PermissionAction
+  createdView: EmbeddedViewRef<any>
 
   /**
    * @param {ViewContainerRef} viewContainerRef -- The location where we need to render the templateRef
@@ -36,13 +39,16 @@ export class IfObjectPermissionsDirective implements OnInit, OnChanges {
 
   public ngOnInit(): void {
     if (
-      !this.ifObjectPermissions ||
+      !this.ifObjectPermissions?.object ||
       this.permissionsService.currentUserHasObjectPermissions(
-        this.action,
-        this.ifObjectPermissions
+        this.ifObjectPermissions.action,
+        this.ifObjectPermissions.object
       )
     ) {
-      this.viewContainerRef.createEmbeddedView(this.templateRef)
+      if (!this.createdView)
+        this.createdView = this.viewContainerRef.createEmbeddedView(
+          this.templateRef
+        )
     } else {
       this.viewContainerRef.clear()
     }

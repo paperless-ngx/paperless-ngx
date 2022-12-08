@@ -14,11 +14,19 @@
       <app-input-text *ngIf="patternRequired" i18n-title title="Matching pattern" formControlName="match" [error]="error?.match"></app-input-text>
       <app-input-check *ngIf="patternRequired" i18n-title title="Case insensitive" formControlName="is_insensitive"></app-input-check>
 
-      <div *ifOwner="object?.owner">
+      <div *ifOwner="object">
         <h5 i18n>Permissions</h5>
         <div formGroupName="set_permissions">
-          <app-share-user type="view" formControlName="view"></app-share-user>
-          <app-share-user type="change" formControlName="change"></app-share-user>
+          <h6 i18n>View</h6>
+          <div formGroupName="view">
+            <app-permissions-user type="view" formControlName="users"></app-permissions-user>
+            <app-permissions-group type="view" formControlName="groups"></app-permissions-group>
+          </div>
+          <h6 i18n>Edit</h6>
+          <div formGroupName="change">
+            <app-permissions-user type="change" formControlName="users"></app-permissions-user>
+            <app-permissions-group type="change" formControlName="groups"></app-permissions-group>
+          </div>
         </div>
       </div>
 

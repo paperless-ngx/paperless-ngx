@@ -158,7 +158,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         response = self.client.get("/api/documents/?fields=", format="json")
         self.assertEqual(response.status_code, 200)
         results = response.data["results"]
-        self.assertEqual(results_full, results)
+        self.assertEqual(len(results_full[0]), len(results[0]))
 
         response = self.client.get("/api/documents/?fields=dgfhs", format="json")
         self.assertEqual(response.status_code, 200)
