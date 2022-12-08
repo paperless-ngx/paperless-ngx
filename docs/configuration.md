@@ -170,6 +170,19 @@ details.
 
     Defaults to "`PAPERLESS_DATA_DIR`/log/".
 
+`PAPERLESS_NLTK_DIR=<path>`
+
+: This is where paperless will search for the data required for NLTK
+processing, if you are using it. If you are using the Docker image,
+this should not be changed, as the data is included in the image
+already.
+
+Previously, the location defaulted to `PAPERLESS_DATA_DIR/nltk`.
+Unless you are using this in a bare metal install or other setup,
+this folder is no longer needed and can be removed manually.
+
+Defaults to `/usr/local/share/nltk_data`
+
 ## Logging
 
 `PAPERLESS_LOGROTATE_MAX_SIZE=<num>`
@@ -697,6 +710,16 @@ less than the worker timeout.
 for details on how to set it.
 
     Defaults to UTC.
+
+`PAPERLESS_ENABLE_NLTK=<bool>`
+
+: Enables or disables the advanced natural language processing
+used during automatic classification. If disabled, paperless will
+still preform some basic text pre-processing before matching.
+
+See also `PAPERLESS_NLTK_DIR`.
+
+    Defaults to 1.
 
 ## Polling {#polling}
 
