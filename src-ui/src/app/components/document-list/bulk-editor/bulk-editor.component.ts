@@ -27,6 +27,7 @@ import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
 import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
+import { PermissionsService } from 'src/app/services/permissions.service'
 
 @Component({
   selector: 'app-bulk-editor',
@@ -55,7 +56,8 @@ export class BulkEditorComponent extends ComponentWithPermissions {
     private openDocumentService: OpenDocumentsService,
     private settings: SettingsService,
     private toastService: ToastService,
-    private storagePathService: StoragePathService
+    private storagePathService: StoragePathService,
+    private permissionService: PermissionsService
   ) {
     super()
   }
@@ -66,6 +68,25 @@ export class BulkEditorComponent extends ComponentWithPermissions {
   showConfirmationDialogs: boolean = this.settings.get(
     SETTINGS_KEYS.BULK_EDIT_CONFIRMATION_DIALOGS
   )
+
+  get userCanEditAll(): boolean {
+    let canEdit: boolean = true
+    const docs = this.list.documents.filter((d) => this.list.selected.has(d.id))
+    canEdit = docs.every((d) =>
+      this.permissionService.currentUserHasObjectPermissions(
+        this.PermissionAction.Change,
+        d
+      )
+    )
+    return canEdit
+  }
+
+  get userOwnsAll(): boolean {
+    let ownsAll: boolean = true
+    const docs = this.list.documents.filter((d) => this.list.selected.has(d.id))
+    ownsAll = docs.every((d) => this.permissionService.currentUserOwnsObject(d))
+    return ownsAll
+  }
 
   ngOnInit() {
     this.tagService
