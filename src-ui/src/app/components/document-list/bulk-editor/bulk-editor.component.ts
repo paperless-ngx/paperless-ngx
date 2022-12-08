@@ -26,6 +26,7 @@ import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
 import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
+import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
 
 @Component({
   selector: 'app-bulk-editor',
@@ -395,6 +396,18 @@ export class BulkEditorComponent extends ComponentWithPermissions {
     modal.componentInstance.confirmClicked.subscribe(() => {
       modal.componentInstance.buttonsEnabled = false
       this.executeBulkOperation(modal, 'redo_ocr', {})
+    })
+  }
+
+  setPermissions() {
+    let modal = this.modalService.open(PermissionsDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.confirmClicked.subscribe((permissions) => {
+      modal.componentInstance.buttonsEnabled = false
+      this.executeBulkOperation(modal, 'set_permissions', {
+        permissions,
+      })
     })
   }
 }

@@ -1,3 +1,11 @@
+from django.contrib.auth.models import Group
+from django.contrib.auth.models import Permission
+from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
+from guardian.models import GroupObjectPermission
+from guardian.shortcuts import assign_perm
+from guardian.shortcuts import get_users_with_perms
+from guardian.shortcuts import remove_perm
 from rest_framework.permissions import BasePermission
 from rest_framework.permissions import DjangoObjectPermissions
 
@@ -31,3 +39,65 @@ class PaperlessObjectPermissions(DjangoObjectPermissions):
 class PaperlessAdminPermissions(BasePermission):
     def has_permission(self, request, view):
         return request.user.has_perm("admin.view_logentry")
+
+
+def get_groups_with_only_permission(obj, codename):
+    ctype = ContentType.objects.get_for_model(obj)
+    permission = Permission.objects.get(content_type=ctype, codename=codename)
+    group_object_perm_group_ids = (
+        GroupObjectPermission.objects.filter(
+            object_pk=obj.pk,
+            content_type=ctype,
+        )
+        .filter(permission=permission)
+        .values_list("group_id")
+    )
+    return Group.objects.filter(id__in=group_object_perm_group_ids).distinct()
+
+
+def set_permissions_for_object(permissions, object):
+    print(permissions, object)
+    for action in permissions:
+        permission = f"{action}_{object.__class__.__name__.lower()}"
+        # users
+        users_to_add = User.objects.filter(id__in=permissions[action]["users"])
+        users_to_remove = get_users_with_perms(
+            object,
+            only_with_perms_in=[permission],
+        )
+        if len(users_to_add) > 0 and len(users_to_remove) > 0:
+            users_to_remove = users_to_remove.difference(users_to_add)
+        if len(users_to_remove) > 0:
+            for user in users_to_remove:
+                remove_perm(permission, user, object)
+        if len(users_to_add) > 0:
+            for user in users_to_add:
+                assign_perm(permission, user, object)
+                if action == "change":
+                    # change gives view too
+                    assign_perm(
+                        f"view_{object.__class__.__name__.lower()}",
+                        user,
+                        object,
+                    )
+        # groups
+        groups_to_add = Group.objects.filter(id__in=permissions[action]["groups"])
+        groups_to_remove = get_groups_with_only_permission(
+            object,
+            permission,
+        )
+        if len(groups_to_add) > 0 and len(groups_to_remove) > 0:
+            groups_to_remove = groups_to_remove.difference(groups_to_add)
+        if len(groups_to_remove) > 0:
+            for group in groups_to_remove:
+                remove_perm(permission, group, object)
+        if len(groups_to_add) > 0:
+            for group in groups_to_add:
+                assign_perm(permission, group, object)
+                if action == "change":
+                    # change gives view too
+                    assign_perm(
+                        f"view_{object.__class__.__name__.lower()}",
+                        group,
+                        object,
+                    )
