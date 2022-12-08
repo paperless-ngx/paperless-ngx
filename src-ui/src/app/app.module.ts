@@ -108,6 +108,7 @@ import localeSr from '@angular/common/locales/sr'
 import localeSv from '@angular/common/locales/sv'
 import localeTr from '@angular/common/locales/tr'
 import localeZh from '@angular/common/locales/zh'
+import { PermissionsDialogComponent } from './components/common/permissions-dialog/permissions-dialog.component'
 
 registerLocaleData(localeBe)
 registerLocaleData(localeCs)
@@ -203,6 +204,7 @@ function initializeApp(settings: SettingsService) {
     PermissionsGroupComponent,
     IfOwnerDirective,
     IfObjectPermissionsDirective,
+    PermissionsDialogComponent,
   ],
   imports: [
     BrowserModule,
