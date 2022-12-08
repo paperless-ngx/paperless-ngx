@@ -4,7 +4,10 @@ import { FILTER_CORRESPONDENT } from 'src/app/data/filter-rule-type'
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import { PermissionType } from 'src/app/services/permissions.service'
+import {
+  PermissionsService,
+  PermissionType,
+} from 'src/app/services/permissions.service'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { CorrespondentEditDialogComponent } from '../../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
@@ -22,6 +25,7 @@ export class CorrespondentListComponent extends ManagementListComponent<Paperles
     modalService: NgbModal,
     toastService: ToastService,
     documentListViewService: DocumentListViewService,
+    permissionsService: PermissionsService,
     private datePipe: CustomDatePipe
   ) {
     super(
@@ -30,6 +34,7 @@ export class CorrespondentListComponent extends ManagementListComponent<Paperles
       CorrespondentEditDialogComponent,
       toastService,
       documentListViewService,
+      permissionsService,
       FILTER_CORRESPONDENT,
       $localize`correspondent`,
       $localize`correspondents`,
