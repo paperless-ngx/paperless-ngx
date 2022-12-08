@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-09 21:50+0000\n"
-"PO-Revision-Date: 2022-12-08 14:25\n"
+"PO-Revision-Date: 2022-12-08 17:18\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -260,7 +260,7 @@ msgstr "المستخدم"
 
 #: documents/models.py:370
 msgid "show on dashboard"
-msgstr "عرض على لوحة البيانات"
+msgstr "عرض على لوحة التحكم"
 
 #: documents/models.py:373
 msgid "show in sidebar"
@@ -818,7 +818,7 @@ msgstr "تصفية الموضوع"
 
 #: paperless_mail/models.py:114
 msgid "filter body"
-msgstr ""
+msgstr "تصفية الجسم"
 
 #: paperless_mail/models.py:121
 msgid "filter attachment filename"
@@ -834,23 +834,23 @@ msgstr "أقصى عُمُر"
 
 #: paperless_mail/models.py:135
 msgid "Specified in days."
-msgstr ""
+msgstr "محدد بالأيام."
 
 #: paperless_mail/models.py:139
 msgid "attachment type"
-msgstr ""
+msgstr "نوع المرفق"
 
 #: paperless_mail/models.py:143
 msgid "Inline attachments include embedded images, so it's best to combine this option with a filename filter."
-msgstr ""
+msgstr "تتضمن المرفقات المضمنة صورا مضمنة، لذا من الأفضل دمج هذا الخِيار مع تصفية اسم الملف."
 
 #: paperless_mail/models.py:149
 msgid "action"
-msgstr ""
+msgstr "إجراء"
 
 #: paperless_mail/models.py:155
 msgid "action parameter"
-msgstr ""
+msgstr "إجراء العامل"
 
 #: paperless_mail/models.py:160
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
@@ -858,21 +858,21 @@ msgstr ""
 
 #: paperless_mail/models.py:168
 msgid "assign title from"
-msgstr ""
+msgstr "تعيين العنوان من"
 
 #: paperless_mail/models.py:176
 msgid "assign this tag"
-msgstr ""
+msgstr "تعيين هذا الوسم"
 
 #: paperless_mail/models.py:184
 msgid "assign this document type"
-msgstr ""
+msgstr "تعيين نوع هذا المستند"
 
 #: paperless_mail/models.py:188
 msgid "assign correspondent from"
-msgstr ""
+msgstr "تعيين مراسل من"
 
 #: paperless_mail/models.py:198
 msgid "assign this correspondent"
-msgstr ""
+msgstr "تعيين هذا المراسل"
 
