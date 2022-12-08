@@ -45,7 +45,7 @@ COPY Pipfile* ./
 
 RUN set -eux \
   && echo "Installing pipenv" \
-    && python3 -m pip install --no-cache-dir --upgrade pipenv \
+    && python3 -m pip install --no-cache-dir --upgrade pipenv==2022.10.12 \
   && echo "Generating requirement.txt" \
     && pipenv requirements > requirements.txt
 
@@ -197,11 +197,7 @@ RUN --mount=type=bind,from=qpdf-builder,target=/qpdf \
     && apt-get install --yes --no-install-recommends /qpdf/usr/src/qpdf/libqpdf29_*.deb \
     && apt-get install --yes --no-install-recommends /qpdf/usr/src/qpdf/qpdf_*.deb \
   && echo "Installing pikepdf and dependencies" \
-    && python3 -m pip install --no-cache-dir /pikepdf/usr/src/wheels/pyparsing*.whl \
-    && python3 -m pip install --no-cache-dir /pikepdf/usr/src/wheels/packaging*.whl \
-    && python3 -m pip install --no-cache-dir /pikepdf/usr/src/wheels/lxml*.whl \
-    && python3 -m pip install --no-cache-dir /pikepdf/usr/src/wheels/Pillow*.whl \
-    && python3 -m pip install --no-cache-dir /pikepdf/usr/src/wheels/pikepdf*.whl \
+    && python3 -m pip install --no-cache-dir /pikepdf/usr/src/wheels/*.whl \
     && python3 -m pip list \
   && echo "Installing psycopg2" \
     && python3 -m pip install --no-cache-dir /psycopg2/usr/src/wheels/psycopg2*.whl \
