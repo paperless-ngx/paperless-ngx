@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-09 21:50+0000\n"
-"PO-Revision-Date: 2022-12-07 17:49\n"
+"PO-Revision-Date: 2022-12-08 11:15\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -220,31 +220,31 @@ msgstr "تحذير"
 
 #: documents/models.py:334
 msgid "error"
-msgstr ""
+msgstr "خطأ"
 
 #: documents/models.py:335
 msgid "critical"
-msgstr ""
+msgstr "الحرجة"
 
 #: documents/models.py:338
 msgid "group"
-msgstr ""
+msgstr "مجموعة"
 
 #: documents/models.py:340
 msgid "message"
-msgstr ""
+msgstr "رسالة"
 
 #: documents/models.py:343
 msgid "level"
-msgstr ""
+msgstr "المستوى"
 
 #: documents/models.py:352
 msgid "log"
-msgstr ""
+msgstr "سجل"
 
 #: documents/models.py:353
 msgid "logs"
-msgstr ""
+msgstr "السجلات"
 
 #: documents/models.py:363 documents/models.py:419
 msgid "saved view"
