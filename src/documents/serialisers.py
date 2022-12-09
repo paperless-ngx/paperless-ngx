@@ -255,7 +255,7 @@ class ColorField(serializers.Field):
         return 1
 
 
-class TagSerializerVersion1(MatchingModelSerializer):
+class TagSerializerVersion1(MatchingModelSerializer, OwnedObjectSerializer):
 
     colour = ColorField(source="color", default="#a6cee3")
 
@@ -271,6 +271,9 @@ class TagSerializerVersion1(MatchingModelSerializer):
             "is_insensitive",
             "is_inbox_tag",
             "document_count",
+            "owner",
+            "permissions",
+            "set_permissions",
         )
 
 
