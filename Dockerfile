@@ -45,7 +45,7 @@ COPY Pipfile* ./
 
 RUN set -eux \
   && echo "Installing pipenv" \
-    && python3 -m pip install --no-cache-dir --upgrade pipenv==2022.10.12 \
+    && python3 -m pip install --no-cache-dir --upgrade pipenv==2022.11.30 \
   && echo "Generating requirement.txt" \
     && pipenv requirements > requirements.txt
 
