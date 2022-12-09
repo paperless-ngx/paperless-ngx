@@ -21,7 +21,7 @@ concurrency:
 jobs:
   build-image:
     name: Build ${{ fromJSON(inputs.build-json).name }} @ ${{ fromJSON(inputs.build-json).version }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       -
         name: Checkout

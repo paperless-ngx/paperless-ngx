@@ -6,12 +6,7 @@
 name: Cleanup Image Tags
 
 on:
-  schedule:
-    - cron: '0 0 * * SAT'
   delete:
-  pull_request:
-    types:
-      - closed
   push:
     paths:
       - ".github/workflows/cleanup-tags.yml"
@@ -26,7 +21,7 @@ concurrency:
 jobs:
   cleanup-images:
     name: Cleanup Image Tags for ${{ matrix.primary-name }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         include:

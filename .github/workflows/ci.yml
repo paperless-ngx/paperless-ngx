@@ -16,7 +16,7 @@ on:
 jobs:
   pre-commit:
     name: Linting Checks
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       -
         name: Checkout repository
@@ -34,7 +34,7 @@ jobs:
 
   documentation:
     name: "Build Documentation"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs:
       - pre-commit
     steps:
@@ -44,7 +44,7 @@ jobs:
       -
         name: Install pipenv
         run: |
-          pipx install pipenv==2022.10.12
+          pipx install pipenv==2022.11.30
       -
         name: Set up Python
         uses: actions/setup-python@v4
@@ -73,7 +73,7 @@ jobs:
 
   documentation-deploy:
     name: "Deploy Documentation"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs:
       - documentation
@@ -92,7 +92,7 @@ jobs:
 
   tests-backend:
     name: "Tests (${{ matrix.python-version }})"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs:
       - pre-commit
     strategy:
@@ -124,7 +124,7 @@ jobs:
       -
         name: Install pipenv
         run: |
-          pipx install pipenv==2022.10.12
+          pipx install pipenv==2022.11.30
       -
         name: Set up Python
         uses: actions/setup-python@v4
@@ -181,7 +181,7 @@ jobs:
 
   tests-frontend:
     name: "Tests Frontend"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs:
       - pre-commit
     strategy:
@@ -201,7 +201,7 @@ jobs:
   prepare-docker-build:
     name: Prepare Docker Pipeline Data
     if: github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/feature-') || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/beta' || contains(github.ref, 'beta.rc') || startsWith(github.ref, 'refs/tags/v'))
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     # If the push triggered the installer library workflow, wait for it to
     # complete here.  This ensures the required versions for the final
     # image have been built, while not waiting at all if the versions haven't changed
@@ -278,7 +278,7 @@ jobs:
 
   # build and push image to docker hub.
   build-docker-image:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     concurrency:
       group: ${{ github.workflow }}-build-docker-image-${{ github.ref_name }}
       cancel-in-progress: true
@@ -383,7 +383,7 @@ jobs:
   build-release:
     needs:
       - build-docker-image
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       -
         name: Checkout
@@ -462,7 +462,7 @@ jobs:
           path: dist/paperless-ngx.tar.xz
 
   publish-release:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     outputs:
       prerelease: ${{ steps.get_version.outputs.prerelease }}
       changelog: ${{ steps.create-release.outputs.body }}
@@ -511,7 +511,7 @@ jobs:
           asset_content_type: application/x-xz
 
   append-changelog:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs:
       - publish-release
     if: needs.publish-release.outputs.prerelease == 'false'
