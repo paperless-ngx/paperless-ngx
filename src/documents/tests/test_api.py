@@ -2358,6 +2358,9 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
 
 
 class TestBulkDownload(DirectoriesMixin, APITestCase):
+
+    ENDPOINT = "/api/documents/bulk_download/"
+
     def setUp(self):
         super().setUp()
 
@@ -2408,7 +2411,7 @@ class TestBulkDownload(DirectoriesMixin, APITestCase):
 
     def test_download_originals(self):
         response = self.client.post(
-            "/api/documents/bulk_download/",
+            self.ENDPOINT,
             json.dumps(
                 {"documents": [self.doc2.id, self.doc3.id], "content": "originals"},
             ),
@@ -2431,7 +2434,7 @@ class TestBulkDownload(DirectoriesMixin, APITestCase):
 
     def test_download_default(self):
         response = self.client.post(
-            "/api/documents/bulk_download/",
+            self.ENDPOINT,
             json.dumps({"documents": [self.doc2.id, self.doc3.id]}),
             content_type="application/json",
         )
@@ -2452,7 +2455,7 @@ class TestBulkDownload(DirectoriesMixin, APITestCase):
 
     def test_download_both(self):
         response = self.client.post(
-            "/api/documents/bulk_download/",
+            self.ENDPOINT,
             json.dumps({"documents": [self.doc2.id, self.doc3.id], "content": "both"}),
             content_type="application/json",
         )
@@ -2486,7 +2489,7 @@ class TestBulkDownload(DirectoriesMixin, APITestCase):
 
     def test_filename_clashes(self):
         response = self.client.post(
-            "/api/documents/bulk_download/",
+            self.ENDPOINT,
             json.dumps({"documents": [self.doc2.id, self.doc2b.id]}),
             content_type="application/json",
         )
@@ -2508,12 +2511,171 @@ class TestBulkDownload(DirectoriesMixin, APITestCase):
 
     def test_compression(self):
         response = self.client.post(
-            "/api/documents/bulk_download/",
+            self.ENDPOINT,
             json.dumps(
                 {"documents": [self.doc2.id, self.doc2b.id], "compression": "lzma"},
             ),
             content_type="application/json",
         )
+
+    @override_settings(FILENAME_FORMAT="{correspondent}/{title}")
+    def test_formatted_download_originals(self):
+        """
+        GIVEN:
+            - Defined file naming format
+        WHEN:
+            - Bulk download request for original documents
+            - Bulk download request requests to follow format
+        THEN:
+            - Files defined in resulting zipfile are formatted
+        """
+
+        c = Correspondent.objects.create(name="test")
+        c2 = Correspondent.objects.create(name="a space name")
+
+        self.doc2.correspondent = c
+        self.doc2.title = "This is Doc 2"
+        self.doc2.save()
+
+        self.doc3.correspondent = c2
+        self.doc3.title = "Title 2 - Doc 3"
+        self.doc3.save()
+
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "documents": [self.doc2.id, self.doc3.id],
+                    "content": "originals",
+                    "follow_formatting": True,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/zip")
+
+        with zipfile.ZipFile(io.BytesIO(response.content)) as zipf:
+            self.assertEqual(len(zipf.filelist), 2)
+            self.assertIn("a space name/Title 2 - Doc 3.jpg", zipf.namelist())
+            self.assertIn("test/This is Doc 2.pdf", zipf.namelist())
+
+            with self.doc2.source_file as f:
+                self.assertEqual(f.read(), zipf.read("test/This is Doc 2.pdf"))
+
+            with self.doc3.source_file as f:
+                self.assertEqual(
+                    f.read(),
+                    zipf.read("a space name/Title 2 - Doc 3.jpg"),
+                )
+
+    @override_settings(FILENAME_FORMAT="somewhere/{title}")
+    def test_formatted_download_archive(self):
+        """
+        GIVEN:
+            - Defined file naming format
+        WHEN:
+            - Bulk download request for archive documents
+            - Bulk download request requests to follow format
+        THEN:
+            - Files defined in resulting zipfile are formatted
+        """
+
+        self.doc2.title = "This is Doc 2"
+        self.doc2.save()
+
+        self.doc3.title = "Title 2 - Doc 3"
+        self.doc3.save()
+        print(self.doc3.archive_path)
+        print(self.doc3.archive_filename)
+
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "documents": [self.doc2.id, self.doc3.id],
+                    "follow_formatting": True,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/zip")
+
+        with zipfile.ZipFile(io.BytesIO(response.content)) as zipf:
+            self.assertEqual(len(zipf.filelist), 2)
+            self.assertIn("somewhere/This is Doc 2.pdf", zipf.namelist())
+            self.assertIn("somewhere/Title 2 - Doc 3.pdf", zipf.namelist())
+
+            with self.doc2.source_file as f:
+                self.assertEqual(f.read(), zipf.read("somewhere/This is Doc 2.pdf"))
+
+            with self.doc3.archive_file as f:
+                self.assertEqual(f.read(), zipf.read("somewhere/Title 2 - Doc 3.pdf"))
+
+    @override_settings(FILENAME_FORMAT="{document_type}/{title}")
+    def test_formatted_download_both(self):
+        """
+        GIVEN:
+            - Defined file naming format
+        WHEN:
+            - Bulk download request for original documents and archive documents
+            - Bulk download request requests to follow format
+        THEN:
+            - Files defined in resulting zipfile are formatted
+        """
+
+        dc1 = DocumentType.objects.create(name="bill")
+        dc2 = DocumentType.objects.create(name="statement")
+
+        self.doc2.document_type = dc1
+        self.doc2.title = "This is Doc 2"
+        self.doc2.save()
+
+        self.doc3.document_type = dc2
+        self.doc3.title = "Title 2 - Doc 3"
+        self.doc3.save()
+
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "documents": [self.doc2.id, self.doc3.id],
+                    "content": "both",
+                    "follow_formatting": True,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/zip")
+
+        with zipfile.ZipFile(io.BytesIO(response.content)) as zipf:
+            self.assertEqual(len(zipf.filelist), 3)
+            self.assertIn("originals/bill/This is Doc 2.pdf", zipf.namelist())
+            self.assertIn("archive/statement/Title 2 - Doc 3.pdf", zipf.namelist())
+            self.assertIn("originals/statement/Title 2 - Doc 3.jpg", zipf.namelist())
+
+            with self.doc2.source_file as f:
+                self.assertEqual(
+                    f.read(),
+                    zipf.read("originals/bill/This is Doc 2.pdf"),
+                )
+
+            with self.doc3.archive_file as f:
+                self.assertEqual(
+                    f.read(),
+                    zipf.read("archive/statement/Title 2 - Doc 3.pdf"),
+                )
+
+            with self.doc3.source_file as f:
+                self.assertEqual(
+                    f.read(),
+                    zipf.read("originals/statement/Title 2 - Doc 3.jpg"),
+                )
 
 
 class TestApiAuth(DirectoriesMixin, APITestCase):

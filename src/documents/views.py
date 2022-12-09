@@ -776,6 +776,7 @@ class BulkDownloadView(GenericAPIView):
         ids = serializer.validated_data.get("documents")
         compression = serializer.validated_data.get("compression")
         content = serializer.validated_data.get("content")
+        follow_filename_format = serializer.validated_data.get("follow_formatting")
 
         os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
         temp = tempfile.NamedTemporaryFile(
@@ -792,7 +793,7 @@ class BulkDownloadView(GenericAPIView):
             strategy_class = ArchiveOnlyStrategy
 
         with zipfile.ZipFile(temp.name, "w", compression) as zipf:
-            strategy = strategy_class(zipf)
+            strategy = strategy_class(zipf, follow_filename_format)
             for id in ids:
                 doc = Document.objects.get(id=id)
                 strategy.add_document(doc)
