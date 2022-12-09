@@ -117,9 +117,9 @@ class SetPermissionsMixin:
         if set_permissions is not None:
             for action in permissions_dict:
                 users = set_permissions[action]["users"]
-                self._validate_user_ids(users)
+                permissions_dict[action]["users"] = self._validate_user_ids(users)
                 groups = set_permissions[action]["groups"]
-                self._validate_group_ids(groups)
+                permissions_dict[action]["groups"] = self._validate_group_ids(groups)
         return permissions_dict
 
     def _set_permissions(self, permissions, object):

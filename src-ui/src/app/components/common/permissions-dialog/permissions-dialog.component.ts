@@ -3,6 +3,7 @@ import { FormControl, FormGroup } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { PaperlessGroup } from 'src/app/data/paperless-group'
 import { PaperlessUser } from 'src/app/data/paperless-user'
+import { UserService } from 'src/app/services/rest/user.service'
 
 @Component({
   selector: 'app-permissions-dialog',
@@ -10,7 +11,14 @@ import { PaperlessUser } from 'src/app/data/paperless-user'
   styleUrls: ['./permissions-dialog.component.scss'],
 })
 export class PermissionsDialogComponent implements OnInit {
-  constructor(public activeModal: NgbActiveModal) {}
+  users: PaperlessUser[]
+
+  constructor(
+    public activeModal: NgbActiveModal,
+    private userService: UserService
+  ) {
+    this.userService.listAll().subscribe((r) => (this.users = r.results))
+  }
 
   @Output()
   public confirmClicked = new EventEmitter()

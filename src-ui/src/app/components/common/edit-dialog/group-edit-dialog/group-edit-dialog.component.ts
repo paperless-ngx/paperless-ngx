@@ -4,6 +4,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-dialog.component'
 import { PaperlessGroup } from 'src/app/data/paperless-group'
 import { GroupService } from 'src/app/services/rest/group.service'
+import { UserService } from 'src/app/services/rest/user.service'
 
 @Component({
   selector: 'app-group-edit-dialog',
@@ -11,8 +12,12 @@ import { GroupService } from 'src/app/services/rest/group.service'
   styleUrls: ['./group-edit-dialog.component.scss'],
 })
 export class GroupEditDialogComponent extends EditDialogComponent<PaperlessGroup> {
-  constructor(service: GroupService, activeModal: NgbActiveModal) {
-    super(service, activeModal)
+  constructor(
+    service: GroupService,
+    activeModal: NgbActiveModal,
+    userService: UserService
+  ) {
+    super(service, activeModal, userService)
   }
 
   getCreateTitle() {

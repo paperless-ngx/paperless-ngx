@@ -5,7 +5,10 @@ import { Observable } from 'rxjs'
 import { MATCHING_ALGORITHMS, MATCH_AUTO } from 'src/app/data/matching-model'
 import { ObjectWithId } from 'src/app/data/object-with-id'
 import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
+import { PaperlessUser } from 'src/app/data/paperless-user'
 import { AbstractPaperlessService } from 'src/app/services/rest/abstract-paperless-service'
+import { UserService } from 'src/app/services/rest/user.service'
+import { PermissionsFormObject } from '../input/permissions-form/permissions-form.component'
 
 @Directive()
 export abstract class EditDialogComponent<
@@ -14,8 +17,11 @@ export abstract class EditDialogComponent<
 {
   constructor(
     private service: AbstractPaperlessService<T>,
-    private activeModal: NgbActiveModal
+    private activeModal: NgbActiveModal,
+    private userService: UserService
   ) {}
+
+  users: PaperlessUser[]
 
   @Input()
   dialogMode: string = 'create'
@@ -41,6 +47,12 @@ export abstract class EditDialogComponent<
       if (this.object['permissions']) {
         this.object['set_permissions'] = this.object['permissions']
       }
+      console.log(this.object)
+
+      this.object['permissions_form'] = {
+        owner: (this.object as ObjectWithPermissions).owner,
+        set_permissions: (this.object as ObjectWithPermissions).permissions,
+      }
       this.objectForm.patchValue(this.object)
     }
 
@@ -48,6 +60,8 @@ export abstract class EditDialogComponent<
     setTimeout(() => {
       this.closeEnabled = true
     })
+
+    this.userService.listAll().subscribe((r) => (this.users = r.results))
   }
 
   getCreateTitle() {
@@ -82,10 +96,16 @@ export abstract class EditDialogComponent<
   }
 
   save() {
-    var newObject = Object.assign(
-      Object.assign({}, this.object),
-      this.objectForm.value
-    )
+    const formValues = Object.assign({}, this.objectForm.value)
+    const permissionsObject: PermissionsFormObject =
+      this.objectForm.get('permissions_form').value
+    if (permissionsObject) {
+      formValues.owner = permissionsObject.owner
+      formValues.set_permissions = permissionsObject.set_permissions
+      delete formValues.permissions_form
+    }
+
+    var newObject = Object.assign(Object.assign({}, this.object), formValues)
     var serverResponse: Observable<T>
     switch (this.dialogMode) {
       case 'create':

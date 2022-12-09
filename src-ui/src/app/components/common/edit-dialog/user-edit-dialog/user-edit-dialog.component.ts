@@ -24,7 +24,7 @@ export class UserEditDialogComponent
     activeModal: NgbActiveModal,
     groupsService: GroupService
   ) {
-    super(service, activeModal)
+    super(service, activeModal, service)
 
     groupsService
       .listAll()
