@@ -397,7 +397,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">157</context>
         </context-group>
-        <target state="translated">أدوات التصفية تسمح لك بالعثور بسرعة على المستندات باستخدام مختلف عمليات البحث والتواريخ والوسوم وما إلى ذلك.</target>
+        <target state="translated">أدوات التصفية تسمح لك بالعثور بسرعة على المستندات باستخدام مختلف عمليات البحث والتواريخ والعلامات وما إلى ذلك.</target>
       </trans-unit>
       <trans-unit id="5427326625898532358" datatype="html">
         <source>Any combination of filters can be saved as a &apos;view&apos; which can then be displayed on the dashboard and / or sidebar.</source>
@@ -413,7 +413,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">176</context>
         </context-group>
-        <target state="translated">يمكن إدارة جميع الوسوم والمراسلين وأنواع الوثائق ومسارات التخزين باستخدام هذه الصفحات. ويمكن أيضا إنشاؤها من نعديل عرض المستند.</target>
+        <target state="translated">يمكن إدارة جميع العلامات والمراسلين وأنواع الوثائق ومسارات التخزين باستخدام هذه الصفحات. ويمكن أيضا إنشاؤها من تعديل عرض المستند.</target>
       </trans-unit>
       <trans-unit id="4680387114119209483" datatype="html">
         <source>File Tasks shows you documents that have been consumed, are waiting to be, or may have failed during the process.</source>
@@ -1390,7 +1390,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="translated">إجراء العامل</target>
+        <target state="translated">إجراء المعامل</target>
       </trans-unit>
       <trans-unit id="6093797930511670257" datatype="html">
         <source>Assign title from</source>
@@ -1550,7 +1550,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">127</context>
         </context-group>
-        <target state="translated">وسم الرسالة بوسم محدد، لا تعالج الرسائل الموسومة</target>
+        <target state="translated">علم الرسالة بعلامة محددة، لا تعالج الرسائل المُعلمة</target>
       </trans-unit>
       <trans-unit id="4673329664686432878" datatype="html">
         <source>Use subject as title</source>
@@ -1694,7 +1694,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component.ts</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="translated">إنشاء وسم جديد</target>
+        <target state="translated">إنشاء علامة جديدة</target>
       </trans-unit>
       <trans-unit id="5872175735754226507" datatype="html">
         <source>Edit tag</source>
@@ -1702,7 +1702,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component.ts</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="translated">تعديل الوسم</target>
+        <target state="translated">تعديل العلامة</target>
       </trans-unit>
       <trans-unit id="1616102757855967475" datatype="html">
         <source>All</source>
@@ -1788,7 +1788,7 @@
           <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="translated">إضافة وسم</target>
+        <target state="translated">إضافة علامة</target>
       </trans-unit>
       <trans-unit id="3797570084942068182" datatype="html" approved="yes">
         <source>Select</source>
@@ -2599,7 +2599,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">28</context>
         </context-group>
-        <target state="translated">تصفية الوسوم</target>
+        <target state="translated">تصفية العلامات</target>
       </trans-unit>
       <trans-unit id="184185893993764098" datatype="html">
         <source>Filter correspondents</source>
@@ -2737,7 +2737,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">198</context>
         </context-group>
-        <target state="translated">تأكيد تعيين الوسوم</target>
+        <target state="translated">تأكيد تعيين العلامات</target>
       </trans-unit>
       <trans-unit id="6619516195038467207" datatype="html">
         <source>This operation will add the tag &quot;<x id="PH" equiv-text="tag.name"/>&quot; to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -2745,7 +2745,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">204</context>
         </context-group>
-        <target state="translated">هذه العملية ستضيف الوسم "<x id="PH" equiv-text="tag.name"/>" إلى <x id="PH_1" equiv-text="this.list.selected.size"/> مستند (مستندات) مختارة.</target>
+        <target state="translated">هذه العملية ستضيف العلامة "<x id="PH" equiv-text="tag.name"/>" إلى <x id="PH_1" equiv-text="this.list.selected.size"/> مستند (مستندات) مختارة.</target>
       </trans-unit>
       <trans-unit id="1894412783609570695" datatype="html">
         <source>This operation will add the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -2753,7 +2753,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">209,211</context>
         </context-group>
-        <target state="translated">هذه العملية ستضيف الوسوم "<x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/>" إلى <x id="PH_1" equiv-text="this.list.selected.size"/> مستند (مستندات) مختارة.</target>
+        <target state="translated">هذه العملية ستضيف العلامات <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> إلى <x id="PH_1" equiv-text="this.list.selected.size"/> مستند (مستندات) مختارة.</target>
       </trans-unit>
       <trans-unit id="7181166515756808573" datatype="html">
         <source>This operation will remove the tag &quot;<x id="PH" equiv-text="tag.name"/>&quot; from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -2761,7 +2761,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">217</context>
         </context-group>
-        <target state="translated">هذه العملية ستزيل الوسم "<x id="PH" equiv-text="tag.name"/>" من <x id="PH_1" equiv-text="this.list.selected.size"/> المستند (المستندات) المختارة.</target>
+        <target state="translated">هذه العملية ستزيل العلامة"<x id="PH" equiv-text="tag.name"/>" من <x id="PH_1" equiv-text="this.list.selected.size"/> المستند (المستندات) المختارة.</target>
       </trans-unit>
       <trans-unit id="3819792277998068944" datatype="html">
         <source>This operation will remove the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -2769,7 +2769,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">222,224</context>
         </context-group>
-        <target state="translated">هذه العملية ستزيل الوسوم "<x id="PH" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/>" من <x id="PH_1" equiv-text="this.list.selected.size"/> المستند (المستندات) المختارة.</target>
+        <target state="translated">هذه العملية ستزيل العلامات <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> من <x id="PH_1" equiv-text="this.list.selected.size"/> المستند (المستندات) المختارة.</target>
       </trans-unit>
       <trans-unit id="2739066218579571288" datatype="html">
         <source>This operation will add the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> and remove the tags <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> on <x id="PH_2" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -2777,7 +2777,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">226,230</context>
         </context-group>
-        <target state="translated">هذه العملية سوف تضيف الوسوم <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> وتزيل الوسوم <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> في <x id="PH_2" equiv-text="this.list.selected.size"/> مستند(مستندات) مختارة.</target>
+        <target state="translated">هذه العملية سوف تضيف العلامات <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> وتزيل العلامات <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> في <x id="PH_2" equiv-text="this.list.selected.size"/> مستند(مستندات) مختارة.</target>
       </trans-unit>
       <trans-unit id="2996713129519325161" datatype="html">
         <source>Confirm correspondent assignment</source>
@@ -2905,7 +2905,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">183</context>
         </context-group>
-        <target state="translated">تصفية حسب الوسم</target>
+        <target state="translated">تصفية حسب العلامة</target>
       </trans-unit>
       <trans-unit id="7585826646011739428" datatype="html" approved="yes">
         <source>Edit</source>
@@ -3041,7 +3041,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="translated">تبديل تصفية الوسم</target>
+        <target state="translated">تبديل تصفية العلامة</target>
       </trans-unit>
       <trans-unit id="4648526799630820486" datatype="html">
         <source>Toggle correspondent filter</source>
@@ -3257,7 +3257,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">111,113</context>
         </context-group>
-        <target state="translated">وسم: <x id="PH" equiv-text="this.tags.find((t) =&gt; t.id == +rule.value)?.name"/></target>
+        <target state="translated">علامة: <x id="PH" equiv-text="this.tags.find((t) =&gt; t.id == +rule.value)?.name"/></target>
       </trans-unit>
       <trans-unit id="6494566478302448576" datatype="html" approved="yes">
         <source>Without any tag</source>
@@ -4229,7 +4229,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.ts</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="translated">وسم</target>
+        <target state="translated">علامة</target>
       </trans-unit>
       <trans-unit id="4975748273657042999" datatype="html">
         <source>tags</source>
@@ -4237,7 +4237,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.ts</context>
           <context context-type="linenumber">31</context>
         </context-group>
-        <target state="translated">وسوم</target>
+        <target state="translated">علامات</target>
       </trans-unit>
       <trans-unit id="93754014749412887" datatype="html" approved="yes">
         <source>Do you really want to delete the tag &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
@@ -4287,7 +4287,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">66</context>
         </context-group>
-        <target state="needs-translation">click for full output</target>
+        <target state="translated">انقر لمشاهدة كامل الإخراج</target>
       </trans-unit>
       <trans-unit id="1536087519743707362" datatype="html">
         <source>Dismiss</source>
@@ -4600,7 +4600,7 @@
           <context context-type="linenumber">17</context>
         </context-group>
         <note priority="1" from="description">Pre-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
-        <target state="needs-translation">Pre-consume script does not exist.</target>
+        <target state="translated">البرنامَج النصي قبل-الاستهلاك غير موجود.</target>
       </trans-unit>
       <trans-unit id="7742915911032564889" datatype="html">
         <source>Error while executing pre-consume script.</source>
@@ -4609,7 +4609,7 @@
           <context context-type="linenumber">18</context>
         </context-group>
         <note priority="1" from="description">Pre-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
-        <target state="needs-translation">Error while executing pre-consume script.</target>
+        <target state="translated">حدث خطأ في أثناء تنفيذ البرنامَج النصي قبل-الاستهلاك.</target>
       </trans-unit>
       <trans-unit id="8995193730018060346" datatype="html">
         <source>Post-consume script does not exist.</source>
@@ -4618,7 +4618,7 @@
           <context context-type="linenumber">19</context>
         </context-group>
         <note priority="1" from="description">Post-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
-        <target state="needs-translation">Post-consume script does not exist.</target>
+        <target state="translated">البرنامَج النصي بعد-الاستهلاك غير موجود.</target>
       </trans-unit>
       <trans-unit id="256773668518189604" datatype="html">
         <source>Error while executing post-consume script.</source>
@@ -4627,7 +4627,7 @@
           <context context-type="linenumber">20</context>
         </context-group>
         <note priority="1" from="description">Post-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
-        <target state="needs-translation">Error while executing post-consume script.</target>
+        <target state="translated">حدث خطأ في أثناء تنفيذ البرنامَج النصي بعد-الاستهلاك.</target>
       </trans-unit>
       <trans-unit id="6252258095055634191" datatype="html" approved="yes">
         <source>Received new file.</source>
