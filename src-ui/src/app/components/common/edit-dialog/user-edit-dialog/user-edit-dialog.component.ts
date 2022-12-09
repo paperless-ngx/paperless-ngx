@@ -52,8 +52,8 @@ export class UserEditDialogComponent
       last_name: new FormControl(''),
       is_active: new FormControl(true),
       is_superuser: new FormControl(false),
-      groups: new FormControl(null),
-      user_permissions: new FormControl(null),
+      groups: new FormControl([]),
+      user_permissions: new FormControl([]),
     })
   }
 
