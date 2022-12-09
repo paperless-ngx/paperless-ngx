@@ -850,7 +850,7 @@ http {
 ```
 
 The `PAPERLESS_URL` configuration variable is also required when using a
-reverse proxy. Please refer to the [hosting and security](configuration#hosting-and-security) docs.
+reverse proxy. Please refer to the [hosting and security](/configuration#hosting-and-security) docs.
 
 Also read
 [this](https://channels.readthedocs.io/en/stable/deploying.html#nginx-supervisor-ubuntu),
