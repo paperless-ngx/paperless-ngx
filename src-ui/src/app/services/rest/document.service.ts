@@ -174,10 +174,18 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
     )
   }
 
-  bulkDownload(ids: number[], content = 'both') {
+  bulkDownload(
+    ids: number[],
+    content = 'both',
+    useFilenameFormatting: boolean = false
+  ) {
     return this.http.post(
       this.getResourceUrl(null, 'bulk_download'),
-      { documents: ids, content: content },
+      {
+        documents: ids,
+        content: content,
+        follow_formatting: useFilenameFormatting,
+      },
       { responseType: 'blob' }
     )
   }
