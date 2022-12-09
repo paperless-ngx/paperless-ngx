@@ -1598,7 +1598,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">161</context>
         </context-group>
-        <target state="needs-translation">Use correspondent selected below</target>
+        <target state="translated">استخدم المراسل المحدد أدناه</target>
       </trans-unit>
       <trans-unit id="6036319582202941456" datatype="html">
         <source><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>Note that editing a path does not apply changes to stored files until you have run the &apos;document_renamer&apos; utility. See the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a target=&quot;_blank&quot; href=&quot;https://docs.paperless-ngx.com/administration/#renamer&quot;&gt;"/>documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></source>
@@ -1606,7 +1606,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.html</context>
           <context context-type="linenumber">10</context>
         </context-group>
-        <target state="needs-translation"><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>Note that editing a path does not apply changes to stored files until you have run the 'document_renamer' utility. See the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a target=&quot;_blank&quot; href=&quot;https://docs.paperless-ngx.com/administration/#renamer&quot;&gt;"/>documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></target>
+        <target state="translated"><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>لاحظ أن تحرير مسار لا يطبق التغييرات على الملفات المخزنة حتى تقوم بتشغيل أداة 'document_renamer'. انظر إلى <x id="START_LINK" ctype="x-a" equiv-text="&lt;a target=&quot;_blank&quot; href=&quot;https://docs.paperless-ngx.com/administration/#renamer&quot;&gt;"/>المستندات<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></target>
       </trans-unit>
       <trans-unit id="8911059720204770105" datatype="html">
         <source>Path</source>
@@ -3837,7 +3837,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">139,142</context>
         </context-group>
-        <target state="needs-translation"> Update checking works by pinging the the public <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;"/>Github API<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> for the latest release to determine whether a new version is available.<x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br/&gt;"/> Actual updating of the app must still be performed manually. </target>
+        <target state="translated"> تحديث التحقق يعمل بأرسال إشارات الى العام <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;"/>Github API<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> للحصول على أحدث إصدار لتحديد ما إذا كان الإصدار الجديد متاحا.<x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br/&gt;"/> لا يزال يتعين إجراء التحديث الفعلي للتطبيق يدويا. </target>
       </trans-unit>
       <trans-unit id="5489945693955857309" datatype="html">
         <source><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>No tracking data is collected by the app in any way.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></source>
@@ -4323,7 +4323,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">109</context>
         </context-group>
-        <target state="needs-translation">Complete <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.completedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.completedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
+        <target state="translated">مكتمل <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.completedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.completedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
       </trans-unit>
       <trans-unit id="1697296301417588213" datatype="html">
         <source>Started <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.startedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.startedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
@@ -4331,7 +4331,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">115</context>
         </context-group>
-        <target state="needs-translation">Started <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.startedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.startedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
+        <target state="translated">بدأ <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.startedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.startedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
       </trans-unit>
       <trans-unit id="6517676116023827583" datatype="html">
         <source>Queued <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.queuedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.queuedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
@@ -4339,7 +4339,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">121</context>
         </context-group>
-        <target state="needs-translation">Queued <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.queuedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.queuedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
+        <target state="translated">الانتظار <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.queuedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.queuedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
       </trans-unit>
       <trans-unit id="5404910960991552159" datatype="html">
         <source>Dismiss selected</source>
@@ -4347,7 +4347,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.ts</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="needs-translation">Dismiss selected</target>
+        <target state="translated">تحديد الرفض</target>
       </trans-unit>
       <trans-unit id="8829078752502782653" datatype="html">
         <source>Dismiss all</source>
@@ -4359,7 +4359,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.ts</context>
           <context context-type="linenumber">54</context>
         </context-group>
-        <target state="needs-translation">Dismiss all</target>
+        <target state="translated">رفض الجميع</target>
       </trans-unit>
       <trans-unit id="1323591410517879795" datatype="html">
         <source>Confirm Dismiss All</source>
@@ -4367,7 +4367,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.ts</context>
           <context context-type="linenumber">52</context>
         </context-group>
-        <target state="needs-translation">Confirm Dismiss All</target>
+        <target state="translated">تأكيد رفض الكل</target>
       </trans-unit>
       <trans-unit id="6566358716882976903" datatype="html">
         <source>tasks?</source>
@@ -4375,7 +4375,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.ts</context>
           <context context-type="linenumber">54</context>
         </context-group>
-        <target state="needs-translation">tasks?</target>
+        <target state="translated">مهام؟</target>
       </trans-unit>
       <trans-unit id="181464970911903082" datatype="html">
         <source>404 Not Found</source>
@@ -4383,7 +4383,7 @@
           <context context-type="sourcefile">src/app/components/not-found/not-found.component.html</context>
           <context context-type="linenumber">7</context>
         </context-group>
-        <target state="needs-translation">404 Not Found</target>
+        <target state="translated">404 غير متوفر</target>
       </trans-unit>
       <trans-unit id="5851669019930456395" datatype="html">
         <source>Any word</source>
@@ -4391,7 +4391,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="needs-translation">Any word</target>
+        <target state="translated">أي كلمة</target>
       </trans-unit>
       <trans-unit id="7517655726614958140" datatype="html">
         <source>Any: Document contains any of these words (space separated)</source>
@@ -4399,7 +4399,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="needs-translation">Any: Document contains any of these words (space separated)</target>
+        <target state="translated">أي: مستند يحوي أي من هذه الكلمات (فراغ فاصل)</target>
       </trans-unit>
       <trans-unit id="700315718208181326" datatype="html">
         <source>All words</source>
@@ -4407,7 +4407,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">19</context>
         </context-group>
-        <target state="needs-translation">All words</target>
+        <target state="translated">كل الكلمات</target>
       </trans-unit>
       <trans-unit id="111914402588955480" datatype="html">
         <source>All: Document contains all of these words (space separated)</source>
@@ -4415,7 +4415,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">All: Document contains all of these words (space separated)</target>
+        <target state="translated">أي: مستند يحوي كل هذه الكلمات (فراغ فاصل)</target>
       </trans-unit>
       <trans-unit id="9180173992399180575" datatype="html">
         <source>Exact match</source>
@@ -4423,7 +4423,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="needs-translation">Exact match</target>
+        <target state="translated">تطابق تام</target>
       </trans-unit>
       <trans-unit id="7109184332944610787" datatype="html">
         <source>Exact: Document contains this string</source>
@@ -4431,7 +4431,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">Exact: Document contains this string</target>
+        <target state="translated">بالضبط: المستند يحتوي على هذه الكلمة</target>
       </trans-unit>
       <trans-unit id="1338733395833138319" datatype="html">
         <source>Regular expression</source>
@@ -4439,7 +4439,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="needs-translation">Regular expression</target>
+        <target state="translated">التعابير النظامية</target>
       </trans-unit>
       <trans-unit id="7548151332424148033" datatype="html">
         <source>Regular expression: Document matches this regular expression</source>
@@ -4447,7 +4447,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="needs-translation">Regular expression: Document matches this regular expression</target>
+        <target state="translated">التعابير النظامية: المستند يطابق هذا التعبير النظامي</target>
       </trans-unit>
       <trans-unit id="1856513373880048959" datatype="html">
         <source>Fuzzy word</source>
@@ -4455,7 +4455,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">34</context>
         </context-group>
-        <target state="needs-translation">Fuzzy word</target>
+        <target state="translated">كلمة غامضة</target>
       </trans-unit>
       <trans-unit id="8419167206585286450" datatype="html">
         <source>Fuzzy: Document contains a word similar to this word</source>
@@ -4463,7 +4463,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">35</context>
         </context-group>
-        <target state="needs-translation">Fuzzy: Document contains a word similar to this word</target>
+        <target state="translated">غامض: المستند يحوي كلمة مشابهة لهذه الكلمة</target>
       </trans-unit>
       <trans-unit id="2167862279705099846" datatype="html">
         <source>Auto: Learn matching automatically</source>
@@ -4471,7 +4471,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">40</context>
         </context-group>
-        <target state="needs-translation">Auto: Learn matching automatically</target>
+        <target state="translated">تلقائياً: تعلم المطابقة تلقائيًا</target>
       </trans-unit>
       <trans-unit id="5948496158474272829" datatype="html">
         <source>Warning: You have unsaved changes to your document(s).</source>
@@ -4479,7 +4479,7 @@
           <context context-type="sourcefile">src/app/guards/dirty-doc.guard.ts</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="needs-translation">Warning: You have unsaved changes to your document(s).</target>
+        <target state="translated">تحذير: لديك تغييرات غير محفوظة للمستند(المستندات).</target>
       </trans-unit>
       <trans-unit id="159901853873315050" datatype="html">
         <source>Unsaved Changes</source>
@@ -4499,7 +4499,7 @@
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
           <context context-type="linenumber">143</context>
         </context-group>
-        <target state="needs-translation">Unsaved Changes</target>
+        <target state="translated">لم تحفظ تغييرات</target>
       </trans-unit>
       <trans-unit id="2573823578527613511" datatype="html">
         <source>You have unsaved changes.</source>
@@ -4511,7 +4511,7 @@
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
           <context context-type="linenumber">144</context>
         </context-group>
-        <target state="needs-translation">You have unsaved changes.</target>
+        <target state="translated">لديك تغييرات لم تحفظ.</target>
       </trans-unit>
       <trans-unit id="3305084982600522070" datatype="html">
         <source>Are you sure you want to leave?</source>
@@ -4519,7 +4519,7 @@
           <context context-type="sourcefile">src/app/guards/dirty-form.guard.ts</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Are you sure you want to leave?</target>
+        <target state="translated">متيقِّن من المغادرة؟</target>
       </trans-unit>
       <trans-unit id="729881853265307704" datatype="html">
         <source>Leave page</source>
@@ -4527,7 +4527,7 @@
           <context context-type="sourcefile">src/app/guards/dirty-form.guard.ts</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="needs-translation">Leave page</target>
+        <target state="translated">غادر الصفحة</target>
       </trans-unit>
       <trans-unit id="1649285023712919370" datatype="html">
         <source>You have unsaved changes to the saved view</source>
@@ -4535,7 +4535,7 @@
           <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="needs-translation">You have unsaved changes to the saved view</target>
+        <target state="translated">لديك تغييرات غير محفوظة في العرض المحفوظ</target>
       </trans-unit>
       <trans-unit id="7282050913165342352" datatype="html">
         <source>Are you sure you want to close this saved view?</source>
@@ -4543,7 +4543,7 @@
           <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="needs-translation">Are you sure you want to close this saved view?</target>
+        <target state="translated">متيقِّن من إغلاق هذا العرض المحفوظ؟</target>
       </trans-unit>
       <trans-unit id="856284624775342512" datatype="html">
         <source>Save and close</source>
@@ -4551,7 +4551,7 @@
           <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
           <context context-type="linenumber">34</context>
         </context-group>
-        <target state="needs-translation">Save and close</target>
+        <target state="translated">حفظ و إغلاق</target>
       </trans-unit>
       <trans-unit id="7536524521722799066" datatype="html" approved="yes">
         <source>(no title)</source>
