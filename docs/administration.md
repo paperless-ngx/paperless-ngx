@@ -68,7 +68,7 @@ $ docker-compose down
 
 After that, [make a backup](#backup).
 
-A. If you pull the image from the docker hub, all you need to do is:
+1. If you pull the image from the docker hub, all you need to do is:
 
     ```shell-session
     $ docker-compose pull
@@ -78,7 +78,7 @@ A. If you pull the image from the docker hub, all you need to do is:
     The docker-compose files refer to the `latest` version, which is
     always the latest stable release.
 
-B. If you built the image yourself, do the following:
+2. If you built the image yourself, do the following:
 
     ```shell-session
     $ git pull
