@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-09 21:50+0000\n"
-"PO-Revision-Date: 2022-12-08 17:18\n"
+"PO-Revision-Date: 2022-12-09 05:57\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -424,19 +424,19 @@ msgstr "اسم المهمة التي كانت تعمل"
 
 #: documents/models.py:562
 msgid "Task Positional Arguments"
-msgstr ""
+msgstr "مهمة المعاملات الموضعية"
 
 #: documents/models.py:564
 msgid "JSON representation of the positional arguments used with the task"
-msgstr ""
+msgstr "تمثيل JSON للمعاملات الموضعية المستخدمة في المهمة"
 
 #: documents/models.py:569
 msgid "Task Named Arguments"
-msgstr ""
+msgstr "مهمة المعامل المسمى"
 
 #: documents/models.py:571
 msgid "JSON representation of the named arguments used with the task"
-msgstr ""
+msgstr "تمثيل JSON للمعاملات المسمية المستخدمة في المهمة"
 
 #: documents/models.py:578
 msgid "Task State"
@@ -854,7 +854,7 @@ msgstr "إجراء العامل"
 
 #: paperless_mail/models.py:160
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
-msgstr ""
+msgstr "معامل إضافي للإجراء المحدد أعلاه، مثال: المجلد المستهدف للانتقال إلى إجراء مجلد. يجب أن تكون المجلدات الفرعية مفصولة بنقاط."
 
 #: paperless_mail/models.py:168
 msgid "assign title from"
