@@ -70,21 +70,21 @@ After that, [make a backup](#backup).
 
 1. If you pull the image from the docker hub, all you need to do is:
 
-    ```shell-session
-    $ docker-compose pull
-    $ docker-compose up
-    ```
+   ```shell-session
+   $ docker-compose pull
+   $ docker-compose up
+   ```
 
-    The docker-compose files refer to the `latest` version, which is
-    always the latest stable release.
+   The docker-compose files refer to the `latest` version, which is
+   always the latest stable release.
 
 2. If you built the image yourself, do the following:
 
-    ```shell-session
-    $ git pull
-    $ docker-compose build
-    $ docker-compose up
-    ```
+   ```shell-session
+   $ git pull
+   $ docker-compose build
+   $ docker-compose up
+   ```
 
 Running `docker-compose up` will also apply any new database migrations.
 If you see everything working, press CTRL+C once to gracefully stop
