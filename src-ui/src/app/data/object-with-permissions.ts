@@ -13,7 +13,7 @@ export interface PermissionsObject {
 }
 
 export interface ObjectWithPermissions extends ObjectWithId {
-  owner?: PaperlessUser
+  owner?: number
 
   permissions?: PermissionsObject
 }
