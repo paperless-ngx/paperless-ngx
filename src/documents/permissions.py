@@ -56,7 +56,6 @@ def get_groups_with_only_permission(obj, codename):
 
 
 def set_permissions_for_object(permissions, object):
-    print(permissions, object)
     for action in permissions:
         permission = f"{action}_{object.__class__.__name__.lower()}"
         # users

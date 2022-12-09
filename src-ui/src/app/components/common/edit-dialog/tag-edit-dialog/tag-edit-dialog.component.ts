@@ -6,6 +6,7 @@ import { PaperlessTag } from 'src/app/data/paperless-tag'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { randomColor } from 'src/app/utils/color'
 import { DEFAULT_MATCHING_ALGORITHM } from 'src/app/data/matching-model'
+import { UserService } from 'src/app/services/rest/user.service'
 
 @Component({
   selector: 'app-tag-edit-dialog',
@@ -13,8 +14,12 @@ import { DEFAULT_MATCHING_ALGORITHM } from 'src/app/data/matching-model'
   styleUrls: ['./tag-edit-dialog.component.scss'],
 })
 export class TagEditDialogComponent extends EditDialogComponent<PaperlessTag> {
-  constructor(service: TagService, activeModal: NgbActiveModal) {
-    super(service, activeModal)
+  constructor(
+    service: TagService,
+    activeModal: NgbActiveModal,
+    userService: UserService
+  ) {
+    super(service, activeModal, userService)
   }
 
   getCreateTitle() {
@@ -33,16 +38,7 @@ export class TagEditDialogComponent extends EditDialogComponent<PaperlessTag> {
       matching_algorithm: new FormControl(DEFAULT_MATCHING_ALGORITHM),
       match: new FormControl(''),
       is_insensitive: new FormControl(true),
-      set_permissions: new FormGroup({
-        view: new FormGroup({
-          users: new FormControl(null),
-          groups: new FormControl(null),
-        }),
-        change: new FormGroup({
-          users: new FormControl(null),
-          groups: new FormControl(null),
-        }),
-      }),
+      permissions_form: new FormControl(null),
     })
   }
 }
