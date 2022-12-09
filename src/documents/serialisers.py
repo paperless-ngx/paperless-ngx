@@ -692,6 +692,10 @@ class BulkDownloadSerializer(DocumentListSerializer):
         default="none",
     )
 
+    follow_formatting = serializers.BooleanField(
+        default=False,
+    )
+
     def validate_compression(self, compression):
         import zipfile
 
