@@ -582,7 +582,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">99</context>
         </context-group>
-        <target state="final">فتح مستندات</target>
+        <target state="final">فتح المستندات</target>
       </trans-unit>
       <trans-unit id="5687256342387781369" datatype="html" approved="yes">
         <source>Close all</source>
