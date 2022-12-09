@@ -101,6 +101,8 @@ def consume_file(
 
     # Celery converts this to a string, but everything expects a datetime
     # Long term solution is to not use JSON for the serializer but pickle instead
+    # TODO: This will be resolved in kombu 5.3, expected with celery 5.3
+    # More types will be retained through JSON encode/decode
     if override_created is not None and isinstance(override_created, str):
         try:
             override_created = datetime.fromisoformat(override_created)
