@@ -6,7 +6,6 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { ConfirmDialogComponent } from 'src/app/components/common/confirm-dialog/confirm-dialog.component'
 import { Observable, Subject, of } from 'rxjs'
 import { first } from 'rxjs/operators'
-import { Router } from '@angular/router'
 
 @Injectable({
   providedIn: 'root',
@@ -16,8 +15,7 @@ export class OpenDocumentsService {
 
   constructor(
     private documentService: DocumentService,
-    private modalService: NgbModal,
-    private router: Router
+    private modalService: NgbModal
   ) {
     if (sessionStorage.getItem(OPEN_DOCUMENT_SERVICE.DOCUMENTS)) {
       try {
@@ -57,39 +55,28 @@ export class OpenDocumentsService {
     return this.openDocuments.find((d) => d.id == id)
   }
 
-  openDocument(
-    doc: PaperlessDocument,
-    navigate: boolean = true
-  ): Observable<boolean> {
+  openDocument(doc: PaperlessDocument): Observable<boolean> {
     if (this.openDocuments.find((d) => d.id == doc.id) == null) {
       if (this.openDocuments.length == this.MAX_OPEN_DOCUMENTS) {
         // at max, ensure changes arent lost
         const docToRemove = this.openDocuments[this.MAX_OPEN_DOCUMENTS - 1]
         const closeObservable = this.closeDocument(docToRemove)
         closeObservable.pipe(first()).subscribe((closed) => {
-          if (closed) this.finishOpenDocument(doc, navigate)
+          if (closed) this.finishOpenDocument(doc)
         })
         return closeObservable
       } else {
         // not at max
-        this.finishOpenDocument(doc, navigate)
-      }
-    } else {
-      // doc is open, just maybe navigate
-      if (navigate) {
-        this.router.navigate(['documents', doc.id])
+        this.finishOpenDocument(doc)
       }
     }
     return of(true)
   }
 
-  private finishOpenDocument(doc: PaperlessDocument, navigate: boolean) {
+  private finishOpenDocument(doc: PaperlessDocument) {
     this.openDocuments.unshift(doc)
     this.dirtyDocuments.delete(doc.id)
     this.save()
-    if (navigate) {
-      this.router.navigate(['documents', doc.id])
-    }
   }
 
   setDirty(doc: PaperlessDocument, dirty: boolean) {
