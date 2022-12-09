@@ -18,14 +18,10 @@ import { AbstractInputComponent } from '../abstract-input'
   templateUrl: './permissions-user.component.html',
   styleUrls: ['./permissions-user.component.scss'],
 })
-export class PermissionsUserComponent
-  extends AbstractInputComponent<PaperlessUser>
-  implements OnInit
-{
+export class PermissionsUserComponent extends AbstractInputComponent<
+  PaperlessUser[]
+> {
   users: PaperlessUser[]
-
-  @Input()
-  type: string
 
   constructor(userService: UserService, settings: SettingsService) {
     super()
@@ -38,16 +34,5 @@ export class PermissionsUserComponent
             (u) => u.id !== settings.currentUser.id
           ))
       )
-  }
-
-  ngOnInit(): void {
-    if (this.type == 'view') {
-      this.title = $localize`Users can view`
-    } else if (this.type == 'change') {
-      this.title = $localize`Users can edit`
-      this.hint = $localize`Edit permissions also grant viewing permissions`
-    }
-
-    super.ngOnInit()
   }
 }

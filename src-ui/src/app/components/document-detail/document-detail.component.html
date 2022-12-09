@@ -181,18 +181,7 @@
                 <li [ngbNavItem]="6" *ifOwner="document">
                     <a ngbNavLink i18n>Permissions</a>
                     <ng-template ngbNavContent>
-                        <div formGroupName="set_permissions">
-                            <h6 i18n>View</h6>
-                            <div formGroupName="view">
-                                <app-permissions-user type="view" formControlName="users"></app-permissions-user>
-                                <app-permissions-group type="view" formControlName="groups"></app-permissions-group>
-                            </div>
-                            <h6 i18n>Edit</h6>
-                            <div formGroupName="change">
-                                <app-permissions-user type="change" formControlName="users"></app-permissions-user>
-                                <app-permissions-group type="change" formControlName="groups"></app-permissions-group>
-                            </div>
-                        </div>
+                        <app-permissions-form [users]="users" formControlName="permissions_form"></app-permissions-form>
                     </ng-template>
                 </li>
             </ul>

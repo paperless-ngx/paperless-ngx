@@ -5,6 +5,7 @@ import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-
 import { DEFAULT_MATCHING_ALGORITHM } from 'src/app/data/matching-model'
 import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
+import { UserService } from 'src/app/services/rest/user.service'
 
 @Component({
   selector: 'app-storage-path-edit-dialog',
@@ -12,8 +13,12 @@ import { StoragePathService } from 'src/app/services/rest/storage-path.service'
   styleUrls: ['./storage-path-edit-dialog.component.scss'],
 })
 export class StoragePathEditDialogComponent extends EditDialogComponent<PaperlessStoragePath> {
-  constructor(service: StoragePathService, activeModal: NgbActiveModal) {
-    super(service, activeModal)
+  constructor(
+    service: StoragePathService,
+    activeModal: NgbActiveModal,
+    userService: UserService
+  ) {
+    super(service, activeModal, userService)
   }
 
   get pathHint() {
@@ -41,16 +46,7 @@ export class StoragePathEditDialogComponent extends EditDialogComponent<Paperles
       matching_algorithm: new FormControl(DEFAULT_MATCHING_ALGORITHM),
       match: new FormControl(''),
       is_insensitive: new FormControl(true),
-      set_permissions: new FormGroup({
-        view: new FormGroup({
-          users: new FormControl(null),
-          groups: new FormControl(null),
-        }),
-        change: new FormGroup({
-          users: new FormControl(null),
-          groups: new FormControl(null),
-        }),
-      }),
+      permissions_form: new FormControl(null),
     })
   }
 }
