@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-09 21:50+0000\n"
-"PO-Revision-Date: 2022-12-09 05:57\n"
+"PO-Revision-Date: 2022-12-09 07:39\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -39,7 +39,7 @@ msgstr "التعابير النظامية"
 
 #: documents/models.py:36
 msgid "Fuzzy word"
-msgstr "كلمة غير واضحة"
+msgstr "كلمة غامضة"
 
 #: documents/models.py:37
 msgid "Automatic"
@@ -76,19 +76,19 @@ msgstr "لون"
 
 #: documents/models.py:72
 msgid "is inbox tag"
-msgstr "سمة علبة الوارد"
+msgstr "علامة علبة الوارد"
 
 #: documents/models.py:75
 msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
-msgstr "ضع علامة على هذه السمة كعلامة سمة علبة الوارد: سيتم وضع سمة على جميع المستندات المستهلكة حديثا مع وسوم صندوق الواردات."
+msgstr "ضع علامة على هذه السمة كعلامة علبة الوارد: سيتم وضع علامة على جميع المستندات المستهلكة حديثا مع علامات صندوق الواردات."
 
 #: documents/models.py:81
 msgid "tag"
-msgstr "وسم"
+msgstr "علامة"
 
 #: documents/models.py:82 documents/models.py:156
 msgid "tags"
-msgstr "وسوم"
+msgstr "علامات"
 
 #: documents/models.py:87 documents/models.py:138
 msgid "document type"
@@ -300,7 +300,7 @@ msgstr "موجود في علبة الوارد"
 
 #: documents/models.py:393
 msgid "has tag"
-msgstr "لديه وسم"
+msgstr "لديه علامة"
 
 #: documents/models.py:394
 msgid "has any tag"
@@ -344,7 +344,7 @@ msgstr "عُدِّل بعد"
 
 #: documents/models.py:404
 msgid "does not have tag"
-msgstr "ليس لديه وسم"
+msgstr "ليس لديه علامة"
 
 #: documents/models.py:405
 msgid "does not have ASN"
@@ -364,7 +364,7 @@ msgstr "أخرى مثلها"
 
 #: documents/models.py:409
 msgid "has tags in"
-msgstr "لديه وسوم في"
+msgstr "لديه علامات في"
 
 #: documents/models.py:410
 msgid "ASN greater than"
@@ -424,19 +424,19 @@ msgstr "اسم المهمة التي كانت تعمل"
 
 #: documents/models.py:562
 msgid "Task Positional Arguments"
-msgstr "مهمة المعاملات الموضعية"
+msgstr "مهمة قيمة المعاملات الموضعية"
 
 #: documents/models.py:564
 msgid "JSON representation of the positional arguments used with the task"
-msgstr "تمثيل JSON للمعاملات الموضعية المستخدمة في المهمة"
+msgstr "تمثيل JSON لقيمة المعاملات الموضعية المستخدمة في المهمة"
 
 #: documents/models.py:569
 msgid "Task Named Arguments"
-msgstr "مهمة المعامل المسمى"
+msgstr "مهمة قيمة المعامل المسمى"
 
 #: documents/models.py:571
 msgid "JSON representation of the named arguments used with the task"
-msgstr "تمثيل JSON للمعاملات المسمية المستخدمة في المهمة"
+msgstr "تمثيل JSON لقيمة المعاملات المسمية المستخدمة في المهمة"
 
 #: documents/models.py:578
 msgid "Task State"
@@ -674,7 +674,7 @@ msgstr "البيانات الوصفية"
 
 #: paperless_mail/admin.py:78
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
-msgstr "تعيين بيانات التعريف للمستندات المستهلكة من هذه القاعدة تِلْقائيًا. إذا لم تعين الوسوم أو الأنواع أو المراسلين هنا، سيظل paperless يعالج جميع قواعد المطابقة التي حددتها."
+msgstr "تعيين بيانات التعريف للمستندات المستهلكة من هذه القاعدة تِلْقائيًا. إذا لم تعين العلامات أو الأنواع أو المراسلين هنا، سيظل paperless يعالج جميع قواعد المطابقة التي حددتها."
 
 #: paperless_mail/apps.py:8
 msgid "Paperless mail"
@@ -766,7 +766,7 @@ msgstr "علم الرسالة، لا تعالج الرسائل المعلمة"
 
 #: paperless_mail/models.py:68
 msgid "Tag the mail with specified tag, don't process tagged mails"
-msgstr "وسم الرسالة بوسم محدد، لا تعالج الرسائل الموسومة"
+msgstr "علم الرسالة بعلامة محددة، لا تعالج الرسائل المُعلمة"
 
 #: paperless_mail/models.py:71
 msgid "Use subject as title"
@@ -850,7 +850,7 @@ msgstr "إجراء"
 
 #: paperless_mail/models.py:155
 msgid "action parameter"
-msgstr "إجراء العامل"
+msgstr "إجراء المعامل"
 
 #: paperless_mail/models.py:160
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
@@ -862,7 +862,7 @@ msgstr "تعيين العنوان من"
 
 #: paperless_mail/models.py:176
 msgid "assign this tag"
-msgstr "تعيين هذا الوسم"
+msgstr "تعيين هذه العلامة"
 
 #: paperless_mail/models.py:184
 msgid "assign this document type"
