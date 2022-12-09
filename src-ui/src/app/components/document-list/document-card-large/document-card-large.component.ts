@@ -10,9 +10,6 @@ import { PaperlessDocument } from 'src/app/data/paperless-document'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
-import { OpenDocumentsService } from 'src/app/services/open-documents.service'
-import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type'
 import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 
 @Component({
@@ -26,8 +23,7 @@ import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 export class DocumentCardLargeComponent implements OnInit {
   constructor(
     private documentService: DocumentService,
-    private settingsService: SettingsService,
-    public openDocumentsService: OpenDocumentsService
+    private settingsService: SettingsService
   ) {}
 
   @Input()
@@ -119,6 +115,9 @@ export class DocumentCardLargeComponent implements OnInit {
   }
 
   get contentTrimmed() {
-    return this.document.content.substr(0, 500)
+    return (
+      this.document.content.substr(0, 500) +
+      (this.document.content.length > 500 ? '...' : '')
+    )
   }
 }
