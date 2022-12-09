@@ -172,9 +172,12 @@ class OwnedObjectSerializer(serializers.ModelSerializer, SetPermissionsMixin):
             "owner" not in validated_data or validated_data["owner"] is None
         ):
             validated_data["owner"] = self.user
-        instance = super().create(validated_data)
+        permissions = None
         if "set_permissions" in validated_data:
-            self._set_permissions(validated_data["set_permissions"], instance)
+            permissions = validated_data.pop("set_permissions")
+        instance = super().create(validated_data)
+        if permissions is not None:
+            self._set_permissions(permissions, instance)
         return instance
 
     def update(self, instance, validated_data):
@@ -342,6 +345,12 @@ class DocumentSerializer(DynamicFieldsModelSerializer, OwnedObjectSerializer):
     original_file_name = SerializerMethodField()
     archived_file_name = SerializerMethodField()
     created_date = serializers.DateField(required=False)
+
+    owner = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+        required=False,
+        allow_null=True,
+    )
 
     def get_original_file_name(self, obj):
         return obj.get_public_filename()
