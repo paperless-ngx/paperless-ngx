@@ -24,7 +24,7 @@ env:
 jobs:
   issue_opened_or_reopened:
     name: issue_opened_or_reopened
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     if: github.event_name == 'issues' && (github.event.action == 'opened' || github.event.action == 'reopened')
     steps:
       - name: Add issue to project and set status to ${{ env.todo }}
@@ -37,7 +37,7 @@ jobs:
           status_value: ${{ env.todo }} # Target status
   pr_opened_or_reopened:
     name: pr_opened_or_reopened
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     permissions:
       # write permission is required for autolabeler
       pull-requests: write
