@@ -10,7 +10,6 @@ import { PaperlessDocument } from 'src/app/data/paperless-document'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
-import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 
@@ -25,8 +24,7 @@ import { ComponentWithPermissions } from '../../with-permissions/with-permission
 export class DocumentCardSmallComponent extends ComponentWithPermissions {
   constructor(
     private documentService: DocumentService,
-    private settingsService: SettingsService,
-    public openDocumentsService: OpenDocumentsService
+    private settingsService: SettingsService
   ) {
     super()
   }
