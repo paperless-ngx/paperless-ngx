@@ -209,7 +209,7 @@ export class DocumentDetailComponent
               this.openDocumentService.getOpenDocument(this.documentId)
             )
           } else {
-            this.openDocumentService.openDocument(doc, false)
+            this.openDocumentService.openDocument(doc)
             this.updateComponent(doc)
           }
 
