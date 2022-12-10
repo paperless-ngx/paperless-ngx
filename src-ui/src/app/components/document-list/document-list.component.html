@@ -181,7 +181,7 @@
           </ng-container>
         </td>
         <td>
-          <a (click)="openDocumentsService.openDocument(d)" title="Edit document" i18n-title style="overflow-wrap: anywhere;">{{d.title | documentTitle}}</a>
+          <a routerLink="/documents/{{d.id}}" title="Edit document" i18n-title style="overflow-wrap: anywhere;">{{d.title | documentTitle}}</a>
           <app-tag [tag]="t" *ngFor="let t of d.tags$ | async" class="ms-1" clickable="true" linkTitle="Filter by tag" i18n-linkTitle (click)="clickTag(t.id);$event.stopPropagation()"></app-tag>
         </td>
         <td class="d-none d-xl-table-cell">

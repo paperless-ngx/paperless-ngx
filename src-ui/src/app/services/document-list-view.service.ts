@@ -213,7 +213,8 @@ export class DocumentListViewService {
         this.currentPageSize,
         activeListViewState.sortField,
         activeListViewState.sortReverse,
-        activeListViewState.filterRules
+        activeListViewState.filterRules,
+        { truncate_content: true }
       )
       .subscribe({
         next: (result) => {
