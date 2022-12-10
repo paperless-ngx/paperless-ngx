@@ -27,20 +27,17 @@ export class PermissionsDialogComponent implements OnInit {
   title = $localize`Set Permissions`
 
   form = new FormGroup({
-    set_permissions: new FormGroup({
-      view: new FormGroup({
-        users: new FormControl([]),
-        groups: new FormControl([]),
-      }),
-      change: new FormGroup({
-        users: new FormControl([]),
-        groups: new FormControl([]),
-      }),
-    }),
+    permissions_form: new FormControl(),
   })
 
   get permissions() {
-    return this.form.value['set_permissions']
+    console.log(this.form.get('permissions_form'))
+
+    return {
+      owner: this.form.get('permissions_form')?.value['owner'],
+      set_permissions:
+        this.form.get('permissions_form')?.value['set_permissions'],
+    }
   }
 
   @Input()

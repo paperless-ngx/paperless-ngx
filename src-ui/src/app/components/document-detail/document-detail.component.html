@@ -181,7 +181,9 @@
                 <li [ngbNavItem]="6" *ifOwner="document">
                     <a ngbNavLink i18n>Permissions</a>
                     <ng-template ngbNavContent>
-                        <app-permissions-form [users]="users" formControlName="permissions_form"></app-permissions-form>
+                        <div class="mb-3">
+                            <app-permissions-form [users]="users" formControlName="permissions_form"></app-permissions-form>
+                        </div>
                     </ng-template>
                 </li>
             </ul>

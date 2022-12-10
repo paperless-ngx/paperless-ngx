@@ -5,24 +5,10 @@
   </div>
   <div class="modal-body">
 
-    <p class="mb-0" *ngIf="message" [innerHTML]="message | safeHtml"></p>
+    <p class="mb-3" *ngIf="message" [innerHTML]="message | safeHtml"></p>
 
     <form [formGroup]="form">
-      <div formGroupName="set_permissions">
-        <app-input-select [items]="users" i18n-title title="Owner" bindLabel="username" formControlName="owner" [allowNull]="true"></app-input-select>
-        <small class="form-text text-muted" i18n>Objects without an owner can be viewed and edited by all users</small>
-        <h6 i18n>View</h6>
-        <div formGroupName="view">
-          <app-permissions-user type="view" formControlName="users"></app-permissions-user>
-          <app-permissions-group type="view" formControlName="groups"></app-permissions-group>
-        </div>
-        <h6 i18n>Edit</h6>
-        <small class="form-text text-muted" i18n>Edit permissions also grant viewing permissions</small>
-        <div formGroupName="change">
-          <app-permissions-user type="change" formControlName="users"></app-permissions-user>
-          <app-permissions-group type="change" formControlName="groups"></app-permissions-group>
-        </div>
-      </div>
+      <app-permissions-form [users]="users" formControlName="permissions_form"></app-permissions-form>
     </form>
 
   </div>

@@ -2347,7 +2347,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
 
         bulk_edit.set_permissions(
             [self.doc2.id, self.doc3.id],
-            permissions=permissions,
+            set_permissions=permissions,
         )
 
         self.assertEqual(get_users_with_perms(self.doc2).count(), 2)

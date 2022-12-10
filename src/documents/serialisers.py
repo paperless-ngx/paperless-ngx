@@ -591,10 +591,18 @@ class BulkEditSerializer(DocumentListSerializer, SetPermissionsMixin):
         else:
             raise serializers.ValidationError("remove_tags not specified")
 
+    def _validate_owner(self, owner):
+        ownerUser = User.objects.get(pk=owner)
+        if ownerUser is None:
+            raise serializers.ValidationError("Specified owner cannot be found")
+        return ownerUser
+
     def _validate_parameters_set_permissions(self, parameters):
         if "permissions" in parameters:
             self.validate_set_permissions(parameters["permissions"])
-        else:
+        if "owner" in parameters:
+            self._validate_owner(parameters["owner"])
+        if "permissions" not in parameters and "owner" not in parameters:
             raise serializers.ValidationError("permissions not specified")
 
     def validate(self, attrs):

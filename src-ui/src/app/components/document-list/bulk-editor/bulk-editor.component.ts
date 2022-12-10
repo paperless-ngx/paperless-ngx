@@ -494,10 +494,10 @@ export class BulkEditorComponent extends ComponentWithPermissions {
       backdrop: 'static',
     })
     modal.componentInstance.confirmClicked.subscribe((permissions) => {
+      console.log(permissions)
+
       modal.componentInstance.buttonsEnabled = false
-      this.executeBulkOperation(modal, 'set_permissions', {
-        permissions,
-      })
+      this.executeBulkOperation(modal, 'set_permissions', permissions)
     })
   }
 }
