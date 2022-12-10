@@ -47,7 +47,6 @@ export abstract class EditDialogComponent<
       if (this.object['permissions']) {
         this.object['set_permissions'] = this.object['permissions']
       }
-      console.log(this.object)
 
       this.object['permissions_form'] = {
         owner: (this.object as ObjectWithPermissions).owner,
@@ -98,7 +97,7 @@ export abstract class EditDialogComponent<
   save() {
     const formValues = Object.assign({}, this.objectForm.value)
     const permissionsObject: PermissionsFormObject =
-      this.objectForm.get('permissions_form').value
+      this.objectForm.get('permissions_form')?.value
     if (permissionsObject) {
       formValues.owner = permissionsObject.owner
       formValues.set_permissions = permissionsObject.set_permissions
