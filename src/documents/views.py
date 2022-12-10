@@ -256,10 +256,12 @@ class DocumentViewSet(
             fields = fields_param.split(",")
         else:
             fields = None
+        truncate_content = self.request.query_params.get("truncate_content", "False")
         serializer_class = self.get_serializer_class()
         kwargs.setdefault("user", self.request.user)  # PassUserMixin
         kwargs.setdefault("context", self.get_serializer_context())
         kwargs.setdefault("fields", fields)
+        kwargs.setdefault("truncate_content", truncate_content.lower() in ["true", "1"])
         return serializer_class(*args, **kwargs)
 
     def update(self, request, *args, **kwargs):

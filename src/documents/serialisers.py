@@ -364,6 +364,12 @@ class DocumentSerializer(DynamicFieldsModelSerializer, OwnedObjectSerializer):
         else:
             return None
 
+    def to_representation(self, instance):
+        doc = super().to_representation(instance)
+        if self.truncate_content:
+            doc["content"] = doc.get("content")[0:550]
+        return doc
+
     def update(self, instance, validated_data):
         if "created_date" in validated_data and "created" not in validated_data:
             new_datetime = datetime.datetime.combine(
@@ -376,6 +382,11 @@ class DocumentSerializer(DynamicFieldsModelSerializer, OwnedObjectSerializer):
             validated_data.pop("created_date")
         super().update(instance, validated_data)
         return instance
+
+    def __init__(self, *args, **kwargs):
+        self.truncate_content = kwargs.pop("truncate_content", False)
+
+        super().__init__(*args, **kwargs)
 
     class Meta:
         model = Document
