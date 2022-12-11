@@ -1,4 +1,18 @@
-<h5 i18n>Permissions</h5>
+<ng-container *ngIf="!accordion">
+  <h5 i18n>Permissions</h5>
+  <ng-container [ngTemplateOutlet]="permissionsForm"></ng-container>
+</ng-container>
+<ng-container *ngIf="accordion">
+  <ngb-accordion #acc="ngbAccordion" activeIds="">
+    <ngb-panel i18n-title title="Edit Permissions">
+      <ng-template ngbPanelContent>
+        <ng-container [ngTemplateOutlet]="permissionsForm"></ng-container>
+      </ng-template>
+    </ngb-panel>
+  </ngb-accordion>
+</ng-container>
+
+<ng-template #permissionsForm>
 <div [formGroup]="form">
   <div class="row">
     <div class="col-lg-3">
@@ -51,3 +65,4 @@
     </div>
   </div>
 </div>
+</ng-template>

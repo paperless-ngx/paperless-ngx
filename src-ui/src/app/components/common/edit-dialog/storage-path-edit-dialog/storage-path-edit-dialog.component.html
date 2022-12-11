@@ -17,7 +17,7 @@
     <app-input-check *ngIf="patternRequired" i18n-title title="Case insensitive" formControlName="is_insensitive"></app-input-check>
 
     <div *ifOwner="object">
-      <app-permissions-form [users]="users" formControlName="permissions_form"></app-permissions-form>
+      <app-permissions-form [users]="users" accordion="true" formControlName="permissions_form"></app-permissions-form>
     </div>
 
   </div>
