@@ -86,7 +86,7 @@ scanner to automatically push files to this directory, you'll need to
 setup some sort of service to accept the files from the scanner.
 Typically, you're looking at an FTP server like
 [Proftpd](http://www.proftpd.org/) or a Windows folder share with
-[Samba](http://www.samba.org/).
+[Samba](https://www.samba.org/).
 
 ### Web UI Upload
 
@@ -398,7 +398,7 @@ Once you have scanned in a document, proceed in paperless as follows.
     paperless will assign them automatically. After consuming a couple
     documents, you can even ask paperless to *learn* when to assign tags and
     correspondents by itself. For details on this feature, see
-    [advanced matching](advanced_usage#matching).
+    [advanced matching](/advanced_usage#matching).
 
 ### Task management
 

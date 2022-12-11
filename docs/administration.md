@@ -266,7 +266,7 @@ instead, specify `--use-filename-format`.
 ### Document importer {#importer}
 
 The document importer takes the export produced by the [Document
-exporter](#document-exporter) and imports it into paperless.
+exporter](#exporter) and imports it into paperless.
 
 The importer works just like the exporter. You point it at a directory,
 and the script does the rest of the work:
