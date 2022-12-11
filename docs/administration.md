@@ -465,13 +465,13 @@ document.
     documents, such as encrypted PDF documents. The archiver will skip over
     these documents each time it sees them.
 
-### Managing encryption {#encyption}
+### Managing encryption {#encryption}
 
 Documents can be stored in Paperless using GnuPG encryption.
 
 !!! warning
 
-    Encryption is deprecated since paperless-ngx 0.9 and doesn't really
+    Encryption is deprecated since [paperless-ng 0.9](/changelog#paperless-ng-090) and doesn't really
     provide any additional security, since you have to store the passphrase
     in a configuration file on the same system as the encrypted documents
     for paperless to work. Furthermore, the entire text content of the
