@@ -36,6 +36,9 @@ export class PermissionsFormComponent
   @Input()
   users: PaperlessUser[]
 
+  @Input()
+  accordion: boolean = false
+
   form = new FormGroup({
     owner: new FormControl(null),
     set_permissions: new FormGroup({
