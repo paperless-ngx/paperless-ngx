@@ -234,9 +234,8 @@ steps described in [Docker setup](#docker_hub) automatically.
         certain, more updated software. If you want to build these images
         your self, that is possible, but beyond the scope of these steps.
 
-4.  Follow steps 3 to 8 of [Docker Setup](#docker_hub)
-    role="ref"}. When asked to run `docker-compose pull` to pull the
-    image, do
+4.  Follow steps 3 to 8 of [Docker Setup](#docker_hub). When asked to run
+    `docker-compose pull` to pull the image, do
 
     ```shell-session
     $ docker-compose build
