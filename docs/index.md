@@ -5,7 +5,7 @@
 **Paperless-ngx** is a _community-supported_ open-source document management system that transforms your
 physical documents into a searchable online archive so you can keep, well, _less paper_.
 
-[Get started](/setup/){ .md-button .md-button--primary .index-callout }
+[Get started](/setup){ .md-button .md-button--primary .index-callout }
 [Demo](https://demo.paperless-ngx.com){ .md-button .md-button--secondary target=\_blank }
 
 </div>
@@ -52,10 +52,10 @@ Paperless, check out these resources in the documentation:
 - [Some screenshots](#screenshots) of the new UI are available.
 - Read [this section](/advanced_usage/#advanced-automatic-matching) if you want to learn about how paperless automates all
   tagging using machine learning.
-- Paperless now comes with a [proper email consumer](/usage/#usage-email) that's fully tested and production ready.
+- Paperless now comes with a [proper email consumer](/usage#usage-email) that's fully tested and production ready.
 - Paperless creates searchable PDF/A documents from whatever you put into the consumption directory. This means
   that you can select text in image-only documents coming from your scanner.
-- See [this note](/administration/#utilities-encyption) about GnuPG encryption in paperless-ngx.
+- See [this note](/administration#utilities-encyption) about GnuPG encryption in paperless-ngx.
 - Paperless is now integrated with a
   [task processing queue](/setup#task_processor) that tells you at a glance when and why something is not working.
 - The [changelog](/changelog) contains a detailed list of all changes in paperless-ngx.

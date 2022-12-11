@@ -1165,7 +1165,7 @@ This release contains new database migrations.
   For status notifications and live updates to work, paperless now
   requires an [ASGI](https://asgi.readthedocs.io/en/latest/)-enabled
   web server. The docker images uses `gunicorn` and an ASGI-enabled
-  worker called [uvicorn](http://www.uvicorn.org/), and there is no
+  worker called [uvicorn](https://www.uvicorn.org/), and there is no
   need to configure anything.
 
   For bare metal installations, changes are required for the
@@ -1575,7 +1575,7 @@ primarily.
     role="ref"} can be used to create archived versions for already
     existing documents.
 - Tags from consumption folder.
-  - Thanks to [jayme-github](http://github.com/jayme-github),
+  - Thanks to [jayme-github](https://github.com/jayme-github),
     paperless now consumes files from sub folders in the consumption
     folder and is able to assign tags based on the sub folders a
     document was found in. This can be configured with
@@ -1860,7 +1860,7 @@ primarily.
 ### 2.5.0
 
 - **New dependency**: Paperless now optimises thumbnail generation
-  with [optipng](http://optipng.sourceforge.net/), so you'll need to
+  with [optipng](https://optipng.sourceforge.net/), so you'll need to
   install that somewhere in your PATH or declare its location in
   `PAPERLESS_OPTIPNG_BINARY`. The Docker image has already been
   updated on the Docker Hub, so you just need to pull the latest one

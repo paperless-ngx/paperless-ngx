@@ -32,7 +32,7 @@ If you find the OCR accuracy to be too low, and/or the document consumer
 warns that
 `OCR for XX failed, but we're going to stick with what we've got since FORGIVING_OCR is enabled`,
 then you might need to install the [Tesseract language
-files](http://packages.ubuntu.com/search?keywords=tesseract-ocr)
+files](https://packages.ubuntu.com/search?keywords=tesseract-ocr)
 marching your document's languages.
 
 As an example, if you are running Paperless-ngx from any Ubuntu or
@@ -145,7 +145,7 @@ The following error occured while consuming document.pdf: [Errno 13] Permission 
 This happens when paperless does not have permission to delete files
 inside the consumption directory. Ensure that `USERMAP_UID` and
 `USERMAP_GID` are set to the user id and group id you use on the host
-operating system, if these are different from `1000`. See [Docker setup](setup#docker_hub).
+operating system, if these are different from `1000`. See [Docker setup](/setup#docker_hub).
 
 Also ensure that you are able to read and write to the consumption
 directory on the host.
