@@ -1315,9 +1315,9 @@ paperless.
   .doc, .odt and more.
   - See the [Tika settings](/configuration#tika) on how to enable this
     feature. This feature requires two additional services (one for
-	parsing Office documents and metadata extraction and another for
-	converting Office documents to PDF), and is therefore not enabled
-	on default installations.
+    parsing Office documents and metadata extraction and another for
+    converting Office documents to PDF), and is therefore not enabled
+    on default installations.
   - As with all other documents, paperless converts Office documents
     to PDF and stores both the original as well as the archived PDF.
 - Dark mode
