@@ -45,7 +45,7 @@ database engine. Available options are `postgresql` and
 
     !!! warning
 
-        Using MariaDB comes with some caveats. See [MySQL Caveats](advanced_usage#mysql-caveats).
+        Using MariaDB comes with some caveats. See [MySQL Caveats](/advanced_usage#mysql-caveats).
 
 `PAPERLESS_DBHOST=<hostname>`
 
@@ -150,7 +150,7 @@ files created using "collectstatic" manager command are stored.
 `PAPERLESS_FILENAME_FORMAT=<format>`
 
 : Changes the filenames paperless uses to store documents in the media
-directory. See [File name handling](advanced_usage#file-name-handling) for details.
+directory. See [File name handling](/advanced_usage#file-name-handling) for details.
 
     Default is none, which disables this feature.
 
@@ -159,7 +159,7 @@ directory. See [File name handling](advanced_usage#file-name-handling) for detai
 : Tells paperless to replace placeholders in
 `PAPERLESS_FILENAME_FORMAT` that would resolve to
 'none' to be omitted from the resulting filename. This also holds
-true for directory names. See [File name handling](advanced_usage#file-name-handling) for
+true for directory names. See [File name handling](/advanced_usage#file-name-handling) for
 details.
 
     Defaults to `false` which disables this feature.
@@ -825,7 +825,7 @@ documents.
 
 : After a document is consumed, Paperless can trigger an arbitrary
 script if you like. This script will be passed a number of arguments
-for you to work with. For more information, take a look at [Post-consumption script](advanced_usage#post-consume-script).
+for you to work with. For more information, take a look at [Post-consumption script](/advanced_usage#post-consume-script).
 
     The default is blank, which means nothing will be executed.
 
@@ -1014,7 +1014,7 @@ configuration option:
 [Flower](https://flower.readthedocs.io/en/latest/index.html) will be
 started by the container.
 
-    You can read more about this in the [advanced documentation](advanced#celery-monitoring).
+    You can read more about this in the [advanced documentation](/advanced_usage#celery-monitoring).
 
 ## Update Checking {#update-checking}
 
