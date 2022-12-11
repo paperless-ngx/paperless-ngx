@@ -317,7 +317,7 @@ value.
     Paperless checks the filename of a document whenever it is saved.
     Therefore, you need to update the filenames of your documents and move
     them after altering this setting by invoking the
-    [`document renamer`](administration#renamer).
+    [`document renamer`](/administration#renamer).
 
 !!! warning
 
