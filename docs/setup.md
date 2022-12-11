@@ -328,8 +328,8 @@ supported.
 
     - `PAPERLESS_REDIS` should point to your redis server, such as
       <redis://localhost:6379>.
-    - `PAPERLESS_DBENGINE` optional, and should be one of [postgres,
-      mariadb, or sqlite]{.title-ref}
+    - `PAPERLESS_DBENGINE` optional, and should be one of `postgres`, 
+	  `mariadb`, or `sqlite`
     - `PAPERLESS_DBHOST` should be the hostname on which your
       PostgreSQL server is running. Do not configure this to use
       SQLite instead. Also configure port, database name, user and

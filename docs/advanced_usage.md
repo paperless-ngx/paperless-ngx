@@ -302,7 +302,7 @@ value.
 !!! tip
 
     You can affect how empty placeholders are treated by changing the
-    following setting to [true]{.title-ref}.
+    following setting to `true`.
 
     ```
     PAPERLESS_FILENAME_FORMAT_REMOVE_NONE=True
@@ -364,7 +364,7 @@ Insurances = Insurances/{correspondent}/{created_year}-{created_month}-{created_
 ```
 
 If you then map these storage paths to the documents, you might get the
-following result. For simplicity, [By Year]{.title-ref} defines the same
+following result. For simplicity, `By Year` defines the same
 structure as in the previous example above.
 
 ```text
@@ -435,7 +435,7 @@ by `root` and should have permissions of `a=rx`. Additionally, scripts
 must only be writable by `root`.
 
 Your scripts will be run directly before the webserver completes
-startup. Scripts will be run by the [root]{.title-ref} user.
+startup. Scripts will be run by the `root` user.
 If you would like to switch users, the utility `gosu` is available and
 preferred over `sudo`.
 
