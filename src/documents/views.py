@@ -637,6 +637,7 @@ class PostDocumentView(GenericAPIView):
         tag_ids = serializer.validated_data.get("tags")
         title = serializer.validated_data.get("title")
         created = serializer.validated_data.get("created")
+        owner_id = serializer.validated_data.get("owner")
 
         t = int(mktime(datetime.now().timetuple()))
 
@@ -662,6 +663,7 @@ class PostDocumentView(GenericAPIView):
             override_tag_ids=tag_ids,
             task_id=task_id,
             override_created=created,
+            override_owner_id=owner_id,
         )
 
         return Response("OK")

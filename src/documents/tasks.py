@@ -96,6 +96,7 @@ def consume_file(
     override_tag_ids=None,
     task_id=None,
     override_created=None,
+    override_owner_id=None,
 ):
 
     path = Path(path).resolve()
@@ -184,6 +185,7 @@ def consume_file(
         override_tag_ids=override_tag_ids,
         task_id=task_id,
         override_created=override_created,
+        override_owner_id=override_owner_id,
     )
 
     if document:

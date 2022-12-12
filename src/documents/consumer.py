@@ -11,6 +11,7 @@ import magic
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
@@ -99,6 +100,7 @@ class Consumer(LoggingMixin):
         self.override_tag_ids = None
         self.override_document_type_id = None
         self.task_id = None
+        self.owner_id = None
 
         self.channel_layer = get_channel_layer()
 
@@ -255,6 +257,7 @@ class Consumer(LoggingMixin):
         override_tag_ids=None,
         task_id=None,
         override_created=None,
+        override_owner_id=None,
     ) -> Document:
         """
         Return the document object if it was successfully created.
@@ -268,6 +271,7 @@ class Consumer(LoggingMixin):
         self.override_tag_ids = override_tag_ids
         self.task_id = task_id or str(uuid.uuid4())
         self.override_created = override_created
+        self.override_owner_id = override_owner_id
 
         self._send_progress(0, 100, "STARTING", MESSAGE_NEW_FILE)
 
@@ -525,6 +529,11 @@ class Consumer(LoggingMixin):
         if self.override_tag_ids:
             for tag_id in self.override_tag_ids:
                 document.tags.add(Tag.objects.get(pk=tag_id))
+
+        if self.override_owner_id:
+            document.owner = User.objects.get(
+                pk=self.override_owner_id,
+            )
 
     def _write(self, storage_type, source, target):
         with open(source, "rb") as read_file:
