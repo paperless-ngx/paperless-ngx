@@ -46,9 +46,14 @@ export class PermissionsSelectComponent
   @Input()
   set inheritedPermissions(inherited: string[]) {
     // remove <app_label>. from permission strings
-    this._inheritedPermissions = inherited?.length
+    const newInheritedPermissions = inherited?.length
       ? inherited.map((p) => p.replace(/^\w+\./g, ''))
       : []
+
+    if (this._inheritedPermissions !== newInheritedPermissions) {
+      this._inheritedPermissions = newInheritedPermissions
+      this.writeValue(this.permissions) // updates visual checks etc.
+    }
   }
 
   inheritedWarning: string = $localize`Inerhited from group`
