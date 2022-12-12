@@ -13,7 +13,7 @@
       <div class="col-3">{{type.key}}:</div>
 
       <div class="col form-check form-check-inline form-switch" [ngbPopover]="inheritedWarning" [disablePopover]="!isInherited(type.key)" placement="left" triggers="mouseenter:mouseleave">
-        <input type="checkbox" class="form-check-input" id="{{type.key}}_all" (change)="toggleAll($event, type.key)" [checked]="typesWithAllActions.has(type.key)" [attr.disabled]="disabled || isInherited(type.key) ? true : null">
+        <input type="checkbox" class="form-check-input" id="{{type.key}}_all" (change)="toggleAll($event, type.key)" [checked]="typesWithAllActions.has(type.key) || isInherited(type.key)" [attr.disabled]="disabled || isInherited(type.key) ? true : null">
         <label class="form-check-label visually-hidden" for="{{type.key}}_all" i18n>All</label>
       </div>
 
