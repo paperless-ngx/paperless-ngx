@@ -681,6 +681,14 @@ class PostDocumentSerializer(serializers.Serializer):
         required=False,
     )
 
+    owner = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+        label="Owner",
+        allow_null=True,
+        write_only=True,
+        required=False,
+    )
+
     def validate_document(self, document):
         document_data = document.file.read()
         mime_type = magic.from_buffer(document_data, mime=True)
@@ -707,6 +715,12 @@ class PostDocumentSerializer(serializers.Serializer):
     def validate_tags(self, tags):
         if tags:
             return [tag.id for tag in tags]
+        else:
+            return None
+
+    def validate_owner(self, owner):
+        if owner:
+            return owner.id
         else:
             return None
 
