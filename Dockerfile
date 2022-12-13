@@ -58,6 +58,12 @@ LABEL org.opencontainers.image.url="https://github.com/paperless-ngx/paperless-n
 LABEL org.opencontainers.image.licenses="GPL-3.0-only"
 
 ARG DEBIAN_FRONTEND=noninteractive
+# Buildx provided
+ARG TARGETARCH
+ARG TARGETVARIANT
+
+# Workflow provided
+ARG QPDF_VERSION
 
 #
 # Begin installation and configuration
@@ -194,8 +200,8 @@ RUN --mount=type=bind,from=qpdf-builder,target=/qpdf \
     --mount=type=bind,from=pikepdf-builder,target=/pikepdf \
   set -eux \
   && echo "Installing qpdf" \
-    && apt-get install --yes --no-install-recommends /qpdf/usr/src/qpdf/libqpdf29_*.deb \
-    && apt-get install --yes --no-install-recommends /qpdf/usr/src/qpdf/qpdf_*.deb \
+    && apt-get install --yes --no-install-recommends /qpdf/usr/src/qpdf/${QPDF_VERSION}/${TARGETARCH}${TARGETVARIANT}/libqpdf29_*.deb \
+    && apt-get install --yes --no-install-recommends /qpdf/usr/src/qpdf/${QPDF_VERSION}/${TARGETARCH}${TARGETVARIANT}/qpdf_*.deb \
   && echo "Installing pikepdf and dependencies" \
     && python3 -m pip install --no-cache-dir /pikepdf/usr/src/wheels/*.whl \
     && python3 -m pip list \
