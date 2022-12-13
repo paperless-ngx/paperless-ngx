@@ -3125,16 +3125,6 @@ class TestTasks(APITestCase):
             task_file_name="test.pdf",
             task_name="documents.tasks.some_task",
             status=celery.states.SUCCESS,
-            task_args=("/tmp/paperless/paperless-upload-5iq7skzc",),
-            task_kwargs={
-                "override_filename": "test.pdf",
-                "override_title": None,
-                "override_correspondent_id": None,
-                "override_document_type_id": None,
-                "override_tag_ids": None,
-                "task_id": "466e8fe7-7193-4698-9fff-72f0340e2082",
-                "override_created": None,
-            },
         )
 
         response = self.client.get(self.ENDPOINT)
@@ -3161,8 +3151,6 @@ class TestTasks(APITestCase):
             task_file_name="anothertest.pdf",
             task_name="documents.tasks.some_task",
             status=celery.states.SUCCESS,
-            task_args=("/consume/anothertest.pdf",),
-            task_kwargs={"override_tag_ids": None},
         )
 
         response = self.client.get(self.ENDPOINT)

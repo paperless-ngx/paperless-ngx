@@ -34,7 +34,7 @@ concurrency:
 jobs:
   prepare-docker-build:
     name: Prepare Docker Image Version Data
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       -
         name: Set ghcr repository name
