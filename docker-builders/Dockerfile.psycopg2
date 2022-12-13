@@ -42,6 +42,8 @@ RUN set -eux \
       # Don't cache build files
       --no-cache-dir \
     && ls -ahl wheels/ \
+  && echo "Gathering package data" \
+    && dpkg-query -f '${Package;-40}${Version}\n' -W > ./wheels/pkg-list.txt \
   && echo "Cleaning up image" \
     && apt-get -y purge ${BUILD_PACKAGES} \
     && apt-get -y autoremove --purge \
