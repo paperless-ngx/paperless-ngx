@@ -221,12 +221,12 @@ class DocumentTypeViewSet(ModelViewSet, PassUserMixin):
 
 
 class DocumentViewSet(
+    PassUserMixin,
     RetrieveModelMixin,
     UpdateModelMixin,
     DestroyModelMixin,
     ListModelMixin,
     GenericViewSet,
-    PassUserMixin,
 ):
     model = Document
     queryset = Document.objects.all()
@@ -256,6 +256,7 @@ class DocumentViewSet(
         return Document.objects.distinct()
 
     def get_serializer(self, *args, **kwargs):
+        super().get_serializer(*args, **kwargs)
         fields_param = self.request.query_params.get("fields", None)
         if fields_param:
             fields = fields_param.split(",")
@@ -263,7 +264,6 @@ class DocumentViewSet(
             fields = None
         truncate_content = self.request.query_params.get("truncate_content", "False")
         serializer_class = self.get_serializer_class()
-        kwargs.setdefault("user", self.request.user)  # PassUserMixin
         kwargs.setdefault("context", self.get_serializer_context())
         kwargs.setdefault("fields", fields)
         kwargs.setdefault("truncate_content", truncate_content.lower() in ["true", "1"])
@@ -491,7 +491,7 @@ class DocumentViewSet(
         )
 
 
-class SearchResultSerializer(DocumentSerializer):
+class SearchResultSerializer(DocumentSerializer, PassUserMixin):
     def to_representation(self, instance):
         doc = Document.objects.get(id=instance["id"])
         r = super().to_representation(doc)
@@ -526,6 +526,12 @@ class UnifiedSearchViewSet(DocumentViewSet):
     def filter_queryset(self, queryset):
         if self._is_search_request():
             from documents import index
+
+            if hasattr(self.request, "user"):
+                # pass user to query for perms
+                self.request.query_params._mutable = True
+                self.request.query_params["user"] = self.request.user.id
+                self.request.query_params._mutable = False
 
             if "query" in self.request.query_params:
                 query_class = index.DelayedFullTextQuery
