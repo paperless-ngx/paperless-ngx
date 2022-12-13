@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ("documents", "1027_remove_paperlesstask_attempted_task_and_more"),
+        ("documents", "1028_remove_paperlesstask_task_args_and_more"),
     ]
 
     operations = [
