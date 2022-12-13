@@ -341,7 +341,7 @@ class StoragePathField(serializers.PrimaryKeyRelatedField):
         return StoragePath.objects.all()
 
 
-class DocumentSerializer(DynamicFieldsModelSerializer, OwnedObjectSerializer):
+class DocumentSerializer(OwnedObjectSerializer, DynamicFieldsModelSerializer):
 
     correspondent = CorrespondentField(allow_null=True)
     tags = TagsField(many=True)
