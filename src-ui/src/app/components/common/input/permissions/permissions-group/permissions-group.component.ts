@@ -3,7 +3,7 @@ import { NG_VALUE_ACCESSOR } from '@angular/forms'
 import { first } from 'rxjs/operators'
 import { PaperlessGroup } from 'src/app/data/paperless-group'
 import { GroupService } from 'src/app/services/rest/group.service'
-import { AbstractInputComponent } from '../abstract-input'
+import { AbstractInputComponent } from '../../abstract-input'
 
 @Component({
   providers: [
