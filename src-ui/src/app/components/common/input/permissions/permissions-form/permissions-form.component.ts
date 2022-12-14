@@ -1,7 +1,7 @@
 import { Component, forwardRef, Input, OnInit } from '@angular/core'
 import { FormControl, FormGroup, NG_VALUE_ACCESSOR } from '@angular/forms'
 import { PaperlessUser } from 'src/app/data/paperless-user'
-import { AbstractInputComponent } from '../abstract-input'
+import { AbstractInputComponent } from '../../abstract-input'
 
 export interface PermissionsFormObject {
   owner?: number

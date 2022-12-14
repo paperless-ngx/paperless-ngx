@@ -8,7 +8,7 @@ import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
 import { PaperlessUser } from 'src/app/data/paperless-user'
 import { AbstractPaperlessService } from 'src/app/services/rest/abstract-paperless-service'
 import { UserService } from 'src/app/services/rest/user.service'
-import { PermissionsFormObject } from '../input/permissions-form/permissions-form.component'
+import { PermissionsFormObject } from '../input/permissions/permissions-form/permissions-form.component'
 
 @Directive()
 export abstract class EditDialogComponent<
