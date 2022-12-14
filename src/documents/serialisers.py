@@ -103,7 +103,7 @@ class SetPermissionsMixin:
                 )
         return groups
 
-    def validate_set_permissions(self, set_permissions):
+    def validate_set_permissions(self, set_permissions=None):
         permissions_dict = {
             "view": {
                 "users": User.objects.none(),
@@ -612,12 +612,11 @@ class BulkEditSerializer(DocumentListSerializer, SetPermissionsMixin):
         return ownerUser
 
     def _validate_parameters_set_permissions(self, parameters):
-        if "permissions" in parameters:
-            self.validate_set_permissions(parameters["permissions"])
-        if "owner" in parameters:
+        parameters["set_permissions"] = self.validate_set_permissions(
+            parameters["set_permissions"],
+        )
+        if "owner" in parameters and parameters["owner"] is not None:
             self._validate_owner(parameters["owner"])
-        if "permissions" not in parameters and "owner" not in parameters:
-            raise serializers.ValidationError("permissions not specified")
 
     def validate(self, attrs):
 

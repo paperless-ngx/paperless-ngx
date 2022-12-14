@@ -2331,30 +2331,40 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
             ],
         )
 
-    def test_set_permissions(self):
+    @mock.patch("documents.serialisers.bulk_edit.set_permissions")
+    def test_set_permissions(self, m):
+        m.return_value = "OK"
         user1 = User.objects.create(username="user1")
         user2 = User.objects.create(username="user2")
         permissions = {
             "view": {
-                "users": User.objects.filter(id__in=[user1.id, user2.id]),
-                "groups": Group.objects.none(),
+                "users": [user1.id, user2.id],
+                "groups": None,
             },
             "change": {
-                "users": User.objects.filter(id__in=[user1.id]),
-                "groups": Group.objects.none(),
+                "users": [user1.id],
+                "groups": None,
             },
         }
 
-        bulk_edit.set_permissions(
-            [self.doc2.id, self.doc3.id],
-            set_permissions=permissions,
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id, self.doc3.id],
+                    "method": "set_permissions",
+                    "parameters": {"set_permissions": permissions},
+                },
+            ),
+            content_type="application/json",
         )
 
-        self.assertEqual(get_users_with_perms(self.doc2).count(), 2)
+        self.assertEqual(response.status_code, 200)
 
-        self.async_task.assert_called_once()
-        args, kwargs = self.async_task.call_args
-        self.assertCountEqual(kwargs["document_ids"], [self.doc2.id, self.doc3.id])
+        m.assert_called_once()
+        args, kwargs = m.call_args
+        self.assertCountEqual(args[0], [self.doc2.id, self.doc3.id])
+        self.assertEqual(len(kwargs["set_permissions"]["view"]["users"]), 2)
 
 
 class TestBulkDownload(DirectoriesMixin, APITestCase):

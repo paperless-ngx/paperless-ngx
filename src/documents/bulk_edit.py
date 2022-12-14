@@ -136,12 +136,10 @@ def set_permissions(doc_ids, set_permissions, owner=None):
 
     qs = Document.objects.filter(id__in=doc_ids)
 
-    if owner is not None:
-        update_owner_for_object.delay(document_ids=doc_ids, owner=owner)
+    update_owner_for_object.delay(document_ids=doc_ids, owner=owner)
 
     for doc in qs:
-        if set_permissions is not None:
-            set_permissions_for_object(set_permissions, doc)
+        set_permissions_for_object(set_permissions, doc)
 
     affected_docs = [doc.id for doc in qs]
 
