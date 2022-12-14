@@ -465,6 +465,7 @@ class MailAccountHandler(LoggingMixin):
                     else None,
                     override_document_type_id=doc_type.id if doc_type else None,
                     override_tag_ids=tag_ids,
+                    override_owner_id=rule.owner.id if rule.owner else None,
                 )
 
                 processed_attachments += 1
@@ -529,6 +530,7 @@ class MailAccountHandler(LoggingMixin):
             override_correspondent_id=correspondent.id if correspondent else None,
             override_document_type_id=doc_type.id if doc_type else None,
             override_tag_ids=tag_ids,
+            override_owner_id=rule.owner.id if rule.owner else None,
         )
         processed_elements = 1
         return processed_elements
