@@ -294,7 +294,7 @@ def update_document_archive_file(document_id):
 @shared_task
 def update_owner_for_object(document_ids, owner):
     documents = Document.objects.filter(id__in=document_ids)
-    ownerUser = User.objects.get(pk=owner)
+    ownerUser = User.objects.get(pk=owner) if owner is not None else None
     for document in documents:
-        document.owner = ownerUser
+        document.owner = ownerUser if owner is not None else None
         document.save()
