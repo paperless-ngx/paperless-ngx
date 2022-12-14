@@ -4,7 +4,7 @@ import { first } from 'rxjs/operators'
 import { PaperlessUser } from 'src/app/data/paperless-user'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
-import { AbstractInputComponent } from '../abstract-input'
+import { AbstractInputComponent } from '../../abstract-input'
 
 @Component({
   providers: [

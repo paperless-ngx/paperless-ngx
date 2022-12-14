@@ -84,8 +84,8 @@ import { GroupEditDialogComponent } from './components/common/edit-dialog/group-
 import { PermissionsSelectComponent } from './components/common/permissions-select/permissions-select.component'
 import { MailAccountEditDialogComponent } from './components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component'
 import { MailRuleEditDialogComponent } from './components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component'
-import { PermissionsUserComponent } from './components/common/input/permissions-user/permissions-user.component'
-import { PermissionsGroupComponent } from './components/common/input/permissions-group/permissions-group.component'
+import { PermissionsUserComponent } from './components/common/input/permissions/permissions-user/permissions-user.component'
+import { PermissionsGroupComponent } from './components/common/input/permissions/permissions-group/permissions-group.component'
 import { IfOwnerDirective } from './directives/if-owner.directive'
 import { IfObjectPermissionsDirective } from './directives/if-object-permissions.directive'
 
@@ -109,7 +109,7 @@ import localeSv from '@angular/common/locales/sv'
 import localeTr from '@angular/common/locales/tr'
 import localeZh from '@angular/common/locales/zh'
 import { PermissionsDialogComponent } from './components/common/permissions-dialog/permissions-dialog.component'
-import { PermissionsFormComponent } from './components/common/input/permissions-form/permissions-form.component'
+import { PermissionsFormComponent } from './components/common/input/permissions/permissions-form/permissions-form.component'
 
 registerLocaleData(localeBe)
 registerLocaleData(localeCs)
