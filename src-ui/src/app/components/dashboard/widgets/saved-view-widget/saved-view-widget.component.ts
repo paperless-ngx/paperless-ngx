@@ -80,6 +80,7 @@ export class SavedViewWidgetComponent
 
   clickTag(tag: PaperlessTag, event: MouseEvent) {
     event.preventDefault()
+    event.stopImmediatePropagation()
 
     this.list.quickFilter([
       { rule_type: FILTER_HAS_TAGS_ALL, value: tag.id.toString() },

@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
 import { FormControl, FormGroup } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
-import { PaperlessGroup } from 'src/app/data/paperless-group'
 import { PaperlessUser } from 'src/app/data/paperless-user'
 import { UserService } from 'src/app/services/rest/user.service'
 
@@ -31,12 +30,10 @@ export class PermissionsDialogComponent implements OnInit {
   })
 
   get permissions() {
-    console.log(this.form.get('permissions_form'))
-
     return {
-      owner: this.form.get('permissions_form')?.value['owner'],
+      owner: this.form.get('permissions_form').value?.owner ?? null,
       set_permissions:
-        this.form.get('permissions_form')?.value['set_permissions'],
+        this.form.get('permissions_form').value?.set_permissions ?? null,
     }
   }
 
