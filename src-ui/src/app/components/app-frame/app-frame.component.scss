@@ -220,6 +220,12 @@ main {
   font-size: 1rem;
 }
 
+@media screen and (min-width: 768px) {
+  .navbar-brand.slim {
+    max-width: 50px;
+  }
+}
+
 .dropdown.show .dropdown-toggle,
 .dropdown-toggle:hover {
   opacity: 0.7;
