@@ -4,6 +4,7 @@ autolabeler:
       - '/^fix/'
     title:
       - "/^fix/i"
+      - "/^Bugfix/i"
   - label: "enhancement"
     branch:
       - '/^feature/'
@@ -13,6 +14,9 @@ categories:
   - title: 'Breaking Changes'
     labels:
       - 'breaking-change'
+  - title: 'Notable Changes'
+    labels:
+      - 'notable'
   - title: 'Features'
     labels:
       - 'enhancement'
@@ -20,7 +24,8 @@ categories:
     labels:
       - 'bug'
   - title: 'Documentation'
-    label: 'documentation'
+    labels:
+      - 'documentation'
   - title: 'Maintenance'
     labels:
       - 'chore'
@@ -29,7 +34,8 @@ categories:
       - 'ci-cd'
   - title: 'Dependencies'
     collapse-after: 3
-    label: 'dependencies'
+    labels:
+      - 'dependencies'
   - title: 'All App Changes'
     labels:
       - 'frontend'
@@ -46,6 +52,8 @@ include-labels:
   - 'frontend'
   - 'backend'
   - 'ci-cd'
+  - 'breaking-change'
+  - 'notable'
 category-template: '### $TITLE'
 change-template: '- $TITLE @$AUTHOR ([#$NUMBER]($URL))'
 change-title-escapes: '\<*_&#@'
