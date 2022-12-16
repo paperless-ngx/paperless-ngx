@@ -1,6 +1,5 @@
-import { HttpEventType } from '@angular/common/http'
-import { Component, OnInit } from '@angular/core'
-import { FileSystemFileEntry, NgxFileDropEntry } from 'ngx-file-drop'
+import { Component } from '@angular/core'
+import { NgxFileDropEntry } from 'ngx-file-drop'
 import {
   ConsumerStatusService,
   FileStatus,
@@ -15,7 +14,7 @@ const MAX_ALERTS = 5
   templateUrl: './upload-file-widget.component.html',
   styleUrls: ['./upload-file-widget.component.scss'],
 })
-export class UploadFileWidgetComponent implements OnInit {
+export class UploadFileWidgetComponent {
   alertsExpanded = false
 
   constructor(
@@ -108,8 +107,6 @@ export class UploadFileWidgetComponent implements OnInit {
   dismissCompleted() {
     this.consumerStatusService.dismissCompleted()
   }
-
-  ngOnInit(): void {}
 
   public fileOver(event) {}
 
