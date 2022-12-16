@@ -2,7 +2,6 @@ import {
   Component,
   EventEmitter,
   Input,
-  OnInit,
   Output,
   ViewChild,
 } from '@angular/core'
@@ -20,7 +19,7 @@ import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
     '../popover-preview/popover-preview.scss',
   ],
 })
-export class DocumentCardLargeComponent implements OnInit {
+export class DocumentCardLargeComponent {
   constructor(
     private documentService: DocumentService,
     private settingsService: SettingsService
@@ -70,8 +69,6 @@ export class DocumentCardLargeComponent implements OnInit {
       }
     }
   }
-
-  ngOnInit(): void {}
 
   getIsThumbInverted() {
     return this.settingsService.get(SETTINGS_KEYS.DARK_MODE_THUMB_INVERTED)
