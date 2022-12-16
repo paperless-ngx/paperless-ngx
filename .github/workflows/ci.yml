@@ -195,6 +195,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - run: cd src-ui && npm ci
+      - run: cd src-ui && npm run lint
       - run: cd src-ui && npm run test
       - run: cd src-ui && npm run e2e:ci
 
