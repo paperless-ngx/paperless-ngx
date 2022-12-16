@@ -24,7 +24,7 @@ import { CorrespondentEditDialogComponent } from './components/common/edit-dialo
 import { TagEditDialogComponent } from './components/common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
 import { DocumentTypeEditDialogComponent } from './components/common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
 import { TagComponent } from './components/common/tag/tag.component'
-import { ClearableBadge } from './components/common/clearable-badge/clearable-badge.component'
+import { ClearableBadgeComponent } from './components/common/clearable-badge/clearable-badge.component'
 import { PageHeaderComponent } from './components/common/page-header/page-header.component'
 import { AppFrameComponent } from './components/app-frame/app-frame.component'
 import { ToastsComponent } from './components/common/toasts/toasts.component'
@@ -146,7 +146,7 @@ function initializeApp(settings: SettingsService) {
     DocumentTypeEditDialogComponent,
     StoragePathEditDialogComponent,
     TagComponent,
-    ClearableBadge,
+    ClearableBadgeComponent,
     PageHeaderComponent,
     AppFrameComponent,
     ToastsComponent,
