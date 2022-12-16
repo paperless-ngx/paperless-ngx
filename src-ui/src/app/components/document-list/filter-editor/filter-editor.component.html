@@ -5,10 +5,10 @@
            <div ngbDropdown>
             <button class="btn btn-sm btn-outline-primary" ngbDropdownToggle>{{textFilterTargetName}}</button>
             <div class="dropdown-menu shadow" ngbDropdownMenu>
-              <button *ngFor="let t of textFilterTargets" ngbDropdownItem [class.active]="textFilterTarget == t.id" (click)="changeTextFilterTarget(t.id)">{{t.name}}</button>
+              <button *ngFor="let t of textFilterTargets" ngbDropdownItem [class.active]="textFilterTarget === t.id" (click)="changeTextFilterTarget(t.id)">{{t.name}}</button>
             </div>
           </div>
-          <select *ngIf="textFilterTarget == 'asn'" class="form-select flex-grow-0 w-auto" [(ngModel)]="textFilterModifier" (change)="textFilterModifierChange()">
+          <select *ngIf="textFilterTarget === 'asn'" class="form-select flex-grow-0 w-auto" [(ngModel)]="textFilterModifier" (change)="textFilterModifierChange()">
             <option *ngFor="let m of textFilterModifiers" ngbDropdownItem [value]="m.id">{{m.label}}</option>
           </select>
           <button *ngIf="_textFilter" class="btn btn-link btn-sm px-0 position-absolute top-0 end-0 z-10" (click)="resetTextField()">
@@ -16,7 +16,7 @@
               <path fill-rule="evenodd" d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
             </svg>
           </button>
-          <input #textFilterInput class="form-control form-control-sm" type="text" [disabled]="textFilterModifierIsNull" [(ngModel)]="textFilter" (keyup)="textFilterKeyup($event)" [readonly]="textFilterTarget == 'fulltext-morelike'">
+          <input #textFilterInput class="form-control form-control-sm" type="text" [disabled]="textFilterModifierIsNull" [(ngModel)]="textFilter" (keyup)="textFilterKeyup($event)" [readonly]="textFilterTarget === 'fulltext-morelike'">
          </div>
      </div>
   </div>
