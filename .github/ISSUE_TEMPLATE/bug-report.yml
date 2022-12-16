@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Have a question? 👉 [Start a new discussion](https://github.com/paperless-ngx/paperless-ngx/discussions/new) or [ask in chat](https://matrix.to/#/#paperless:adnidor.de).
+        Have a question? 👉 [Start a new discussion](https://github.com/paperless-ngx/paperless-ngx/discussions/new) or [ask in chat](https://matrix.to/#/#paperlessngx:matrix.org).
 
         Before opening an issue, please double check:
 
