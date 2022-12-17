@@ -796,7 +796,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">476</context>
+          <context context-type="linenumber">492</context>
         </context-group>
         <target state="translated">Prišlo je do napake ob shranjevanju nastavitev.</target>
       </trans-unit>
@@ -848,19 +848,19 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">234</context>
+          <context context-type="linenumber">279</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">272</context>
+          <context context-type="linenumber">319</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">308</context>
+          <context context-type="linenumber">357</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">344</context>
+          <context context-type="linenumber">395</context>
         </context-group>
         <target state="translated">Potrdi</target>
       </trans-unit>
@@ -1068,7 +1068,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">35</context>
+          <context context-type="linenumber">36</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.html</context>
@@ -1108,7 +1108,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">36</context>
+          <context context-type="linenumber">37</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.html</context>
@@ -1236,27 +1236,11 @@
         </context-group>
         <target state="needs-translation">Character Set</target>
       </trans-unit>
-      <trans-unit id="8758081884575368561" datatype="html">
-        <source>Create new mail account</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.ts</context>
-          <context context-type="linenumber">22</context>
-        </context-group>
-        <target state="needs-translation">Create new mail account</target>
-      </trans-unit>
-      <trans-unit id="5559445021532852612" datatype="html">
-        <source>Edit mail account</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.ts</context>
-          <context context-type="linenumber">26</context>
-        </context-group>
-        <target state="needs-translation">Edit mail account</target>
-      </trans-unit>
       <trans-unit id="451418349275958054" datatype="html">
         <source>No encryption</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.ts</context>
-          <context context-type="linenumber">43</context>
+          <context context-type="linenumber">12</context>
         </context-group>
         <target state="needs-translation">No encryption</target>
       </trans-unit>
@@ -1264,7 +1248,7 @@
         <source>SSL</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.ts</context>
-          <context context-type="linenumber">44</context>
+          <context context-type="linenumber">13</context>
         </context-group>
         <target state="needs-translation">SSL</target>
       </trans-unit>
@@ -1272,9 +1256,25 @@
         <source>STARTTLS</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.ts</context>
-          <context context-type="linenumber">45</context>
+          <context context-type="linenumber">14</context>
         </context-group>
         <target state="needs-translation">STARTTLS</target>
+      </trans-unit>
+      <trans-unit id="8758081884575368561" datatype="html">
+        <source>Create new mail account</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.ts</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+        <target state="needs-translation">Create new mail account</target>
+      </trans-unit>
+      <trans-unit id="5559445021532852612" datatype="html">
+        <source>Edit mail account</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.ts</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+        <target state="needs-translation">Edit mail account</target>
       </trans-unit>
       <trans-unit id="4086606389696938932" datatype="html">
         <source>Account</source>
@@ -1424,27 +1424,23 @@
         </context-group>
         <target state="needs-translation">Assign correspondent</target>
       </trans-unit>
-      <trans-unit id="3147349817770432927" datatype="html">
-        <source>Create new mail rule</source>
+      <trans-unit id="1519954996184640001" datatype="html">
+        <source>Error</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
-          <context context-type="linenumber">57</context>
+          <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
+          <context context-type="linenumber">35</context>
         </context-group>
-        <target state="needs-translation">Create new mail rule</target>
-      </trans-unit>
-      <trans-unit id="3374331029704382439" datatype="html">
-        <source>Edit mail rule</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
-          <context context-type="linenumber">61</context>
+          <context context-type="sourcefile">src/app/services/toast.service.ts</context>
+          <context context-type="linenumber">32</context>
         </context-group>
-        <target state="needs-translation">Edit mail rule</target>
+        <target state="translated">Napaka</target>
       </trans-unit>
       <trans-unit id="6233529027580744166" datatype="html">
         <source>Only process attachments.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
-          <context context-type="linenumber">98</context>
+          <context context-type="linenumber">24</context>
         </context-group>
         <target state="needs-translation">Only process attachments.</target>
       </trans-unit>
@@ -1452,7 +1448,7 @@
         <source>Process all files, including &apos;inline&apos; attachments.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
-          <context context-type="linenumber">102</context>
+          <context context-type="linenumber">28</context>
         </context-group>
         <target state="needs-translation">Process all files, including 'inline' attachments.</target>
       </trans-unit>
@@ -1460,7 +1456,7 @@
         <source>Delete</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
-          <context context-type="linenumber">111</context>
+          <context context-type="linenumber">35</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
@@ -1468,7 +1464,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-          <context context-type="linenumber">97</context>
+          <context context-type="linenumber">126</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
@@ -1524,7 +1520,7 @@
         <source>Move to specified folder</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
-          <context context-type="linenumber">115</context>
+          <context context-type="linenumber">39</context>
         </context-group>
         <target state="needs-translation">Move to specified folder</target>
       </trans-unit>
@@ -1532,7 +1528,7 @@
         <source>Mark as read, don&apos;t process read mails</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
-          <context context-type="linenumber">119</context>
+          <context context-type="linenumber">43</context>
         </context-group>
         <target state="needs-translation">Mark as read, don't process read mails</target>
       </trans-unit>
@@ -1540,7 +1536,7 @@
         <source>Flag the mail, don&apos;t process flagged mails</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
-          <context context-type="linenumber">123</context>
+          <context context-type="linenumber">47</context>
         </context-group>
         <target state="needs-translation">Flag the mail, don't process flagged mails</target>
       </trans-unit>
@@ -1548,7 +1544,7 @@
         <source>Tag the mail with specified tag, don&apos;t process tagged mails</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
-          <context context-type="linenumber">127</context>
+          <context context-type="linenumber">51</context>
         </context-group>
         <target state="needs-translation">Tag the mail with specified tag, don't process tagged mails</target>
       </trans-unit>
@@ -1556,7 +1552,7 @@
         <source>Use subject as title</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
-          <context context-type="linenumber">136</context>
+          <context context-type="linenumber">58</context>
         </context-group>
         <target state="needs-translation">Use subject as title</target>
       </trans-unit>
@@ -1564,7 +1560,7 @@
         <source>Use attachment filename as title</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
-          <context context-type="linenumber">140</context>
+          <context context-type="linenumber">62</context>
         </context-group>
         <target state="needs-translation">Use attachment filename as title</target>
       </trans-unit>
@@ -1572,7 +1568,7 @@
         <source>Do not assign a correspondent</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
-          <context context-type="linenumber">149</context>
+          <context context-type="linenumber">69</context>
         </context-group>
         <target state="needs-translation">Do not assign a correspondent</target>
       </trans-unit>
@@ -1580,7 +1576,7 @@
         <source>Use mail address</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
-          <context context-type="linenumber">153</context>
+          <context context-type="linenumber">73</context>
         </context-group>
         <target state="needs-translation">Use mail address</target>
       </trans-unit>
@@ -1588,7 +1584,7 @@
         <source>Use name (or mail address if not available)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
-          <context context-type="linenumber">157</context>
+          <context context-type="linenumber">77</context>
         </context-group>
         <target state="needs-translation">Use name (or mail address if not available)</target>
       </trans-unit>
@@ -1596,9 +1592,25 @@
         <source>Use correspondent selected below</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
-          <context context-type="linenumber">161</context>
+          <context context-type="linenumber">81</context>
         </context-group>
         <target state="needs-translation">Use correspondent selected below</target>
+      </trans-unit>
+      <trans-unit id="3147349817770432927" datatype="html">
+        <source>Create new mail rule</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
+          <context context-type="linenumber">121</context>
+        </context-group>
+        <target state="needs-translation">Create new mail rule</target>
+      </trans-unit>
+      <trans-unit id="3374331029704382439" datatype="html">
+        <source>Edit mail rule</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
+          <context context-type="linenumber">125</context>
+        </context-group>
+        <target state="needs-translation">Edit mail rule</target>
       </trans-unit>
       <trans-unit id="6036319582202941456" datatype="html">
         <source><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>Note that editing a path does not apply changes to stored files until you have run the &apos;document_renamer&apos; utility. See the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a target=&quot;_blank&quot; href=&quot;https://docs.paperless-ngx.com/administration/#renamer&quot;&gt;"/>documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></source>
@@ -1992,7 +2004,7 @@
         <source>Processing: <x id="PH" equiv-text="countUploadingAndProcessing"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.ts</context>
-          <context context-type="linenumber">37</context>
+          <context context-type="linenumber">36</context>
         </context-group>
         <target state="translated">Obravnavanje: <x id="PH" equiv-text="countUploadingAndProcessing"/></target>
       </trans-unit>
@@ -2000,7 +2012,7 @@
         <source>Failed: <x id="PH" equiv-text="countFailed"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.ts</context>
-          <context context-type="linenumber">40</context>
+          <context context-type="linenumber">39</context>
         </context-group>
         <target state="translated">Neuspešno: <x id="PH" equiv-text="countFailed"/></target>
       </trans-unit>
@@ -2008,7 +2020,7 @@
         <source>Added: <x id="PH" equiv-text="countSuccess"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.ts</context>
-          <context context-type="linenumber">43</context>
+          <context context-type="linenumber">42</context>
         </context-group>
         <target state="translated">Dodani: <x id="PH" equiv-text="countSuccess"/></target>
       </trans-unit>
@@ -2016,11 +2028,11 @@
         <source>, </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.ts</context>
-          <context context-type="linenumber">46</context>
+          <context context-type="linenumber">45</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">179</context>
+          <context context-type="linenumber">224</context>
         </context-group>
         <note priority="1" from="description">this string is used to separate processing, failed and added on the file upload widget</note>
         <target state="translated">, </target>
@@ -2140,6 +2152,10 @@
           <context context-type="linenumber">19</context>
         </context-group>
         <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
+          <context context-type="linenumber">90</context>
+        </context-group>
+        <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
           <context context-type="linenumber">58</context>
         </context-group>
@@ -2165,7 +2181,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-          <context context-type="linenumber">90</context>
+          <context context-type="linenumber">77</context>
         </context-group>
         <target state="translated">Ponovno naredi OCR</target>
       </trans-unit>
@@ -2501,7 +2517,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">387</context>
+          <context context-type="linenumber">454</context>
         </context-group>
         <target state="translated">Potrdi ponovno izdelavo OCR</target>
       </trans-unit>
@@ -2521,19 +2537,19 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">364</context>
+          <context context-type="linenumber">417</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">389</context>
+          <context context-type="linenumber">456</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">560</context>
+          <context context-type="linenumber">576</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">619</context>
+          <context context-type="linenumber">635</context>
         </context-group>
         <target state="translated">Te operacije ni mogoče razveljaviti.</target>
       </trans-unit>
@@ -2545,15 +2561,15 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">391</context>
+          <context context-type="linenumber">458</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">562</context>
+          <context context-type="linenumber">578</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">621</context>
+          <context context-type="linenumber">637</context>
         </context-group>
         <target state="translated">Nadaljuj</target>
       </trans-unit>
@@ -2641,7 +2657,7 @@
         <source>Actions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-          <context context-type="linenumber">75</context>
+          <context context-type="linenumber">74</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
@@ -2677,27 +2693,43 @@
         </context-group>
         <target state="translated">Dejanja</target>
       </trans-unit>
-      <trans-unit id="1559181160090274453" datatype="html">
-        <source> Download <x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div *ngIf=&quot;awaitingDownload&quot; class=&quot;spinner-border spinner-border-sm&quot; role=&quot;status&quot;&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;visually-hidden&quot;&gt;"/>Preparing download...<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/></source>
+      <trans-unit id="1015374532025907183" datatype="html">
+        <source>Include:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-          <context context-type="linenumber">78,82</context>
+          <context context-type="linenumber">96</context>
         </context-group>
-        <target state="translated"> Prenesi <x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div *ngIf=&quot;awaitingDownload&quot; class=&quot;spinner-border spinner-border-sm&quot; role=&quot;status&quot;&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;visually-hidden&quot;&gt;"/>Pripravljam prenos...<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/></target>
+        <target state="needs-translation">Include:</target>
       </trans-unit>
-      <trans-unit id="9202029122138685465" datatype="html">
-        <source> Download originals <x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div *ngIf=&quot;awaitingDownload&quot; class=&quot;spinner-border spinner-border-sm&quot; role=&quot;status&quot;&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;visually-hidden&quot;&gt;"/>Preparing download...<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/></source>
+      <trans-unit id="1208547554603365604" datatype="html">
+        <source> Archived files </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-          <context context-type="linenumber">84,88</context>
+          <context context-type="linenumber">100,102</context>
         </context-group>
-        <target state="translated"> Prenesi originale <x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div *ngIf=&quot;awaitingDownload&quot; class=&quot;spinner-border spinner-border-sm&quot; role=&quot;status&quot;&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;visually-hidden&quot;&gt;"/>Pripravljam prenos...<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/></target>
+        <target state="needs-translation"> Archived files </target>
+      </trans-unit>
+      <trans-unit id="6791570188945688785" datatype="html">
+        <source> Original files </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
+          <context context-type="linenumber">106,108</context>
+        </context-group>
+        <target state="needs-translation"> Original files </target>
+      </trans-unit>
+      <trans-unit id="3608345051493493574" datatype="html">
+        <source> Use formatted filename </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
+          <context context-type="linenumber">113,115</context>
+        </context-group>
+        <target state="needs-translation"> Use formatted filename </target>
       </trans-unit>
       <trans-unit id="7985804062689412812" datatype="html">
         <source>Error executing bulk operation: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">103,105</context>
+          <context context-type="linenumber">144,146</context>
         </context-group>
         <target state="translated">Napaka pri izvajanju operacije v velikem obsegu: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></target>
       </trans-unit>
@@ -2705,11 +2737,11 @@
         <source>&quot;<x id="PH" equiv-text="items[0].name"/>&quot;</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">171</context>
+          <context context-type="linenumber">216</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">177</context>
+          <context context-type="linenumber">222</context>
         </context-group>
         <target state="translated">"<x id="PH" equiv-text="items[0].name"/>"</target>
       </trans-unit>
@@ -2717,7 +2749,7 @@
         <source>&quot;<x id="PH" equiv-text="items[0].name"/>&quot; and &quot;<x id="PH_1" equiv-text="items[1].name"/>&quot;</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">173</context>
+          <context context-type="linenumber">218</context>
         </context-group>
         <note priority="1" from="description">This is for messages like 'modify "tag1" and "tag2"'</note>
         <target state="translated">"<x id="PH" equiv-text="items[0].name"/>" in "<x id="PH_1" equiv-text="items[1].name"/>"</target>
@@ -2726,7 +2758,7 @@
         <source><x id="PH" equiv-text="list"/> and &quot;<x id="PH_1" equiv-text="items[items.length - 1].name"/>&quot;</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">181,183</context>
+          <context context-type="linenumber">226,228</context>
         </context-group>
         <note priority="1" from="description">this is for messages like 'modify "tag1", "tag2" and "tag3"'</note>
         <target state="translated"><x id="PH" equiv-text="list"/> in "<x id="PH_1" equiv-text="items[items.length - 1].name"/>"</target>
@@ -2735,7 +2767,7 @@
         <source>Confirm tags assignment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">198</context>
+          <context context-type="linenumber">243</context>
         </context-group>
         <target state="translated">Potrdite dodelitev oznak</target>
       </trans-unit>
@@ -2743,7 +2775,7 @@
         <source>This operation will add the tag &quot;<x id="PH" equiv-text="tag.name"/>&quot; to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">204</context>
+          <context context-type="linenumber">249</context>
         </context-group>
         <target state="translated">Ta operacija bo dodala oznako "<x id="PH" equiv-text="tag.name"/>" izbranemu dokumentu <x id="PH_1" equiv-text="this.list.selected.size"/>.</target>
       </trans-unit>
@@ -2751,7 +2783,7 @@
         <source>This operation will add the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">209,211</context>
+          <context context-type="linenumber">254,256</context>
         </context-group>
         <target state="translated">Ta operacija bo dodala oznake <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> na izbrane <x id="PH_1" equiv-text="this.list.selected.size"/> dokumente.</target>
       </trans-unit>
@@ -2759,7 +2791,7 @@
         <source>This operation will remove the tag &quot;<x id="PH" equiv-text="tag.name"/>&quot; from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">217</context>
+          <context context-type="linenumber">262</context>
         </context-group>
         <target state="translated">Ta operacija bo odstranila oznako "<x id="PH" equiv-text="tag.name"/>" iz izbranega <x id="PH_1" equiv-text="this.list.selected.size"/> dokumenta(ov).</target>
       </trans-unit>
@@ -2767,7 +2799,7 @@
         <source>This operation will remove the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">222,224</context>
+          <context context-type="linenumber">267,269</context>
         </context-group>
         <target state="translated">Ta operacija bo odstranila oznake <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> iz <x id="PH_1" equiv-text="this.list.selected.size" /> izbranih dokumentov.</target>
       </trans-unit>
@@ -2775,7 +2807,7 @@
         <source>This operation will add the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> and remove the tags <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> on <x id="PH_2" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">226,230</context>
+          <context context-type="linenumber">271,275</context>
         </context-group>
         <target state="translated">Ta operacija bo dodala oznake <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> in odstranila oznake <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> na <x id="PH_2" equiv-text="this.list.selected.size"/> izbranih dokumentih.</target>
       </trans-unit>
@@ -2783,7 +2815,7 @@
         <source>Confirm correspondent assignment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">265</context>
+          <context context-type="linenumber">312</context>
         </context-group>
         <target state="translated">Potrdite dopisnika</target>
       </trans-unit>
@@ -2791,7 +2823,7 @@
         <source>This operation will assign the correspondent &quot;<x id="PH" equiv-text="correspondent.name"/>&quot; to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">267</context>
+          <context context-type="linenumber">314</context>
         </context-group>
         <target state="translated">Ta operacija bo dodelila ustrezniega dopisnika "<x id="PH" equiv-text="correspondent.name"/>" izbranemu <x id="PH_1" equiv-text="this.list.selected.size"/> dokumentu(om).</target>
       </trans-unit>
@@ -2799,7 +2831,7 @@
         <source>This operation will remove the correspondent from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">269</context>
+          <context context-type="linenumber">316</context>
         </context-group>
         <target state="translated">Ta operacija bo odstranila dopisnika iz <x id="PH" equiv-text="this.list.selected.size"/> izbranih dokumentov.</target>
       </trans-unit>
@@ -2807,7 +2839,7 @@
         <source>Confirm document type assignment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">301</context>
+          <context context-type="linenumber">350</context>
         </context-group>
         <target state="translated">Potrdite dodelitev vrste dokumenta</target>
       </trans-unit>
@@ -2815,7 +2847,7 @@
         <source>This operation will assign the document type &quot;<x id="PH" equiv-text="documentType.name"/>&quot; to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">303</context>
+          <context context-type="linenumber">352</context>
         </context-group>
         <target state="translated">Ta operacija bo dodelila vrsto dokumenta "<x id="PH" equiv-text="documentType.name"/>" <x id="PH_1" equiv-text="this.list.selected.size"/> izbranim dokumentom.</target>
       </trans-unit>
@@ -2823,7 +2855,7 @@
         <source>This operation will remove the document type from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">305</context>
+          <context context-type="linenumber">354</context>
         </context-group>
         <target state="translated">Ta operacija bo odstranila vrsto dokumenta iz <x id="PH" equiv-text="this.list.selected.size"/> izbranih dokumentov.</target>
       </trans-unit>
@@ -2831,7 +2863,7 @@
         <source>Confirm storage path assignment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">337</context>
+          <context context-type="linenumber">388</context>
         </context-group>
         <target state="translated">Potrdite dodelitev oznak poti</target>
       </trans-unit>
@@ -2839,7 +2871,7 @@
         <source>This operation will assign the storage path &quot;<x id="PH" equiv-text="storagePath.name"/>&quot; to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">339</context>
+          <context context-type="linenumber">390</context>
         </context-group>
         <target state="translated">Ta operacija bo dodelila pot shranjevanja "<x id="PH" equiv-text="storagePath.name"/>" v <x id="PH_1" equiv-text="this.list.selected.size"/> izbran dokument/e.</target>
       </trans-unit>
@@ -2847,7 +2879,7 @@
         <source>This operation will remove the storage path from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">341</context>
+          <context context-type="linenumber">392</context>
         </context-group>
         <target state="translated">Ta operacija bo odstranila pot shranjevanja iz <x id="PH" equiv-text="this.list.selected.size"/> izbranih dokumentov.</target>
       </trans-unit>
@@ -2855,7 +2887,7 @@
         <source>Delete confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">362</context>
+          <context context-type="linenumber">415</context>
         </context-group>
         <target state="translated">Potrdi izbris</target>
       </trans-unit>
@@ -2863,7 +2895,7 @@
         <source>This operation will permanently delete <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">363</context>
+          <context context-type="linenumber">416</context>
         </context-group>
         <target state="translated">Ta operacija bo trajno izbrisala <x id="PH" equiv-text="this.list.selected.size"/> izbrane dokumente.</target>
       </trans-unit>
@@ -2871,7 +2903,7 @@
         <source>Delete document(s)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">366</context>
+          <context context-type="linenumber">419</context>
         </context-group>
         <target state="translated">Izbriši dokument(e)</target>
       </trans-unit>
@@ -2879,7 +2911,7 @@
         <source>This operation will permanently redo OCR for <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">388</context>
+          <context context-type="linenumber">455</context>
         </context-group>
         <target state="translated">Ta operacija bo trajno obnovila OCR za <x id="PH" equiv-text="this.list.selected.size"/> izbrane dokumente.</target>
       </trans-unit>
@@ -4043,7 +4075,7 @@
         <source>Saved view &quot;<x id="PH" equiv-text="savedView.name"/>&quot; deleted.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">367</context>
+          <context context-type="linenumber">383</context>
         </context-group>
         <target state="translated">Shranjen pogled "<x id="PH" equiv-text="savedView.name"/>" je izbrisan.</target>
       </trans-unit>
@@ -4051,7 +4083,7 @@
         <source>Settings saved</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">460</context>
+          <context context-type="linenumber">476</context>
         </context-group>
         <target state="translated">Nastavitve shranjene</target>
       </trans-unit>
@@ -4059,7 +4091,7 @@
         <source>Settings were saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">461</context>
+          <context context-type="linenumber">477</context>
         </context-group>
         <target state="translated">Nastavitve uspešno shranjene.</target>
       </trans-unit>
@@ -4067,7 +4099,7 @@
         <source>Settings were saved successfully. Reload is required to apply some changes.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">465</context>
+          <context context-type="linenumber">481</context>
         </context-group>
         <target state="translated">Nastavitve so bile uspešno shranjene. Za uveljavitev nekaterih sprememb je potreben ponovni zagon.</target>
       </trans-unit>
@@ -4075,7 +4107,7 @@
         <source>Reload now</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">466</context>
+          <context context-type="linenumber">482</context>
         </context-group>
         <target state="translated">Ponovno zaženi</target>
       </trans-unit>
@@ -4083,7 +4115,7 @@
         <source>Use system language</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">484</context>
+          <context context-type="linenumber">500</context>
         </context-group>
         <target state="translated">Uporabi sistemski jezik</target>
       </trans-unit>
@@ -4091,7 +4123,7 @@
         <source>Use date format of display language</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">491</context>
+          <context context-type="linenumber">507</context>
         </context-group>
         <target state="translated">Uporabite obliko datuma prikaznega jezika</target>
       </trans-unit>
@@ -4099,7 +4131,7 @@
         <source>Error while storing settings on server: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">511,513</context>
+          <context context-type="linenumber">527,529</context>
         </context-group>
         <target state="translated">Napaka pri shranjevanju nastavitev na strežnik: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></target>
       </trans-unit>
@@ -4107,7 +4139,7 @@
         <source>Saved account &quot;<x id="PH" equiv-text="newMailAccount.name"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">538</context>
+          <context context-type="linenumber">554</context>
         </context-group>
         <target state="needs-translation">Saved account "<x id="PH" equiv-text="newMailAccount.name"/>".</target>
       </trans-unit>
@@ -4115,7 +4147,7 @@
         <source>Error saving account: <x id="PH" equiv-text="e.toString()"/>.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">548</context>
+          <context context-type="linenumber">564</context>
         </context-group>
         <target state="needs-translation">Error saving account: <x id="PH" equiv-text="e.toString()"/>.</target>
       </trans-unit>
@@ -4123,7 +4155,7 @@
         <source>Confirm delete mail account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">558</context>
+          <context context-type="linenumber">574</context>
         </context-group>
         <target state="needs-translation">Confirm delete mail account</target>
       </trans-unit>
@@ -4131,7 +4163,7 @@
         <source>This operation will permanently this mail account.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">559</context>
+          <context context-type="linenumber">575</context>
         </context-group>
         <target state="needs-translation">This operation will permanently this mail account.</target>
       </trans-unit>
@@ -4139,7 +4171,7 @@
         <source>Deleted mail account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">568</context>
+          <context context-type="linenumber">584</context>
         </context-group>
         <target state="needs-translation">Deleted mail account</target>
       </trans-unit>
@@ -4147,7 +4179,7 @@
         <source>Error deleting mail account: <x id="PH" equiv-text="e.toString()"/>.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">577</context>
+          <context context-type="linenumber">593</context>
         </context-group>
         <target state="needs-translation">Error deleting mail account: <x id="PH" equiv-text="e.toString()"/>.</target>
       </trans-unit>
@@ -4155,7 +4187,7 @@
         <source>Saved rule &quot;<x id="PH" equiv-text="newMailRule.name"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">596</context>
+          <context context-type="linenumber">612</context>
         </context-group>
         <target state="needs-translation">Saved rule "<x id="PH" equiv-text="newMailRule.name"/>".</target>
       </trans-unit>
@@ -4163,7 +4195,7 @@
         <source>Error saving rule: <x id="PH" equiv-text="e.toString()"/>.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">607</context>
+          <context context-type="linenumber">623</context>
         </context-group>
         <target state="needs-translation">Error saving rule: <x id="PH" equiv-text="e.toString()"/>.</target>
       </trans-unit>
@@ -4171,7 +4203,7 @@
         <source>Confirm delete mail rule</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">617</context>
+          <context context-type="linenumber">633</context>
         </context-group>
         <target state="needs-translation">Confirm delete mail rule</target>
       </trans-unit>
@@ -4179,7 +4211,7 @@
         <source>This operation will permanently this mail rule.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">618</context>
+          <context context-type="linenumber">634</context>
         </context-group>
         <target state="needs-translation">This operation will permanently this mail rule.</target>
       </trans-unit>
@@ -4187,7 +4219,7 @@
         <source>Deleted mail rule</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">627</context>
+          <context context-type="linenumber">643</context>
         </context-group>
         <target state="needs-translation">Deleted mail rule</target>
       </trans-unit>
@@ -4195,7 +4227,7 @@
         <source>Error deleting mail rule: <x id="PH" equiv-text="e.toString()"/>.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">636</context>
+          <context context-type="linenumber">652</context>
         </context-group>
         <target state="needs-translation">Error deleting mail rule: <x id="PH" equiv-text="e.toString()"/>.</target>
       </trans-unit>
@@ -4485,7 +4517,7 @@
         <source>Unsaved Changes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/guards/dirty-form.guard.ts</context>
-          <context context-type="linenumber">18</context>
+          <context context-type="linenumber">17</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
@@ -4493,11 +4525,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
-          <context context-type="linenumber">116</context>
+          <context context-type="linenumber">103</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
-          <context context-type="linenumber">143</context>
+          <context context-type="linenumber">130</context>
         </context-group>
         <target state="translated">Neshranjene spremembe</target>
       </trans-unit>
@@ -4505,11 +4537,11 @@
         <source>You have unsaved changes.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/guards/dirty-form.guard.ts</context>
-          <context context-type="linenumber">19</context>
+          <context context-type="linenumber">18</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
-          <context context-type="linenumber">144</context>
+          <context context-type="linenumber">131</context>
         </context-group>
         <target state="translated">Imate neshranjene spremembe.</target>
       </trans-unit>
@@ -4517,7 +4549,7 @@
         <source>Are you sure you want to leave?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/guards/dirty-form.guard.ts</context>
-          <context context-type="linenumber">20</context>
+          <context context-type="linenumber">19</context>
         </context-group>
         <target state="translated">Ste prepričani, da želite oditi?</target>
       </trans-unit>
@@ -4525,7 +4557,7 @@
         <source>Leave page</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/guards/dirty-form.guard.ts</context>
-          <context context-type="linenumber">22</context>
+          <context context-type="linenumber">21</context>
         </context-group>
         <target state="translated">Zapusti stran</target>
       </trans-unit>
@@ -4689,7 +4721,7 @@
         <source>You have unsaved changes to the document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
-          <context context-type="linenumber">118</context>
+          <context context-type="linenumber">105</context>
         </context-group>
         <target state="translated">Imate neshranjene spremembe dokumenta</target>
       </trans-unit>
@@ -4697,7 +4729,7 @@
         <source>Are you sure you want to close this document?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
-          <context context-type="linenumber">122</context>
+          <context context-type="linenumber">109</context>
         </context-group>
         <target state="translated">Ali ste prepričani, da želite zapreti ta dokument?</target>
       </trans-unit>
@@ -4705,7 +4737,7 @@
         <source>Close document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
-          <context context-type="linenumber">124</context>
+          <context context-type="linenumber">111</context>
         </context-group>
         <target state="translated">Zapri dokument</target>
       </trans-unit>
@@ -4713,7 +4745,7 @@
         <source>Are you sure you want to close all documents?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
-          <context context-type="linenumber">145</context>
+          <context context-type="linenumber">132</context>
         </context-group>
         <target state="translated">Ali ste prepričani, da želite zapreti vse dokumente?</target>
       </trans-unit>
@@ -4721,7 +4753,7 @@
         <source>Close documents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
-          <context context-type="linenumber">147</context>
+          <context context-type="linenumber">134</context>
         </context-group>
         <target state="translated">Zapri dokumente</target>
       </trans-unit>
@@ -4933,14 +4965,6 @@
           <context context-type="linenumber">394</context>
         </context-group>
         <target state="translated">Nastavitev ni mogoče preseliti v bazo podatkov, poskusite jih shraniti ročno.</target>
-      </trans-unit>
-      <trans-unit id="1519954996184640001" datatype="html">
-        <source>Error</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/services/toast.service.ts</context>
-          <context context-type="linenumber">32</context>
-        </context-group>
-        <target state="translated">Napaka</target>
       </trans-unit>
       <trans-unit id="5037437391296624618" datatype="html">
         <source>Information</source>
