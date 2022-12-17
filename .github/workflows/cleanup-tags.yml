@@ -1,7 +1,9 @@
 # This workflow runs on certain conditions to check for and potentially
 # delete container images from the GHCR which no longer have an associated
 # code branch.
-# Requires a PAT with the correct scope set in the secrets
+# Requires a PAT with the correct scope set in the secrets.
+#
+# This workflow will not trigger runs on forked repos.
 
 name: Cleanup Image Tags
 
@@ -21,6 +23,7 @@ concurrency:
 jobs:
   cleanup-images:
     name: Cleanup Image Tags for ${{ matrix.primary-name }}
+    if: github.repository_owner == 'paperless-ngx'
     runs-on: ubuntu-22.04
     strategy:
       matrix:
