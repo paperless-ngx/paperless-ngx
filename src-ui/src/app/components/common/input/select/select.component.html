@@ -1,4 +1,4 @@
-<div class="mb-3 paperless-input-select">
+<div class="mb-3 paperless-input-select" [class.disabled]="disabled">
   <label *ngIf="title" class="form-label" [for]="inputId">{{title}}</label>
     <div [class.input-group]="allowCreateNew">
       <ng-select name="inputId" [(ngModel)]="value"
