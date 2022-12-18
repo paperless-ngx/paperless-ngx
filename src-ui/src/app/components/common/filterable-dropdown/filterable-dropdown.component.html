@@ -4,7 +4,7 @@
       <use attr.xlink:href="assets/bootstrap-icons.svg#{{icon}}" />
     </svg>
     <div class="d-none d-sm-inline">&nbsp;{{title}}</div>
-    <ng-container *ngIf="!editing && selectionModel.selectionSize() > 0">
+    <ng-container *ngIf="!editing && selectionModel.totalCount > 0">
       <app-clearable-badge [number]="multiple ? selectionModel.totalCount : undefined" [selected]="!multiple && selectionModel.selectionSize() > 0" (cleared)="reset()"></app-clearable-badge>
     </ng-container>
   </button>
