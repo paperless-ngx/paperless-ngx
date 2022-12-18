@@ -195,7 +195,7 @@ configured on the 'Scheduled tasks' page in the admin.
 
 ### REST API
 
-You can also submit a document using the REST API, see [POSTing documents][/api#file-uploads]
+You can also submit a document using the REST API, see [POSTing documents](/api#file-uploads)
 for details.
 
 ## Best practices {#basic-searching}
