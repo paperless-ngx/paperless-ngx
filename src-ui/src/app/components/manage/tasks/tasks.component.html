@@ -5,7 +5,7 @@
         <use xlink:href="assets/bootstrap-icons.svg#x"/>
       </svg>&nbsp;<ng-container i18n>Clear selection</ng-container>
     </button>
-    <button class="btn btn-sm btn-outline-primary me-4" (click)="dismissTasks()" *ifPermissions="{ action: PermissionAction.Change, type: PermissionType.PaperlessTask }" [disabled]="tasksService.total === 0">
+    <button class="btn btn-sm btn-outline-primary me-4" (click)="dismissTasks()" *appIfPermissions="{ action: PermissionAction.Change, type: PermissionType.PaperlessTask }" [disabled]="tasksService.total === 0">
       <svg class="sidebaricon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#check2-all"/>
       </svg>&nbsp;<ng-container i18n>{{dismissButtonText}}</ng-container>
@@ -75,12 +75,12 @@
         </td>
         <td scope="row">
           <div class="btn-group" role="group">
-            <button class="btn btn-sm btn-outline-secondary" (click)="dismissTask(task); $event.stopPropagation();" *ifPermissions="{ action: PermissionAction.Change, type: PermissionType.PaperlessTask }">
+            <button class="btn btn-sm btn-outline-secondary" (click)="dismissTask(task); $event.stopPropagation();" *appIfPermissions="{ action: PermissionAction.Change, type: PermissionType.PaperlessTask }">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#check"/>
               </svg>&nbsp;<ng-container i18n>Dismiss</ng-container>
             </button>
-            <ng-container *ifPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
+            <ng-container *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
               <button *ngIf="task.related_document" class="btn btn-sm btn-outline-primary" (click)="dismissAndGo(task); $event.stopPropagation();">
                 <svg class="sidebaricon" fill="currentColor">
                   <use xlink:href="assets/bootstrap-icons.svg#file-text"/>
