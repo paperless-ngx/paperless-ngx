@@ -4,6 +4,7 @@ from guardian.admin import GuardedModelAdmin
 from .models import Correspondent
 from .models import Document
 from .models import DocumentType
+from .models import PaperlessTask
 from .models import SavedView
 from .models import SavedViewFilterRule
 from .models import StoragePath
@@ -113,9 +114,27 @@ class StoragePathAdmin(GuardedModelAdmin):
     list_editable = ("path", "match", "matching_algorithm")
 
 
+class TaskAdmin(admin.ModelAdmin):
+
+    list_display = ("task_id", "task_file_name", "task_name", "date_done", "status")
+    list_filter = ("status", "date_done", "task_file_name", "task_name")
+    search_fields = ("task_name", "task_id", "status")
+    readonly_fields = (
+        "task_id",
+        "task_file_name",
+        "task_name",
+        "status",
+        "date_created",
+        "date_started",
+        "date_done",
+        "result",
+    )
+
+
 admin.site.register(Correspondent, CorrespondentAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(DocumentType, DocumentTypeAdmin)
 admin.site.register(Document, DocumentAdmin)
 admin.site.register(SavedView, SavedViewAdmin)
 admin.site.register(StoragePath, StoragePathAdmin)
+admin.site.register(PaperlessTask, TaskAdmin)

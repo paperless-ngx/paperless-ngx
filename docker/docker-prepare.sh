@@ -20,7 +20,6 @@ wait_for_postgres() {
 			exit 1
 		else
 			echo "Attempt $attempt_num failed! Trying again in 5 seconds..."
-
 		fi
 
 		attempt_num=$(("$attempt_num" + 1))
@@ -67,8 +66,14 @@ migrations() {
 		# of the current container starts.
 		flock 200
 		echo "Apply database migrations..."
-		python3 manage.py migrate
+		python3 manage.py migrate --skip-checks --no-input
 	) 200>"${DATA_DIR}/migration_lock"
+}
+
+django_checks() {
+	# Explicitly run the Django system checks
+	echo "Running Django checks"
+	python3 manage.py check
 }
 
 search_index() {
@@ -99,6 +104,8 @@ do_work() {
 	wait_for_redis
 
 	migrations
+
+	django_checks
 
 	search_index
 
