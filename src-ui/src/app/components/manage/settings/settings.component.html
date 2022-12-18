@@ -24,7 +24,7 @@
           <div class="col">
 
             <select class="form-select" formControlName="displayLanguage">
-              <option *ngFor="let lang of displayLanguageOptions" [ngValue]="lang.code">{{lang.name}}<span *ngIf="lang.code && currentLocale != 'en-US'"> - {{lang.englishName}}</span></option>
+              <option *ngFor="let lang of displayLanguageOptions" [ngValue]="lang.code">{{lang.name}}<span *ngIf="lang.code && currentLocale !== 'en-US'"> - {{lang.englishName}}</span></option>
             </select>
 
             <small *ngIf="displayLanguageIsDirty" class="form-text text-primary" i18n>You need to reload the page after applying a new language.</small>
@@ -215,7 +215,7 @@
               </div>
             </div>
 
-            <div *ngIf="savedViews && savedViews.length == 0" i18n>No saved views defined.</div>
+            <div *ngIf="savedViews && savedViews.length === 0" i18n>No saved views defined.</div>
 
             <div *ngIf="!savedViews">
               <div class="spinner-border spinner-border-sm fw-normal ms-2 me-auto" role="status"></div>
@@ -265,7 +265,7 @@
                   </div>
                 </li>
 
-                <div *ngIf="mailAccounts.length == 0" i18n>No mail accounts defined.</div>
+                <div *ngIf="mailAccounts.length === 0" i18n>No mail accounts defined.</div>
             </ul>
           </ng-container>
 
@@ -302,7 +302,7 @@
                   </div>
                 </li>
 
-                <div *ngIf="mailRules.length == 0" i18n>No mail rules defined.</div>
+                <div *ngIf="mailRules.length === 0" i18n>No mail rules defined.</div>
             </ul>
           </ng-container>
         </ng-container>
@@ -404,5 +404,5 @@
 
   <div [ngbNavOutlet]="nav" class="border-start border-end border-bottom p-3 mb-3 shadow-sm"></div>
 
-  <button type="submit" class="btn btn-primary mb-2" *ifPermissions="{ action: PermissionAction.Change, type: PermissionType.UISettings }" [disabled]="!(isDirty$ | async)" i18n>Save</button>
+  <button type="submit" class="btn btn-primary mb-2" *ifPermissions="{ action: PermissionAction.Change, type: PermissionType.UISettings }" [disabled]="(isDirty$ | async) === false" i18n>Save</button>
 </form>
