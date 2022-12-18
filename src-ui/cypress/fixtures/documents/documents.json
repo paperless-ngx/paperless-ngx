@@ -14,6 +14,7 @@
                 4
             ],
             "created": "2022-03-22T07:24:18Z",
+            "created_date": "2022-03-22",
             "modified": "2022-03-22T07:24:23.264859Z",
             "added": "2022-03-22T07:24:22.922631Z",
             "archive_serial_number": null,
@@ -31,6 +32,7 @@
             "content": "Test document PDF",
             "tags": [],
             "created": "2022-03-23T07:24:18Z",
+            "created_date": "2022-03-23",
             "modified": "2022-03-23T07:24:23.264859Z",
             "added": "2022-03-23T07:24:22.922631Z",
             "archive_serial_number": 12345,
@@ -50,6 +52,7 @@
                 2
             ],
             "created": "2022-03-24T07:24:18Z",
+            "created_date": "2022-03-24",
             "modified": "2022-03-24T07:24:23.264859Z",
             "added": "2022-03-24T07:24:22.922631Z",
             "archive_serial_number": null,
@@ -69,6 +72,7 @@
                 4, 5
             ],
             "created": "2022-06-01T07:24:18Z",
+            "created_date": "2022-06-01",
             "modified": "2022-06-01T07:24:23.264859Z",
             "added": "2022-06-01T07:24:22.922631Z",
             "archive_serial_number": 12347,

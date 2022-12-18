@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
+import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { FormControl, FormGroup } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { PaperlessUser } from 'src/app/data/paperless-user'
@@ -9,7 +9,7 @@ import { UserService } from 'src/app/services/rest/user.service'
   templateUrl: './permissions-dialog.component.html',
   styleUrls: ['./permissions-dialog.component.scss'],
 })
-export class PermissionsDialogComponent implements OnInit {
+export class PermissionsDialogComponent {
   users: PaperlessUser[]
 
   constructor(
@@ -39,8 +39,6 @@ export class PermissionsDialogComponent implements OnInit {
 
   @Input()
   message = $localize`Note that permissions set here will override any existing permissions`
-
-  ngOnInit(): void {}
 
   cancelClicked() {
     this.activeModal.close()

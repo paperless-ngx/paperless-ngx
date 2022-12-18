@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, OnDestroy, OnInit } from '@angular/core'
 import { PaperlessTag } from 'src/app/data/paperless-tag'
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent'
 import { PaperlessDocumentType } from 'src/app/data/paperless-document-type'
@@ -36,7 +36,10 @@ import { first, Subject, takeUntil } from 'rxjs'
   templateUrl: './bulk-editor.component.html',
   styleUrls: ['./bulk-editor.component.scss'],
 })
-export class BulkEditorComponent extends ComponentWithPermissions {
+export class BulkEditorComponent
+  extends ComponentWithPermissions
+  implements OnInit, OnDestroy
+{
   tags: PaperlessTag[]
   correspondents: PaperlessCorrespondent[]
   documentTypes: PaperlessDocumentType[]

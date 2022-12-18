@@ -9,7 +9,7 @@
     </a>
   </div>
   <div content tourAnchor="tour.upload-widget">
-    <form *ifPermissions="{ action: PermissionAction.Add, type: PermissionType.Document }">
+    <form *appIfPermissions="{ action: PermissionAction.Add, type: PermissionType.Document }">
       <ngx-file-drop dropZoneLabel="Drop documents here or" browseBtnLabel="Browse files" (onFileDrop)="dropped($event)"
         (onFileOver)="fileOver($event)" (onFileLeave)="fileLeave($event)" dropZoneClassName="bg-light card"
         multiple="true" contentClassName="justify-content-center d-flex align-items-center py-5 px-2" [showBrowseBtn]=true
@@ -40,7 +40,7 @@
     <h6 class="alert-heading">{{status.filename}}</h6>
     <p class="mb-0 pb-1" *ngIf="!isFinished(status) || (isFinished(status) && !status.documentId)">{{status.message}}</p>
     <ngb-progressbar [value]="status.getProgress()" [max]="1" [type]="getStatusColor(status)"></ngb-progressbar>
-    <div *ifPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
+    <div *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
       <div *ngIf="isFinished(status)">
         <button *ngIf="status.documentId" class="btn btn-sm btn-outline-primary btn-open" routerLink="/documents/{{status.documentId}}" (click)="dismiss(status)">
           <small i18n>Open document</small>

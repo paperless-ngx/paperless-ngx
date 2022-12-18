@@ -28,7 +28,7 @@
 
     <app-welcome-widget *ngIf="settingsService.offerTour()" tourAnchor="tour.dashboard"></app-welcome-widget>
 
-    <div *ifPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }">
+    <div *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }">
       <ng-container *ngFor="let v of savedViewService.dashboardViews; first as isFirst">
         <app-saved-view-widget *ngIf="isFirst; else noTour" [savedView]="v" tourAnchor="tour.dashboard"></app-saved-view-widget>
         <ng-template #noTour>

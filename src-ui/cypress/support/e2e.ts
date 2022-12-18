@@ -5,11 +5,11 @@ beforeEach(() => {
     fixture: 'ui_settings/settings.json',
   })
 
-  cy.intercept('http://localhost:8000/api/users/', {
+  cy.intercept('http://localhost:8000/api/users/*', {
     fixture: 'users/users.json',
   })
 
-  cy.intercept('http://localhost:8000/api/groups/', {
+  cy.intercept('http://localhost:8000/api/groups/*', {
     fixture: 'groups/groups.json',
   })
 
