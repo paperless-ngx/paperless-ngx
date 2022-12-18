@@ -12,11 +12,11 @@ import {
 } from '../services/permissions.service'
 
 @Directive({
-  selector: '[ifPermissions]',
+  selector: '[appIfPermissions]',
 })
 export class IfPermissionsDirective implements OnInit {
   @Input()
-  ifPermissions:
+  appIfPermissions:
     | Array<{ action: PermissionAction; type: PermissionType }>
     | { action: PermissionAction; type: PermissionType }
 
@@ -34,7 +34,7 @@ export class IfPermissionsDirective implements OnInit {
   public ngOnInit(): void {
     if (
       []
-        .concat(this.ifPermissions)
+        .concat(this.appIfPermissions)
         .every((perm: { action: PermissionAction; type: PermissionType }) =>
           this.permissionsService.currentUserCan(perm.action, perm.type)
         )

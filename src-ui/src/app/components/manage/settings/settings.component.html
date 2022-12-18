@@ -1,6 +1,6 @@
 <app-page-header title="Settings" i18n-title>
   <button class="btn btn-sm btn-outline-primary" (click)="tourService.start()"><ng-container i18n>Start tour</ng-container></button>
-  <a *ifPermissions="{ action: PermissionAction.View, type: PermissionType.Admin }" class="btn btn-sm btn-primary ms-3" href="admin/" target="_blank">
+  <a *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.Admin }" class="btn btn-sm btn-primary ms-3" href="admin/" target="_blank">
       <ng-container i18n>Open Django Admin</ng-container>
       <svg class="sidebaricon ms-1" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#arrow-up-right"/>
@@ -211,7 +211,7 @@
 
               <div class="mb-2 col-auto">
                 <label class="form-label" for="name_{{view.id}}" i18n>Actions</label>
-                <button type="button" class="btn btn-sm btn-outline-danger form-control" (click)="deleteSavedView(view)" *ifPermissions="{ action: PermissionAction.Delete, type: PermissionType.SavedView }" i18n>Delete</button>
+                <button type="button" class="btn btn-sm btn-outline-danger form-control" (click)="deleteSavedView(view)" *appIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.SavedView }" i18n>Delete</button>
               </div>
             </div>
 
@@ -227,12 +227,12 @@
       </ng-template>
     </li>
 
-    <li *ifPermissions="{ action: PermissionAction.View, type: PermissionType.MailRule }" [ngbNavItem]="SettingsNavIDs.Mail" (mouseover)="maybeInitializeTab(SettingsNavIDs.Mail)" (focusin)="maybeInitializeTab(SettingsNavIDs.Mail)">
+    <li *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.MailRule }" [ngbNavItem]="SettingsNavIDs.Mail" (mouseover)="maybeInitializeTab(SettingsNavIDs.Mail)" (focusin)="maybeInitializeTab(SettingsNavIDs.Mail)">
       <a ngbNavLink i18n>Mail</a>
       <ng-template ngbNavContent>
 
         <ng-container *ngIf="mailAccounts && mailRules">
-          <ng-container *ifPermissions="{ action: PermissionAction.View, type: PermissionType.MailAccount }">
+          <ng-container *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.MailAccount }">
             <h4>
               <ng-container i18n>Mail accounts</ng-container>
               <button type="button" class="btn btn-sm btn-primary ms-4" (click)="editMailAccount()">
@@ -258,8 +258,8 @@
                     <div class="col d-flex align-items-center">{{account.imap_server}}</div>
                     <div class="col">
                       <div class="btn-group">
-                        <button *ifPermissions="{ action: PermissionAction.Change, type: PermissionType.MailAccount }" class="btn btn-sm btn-primary" type="button" (click)="editMailAccount(account)" i18n>Edit</button>
-                        <button *ifPermissions="{ action: PermissionAction.Change, type: PermissionType.MailAccount }" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteMailAccount(account)" i18n>Delete</button>
+                        <button *appIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailAccount }" class="btn btn-sm btn-primary" type="button" (click)="editMailAccount(account)" i18n>Edit</button>
+                        <button *appIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailAccount }" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteMailAccount(account)" i18n>Delete</button>
                       </div>
                     </div>
                   </div>
@@ -269,7 +269,7 @@
             </ul>
           </ng-container>
 
-          <ng-container *ifPermissions="{ action: PermissionAction.View, type: PermissionType.MailRule }">
+          <ng-container *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.MailRule }">
             <h4 class="mt-4">
               <ng-container i18n>Mail rules</ng-container>
               <button type="button" class="btn btn-sm btn-primary ms-4" (click)="editMailRule()">
@@ -295,8 +295,8 @@
                     <div class="col d-flex align-items-center">{{(mailAccountService.getCached(rule.account) | async)?.name}}</div>
                     <div class="col">
                       <div class="btn-group">
-                        <button *ifPermissions="{ action: PermissionAction.Change, type: PermissionType.MailRule }" class="btn btn-sm btn-primary" type="button" (click)="editMailRule(rule)" i18n>Edit</button>
-                        <button *ifPermissions="{ action: PermissionAction.Change, type: PermissionType.MailRule }" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteMailRule(rule)" i18n>Delete</button>
+                        <button *appIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailRule }" class="btn btn-sm btn-primary" type="button" (click)="editMailRule(rule)" i18n>Edit</button>
+                        <button *appIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailRule }" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteMailRule(rule)" i18n>Delete</button>
                       </div>
                     </div>
                   </div>
@@ -315,7 +315,7 @@
       </ng-template>
     </li>
 
-    <li [ngbNavItem]="SettingsNavIDs.UsersGroups" *ifPermissions="{ action: PermissionAction.Add, type: PermissionType.User }" (mouseover)="maybeInitializeTab(SettingsNavIDs.UsersGroups)" (focusin)="maybeInitializeTab(SettingsNavIDs.UsersGroups)">
+    <li [ngbNavItem]="SettingsNavIDs.UsersGroups" *appIfPermissions="{ action: PermissionAction.Add, type: PermissionType.User }" (mouseover)="maybeInitializeTab(SettingsNavIDs.UsersGroups)" (focusin)="maybeInitializeTab(SettingsNavIDs.UsersGroups)">
       <a ngbNavLink i18n>Users & Groups</a>
       <ng-template ngbNavContent>
 
@@ -390,7 +390,7 @@
           </li>
         </ul>
 
-        <div *ngIf="groups.length == 0">No groups defined</div>
+        <div *ngIf="groups.length === 0">No groups defined</div>
       </ng-container>
 
       <div *ngIf="!users || !groups">
@@ -404,5 +404,5 @@
 
   <div [ngbNavOutlet]="nav" class="border-start border-end border-bottom p-3 mb-3 shadow-sm"></div>
 
-  <button type="submit" class="btn btn-primary mb-2" *ifPermissions="{ action: PermissionAction.Change, type: PermissionType.UISettings }" [disabled]="(isDirty$ | async) === false" i18n>Save</button>
+  <button type="submit" class="btn btn-primary mb-2" *appIfPermissions="{ action: PermissionAction.Change, type: PermissionType.UISettings }" [disabled]="(isDirty$ | async) === false" i18n>Save</button>
 </form>

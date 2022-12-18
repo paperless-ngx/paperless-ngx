@@ -1,5 +1,5 @@
 <div *ngIf="comments">
-    <form [formGroup]="commentForm" class="needs-validation mt-3" *ifPermissions="{ action: PermissionAction.Add, type: PermissionType.Comment }" novalidate>
+    <form [formGroup]="commentForm" class="needs-validation mt-3" *appIfPermissions="{ action: PermissionAction.Add, type: PermissionType.Comment }" novalidate>
         <div class="form-group">
             <textarea class="form-control form-control-sm" [class.is-invalid]="newCommentError" rows="3" formControlName="newComment" placeholder="Enter comment" i18n-placeholder required></textarea>
             <div class="invalid-feedback" i18n>
@@ -18,7 +18,7 @@
         </div>
         <div class="d-flex card-footer small bg-light text-primary justify-content-between align-items-center">
             <span>{{displayName(comment)}} - {{ comment.created | customDate}}</span>
-            <button type="button" class="btn btn-link btn-sm p-0 fade" (click)="deleteComment(comment.id)" *ifPermissions="{ action: PermissionAction.Delete, type: PermissionType.Comment }">
+            <button type="button" class="btn btn-link btn-sm p-0 fade" (click)="deleteComment(comment.id)" *appIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Comment }">
                 <svg width="13" height="13" fill="currentColor">
                     <use xlink:href="assets/bootstrap-icons.svg#trash" />
                 </svg>
