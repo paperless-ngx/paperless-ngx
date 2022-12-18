@@ -16,7 +16,13 @@ FROM python:3.9-slim-bullseye as main
 
 LABEL org.opencontainers.image.description="A intermediate image with pikepdf wheel built"
 
+# Buildx provided
+ARG TARGETARCH
+ARG TARGETVARIANT
+
 ARG DEBIAN_FRONTEND=noninteractive
+# Workflow provided
+ARG QPDF_VERSION
 ARG PIKEPDF_VERSION
 # These are not used, but will still bust the cache if one changes
 # Otherwise, the main image will try to build thing (and fail)
@@ -54,7 +60,7 @@ ARG BUILD_PACKAGES="\
 
 WORKDIR /usr/src
 
-COPY --from=qpdf-builder /usr/src/qpdf/*.deb ./
+COPY --from=qpdf-builder /usr/src/qpdf/${QPDF_VERSION}/${TARGETARCH}${TARGETVARIANT}/*.deb ./
 
 # As this is an base image for a multi-stage final image
 # the added size of the install is basically irrelevant
@@ -77,6 +83,8 @@ RUN set -eux \
     && python3 -m pip wheel \
       # Build the package at the required version
       pikepdf==${PIKEPDF_VERSION} \
+      # Look to piwheels for additional pre-built wheels
+      --extra-index-url https://www.piwheels.org/simple \
       # Output the *.whl into this directory
       --wheel-dir wheels \
       # Do not use a binary packge for the package being built
@@ -86,6 +94,8 @@ RUN set -eux \
       # Don't cache build files
       --no-cache-dir \
     && ls -ahl wheels \
+  && echo "Gathering package data" \
+    && dpkg-query -f '${Package;-40}${Version}\n' -W > ./wheels/pkg-list.txt \
   && echo "Cleaning up image" \
     && apt-get -y purge ${BUILD_PACKAGES} \
     && apt-get -y autoremove --purge \

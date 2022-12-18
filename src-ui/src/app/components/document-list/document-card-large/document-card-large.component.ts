@@ -2,7 +2,6 @@ import {
   Component,
   EventEmitter,
   Input,
-  OnInit,
   Output,
   ViewChild,
 } from '@angular/core'
@@ -21,10 +20,7 @@ import { ComponentWithPermissions } from '../../with-permissions/with-permission
     '../popover-preview/popover-preview.scss',
   ],
 })
-export class DocumentCardLargeComponent
-  extends ComponentWithPermissions
-  implements OnInit
-{
+export class DocumentCardLargeComponent extends ComponentWithPermissions {
   constructor(
     private documentService: DocumentService,
     private settingsService: SettingsService
@@ -76,8 +72,6 @@ export class DocumentCardLargeComponent
       }
     }
   }
-
-  ngOnInit(): void {}
 
   getIsThumbInverted() {
     return this.settingsService.get(SETTINGS_KEYS.DARK_MODE_THUMB_INVERTED)

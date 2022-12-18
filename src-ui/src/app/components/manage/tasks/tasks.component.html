@@ -1,11 +1,11 @@
 <app-page-header title="File Tasks" i18n-title>
   <div class="btn-toolbar col col-md-auto">
-    <button class="btn btn-sm btn-outline-secondary me-2" (click)="clearSelection()" [hidden]="selectedTasks.size == 0">
+    <button class="btn btn-sm btn-outline-secondary me-2" (click)="clearSelection()" [hidden]="selectedTasks.size === 0">
       <svg class="sidebaricon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#x"/>
       </svg>&nbsp;<ng-container i18n>Clear selection</ng-container>
     </button>
-    <button class="btn btn-sm btn-outline-primary me-4" (click)="dismissTasks()" *ifPermissions="{ action: PermissionAction.Change, type: PermissionType.PaperlessTask }" [disabled]="tasksService.total == 0">
+    <button class="btn btn-sm btn-outline-primary me-4" (click)="dismissTasks()" *ifPermissions="{ action: PermissionAction.Change, type: PermissionType.PaperlessTask }" [disabled]="tasksService.total === 0">
       <svg class="sidebaricon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#check2-all"/>
       </svg>&nbsp;<ng-container i18n>{{dismissButtonText}}</ng-container>
@@ -33,13 +33,13 @@
       <tr>
         <th scope="col">
           <div class="form-check">
-            <input type="checkbox" class="form-check-input" id="all-tasks" [disabled]="currentTasks.length == 0" (click)="toggleAll($event); $event.stopPropagation();">
+            <input type="checkbox" class="form-check-input" id="all-tasks" [disabled]="currentTasks.length === 0" (click)="toggleAll($event); $event.stopPropagation();">
             <label class="form-check-label" for="all-tasks"></label>
           </div>
         </th>
         <th scope="col" i18n>Name</th>
         <th scope="col" class="d-none d-lg-table-cell" i18n>Created</th>
-        <th scope="col" class="d-none d-lg-table-cell" *ngIf="activeTab != 'started' && activeTab != 'queued'" i18n>Results</th>
+        <th scope="col" class="d-none d-lg-table-cell" *ngIf="activeTab !== 'started' && activeTab !== 'queued'" i18n>Results</th>
         <th scope="col" class="d-table-cell d-lg-none" i18n>Info</th>
         <th scope="col" i18n>Actions</th>
       </tr>
@@ -55,7 +55,7 @@
         </th>
         <td class="overflow-auto">{{ task.task_file_name }}</td>
         <td class="d-none d-lg-table-cell">{{ task.date_created | customDate:'short' }}</td>
-        <td class="d-none d-lg-table-cell" *ngIf="activeTab != 'started' && activeTab != 'queued'">
+        <td class="d-none d-lg-table-cell" *ngIf="activeTab !== 'started' && activeTab !== 'queued'">
           <div *ngIf="task.result?.length > 50" class="result" (click)="expandTask(task); $event.stopPropagation();"
             [ngbPopover]="resultPopover" popoverClass="shadow small mobile" triggers="mouseenter:mouseleave" container="body">
             <span class="small d-none d-md-inline-block font-monospace text-muted">{{ task.result | slice:0:50 }}&hellip;</span>
@@ -91,7 +91,7 @@
         </td>
       </tr>
       <tr>
-        <td class="p-0" [class.border-0]="expandedTask != task.id" colspan="5">
+        <td class="p-0" [class.border-0]="expandedTask !== task.id" colspan="5">
           <pre #collapse="ngbCollapse" [ngbCollapse]="expandedTask !== task.id" class="small mb-0"><div class="small p-1 p-lg-3 ms-lg-3">{{ task.result }}</div></pre>
         </td>
       </tr>

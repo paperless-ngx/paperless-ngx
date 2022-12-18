@@ -30,7 +30,7 @@ export abstract class EditDialogComponent<
   object: T
 
   @Output()
-  success = new EventEmitter()
+  succeeded = new EventEmitter()
 
   networkActive = false
 
@@ -119,7 +119,7 @@ export abstract class EditDialogComponent<
     serverResponse.subscribe({
       next: (result) => {
         this.activeModal.close()
-        this.success.emit(result)
+        this.succeeded.emit(result)
       },
       error: (error) => {
         this.error = error.error
