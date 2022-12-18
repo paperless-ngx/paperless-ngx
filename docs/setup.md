@@ -387,17 +387,17 @@ supported.
 9.  Go to `/opt/paperless/src`, and execute the following commands:
 
     ```bash
-    \# This creates the database schema.
+    # This creates the database schema.
     sudo -Hu paperless python3 manage.py migrate
 
-    \# This creates your first paperless user
+    # This creates your first paperless user
     sudo -Hu paperless python3 manage.py createsuperuser
     ```
 
 10. Optional: Test that paperless is working by executing
 
     ```bash
-    \# This collects static files from paperless and django.
+    # This collects static files from paperless and django.
     sudo -Hu paperless python3 manage.py runserver
     ```
 
