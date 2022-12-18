@@ -10,3 +10,17 @@
 .tag-wrap-delete {
   cursor: pointer;
 }
+
+.paperless-input-select.disabled {
+  .input-group {
+      cursor: not-allowed;
+  }
+
+  ::ng-deep ng-select {
+      pointer-events: none;
+
+      .ng-select-container {
+          background-color: var(--pngx-bg-alt) !important;
+      }
+  }
+}
