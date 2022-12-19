@@ -625,6 +625,6 @@ class TestParserFileTypes(DirectoriesMixin, TestCase):
         self.assertTrue(os.path.isfile(parser.archive_path))
         # OCR consistent mangles this space, oh well
         self.assertIn(
-            "this is awebp document, created 11/14/2022.",
+            "this is a webp document, created 11/14/2022.",
             parser.get_text().lower(),
         )
