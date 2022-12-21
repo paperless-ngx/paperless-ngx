@@ -10,12 +10,10 @@ run paperless, these settings have to be defined in different places.
 - If you are running paperless on anything else, paperless will search
   for the configuration file in these locations and use the first one
   it finds:
-
-  ```
-  /path/to/paperless/paperless.conf
-  /etc/paperless.conf
-  /usr/local/etc/paperless.conf
-  ```
+  - The environment variable `PAPERLESS_CONFIGURATION_PATH`
+  - `/path/to/paperless/paperless.conf`
+  - `/etc/paperless.conf`
+  - `/usr/local/etc/paperless.conf`
 
 ## Required services
 
@@ -678,7 +676,7 @@ paperless will process in parallel on a single document.
     count, with a slight favor towards threads per worker:
 
     | CPU core count | Workers | Threads |
-    |----------------|---------|---------|
+    | -------------- | ------- | ------- |
     | > 1            | > 1     | > 1     |
     | > 2            | > 2     | > 1     |
     | > 4            | > 2     | > 2     |
