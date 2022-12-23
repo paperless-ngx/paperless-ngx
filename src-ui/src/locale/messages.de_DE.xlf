@@ -2715,7 +2715,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">106,108</context>
         </context-group>
-        <target state="needs-translation"> Original files </target>
+        <target state="translated"> Originaldateien </target>
       </trans-unit>
       <trans-unit id="3608345051493493574" datatype="html">
         <source> Use formatted filename </source>
