@@ -143,6 +143,9 @@ class DelayedQuery:
             elif k == "tags__id__all":
                 for tag_id in v.split(","):
                     criterias.append(query.Term("tag_id", tag_id))
+            elif k == "tags__id__none":
+                for tag_id in v.split(","):
+                    criterias.append(query.Not(query.Term("tag_id", tag_id)))
             elif k == "document_type__id":
                 criterias.append(query.Term("type_id", v))
             elif k == "correspondent__isnull":
