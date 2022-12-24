@@ -4159,13 +4159,13 @@
         </context-group>
         <target state="translated">Conferma eliminazione dell'account email</target>
       </trans-unit>
-      <trans-unit id="2105352414355663637" datatype="html">
-        <source>This operation will permanently this mail account.</source>
+      <trans-unit id="7176985344323395435" datatype="html">
+        <source>This operation will permanently delete this mail account.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">575</context>
         </context-group>
-        <target state="translated">Questa operazione eliminerà definitivamente questo account email.</target>
+        <target state="needs-translation">This operation will permanently delete this mail account.</target>
       </trans-unit>
       <trans-unit id="4233826387148482123" datatype="html">
         <source>Deleted mail account</source>
@@ -4207,13 +4207,13 @@
         </context-group>
         <target state="translated">Conferma eliminazione della regola email</target>
       </trans-unit>
-      <trans-unit id="6183247517597275616" datatype="html">
-        <source>This operation will permanently this mail rule.</source>
+      <trans-unit id="2250372580580310337" datatype="html">
+        <source>This operation will permanently delete this mail rule.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">634</context>
         </context-group>
-        <target state="translated">Questa operazione eliminerà definitivamente questa regola email.</target>
+        <target state="needs-translation">This operation will permanently delete this mail rule.</target>
       </trans-unit>
       <trans-unit id="9077981247971516916" datatype="html">
         <source>Deleted mail rule</source>
