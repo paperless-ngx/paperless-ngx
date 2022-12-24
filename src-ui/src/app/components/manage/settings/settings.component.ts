@@ -572,7 +572,7 @@ export class SettingsComponent
       backdrop: 'static',
     })
     modal.componentInstance.title = $localize`Confirm delete mail account`
-    modal.componentInstance.messageBold = $localize`This operation will permanently this mail account.`
+    modal.componentInstance.messageBold = $localize`This operation will permanently delete this mail account.`
     modal.componentInstance.message = $localize`This operation cannot be undone.`
     modal.componentInstance.btnClass = 'btn-danger'
     modal.componentInstance.btnCaption = $localize`Proceed`
@@ -631,7 +631,7 @@ export class SettingsComponent
       backdrop: 'static',
     })
     modal.componentInstance.title = $localize`Confirm delete mail rule`
-    modal.componentInstance.messageBold = $localize`This operation will permanently this mail rule.`
+    modal.componentInstance.messageBold = $localize`This operation will permanently delete this mail rule.`
     modal.componentInstance.message = $localize`This operation cannot be undone.`
     modal.componentInstance.btnClass = 'btn-danger'
     modal.componentInstance.btnCaption = $localize`Proceed`
