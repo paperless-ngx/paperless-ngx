@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-09 21:50+0000\n"
-"PO-Revision-Date: 2022-12-25 11:34\n"
+"PO-Revision-Date: 2022-12-25 12:32\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -432,63 +432,63 @@ msgstr "Représentation JSON des arguments positionnés utilisés pour la tâche
 
 #: documents/models.py:569
 msgid "Task Named Arguments"
-msgstr ""
+msgstr "Arguments nommés de la tâche"
 
 #: documents/models.py:571
 msgid "JSON representation of the named arguments used with the task"
-msgstr ""
+msgstr "Représentation JSON des arguments nommés utilisés pour la tâche"
 
 #: documents/models.py:578
 msgid "Task State"
-msgstr ""
+msgstr "État de la tâche"
 
 #: documents/models.py:579
 msgid "Current state of the task being run"
-msgstr ""
+msgstr "Etat actuel de la tâche en cours d'exécution"
 
 #: documents/models.py:584
 msgid "Created DateTime"
-msgstr ""
+msgstr "Date de création"
 
 #: documents/models.py:585
 msgid "Datetime field when the task result was created in UTC"
-msgstr ""
+msgstr "Champ de date lorsque le résultat de la tâche a été créé (UTC)"
 
 #: documents/models.py:590
 msgid "Started DateTime"
-msgstr ""
+msgstr "Date de début"
 
 #: documents/models.py:591
 msgid "Datetime field when the task was started in UTC"
-msgstr ""
+msgstr "Champ de date lorsque la tâche a été créé (UTC)"
 
 #: documents/models.py:596
 msgid "Completed DateTime"
-msgstr ""
+msgstr "Date de fin"
 
 #: documents/models.py:597
 msgid "Datetime field when the task was completed in UTC"
-msgstr ""
+msgstr "Champ de date lorsque la tâche a été terminée (UTC)"
 
 #: documents/models.py:602
 msgid "Result Data"
-msgstr ""
+msgstr "Données de résultat"
 
 #: documents/models.py:604
 msgid "The data returned by the task"
-msgstr ""
+msgstr "Les données retournées par la tâche"
 
 #: documents/models.py:613
 msgid "Comment for the document"
-msgstr ""
+msgstr "Commentaire pour ce document"
 
 #: documents/models.py:642
 msgid "comment"
-msgstr ""
+msgstr "commentaire"
 
 #: documents/models.py:643
 msgid "comments"
-msgstr ""
+msgstr "commentaires"
 
 #: documents/serialisers.py:72
 #, python-format
