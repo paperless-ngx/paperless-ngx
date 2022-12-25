@@ -2,37 +2,6 @@
 
 set -e
 
-# Adapted from:
-# https://github.com/docker-library/postgres/blob/master/docker-entrypoint.sh
-# usage: file_env VAR
-#    ie: file_env 'XYZ_DB_PASSWORD' will allow for "$XYZ_DB_PASSWORD_FILE" to
-# fill in the value of "$XYZ_DB_PASSWORD" from a file, especially for Docker's
-# secrets feature
-file_env() {
-	local -r var="$1"
-	local -r fileVar="${var}_FILE"
-
-	# Basic validation
-	if [ "${!var:-}" ] && [ "${!fileVar:-}" ]; then
-		echo >&2 "error: both $var and $fileVar are set (but are exclusive)"
-		exit 1
-	fi
-
-	# Only export var if the _FILE exists
-	if [ "${!fileVar:-}" ]; then
-		# And the file exists
-		if [[ -f ${!fileVar} ]]; then
-			echo "Setting ${var} from file"
-			val="$(< "${!fileVar}")"
-			export "$var"="$val"
-		else
-			echo "File ${!fileVar} doesn't exist"
-			exit 1
-		fi
-	fi
-
-}
-
 # Source: https://github.com/sameersbn/docker-gitlab/
 map_uidgid() {
 	local -r usermap_original_uid=$(id -u paperless)
@@ -96,19 +65,11 @@ custom_container_init() {
 initialize() {
 
 	# Setup environment from secrets before anything else
-	for env_var in \
-		PAPERLESS_DBUSER \
-		PAPERLESS_DBPASS \
-		PAPERLESS_SECRET_KEY \
-		PAPERLESS_AUTO_LOGIN_USERNAME \
-		PAPERLESS_ADMIN_USER \
-		PAPERLESS_ADMIN_MAIL \
-		PAPERLESS_ADMIN_PASSWORD \
-		PAPERLESS_REDIS; do
-		# Check for a version of this var with _FILE appended
-		# and convert the contents to the env var value
-		file_env ${env_var}
-	done
+	# Check for a version of this var with _FILE appended
+	# and convert the contents to the env var value
+	# Source it so export is persistent
+	# shellcheck disable=SC1091
+	source /sbin/env-from-file.sh
 
 	# Change the user and group IDs if needed
 	map_uidgid
