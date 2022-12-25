@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-09 21:50+0000\n"
-"PO-Revision-Date: 2022-11-09 23:11\n"
+"PO-Revision-Date: 2022-12-25 11:34\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -184,11 +184,11 @@ msgstr "Nom du fichier d'archive courant en base de données"
 
 #: documents/models.py:221
 msgid "original filename"
-msgstr ""
+msgstr "nom de fichier d'origine"
 
 #: documents/models.py:227
 msgid "The original name of the file when it was uploaded"
-msgstr ""
+msgstr "Le nom original du fichier quand il a été envoyé"
 
 #: documents/models.py:231
 msgid "archive serial number"
@@ -368,15 +368,15 @@ msgstr "porte une étiquette parmi"
 
 #: documents/models.py:410
 msgid "ASN greater than"
-msgstr ""
+msgstr "est supérieur à"
 
 #: documents/models.py:411
 msgid "ASN less than"
-msgstr ""
+msgstr "est inférieur à"
 
 #: documents/models.py:412
 msgid "storage path is"
-msgstr ""
+msgstr "chemin d'accès au stockage"
 
 #: documents/models.py:422
 msgid "rule type"
@@ -396,39 +396,39 @@ msgstr "règles de filtrage"
 
 #: documents/models.py:536
 msgid "Task ID"
-msgstr ""
+msgstr "ID de tâche"
 
 #: documents/models.py:537
 msgid "Celery ID for the Task that was run"
-msgstr ""
+msgstr "Identifiant Celery pour la tâche qui a été exécutée"
 
 #: documents/models.py:542
 msgid "Acknowledged"
-msgstr ""
+msgstr "Prise en compte"
 
 #: documents/models.py:543
 msgid "If the task is acknowledged via the frontend or API"
-msgstr ""
+msgstr "Si la tâche est prise en compte via l'interface utilisateur ou l'API"
 
 #: documents/models.py:549 documents/models.py:556
 msgid "Task Name"
-msgstr ""
+msgstr "Nom de la tâche"
 
 #: documents/models.py:550
 msgid "Name of the file which the Task was run for"
-msgstr ""
+msgstr "Nom du fichier pour lequel la tâche a été exécutée"
 
 #: documents/models.py:557
 msgid "Name of the Task which was run"
-msgstr ""
+msgstr "Nom de la tâche exécutée"
 
 #: documents/models.py:562
 msgid "Task Positional Arguments"
-msgstr ""
+msgstr "Arguments positionnés de la tâche"
 
 #: documents/models.py:564
 msgid "JSON representation of the positional arguments used with the task"
-msgstr ""
+msgstr "Représentation JSON des arguments positionnés utilisés pour la tâche"
 
 #: documents/models.py:569
 msgid "Task Named Arguments"
