@@ -7,6 +7,7 @@ import tempfile
 import urllib.request
 import uuid
 import zipfile
+from pathlib import Path
 from unittest import mock
 from unittest.mock import MagicMock
 
@@ -808,7 +809,9 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         m.assert_called_once()
 
         args, kwargs = m.call_args
-        self.assertEqual(kwargs["override_filename"], "simple.pdf")
+        file_path = Path(args[0])
+        self.assertEqual(file_path.name, "simple.pdf")
+        self.assertIn(Path(settings.SCRATCH_DIR), file_path.parents)
         self.assertIsNone(kwargs["override_title"])
         self.assertIsNone(kwargs["override_correspondent_id"])
         self.assertIsNone(kwargs["override_document_type_id"])
@@ -833,7 +836,9 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         m.assert_called_once()
 
         args, kwargs = m.call_args
-        self.assertEqual(kwargs["override_filename"], "simple.pdf")
+        file_path = Path(args[0])
+        self.assertEqual(file_path.name, "simple.pdf")
+        self.assertIn(Path(settings.SCRATCH_DIR), file_path.parents)
         self.assertIsNone(kwargs["override_title"])
         self.assertIsNone(kwargs["override_correspondent_id"])
         self.assertIsNone(kwargs["override_document_type_id"])

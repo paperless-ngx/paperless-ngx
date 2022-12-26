@@ -7,6 +7,7 @@ import urllib
 import uuid
 import zipfile
 from datetime import datetime
+from pathlib import Path
 from time import mktime
 from unicodedata import normalize
 from urllib.parse import quote
@@ -623,20 +624,18 @@ class PostDocumentView(GenericAPIView):
 
         os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
 
-        with tempfile.NamedTemporaryFile(
-            prefix="paperless-upload-",
-            dir=settings.SCRATCH_DIR,
-            delete=False,
-        ) as f:
-            f.write(doc_data)
-            os.utime(f.name, times=(t, t))
-            temp_filename = f.name
+        temp_file_path = Path(tempfile.mkdtemp(dir=settings.SCRATCH_DIR)) / Path(
+            doc_name,
+        )
+
+        temp_file_path.write_bytes(doc_data)
+
+        os.utime(temp_file_path, times=(t, t))
 
         task_id = str(uuid.uuid4())
 
         async_task = consume_file.delay(
-            temp_filename,
-            override_filename=doc_name,
+            temp_file_path,
             override_title=title,
             override_correspondent_id=correspondent_id,
             override_document_type_id=document_type_id,
