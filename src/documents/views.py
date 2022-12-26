@@ -12,6 +12,7 @@ from time import mktime
 from unicodedata import normalize
 from urllib.parse import quote
 
+import pathvalidate
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models import Case
@@ -625,7 +626,7 @@ class PostDocumentView(GenericAPIView):
         os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
 
         temp_file_path = Path(tempfile.mkdtemp(dir=settings.SCRATCH_DIR)) / Path(
-            doc_name,
+            pathvalidate.sanitize_filename(doc_name),
         )
 
         temp_file_path.write_bytes(doc_data)
@@ -634,8 +635,9 @@ class PostDocumentView(GenericAPIView):
 
         task_id = str(uuid.uuid4())
 
-        async_task = consume_file.delay(
-            temp_file_path,
+        consume_file.delay(
+            # Paths are not JSON friendly
+            str(temp_file_path),
             override_title=title,
             override_correspondent_id=correspondent_id,
             override_document_type_id=document_type_id,
