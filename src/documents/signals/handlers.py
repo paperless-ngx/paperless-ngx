@@ -447,7 +447,7 @@ def update_filename_and_move_files(sender, instance, **kwargs):
             )
 
         except (OSError, DatabaseError, CannotMoveFilesException) as e:
-            logger.warn(f"Exception during file handling: {e}")
+            logger.warning(f"Exception during file handling: {e}")
             # This happens when either:
             #  - moving the files failed due to file system errors
             #  - saving to the database failed due to database errors
