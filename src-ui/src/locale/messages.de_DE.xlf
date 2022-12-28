@@ -429,7 +429,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">194</context>
         </context-group>
-        <target state="needs-translation">Check out the settings for various tweaks to the web app, toggle settings for saved views or setup e-mail checking.</target>
+        <target state="translated">Überprüfen Sie die Einstellungen für verschiedene Optimierungen der Web-App, ändern Sie Einstellungen für gespeicherte Ansichten oder richten Sie die E-Mail-Abfrage ein.</target>
       </trans-unit>
       <trans-unit id="7172877665285340082" datatype="html">
         <source>Thank you! 🙏</source>
