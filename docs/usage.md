@@ -416,7 +416,7 @@ how regularly you intend to scan documents and use paperless.
   performed the task associated with the document, move it to the
   inbox.
 
-## Architectue
+## Architecture
 
 Paperless-ngx consists of the following components:
 
