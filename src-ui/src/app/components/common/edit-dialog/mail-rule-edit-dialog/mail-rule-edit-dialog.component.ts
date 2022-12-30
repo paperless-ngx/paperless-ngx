@@ -24,8 +24,12 @@ const ATTACHMENT_TYPE_OPTIONS = [
     name: $localize`Only process attachments.`,
   },
   {
+    id: MailFilterAttachmentType.Email_Only,
+    name: $localize`Process with embedded attachments as .eml`,
+  },
+  {
     id: MailFilterAttachmentType.Everything,
-    name: $localize`Process all files, including 'inline' attachments.`,
+    name: $localize`Process as .eml and attachments as separate documents`,
   },
 ]
 
