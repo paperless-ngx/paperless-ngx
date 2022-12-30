@@ -1,5 +1,97 @@
 # Changelog
 
+## paperless-ngx 1.11.0
+
+### Notable Changes
+
+- Feature: frontend paperless mail [@shamoon](https://github.com/shamoon) ([#2000](https://github.com/paperless-ngx/paperless-ngx/pull/2000))
+- Feature: Ability to consume mails and eml files [@p-h-a-i-l](https://github.com/p-h-a-i-l) ([#848](https://github.com/paperless-ngx/paperless-ngx/pull/848))
+
+### Features
+
+- Chore: Downgrade hiredis to 2.0.0 [@stumpylog](https://github.com/stumpylog) ([#2262](https://github.com/paperless-ngx/paperless-ngx/pull/2262))
+- Add ability to provide the configuration file path using an env variable [@hashworks](https://github.com/hashworks) ([#2241](https://github.com/paperless-ngx/paperless-ngx/pull/2241))
+- Feature: Adds option to allow a user to export directly to a zipfile [@stumpylog](https://github.com/stumpylog) ([#2004](https://github.com/paperless-ngx/paperless-ngx/pull/2004))
+- Feature: Adds PaperlessTask admin page interface [@stumpylog](https://github.com/stumpylog) ([#2184](https://github.com/paperless-ngx/paperless-ngx/pull/2184))
+- Feature: speed up frontend by truncating content [@shamoon](https://github.com/shamoon) ([#2028](https://github.com/paperless-ngx/paperless-ngx/pull/2028))
+- Feature: Allow bulk download API to follow file name formatting [@stumpylog](https://github.com/stumpylog) ([#2003](https://github.com/paperless-ngx/paperless-ngx/pull/2003))
+- Feature: Bake NLTK into Docker image [@stumpylog](https://github.com/stumpylog) ([#2129](https://github.com/paperless-ngx/paperless-ngx/pull/2129))
+- Feature: frontend paperless mail [@shamoon](https://github.com/shamoon) ([#2000](https://github.com/paperless-ngx/paperless-ngx/pull/2000))
+- Feature: Ability to consume mails and eml files [@p-h-a-i-l](https://github.com/p-h-a-i-l) ([#848](https://github.com/paperless-ngx/paperless-ngx/pull/848))
+
+### Bug Fixes
+
+- Bugfix: Handle RTL languages better [@stumpylog](https://github.com/stumpylog) ([#1665](https://github.com/paperless-ngx/paperless-ngx/pull/1665))
+- Fixed typo in docs [@mendelk](https://github.com/mendelk) ([#2256](https://github.com/paperless-ngx/paperless-ngx/pull/2256))
+- Fix: support in advanced search, fix tags filter badge count for excluded [@shamoon](https://github.com/shamoon) ([#2205](https://github.com/paperless-ngx/paperless-ngx/pull/2205))
+- Bugfix: Don't run system checks on migrate [@stumpylog](https://github.com/stumpylog) ([#2183](https://github.com/paperless-ngx/paperless-ngx/pull/2183))
+- Bugfix: Decoding task signals could fail on datetime type [@stumpylog](https://github.com/stumpylog) ([#2058](https://github.com/paperless-ngx/paperless-ngx/pull/2058))
+
+### Documentation
+
+- Fixed typo in docs [@mendelk](https://github.com/mendelk) ([#2256](https://github.com/paperless-ngx/paperless-ngx/pull/2256))
+- Docs: More fixes and improvements [@tooomm](https://github.com/tooomm) ([#2203](https://github.com/paperless-ngx/paperless-ngx/pull/2203))
+- Docs: Fix leftover issues from conversion [@tooomm](https://github.com/tooomm) ([#2172](https://github.com/paperless-ngx/paperless-ngx/pull/2172))
+- Docs: Fix broken internal links [@tooomm](https://github.com/tooomm) ([#2165](https://github.com/paperless-ngx/paperless-ngx/pull/2165))
+- Update setup.md [@Weltraumschaf](https://github.com/Weltraumschaf) ([#2157](https://github.com/paperless-ngx/paperless-ngx/pull/2157))
+- Chore: Cleanup of new documentation [@stumpylog](https://github.com/stumpylog) ([#2137](https://github.com/paperless-ngx/paperless-ngx/pull/2137))
+- [Documentation] Add v1.10.2 changelog [@github-actions](https://github.com/github-actions) ([#2114](https://github.com/paperless-ngx/paperless-ngx/pull/2114))
+
+### Maintenance
+
+- Chore: Adds notable label for release drafter [@stumpylog](https://github.com/stumpylog) ([#2200](https://github.com/paperless-ngx/paperless-ngx/pull/2200))
+- Chore: Prevent forks from having failing CI runs by default [@tooomm](https://github.com/tooomm) ([#2166](https://github.com/paperless-ngx/paperless-ngx/pull/2166))
+- Chore: migrate to eslint [@shamoon](https://github.com/shamoon) ([#2199](https://github.com/paperless-ngx/paperless-ngx/pull/2199))
+- Feature: Adds PaperlessTask admin page interface [@stumpylog](https://github.com/stumpylog) ([#2184](https://github.com/paperless-ngx/paperless-ngx/pull/2184))
+- Chore: Changes qpdf to be cross compiled for large speed up [@stumpylog](https://github.com/stumpylog) ([#2181](https://github.com/paperless-ngx/paperless-ngx/pull/2181))
+- Chore: Decrease time to build pikepdf [@stumpylog](https://github.com/stumpylog) ([#2178](https://github.com/paperless-ngx/paperless-ngx/pull/2178))
+- Chore: Minor CI cleanups [@stumpylog](https://github.com/stumpylog) ([#2175](https://github.com/paperless-ngx/paperless-ngx/pull/2175))
+
+### All App Changes
+
+- Add ability to provide the configuration file path using an env variable [@hashworks](https://github.com/hashworks) ([#2241](https://github.com/paperless-ngx/paperless-ngx/pull/2241))
+- Fix: support in advanced search, fix tags filter badge count for excluded [@shamoon](https://github.com/shamoon) ([#2205](https://github.com/paperless-ngx/paperless-ngx/pull/2205))
+- Chore: migrate to eslint [@shamoon](https://github.com/shamoon) ([#2199](https://github.com/paperless-ngx/paperless-ngx/pull/2199))
+- Feature: Adds option to allow a user to export directly to a zipfile [@stumpylog](https://github.com/stumpylog) ([#2004](https://github.com/paperless-ngx/paperless-ngx/pull/2004))
+- Feature: Adds PaperlessTask admin page interface [@stumpylog](https://github.com/stumpylog) ([#2184](https://github.com/paperless-ngx/paperless-ngx/pull/2184))
+- Bugfix: Decoding task signals could fail on datetime type [@stumpylog](https://github.com/stumpylog) ([#2058](https://github.com/paperless-ngx/paperless-ngx/pull/2058))
+- Feature: speed up frontend by truncating content [@shamoon](https://github.com/shamoon) ([#2028](https://github.com/paperless-ngx/paperless-ngx/pull/2028))
+- Feature: Allow bulk download API to follow file name formatting [@stumpylog](https://github.com/stumpylog) ([#2003](https://github.com/paperless-ngx/paperless-ngx/pull/2003))
+- Feature: Bake NLTK into Docker image [@stumpylog](https://github.com/stumpylog) ([#2129](https://github.com/paperless-ngx/paperless-ngx/pull/2129))
+- Chore: Apply live testing backoff logic to new mail tests [@stumpylog](https://github.com/stumpylog) ([#2134](https://github.com/paperless-ngx/paperless-ngx/pull/2134))
+- Feature: frontend paperless mail [@shamoon](https://github.com/shamoon) ([#2000](https://github.com/paperless-ngx/paperless-ngx/pull/2000))
+- Feature: Ability to consume mails and eml files [@p-h-a-i-l](https://github.com/p-h-a-i-l) ([#848](https://github.com/paperless-ngx/paperless-ngx/pull/848))
+
+## paperless-ngx 1.10.2
+
+### Features
+
+- Take ownership of k8s-at-home Helm chart [@alexander-bauer](https://github.com/alexander-bauer) ([#1947](https://github.com/paperless-ngx/paperless-ngx/pull/1947))
+
+### Bug Fixes
+
+- Bugfix: Language code checks around two part languages [@stumpylog](https://github.com/stumpylog) ([#2112](https://github.com/paperless-ngx/paperless-ngx/pull/2112))
+- Bugfix: Redis socket compatibility didn't handle URLs with ports [@stumpylog](https://github.com/stumpylog) ([#2109](https://github.com/paperless-ngx/paperless-ngx/pull/2109))
+- Bugfix: Incompatible URL schemes for socket based Redis [@stumpylog](https://github.com/stumpylog) ([#2092](https://github.com/paperless-ngx/paperless-ngx/pull/2092))
+- Fix doc links in contributing [@tooomm](https://github.com/tooomm) ([#2102](https://github.com/paperless-ngx/paperless-ngx/pull/2102))
+
+### Documentation
+
+- Docs: Some more small MkDocs updates [@tooomm](https://github.com/tooomm) ([#2106](https://github.com/paperless-ngx/paperless-ngx/pull/2106))
+- Chore: Cleans up documentation links [@stumpylog](https://github.com/stumpylog) ([#2104](https://github.com/paperless-ngx/paperless-ngx/pull/2104))
+- Feature: Move docs to material-mkdocs [@shamoon](https://github.com/shamoon) ([#2067](https://github.com/paperless-ngx/paperless-ngx/pull/2067))
+- Chore: Add v1.10.1 changelong [@shamoon](https://github.com/shamoon) ([#2082](https://github.com/paperless-ngx/paperless-ngx/pull/2082))
+
+### Maintenance
+
+- Take ownership of k8s-at-home Helm chart [@alexander-bauer](https://github.com/alexander-bauer) ([#1947](https://github.com/paperless-ngx/paperless-ngx/pull/1947))
+
+### All App Changes
+
+- Bugfix: Language code checks around two part languages [@stumpylog](https://github.com/stumpylog) ([#2112](https://github.com/paperless-ngx/paperless-ngx/pull/2112))
+- Bugfix: Redis socket compatibility didn't handle URLs with ports [@stumpylog](https://github.com/stumpylog) ([#2109](https://github.com/paperless-ngx/paperless-ngx/pull/2109))
+- Bugfix: Incompatible URL schemes for socket based Redis [@stumpylog](https://github.com/stumpylog) ([#2092](https://github.com/paperless-ngx/paperless-ngx/pull/2092))
+
 ## paperless-ngx 1.10.1
 
 ### Features
@@ -961,11 +1053,10 @@ This is a maintenance release.
 
 !!! note
 
-The changed to the full text searching require you to reindex your
-documents. _The docker image does this automatically, you don't need to
-do anything._ To do this, execute the `document_index reindex`
-management command (see `administration-index`{.interpreted-text
-role="ref"}).
+    The changed to the full text searching require you to reindex your
+    documents. _The docker image does this automatically, you don't need to
+    do anything._ To do this, execute the `document_index reindex`
+    management command (see [Managing the document search index](/administration#index)).
 
 ### paperless-ng 1.3.2
 
@@ -1004,8 +1095,7 @@ This release contains new database migrations.
 - Changes
   - The REST API is versioned from this point onwards. This will
     allow me to make changes without breaking existing clients. See
-    the documentation about `api-versioning`{.interpreted-text
-    role="ref"} for details.
+    the documentation about [API versioning](/api#api-versioning) for details.
   - Added a color picker for tag colors.
   - Added the ability to use the filter for searching the document
     content as well.
@@ -1039,7 +1129,7 @@ This release contains new database migrations.
 - Changes to the OCRmyPDF integration
   - Added support for deskewing and automatic rotation of
     incorrectly rotated pages. This is enabled by default, see
-    `configuration-ocr`{.interpreted-text role="ref"}.
+    [OCR settings](/configuration#ocr).
   - Better support for encrypted files.
   - Better support for various other PDF files: Paperless will now
     attempt to force OCR with safe options when OCR fails with the
@@ -1066,7 +1156,7 @@ This release contains new database migrations.
 
 - Added a docker-specific configuration option to adjust the number of
   worker processes of the web server. See
-  `configuration-docker`{.interpreted-text role="ref"}.
+  [Docker options](/configuration#docker).
 - Some more memory usage optimizations.
 - Don't show inbox statistics if no inbox tag is defined.
 
@@ -1075,8 +1165,7 @@ This release contains new database migrations.
 - Always show top left corner of thumbnails, even for extra wide
   documents.
 - Added a management command for executing the sanity checker
-  directly. See `utilities-sanity-checker`{.interpreted-text
-  role="ref"}.
+  directly. See [management utilities](/administration#sanity-checker).
 - The weekly sanity check now reports messages in the log files.
 - Fixed an issue with the metadata tab not reporting anything in case
   of missing files.
@@ -1110,7 +1199,7 @@ This release contains new database migrations.
   management commands, since these also ensure that they're always
   executed as the paperless user and you're less likely to run into
   permission issues. See
-  `utilities-management-commands`{.interpreted-text role="ref"}.
+  [management commands](/administration#management-commands).
 
 ### paperless-ng 1.1.0
 
@@ -1135,7 +1224,7 @@ This release contains new database migrations.
   For status notifications and live updates to work, paperless now
   requires an [ASGI](https://asgi.readthedocs.io/en/latest/)-enabled
   web server. The docker images uses `gunicorn` and an ASGI-enabled
-  worker called [uvicorn](http://www.uvicorn.org/), and there is no
+  worker called [uvicorn](https://www.uvicorn.org/), and there is no
   need to configure anything.
 
   For bare metal installations, changes are required for the
@@ -1152,7 +1241,7 @@ This release contains new database migrations.
   status notifications.
 
   Apache `mod_wsgi` users, see
-  `this note <faq-mod_wsgi>`{.interpreted-text role="ref"}.
+  [this note](/faq#how-do-i-get-websocket-support-with-apache-mod_wsgi).
 
 - Paperless now offers suggestions for tags, correspondents and types
   on the document detail page.
@@ -1197,9 +1286,7 @@ bug reports coming in, I think that this is reasonably stable.
   - The document exporter locks the media directory and the database
     during execution to ensure that the resulting export is
     consistent.
-  - See the
-    `updated documentation <utilities-exporter>`{.interpreted-text
-    role="ref"} for more details.
+  - See the [updated documentation](/administration#exporter) for more details.
 - Other changes and additions
   - Added a language selector to the settings.
   - Added date format options to the settings.
@@ -1288,11 +1375,11 @@ paperless.
 - Thanks to [Jo Vandeginste](https://github.com/jovandeginste),
   Paperless has optional support for Office documents such as .docx,
   .doc, .odt and more.
-  - See the `configuration<configuration-tika>`{.interpreted-text
-    role="ref"} on how to enable this feature. This feature requires
-    two additional services (one for parsing Office documents and
-    metadata extraction and another for converting Office documents
-    to PDF), and is therefore not enabled on default installations.
+  - See the [Tika settings](/configuration#tika) on how to enable this
+    feature. This feature requires two additional services (one for
+    parsing Office documents and metadata extraction and another for
+    converting Office documents to PDF), and is therefore not enabled
+    on default installations.
   - As with all other documents, paperless converts Office documents
     to PDF and stores both the original as well as the archived PDF.
 - Dark mode
@@ -1368,15 +1455,14 @@ paperless.
 
 !!! note
 
-The bulk delete operations did not update the search index. Therefore,
-documents that you deleted remained in the index and caused the search
-to return messages about missing documents when searching. Further bulk
-operations will properly update the index.
+    The bulk delete operations did not update the search index. Therefore,
+    documents that you deleted remained in the index and caused the search
+    to return messages about missing documents when searching. Further bulk
+    operations will properly update the index.
 
-However, this change is not retroactive: If you used the delete method
-of the bulk editor, you need to reindex your search index by
-`running the management command document_index with the argument reindex <administration-index>`{.interpreted-text
-role="ref"}.
+    However, this change is not retroactive: If you used the delete method
+    of the bulk editor, you need to reindex your search index by
+    [running the management command `document_index` with the argument `reindex`](/administration#index).
 
 ### paperless-ng 0.9.9
 
@@ -1533,19 +1619,16 @@ primarily.
     edit page. If available, a dropdown menu will appear next to the
     download button.
   - Many of the configuration options regarding OCR have changed.
-    See `configuration-ocr`{.interpreted-text role="ref"} for
-    details.
+    See [OCR settings](/configuration#ocr) for details.
   - Paperless no longer guesses the language of your documents. It
     always uses the language that you specified with
     `PAPERLESS_OCR_LANGUAGE`. Be sure to set this to the language
     the majority of your documents are in. Multiple languages can be
     specified, but that requires more CPU time.
-  - The management command
-    `document_archiver <utilities-archiver>`{.interpreted-text
-    role="ref"} can be used to create archived versions for already
-    existing documents.
+  - The management command [`document_archiver`](/administration#archiver)
+    can be used to create archived versions for already existing documents.
 - Tags from consumption folder.
-  - Thanks to [jayme-github](http://github.com/jayme-github),
+  - Thanks to [jayme-github](https://github.com/jayme-github),
     paperless now consumes files from sub folders in the consumption
     folder and is able to assign tags based on the sub folders a
     document was found in. This can be configured with
@@ -1556,7 +1639,7 @@ primarily.
   - The endpoint for uploading documents now supports specifying
     custom titles, correspondents, tags and types. This can be used
     by clients to override the default behavior of paperless. See
-    `api-file_uploads`{.interpreted-text role="ref"}.
+    [POSTing documents](/api#file-uploads).
   - The document endpoint of API now serves documents in this form:
     - correspondents, document types and tags are referenced by
       their ID in the fields `correspondent`, `document_type` and
@@ -1590,16 +1673,14 @@ primarily.
   - Paperless now supports searching by tags, types and dates and
     correspondents. In order to have this applied to your existing
     documents, you need to perform a `document_index reindex`
-    management command (see `administration-index`{.interpreted-text
-    role="ref"}) that adds the data to the search index. You only
-    need to do this once, since the schema of the search index
-    changed. Paperless keeps the index updated after that whenever
-    something changes.
+    management command (see [document search index](/administration#index))
+    that adds the data to the search index. You only need to do this
+    once, since the schema of the search index changed. Paperless
+    keeps the index updated after that whenever something changes.
   - Paperless now has spelling corrections ("Did you mean") for
     miss-typed queries.
   - The documentation contains
-    `information about the query syntax <basic-searching>`{.interpreted-text
-    role="ref"}.
+    [information about the query syntax](/usage#basic-usage_searching).
 - Front end:
   - Clickable tags, correspondents and types allow quick filtering
     for related documents.
@@ -1660,10 +1741,8 @@ primarily.
 
 ### paperless-ng 0.9.0
 
-- **Deprecated:** GnuPG.
-  `See this note on the state of GnuPG in paperless-ng. <utilities-encyption>`{.interpreted-text
-  role="ref"} This features will most likely be removed in future
-  versions.
+- **Deprecated:** GnuPG. [See this note on the state of GnuPG in paperless-ng.](/administration#encryption)
+  This features will most likely be removed in future versions.
 - **Added:** New frontend. Features:
   - Single page application: It's much more responsive than the
     django admin pages.
@@ -1720,7 +1799,7 @@ primarily.
     uses PostgreSQL instead of SQLite. Username, database and
     password all default to `paperless` if not specified.
 - **Modified \[breaking\]:** document_retagger management command
-  rework. See `utilities-retagger`{.interpreted-text role="ref"} for
+  rework. See [Document retagger](/administration#retagger) for
   details. Replaces `document_correspondents` management command.
 - **Removed \[breaking\]:** Reminders.
 - **Removed:** All customizations made to the django admin pages.
@@ -1830,7 +1909,7 @@ primarily.
 ### 2.5.0
 
 - **New dependency**: Paperless now optimises thumbnail generation
-  with [optipng](http://optipng.sourceforge.net/), so you'll need to
+  with [optipng](https://optipng.sourceforge.net/), so you'll need to
   install that somewhere in your PATH or declare its location in
   `PAPERLESS_OPTIPNG_BINARY`. The Docker image has already been
   updated on the Docker Hub, so you just need to pull the latest one
