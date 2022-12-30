@@ -1,5 +1,67 @@
 # Changelog
 
+## paperless-ngx 1.11.0
+
+### Notable Changes
+
+- Feature: frontend paperless mail [@shamoon](https://github.com/shamoon) ([#2000](https://github.com/paperless-ngx/paperless-ngx/pull/2000))
+- Feature: Ability to consume mails and eml files [@p-h-a-i-l](https://github.com/p-h-a-i-l) ([#848](https://github.com/paperless-ngx/paperless-ngx/pull/848))
+
+### Features
+
+- Chore: Downgrade hiredis to 2.0.0 [@stumpylog](https://github.com/stumpylog) ([#2262](https://github.com/paperless-ngx/paperless-ngx/pull/2262))
+- Add ability to provide the configuration file path using an env variable [@hashworks](https://github.com/hashworks) ([#2241](https://github.com/paperless-ngx/paperless-ngx/pull/2241))
+- Feature: Adds option to allow a user to export directly to a zipfile [@stumpylog](https://github.com/stumpylog) ([#2004](https://github.com/paperless-ngx/paperless-ngx/pull/2004))
+- Feature: Adds PaperlessTask admin page interface [@stumpylog](https://github.com/stumpylog) ([#2184](https://github.com/paperless-ngx/paperless-ngx/pull/2184))
+- Feature: speed up frontend by truncating content [@shamoon](https://github.com/shamoon) ([#2028](https://github.com/paperless-ngx/paperless-ngx/pull/2028))
+- Feature: Allow bulk download API to follow file name formatting [@stumpylog](https://github.com/stumpylog) ([#2003](https://github.com/paperless-ngx/paperless-ngx/pull/2003))
+- Feature: Bake NLTK into Docker image [@stumpylog](https://github.com/stumpylog) ([#2129](https://github.com/paperless-ngx/paperless-ngx/pull/2129))
+- Feature: frontend paperless mail [@shamoon](https://github.com/shamoon) ([#2000](https://github.com/paperless-ngx/paperless-ngx/pull/2000))
+- Feature: Ability to consume mails and eml files [@p-h-a-i-l](https://github.com/p-h-a-i-l) ([#848](https://github.com/paperless-ngx/paperless-ngx/pull/848))
+
+### Bug Fixes
+
+- Bugfix: Handle RTL languages better [@stumpylog](https://github.com/stumpylog) ([#1665](https://github.com/paperless-ngx/paperless-ngx/pull/1665))
+- Fixed typo in docs [@mendelk](https://github.com/mendelk) ([#2256](https://github.com/paperless-ngx/paperless-ngx/pull/2256))
+- Fix: support in advanced search, fix tags filter badge count for excluded [@shamoon](https://github.com/shamoon) ([#2205](https://github.com/paperless-ngx/paperless-ngx/pull/2205))
+- Bugfix: Don't run system checks on migrate [@stumpylog](https://github.com/stumpylog) ([#2183](https://github.com/paperless-ngx/paperless-ngx/pull/2183))
+- Bugfix: Decoding task signals could fail on datetime type [@stumpylog](https://github.com/stumpylog) ([#2058](https://github.com/paperless-ngx/paperless-ngx/pull/2058))
+
+### Documentation
+
+- Fixed typo in docs [@mendelk](https://github.com/mendelk) ([#2256](https://github.com/paperless-ngx/paperless-ngx/pull/2256))
+- Docs: More fixes and improvements [@tooomm](https://github.com/tooomm) ([#2203](https://github.com/paperless-ngx/paperless-ngx/pull/2203))
+- Docs: Fix leftover issues from conversion [@tooomm](https://github.com/tooomm) ([#2172](https://github.com/paperless-ngx/paperless-ngx/pull/2172))
+- Docs: Fix broken internal links [@tooomm](https://github.com/tooomm) ([#2165](https://github.com/paperless-ngx/paperless-ngx/pull/2165))
+- Update setup.md [@Weltraumschaf](https://github.com/Weltraumschaf) ([#2157](https://github.com/paperless-ngx/paperless-ngx/pull/2157))
+- Chore: Cleanup of new documentation [@stumpylog](https://github.com/stumpylog) ([#2137](https://github.com/paperless-ngx/paperless-ngx/pull/2137))
+- [Documentation] Add v1.10.2 changelog [@github-actions](https://github.com/github-actions) ([#2114](https://github.com/paperless-ngx/paperless-ngx/pull/2114))
+
+### Maintenance
+
+- Chore: Adds notable label for release drafter [@stumpylog](https://github.com/stumpylog) ([#2200](https://github.com/paperless-ngx/paperless-ngx/pull/2200))
+- Chore: Prevent forks from having failing CI runs by default [@tooomm](https://github.com/tooomm) ([#2166](https://github.com/paperless-ngx/paperless-ngx/pull/2166))
+- Chore: migrate to eslint [@shamoon](https://github.com/shamoon) ([#2199](https://github.com/paperless-ngx/paperless-ngx/pull/2199))
+- Feature: Adds PaperlessTask admin page interface [@stumpylog](https://github.com/stumpylog) ([#2184](https://github.com/paperless-ngx/paperless-ngx/pull/2184))
+- Chore: Changes qpdf to be cross compiled for large speed up [@stumpylog](https://github.com/stumpylog) ([#2181](https://github.com/paperless-ngx/paperless-ngx/pull/2181))
+- Chore: Decrease time to build pikepdf [@stumpylog](https://github.com/stumpylog) ([#2178](https://github.com/paperless-ngx/paperless-ngx/pull/2178))
+- Chore: Minor CI cleanups [@stumpylog](https://github.com/stumpylog) ([#2175](https://github.com/paperless-ngx/paperless-ngx/pull/2175))
+
+### All App Changes
+
+- Add ability to provide the configuration file path using an env variable [@hashworks](https://github.com/hashworks) ([#2241](https://github.com/paperless-ngx/paperless-ngx/pull/2241))
+- Fix: support in advanced search, fix tags filter badge count for excluded [@shamoon](https://github.com/shamoon) ([#2205](https://github.com/paperless-ngx/paperless-ngx/pull/2205))
+- Chore: migrate to eslint [@shamoon](https://github.com/shamoon) ([#2199](https://github.com/paperless-ngx/paperless-ngx/pull/2199))
+- Feature: Adds option to allow a user to export directly to a zipfile [@stumpylog](https://github.com/stumpylog) ([#2004](https://github.com/paperless-ngx/paperless-ngx/pull/2004))
+- Feature: Adds PaperlessTask admin page interface [@stumpylog](https://github.com/stumpylog) ([#2184](https://github.com/paperless-ngx/paperless-ngx/pull/2184))
+- Bugfix: Decoding task signals could fail on datetime type [@stumpylog](https://github.com/stumpylog) ([#2058](https://github.com/paperless-ngx/paperless-ngx/pull/2058))
+- Feature: speed up frontend by truncating content [@shamoon](https://github.com/shamoon) ([#2028](https://github.com/paperless-ngx/paperless-ngx/pull/2028))
+- Feature: Allow bulk download API to follow file name formatting [@stumpylog](https://github.com/stumpylog) ([#2003](https://github.com/paperless-ngx/paperless-ngx/pull/2003))
+- Feature: Bake NLTK into Docker image [@stumpylog](https://github.com/stumpylog) ([#2129](https://github.com/paperless-ngx/paperless-ngx/pull/2129))
+- Chore: Apply live testing backoff logic to new mail tests [@stumpylog](https://github.com/stumpylog) ([#2134](https://github.com/paperless-ngx/paperless-ngx/pull/2134))
+- Feature: frontend paperless mail [@shamoon](https://github.com/shamoon) ([#2000](https://github.com/paperless-ngx/paperless-ngx/pull/2000))
+- Feature: Ability to consume mails and eml files [@p-h-a-i-l](https://github.com/p-h-a-i-l) ([#848](https://github.com/paperless-ngx/paperless-ngx/pull/848))
+
 ## paperless-ngx 1.10.2
 
 ### Features
