@@ -9,7 +9,7 @@ Before making backups, make sure that paperless is not running.
 
 Options available to any installation of paperless:
 
-- Use the [document exporter](administration#exporter). The document exporter exports all your documents,
+- Use the [document exporter](#exporter). The document exporter exports all your documents,
   thumbnails and metadata to a specific folder. You may import your
   documents into a fresh instance of paperless again or store your
   documents in another DMS with this export.
@@ -52,7 +52,7 @@ Options available to bare-metal and non-docker installations:
 
 ## Updating Paperless {#updating}
 
-### Docker Route
+### Docker Route {#docker-updating}
 
 If a new release of paperless-ngx is available, upgrading depends on how
 you installed paperless-ngx in the first place. The releases are
@@ -68,23 +68,23 @@ $ docker-compose down
 
 After that, [make a backup](#backup).
 
-A. If you pull the image from the docker hub, all you need to do is:
+1. If you pull the image from the docker hub, all you need to do is:
 
-    ``` shell-session
-    $ docker-compose pull
-    $ docker-compose up
-    ```
+   ```shell-session
+   $ docker-compose pull
+   $ docker-compose up
+   ```
 
-    The docker-compose files refer to the `latest` version, which is
-    always the latest stable release.
+   The docker-compose files refer to the `latest` version, which is
+   always the latest stable release.
 
-B. If you built the image yourself, do the following:
+2. If you built the image yourself, do the following:
 
-    ``` shell-session
-    $ git pull
-    $ docker-compose build
-    $ docker-compose up
-    ```
+   ```shell-session
+   $ git pull
+   $ docker-compose build
+   $ docker-compose up
+   ```
 
 Running `docker-compose up` will also apply any new database migrations.
 If you see everything working, press CTRL+C once to gracefully stop
@@ -131,7 +131,7 @@ the background.
     image: ghcr.io/paperless-ngx/paperless-ngx:1.7
     ```
 
-### Bare Metal Route
+### Bare Metal Route {#bare-metal-updating}
 
 After grabbing the new release and unpacking the contents, do the
 following:
@@ -158,7 +158,7 @@ following:
     This might not actually do anything. Not every new paperless version
     comes with new database migrations.
 
-## Downgrading Paperless
+## Downgrading Paperless {#downgrade-paperless}
 
 Downgrades are possible. However, some updates also contain database
 migrations (these change the layout of the database and may move data).
@@ -270,7 +270,7 @@ instead, specify `--use-filename-format`.
 ### Document importer {#importer}
 
 The document importer takes the export produced by the [Document
-exporter](#document-exporter) and imports it into paperless.
+exporter](#exporter) and imports it into paperless.
 
 The importer works just like the exporter. You point it at a directory,
 and the script does the rest of the work:
@@ -370,7 +370,7 @@ task scheduler.
 ### Managing filenames {#renamer}
 
 If you use paperless' feature to
-[assign custom filenames to your documents](/advanced_usage#file_name_handling), you can use this command to move all your files after
+[assign custom filenames to your documents](/advanced_usage#file-name-handling), you can use this command to move all your files after
 changing the naming scheme.
 
 !!! warning
@@ -434,9 +434,7 @@ rules.
     As of October 2022 Microsoft no longer supports IMAP authentication
     for Exchange servers, thus Exchange is no longer supported until a
     solution is implemented in the Python IMAP library used by Paperless.
-    See
-
-[learn.microsoft.com](https://learn.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/deprecation-of-basic-authentication-exchange-online)
+    See [learn.microsoft.com](https://learn.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/deprecation-of-basic-authentication-exchange-online)
 
 ### Creating archived documents {#archiver}
 
@@ -471,13 +469,13 @@ document.
     documents, such as encrypted PDF documents. The archiver will skip over
     these documents each time it sees them.
 
-### Managing encryption {#encyption}
+### Managing encryption {#encryption}
 
 Documents can be stored in Paperless using GnuPG encryption.
 
 !!! warning
 
-    Encryption is deprecated since paperless-ngx 0.9 and doesn't really
+    Encryption is deprecated since [paperless-ng 0.9](/changelog#paperless-ng-090) and doesn't really
     provide any additional security, since you have to store the passphrase
     in a configuration file on the same system as the encrypted documents
     for paperless to work. Furthermore, the entire text content of the
