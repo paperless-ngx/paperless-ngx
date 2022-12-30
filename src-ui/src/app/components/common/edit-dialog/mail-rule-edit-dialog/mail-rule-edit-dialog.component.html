@@ -11,7 +11,8 @@
         <app-input-select i18n-title title="Account" [items]="accounts" formControlName="account"></app-input-select>
         <app-input-text i18n-title title="Folder" formControlName="folder" i18n-hint hint="Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server." [error]="error?.folder"></app-input-text>
         <app-input-number i18n-title title="Maximum age (days)" formControlName="maximum_age" [showAdd]="false" [error]="error?.maximum_age"></app-input-number>
-        <app-input-select i18n-title title="Attachment type" [items]="attachmentTypeOptions" formControlName="attachment_type" i18n-hint hint="See docs for .eml processing requirements"></app-input-select>
+        <app-input-select i18n-title title="Attachment type" [items]="attachmentTypeOptions" formControlName="attachment_type"></app-input-select>
+        <app-input-select i18n-title title="Consumption scope" [items]="consumptionScopeOptions" formControlName="consumption_scope" i18n-hint hint="See docs for .eml processing requirements"></app-input-select>
       </div>
       <div class="col">
         <p class="small" i18n>Paperless will only process mails that match <em>all</em> of the filters specified below.</p>
