@@ -10,9 +10,9 @@
 # Example Usage:
 #	./build-docker-image.sh Dockerfile -t paperless-ngx:my-awesome-feature
 
-set -eux
+set -eu
 
-if ! command -v jq;  then
+if ! command -v jq &> /dev/null ;  then
 	echo "jq required"
 	exit 1
 elif [ ! -f "$1" ]; then
@@ -20,28 +20,62 @@ elif [ ! -f "$1" ]; then
 	exit 1
 fi
 
-# Parse what we can from Pipfile.lock
-pikepdf_version=$(jq ".default.pikepdf.version" Pipfile.lock  | sed 's/=//g' | sed 's/"//g')
-psycopg2_version=$(jq ".default.psycopg2.version" Pipfile.lock | sed 's/=//g' | sed 's/"//g')
-pillow_version=$(jq ".default.pillow.version" Pipfile.lock | sed 's/=//g' | sed 's/"//g')
-lxml_version=$(jq ".default.lxml.version" Pipfile.lock | sed 's/=//g' | sed 's/"//g')
-# Read this from the other config file
-qpdf_version=$(jq ".qpdf.version" .build-config.json | sed 's/"//g')
-jbig2enc_version=$(jq ".jbig2enc.version" .build-config.json | sed 's/"//g')
 # Get the branch name (used for caching)
 branch_name=$(git rev-parse --abbrev-ref HEAD)
 
-# https://docs.docker.com/develop/develop-images/build_enhancements/
-# Required to use cache-from
-export DOCKER_BUILDKIT=1
+# Parse eithe Pipfile.lock or the .build-config.json
+jbig2enc_version=$(jq ".jbig2enc.version" .build-config.json | sed 's/"//g')
+qpdf_version=$(jq ".qpdf.version" .build-config.json | sed 's/"//g')
+psycopg2_version=$(jq ".default.psycopg2.version" Pipfile.lock | sed 's/=//g' | sed 's/"//g')
+pikepdf_version=$(jq ".default.pikepdf.version" Pipfile.lock  | sed 's/=//g' | sed 's/"//g')
+pillow_version=$(jq ".default.pillow.version" Pipfile.lock | sed 's/=//g' | sed 's/"//g')
+lxml_version=$(jq ".default.lxml.version" Pipfile.lock | sed 's/=//g' | sed 's/"//g')
 
-docker build --file "$1" \
+base_filename="$(basename -- "${1}")"
+build_args_str=""
+cache_from_str=""
+
+case "${base_filename}" in
+
+	*.jbig2enc)
+		build_args_str="--build-arg JBIG2ENC_VERSION=${jbig2enc_version}"
+		cache_from_str="--cache-from ghcr.io/paperless-ngx/paperless-ngx/builder/cache/jbig2enc:${jbig2enc_version}"
+		;;
+
+	*.psycopg2)
+		build_args_str="--build-arg PSYCOPG2_VERSION=${psycopg2_version}"
+		cache_from_str="--cache-from ghcr.io/paperless-ngx/paperless-ngx/builder/cache/psycopg2:${psycopg2_version}"
+		;;
+
+	*.qpdf)
+		build_args_str="--build-arg QPDF_VERSION=${qpdf_version}"
+		cache_from_str="--cache-from ghcr.io/paperless-ngx/paperless-ngx/builder/cache/qpdf:${qpdf_version}"
+		;;
+
+	*.pikepdf)
+		build_args_str="--build-arg QPDF_VERSION=${qpdf_version} --build-arg PIKEPDF_VERSION=${pikepdf_version} --build-arg PILLOW_VERSION=${pillow_version} --build-arg LXML_VERSION=${lxml_version}"
+		cache_from_str="--cache-from ghcr.io/paperless-ngx/paperless-ngx/builder/cache/pikepdf:${pikepdf_version}"
+		;;
+
+	Dockerfile)
+		build_args_str="--build-arg QPDF_VERSION=${qpdf_version} --build-arg PIKEPDF_VERSION=${pikepdf_version} --build-arg PSYCOPG2_VERSION=${psycopg2_version} --build-arg JBIG2ENC_VERSION=${jbig2enc_version}"
+		cache_from_str="--cache-from ghcr.io/paperless-ngx/paperless-ngx/builder/cache/app:${branch_name} --cache-from ghcr.io/paperless-ngx/paperless-ngx/builder/cache/app:dev"
+		;;
+
+	*)
+		echo "Unable to match ${base_filename}"
+		exit 1
+		;;
+esac
+
+read -r -a build_args_arr <<< "${build_args_str}"
+read -r -a cache_from_arr <<< "${cache_from_str}"
+
+set -eux
+
+docker buildx build --file "${1}" \
 	--progress=plain \
-	--cache-from ghcr.io/paperless-ngx/paperless-ngx/builder/cache/app:"${branch_name}" \
-	--cache-from ghcr.io/paperless-ngx/paperless-ngx/builder/cache/app:dev \
-	--build-arg JBIG2ENC_VERSION="${jbig2enc_version}" \
-	--build-arg QPDF_VERSION="${qpdf_version}" \
-	--build-arg PIKEPDF_VERSION="${pikepdf_version}" \
-	--build-arg PILLOW_VERSION="${pillow_version}" \
-	--build-arg LXML_VERSION="${lxml_version}" \
-	--build-arg PSYCOPG2_VERSION="${psycopg2_version}" "${@:2}" .
+	--output=type=docker \
+	"${cache_from_arr[@]}" \
+	"${build_args_arr[@]}" \
+	"${@:2}" .

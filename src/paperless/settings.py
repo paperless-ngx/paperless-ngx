@@ -17,7 +17,10 @@ from django.utils.translation import gettext_lazy as _
 from dotenv import load_dotenv
 
 # Tap paperless.conf if it's available
-if os.path.exists("../paperless.conf"):
+configuration_path = os.getenv("PAPERLESS_CONFIGURATION_PATH")
+if configuration_path and os.path.exists(configuration_path):
+    load_dotenv(configuration_path)
+elif os.path.exists("../paperless.conf"):
     load_dotenv("../paperless.conf")
 elif os.path.exists("/etc/paperless.conf"):
     load_dotenv("/etc/paperless.conf")
@@ -123,7 +126,7 @@ THUMBNAIL_DIR = os.path.join(MEDIA_ROOT, "documents", "thumbnails")
 
 DATA_DIR = __get_path("PAPERLESS_DATA_DIR", os.path.join(BASE_DIR, "..", "data"))
 
-NLTK_DIR = os.path.join(DATA_DIR, "nltk")
+NLTK_DIR = __get_path("PAPERLESS_NLTK_DIR", "/usr/local/share/nltk_data")
 
 TRASH_DIR = os.getenv("PAPERLESS_TRASH_DIR")
 
@@ -525,6 +528,7 @@ CELERY_TASK_TIME_LIMIT = WORKER_TIMEOUT
 CELERY_RESULT_EXTENDED = True
 CELERY_RESULT_BACKEND = "django-db"
 CELERY_CACHE_BACKEND = "default"
+
 
 CELERY_BEAT_SCHEDULE = {
     # Every ten minutes

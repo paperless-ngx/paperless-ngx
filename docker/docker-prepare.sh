@@ -20,7 +20,6 @@ wait_for_postgres() {
 			exit 1
 		else
 			echo "Attempt $attempt_num failed! Trying again in 5 seconds..."
-
 		fi
 
 		attempt_num=$(("$attempt_num" + 1))
@@ -37,6 +36,8 @@ wait_for_mariadb() {
 	local attempt_num=1
 	local -r max_attempts=5
 
+	# Disable warning, host and port can't have spaces
+	# shellcheck disable=SC2086
 	while ! true > /dev/tcp/$host/$port; do
 
 		if [ $attempt_num -eq $max_attempts ]; then
@@ -67,8 +68,14 @@ migrations() {
 		# of the current container starts.
 		flock 200
 		echo "Apply database migrations..."
-		python3 manage.py migrate
+		python3 manage.py migrate --skip-checks --no-input
 	) 200>"${DATA_DIR}/migration_lock"
+}
+
+django_checks() {
+	# Explicitly run the Django system checks
+	echo "Running Django checks"
+	python3 manage.py check
 }
 
 search_index() {
@@ -99,6 +106,8 @@ do_work() {
 	wait_for_redis
 
 	migrations
+
+	django_checks
 
 	search_index
 

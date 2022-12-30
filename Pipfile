@@ -30,8 +30,6 @@ psycopg2 = "*"
 rapidfuzz = "*"
 redis = {extras = ["hiredis"], version = "*"}
 scikit-learn = "~=1.1"
-# Pin this until piwheels is building 1.9 (see https://www.piwheels.org/project/scipy/)
-scipy = "==1.8.1"
 numpy = "*"
 whitenoise = "~=6.2"
 watchdog = "~=2.1"
@@ -43,9 +41,6 @@ tika = "*"
 # TODO: This will sadly also install daphne+dependencies,
 #  which an ASGI server we don't need. Adds about 15MB image size.
 channels = "~=3.0"
-# Locked version until https://github.com/django/channels_redis/issues/332
-# is resolved
-channels-redis = "==3.4.1"
 uvicorn = {extras = ["standard"], version = "*"}
 concurrent-log-handler = "*"
 "pdfminer.six" = "*"
@@ -60,6 +55,21 @@ setproctitle = "*"
 nltk = "*"
 pdf2image = "*"
 flower = "*"
+bleach = "*"
+
+#
+# Packages locked due to issues (try to check if these are fixed in a release every so often)
+#
+
+# Pin this until piwheels is building 1.9 (see https://www.piwheels.org/project/scipy/)
+scipy = "==1.8.1"
+
+# Newer versions aren't builting yet (see https://www.piwheels.org/project/cryptography/)
+cryptography = "==38.0.1"
+
+# Locked version until https://github.com/django/channels_redis/issues/332
+# is resolved
+channels-redis = "==3.4.1"
 
 [dev-packages]
 coveralls = "*"
@@ -76,4 +86,5 @@ black = "*"
 pre-commit = "*"
 sphinx-autobuild = "*"
 myst-parser = "*"
+imagehash = "*"
 mkdocs-material = "*"

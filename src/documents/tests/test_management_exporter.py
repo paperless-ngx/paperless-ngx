@@ -5,10 +5,12 @@ import shutil
 import tempfile
 from pathlib import Path
 from unittest import mock
+from zipfile import ZipFile
 
 from django.core.management import call_command
 from django.test import override_settings
 from django.test import TestCase
+from django.utils import timezone
 from documents.management.commands import document_exporter
 from documents.models import Comment
 from documents.models import Correspondent
@@ -365,3 +367,74 @@ class TestExportImport(DirectoriesMixin, TestCase):
             mime_type="application/pdf",
         )
         self.assertRaises(FileNotFoundError, call_command, "document_exporter", target)
+
+    @override_settings(PASSPHRASE="test")
+    def test_export_zipped(self):
+        """
+        GIVEN:
+            - Request to export documents to zipfile
+        WHEN:
+            - Documents are exported
+        THEN:
+            - Zipfile is created
+            - Zipfile contains exported files
+        """
+        shutil.rmtree(os.path.join(self.dirs.media_dir, "documents"))
+        shutil.copytree(
+            os.path.join(os.path.dirname(__file__), "samples", "documents"),
+            os.path.join(self.dirs.media_dir, "documents"),
+        )
+
+        args = ["document_exporter", self.target, "--zip"]
+
+        call_command(*args)
+
+        expected_file = os.path.join(
+            self.target,
+            f"export-{timezone.localdate().isoformat()}.zip",
+        )
+
+        self.assertTrue(os.path.isfile(expected_file))
+
+        with ZipFile(expected_file) as zip:
+            self.assertEqual(len(zip.namelist()), 11)
+            self.assertIn("manifest.json", zip.namelist())
+            self.assertIn("version.json", zip.namelist())
+
+    @override_settings(PASSPHRASE="test")
+    def test_export_zipped_format(self):
+        """
+        GIVEN:
+            - Request to export documents to zipfile
+            - Export is following filename formatting
+        WHEN:
+            - Documents are exported
+        THEN:
+            - Zipfile is created
+            - Zipfile contains exported files
+        """
+        shutil.rmtree(os.path.join(self.dirs.media_dir, "documents"))
+        shutil.copytree(
+            os.path.join(os.path.dirname(__file__), "samples", "documents"),
+            os.path.join(self.dirs.media_dir, "documents"),
+        )
+
+        args = ["document_exporter", self.target, "--zip", "--use-filename-format"]
+
+        with override_settings(
+            FILENAME_FORMAT="{created_year}/{correspondent}/{title}",
+        ):
+            call_command(*args)
+
+        expected_file = os.path.join(
+            self.target,
+            f"export-{timezone.localdate().isoformat()}.zip",
+        )
+
+        self.assertTrue(os.path.isfile(expected_file))
+
+        with ZipFile(expected_file) as zip:
+            # Extras are from the directories, which also appear in the listing
+            self.assertEqual(len(zip.namelist()), 14)
+            self.assertIn("manifest.json", zip.namelist())
+            self.assertIn("version.json", zip.namelist())

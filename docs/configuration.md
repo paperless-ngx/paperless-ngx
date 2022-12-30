@@ -10,12 +10,10 @@ run paperless, these settings have to be defined in different places.
 - If you are running paperless on anything else, paperless will search
   for the configuration file in these locations and use the first one
   it finds:
-
-  ```
-  /path/to/paperless/paperless.conf
-  /etc/paperless.conf
-  /usr/local/etc/paperless.conf
-  ```
+  - The environment variable `PAPERLESS_CONFIGURATION_PATH`
+  - `/path/to/paperless/paperless.conf`
+  - `/etc/paperless.conf`
+  - `/usr/local/etc/paperless.conf`
 
 ## Required services
 
@@ -169,6 +167,19 @@ details.
 : This is where paperless will store log files.
 
     Defaults to `PAPERLESS_DATA_DIR/log/`.
+
+`PAPERLESS_NLTK_DIR=<path>`
+
+: This is where paperless will search for the data required for NLTK
+processing, if you are using it. If you are using the Docker image,
+this should not be changed, as the data is included in the image
+already.
+
+Previously, the location defaulted to `PAPERLESS_DATA_DIR/nltk`.
+Unless you are using this in a bare metal install or other setup,
+this folder is no longer needed and can be removed manually.
+
+Defaults to `/usr/local/share/nltk_data`
 
 ## Logging
 
@@ -564,8 +575,10 @@ they use underscores instead of dashes.
 
 Paperless can make use of [Tika](https://tika.apache.org/) and
 [Gotenberg](https://gotenberg.dev/) for parsing and converting
-"Office" documents (such as ".doc", ".xlsx" and ".odt"). If you
-wish to use this, you must provide a Tika server and a Gotenberg server,
+"Office" documents (such as ".doc", ".xlsx" and ".odt").
+Tika and Gotenberg are also needed to allow parsing of E-Mails (.eml).
+
+If you wish to use this, you must provide a Tika server and a Gotenberg server,
 configure their endpoints, and enable the feature.
 
 `PAPERLESS_TIKA_ENABLED=<bool>`
@@ -604,14 +617,17 @@ services:
       PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
       PAPERLESS_TIKA_ENDPOINT: http://tika:9998
 
-  # ...
+    # ...
 
-  gotenberg:
-    image: gotenberg/gotenberg:7.6
-    restart: unless-stopped
-    command:
-      - 'gotenberg'
-      - '--chromium-disable-routes=true'
+    gotenberg:
+      image: gotenberg/gotenberg:7.6
+      restart: unless-stopped
+      # The gotenberg chromium route is used to convert .eml files. We do not
+      # want to allow external content like tracking pixels or even javascript.
+      command:
+        - 'gotenberg'
+        - '--chromium-disable-javascript=true'
+        - '--chromium-allow-list=file:///tmp/.*'
 
   tika:
     image: ghcr.io/paperless-ngx/tika:latest
@@ -658,7 +674,7 @@ paperless will process in parallel on a single document.
     count, with a slight favor towards threads per worker:
 
     | CPU core count | Workers | Threads |
-    |----------------|---------|---------|
+    | -------------- | ------- | ------- |
     | > 1            | > 1     | > 1     |
     | > 2            | > 2     | > 1     |
     | > 4            | > 2     | > 2     |
@@ -690,6 +706,16 @@ less than the worker timeout.
 for details on how to set it.
 
     Defaults to UTC.
+
+`PAPERLESS_ENABLE_NLTK=<bool>`
+
+: Enables or disables the advanced natural language processing
+used during automatic classification. If disabled, paperless will
+still preform some basic text pre-processing before matching.
+
+See also `PAPERLESS_NLTK_DIR`.
+
+    Defaults to 1.
 
 ## Polling {#polling}
 
