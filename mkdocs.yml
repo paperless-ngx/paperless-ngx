@@ -23,6 +23,7 @@ theme:
     - navigation.tabs
     - navigation.top
     - toc.integrate
+    - content.code.annotate
   icon:
     repo: fontawesome/brands/github
   favicon: assets/favicon.png
@@ -39,6 +40,8 @@ markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
   - pymdownx.superfences
+  - pymdownx.inlinehilite
+strict: true
 nav:
     - index.md
     - setup.md

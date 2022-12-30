@@ -36,6 +36,8 @@ wait_for_mariadb() {
 	local attempt_num=1
 	local -r max_attempts=5
 
+	# Disable warning, host and port can't have spaces
+	# shellcheck disable=SC2086
 	while ! true > /dev/tcp/$host/$port; do
 
 		if [ $attempt_num -eq $max_attempts ]; then
