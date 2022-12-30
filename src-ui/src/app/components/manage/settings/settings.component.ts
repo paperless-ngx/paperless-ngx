@@ -546,7 +546,7 @@ export class SettingsComponent
     })
     modal.componentInstance.dialogMode = account ? 'edit' : 'create'
     modal.componentInstance.object = account
-    modal.componentInstance.success
+    modal.componentInstance.succeeded
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: (newMailAccount) => {
@@ -604,7 +604,7 @@ export class SettingsComponent
     })
     modal.componentInstance.dialogMode = rule ? 'edit' : 'create'
     modal.componentInstance.object = rule
-    modal.componentInstance.success
+    modal.componentInstance.succeeded
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: (newMailRule) => {
