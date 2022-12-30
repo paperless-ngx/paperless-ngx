@@ -5,7 +5,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core'
   templateUrl: './clearable-badge.component.html',
   styleUrls: ['./clearable-badge.component.scss'],
 })
-export class ClearableBadge {
+export class ClearableBadgeComponent {
   constructor() {}
 
   @Input()

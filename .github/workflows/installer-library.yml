@@ -34,7 +34,7 @@ concurrency:
 jobs:
   prepare-docker-build:
     name: Prepare Docker Image Version Data
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       -
         name: Set ghcr repository name
@@ -127,6 +127,7 @@ jobs:
     uses: ./.github/workflows/reusable-workflow-builder.yml
     with:
       dockerfile: ./docker-builders/Dockerfile.qpdf
+      build-platforms: linux/amd64
       build-json: ${{ needs.prepare-docker-build.outputs.qpdf-json }}
       build-args: |
         QPDF_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.qpdf-json).version }}

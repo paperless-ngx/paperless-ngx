@@ -287,6 +287,9 @@ class Document(models.Model):
         return open(self.archive_path, "rb")
 
     def get_public_filename(self, archive=False, counter=0, suffix=None) -> str:
+        """
+        Returns a sanitized filename for the document, not including any paths.
+        """
         result = str(self)
 
         if counter:
@@ -557,20 +560,6 @@ class PaperlessTask(models.Model):
         help_text=_("Name of the Task which was run"),
     )
 
-    task_args = models.JSONField(
-        null=True,
-        verbose_name=_("Task Positional Arguments"),
-        help_text=_(
-            "JSON representation of the positional arguments used with the task",
-        ),
-    )
-    task_kwargs = models.JSONField(
-        null=True,
-        verbose_name=_("Task Named Arguments"),
-        help_text=_(
-            "JSON representation of the named arguments used with the task",
-        ),
-    )
     status = models.CharField(
         max_length=30,
         default=states.PENDING,

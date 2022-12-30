@@ -11,9 +11,9 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let doc of documents" (click)="openDocumentsService.openDocument(doc)">
-        <td>{{doc.created_date | customDate}}</td>
-        <td>{{doc.title | documentTitle}}<app-tag [tag]="t" *ngFor="let t of doc.tags$ | async" class="ms-1" (click)="clickTag(t); $event.stopPropagation();"></app-tag></td>
+      <tr *ngFor="let doc of documents">
+        <td><a routerLink="/documents/{{doc.id}}" class="d-block text-dark text-decoration-none">{{doc.created_date | customDate}}</a></td>
+        <td><a routerLink="/documents/{{doc.id}}" class="d-block text-dark text-decoration-none">{{doc.title | documentTitle}}<app-tag [tag]="t" *ngFor="let t of doc.tags$ | async" class="ms-1" (click)="clickTag(t, $event)"></app-tag></a></td>
       </tr>
     </tbody>
   </table>

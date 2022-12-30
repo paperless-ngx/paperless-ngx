@@ -5,7 +5,6 @@ import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-
 import { DEFAULT_MATCHING_ALGORITHM } from 'src/app/data/matching-model'
 import { PaperlessDocumentType } from 'src/app/data/paperless-document-type'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
-import { ToastService } from 'src/app/services/toast.service'
 
 @Component({
   selector: 'app-document-type-edit-dialog',
@@ -13,12 +12,8 @@ import { ToastService } from 'src/app/services/toast.service'
   styleUrls: ['./document-type-edit-dialog.component.scss'],
 })
 export class DocumentTypeEditDialogComponent extends EditDialogComponent<PaperlessDocumentType> {
-  constructor(
-    service: DocumentTypeService,
-    activeModal: NgbActiveModal,
-    toastService: ToastService
-  ) {
-    super(service, activeModal, toastService)
+  constructor(service: DocumentTypeService, activeModal: NgbActiveModal) {
+    super(service, activeModal)
   }
 
   getCreateTitle() {

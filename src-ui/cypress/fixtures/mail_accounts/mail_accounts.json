@@ -1,0 +1,27 @@
+{
+    "count": 2,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": 1,
+            "name": "IMAP Server",
+            "imap_server": "imap.example.com",
+            "imap_port": 993,
+            "imap_security": 2,
+            "username": "inbox@example.com",
+            "password": "pass",
+            "character_set": "UTF-8"
+        },
+        {
+            "id": 2,
+            "name": "Gmail",
+            "imap_server": "imap.gmail.com",
+            "imap_port": 993,
+            "imap_security": 2,
+            "username": "user@gmail.com",
+            "password": "pass",
+            "character_set": "UTF-8"
+        }
+    ]
+}

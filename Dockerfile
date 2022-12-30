@@ -45,7 +45,7 @@ COPY Pipfile* ./
 
 RUN set -eux \
   && echo "Installing pipenv" \
-    && python3 -m pip install --no-cache-dir --upgrade pipenv \
+    && python3 -m pip install --no-cache-dir --upgrade pipenv==2022.11.30 \
   && echo "Generating requirement.txt" \
     && pipenv requirements > requirements.txt
 
@@ -58,6 +58,12 @@ LABEL org.opencontainers.image.url="https://github.com/paperless-ngx/paperless-n
 LABEL org.opencontainers.image.licenses="GPL-3.0-only"
 
 ARG DEBIAN_FRONTEND=noninteractive
+# Buildx provided
+ARG TARGETARCH
+ARG TARGETVARIANT
+
+# Workflow provided
+ARG QPDF_VERSION
 
 #
 # Begin installation and configuration
@@ -194,14 +200,10 @@ RUN --mount=type=bind,from=qpdf-builder,target=/qpdf \
     --mount=type=bind,from=pikepdf-builder,target=/pikepdf \
   set -eux \
   && echo "Installing qpdf" \
-    && apt-get install --yes --no-install-recommends /qpdf/usr/src/qpdf/libqpdf29_*.deb \
-    && apt-get install --yes --no-install-recommends /qpdf/usr/src/qpdf/qpdf_*.deb \
+    && apt-get install --yes --no-install-recommends /qpdf/usr/src/qpdf/${QPDF_VERSION}/${TARGETARCH}${TARGETVARIANT}/libqpdf29_*.deb \
+    && apt-get install --yes --no-install-recommends /qpdf/usr/src/qpdf/${QPDF_VERSION}/${TARGETARCH}${TARGETVARIANT}/qpdf_*.deb \
   && echo "Installing pikepdf and dependencies" \
-    && python3 -m pip install --no-cache-dir /pikepdf/usr/src/wheels/pyparsing*.whl \
-    && python3 -m pip install --no-cache-dir /pikepdf/usr/src/wheels/packaging*.whl \
-    && python3 -m pip install --no-cache-dir /pikepdf/usr/src/wheels/lxml*.whl \
-    && python3 -m pip install --no-cache-dir /pikepdf/usr/src/wheels/Pillow*.whl \
-    && python3 -m pip install --no-cache-dir /pikepdf/usr/src/wheels/pikepdf*.whl \
+    && python3 -m pip install --no-cache-dir /pikepdf/usr/src/wheels/*.whl \
     && python3 -m pip list \
   && echo "Installing psycopg2" \
     && python3 -m pip install --no-cache-dir /psycopg2/usr/src/wheels/psycopg2*.whl \
@@ -228,6 +230,10 @@ RUN set -eux \
     && python3 -m pip install --no-cache-dir --upgrade wheel \
   && echo "Installing Python requirements" \
     && python3 -m pip install --default-timeout=1000 --no-cache-dir --requirement requirements.txt \
+  && echo "Installing NLTK data" \
+    && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/local/share/nltk_data" snowball_data \
+    && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/local/share/nltk_data" stopwords \
+    && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/local/share/nltk_data" punkt \
   && echo "Cleaning up image" \
     && apt-get -y purge ${BUILD_PACKAGES} \
     && apt-get -y autoremove --purge \

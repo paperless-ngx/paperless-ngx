@@ -47,6 +47,11 @@ const routes: Routes = [
         component: SettingsComponent,
         canDeactivate: [DirtyFormGuard],
       },
+      {
+        path: 'settings/:section',
+        component: SettingsComponent,
+        canDeactivate: [DirtyFormGuard],
+      },
       { path: 'tasks', component: TasksComponent },
     ],
   },
