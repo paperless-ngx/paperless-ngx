@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-09 21:50+0000\n"
-"PO-Revision-Date: 2022-11-12 10:50\n"
+"PO-Revision-Date: 2022-12-05 11:26\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -400,51 +400,51 @@ msgstr "ID Attività"
 
 #: documents/models.py:537
 msgid "Celery ID for the Task that was run"
-msgstr ""
+msgstr "Celery ID per l'attività che è stata eseguita"
 
 #: documents/models.py:542
 msgid "Acknowledged"
-msgstr ""
+msgstr "Accettato"
 
 #: documents/models.py:543
 msgid "If the task is acknowledged via the frontend or API"
-msgstr ""
+msgstr "Se l'attività è accettata tramite il frontend o API"
 
 #: documents/models.py:549 documents/models.py:556
 msgid "Task Name"
-msgstr ""
+msgstr "Nome attività"
 
 #: documents/models.py:550
 msgid "Name of the file which the Task was run for"
-msgstr ""
+msgstr "Nome del file per il quale è stata eseguita l'attività"
 
 #: documents/models.py:557
 msgid "Name of the Task which was run"
-msgstr ""
+msgstr "Nome dell'attività che è stata eseguita"
 
 #: documents/models.py:562
 msgid "Task Positional Arguments"
-msgstr ""
+msgstr "Positional Arguments dell'attività"
 
 #: documents/models.py:564
 msgid "JSON representation of the positional arguments used with the task"
-msgstr ""
+msgstr "Rappresentazione JSON dei named arguments utilizzati con l'attività"
 
 #: documents/models.py:569
 msgid "Task Named Arguments"
-msgstr ""
+msgstr "Named Arguments dell'attività"
 
 #: documents/models.py:571
 msgid "JSON representation of the named arguments used with the task"
-msgstr ""
+msgstr "Rappresentazione JSON dei named arguments utilizzati con l'attività"
 
 #: documents/models.py:578
 msgid "Task State"
-msgstr ""
+msgstr "Stato attività"
 
 #: documents/models.py:579
 msgid "Current state of the task being run"
-msgstr ""
+msgstr "Stato attuale dell'attività in esecuzione"
 
 #: documents/models.py:584
 msgid "Created DateTime"
@@ -472,15 +472,15 @@ msgstr ""
 
 #: documents/models.py:602
 msgid "Result Data"
-msgstr ""
+msgstr "Dati Risultanti"
 
 #: documents/models.py:604
 msgid "The data returned by the task"
-msgstr ""
+msgstr "I dati restituiti dall'attività"
 
 #: documents/models.py:613
 msgid "Comment for the document"
-msgstr ""
+msgstr "Commento per il documento"
 
 #: documents/models.py:642
 msgid "comment"

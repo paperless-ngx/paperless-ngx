@@ -13,6 +13,10 @@ on:
         required: false
         default: ""
         type: string
+      build-platforms:
+        required: false
+        default: linux/amd64,linux/arm64,linux/arm/v7
+        type: string
 
 concurrency:
   group: ${{ github.workflow }}-${{ fromJSON(inputs.build-json).name }}-${{ fromJSON(inputs.build-json).version }}
@@ -21,7 +25,7 @@ concurrency:
 jobs:
   build-image:
     name: Build ${{ fromJSON(inputs.build-json).name }} @ ${{ fromJSON(inputs.build-json).version }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       -
         name: Checkout
@@ -46,7 +50,7 @@ jobs:
           context: .
           file: ${{ inputs.dockerfile }}
           tags: ${{ fromJSON(inputs.build-json).image_tag }}
-          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          platforms: ${{ inputs.build-platforms }}
           build-args: ${{ inputs.build-args }}
           push: true
           cache-from: type=registry,ref=${{ fromJSON(inputs.build-json).cache_tag }}

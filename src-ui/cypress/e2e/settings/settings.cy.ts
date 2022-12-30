@@ -35,6 +35,16 @@ describe('settings', () => {
             req.reply(response)
           }
         ).as('savedViews')
+
+        cy.intercept('http://localhost:8000/api/mail_accounts/*', {
+          fixture: 'mail_accounts/mail_accounts.json',
+        })
+        cy.intercept('http://localhost:8000/api/mail_rules/*', {
+          fixture: 'mail_rules/mail_rules.json',
+        }).as('mailRules')
+        cy.intercept('http://localhost:8000/api/tasks/', {
+          fixture: 'tasks/tasks.json',
+        })
       })
 
       cy.fixture('documents/documents.json').then((documentsJson) => {
@@ -48,7 +58,6 @@ describe('settings', () => {
 
     cy.viewport(1024, 1600)
     cy.visit('/settings')
-    cy.wait('@savedViews')
   })
 
   it('should activate / deactivate save button when settings change and are saved', () => {
@@ -64,7 +73,7 @@ describe('settings', () => {
     cy.contains('a', 'Dashboard').click()
     cy.contains('You have unsaved changes')
     cy.contains('button', 'Cancel').click()
-    cy.contains('button', 'Save').click().wait('@savedViews')
+    cy.contains('button', 'Save').click().wait('@savedViews').wait(2000)
     cy.contains('a', 'Dashboard').click()
     cy.contains('You have unsaved changes').should('not.exist')
   })
@@ -77,16 +86,16 @@ describe('settings', () => {
   })
 
   it('should remove saved view from sidebar when unset', () => {
-    cy.contains('a', 'Saved views').click()
+    cy.contains('a', 'Saved views').click().wait(2000)
     cy.get('#show_in_sidebar_1').click()
-    cy.contains('button', 'Save').click().wait('@savedViews')
+    cy.contains('button', 'Save').click().wait('@savedViews').wait(2000)
     cy.contains('li', 'Inbox').should('not.exist')
   })
 
   it('should remove saved view from dashboard when unset', () => {
     cy.contains('a', 'Saved views').click()
     cy.get('#show_on_dashboard_1').click()
-    cy.contains('button', 'Save').click().wait('@savedViews')
+    cy.contains('button', 'Save').click().wait('@savedViews').wait(2000)
     cy.visit('/dashboard')
     cy.get('app-saved-view-widget').contains('Inbox').should('not.exist')
   })

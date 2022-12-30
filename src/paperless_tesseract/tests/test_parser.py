@@ -588,6 +588,39 @@ class TestParser(DirectoriesMixin, TestCase):
             params = parser.construct_ocrmypdf_parameters("", "", "", "")
             self.assertNotIn("deskew", params)
 
+    def test_rtl_language_detection(self):
+        """
+        GIVEN:
+            - File with text in an RTL language
+        WHEN:
+            - Document is parsed
+        THEN:
+            - Text from the document is extracted
+        """
+        parser = RasterisedDocumentParser(None)
+        with mock.patch.object(
+            parser,
+            "construct_ocrmypdf_parameters",
+            wraps=parser.construct_ocrmypdf_parameters,
+        ) as wrapped:
+
+            parser.parse(
+                os.path.join(self.SAMPLE_FILES, "rtl-test.pdf"),
+                "application/pdf",
+            )
+
+            # There isn't a good way to actually check this working, with RTL correctly return
+            #  as it would require tesseract-ocr-ara installed for everyone running the
+            #  test suite.  This test does provide the coverage though and attempts to ensure
+            # the force OCR happens
+            self.assertIsNotNone(parser.get_text())
+
+            self.assertEqual(parser.construct_ocrmypdf_parameters.call_count, 2)
+            # Check the last call kwargs
+            self.assertTrue(
+                parser.construct_ocrmypdf_parameters.call_args.kwargs["safe_fallback"],
+            )
+
 
 class TestParserFileTypes(DirectoriesMixin, TestCase):
 
