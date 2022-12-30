@@ -1,6 +1,8 @@
 import json
 import os
 import re
+from pathlib import Path
+from typing import Optional
 
 from django.conf import settings
 from documents.parsers import DocumentParser
@@ -99,7 +101,7 @@ class RasterisedDocumentParser(DocumentParser):
             self.log("warning", f"Error while calculating DPI for image {image}: {e}")
             return None
 
-    def extract_text(self, sidecar_file, pdf_file):
+    def extract_text(self, sidecar_file: Optional[Path], pdf_file: Path):
         # When re-doing OCR, the sidecar contains ONLY the new text, not
         # the whole text, so do not utilize it in that case
         if (
@@ -139,11 +141,15 @@ class RasterisedDocumentParser(DocumentParser):
 
             self.log("debug", f"Detected language {lang}")
 
-            if lang in {
-                "ar",  # Arabic
-                "he",  # Hebrew,
-                "fa",  # Persian
-            }:
+            if (
+                lang
+                in {
+                    "ar",  # Arabic
+                    "he",  # Hebrew,
+                    "fa",  # Persian
+                }
+                and pdf_file.name != "archive-fallback.pdf"
+            ):
                 raise RtlLanguageException()
             return stripped
         except RtlLanguageException:
@@ -275,7 +281,7 @@ class RasterisedDocumentParser(DocumentParser):
 
         return ocrmypdf_args
 
-    def parse(self, document_path, mime_type, file_name=None):
+    def parse(self, document_path: Path, mime_type, file_name=None):
         # This forces tesseract to use one core per page.
         os.environ["OMP_THREAD_LIMIT"] = "1"
 
@@ -300,8 +306,8 @@ class RasterisedDocumentParser(DocumentParser):
         import ocrmypdf
         from ocrmypdf import InputFileError, EncryptedPdfError
 
-        archive_path = os.path.join(self.tempdir, "archive.pdf")
-        sidecar_file = os.path.join(self.tempdir, "sidecar.txt")
+        archive_path = Path(os.path.join(self.tempdir, "archive.pdf"))
+        sidecar_file = Path(os.path.join(self.tempdir, "sidecar.txt"))
 
         args = self.construct_ocrmypdf_parameters(
             document_path,
@@ -335,8 +341,12 @@ class RasterisedDocumentParser(DocumentParser):
                 f"Attempting force OCR to get the text.",
             )
 
-            archive_path_fallback = os.path.join(self.tempdir, "archive-fallback.pdf")
-            sidecar_file_fallback = os.path.join(self.tempdir, "sidecar-fallback.txt")
+            archive_path_fallback = Path(
+                os.path.join(self.tempdir, "archive-fallback.pdf"),
+            )
+            sidecar_file_fallback = Path(
+                os.path.join(self.tempdir, "sidecar-fallback.txt"),
+            )
 
             # Attempt to run OCR with safe settings.
 
