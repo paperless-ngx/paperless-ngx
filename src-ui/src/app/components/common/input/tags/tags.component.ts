@@ -91,7 +91,7 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
     if (name) modal.componentInstance.object = { name: name }
     else if (this._lastSearchTerm)
       modal.componentInstance.object = { name: this._lastSearchTerm }
-    modal.componentInstance.success.subscribe((newTag) => {
+    modal.componentInstance.succeeded.subscribe((newTag) => {
       this.tagService.listAll().subscribe((tags) => {
         this.tags = tags.results
         this.value = [...this.value, newTag.id]
