@@ -1,5 +1,19 @@
 # Changelog
 
+## paperless-ngx 1.11.2
+
+### Bug Fixes
+
+- Fix frontend mailrule missing consumption scope parameter [@shamoon](https://github.com/shamoon) ([#2280](https://github.com/paperless-ngx/paperless-ngx/pull/2280))
+
+### Documentation
+
+- [Documentation] Add v1.11.1 changelog [@github-actions](https://github.com/github-actions) ([#2274](https://github.com/paperless-ngx/paperless-ngx/pull/2274))
+
+### All App Changes
+
+- Fix frontend mailrule missing consumption scope parameter [@shamoon](https://github.com/shamoon) ([#2280](https://github.com/paperless-ngx/paperless-ngx/pull/2280))
+
 ## paperless-ngx 1.11.1
 
 ### Bug Fixes
