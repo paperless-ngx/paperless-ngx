@@ -1068,7 +1068,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">36</context>
+          <context context-type="linenumber">37</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.html</context>
@@ -1108,7 +1108,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">37</context>
+          <context context-type="linenumber">38</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.html</context>
@@ -1266,7 +1266,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.ts</context>
           <context context-type="linenumber">28</context>
         </context-group>
-        <target state="translated">Kreirajte novi mejl nalog</target>
+        <target state="translated">Kreirajte novi e-mail nalog</target>
       </trans-unit>
       <trans-unit id="5559445021532852612" datatype="html">
         <source>Edit mail account</source>
@@ -1274,7 +1274,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.ts</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="translated">Izmeni mejl nalog</target>
+        <target state="translated">Izmeni e-mail nalog</target>
       </trans-unit>
       <trans-unit id="4086606389696938932" datatype="html">
         <source>Account</source>
@@ -1320,19 +1320,27 @@
         </context-group>
         <target state="translated">Tip priloga</target>
       </trans-unit>
+      <trans-unit id="559099472394646919" datatype="html">
+        <source>Consumption scope</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+        <target state="needs-translation">Consumption scope</target>
+      </trans-unit>
       <trans-unit id="56643687972548912" datatype="html">
         <source>See docs for .eml processing requirements</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">14</context>
+          <context context-type="linenumber">15</context>
         </context-group>
-        <target state="needs-translation">See docs for .eml processing requirements</target>
+        <target state="translated">Pogledajte dokumentaciju za .eml obradu priloga</target>
       </trans-unit>
       <trans-unit id="5488632521862493221" datatype="html">
         <source>Paperless will only process mails that match <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>all<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> of the filters specified below.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">17</context>
+          <context context-type="linenumber">18</context>
         </context-group>
         <target state="translated">Paperless će obrađivati samo poštu koja odgovara <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>svim<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> filterima navedenim ispod.</target>
       </trans-unit>
@@ -1340,7 +1348,7 @@
         <source>Filter from</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">18</context>
+          <context context-type="linenumber">19</context>
         </context-group>
         <target state="translated">Filter od</target>
       </trans-unit>
@@ -1348,31 +1356,31 @@
         <source>Filter subject</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">19</context>
+          <context context-type="linenumber">20</context>
         </context-group>
-        <target state="translated">Filter naslov</target>
+        <target state="translated">Filter naslova</target>
       </trans-unit>
       <trans-unit id="7314357616097563149" datatype="html">
         <source>Filter body</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">20</context>
+          <context context-type="linenumber">21</context>
         </context-group>
-        <target state="translated">Filter telo poruke</target>
+        <target state="translated">Filter tela poruke</target>
       </trans-unit>
       <trans-unit id="5031687746498952417" datatype="html">
         <source>Filter attachment filename</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">21</context>
+          <context context-type="linenumber">22</context>
         </context-group>
-        <target state="translated">Filter naziv fajla priloga</target>
+        <target state="translated">Filter naziva fajla priloga</target>
       </trans-unit>
       <trans-unit id="4245210767172267486" datatype="html">
         <source>Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">21</context>
+          <context context-type="linenumber">22</context>
         </context-group>
         <target state="translated">Konzumirajte samo dokumente koji u potpunosti odgovaraju ovom nazivu datoteke ako je navedeno. Dopušteni su zamenski znakovi kao što su *.pdf ili *faktura*. Neosetljivo je na mala i mala slova.</target>
       </trans-unit>
@@ -1380,7 +1388,7 @@
         <source>Action</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">24</context>
+          <context context-type="linenumber">25</context>
         </context-group>
         <target state="translated">Radnja</target>
       </trans-unit>
@@ -1388,7 +1396,7 @@
         <source>Action is only performed when documents are consumed from the mail. Mails without attachments remain entirely untouched.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">24</context>
+          <context context-type="linenumber">25</context>
         </context-group>
         <target state="translated">Radnja se izvodi samo ako su dokumenti konzumirani iz e-pošte. E-pošta bez priloga ostat će u potpunosti netaknuta.</target>
       </trans-unit>
@@ -1396,7 +1404,7 @@
         <source>Action parameter</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">25</context>
+          <context context-type="linenumber">26</context>
         </context-group>
         <target state="translated">Parametar radnje</target>
       </trans-unit>
@@ -1404,7 +1412,7 @@
         <source>Assign title from</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">26</context>
+          <context context-type="linenumber">27</context>
         </context-group>
         <target state="translated">Dodeli naziv iz</target>
       </trans-unit>
@@ -1412,7 +1420,7 @@
         <source>Assign document type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">28</context>
+          <context context-type="linenumber">29</context>
         </context-group>
         <target state="translated">Dodeli tip dokumenta</target>
       </trans-unit>
@@ -1420,7 +1428,7 @@
         <source>Assign correspondent from</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">29</context>
+          <context context-type="linenumber">30</context>
         </context-group>
         <target state="translated">Dodeli korespodenta iz</target>
       </trans-unit>
@@ -1428,15 +1436,15 @@
         <source>Assign correspondent</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">30</context>
+          <context context-type="linenumber">31</context>
         </context-group>
-        <target state="translated">Dodeli korspodenta</target>
+        <target state="translated">Dodeli korespodenta</target>
       </trans-unit>
       <trans-unit id="1519954996184640001" datatype="html">
         <source>Error</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">35</context>
+          <context context-type="linenumber">36</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/toast.service.ts</context>
@@ -1444,35 +1452,47 @@
         </context-group>
         <target state="translated">Grеška</target>
       </trans-unit>
-      <trans-unit id="6233529027580744166" datatype="html">
-        <source>Only process attachments.</source>
+      <trans-unit id="6886003843406464884" datatype="html">
+        <source>Only process attachments</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
-          <context context-type="linenumber">24</context>
+          <context context-type="linenumber">25</context>
         </context-group>
-        <target state="translated">Obradi samo priloge.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+        <target state="needs-translation">Only process attachments</target>
       </trans-unit>
-      <trans-unit id="3622418743488695840" datatype="html">
-        <source>Process with embedded attachments as .eml</source>
+      <trans-unit id="936923743212522897" datatype="html">
+        <source>Process all files, including &apos;inline&apos; attachments</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
-          <context context-type="linenumber">28</context>
+          <context context-type="linenumber">29</context>
         </context-group>
-        <target state="needs-translation">Process with embedded attachments as .eml</target>
+        <target state="needs-translation">Process all files, including 'inline' attachments</target>
       </trans-unit>
-      <trans-unit id="7205371824972320534" datatype="html">
-        <source>Process as .eml and attachments as separate documents</source>
+      <trans-unit id="9025522236384167767" datatype="html">
+        <source>Process message as .eml</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
-          <context context-type="linenumber">32</context>
+          <context context-type="linenumber">40</context>
         </context-group>
-        <target state="needs-translation">Process as .eml and attachments as separate documents</target>
+        <target state="needs-translation">Process message as .eml</target>
+      </trans-unit>
+      <trans-unit id="7411485377918318115" datatype="html">
+        <source>Process message as .eml and attachments separately</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+        <target state="needs-translation">Process message as .eml and attachments separately</target>
       </trans-unit>
       <trans-unit id="7022070615528435141" datatype="html">
         <source>Delete</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
-          <context context-type="linenumber">39</context>
+          <context context-type="linenumber">51</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
@@ -1536,7 +1556,7 @@
         <source>Move to specified folder</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
-          <context context-type="linenumber">43</context>
+          <context context-type="linenumber">55</context>
         </context-group>
         <target state="translated">Premesti u određen folder</target>
       </trans-unit>
@@ -1544,7 +1564,7 @@
         <source>Mark as read, don&apos;t process read mails</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
-          <context context-type="linenumber">47</context>
+          <context context-type="linenumber">59</context>
         </context-group>
         <target state="translated">Označi kao pročitano, ne obrađuj pročitanu e-poštu</target>
       </trans-unit>
@@ -1552,7 +1572,7 @@
         <source>Flag the mail, don&apos;t process flagged mails</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
-          <context context-type="linenumber">51</context>
+          <context context-type="linenumber">63</context>
         </context-group>
         <target state="translated">Označi poštu zastavicom, ne obrađuj e-poštu sa zastavicom</target>
       </trans-unit>
@@ -1560,7 +1580,7 @@
         <source>Tag the mail with specified tag, don&apos;t process tagged mails</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
-          <context context-type="linenumber">55</context>
+          <context context-type="linenumber">67</context>
         </context-group>
         <target state="translated">Označite poštu specifičnom oznakom., ne obrađuj e-poštu s specifičnom oznakom</target>
       </trans-unit>
@@ -1568,7 +1588,7 @@
         <source>Use subject as title</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
-          <context context-type="linenumber">62</context>
+          <context context-type="linenumber">74</context>
         </context-group>
         <target state="translated">Koristi predmet kao naziv</target>
       </trans-unit>
@@ -1576,7 +1596,7 @@
         <source>Use attachment filename as title</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
-          <context context-type="linenumber">66</context>
+          <context context-type="linenumber">78</context>
         </context-group>
         <target state="translated">Koristi naziv datoteke priloga kao naziv</target>
       </trans-unit>
@@ -1584,7 +1604,7 @@
         <source>Do not assign a correspondent</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
-          <context context-type="linenumber">73</context>
+          <context context-type="linenumber">85</context>
         </context-group>
         <target state="translated">Ne dodeljuj korespodenta</target>
       </trans-unit>
@@ -1592,41 +1612,41 @@
         <source>Use mail address</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
-          <context context-type="linenumber">77</context>
+          <context context-type="linenumber">89</context>
         </context-group>
-        <target state="translated">Koristi mejl adresu</target>
+        <target state="translated">Koristi e-mail adresu</target>
       </trans-unit>
       <trans-unit id="445154175758965852" datatype="html">
         <source>Use name (or mail address if not available)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
-          <context context-type="linenumber">81</context>
+          <context context-type="linenumber">93</context>
         </context-group>
-        <target state="translated">Koristi naziv (ili mejl adresu ako nije dostupno)</target>
+        <target state="translated">Koristi naziv (ili e-mail adresu ako nije dostupno)</target>
       </trans-unit>
       <trans-unit id="1258862217749148424" datatype="html">
         <source>Use correspondent selected below</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
-          <context context-type="linenumber">85</context>
+          <context context-type="linenumber">97</context>
         </context-group>
-        <target state="translated">Koristi koreespodenta ispod</target>
+        <target state="translated">Koristi korespodenta ispod</target>
       </trans-unit>
       <trans-unit id="3147349817770432927" datatype="html">
         <source>Create new mail rule</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
-          <context context-type="linenumber">125</context>
+          <context context-type="linenumber">137</context>
         </context-group>
-        <target state="translated">Kreiraj novo mejl pravilo</target>
+        <target state="translated">Kreiraj novo e-mail pravilo</target>
       </trans-unit>
       <trans-unit id="3374331029704382439" datatype="html">
         <source>Edit mail rule</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
-          <context context-type="linenumber">129</context>
+          <context context-type="linenumber">141</context>
         </context-group>
-        <target state="translated">Izmeni mejl pravilo</target>
+        <target state="translated">Izmeni e-mail pravilo</target>
       </trans-unit>
       <trans-unit id="6036319582202941456" datatype="html">
         <source><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>Note that editing a path does not apply changes to stored files until you have run the &apos;document_renamer&apos; utility. See the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a target=&quot;_blank&quot; href=&quot;https://docs.paperless-ngx.com/administration/#renamer&quot;&gt;"/>documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></source>
@@ -2723,7 +2743,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">100,102</context>
         </context-group>
-        <target state="needs-translation"> Archived files </target>
+        <target state="translated"> Arhivni fajlovi </target>
       </trans-unit>
       <trans-unit id="6791570188945688785" datatype="html">
         <source> Original files </source>
@@ -2731,7 +2751,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">106,108</context>
         </context-group>
-        <target state="needs-translation"> Original files </target>
+        <target state="translated"> Originalni fajlovi </target>
       </trans-unit>
       <trans-unit id="3608345051493493574" datatype="html">
         <source> Use formatted filename </source>
@@ -2739,7 +2759,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">113,115</context>
         </context-group>
-        <target state="needs-translation"> Use formatted filename </target>
+        <target state="translated"> Koristi formatirano ime fajla </target>
       </trans-unit>
       <trans-unit id="7985804062689412812" datatype="html">
         <source>Error executing bulk operation: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></source>
@@ -4037,7 +4057,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">236</context>
         </context-group>
-        <target state="translated">Mejl nalozi</target>
+        <target state="translated">E-mail nalozi</target>
       </trans-unit>
       <trans-unit id="1259421956660976189" datatype="html">
         <source>Add Account</source>
@@ -4061,7 +4081,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">267</context>
         </context-group>
-        <target state="translated">Nisu definisani mejl nalozi.</target>
+        <target state="translated">Nema definisanih e-mail naloga.</target>
       </trans-unit>
       <trans-unit id="5364020217520256833" datatype="html">
         <source>Mail rules</source>
@@ -4085,7 +4105,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">302</context>
         </context-group>
-        <target state="translated">Nema definisanih mejl pravila.</target>
+        <target state="translated">Nema definisanih e-mail pravila.</target>
       </trans-unit>
       <trans-unit id="5610279464668232148" datatype="html">
         <source>Saved view &quot;<x id="PH" equiv-text="savedView.name"/>&quot; deleted.</source>
@@ -4173,7 +4193,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">574</context>
         </context-group>
-        <target state="translated">Potvrdi brisanje mejl naloga</target>
+        <target state="translated">Potvrdi brisanje e-mail naloga</target>
       </trans-unit>
       <trans-unit id="7176985344323395435" datatype="html">
         <source>This operation will permanently delete this mail account.</source>
@@ -4181,7 +4201,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">575</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently delete this mail account.</target>
+        <target state="translated">Ova operacija će trajno obrisati ovaj e-mail nalog.</target>
       </trans-unit>
       <trans-unit id="4233826387148482123" datatype="html">
         <source>Deleted mail account</source>
@@ -4189,7 +4209,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">584</context>
         </context-group>
-        <target state="translated">Izbrisan mejl nalog</target>
+        <target state="translated">Obrisan je e-mail nalog</target>
       </trans-unit>
       <trans-unit id="7443801450153832973" datatype="html">
         <source>Error deleting mail account: <x id="PH" equiv-text="e.toString()"/>.</source>
@@ -4197,7 +4217,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">593</context>
         </context-group>
-        <target state="translated">Greška prilikom brisanja mejl naloga: <x id="PH" equiv-text="e.toString()"/>.</target>
+        <target state="translated">Greška prilikom brisanja e-mail naloga: <x id="PH" equiv-text="e.toString()"/>.</target>
       </trans-unit>
       <trans-unit id="123368655395433699" datatype="html">
         <source>Saved rule &quot;<x id="PH" equiv-text="newMailRule.name"/>&quot;.</source>
@@ -4221,7 +4241,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">633</context>
         </context-group>
-        <target state="translated">Potvrdi brisanje mejl pravila</target>
+        <target state="translated">Potvrdi brisanje e-mail pravila</target>
       </trans-unit>
       <trans-unit id="2250372580580310337" datatype="html">
         <source>This operation will permanently delete this mail rule.</source>
@@ -4229,7 +4249,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">634</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently delete this mail rule.</target>
+        <target state="translated">Ova operacija će trajno obrisati ovo e-mail pravilo.</target>
       </trans-unit>
       <trans-unit id="9077981247971516916" datatype="html">
         <source>Deleted mail rule</source>
@@ -4237,7 +4257,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">643</context>
         </context-group>
-        <target state="translated">Izbrisano mejl pravilo</target>
+        <target state="translated">Obrisano je e-mail pravilo</target>
       </trans-unit>
       <trans-unit id="4740074357089345173" datatype="html">
         <source>Error deleting mail rule: <x id="PH" equiv-text="e.toString()"/>.</source>
@@ -4245,7 +4265,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">652</context>
         </context-group>
-        <target state="translated">Greška prilikom brisanja mejl pravila: <x id="PH" equiv-text="e.toString()"/>.</target>
+        <target state="translated">Greška prilikom brisanja e-mail pravila: <x id="PH" equiv-text="e.toString()"/>.</target>
       </trans-unit>
       <trans-unit id="5101757640976222639" datatype="html">
         <source>storage path</source>
