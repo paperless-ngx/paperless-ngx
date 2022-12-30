@@ -617,7 +617,7 @@ class PostDocumentView(GenericAPIView):
 
         task_id = str(uuid.uuid4())
 
-        consume_file.delay(
+        async_task = consume_file.delay(
             temp_filename,
             override_filename=doc_name,
             override_title=title,
@@ -628,7 +628,7 @@ class PostDocumentView(GenericAPIView):
             override_created=created,
         )
 
-        return Response("OK")
+        return Response(async_task.id)
 
 
 class SelectionDataView(GenericAPIView):
@@ -886,13 +886,18 @@ class TasksViewSet(ReadOnlyModelViewSet):
     permission_classes = (IsAuthenticated,)
     serializer_class = TasksViewSerializer
 
-    queryset = (
-        PaperlessTask.objects.filter(
-            acknowledged=False,
+    def get_queryset(self):
+        queryset = (
+            PaperlessTask.objects.filter(
+                acknowledged=False,
+            )
+            .order_by("date_created")
+            .reverse()
         )
-        .order_by("date_created")
-        .reverse()
-    )
+        task_id = self.request.query_params.get("task_id")
+        if task_id is not None:
+            queryset = PaperlessTask.objects.filter(task_id=task_id)
+        return queryset
 
 
 class AcknowledgeTasksView(GenericAPIView):
