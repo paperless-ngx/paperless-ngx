@@ -2699,7 +2699,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">96</context>
         </context-group>
-        <target state="needs-translation">Include:</target>
+        <target state="translated">Uključi:</target>
       </trans-unit>
       <trans-unit id="1208547554603365604" datatype="html">
         <source> Archived files </source>
