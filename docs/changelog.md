@@ -1,5 +1,17 @@
 # Changelog
 
+## paperless-ngx 1.11.1
+
+### Bug Fixes
+
+- Fix: missing frontend email attachment options [@shamoon](https://github.com/shamoon) ([#2272](https://github.com/paperless-ngx/paperless-ngx/pull/2272))
+- Fix: edit dialog creation in v1.11.0 [@shamoon](https://github.com/shamoon) ([#2273](https://github.com/paperless-ngx/paperless-ngx/pull/2273))
+
+### All App Changes
+
+- Fix: missing frontend email attachment options [@shamoon](https://github.com/shamoon) ([#2272](https://github.com/paperless-ngx/paperless-ngx/pull/2272))
+- Fix: edit dialog creation in v1.11.0 [@shamoon](https://github.com/shamoon) ([#2273](https://github.com/paperless-ngx/paperless-ngx/pull/2273))
+
 ## paperless-ngx 1.11.0
 
 ### Notable Changes
