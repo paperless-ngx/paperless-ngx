@@ -50,7 +50,7 @@ and run another document through the consumer. Once complete, you should
 see the newly-created document, automatically tagged with the
 appropriate data.
 
-### Automatic matching {#automatic_matching}
+### Automatic matching {#automatic-matching}
 
 Paperless-ngx comes with a new matching algorithm called _Auto_. This
 matching algorithm tries to assign tags, correspondents, document types,
@@ -59,8 +59,8 @@ assigned these on existing documents. It uses a neural network under the
 hood.
 
 If, for example, all your bank statements of your account 123 at the
-Bank of America are tagged with the tag "bofa*123" and the matching
-algorithm of this tag is set to \_Auto*, this neural network will examine
+Bank of America are tagged with the tag "bofa123" and the matching
+algorithm of this tag is set to _Auto_, this neural network will examine
 your documents and automatically learn when to assign this tag.
 
 Paperless tries to hide much of the involved complexity with this
@@ -95,7 +95,7 @@ when using this feature:
   of these correspondents to ANY new document, if both are set to
   automatic matching.
 
-## Hooking into the consumption process
+## Hooking into the consumption process {#consume-hooks}
 
 Sometimes you may want to do something arbitrary whenever a document is
 consumed. Rather than try to predict what you may want to do, Paperless
@@ -115,7 +115,7 @@ and then put the path to that script in `paperless.conf` or
     asynchronously, you'll have to fork the process in your script and
     exit.
 
-### Pre-consumption script
+### Pre-consumption script {#pre-consume-script}
 
 Executed after the consumer sees a new document in the consumption
 folder, but before any processing of the document is performed. This
@@ -151,7 +151,7 @@ with the newly modified file.
 The script's stdout and stderr will be logged line by line to the
 webserver log, along with the exit code of the script.
 
-### Post-consumption script {#post_consume_script}
+### Post-consumption script {#post-consume-script}
 
 Executed after the consumer has successfully processed a document and
 has moved it into paperless. It receives the following environment
@@ -181,33 +181,34 @@ The post consumption script cannot cancel the consumption process.
 The script's stdout and stderr will be logged line by line to the
 webserver log, along with the exit code of the script.
 
-#### Docker
+### Docker {#docker-consume-hooks}
 
-Assumed you have
-`/home/foo/paperless-ngx/scripts/post-consumption-example.sh`.
+To hook into the consumption process when using Docker, you
+will need to pass the scripts into the container via a host mount
+in your `docker-compose.yml`.
 
-You can pass that script into the consumer container via a host mount in
-your `docker-compose.yml`.
+Assuming you have
+`/home/paperless-ngx/scripts/post-consumption-example.sh` as a
+script which you'd like to run.
 
-```bash
+You can pass that script into the consumer container via a host mount:
+
+```yaml
 ...
-consumer:
+webserver:
   ...
   volumes:
     ...
-    - /home/paperless-ngx/scripts:/path/in/container/scripts/
+    - /home/paperless-ngx/scripts:/path/in/container/scripts/ # (1)!
+  environment: # (3)!
+    ...
+    PAPERLESS_POST_CONSUME_SCRIPT: /path/in/container/scripts/post-consumption-example.sh # (2)!
 ...
 ```
 
-Example (docker-compose.yml):
-`- /home/foo/paperless-ngx/scripts:/usr/src/paperless/scripts`
-
-which in turn requires the variable `PAPERLESS_POST_CONSUME_SCRIPT` in
-`docker-compose.env` to point to
-`/path/in/container/scripts/post-consumption-example.sh`.
-
-Example (docker-compose.env):
-`PAPERLESS_POST_CONSUME_SCRIPT=/usr/src/paperless/scripts/post-consumption-example.sh`
+1. The external scripts directory is mounted to a location inside the container.
+2. The internal location of the script is used to set the script to run
+3. This can also be set in `docker-compose.env`
 
 Troubleshooting:
 
@@ -218,7 +219,7 @@ Troubleshooting:
 - Pipe your scripts's output to a log file e.g.
   `echo "${DOCUMENT_ID}" | tee --append /usr/src/paperless/scripts/post-consumption-example.log`
 
-## File name handling {#file_name_handling}
+## File name handling {#file-name-handling}
 
 By default, paperless stores your documents in the media directory and
 renames them using the identifier which it has assigned to each
@@ -301,7 +302,7 @@ value.
 !!! tip
 
     You can affect how empty placeholders are treated by changing the
-    following setting to [true]{.title-ref}.
+    following setting to `true`.
 
     ```
     PAPERLESS_FILENAME_FORMAT_REMOVE_NONE=True
@@ -316,7 +317,7 @@ value.
     Paperless checks the filename of a document whenever it is saved.
     Therefore, you need to update the filenames of your documents and move
     them after altering this setting by invoking the
-    [`document renamer <utilities-renamer>`]().
+    [`document renamer`](/administration#renamer).
 
 !!! warning
 
@@ -344,7 +345,7 @@ When as single storage layout is not sufficient for your use case,
 storage paths come to the rescue. Storage paths allow you to configure
 more precisely where each document is stored in the file system.
 
-- Each storage path is a [PAPERLESS_FILENAME_FORMAT]{.title-ref} and
+- Each storage path is a `PAPERLESS_FILENAME_FORMAT` and
   follows the rules described above
 - Each document is assigned a storage path using the matching
   algorithms described above, but can be overwritten at any time
@@ -352,7 +353,7 @@ more precisely where each document is stored in the file system.
 For example, you could define the following two storage paths:
 
 1.  Normal communications are put into a folder structure sorted by
-    [year/correspondent]{.title-ref}
+    `year/correspondent`
 2.  Communications with insurance companies are stored in a flat
     structure with longer file names, but containing the full date of
     the correspondence.
@@ -363,7 +364,7 @@ Insurances = Insurances/{correspondent}/{created_year}-{created_month}-{created_
 ```
 
 If you then map these storage paths to the documents, you might get the
-following result. For simplicity, [By Year]{.title-ref} defines the same
+following result. For simplicity, `By Year` defines the same
 structure as in the previous example above.
 
 ```text
@@ -384,7 +385,7 @@ structure as in the previous example above.
 !!! tip
 
     Defining a storage path is optional. If no storage path is defined for a
-    document, the global [PAPERLESS_FILENAME_FORMAT]{.title-ref} is applied.
+    document, the global `PAPERLESS_FILENAME_FORMAT` is applied.
 
 !!! warning
 
@@ -403,33 +404,38 @@ queued and completed tasks, timing and more. Flower can also be used
 with Prometheus, as it exports metrics. For details on its capabilities,
 refer to the Flower documentation.
 
-To configure Flower further, create a [flowerconfig.py]{.title-ref} and
-place it into the [src/paperless]{.title-ref} directory. For a Docker
+To configure Flower further, create a `flowerconfig.py` and
+place it into the `src/paperless` directory. For a Docker
 installation, you can use volumes to accomplish this:
 
 ```yaml
 services:
   # ...
   webserver:
+    ports:
+      - 5555:5555 # (2)!
     # ...
     volumes:
-      - /path/to/my/flowerconfig.py:/usr/src/paperless/src/paperless/flowerconfig.py:ro
+      - /path/to/my/flowerconfig.py:/usr/src/paperless/src/paperless/flowerconfig.py:ro # (1)!
 ```
+
+1. Note the `:ro` tag means the file will be mounted as read only.
+2. `flower` runs by default on port 5555, but this can be configured
 
 ## Custom Container Initialization
 
 The Docker image includes the ability to run custom user scripts during
 startup. This could be utilized for installing additional tools or
-Python packages, for example.
+Python packages, for example. Scripts are expected to be shell scripts.
 
 To utilize this, mount a folder containing your scripts to the custom
-initialization directory, [/custom-cont-init.d]{.title-ref} and place
+initialization directory, `/custom-cont-init.d` and place
 scripts you wish to run inside. For security, the folder must be owned
 by `root` and should have permissions of `a=rx`. Additionally, scripts
 must only be writable by `root`.
 
 Your scripts will be run directly before the webserver completes
-startup. Scripts will be run by the [root]{.title-ref} user.
+startup. Scripts will be run by the `root` user.
 If you would like to switch users, the utility `gosu` is available and
 preferred over `sudo`.
 
@@ -445,8 +451,10 @@ services:
   webserver:
     # ...
     volumes:
-      - /path/to/my/scripts:/custom-cont-init.d:ro
+      - /path/to/my/scripts:/custom-cont-init.d:ro # (1)!
 ```
+
+1. Note the `:ro` tag means the folder will be mounted as read only. This is for extra security against changes
 
 ## MySQL Caveats {#mysql-caveats}
 
