@@ -1,7 +1,7 @@
 # The REST API
 
 Paperless makes use of the [Django REST
-Framework](http://django-rest-framework.org/) standard API interface. It
+Framework](https://django-rest-framework.org/) standard API interface. It
 provides a browsable API for most of its endpoints, which you can
 inspect at `http://<paperless-host>:<port>/api/`. This also documents
 most of the available filters and ordering fields.
@@ -162,7 +162,7 @@ specific query parameters cause the API to return full text search
 results:
 
 - `/api/documents/?query=your%20search%20query`: Search for a document
-  using a full text query. For details on the syntax, see [Basic Usage - Searching](usage#basic-usage_searching).
+  using a full text query. For details on the syntax, see [Basic Usage - Searching](/usage#basic-usage_searching).
 - `/api/documents/?more_like=1234`: Search for documents similar to
   the document with id 1234.
 
@@ -225,7 +225,7 @@ Query parameters:
 
 Results returned by the endpoint are ordered by importance of the term
 in the document index. The first result is the term that has the highest
-Tf/Idf score in the index.
+[Tf/Idf](https://en.wikipedia.org/wiki/Tf%E2%80%93idf) score in the index.
 
 ```json
 ["term1", "term3", "term6", "term4"]
