@@ -86,6 +86,7 @@ class MailRuleSerializer(serializers.ModelSerializer):
             "assign_document_type",
             "order",
             "attachment_type",
+            "consumption_scope",
         ]
 
     def update(self, instance, validated_data):
