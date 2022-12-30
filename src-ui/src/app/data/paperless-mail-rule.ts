@@ -2,6 +2,11 @@ import { ObjectWithId } from './object-with-id'
 
 export enum MailFilterAttachmentType {
   Attachments = 1,
+  Everything = 2,
+}
+
+export enum MailRuleConsumptionScope {
+  Attachments = 1,
   Email_Only = 2,
   Everything = 3,
 }
