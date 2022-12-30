@@ -45,8 +45,6 @@ services:
       MARIADB_USER: paperless
       MARIADB_PASSWORD: paperless
       MARIADB_ROOT_PASSWORD: paperless
-    ports:
-      - "3306:3306"
 
   webserver:
     image: ghcr.io/paperless-ngx/paperless-ngx:latest

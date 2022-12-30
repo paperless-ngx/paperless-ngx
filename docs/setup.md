@@ -2,10 +2,10 @@
 
 You can go multiple routes to setup and run Paperless:
 
-- [Use the easy install docker script](/setup#docker_script)
-- [Pull the image from Docker Hub](/setup#docker_hub)
-- [Build the Docker image yourself](/setup#docker_build)
-- [Install Paperless directly on your system manually (bare metal)](/setup#bare_metal)
+- [Use the easy install docker script](#docker_script)
+- [Pull the image from Docker Hub](#docker_hub)
+- [Build the Docker image yourself](#docker_build)
+- [Install Paperless directly on your system manually (bare metal)](#bare_metal)
 
 The Docker routes are quick & easy. These are the recommended routes.
 This configures all the stuff from the above automatically so that it
@@ -234,9 +234,8 @@ steps described in [Docker setup](#docker_hub) automatically.
         certain, more updated software. If you want to build these images
         your self, that is possible, but beyond the scope of these steps.
 
-4.  Follow steps 3 to 8 of [Docker Setup](setup#docker_hub)
-    role="ref"}. When asked to run `docker-compose pull` to pull the
-    image, do
+4.  Follow steps 3 to 8 of [Docker Setup](#docker_hub). When asked to run
+    `docker-compose pull` to pull the image, do
 
     ```shell-session
     $ docker-compose build
@@ -316,20 +315,21 @@ supported.
         enabled. This is usually the case, but not always.
 
 4.  Get the release archive from
-    <https://github.com/paperless-ngx/paperless-ngx/releases>. If you
-    clone the git repo as it is, you also have to compile the front end
-    by yourself. Extract the archive to a place from where you wish to
-    execute it, such as `/opt/paperless`.
+    <https://github.com/paperless-ngx/paperless-ngx/releases>. Extract the
+    archive to a place from where you wish to execute it, such as
+    `/opt/paperless`. If you clone the git repo as it is, you also have to
+    compile the frontend yourself, see [here](/development#front-end-development)
+    and use the `build` step, not `serve`.
 
-5.  Configure paperless. See [configuration](configuration) for details.
+5.  Configure paperless. See [configuration](/configuration) for details.
     Edit the included `paperless.conf` and adjust the settings to your
     needs. Required settings for getting
     paperless running are:
 
     - `PAPERLESS_REDIS` should point to your redis server, such as
       <redis://localhost:6379>.
-    - `PAPERLESS_DBENGINE` optional, and should be one of [postgres,
-      mariadb, or sqlite]{.title-ref}
+    - `PAPERLESS_DBENGINE` optional, and should be one of `postgres`,
+      `mariadb`, or `sqlite`
     - `PAPERLESS_DBHOST` should be the hostname on which your
       PostgreSQL server is running. Do not configure this to use
       SQLite instead. Also configure port, database name, user and
@@ -344,7 +344,7 @@ supported.
       allows third parties to forge authentication credentials.
     - `PAPERLESS_URL` if you are behind a reverse proxy. This should
       point to your domain. Please see
-      [configuration](configuration) for more
+      [configuration](/configuration) for more
       information.
 
     Many more adjustments can be made to paperless, especially the OCR
@@ -387,17 +387,17 @@ supported.
 9.  Go to `/opt/paperless/src`, and execute the following commands:
 
     ```bash
-    \# This creates the database schema.
+    # This creates the database schema.
     sudo -Hu paperless python3 manage.py migrate
 
-    \# This creates your first paperless user
+    # This creates your first paperless user
     sudo -Hu paperless python3 manage.py createsuperuser
     ```
 
 10. Optional: Test that paperless is working by executing
 
     ```bash
-    \# This collects static files from paperless and django.
+    # This collects static files from paperless and django.
     sudo -Hu paperless python3 manage.py runserver
     ```
 
@@ -480,7 +480,7 @@ supported.
     not available for most distributions.
 
 15. Optional: If using the NLTK machine learning processing (see
-    `PAPERLESS_ENABLE_NLTK` in [configuration](configuration#software_tweaks) for details),
+    `PAPERLESS_ENABLE_NLTK` in [configuration](/configuration#software_tweaks) for details),
     download the NLTK data for the Snowball
     Stemmer, Stopwords and Punkt tokenizer to your
     `PAPERLESS_DATA_DIR/nltk`. Refer to the [NLTK
@@ -562,7 +562,7 @@ Migration to paperless-ngx is then performed in a few simple steps:
     the docker-compose files from
     [here](https://github.com/paperless-ngx/paperless-ngx/tree/master/docker/compose)
     or clone the repository to build the image yourself (see
-    [above](/setup#docker_build)). You can
+    [above](#docker_build)). You can
     either replace your current paperless folder or put paperless-ngx in
     a different location.
 
@@ -586,7 +586,7 @@ Migration to paperless-ngx is then performed in a few simple steps:
     after you migrated your existing SQLite database.
 
 5.  Adjust `docker-compose.yml` and `docker-compose.env` to your needs.
-    See [Docker setup](setup#docker_hub) details on
+    See [Docker setup](#docker_hub) details on
     which edits are advised.
 
 6.  [Update paperless.](/administration#updating)
@@ -676,7 +676,7 @@ below use PostgreSQL, but are applicable to MySQL/MariaDB with the
 !!! warning
 
     MySQL is case insensitive by default, treating values like "Name" and
-    "NAME" as identical. See [MySQL caveats](advanced##mysql-caveats) for details.
+    "NAME" as identical. See [MySQL caveats](/advanced_usage#mysql-caveats) for details.
 
 !!! warning
 
@@ -691,7 +691,7 @@ below use PostgreSQL, but are applicable to MySQL/MariaDB with the
     file to `docker-compose.yml`. Remember to adjust the consumption
     directory, if necessary.
     b) Without docker, configure the database in your `paperless.conf`
-    file. See [configuration](configuration) for
+    file. See [configuration](/configuration) for
     details.
 
 3.  Open a shell and initialize the database:
@@ -766,7 +766,7 @@ After that, you need to clear your cookies (Paperless-ngx comes with
 updated dependencies that do cookie-processing differently) and probably
 your cache as well.
 
-# Considerations for less powerful devices {#less_powerful_devices}
+# Considerations for less powerful devices {#less-powerful-devices}
 
 Paperless runs on Raspberry Pi. However, some things are rather slow on
 the Pi and configuring some options in paperless can help improve
@@ -797,12 +797,12 @@ performance immensely:
   more advanced language processing, which can take more memory and
   processing time.
 
-For details, refer to [configuration](configuration).
+For details, refer to [configuration](/configuration).
 
 !!! note
 
     Updating the
-    [automatic matching algorithm](/advanced_usage#automatic_matching) takes quite a bit of time. However, the update mechanism
+    [automatic matching algorithm](/advanced_usage#automatic-matching) takes quite a bit of time. However, the update mechanism
     checks if your data has changed before doing the heavy lifting. If you
     experience the algorithm taking too much cpu time, consider changing the
     schedule in the admin interface to daily. You can also manually invoke
@@ -849,7 +849,7 @@ http {
 ```
 
 The `PAPERLESS_URL` configuration variable is also required when using a
-reverse proxy. Please refer to the [hosting and security](configuration#hosting-and-security) docs.
+reverse proxy. Please refer to the [hosting and security](/configuration#hosting-and-security) docs.
 
 Also read
 [this](https://channels.readthedocs.io/en/stable/deploying.html#nginx-supervisor-ubuntu),

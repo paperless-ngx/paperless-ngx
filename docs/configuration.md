@@ -10,12 +10,10 @@ run paperless, these settings have to be defined in different places.
 - If you are running paperless on anything else, paperless will search
   for the configuration file in these locations and use the first one
   it finds:
-
-  ```
-  /path/to/paperless/paperless.conf
-  /etc/paperless.conf
-  /usr/local/etc/paperless.conf
-  ```
+  - The environment variable `PAPERLESS_CONFIGURATION_PATH`
+  - `/path/to/paperless/paperless.conf`
+  - `/etc/paperless.conf`
+  - `/usr/local/etc/paperless.conf`
 
 ## Required services
 
@@ -33,19 +31,19 @@ matcher.
     [More information on securing your Redis
     Instance](https://redis.io/docs/getting-started/#securing-redis).
 
-    Defaults to <redis://localhost:6379>.
+    Defaults to `redis://localhost:6379`.
 
 `PAPERLESS_DBENGINE=<engine_name>`
 
 : Optional, gives the ability to choose Postgres or MariaDB for
-database engine. Available options are [postgresql]{.title-ref} and
-[mariadb]{.title-ref}.
+database engine. Available options are `postgresql` and
+`mariadb`.
 
-    Default is [postgresql]{.title-ref}.
+    Default is `postgresql`.
 
     !!! warning
 
-        Using MariaDB comes with some caveats. See [MySQL Caveats](advanced_usage#mysql-caveats).
+        Using MariaDB comes with some caveats. See [MySQL Caveats](/advanced_usage#mysql-caveats).
 
 `PAPERLESS_DBHOST=<hostname>`
 
@@ -150,25 +148,25 @@ files created using "collectstatic" manager command are stored.
 `PAPERLESS_FILENAME_FORMAT=<format>`
 
 : Changes the filenames paperless uses to store documents in the media
-directory. See [File name handling](advanced_usage#file_name_handling) for details.
+directory. See [File name handling](/advanced_usage#file-name-handling) for details.
 
     Default is none, which disables this feature.
 
 `PAPERLESS_FILENAME_FORMAT_REMOVE_NONE=<bool>`
 
 : Tells paperless to replace placeholders in
-[PAPERLESS_FILENAME_FORMAT]{.title-ref} that would resolve to
+`PAPERLESS_FILENAME_FORMAT` that would resolve to
 'none' to be omitted from the resulting filename. This also holds
-true for directory names. See [File name handling](advanced_usage#file_name_handling) for
+true for directory names. See [File name handling](/advanced_usage#file-name-handling) for
 details.
 
-    Defaults to [false]{.title-ref} which disables this feature.
+    Defaults to `false` which disables this feature.
 
 `PAPERLESS_LOGGING_DIR=<path>`
 
 : This is where paperless will store log files.
 
-    Defaults to "`PAPERLESS_DATA_DIR`/log/".
+    Defaults to `PAPERLESS_DATA_DIR/log/`.
 
 `PAPERLESS_NLTK_DIR=<path>`
 
@@ -296,10 +294,10 @@ login with the selected user.
 : If this environment variable is specified, Paperless automatically
 creates a superuser with the provided username at start. This is
 useful in cases where you can not run the
-[createsuperuser]{.title-ref} command separately, such as Kubernetes
+`createsuperuser` command separately, such as Kubernetes
 or AWS ECS.
 
-    Requires [PAPERLESS_ADMIN_PASSWORD]{.title-ref} to be set.
+    Requires PAPERLESS_ADMIN_PASSWORD be set.
 
     !!! note
 
@@ -310,13 +308,13 @@ or AWS ECS.
 `PAPERLESS_ADMIN_MAIL=<email>`
 
 : (Optional) Specify superuser email address. Only used when
-[PAPERLESS_ADMIN_USER]{.title-ref} is set.
+PAPERLESS_ADMIN_USER is set.
 
     Defaults to `root@localhost`.
 
 `PAPERLESS_ADMIN_PASSWORD=<password>`
 
-: Only used when [PAPERLESS_ADMIN_USER]{.title-ref} is set. This will
+: Only used when PAPERLESS_ADMIN_USER is set. This will
 be the password of the automatically created superuser.
 
 `PAPERLESS_COOKIE_PREFIX=<str>`
@@ -344,26 +342,25 @@ applications.
         If you're exposing paperless to the internet directly, do not use
         this.
 
-        Also see the warning [in the official documentation
-        <https://docs.djangoproject.com/en/3.1/howto/auth-remote-user/#configuration>]{.title-ref}.
+        Also see the warning [in the official documentation](https://docs.djangoproject.com/en/3.1/howto/auth-remote-user/#configuration).
 
-    Defaults to [false]{.title-ref} which disables this feature.
+    Defaults to "false" which disables this feature.
 
 `PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME=<str>`
 
-: If [PAPERLESS_ENABLE_HTTP_REMOTE_USER]{.title-ref} is enabled, this
+: If "PAPERLESS*ENABLE_HTTP_REMOTE_USER" is enabled, this
 property allows to customize the name of the HTTP header from which
 the authenticated username is extracted. Values are in terms of
-\[HttpRequest.META\](<https://docs.djangoproject.com/en/3.1/ref/request-response/#django.http.HttpRequest.META>).
-Thus, the configured value must start with [HTTP\_]{.title-ref}
+[HttpRequest.META](https://docs.djangoproject.com/en/3.1/ref/request-response/#django.http.HttpRequest.META).
+Thus, the configured value must start with `HTTP*`
 followed by the normalized actual header name.
 
-    Defaults to [HTTP_REMOTE_USER]{.title-ref}.
+    Defaults to "HTTP_REMOTE_USER".
 
 `PAPERLESS_LOGOUT_REDIRECT_URL=<str>`
 
 : URL to redirect the user to after a logout. This can be used
-together with [PAPERLESS_ENABLE_HTTP_REMOTE_USER]{.title-ref} to
+together with PAPERLESS_ENABLE_HTTP_REMOTE_USER to
 redirect the user back to the SSO application's logout page.
 
     Defaults to None, which disables this feature.
@@ -381,7 +378,7 @@ needs.
 parsing documents.
 
     It should be a 3-letter language code consistent with ISO 639:
-    <https://www.loc.gov/standards/iso639-2/php/code_list.php>
+    https://www.loc.gov/standards/iso639-2/php/code_list.php
 
     Set this to the language most of your documents are written in.
 
@@ -642,8 +639,7 @@ Add the configuration variables to the environment of the webserver
 and add the additional services below the webserver service. Watch out
 for indentation.
 
-Make sure to use the correct format [PAPERLESS_TIKA_ENABLED =
-1]{.title-ref} so python_dotenv can parse the statement correctly.
+Make sure to use the correct format `PAPERLESS_TIKA_ENABLED = 1` so python_dotenv can parse the statement correctly.
 
 ## Software tweaks {#software_tweaks}
 
@@ -666,7 +662,7 @@ paperless will process in parallel on a single document.
 
         Ensure that the product
 
-        `PAPERLESS_TASK_WORKERS \:   PAPERLESS_THREADS_PER_WORKER`
+        `PAPERLESS_TASK_WORKERS * PAPERLESS_THREADS_PER_WORKER`
 
         does not exceed your CPU core count or else paperless will be
         extremely slow. If you want paperless to process many documents in
@@ -678,7 +674,7 @@ paperless will process in parallel on a single document.
     count, with a slight favor towards threads per worker:
 
     | CPU core count | Workers | Threads |
-    |----------------|---------|---------|
+    | -------------- | ------- | ------- |
     | > 1            | > 1     | > 1     |
     | > 2            | > 2     | > 1     |
     | > 4            | > 2     | > 2     |
@@ -780,7 +776,7 @@ consumption directory as well.
 `PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS=<bool>`
 
 : Set the names of subdirectories as tags for consumed files. E.g.
-<CONSUMPTION_DIR>/foo/bar/file.pdf will add the tags "foo" and
+`<CONSUMPTION_DIR>/foo/bar/file.pdf` will add the tags "foo" and
 "bar" to the consumed file. Paperless will create any tags that
 don't exist yet.
 
@@ -855,7 +851,7 @@ documents.
 
 : After a document is consumed, Paperless can trigger an arbitrary
 script if you like. This script will be passed a number of arguments
-for you to work with. For more information, take a look at [Post-consumption script](advanced_usage#post_consume_script).
+for you to work with. For more information, take a look at [Post-consumption script](/advanced_usage#post-consume-script).
 
     The default is blank, which means nothing will be executed.
 
@@ -869,8 +865,7 @@ option as specified in
 The filename will be checked first, and if nothing is found, the
 document text will be checked as normal.
 
-    A date in a filename must have some separators ([.]{.title-ref},
-    [-]{.title-ref}, [/]{.title-ref}, etc) for it to be parsed.
+    A date in a filename must have some separators (`.`, `,`, `-`, `/`, etc) for it to be parsed.
 
     Defaults to none, which disables this feature.
 
@@ -956,7 +951,7 @@ the literal path for that program.
 
 These options don't have any effect in `paperless.conf`. These options
 adjust the behavior of the docker container. Configure these in
-[docker-compose.env]{.title-ref}.
+`docker-compose.env`.
 
 `PAPERLESS_WEBSERVER_WORKERS=<num>`
 
@@ -974,7 +969,7 @@ increase RAM usage.
 There are special setups where you may need to configure this value
 to restrict the Ip address or interface the webserver listens on.
 
-    Defaults to \[::\], meaning all interfaces, including IPv6.
+    Defaults to `[::]`, meaning all interfaces, including IPv6.
 
 `PAPERLESS_PORT=<port>`
 
@@ -1045,7 +1040,7 @@ configuration option:
 [Flower](https://flower.readthedocs.io/en/latest/index.html) will be
 started by the container.
 
-    You can read more about this in the [advanced documentation](advanced#celery-monitoring).
+    You can read more about this in the [advanced documentation](/advanced_usage#celery-monitoring).
 
 ## Update Checking {#update-checking}
 
