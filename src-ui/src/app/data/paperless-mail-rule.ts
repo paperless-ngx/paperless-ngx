@@ -2,7 +2,8 @@ import { ObjectWithId } from './object-with-id'
 
 export enum MailFilterAttachmentType {
   Attachments = 1,
-  Everything = 2,
+  Email_Only = 2,
+  Everything = 3,
 }
 
 export enum MailAction {
