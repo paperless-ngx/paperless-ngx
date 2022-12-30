@@ -64,8 +64,7 @@ steps described in [Docker setup](#docker_hub) automatically.
 
         If you want to use the included `docker-compose.*.yml` file, you
         need to have at least Docker version **17.09.0** and docker-compose
-        version **1.17.0**. To check do: `docker-compose -v` or
-        `docker -v`
+        version **1.17.0**. To check do: `docker-compose -v` or `docker -v`
 
         See the [Docker installation guide](https://docs.docker.com/engine/install/) on how to install the current
         version of Docker for your operating system or Linux distribution of
@@ -314,14 +313,34 @@ supported.
         extension](https://code.djangoproject.com/wiki/JSON1Extension) is
         enabled. This is usually the case, but not always.
 
-4.  Get the release archive from
-    <https://github.com/paperless-ngx/paperless-ngx/releases>. Extract the
-    archive to a place from where you wish to execute it, such as
-    `/opt/paperless`. If you clone the git repo as it is, you also have to
+4.  Create a system user with a new home folder under which you wish
+    to run paperless.
+
+    ```shell-session
+    adduser paperless --system --home /opt/paperless --group
+    ```
+
+5.  Get the release archive from
+    <https://github.com/paperless-ngx/paperless-ngx/releases> for example with
+
+    ```shell-session
+    curl -O -L https://github.com/paperless-ngx/paperless-ngx/releases/download/v1.10.2/paperless-ngx-v1.10.2.tar.xz
+    ```
+
+    Extract the archive with
+
+    ```shell-session
+    tar -xf paperless-ngx-v1.10.2.tar.xz
+    ```
+
+    and copy the contents to the
+    home folder of the user you created before (`/opt/paperless`).
+
+    Optional: If you cloned the git repo, you will have to
     compile the frontend yourself, see [here](/development#front-end-development)
     and use the `build` step, not `serve`.
 
-5.  Configure paperless. See [configuration](/configuration) for details.
+6.  Configure paperless. See [configuration](/configuration) for details.
     Edit the included `paperless.conf` and adjust the settings to your
     needs. Required settings for getting
     paperless running are:
@@ -354,20 +373,27 @@ supported.
       documents are written in.
     - Set `PAPERLESS_TIME_ZONE` to your local time zone.
 
-6.  Create a system user under which you wish to run paperless.
-
-    ```shell-session
-    adduser paperless --system --home /opt/paperless --group
-    ```
-
-7.  Ensure that these directories exist and that the paperless user has
-    write permissions to the following directories:
+7.  Create the following directories if they are missing:
 
     - `/opt/paperless/media`
     - `/opt/paperless/data`
     - `/opt/paperless/consume`
 
     Adjust as necessary if you configured different folders.
+    Ensure that the paperless user has write permissions for every one
+    of these folders with
+
+    ```shell-session
+    ls -l -d /opt/paperless/media
+    ```
+
+    If needed, change the owner with
+
+    ```shell-session
+    sudo chown paperless:paperless /opt/paperless/media
+    sudo chown paperless:paperless /opt/paperless/data
+    sudo chown paperless:paperless /opt/paperless/consume
+    ```
 
 8.  Install python requirements from the `requirements.txt` file. It is
     up to you if you wish to use a virtual environment or not. First you
@@ -401,7 +427,9 @@ supported.
     sudo -Hu paperless python3 manage.py runserver
     ```
 
-    and pointing your browser to <http://localhost:8000/>.
+    and pointing your browser to http://localhost:8000 if
+    accessing from the same devices on which paperless is installed.
+    If accessing from another machine, set up systemd services.
 
     !!! warning
 
@@ -451,6 +479,14 @@ supported.
 
         For instructions on how to use nginx for that,
         [see the instructions below](/setup#nginx).
+
+    !!! warning
+
+        If celery won't start (check with
+        `sudo systemctl status paperless-task-queue.service` for
+        paperless-task-queue.service and paperless-scheduler.service
+        ) you need to change the path in the files. Example:
+        `ExecStart=/opt/paperless/.local/bin/celery --app paperless worker --loglevel INFO`
 
 12. Optional: Install a samba server and make the consumption folder
     available as a network share.
