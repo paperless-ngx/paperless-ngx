@@ -416,6 +416,13 @@ if _paperless_url:
         # always allow localhost. Necessary e.g. for healthcheck in docker.
         ALLOWED_HOSTS = [_paperless_uri.hostname] + ["localhost"]
 
+# For use with trusted proxies
+_trusted_proxies = os.getenv("PAPERLESS_TRUSTED_PROXIES")
+if _trusted_proxies:
+    TRUSTED_PROXIES = _trusted_proxies.split(",")
+else:
+    TRUSTED_PROXIES = []
+
 # The secret key has a default that should be fine so long as you're hosting
 # Paperless on a closed network.  However, if you're putting this anywhere
 # public, you should change the key to something unique and verbose.
