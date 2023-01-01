@@ -42,7 +42,7 @@
     "@angular-devkit/build-angular": "~14.2.7",
     "@angular-eslint/builder": "14.4.0",
     "@angular-eslint/eslint-plugin": "14.4.0",
-    "@angular-eslint/eslint-plugin-template": "14.4.0",
+    "@angular-eslint/eslint-plugin-template": "15.1.0",
     "@angular-eslint/schematics": "14.4.0",
     "@angular-eslint/template-parser": "14.4.0",
     "@angular/cli": "~14.2.7",
