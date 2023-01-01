@@ -30,27 +30,27 @@
             [(selectionModel)]="tagSelectionModel"
             (selectionModelChange)="updateRules()"
             [multiple]="true"
-            (open)="onTagsDropdownOpen()"
+            (opened)="onTagsDropdownOpen()"
             [allowSelectNone]="true"></app-filterable-dropdown>
           <app-filterable-dropdown class="flex-fill" title="Correspondent" icon="person-fill" i18n-title
             filterPlaceholder="Filter correspondents" i18n-filterPlaceholder
             [items]="correspondents"
             [(selectionModel)]="correspondentSelectionModel"
             (selectionModelChange)="updateRules()"
-            (open)="onCorrespondentDropdownOpen()"
+            (opened)="onCorrespondentDropdownOpen()"
             [allowSelectNone]="true"></app-filterable-dropdown>
           <app-filterable-dropdown class="flex-fill" title="Document type" icon="file-earmark-fill" i18n-title
             filterPlaceholder="Filter document types" i18n-filterPlaceholder
             [items]="documentTypes"
             [(selectionModel)]="documentTypeSelectionModel"
-            (open)="onDocumentTypeDropdownOpen()"
+            (opened)="onDocumentTypeDropdownOpen()"
             (selectionModelChange)="updateRules()"
             [allowSelectNone]="true"></app-filterable-dropdown>
           <app-filterable-dropdown class="me-2 flex-fill" title="Storage path" icon="folder-fill" i18n-title
             filterPlaceholder="Filter storage paths" i18n-filterPlaceholder
             [items]="storagePaths"
             [(selectionModel)]="storagePathSelectionModel"
-            (open)="onStoragePathDropdownOpen()"
+            (opened)="onStoragePathDropdownOpen()"
             (selectionModelChange)="updateRules()"
             [allowSelectNone]="true"></app-filterable-dropdown>
         </div>

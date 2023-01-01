@@ -8,6 +8,8 @@ import requests
 from bleach import clean
 from bleach import linkify
 from django.conf import settings
+from django.utils.timezone import is_naive
+from django.utils.timezone import make_aware
 from documents.parsers import DocumentParser
 from documents.parsers import make_thumbnail_from_pdf
 from documents.parsers import ParseError
@@ -135,7 +137,11 @@ class MailDocumentParser(DocumentParser):
 
         self.text += f"\n\n{strip_text(mail.text)}"
 
-        self.date = mail.date
+        if is_naive(mail.date):
+            self.date = make_aware(mail.date)
+        else:
+            self.date = mail.date
+
         self.archive_path = self.generate_pdf(document_path)
 
     def tika_parse(self, html: str):
