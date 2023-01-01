@@ -135,6 +135,13 @@ export class DocumentDetailComponent
       : this.metadata?.original_mime_type
   }
 
+  get isRTL() {
+    if (!this.metadata || !this.metadata.lang) return false
+    else {
+      return ['ar', 'he', 'fe'].includes(this.metadata.lang)
+    }
+  }
+
   ngOnInit(): void {
     this.documentForm.valueChanges
       .pipe(takeUntil(this.unsubscribeNotifier))
