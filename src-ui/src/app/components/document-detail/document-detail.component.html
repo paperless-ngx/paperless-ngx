@@ -91,7 +91,7 @@
                     <a ngbNavLink i18n>Content</a>
                     <ng-template ngbNavContent>
                         <div class="mb-3">
-                            <textarea class="form-control" id="content" rows="20" formControlName='content'></textarea>
+                            <textarea class="form-control" id="content" rows="20" formControlName='content' [class.rtl]="isRTL"></textarea>
                         </div>
                     </ng-template>
                 </li>
