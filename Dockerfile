@@ -165,6 +165,7 @@ COPY [ \
   "docker/docker-prepare.sh", \
   "docker/paperless_cmd.sh", \
   "docker/wait-for-redis.py", \
+  "docker/env-from-file.sh", \
   "docker/management_script.sh", \
   "docker/flower-conditional.sh", \
   "docker/install_management_commands.sh", \
@@ -184,6 +185,8 @@ RUN set -eux \
     && chmod 755 /sbin/docker-prepare.sh \
     && mv wait-for-redis.py /sbin/wait-for-redis.py \
     && chmod 755 /sbin/wait-for-redis.py \
+    && mv env-from-file.sh /sbin/env-from-file.sh \
+    && chmod 755 /sbin/env-from-file.sh \
     && mv paperless_cmd.sh /usr/local/bin/paperless_cmd.sh \
     && chmod 755 /usr/local/bin/paperless_cmd.sh \
     && mv flower-conditional.sh /usr/local/bin/flower-conditional.sh \
