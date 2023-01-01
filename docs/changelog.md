@@ -4,9 +4,9 @@
 
 ### Breaking Changes
 
-*Note: PR #2279 could represent a breaking change to the API which may affect third party applications that were only checking the `post_document` endpoint for result = 'OK' as opposed to e.g. HTTP status = 200*
+_Note: PR #2279 could represent a breaking change to the API which may affect third party applications that were only checking the `post_document` endpoint for e.g. result = 'OK' as opposed to e.g. HTTP status = 200_
 
-- Bugfix: Return created task ID when posting document to API [@stumpylog](https://github.com/stumpylog) ([#2279](https://github.com/paperless-ngx/paperless-ngx/pull/2279)) 
+- Bugfix: Return created task ID when posting document to API [@stumpylog](https://github.com/stumpylog) ([#2279](https://github.com/paperless-ngx/paperless-ngx/pull/2279))
 
 ### Bug Fixes
 
