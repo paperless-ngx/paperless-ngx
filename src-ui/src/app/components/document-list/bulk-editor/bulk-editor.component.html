@@ -32,7 +32,7 @@
         [editing]="true"
         [multiple]="true"
         [applyOnClose]="applyOnClose"
-        (open)="openTagsDropdown()"
+        (opened)="openTagsDropdown()"
         [(selectionModel)]="tagSelectionModel"
         (apply)="setTags($event)">
       </app-filterable-dropdown>
@@ -42,7 +42,7 @@
         [disabled]="!userCanEditAll"
         [editing]="true"
         [applyOnClose]="applyOnClose"
-        (open)="openCorrespondentDropdown()"
+        (opened)="openCorrespondentDropdown()"
         [(selectionModel)]="correspondentSelectionModel"
         (apply)="setCorrespondents($event)">
       </app-filterable-dropdown>
@@ -52,7 +52,7 @@
         [disabled]="!userCanEditAll"
         [editing]="true"
         [applyOnClose]="applyOnClose"
-        (open)="openDocumentTypeDropdown()"
+        (opened)="openDocumentTypeDropdown()"
         [(selectionModel)]="documentTypeSelectionModel"
         (apply)="setDocumentTypes($event)">
       </app-filterable-dropdown>
@@ -62,7 +62,7 @@
         [disabled]="!userCanEditAll"
         [editing]="true"
         [applyOnClose]="applyOnClose"
-        (open)="openStoragePathDropdown()"
+        (opened)="openStoragePathDropdown()"
         [(selectionModel)]="storagePathsSelectionModel"
         (apply)="setStoragePaths($event)">
       </app-filterable-dropdown>

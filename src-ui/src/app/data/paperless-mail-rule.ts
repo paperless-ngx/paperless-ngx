@@ -5,6 +5,12 @@ export enum MailFilterAttachmentType {
   Everything = 2,
 }
 
+export enum MailRuleConsumptionScope {
+  Attachments = 1,
+  Email_Only = 2,
+  Everything = 3,
+}
+
 export enum MailAction {
   Delete = 1,
   Move = 2,

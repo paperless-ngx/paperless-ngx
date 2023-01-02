@@ -797,6 +797,8 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
     @mock.patch("documents.views.consume_file.delay")
     def test_upload(self, m):
 
+        m.return_value = celery.result.AsyncResult(id=str(uuid.uuid4()))
+
         with open(
             os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"),
             "rb",
@@ -819,6 +821,8 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
     @mock.patch("documents.views.consume_file.delay")
     def test_upload_empty_metadata(self, m):
+
+        m.return_value = celery.result.AsyncResult(id=str(uuid.uuid4()))
 
         with open(
             os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"),
@@ -843,6 +847,8 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
     @mock.patch("documents.views.consume_file.delay")
     def test_upload_invalid_form(self, m):
 
+        m.return_value = celery.result.AsyncResult(id=str(uuid.uuid4()))
+
         with open(
             os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"),
             "rb",
@@ -857,6 +863,8 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
     @mock.patch("documents.views.consume_file.delay")
     def test_upload_invalid_file(self, m):
 
+        m.return_value = celery.result.AsyncResult(id=str(uuid.uuid4()))
+
         with open(
             os.path.join(os.path.dirname(__file__), "samples", "simple.zip"),
             "rb",
@@ -870,6 +878,9 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
     @mock.patch("documents.views.consume_file.delay")
     def test_upload_with_title(self, async_task):
+
+        async_task.return_value = celery.result.AsyncResult(id=str(uuid.uuid4()))
+
         with open(
             os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"),
             "rb",
@@ -888,6 +899,9 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
     @mock.patch("documents.views.consume_file.delay")
     def test_upload_with_correspondent(self, async_task):
+
+        async_task.return_value = celery.result.AsyncResult(id=str(uuid.uuid4()))
+
         c = Correspondent.objects.create(name="test-corres")
         with open(
             os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"),
@@ -907,6 +921,9 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
     @mock.patch("documents.views.consume_file.delay")
     def test_upload_with_invalid_correspondent(self, async_task):
+
+        async_task.return_value = celery.result.AsyncResult(id=str(uuid.uuid4()))
+
         with open(
             os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"),
             "rb",
@@ -921,6 +938,9 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
     @mock.patch("documents.views.consume_file.delay")
     def test_upload_with_document_type(self, async_task):
+
+        async_task.return_value = celery.result.AsyncResult(id=str(uuid.uuid4()))
+
         dt = DocumentType.objects.create(name="invoice")
         with open(
             os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"),
@@ -940,6 +960,9 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
     @mock.patch("documents.views.consume_file.delay")
     def test_upload_with_invalid_document_type(self, async_task):
+
+        async_task.return_value = celery.result.AsyncResult(id=str(uuid.uuid4()))
+
         with open(
             os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"),
             "rb",
@@ -954,6 +977,9 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
     @mock.patch("documents.views.consume_file.delay")
     def test_upload_with_tags(self, async_task):
+
+        async_task.return_value = celery.result.AsyncResult(id=str(uuid.uuid4()))
+
         t1 = Tag.objects.create(name="tag1")
         t2 = Tag.objects.create(name="tag2")
         with open(
@@ -974,6 +1000,9 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
     @mock.patch("documents.views.consume_file.delay")
     def test_upload_with_invalid_tags(self, async_task):
+
+        async_task.return_value = celery.result.AsyncResult(id=str(uuid.uuid4()))
+
         t1 = Tag.objects.create(name="tag1")
         t2 = Tag.objects.create(name="tag2")
         with open(
@@ -990,6 +1019,9 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
     @mock.patch("documents.views.consume_file.delay")
     def test_upload_with_created(self, async_task):
+
+        async_task.return_value = celery.result.AsyncResult(id=str(uuid.uuid4()))
+
         created = datetime.datetime(
             2022,
             5,
@@ -3039,6 +3071,59 @@ class TestTasks(APITestCase):
         self.assertEqual(returned_task2["task_id"], task2.task_id)
         self.assertEqual(returned_task2["status"], celery.states.PENDING)
         self.assertEqual(returned_task2["task_file_name"], task2.task_file_name)
+
+    def test_get_single_task_status(self):
+        """
+        GIVEN
+            - Query parameter for a valid task ID
+        WHEN:
+            - API call is made to get task status
+        THEN:
+            - Single task data is returned
+        """
+
+        id1 = str(uuid.uuid4())
+        task1 = PaperlessTask.objects.create(
+            task_id=id1,
+            task_file_name="task_one.pdf",
+        )
+
+        _ = PaperlessTask.objects.create(
+            task_id=str(uuid.uuid4()),
+            task_file_name="task_two.pdf",
+        )
+
+        response = self.client.get(self.ENDPOINT + f"?task_id={id1}")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        returned_task1 = response.data[0]
+
+        self.assertEqual(returned_task1["task_id"], task1.task_id)
+
+    def test_get_single_task_status_not_valid(self):
+        """
+        GIVEN
+            - Query parameter for a non-existent task ID
+        WHEN:
+            - API call is made to get task status
+        THEN:
+            - No task data is returned
+        """
+        task1 = PaperlessTask.objects.create(
+            task_id=str(uuid.uuid4()),
+            task_file_name="task_one.pdf",
+        )
+
+        _ = PaperlessTask.objects.create(
+            task_id=str(uuid.uuid4()),
+            task_file_name="task_two.pdf",
+        )
+
+        response = self.client.get(self.ENDPOINT + "?task_id=bad-task-id")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 0)
 
     def test_acknowledge_tasks(self):
         """

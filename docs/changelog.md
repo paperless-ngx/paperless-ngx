@@ -1,5 +1,44 @@
 # Changelog
 
+## paperless-ngx 1.11.3
+
+### Breaking Changes
+
+_Note: PR #2279 could represent a breaking change to the API which may affect third party applications that were only checking the `post_document` endpoint for e.g. result = 'OK' as opposed to e.g. HTTP status = 200_
+
+- Bugfix: Return created task ID when posting document to API [@stumpylog](https://github.com/stumpylog) ([#2279](https://github.com/paperless-ngx/paperless-ngx/pull/2279))
+
+### Bug Fixes
+
+- Bugfix: Fix no content when processing some RTL files [@stumpylog](https://github.com/stumpylog) ([#2295](https://github.com/paperless-ngx/paperless-ngx/pull/2295))
+- Bugfix: Handle email dates maybe being naive [@stumpylog](https://github.com/stumpylog) ([#2293](https://github.com/paperless-ngx/paperless-ngx/pull/2293))
+- Fix: live filterable dropdowns broken in 1.11.x [@shamoon](https://github.com/shamoon) ([#2292](https://github.com/paperless-ngx/paperless-ngx/pull/2292))
+- Bugfix: Reading environment from files didn't work for management commands [@stumpylog](https://github.com/stumpylog) ([#2261](https://github.com/paperless-ngx/paperless-ngx/pull/2261))
+- Bugfix: Return created task ID when posting document to API [@stumpylog](https://github.com/stumpylog) ([#2279](https://github.com/paperless-ngx/paperless-ngx/pull/2279))
+
+### All App Changes
+
+- Bugfix: Fix no content when processing some RTL files [@stumpylog](https://github.com/stumpylog) ([#2295](https://github.com/paperless-ngx/paperless-ngx/pull/2295))
+- Bugfix: Handle email dates maybe being naive [@stumpylog](https://github.com/stumpylog) ([#2293](https://github.com/paperless-ngx/paperless-ngx/pull/2293))
+- Fix: live filterable dropdowns broken in 1.11.x [@shamoon](https://github.com/shamoon) ([#2292](https://github.com/paperless-ngx/paperless-ngx/pull/2292))
+- Bugfix: Return created task ID when posting document to API [@stumpylog](https://github.com/stumpylog) ([#2279](https://github.com/paperless-ngx/paperless-ngx/pull/2279))
+
+## paperless-ngx 1.11.2
+
+Versions 1.11.1 and 1.11.2 contain bug fixes from v1.11.0 that prevented use of the new email consumption feature
+
+### Bug Fixes
+
+- Fix frontend mailrule missing consumption scope parameter [@shamoon](https://github.com/shamoon) ([#2280](https://github.com/paperless-ngx/paperless-ngx/pull/2280))
+- Fix: missing frontend email attachment options [@shamoon](https://github.com/shamoon) ([#2272](https://github.com/paperless-ngx/paperless-ngx/pull/2272))
+- Fix: edit dialog creation in v1.11.0 [@shamoon](https://github.com/shamoon) ([#2273](https://github.com/paperless-ngx/paperless-ngx/pull/2273))
+
+### All App Changes
+
+- Fix frontend mailrule missing consumption scope parameter [@shamoon](https://github.com/shamoon) ([#2280](https://github.com/paperless-ngx/paperless-ngx/pull/2280))
+- Fix: missing frontend email attachment options [@shamoon](https://github.com/shamoon) ([#2272](https://github.com/paperless-ngx/paperless-ngx/pull/2272))
+- Fix: edit dialog creation in v1.11.0 [@shamoon](https://github.com/shamoon) ([#2273](https://github.com/paperless-ngx/paperless-ngx/pull/2273))
+
 ## paperless-ngx 1.11.0
 
 ### Notable Changes
