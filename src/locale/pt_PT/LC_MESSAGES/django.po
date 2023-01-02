@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-09 21:50+0000\n"
-"PO-Revision-Date: 2022-11-09 23:11\n"
+"PO-Revision-Date: 2022-12-30 15:36\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -100,7 +100,7 @@ msgstr "tipos de documento"
 
 #: documents/models.py:93
 msgid "path"
-msgstr ""
+msgstr "caminho"
 
 #: documents/models.py:99 documents/models.py:127
 msgid "storage path"
@@ -396,7 +396,7 @@ msgstr "regras de filtragem"
 
 #: documents/models.py:536
 msgid "Task ID"
-msgstr ""
+msgstr "ID da tarefa"
 
 #: documents/models.py:537
 msgid "Celery ID for the Task that was run"
@@ -412,7 +412,7 @@ msgstr ""
 
 #: documents/models.py:549 documents/models.py:556
 msgid "Task Name"
-msgstr ""
+msgstr "Nome da Tarefa"
 
 #: documents/models.py:550
 msgid "Name of the file which the Task was run for"
@@ -626,7 +626,7 @@ msgstr ""
 
 #: paperless/settings.py:395
 msgid "Serbian"
-msgstr ""
+msgstr "Sérvio"
 
 #: paperless/settings.py:396
 msgid "Swedish"
@@ -634,11 +634,11 @@ msgstr "Sueco"
 
 #: paperless/settings.py:397
 msgid "Turkish"
-msgstr ""
+msgstr "Turco"
 
 #: paperless/settings.py:398
 msgid "Chinese Simplified"
-msgstr ""
+msgstr "Chinês Simplificado"
 
 #: paperless/urls.py:161
 msgid "Paperless-ngx administration"

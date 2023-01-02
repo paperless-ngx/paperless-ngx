@@ -12,6 +12,7 @@ import {
   MailMetadataCorrespondentOption,
   MailMetadataTitleOption,
   PaperlessMailRule,
+  MailRuleConsumptionScope,
 } from 'src/app/data/paperless-mail-rule'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
@@ -22,11 +23,26 @@ import { UserService } from 'src/app/services/rest/user.service'
 const ATTACHMENT_TYPE_OPTIONS = [
   {
     id: MailFilterAttachmentType.Attachments,
-    name: $localize`Only process attachments.`,
+    name: $localize`Only process attachments`,
   },
   {
     id: MailFilterAttachmentType.Everything,
-    name: $localize`Process all files, including 'inline' attachments.`,
+    name: $localize`Process all files, including 'inline' attachments`,
+  },
+]
+
+const CONSUMPTION_SCOPE_OPTIONS = [
+  {
+    id: MailRuleConsumptionScope.Attachments,
+    name: $localize`Only process attachments`,
+  },
+  {
+    id: MailRuleConsumptionScope.Email_Only,
+    name: $localize`Process message as .eml`,
+  },
+  {
+    id: MailRuleConsumptionScope.Everything,
+    name: $localize`Process message as .eml and attachments separately`,
   },
 ]
 
@@ -138,6 +154,7 @@ export class MailRuleEditDialogComponent extends EditDialogComponent<PaperlessMa
       filter_attachment_filename: new FormControl(null),
       maximum_age: new FormControl(null),
       attachment_type: new FormControl(MailFilterAttachmentType.Attachments),
+      consumption_scope: new FormControl(MailRuleConsumptionScope.Attachments),
       action: new FormControl(MailAction.MarkRead),
       action_parameter: new FormControl(null),
       assign_title_from: new FormControl(MailMetadataTitleOption.FromSubject),
@@ -178,5 +195,9 @@ export class MailRuleEditDialogComponent extends EditDialogComponent<PaperlessMa
 
   get metadataCorrespondentOptions() {
     return METADATA_CORRESPONDENT_OPTIONS
+  }
+
+  get consumptionScopeOptions() {
+    return CONSUMPTION_SCOPE_OPTIONS
   }
 }

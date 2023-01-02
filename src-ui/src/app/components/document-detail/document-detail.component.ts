@@ -320,7 +320,7 @@ export class DocumentDetailComponent
     })
     modal.componentInstance.dialogMode = 'create'
     if (newName) modal.componentInstance.object = { name: newName }
-    modal.componentInstance.success
+    modal.componentInstance.succeeded
       .pipe(
         switchMap((newDocumentType) => {
           return this.documentTypeService
@@ -341,7 +341,7 @@ export class DocumentDetailComponent
     })
     modal.componentInstance.dialogMode = 'create'
     if (newName) modal.componentInstance.object = { name: newName }
-    modal.componentInstance.success
+    modal.componentInstance.succeeded
       .pipe(
         switchMap((newCorrespondent) => {
           return this.correspondentService
@@ -364,7 +364,7 @@ export class DocumentDetailComponent
     })
     modal.componentInstance.dialogMode = 'create'
     if (newName) modal.componentInstance.object = { name: newName }
-    modal.componentInstance.success
+    modal.componentInstance.succeeded
       .pipe(
         switchMap((newStoragePath) => {
           return this.storagePathService
