@@ -1,6 +1,7 @@
 import json
 import os
 import re
+import subprocess
 from pathlib import Path
 from typing import Optional
 
@@ -78,6 +79,17 @@ class RasterisedDocumentParser(DocumentParser):
     def has_alpha(self, image):
         with Image.open(image) as im:
             return im.mode in ("RGBA", "LA")
+
+    def remove_alpha(self, image_path: str):
+        subprocess.run(
+            [
+                settings.CONVERT_BINARY,
+                "-alpha",
+                "off",
+                image_path,
+                image_path,
+            ],
+        )
 
     def get_dpi(self, image):
         try:
@@ -230,11 +242,7 @@ class RasterisedDocumentParser(DocumentParser):
                     f"Removing alpha layer from {input_file} "
                     "for compatibility with img2pdf",
                 )
-                with Image.open(input_file) as im:
-                    background = Image.new("RGBA", im.size, (255, 255, 255))
-                    background.alpha_composite(im)
-                    background = background.convert("RGB")
-                    background.save(input_file, format=im.format)
+                self.remove_alpha(input_file)
 
             if dpi:
                 self.log("debug", f"Detected DPI for image {input_file}: {dpi}")
