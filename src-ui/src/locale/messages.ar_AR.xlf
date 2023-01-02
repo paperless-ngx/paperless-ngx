@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
-  <file source-language="en" datatype="plaintext" original="ng2.template" target-language="ar-AR">
+  <file source-language="en" datatype="plaintext" original="ng2.template" target-language="ar">
     <body>
       <trans-unit id="ngb.alert.close" datatype="html">
         <source>Close</source>
