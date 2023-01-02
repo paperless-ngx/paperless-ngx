@@ -131,7 +131,7 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
       backdrop: 'static',
     })
     activeModal.componentInstance.dialogMode = 'create'
-    activeModal.componentInstance.success.subscribe({
+    activeModal.componentInstance.succeeded.subscribe({
       next: () => {
         this.reloadData()
         this.toastService.showInfo(
@@ -154,7 +154,7 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
     })
     activeModal.componentInstance.object = object
     activeModal.componentInstance.dialogMode = 'edit'
-    activeModal.componentInstance.success.subscribe({
+    activeModal.componentInstance.succeeded.subscribe({
       next: () => {
         this.reloadData()
         this.toastService.showInfo(
