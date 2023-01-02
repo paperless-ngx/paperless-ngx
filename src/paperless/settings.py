@@ -420,6 +420,7 @@ LANGUAGE_CODE = "en-us"
 
 LANGUAGES = [
     ("en-us", _("English (US)")),  # needs to be first to act as fallback language
+    ("ar-ar", _("Arabic")),
     ("be-by", _("Belarusian")),
     ("cs-cz", _("Czech")),
     ("da-dk", _("Danish")),
