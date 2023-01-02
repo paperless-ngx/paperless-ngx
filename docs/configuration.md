@@ -217,6 +217,11 @@ not include a trailing slash. E.g. <https://paperless.domain.com>
 
     Defaults to empty string, leaving the other settings unaffected.
 
+    !!! note
+
+        This value cannot contain a path (e.g. domain.com/path), even if
+        you are installing paperless-ngx at a subpath.
+
 `PAPERLESS_CSRF_TRUSTED_ORIGINS=<comma-separated-list>`
 
 : A list of trusted origins for unsafe requests (e.g. POST). As of
