@@ -620,7 +620,7 @@ export class SettingsComponent
     })
     modal.componentInstance.dialogMode = user ? 'edit' : 'create'
     modal.componentInstance.object = user
-    modal.componentInstance.success
+    modal.componentInstance.succeeded
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: (newUser) => {
@@ -676,7 +676,7 @@ export class SettingsComponent
     })
     modal.componentInstance.dialogMode = group ? 'edit' : 'create'
     modal.componentInstance.object = group
-    modal.componentInstance.success
+    modal.componentInstance.succeeded
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: (newGroup) => {
