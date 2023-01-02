@@ -80,6 +80,7 @@ import { TourNgBootstrapModule } from 'ngx-ui-tour-ng-bootstrap'
 import { MailAccountEditDialogComponent } from './components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component'
 import { MailRuleEditDialogComponent } from './components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component'
 
+import localeAr from '@angular/common/locales/ar'
 import localeBe from '@angular/common/locales/be'
 import localeCs from '@angular/common/locales/cs'
 import localeDa from '@angular/common/locales/da'
@@ -100,6 +101,7 @@ import localeSv from '@angular/common/locales/sv'
 import localeTr from '@angular/common/locales/tr'
 import localeZh from '@angular/common/locales/zh'
 
+registerLocaleData(localeAr)
 registerLocaleData(localeBe)
 registerLocaleData(localeCs)
 registerLocaleData(localeDa)
