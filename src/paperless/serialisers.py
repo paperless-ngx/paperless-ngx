@@ -18,7 +18,7 @@ class ObfuscatedUserPasswordField(serializers.Field):
 
 class UserSerializer(serializers.ModelSerializer):
 
-    password = ObfuscatedUserPasswordField()
+    password = ObfuscatedUserPasswordField(required=False)
     user_permissions = serializers.SlugRelatedField(
         many=True,
         queryset=Permission.objects.all(),
