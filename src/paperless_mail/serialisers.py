@@ -1,5 +1,6 @@
 from documents.serialisers import CorrespondentField
 from documents.serialisers import DocumentTypeField
+from documents.serialisers import OwnedObjectSerializer
 from documents.serialisers import TagsField
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
@@ -18,7 +19,7 @@ class ObfuscatedPasswordField(serializers.Field):
         return data
 
 
-class MailAccountSerializer(serializers.ModelSerializer):
+class MailAccountSerializer(OwnedObjectSerializer):
     password = ObfuscatedPasswordField()
 
     class Meta:
@@ -42,17 +43,13 @@ class MailAccountSerializer(serializers.ModelSerializer):
         super().update(instance, validated_data)
         return instance
 
-    def create(self, validated_data):
-        mail_account = MailAccount.objects.create(**validated_data)
-        return mail_account
-
 
 class AccountField(serializers.PrimaryKeyRelatedField):
     def get_queryset(self):
         return MailAccount.objects.all().order_by("-id")
 
 
-class MailRuleSerializer(serializers.ModelSerializer):
+class MailRuleSerializer(OwnedObjectSerializer):
     account = AccountField(required=True)
     action_parameter = serializers.CharField(
         allow_null=True,
@@ -96,7 +93,7 @@ class MailRuleSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         if "assign_tags" in validated_data:
             assign_tags = validated_data.pop("assign_tags")
-        mail_rule = MailRule.objects.create(**validated_data)
+        mail_rule = super().create(validated_data)
         if assign_tags:
             mail_rule.assign_tags.set(assign_tags)
         return mail_rule
