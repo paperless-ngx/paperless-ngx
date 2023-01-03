@@ -875,3 +875,4 @@ msgstr "تعيين مراسل من"
 #: paperless_mail/models.py:198
 msgid "assign this correspondent"
 msgstr "تعيين هذا المراسل"
+
