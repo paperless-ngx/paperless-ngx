@@ -48,6 +48,8 @@ export class UserEditDialogComponent
   getForm(): FormGroup {
     return new FormGroup({
       username: new FormControl(''),
+      email: new FormControl(''),
+      password: new FormControl(null),
       first_name: new FormControl(''),
       last_name: new FormControl(''),
       is_active: new FormControl(true),
