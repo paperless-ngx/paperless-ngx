@@ -142,7 +142,7 @@ class RasterisedDocumentParser(DocumentParser):
             text = None
             with tempfile.NamedTemporaryFile(
                 mode="w+",
-                dir=settings.SCRATCH_DIR,
+                dir=self.tempdir,
             ) as tmp:
                 subprocess.run(
                     [
