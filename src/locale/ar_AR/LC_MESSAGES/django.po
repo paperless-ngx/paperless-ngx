@@ -1,12 +1,13 @@
+
 msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-09 21:50+0000\n"
-"PO-Revision-Date: 2023-01-03 09:35\n"
+"PO-Revision-Date: 2022-12-09 07:39\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
-"Language: ar_SA\n"
+"Language: ar_AR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -875,4 +876,3 @@ msgstr "تعيين مراسل من"
 #: paperless_mail/models.py:198
 msgid "assign this correspondent"
 msgstr "تعيين هذا المراسل"
-
