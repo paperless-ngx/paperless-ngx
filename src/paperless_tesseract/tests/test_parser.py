@@ -542,6 +542,69 @@ class TestParser(DirectoriesMixin, TestCase):
             ],
         )
 
+    def test_multi_page_tiff(self):
+        """
+        GIVEN:
+            - Multi-page TIFF image
+        WHEN:
+            - Image is parsed
+        THEN:
+            - Text from all pages extracted
+        """
+        parser = RasterisedDocumentParser(None)
+        parser.parse(
+            os.path.join(self.SAMPLE_FILES, "multi-page-images.tiff"),
+            "image/tiff",
+        )
+        self.assertTrue(os.path.isfile(parser.archive_path))
+        self.assertContainsStrings(
+            parser.get_text().lower(),
+            ["page 1", "page 2", "page 3"],
+        )
+
+    def test_multi_page_tiff_alpha(self):
+        """
+        GIVEN:
+            - Multi-page TIFF image
+            - Image include an alpha channel
+        WHEN:
+            - Image is parsed
+        THEN:
+            - Text from all pages extracted
+        """
+        parser = RasterisedDocumentParser(None)
+        parser.parse(
+            os.path.join(self.SAMPLE_FILES, "multi-page-images-alpha.tiff"),
+            "image/tiff",
+        )
+        self.assertTrue(os.path.isfile(parser.archive_path))
+        self.assertContainsStrings(
+            parser.get_text().lower(),
+            ["page 1", "page 2", "page 3"],
+        )
+
+    def test_multi_page_tiff_alpha_srgb(self):
+        """
+        GIVEN:
+            - Multi-page TIFF image
+            - Image include an alpha channel
+            - Image is srgb colorspace
+        WHEN:
+            - Image is parsed
+        THEN:
+            - Text from all pages extracted
+        """
+        parser = RasterisedDocumentParser(None)
+        parser.parse(
+            os.path.join(self.SAMPLE_FILES, "multi-page-images-alpha-rgb.tiff"),
+            "image/tiff",
+        )
+        self.assertTrue(os.path.isfile(parser.archive_path))
+        self.assertContainsStrings(
+            parser.get_text().lower(),
+            ["page 1", "page 2", "page 3"],
+        )
+
     def test_ocrmypdf_parameters(self):
         parser = RasterisedDocumentParser(None)
         params = parser.construct_ocrmypdf_parameters(
