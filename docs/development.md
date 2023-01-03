@@ -248,7 +248,7 @@ Testing and code style:
 In order to build the front end and serve it as part of django, execute
 
 ```shell-session
-$ ng build --prod
+$ ng build --configuration production
 ```
 
 This will build the front end and put it in a location from which the
