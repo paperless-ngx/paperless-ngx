@@ -7,7 +7,6 @@ from typing import Union
 from unittest import mock
 
 from django.test import override_settings
-from documents.tests.test_migration_archive_files import thumbnail_path
 from documents.tests.utils import TestMigrations
 
 

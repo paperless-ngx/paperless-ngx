@@ -401,7 +401,7 @@ class TestBarcode(DirectoriesMixin, TestCase):
             self.assertEqual(
                 cm.output,
                 [
-                    f"WARNING:paperless.barcodes:No pages to split on!",
+                    "WARNING:paperless.barcodes:No pages to split on!",
                 ],
             )
 
