@@ -362,9 +362,6 @@ class Consumer(LoggingMixin):
                 exc_info=True,
                 exception=e,
             )
-        finally:
-            document_parser.memory_checkpoint("final")
-            document_parser.cleanup()
 
         # Prepare the document classifier.
 
@@ -451,6 +448,9 @@ class Consumer(LoggingMixin):
                 exc_info=True,
                 exception=e,
             )
+        finally:
+            document_parser.memory_checkpoint("final")
+            document_parser.cleanup()
 
         self.run_post_consume_script(document)
 
