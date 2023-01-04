@@ -69,7 +69,7 @@ class BogusClient:
                 if message.uid == args[0]:
                     flag = args[2]
                     if flag == "processed":
-                        message._raw_flag_data.append(f"+FLAGS (processed)".encode())
+                        message._raw_flag_data.append(b"+FLAGS (processed)")
                         MailMessage.flags.fget.cache_clear()
 
 
@@ -153,7 +153,7 @@ class BogusMailBox(ContextManager):
                     if flag == MailMessageFlags.SEEN:
                         message.seen = value
                     if flag == "processed":
-                        message._raw_flag_data.append(f"+FLAGS (processed)".encode())
+                        message._raw_flag_data.append(b"+FLAGS (processed)")
                         MailMessage.flags.fget.cache_clear()
 
     def move(self, uid_list, folder):
@@ -223,7 +223,7 @@ def create_message(
     imap_msg.seen = seen
     imap_msg.flagged = flagged
     if processed:
-        imap_msg._raw_flag_data.append(f"+FLAGS (processed)".encode())
+        imap_msg._raw_flag_data.append(b"+FLAGS (processed)")
         MailMessage.flags.fget.cache_clear()
 
     return imap_msg

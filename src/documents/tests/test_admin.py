@@ -1,5 +1,3 @@
-from unittest import mock
-
 from django.contrib.admin.sites import AdminSite
 from django.test import TestCase
 from django.utils import timezone
