@@ -149,7 +149,7 @@
 
                 <li [ngbNavItem]="4" class="d-md-none">
                     <a ngbNavLink>Preview</a>
-                    <ng-template ngbNavContent *ngIf="pdfPreview.offsetParent === undefined">
+                    <ng-template ngbNavContent *ngIf="!pdfPreview.offsetParent">
                         <div class="position-relative">
                             <ng-container *ngIf="getContentType() === 'application/pdf'">
                                 <div class="preview-sticky pdf-viewer-container" *ngIf="!useNativePdfViewer ; else nativePdfViewer">
