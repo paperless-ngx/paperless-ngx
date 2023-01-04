@@ -292,6 +292,7 @@ class RasterisedDocumentParser(DocumentParser):
     def parse(self, document_path: Path, mime_type, file_name=None):
         # This forces tesseract to use one core per page.
         os.environ["OMP_THREAD_LIMIT"] = "1"
+        self.memory_checkpoint("parse-initial")
 
         if mime_type == "application/pdf":
             text_original = self.extract_text(None, document_path)
@@ -299,6 +300,8 @@ class RasterisedDocumentParser(DocumentParser):
         else:
             text_original = None
             original_has_text = False
+
+        self.memory_checkpoint("post-extract-text")
 
         # If the original has text, and the user doesn't want an archive,
         # we're done here
@@ -327,6 +330,7 @@ class RasterisedDocumentParser(DocumentParser):
         try:
             self.log("debug", f"Calling OCRmyPDF with args: {args}")
             ocrmypdf.ocr(**args)
+            self.memory_checkpoint("post-ocr")
 
             self.archive_path = archive_path
 
@@ -369,6 +373,7 @@ class RasterisedDocumentParser(DocumentParser):
             try:
                 self.log("debug", f"Fallback: Calling OCRmyPDF with args: {args}")
                 ocrmypdf.ocr(**args)
+                self.memory_checkpoint("post-fallback-ocr")
 
                 # Don't return the archived file here, since this file
                 # is bigger and blurry due to --force-ocr.
@@ -377,6 +382,7 @@ class RasterisedDocumentParser(DocumentParser):
                     sidecar_file_fallback,
                     archive_path_fallback,
                 )
+                self.memory_checkpoint("post-fallback-extract-text")
 
             except Exception as e:
                 # If this fails, we have a serious issue at hand.
