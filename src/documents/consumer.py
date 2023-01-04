@@ -320,6 +320,7 @@ class Consumer(LoggingMixin):
         )
 
         self.log("debug", f"Parser: {type(document_parser).__name__}")
+        document_parser.memory_checkpoint("initial")
 
         # However, this already created working directories which we have to
         # clean up.
@@ -335,6 +336,7 @@ class Consumer(LoggingMixin):
             self._send_progress(20, 100, "WORKING", MESSAGE_PARSING_DOCUMENT)
             self.log("debug", f"Parsing {self.filename}...")
             document_parser.parse(self.path, mime_type, self.filename)
+            document_parser.memory_checkpoint("post-parse")
 
             self.log("debug", f"Generating thumbnail for {self.filename}...")
             self._send_progress(70, 100, "WORKING", MESSAGE_GENERATING_THUMBNAIL)
@@ -343,6 +345,7 @@ class Consumer(LoggingMixin):
                 mime_type,
                 self.filename,
             )
+            document_parser.memory_checkpoint("post-thumbnail")
 
             text = document_parser.get_text()
             date = document_parser.get_date()
@@ -359,6 +362,9 @@ class Consumer(LoggingMixin):
                 exc_info=True,
                 exception=e,
             )
+        finally:
+            document_parser.memory_checkpoint("final")
+            document_parser.cleanup()
 
         # Prepare the document classifier.
 
@@ -445,8 +451,6 @@ class Consumer(LoggingMixin):
                 exc_info=True,
                 exception=e,
             )
-        finally:
-            document_parser.cleanup()
 
         self.run_post_consume_script(document)
 

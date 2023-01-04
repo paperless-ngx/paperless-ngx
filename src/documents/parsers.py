@@ -3,6 +3,7 @@ import logging
 import mimetypes
 import os
 import re
+import resource
 import shutil
 import subprocess
 import tempfile
@@ -331,3 +332,19 @@ class DocumentParser(LoggingMixin):
     def cleanup(self):
         self.log("debug", f"Deleting directory {self.tempdir}")
         shutil.rmtree(self.tempdir)
+
+    def memory_checkpoint(self, name: str):
+        """
+        Reports a summation of the current process and child
+        process memory usage into the log with a given checkpoint name.
+
+        Memory usage is in kilobytes
+        """
+        usage_self = resource.getrusage(resource.RUSAGE_SELF)
+        usage_children = resource.getrusage(resource.RUSAGE_CHILDREN)
+        self.log(
+            "debug",
+            f"Memory Checkpoint - "
+            f"{name} - "
+            f"{usage_self.ru_maxrss + usage_children.ru_maxrss}",
+        )
