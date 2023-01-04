@@ -149,7 +149,7 @@ jobs:
         name: Tests
         run: |
           cd src/
-          pipenv run pytest -rfEp
+          pipenv run pytest -ra
       -
         name: Get changed files
         id: changed-files-specific
