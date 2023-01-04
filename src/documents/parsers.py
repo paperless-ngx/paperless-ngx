@@ -6,12 +6,12 @@ import re
 import shutil
 import subprocess
 import tempfile
+from functools import cache
 from typing import Iterator
 from typing import Match
 from typing import Optional
 from typing import Set
 
-import magic
 from django.conf import settings
 from django.utils import timezone
 from documents.loggers import LoggingMixin
@@ -45,11 +45,20 @@ DATE_REGEX = re.compile(
 logger = logging.getLogger("paperless.parsing")
 
 
-def is_mime_type_supported(mime_type) -> bool:
+@cache
+def is_mime_type_supported(mime_type: str) -> bool:
+    """
+    Returns True if the mime type is supported, False otherwise
+    """
     return get_parser_class_for_mime_type(mime_type) is not None
 
 
-def get_default_file_extension(mime_type) -> str:
+@cache
+def get_default_file_extension(mime_type: str) -> str:
+    """
+    Returns the default file extension for a mimetype, or
+    an empty string if it could not be determined
+    """
     for response in document_consumer_declaration.send(None):
         parser_declaration = response[1]
         supported_mime_types = parser_declaration["mime_types"]
@@ -64,7 +73,12 @@ def get_default_file_extension(mime_type) -> str:
         return ""
 
 
-def is_file_ext_supported(ext) -> bool:
+@cache
+def is_file_ext_supported(ext: str) -> bool:
+    """
+    Returns True if the file extension is supported, False otherwise
+    TODO: Investigate why this really exists, why not use mimetype
+    """
     if ext:
         return ext.lower() in get_supported_file_extensions()
     else:
@@ -79,11 +93,19 @@ def get_supported_file_extensions() -> Set[str]:
 
         for mime_type in supported_mime_types:
             extensions.update(mimetypes.guess_all_extensions(mime_type))
+            # Python's stdlib might be behind, so also add what the parser
+            # says is the default extension
+            # This makes image/webp supported on Python < 3.11
+            extensions.add(supported_mime_types[mime_type])
 
     return extensions
 
 
-def get_parser_class_for_mime_type(mime_type):
+def get_parser_class_for_mime_type(mime_type: str) -> Optional["DocumentParser"]:
+    """
+    Returns the best parser (by weight) for the given mimetype or
+    None if no parser exists
+    """
 
     options = []
 
@@ -101,16 +123,6 @@ def get_parser_class_for_mime_type(mime_type):
 
     # Return the parser with the highest weight.
     return sorted(options, key=lambda _: _["weight"], reverse=True)[0]["parser"]
-
-
-def get_parser_class(path):
-    """
-    Determine the appropriate parser class based on the file
-    """
-
-    mime_type = magic.from_file(path, mime=True)
-
-    return get_parser_class_for_mime_type(mime_type)
 
 
 def run_convert(
