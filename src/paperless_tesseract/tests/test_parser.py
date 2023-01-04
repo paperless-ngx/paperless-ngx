@@ -573,15 +573,18 @@ class TestParser(DirectoriesMixin, TestCase):
             - Text from all pages extracted
         """
         parser = RasterisedDocumentParser(None)
-        parser.parse(
-            os.path.join(self.SAMPLE_FILES, "multi-page-images-alpha.tiff"),
-            "image/tiff",
-        )
-        self.assertTrue(os.path.isfile(parser.archive_path))
-        self.assertContainsStrings(
-            parser.get_text().lower(),
-            ["page 1", "page 2", "page 3"],
-        )
+        sample_file = os.path.join(self.SAMPLE_FILES, "multi-page-images-alpha.tiff")
+        with tempfile.NamedTemporaryFile() as tmp_file:
+            shutil.copy(sample_file, tmp_file.name)
+            parser.parse(
+                tmp_file.name,
+                "image/tiff",
+            )
+            self.assertTrue(os.path.isfile(parser.archive_path))
+            self.assertContainsStrings(
+                parser.get_text().lower(),
+                ["page 1", "page 2", "page 3"],
+            )
 
     def test_multi_page_tiff_alpha_srgb(self):
         """
@@ -595,15 +598,21 @@ class TestParser(DirectoriesMixin, TestCase):
             - Text from all pages extracted
         """
         parser = RasterisedDocumentParser(None)
-        parser.parse(
-            os.path.join(self.SAMPLE_FILES, "multi-page-images-alpha-rgb.tiff"),
-            "image/tiff",
+        sample_file = os.path.join(
+            self.SAMPLE_FILES,
+            "multi-page-images-alpha-rgb.tiff",
         )
-        self.assertTrue(os.path.isfile(parser.archive_path))
-        self.assertContainsStrings(
-            parser.get_text().lower(),
-            ["page 1", "page 2", "page 3"],
-        )
+        with tempfile.NamedTemporaryFile() as tmp_file:
+            shutil.copy(sample_file, tmp_file.name)
+            parser.parse(
+                tmp_file.name,
+                "image/tiff",
+            )
+            self.assertTrue(os.path.isfile(parser.archive_path))
+            self.assertContainsStrings(
+                parser.get_text().lower(),
+                ["page 1", "page 2", "page 3"],
+            )
 
     def test_ocrmypdf_parameters(self):
         parser = RasterisedDocumentParser(None)
