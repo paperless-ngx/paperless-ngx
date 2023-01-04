@@ -5,7 +5,6 @@ from typing import Final
 
 import pytest
 from django.test import TestCase
-from documents.parsers import ParseError
 from paperless_tika.parsers import TikaDocumentParser
 
 

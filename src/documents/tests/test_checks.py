@@ -1,5 +1,4 @@
 import textwrap
-import unittest
 from unittest import mock
 
 from django.core.checks import Error
