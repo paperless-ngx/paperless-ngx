@@ -62,7 +62,7 @@ bleach = "*"
 #
 
 # Pin this until piwheels is building 1.9 (see https://www.piwheels.org/project/scipy/)
-scipy = "==1.8.1"
+scipy = "==1.10.0"
 
 # Newer versions aren't builting yet (see https://www.piwheels.org/project/cryptography/)
 cryptography = "==38.0.1"
