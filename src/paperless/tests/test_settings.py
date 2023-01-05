@@ -1,7 +1,10 @@
 import datetime
+import os
 from unittest import mock
 from unittest import TestCase
 
+from celery.schedules import crontab
+from paperless.settings import _parse_beat_schedule
 from paperless.settings import _parse_ignore_dates
 from paperless.settings import _parse_redis_url
 from paperless.settings import default_threads_per_worker
@@ -139,3 +142,130 @@ class TestIgnoreDateParsing(TestCase):
         ]:
             result = _parse_redis_url(input)
             self.assertTupleEqual(expected, result)
+
+    def test_schedule_configuration_default(self):
+        """
+        GIVEN:
+            - No configured task schedules
+        WHEN:
+            - The celery beat schedule is built
+        THEN:
+            - The default schedule is returned
+        """
+        schedule = _parse_beat_schedule()
+
+        self.assertDictEqual(
+            {
+                "Check all e-mail accounts": {
+                    "task": "paperless_mail.tasks.process_mail_accounts",
+                    "schedule": crontab(minute="*/10"),
+                },
+                "Train the classifier": {
+                    "task": "documents.tasks.train_classifier",
+                    "schedule": crontab(minute="5", hour="*/1"),
+                },
+                "Optimize the index": {
+                    "task": "documents.tasks.index_optimize",
+                    "schedule": crontab(minute=0, hour=0),
+                },
+                "Perform sanity check": {
+                    "task": "documents.tasks.sanity_check",
+                    "schedule": crontab(minute=30, hour=0, day_of_week="sun"),
+                },
+            },
+            schedule,
+        )
+
+    def test_schedule_configuration_changed(self):
+        """
+        GIVEN:
+            - Email task is configured non-default
+        WHEN:
+            - The celery beat schedule is built
+        THEN:
+            - The email task is configured per environment
+            - The default schedule is returned for other tasks
+        """
+        with mock.patch.dict(
+            os.environ,
+            {"PAPERLESS_EMAIL_TASK_CRON": "*/50 * * * mon"},
+        ):
+            schedule = _parse_beat_schedule()
+
+        self.assertDictEqual(
+            {
+                "Check all e-mail accounts": {
+                    "task": "paperless_mail.tasks.process_mail_accounts",
+                    "schedule": crontab(minute="*/50", day_of_week="mon"),
+                },
+                "Train the classifier": {
+                    "task": "documents.tasks.train_classifier",
+                    "schedule": crontab(minute="5", hour="*/1"),
+                },
+                "Optimize the index": {
+                    "task": "documents.tasks.index_optimize",
+                    "schedule": crontab(minute=0, hour=0),
+                },
+                "Perform sanity check": {
+                    "task": "documents.tasks.sanity_check",
+                    "schedule": crontab(minute=30, hour=0, day_of_week="sun"),
+                },
+            },
+            schedule,
+        )
+
+    def test_schedule_configuration_disabled(self):
+        """
+        GIVEN:
+            - Search index task is disabled
+        WHEN:
+            - The celery beat schedule is built
+        THEN:
+            - The search index task is not present
+            - The default schedule is returned for other tasks
+        """
+        with mock.patch.dict(os.environ, {"PAPERLESS_INDEX_TASK_CRON": "disable"}):
+            schedule = _parse_beat_schedule()
+
+        self.assertDictEqual(
+            {
+                "Check all e-mail accounts": {
+                    "task": "paperless_mail.tasks.process_mail_accounts",
+                    "schedule": crontab(minute="*/10"),
+                },
+                "Train the classifier": {
+                    "task": "documents.tasks.train_classifier",
+                    "schedule": crontab(minute="5", hour="*/1"),
+                },
+                "Perform sanity check": {
+                    "task": "documents.tasks.sanity_check",
+                    "schedule": crontab(minute=30, hour=0, day_of_week="sun"),
+                },
+            },
+            schedule,
+        )
+
+    def test_schedule_configuration_disabled_all(self):
+        """
+        GIVEN:
+            - All tasks are disabled
+        WHEN:
+            - The celery beat schedule is built
+        THEN:
+            - No tasks are scheduled
+        """
+        with mock.patch.dict(
+            os.environ,
+            {
+                "PAPERLESS_EMAIL_TASK_CRON": "disable",
+                "PAPERLESS_TRAIN_TASK_CRON": "disable",
+                "PAPERLESS_SANITY_TASK_CRON": "disable",
+                "PAPERLESS_INDEX_TASK_CRON": "disable",
+            },
+        ):
+            schedule = _parse_beat_schedule()
+
+        self.assertDictEqual(
+            {},
+            schedule,
+        )
