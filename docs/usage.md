@@ -191,7 +191,7 @@ different means. These are as follows:
     them further.
 
 Paperless is set up to check your mails every 10 minutes. This can be
-configured on the 'Scheduled tasks' page in the admin.
+configured via `PAPERLESS_EMAIL_TASK_CRON` (see [software tweaks](/configuration#software_tweaks))
 
 ### REST API
 
