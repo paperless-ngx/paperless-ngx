@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-09 21:50+0000\n"
-"PO-Revision-Date: 2023-01-05 19:09\n"
+"PO-Revision-Date: 2023-01-05 21:56\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -440,7 +440,7 @@ msgstr ""
 
 #: documents/models.py:578
 msgid "Task State"
-msgstr ""
+msgstr "Estado de la tarea"
 
 #: documents/models.py:579
 msgid "Current state of the task being run"
@@ -456,7 +456,7 @@ msgstr ""
 
 #: documents/models.py:590
 msgid "Started DateTime"
-msgstr ""
+msgstr "Fecha y hora de inicio"
 
 #: documents/models.py:591
 msgid "Datetime field when the task was started in UTC"
@@ -484,11 +484,11 @@ msgstr ""
 
 #: documents/models.py:642
 msgid "comment"
-msgstr ""
+msgstr "comentario"
 
 #: documents/models.py:643
 msgid "comments"
-msgstr ""
+msgstr "comentarios"
 
 #: documents/serialisers.py:72
 #, python-format
