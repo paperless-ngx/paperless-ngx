@@ -141,9 +141,15 @@ def _parse_beat_schedule() -> Dict:
         },
     ]
     for task in tasks:
+        # Either get the environment setting or use the default
         value = os.getenv(task["env_key"], task["env_default"])
+        # Don't add disabled tasks to the schedule
         if value == "disable":
             continue
+        # I find https://crontab.guru/ super helpful
+        # crontab(5) format
+        #   - five time-and-date fields
+        #   - separated by at least one blank
         minute, hour, day_month, month, day_week = value.split(" ")
         schedule[task["name"]] = {
             "task": task["task"],
