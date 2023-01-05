@@ -44,7 +44,7 @@ describe('document-detail', () => {
     })
 
     cy.viewport(1024, 1024)
-    cy.visit('/documents/1/')
+    cy.visit('/documents/1/').wait('@ui-settings')
   })
 
   it('should activate / deactivate save button when changes are saved', () => {
@@ -66,8 +66,21 @@ describe('document-detail', () => {
     cy.contains('You have unsaved changes').should('not.exist')
   })
 
+  it('should show a mobile preview', () => {
+    cy.viewport(440, 1000)
+    cy.get('a')
+      .contains('Preview')
+      .scrollIntoView({ offset: { top: 150, left: 0 } })
+      .click()
+    cy.get('pdf-viewer').should('be.visible')
+  })
+
   it('should show a list of comments', () => {
-    cy.wait(1000).get('a').contains('Comments').click().wait(1000)
+    cy.wait(1000)
+      .get('a')
+      .contains('Comments')
+      .click({ force: true })
+      .wait(1000)
     cy.get('app-document-comments').find('.card').its('length').should('eq', 3)
   })
 
