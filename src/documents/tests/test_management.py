@@ -88,10 +88,10 @@ class TestArchiver(DirectoriesMixin, TestCase):
             mime_type="application/pdf",
             filename="document_01.pdf",
         )
-        shutil.copy(sample_file, os.path.join(self.dirs.originals_dir, f"document.pdf"))
+        shutil.copy(sample_file, os.path.join(self.dirs.originals_dir, "document.pdf"))
         shutil.copy(
             sample_file,
-            os.path.join(self.dirs.originals_dir, f"document_01.pdf"),
+            os.path.join(self.dirs.originals_dir, "document_01.pdf"),
         )
 
         update_document_archive_file(doc2.pk)
@@ -150,7 +150,7 @@ class TestDecryptDocuments(TestCase):
                 "samples",
                 "documents",
                 "thumbnails",
-                f"0000004.webp.gpg",
+                "0000004.webp.gpg",
             ),
             os.path.join(thumb_dir, f"{doc.id:07}.webp.gpg"),
         )

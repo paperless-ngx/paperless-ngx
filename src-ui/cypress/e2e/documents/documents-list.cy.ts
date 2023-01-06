@@ -52,6 +52,10 @@ describe('documents-list', () => {
 
         req.reply(response)
       })
+
+      cy.intercept('http://localhost:8000/api/documents/selection_data/', {
+        fixture: 'documents/selection_data.json',
+      }).as('selection-data')
     })
 
     cy.viewport(1280, 1024)
@@ -74,6 +78,28 @@ describe('documents-list', () => {
   it('should change to large cards view', () => {
     cy.get('div.btn-group input[value="largeCards"]').next().click()
     cy.get('app-document-card-large')
+  })
+
+  it('should show partial tag selection', () => {
+    cy.get('app-document-card-small:nth-child(1)').click()
+    cy.get('app-document-card-small:nth-child(4)').click()
+    cy.get('app-bulk-editor button')
+      .contains('Tags')
+      .click()
+      .wait('@selection-data')
+    cy.get('svg.bi-dash').should('be.visible')
+    cy.get('svg.bi-check').should('be.visible')
+  })
+
+  it('should allow bulk removal', () => {
+    cy.get('app-document-card-small:nth-child(1)').click()
+    cy.get('app-document-card-small:nth-child(4)').click()
+    cy.get('app-bulk-editor').within(() => {
+      cy.get('button').contains('Tags').click().wait('@selection-data')
+      cy.get('button').contains('Another Sample Tag').click()
+      cy.get('button').contains('Apply').click()
+    })
+    cy.contains('operation will remove the tag')
   })
 
   it('should filter tags', () => {

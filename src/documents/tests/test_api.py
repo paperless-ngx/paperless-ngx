@@ -35,7 +35,6 @@ from documents.models import SavedView
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import Comment
-from documents.models import StoragePath
 from documents.tests.utils import DirectoriesMixin
 from paperless import version
 from rest_framework.test import APITestCase
@@ -484,7 +483,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
                 self.assertNotIn(result["id"], seen_ids)
                 seen_ids.append(result["id"])
 
-        response = self.client.get(f"/api/documents/?query=content&page=6&page_size=10")
+        response = self.client.get("/api/documents/?query=content&page=6&page_size=10")
         results = response.data["results"]
         self.assertEqual(response.data["count"], 55)
         self.assertEqual(len(results), 5)
@@ -504,9 +503,9 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
                 )
                 index.update_document(writer, doc)
 
-        response = self.client.get(f"/api/documents/?query=content&page=0&page_size=10")
+        response = self.client.get("/api/documents/?query=content&page=0&page_size=10")
         self.assertEqual(response.status_code, 404)
-        response = self.client.get(f"/api/documents/?query=content&page=3&page_size=10")
+        response = self.client.get("/api/documents/?query=content&page=3&page_size=10")
         self.assertEqual(response.status_code, 404)
 
     @mock.patch("documents.index.autocomplete")
@@ -1084,7 +1083,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(meta["archive_size"], os.stat(archive_file).st_size)
 
     def test_get_metadata_invalid_doc(self):
-        response = self.client.get(f"/api/documents/34576/metadata/")
+        response = self.client.get("/api/documents/34576/metadata/")
         self.assertEqual(response.status_code, 404)
 
     def test_get_metadata_no_archive(self):
@@ -1149,7 +1148,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         )
 
     def test_get_suggestions_invalid_doc(self):
-        response = self.client.get(f"/api/documents/34676/suggestions/")
+        response = self.client.get("/api/documents/34676/suggestions/")
         self.assertEqual(response.status_code, 404)
 
     @mock.patch("documents.views.match_storage_paths")
