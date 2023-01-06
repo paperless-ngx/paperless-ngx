@@ -2089,13 +2089,13 @@
         </context-group>
         <target state="final">Vous êtes prêt à téléverser des documents ! Explorez les différentes fonctionnalités de cette application web par vous-même, ou commencez une visite rapide en utilisant le bouton ci-dessous.</target>
       </trans-unit>
-      <trans-unit id="4474647174688421179" datatype="html">
+      <trans-unit id="4474647174688421179" datatype="html" approved="yes">
         <source>More detail on how to use and configure Paperless-ngx is always available in the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://docs.paperless-ngx.com&quot; target=&quot;_blank&quot;&gt;"/>documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">5</context>
         </context-group>
-        <target state="translated">Davantage de détails sur comment utiliser et configurer Paperless-ngx sont disponibles dans la <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://docs.paperless-ngx.com&quot; target=&quot;_blank&quot;&gt;"/>documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</target>
+        <target state="final">Davantage de détails sur comment utiliser et configurer Paperless-ngx sont disponibles dans la <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://docs.paperless-ngx.com&quot; target=&quot;_blank&quot;&gt;"/>documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</target>
       </trans-unit>
       <trans-unit id="4294899532887357745" datatype="html" approved="yes">
         <source>Thanks for being a part of the Paperless-ngx community!</source>
