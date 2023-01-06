@@ -1622,7 +1622,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">93</context>
         </context-group>
-        <target state="needs-translation">Use name (or mail address if not available)</target>
+        <target state="translated">Usar nombre (o dirección de correo si no está disponible)</target>
       </trans-unit>
       <trans-unit id="1258862217749148424" datatype="html">
         <source>Use correspondent selected below</source>
@@ -1908,7 +1908,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Welcome to Paperless-ngx</target>
+        <target state="translated">Bienvenido a Paperless-ngx</target>
       </trans-unit>
       <trans-unit id="2946624699882754313" datatype="html" approved="yes">
         <source>Show all</source>
