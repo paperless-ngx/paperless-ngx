@@ -23,7 +23,8 @@
             "assign_correspondent": 2,
             "assign_document_type": null,
             "order": 0,
-            "attachment_type": 2
+            "attachment_type": 2,
+            "consumption_scope": 1
         }
     ]
 }

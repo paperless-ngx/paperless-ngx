@@ -3,7 +3,7 @@
 beforeEach(() => {
   cy.intercept('http://localhost:8000/api/ui_settings/', {
     fixture: 'ui_settings/settings.json',
-  })
+  }).as('ui-settings')
 
   cy.intercept('http://localhost:8000/api/users/*', {
     fixture: 'users/users.json',
@@ -35,6 +35,10 @@ beforeEach(() => {
 
   cy.intercept('http://localhost:8000/api/storage_paths/*', {
     fixture: 'storage_paths/storage_paths.json',
+  })
+
+  cy.intercept('http://localhost:8000/api/tasks/', {
+    fixture: 'tasks/tasks.json',
   })
 
   cy.intercept('http://localhost:8000/api/documents/1/metadata/', {

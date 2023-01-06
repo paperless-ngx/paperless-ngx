@@ -149,11 +149,11 @@ jobs:
         name: Tests
         run: |
           cd src/
-          pipenv run pytest -rfEp
+          pipenv run pytest -ra
       -
         name: Get changed files
         id: changed-files-specific
-        uses: tj-actions/changed-files@v34
+        uses: tj-actions/changed-files@v35
         with:
           files: |
             src/**

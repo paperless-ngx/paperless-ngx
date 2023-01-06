@@ -164,6 +164,12 @@ export class SettingsService {
         dateInputFormat: 'mm/dd/yyyy',
       },
       {
+        code: 'ar-ar',
+        name: $localize`Arabic`,
+        englishName: 'Arabic',
+        dateInputFormat: 'yyyy-mm-dd',
+      },
+      {
         code: 'be-by',
         name: $localize`Belarusian`,
         englishName: 'Belarusian',

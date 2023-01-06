@@ -9,7 +9,6 @@ from django.test import override_settings
 from django.test import TestCase
 from documents.parsers import parse_date
 from documents.parsers import parse_date_generator
-from paperless.settings import DATE_ORDER
 
 
 class TestDate(TestCase):

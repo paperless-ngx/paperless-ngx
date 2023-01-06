@@ -89,6 +89,7 @@ import { PermissionsGroupComponent } from './components/common/input/permissions
 import { IfOwnerDirective } from './directives/if-owner.directive'
 import { IfObjectPermissionsDirective } from './directives/if-object-permissions.directive'
 
+import localeAr from '@angular/common/locales/ar'
 import localeBe from '@angular/common/locales/be'
 import localeCs from '@angular/common/locales/cs'
 import localeDa from '@angular/common/locales/da'
@@ -111,6 +112,7 @@ import localeZh from '@angular/common/locales/zh'
 import { PermissionsDialogComponent } from './components/common/permissions-dialog/permissions-dialog.component'
 import { PermissionsFormComponent } from './components/common/input/permissions/permissions-form/permissions-form.component'
 
+registerLocaleData(localeAr)
 registerLocaleData(localeBe)
 registerLocaleData(localeCs)
 registerLocaleData(localeDa)

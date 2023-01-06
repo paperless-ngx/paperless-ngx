@@ -6,7 +6,6 @@ from urllib.request import urlopen
 
 import pytest
 from django.test import TestCase
-from documents.parsers import ParseError
 from documents.parsers import run_convert
 from imagehash import average_hash
 from paperless_mail.parsers import MailDocumentParser
