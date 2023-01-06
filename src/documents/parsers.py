@@ -6,7 +6,7 @@ import re
 import shutil
 import subprocess
 import tempfile
-from functools import cache
+from functools import lru_cache
 from typing import Iterator
 from typing import Match
 from typing import Optional
@@ -45,7 +45,7 @@ DATE_REGEX = re.compile(
 logger = logging.getLogger("paperless.parsing")
 
 
-@cache
+@lru_cache(maxsize=8)
 def is_mime_type_supported(mime_type: str) -> bool:
     """
     Returns True if the mime type is supported, False otherwise
@@ -53,7 +53,7 @@ def is_mime_type_supported(mime_type: str) -> bool:
     return get_parser_class_for_mime_type(mime_type) is not None
 
 
-@cache
+@lru_cache(maxsize=8)
 def get_default_file_extension(mime_type: str) -> str:
     """
     Returns the default file extension for a mimetype, or
@@ -73,7 +73,7 @@ def get_default_file_extension(mime_type: str) -> str:
         return ""
 
 
-@cache
+@lru_cache(maxsize=8)
 def is_file_ext_supported(ext: str) -> bool:
     """
     Returns True if the file extension is supported, False otherwise
