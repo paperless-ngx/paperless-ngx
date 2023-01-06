@@ -4,7 +4,6 @@ import re
 import shutil
 import stat
 import tempfile
-from subprocess import CalledProcessError
 from unittest import mock
 from unittest.mock import MagicMock
 

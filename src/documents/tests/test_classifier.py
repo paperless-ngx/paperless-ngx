@@ -1,5 +1,6 @@
 import os
 import re
+import shutil
 import tempfile
 from pathlib import Path
 from unittest import mock
@@ -27,6 +28,9 @@ def dummy_preprocess(content: str):
 
 
 class TestClassifier(DirectoriesMixin, TestCase):
+
+    SAMPLE_MODEL_FILE = os.path.join(os.path.dirname(__file__), "data", "model.pickle")
+
     def setUp(self):
         super().setUp()
         self.classifier = DocumentClassifier()
@@ -213,13 +217,14 @@ class TestClassifier(DirectoriesMixin, TestCase):
     #     self.classifier.train()
     #     self.classifier.save()
 
-    @override_settings(
-        MODEL_FILE=os.path.join(os.path.dirname(__file__), "data", "model.pickle"),
-    )
     def test_load_and_classify(self):
         # Generate test data, train and save to the model file
         # This ensures the model file sklearn version matches
         # and eliminates a warning
+        shutil.copy(
+            self.SAMPLE_MODEL_FILE,
+            os.path.join(self.dirs.data_dir, "classification_model.pickle"),
+        )
         self.generate_test_data()
         self.classifier.train()
         self.classifier.save()
@@ -230,9 +235,6 @@ class TestClassifier(DirectoriesMixin, TestCase):
 
         self.assertCountEqual(new_classifier.predict_tags(self.doc2.content), [45, 12])
 
-    @override_settings(
-        MODEL_FILE=os.path.join(os.path.dirname(__file__), "data", "model.pickle"),
-    )
     @mock.patch("documents.classifier.pickle.load")
     def test_load_corrupt_file(self, patched_pickle_load):
         """
@@ -243,6 +245,10 @@ class TestClassifier(DirectoriesMixin, TestCase):
         THEN:
             - The ClassifierModelCorruptError is raised
         """
+        shutil.copy(
+            self.SAMPLE_MODEL_FILE,
+            os.path.join(self.dirs.data_dir, "classification_model.pickle"),
+        )
         # First load is the schema version
         patched_pickle_load.side_effect = [DocumentClassifier.FORMAT_VERSION, OSError()]
 

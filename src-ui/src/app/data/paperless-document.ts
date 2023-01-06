@@ -10,6 +10,7 @@ export interface SearchHit {
   rank?: number
 
   highlights?: string
+  comment_highlights?: string
 }
 
 export interface PaperlessDocument extends ObjectWithPermissions {
