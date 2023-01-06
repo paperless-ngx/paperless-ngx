@@ -2105,13 +2105,13 @@
         </context-group>
         <target state="final">Merci de faire partie de la communauté Paperless-ngx !</target>
       </trans-unit>
-      <trans-unit id="1415832194529539652" datatype="html">
+      <trans-unit id="1415832194529539652" datatype="html" approved="yes">
         <source>Start the tour</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">9</context>
         </context-group>
-        <target state="translated">Commencer la visite </target>
+        <target state="final">Commencer la visite </target>
       </trans-unit>
       <trans-unit id="7822640317427130239" datatype="html" approved="yes">
         <source>Searching document with asn <x id="INTERPOLATION" equiv-text="{{asn}}"/></source>
@@ -2121,37 +2121,37 @@
         </context-group>
         <target state="final">Recherche de document avec NSA <x id="INTERPOLATION" equiv-text="{{asn}}"/></target>
       </trans-unit>
-      <trans-unit id="2122666445936087317" datatype="html">
+      <trans-unit id="2122666445936087317" datatype="html" approved="yes">
         <source>Enter comment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-comments/document-comments.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="translated">Saisir un commentaire</target>
+        <target state="final">Saisir un commentaire</target>
       </trans-unit>
-      <trans-unit id="4025397324401332794" datatype="html">
+      <trans-unit id="4025397324401332794" datatype="html" approved="yes">
         <source> Please enter a comment. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-comments/document-comments.component.html</context>
           <context context-type="linenumber">5,7</context>
         </context-group>
-        <target state="translated">Veuillez saisir un commentaire.</target>
+        <target state="final"> Veuillez saisir un commentaire. </target>
       </trans-unit>
-      <trans-unit id="2337485514607640701" datatype="html">
+      <trans-unit id="2337485514607640701" datatype="html" approved="yes">
         <source>Add comment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-comments/document-comments.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="translated">Ajouter un commentaire</target>
+        <target state="final">Ajouter un commentaire</target>
       </trans-unit>
-      <trans-unit id="5438997040668245251" datatype="html">
+      <trans-unit id="5438997040668245251" datatype="html" approved="yes">
         <source>Error saving comment: <x id="PH" equiv-text="e.toString()"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-comments/document-comments.component.ts</context>
           <context context-type="linenumber">68</context>
         </context-group>
-        <target state="translated">Erreur lors de l'enregistrement du commentaire : <x id="PH" equiv-text="e.toString()"/></target>
+        <target state="final">Erreur lors de l'enregistrement du commentaire : <x id="PH" equiv-text="e.toString()"/></target>
       </trans-unit>
       <trans-unit id="7593210124183303626" datatype="html">
         <source>Error deleting comment: <x id="PH" equiv-text="e.toString()"/></source>
@@ -3721,7 +3721,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="translated">Ouvrir le panneau d'administration Django</target>
+        <target state="translated">Ouvrir l'interface d'administration Django</target>
       </trans-unit>
       <trans-unit id="6439365426343089851" datatype="html">
         <source>General</source>
