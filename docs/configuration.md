@@ -716,7 +716,7 @@ for details on how to set it.
 
 : Enables or disables the advanced natural language processing
 used during automatic classification. If disabled, paperless will
-still preform some basic text pre-processing before matching.
+still perform some basic text pre-processing before matching.
 
 See also `PAPERLESS_NLTK_DIR`.
 
