@@ -13,6 +13,14 @@ on:
     branches-ignore:
       - 'translations**'
 
+env:
+  # This is the version of pipenv all the steps will use
+  # If changing this, change Dockerfile
+  DEFAULT_PIP_ENV_VERSION: "2022.11.30"
+  # This is the default version of Python to use in most steps
+  # If changing this, change Dockerfile
+  DEFAULT_PYTHON_VERSION: "3.9"
+
 jobs:
   pre-commit:
     name: Linting Checks
@@ -21,13 +29,11 @@ jobs:
       -
         name: Checkout repository
         uses: actions/checkout@v3
-
       -
-        name: Install tools
+        name: Install python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.9"
-
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
       -
         name: Check files
         uses: pre-commit/action@v3.0.0
@@ -42,28 +48,29 @@ jobs:
         name: Checkout
         uses: actions/checkout@v3
       -
-        name: Install pipenv
-        run: |
-          pipx install pipenv==2022.11.30
-      -
         name: Set up Python
+        id: setup-python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.8
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
           cache: "pipenv"
           cache-dependency-path: 'Pipfile.lock'
       -
+        name: Install pipenv
+        run: |
+          pip install --user pipenv==${DEFAULT_PIP_ENV_VERSION}
+      -
         name: Install dependencies
         run: |
-          pipenv sync --dev
+          pipenv --python ${{ steps.setup-python.outputs.python-version }} sync --dev
       -
         name: List installed Python dependencies
         run: |
-          pipenv run pip list
+          pipenv --python ${{ steps.setup-python.outputs.python-version }} run pip list
       -
         name: Make documentation
         run: |
-          pipenv run mkdocs build --config-file ./mkdocs.yml
+          pipenv --python ${{ steps.setup-python.outputs.python-version }} run mkdocs build --config-file ./mkdocs.yml
       -
         name: Upload artifact
         uses: actions/upload-artifact@v3
@@ -122,16 +129,17 @@ jobs:
           docker compose --file ${GITHUB_WORKSPACE}/docker/compose/docker-compose.ci-test.yml pull --quiet
           docker compose --file ${GITHUB_WORKSPACE}/docker/compose/docker-compose.ci-test.yml up --detach
       -
-        name: Install pipenv
-        run: |
-          pipx install pipenv==2022.11.30
-      -
         name: Set up Python
+        id: setup-python
         uses: actions/setup-python@v4
         with:
           python-version: "${{ matrix.python-version }}"
           cache: "pipenv"
           cache-dependency-path: 'Pipfile.lock'
+      -
+        name: Install pipenv
+        run: |
+          pip install --user pipenv==${DEFAULT_PIP_ENV_VERSION}
       -
         name: Install system dependencies
         run: |
@@ -140,16 +148,17 @@ jobs:
       -
         name: Install Python dependencies
         run: |
-          pipenv sync --dev
+          pipenv --python ${{ steps.setup-python.outputs.python-version }} run python --version
+          pipenv --python ${{ steps.setup-python.outputs.python-version }} sync --dev
       -
         name: List installed Python dependencies
         run: |
-          pipenv run pip list
+          pipenv --python ${{ steps.setup-python.outputs.python-version }} run pip list
       -
         name: Tests
         run: |
           cd src/
-          pipenv run pytest -ra
+          pipenv --python ${{ steps.setup-python.outputs.python-version }} run pytest -ra
       -
         name: Get changed files
         id: changed-files-specific
@@ -165,13 +174,13 @@ jobs:
           done
       -
         name: Publish coverage results
-        if: matrix.python-version == '3.9' && steps.changed-files-specific.outputs.any_changed == 'true'
+        if: matrix.python-version == ${{ env.DEFAULT_PYTHON_VERSION }} && steps.changed-files-specific.outputs.any_changed == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         # https://github.com/coveralls-clients/coveralls-python/issues/251
         run: |
           cd src/
-          pipenv run coveralls --service=github
+          pipenv --python ${{ steps.setup-python.outputs.python-version }} run coveralls --service=github
       -
         name: Stop containers
         if: always()
@@ -227,7 +236,7 @@ jobs:
         name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.9"
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
       -
         name: Setup qpdf image
         id: qpdf-setup
@@ -390,21 +399,21 @@ jobs:
         name: Checkout
         uses: actions/checkout@v3
       -
-        name: Install pipenv
-        run: |
-          pip3 install --upgrade pip setuptools wheel pipx
-          pipx install pipenv
-      -
         name: Set up Python
+        id: setup-python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.9
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
           cache: "pipenv"
           cache-dependency-path: 'Pipfile.lock'
       -
+        name: Install pipenv + tools
+        run: |
+          pip install --upgrade --user pipenv==${DEFAULT_PIP_ENV_VERSION} setuptools wheel
+      -
         name: Install Python dependencies
         run: |
-          pipenv sync --dev
+          pipenv --python ${{ steps.setup-python.outputs.python-version }} sync --dev
       -
         name: Install system dependencies
         run: |
@@ -425,17 +434,17 @@ jobs:
       -
         name: Generate requirements file
         run: |
-          pipenv requirements > requirements.txt
+          pipenv --python ${{ steps.setup-python.outputs.python-version }} requirements > requirements.txt
       -
         name: Compile messages
         run: |
           cd src/
-          pipenv run python3 manage.py compilemessages
+          pipenv --python ${{ steps.setup-python.outputs.python-version }} run python3 manage.py compilemessages
       -
         name: Collect static files
         run: |
           cd src/
-          pipenv run python3 manage.py collectstatic --no-input
+          pipenv --python ${{ steps.setup-python.outputs.python-version }} run python3 manage.py collectstatic --no-input
       -
         name: Move files
         run: |
@@ -523,17 +532,16 @@ jobs:
         with:
           ref: main
       -
-        name: Install pipenv
-        run: |
-          pip3 install --upgrade pip setuptools wheel pipx
-          pipx install pipenv
-      -
         name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.9
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
           cache: "pipenv"
           cache-dependency-path: 'Pipfile.lock'
+      -
+        name: Install pipenv + tools
+        run: |
+          pip install --upgrade --user pipenv==${DEFAULT_PIP_ENV_VERSION} setuptools wheel
       -
         name: Append Changelog to docs
         id: append-Changelog
