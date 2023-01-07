@@ -14,7 +14,7 @@ do
 	# Extract the name of the environment variable
 	env_name=${line%%=*}
 	# Check if it ends in "_FILE"
-	if [[ ${env_name} == *_FILE ]]; then
+	if [[ ${env_name} == PAPERLESS_*_FILE ]]; then
 		# Extract the value of the environment
 		env_value=${line#*=}
 
