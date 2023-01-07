@@ -32,8 +32,7 @@ do
 			export "${non_file_env_name}"="${val}"
 
 		else
-			echo "File ${env_value} doesn't exist"
-			exit 1
+			echo "File ${env_value} referenced ${env_name} by doesn't exist"
 		fi
 	fi
 done
