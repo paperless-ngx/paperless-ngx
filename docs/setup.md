@@ -148,17 +148,9 @@ steps described in [Docker setup](#docker_hub) automatically.
 
     !!! note
 
-        You can utilize Docker secrets for some configuration settings by
-        appending `_FILE` to some configuration values. This is
-        supported currently only by:
-
-        - PAPERLESS_DBUSER
-        - PAPERLESS_DBPASS
-        - PAPERLESS_SECRET_KEY
-        - PAPERLESS_AUTO_LOGIN_USERNAME
-        - PAPERLESS_ADMIN_USER
-        - PAPERLESS_ADMIN_MAIL
-        - PAPERLESS_ADMIN_PASSWORD
+        You can utilize Docker secrets for configuration settings by
+        appending `_FILE` to configuration values. For example `PAPERLESS_DBUSER`
+        can be set using `PAPERLESS_DBUSER_FILE=/var/run/secrets/password.txt`.
 
     !!! warning
 
