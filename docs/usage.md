@@ -108,7 +108,7 @@ Furthermore, there is the [Paperless
 App](https://github.com/bauerj/paperless_app) as well, which not only
 has document upload, but also document browsing and download features.
 
-Another option is [Paperless Mobile](https://github.com/astubenbord/paperless-mobile), an Android app that supports document upload, scanning,  management of labels and more.
+Another option is [Paperless Mobile](https://github.com/astubenbord/paperless-mobile), an Android app that supports document upload, scanning, management of labels and more.
 
 ### IMAP (Email) {#usage-email}
 
