@@ -278,7 +278,7 @@ supported.
     - `unpaper`
     - `ghostscript`
     - `icc-profiles-free`
-    - `qpdf`
+    - `libqpdf-dev` >= 11.1.0
     - `liblept5`
     - `libxml2`
     - `pngquant` (suggested for certain PDF image optimizations)
@@ -290,7 +290,7 @@ supported.
     Use this list for your preferred package management:
 
     ```
-    unpaper ghostscript icc-profiles-free qpdf liblept5 libxml2 pngquant zlib1g tesseract-ocr
+    unpaper ghostscript icc-profiles-free libqpdf-dev liblept5 libxml2 pngquant zlib1g tesseract-ocr
     ```
 
     On Raspberry Pi, these libraries are required as well:
