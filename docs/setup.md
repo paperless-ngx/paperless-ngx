@@ -429,7 +429,9 @@ supported.
 
     and pointing your browser to http://localhost:8000 if
     accessing from the same devices on which paperless is installed.
-    If accessing from another machine, set up systemd services.
+    If accessing from another machine, set up systemd services. You may need
+    to set `PAPERLESS_DEBUG=true` in order for the development server to work
+    normally in your browser.
 
     !!! warning
 
