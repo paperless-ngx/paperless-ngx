@@ -148,7 +148,7 @@ urlpatterns = [
     # TODO: with localization, this is even worse! :/
     # login, logout
     path("accounts/", include("django.contrib.auth.urls")),
-    # Root of the Frontent
+    # Root of the Frontend
     re_path(r".*", login_required(IndexView.as_view()), name="base"),
 ]
 
