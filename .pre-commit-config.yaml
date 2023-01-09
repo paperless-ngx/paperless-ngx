@@ -11,14 +11,13 @@ repos:
       - id: check-json
         exclude: "tsconfig.*json"
       - id: check-yaml
-        exclude: "charts/paperless-ngx/templates/common.yaml"
       - id: check-toml
       - id: check-executables-have-shebangs
       - id: end-of-file-fixer
         exclude_types:
           - svg
           - pofile
-        exclude: "^(LICENSE|charts/paperless-ngx/README.md)$"
+        exclude: "(^LICENSE$)"
       - id: mixed-line-ending
         args:
           - "--fix=lf"
@@ -35,7 +34,7 @@ repos:
           - javascript
           - ts
           - markdown
-        exclude: "(^Pipfile\\.lock$)|(^charts/paperless-ngx/README.md$)"
+        exclude: "(^Pipfile\\.lock$)"
   # Python hooks
   - repo: https://github.com/asottile/reorder_python_imports
     rev: v3.9.0
