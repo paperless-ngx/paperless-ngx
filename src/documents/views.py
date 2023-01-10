@@ -29,6 +29,7 @@ from django.views.decorators.cache import cache_control
 from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
 from documents.tasks import consume_file
+from langdetect import detect
 from packaging import version as packaging_version
 from paperless import version
 from paperless.db import GnuPG
@@ -324,6 +325,13 @@ class DocumentViewSet(
             "archive_media_filename": doc.archive_filename,
             "original_filename": doc.original_filename,
         }
+
+        lang = "en"
+        try:
+            lang = detect(doc.content)
+        except Exception:
+            pass
+        meta["lang"] = lang
 
         if doc.has_archive_version:
             meta["archive_size"] = self.get_filesize(doc.archive_path)
