@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Helper script for building the Docker image locally.
-# Parses and provides the nessecary versions of other images to Docker
+# Parses and provides the necessary versions of other images to Docker
 # before passing in the rest of script args.
 
 # First Argument: The Dockerfile to build
