@@ -2,6 +2,7 @@ import json
 import os
 import re
 import subprocess
+import tempfile
 from pathlib import Path
 from typing import Optional
 
@@ -137,36 +138,27 @@ class RasterisedDocumentParser(DocumentParser):
         if not os.path.isfile(pdf_file):
             return None
 
-        from pdfminer.high_level import extract_text as pdfminer_extract_text
-
         try:
-            stripped = post_process_text(pdfminer_extract_text(pdf_file))
+            text = None
+            with tempfile.NamedTemporaryFile(
+                mode="w+",
+                dir=self.tempdir,
+            ) as tmp:
+                subprocess.run(
+                    [
+                        "pdftotext",
+                        "-q",
+                        "-layout",
+                        "-enc",
+                        "UTF-8",
+                        pdf_file,
+                        tmp.name,
+                    ],
+                )
+                text = tmp.read()
 
-            self.log("debug", f"Extracted text from PDF file {pdf_file}")
+            return post_process_text(text)
 
-            # pdfminer.six does not handle RTL text
-            # as a hack, for some languages, return no text, to force
-            # OCRMyPdf/Tesseract do handle this correctly
-            from langdetect import detect
-
-            lang = detect(stripped)
-
-            self.log("debug", f"Detected language {lang}")
-
-            if (
-                lang
-                in {
-                    "ar",  # Arabic
-                    "he",  # Hebrew,
-                    "fa",  # Persian
-                }
-                and pdf_file.name != "archive-fallback.pdf"
-            ):
-                raise RtlLanguageException()
-            return stripped
-        except RtlLanguageException:
-            self.log("warning", f"Detected RTL language {lang}")
-            return None
         except Exception:
             # TODO catch all for various issues with PDFminer.six.
             #  If PDFminer fails, fall back to OCR.
@@ -342,7 +334,7 @@ class RasterisedDocumentParser(DocumentParser):
             )
             if original_has_text:
                 self.text = text_original
-        except (NoTextFoundException, RtlLanguageException, InputFileError) as e:
+        except (NoTextFoundException, InputFileError) as e:
             self.log(
                 "warning",
                 f"Encountered an error while running OCR: {str(e)}. "
