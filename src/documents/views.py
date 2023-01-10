@@ -635,7 +635,7 @@ class PostDocumentView(GenericAPIView):
 
         task_id = str(uuid.uuid4())
 
-        consume_file.delay(
+        async_task = consume_file.delay(
             # Paths are not JSON friendly
             str(temp_file_path),
             override_title=title,
