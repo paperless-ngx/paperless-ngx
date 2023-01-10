@@ -63,6 +63,8 @@ class TestIgnoreDateParsing(TestCase):
 
         self._parse_checker(test_cases)
 
+
+class TestThreadCalculation(TestCase):
     def test_workers_threads(self):
         """
         GIVEN:
@@ -87,6 +89,8 @@ class TestIgnoreDateParsing(TestCase):
 
                 self.assertLessEqual(default_workers * default_threads, i)
 
+
+class TestRedisSocketConversion(TestCase):
     def test_redis_socket_parsing(self):
         """
         GIVEN:
@@ -143,6 +147,8 @@ class TestIgnoreDateParsing(TestCase):
             result = _parse_redis_url(input)
             self.assertTupleEqual(expected, result)
 
+
+class TestCeleryScheduleParsing(TestCase):
     def test_schedule_configuration_default(self):
         """
         GIVEN:
