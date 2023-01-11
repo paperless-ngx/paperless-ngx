@@ -151,6 +151,8 @@ different means. These are as follows:
   will not consume mails already tagged. Not all mail servers support
   this feature!
 
+  - **AppleMail support:** AppleMail allows differently colored tags. For this to work use `apple:<color>` (e.g. "apple:green") as a custom tag. Available colors are "red", "orange", "yellow", "blue", "green", "violet" and "grey".
+
 !!! warning
 
     The mail consumer will perform these actions on all mails it has
