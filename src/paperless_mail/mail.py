@@ -101,13 +101,15 @@ class TagMailAction(BaseMailAction):
                     raise MailError("Not a valid AppleMail tag color.")
             except Exception as e:
                 raise MailError(
-                    """Could not parse the parameters.
-                    Make sure they look like this: apple:<color>""",
+                    """Could not parse parameters.
+                    Make sure they look like this: apple:<color> and
+                    only use allowed colors.""",
                 ) from e
             self.keyword = None
 
         else:
             self.keyword = parameter
+            self.color = None
 
     def get_criteria(self):
 
