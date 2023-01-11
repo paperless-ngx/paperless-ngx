@@ -24,6 +24,7 @@ from imap_tools import NOT
 from paperless_mail import tasks
 from paperless_mail.mail import MailAccountHandler
 from paperless_mail.mail import MailError
+from paperless_mail.mail import TagMailAction
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 
@@ -672,6 +673,44 @@ class TestMail(DirectoriesMixin, TestCase):
         self.mail_account_handler.handle_mail_account(account)
         self.assertEqual(self.async_task.call_count, 2)
         self.assertEqual(len(self.bogus_mailbox.fetch(criteria, False)), 0)
+        self.assertEqual(len(self.bogus_mailbox.messages), 3)
+
+    def test_tag_mail_action_applemail_wrong_input(self):
+
+        self.assertRaises(
+            MailError,
+            TagMailAction,
+            "apple:black",
+        )
+        self.assertRaises(
+            MailError,
+            TagMailAction,
+            "applegreen",
+        )
+
+    def test_handle_mail_account_tag_applemail(self):
+        # all mails will be FLAGGED afterwards
+
+        account = MailAccount.objects.create(
+            name="test",
+            imap_server="",
+            username="admin",
+            password="secret",
+        )
+
+        _ = MailRule.objects.create(
+            name="testrule",
+            account=account,
+            action=MailRule.MailAction.TAG,
+            action_parameter="apple:green",
+        )
+
+        self.assertEqual(len(self.bogus_mailbox.messages), 3)
+        self.assertEqual(self.async_task.call_count, 0)
+        self.assertEqual(len(self.bogus_mailbox.fetch("UNFLAGGED", False)), 2)
+        self.mail_account_handler.handle_mail_account(account)
+        self.assertEqual(self.async_task.call_count, 2)
+        self.assertEqual(len(self.bogus_mailbox.fetch("UNFLAGGED", False)), 0)
         self.assertEqual(len(self.bogus_mailbox.messages), 3)
 
     def test_error_login(self):
