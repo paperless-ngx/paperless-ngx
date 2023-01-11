@@ -33,10 +33,10 @@ from paperless_mail.models import MailRule
 # no flag   - (FLAGS (\\Seen $NotJunk NotJunk))'
 # red       - (FLAGS (\\Flagged \\Seen $NotJunk NotJunk))'
 # orange    - (FLAGS (\\Flagged \\Seen $NotJunk NotJunk $MailFlagBit0))'
-# violet    - (FLAGS (\\Flagged \\Seen $NotJunk NotJunk $MailFlagBit0 $MailFlagBit2))'
-# blue      - (FLAGS (\\Flagged \\Seen $NotJunk NotJunk $MailFlagBit2))'
 # yellow    - (FLAGS (\\Flagged \\Seen $NotJunk NotJunk $MailFlagBit1))'
+# blue      - (FLAGS (\\Flagged \\Seen $NotJunk NotJunk $MailFlagBit2))'
 # green     - (FLAGS (\\Flagged \\Seen $NotJunk NotJunk $MailFlagBit0 $MailFlagBit1))'
+# violet    - (FLAGS (\\Flagged \\Seen $NotJunk NotJunk $MailFlagBit0 $MailFlagBit2))'
 # grey      - (FLAGS (\\Flagged \\Seen $NotJunk NotJunk $MailFlagBit1 $MailFlagBit2))'
 
 APPLE_MAIL_TAG_COLORS = {
@@ -138,7 +138,9 @@ class TagMailAction(BaseMailAction):
             M.flag(message_uids, APPLE_MAIL_TAG_COLORS.get(self.color), True)
 
             # Set the general \Flagged
-            # This defaults to the "red" flag and "stars" in Thunderbird or GMail
+            # This defaults to the "red" flag in AppleMail and
+            # "stars" in Thunderbird or GMail
+
             M.flag(message_uids, [MailMessageFlags.FLAGGED], True)
 
         elif self.keyword:
