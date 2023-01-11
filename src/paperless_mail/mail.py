@@ -91,7 +91,7 @@ class TagMailAction(BaseMailAction):
     def __init__(self, parameter):
 
         # The custom tag should look like "apple:<color>"
-        if "apple" in parameter.lower():
+        if "apple:" in parameter.lower():
             try:
                 _, self.color = parameter.split(":")
                 self.color = self.color.strip()
