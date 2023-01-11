@@ -27,7 +27,6 @@ from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 
 # Apple Mail sets multiple IMAP KEYWORD and the general "\Flagged" FLAG
-
 # imaplib => conn.fetch(b"<message_id>", "FLAGS")
 
 # no flag   - (FLAGS (\\Seen $NotJunk NotJunk))'
@@ -140,7 +139,6 @@ class TagMailAction(BaseMailAction):
             # Set the general \Flagged
             # This defaults to the "red" flag in AppleMail and
             # "stars" in Thunderbird or GMail
-
             M.flag(message_uids, [MailMessageFlags.FLAGGED], True)
 
         elif self.keyword:
