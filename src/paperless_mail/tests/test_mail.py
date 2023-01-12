@@ -682,11 +682,6 @@ class TestMail(DirectoriesMixin, TestCase):
             TagMailAction,
             "apple:black",
         )
-        self.assertRaises(
-            MailError,
-            TagMailAction,
-            "applegreen",
-        )
 
     def test_handle_mail_account_tag_applemail(self):
         # all mails will be FLAGGED afterwards

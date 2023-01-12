@@ -92,18 +92,13 @@ class TagMailAction(BaseMailAction):
 
         # The custom tag should look like "apple:<color>"
         if "apple:" in parameter.lower():
-            try:
-                _, self.color = parameter.split(":")
-                self.color = self.color.strip()
 
-                if not self.color.lower() in APPLE_MAIL_TAG_COLORS.keys():
-                    raise MailError("Not a valid AppleMail tag color.")
-            except Exception as e:
-                raise MailError(
-                    """Could not parse parameters.
-                    Make sure they look like this: apple:<color> and
-                    only use allowed colors.""",
-                ) from e
+            _, self.color = parameter.split(":")
+            self.color = self.color.strip()
+
+            if not self.color.lower() in APPLE_MAIL_TAG_COLORS.keys():
+                raise MailError("Not a valid AppleMail tag color.")
+
             self.keyword = None
 
         else:
