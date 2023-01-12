@@ -8,6 +8,7 @@ from unittest import mock
 from zipfile import ZipFile
 
 from django.core.management import call_command
+from django.core.management.base import CommandError
 from django.test import override_settings
 from django.test import TestCase
 from django.utils import timezone
@@ -438,3 +439,61 @@ class TestExportImport(DirectoriesMixin, TestCase):
             self.assertEqual(len(zip.namelist()), 14)
             self.assertIn("manifest.json", zip.namelist())
             self.assertIn("version.json", zip.namelist())
+
+    def test_export_target_not_exists(self):
+        """
+        GIVEN:
+            - Request to export documents to directory that doesn't exist
+        WHEN:
+            - Export command is called
+        THEN:
+            - Error is raised
+        """
+        args = ["document_exporter", "/tmp/foo/bar"]
+
+        with self.assertRaises(CommandError) as e:
+
+            call_command(*args)
+
+            self.assertEqual("That path isn't a directory", str(e))
+
+    def test_export_target_exists_but_is_file(self):
+        """
+        GIVEN:
+            - Request to export documents to file instead of directory
+        WHEN:
+            - Export command is called
+        THEN:
+            - Error is raised
+        """
+
+        with tempfile.NamedTemporaryFile() as tmp_file:
+
+            args = ["document_exporter", tmp_file.name]
+
+            with self.assertRaises(CommandError) as e:
+
+                call_command(*args)
+
+                self.assertEqual("That path isn't a directory", str(e))
+
+    def test_export_target_not_writable(self):
+        """
+        GIVEN:
+            - Request to export documents to directory that's not writeable
+        WHEN:
+            - Export command is called
+        THEN:
+            - Error is raised
+        """
+        with tempfile.TemporaryDirectory() as tmp_dir:
+
+            os.chmod(tmp_dir, 0o000)
+
+            args = ["document_exporter", tmp_dir]
+
+            with self.assertRaises(CommandError) as e:
+
+                call_command(*args)
+
+                self.assertEqual("That path doesn't appear to be writable", str(e))
