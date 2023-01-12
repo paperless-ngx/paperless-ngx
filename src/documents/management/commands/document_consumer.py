@@ -19,7 +19,7 @@ from watchdog.observers.polling import PollingObserver
 
 try:
     from inotifyrecursive import INotify, flags
-except ImportError:
+except ImportError:  # pragma: nocover
     INotify = flags = None
 
 logger = logging.getLogger("paperless.management.consumer")
