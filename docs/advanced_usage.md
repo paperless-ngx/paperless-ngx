@@ -336,6 +336,13 @@ value.
     However, keep in mind that inside docker, if files get stored outside of
     the predefined volumes, they will be lost after a restart of paperless.
 
+!!! warning
+
+    When file naming handling, in particular when using `{tag_list}`,
+    you may run into the limits of your operating system's maximum
+    path lengths.  Files will retain the previous path instead and
+    the issue logged.
+
 ## Storage paths
 
 One of the best things in Paperless is that you can not only access the
@@ -392,7 +399,7 @@ structure as in the previous example above.
     If you adjust the format of an existing storage path, old documents
     don't get relocated automatically. You need to run the
     [document renamer](/administration#renamer) to
-    adjust their pathes.
+    adjust their paths.
 
 ## Celery Monitoring {#celery-monitoring}
 
