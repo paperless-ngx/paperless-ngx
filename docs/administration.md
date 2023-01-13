@@ -227,12 +227,14 @@ is not a TTY" errors. For example:
 `docker-compose exec -T webserver document_exporter ../export`
 
 ```
-document_exporter target [-c] [-f] [-d]
+document_exporter target [-c] [-f] [-d] [-na] [-nt]
 
 optional arguments:
 -c, --compare-checksums
 -f, --use-filename-format
 -d, --delete
+-na, --no-archive
+-nt, --no-thumbnail
 -z  --zip
 ```
 
@@ -258,6 +260,14 @@ you want paperless to also remove files that do not belong to the
 current export such as files from deleted documents, specify `--delete`.
 Be careful when pointing paperless to a directory that already contains
 other files.
+
+Paperless will not export archive files if you use `--no-archive`, or will
+not export thumbnails if you use `--no-thumbnail`. After importing, These
+files can be generated again by using `document_archiver` or
+`document_thumbnails`. It can make sense to omit these files from backup
+as their content and checksum can change (new archiver or thumbnail
+generator algorithm) and may then cause additional used space in
+a deduplicated backup.
 
 If `-z` or `--zip` is provided, the export will be a zipfile
 in the target directory, named according to the current date.

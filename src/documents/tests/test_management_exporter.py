@@ -102,6 +102,8 @@ class TestExportImport(DirectoriesMixin, TestCase):
         use_filename_format=False,
         compare_checksums=False,
         delete=False,
+        no_archive=False,
+        no_thumbnail=False,
     ):
         args = ["document_exporter", self.target]
         if use_filename_format:
@@ -110,6 +112,10 @@ class TestExportImport(DirectoriesMixin, TestCase):
             args += ["--compare-checksums"]
         if delete:
             args += ["--delete"]
+        if no_archive:
+            args += ["--no-archive"]
+        if no_thumbnail:
+            args += ["--no-thumbnail"]
 
         call_command(*args)
 
@@ -497,3 +503,63 @@ class TestExportImport(DirectoriesMixin, TestCase):
                 call_command(*args)
 
                 self.assertEqual("That path doesn't appear to be writable", str(e))
+
+    def test_no_archive(self):
+        shutil.rmtree(os.path.join(self.dirs.media_dir, "documents"))
+        shutil.copytree(
+            os.path.join(os.path.dirname(__file__), "samples", "documents"),
+            os.path.join(self.dirs.media_dir, "documents"),
+        )
+
+        manifest = self._do_export()
+        has_archive = False
+        for element in manifest:
+            if element["model"] == "documents.document":
+                has_archive = (
+                    has_archive or document_exporter.EXPORTER_ARCHIVE_NAME in element
+                )
+        self.assertTrue(has_archive)
+
+        has_archive = False
+        manifest = self._do_export(no_archive=True)
+        for element in manifest:
+            if element["model"] == "documents.document":
+                has_archive = (
+                    has_archive or document_exporter.EXPORTER_ARCHIVE_NAME in element
+                )
+        self.assertFalse(has_archive)
+
+        with paperless_environment() as dirs:
+            call_command("document_importer", self.target)
+            self.assertEqual(Document.objects.count(), 4)
+
+    def test_no_thumbnail(self):
+        shutil.rmtree(os.path.join(self.dirs.media_dir, "documents"))
+        shutil.copytree(
+            os.path.join(os.path.dirname(__file__), "samples", "documents"),
+            os.path.join(self.dirs.media_dir, "documents"),
+        )
+
+        manifest = self._do_export()
+        has_thumbnail = False
+        for element in manifest:
+            if element["model"] == "documents.document":
+                has_thumbnail = (
+                    has_thumbnail
+                    or document_exporter.EXPORTER_THUMBNAIL_NAME in element
+                )
+        self.assertTrue(has_thumbnail)
+
+        has_thumbnail = False
+        manifest = self._do_export(no_thumbnail=True)
+        for element in manifest:
+            if element["model"] == "documents.document":
+                has_thumbnail = (
+                    has_thumbnail
+                    or document_exporter.EXPORTER_THUMBNAIL_NAME in element
+                )
+        self.assertFalse(has_thumbnail)
+
+        with paperless_environment() as dirs:
+            call_command("document_importer", self.target)
+            self.assertEqual(Document.objects.count(), 4)
