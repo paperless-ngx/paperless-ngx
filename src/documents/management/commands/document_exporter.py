@@ -70,6 +70,15 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
+            "-p",
+            "--use-filename-prefix",
+            default=False,
+            action="store_true",
+            help="Export files in dedicated folders according to their nature: "
+            "archive, originals or thumbnails",
+        )
+
+        parser.add_argument(
             "-d",
             "--delete",
             default=False,
@@ -94,6 +103,7 @@ class Command(BaseCommand):
             action="store_true",
             help="Avoid exporting thumbnail files",
         )
+
         parser.add_argument(
             "--no-progress-bar",
             default=False,
@@ -116,6 +126,7 @@ class Command(BaseCommand):
         self.exported_files = []
         self.compare_checksums = False
         self.use_filename_format = False
+        self.use_filename_prefix = False
         self.delete = False
         self.no_archive = False
         self.no_thumbnail = False
@@ -125,6 +136,7 @@ class Command(BaseCommand):
         self.target = options["target"]
         self.compare_checksums = options["compare_checksums"]
         self.use_filename_format = options["use_filename_format"]
+        self.use_filename_prefix = options["use_filename_prefix"]
         self.delete = options["delete"]
         self.no_archive = options["no_archive"]
         self.no_thumbnail = options["no_thumbnail"]
@@ -257,11 +269,15 @@ class Command(BaseCommand):
 
             # 3.3. write filenames into manifest
             original_name = base_name
+            if self.use_filename_prefix:
+                original_name = os.path.join("originals", original_name)
             original_target = os.path.join(self.target, original_name)
             document_dict[EXPORTER_FILE_NAME] = original_name
 
             if not self.no_thumbnail:
                 thumbnail_name = base_name + "-thumbnail.webp"
+                if self.use_filename_prefix:
+                    thumbnail_name = os.path.join("thumbnails", thumbnail_name)
                 thumbnail_target = os.path.join(self.target, thumbnail_name)
                 document_dict[EXPORTER_THUMBNAIL_NAME] = thumbnail_name
             else:
@@ -269,6 +285,8 @@ class Command(BaseCommand):
 
             if not self.no_archive and document.has_archive_version:
                 archive_name = base_name + "-archive.pdf"
+                if self.use_filename_prefix:
+                    archive_name = os.path.join("archive", archive_name)
                 archive_target = os.path.join(self.target, archive_name)
                 document_dict[EXPORTER_ARCHIVE_NAME] = archive_name
             else:
