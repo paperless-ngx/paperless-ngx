@@ -237,7 +237,7 @@ def _get_oidc_server():
     secret = os.environ.get("PAPERLESS_SSO_OIDC_SECRET")
     if name and url and client_id and secret:
         return {
-            "id": config_id or slugify(name)[:35],
+            "id": config_id or slugify(name)[:30],
             "name": name,
             "server_url": url,
             "APP": {
@@ -956,6 +956,6 @@ if SSO_ENABLED:
         os.environ.get("PAPERLESS_SSO_PROVIDERS", "{}"),
     )
     if _oidc_server:
-        SOCIALACCOUNT_PROVIDERS.setdefault("openid-connect", {})
-        SOCIALACCOUNT_PROVIDERS["openid-connect"].setdefault("SERVERS", [])
-        SOCIALACCOUNT_PROVIDERS["openid-connect"]["SERVERS"] += [_oidc_server]
+        SOCIALACCOUNT_PROVIDERS.setdefault("openid_connect", {})
+        SOCIALACCOUNT_PROVIDERS["openid_connect"].setdefault("SERVERS", [])
+        SOCIALACCOUNT_PROVIDERS["openid_connect"]["SERVERS"] += [_oidc_server]
