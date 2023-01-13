@@ -80,6 +80,21 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
+            "-na",
+            "--no-archive",
+            default=False,
+            action="store_true",
+            help="Avoid exporting archive files",
+        )
+
+        parser.add_argument(
+            "-nt",
+            "--no-thumbnail",
+            default=False,
+            action="store_true",
+            help="Avoid exporting thumbnail files",
+        )
+        parser.add_argument(
             "--no-progress-bar",
             default=False,
             action="store_true",
@@ -102,6 +117,8 @@ class Command(BaseCommand):
         self.compare_checksums = False
         self.use_filename_format = False
         self.delete = False
+        self.no_archive = False
+        self.no_thumbnail = False
 
     def handle(self, *args, **options):
 
@@ -109,6 +126,8 @@ class Command(BaseCommand):
         self.compare_checksums = options["compare_checksums"]
         self.use_filename_format = options["use_filename_format"]
         self.delete = options["delete"]
+        self.no_archive = options["no_archive"]
+        self.no_thumbnail = options["no_thumbnail"]
         zip_export: bool = options["zip"]
 
         # If zipping, save the original target for later and
@@ -241,11 +260,14 @@ class Command(BaseCommand):
             original_target = os.path.join(self.target, original_name)
             document_dict[EXPORTER_FILE_NAME] = original_name
 
-            thumbnail_name = base_name + "-thumbnail.webp"
-            thumbnail_target = os.path.join(self.target, thumbnail_name)
-            document_dict[EXPORTER_THUMBNAIL_NAME] = thumbnail_name
+            if not self.no_thumbnail:
+                thumbnail_name = base_name + "-thumbnail.webp"
+                thumbnail_target = os.path.join(self.target, thumbnail_name)
+                document_dict[EXPORTER_THUMBNAIL_NAME] = thumbnail_name
+            else:
+                thumbnail_target = None
 
-            if document.has_archive_version:
+            if not self.no_archive and document.has_archive_version:
                 archive_name = base_name + "-archive.pdf"
                 archive_target = os.path.join(self.target, archive_name)
                 document_dict[EXPORTER_ARCHIVE_NAME] = archive_name
@@ -262,11 +284,12 @@ class Command(BaseCommand):
                         f.write(GnuPG.decrypted(out_file))
                         os.utime(original_target, times=(t, t))
 
-                os.makedirs(os.path.dirname(thumbnail_target), exist_ok=True)
-                with open(thumbnail_target, "wb") as f:
-                    with document.thumbnail_file as out_file:
-                        f.write(GnuPG.decrypted(out_file))
-                        os.utime(thumbnail_target, times=(t, t))
+                if thumbnail_target:
+                    os.makedirs(os.path.dirname(thumbnail_target), exist_ok=True)
+                    with open(thumbnail_target, "wb") as f:
+                        with document.thumbnail_file as out_file:
+                            f.write(GnuPG.decrypted(out_file))
+                            os.utime(thumbnail_target, times=(t, t))
 
                 if archive_target:
                     os.makedirs(os.path.dirname(archive_target), exist_ok=True)
@@ -281,7 +304,8 @@ class Command(BaseCommand):
                     original_target,
                 )
 
-                self.check_and_copy(document.thumbnail_path, None, thumbnail_target)
+                if thumbnail_target:
+                    self.check_and_copy(document.thumbnail_path, None, thumbnail_target)
 
                 if archive_target:
                     self.check_and_copy(
