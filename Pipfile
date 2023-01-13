@@ -11,7 +11,7 @@ name = "piwheels"
 [packages]
 dateparser = "~=1.1"
 django = "~=4.0"
-django-allauth = "~=0.51"
+django-allauth = "~=0.52"
 django-cors-headers = "*"
 django-extensions = "*"
 django-filter = "~=22.1"
