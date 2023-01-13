@@ -193,8 +193,11 @@ class Command(BaseCommand):
             doc_file = record[EXPORTER_FILE_NAME]
             document_path = os.path.join(self.source, doc_file)
 
-            thumb_file = record[EXPORTER_THUMBNAIL_NAME]
-            thumbnail_path = Path(os.path.join(self.source, thumb_file)).resolve()
+            if EXPORTER_THUMBNAIL_NAME in record:
+                thumb_file = record[EXPORTER_THUMBNAIL_NAME]
+                thumbnail_path = Path(os.path.join(self.source, thumb_file)).resolve()
+            else:
+                thumbnail_path = None
 
             if EXPORTER_ARCHIVE_NAME in record:
                 archive_file = record[EXPORTER_ARCHIVE_NAME]
@@ -212,19 +215,21 @@ class Command(BaseCommand):
 
                 shutil.copy2(document_path, document.source_path)
 
-                if thumbnail_path.suffix in {".png", ".PNG"}:
-                    run_convert(
-                        density=300,
-                        scale="500x5000>",
-                        alpha="remove",
-                        strip=True,
-                        trim=False,
-                        auto_orient=True,
-                        input_file=f"{thumbnail_path}[0]",
-                        output_file=str(document.thumbnail_path),
-                    )
-                else:
-                    shutil.copy2(thumbnail_path, document.thumbnail_path)
+                if thumbnail_path:
+                    if thumbnail_path.suffix in {".png", ".PNG"}:
+                        run_convert(
+                            density=300,
+                            scale="500x5000>",
+                            alpha="remove",
+                            strip=True,
+                            trim=False,
+                            auto_orient=True,
+                            input_file=f"{thumbnail_path}[0]",
+                            output_file=str(document.thumbnail_path),
+                        )
+                    else:
+                        shutil.copy2(thumbnail_path, document.thumbnail_path)
+
                 if archive_path:
                     create_source_path_directory(document.archive_path)
                     # TODO: this assumes that the export is valid and
