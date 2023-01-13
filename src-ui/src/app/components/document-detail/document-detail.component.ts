@@ -135,6 +135,13 @@ export class DocumentDetailComponent
       : this.metadata?.original_mime_type
   }
 
+  get isRTL() {
+    if (!this.metadata || !this.metadata.lang) return false
+    else {
+      return ['ar', 'he', 'fe'].includes(this.metadata.lang)
+    }
+  }
+
   ngOnInit(): void {
     this.documentForm.valueChanges
       .pipe(takeUntil(this.unsubscribeNotifier))
@@ -184,7 +191,7 @@ export class DocumentDetailComponent
               this.openDocumentService.getOpenDocument(this.documentId)
             )
           } else {
-            this.openDocumentService.openDocument(doc, false)
+            this.openDocumentService.openDocument(doc)
             this.updateComponent(doc)
           }
 
@@ -284,7 +291,7 @@ export class DocumentDetailComponent
     })
     modal.componentInstance.dialogMode = 'create'
     if (newName) modal.componentInstance.object = { name: newName }
-    modal.componentInstance.success
+    modal.componentInstance.succeeded
       .pipe(
         switchMap((newDocumentType) => {
           return this.documentTypeService
@@ -305,7 +312,7 @@ export class DocumentDetailComponent
     })
     modal.componentInstance.dialogMode = 'create'
     if (newName) modal.componentInstance.object = { name: newName }
-    modal.componentInstance.success
+    modal.componentInstance.succeeded
       .pipe(
         switchMap((newCorrespondent) => {
           return this.correspondentService
@@ -328,7 +335,7 @@ export class DocumentDetailComponent
     })
     modal.componentInstance.dialogMode = 'create'
     if (newName) modal.componentInstance.object = { name: newName }
-    modal.componentInstance.success
+    modal.componentInstance.succeeded
       .pipe(
         switchMap((newStoragePath) => {
           return this.storagePathService
@@ -337,7 +344,7 @@ export class DocumentDetailComponent
         })
       )
       .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe(({ newStoragePath, documentTypes: storagePaths }) => {
+      .subscribe(({ newStoragePath, storagePaths }) => {
         this.storagePaths = storagePaths.results
         this.documentForm.get('storage_path').setValue(newStoragePath.id)
       })
@@ -491,7 +498,7 @@ export class DocumentDetailComponent
         .subscribe({
           next: () => {
             this.toastService.showInfo(
-              $localize`Redo OCR operation will begin in the background.`
+              $localize`Redo OCR operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.`
             )
             if (modal) {
               modal.close()

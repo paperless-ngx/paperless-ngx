@@ -1,0 +1,30 @@
+{
+    "count": 1,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": 1,
+            "name": "Gmail",
+            "account": 2,
+            "folder": "INBOX",
+            "filter_from": null,
+            "filter_subject": "[paperless]",
+            "filter_body": null,
+            "filter_attachment_filename": null,
+            "maximum_age": 30,
+            "action": 3,
+            "action_parameter": null,
+            "assign_title_from": 1,
+            "assign_tags": [
+                9
+            ],
+            "assign_correspondent_from": 1,
+            "assign_correspondent": 2,
+            "assign_document_type": null,
+            "order": 0,
+            "attachment_type": 2,
+            "consumption_scope": 1
+        }
+    ]
+}

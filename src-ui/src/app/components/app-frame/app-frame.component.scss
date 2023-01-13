@@ -1,3 +1,6 @@
+@import "node_modules/bootstrap/scss/functions";
+@import "node_modules/bootstrap/scss/variables";
+
 /*
  * Sidebar
  */
@@ -14,11 +17,106 @@
     width: 0.8em;
     height: 0.8em;
   }
+
+  // These come from the col-md-3 col-lg-2 classes for regular sidebar, needed for animation
+  @media (min-width: 768px) {
+    max-width: 25%;
+  }
+
+  @media (min-width: 992px) {
+    max-width: 16.66666667%;
+  }
+
+  transition: all .2s ease;
 }
 @media (max-width: 767.98px) {
   .sidebar {
     top: 3.5rem;
   }
+}
+
+main {
+  transition: all .2s ease;
+}
+
+.sidebar-slim-toggler {
+  display: none; // hide on mobile
+}
+
+.sidebar li.nav-item span,
+.sidebar .sidebar-heading span {
+  transition: all .1s ease;
+}
+
+@media(min-width: 768px) {
+  .sidebar.slim {
+    max-width: 50px;
+
+    li.nav-item span.badge {
+      display: inline-block;
+      margin-right: 2px;
+    }
+  }
+
+  .sidebar.slim:not(.animating) {
+    li.nav-item span,
+    .sidebar-heading span {
+      display: none;
+    }
+  }
+
+  .sidebar.animating {
+    li.nav-item span,
+    .sidebar-heading span {
+      display: unset;
+      position: absolute;
+      opacity: 0;
+      overflow: hidden;
+    }
+  }
+
+  .sidebar:not(.slim):not(.animating) {
+    li.nav-item span,
+    .sidebar-heading span {
+      position: unset;
+      opacity: 1;
+      overflow: auto;
+    }
+  }
+
+  .sidebar.slim,
+  .sidebar.animating {
+    .text-truncate {
+      text-overflow: unset !important;
+      word-wrap: break-word !important;
+    }
+  }
+
+  .sidebar.slim {
+    li.nav-item span.badge {
+      display: inline-block;
+      margin-right: 2px;
+    }
+  }
+
+  .col-slim {
+    padding-left: calc(50px + $grid-gutter-width) !important;
+  }
+
+  .sidebar-slim-toggler {
+    display: block;
+    position: absolute;
+    right: -12px;
+    top: 60px;
+    z-index: 996;
+    --bs-btn-padding-x: 0.35rem;
+    --bs-btn-padding-y: 0.125rem;
+  }
+}
+
+::ng-deep .popover-slim .popover-body {
+  --bs-popover-body-padding-x: .5rem;
+  --bs-popover-body-padding-y: .5rem;
 }
 
 .sidebar-sticky {
@@ -77,7 +175,7 @@
 
   .close {
     display: none;
-    position: absolute;
+    position: absolute !important;
     cursor: pointer;
     opacity: 1;
     top: 0;
@@ -122,6 +220,12 @@
   font-size: 1rem;
 }
 
+@media screen and (min-width: 768px) {
+  .navbar-brand.slim {
+    max-width: 50px;
+  }
+}
+
 .dropdown.show .dropdown-toggle,
 .dropdown-toggle:hover {
   opacity: 0.7;
@@ -145,17 +249,18 @@
 
   form {
     position: relative;
+
+    > svg {
+      position: absolute;
+      left: 0.6rem;
+      top: 0.5rem;
+      color: rgba(255, 255, 255, 0.6);
+    }
   }
 
-  svg {
-    position: absolute;
-    left: 0.6rem;
-    top: 0.5rem;
-    color: rgba(255, 255, 255, 0.6);
-  }
 
   &:focus-within {
-    svg {
+    form > svg {
       display: none;
     }
 

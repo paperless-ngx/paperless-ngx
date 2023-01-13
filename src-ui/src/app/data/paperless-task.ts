@@ -6,11 +6,10 @@ export enum PaperlessTaskType {
 }
 
 export enum PaperlessTaskStatus {
-  Queued = 'queued',
-  Started = 'started',
-  Complete = 'complete',
-  Failed = 'failed',
-  Unknown = 'unknown',
+  Pending = 'PENDING',
+  Started = 'STARTED',
+  Complete = 'SUCCESS',
+  Failed = 'FAILURE',
 }
 
 export interface PaperlessTask extends ObjectWithId {
@@ -22,11 +21,13 @@ export interface PaperlessTask extends ObjectWithId {
 
   task_id: string
 
-  name: string
+  task_file_name: string
 
-  created: Date
+  date_created: Date
 
-  started?: Date
+  date_done?: Date
 
-  result: string
+  result?: string
+
+  related_document?: number
 }

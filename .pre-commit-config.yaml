@@ -5,19 +5,20 @@
 repos:
   # General hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.3.0
+    rev: v4.4.0
     hooks:
       - id: check-docstring-first
       - id: check-json
         exclude: "tsconfig.*json"
       - id: check-yaml
+        exclude: "charts/paperless-ngx/templates/common.yaml"
       - id: check-toml
       - id: check-executables-have-shebangs
       - id: end-of-file-fixer
         exclude_types:
           - svg
           - pofile
-        exclude: "(^LICENSE$)"
+        exclude: "^(LICENSE|charts/paperless-ngx/README.md)$"
       - id: mixed-line-ending
         args:
           - "--fix=lf"
@@ -34,10 +35,10 @@ repos:
           - javascript
           - ts
           - markdown
-        exclude: "(^Pipfile\\.lock$)"
+        exclude: "(^Pipfile\\.lock$)|(^charts/paperless-ngx/README.md$)"
   # Python hooks
   - repo: https://github.com/asottile/reorder_python_imports
-    rev: v3.8.3
+    rev: v3.9.0
     hooks:
       - id: reorder-python-imports
         exclude: "(migrations)"
@@ -47,23 +48,23 @@ repos:
       - id: yesqa
         exclude: "(migrations)"
   - repo: https://github.com/asottile/add-trailing-comma
-    rev: "v2.2.3"
+    rev: "v2.4.0"
     hooks:
       - id: add-trailing-comma
         exclude: "(migrations)"
-  - repo: https://gitlab.com/pycqa/flake8
-    rev: 3.9.2
+  - repo: https://github.com/PyCQA/flake8
+    rev: 6.0.0
     hooks:
       - id: flake8
         files: ^src/
         args:
           - "--config=./src/setup.cfg"
   - repo: https://github.com/psf/black
-    rev: 22.8.0
+    rev: 22.12.0
     hooks:
       - id: black
   - repo: https://github.com/asottile/pyupgrade
-    rev: v2.38.1
+    rev: v3.3.1
     hooks:
       - id: pyupgrade
         exclude: "(migrations)"
@@ -82,6 +83,6 @@ repos:
         args:
           - "--tab"
   - repo: https://github.com/shellcheck-py/shellcheck-py
-    rev: "v0.8.0.4"
+    rev: "v0.9.0.2"
     hooks:
       - id: shellcheck

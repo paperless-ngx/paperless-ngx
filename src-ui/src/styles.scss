@@ -1,9 +1,9 @@
 // bs options
 $enable-negative-margins: true;
 
+@import "theme";
 @import "node_modules/bootstrap/scss/bootstrap";
 @import "~@ng-select/ng-select/themes/default.theme.css";
-@import "theme";
 @import "print";
 
 // Paperless-ngx styles
@@ -73,8 +73,8 @@ svg.logo {
   border-color: var(--bs-primary);
 
   &:hover, &:focus {
-    background-color: var(--pngx-primary-darken-5);
-    border-color: var(--pngx-primary-darken-5);
+    background-color: var(--pngx-primary-darken-5) !important;
+    border-color: var(--pngx-primary-darken-5) !important;
   }
 
   &:disabled, &.disabled {
@@ -82,6 +82,15 @@ svg.logo {
     background-color: var(--pngx-primary-darken-5) !important;
     border-color: var(--pngx-primary-darken-5) !important;
   }
+}
+
+.btn-dark {
+  --bs-btn-color: var(--bs-gray-600);
+  --bs-btn-bg: var(--bs-gray-200);
+  --bs-btn-border-color: var(--bs-gray-200);
+  --bs-btn-hover-bg: var(--bs-gray-400);
+  --bs-btn-hover-border-color: var(--bs-gray-500);
+  --bs-btn-active-bg: var(--bs-gray-200);
 }
 
 .text-primary {
@@ -155,8 +164,14 @@ a.navbar-brand:focus-visible {
   }
 }
 
-a, a:hover, .btn-link, .btn-link:hover {
+a, a:hover,
+.btn-link {
   color: var(--bs-primary);
+}
+
+.btn-link:hover,
+.btn-link:active {
+  color: var(--pngx-primary-darken-15) !important;
 }
 
 .form-control-dark {
@@ -227,10 +242,12 @@ a, a:hover, .btn-link, .btn-link:hover {
   }
 
   .input-group {
-    .ng-select-container {
-      height: 100%;
-      border-top-right-radius: 0;
-      border-bottom-right-radius: 0;
+    ng-select:not(:last-child) {
+      .ng-select-container {
+        height: 100%;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+      }
     }
   }
 }
@@ -357,6 +374,10 @@ textarea,
   &:hover, &:focus {
     background-color: var(--bs-body-bg);
   }
+
+  &:focus {
+    color: var(--bs-body-color);
+  }
 }
 
 .dropdown-menu {
@@ -377,6 +398,10 @@ textarea,
     &.active {
       background-color: var(--bs-primary);
       color: var(--pngx-primary-text-contrast);
+    }
+
+    &.disabled, &:disabled {
+      opacity: 50%;
     }
   }
 }
@@ -403,6 +428,11 @@ textarea,
   width: 16px;
   height: 16px;
   vertical-align: text-bottom;
+}
+
+.sidebaricon-sm {
+  width: 12px;
+  height: 12px;
 }
 
 table.table {
@@ -465,6 +495,12 @@ table.table {
   user-select: none !important;
 }
 
+.alert-primary {
+  --bs-alert-color: var(--bs-primary);
+  --bs-alert-bg: var(--pngx-primary-faded);
+  --bs-alert-border-color: var(--bs-primary);
+}
+
 .alert-danger {
   color: var(--bs-body-color);
   background-color: var(--bs-danger);
@@ -482,12 +518,31 @@ table.table {
 }
 
 .popover {
+  background-color: var(--pngx-bg-alt);
+  .popover-header {
+    background-color: var(--pngx-bg-alt);
+  }
   .popover-header,
   .popover-body {
-    background-color: var(--pngx-bg-alt);
     border-color: var(--bs-border-color);
     color: var(--bs-body-color);
   }
+}
+
+// Tour
+.tour-active .popover {
+  min-width: 360px;
+  margin: 0 .25rem .25rem !important;
+}
+
+body.tour-active .row.sticky-top,
+body.tour-active .sidebar {
+  z-index: inherit !important;
+}
+
+.nav-item.touranchor--is-active a {
+  font-weight: bold !important;
+  color: var(--bs-primary);
 }
 
 // fix popover carat colors
@@ -524,6 +579,25 @@ a.badge {
 .btn-outline-primary:not(:disabled):not(.disabled).active,.btn-outline-primary:not(:disabled):not(.disabled):active,.show>.btn-outline-primary.dropdown-toggle {
     background-color: var(--bs-primary);
     border-color: var(--bs-primary);
+}
+
+.btn-group-xs {
+  > .btn {
+    padding: 0.2rem 0.25rem;
+    font-size: 0.675rem;
+    line-height: 1.2;
+    border-radius: 0.15rem;
+  }
+
+  > .btn:not(:first-child):not(:nth-child(2)) {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  > .btn:not(:last-child) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
 }
 
 code {

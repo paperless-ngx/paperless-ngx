@@ -1,179 +1,197 @@
 {
-	"$schema": "./node_modules/@angular/cli/lib/config/schema.json",
-	"version": 1,
-	"newProjectRoot": "projects",
-	"projects": {
-		"paperless-ui": {
-			"projectType": "application",
-			"schematics": {
-				"@schematics/angular:component": {
-					"style": "scss"
-				}
-			},
-			"root": "",
-			"sourceRoot": "src",
-			"prefix": "app",
-			"i18n": {
-				"sourceLocale": "en-US",
-				"locales": {
-					"be-BY": "src/locale/messages.be_BY.xlf",
-					"cs-CZ": "src/locale/messages.cs_CZ.xlf",
-					"da-DK": "src/locale/messages.da_DK.xlf",
-					"de-DE": "src/locale/messages.de_DE.xlf",
-					"en-GB": "src/locale/messages.en_GB.xlf",
-					"es-ES": "src/locale/messages.es_ES.xlf",
-					"fr-FR": "src/locale/messages.fr_FR.xlf",
-					"it-IT": "src/locale/messages.it_IT.xlf",
-					"lb-LU": "src/locale/messages.lb_LU.xlf",
-					"nl-NL": "src/locale/messages.nl_NL.xlf",
-					"pl-PL": "src/locale/messages.pl_PL.xlf",
-					"pt-BR": "src/locale/messages.pt_BR.xlf",
-					"pt-PT": "src/locale/messages.pt_PT.xlf",
-					"ro-RO": "src/locale/messages.ro_RO.xlf",
-					"ru-RU": "src/locale/messages.ru_RU.xlf",
-					"sl-SI": "src/locale/messages.sl_SI.xlf",
-					"sr-CS": "src/locale/messages.sr_CS.xlf",
-					"sv-SE": "src/locale/messages.sv_SE.xlf",
-					"tr-TR": "src/locale/messages.tr_TR.xlf",
-					"zh-CN": "src/locale/messages.zh_CN.xlf"
-				}
-			},
-			"architect": {
-				"build": {
-					"builder": "@angular-devkit/build-angular:browser",
-					"options": {
-						"outputPath": "dist/paperless-ui",
-						"outputHashing": "none",
-						"index": "src/index.html",
-						"main": "src/main.ts",
-						"polyfills": "src/polyfills.ts",
-						"tsConfig": "tsconfig.app.json",
-						"localize": true,
-						"assets": [
-							"src/favicon.ico",
-							"src/apple-touch-icon.png",
-							"src/assets",
-							"src/manifest.webmanifest", {
-								"glob": "pdf.worker.min.js",
-								"input": "node_modules/pdfjs-dist/build/",
-								"output": "/assets/js/"
-							}
-						],
-						"styles": [
-							"src/styles.scss"
-						],
-						"scripts": [],
-						"allowedCommonJsDependencies": [
-							"ng2-pdf-viewer"
-						],
-						"vendorChunk": true,
-						"extractLicenses": false,
-						"buildOptimizer": false,
-						"sourceMap": true,
-						"optimization": false,
-						"namedChunks": true
-					},
-					"configurations": {
-						"production": {
-							"fileReplacements": [
-								{
-									"replace": "src/environments/environment.ts",
-									"with": "src/environments/environment.prod.ts"
-								}
-							],
-							"outputPath": "../src/documents/static/frontend/",
-							"optimization": true,
-							"outputHashing": "none",
-							"sourceMap": false,
-							"namedChunks": false,
-							"extractLicenses": true,
-							"vendorChunk": false,
-							"buildOptimizer": true,
-							"budgets": [
-								{
-									"type": "initial",
-									"maximumWarning": "2mb",
-									"maximumError": "5mb"
-								},
-								{
-									"type": "anyComponentStyle",
-									"maximumWarning": "6kb",
-									"maximumError": "10kb"
-								}
-							]
-						},
-						"en-US": {
-							"localize": ["en-US"]
-						}
-					},
-					"defaultConfiguration": ""
-				},
-				"serve": {
-					"builder": "@angular-devkit/build-angular:dev-server",
-					"options": {
-						"browserTarget": "paperless-ui:build:en-US"
-					},
-					"configurations": {
-						"production": {
-							"browserTarget": "paperless-ui:build:production"
-						}
-					}
-				},
-				"extract-i18n": {
-					"builder": "@angular-devkit/build-angular:extract-i18n",
-					"options": {
-						"browserTarget": "paperless-ui:build"
-					}
-				},
-				"test": {
-					"builder": "@angular-builders/jest:run",
-					"options": {
-						"tsConfig": "tsconfig.spec.json",
-						"assets": [
-							"src/favicon.ico",
-							"src/apple-touch-icon.png",
-							"src/assets",
-							"src/manifest.webmanifest"
-						],
-						"styles": [
-							"src/styles.scss"
-						],
-						"scripts": []
-					}
-				},
-				"e2e": {
-					"builder": "@cypress/schematic:cypress",
-					"options": {
-						"devServerTarget": "paperless-ui:serve",
-						"watch": true,
-						"headless": false
-					},
-					"configurations": {
-						"production": {
-							"devServerTarget": "paperless-ui:serve:production"
-						}
-					}
-				},
-				"cypress-run": {
-					"builder": "@cypress/schematic:cypress",
-					"options": {
-						"devServerTarget": "paperless-ui:serve"
-					},
-					"configurations": {
-						"production": {
-							"devServerTarget": "paperless-ui:serve:production"
-						}
-					}
-				},
-				"cypress-open": {
-					"builder": "@cypress/schematic:cypress",
-					"options": {
-						"watch": true,
-						"headless": false
-					}
-				}
-			}
-		}
-	},
-	"defaultProject": "paperless-ui"
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "paperless-ui": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
+      "root": "",
+      "sourceRoot": "src",
+      "prefix": "app",
+      "i18n": {
+        "sourceLocale": "en-US",
+        "locales": {
+          "ar-AR": "src/locale/messages.ar_AR.xlf",
+          "be-BY": "src/locale/messages.be_BY.xlf",
+          "cs-CZ": "src/locale/messages.cs_CZ.xlf",
+          "da-DK": "src/locale/messages.da_DK.xlf",
+          "de-DE": "src/locale/messages.de_DE.xlf",
+          "en-GB": "src/locale/messages.en_GB.xlf",
+          "es-ES": "src/locale/messages.es_ES.xlf",
+          "fr-FR": "src/locale/messages.fr_FR.xlf",
+          "it-IT": "src/locale/messages.it_IT.xlf",
+          "lb-LU": "src/locale/messages.lb_LU.xlf",
+          "nl-NL": "src/locale/messages.nl_NL.xlf",
+          "pl-PL": "src/locale/messages.pl_PL.xlf",
+          "pt-BR": "src/locale/messages.pt_BR.xlf",
+          "pt-PT": "src/locale/messages.pt_PT.xlf",
+          "ro-RO": "src/locale/messages.ro_RO.xlf",
+          "ru-RU": "src/locale/messages.ru_RU.xlf",
+          "sl-SI": "src/locale/messages.sl_SI.xlf",
+          "sr-CS": "src/locale/messages.sr_CS.xlf",
+          "sv-SE": "src/locale/messages.sv_SE.xlf",
+          "tr-TR": "src/locale/messages.tr_TR.xlf",
+          "zh-CN": "src/locale/messages.zh_CN.xlf"
+        }
+      },
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/paperless-ui",
+            "outputHashing": "none",
+            "index": "src/index.html",
+            "main": "src/main.ts",
+            "polyfills": "src/polyfills.ts",
+            "tsConfig": "tsconfig.app.json",
+            "localize": true,
+            "assets": [
+              "src/favicon.ico",
+              "src/apple-touch-icon.png",
+              "src/assets",
+              "src/manifest.webmanifest",
+              {
+                "glob": "pdf.worker.min.js",
+                "input": "node_modules/pdfjs-dist/build/",
+                "output": "/assets/js/"
+              }
+            ],
+            "styles": [
+              "src/styles.scss"
+            ],
+            "scripts": [],
+            "allowedCommonJsDependencies": [
+              "ng2-pdf-viewer"
+            ],
+            "vendorChunk": true,
+            "extractLicenses": false,
+            "buildOptimizer": false,
+            "sourceMap": true,
+            "optimization": false,
+            "namedChunks": true
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
+              "outputPath": "../src/documents/static/frontend/",
+              "optimization": true,
+              "outputHashing": "none",
+              "sourceMap": false,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            },
+            "en-US": {
+              "localize": [
+                "en-US"
+              ]
+            }
+          },
+          "defaultConfiguration": ""
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "paperless-ui:build:en-US"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "paperless-ui:build:production"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "paperless-ui:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-builders/jest:run",
+          "options": {
+            "tsConfig": "tsconfig.spec.json",
+            "assets": [
+              "src/favicon.ico",
+              "src/apple-touch-icon.png",
+              "src/assets",
+              "src/manifest.webmanifest"
+            ],
+            "styles": [
+              "src/styles.scss"
+            ],
+            "scripts": []
+          }
+        },
+        "e2e": {
+          "builder": "@cypress/schematic:cypress",
+          "options": {
+            "devServerTarget": "paperless-ui:serve",
+            "watch": true,
+            "headless": false
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "paperless-ui:serve:production"
+            }
+          }
+        },
+        "cypress-run": {
+          "builder": "@cypress/schematic:cypress",
+          "options": {
+            "devServerTarget": "paperless-ui:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "paperless-ui:serve:production"
+            }
+          }
+        },
+        "cypress-open": {
+          "builder": "@cypress/schematic:cypress",
+          "options": {
+            "watch": true,
+            "headless": false
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "defaultProject": "paperless-ui",
+  "cli": {
+    "schematicCollections": [
+      "@angular-eslint/schematics"
+    ]
+  }
 }

@@ -31,7 +31,7 @@
         [editing]="true"
         [multiple]="true"
         [applyOnClose]="applyOnClose"
-        (open)="openTagsDropdown()"
+        (opened)="openTagsDropdown()"
         [(selectionModel)]="tagSelectionModel"
         (apply)="setTags($event)">
       </app-filterable-dropdown>
@@ -40,7 +40,7 @@
         [items]="correspondents"
         [editing]="true"
         [applyOnClose]="applyOnClose"
-        (open)="openCorrespondentDropdown()"
+        (opened)="openCorrespondentDropdown()"
         [(selectionModel)]="correspondentSelectionModel"
         (apply)="setCorrespondents($event)">
       </app-filterable-dropdown>
@@ -49,7 +49,7 @@
         [items]="documentTypes"
         [editing]="true"
         [applyOnClose]="applyOnClose"
-        (open)="openDocumentTypeDropdown()"
+        (opened)="openDocumentTypeDropdown()"
         [(selectionModel)]="documentTypeSelectionModel"
         (apply)="setDocumentTypes($event)">
       </app-filterable-dropdown>
@@ -58,7 +58,7 @@
         [items]="storagePaths"
         [editing]="true"
         [applyOnClose]="applyOnClose"
-        (open)="openStoragePathDropdown()"
+        (opened)="openStoragePathDropdown()"
         [(selectionModel)]="storagePathsSelectionModel"
         (apply)="setStoragePaths($event)">
       </app-filterable-dropdown>
@@ -66,7 +66,6 @@
   </div>
   <div class="col-auto ms-auto mb-2 mb-xl-0 d-flex">
     <div class="btn-group btn-group-sm me-2">
-
       <div ngbDropdown class="me-2 d-flex">
         <button class="btn btn-sm btn-outline-primary" id="dropdownSelect" ngbDropdownToggle>
           <svg class="toolbaricon" fill="currentColor">
@@ -75,26 +74,57 @@
           <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Actions</ng-container></div>
         </button>
         <div ngbDropdownMenu aria-labelledby="dropdownSelect" class="shadow">
-          <button ngbDropdownItem [disabled]="awaitingDownload" (click)="downloadSelected()" i18n>
-            Download
-            <div *ngIf="awaitingDownload" class="spinner-border spinner-border-sm" role="status">
-              <span class="visually-hidden">Preparing download...</span>
-            </div>
-          </button>
-          <button ngbDropdownItem [disabled]="awaitingDownload" (click)="downloadSelected('originals')" i18n>
-            Download originals
-            <div *ngIf="awaitingDownload" class="spinner-border spinner-border-sm" role="status">
-              <span class="visually-hidden">Preparing download...</span>
-            </div>
-          </button>
           <button ngbDropdownItem (click)="redoOcrSelected()" i18n>Redo OCR</button>
         </div>
       </div>
+    </div>
 
-    <button type="button" class="btn btn-sm btn-outline-danger" (click)="applyDelete()">
-      <svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
-        <use xlink:href="assets/bootstrap-icons.svg#trash" />
-      </svg>&nbsp;<ng-container i18n>Delete</ng-container>
-    </button>
+    <div class="btn-group btn-group-sm me-2">
+      <button class="btn btn-sm btn-outline-primary" [disabled]="awaitingDownload" (click)="downloadSelected()">
+        <svg *ngIf="!awaitingDownload" class="toolbaricon" fill="currentColor">
+          <use xlink:href="assets/bootstrap-icons.svg#arrow-down" />
+        </svg>
+        <div *ngIf="awaitingDownload" class="spinner-border spinner-border-sm" role="status">
+          <span class="visually-hidden">Preparing download...</span>
+        </div>
+        <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Download</ng-container></div>
+      </button>
+      <div ngbDropdown class="me-2 d-flex btn-group" role="group">
+        <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle-split rounded-end" ngbDropdownToggle></button>
+        <div ngbDropdownMenu aria-labelledby="dropdownSelect" class="shadow">
+					<form [formGroup]="downloadForm" class="px-3 py-1">
+            <p class="mb-1" i18n>Include:</p>
+            <div class="form-group ps-3 mb-2">
+              <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="downloadFileType_archive" formControlName="downloadFileTypeArchive" />
+                <label class="form-check-label" for="downloadFileType_archive" i18n>
+                  Archived files
+                </label>
+              </div>
+              <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="downloadFileType_originals" formControlName="downloadFileTypeOriginals" />
+                <label class="form-check-label" for="downloadFileType_originals" i18n>
+                  Original files
+                </label>
+              </div>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="downloadUseFormatting" formControlName="downloadUseFormatting" />
+              <label class="form-check-label" for="downloadUseFormatting" i18n>
+                Use formatted filename
+              </label>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-group btn-group-sm me-2">
+      <button type="button" class="btn btn-sm btn-outline-danger" (click)="applyDelete()">
+        <svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
+          <use xlink:href="assets/bootstrap-icons.svg#trash" />
+        </svg>&nbsp;<ng-container i18n>Delete</ng-container>
+      </button>
+    </div>
   </div>
 </div>

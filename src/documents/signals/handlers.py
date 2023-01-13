@@ -1,8 +1,12 @@
 import logging
 import os
 import shutil
+from pathlib import Path
 
-import django_q
+from celery import states
+from celery.signals import before_task_publish
+from celery.signals import task_postrun
+from celery.signals import task_prerun
 from django.conf import settings
 from django.contrib.admin.models import ADDITION
 from django.contrib.admin.models import LogEntry
@@ -24,7 +28,6 @@ from ..models import Document
 from ..models import MatchingModel
 from ..models import PaperlessTask
 from ..models import Tag
-
 
 logger = logging.getLogger("paperless.handlers")
 
@@ -396,6 +399,13 @@ def update_filename_and_move_files(sender, instance, **kwargs):
 
     with FileLock(settings.MEDIA_LOCK):
         try:
+
+            # If this was waiting for the lock, the filename or archive_filename
+            # of this document may have been updated.  This happens if multiple updates
+            # get queued from the UI for the same document
+            # So freshen up the data before doing anything
+            instance.refresh_from_db()
+
             old_filename = instance.filename
             old_source_path = instance.source_path
 
@@ -436,7 +446,8 @@ def update_filename_and_move_files(sender, instance, **kwargs):
                 archive_filename=instance.archive_filename,
             )
 
-        except (OSError, DatabaseError, CannotMoveFilesException):
+        except (OSError, DatabaseError, CannotMoveFilesException) as e:
+            logger.warning(f"Exception during file handling: {e}")
             # This happens when either:
             #  - moving the files failed due to file system errors
             #  - saving to the database failed due to database errors
@@ -445,9 +456,11 @@ def update_filename_and_move_files(sender, instance, **kwargs):
             # Try to move files to their original location.
             try:
                 if move_original and os.path.isfile(instance.source_path):
+                    logger.info("Restoring previous original path")
                     os.rename(instance.source_path, old_source_path)
 
                 if move_archive and os.path.isfile(instance.archive_path):
+                    logger.info("Restoring previous archive path")
                     os.rename(instance.archive_path, old_archive_path)
 
             except Exception:
@@ -457,7 +470,7 @@ def update_filename_and_move_files(sender, instance, **kwargs):
                 #  issue that's going to get caught by the santiy checker.
                 #  All files remain in place and will never be overwritten,
                 #  so this is not the end of the world.
-                # B: if moving the orignal file failed, nothing has changed
+                # B: if moving the original file failed, nothing has changed
                 #  anyway.
                 pass
 
@@ -503,47 +516,91 @@ def add_to_index(sender, document, **kwargs):
     index.add_or_update_document(document)
 
 
-@receiver(django_q.signals.pre_enqueue)
-def init_paperless_task(sender, task, **kwargs):
-    if task["func"] == "documents.tasks.consume_file":
-        try:
-            paperless_task, created = PaperlessTask.objects.get_or_create(
-                task_id=task["id"],
-            )
-            paperless_task.name = task["name"]
-            paperless_task.created = task["started"]
-            paperless_task.save()
-        except Exception as e:
-            # Don't let an exception in the signal handlers prevent
-            # a document from being consumed.
-            logger.error(f"Creating PaperlessTask failed: {e}")
+@before_task_publish.connect
+def before_task_publish_handler(sender=None, headers=None, body=None, **kwargs):
+    """
+    Creates the PaperlessTask object in a pending state.  This is sent before
+    the task reaches the broker, but before it begins executing on a worker.
 
+    https://docs.celeryq.dev/en/stable/userguide/signals.html#before-task-publish
 
-@receiver(django_q.signals.pre_execute)
-def paperless_task_started(sender, task, **kwargs):
+    https://docs.celeryq.dev/en/stable/internals/protocol.html#version-2
+
+    """
+    if "task" not in headers or headers["task"] != "documents.tasks.consume_file":
+        # Assumption: this is only ever a v2 message
+        return
+
     try:
-        if task["func"] == "documents.tasks.consume_file":
-            paperless_task, created = PaperlessTask.objects.get_or_create(
-                task_id=task["id"],
-            )
-            paperless_task.started = timezone.now()
-            paperless_task.save()
-    except PaperlessTask.DoesNotExist:
-        pass
-    except Exception as e:
-        logger.error(f"Creating PaperlessTask failed: {e}")
+        task_args = body[0]
+        task_kwargs = body[1]
+
+        task_file_name = ""
+        if "override_filename" in task_kwargs:
+            task_file_name = task_kwargs["override_filename"]
+
+        # Nothing was found, report the task first argument
+        if not len(task_file_name):
+            # There are always some arguments to the consume, first is always filename
+            filepath = Path(task_args[0])
+            task_file_name = filepath.name
+
+        PaperlessTask.objects.create(
+            task_id=headers["id"],
+            status=states.PENDING,
+            task_file_name=task_file_name,
+            task_name=headers["task"],
+            result=None,
+            date_created=timezone.now(),
+            date_started=None,
+            date_done=None,
+        )
+    except Exception as e:  # pragma: no cover
+        # Don't let an exception in the signal handlers prevent
+        # a document from being consumed.
+        logger.error(f"Creating PaperlessTask failed: {e}", exc_info=True)
 
 
-@receiver(models.signals.post_save, sender=django_q.models.Task)
-def update_paperless_task(sender, instance, **kwargs):
+@task_prerun.connect
+def task_prerun_handler(sender=None, task_id=None, task=None, **kwargs):
+    """
+
+    Updates the PaperlessTask to be started.  Sent before the task begins execution
+    on a worker.
+
+    https://docs.celeryq.dev/en/stable/userguide/signals.html#task-prerun
+    """
     try:
-        if instance.func == "documents.tasks.consume_file":
-            paperless_task, created = PaperlessTask.objects.get_or_create(
-                task_id=instance.id,
-            )
-            paperless_task.attempted_task = instance
-            paperless_task.save()
-    except PaperlessTask.DoesNotExist:
-        pass
-    except Exception as e:
-        logger.error(f"Creating PaperlessTask failed: {e}")
+        task_instance = PaperlessTask.objects.filter(task_id=task_id).first()
+
+        if task_instance is not None:
+            task_instance.status = states.STARTED
+            task_instance.date_started = timezone.now()
+            task_instance.save()
+    except Exception as e:  # pragma: no cover
+        # Don't let an exception in the signal handlers prevent
+        # a document from being consumed.
+        logger.error(f"Setting PaperlessTask started failed: {e}", exc_info=True)
+
+
+@task_postrun.connect
+def task_postrun_handler(
+    sender=None, task_id=None, task=None, retval=None, state=None, **kwargs
+):
+    """
+    Updates the result of the PaperlessTask.
+
+    https://docs.celeryq.dev/en/stable/userguide/signals.html#task-postrun
+    """
+    try:
+        task_instance = PaperlessTask.objects.filter(task_id=task_id).first()
+
+        if task_instance is not None:
+            task_instance.status = state
+            task_instance.result = retval
+            task_instance.date_done = timezone.now()
+            task_instance.save()
+    except Exception as e:  # pragma: no cover
+        # Don't let an exception in the signal handlers prevent
+        # a document from being consumed.
+        logger.error(f"Updating PaperlessTask failed: {e}", exc_info=True)

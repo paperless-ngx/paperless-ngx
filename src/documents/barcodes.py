@@ -9,7 +9,9 @@ from typing import Tuple
 
 import magic
 from django.conf import settings
+from pdf2image import convert_from_path
 from pikepdf import Page
+from pikepdf import PasswordError
 from pikepdf import Pdf
 from pikepdf import PdfImage
 from PIL import Image
@@ -17,6 +19,10 @@ from PIL import ImageSequence
 from pyzbar import pyzbar
 
 logger = logging.getLogger("paperless.barcodes")
+
+
+class BarcodeImageFormatError(Exception):
+    pass
 
 
 @lru_cache(maxsize=8)
@@ -93,7 +99,7 @@ def convert_from_tiff_to_pdf(filepath: str) -> str:
                 images[0].save(newpath)
             else:
                 images[0].save(newpath, save_all=True, append_images=images[1:])
-        except OSError as e:
+        except OSError as e:  # pragma: no cover
             logger.warning(
                 f"Could not save the file as pdf. Error: {str(e)}",
             )
@@ -108,6 +114,38 @@ def scan_file_for_separating_barcodes(filepath: str) -> Tuple[Optional[str], Lis
     which separate the file into new files
     """
 
+    def _pikepdf_barcode_scan(pdf_filepath: str):
+        with Pdf.open(pdf_filepath) as pdf:
+            for page_num, page in enumerate(pdf.pages):
+                for image_key in page.images:
+                    pdfimage = PdfImage(page.images[image_key])
+
+                    # This type is known to have issues:
+                    # https://github.com/pikepdf/pikepdf/issues/401
+                    if "/CCITTFaxDecode" in pdfimage.filters:
+                        raise BarcodeImageFormatError(
+                            "Unable to decode CCITTFaxDecode images",
+                        )
+
+                    # Not all images can be transcoded to a PIL image, which
+                    # is what pyzbar expects to receive, so this may
+                    # raise an exception, triggering fallback
+                    pillow_img = pdfimage.as_pil_image()
+
+                    detected_barcodes = barcode_reader(pillow_img)
+
+                    if settings.CONSUMER_BARCODE_STRING in detected_barcodes:
+                        separator_page_numbers.append(page_num)
+
+    def _pdf2image_barcode_scan(pdf_filepath: str):
+        # use a temporary directory in case the file is too big to handle in memory
+        with tempfile.TemporaryDirectory() as path:
+            pages_from_path = convert_from_path(pdf_filepath, output_folder=path)
+            for current_page_number, page in enumerate(pages_from_path):
+                current_barcodes = barcode_reader(page)
+                if settings.CONSUMER_BARCODE_STRING in current_barcodes:
+                    separator_page_numbers.append(current_page_number)
+
     separator_page_numbers = []
     pdf_filepath = None
 
@@ -118,17 +156,32 @@ def scan_file_for_separating_barcodes(filepath: str) -> Tuple[Optional[str], Lis
         if mime_type == "image/tiff":
             pdf_filepath = convert_from_tiff_to_pdf(filepath)
 
-        pdf = Pdf.open(pdf_filepath)
+        # Always try pikepdf first, it's usually fine, faster and
+        # uses less memory
+        try:
+            _pikepdf_barcode_scan(pdf_filepath)
+        # Password protected files can't be checked
+        except PasswordError as e:
+            logger.warning(
+                f"File is likely password protected, not checking for barcodes: {e}",
+            )
+        # Handle pikepdf related image decoding issues with a fallback to page
+        # by page conversion to images in a temporary directory
+        except Exception as e:
+            logger.warning(
+                f"Falling back to pdf2image because: {e}",
+            )
+            try:
+                # Clear the list in case some processing worked
+                separator_page_numbers = []
+                _pdf2image_barcode_scan(pdf_filepath)
+            # This file is really borked, allow the consumption to continue
+            # but it may fail further on
+            except Exception as e:  # pragma: no cover
+                logger.warning(
+                    f"Exception during barcode scanning: {e}",
+                )
 
-        for page_num, page in enumerate(pdf.pages):
-            for image_key in page.images:
-                pdfimage = PdfImage(page.images[image_key])
-                pillow_img = pdfimage.as_pil_image()
-
-                detected_barcodes = barcode_reader(pillow_img)
-
-                if settings.CONSUMER_BARCODE_STRING in detected_barcodes:
-                    separator_page_numbers.append(page_num)
     else:
         logger.warning(
             f"Unsupported file format for barcode reader: {str(mime_type)}",

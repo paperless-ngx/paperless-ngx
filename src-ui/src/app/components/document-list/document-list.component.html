@@ -53,21 +53,26 @@
       </div>
       <div>
         <button *ngFor="let f of getSortFields()" ngbDropdownItem (click)="setSortField(f.field)"
-          [class.active]="list.sortField == f.field">{{f.name}}
+          [class.active]="list.sortField === f.field">{{f.name}}
         </button>
       </div>
     </div>
   </div>
 
   <div class="btn-group ms-2 flex-fill" ngbDropdown role="group">
-    <button class="btn btn-sm btn-outline-primary dropdown-toggle flex-fill" ngbDropdownToggle i18n>Views</button>
+    <button class="btn btn-sm btn-outline-primary dropdown-toggle flex-fill" tourAnchor="tour.documents-views" ngbDropdownToggle>
+      <ng-container i18n>Views</ng-container>
+      <div *ngIf="savedViewIsModified" class="position-absolute top-0 start-100 p-2 translate-middle badge bg-secondary border border-light rounded-circle">
+        <span class="visually-hidden">selected</span>
+      </div>
+    </button>
     <div class="dropdown-menu shadow dropdown-menu-right" ngbDropdownMenu>
       <ng-container *ngIf="!list.activeSavedViewId">
         <button ngbDropdownItem *ngFor="let view of savedViewService.allViews" (click)="loadViewConfig(view.id)">{{view.name}}</button>
         <div class="dropdown-divider" *ngIf="savedViewService.allViews.length > 0"></div>
       </ng-container>
 
-      <button ngbDropdownItem (click)="saveViewConfig()" *ngIf="list.activeSavedViewId" i18n>Save "{{list.activeSavedViewTitle}}"</button>
+      <button ngbDropdownItem (click)="saveViewConfig()" *ngIf="list.activeSavedViewId" [disabled]="!savedViewIsModified" i18n>Save "{{list.activeSavedViewTitle}}"</button>
       <button ngbDropdownItem (click)="saveViewConfigAs()" i18n>Save as...</button>
     </div>
   </div>
@@ -79,6 +84,7 @@
   <app-bulk-editor [hidden]="!isBulkEditing"></app-bulk-editor>
 </div>
 
+
 <ng-template #pagination>
   <div class="d-flex justify-content-between align-items-center">
     <p>
@@ -88,7 +94,7 @@
       </ng-container>
       <span i18n *ngIf="list.selected.size > 0">{list.collectionSize, plural, =1 {Selected {{list.selected.size}} of one document} other {Selected {{list.selected.size}} of {{list.collectionSize || 0}} documents}}</span>
       <ng-container *ngIf="!list.isReloading">
-        <span i18n *ngIf="list.selected.size == 0">{list.collectionSize, plural, =1 {One document} other {{{list.collectionSize || 0}} documents}}</span>&nbsp;<span i18n *ngIf="isFiltered">(filtered)</span>
+        <span i18n *ngIf="list.selected.size === 0">{list.collectionSize, plural, =1 {One document} other {{{list.collectionSize || 0}} documents}}</span>&nbsp;<span i18n *ngIf="isFiltered">(filtered)</span>
       </ng-container>
     </p>
     <ngb-pagination *ngIf="list.collectionSize" [pageSize]="list.currentPageSize" [collectionSize]="list.collectionSize" [(page)]="list.currentPage" [maxSize]="5"
@@ -96,60 +102,61 @@
   </div>
 </ng-template>
 
-<ng-container *ngTemplateOutlet="pagination"></ng-container>
+<div tourAnchor="tour.documents">
+  <ng-container *ngTemplateOutlet="pagination"></ng-container>
+</div>
 
 <ng-container *ngIf="list.error ; else documentListNoError">
   <div class="alert alert-danger" role="alert"><ng-container i18n>Error while loading documents</ng-container>: {{list.error}}</div>
 </ng-container>
 
 <ng-template #documentListNoError>
-
-  <div *ngIf="displayMode == 'largeCards'">
+  <div *ngIf="displayMode === 'largeCards'">
     <app-document-card-large [selected]="list.isSelected(d)" (toggleSelected)="toggleSelected(d, $event)" *ngFor="let d of list.documents; trackBy: trackByDocumentId" [document]="d" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)" (clickDocumentType)="clickDocumentType($event)" (clickStoragePath)="clickStoragePath($event)" (clickMoreLike)="clickMoreLike(d.id)">
     </app-document-card-large>
   </div>
 
-  <table class="table table-sm align-middle border shadow-sm" *ngIf="displayMode == 'details'">
+  <table class="table table-sm align-middle border shadow-sm" *ngIf="displayMode === 'details'">
     <thead>
       <th></th>
       <th class="d-none d-lg-table-cell"
-        sortable="archive_serial_number"
+        appSortable="archive_serial_number"
         [currentSortField]="list.sortField"
         [currentSortReverse]="list.sortReverse"
         (sort)="onSort($event)"
         i18n>ASN</th>
       <th class="d-none d-md-table-cell"
-        sortable="correspondent__name"
+        appSortable="correspondent__name"
         [currentSortField]="list.sortField"
         [currentSortReverse]="list.sortReverse"
         (sort)="onSort($event)"
         i18n>Correspondent</th>
       <th
-        sortable="title"
+        appSortable="title"
         [currentSortField]="list.sortField"
         [currentSortReverse]="list.sortReverse"
         (sort)="onSort($event)"
         i18n>Title</th>
       <th class="d-none d-xl-table-cell"
-        sortable="document_type__name"
+        appSortable="document_type__name"
         [currentSortField]="list.sortField"
         [currentSortReverse]="list.sortReverse"
         (sort)="onSort($event)"
         i18n>Document type</th>
       <th class="d-none d-xl-table-cell"
-        sortable="storage_path__name"
+        appSortable="storage_path__name"
         [currentSortField]="list.sortField"
         [currentSortReverse]="list.sortReverse"
         (sort)="onSort($event)"
         i18n>Storage path</th>
       <th
-        sortable="created"
+        appSortable="created"
         [currentSortField]="list.sortField"
         [currentSortReverse]="list.sortReverse"
         (sort)="onSort($event)"
         i18n>Created</th>
       <th class="d-none d-xl-table-cell"
-        sortable="added"
+        appSortable="added"
         [currentSortField]="list.sortField"
         [currentSortReverse]="list.sortReverse"
         (sort)="onSort($event)"
@@ -172,7 +179,7 @@
           </ng-container>
         </td>
         <td>
-          <a (click)="openDocumentsService.openDocument(d)" title="Edit document" i18n-title style="overflow-wrap: anywhere;">{{d.title | documentTitle}}</a>
+          <a routerLink="/documents/{{d.id}}" title="Edit document" i18n-title style="overflow-wrap: anywhere;">{{d.title | documentTitle}}</a>
           <app-tag [tag]="t" *ngFor="let t of d.tags$ | async" class="ms-1" clickable="true" linkTitle="Filter by tag" i18n-linkTitle (click)="clickTag(t.id);$event.stopPropagation()"></app-tag>
         </td>
         <td class="d-none d-xl-table-cell">
@@ -195,7 +202,7 @@
     </tbody>
   </table>
 
-  <div class="row row-cols-paperless-cards" *ngIf="displayMode == 'smallCards'">
+  <div class="row row-cols-paperless-cards" *ngIf="displayMode === 'smallCards'">
     <app-document-card-small class="p-0" [selected]="list.isSelected(d)" (toggleSelected)="toggleSelected(d, $event)" [document]="d" *ngFor="let d of list.documents; trackBy: trackByDocumentId" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)" (clickStoragePath)="clickStoragePath($event)" (clickDocumentType)="clickDocumentType($event)"></app-document-card-small>
   </div>
   <div *ngIf="list.documents?.length > 15" class="mt-3">

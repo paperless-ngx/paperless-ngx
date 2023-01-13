@@ -321,7 +321,7 @@ export class FilterableDropdownComponent {
   apply = new EventEmitter<ChangedItems>()
 
   @Output()
-  open = new EventEmitter()
+  opened = new EventEmitter()
 
   get operatorToggleEnabled(): boolean {
     return (
@@ -356,7 +356,7 @@ export class FilterableDropdownComponent {
       if (this.editing) {
         this.selectionModel.reset()
       }
-      this.open.next(this)
+      this.opened.next(this)
     } else {
       this.filterText = ''
       if (this.applyOnClose && this.selectionModel.isDirty()) {
@@ -383,5 +383,10 @@ export class FilterableDropdownComponent {
     } else {
       this.selectionModel.exclude(itemID)
     }
+  }
+
+  reset() {
+    this.selectionModel.reset()
+    this.selectionModelChange.emit(this.selectionModel)
   }
 }

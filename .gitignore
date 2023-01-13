@@ -51,8 +51,8 @@ coverage.xml
 # Django stuff:
 *.log
 
-# Sphinx documentation
-docs/_build/
+# MkDocs documentation
+site/
 
 # PyBuilder
 target/
@@ -93,3 +93,6 @@ scripts/nuke
 
 # mac os
 .DS_Store
+
+# celery schedule file
+celerybeat-schedule*

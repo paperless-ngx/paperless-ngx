@@ -4,7 +4,7 @@ import {
   LOCALE_ID,
   OnInit,
   OnDestroy,
-  Renderer2,
+  AfterViewInit,
 } from '@angular/core'
 import { FormControl, FormGroup } from '@angular/forms'
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
@@ -16,43 +16,91 @@ import {
 } from 'src/app/services/settings.service'
 import { Toast, ToastService } from 'src/app/services/toast.service'
 import { dirtyCheck, DirtyComponent } from '@ngneat/dirty-check-forms'
-import { Observable, Subscription, BehaviorSubject, first } from 'rxjs'
+import {
+  Observable,
+  Subscription,
+  BehaviorSubject,
+  first,
+  tap,
+  takeUntil,
+  Subject,
+} from 'rxjs'
 import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
+import { ActivatedRoute, Router } from '@angular/router'
+import { ViewportScroller } from '@angular/common'
+import { TourService } from 'ngx-ui-tour-ng-bootstrap'
+import { PaperlessMailAccount } from 'src/app/data/paperless-mail-account'
+import { PaperlessMailRule } from 'src/app/data/paperless-mail-rule'
+import { MailAccountService } from 'src/app/services/rest/mail-account.service'
+import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
+import { MailAccountEditDialogComponent } from '../../common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component'
+import { MailRuleEditDialogComponent } from '../../common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component'
+import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
+import { NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap'
+
+enum SettingsNavIDs {
+  General = 1,
+  Notifications = 2,
+  SavedViews = 3,
+  Mail = 4,
+  UsersGroups = 5,
+}
 
 @Component({
   selector: 'app-settings',
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss'],
 })
-export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
+export class SettingsComponent
+  implements OnInit, AfterViewInit, OnDestroy, DirtyComponent
+{
+  SettingsNavIDs = SettingsNavIDs
+  activeNavID: number
+
   savedViewGroup = new FormGroup({})
+
+  mailAccountGroup = new FormGroup({})
+  mailRuleGroup = new FormGroup({})
 
   settingsForm = new FormGroup({
     bulkEditConfirmationDialogs: new FormControl(null),
     bulkEditApplyOnClose: new FormControl(null),
     documentListItemPerPage: new FormControl(null),
+    slimSidebarEnabled: new FormControl(null),
     darkModeUseSystem: new FormControl(null),
     darkModeEnabled: new FormControl(null),
     darkModeInvertThumbs: new FormControl(null),
     themeColor: new FormControl(null),
     useNativePdfViewer: new FormControl(null),
-    savedViews: this.savedViewGroup,
     displayLanguage: new FormControl(null),
     dateLocale: new FormControl(null),
     dateFormat: new FormControl(null),
+    commentsEnabled: new FormControl(null),
+    updateCheckingEnabled: new FormControl(null),
+
     notificationsConsumerNewDocument: new FormControl(null),
     notificationsConsumerSuccess: new FormControl(null),
     notificationsConsumerFailed: new FormControl(null),
     notificationsConsumerSuppressOnDashboard: new FormControl(null),
-    commentsEnabled: new FormControl(null),
+
+    savedViews: this.savedViewGroup,
+
+    mailAccounts: this.mailAccountGroup,
+    mailRules: this.mailRuleGroup,
   })
 
   savedViews: PaperlessSavedView[]
 
+  mailAccounts: PaperlessMailAccount[]
+  mailRules: PaperlessMailRule[]
+
   store: BehaviorSubject<any>
   storeSub: Subscription
   isDirty$: Observable<boolean>
-  isDirty: Boolean = false
+  isDirty: boolean = false
+  unsubscribeNotifier: Subject<any> = new Subject()
+  savePending: boolean = false
 
   get computedDateLocale(): string {
     return (
@@ -62,64 +110,144 @@ export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
     )
   }
 
-  get displayLanguageIsDirty(): boolean {
-    return (
-      this.settingsForm.get('displayLanguage').value !=
-      this.store?.getValue()['displayLanguage']
-    )
-  }
-
   constructor(
     public savedViewService: SavedViewService,
+    public mailAccountService: MailAccountService,
+    public mailRuleService: MailRuleService,
     private documentListViewService: DocumentListViewService,
     private toastService: ToastService,
     private settings: SettingsService,
-    @Inject(LOCALE_ID) public currentLocale: string
-  ) {}
+    @Inject(LOCALE_ID) public currentLocale: string,
+    private viewportScroller: ViewportScroller,
+    private activatedRoute: ActivatedRoute,
+    private router: Router,
+    public readonly tourService: TourService,
+    private modalService: NgbModal
+  ) {
+    this.settings.settingsSaved.subscribe(() => {
+      if (!this.savePending) this.initialize()
+    })
+  }
 
   ngOnInit() {
-    this.savedViewService.listAll().subscribe((r) => {
-      this.savedViews = r.results
-      let storeData = {
-        bulkEditConfirmationDialogs: this.settings.get(
-          SETTINGS_KEYS.BULK_EDIT_CONFIRMATION_DIALOGS
-        ),
-        bulkEditApplyOnClose: this.settings.get(
-          SETTINGS_KEYS.BULK_EDIT_APPLY_ON_CLOSE
-        ),
-        documentListItemPerPage: this.settings.get(
-          SETTINGS_KEYS.DOCUMENT_LIST_SIZE
-        ),
-        darkModeUseSystem: this.settings.get(
-          SETTINGS_KEYS.DARK_MODE_USE_SYSTEM
-        ),
-        darkModeEnabled: this.settings.get(SETTINGS_KEYS.DARK_MODE_ENABLED),
-        darkModeInvertThumbs: this.settings.get(
-          SETTINGS_KEYS.DARK_MODE_THUMB_INVERTED
-        ),
-        themeColor: this.settings.get(SETTINGS_KEYS.THEME_COLOR),
-        useNativePdfViewer: this.settings.get(
-          SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER
-        ),
-        savedViews: {},
-        displayLanguage: this.settings.getLanguage(),
-        dateLocale: this.settings.get(SETTINGS_KEYS.DATE_LOCALE),
-        dateFormat: this.settings.get(SETTINGS_KEYS.DATE_FORMAT),
-        notificationsConsumerNewDocument: this.settings.get(
-          SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_NEW_DOCUMENT
-        ),
-        notificationsConsumerSuccess: this.settings.get(
-          SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUCCESS
-        ),
-        notificationsConsumerFailed: this.settings.get(
-          SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_FAILED
-        ),
-        notificationsConsumerSuppressOnDashboard: this.settings.get(
-          SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUPPRESS_ON_DASHBOARD
-        ),
-        commentsEnabled: this.settings.get(SETTINGS_KEYS.COMMENTS_ENABLED),
-      }
+    this.initialize()
 
+    this.activatedRoute.paramMap.subscribe((paramMap) => {
+      const section = paramMap.get('section')
+      if (section) {
+        const navIDKey: string = Object.keys(SettingsNavIDs).find(
+          (navID) => navID.toLowerCase() == section
+        )
+        if (navIDKey) {
+          this.activeNavID = SettingsNavIDs[navIDKey]
+          this.maybeInitializeTab(this.activeNavID)
+        }
+      }
+    })
+  }
+
+  ngAfterViewInit(): void {
+    if (this.activatedRoute.snapshot.fragment) {
+      this.viewportScroller.scrollToAnchor(
+        this.activatedRoute.snapshot.fragment
+      )
+    }
+  }
+
+  private getCurrentSettings() {
+    return {
+      bulkEditConfirmationDialogs: this.settings.get(
+        SETTINGS_KEYS.BULK_EDIT_CONFIRMATION_DIALOGS
+      ),
+      bulkEditApplyOnClose: this.settings.get(
+        SETTINGS_KEYS.BULK_EDIT_APPLY_ON_CLOSE
+      ),
+      documentListItemPerPage: this.settings.get(
+        SETTINGS_KEYS.DOCUMENT_LIST_SIZE
+      ),
+      slimSidebarEnabled: this.settings.get(SETTINGS_KEYS.SLIM_SIDEBAR),
+      darkModeUseSystem: this.settings.get(SETTINGS_KEYS.DARK_MODE_USE_SYSTEM),
+      darkModeEnabled: this.settings.get(SETTINGS_KEYS.DARK_MODE_ENABLED),
+      darkModeInvertThumbs: this.settings.get(
+        SETTINGS_KEYS.DARK_MODE_THUMB_INVERTED
+      ),
+      themeColor: this.settings.get(SETTINGS_KEYS.THEME_COLOR),
+      useNativePdfViewer: this.settings.get(
+        SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER
+      ),
+      displayLanguage: this.settings.getLanguage(),
+      dateLocale: this.settings.get(SETTINGS_KEYS.DATE_LOCALE),
+      dateFormat: this.settings.get(SETTINGS_KEYS.DATE_FORMAT),
+      commentsEnabled: this.settings.get(SETTINGS_KEYS.COMMENTS_ENABLED),
+      updateCheckingEnabled: this.settings.get(
+        SETTINGS_KEYS.UPDATE_CHECKING_ENABLED
+      ),
+      notificationsConsumerNewDocument: this.settings.get(
+        SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_NEW_DOCUMENT
+      ),
+      notificationsConsumerSuccess: this.settings.get(
+        SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUCCESS
+      ),
+      notificationsConsumerFailed: this.settings.get(
+        SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_FAILED
+      ),
+      notificationsConsumerSuppressOnDashboard: this.settings.get(
+        SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUPPRESS_ON_DASHBOARD
+      ),
+      savedViews: {},
+      mailAccounts: {},
+      mailRules: {},
+    }
+  }
+
+  onNavChange(navChangeEvent: NgbNavChangeEvent) {
+    this.maybeInitializeTab(navChangeEvent.nextId)
+    const [foundNavIDkey, foundNavIDValue] = Object.entries(
+      SettingsNavIDs
+    ).find(([navIDkey, navIDValue]) => navIDValue == navChangeEvent.nextId)
+    if (foundNavIDkey)
+      // if its dirty we need to wait for confirmation
+      this.router
+        .navigate(['settings', foundNavIDkey.toLowerCase()])
+        .then((navigated) => {
+          if (!navigated && this.isDirty) {
+            this.activeNavID = navChangeEvent.activeId
+          } else if (navigated && this.isDirty) {
+            this.initialize()
+          }
+        })
+  }
+
+  // Load tab contents 'on demand', either on mouseover or focusin (i.e. before click) or called from nav change event
+  maybeInitializeTab(navID: number): void {
+    if (navID == SettingsNavIDs.SavedViews && !this.savedViews) {
+      this.savedViewService.listAll().subscribe((r) => {
+        this.savedViews = r.results
+        this.initialize(false)
+      })
+    } else if (
+      navID == SettingsNavIDs.Mail &&
+      (!this.mailAccounts || !this.mailRules)
+    ) {
+      this.mailAccountService.listAll().subscribe((r) => {
+        this.mailAccounts = r.results
+
+        this.mailRuleService.listAll().subscribe((r) => {
+          this.mailRules = r.results
+          this.initialize(false)
+        })
+      })
+    }
+  }
+
+  initialize(resetSettings: boolean = true) {
+    this.unsubscribeNotifier.next(true)
+
+    const currentFormValue = this.settingsForm.value
+
+    let storeData = this.getCurrentSettings()
+
+    if (this.savedViews) {
       for (let view of this.savedViews) {
         storeData.savedViews[view.id.toString()] = {
           id: view.id,
@@ -137,30 +265,109 @@ export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
           })
         )
       }
+    }
 
-      this.store = new BehaviorSubject(storeData)
+    if (this.mailAccounts && this.mailRules) {
+      for (let account of this.mailAccounts) {
+        storeData.mailAccounts[account.id.toString()] = {
+          id: account.id,
+          name: account.name,
+          imap_server: account.imap_server,
+          imap_port: account.imap_port,
+          imap_security: account.imap_security,
+          username: account.username,
+          password: account.password,
+          character_set: account.character_set,
+        }
+        this.mailAccountGroup.addControl(
+          account.id.toString(),
+          new FormGroup({
+            id: new FormControl(null),
+            name: new FormControl(null),
+            imap_server: new FormControl(null),
+            imap_port: new FormControl(null),
+            imap_security: new FormControl(null),
+            username: new FormControl(null),
+            password: new FormControl(null),
+            character_set: new FormControl(null),
+          })
+        )
+      }
 
-      this.storeSub = this.store.asObservable().subscribe((state) => {
-        this.settingsForm.patchValue(state, { emitEvent: false })
-      })
+      for (let rule of this.mailRules) {
+        storeData.mailRules[rule.id.toString()] = {
+          name: rule.name,
+          account: rule.account,
+          folder: rule.folder,
+          filter_from: rule.filter_from,
+          filter_subject: rule.filter_subject,
+          filter_body: rule.filter_body,
+          filter_attachment_filename: rule.filter_attachment_filename,
+          maximum_age: rule.maximum_age,
+          attachment_type: rule.attachment_type,
+          action: rule.action,
+          action_parameter: rule.action_parameter,
+          assign_title_from: rule.assign_title_from,
+          assign_tags: rule.assign_tags,
+          assign_document_type: rule.assign_document_type,
+          assign_correspondent_from: rule.assign_correspondent_from,
+          assign_correspondent: rule.assign_correspondent,
+        }
+        this.mailRuleGroup.addControl(
+          rule.id.toString(),
+          new FormGroup({
+            name: new FormControl(null),
+            account: new FormControl(null),
+            folder: new FormControl(null),
+            filter_from: new FormControl(null),
+            filter_subject: new FormControl(null),
+            filter_body: new FormControl(null),
+            filter_attachment_filename: new FormControl(null),
+            maximum_age: new FormControl(null),
+            attachment_type: new FormControl(null),
+            action: new FormControl(null),
+            action_parameter: new FormControl(null),
+            assign_title_from: new FormControl(null),
+            assign_tags: new FormControl(null),
+            assign_document_type: new FormControl(null),
+            assign_correspondent_from: new FormControl(null),
+            assign_correspondent: new FormControl(null),
+          })
+        )
+      }
+    }
 
-      // Initialize dirtyCheck
-      this.isDirty$ = dirtyCheck(this.settingsForm, this.store.asObservable())
+    this.store = new BehaviorSubject(storeData)
 
-      // Record dirty in case we need to 'undo' appearance settings if not saved on close
-      this.isDirty$.subscribe((dirty) => {
+    this.storeSub = this.store.asObservable().subscribe((state) => {
+      this.settingsForm.patchValue(state, { emitEvent: false })
+    })
+
+    // Initialize dirtyCheck
+    this.isDirty$ = dirtyCheck(this.settingsForm, this.store.asObservable())
+
+    // Record dirty in case we need to 'undo' appearance settings if not saved on close
+    this.isDirty$
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe((dirty) => {
         this.isDirty = dirty
       })
 
-      // "Live" visual changes prior to save
-      this.settingsForm.valueChanges.subscribe(() => {
+    // "Live" visual changes prior to save
+    this.settingsForm.valueChanges
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
         this.settings.updateAppearanceSettings(
           this.settingsForm.get('darkModeUseSystem').value,
           this.settingsForm.get('darkModeEnabled').value,
           this.settingsForm.get('themeColor').value
         )
       })
-    })
+
+    if (!resetSettings && currentFormValue) {
+      // prevents loss of unsaved changes
+      this.settingsForm.patchValue(currentFormValue)
+    }
   }
 
   ngOnDestroy() {
@@ -179,7 +386,14 @@ export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
   }
 
   private saveLocalSettings() {
-    const reloadRequired = this.displayLanguageIsDirty // just this one, for now
+    this.savePending = true
+    const reloadRequired =
+      this.settingsForm.value.displayLanguage !=
+        this.store?.getValue()['displayLanguage'] || // displayLanguage is dirty
+      (this.settingsForm.value.updateCheckingEnabled !=
+        this.store?.getValue()['updateCheckingEnabled'] &&
+        this.settingsForm.value.updateCheckingEnabled) // update checking was turned on
+
     this.settings.set(
       SETTINGS_KEYS.BULK_EDIT_APPLY_ON_CLOSE,
       this.settingsForm.value.bulkEditApplyOnClose
@@ -191,6 +405,10 @@ export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
     this.settings.set(
       SETTINGS_KEYS.DOCUMENT_LIST_SIZE,
       this.settingsForm.value.documentListItemPerPage
+    )
+    this.settings.set(
+      SETTINGS_KEYS.SLIM_SIDEBAR,
+      this.settingsForm.value.slimSidebarEnabled
     )
     this.settings.set(
       SETTINGS_KEYS.DARK_MODE_USE_SYSTEM,
@@ -240,10 +458,15 @@ export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
       SETTINGS_KEYS.COMMENTS_ENABLED,
       this.settingsForm.value.commentsEnabled
     )
+    this.settings.set(
+      SETTINGS_KEYS.UPDATE_CHECKING_ENABLED,
+      this.settingsForm.value.updateCheckingEnabled
+    )
     this.settings.setLanguage(this.settingsForm.value.displayLanguage)
     this.settings
       .storeSettings()
       .pipe(first())
+      .pipe(tap(() => (this.savePending = false)))
       .subscribe({
         next: () => {
           this.store.next(this.settingsForm.value)
@@ -314,5 +537,122 @@ export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
 
   clearThemeColor() {
     this.settingsForm.get('themeColor').patchValue('')
+  }
+
+  editMailAccount(account: PaperlessMailAccount) {
+    const modal = this.modalService.open(MailAccountEditDialogComponent, {
+      backdrop: 'static',
+      size: 'xl',
+    })
+    modal.componentInstance.dialogMode = account ? 'edit' : 'create'
+    modal.componentInstance.object = account
+    modal.componentInstance.succeeded
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe({
+        next: (newMailAccount) => {
+          this.toastService.showInfo(
+            $localize`Saved account "${newMailAccount.name}".`
+          )
+          this.mailAccountService.clearCache()
+          this.mailAccountService.listAll().subscribe((r) => {
+            this.mailAccounts = r.results
+            this.initialize()
+          })
+        },
+        error: (e) => {
+          this.toastService.showError(
+            $localize`Error saving account: ${e.toString()}.`
+          )
+        },
+      })
+  }
+
+  deleteMailAccount(account: PaperlessMailAccount) {
+    const modal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.title = $localize`Confirm delete mail account`
+    modal.componentInstance.messageBold = $localize`This operation will permanently delete this mail account.`
+    modal.componentInstance.message = $localize`This operation cannot be undone.`
+    modal.componentInstance.btnClass = 'btn-danger'
+    modal.componentInstance.btnCaption = $localize`Proceed`
+    modal.componentInstance.confirmClicked.subscribe(() => {
+      modal.componentInstance.buttonsEnabled = false
+      this.mailAccountService.delete(account).subscribe({
+        next: () => {
+          modal.close()
+          this.toastService.showInfo($localize`Deleted mail account`)
+          this.mailAccountService.clearCache()
+          this.mailAccountService.listAll().subscribe((r) => {
+            this.mailAccounts = r.results
+            this.initialize()
+          })
+        },
+        error: (e) => {
+          this.toastService.showError(
+            $localize`Error deleting mail account: ${e.toString()}.`
+          )
+        },
+      })
+    })
+  }
+
+  editMailRule(rule: PaperlessMailRule) {
+    const modal = this.modalService.open(MailRuleEditDialogComponent, {
+      backdrop: 'static',
+      size: 'xl',
+    })
+    modal.componentInstance.dialogMode = rule ? 'edit' : 'create'
+    modal.componentInstance.object = rule
+    modal.componentInstance.succeeded
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe({
+        next: (newMailRule) => {
+          this.toastService.showInfo(
+            $localize`Saved rule "${newMailRule.name}".`
+          )
+          this.mailRuleService.clearCache()
+          this.mailRuleService.listAll().subscribe((r) => {
+            this.mailRules = r.results
+
+            this.initialize()
+          })
+        },
+        error: (e) => {
+          this.toastService.showError(
+            $localize`Error saving rule: ${e.toString()}.`
+          )
+        },
+      })
+  }
+
+  deleteMailRule(rule: PaperlessMailRule) {
+    const modal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.title = $localize`Confirm delete mail rule`
+    modal.componentInstance.messageBold = $localize`This operation will permanently delete this mail rule.`
+    modal.componentInstance.message = $localize`This operation cannot be undone.`
+    modal.componentInstance.btnClass = 'btn-danger'
+    modal.componentInstance.btnCaption = $localize`Proceed`
+    modal.componentInstance.confirmClicked.subscribe(() => {
+      modal.componentInstance.buttonsEnabled = false
+      this.mailRuleService.delete(rule).subscribe({
+        next: () => {
+          modal.close()
+          this.toastService.showInfo($localize`Deleted mail rule`)
+          this.mailRuleService.clearCache()
+          this.mailRuleService.listAll().subscribe((r) => {
+            this.mailRules = r.results
+            this.initialize()
+          })
+        },
+        error: (e) => {
+          this.toastService.showError(
+            $localize`Error deleting mail rule: ${e.toString()}.`
+          )
+        },
+      })
+    })
   }
 }

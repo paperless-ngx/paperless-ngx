@@ -2,6 +2,8 @@ import datetime
 import math
 import re
 
+from celery import states
+
 try:
     import zoneinfo
 except ImportError:
@@ -18,12 +20,12 @@ from .models import Correspondent
 from .models import Document
 from .models import DocumentType
 from .models import MatchingModel
-from .models import PaperlessTask
 from .models import SavedView
 from .models import SavedViewFilterRule
 from .models import StoragePath
 from .models import Tag
 from .models import UiSettings
+from .models import PaperlessTask
 from .parsers import is_mime_type_supported
 
 
@@ -232,6 +234,12 @@ class DocumentSerializer(DynamicFieldsModelSerializer):
         else:
             return None
 
+    def to_representation(self, instance):
+        doc = super().to_representation(instance)
+        if self.truncate_content:
+            doc["content"] = doc.get("content")[0:550]
+        return doc
+
     def update(self, instance, validated_data):
         if "created_date" in validated_data and "created" not in validated_data:
             new_datetime = datetime.datetime.combine(
@@ -244,6 +252,11 @@ class DocumentSerializer(DynamicFieldsModelSerializer):
             validated_data.pop("created_date")
         super().update(instance, validated_data)
         return instance
+
+    def __init__(self, *args, **kwargs):
+        self.truncate_content = kwargs.pop("truncate_content", False)
+
+        super().__init__(*args, **kwargs)
 
     class Meta:
         model = Document
@@ -549,6 +562,10 @@ class BulkDownloadSerializer(DocumentListSerializer):
         default="none",
     )
 
+    follow_formatting = serializers.BooleanField(
+        default=False,
+    )
+
     def validate_compression(self, compression):
         import zipfile
 
@@ -608,6 +625,15 @@ class UiSettingsViewSerializer(serializers.ModelSerializer):
             "settings",
         ]
 
+    def validate_settings(self, settings):
+        # we never save update checking backend setting
+        if "update_checking" in settings:
+            try:
+                settings["update_checking"].pop("backend_setting")
+            except KeyError:
+                pass
+        return settings
+
     def create(self, validated_data):
         ui_settings = UiSettings.objects.update_or_create(
             user=validated_data.get("user"),
@@ -620,7 +646,18 @@ class TasksViewSerializer(serializers.ModelSerializer):
     class Meta:
         model = PaperlessTask
         depth = 1
-        fields = "__all__"
+        fields = (
+            "id",
+            "task_id",
+            "task_file_name",
+            "date_created",
+            "date_done",
+            "type",
+            "status",
+            "result",
+            "acknowledged",
+            "related_document",
+        )
 
     type = serializers.SerializerMethodField()
 
@@ -628,28 +665,18 @@ class TasksViewSerializer(serializers.ModelSerializer):
         # just file tasks, for now
         return "file"
 
-    result = serializers.SerializerMethodField()
+    related_document = serializers.SerializerMethodField()
+    related_doc_re = re.compile(r"New document id (\d+) created")
 
-    def get_result(self, obj):
-        result = ""
-        if hasattr(obj, "attempted_task") and obj.attempted_task:
-            result = obj.attempted_task.result
+    def get_related_document(self, obj):
+        result = None
+        if obj.status is not None and obj.status == states.SUCCESS:
+            try:
+                result = self.related_doc_re.search(obj.result).group(1)
+            except Exception:
+                pass
+
         return result
-
-    status = serializers.SerializerMethodField()
-
-    def get_status(self, obj):
-        if obj.attempted_task is None:
-            if obj.started:
-                return "started"
-            else:
-                return "queued"
-        elif obj.attempted_task.success:
-            return "complete"
-        elif not obj.attempted_task.success:
-            return "failed"
-        else:
-            return "unknown"
 
 
 class AcknowledgeTasksViewSerializer(serializers.Serializer):

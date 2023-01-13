@@ -1,5 +1,4 @@
-import { Component, OnInit } from '@angular/core'
-import { Meta } from '@angular/platform-browser'
+import { Component } from '@angular/core'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
 
@@ -16,9 +15,9 @@ export class DashboardComponent {
 
   get subtitle() {
     if (this.settingsService.displayName) {
-      return $localize`Hello ${this.settingsService.displayName}, welcome to Paperless-ngx!`
+      return $localize`Hello ${this.settingsService.displayName}, welcome to Paperless-ngx`
     } else {
-      return $localize`Welcome to Paperless-ngx!`
+      return $localize`Welcome to Paperless-ngx`
     }
   }
 }

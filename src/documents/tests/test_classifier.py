@@ -1,9 +1,10 @@
 import os
+import re
+import shutil
 import tempfile
 from pathlib import Path
 from unittest import mock
 
-import documents
 import pytest
 from django.conf import settings
 from django.test import override_settings
@@ -20,10 +21,22 @@ from documents.models import Tag
 from documents.tests.utils import DirectoriesMixin
 
 
+def dummy_preprocess(content: str):
+    content = content.lower().strip()
+    content = re.sub(r"\s+", " ", content)
+    return content
+
+
 class TestClassifier(DirectoriesMixin, TestCase):
+
+    SAMPLE_MODEL_FILE = os.path.join(os.path.dirname(__file__), "data", "model.pickle")
+
     def setUp(self):
         super().setUp()
         self.classifier = DocumentClassifier()
+        self.classifier.preprocess_content = mock.MagicMock(
+            side_effect=dummy_preprocess,
+        )
 
     def generate_test_data(self):
         self.c1 = Correspondent.objects.create(
@@ -192,6 +205,8 @@ class TestClassifier(DirectoriesMixin, TestCase):
 
         new_classifier = DocumentClassifier()
         new_classifier.load()
+        new_classifier.preprocess_content = mock.MagicMock(side_effect=dummy_preprocess)
+
         self.assertFalse(new_classifier.train())
 
     # @override_settings(
@@ -202,25 +217,24 @@ class TestClassifier(DirectoriesMixin, TestCase):
     #     self.classifier.train()
     #     self.classifier.save()
 
-    @override_settings(
-        MODEL_FILE=os.path.join(os.path.dirname(__file__), "data", "model.pickle"),
-    )
     def test_load_and_classify(self):
         # Generate test data, train and save to the model file
         # This ensures the model file sklearn version matches
         # and eliminates a warning
+        shutil.copy(
+            self.SAMPLE_MODEL_FILE,
+            os.path.join(self.dirs.data_dir, "classification_model.pickle"),
+        )
         self.generate_test_data()
         self.classifier.train()
         self.classifier.save()
 
         new_classifier = DocumentClassifier()
         new_classifier.load()
+        new_classifier.preprocess_content = mock.MagicMock(side_effect=dummy_preprocess)
 
         self.assertCountEqual(new_classifier.predict_tags(self.doc2.content), [45, 12])
 
-    @override_settings(
-        MODEL_FILE=os.path.join(os.path.dirname(__file__), "data", "model.pickle"),
-    )
     @mock.patch("documents.classifier.pickle.load")
     def test_load_corrupt_file(self, patched_pickle_load):
         """
@@ -231,6 +245,10 @@ class TestClassifier(DirectoriesMixin, TestCase):
         THEN:
             - The ClassifierModelCorruptError is raised
         """
+        shutil.copy(
+            self.SAMPLE_MODEL_FILE,
+            os.path.join(self.dirs.data_dir, "classification_model.pickle"),
+        )
         # First load is the schema version
         patched_pickle_load.side_effect = [DocumentClassifier.FORMAT_VERSION, OSError()]
 

@@ -3,6 +3,7 @@ import shutil
 import tempfile
 from unittest import mock
 
+import pikepdf
 from django.conf import settings
 from django.test import override_settings
 from django.test import TestCase
@@ -173,7 +174,7 @@ class TestBarcode(DirectoriesMixin, TestCase):
         self.assertEqual(pdf_file, test_file)
         self.assertListEqual(separator_page_numbers, [0])
 
-    def test_scan_file_for_separating_barcodes2(self):
+    def test_scan_file_for_separating_barcodes_none_present(self):
         test_file = os.path.join(self.SAMPLE_DIR, "simple.pdf")
         pdf_file, separator_page_numbers = barcodes.scan_file_for_separating_barcodes(
             test_file,
@@ -210,6 +211,86 @@ class TestBarcode(DirectoriesMixin, TestCase):
         test_file = os.path.join(
             self.BARCODE_SAMPLE_DIR,
             "patch-code-t-middle_reverse.pdf",
+        )
+        pdf_file, separator_page_numbers = barcodes.scan_file_for_separating_barcodes(
+            test_file,
+        )
+
+        self.assertEqual(pdf_file, test_file)
+        self.assertListEqual(separator_page_numbers, [1])
+
+    def test_scan_file_for_separating_barcodes_pillow_transcode_error(self):
+        """
+        GIVEN:
+            - A PDF containing an image which cannot be transcoded to a PIL image
+        WHEN:
+            - The image tries to be transcoded to a PIL image, but fails
+        THEN:
+            - The barcode reader is still called
+        """
+
+        def _build_device_n_pdf(self, save_path: str):
+            # Based on the pikepdf tests
+            # https://github.com/pikepdf/pikepdf/blob/abb35ebe17d579d76abe08265e00cf8890a12a95/tests/test_image_access.py
+            pdf = pikepdf.new()
+            pdf.add_blank_page(page_size=(72, 72))
+            imobj = pikepdf.Stream(
+                pdf,
+                bytes(range(0, 256)),
+                BitsPerComponent=8,
+                ColorSpace=pikepdf.Array(
+                    [
+                        pikepdf.Name.DeviceN,
+                        pikepdf.Array([pikepdf.Name.Black]),
+                        pikepdf.Name.DeviceCMYK,
+                        pikepdf.Stream(
+                            pdf,
+                            b"{0 0 0 4 -1 roll}",  # Colorspace conversion function
+                            FunctionType=4,
+                            Domain=[0.0, 1.0],
+                            Range=[0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0],
+                        ),
+                    ],
+                ),
+                Width=16,
+                Height=16,
+                Type=pikepdf.Name.XObject,
+                Subtype=pikepdf.Name.Image,
+            )
+            pim = pikepdf.PdfImage(imobj)
+            self.assertEqual(pim.mode, "DeviceN")
+            self.assertTrue(pim.is_device_n)
+
+            pdf.pages[0].Contents = pikepdf.Stream(pdf, b"72 0 0 72 0 0 cm /Im0 Do")
+            pdf.pages[0].Resources = pikepdf.Dictionary(
+                XObject=pikepdf.Dictionary(Im0=imobj),
+            )
+            pdf.save(save_path)
+
+        with tempfile.NamedTemporaryFile(suffix="pdf") as device_n_pdf:
+            # Build an offending file
+            _build_device_n_pdf(self, str(device_n_pdf.name))
+            with mock.patch("documents.barcodes.barcode_reader") as reader:
+                reader.return_value = list()
+
+                _, _ = barcodes.scan_file_for_separating_barcodes(
+                    str(device_n_pdf.name),
+                )
+
+                reader.assert_called()
+
+    def test_scan_file_for_separating_barcodes_fax_decode(self):
+        """
+        GIVEN:
+            - A PDF containing an image encoded as CCITT Group 4 encoding
+        WHEN:
+            - Barcode processing happens with the file
+        THEN:
+            - The barcode is still detected
+        """
+        test_file = os.path.join(
+            self.BARCODE_SAMPLE_DIR,
+            "barcode-fax-image.pdf",
         )
         pdf_file, separator_page_numbers = barcodes.scan_file_for_separating_barcodes(
             test_file,
@@ -320,7 +401,7 @@ class TestBarcode(DirectoriesMixin, TestCase):
             self.assertEqual(
                 cm.output,
                 [
-                    f"WARNING:paperless.barcodes:No pages to split on!",
+                    "WARNING:paperless.barcodes:No pages to split on!",
                 ],
             )
 
@@ -397,7 +478,8 @@ class TestBarcode(DirectoriesMixin, TestCase):
         dst = os.path.join(settings.SCRATCH_DIR, "patch-code-t-middle.pdf")
         shutil.copy(test_file, dst)
 
-        self.assertEqual(tasks.consume_file(dst), "File successfully split")
+        with mock.patch("documents.tasks.async_to_sync"):
+            self.assertEqual(tasks.consume_file(dst), "File successfully split")
 
     @override_settings(
         CONSUMER_ENABLE_BARCODES=True,
@@ -411,7 +493,8 @@ class TestBarcode(DirectoriesMixin, TestCase):
         dst = os.path.join(settings.SCRATCH_DIR, "patch-code-t-middle.tiff")
         shutil.copy(test_file, dst)
 
-        self.assertEqual(tasks.consume_file(dst), "File successfully split")
+        with mock.patch("documents.tasks.async_to_sync"):
+            self.assertEqual(tasks.consume_file(dst), "File successfully split")
 
     @override_settings(
         CONSUMER_ENABLE_BARCODES=True,
@@ -465,4 +548,23 @@ class TestBarcode(DirectoriesMixin, TestCase):
         dst = os.path.join(settings.SCRATCH_DIR, "patch-code-t-middle")
         shutil.copy(test_file, dst)
 
-        self.assertEqual(tasks.consume_file(dst), "File successfully split")
+        with mock.patch("documents.tasks.async_to_sync"):
+            self.assertEqual(tasks.consume_file(dst), "File successfully split")
+
+    def test_scan_file_for_separating_barcodes_password(self):
+        """
+        GIVEN:
+            - Password protected PDF
+            - pikepdf based scanning
+        WHEN:
+            - File is scanned for barcode
+        THEN:
+            - Scanning handle the exception without exception
+        """
+        test_file = os.path.join(self.SAMPLE_DIR, "password-is-test.pdf")
+        pdf_file, separator_page_numbers = barcodes.scan_file_for_separating_barcodes(
+            test_file,
+        )
+
+        self.assertEqual(pdf_file, test_file)
+        self.assertListEqual(separator_page_numbers, [])

@@ -5,19 +5,25 @@ import multiprocessing
 import os
 import re
 import tempfile
+from typing import Dict
 from typing import Final
 from typing import List
 from typing import Optional
 from typing import Set
+from typing import Tuple
 from urllib.parse import urlparse
 
+from celery.schedules import crontab
 from concurrent_log_handler.queue import setup_logging_queues
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from dotenv import load_dotenv
 
 # Tap paperless.conf if it's available
-if os.path.exists("../paperless.conf"):
+configuration_path = os.getenv("PAPERLESS_CONFIGURATION_PATH")
+if configuration_path and os.path.exists(configuration_path):
+    load_dotenv(configuration_path)
+elif os.path.exists("../paperless.conf"):
     load_dotenv("../paperless.conf")
 elif os.path.exists("/etc/paperless.conf"):
     load_dotenv("/etc/paperless.conf")
@@ -75,6 +81,95 @@ def __get_list(key: str, default: Optional[List[str]] = None) -> List[str]:
     return os.getenv(key).split(",") if os.getenv(key) else []
 
 
+def _parse_redis_url(env_redis: Optional[str]) -> Tuple[str]:
+    """
+    Gets the Redis information from the environment or a default and handles
+    converting from incompatible django_channels and celery formats.
+
+    Returns a tuple of (celery_url, channels_url)
+    """
+
+    # Not set, return a compatible default
+    if env_redis is None:
+        return ("redis://localhost:6379", "redis://localhost:6379")
+
+    if "unix" in env_redis.lower():
+        # channels_redis socket format, looks like:
+        # "unix:///path/to/redis.sock"
+        _, path = env_redis.split(":")
+        # Optionally setting a db number
+        if "?db=" in env_redis:
+            path, number = path.split("?db=")
+            return (f"redis+socket:{path}?virtual_host={number}", env_redis)
+        else:
+            return (f"redis+socket:{path}", env_redis)
+
+    elif "+socket" in env_redis.lower():
+        # celery socket style, looks like:
+        # "redis+socket:///path/to/redis.sock"
+        _, path = env_redis.split(":")
+        if "?virtual_host=" in env_redis:
+            # Virtual host (aka db number)
+            path, number = path.split("?virtual_host=")
+            return (env_redis, f"unix:{path}?db={number}")
+        else:
+            return (env_redis, f"unix:{path}")
+
+    # Not a socket
+    return (env_redis, env_redis)
+
+
+def _parse_beat_schedule() -> Dict:
+    schedule = {}
+    tasks = [
+        {
+            "name": "Check all e-mail accounts",
+            "env_key": "PAPERLESS_EMAIL_TASK_CRON",
+            # Default every ten minutes
+            "env_default": "*/10 * * * *",
+            "task": "paperless_mail.tasks.process_mail_accounts",
+        },
+        {
+            "name": "Train the classifier",
+            "env_key": "PAPERLESS_TRAIN_TASK_CRON",
+            # Default hourly at 5 minutes past the hour
+            "env_default": "5 */1 * * *",
+            "task": "documents.tasks.train_classifier",
+        },
+        {
+            "name": "Optimize the index",
+            "env_key": "PAPERLESS_INDEX_TASK_CRON",
+            # Default daily at midnight
+            "env_default": "0 0 * * *",
+            "task": "documents.tasks.index_optimize",
+        },
+        {
+            "name": "Perform sanity check",
+            "env_key": "PAPERLESS_SANITY_TASK_CRON",
+            # Default Sunday at 00:30
+            "env_default": "30 0 * * sun",
+            "task": "documents.tasks.sanity_check",
+        },
+    ]
+    for task in tasks:
+        # Either get the environment setting or use the default
+        value = os.getenv(task["env_key"], task["env_default"])
+        # Don't add disabled tasks to the schedule
+        if value == "disable":
+            continue
+        # I find https://crontab.guru/ super helpful
+        # crontab(5) format
+        #   - five time-and-date fields
+        #   - separated by at least one blank
+        minute, hour, day_month, month, day_week = value.split(" ")
+        schedule[task["name"]] = {
+            "task": task["task"],
+            "schedule": crontab(minute, hour, day_week, day_month, month),
+        }
+
+    return schedule
+
+
 # NEVER RUN WITH DEBUG IN PRODUCTION.
 DEBUG = __get_boolean("PAPERLESS_DEBUG", "NO")
 
@@ -102,6 +197,8 @@ DATA_DIR = __get_path(
     "PAPERLESS_DATA_DIR",
     os.path.join(BASE_DIR, "..", "data"),
 )
+
+NLTK_DIR = __get_path("PAPERLESS_NLTK_DIR", "/usr/local/share/nltk_data")
 
 TRASH_DIR = os.getenv("PAPERLESS_TRASH_DIR")
 
@@ -184,7 +281,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "django_filters",
-    "django_q",
+    "django_celery_results",
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
@@ -244,6 +341,10 @@ ASGI_APPLICATION = "paperless.asgi.application"
 STATIC_URL = os.getenv("PAPERLESS_STATIC_URL", BASE_URL + "static/")
 WHITENOISE_STATIC_PREFIX = "/static/"
 
+_CELERY_REDIS_URL, _CHANNELS_REDIS_URL = _parse_redis_url(
+    os.getenv("PAPERLESS_REDIS", None),
+)
+
 # TODO: what is this used for?
 TEMPLATES = [
     {
@@ -265,7 +366,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [os.getenv("PAPERLESS_REDIS", "redis://localhost:6379")],
+            "hosts": [_CHANNELS_REDIS_URL],
             "capacity": 2000,  # default 100
             "expiry": 15,  # default 60
         },
@@ -414,10 +515,14 @@ if os.getenv("PAPERLESS_DBHOST"):
     # Leave room for future extensibility
     if os.getenv("PAPERLESS_DBENGINE") == "mariadb":
         engine = "django.db.backends.mysql"
-        options = {
-            "read_default_file": "/etc/mysql/my.cnf",
-            "charset": "utf8mb4",
-        }
+        options = {"read_default_file": "/etc/mysql/my.cnf", "charset": "utf8mb4"}
+
+        # Silence Django error on old MariaDB versions.
+        # VARCHAR can support > 255 in modern versions
+        # https://docs.djangoproject.com/en/4.1/ref/checks/#database
+        # https://mariadb.com/kb/en/innodb-system-variables/#innodb_large_prefix
+        SILENCED_SYSTEM_CHECKS = ["mysql.W003"]
+
     else:  # Default to PostgresDB
         engine = "django.db.backends.postgresql_psycopg2"
         options = {"sslmode": os.getenv("PAPERLESS_DBSSLMODE", "prefer")}
@@ -439,10 +544,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 LANGUAGE_CODE = "en-us"
 
 LANGUAGES = [
-    (
-        "en-us",
-        _("English (US)"),
-    ),  # needs to be first to act as fallback language
+    ("en-us", _("English (US)")),  # needs to be first to act as fallback language
+    ("ar-ar", _("Arabic")),
     ("be-by", _("Belarusian")),
     ("cs-cz", _("Czech")),
     ("da-dk", _("Danish")),
@@ -535,24 +638,35 @@ TASK_WORKERS = __get_int("PAPERLESS_TASK_WORKERS", 1)
 
 WORKER_TIMEOUT: Final[int] = __get_int("PAPERLESS_WORKER_TIMEOUT", 1800)
 
-# Per django-q docs, timeout must be smaller than retry
-# We default retry to 10s more than the timeout to silence the
-# warning, as retry functionality isn't used.
-WORKER_RETRY: Final[int] = __get_int(
-    "PAPERLESS_WORKER_RETRY",
-    WORKER_TIMEOUT + 10,
-)
+CELERY_BROKER_URL = _CELERY_REDIS_URL
+CELERY_TIMEZONE = TIME_ZONE
 
-Q_CLUSTER = {
-    "name": "paperless",
-    "guard_cycle": 5,
-    "catch_up": False,
-    "recycle": 1,
-    "retry": WORKER_RETRY,
-    "timeout": WORKER_TIMEOUT,
-    "workers": TASK_WORKERS,
-    "redis": os.getenv("PAPERLESS_REDIS", "redis://localhost:6379"),
-    "log_level": "DEBUG" if DEBUG else "INFO",
+CELERY_WORKER_HIJACK_ROOT_LOGGER = False
+CELERY_WORKER_CONCURRENCY = TASK_WORKERS
+CELERY_WORKER_MAX_TASKS_PER_CHILD = 1
+CELERY_WORKER_SEND_TASK_EVENTS = True
+
+CELERY_SEND_TASK_SENT_EVENT = True
+
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = WORKER_TIMEOUT
+
+CELERY_RESULT_EXTENDED = True
+CELERY_RESULT_BACKEND = "django-db"
+CELERY_CACHE_BACKEND = "default"
+
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#beat-schedule
+CELERY_BEAT_SCHEDULE = _parse_beat_schedule()
+
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#beat-schedule-filename
+CELERY_BEAT_SCHEDULE_FILENAME = os.path.join(DATA_DIR, "celerybeat-schedule.db")
+
+# django setting.
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": _CHANNELS_REDIS_URL,
+    },
 }
 
 
@@ -605,15 +719,15 @@ CONSUMER_IGNORE_PATTERNS = list(
 
 CONSUMER_SUBDIRS_AS_TAGS = __get_boolean("PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS")
 
-CONSUMER_ENABLE_BARCODES = __get_boolean(
+CONSUMER_ENABLE_BARCODES: Final[bool] = __get_boolean(
     "PAPERLESS_CONSUMER_ENABLE_BARCODES",
 )
 
-CONSUMER_BARCODE_TIFF_SUPPORT = __get_boolean(
+CONSUMER_BARCODE_TIFF_SUPPORT: Final[bool] = __get_boolean(
     "PAPERLESS_CONSUMER_BARCODE_TIFF_SUPPORT",
 )
 
-CONSUMER_BARCODE_STRING = os.getenv(
+CONSUMER_BARCODE_STRING: Final[str] = os.getenv(
     "PAPERLESS_CONSUMER_BARCODE_STRING",
     "PATCHT",
 )
@@ -760,6 +874,49 @@ if os.getenv("PAPERLESS_IGNORE_DATES") is not None:
 ENABLE_UPDATE_CHECK = os.getenv("PAPERLESS_ENABLE_UPDATE_CHECK", "default")
 if ENABLE_UPDATE_CHECK != "default":
     ENABLE_UPDATE_CHECK = __get_boolean("PAPERLESS_ENABLE_UPDATE_CHECK")
+
+
+###############################################################################
+# Machine Learning                                                            #
+###############################################################################
+
+
+def _get_nltk_language_setting(ocr_lang: str) -> Optional[str]:
+    """
+    Maps an ISO-639-1 language code supported by Tesseract into
+    an optional NLTK language name.  This is the set of common supported
+    languages for all the NLTK data used.
+
+    Assumption: The primary language is first
+    """
+    ocr_lang = ocr_lang.split("+")[0]
+    iso_code_to_nltk = {
+        "dan": "danish",
+        "nld": "dutch",
+        "eng": "english",
+        "fin": "finnish",
+        "fra": "french",
+        "deu": "german",
+        "ita": "italian",
+        "nor": "norwegian",
+        "por": "portuguese",
+        "rus": "russian",
+        "spa": "spanish",
+        "swe": "swedish",
+        "tur": "turkish",
+    }
+
+    return iso_code_to_nltk.get(ocr_lang, None)
+
+
+NLTK_ENABLED: Final[bool] = __get_boolean("PAPERLESS_ENABLE_NLTK", "yes")
+
+NLTK_LANGUAGE: Optional[str] = _get_nltk_language_setting(OCR_LANGUAGE)
+
+
+###############################################################################
+# Single Sign-On (SSO)
+###############################################################################
 
 
 if SSO_ENABLED:

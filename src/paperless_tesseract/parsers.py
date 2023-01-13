@@ -1,6 +1,10 @@
 import json
 import os
 import re
+import subprocess
+import tempfile
+from pathlib import Path
+from typing import Optional
 
 from django.conf import settings
 from documents.parsers import DocumentParser
@@ -10,6 +14,10 @@ from PIL import Image
 
 
 class NoTextFoundException(Exception):
+    pass
+
+
+class RtlLanguageException(Exception):
     pass
 
 
@@ -66,11 +74,23 @@ class RasterisedDocumentParser(DocumentParser):
             "image/tiff",
             "image/bmp",
             "image/gif",
+            "image/webp",
         ]
 
     def has_alpha(self, image):
         with Image.open(image) as im:
             return im.mode in ("RGBA", "LA")
+
+    def remove_alpha(self, image_path: str):
+        subprocess.run(
+            [
+                settings.CONVERT_BINARY,
+                "-alpha",
+                "off",
+                image_path,
+                image_path,
+            ],
+        )
 
     def get_dpi(self, image):
         try:
@@ -94,8 +114,14 @@ class RasterisedDocumentParser(DocumentParser):
             self.log("warning", f"Error while calculating DPI for image {image}: {e}")
             return None
 
-    def extract_text(self, sidecar_file, pdf_file):
-        if sidecar_file and os.path.isfile(sidecar_file):
+    def extract_text(self, sidecar_file: Optional[Path], pdf_file: Path):
+        # When re-doing OCR, the sidecar contains ONLY the new text, not
+        # the whole text, so do not utilize it in that case
+        if (
+            sidecar_file is not None
+            and os.path.isfile(sidecar_file)
+            and settings.OCR_MODE != "redo"
+        ):
             with open(sidecar_file) as f:
                 text = f.read()
 
@@ -112,13 +138,27 @@ class RasterisedDocumentParser(DocumentParser):
         if not os.path.isfile(pdf_file):
             return None
 
-        from pdfminer.high_level import extract_text as pdfminer_extract_text
-
         try:
-            stripped = post_process_text(pdfminer_extract_text(pdf_file))
+            text = None
+            with tempfile.NamedTemporaryFile(
+                mode="w+",
+                dir=self.tempdir,
+            ) as tmp:
+                subprocess.run(
+                    [
+                        "pdftotext",
+                        "-q",
+                        "-layout",
+                        "-enc",
+                        "UTF-8",
+                        pdf_file,
+                        tmp.name,
+                    ],
+                )
+                text = tmp.read()
 
-            self.log("debug", f"Extracted text from PDF file {pdf_file}")
-            return stripped
+            return post_process_text(text)
+
         except Exception:
             # TODO catch all for various issues with PDFminer.six.
             #  If PDFminer fails, fall back to OCR.
@@ -142,7 +182,7 @@ class RasterisedDocumentParser(DocumentParser):
             "input_file": input_file,
             "output_file": output_file,
             # need to use threads, since this will be run in daemonized
-            # processes by django-q.
+            # processes via the task library.
             "use_threads": True,
             "jobs": settings.THREADS_PER_WORKER,
             "language": settings.OCR_LANGUAGE,
@@ -165,9 +205,11 @@ class RasterisedDocumentParser(DocumentParser):
             if settings.OCR_MODE == "redo":
                 ocrmypdf_args["clean"] = True
             else:
+                # --clean-final is not compatible with --redo-ocr
                 ocrmypdf_args["clean_final"] = True
 
-        if settings.OCR_DESKEW and not settings.OCR_MODE == "redo":
+        if settings.OCR_DESKEW and settings.OCR_MODE != "redo":
+            # --deskew is not compatible with --redo-ocr
             ocrmypdf_args["deskew"] = True
 
         if settings.OCR_ROTATE_PAGES:
@@ -192,11 +234,7 @@ class RasterisedDocumentParser(DocumentParser):
                     f"Removing alpha layer from {input_file} "
                     "for compatibility with img2pdf",
                 )
-                with Image.open(input_file) as im:
-                    background = Image.new("RGBA", im.size, (255, 255, 255))
-                    background.alpha_composite(im)
-                    background = background.convert("RGB")
-                    background.save(input_file, format=im.format)
+                self.remove_alpha(input_file)
 
             if dpi:
                 self.log("debug", f"Detected DPI for image {input_file}: {dpi}")
@@ -243,27 +281,33 @@ class RasterisedDocumentParser(DocumentParser):
 
         return ocrmypdf_args
 
-    def parse(self, document_path, mime_type, file_name=None):
+    def parse(self, document_path: Path, mime_type, file_name=None):
         # This forces tesseract to use one core per page.
         os.environ["OMP_THREAD_LIMIT"] = "1"
 
         if mime_type == "application/pdf":
             text_original = self.extract_text(None, document_path)
-            original_has_text = text_original and len(text_original) > 50
+            original_has_text = text_original is not None and len(text_original) > 50
         else:
             text_original = None
             original_has_text = False
 
+        # If the original has text, and the user doesn't want an archive,
+        # we're done here
         if settings.OCR_MODE == "skip_noarchive" and original_has_text:
             self.log("debug", "Document has text, skipping OCRmyPDF entirely.")
             self.text = text_original
             return
 
+        # Either no text was in the original or there should be an archive
+        # file created, so OCR the file and create an archive with any
+        # text located via OCR
+
         import ocrmypdf
         from ocrmypdf import InputFileError, EncryptedPdfError
 
-        archive_path = os.path.join(self.tempdir, "archive.pdf")
-        sidecar_file = os.path.join(self.tempdir, "sidecar.txt")
+        archive_path = Path(os.path.join(self.tempdir, "archive.pdf"))
+        sidecar_file = Path(os.path.join(self.tempdir, "sidecar.txt"))
 
         args = self.construct_ocrmypdf_parameters(
             document_path,
@@ -276,9 +320,7 @@ class RasterisedDocumentParser(DocumentParser):
             self.log("debug", f"Calling OCRmyPDF with args: {args}")
             ocrmypdf.ocr(**args)
 
-            # Only create archive file if archiving isn't being skipped
-            if settings.OCR_MODE != "skip_noarchive":
-                self.archive_path = archive_path
+            self.archive_path = archive_path
 
             self.text = self.extract_text(sidecar_file, archive_path)
 
@@ -299,8 +341,12 @@ class RasterisedDocumentParser(DocumentParser):
                 f"Attempting force OCR to get the text.",
             )
 
-            archive_path_fallback = os.path.join(self.tempdir, "archive-fallback.pdf")
-            sidecar_file_fallback = os.path.join(self.tempdir, "sidecar-fallback.txt")
+            archive_path_fallback = Path(
+                os.path.join(self.tempdir, "archive-fallback.pdf"),
+            )
+            sidecar_file_fallback = Path(
+                os.path.join(self.tempdir, "sidecar-fallback.txt"),
+            )
 
             # Attempt to run OCR with safe settings.
 

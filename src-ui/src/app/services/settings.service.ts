@@ -1,6 +1,7 @@
 import { DOCUMENT } from '@angular/common'
 import { HttpClient } from '@angular/common/http'
 import {
+  EventEmitter,
   Inject,
   Injectable,
   LOCALE_ID,
@@ -22,6 +23,7 @@ import {
   SETTINGS,
   SETTINGS_KEYS,
 } from '../data/paperless-uisettings'
+import { SavedViewService } from './rest/saved-view.service'
 import { ToastService } from './toast.service'
 
 export interface LanguageOption {
@@ -46,6 +48,8 @@ export class SettingsService {
 
   public displayName: string
 
+  public settingsSaved: EventEmitter<any> = new EventEmitter()
+
   constructor(
     rendererFactory: RendererFactory2,
     @Inject(DOCUMENT) private document,
@@ -53,7 +57,8 @@ export class SettingsService {
     private meta: Meta,
     @Inject(LOCALE_ID) private localeId: string,
     protected http: HttpClient,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private savedViewService: SavedViewService
   ) {
     this.renderer = rendererFactory.createRenderer(null, null)
   }
@@ -140,6 +145,12 @@ export class SettingsService {
         name: $localize`English (US)`,
         englishName: 'English (US)',
         dateInputFormat: 'mm/dd/yyyy',
+      },
+      {
+        code: 'ar-ar',
+        name: $localize`Arabic`,
+        englishName: 'Arabic',
+        dateInputFormat: 'yyyy-mm-dd',
       },
       {
         code: 'be-by',
@@ -313,13 +324,7 @@ export class SettingsService {
     )
   }
 
-  get(key: string): any {
-    let setting = SETTINGS.find((s) => s.key == key)
-
-    if (!setting) {
-      return null
-    }
-
+  private getSettingRawValue(key: string): any {
     let value = null
     // parse key:key:key into nested object
     const keys = key.replace('general-settings:', '').split(':')
@@ -330,6 +335,17 @@ export class SettingsService {
       if (index == keys.length - 1) value = settingObj[keyPart]
       else settingObj = settingObj[keyPart]
     })
+    return value
+  }
+
+  get(key: string): any {
+    let setting = SETTINGS.find((s) => s.key == key)
+
+    if (!setting) {
+      return null
+    }
+
+    let value = this.getSettingRawValue(key)
 
     if (value != null) {
       switch (setting.type) {
@@ -359,8 +375,19 @@ export class SettingsService {
     })
   }
 
+  private settingIsSet(key: string): boolean {
+    let value = this.getSettingRawValue(key)
+    return value != null
+  }
+
   storeSettings(): Observable<any> {
-    return this.http.post(this.baseUrl, { settings: this.settings })
+    return this.http.post(this.baseUrl, { settings: this.settings }).pipe(
+      tap((results) => {
+        if (results.success) {
+          this.settingsSaved.emit()
+        }
+      })
+    )
   }
 
   maybeMigrateSettings() {
@@ -400,5 +427,38 @@ export class SettingsService {
           },
         })
     }
+
+    if (
+      !this.settingIsSet(SETTINGS_KEYS.UPDATE_CHECKING_ENABLED) &&
+      this.get(SETTINGS_KEYS.UPDATE_CHECKING_BACKEND_SETTING) != 'default'
+    ) {
+      this.set(
+        SETTINGS_KEYS.UPDATE_CHECKING_ENABLED,
+        this.get(SETTINGS_KEYS.UPDATE_CHECKING_BACKEND_SETTING).toString() ===
+          'true'
+      )
+
+      this.storeSettings()
+        .pipe(first())
+        .subscribe({
+          error: (e) => {
+            this.toastService.showError(
+              'Error migrating update checking setting'
+            )
+            console.log(e)
+          },
+        })
+    }
+  }
+
+  get updateCheckingIsSet(): boolean {
+    return this.settingIsSet(SETTINGS_KEYS.UPDATE_CHECKING_ENABLED)
+  }
+
+  offerTour(): boolean {
+    return (
+      !this.savedViewService.loading &&
+      this.savedViewService.dashboardViews.length == 0
+    )
   }
 }

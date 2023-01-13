@@ -13,28 +13,34 @@ on:
     branches-ignore:
       - 'translations**'
 
+env:
+  # This is the version of pipenv all the steps will use
+  # If changing this, change Dockerfile
+  DEFAULT_PIP_ENV_VERSION: "2022.11.30"
+  # This is the default version of Python to use in most steps
+  # If changing this, change Dockerfile
+  DEFAULT_PYTHON_VERSION: "3.9"
+
 jobs:
   pre-commit:
     name: Linting Checks
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       -
         name: Checkout repository
         uses: actions/checkout@v3
-
       -
-        name: Install tools
+        name: Install python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.9"
-
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
       -
         name: Check files
         uses: pre-commit/action@v3.0.0
 
   documentation:
     name: "Build Documentation"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs:
       - pre-commit
     steps:
@@ -42,64 +48,98 @@ jobs:
         name: Checkout
         uses: actions/checkout@v3
       -
-        name: Install pipenv
-        run: |
-          pipx install pipenv==2022.8.5
-          pipenv --version
-      -
         name: Set up Python
+        id: setup-python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.9
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
           cache: "pipenv"
           cache-dependency-path: 'Pipfile.lock'
       -
+        name: Install pipenv
+        run: |
+          pip install --user pipenv==${DEFAULT_PIP_ENV_VERSION}
+      -
         name: Install dependencies
         run: |
-          pipenv sync --dev
+          pipenv --python ${{ steps.setup-python.outputs.python-version }} sync --dev
       -
         name: List installed Python dependencies
         run: |
-          pipenv run pip list
+          pipenv --python ${{ steps.setup-python.outputs.python-version }} run pip list
       -
         name: Make documentation
         run: |
-          cd docs/
-          pipenv run make html
+          pipenv --python ${{ steps.setup-python.outputs.python-version }} run mkdocs build --config-file ./mkdocs.yml
       -
         name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
           name: documentation
-          path: docs/_build/html/
+          path: site/
+
+  documentation-deploy:
+    name: "Deploy Documentation"
+    runs-on: ubuntu-22.04
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs:
+      - documentation
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Deploy docs
+        uses: mhausenblas/mkdocs-deploy-gh-pages@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CUSTOM_DOMAIN: docs.paperless-ngx.com
+          CONFIG_FILE: mkdocs.yml
+          EXTRA_PACKAGES: build-base
 
   tests-backend:
     name: "Tests (${{ matrix.python-version }})"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs:
       - pre-commit
     strategy:
       matrix:
         python-version: ['3.8', '3.9', '3.10']
       fail-fast: false
+    env:
+      # Enable Tika end to end testing
+      TIKA_LIVE: 1
+      # Enable paperless_mail testing against real server
+      PAPERLESS_MAIL_TEST_HOST: ${{ secrets.TEST_MAIL_HOST }}
+      PAPERLESS_MAIL_TEST_USER: ${{ secrets.TEST_MAIL_USER }}
+      PAPERLESS_MAIL_TEST_PASSWD: ${{ secrets.TEST_MAIL_PASSWD }}
+      # Skip Tests which require convert
+      PAPERLESS_TEST_SKIP_CONVERT: 1
+      # Enable Gotenberg end to end testing
+      GOTENBERG_LIVE: 1
     steps:
       -
         name: Checkout
         uses: actions/checkout@v3
         with:
-          fetch-depth: 2
+          fetch-depth: 0
       -
-        name: Install pipenv
+        name: Start containers
         run: |
-          pipx install pipenv==2022.8.5
-          pipenv --version
+          docker compose --file ${GITHUB_WORKSPACE}/docker/compose/docker-compose.ci-test.yml pull --quiet
+          docker compose --file ${GITHUB_WORKSPACE}/docker/compose/docker-compose.ci-test.yml up --detach
       -
         name: Set up Python
+        id: setup-python
         uses: actions/setup-python@v4
         with:
           python-version: "${{ matrix.python-version }}"
           cache: "pipenv"
           cache-dependency-path: 'Pipfile.lock'
+      -
+        name: Install pipenv
+        run: |
+          pip install --user pipenv==${DEFAULT_PIP_ENV_VERSION}
       -
         name: Install system dependencies
         run: |
@@ -108,20 +148,21 @@ jobs:
       -
         name: Install Python dependencies
         run: |
-          pipenv sync --dev
+          pipenv --python ${{ steps.setup-python.outputs.python-version }} run python --version
+          pipenv --python ${{ steps.setup-python.outputs.python-version }} sync --dev
       -
         name: List installed Python dependencies
         run: |
-          pipenv run pip list
+          pipenv --python ${{ steps.setup-python.outputs.python-version }} run pip list
       -
         name: Tests
         run: |
           cd src/
-          pipenv run pytest
+          pipenv --python ${{ steps.setup-python.outputs.python-version }} run pytest -ra
       -
         name: Get changed files
         id: changed-files-specific
-        uses: tj-actions/changed-files@v31.0.2
+        uses: tj-actions/changed-files@v35
         with:
           files: |
             src/**
@@ -133,17 +174,23 @@ jobs:
           done
       -
         name: Publish coverage results
-        if: matrix.python-version == '3.9' && steps.changed-files-specific.outputs.any_changed == 'true'
+        if: matrix.python-version == ${{ env.DEFAULT_PYTHON_VERSION }} && steps.changed-files-specific.outputs.any_changed == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         # https://github.com/coveralls-clients/coveralls-python/issues/251
         run: |
           cd src/
-          pipenv run coveralls --service=github
+          pipenv --python ${{ steps.setup-python.outputs.python-version }} run coveralls --service=github
+      -
+        name: Stop containers
+        if: always()
+        run: |
+          docker compose --file ${GITHUB_WORKSPACE}/docker/compose/docker-compose.ci-test.yml logs
+          docker compose --file ${GITHUB_WORKSPACE}/docker/compose/docker-compose.ci-test.yml down
 
   tests-frontend:
     name: "Tests Frontend"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs:
       - pre-commit
     strategy:
@@ -157,13 +204,14 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - run: cd src-ui && npm ci
+      - run: cd src-ui && npm run lint
       - run: cd src-ui && npm run test
       - run: cd src-ui && npm run e2e:ci
 
   prepare-docker-build:
     name: Prepare Docker Pipeline Data
     if: github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/feature-') || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/beta' || contains(github.ref, 'beta.rc') || startsWith(github.ref, 'refs/tags/v'))
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     # If the push triggered the installer library workflow, wait for it to
     # complete here.  This ensures the required versions for the final
     # image have been built, while not waiting at all if the versions haven't changed
@@ -180,7 +228,7 @@ jobs:
         id: set-ghcr-repository
         run: |
           ghcr_name=$(echo "${GITHUB_REPOSITORY}" | awk '{ print tolower($0) }')
-          echo ::set-output name=repository::${ghcr_name}
+          echo "repository=${ghcr_name}" >> $GITHUB_OUTPUT
       -
         name: Checkout
         uses: actions/checkout@v3
@@ -188,7 +236,7 @@ jobs:
         name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.9"
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
       -
         name: Setup qpdf image
         id: qpdf-setup
@@ -197,7 +245,7 @@ jobs:
 
           echo ${build_json}
 
-          echo ::set-output name=qpdf-json::${build_json}
+          echo "qpdf-json=${build_json}" >> $GITHUB_OUTPUT
       -
         name: Setup psycopg2 image
         id: psycopg2-setup
@@ -206,7 +254,7 @@ jobs:
 
           echo ${build_json}
 
-          echo ::set-output name=psycopg2-json::${build_json}
+          echo "psycopg2-json=${build_json}" >> $GITHUB_OUTPUT
       -
         name: Setup pikepdf image
         id: pikepdf-setup
@@ -215,7 +263,7 @@ jobs:
 
           echo ${build_json}
 
-          echo ::set-output name=pikepdf-json::${build_json}
+          echo "pikepdf-json=${build_json}" >> $GITHUB_OUTPUT
       -
         name: Setup jbig2enc image
         id: jbig2enc-setup
@@ -224,7 +272,7 @@ jobs:
 
           echo ${build_json}
 
-          echo ::set-output name=jbig2enc-json::${build_json}
+          echo "jbig2enc-json=${build_json}" >> $GITHUB_OUTPUT
 
     outputs:
 
@@ -240,7 +288,7 @@ jobs:
 
   # build and push image to docker hub.
   build-docker-image:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     concurrency:
       group: ${{ github.workflow }}-build-docker-image-${{ github.ref_name }}
       cancel-in-progress: true
@@ -259,10 +307,10 @@ jobs:
         run: |
           if [[ ${{ needs.prepare-docker-build.outputs.ghcr-repository }} == "paperless-ngx/paperless-ngx" && ( ${{ github.ref_name }} == "main" || ${{ github.ref_name }} == "dev" || ${{ github.ref_name }} == "beta" || ${{ startsWith(github.ref, 'refs/tags/v') }} == "true" ) ]] ; then
             echo "Enabling DockerHub image push"
-            echo ::set-output name=enable::"true"
+            echo "enable=true" >> $GITHUB_OUTPUT
           else
             echo "Not pushing to DockerHub"
-            echo ::set-output name=enable::"false"
+            echo "enable=false" >> $GITHUB_OUTPUT
           fi
       -
         name: Gather Docker metadata
@@ -345,27 +393,27 @@ jobs:
   build-release:
     needs:
       - build-docker-image
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       -
         name: Checkout
         uses: actions/checkout@v3
       -
-        name: Install pipenv
-        run: |
-          pip3 install --upgrade pip setuptools wheel pipx
-          pipx install pipenv
-      -
         name: Set up Python
+        id: setup-python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.9
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
           cache: "pipenv"
           cache-dependency-path: 'Pipfile.lock'
       -
+        name: Install pipenv + tools
+        run: |
+          pip install --upgrade --user pipenv==${DEFAULT_PIP_ENV_VERSION} setuptools wheel
+      -
         name: Install Python dependencies
         run: |
-          pipenv sync --dev
+          pipenv --python ${{ steps.setup-python.outputs.python-version }} sync --dev
       -
         name: Install system dependencies
         run: |
@@ -386,17 +434,17 @@ jobs:
       -
         name: Generate requirements file
         run: |
-          pipenv requirements > requirements.txt
+          pipenv --python ${{ steps.setup-python.outputs.python-version }} requirements > requirements.txt
       -
         name: Compile messages
         run: |
           cd src/
-          pipenv run python3 manage.py compilemessages
+          pipenv --python ${{ steps.setup-python.outputs.python-version }} run python3 manage.py compilemessages
       -
         name: Collect static files
         run: |
           cd src/
-          pipenv run python3 manage.py collectstatic --no-input
+          pipenv --python ${{ steps.setup-python.outputs.python-version }} run python3 manage.py collectstatic --no-input
       -
         name: Move files
         run: |
@@ -407,7 +455,7 @@ jobs:
           cp paperless.conf.example dist/paperless-ngx/paperless.conf
           cp gunicorn.conf.py dist/paperless-ngx/gunicorn.conf.py
           cp -r docker/ dist/paperless-ngx/docker
-          cp scripts/*.service scripts/*.sh dist/paperless-ngx/scripts/
+          cp scripts/*.service scripts/*.sh scripts/*.socket dist/paperless-ngx/scripts/
           cp -r src/ dist/paperless-ngx/src
           cp -r docs/_build/html/ dist/paperless-ngx/docs
           mv static dist/paperless-ngx
@@ -424,7 +472,7 @@ jobs:
           path: dist/paperless-ngx.tar.xz
 
   publish-release:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     outputs:
       prerelease: ${{ steps.get_version.outputs.prerelease }}
       changelog: ${{ steps.create-release.outputs.body }}
@@ -443,11 +491,11 @@ jobs:
         name: Get version
         id: get_version
         run: |
-          echo ::set-output name=version::${{ github.ref_name }}
+          echo "version=${{ github.ref_name }}" >> $GITHUB_OUTPUT
           if [[ ${{ contains(github.ref_name, '-beta.rc') }} == 'true' ]]; then
-            echo ::set-output name=prerelease::true
+            echo "prerelease=true" >> $GITHUB_OUTPUT
           else
-            echo ::set-output name=prerelease::false
+            echo "prerelease=false" >> $GITHUB_OUTPUT
           fi
       -
         name: Create Release and Changelog
@@ -464,17 +512,16 @@ jobs:
       -
         name: Upload release archive
         id: upload-release-asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: shogo82148/actions-upload-release-asset@v1
         with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           upload_url: ${{ steps.create-release.outputs.upload_url }}
           asset_path: ./paperless-ngx.tar.xz
           asset_name: paperless-ngx-${{ steps.get_version.outputs.version }}.tar.xz
           asset_content_type: application/x-xz
 
   append-changelog:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs:
       - publish-release
     if: needs.publish-release.outputs.prerelease == 'false'
@@ -485,17 +532,16 @@ jobs:
         with:
           ref: main
       -
-        name: Install pipenv
-        run: |
-          pip3 install --upgrade pip setuptools wheel pipx
-          pipx install pipenv
-      -
         name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.9
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
           cache: "pipenv"
           cache-dependency-path: 'Pipfile.lock'
+      -
+        name: Install pipenv + tools
+        run: |
+          pip install --upgrade --user pipenv==${DEFAULT_PIP_ENV_VERSION} setuptools wheel
       -
         name: Append Changelog to docs
         id: append-Changelog
@@ -509,7 +555,7 @@ jobs:
           CURRENT_CHANGELOG=`tail --lines +2 changelog.md`
           echo -e "$CURRENT_CHANGELOG" >> changelog-new.md
           mv changelog-new.md changelog.md
-          pipenv run pre-commit --files changelog.md
+          pipenv run pre-commit run --files changelog.md || true
           git config --global user.name "github-actions"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -am "Changelog ${{ needs.publish-release.outputs.version }} - GHA"

@@ -10,11 +10,12 @@ body {
 
   --bs-primary: hsl(var(--pngx-primary), var(--pngx-primary-lightness));
   --bs-border-color: var(--bs-gray-400);
-  --pngx-primary-faded: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) + 72%));
+  --pngx-primary-faded: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) + 76%));
   --pngx-primary-lighten-30: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) + 30%));
   --pngx-primary-darken-5: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) - 5%));
   --pngx-primary-darken-15: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) - 15%));
   --pngx-primary-darken-18: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) - 18%));
+  --pngx-primary-darken-27: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) - 27%));
   --pngx-bg-alt: #fff;
   --pngx-bg-darker: var(--bs-gray-100);
   --pngx-focus-alpha: 0.3;
@@ -77,6 +78,15 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
     &:hover, &:focus, &.active, &:active {
       color: var(--bs-body-color) !important;
     }
+  }
+
+  .btn-dark {
+    --bs-btn-color: $text-color-dark-bg;
+    --bs-btn-bg: var(--pngx-bg-alt);
+    --bs-btn-border-color: var(--pngx-bg-alt);
+    --bs-btn-hover-bg: var(--bs-light);
+    --bs-btn-hover-border-color: var(--pngx-bg-darker);
+    --bs-btn-active-bg: var(--pngx-bg-alt);
   }
 
   .btn-outline-primary {
@@ -168,6 +178,12 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
     color: var(--bs-body-color);
   }
 
+  .alert-primary {
+    --bs-alert-color: var(--pngx-primary-text-contrast);
+    --bs-alert-bg: var(--pngx-primary-darken-27);
+    --bs-alert-border-color: var(--pngx-bg-darker);
+  }
+
   .table-striped > tbody > tr:nth-of-type(odd) > * {
     color: var(--pngx-body-color-accent);
   }
@@ -187,8 +203,12 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
   .toast,
   .toast .toast-header,
   .toast .btn,
-  .toast .btn-close, {
+  .toast .btn-close {
     color: var(--pngx-primary-text-contrast);
+  }
+
+  .dropdown-menu {
+    --bs-dropdown-color: var(--bs-body-color);
   }
 }
 
