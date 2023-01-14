@@ -227,9 +227,10 @@ is not a TTY" errors. For example:
 `docker-compose exec -T webserver document_exporter ../export`
 
 ```
-document_exporter target [-c] [-f] [-p] [-d] [-na] [-nt]
+document_exporter target [-sm] [-c] [-f] [-p] [-d] [-na] [-nt]
 
 optional arguments:
+-sm, --split-manifest
 -c, --compare-checksums
 -f, --use-filename-format
 -p, --use-filename-prefix
@@ -242,6 +243,9 @@ optional arguments:
 `target` is a folder to which the data gets written. This includes
 documents, thumbnails and a `manifest.json` file. The manifest contains
 all metadata from the database (correspondents, tags, etc).
+
+If `-sm` or `--split-manifest` is provided, information about document
+will be placed in individual json files.
 
 When you use the provided docker compose script, specify `../export` as
 the target. This path inside the container is automatically mounted on
@@ -279,8 +283,8 @@ paperless to use `PAPERLESS_FILENAME_FORMAT` for exported filenames
 instead, specify `--use-filename-format`.
 
 If `-p` or `--use-filename-format` is provided, Files will be exported
-in dedicated folders according to their nature: `archive`, `originals`
-or `thumbnails`
+in dedicated folders according to their nature: `archive`, `originals`,
+`thumbnails` or `json`
 
 ### Document importer {#importer}
 
