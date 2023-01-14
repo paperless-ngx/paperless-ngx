@@ -72,11 +72,24 @@ class Command(BaseCommand):
         if not os.access(self.source, os.R_OK):
             raise CommandError("That path doesn't appear to be readable")
 
-        manifest_path = os.path.normpath(os.path.join(self.source, "manifest.json"))
-        self._check_manifest_exists(manifest_path)
+        manifest_paths = []
 
-        with open(manifest_path) as f:
+        main_manifest_path = os.path.normpath(
+            os.path.join(self.source, "manifest.json"),
+        )
+        self._check_manifest_exists(main_manifest_path)
+
+        with open(main_manifest_path) as f:
             self.manifest = json.load(f)
+        manifest_paths.append(main_manifest_path)
+
+        for root, dirs, files in os.walk(self.source):
+            for file in files:
+                if file.endswith("-manifest.json"):
+                    doc_manifest_path = os.path.normpath(os.path.join(root, file))
+                    with open(doc_manifest_path) as f:
+                        self.manifest += json.load(f)
+                    manifest_paths.append(doc_manifest_path)
 
         version_path = os.path.normpath(os.path.join(self.source, "version.json"))
         if os.path.exists(version_path):
@@ -109,7 +122,8 @@ class Command(BaseCommand):
             ):
                 # Fill up the database with whatever is in the manifest
                 try:
-                    call_command("loaddata", manifest_path)
+                    for manifest_path in manifest_paths:
+                        call_command("loaddata", manifest_path)
                 except (FieldDoesNotExist, DeserializationError) as e:
                     self.stdout.write(self.style.ERROR("Database import failed"))
                     if (

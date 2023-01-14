@@ -104,6 +104,7 @@ class TestExportImport(DirectoriesMixin, TestCase):
         delete=False,
         no_archive=False,
         no_thumbnail=False,
+        split_manifest=False,
     ):
         args = ["document_exporter", self.target]
         if use_filename_format:
@@ -116,6 +117,8 @@ class TestExportImport(DirectoriesMixin, TestCase):
             args += ["--no-archive"]
         if no_thumbnail:
             args += ["--no-thumbnail"]
+        if split_manifest:
+            args += ["--split-manifest"]
 
         call_command(*args)
 
@@ -559,6 +562,23 @@ class TestExportImport(DirectoriesMixin, TestCase):
                     or document_exporter.EXPORTER_THUMBNAIL_NAME in element
                 )
         self.assertFalse(has_thumbnail)
+
+        with paperless_environment() as dirs:
+            call_command("document_importer", self.target)
+            self.assertEqual(Document.objects.count(), 4)
+
+    def test_split_manifest(self):
+        shutil.rmtree(os.path.join(self.dirs.media_dir, "documents"))
+        shutil.copytree(
+            os.path.join(os.path.dirname(__file__), "samples", "documents"),
+            os.path.join(self.dirs.media_dir, "documents"),
+        )
+
+        manifest = self._do_export(split_manifest=True)
+        has_document = False
+        for element in manifest:
+            has_document = has_document or element["model"] == "documents.document"
+        self.assertFalse(has_document)
 
         with paperless_environment() as dirs:
             call_command("document_importer", self.target)
