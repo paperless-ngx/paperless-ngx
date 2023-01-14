@@ -348,27 +348,30 @@ class Command(BaseCommand):
                 if self.use_filename_prefix:
                     manifest_name = os.path.join("json", manifest_name)
                 manifest_name = os.path.join(self.target, manifest_name)
+                if manifest_name in self.files_in_export_dir:
+                    self.files_in_export_dir.remove(manifest_name)
                 os.makedirs(os.path.dirname(manifest_name), exist_ok=True)
                 with open(manifest_name, "w") as f:
                     json.dump([document_manifest[index]], f, indent=2)
 
         # 4.1 write manifest to target folder
         manifest_path = os.path.abspath(os.path.join(self.target, "manifest.json"))
+        if manifest_path in self.files_in_export_dir:
+            self.files_in_export_dir.remove(manifest_path)
 
         with open(manifest_path, "w") as f:
             json.dump(manifest, f, indent=2)
 
         # 4.2 write version information to target folder
         version_path = os.path.abspath(os.path.join(self.target, "version.json"))
+        if version_path in self.files_in_export_dir:
+            self.files_in_export_dir.remove(version_path)
 
         with open(version_path, "w") as f:
             json.dump({"version": version.__full_version_str__}, f, indent=2)
 
         if self.delete:
             # 5. Remove files which we did not explicitly export in this run
-
-            if manifest_path in self.files_in_export_dir:
-                self.files_in_export_dir.remove(manifest_path)
 
             for f in self.files_in_export_dir:
                 os.remove(f)
