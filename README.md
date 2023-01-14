@@ -103,6 +103,7 @@ For bugs please [open an issue](https://github.com/paperless-ngx/paperless-ngx/i
 
 Paperless has been around a while now, and people are starting to build stuff on top of it. If you're one of those people, we can add your project to this list:
 
+- [Paperless Migration Tool](https://gitlab.com/jeroenrnl/mayan-edms-to-paperless-ngx): Mayan EDMS to Paperless-NGX migration script
 - [Paperless App](https://github.com/bauerj/paperless_app): An Android/iOS app for Paperless-ngx. Also works with the original Paperless and Paperless-ng.
 - [Paperless Share](https://github.com/qcasey/paperless_share). Share any files from your Android application with paperless. Very simple, but works with all of the mobile scanning apps out there that allow you to share scanned documents.
 - [Scan to Paperless](https://github.com/sbrunner/scan-to-paperless): Scan and prepare (crop, deskew, OCR, ...) your documents for Paperless.
