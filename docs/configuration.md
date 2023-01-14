@@ -179,7 +179,7 @@ Previously, the location defaulted to `PAPERLESS_DATA_DIR/nltk`.
 Unless you are using this in a bare metal install or other setup,
 this folder is no longer needed and can be removed manually.
 
-Defaults to `/usr/local/share/nltk_data`
+Defaults to `/usr/share/nltk_data`
 
 ## Logging
 
