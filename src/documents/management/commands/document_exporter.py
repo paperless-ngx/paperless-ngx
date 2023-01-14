@@ -54,6 +54,14 @@ class Command(BaseCommand):
         parser.add_argument("target")
 
         parser.add_argument(
+            "-sm",
+            "--split-manifest",
+            default=False,
+            action="store_true",
+            help="Export document information in individual manifest json files.",
+        )
+
+        parser.add_argument(
             "-c",
             "--compare-checksums",
             default=False,
@@ -125,6 +133,7 @@ class Command(BaseCommand):
     def __init__(self, *args, **kwargs):
         BaseCommand.__init__(self, *args, **kwargs)
         self.target: Path = None
+        self.split_manifest = None
         self.files_in_export_dir: Set[Path] = set()
         self.exported_files: List[Path] = []
         self.compare_checksums = False
@@ -137,6 +146,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         self.target = Path(options["target"]).resolve()
+        self.split_manifest = options["split_manifest"]
         self.compare_checksums = options["compare_checksums"]
         self.use_filename_format = options["use_filename_format"]
         self.use_filename_prefix = options["use_filename_prefix"]
@@ -217,7 +227,8 @@ class Command(BaseCommand):
             documents = Document.objects.order_by("id")
             document_map = {d.pk: d for d in documents}
             document_manifest = json.loads(serializers.serialize("json", documents))
-            manifest += document_manifest
+            if not self.split_manifest:
+                manifest += document_manifest
 
             manifest += json.loads(
                 serializers.serialize("json", MailAccount.objects.all()),
@@ -333,6 +344,15 @@ class Command(BaseCommand):
                         document.archive_checksum,
                         archive_target,
                     )
+
+            if self.split_manifest:
+                manifest_name = base_name + "-manifest.json"
+                if self.use_filename_prefix:
+                    manifest_name = os.path.join("json", manifest_name)
+                manifest_name = os.path.join(self.target, manifest_name)
+                os.makedirs(os.path.dirname(manifest_name), exist_ok=True)
+                with open(manifest_name, "w") as f:
+                    json.dump([document_manifest[index]], f, indent=2)
 
         # 4.1 write manifest to target folder
         manifest_path = (self.target / Path("manifest.json")).resolve()
