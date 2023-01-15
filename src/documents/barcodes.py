@@ -293,3 +293,36 @@ def save_to_dir(
             os.rename(dst, dst_new)
     else:
         logger.warning(f"{str(filepath)} or {str(target_dir)} don't exist.")
+
+
+def scan_file_for_asn_barcode(filepath: str) -> Tuple[Optional[str], Optional[int]]:
+    """
+    Scan the provided pdf file for barcodes that contain the ASN
+    for this document.
+    The first barcode that starts with CONSUMER_ASN_BARCODE_PREFIX
+    is considered the ASN to be used.
+    Returns a PDF filepath and the detected ASN (or None)
+    """
+    asn = None
+
+    pdf_filepath, barcodes = scan_file_for_barcodes(filepath)
+    # only the barcode text is important here -> discard the page number
+    barcodes = [text for _, text in barcodes]
+    # get the first barcode that starts with CONSUMER_ASN_BARCODE_PREFIX
+    asn_text = next(
+        (x for x in barcodes if x.startswith(settings.CONSUMER_ASN_BARCODE_PREFIX))
+    )
+
+    logger.debug(f"Found ASN Barcode: {asn_text}")
+
+    if asn_text:
+        # remove the prefix and remove whitespace
+        asn_text = asn_text[len(settings.CONSUMER_ASN_BARCODE_PREFIX) :].strip()
+
+        # now, try parsing the ASN number
+        try:
+            asn = int(asn_text)
+        except ValueError as e:
+            logger.warn(f"Failed to parse ASN number because: {e}")
+
+    return pdf_filepath, asn

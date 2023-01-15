@@ -175,6 +175,13 @@ def consume_file(
                 # the barcodes has been split and will be consumed separately
                 return "File successfully split"
 
+    # try reading ASN barcodes
+    asn = None
+    if settings.CONSUMER_ENABLE_ASN_BARCODE:
+        _, asn = barcodes.scan_file_for_asn_barcode(path)
+        if asn:
+            logger.info(f"Using ASN {asn} from barcode")
+
     # continue with consumption if no barcode was found
     document = Consumer().try_consume_file(
         path,
@@ -185,6 +192,7 @@ def consume_file(
         override_tag_ids=override_tag_ids,
         task_id=task_id,
         override_created=override_created,
+        override_asn=asn
     )
 
     if document:

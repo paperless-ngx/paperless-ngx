@@ -98,6 +98,7 @@ class Consumer(LoggingMixin):
         self.override_correspondent_id = None
         self.override_tag_ids = None
         self.override_document_type_id = None
+        self.override_asn = None
         self.task_id = None
 
         self.channel_layer = get_channel_layer()
@@ -129,6 +130,20 @@ class Consumer(LoggingMixin):
         os.makedirs(settings.THUMBNAIL_DIR, exist_ok=True)
         os.makedirs(settings.ORIGINALS_DIR, exist_ok=True)
         os.makedirs(settings.ARCHIVE_DIR, exist_ok=True)
+
+    def pre_check_asn_unique(self):
+        """
+        Check that if override_asn is given, it is unique
+        """
+        if not self.override_asn:
+            # check not necessary in case no ASN gets set
+            return
+        if Document.objects.filter(archive_serial_number=self.override_asn).exists():
+            self.log(
+                "warning",
+                f"A document with ASN {self.override_asn} already exists. No ASN will be set!",
+            )
+            self.override_asn = None
 
     def run_pre_consume_script(self):
         if not settings.PRE_CONSUME_SCRIPT:
@@ -255,6 +270,7 @@ class Consumer(LoggingMixin):
         override_tag_ids=None,
         task_id=None,
         override_created=None,
+        override_asn=None,
     ) -> Document:
         """
         Return the document object if it was successfully created.
@@ -268,6 +284,7 @@ class Consumer(LoggingMixin):
         self.override_tag_ids = override_tag_ids
         self.task_id = task_id or str(uuid.uuid4())
         self.override_created = override_created
+        self.override_asn = override_asn
 
         self._send_progress(0, 100, "STARTING", MESSAGE_NEW_FILE)
 
@@ -281,6 +298,7 @@ class Consumer(LoggingMixin):
         self.pre_check_file_exists()
         self.pre_check_directories()
         self.pre_check_duplicate()
+        self.pre_check_asn_unique()
 
         self.log("info", f"Consuming {self.filename}")
 
@@ -525,6 +543,9 @@ class Consumer(LoggingMixin):
         if self.override_tag_ids:
             for tag_id in self.override_tag_ids:
                 document.tags.add(Tag.objects.get(pk=tag_id))
+
+        if self.override_asn:
+            document.archive_serial_number = self.override_asn
 
     def _write(self, storage_type, source, target):
         with open(source, "rb") as read_file:
