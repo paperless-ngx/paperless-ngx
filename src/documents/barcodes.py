@@ -107,14 +107,17 @@ def convert_from_tiff_to_pdf(filepath: str) -> str:
     return newpath
 
 
-def scan_file_for_separating_barcodes(filepath: str) -> Tuple[Optional[str], List[int]]:
+def scan_file_for_barcodes(
+    filepath: str,
+) -> Tuple[Optional[str], List[Tuple[int, str]]]:
     """
-    Scan the provided pdf file for page separating barcodes
-    Returns a PDF filepath and a list of pagenumbers,
-    which separate the file into new files
+    Scan the provided pdf file for any barcodes
+    Returns a PDF filepath and a list of
+    (page_number, barcode_text) tuples
     """
 
     def _pikepdf_barcode_scan(pdf_filepath: str):
+        detected_barcodes = []
         with Pdf.open(pdf_filepath) as pdf:
             for page_num, page in enumerate(pdf.pages):
                 for image_key in page.images:
@@ -132,24 +135,27 @@ def scan_file_for_separating_barcodes(filepath: str) -> Tuple[Optional[str], Lis
                     # raise an exception, triggering fallback
                     pillow_img = pdfimage.as_pil_image()
 
-                    detected_barcodes = barcode_reader(pillow_img)
-
-                    if settings.CONSUMER_BARCODE_STRING in detected_barcodes:
-                        separator_page_numbers.append(page_num)
+                    barcodes_on_page = barcode_reader(pillow_img)
+                    detected_barcodes.extend(
+                        [(page_num, text) for text in barcodes_on_page]
+                    )
+        return detected_barcodes
 
     def _pdf2image_barcode_scan(pdf_filepath: str):
+        detected_barcodes = []
         # use a temporary directory in case the file is too big to handle in memory
         with tempfile.TemporaryDirectory() as path:
             pages_from_path = convert_from_path(pdf_filepath, output_folder=path)
             for current_page_number, page in enumerate(pages_from_path):
-                current_barcodes = barcode_reader(page)
-                if settings.CONSUMER_BARCODE_STRING in current_barcodes:
-                    separator_page_numbers.append(current_page_number)
+                barcodes_on_page = barcode_reader(page)
+                detected_barcodes.extend(
+                    [(current_page_number, text) for text in barcodes_on_page]
+                )
+        return detected_barcodes
 
-    separator_page_numbers = []
     pdf_filepath = None
-
     mime_type = get_file_mime_type(filepath)
+    barcodes = []
 
     if supported_file_type(mime_type):
         pdf_filepath = filepath
@@ -159,7 +165,7 @@ def scan_file_for_separating_barcodes(filepath: str) -> Tuple[Optional[str], Lis
         # Always try pikepdf first, it's usually fine, faster and
         # uses less memory
         try:
-            _pikepdf_barcode_scan(pdf_filepath)
+            barcodes = _pikepdf_barcode_scan(pdf_filepath)
         # Password protected files can't be checked
         except PasswordError as e:
             logger.warning(
@@ -172,9 +178,7 @@ def scan_file_for_separating_barcodes(filepath: str) -> Tuple[Optional[str], Lis
                 f"Falling back to pdf2image because: {e}",
             )
             try:
-                # Clear the list in case some processing worked
-                separator_page_numbers = []
-                _pdf2image_barcode_scan(pdf_filepath)
+                barcodes = _pdf2image_barcode_scan(pdf_filepath)
             # This file is really borked, allow the consumption to continue
             # but it may fail further on
             except Exception as e:  # pragma: no cover
@@ -186,6 +190,28 @@ def scan_file_for_separating_barcodes(filepath: str) -> Tuple[Optional[str], Lis
         logger.warning(
             f"Unsupported file format for barcode reader: {str(mime_type)}",
         )
+
+    return pdf_filepath, barcodes
+
+
+def scan_file_for_separating_barcodes(filepath: str) -> Tuple[Optional[str], List[int]]:
+    """
+    Scan the provided pdf file for page separating barcodes
+    Returns a PDF filepath and a list of pagenumbers,
+    which separate the file into new files
+    """
+    separator_page_numbers = []
+
+    pdf_filepath, barcodes = scan_file_for_barcodes(filepath)
+
+    # filter all barcodes for the separator string
+    separator_barcodes = list(
+        filter(lambda bc: bc[1] == settings.CONSUMER_BARCODE_STRING, barcodes),
+    )
+
+    # get the page numbers of the separating barcodes
+    separator_page_numbers = [page for page, _ in separator_barcodes]
+
     return pdf_filepath, separator_page_numbers
 
 
