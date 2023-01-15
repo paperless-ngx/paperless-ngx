@@ -194,25 +194,51 @@ def scan_file_for_barcodes(
     return pdf_filepath, barcodes
 
 
-def scan_file_for_separating_barcodes(filepath: str) -> Tuple[Optional[str], List[int]]:
+def get_separating_barcodes(barcodes: List[Tuple[int, str]]) -> List[int]:
     """
-    Scan the provided pdf file for page separating barcodes
-    Returns a PDF filepath and a list of pagenumbers,
-    which separate the file into new files
+    Search the parsed barcodes for separators
+    and returns a list of pagenumbers, which
+    separate the file into new files
     """
-    separator_page_numbers = []
-
-    pdf_filepath, barcodes = scan_file_for_barcodes(filepath)
-
     # filter all barcodes for the separator string
     separator_barcodes = list(
         filter(lambda bc: bc[1] == settings.CONSUMER_BARCODE_STRING, barcodes),
     )
-
     # get the page numbers of the separating barcodes
     separator_page_numbers = [page for page, _ in separator_barcodes]
 
-    return pdf_filepath, separator_page_numbers
+    return separator_page_numbers
+
+
+def get_asn_from_barcodes(barcodes: List[Tuple[int, str]]) -> Optional[int]:
+    """
+    Search the parsed barcodes for any ASNs.
+    The first barcode that starts with CONSUMER_ASN_BARCODE_PREFIX
+    is considered the ASN to be used.
+    Returns the detected ASN (or None)
+    """
+    asn = None
+
+    # only the barcode text is important here -> discard the page number
+    barcodes = [text for _, text in barcodes]
+    # get the first barcode that starts with CONSUMER_ASN_BARCODE_PREFIX
+    asn_text = next(
+        (x for x in barcodes if x.startswith(settings.CONSUMER_ASN_BARCODE_PREFIX)),
+        None,
+    )
+
+    if asn_text:
+        logger.debug(f"Found ASN Barcode: {asn_text}")
+        # remove the prefix and remove whitespace
+        asn_text = asn_text[len(settings.CONSUMER_ASN_BARCODE_PREFIX) :].strip()
+
+        # now, try parsing the ASN number
+        try:
+            asn = int(asn_text)
+        except ValueError as e:
+            logger.warn(f"Failed to parse ASN number because: {e}")
+
+    return asn
 
 
 def separate_pages(filepath: str, pages_to_split_on: List[int]) -> List[str]:
@@ -293,36 +319,3 @@ def save_to_dir(
             os.rename(dst, dst_new)
     else:
         logger.warning(f"{str(filepath)} or {str(target_dir)} don't exist.")
-
-
-def scan_file_for_asn_barcode(filepath: str) -> Tuple[Optional[str], Optional[int]]:
-    """
-    Scan the provided pdf file for barcodes that contain the ASN
-    for this document.
-    The first barcode that starts with CONSUMER_ASN_BARCODE_PREFIX
-    is considered the ASN to be used.
-    Returns a PDF filepath and the detected ASN (or None)
-    """
-    asn = None
-
-    pdf_filepath, barcodes = scan_file_for_barcodes(filepath)
-    # only the barcode text is important here -> discard the page number
-    barcodes = [text for _, text in barcodes]
-    # get the first barcode that starts with CONSUMER_ASN_BARCODE_PREFIX
-    asn_text = next(
-        (x for x in barcodes if x.startswith(settings.CONSUMER_ASN_BARCODE_PREFIX))
-    )
-
-    logger.debug(f"Found ASN Barcode: {asn_text}")
-
-    if asn_text:
-        # remove the prefix and remove whitespace
-        asn_text = asn_text[len(settings.CONSUMER_ASN_BARCODE_PREFIX) :].strip()
-
-        # now, try parsing the ASN number
-        try:
-            asn = int(asn_text)
-        except ValueError as e:
-            logger.warn(f"Failed to parse ASN number because: {e}")
-
-    return pdf_filepath, asn

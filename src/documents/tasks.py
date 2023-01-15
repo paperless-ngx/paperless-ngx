@@ -98,6 +98,7 @@ def consume_file(
 ):
 
     path = Path(path).resolve()
+    asn = None
 
     # Celery converts this to a string, but everything expects a datetime
     # Long term solution is to not use JSON for the serializer but pickle instead
@@ -109,78 +110,80 @@ def consume_file(
         except Exception:
             pass
 
-    # check for separators in current document
-    if settings.CONSUMER_ENABLE_BARCODES:
+    # read all barcodes in the current document
+    if settings.CONSUMER_ENABLE_BARCODES or settings.CONSUMER_ENABLE_ASN_BARCODE:
+        pdf_filepath, parsed_barcodes = barcodes.scan_file_for_barcodes(path)
 
-        pdf_filepath, separators = barcodes.scan_file_for_separating_barcodes(path)
+        # split document by separator pages, if enabled
+        if settings.CONSUMER_ENABLE_BARCODES:
+            separators = barcodes.get_separating_barcodes(parsed_barcodes)
 
-        if separators:
-            logger.debug(
-                f"Pages with separators found in: {str(path)}",
-            )
-            document_list = barcodes.separate_pages(pdf_filepath, separators)
+            if len(separators) > 0:
+                logger.debug(
+                    f"Pages with separators found in: {str(path)}",
+                )
+                document_list = barcodes.separate_pages(pdf_filepath, separators)
 
-            if document_list:
-                for n, document in enumerate(document_list):
-                    # save to consumption dir
-                    # rename it to the original filename  with number prefix
-                    if override_filename:
-                        newname = f"{str(n)}_" + override_filename
-                    else:
-                        newname = None
+                if document_list:
+                    for n, document in enumerate(document_list):
+                        # save to consumption dir
+                        # rename it to the original filename  with number prefix
+                        if override_filename:
+                            newname = f"{str(n)}_" + override_filename
+                        else:
+                            newname = None
 
-                    # If the file is an upload, it's in the scratch directory
-                    # Move it to consume directory to be picked up
-                    # Otherwise, use the current parent to keep possible tags
-                    # from subdirectories
+                        # If the file is an upload, it's in the scratch directory
+                        # Move it to consume directory to be picked up
+                        # Otherwise, use the current parent to keep possible tags
+                        # from subdirectories
+                        try:
+                            # is_relative_to would be nicer, but new in 3.9
+                            _ = path.relative_to(settings.SCRATCH_DIR)
+                            save_to_dir = settings.CONSUMPTION_DIR
+                        except ValueError:
+                            save_to_dir = path.parent
+
+                        barcodes.save_to_dir(
+                            document,
+                            newname=newname,
+                            target_dir=save_to_dir,
+                        )
+
+                    # Delete the PDF file which was split
+                    os.remove(pdf_filepath)
+
+                    # If the original was a TIFF, remove the original file as well
+                    if str(pdf_filepath) != str(path):
+                        logger.debug(f"Deleting file {path}")
+                        os.unlink(path)
+
+                    # notify the sender, otherwise the progress bar
+                    # in the UI stays stuck
+                    payload = {
+                        "filename": override_filename,
+                        "task_id": task_id,
+                        "current_progress": 100,
+                        "max_progress": 100,
+                        "status": "SUCCESS",
+                        "message": "finished",
+                    }
                     try:
-                        # is_relative_to would be nicer, but new in 3.9
-                        _ = path.relative_to(settings.SCRATCH_DIR)
-                        save_to_dir = settings.CONSUMPTION_DIR
-                    except ValueError:
-                        save_to_dir = path.parent
+                        async_to_sync(get_channel_layer().group_send)(
+                            "status_updates",
+                            {"type": "status_update", "data": payload},
+                        )
+                    except ConnectionError as e:
+                        logger.warning(f"ConnectionError on status send: {str(e)}")
+                    # consuming stops here, since the original document with
+                    # the barcodes has been split and will be consumed separately
+                    return "File successfully split"
 
-                    barcodes.save_to_dir(
-                        document,
-                        newname=newname,
-                        target_dir=save_to_dir,
-                    )
-
-                # Delete the PDF file which was split
-                os.remove(pdf_filepath)
-
-                # If the original was a TIFF, remove the original file as well
-                if str(pdf_filepath) != str(path):
-                    logger.debug(f"Deleting file {path}")
-                    os.unlink(path)
-
-                # notify the sender, otherwise the progress bar
-                # in the UI stays stuck
-                payload = {
-                    "filename": override_filename,
-                    "task_id": task_id,
-                    "current_progress": 100,
-                    "max_progress": 100,
-                    "status": "SUCCESS",
-                    "message": "finished",
-                }
-                try:
-                    async_to_sync(get_channel_layer().group_send)(
-                        "status_updates",
-                        {"type": "status_update", "data": payload},
-                    )
-                except ConnectionError as e:
-                    logger.warning(f"ConnectionError on status send: {str(e)}")
-                # consuming stops here, since the original document with
-                # the barcodes has been split and will be consumed separately
-                return "File successfully split"
-
-    # try reading ASN barcodes
-    asn = None
-    if settings.CONSUMER_ENABLE_ASN_BARCODE:
-        _, asn = barcodes.scan_file_for_asn_barcode(path)
-        if asn:
-            logger.info(f"Using ASN {asn} from barcode")
+        # try reading the ASN from barcode
+        if settings.CONSUMER_ENABLE_ASN_BARCODE:
+            asn = barcodes.get_asn_from_barcodes(parsed_barcodes)
+            if asn:
+                logger.info(f"Found ASN in barcode: {asn}")
 
     # continue with consumption if no barcode was found
     document = Consumer().try_consume_file(
@@ -192,7 +195,7 @@ def consume_file(
         override_tag_ids=override_tag_ids,
         task_id=task_id,
         override_created=override_created,
-        override_asn=asn
+        override_asn=asn,
     )
 
     if document:
