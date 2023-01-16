@@ -141,7 +141,8 @@ class Consumer(LoggingMixin):
         if Document.objects.filter(archive_serial_number=self.override_asn).exists():
             self.log(
                 "warning",
-                f"A document with ASN {self.override_asn} already exists. No ASN will be set!",
+                f"A document with ASN {self.override_asn} already exists. "
+                + "No ASN will be set!",
             )
             self.override_asn = None
 
