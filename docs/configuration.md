@@ -848,7 +848,7 @@ PAPERLESS_CONSUMER_ENABLE_BARCODES has been enabled.
 
     Defaults to false.
 
-PAPERLESS_CONSUMER_BARCODE_STRING=PATCHT
+`PAPERLESS_CONSUMER_BARCODE_STRING=PATCHT`
 
 : Defines the string to be detected as a separator barcode. If
 paperless is used with the PATCH-T separator pages, users shouldn't
