@@ -3,10 +3,10 @@ import logging
 import os
 import shutil
 import uuid
-from datetime import datetime
 from pathlib import Path
 from typing import Type
 
+import dateutil.parser
 import tqdm
 from asgiref.sync import async_to_sync
 from celery import shared_task
@@ -107,7 +107,7 @@ def consume_file(
     # More types will be retained through JSON encode/decode
     if override_created is not None and isinstance(override_created, str):
         try:
-            override_created = datetime.fromisoformat(override_created)
+            override_created = dateutil.parser.isoparse(override_created)
         except Exception:
             pass
 

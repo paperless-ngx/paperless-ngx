@@ -455,7 +455,7 @@ jobs:
           cp paperless.conf.example dist/paperless-ngx/paperless.conf
           cp gunicorn.conf.py dist/paperless-ngx/gunicorn.conf.py
           cp -r docker/ dist/paperless-ngx/docker
-          cp scripts/*.service scripts/*.sh dist/paperless-ngx/scripts/
+          cp scripts/*.service scripts/*.sh scripts/*.socket dist/paperless-ngx/scripts/
           cp -r src/ dist/paperless-ngx/src
           cp -r docs/_build/html/ dist/paperless-ngx/docs
           mv static dist/paperless-ngx

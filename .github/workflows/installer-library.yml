@@ -95,8 +95,8 @@ jobs:
         name: Setup other versions
         id: cache-bust-setup
         run: |
-          pillow_version=$(jq ".default.pillow.version" Pipfile.lock | sed 's/=//g' | sed 's/"//g')
-          lxml_version=$(jq ".default.lxml.version" Pipfile.lock | sed 's/=//g' | sed 's/"//g')
+          pillow_version=$(jq -r '.default.pillow.version | gsub("=";"")' Pipfile.lock)
+          lxml_version=$(jq -r '.default.lxml.version | gsub("=";"")' Pipfile.lock)
 
           echo "Pillow is ${pillow_version}"
           echo "lxml is ${lxml_version}"

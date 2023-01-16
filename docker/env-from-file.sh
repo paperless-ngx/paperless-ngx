@@ -13,8 +13,8 @@ for line in $(printenv)
 do
 	# Extract the name of the environment variable
 	env_name=${line%%=*}
-	# Check if it ends in "_FILE"
-	if [[ ${env_name} == *_FILE ]]; then
+	# Check if it starts with "PAPERLESS_" and ends in "_FILE"
+	if [[ ${env_name} == PAPERLESS_*_FILE ]]; then
 		# Extract the value of the environment
 		env_value=${line#*=}
 
@@ -32,8 +32,7 @@ do
 			export "${non_file_env_name}"="${val}"
 
 		else
-			echo "File ${env_value} doesn't exist"
-			exit 1
+			echo "File ${env_value} referenced by ${env_name} doesn't exist"
 		fi
 	fi
 done

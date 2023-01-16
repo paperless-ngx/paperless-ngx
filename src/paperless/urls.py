@@ -158,7 +158,7 @@ urlpatterns = [
 
 
 websocket_urlpatterns = [
-    re_path(r"ws/status/$", StatusConsumer.as_asgi()),
+    path(settings.BASE_URL.lstrip("/") + "ws/status/", StatusConsumer.as_asgi()),
 ]
 
 # Text in each page's <h1> (and above login form).

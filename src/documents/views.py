@@ -8,10 +8,12 @@ import urllib
 import uuid
 import zipfile
 from datetime import datetime
+from pathlib import Path
 from time import mktime
 from unicodedata import normalize
 from urllib.parse import quote
 
+import pathvalidate
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models import Case
@@ -33,6 +35,7 @@ from documents.filters import ObjectOwnedOrGrandtedPermissionsFilter
 from documents.permissions import PaperlessAdminPermissions
 from documents.permissions import PaperlessObjectPermissions
 from documents.tasks import consume_file
+from langdetect import detect
 from packaging import version as packaging_version
 from paperless import version
 from paperless.db import GnuPG
@@ -361,6 +364,13 @@ class DocumentViewSet(
             "original_filename": doc.original_filename,
         }
 
+        lang = "en"
+        try:
+            lang = detect(doc.content)
+        except Exception:
+            pass
+        meta["lang"] = lang
+
         if doc.has_archive_version:
             meta["archive_size"] = self.get_filesize(doc.archive_path)
             meta["archive_metadata"] = self.get_metadata(
@@ -658,20 +668,19 @@ class PostDocumentView(GenericAPIView):
 
         os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
 
-        with tempfile.NamedTemporaryFile(
-            prefix="paperless-upload-",
-            dir=settings.SCRATCH_DIR,
-            delete=False,
-        ) as f:
-            f.write(doc_data)
-            os.utime(f.name, times=(t, t))
-            temp_filename = f.name
+        temp_file_path = Path(tempfile.mkdtemp(dir=settings.SCRATCH_DIR)) / Path(
+            pathvalidate.sanitize_filename(doc_name),
+        )
+
+        temp_file_path.write_bytes(doc_data)
+
+        os.utime(temp_file_path, times=(t, t))
 
         task_id = str(uuid.uuid4())
 
         async_task = consume_file.delay(
-            temp_filename,
-            override_filename=doc_name,
+            # Paths are not JSON friendly
+            str(temp_file_path),
             override_title=title,
             override_correspondent_id=correspondent_id,
             override_document_type_id=document_type_id,
