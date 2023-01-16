@@ -110,6 +110,30 @@ class TestBarcode(DirectoriesMixin, TestCase):
         img = Image.open(test_file)
         self.assertEqual(barcodes.barcode_reader(img), ["CUSTOM BARCODE"])
 
+    def test_barcode_reader_asn_normal(self):
+        test_file = os.path.join(
+            self.BARCODE_SAMPLE_DIR,
+            "barcode-39-asn-123.png",
+        )
+        img = Image.open(test_file)
+        self.assertEqual(barcodes.barcode_reader(img), ["ASN00123"])
+
+    def test_barcode_reader_asn_invalid(self):
+        test_file = os.path.join(
+            self.BARCODE_SAMPLE_DIR,
+            "barcode-39-asn-invalid.png",
+        )
+        img = Image.open(test_file)
+        self.assertEqual(barcodes.barcode_reader(img), ["ASNXYZXYZ"])
+
+    def test_barcode_reader_asn_customprefix(self):
+        test_file = os.path.join(
+            self.BARCODE_SAMPLE_DIR,
+            "barcode-39-asn-custom-prefix.png",
+        )
+        img = Image.open(test_file)
+        self.assertEqual(barcodes.barcode_reader(img), ["CUSTOM-PREFIX-00123"])
+
     def test_get_mime_type(self):
         tiff_file = os.path.join(
             self.SAMPLE_DIR,
@@ -607,3 +631,57 @@ class TestBarcode(DirectoriesMixin, TestCase):
 
         self.assertEqual(pdf_file, test_file)
         self.assertListEqual(separator_page_numbers, [])
+
+    def test_scan_file_for_asn_barcode(self):
+        test_file = os.path.join(
+            self.BARCODE_SAMPLE_DIR,
+            "barcode-39-asn-123.pdf",
+        )
+        pdf_file, parsed_barcodes = barcodes.scan_file_for_barcodes(
+            test_file,
+        )
+        asn = barcodes.get_asn_from_barcodes(parsed_barcodes)
+
+        self.assertEqual(pdf_file, test_file)
+        self.assertEqual(asn, 123)
+
+    def test_scan_file_for_asn_not_existing(self):
+        test_file = os.path.join(
+            self.BARCODE_SAMPLE_DIR,
+            "patch-code-t.pdf",
+        )
+        pdf_file, parsed_barcodes = barcodes.scan_file_for_barcodes(
+            test_file,
+        )
+        asn = barcodes.get_asn_from_barcodes(parsed_barcodes)
+
+        self.assertEqual(pdf_file, test_file)
+        self.assertEqual(asn, None)
+
+    def test_scan_file_for_asn_barcode_invalid(self):
+        test_file = os.path.join(
+            self.BARCODE_SAMPLE_DIR,
+            "barcode-39-asn-invalid.pdf",
+        )
+        pdf_file, parsed_barcodes = barcodes.scan_file_for_barcodes(
+            test_file,
+        )
+
+        asn = barcodes.get_asn_from_barcodes(parsed_barcodes)
+
+        self.assertEqual(pdf_file, test_file)
+        self.assertEqual(asn, None)
+
+    @override_settings(CONSUMER_ASN_BARCODE_PREFIX="CUSTOM-PREFIX-")
+    def test_scan_file_for_asn_custom_prefix(self):
+        test_file = os.path.join(
+            self.BARCODE_SAMPLE_DIR,
+            "barcode-39-asn-custom-prefix.pdf",
+        )
+        pdf_file, parsed_barcodes = barcodes.scan_file_for_barcodes(
+            test_file,
+        )
+        asn = barcodes.get_asn_from_barcodes(parsed_barcodes)
+
+        self.assertEqual(pdf_file, test_file)
+        self.assertEqual(asn, 123)
