@@ -423,7 +423,7 @@ supported.
 10. Optional: Test that paperless is working by executing
 
     ```bash
-    # This collects static files from paperless and django.
+    # Manually starts the webserver
     sudo -Hu paperless python3 manage.py runserver
     ```
 
