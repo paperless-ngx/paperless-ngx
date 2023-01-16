@@ -359,6 +359,14 @@ documents in your inbox:
     sorted by ASN. Don't order this binder in any other way.
 5.  If the document has no ASN, throw it away. Yay!
 
+!!! tip
+
+    Instead of writing a number on the document by hand, you may also prepare
+    a spool of labels with barcodes with an ascending serial number, that are
+    formatted like `ASN00001`.
+    This also enables Paperless to automatically parse and process the ASN
+    (if enabled in the config), so that you don't need to manually assign it.
+
 Over time, you will notice that your physical binder will fill up. If it
 is full, label the binder with the range of ASNs in this binder (i.e.,
 "Documents 1 to 343"), store the binder in your cellar or elsewhere,
