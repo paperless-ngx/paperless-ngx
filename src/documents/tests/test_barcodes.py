@@ -167,8 +167,11 @@ class TestBarcode(DirectoriesMixin, TestCase):
             self.BARCODE_SAMPLE_DIR,
             "patch-code-t.pdf",
         )
-        pdf_file, separator_page_numbers = barcodes.scan_file_for_separating_barcodes(
+        pdf_file, parsed_barcodes = barcodes.scan_file_for_barcodes(
             test_file,
+        )
+        separator_page_numbers = barcodes.get_separating_barcodes(
+            parsed_barcodes,
         )
 
         self.assertEqual(pdf_file, test_file)
@@ -176,8 +179,11 @@ class TestBarcode(DirectoriesMixin, TestCase):
 
     def test_scan_file_for_separating_barcodes_none_present(self):
         test_file = os.path.join(self.SAMPLE_DIR, "simple.pdf")
-        pdf_file, separator_page_numbers = barcodes.scan_file_for_separating_barcodes(
+        pdf_file, parsed_barcodes = barcodes.scan_file_for_barcodes(
             test_file,
+        )
+        separator_page_numbers = barcodes.get_separating_barcodes(
+            parsed_barcodes,
         )
 
         self.assertEqual(pdf_file, test_file)
@@ -188,8 +194,11 @@ class TestBarcode(DirectoriesMixin, TestCase):
             self.BARCODE_SAMPLE_DIR,
             "patch-code-t-middle.pdf",
         )
-        pdf_file, separator_page_numbers = barcodes.scan_file_for_separating_barcodes(
+        pdf_file, parsed_barcodes = barcodes.scan_file_for_barcodes(
             test_file,
+        )
+        separator_page_numbers = barcodes.get_separating_barcodes(
+            parsed_barcodes,
         )
 
         self.assertEqual(pdf_file, test_file)
@@ -200,8 +209,11 @@ class TestBarcode(DirectoriesMixin, TestCase):
             self.BARCODE_SAMPLE_DIR,
             "several-patcht-codes.pdf",
         )
-        pdf_file, separator_page_numbers = barcodes.scan_file_for_separating_barcodes(
+        pdf_file, parsed_barcodes = barcodes.scan_file_for_barcodes(
             test_file,
+        )
+        separator_page_numbers = barcodes.get_separating_barcodes(
+            parsed_barcodes,
         )
 
         self.assertEqual(pdf_file, test_file)
@@ -212,14 +224,17 @@ class TestBarcode(DirectoriesMixin, TestCase):
             self.BARCODE_SAMPLE_DIR,
             "patch-code-t-middle_reverse.pdf",
         )
-        pdf_file, separator_page_numbers = barcodes.scan_file_for_separating_barcodes(
+        pdf_file, parsed_barcodes = barcodes.scan_file_for_barcodes(
             test_file,
+        )
+        separator_page_numbers = barcodes.get_separating_barcodes(
+            parsed_barcodes,
         )
 
         self.assertEqual(pdf_file, test_file)
         self.assertListEqual(separator_page_numbers, [1])
 
-    def test_scan_file_for_separating_barcodes_pillow_transcode_error(self):
+    def test_scan_file_for_barcodes_pillow_transcode_error(self):
         """
         GIVEN:
             - A PDF containing an image which cannot be transcoded to a PIL image
@@ -273,7 +288,7 @@ class TestBarcode(DirectoriesMixin, TestCase):
             with mock.patch("documents.barcodes.barcode_reader") as reader:
                 reader.return_value = list()
 
-                _, _ = barcodes.scan_file_for_separating_barcodes(
+                _, _ = barcodes.scan_file_for_barcodes(
                     str(device_n_pdf.name),
                 )
 
@@ -292,8 +307,11 @@ class TestBarcode(DirectoriesMixin, TestCase):
             self.BARCODE_SAMPLE_DIR,
             "barcode-fax-image.pdf",
         )
-        pdf_file, separator_page_numbers = barcodes.scan_file_for_separating_barcodes(
+        pdf_file, parsed_barcodes = barcodes.scan_file_for_barcodes(
             test_file,
+        )
+        separator_page_numbers = barcodes.get_separating_barcodes(
+            parsed_barcodes,
         )
 
         self.assertEqual(pdf_file, test_file)
@@ -304,8 +322,11 @@ class TestBarcode(DirectoriesMixin, TestCase):
             self.BARCODE_SAMPLE_DIR,
             "patch-code-t-qr.pdf",
         )
-        pdf_file, separator_page_numbers = barcodes.scan_file_for_separating_barcodes(
+        pdf_file, parsed_barcodes = barcodes.scan_file_for_barcodes(
             test_file,
+        )
+        separator_page_numbers = barcodes.get_separating_barcodes(
+            parsed_barcodes,
         )
 
         self.assertEqual(pdf_file, test_file)
@@ -317,8 +338,11 @@ class TestBarcode(DirectoriesMixin, TestCase):
             self.BARCODE_SAMPLE_DIR,
             "barcode-39-custom.pdf",
         )
-        pdf_file, separator_page_numbers = barcodes.scan_file_for_separating_barcodes(
+        pdf_file, parsed_barcodes = barcodes.scan_file_for_barcodes(
             test_file,
+        )
+        separator_page_numbers = barcodes.get_separating_barcodes(
+            parsed_barcodes,
         )
 
         self.assertEqual(pdf_file, test_file)
@@ -330,8 +354,11 @@ class TestBarcode(DirectoriesMixin, TestCase):
             self.BARCODE_SAMPLE_DIR,
             "barcode-qr-custom.pdf",
         )
-        pdf_file, separator_page_numbers = barcodes.scan_file_for_separating_barcodes(
+        pdf_file, parsed_barcodes = barcodes.scan_file_for_barcodes(
             test_file,
+        )
+        separator_page_numbers = barcodes.get_separating_barcodes(
+            parsed_barcodes,
         )
 
         self.assertEqual(pdf_file, test_file)
@@ -343,8 +370,11 @@ class TestBarcode(DirectoriesMixin, TestCase):
             self.BARCODE_SAMPLE_DIR,
             "barcode-128-custom.pdf",
         )
-        pdf_file, separator_page_numbers = barcodes.scan_file_for_separating_barcodes(
+        pdf_file, parsed_barcodes = barcodes.scan_file_for_barcodes(
             test_file,
+        )
+        separator_page_numbers = barcodes.get_separating_barcodes(
+            parsed_barcodes,
         )
 
         self.assertEqual(pdf_file, test_file)
@@ -355,8 +385,11 @@ class TestBarcode(DirectoriesMixin, TestCase):
             self.BARCODE_SAMPLE_DIR,
             "barcode-39-custom.pdf",
         )
-        pdf_file, separator_page_numbers = barcodes.scan_file_for_separating_barcodes(
+        pdf_file, parsed_barcodes = barcodes.scan_file_for_barcodes(
             test_file,
+        )
+        separator_page_numbers = barcodes.get_separating_barcodes(
+            parsed_barcodes,
         )
 
         self.assertEqual(pdf_file, test_file)
@@ -450,8 +483,11 @@ class TestBarcode(DirectoriesMixin, TestCase):
         )
         tempdir = tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR)
 
-        pdf_file, separator_page_numbers = barcodes.scan_file_for_separating_barcodes(
+        pdf_file, parsed_barcodes = barcodes.scan_file_for_barcodes(
             test_file,
+        )
+        separator_page_numbers = barcodes.get_separating_barcodes(
+            parsed_barcodes,
         )
 
         self.assertEqual(test_file, pdf_file)
@@ -562,8 +598,11 @@ class TestBarcode(DirectoriesMixin, TestCase):
             - Scanning handle the exception without exception
         """
         test_file = os.path.join(self.SAMPLE_DIR, "password-is-test.pdf")
-        pdf_file, separator_page_numbers = barcodes.scan_file_for_separating_barcodes(
+        pdf_file, parsed_barcodes = barcodes.scan_file_for_barcodes(
             test_file,
+        )
+        separator_page_numbers = barcodes.get_separating_barcodes(
+            parsed_barcodes,
         )
 
         self.assertEqual(pdf_file, test_file)
