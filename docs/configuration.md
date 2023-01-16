@@ -179,7 +179,7 @@ Previously, the location defaulted to `PAPERLESS_DATA_DIR/nltk`.
 Unless you are using this in a bare metal install or other setup,
 this folder is no longer needed and can be removed manually.
 
-Defaults to `/usr/local/share/nltk_data`
+Defaults to `/usr/share/nltk_data`
 
 ## Logging
 
@@ -713,9 +713,44 @@ for details on how to set it.
 used during automatic classification. If disabled, paperless will
 still preform some basic text pre-processing before matching.
 
-See also `PAPERLESS_NLTK_DIR`.
+: See also `PAPERLESS_NLTK_DIR`.
 
     Defaults to 1.
+
+`PAPERLESS_EMAIL_TASK_CRON=<cron expression>`
+
+: Configures the scheduled email fetching frequency. The value
+should be a valid crontab(5) expression describing when to run.
+
+: If set to the string "disable", no emails will be fetched automatically.
+
+    Defaults to `*/10 * * * *` or every ten minutes.
+
+`PAPERLESS_TRAIN_TASK_CRON=<cron expression>`
+
+: Configures the scheduled automatic classifier training frequency. The value
+should be a valid crontab(5) expression describing when to run.
+
+: If set to the string "disable", the classifier will not be trained automatically.
+
+    Defaults to `5 */1 * * *` or every hour at 5 minutes past the hour.
+
+`PAPERLESS_INDEX_TASK_CRON=<cron expression>`
+
+: Configures the scheduled search index update frequency. The value
+should be a valid crontab(5) expression describing when to run.
+
+: If set to the string "disable", the search index will not be automatically updated.
+
+    Defaults to `0 0 * * *` or daily at midnight.
+
+`PAPERLESS_SANITY_TASK_CRON=<cron expression>`
+
+: Configures the scheduled sanity checker frequency.
+
+: If set to the string "disable", the sanity checker will not run automatically.
+
+    Defaults to `30 0 * * sun` or Sunday at 30 minutes past midnight.
 
 ## Polling {#polling}
 
@@ -813,7 +848,7 @@ PAPERLESS_CONSUMER_ENABLE_BARCODES has been enabled.
 
     Defaults to false.
 
-PAPERLESS_CONSUMER_BARCODE_STRING=PATCHT
+`PAPERLESS_CONSUMER_BARCODE_STRING=PATCHT`
 
 : Defines the string to be detected as a separator barcode. If
 paperless is used with the PATCH-T separator pages, users shouldn't

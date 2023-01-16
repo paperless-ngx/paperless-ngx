@@ -10,4 +10,6 @@ export interface PaperlessDocumentMetadata {
   original_filename?: string
 
   has_archive_version?: boolean
+
+  lang?: string
 }

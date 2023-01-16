@@ -151,6 +151,8 @@ different means. These are as follows:
   will not consume mails already tagged. Not all mail servers support
   this feature!
 
+  - **Apple Mail support:** Apple Mail clients allow differently colored tags. For this to work use `apple:<color>` (e.g. _apple:green_) as a custom tag. Available colors are _red_, _orange_, _yellow_, _blue_, _green_, _violet_ and _grey_.
+
 !!! warning
 
     The mail consumer will perform these actions on all mails it has
@@ -191,7 +193,7 @@ different means. These are as follows:
     them further.
 
 Paperless is set up to check your mails every 10 minutes. This can be
-configured on the 'Scheduled tasks' page in the admin.
+configured via `PAPERLESS_EMAIL_TASK_CRON` (see [software tweaks](/configuration#software_tweaks))
 
 ### REST API
 

@@ -5,6 +5,7 @@ import multiprocessing
 import os
 import re
 import tempfile
+from typing import Dict
 from typing import Final
 from typing import Optional
 from typing import Set
@@ -107,6 +108,57 @@ def _parse_redis_url(env_redis: Optional[str]) -> Tuple[str]:
     return (env_redis, env_redis)
 
 
+def _parse_beat_schedule() -> Dict:
+    schedule = {}
+    tasks = [
+        {
+            "name": "Check all e-mail accounts",
+            "env_key": "PAPERLESS_EMAIL_TASK_CRON",
+            # Default every ten minutes
+            "env_default": "*/10 * * * *",
+            "task": "paperless_mail.tasks.process_mail_accounts",
+        },
+        {
+            "name": "Train the classifier",
+            "env_key": "PAPERLESS_TRAIN_TASK_CRON",
+            # Default hourly at 5 minutes past the hour
+            "env_default": "5 */1 * * *",
+            "task": "documents.tasks.train_classifier",
+        },
+        {
+            "name": "Optimize the index",
+            "env_key": "PAPERLESS_INDEX_TASK_CRON",
+            # Default daily at midnight
+            "env_default": "0 0 * * *",
+            "task": "documents.tasks.index_optimize",
+        },
+        {
+            "name": "Perform sanity check",
+            "env_key": "PAPERLESS_SANITY_TASK_CRON",
+            # Default Sunday at 00:30
+            "env_default": "30 0 * * sun",
+            "task": "documents.tasks.sanity_check",
+        },
+    ]
+    for task in tasks:
+        # Either get the environment setting or use the default
+        value = os.getenv(task["env_key"], task["env_default"])
+        # Don't add disabled tasks to the schedule
+        if value == "disable":
+            continue
+        # I find https://crontab.guru/ super helpful
+        # crontab(5) format
+        #   - five time-and-date fields
+        #   - separated by at least one blank
+        minute, hour, day_month, month, day_week = value.split(" ")
+        schedule[task["name"]] = {
+            "task": task["task"],
+            "schedule": crontab(minute, hour, day_week, day_month, month),
+        }
+
+    return schedule
+
+
 # NEVER RUN WITH DEBUG IN PRODUCTION.
 DEBUG = __get_boolean("PAPERLESS_DEBUG", "NO")
 
@@ -126,7 +178,7 @@ THUMBNAIL_DIR = os.path.join(MEDIA_ROOT, "documents", "thumbnails")
 
 DATA_DIR = __get_path("PAPERLESS_DATA_DIR", os.path.join(BASE_DIR, "..", "data"))
 
-NLTK_DIR = __get_path("PAPERLESS_NLTK_DIR", "/usr/local/share/nltk_data")
+NLTK_DIR = __get_path("PAPERLESS_NLTK_DIR", "/usr/share/nltk_data")
 
 TRASH_DIR = os.getenv("PAPERLESS_TRASH_DIR")
 
@@ -533,29 +585,10 @@ CELERY_RESULT_EXTENDED = True
 CELERY_RESULT_BACKEND = "django-db"
 CELERY_CACHE_BACKEND = "default"
 
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#beat-schedule
+CELERY_BEAT_SCHEDULE = _parse_beat_schedule()
 
-CELERY_BEAT_SCHEDULE = {
-    # Every ten minutes
-    "Check all e-mail accounts": {
-        "task": "paperless_mail.tasks.process_mail_accounts",
-        "schedule": crontab(minute="*/10"),
-    },
-    # Hourly at 5 minutes past the hour
-    "Train the classifier": {
-        "task": "documents.tasks.train_classifier",
-        "schedule": crontab(minute="5", hour="*/1"),
-    },
-    # Daily at midnight
-    "Optimize the index": {
-        "task": "documents.tasks.index_optimize",
-        "schedule": crontab(minute=0, hour=0),
-    },
-    # Weekly, Sunday at 00:30
-    "Perform sanity check": {
-        "task": "documents.tasks.sanity_check",
-        "schedule": crontab(minute=30, hour=0, day_of_week="sun"),
-    },
-}
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#beat-schedule-filename
 CELERY_BEAT_SCHEDULE_FILENAME = os.path.join(DATA_DIR, "celerybeat-schedule.db")
 
 # django setting.

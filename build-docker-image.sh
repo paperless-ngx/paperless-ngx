@@ -24,12 +24,12 @@ fi
 branch_name=$(git rev-parse --abbrev-ref HEAD)
 
 # Parse eithe Pipfile.lock or the .build-config.json
-jbig2enc_version=$(jq ".jbig2enc.version" .build-config.json | sed 's/"//g')
-qpdf_version=$(jq ".qpdf.version" .build-config.json | sed 's/"//g')
-psycopg2_version=$(jq ".default.psycopg2.version" Pipfile.lock | sed 's/=//g' | sed 's/"//g')
-pikepdf_version=$(jq ".default.pikepdf.version" Pipfile.lock  | sed 's/=//g' | sed 's/"//g')
-pillow_version=$(jq ".default.pillow.version" Pipfile.lock | sed 's/=//g' | sed 's/"//g')
-lxml_version=$(jq ".default.lxml.version" Pipfile.lock | sed 's/=//g' | sed 's/"//g')
+jbig2enc_version=$(jq -r '.jbig2enc.version' .build-config.json)
+qpdf_version=$(jq -r '.qpdf.version' .build-config.json)
+psycopg2_version=$(jq -r '.default.psycopg2.version | gsub("=";"")' Pipfile.lock)
+pikepdf_version=$(jq -r '.default.pikepdf.version | gsub("=";"")' Pipfile.lock)
+pillow_version=$(jq -r '.default.pillow.version | gsub("=";"")' Pipfile.lock)
+lxml_version=$(jq -r '.default.lxml.version | gsub("=";"")' Pipfile.lock)
 
 base_filename="$(basename -- "${1}")"
 build_args_str=""
