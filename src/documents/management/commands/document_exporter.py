@@ -286,14 +286,14 @@ class Command(BaseCommand):
             # 3.3. write filenames into manifest
             original_name = base_name
             if self.use_filename_prefix:
-                original_name = ("originals" / Path(original_name)).resolve()
+                original_name = os.path.join("originals", original_name)
             original_target = (self.target / Path(original_name)).resolve()
             document_dict[EXPORTER_FILE_NAME] = original_name
 
             if not self.no_thumbnail:
                 thumbnail_name = base_name + "-thumbnail.webp"
                 if self.use_filename_prefix:
-                    thumbnail_name = ("thumbnails" / Path(thumbnail_name)).resolve()
+                    thumbnail_name = os.path.join("thumbnails", thumbnail_name)
                 thumbnail_target = (self.target / Path(thumbnail_name)).resolve()
                 document_dict[EXPORTER_THUMBNAIL_NAME] = thumbnail_name
             else:
@@ -302,7 +302,7 @@ class Command(BaseCommand):
             if not self.no_archive and document.has_archive_version:
                 archive_name = base_name + "-archive.pdf"
                 if self.use_filename_prefix:
-                    archive_name = ("archive" / Path(archive_name)).resolve()
+                    archive_name = os.path.join("archive", archive_name)
                 archive_target = (self.target / Path(archive_name)).resolve()
                 document_dict[EXPORTER_ARCHIVE_NAME] = archive_name
             else:
@@ -349,12 +349,13 @@ class Command(BaseCommand):
                 manifest_name = base_name + "-manifest.json"
                 if self.use_filename_prefix:
                     manifest_name = os.path.join("json", manifest_name)
-                manifest_name = os.path.join(self.target, manifest_name)
+                manifest_name = (self.target / Path(manifest_name)).resolve()
+                manifest_name.parent.mkdir(parents=True, exist_ok=True)
+                manifest_name.write_text(
+                    json.dumps([document_manifest[index]], indent=2),
+                )
                 if manifest_name in self.files_in_export_dir:
                     self.files_in_export_dir.remove(manifest_name)
-                os.makedirs(os.path.dirname(manifest_name), exist_ok=True)
-                with open(manifest_name, "w") as f:
-                    json.dump([document_manifest[index]], f, indent=2)
 
         # 4.1 write manifest to target folder
         manifest_path = (self.target / Path("manifest.json")).resolve()
