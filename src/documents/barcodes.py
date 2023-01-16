@@ -137,7 +137,7 @@ def scan_file_for_barcodes(
 
                     barcodes_on_page = barcode_reader(pillow_img)
                     detected_barcodes.extend(
-                        [(page_num, text) for text in barcodes_on_page]
+                        [(page_num, text) for text in barcodes_on_page],
                     )
         return detected_barcodes
 
@@ -149,7 +149,7 @@ def scan_file_for_barcodes(
             for current_page_number, page in enumerate(pages_from_path):
                 barcodes_on_page = barcode_reader(page)
                 detected_barcodes.extend(
-                    [(current_page_number, text) for text in barcodes_on_page]
+                    [(current_page_number, text) for text in barcodes_on_page],
                 )
         return detected_barcodes
 
