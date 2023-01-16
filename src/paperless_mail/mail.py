@@ -1,3 +1,4 @@
+import itertools
 import os
 import re
 import tempfile
@@ -24,6 +25,28 @@ from imap_tools import NOT
 from imap_tools.mailbox import MailBoxTls
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
+
+# Apple Mail sets multiple IMAP KEYWORD and the general "\Flagged" FLAG
+# imaplib => conn.fetch(b"<message_id>", "FLAGS")
+
+# no flag   - (FLAGS (\\Seen $NotJunk NotJunk))'
+# red       - (FLAGS (\\Flagged \\Seen $NotJunk NotJunk))'
+# orange    - (FLAGS (\\Flagged \\Seen $NotJunk NotJunk $MailFlagBit0))'
+# yellow    - (FLAGS (\\Flagged \\Seen $NotJunk NotJunk $MailFlagBit1))'
+# blue      - (FLAGS (\\Flagged \\Seen $NotJunk NotJunk $MailFlagBit2))'
+# green     - (FLAGS (\\Flagged \\Seen $NotJunk NotJunk $MailFlagBit0 $MailFlagBit1))'
+# violet    - (FLAGS (\\Flagged \\Seen $NotJunk NotJunk $MailFlagBit0 $MailFlagBit2))'
+# grey      - (FLAGS (\\Flagged \\Seen $NotJunk NotJunk $MailFlagBit1 $MailFlagBit2))'
+
+APPLE_MAIL_TAG_COLORS = {
+    "red": [],
+    "orange": ["$MailFlagBit0"],
+    "yellow": ["$MailFlagBit1"],
+    "blue": ["$MailFlagBit2"],
+    "green": ["$MailFlagBit0", "$MailFlagBit1"],
+    "violet": ["$MailFlagBit0", "$MailFlagBit2"],
+    "grey": ["$MailFlagBit1", "$MailFlagBit2"],
+}
 
 
 class MailError(Exception):
@@ -66,17 +89,58 @@ class FlagMailAction(BaseMailAction):
 
 class TagMailAction(BaseMailAction):
     def __init__(self, parameter):
-        self.keyword = parameter
+
+        # The custom tag should look like "apple:<color>"
+        if "apple:" in parameter.lower():
+
+            _, self.color = parameter.split(":")
+            self.color = self.color.strip()
+
+            if not self.color.lower() in APPLE_MAIL_TAG_COLORS.keys():
+                raise MailError("Not a valid AppleMail tag color.")
+
+            self.keyword = None
+
+        else:
+            self.keyword = parameter
+            self.color = None
 
     def get_criteria(self):
+
+        # AppleMail: We only need to check if mails are \Flagged
+        if self.color:
+            return {"flagged": False}
+
         return {"no_keyword": self.keyword, "gmail_label": self.keyword}
 
     def post_consume(self, M: MailBox, message_uids, parameter):
         if re.search(r"gmail\.com$|googlemail\.com$", M._host):
             for uid in message_uids:
                 M.client.uid("STORE", uid, "X-GM-LABELS", self.keyword)
-        else:
+
+        # AppleMail
+        elif self.color:
+
+            # Remove all existing $MailFlagBits
+            M.flag(
+                message_uids,
+                set(itertools.chain(*APPLE_MAIL_TAG_COLORS.values())),
+                False,
+            )
+
+            # Set new $MailFlagBits
+            M.flag(message_uids, APPLE_MAIL_TAG_COLORS.get(self.color), True)
+
+            # Set the general \Flagged
+            # This defaults to the "red" flag in AppleMail and
+            # "stars" in Thunderbird or GMail
+            M.flag(message_uids, [MailMessageFlags.FLAGGED], True)
+
+        elif self.keyword:
             M.flag(message_uids, [self.keyword], True)
+
+        else:
+            raise MailError("No keyword specified.")
 
 
 def get_rule_action(rule) -> BaseMailAction:
@@ -197,14 +261,14 @@ class MailAccountHandler(LoggingMixin):
 
                     try:
                         M.login_utf8(account.username, account.password)
-                    except Exception as err:
+                    except Exception as e:
                         self.log(
                             "error",
                             "Unable to authenticate with mail server using AUTH=PLAIN",
                         )
                         raise MailError(
                             f"Error while authenticating account {account}",
-                        ) from err
+                        ) from e
                 except Exception as e:
                     self.log(
                         "error",
