@@ -39,6 +39,7 @@ class ConsumerError(Exception):
 
 
 MESSAGE_DOCUMENT_ALREADY_EXISTS = "document_already_exists"
+MESSAGE_ASN_ALREADY_EXISTS = "asn_already_exists"
 MESSAGE_FILE_NOT_FOUND = "file_not_found"
 MESSAGE_PRE_CONSUME_SCRIPT_NOT_FOUND = "pre_consume_script_not_found"
 MESSAGE_PRE_CONSUME_SCRIPT_ERROR = "pre_consume_script_error"
@@ -139,12 +140,10 @@ class Consumer(LoggingMixin):
             # check not necessary in case no ASN gets set
             return
         if Document.objects.filter(archive_serial_number=self.override_asn).exists():
-            self.log(
-                "warning",
-                f"A document with ASN {self.override_asn} already exists. "
-                + "No ASN will be set!",
+            self._fail(
+                MESSAGE_ASN_ALREADY_EXISTS,
+                f"Not consuming {self.filename}: Given ASN already" f"exists!",
             )
-            self.override_asn = None
 
     def run_pre_consume_script(self):
         if not settings.PRE_CONSUME_SCRIPT:
