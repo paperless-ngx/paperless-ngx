@@ -36,6 +36,8 @@ export interface PaperlessMailRule extends ObjectWithId {
 
   account: number // PaperlessMailAccount.id
 
+  order: number
+
   folder: string
 
   filter_from: string
