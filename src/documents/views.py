@@ -176,7 +176,7 @@ class TagViewSet(ModelViewSet):
     permission_classes = (IsAuthenticated,)
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filterset_class = TagFilterSet
-    ordering_fields = ("name", "matching_algorithm", "match", "document_count")
+    ordering_fields = ("color", "name", "matching_algorithm", "match", "document_count")
 
 
 class DocumentTypeViewSet(ModelViewSet):
