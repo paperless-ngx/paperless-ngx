@@ -143,7 +143,7 @@ steps described in [Docker setup](#docker_hub) automatically.
     !!! note
 
         You can copy any setting from the file `paperless.conf.example` and
-        paste it here. Have a look at [configuration](/configuration] to see what's available.
+        paste it here. Have a look at [configuration](/configuration) to see what's available.
 
     !!! note
 
