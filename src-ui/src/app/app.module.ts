@@ -200,7 +200,7 @@ function initializeApp(settings: SettingsService) {
     PdfViewerModule,
     NgSelectModule,
     ColorSliderModule,
-    TourNgBootstrapModule.forRoot(),
+    TourNgBootstrapModule,
   ],
   providers: [
     {
