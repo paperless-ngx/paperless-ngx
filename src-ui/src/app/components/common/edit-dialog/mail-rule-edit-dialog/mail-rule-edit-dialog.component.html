@@ -13,6 +13,7 @@
         <app-input-number i18n-title title="Maximum age (days)" formControlName="maximum_age" [showAdd]="false" [error]="error?.maximum_age"></app-input-number>
         <app-input-select i18n-title title="Attachment type" [items]="attachmentTypeOptions" formControlName="attachment_type"></app-input-select>
         <app-input-select i18n-title title="Consumption scope" [items]="consumptionScopeOptions" formControlName="consumption_scope" i18n-hint hint="See docs for .eml processing requirements"></app-input-select>
+        <app-input-number i18n-title title="Rule order" formControlName="order" [showAdd]="false" [error]="error?.order"></app-input-number>
       </div>
       <div class="col">
         <p class="small" i18n>Paperless will only process mails that match <em>all</em> of the filters specified below.</p>

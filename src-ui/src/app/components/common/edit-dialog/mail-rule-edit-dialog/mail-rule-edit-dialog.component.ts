@@ -153,6 +153,7 @@ export class MailRuleEditDialogComponent extends EditDialogComponent<PaperlessMa
       maximum_age: new FormControl(null),
       attachment_type: new FormControl(MailFilterAttachmentType.Attachments),
       consumption_scope: new FormControl(MailRuleConsumptionScope.Attachments),
+      order: new FormControl(null),
       action: new FormControl(MailAction.MarkRead),
       action_parameter: new FormControl(null),
       assign_title_from: new FormControl(MailMetadataTitleOption.FromSubject),
