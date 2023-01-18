@@ -2,10 +2,11 @@ import logging
 import os
 import shutil
 import tempfile
+from dataclasses import dataclass
 from functools import lru_cache
+from pathlib import Path
 from typing import List
 from typing import Optional
-from typing import Tuple
 
 import magic
 from django.conf import settings
@@ -23,6 +24,42 @@ logger = logging.getLogger("paperless.barcodes")
 
 class BarcodeImageFormatError(Exception):
     pass
+
+
+@dataclass(frozen=True)
+class Barcode:
+    """
+    Holds the information about a single barcode and its location
+    """
+
+    page: int
+    value: str
+
+    @property
+    def is_separator(self) -> bool:
+        """
+        Returns True if the barcode value equals the configured separation value,
+        False otherwise
+        """
+        return self.value == settings.CONSUMER_BARCODE_STRING
+
+    @property
+    def is_asn(self) -> bool:
+        """
+        Returns True if the barcode value matches the configured ASN prefix,
+        False otherwise
+        """
+        return self.value.startswith(settings.CONSUMER_ASN_BARCODE_PREFIX)
+
+
+@dataclass
+class DocumentBarcodeInfo:
+    """
+    Describes a single document's barcode status
+    """
+
+    pdf_path: Path
+    barcodes: List[Barcode]
 
 
 @lru_cache(maxsize=8)
@@ -109,14 +146,14 @@ def convert_from_tiff_to_pdf(filepath: str) -> str:
 
 def scan_file_for_barcodes(
     filepath: str,
-) -> Tuple[Optional[str], List[Tuple[int, str]]]:
+) -> DocumentBarcodeInfo:
     """
     Scan the provided pdf file for any barcodes
     Returns a PDF filepath and a list of
     (page_number, barcode_text) tuples
     """
 
-    def _pikepdf_barcode_scan(pdf_filepath: str):
+    def _pikepdf_barcode_scan(pdf_filepath: str) -> List[Barcode]:
         detected_barcodes = []
         with Pdf.open(pdf_filepath) as pdf:
             for page_num, page in enumerate(pdf.pages):
@@ -135,22 +172,21 @@ def scan_file_for_barcodes(
                     # raise an exception, triggering fallback
                     pillow_img = pdfimage.as_pil_image()
 
-                    barcodes_on_page = barcode_reader(pillow_img)
-                    detected_barcodes.extend(
-                        [(page_num, text) for text in barcodes_on_page],
-                    )
+                    for barcode_value in barcode_reader(pillow_img):
+                        detected_barcodes.append(Barcode(page_num, barcode_value))
+
         return detected_barcodes
 
-    def _pdf2image_barcode_scan(pdf_filepath: str):
+    def _pdf2image_barcode_scan(pdf_filepath: str) -> List[Barcode]:
         detected_barcodes = []
         # use a temporary directory in case the file is too big to handle in memory
         with tempfile.TemporaryDirectory() as path:
             pages_from_path = convert_from_path(pdf_filepath, output_folder=path)
             for current_page_number, page in enumerate(pages_from_path):
-                barcodes_on_page = barcode_reader(page)
-                detected_barcodes.extend(
-                    [(current_page_number, text) for text in barcodes_on_page],
-                )
+                for barcode_value in barcode_reader(page):
+                    detected_barcodes.append(
+                        Barcode(current_page_number, barcode_value),
+                    )
         return detected_barcodes
 
     pdf_filepath = None
@@ -191,26 +227,22 @@ def scan_file_for_barcodes(
             f"Unsupported file format for barcode reader: {str(mime_type)}",
         )
 
-    return pdf_filepath, barcodes
+    return DocumentBarcodeInfo(pdf_filepath, barcodes)
 
 
-def get_separating_barcodes(barcodes: List[Tuple[int, str]]) -> List[int]:
+def get_separating_barcodes(barcodes: List[Barcode]) -> List[int]:
     """
     Search the parsed barcodes for separators
-    and returns a list of pagenumbers, which
+    and returns a list of page numbers, which
     separate the file into new files
     """
     # filter all barcodes for the separator string
-    separator_barcodes = list(
-        filter(lambda bc: bc[1] == settings.CONSUMER_BARCODE_STRING, barcodes),
-    )
     # get the page numbers of the separating barcodes
-    separator_page_numbers = [page for page, _ in separator_barcodes]
 
-    return separator_page_numbers
+    return [bc.page for bc in barcodes if bc.is_separator]
 
 
-def get_asn_from_barcodes(barcodes: List[Tuple[int, str]]) -> Optional[int]:
+def get_asn_from_barcodes(barcodes: List[Barcode]) -> Optional[int]:
     """
     Search the parsed barcodes for any ASNs.
     The first barcode that starts with CONSUMER_ASN_BARCODE_PREFIX
@@ -219,11 +251,9 @@ def get_asn_from_barcodes(barcodes: List[Tuple[int, str]]) -> Optional[int]:
     """
     asn = None
 
-    # only the barcode text is important here -> discard the page number
-    barcodes = [text for _, text in barcodes]
     # get the first barcode that starts with CONSUMER_ASN_BARCODE_PREFIX
     asn_text = next(
-        (x for x in barcodes if x.startswith(settings.CONSUMER_ASN_BARCODE_PREFIX)),
+        (x.value for x in barcodes if x.is_asn),
         None,
     )
 
