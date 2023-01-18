@@ -112,17 +112,20 @@ def consume_file(
 
     # read all barcodes in the current document
     if settings.CONSUMER_ENABLE_BARCODES or settings.CONSUMER_ENABLE_ASN_BARCODE:
-        pdf_filepath, parsed_barcodes = barcodes.scan_file_for_barcodes(path)
+        doc_barcode_info = barcodes.scan_file_for_barcodes(path)
 
         # split document by separator pages, if enabled
         if settings.CONSUMER_ENABLE_BARCODES:
-            separators = barcodes.get_separating_barcodes(parsed_barcodes)
+            separators = barcodes.get_separating_barcodes(doc_barcode_info.barcodes)
 
             if len(separators) > 0:
                 logger.debug(
                     f"Pages with separators found in: {str(path)}",
                 )
-                document_list = barcodes.separate_pages(pdf_filepath, separators)
+                document_list = barcodes.separate_pages(
+                    doc_barcode_info.pdf_path,
+                    separators,
+                )
 
                 if document_list:
                     for n, document in enumerate(document_list):
@@ -151,10 +154,10 @@ def consume_file(
                         )
 
                     # Delete the PDF file which was split
-                    os.remove(pdf_filepath)
+                    os.remove(doc_barcode_info.pdf_path)
 
                     # If the original was a TIFF, remove the original file as well
-                    if str(pdf_filepath) != str(path):
+                    if str(doc_barcode_info.pdf_path) != str(path):
                         logger.debug(f"Deleting file {path}")
                         os.unlink(path)
 
@@ -181,7 +184,7 @@ def consume_file(
 
         # try reading the ASN from barcode
         if settings.CONSUMER_ENABLE_ASN_BARCODE:
-            asn = barcodes.get_asn_from_barcodes(parsed_barcodes)
+            asn = barcodes.get_asn_from_barcodes(doc_barcode_info.barcodes)
             if asn:
                 logger.info(f"Found ASN in barcode: {asn}")
 
