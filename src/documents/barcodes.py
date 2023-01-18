@@ -4,6 +4,7 @@ import shutil
 import tempfile
 from dataclasses import dataclass
 from functools import lru_cache
+from math import ceil
 from pathlib import Path
 from typing import List
 from typing import Optional
@@ -172,6 +173,24 @@ def scan_file_for_barcodes(
                     # raise an exception, triggering fallback
                     pillow_img = pdfimage.as_pil_image()
 
+                    # Scale the image down
+                    # See: https://github.com/paperless-ngx/paperless-ngx/issues/2385
+                    # TLDR: zbar has issues with larger images
+                    width, height = pillow_img.size
+                    if width > 512:
+                        scaler = ceil(width / 512)
+                        new_width = int(width / scaler)
+                        new_height = int(height / scaler)
+                        pillow_img = pillow_img.resize((new_width, new_height))
+
+                    width, height = pillow_img.size
+
+                    if height > 1024:
+                        scaler = ceil(height / 1024)
+                        new_width = int(width / scaler)
+                        new_height = int(height / scaler)
+                        pillow_img = pillow_img.resize((new_width, new_height))
+
                     for barcode_value in barcode_reader(pillow_img):
                         detected_barcodes.append(Barcode(page_num, barcode_value))
 
@@ -234,12 +253,12 @@ def get_separating_barcodes(barcodes: List[Barcode]) -> List[int]:
     """
     Search the parsed barcodes for separators
     and returns a list of page numbers, which
-    separate the file into new files
+    separate the file into new files.
     """
     # filter all barcodes for the separator string
     # get the page numbers of the separating barcodes
 
-    return [bc.page for bc in barcodes if bc.is_separator]
+    return list({bc.page for bc in barcodes if bc.is_separator})
 
 
 def get_asn_from_barcodes(barcodes: List[Barcode]) -> Optional[int]:
@@ -266,7 +285,7 @@ def get_asn_from_barcodes(barcodes: List[Barcode]) -> Optional[int]:
         try:
             asn = int(asn_text)
         except ValueError as e:
-            logger.warn(f"Failed to parse ASN number because: {e}")
+            logger.warning(f"Failed to parse ASN number because: {e}")
 
     return asn
 
