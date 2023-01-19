@@ -353,6 +353,14 @@ document_create_classifier
 
 This command takes no arguments.
 
+### Document thumbnails {#thumbnails}
+
+Sometimes you may wish to re-create document thumbnails. Use
+
+```
+document_thumbnails
+```
+
 ### Managing the document search index {#index}
 
 The document search index is responsible for delivering search results
