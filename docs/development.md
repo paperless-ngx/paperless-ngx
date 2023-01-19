@@ -70,7 +70,7 @@ following chapters in a certain order:
     $ npm install -g @angular/cli
     ```
 
-4.  Install pre-commit hooks 
+4.  Install pre-commit hooks
 
     ```shell-session
     $ cd /path/to/paperless
