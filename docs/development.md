@@ -58,27 +58,30 @@ first-time setup. To do the setup you need to perform the steps from the
 following chapters in a certain order:
 
 1.  Install prerequisites + pipenv as mentioned in
-    [Bare metal route](/setup#bare_metal)
+    [Bare metal route](/setup#bare_metal).
 
 2.  Copy `paperless.conf.example` to `paperless.conf` and enable debug
     mode.
 
-3.  Install the Angular CLI interface:
+3.  Install the Angular CLI interface. You might need sudo privileges 
+    to perform this command:
 
     ```shell-session
     $ npm install -g @angular/cli
     ```
 
-4.  Install pre-commit hooks
+4.  Install pre-commit hooks 
 
     ```shell-session
-    pre-commit install
+    $ cd /path/to/paperless
+    $ pre-commit install
     ```
 
 5.  Create `consume` and `media` folders in the cloned root folder.
 
     ```shell-session
-    mkdir -p consume media
+    $ cd /path/to/paperless
+    $ mkdir -p consume media
     ```
 
 6.  You can now either ...
@@ -92,36 +95,40 @@ following chapters in a certain order:
     - spin up a bare redis container
 
       ```shell-session
-      docker run -d -p 6379:6379 --restart unless-stopped redis:latest
+      $ docker run -d -p 6379:6379 --restart unless-stopped redis:latest
       ```
 
-7.  Install the python dependencies by performing in the src/ directory.
+7.  Install the python dependencies by performing in the root directory:
 
     ```shell-session
-    pipenv install --dev
+    $ cd /path/to/paperless
+    $ pipenv install --dev
     ```
 
-!!! note
+    !!! note
 
-    Make sure you're using python 3.10.x or lower. Otherwise you might
-    get issues with building dependencies. You can use
-    [pyenv](https://github.com/pyenv/pyenv) to install a specific
-    python version.
+        Using a virtual environment is highly recommended.
+        Make sure you're using python 3.10.x or lower. Otherwise you might
+        get issues with building dependencies. You can use
+        [pyenv](https://github.com/pyenv/pyenv) to install a specific
+        python version.
 
 8.  Generate the static UI so you can perform a login to get session
     that is required for frontend development (this needs to be done one
     time only). From src-ui directory:
 
     ```shell-session
-    npm install .
-    ./node_modules/.bin/ng build --configuration production
+    $ cd /path/to/paperless/src-ui
+    $ npm install .
+    $ ./node_modules/.bin/ng build --configuration production
     ```
 
 9.  Apply migrations and create a superuser for your dev instance:
 
     ```shell-session
-    python3 manage.py migrate
-    python3 manage.py createsuperuser
+    $ cd /path/to/paperless/src
+    $ python3 manage.py migrate
+    $ python3 manage.py createsuperuser
     ```
 
 10. Now spin up the dev backend. Depending on which part of paperless
@@ -129,7 +136,8 @@ following chapters in a certain order:
     running.
 
     ```shell-session
-    python3 manage.py runserver & python3 manage.py document_consumer & celery --app paperless worker
+    $ cd /path/to/paperless/src
+    $ python3 manage.py runserver & python3 manage.py document_consumer & celery --app paperless worker
     ```
 
 11. Login with the superuser credentials provided in step 8 at
@@ -155,7 +163,8 @@ Configure the following launch configurations in your IDE:
 To start them all:
 
 ```shell-session
-python3 manage.py runserver & python3 manage.py document_consumer & celery --app paperless worker
+$ cd /path/to/paperless/src
+$ python3 manage.py runserver & python3 manage.py document_consumer & celery --app paperless worker
 ```
 
 Testing and code style:
@@ -195,12 +204,14 @@ and make sure that it's on your path. Next, in the src-ui/ directory,
 install the required dependencies of the project.
 
 ```shell-session
+$ cd /path/to/paperless/src-ui
 $ npm install
 ```
 
 You can launch a development server by running
 
 ```shell-session
+$ cd /path/to/paperless/src-ui
 $ ng serve
 ```
 
@@ -226,6 +237,7 @@ Testing and code style:
   command such as
 
   ```shell-session
+  $ cd /path/to/paperless/src-ui
   $ git ls-files -- '*.ts' | xargs pre-commit run prettier --files
   ```
 
@@ -234,6 +246,7 @@ Testing and code style:
   respectively, can be run non-interactively with:
 
   ```shell-session
+  $ cd /path/to/paperless/src-ui
   $ ng test
   $ npm run e2e:ci
   ```
@@ -242,12 +255,14 @@ Testing and code style:
   directory with
 
   ```shell-session
+  $ cd /path/to/paperless/src-ui
   $ ./node_modules/.bin/cypress open
   ```
 
 In order to build the front end and serve it as part of django, execute
 
 ```shell-session
+$ cd /path/to/paperless/src-ui
 $ ng build --configuration production
 ```
 
@@ -374,6 +389,20 @@ If you want to build the documentation locally, this is how you do it:
     $ pipenv mkdocs build --config-file mkdocs.yml
     ```
 
+    *alternatively...*
+
+
+3.  Serve the documentation. This will spin up a 
+    copy of the documentation at http://127.0.0.1:8000
+    that will automatically refresh everytime you change
+    the documentation.
+
+    ```shell-session
+    $ cd /path/to/paperless
+    $ pipenv mkdocs serve
+    ```
+
+
 ## Building the Docker image
 
 The docker image is primarily built by the GitHub actions workflow, but
@@ -385,6 +414,7 @@ helper script `build-docker-image.sh`.
 Building the docker image from source:
 
 ```shell-session
+$ cd /path/to/paperless
 ./build-docker-image.sh Dockerfile -t <your-tag>
 ```
 
