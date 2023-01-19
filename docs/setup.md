@@ -890,5 +890,3 @@ reverse proxy. Please refer to the [hosting and security](/configuration#hosting
 Also read
 [this](https://channels.readthedocs.io/en/stable/deploying.html#nginx-supervisor-ubuntu),
 towards the end of the section.
-
-

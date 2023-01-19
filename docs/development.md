@@ -63,7 +63,7 @@ following chapters in a certain order:
 2.  Copy `paperless.conf.example` to `paperless.conf` and enable debug
     mode.
 
-3.  Install the Angular CLI interface. You might need sudo privileges 
+3.  Install the Angular CLI interface. You might need sudo privileges
     to perform this command:
 
     ```shell-session
@@ -389,10 +389,9 @@ If you want to build the documentation locally, this is how you do it:
     $ pipenv mkdocs build --config-file mkdocs.yml
     ```
 
-    *alternatively...*
+    _alternatively..._
 
-
-3.  Serve the documentation. This will spin up a 
+3.  Serve the documentation. This will spin up a
     copy of the documentation at http://127.0.0.1:8000
     that will automatically refresh everytime you change
     the documentation.
@@ -401,7 +400,6 @@ If you want to build the documentation locally, this is how you do it:
     $ cd /path/to/paperless
     $ pipenv mkdocs serve
     ```
-
 
 ## Building the Docker image
 
@@ -502,5 +500,3 @@ def myparser_consumer_declaration(sender, **kwargs):
   mime types have many extensions associated with them and the python
   methods responsible for guessing the extension do not always return
   the same value.
-
-  
