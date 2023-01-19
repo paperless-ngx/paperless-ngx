@@ -177,16 +177,15 @@ def scan_file_for_barcodes(
                     # See: https://github.com/paperless-ngx/paperless-ngx/issues/2385
                     # TLDR: zbar has issues with larger images
                     width, height = pillow_img.size
-                    if width > 512:
-                        scaler = ceil(width / 512)
+                    if width > 1024:
+                        scaler = ceil(width / 1024)
                         new_width = int(width / scaler)
                         new_height = int(height / scaler)
                         pillow_img = pillow_img.resize((new_width, new_height))
 
                     width, height = pillow_img.size
-
-                    if height > 1024:
-                        scaler = ceil(height / 1024)
+                    if height > 2048:
+                        scaler = ceil(height / 2048)
                         new_width = int(width / scaler)
                         new_height = int(height / scaler)
                         pillow_img = pillow_img.resize((new_width, new_height))
