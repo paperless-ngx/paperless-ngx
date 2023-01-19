@@ -355,7 +355,7 @@ This command takes no arguments.
 
 ### Document thumbnails {#thumbnails}
 
-Sometimes you may wish to re-create document thumbnails. Use
+Use this command to re-create document thumbnails. Optionally include the ` --document {id}` option to generate thumbnails for a specific document only.
 
 ```
 document_thumbnails
