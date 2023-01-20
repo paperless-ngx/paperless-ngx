@@ -83,13 +83,10 @@ class Command(BaseCommand):
             self.manifest = json.load(f)
         manifest_paths.append(main_manifest_path)
 
-        for root, dirs, files in os.walk(self.source):
-            for file in files:
-                if file.endswith("-manifest.json"):
-                    doc_manifest_path = os.path.normpath(os.path.join(root, file))
-                    with open(doc_manifest_path) as f:
-                        self.manifest += json.load(f)
-                    manifest_paths.append(doc_manifest_path)
+        for file in Path(self.source).glob("**/*-manifest.json"):
+            with open(file) as f:
+                self.manifest += json.load(f)
+            manifest_paths.append(file)
 
         version_path = os.path.normpath(os.path.join(self.source, "version.json"))
         if os.path.exists(version_path):
