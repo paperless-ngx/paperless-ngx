@@ -267,13 +267,16 @@ Be careful when pointing paperless to a directory that already contains
 other files.
 
 Paperless will not export archive files if you use `--no-archive`. After
-importing, These files can be generated again by using `document_archiver`.
+importing, the sanity checker will warn about missing files until these files
+are generated again by using `document_archiver`.
 It can make sense to omit these files from backup as their content and checksum
 can change (new archiver algorithm) and may then cause additional used space in
 a deduplicated backup.
 
 Paperless will not export thumbnails if you use `--no-thumbnail`. After
-importing, These files can be generated again by using `document_thumbnails`.
+importing, the sanity checker will warn about missing files and the documents
+view will not have thumbnails until these files are generated again by using
+`document_thumbnails`.
 It can make sense to omit these files from backup as their content and checksum
 can change (new thumbnail generation algorithm) and may then cause additional
 used space in a deduplicated backup.
