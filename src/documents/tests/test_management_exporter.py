@@ -105,6 +105,7 @@ class TestExportImport(DirectoriesMixin, TestCase):
         no_archive=False,
         no_thumbnail=False,
         split_manifest=False,
+        use_filename_prefix=False,
     ):
         args = ["document_exporter", self.target]
         if use_filename_format:
@@ -119,6 +120,8 @@ class TestExportImport(DirectoriesMixin, TestCase):
             args += ["--no-thumbnail"]
         if split_manifest:
             args += ["--split-manifest"]
+        if use_filename_prefix:
+            args += ["--use-filename-prefix"]
 
         call_command(*args)
 
@@ -508,6 +511,15 @@ class TestExportImport(DirectoriesMixin, TestCase):
                 self.assertEqual("That path doesn't appear to be writable", str(e))
 
     def test_no_archive(self):
+        """
+        GIVEN:
+            - Request to export documents to directory
+        WHEN:
+            - Option no-archive is used
+        THEN:
+            - Manifest.json doesn't contain information about archive files
+            - Documents can be imported again
+        """
         shutil.rmtree(os.path.join(self.dirs.media_dir, "documents"))
         shutil.copytree(
             os.path.join(os.path.dirname(__file__), "samples", "documents"),
@@ -533,10 +545,22 @@ class TestExportImport(DirectoriesMixin, TestCase):
         self.assertFalse(has_archive)
 
         with paperless_environment() as dirs:
+            self.assertEqual(Document.objects.count(), 4)
+            Document.objects.all().delete()
+            self.assertEqual(Document.objects.count(), 0)
             call_command("document_importer", self.target)
             self.assertEqual(Document.objects.count(), 4)
 
     def test_no_thumbnail(self):
+        """
+        GIVEN:
+            - Request to export documents to directory
+        WHEN:
+            - Option no-thumbnails is used
+        THEN:
+            - Manifest.json doesn't contain information about thumbnails
+            - Documents can be imported again
+        """
         shutil.rmtree(os.path.join(self.dirs.media_dir, "documents"))
         shutil.copytree(
             os.path.join(os.path.dirname(__file__), "samples", "documents"),
@@ -564,10 +588,22 @@ class TestExportImport(DirectoriesMixin, TestCase):
         self.assertFalse(has_thumbnail)
 
         with paperless_environment() as dirs:
+            self.assertEqual(Document.objects.count(), 4)
+            Document.objects.all().delete()
+            self.assertEqual(Document.objects.count(), 0)
             call_command("document_importer", self.target)
             self.assertEqual(Document.objects.count(), 4)
 
     def test_split_manifest(self):
+        """
+        GIVEN:
+            - Request to export documents to directory
+        WHEN:
+            - Option split_manifest is used
+        THEN:
+            - Main manifest.json file doesn't contain information about documents
+            - Documents can be imported again
+        """
         shutil.rmtree(os.path.join(self.dirs.media_dir, "documents"))
         shutil.copytree(
             os.path.join(os.path.dirname(__file__), "samples", "documents"),
@@ -581,5 +617,32 @@ class TestExportImport(DirectoriesMixin, TestCase):
         self.assertFalse(has_document)
 
         with paperless_environment() as dirs:
+            self.assertEqual(Document.objects.count(), 4)
+            Document.objects.all().delete()
+            self.assertEqual(Document.objects.count(), 0)
+            call_command("document_importer", self.target)
+            self.assertEqual(Document.objects.count(), 4)
+
+    def test_filename_prefix(self):
+        """
+        GIVEN:
+            - Request to export documents to directory
+        WHEN:
+            - Option use_filename_prefix is used
+        THEN:
+            - Documents can be imported again
+        """
+        shutil.rmtree(os.path.join(self.dirs.media_dir, "documents"))
+        shutil.copytree(
+            os.path.join(os.path.dirname(__file__), "samples", "documents"),
+            os.path.join(self.dirs.media_dir, "documents"),
+        )
+
+        manifest = self._do_export(use_filename_prefix=True)
+
+        with paperless_environment() as dirs:
+            self.assertEqual(Document.objects.count(), 4)
+            Document.objects.all().delete()
+            self.assertEqual(Document.objects.count(), 0)
             call_command("document_importer", self.target)
             self.assertEqual(Document.objects.count(), 4)
