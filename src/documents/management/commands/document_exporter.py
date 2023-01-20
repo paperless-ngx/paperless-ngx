@@ -54,14 +54,6 @@ class Command(BaseCommand):
         parser.add_argument("target")
 
         parser.add_argument(
-            "-sm",
-            "--split-manifest",
-            default=False,
-            action="store_true",
-            help="Export document information in individual manifest json files.",
-        )
-
-        parser.add_argument(
             "-c",
             "--compare-checksums",
             default=False,
@@ -72,24 +64,6 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
-            "-f",
-            "--use-filename-format",
-            default=False,
-            action="store_true",
-            help="Use PAPERLESS_FILENAME_FORMAT for storing files in the "
-            "export directory, if configured.",
-        )
-
-        parser.add_argument(
-            "-p",
-            "--use-filename-prefix",
-            default=False,
-            action="store_true",
-            help="Export files in dedicated folders according to their nature: "
-            "archive, originals or thumbnails",
-        )
-
-        parser.add_argument(
             "-d",
             "--delete",
             default=False,
@@ -97,6 +71,15 @@ class Command(BaseCommand):
             help="After exporting, delete files in the export directory that "
             "do not belong to the current export, such as files from "
             "deleted documents.",
+        )
+
+        parser.add_argument(
+            "-f",
+            "--use-filename-format",
+            default=False,
+            action="store_true",
+            help="Use PAPERLESS_FILENAME_FORMAT for storing files in the "
+            "export directory, if configured.",
         )
 
         parser.add_argument(
@@ -116,10 +99,20 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
-            "--no-progress-bar",
+            "-p",
+            "--use-filename-prefix",
             default=False,
             action="store_true",
-            help="If set, the progress bar will not be shown",
+            help="Export files in dedicated folders according to their nature: "
+            "archive, originals or thumbnails",
+        )
+
+        parser.add_argument(
+            "-sm",
+            "--split-manifest",
+            default=False,
+            action="store_true",
+            help="Export document information in individual manifest json files.",
         )
 
         parser.add_argument(
@@ -128,6 +121,13 @@ class Command(BaseCommand):
             default=False,
             action="store_true",
             help="Export the documents to a zip file in the given directory",
+        )
+
+        parser.add_argument(
+            "--no-progress-bar",
+            default=False,
+            action="store_true",
+            help="If set, the progress bar will not be shown",
         )
 
     def __init__(self, *args, **kwargs):
