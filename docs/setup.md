@@ -46,7 +46,7 @@ steps described in [Docker setup](#docker_hub) automatically.
     page](https://github.com/paperless-ngx/paperless-ngx/tree/master/docker/compose)
     and download one of the `docker-compose.*.yml` files,
     depending on which database backend you want to use. Rename this
-    file to `docker-compose.*.yml`. If you want to enable
+    file to `docker-compose.yml`. If you want to enable
     optional support for Office documents, download a file with
     `-tika` in the file name. Download the
     `docker-compose.env` file and the `.env` file as well and store them
