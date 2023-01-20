@@ -220,9 +220,11 @@ class Command(BaseCommand):
                 serializers.serialize("json", StoragePath.objects.all()),
             )
 
-            manifest += json.loads(
+            comments = json.loads(
                 serializers.serialize("json", Comment.objects.all()),
             )
+            if not self.split_manifest:
+                manifest += comments
 
             documents = Document.objects.order_by("id")
             document_map = {d.pk: d for d in documents}
@@ -351,9 +353,14 @@ class Command(BaseCommand):
                     manifest_name = os.path.join("json", manifest_name)
                 manifest_name = (self.target / Path(manifest_name)).resolve()
                 manifest_name.parent.mkdir(parents=True, exist_ok=True)
-                manifest_name.write_text(
-                    json.dumps([document_manifest[index]], indent=2),
+                content = [document_manifest[index]]
+                content += list(
+                    filter(
+                        lambda d: d["fields"]["document"] == document_dict["pk"],
+                        comments,
+                    ),
                 )
+                manifest_name.write_text(json.dumps(content, indent=2))
                 if manifest_name in self.files_in_export_dir:
                     self.files_in_export_dir.remove(manifest_name)
 
