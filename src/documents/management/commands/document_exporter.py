@@ -133,7 +133,7 @@ class Command(BaseCommand):
     def __init__(self, *args, **kwargs):
         BaseCommand.__init__(self, *args, **kwargs)
         self.target: Path = None
-        self.split_manifest = None
+        self.split_manifest = False
         self.files_in_export_dir: Set[Path] = set()
         self.exported_files: List[Path] = []
         self.compare_checksums = False
