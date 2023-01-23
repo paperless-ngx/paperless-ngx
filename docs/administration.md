@@ -235,7 +235,7 @@ optional arguments:
 -f, --use-filename-format
 -na, --no-archive
 -nt, --no-thumbnail
--p, --use-filename-prefix
+-p, --use-folder-prefix
 -sm, --split-manifest
 -z  --zip
 ```
@@ -283,7 +283,7 @@ If `-nt` or `--no-thumbnail` is provided, thumbnail files will not be exported.
     can change (new archiver algorithm) and may then cause additional used space in
     a deduplicated backup.
 
-If `-p` or `--use-filename-prefix` is provided, files will be exported
+If `-p` or `--use-folder-prefix` is provided, files will be exported
 in dedicated folders according to their nature: `archive`, `originals`,
 `thumbnails` or `json`
 
