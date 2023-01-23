@@ -12,8 +12,11 @@ from unittest import mock
 from django.core.management import call_command
 from django.db import DatabaseError
 from django.test import TestCase
+from documents.data_models import ConsumableDocument
+from documents.data_models import DocumentMetadataOverrides
 from documents.models import Correspondent
 from documents.tests.utils import DirectoriesMixin
+from documents.tests.utils import DocumentConsumeDelayMixin
 from documents.tests.utils import FileSystemAssertsMixin
 from imap_tools import EmailAddress
 from imap_tools import FolderInfo
@@ -194,7 +197,11 @@ def fake_magic_from_buffer(buffer, mime=False):
 
 
 @mock.patch("paperless_mail.mail.magic.from_buffer", fake_magic_from_buffer)
-class TestMail(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
+class TestMail(
+    DirectoriesMixin,
+    FileSystemAssertsMixin,
+    TestCase,
+):
     def setUp(self):
         self._used_uids = set()
 
@@ -409,6 +416,8 @@ class TestMail(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         self.assertEqual(result, 2)
 
+        self._queue_consumption_tasks_mock.assert_called()
+
         self.assert_queue_consumption_tasks_call_args(
             [
                 [
@@ -426,7 +435,7 @@ class TestMail(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         result = self.mail_account_handler._handle_message(message, rule)
 
-        self.assertFalse(self._queue_consumption_tasks_mock.called)
+        self._queue_consumption_tasks_mock.assert_not_called()
         self.assertEqual(result, 0)
 
     def test_handle_unknown_mime_type(self):
@@ -541,7 +550,6 @@ class TestMail(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         for (pattern, matches) in tests:
             with self.subTest(msg=pattern):
-                print(f"PATTERN {pattern}")
                 self._queue_consumption_tasks_mock.reset_mock()
                 account = MailAccount(name=str(uuid.uuid4()))
                 account.save()
@@ -855,7 +863,7 @@ class TestMail(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.mail_account_handler.handle_mail_account(account)
 
         self.bogus_mailbox.folder.list.assert_called_once()
-        self.assertEqual(self._queue_consumption_tasks_mock.call_count, 0)
+        self._queue_consumption_tasks_mock.assert_not_called()
 
     def test_error_folder_set_error_listing(self):
         """
@@ -888,7 +896,7 @@ class TestMail(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.mail_account_handler.handle_mail_account(account)
 
         self.bogus_mailbox.folder.list.assert_called_once()
-        self.assertEqual(self._queue_consumption_tasks_mock.call_count, 0)
+        self._queue_consumption_tasks_mock.assert_not_called()
 
     @mock.patch("paperless_mail.mail.MailAccountHandler._get_correspondent")
     def test_error_skip_mail(self, m):
@@ -1002,7 +1010,7 @@ class TestMail(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
                 self.reset_bogus_mailbox()
                 self._queue_consumption_tasks_mock.reset_mock()
 
-                self.assertEqual(self._queue_consumption_tasks_mock.call_count, 0)
+                self._queue_consumption_tasks_mock.assert_not_called()
                 self.assertEqual(len(self.bogus_mailbox.messages), 3)
 
                 self.mail_account_handler.handle_mail_account(account)
@@ -1041,7 +1049,7 @@ class TestMail(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         )
 
         self.assertEqual(len(self.bogus_mailbox.messages), 3)
-        self.assertEqual(self._queue_consumption_tasks_mock.call_count, 0)
+        self._queue_consumption_tasks_mock.assert_not_called()
         self.assertEqual(len(self.bogus_mailbox.fetch("UNSEEN", False)), 2)
 
         self.mail_account_handler.handle_mail_account(account)
@@ -1148,13 +1156,21 @@ class TestMail(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
                 consume_tasks,
                 expected_signatures,
             ):
+                input_doc, overrides = consume_task.args
+
                 # assert the file exists
-                self.assertIsFile(consume_task.kwargs["path"])
+                self.assertIsFile(input_doc.original_file)
 
                 # assert all expected arguments are present in the signature
                 for key, value in expected_signature.items():
-                    self.assertIn(key, consume_task.kwargs)
-                    self.assertEqual(consume_task.kwargs[key], value)
+                    if key == "override_correspondent_id":
+                        self.assertEqual(overrides.correspondent_id, value)
+                    elif key == "override_filename":
+                        self.assertEqual(overrides.filename, value)
+                    elif key == "override_title":
+                        self.assertEqual(overrides.title, value)
+                    else:
+                        self.fail("No match for expected arg")
 
     def apply_mail_actions(self):
         """

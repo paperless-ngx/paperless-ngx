@@ -284,7 +284,7 @@ class Consumer(LoggingMixin):
 
     def try_consume_file(
         self,
-        path,
+        path: Path,
         override_filename=None,
         override_title=None,
         override_correspondent_id=None,
