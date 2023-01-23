@@ -105,7 +105,7 @@ class TestExportImport(DirectoriesMixin, TestCase):
         no_archive=False,
         no_thumbnail=False,
         split_manifest=False,
-        use_filename_prefix=False,
+        use_folder_prefix=False,
     ):
         args = ["document_exporter", self.target]
         if use_filename_format:
@@ -120,8 +120,8 @@ class TestExportImport(DirectoriesMixin, TestCase):
             args += ["--no-thumbnail"]
         if split_manifest:
             args += ["--split-manifest"]
-        if use_filename_prefix:
-            args += ["--use-filename-prefix"]
+        if use_folder_prefix:
+            args += ["--use-folder-prefix"]
 
         call_command(*args)
 
@@ -623,12 +623,12 @@ class TestExportImport(DirectoriesMixin, TestCase):
             call_command("document_importer", self.target)
             self.assertEqual(Document.objects.count(), 4)
 
-    def test_filename_prefix(self):
+    def test_folder_prefix(self):
         """
         GIVEN:
             - Request to export documents to directory
         WHEN:
-            - Option use_filename_prefix is used
+            - Option use_folder_prefix is used
         THEN:
             - Documents can be imported again
         """
@@ -638,7 +638,7 @@ class TestExportImport(DirectoriesMixin, TestCase):
             os.path.join(self.dirs.media_dir, "documents"),
         )
 
-        manifest = self._do_export(use_filename_prefix=True)
+        manifest = self._do_export(use_folder_prefix=True)
 
         with paperless_environment() as dirs:
             self.assertEqual(Document.objects.count(), 4)
