@@ -288,7 +288,9 @@ in dedicated folders according to their nature: `archive`, `originals`,
 `thumbnails` or `json`
 
 If `-sm` or `--split-manifest` is provided, information about document
-will be placed in individual json files, instead of a single JSON file.
+will be placed in individual json files, instead of a single JSON file. The main
+manifest.json will still contain application wide information (e.g. tags, correspondent,
+documenttype, etc)
 
 If `-z` or `--zip` is provided, the export will be a zipfile
 in the target directory, named according to the current date.
