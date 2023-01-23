@@ -1,7 +1,6 @@
 import logging
 import os
 import shutil
-from pathlib import Path
 
 from celery import states
 from celery.signals import before_task_publish
@@ -533,17 +532,9 @@ def before_task_publish_handler(sender=None, headers=None, body=None, **kwargs):
 
     try:
         task_args = body[0]
-        task_kwargs = body[1]
+        input_doc, _ = task_args
 
-        task_file_name = ""
-        if "override_filename" in task_kwargs:
-            task_file_name = task_kwargs["override_filename"]
-
-        # Nothing was found, report the task first argument
-        if not len(task_file_name):
-            # There are always some arguments to the consume, first is always filename
-            filepath = Path(task_args[0])
-            task_file_name = filepath.name
+        task_file_name = input_doc.original_file.name
 
         PaperlessTask.objects.create(
             task_id=headers["id"],

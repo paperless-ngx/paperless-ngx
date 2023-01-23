@@ -1,13 +1,10 @@
 import hashlib
 import logging
-import os
 import shutil
 import uuid
-from pathlib import Path
 from typing import Optional
 from typing import Type
 
-import dateutil.parser
 import tqdm
 from asgiref.sync import async_to_sync
 from celery import shared_task
@@ -22,6 +19,9 @@ from documents.classifier import DocumentClassifier
 from documents.classifier import load_classifier
 from documents.consumer import Consumer
 from documents.consumer import ConsumerError
+from documents.data_models import ConsumableDocument
+from documents.data_models import DocumentMetadataOverrides
+from documents.data_models import DocumentSource
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
 from documents.models import Correspondent
@@ -88,34 +88,20 @@ def train_classifier():
 
 @shared_task
 def consume_file(
-    path,
-    override_filename=None,
-    override_title=None,
-    override_correspondent_id=None,
-    override_document_type_id=None,
-    override_tag_ids=None,
-    task_id=None,
-    override_created=None,
-    override_owner_id=None,
-    override_archive_serial_num: Optional[int] = None,
+    input_doc: ConsumableDocument,
+    overrides: Optional[DocumentMetadataOverrides] = None,
 ):
 
-    path = Path(path).resolve()
-    asn = None
-
-    # Celery converts this to a string, but everything expects a datetime
-    # Long term solution is to not use JSON for the serializer but pickle instead
-    # TODO: This will be resolved in kombu 5.3, expected with celery 5.3
-    # More types will be retained through JSON encode/decode
-    if override_created is not None and isinstance(override_created, str):
-        try:
-            override_created = dateutil.parser.isoparse(override_created)
-        except Exception:
-            pass
+    # Default no overrides
+    if overrides is None:
+        overrides = DocumentMetadataOverrides()
 
     # read all barcodes in the current document
     if settings.CONSUMER_ENABLE_BARCODES or settings.CONSUMER_ENABLE_ASN_BARCODE:
-        doc_barcode_info = barcodes.scan_file_for_barcodes(path)
+        doc_barcode_info = barcodes.scan_file_for_barcodes(
+            input_doc.original_file,
+            input_doc.mime_type,
+        )
 
         # split document by separator pages, if enabled
         if settings.CONSUMER_ENABLE_BARCODES:
@@ -123,7 +109,7 @@ def consume_file(
 
             if len(separators) > 0:
                 logger.debug(
-                    f"Pages with separators found in: {str(path)}",
+                    f"Pages with separators found in: {input_doc.original_file}",
                 )
                 document_list = barcodes.separate_pages(
                     doc_barcode_info.pdf_path,
@@ -136,18 +122,20 @@ def consume_file(
                     # Move it to consume directory to be picked up
                     # Otherwise, use the current parent to keep possible tags
                     # from subdirectories
-                    try:
-                        # is_relative_to would be nicer, but new in 3.9
-                        _ = path.relative_to(settings.SCRATCH_DIR)
+                    if input_doc.source != DocumentSource.ConsumeFolder:
                         save_to_dir = settings.CONSUMPTION_DIR
-                    except ValueError:
-                        save_to_dir = path.parent
+                    else:
+                        # Note this uses the original file, because it's in the
+                        # consume folder already and may include additional path
+                        # components for tagging
+                        # the .path is somewhere in scratch in this case
+                        save_to_dir = input_doc.original_file.parent
 
                     for n, document in enumerate(document_list):
                         # save to consumption dir
                         # rename it to the original filename  with number prefix
-                        if override_filename:
-                            newname = f"{str(n)}_" + override_filename
+                        if overrides.filename is not None:
+                            newname = f"{str(n)}_{overrides.filename}"
                         else:
                             newname = None
 
@@ -158,24 +146,27 @@ def consume_file(
                         )
 
                         # Split file has been copied safely, remove it
-                        os.remove(document)
+                        document.unlink()
 
                     # And clean up the directory as well, now it's empty
-                    shutil.rmtree(os.path.dirname(document_list[0]))
+                    shutil.rmtree(document_list[0].parent)
 
-                    # Delete the PDF file which was split
-                    os.remove(doc_barcode_info.pdf_path)
+                    # This file has been split into multiple files without issue
+                    # remove the original and working copy
+                    input_doc.original_file.unlink()
 
-                    # If the original was a TIFF, remove the original file as well
-                    if str(doc_barcode_info.pdf_path) != str(path):
-                        logger.debug(f"Deleting file {path}")
-                        os.unlink(path)
+                    # If the original file was a TIFF, remove the PDF generated from it
+                    if input_doc.mime_type == "image/tiff":
+                        logger.debug(
+                            f"Deleting file {doc_barcode_info.pdf_path}",
+                        )
+                        doc_barcode_info.pdf_path.unlink()
 
                     # notify the sender, otherwise the progress bar
                     # in the UI stays stuck
                     payload = {
-                        "filename": override_filename or path.name,
-                        "task_id": task_id,
+                        "filename": overrides.filename or input_doc.original_file.name,
+                        "task_id": None,
                         "current_progress": 100,
                         "max_progress": 100,
                         "status": "SUCCESS",
@@ -194,22 +185,21 @@ def consume_file(
 
         # try reading the ASN from barcode
         if settings.CONSUMER_ENABLE_ASN_BARCODE:
-            asn = barcodes.get_asn_from_barcodes(doc_barcode_info.barcodes)
-            if asn:
-                logger.info(f"Found ASN in barcode: {asn}")
+            overrides.asn = barcodes.get_asn_from_barcodes(doc_barcode_info.barcodes)
+            if overrides.asn:
+                logger.info(f"Found ASN in barcode: {overrides.asn}")
 
     # continue with consumption if no barcode was found
     document = Consumer().try_consume_file(
-        path,
-        override_filename=override_filename,
-        override_title=override_title,
-        override_correspondent_id=override_correspondent_id,
-        override_document_type_id=override_document_type_id,
-        override_tag_ids=override_tag_ids,
-        task_id=task_id,
-        override_created=override_created,
-        override_asn=override_archive_serial_num or asn,
-        override_owner_id=override_owner_id,
+        input_doc.original_file,
+        override_filename=overrides.filename,
+        override_title=overrides.title,
+        override_correspondent_id=overrides.correspondent_id,
+        override_document_type_id=overrides.document_type_id,
+        override_tag_ids=overrides.tag_ids,
+        override_created=overrides.created,
+        override_asn=overrides.asn,
+        override_owner_id=overrides.owner_id,
     )
 
     if document:

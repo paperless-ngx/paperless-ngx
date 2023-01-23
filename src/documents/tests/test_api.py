@@ -32,6 +32,7 @@ from documents import bulk_edit
 from documents import index
 from documents.models import Correspondent
 from documents.models import Document
+from documents.tests.utils import DocumentConsumeDelayMixin
 from documents.models import DocumentType
 from documents.models import MatchingModel
 from documents.models import PaperlessTask
@@ -45,7 +46,7 @@ from rest_framework.test import APITestCase
 from whoosh.writing import AsyncWriter
 
 
-class TestDocumentApi(DirectoriesMixin, APITestCase):
+class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
     def setUp(self):
         super().setUp()
 
@@ -1085,10 +1086,11 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.data["documents_inbox"], None)
         self.assertEqual(response.data["inbox_tag"], None)
 
-    @mock.patch("documents.views.consume_file.delay")
-    def test_upload(self, m):
+    def test_upload(self):
 
-        m.return_value = celery.result.AsyncResult(id=str(uuid.uuid4()))
+        self.consume_file_mock.return_value = celery.result.AsyncResult(
+            id=str(uuid.uuid4()),
+        )
 
         with open(
             os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"),
@@ -1101,21 +1103,22 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        m.assert_called_once()
+        self.consume_file_mock.assert_called_once()
 
-        args, kwargs = m.call_args
-        file_path = Path(args[0])
-        self.assertEqual(file_path.name, "simple.pdf")
-        self.assertIn(Path(settings.SCRATCH_DIR), file_path.parents)
-        self.assertIsNone(kwargs["override_title"])
-        self.assertIsNone(kwargs["override_correspondent_id"])
-        self.assertIsNone(kwargs["override_document_type_id"])
-        self.assertIsNone(kwargs["override_tag_ids"])
+        input_doc, overrides = self.get_last_consume_delay_call_args()
 
-    @mock.patch("documents.views.consume_file.delay")
-    def test_upload_empty_metadata(self, m):
+        self.assertEqual(input_doc.original_file.name, "simple.pdf")
+        self.assertIn(Path(settings.SCRATCH_DIR), input_doc.original_file.parents)
+        self.assertIsNone(overrides.title)
+        self.assertIsNone(overrides.correspondent_id)
+        self.assertIsNone(overrides.document_type_id)
+        self.assertIsNone(overrides.tag_ids)
 
-        m.return_value = celery.result.AsyncResult(id=str(uuid.uuid4()))
+    def test_upload_empty_metadata(self):
+
+        self.consume_file_mock.return_value = celery.result.AsyncResult(
+            id=str(uuid.uuid4()),
+        )
 
         with open(
             os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"),
@@ -1128,21 +1131,22 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        m.assert_called_once()
+        self.consume_file_mock.assert_called_once()
 
-        args, kwargs = m.call_args
-        file_path = Path(args[0])
-        self.assertEqual(file_path.name, "simple.pdf")
-        self.assertIn(Path(settings.SCRATCH_DIR), file_path.parents)
-        self.assertIsNone(kwargs["override_title"])
-        self.assertIsNone(kwargs["override_correspondent_id"])
-        self.assertIsNone(kwargs["override_document_type_id"])
-        self.assertIsNone(kwargs["override_tag_ids"])
+        input_doc, overrides = self.get_last_consume_delay_call_args()
 
-    @mock.patch("documents.views.consume_file.delay")
-    def test_upload_invalid_form(self, m):
+        self.assertEqual(input_doc.original_file.name, "simple.pdf")
+        self.assertIn(Path(settings.SCRATCH_DIR), input_doc.original_file.parents)
+        self.assertIsNone(overrides.title)
+        self.assertIsNone(overrides.correspondent_id)
+        self.assertIsNone(overrides.document_type_id)
+        self.assertIsNone(overrides.tag_ids)
 
-        m.return_value = celery.result.AsyncResult(id=str(uuid.uuid4()))
+    def test_upload_invalid_form(self):
+
+        self.consume_file_mock.return_value = celery.result.AsyncResult(
+            id=str(uuid.uuid4()),
+        )
 
         with open(
             os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"),
@@ -1153,12 +1157,13 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
                 {"documenst": f},
             )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        m.assert_not_called()
+        self.consume_file_mock.assert_not_called()
 
-    @mock.patch("documents.views.consume_file.delay")
-    def test_upload_invalid_file(self, m):
+    def test_upload_invalid_file(self):
 
-        m.return_value = celery.result.AsyncResult(id=str(uuid.uuid4()))
+        self.consume_file_mock.return_value = celery.result.AsyncResult(
+            id=str(uuid.uuid4()),
+        )
 
         with open(
             os.path.join(os.path.dirname(__file__), "samples", "simple.zip"),
@@ -1169,12 +1174,13 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
                 {"document": f},
             )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        m.assert_not_called()
+        self.consume_file_mock.assert_not_called()
 
-    @mock.patch("documents.views.consume_file.delay")
-    def test_upload_with_title(self, async_task):
+    def test_upload_with_title(self):
 
-        async_task.return_value = celery.result.AsyncResult(id=str(uuid.uuid4()))
+        self.consume_file_mock.return_value = celery.result.AsyncResult(
+            id=str(uuid.uuid4()),
+        )
 
         with open(
             os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"),
@@ -1186,16 +1192,20 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
             )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        async_task.assert_called_once()
+        self.consume_file_mock.assert_called_once()
 
-        args, kwargs = async_task.call_args
+        _, overrides = self.get_last_consume_delay_call_args()
 
-        self.assertEqual(kwargs["override_title"], "my custom title")
+        self.assertEqual(overrides.title, "my custom title")
+        self.assertIsNone(overrides.correspondent_id)
+        self.assertIsNone(overrides.document_type_id)
+        self.assertIsNone(overrides.tag_ids)
 
-    @mock.patch("documents.views.consume_file.delay")
-    def test_upload_with_correspondent(self, async_task):
+    def test_upload_with_correspondent(self):
 
-        async_task.return_value = celery.result.AsyncResult(id=str(uuid.uuid4()))
+        self.consume_file_mock.return_value = celery.result.AsyncResult(
+            id=str(uuid.uuid4()),
+        )
 
         c = Correspondent.objects.create(name="test-corres")
         with open(
@@ -1208,16 +1218,20 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
             )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        async_task.assert_called_once()
+        self.consume_file_mock.assert_called_once()
 
-        args, kwargs = async_task.call_args
+        _, overrides = self.get_last_consume_delay_call_args()
 
-        self.assertEqual(kwargs["override_correspondent_id"], c.id)
+        self.assertEqual(overrides.correspondent_id, c.id)
+        self.assertIsNone(overrides.title)
+        self.assertIsNone(overrides.document_type_id)
+        self.assertIsNone(overrides.tag_ids)
 
-    @mock.patch("documents.views.consume_file.delay")
-    def test_upload_with_invalid_correspondent(self, async_task):
+    def test_upload_with_invalid_correspondent(self):
 
-        async_task.return_value = celery.result.AsyncResult(id=str(uuid.uuid4()))
+        self.consume_file_mock.return_value = celery.result.AsyncResult(
+            id=str(uuid.uuid4()),
+        )
 
         with open(
             os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"),
@@ -1229,12 +1243,13 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
             )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-        async_task.assert_not_called()
+        self.consume_file_mock.assert_not_called()
 
-    @mock.patch("documents.views.consume_file.delay")
-    def test_upload_with_document_type(self, async_task):
+    def test_upload_with_document_type(self):
 
-        async_task.return_value = celery.result.AsyncResult(id=str(uuid.uuid4()))
+        self.consume_file_mock.return_value = celery.result.AsyncResult(
+            id=str(uuid.uuid4()),
+        )
 
         dt = DocumentType.objects.create(name="invoice")
         with open(
@@ -1247,16 +1262,20 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
             )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        async_task.assert_called_once()
+        self.consume_file_mock.assert_called_once()
 
-        args, kwargs = async_task.call_args
+        _, overrides = self.get_last_consume_delay_call_args()
 
-        self.assertEqual(kwargs["override_document_type_id"], dt.id)
+        self.assertEqual(overrides.document_type_id, dt.id)
+        self.assertIsNone(overrides.correspondent_id)
+        self.assertIsNone(overrides.title)
+        self.assertIsNone(overrides.tag_ids)
 
-    @mock.patch("documents.views.consume_file.delay")
-    def test_upload_with_invalid_document_type(self, async_task):
+    def test_upload_with_invalid_document_type(self):
 
-        async_task.return_value = celery.result.AsyncResult(id=str(uuid.uuid4()))
+        self.consume_file_mock.return_value = celery.result.AsyncResult(
+            id=str(uuid.uuid4()),
+        )
 
         with open(
             os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"),
@@ -1268,12 +1287,13 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
             )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-        async_task.assert_not_called()
+        self.consume_file_mock.assert_not_called()
 
-    @mock.patch("documents.views.consume_file.delay")
-    def test_upload_with_tags(self, async_task):
+    def test_upload_with_tags(self):
 
-        async_task.return_value = celery.result.AsyncResult(id=str(uuid.uuid4()))
+        self.consume_file_mock.return_value = celery.result.AsyncResult(
+            id=str(uuid.uuid4()),
+        )
 
         t1 = Tag.objects.create(name="tag1")
         t2 = Tag.objects.create(name="tag2")
@@ -1287,16 +1307,20 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
             )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        async_task.assert_called_once()
+        self.consume_file_mock.assert_called_once()
 
-        args, kwargs = async_task.call_args
+        _, overrides = self.get_last_consume_delay_call_args()
 
-        self.assertCountEqual(kwargs["override_tag_ids"], [t1.id, t2.id])
+        self.assertCountEqual(overrides.tag_ids, [t1.id, t2.id])
+        self.assertIsNone(overrides.document_type_id)
+        self.assertIsNone(overrides.correspondent_id)
+        self.assertIsNone(overrides.title)
 
-    @mock.patch("documents.views.consume_file.delay")
-    def test_upload_with_invalid_tags(self, async_task):
+    def test_upload_with_invalid_tags(self):
 
-        async_task.return_value = celery.result.AsyncResult(id=str(uuid.uuid4()))
+        self.consume_file_mock.return_value = celery.result.AsyncResult(
+            id=str(uuid.uuid4()),
+        )
 
         t1 = Tag.objects.create(name="tag1")
         t2 = Tag.objects.create(name="tag2")
@@ -1310,12 +1334,13 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
             )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-        async_task.assert_not_called()
+        self.consume_file_mock.assert_not_called()
 
-    @mock.patch("documents.views.consume_file.delay")
-    def test_upload_with_created(self, async_task):
+    def test_upload_with_created(self):
 
-        async_task.return_value = celery.result.AsyncResult(id=str(uuid.uuid4()))
+        self.consume_file_mock.return_value = celery.result.AsyncResult(
+            id=str(uuid.uuid4()),
+        )
 
         created = datetime.datetime(
             2022,
@@ -1337,16 +1362,17 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
             )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        async_task.assert_called_once()
+        self.consume_file_mock.assert_called_once()
 
-        args, kwargs = async_task.call_args
+        _, overrides = self.get_last_consume_delay_call_args()
 
-        self.assertEqual(kwargs["override_created"], created)
+        self.assertEqual(overrides.created, created)
 
-    @mock.patch("documents.views.consume_file.delay")
-    def test_upload_with_asn(self, m):
+    def test_upload_with_asn(self):
 
-        m.return_value = celery.result.AsyncResult(id=str(uuid.uuid4()))
+        self.consume_file_mock.return_value = celery.result.AsyncResult(
+            id=str(uuid.uuid4()),
+        )
 
         with open(
             os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"),
@@ -1359,17 +1385,16 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        m.assert_called_once()
+        self.consume_file_mock.assert_called_once()
 
-        args, kwargs = m.call_args
-        file_path = Path(args[0])
-        self.assertEqual(file_path.name, "simple.pdf")
-        self.assertIn(Path(settings.SCRATCH_DIR), file_path.parents)
-        self.assertIsNone(kwargs["override_title"])
-        self.assertIsNone(kwargs["override_correspondent_id"])
-        self.assertIsNone(kwargs["override_document_type_id"])
-        self.assertIsNone(kwargs["override_tag_ids"])
-        self.assertEqual(500, kwargs["override_archive_serial_num"])
+        input_doc, overrides = self.get_last_consume_delay_call_args()
+
+        self.assertEqual(input_doc.original_file.name, "simple.pdf")
+        self.assertEqual(overrides.filename, "simple.pdf")
+        self.assertIsNone(overrides.correspondent_id)
+        self.assertIsNone(overrides.document_type_id)
+        self.assertIsNone(overrides.tag_ids)
+        self.assertEqual(500, overrides.asn)
 
     def test_get_metadata(self):
         doc = Document.objects.create(
