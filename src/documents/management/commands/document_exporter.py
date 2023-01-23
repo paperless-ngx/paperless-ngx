@@ -100,7 +100,7 @@ class Command(BaseCommand):
 
         parser.add_argument(
             "-p",
-            "--use-filename-prefix",
+            "--use-folder-prefix",
             default=False,
             action="store_true",
             help="Export files in dedicated folders according to their nature: "
@@ -138,7 +138,7 @@ class Command(BaseCommand):
         self.exported_files: List[Path] = []
         self.compare_checksums = False
         self.use_filename_format = False
-        self.use_filename_prefix = False
+        self.use_folder_prefix = False
         self.delete = False
         self.no_archive = False
         self.no_thumbnail = False
@@ -149,7 +149,7 @@ class Command(BaseCommand):
         self.split_manifest = options["split_manifest"]
         self.compare_checksums = options["compare_checksums"]
         self.use_filename_format = options["use_filename_format"]
-        self.use_filename_prefix = options["use_filename_prefix"]
+        self.use_folder_prefix = options["use_folder_prefix"]
         self.delete = options["delete"]
         self.no_archive = options["no_archive"]
         self.no_thumbnail = options["no_thumbnail"]
@@ -287,14 +287,14 @@ class Command(BaseCommand):
 
             # 3.3. write filenames into manifest
             original_name = base_name
-            if self.use_filename_prefix:
+            if self.use_folder_prefix:
                 original_name = os.path.join("originals", original_name)
             original_target = (self.target / Path(original_name)).resolve()
             document_dict[EXPORTER_FILE_NAME] = original_name
 
             if not self.no_thumbnail:
                 thumbnail_name = base_name + "-thumbnail.webp"
-                if self.use_filename_prefix:
+                if self.use_folder_prefix:
                     thumbnail_name = os.path.join("thumbnails", thumbnail_name)
                 thumbnail_target = (self.target / Path(thumbnail_name)).resolve()
                 document_dict[EXPORTER_THUMBNAIL_NAME] = thumbnail_name
@@ -303,7 +303,7 @@ class Command(BaseCommand):
 
             if not self.no_archive and document.has_archive_version:
                 archive_name = base_name + "-archive.pdf"
-                if self.use_filename_prefix:
+                if self.use_folder_prefix:
                     archive_name = os.path.join("archive", archive_name)
                 archive_target = (self.target / Path(archive_name)).resolve()
                 document_dict[EXPORTER_ARCHIVE_NAME] = archive_name
@@ -349,7 +349,7 @@ class Command(BaseCommand):
 
             if self.split_manifest:
                 manifest_name = base_name + "-manifest.json"
-                if self.use_filename_prefix:
+                if self.use_folder_prefix:
                     manifest_name = os.path.join("json", manifest_name)
                 manifest_name = (self.target / Path(manifest_name)).resolve()
                 manifest_name.parent.mkdir(parents=True, exist_ok=True)
