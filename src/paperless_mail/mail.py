@@ -21,6 +21,9 @@ from django.conf import settings
 from django.db import DatabaseError
 from django.utils.timezone import is_naive
 from django.utils.timezone import make_aware
+from documents.data_models import ConsumableDocument
+from documents.data_models import DocumentMetadataOverrides
+from documents.data_models import DocumentSource
 from documents.loggers import LoggingMixin
 from documents.models import Correspondent
 from documents.parsers import is_mime_type_supported
@@ -694,18 +697,22 @@ class MailAccountHandler(LoggingMixin):
                     f"{message.subject} from {message.from_}",
                 )
 
+                input_doc = ConsumableDocument(
+                    source=DocumentSource.MailFetch,
+                    original_file=temp_filename,
+                )
+                doc_overrides = DocumentMetadataOverrides(
+                    title=title,
+                    filename=pathvalidate.sanitize_filename(att.filename),
+                    correspondent_id=correspondent.id if correspondent else None,
+                    document_type_id=doc_type.id if doc_type else None,
+                    tag_ids=tag_ids,
+                    owner_id=rule.owner.id if rule.owner else None,
+                )
+
                 consume_task = consume_file.s(
-                    path=temp_filename,
-                    override_filename=pathvalidate.sanitize_filename(
-                        att.filename,
-                    ),
-                    override_title=title,
-                    override_correspondent_id=correspondent.id
-                    if correspondent
-                    else None,
-                    override_document_type_id=doc_type.id if doc_type else None,
-                    override_tag_ids=tag_ids,
-                    override_owner_id=rule.owner.id if rule.owner else None,
+                    input_doc,
+                    doc_overrides,
                 )
 
                 consume_tasks.append(consume_task)
@@ -770,16 +777,22 @@ class MailAccountHandler(LoggingMixin):
             f"{message.subject} from {message.from_}",
         )
 
+        input_doc = ConsumableDocument(
+            source=DocumentSource.MailFetch,
+            original_file=temp_filename,
+        )
+        doc_overrides = DocumentMetadataOverrides(
+            title=message.subject,
+            filename=pathvalidate.sanitize_filename(f"{message.subject}.eml"),
+            correspondent_id=correspondent.id if correspondent else None,
+            document_type_id=doc_type.id if doc_type else None,
+            tag_ids=tag_ids,
+            owner_id=rule.owner.id if rule.owner else None,
+        )
+
         consume_task = consume_file.s(
-            path=temp_filename,
-            override_filename=pathvalidate.sanitize_filename(
-                message.subject + ".eml",
-            ),
-            override_title=message.subject,
-            override_correspondent_id=correspondent.id if correspondent else None,
-            override_document_type_id=doc_type.id if doc_type else None,
-            override_tag_ids=tag_ids,
-            override_owner_id=rule.owner.id if rule.owner else None,
+            input_doc,
+            doc_overrides,
         )
 
         queue_consumption_tasks(

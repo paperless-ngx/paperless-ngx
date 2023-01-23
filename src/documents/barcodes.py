@@ -11,7 +11,6 @@ from typing import List
 from typing import Optional
 
 import img2pdf
-import magic
 from django.conf import settings
 from pdf2image import convert_from_path
 from pdf2image.exceptions import PDFPageCountError
@@ -63,7 +62,7 @@ class DocumentBarcodeInfo:
 
 
 @lru_cache(maxsize=8)
-def supported_file_type(mime_type) -> bool:
+def supported_file_type(mime_type: str) -> bool:
     """
     Determines if the file is valid for barcode
     processing, based on MIME type and settings
@@ -115,33 +114,16 @@ def barcode_reader(image: Image) -> List[str]:
     return barcodes
 
 
-def get_file_mime_type(path: Path) -> str:
-    """
-    Determines the file type, based on MIME type.
-
-    Returns the MIME type.
-    """
-    mime_type = magic.from_file(path, mime=True)
-    logger.debug(f"Detected mime type: {mime_type}")
-    return mime_type
-
-
 def convert_from_tiff_to_pdf(filepath: Path) -> Path:
     """
     converts a given TIFF image file to pdf into a temporary directory.
 
     Returns the new pdf file.
     """
-    mime_type = get_file_mime_type(filepath)
     tempdir = tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR)
     # use old file name with pdf extension
-    if mime_type == "image/tiff":
-        newpath = Path(tempdir) / Path(filepath.name).with_suffix(".pdf")
-    else:
-        logger.warning(
-            f"Cannot convert mime type {mime_type} from {filepath} to pdf.",
-        )
-        return None
+    newpath = Path(tempdir) / Path(filepath.name).with_suffix(".pdf")
+
     with Image.open(filepath) as im:
         has_alpha_layer = im.mode in ("RGBA", "LA")
     if has_alpha_layer:
@@ -162,6 +144,7 @@ def convert_from_tiff_to_pdf(filepath: Path) -> Path:
 
 def scan_file_for_barcodes(
     filepath: Path,
+    mime_type: str,
 ) -> DocumentBarcodeInfo:
     """
     Scan the provided pdf file for any barcodes
@@ -186,7 +169,6 @@ def scan_file_for_barcodes(
         return detected_barcodes
 
     pdf_filepath = None
-    mime_type = get_file_mime_type(filepath)
     barcodes = []
 
     if supported_file_type(mime_type):
