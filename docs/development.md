@@ -1,9 +1,9 @@
 # Development
 
 This section describes the steps you need to take to start development
-on paperless-ngx.
+on Paperless-ngx.
 
-Check out the source from github. The repository is organized in the
+Check out the source from GitHub. The repository is organized in the
 following way:
 
 - `main` always represents the latest release and will only see
@@ -12,7 +12,7 @@ following way:
 - `feature-X` contain bigger changes that will be in some release, but
   not necessarily the next one.
 
-When making functional changes to paperless, _always_ make your changes
+When making functional changes to Paperless-ngx, _always_ make your changes
 on the `dev` branch.
 
 Apart from that, the folder structure is as follows:
@@ -24,9 +24,9 @@ Apart from that, the folder structure is as follows:
   development.
 - `docker/` - Files required to build the docker image.
 
-## Contributing to Paperless
+## Contributing to Paperless-ngx
 
-Maybe you've been using Paperless for a while and want to add a feature
+Maybe you've been using Paperless-ngx for a while and want to add a feature
 or two, or maybe you've come across a bug that you have some ideas how
 to solve. The beauty of open source software is that you can see what's
 wrong and help to get it fixed for everyone!
@@ -36,13 +36,13 @@ conduct](https://github.com/paperless-ngx/paperless-ngx/blob/main/CODE_OF_CONDUC
 and other important information in the [contributing
 guidelines](https://github.com/paperless-ngx/paperless-ngx/blob/main/CONTRIBUTING.md).
 
-## Code formatting with pre-commit Hooks
+## Code formatting with pre-commit hooks
 
 To ensure a consistent style and formatting across the project source,
-the project utilizes a Git [`pre-commit`](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks)
-hook to perform some formatting and linting before a commit is allowed.
+the project utilizes Git [`pre-commit`](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks)
+hooks to perform some formatting and linting before a commit is allowed.
 That way, everyone uses the same style and some common issues can be caught
-early on. See below for installation instructions.
+early on.
 
 Once installed, hooks will run when you commit. If the formatting isn't
 quite right or a linter catches something, the commit will be rejected.
@@ -51,137 +51,110 @@ as the Python formatting tool `black`, will format failing
 files, so all you need to do is `git add` those files again
 and retry your commit.
 
-## Initial setup and first start
+## General setup
 
-After you forked and cloned the code from github you need to perform a
-first-time setup. To do the setup you need to perform the steps from the
-following chapters in a certain order:
+After you forked and cloned the code from GitHub you need to perform a
+first-time setup. 
+
+!!! note
+    Every command is executed directly from the root folder of the project unless specified otherwise.
+
 
 1.  Install prerequisites + pipenv as mentioned in
     [Bare metal route](/setup#bare_metal).
 
 2.  Copy `paperless.conf.example` to `paperless.conf` and enable debug
-    mode.
+    mode within the file via `PAPERLESS_DEBUG=true`.
 
-3.  Install the Angular CLI interface. You might need sudo privileges
-    to perform this command:
+3.  Create `consume` and `media` directories:
 
-    ```shell-session
-    $ npm install -g @angular/cli
-    ```
-
-4.  Install pre-commit hooks
-
-    ```shell-session
-    $ cd /path/to/paperless
-    $ pre-commit install
-    ```
-
-5.  Create `consume` and `media` folders in the cloned root folder.
-
-    ```shell-session
-    $ cd /path/to/paperless
+    ```bash
     $ mkdir -p consume media
     ```
 
-6.  You can now either ...
+4.  Install the Python dependencies:
 
-    - install redis or
-
-    - use the included scripts/start-services.sh to use docker to fire
-      up a redis instance (and some other services such as tika,
-      gotenberg and a database server) or
-
-    - spin up a bare redis container
-
-      ```shell-session
-      $ docker run -d -p 6379:6379 --restart unless-stopped redis:latest
-      ```
-
-7.  Install the python dependencies by performing in the root directory:
-
-    ```shell-session
-    $ cd /path/to/paperless
+    ```bash
     $ pipenv install --dev
     ```
 
     !!! note
 
-        Using a virtual environment is highly recommended.
-        Make sure you're using python 3.10.x or lower. Otherwise you might
+        Using a virtual environment is highly recommended. You can spawn one via `pipenv shell`.
+        Make sure you're using Python 3.10.x or lower. Otherwise you might
         get issues with building dependencies. You can use
         [pyenv](https://github.com/pyenv/pyenv) to install a specific
-        python version.
+        Python version.
 
-8.  Generate the static UI so you can perform a login to get session
-    that is required for frontend development (this needs to be done one
-    time only). From src-ui directory:
 
-    ```shell-session
-    $ cd /path/to/paperless/src-ui
-    $ npm install .
-    $ ./node_modules/.bin/ng build --configuration production
+5.  Install pre-commit hooks:
+
+    ```bash
+    $ pre-commit install
     ```
 
-9.  Apply migrations and create a superuser for your dev instance:
+6.  Apply migrations and create a superuser for your development instance:
 
-    ```shell-session
-    $ cd /path/to/paperless/src
+    ```bash
+    # src/
+
     $ python3 manage.py migrate
     $ python3 manage.py createsuperuser
     ```
 
-10. Now spin up the dev backend. Depending on which part of paperless
-    you're developing for, you need to have some or all of them
-    running.
+7.  You can now either ...
 
-    ```shell-session
-    $ cd /path/to/paperless/src
-    $ python3 manage.py runserver & python3 manage.py document_consumer & celery --app paperless worker
-    ```
+    - install redis or
 
-11. Login with the superuser credentials provided in step 8 at
-    `http://localhost:8000` to create a session that enables you to use
-    the backend.
+    - use the included `scripts/start_services.sh` to use docker to fire
+      up a redis instance (and some other services such as tika,
+      gotenberg and a database server) or
 
-Backend development environment is now ready, to start Frontend
-development go to `/src-ui` and run `ng serve`. From there you can use
-`http://localhost:4200` for a preview.
+    - spin up a bare redis container
+
+      ```
+      $ docker run -d -p 6379:6379 --restart unless-stopped redis:latest
+      ```
+
+8. Continue with either back-end or front-end development – or both :-).
 
 ## Back end development
 
-The backend is a [Django](https://www.djangoproject.com/) application. PyCharm works well for development,
-but you can use whatever you want.
+The back end is a [Django](https://www.djangoproject.com/) application. [PyCharm](https://www.jetbrains.com/de-de/pycharm/) as well as [Visual Studio Code](https://code.visualstudio.com) work well for development, but you can use whatever you want.
 
-Configure the IDE to use the src/ folder as the base source folder.
+Configure the IDE to use the `src/`-folder as the base source folder.
 Configure the following launch configurations in your IDE:
 
 - `python3 manage.py runserver`
-- `celery --app paperless worker`
 - `python3 manage.py document_consumer`
+- `celery --app paperless worker -l DEBUG` (or any other log level)
 
 To start them all:
 
-```shell-session
-$ cd /path/to/paperless/src
-$ python3 manage.py runserver & python3 manage.py document_consumer & celery --app paperless worker
+```bash
+# src/
+
+$ python3 manage.py runserver & \ 
+  python3 manage.py document_consumer & \
+  celery --app paperless worker -l DEBUG
 ```
 
-Testing and code style:
+You might need the front end to test your back end code. This assumes that you have AngularJS installed on your system. Go to the [Front end development](#front-end-development) section for further details. To build the front end once use this commmand:
+
+```bash
+# src-ui/
+
+$ npm install
+$ ng build --configuration production
+```
+
+### Testing
 
 - Run `pytest` in the `src/` directory to execute all tests. This also
-  generates a HTML coverage report. When runnings test, paperless.conf
-  is loaded as well. However: the tests rely on the default
+  generates a HTML coverage report. When runnings test, `paperless.conf`
+  is loaded as well. However, the tests rely on the default
   configuration. This is not ideal. But for now, make sure no settings
   except for DEBUG are overridden when testing.
-
-- Coding style is enforced by the Git pre-commit hooks. These will
-  ensure your code is formatted and do some linting when you do a `git commit`.
-
-- You can also run `black` manually to format your code
-
-- The `pre-commit` hooks will modify files and interact with each other.
-  It may take a couple of `git add`, `git commit` cycle to satisfy them.
 
 !!! note
 
@@ -191,106 +164,110 @@ Testing and code style:
       complicated IF cases. Append `# noqa: E501` to disable this check
       for certain lines.
 
+
 ## Front end development
 
-The front end is built using Angular. In order to get started, you need
-`npm`. Install the Angular CLI interface with
+The front end is built using AngularJS. In order to get started, you need Node.js (version 14.15+) and
+`npm`.
 
-```shell-session
-$ npm install -g @angular/cli
-```
+!!! note
 
-and make sure that it's on your path. Next, in the src-ui/ directory,
-install the required dependencies of the project.
+    The following commands are all performed in the `src-ui`-directory. You will need a running back end (including an active session) to connect to the back end API. To spin it up refer to the commands under the section [above](#back-end-development).
 
-```shell-session
-$ cd /path/to/paperless/src-ui
-$ npm install
-```
 
-You can launch a development server by running
 
-```shell-session
-$ cd /path/to/paperless/src-ui
-$ ng serve
-```
 
-This will automatically update whenever you save. However, in-place
-compilation might fail on syntax errors, in which case you need to
-restart it.
+1. Install the Angular CLI. You might need sudo privileges
+    to perform this command:
 
-By default, the development server is available on
-`http://localhost:4200/` and is configured to access the API at
-`http://localhost:8000/api/`, which is the default of the backend. If
-you enabled DEBUG on the back end, several security overrides for
-allowed hosts, CORS and X-Frame-Options are in place so that the front
-end behaves exactly as in production. This also relies on you being
-logged into the back end. Without a valid session, The front end will
-simply not work.
+    ```bash
+    $ npm install -g @angular/cli
+    ```
 
-Testing and code style:
+2. Make sure that it's on your path. 
 
-- The frontend code (.ts, .html, .scss) use `prettier` for code
+
+
+3. Install all neccessary modules:
+
+    ```bash
+    $ npm install
+    ```
+
+4. You can launch a development server by running:
+
+    ```bash
+    $ ng serve
+    ```
+
+    This will automatically update whenever you save. However, in-place
+    compilation might fail on syntax errors, in which case you need to
+    restart it.
+
+
+    By default, the development server is available on `http://localhost:4200/` and is configured to access the API at 
+    `http://localhost:8000/api/`, which is the default of the backend. If you enabled `DEBUG` on the back end, several security overrides for allowed hosts, CORS and X-Frame-Options are in place so that the front end behaves exactly as in production. 
+
+
+
+
+### Testing and code style
+
+- The front end code (.ts, .html, .scss) use `prettier` for code
   formatting via the Git `pre-commit` hooks which run automatically on
-  commit. See
-  [above](#code-formatting-with-pre-commit-hooks) for installation. You can also run this via cli with a
+  commit. See [above](#code-formatting-with-pre-commit-hooks) for installation instructions. You can also run this via the CLI with a
   command such as
 
-  ```shell-session
-  $ cd /path/to/paperless/src-ui
-  $ git ls-files -- '*.ts' | xargs pre-commit run prettier --files
-  ```
+    ```bash
+    $ git ls-files -- '*.ts' | xargs pre-commit run prettier --files
+    ```
 
-- Frontend testing uses jest and cypress. There is currently a need
-  for significantly more frontend tests. Unit tests and e2e tests,
+- Front end testing uses jest and cypress. There is currently a need
+  for significantly more front end tests. Unit tests and e2e tests,
   respectively, can be run non-interactively with:
 
-  ```shell-session
-  $ cd /path/to/paperless/src-ui
-  $ ng test
-  $ npm run e2e:ci
-  ```
+    ```bash
+    $ ng test
+    $ npm run e2e:ci
+    ```
 
-  Cypress also includes a UI which can be run from within the `src-ui`
-  directory with
+  - Cypress also includes a UI which can be run with:
 
-  ```shell-session
-  $ cd /path/to/paperless/src-ui
-  $ ./node_modules/.bin/cypress open
-  ```
+      ```bash
+      $ ./node_modules/.bin/cypress open
+      ```
 
-In order to build the front end and serve it as part of django, execute
+- In order to build the front end and serve it as part of Django, execute:
 
-```shell-session
-$ cd /path/to/paperless/src-ui
-$ ng build --configuration production
-```
+    ```bash
+    $ ng build --configuration production
+    ```
 
-This will build the front end and put it in a location from which the
-Django server will serve it as static content. This way, you can verify
-that authentication is working.
+    This will build the front end and put it in a location from which the
+    Django server will serve it as static content. This way, you can verify
+    that authentication is working.
 
 ## Localization
 
-Paperless is available in many different languages. Since paperless
-consists both of a django application and an Angular front end, both
+Paperless-ngx is available in many different languages. Since Paperless-ngx
+consists both of a Django application and an AngularJS front end, both
 these parts have to be translated separately.
 
 ### Front end localization
 
-- The Angular front end does localization according to the [Angular
+- The AngularJS front end does localization according to the [Angular
   documentation](https://angular.io/guide/i18n).
 - The source language of the project is "en_US".
-- The source strings end up in the file "src-ui/messages.xlf".
+- The source strings end up in the file `src-ui/messages.xlf`.
 - The translated strings need to be placed in the
-  "src-ui/src/locale/" folder.
+  `src-ui/src/locale/` folder.
 - In order to extract added or changed strings from the source files,
   call `ng xi18n --ivy`.
 
 Adding new languages requires adding the translated files in the
-"src-ui/src/locale/" folder and adjusting a couple files.
+`src-ui/src/locale/` folder and adjusting a couple files.
 
-1.  Adjust "src-ui/angular.json":
+1.  Adjust `src-ui/angular.json`:
 
     ```json
     "i18n": {
@@ -307,7 +284,7 @@ Adding new languages requires adding the translated files in the
     ```
 
 2.  Add the language to the available options in
-    "src-ui/src/app/services/settings.service.ts":
+    `src-ui/src/app/services/settings.service.ts`:
 
     ```typescript
     getLanguageOptions(): LanguageOption[] {
@@ -328,7 +305,7 @@ Adding new languages requires adding the translated files in the
     and "yyyy".
 
 3.  Import and register the Angular data for this locale in
-    "src-ui/src/app/app.module.ts":
+    `src-ui/src/app/app.module.ts`:
 
     ```typescript
     import localeDe from '@angular/common/locales/de'
@@ -341,10 +318,10 @@ A majority of the strings that appear in the back end appear only when
 the admin is used. However, some of these are still shown on the front
 end (such as error messages).
 
-- The django application does localization according to the [django
+- The django application does localization according to the [Django
   documentation](https://docs.djangoproject.com/en/3.1/topics/i18n/translation/).
 - The source language of the project is "en_US".
-- Localization files end up in the folder "src/locale/".
+- Localization files end up in the folder `src/locale/`.
 - In order to extract strings from the application, call
   `python3 manage.py makemessages -l en_US`. This is important after
   making changes to translatable strings.
@@ -355,8 +332,8 @@ end (such as error messages).
   command.
 
 Adding new languages requires adding the translated files in the
-"src/locale/" folder and adjusting the file
-"src/paperless/settings.py" to include the new language:
+`src/locale/`-folder and adjusting the file
+`src/paperless/settings.py` to include the new language:
 
 ```python
 LANGUAGES = [
@@ -375,17 +352,15 @@ LANGUAGES = [
 The documentation is built using material-mkdocs, see their [documentation](https://squidfunk.github.io/mkdocs-material/reference/).
 If you want to build the documentation locally, this is how you do it:
 
-1.  Install python dependencies.
+1.  Have an active pipenv shell (`pipenv shell`) and install Python dependencies:
 
-    ```shell-session
-    $ cd /path/to/paperless
+    ```bash
     $ pipenv install --dev
     ```
 
 2.  Build the documentation
 
-    ```shell-session
-    $ cd /path/to/paperless
+    ```bash
     $ pipenv mkdocs build --config-file mkdocs.yml
     ```
 
@@ -394,10 +369,9 @@ If you want to build the documentation locally, this is how you do it:
 3.  Serve the documentation. This will spin up a
     copy of the documentation at http://127.0.0.1:8000
     that will automatically refresh everytime you change
-    the documentation.
+    something.
 
-    ```shell-session
-    $ cd /path/to/paperless
+    ```bash
     $ pipenv mkdocs serve
     ```
 
@@ -411,36 +385,35 @@ helper script `build-docker-image.sh`.
 
 Building the docker image from source:
 
-```shell-session
-$ cd /path/to/paperless
+```bash
 ./build-docker-image.sh Dockerfile -t <your-tag>
 ```
 
-## Extending Paperless
+## Extending Paperless-ngx
 
-Paperless does not have any fancy plugin systems and will probably never
+Paperless-ngx does not have any fancy plugin systems and will probably never
 have. However, some parts of the application have been designed to allow
 easy integration of additional features without any modification to the
 base code.
 
 ### Making custom parsers
 
-Paperless uses parsers to add documents to paperless. A parser is
+Paperless-ngx uses parsers to add documents. A parser is
 responsible for:
 
-- Retrieve the content from the original
-- Create a thumbnail
-- Optional: Retrieve a created date from the original
-- Optional: Create an archived document from the original
+- Retrieving the content from the original
+- Creating a thumbnail
+- _optional:_ Retrieving a created date from the original
+- _optional:_ Creainge an archived document from the original
 
-Custom parsers can be added to paperless to support more file types. In
+Custom parsers can be added to Paperless-ngx to support more file types. In
 order to do that, you need to write the parser itself and announce its
-existence to paperless.
+existence to Paperless-ngx.
 
 The parser itself must extend `documents.parsers.DocumentParser` and
 must implement the methods `parse` and `get_thumbnail`. You can provide
 your own implementation to `get_date` if you don't want to rely on
-paperless' default date guessing mechanisms.
+Paperless-ngx' default date guessing mechanisms.
 
 ```python
 class MyCustomParser(DocumentParser):
@@ -472,7 +445,7 @@ to be empty and removed after consumption finished. You can use that
 directory to store any intermediate files and also use it to store the
 thumbnail / archived document.
 
-After that, you need to announce your parser to paperless. You need to
+After that, you need to announce your parser to Paperless-ngx. You need to
 connect a handler to the `document_consumer_declaration` signal. Have a
 look in the file `src/paperless_tesseract/apps.py` on how that's done.
 The handler is a method that returns information about your parser:
@@ -492,11 +465,11 @@ def myparser_consumer_declaration(sender, **kwargs):
 - `parser` is a reference to a class that extends `DocumentParser`.
 - `weight` is used whenever two or more parsers are able to parse a
   file: The parser with the higher weight wins. This can be used to
-  override the parsers provided by paperless.
+  override the parsers provided by Paperless-ngx.
 - `mime_types` is a dictionary. The keys are the mime types your
   parser supports and the value is the default file extension that
-  paperless should use when storing files and serving them for
+  Paperless-ngx should use when storing files and serving them for
   download. We could guess that from the file extensions, but some
-  mime types have many extensions associated with them and the python
+  mime types have many extensions associated with them and the Python
   methods responsible for guessing the extension do not always return
   the same value.
