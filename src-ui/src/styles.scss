@@ -510,6 +510,10 @@ table.table {
 
 .progress {
   background-color: var(--bs-body-bg);
+
+  .text-bg-primary {
+    background-color: var(--bs-primary) !important;
+  }
 }
 
 .ngb-dp-header,

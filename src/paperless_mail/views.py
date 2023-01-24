@@ -20,7 +20,7 @@ class MailAccountViewSet(ModelViewSet, PassUserMixin):
 class MailRuleViewSet(ModelViewSet, PassUserMixin):
     model = MailRule
 
-    queryset = MailRule.objects.all().order_by("pk")
+    queryset = MailRule.objects.all().order_by("order")
     serializer_class = MailRuleSerializer
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated,)
