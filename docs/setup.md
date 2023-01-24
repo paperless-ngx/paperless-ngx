@@ -784,7 +784,9 @@ with a few simple steps.
 
 Paperless-ngx modified the database schema slightly, however, these
 changes can be reverted while keeping your current data, so that your
-current data will be compatible with original Paperless.
+current data will be compatible with original Paperless. Thumbnails
+were also changed from PNG to WEBP format and will need to be
+re-generated.
 
 Execute this:
 
@@ -800,9 +802,9 @@ $ cd /path/to/paperless/src
 $ python3 manage.py migrate documents 0023
 ```
 
-After that, you need to clear your cookies (Paperless-ngx comes with
-updated dependencies that do cookie-processing differently) and probably
-your cache as well.
+After regenerating thumbnails, you'll need to clear your cookies
+(Paperless-ngx comes with updated dependencies that do cookie-processing
+differently) and probably your cache as well.
 
 # Considerations for less powerful devices {#less-powerful-devices}
 
