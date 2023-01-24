@@ -54,11 +54,10 @@ and retry your commit.
 ## General setup
 
 After you forked and cloned the code from GitHub you need to perform a
-first-time setup. 
+first-time setup.
 
 !!! note
-    Every command is executed directly from the root folder of the project unless specified otherwise.
-
+Every command is executed directly from the root folder of the project unless specified otherwise.
 
 1.  Install prerequisites + pipenv as mentioned in
     [Bare metal route](/setup#bare_metal).
@@ -85,7 +84,6 @@ first-time setup.
         get issues with building dependencies. You can use
         [pyenv](https://github.com/pyenv/pyenv) to install a specific
         Python version.
-
 
 5.  Install pre-commit hooks:
 
@@ -116,7 +114,7 @@ first-time setup.
       $ docker run -d -p 6379:6379 --restart unless-stopped redis:latest
       ```
 
-8. Continue with either back-end or front-end development – or both :-).
+8.  Continue with either back-end or front-end development – or both :-).
 
 ## Back end development
 
@@ -134,7 +132,7 @@ To start them all:
 ```bash
 # src/
 
-$ python3 manage.py runserver & \ 
+$ python3 manage.py runserver & \
   python3 manage.py document_consumer & \
   celery --app paperless worker -l DEBUG
 ```
@@ -164,7 +162,6 @@ $ ng build --configuration production
       complicated IF cases. Append `# noqa: E501` to disable this check
       for certain lines.
 
-
 ## Front end development
 
 The front end is built using AngularJS. In order to get started, you need Node.js (version 14.15+) and
@@ -174,42 +171,33 @@ The front end is built using AngularJS. In order to get started, you need Node.j
 
     The following commands are all performed in the `src-ui`-directory. You will need a running back end (including an active session) to connect to the back end API. To spin it up refer to the commands under the section [above](#back-end-development).
 
-
-
-
 1. Install the Angular CLI. You might need sudo privileges
-    to perform this command:
+   to perform this command:
 
-    ```bash
-    $ npm install -g @angular/cli
-    ```
+   ```bash
+   $ npm install -g @angular/cli
+   ```
 
-2. Make sure that it's on your path. 
-
-
+2. Make sure that it's on your path.
 
 3. Install all neccessary modules:
 
-    ```bash
-    $ npm install
-    ```
+   ```bash
+   $ npm install
+   ```
 
 4. You can launch a development server by running:
 
-    ```bash
-    $ ng serve
-    ```
+   ```bash
+   $ ng serve
+   ```
 
-    This will automatically update whenever you save. However, in-place
-    compilation might fail on syntax errors, in which case you need to
-    restart it.
+   This will automatically update whenever you save. However, in-place
+   compilation might fail on syntax errors, in which case you need to
+   restart it.
 
-
-    By default, the development server is available on `http://localhost:4200/` and is configured to access the API at 
-    `http://localhost:8000/api/`, which is the default of the backend. If you enabled `DEBUG` on the back end, several security overrides for allowed hosts, CORS and X-Frame-Options are in place so that the front end behaves exactly as in production. 
-
-
-
+   By default, the development server is available on `http://localhost:4200/` and is configured to access the API at
+   `http://localhost:8000/api/`, which is the default of the backend. If you enabled `DEBUG` on the back end, several security overrides for allowed hosts, CORS and X-Frame-Options are in place so that the front end behaves exactly as in production.
 
 ### Testing and code style
 
@@ -218,34 +206,34 @@ The front end is built using AngularJS. In order to get started, you need Node.j
   commit. See [above](#code-formatting-with-pre-commit-hooks) for installation instructions. You can also run this via the CLI with a
   command such as
 
-    ```bash
-    $ git ls-files -- '*.ts' | xargs pre-commit run prettier --files
-    ```
+  ```bash
+  $ git ls-files -- '*.ts' | xargs pre-commit run prettier --files
+  ```
 
 - Front end testing uses jest and cypress. There is currently a need
   for significantly more front end tests. Unit tests and e2e tests,
   respectively, can be run non-interactively with:
 
-    ```bash
-    $ ng test
-    $ npm run e2e:ci
-    ```
+  ```bash
+  $ ng test
+  $ npm run e2e:ci
+  ```
 
   - Cypress also includes a UI which can be run with:
 
-      ```bash
-      $ ./node_modules/.bin/cypress open
-      ```
+    ```bash
+    $ ./node_modules/.bin/cypress open
+    ```
 
 - In order to build the front end and serve it as part of Django, execute:
 
-    ```bash
-    $ ng build --configuration production
-    ```
+  ```bash
+  $ ng build --configuration production
+  ```
 
-    This will build the front end and put it in a location from which the
-    Django server will serve it as static content. This way, you can verify
-    that authentication is working.
+  This will build the front end and put it in a location from which the
+  Django server will serve it as static content. This way, you can verify
+  that authentication is working.
 
 ## Localization
 
