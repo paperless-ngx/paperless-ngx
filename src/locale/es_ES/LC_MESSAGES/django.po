@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-09 21:50+0000\n"
-"PO-Revision-Date: 2022-11-09 23:11\n"
+"PO-Revision-Date: 2023-01-05 22:57\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -184,11 +184,11 @@ msgstr "Nombre de archivo actual en disco"
 
 #: documents/models.py:221
 msgid "original filename"
-msgstr ""
+msgstr "nombre del archivo original"
 
 #: documents/models.py:227
 msgid "The original name of the file when it was uploaded"
-msgstr ""
+msgstr "El nombre que tenía el archivo cuando fue cargado"
 
 #: documents/models.py:231
 msgid "archive serial number"
@@ -396,11 +396,11 @@ msgstr "reglas de filtrado"
 
 #: documents/models.py:536
 msgid "Task ID"
-msgstr ""
+msgstr "ID de la tarea"
 
 #: documents/models.py:537
 msgid "Celery ID for the Task that was run"
-msgstr ""
+msgstr "ID de Celery de la tarea ejecutada"
 
 #: documents/models.py:542
 msgid "Acknowledged"
@@ -412,7 +412,7 @@ msgstr ""
 
 #: documents/models.py:549 documents/models.py:556
 msgid "Task Name"
-msgstr ""
+msgstr "Nombre de la tarea"
 
 #: documents/models.py:550
 msgid "Name of the file which the Task was run for"
@@ -420,7 +420,7 @@ msgstr ""
 
 #: documents/models.py:557
 msgid "Name of the Task which was run"
-msgstr ""
+msgstr "Nombre de la tarea ejecutada"
 
 #: documents/models.py:562
 msgid "Task Positional Arguments"
@@ -440,15 +440,15 @@ msgstr ""
 
 #: documents/models.py:578
 msgid "Task State"
-msgstr ""
+msgstr "Estado de la tarea"
 
 #: documents/models.py:579
 msgid "Current state of the task being run"
-msgstr ""
+msgstr "Estado de la tarea actualmente en ejecución"
 
 #: documents/models.py:584
 msgid "Created DateTime"
-msgstr ""
+msgstr "Fecha y hora de creación"
 
 #: documents/models.py:585
 msgid "Datetime field when the task result was created in UTC"
@@ -456,7 +456,7 @@ msgstr ""
 
 #: documents/models.py:590
 msgid "Started DateTime"
-msgstr ""
+msgstr "Fecha y hora de inicio"
 
 #: documents/models.py:591
 msgid "Datetime field when the task was started in UTC"
@@ -480,15 +480,15 @@ msgstr ""
 
 #: documents/models.py:613
 msgid "Comment for the document"
-msgstr ""
+msgstr "Comentario para el documento"
 
 #: documents/models.py:642
 msgid "comment"
-msgstr ""
+msgstr "comentario"
 
 #: documents/models.py:643
 msgid "comments"
-msgstr ""
+msgstr "comentarios"
 
 #: documents/serialisers.py:72
 #, python-format
