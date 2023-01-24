@@ -34,7 +34,7 @@ def get_schema():
         id=NUMERIC(stored=True, unique=True),
         title=TEXT(sortable=True),
         content=TEXT(),
-        asn=NUMERIC(sortable=True),
+        asn=NUMERIC(sortable=True, signed=False),
         correspondent=TEXT(sortable=True),
         correspondent_id=NUMERIC(),
         has_correspondent=BOOLEAN(),
