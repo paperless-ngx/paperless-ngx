@@ -40,6 +40,7 @@ class ConsumerError(Exception):
 
 MESSAGE_DOCUMENT_ALREADY_EXISTS = "document_already_exists"
 MESSAGE_ASN_ALREADY_EXISTS = "asn_already_exists"
+MESSAGE_ASN_RANGE = "asn_value_out_of_range"
 MESSAGE_FILE_NOT_FOUND = "file_not_found"
 MESSAGE_PRE_CONSUME_SCRIPT_NOT_FOUND = "pre_consume_script_not_found"
 MESSAGE_PRE_CONSUME_SCRIPT_ERROR = "pre_consume_script_error"
@@ -132,17 +133,25 @@ class Consumer(LoggingMixin):
         os.makedirs(settings.ORIGINALS_DIR, exist_ok=True)
         os.makedirs(settings.ARCHIVE_DIR, exist_ok=True)
 
-    def pre_check_asn_unique(self):
+    def pre_check_asn_value(self):
         """
-        Check that if override_asn is given, it is unique
+        Check that if override_asn is given, it is unique and within a valid range
         """
         if not self.override_asn:
             # check not necessary in case no ASN gets set
             return
+        # Validate the range is above zero and less than int32 max
+        # otherwise, Whoosh can't handle it in the index
+        if self.override_asn < 0 or self.override_asn > 2_147_483_647:
+            self._fail(
+                MESSAGE_ASN_RANGE,
+                f"Not consuming {self.filename}: "
+                "Given ASN is out of range [0, 2147483647]",
+            )
         if Document.objects.filter(archive_serial_number=self.override_asn).exists():
             self._fail(
                 MESSAGE_ASN_ALREADY_EXISTS,
-                f"Not consuming {self.filename}: Given ASN already" f"exists!",
+                f"Not consuming {self.filename}: Given ASN already exists!",
             )
 
     def run_pre_consume_script(self):
@@ -298,7 +307,7 @@ class Consumer(LoggingMixin):
         self.pre_check_file_exists()
         self.pre_check_directories()
         self.pre_check_duplicate()
-        self.pre_check_asn_unique()
+        self.pre_check_asn_value()
 
         self.log("info", f"Consuming {self.filename}")
 
