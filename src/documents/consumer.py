@@ -140,13 +140,13 @@ class Consumer(LoggingMixin):
         if not self.override_asn:
             # check not necessary in case no ASN gets set
             return
-        # Validate the range is above zero and less than int32 max
+        # Validate the range is above zero and less than uint32_t max
         # otherwise, Whoosh can't handle it in the index
-        if self.override_asn < 0 or self.override_asn > 2_147_483_647:
+        if self.override_asn < 0 or self.override_asn > 0xFF_FF_FF_FF:
             self._fail(
                 MESSAGE_ASN_RANGE,
                 f"Not consuming {self.filename}: "
-                "Given ASN is out of range [0, 2147483647]",
+                f"Given ASN {self.override_asn} is out of range [0, 4,294,967,295]",
             )
         if Document.objects.filter(archive_serial_number=self.override_asn).exists():
             self._fail(
