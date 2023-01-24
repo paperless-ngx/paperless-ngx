@@ -9,6 +9,7 @@ from django.test import override_settings
 from django.test import TestCase
 from documents import barcodes
 from documents import tasks
+from documents.consumer import ConsumerError
 from documents.tests.utils import DirectoriesMixin
 from PIL import Image
 
@@ -779,3 +780,23 @@ class TestBarcode(DirectoriesMixin, TestCase):
             args, kwargs = mocked_call.call_args
 
             self.assertEqual(kwargs["override_asn"], 123)
+
+    @override_settings(CONSUMER_ENABLE_ASN_BARCODE=True)
+    def test_asn_too_large(self):
+
+        src = os.path.join(
+            os.path.dirname(__file__),
+            "samples",
+            "barcodes",
+            "barcode-128-asn-too-large.pdf",
+        )
+        dst = os.path.join(self.dirs.scratch_dir, "barcode-128-asn-too-large.pdf")
+        shutil.copy(src, dst)
+
+        with mock.patch("documents.consumer.Consumer._send_progress"):
+            self.assertRaisesMessage(
+                ConsumerError,
+                "Given ASN 4294967296 is out of range [0, 4,294,967,295]",
+                tasks.consume_file,
+                dst,
+            )
