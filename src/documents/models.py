@@ -236,7 +236,7 @@ class Document(models.Model):
         unique=True,
         db_index=True,
         validators=[
-            MaxValueValidator(2147483647),
+            MaxValueValidator(0xFF_FF_FF_FF),
             MinValueValidator(0),
         ],
         help_text=_(
