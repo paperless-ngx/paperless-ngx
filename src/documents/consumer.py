@@ -40,6 +40,8 @@ class ConsumerError(Exception):
 
 
 MESSAGE_DOCUMENT_ALREADY_EXISTS = "document_already_exists"
+MESSAGE_ASN_ALREADY_EXISTS = "asn_already_exists"
+MESSAGE_ASN_RANGE = "asn_value_out_of_range"
 MESSAGE_FILE_NOT_FOUND = "file_not_found"
 MESSAGE_PRE_CONSUME_SCRIPT_NOT_FOUND = "pre_consume_script_not_found"
 MESSAGE_PRE_CONSUME_SCRIPT_ERROR = "pre_consume_script_error"
@@ -99,6 +101,7 @@ class Consumer(LoggingMixin):
         self.override_correspondent_id = None
         self.override_tag_ids = None
         self.override_document_type_id = None
+        self.override_asn = None
         self.task_id = None
         self.owner_id = None
 
@@ -131,6 +134,27 @@ class Consumer(LoggingMixin):
         os.makedirs(settings.THUMBNAIL_DIR, exist_ok=True)
         os.makedirs(settings.ORIGINALS_DIR, exist_ok=True)
         os.makedirs(settings.ARCHIVE_DIR, exist_ok=True)
+
+    def pre_check_asn_value(self):
+        """
+        Check that if override_asn is given, it is unique and within a valid range
+        """
+        if not self.override_asn:
+            # check not necessary in case no ASN gets set
+            return
+        # Validate the range is above zero and less than uint32_t max
+        # otherwise, Whoosh can't handle it in the index
+        if self.override_asn < 0 or self.override_asn > 0xFF_FF_FF_FF:
+            self._fail(
+                MESSAGE_ASN_RANGE,
+                f"Not consuming {self.filename}: "
+                f"Given ASN {self.override_asn} is out of range [0, 4,294,967,295]",
+            )
+        if Document.objects.filter(archive_serial_number=self.override_asn).exists():
+            self._fail(
+                MESSAGE_ASN_ALREADY_EXISTS,
+                f"Not consuming {self.filename}: Given ASN already exists!",
+            )
 
     def run_pre_consume_script(self):
         if not settings.PRE_CONSUME_SCRIPT:
@@ -257,6 +281,7 @@ class Consumer(LoggingMixin):
         override_tag_ids=None,
         task_id=None,
         override_created=None,
+        override_asn=None,
         override_owner_id=None,
     ) -> Document:
         """
@@ -271,6 +296,7 @@ class Consumer(LoggingMixin):
         self.override_tag_ids = override_tag_ids
         self.task_id = task_id or str(uuid.uuid4())
         self.override_created = override_created
+        self.override_asn = override_asn
         self.override_owner_id = override_owner_id
 
         self._send_progress(0, 100, "STARTING", MESSAGE_NEW_FILE)
@@ -285,6 +311,7 @@ class Consumer(LoggingMixin):
         self.pre_check_file_exists()
         self.pre_check_directories()
         self.pre_check_duplicate()
+        self.pre_check_asn_value()
 
         self.log("info", f"Consuming {self.filename}")
 
@@ -529,6 +556,9 @@ class Consumer(LoggingMixin):
         if self.override_tag_ids:
             for tag_id in self.override_tag_ids:
                 document.tags.add(Tag.objects.get(pk=tag_id))
+
+        if self.override_asn:
+            document.archive_serial_number = self.override_asn
 
         if self.override_owner_id:
             document.owner = User.objects.get(

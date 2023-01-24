@@ -856,6 +856,31 @@ change this.
 
     Defaults to "PATCHT"
 
+`PAPERLESS_CONSUMER_ENABLE_ASN_BARCODE=<bool>`
+
+: Enables the detection of barcodes in the scanned document and
+setting the ASN (archive serial number) if a properly formatted
+barcode is detected.
+
+    The barcode must consist of a (configurable) prefix and the ASN
+    to be set, for instance `ASN00123`.
+
+    This option is compatible with barcode page separation, since
+    pages will be split up before reading the ASN.
+
+    If no ASN barcodes are detected in the uploaded file, no ASN will
+    be set. If a barcode with an already existing ASN is detected, no ASN
+    will be set either and a warning will be logged.
+
+    Defaults to false.
+
+`PAPERLESS_CONSUMER_ASN_BARCODE_PREFIX=ASN`
+
+: Defines the prefix that is used to identify a barcode as an ASN
+barcode.
+
+    Defaults to "ASN"
+
 `PAPERLESS_CONVERT_MEMORY_LIMIT=<num>`
 
 : On smaller systems, or even in the case of Very Large Documents, the
