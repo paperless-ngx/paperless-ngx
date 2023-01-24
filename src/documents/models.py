@@ -10,6 +10,8 @@ import pathvalidate
 from celery import states
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.validators import MaxValueValidator
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -227,12 +229,16 @@ class Document(models.Model):
         help_text=_("The original name of the file when it was uploaded"),
     )
 
-    archive_serial_number = models.IntegerField(
+    archive_serial_number = models.PositiveIntegerField(
         _("archive serial number"),
         blank=True,
         null=True,
         unique=True,
         db_index=True,
+        validators=[
+            MaxValueValidator(2147483647),
+            MinValueValidator(0),
+        ],
         help_text=_(
             "The position of this document in your physical document " "archive.",
         ),
