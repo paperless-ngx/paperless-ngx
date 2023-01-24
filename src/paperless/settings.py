@@ -660,6 +660,16 @@ CONSUMER_BARCODE_STRING: Final[str] = os.getenv(
     "PATCHT",
 )
 
+CONSUMER_ENABLE_ASN_BARCODE: Final[bool] = __get_boolean(
+    "PAPERLESS_CONSUMER_ENABLE_ASN_BARCODE",
+)
+
+CONSUMER_ASN_BARCODE_PREFIX: Final[str] = os.getenv(
+    "PAPERLESS_CONSUMER_ASN_BARCODE_PREFIX",
+    "ASN",
+)
+
+
 OCR_PAGES = int(os.getenv("PAPERLESS_OCR_PAGES", 0))
 
 # The default language that tesseract will attempt to use when parsing

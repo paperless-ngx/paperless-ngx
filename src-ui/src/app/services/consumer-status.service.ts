@@ -13,6 +13,7 @@ export enum FileStatusPhase {
 
 export const FILE_STATUS_MESSAGES = {
   document_already_exists: $localize`Document already exists.`,
+  asn_already_exists: $localize`Document with ASN already exists.`,
   file_not_found: $localize`File not found.`,
   pre_consume_script_not_found: $localize`:Pre-Consume is a term that appears like that in the documentation as well and does not need a specific translation:Pre-consume script does not exist.`,
   pre_consume_script_error: $localize`:Pre-Consume is a term that appears like that in the documentation as well and does not need a specific translation:Error while executing pre-consume script.`,

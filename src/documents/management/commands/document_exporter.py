@@ -64,15 +64,6 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
-            "-f",
-            "--use-filename-format",
-            default=False,
-            action="store_true",
-            help="Use PAPERLESS_FILENAME_FORMAT for storing files in the "
-            "export directory, if configured.",
-        )
-
-        parser.add_argument(
             "-d",
             "--delete",
             default=False,
@@ -83,10 +74,45 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
-            "--no-progress-bar",
+            "-f",
+            "--use-filename-format",
             default=False,
             action="store_true",
-            help="If set, the progress bar will not be shown",
+            help="Use PAPERLESS_FILENAME_FORMAT for storing files in the "
+            "export directory, if configured.",
+        )
+
+        parser.add_argument(
+            "-na",
+            "--no-archive",
+            default=False,
+            action="store_true",
+            help="Avoid exporting archive files",
+        )
+
+        parser.add_argument(
+            "-nt",
+            "--no-thumbnail",
+            default=False,
+            action="store_true",
+            help="Avoid exporting thumbnail files",
+        )
+
+        parser.add_argument(
+            "-p",
+            "--use-folder-prefix",
+            default=False,
+            action="store_true",
+            help="Export files in dedicated folders according to their nature: "
+            "archive, originals or thumbnails",
+        )
+
+        parser.add_argument(
+            "-sm",
+            "--split-manifest",
+            default=False,
+            action="store_true",
+            help="Export document information in individual manifest json files.",
         )
 
         parser.add_argument(
@@ -97,21 +123,36 @@ class Command(BaseCommand):
             help="Export the documents to a zip file in the given directory",
         )
 
+        parser.add_argument(
+            "--no-progress-bar",
+            default=False,
+            action="store_true",
+            help="If set, the progress bar will not be shown",
+        )
+
     def __init__(self, *args, **kwargs):
         BaseCommand.__init__(self, *args, **kwargs)
         self.target: Path = None
+        self.split_manifest = False
         self.files_in_export_dir: Set[Path] = set()
         self.exported_files: List[Path] = []
         self.compare_checksums = False
         self.use_filename_format = False
+        self.use_folder_prefix = False
         self.delete = False
+        self.no_archive = False
+        self.no_thumbnail = False
 
     def handle(self, *args, **options):
 
         self.target = Path(options["target"]).resolve()
+        self.split_manifest = options["split_manifest"]
         self.compare_checksums = options["compare_checksums"]
         self.use_filename_format = options["use_filename_format"]
+        self.use_folder_prefix = options["use_folder_prefix"]
         self.delete = options["delete"]
+        self.no_archive = options["no_archive"]
+        self.no_thumbnail = options["no_thumbnail"]
         zip_export: bool = options["zip"]
 
         # If zipping, save the original target for later and
@@ -179,14 +220,17 @@ class Command(BaseCommand):
                 serializers.serialize("json", StoragePath.objects.all()),
             )
 
-            manifest += json.loads(
+            comments = json.loads(
                 serializers.serialize("json", Comment.objects.all()),
             )
+            if not self.split_manifest:
+                manifest += comments
 
             documents = Document.objects.order_by("id")
             document_map = {d.pk: d for d in documents}
             document_manifest = json.loads(serializers.serialize("json", documents))
-            manifest += document_manifest
+            if not self.split_manifest:
+                manifest += document_manifest
 
             manifest += json.loads(
                 serializers.serialize("json", MailAccount.objects.all()),
@@ -243,15 +287,24 @@ class Command(BaseCommand):
 
             # 3.3. write filenames into manifest
             original_name = base_name
+            if self.use_folder_prefix:
+                original_name = os.path.join("originals", original_name)
             original_target = (self.target / Path(original_name)).resolve()
             document_dict[EXPORTER_FILE_NAME] = original_name
 
-            thumbnail_name = base_name + "-thumbnail.webp"
-            thumbnail_target = (self.target / Path(thumbnail_name)).resolve()
-            document_dict[EXPORTER_THUMBNAIL_NAME] = thumbnail_name
+            if not self.no_thumbnail:
+                thumbnail_name = base_name + "-thumbnail.webp"
+                if self.use_folder_prefix:
+                    thumbnail_name = os.path.join("thumbnails", thumbnail_name)
+                thumbnail_target = (self.target / Path(thumbnail_name)).resolve()
+                document_dict[EXPORTER_THUMBNAIL_NAME] = thumbnail_name
+            else:
+                thumbnail_target = None
 
-            if document.has_archive_version:
+            if not self.no_archive and document.has_archive_version:
                 archive_name = base_name + "-archive.pdf"
+                if self.use_folder_prefix:
+                    archive_name = os.path.join("archive", archive_name)
                 archive_target = (self.target / Path(archive_name)).resolve()
                 document_dict[EXPORTER_ARCHIVE_NAME] = archive_name
             else:
@@ -266,10 +319,11 @@ class Command(BaseCommand):
                     original_target.write_bytes(GnuPG.decrypted(out_file))
                     os.utime(original_target, times=(t, t))
 
-                thumbnail_target.parent.mkdir(parents=True, exist_ok=True)
-                with document.thumbnail_file as out_file:
-                    thumbnail_target.write_bytes(GnuPG.decrypted(out_file))
-                    os.utime(thumbnail_target, times=(t, t))
+                if thumbnail_target:
+                    thumbnail_target.parent.mkdir(parents=True, exist_ok=True)
+                    with document.thumbnail_file as out_file:
+                        thumbnail_target.write_bytes(GnuPG.decrypted(out_file))
+                        os.utime(thumbnail_target, times=(t, t))
 
                 if archive_target:
                     archive_target.parent.mkdir(parents=True, exist_ok=True)
@@ -283,7 +337,8 @@ class Command(BaseCommand):
                     original_target,
                 )
 
-                self.check_and_copy(document.thumbnail_path, None, thumbnail_target)
+                if thumbnail_target:
+                    self.check_and_copy(document.thumbnail_path, None, thumbnail_target)
 
                 if archive_target:
                     self.check_and_copy(
@@ -292,21 +347,39 @@ class Command(BaseCommand):
                         archive_target,
                     )
 
+            if self.split_manifest:
+                manifest_name = base_name + "-manifest.json"
+                if self.use_folder_prefix:
+                    manifest_name = os.path.join("json", manifest_name)
+                manifest_name = (self.target / Path(manifest_name)).resolve()
+                manifest_name.parent.mkdir(parents=True, exist_ok=True)
+                content = [document_manifest[index]]
+                content += list(
+                    filter(
+                        lambda d: d["fields"]["document"] == document_dict["pk"],
+                        comments,
+                    ),
+                )
+                manifest_name.write_text(json.dumps(content, indent=2))
+                if manifest_name in self.files_in_export_dir:
+                    self.files_in_export_dir.remove(manifest_name)
+
         # 4.1 write manifest to target folder
         manifest_path = (self.target / Path("manifest.json")).resolve()
         manifest_path.write_text(json.dumps(manifest, indent=2))
+        if manifest_path in self.files_in_export_dir:
+            self.files_in_export_dir.remove(manifest_path)
 
         # 4.2 write version information to target folder
         version_path = (self.target / Path("version.json")).resolve()
         version_path.write_text(
             json.dumps({"version": version.__full_version_str__}, indent=2),
         )
+        if version_path in self.files_in_export_dir:
+            self.files_in_export_dir.remove(version_path)
 
         if self.delete:
             # 5. Remove files which we did not explicitly export in this run
-
-            if manifest_path in self.files_in_export_dir:
-                self.files_in_export_dir.remove(manifest_path)
 
             for f in self.files_in_export_dir:
                 f.unlink()

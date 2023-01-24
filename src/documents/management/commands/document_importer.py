@@ -72,11 +72,21 @@ class Command(BaseCommand):
         if not os.access(self.source, os.R_OK):
             raise CommandError("That path doesn't appear to be readable")
 
-        manifest_path = os.path.normpath(os.path.join(self.source, "manifest.json"))
-        self._check_manifest_exists(manifest_path)
+        manifest_paths = []
 
-        with open(manifest_path) as f:
+        main_manifest_path = os.path.normpath(
+            os.path.join(self.source, "manifest.json"),
+        )
+        self._check_manifest_exists(main_manifest_path)
+
+        with open(main_manifest_path) as f:
             self.manifest = json.load(f)
+        manifest_paths.append(main_manifest_path)
+
+        for file in Path(self.source).glob("**/*-manifest.json"):
+            with open(file) as f:
+                self.manifest += json.load(f)
+            manifest_paths.append(file)
 
         version_path = os.path.normpath(os.path.join(self.source, "version.json"))
         if os.path.exists(version_path):
@@ -109,7 +119,8 @@ class Command(BaseCommand):
             ):
                 # Fill up the database with whatever is in the manifest
                 try:
-                    call_command("loaddata", manifest_path)
+                    for manifest_path in manifest_paths:
+                        call_command("loaddata", manifest_path)
                 except (FieldDoesNotExist, DeserializationError) as e:
                     self.stdout.write(self.style.ERROR("Database import failed"))
                     if (
@@ -193,8 +204,11 @@ class Command(BaseCommand):
             doc_file = record[EXPORTER_FILE_NAME]
             document_path = os.path.join(self.source, doc_file)
 
-            thumb_file = record[EXPORTER_THUMBNAIL_NAME]
-            thumbnail_path = Path(os.path.join(self.source, thumb_file)).resolve()
+            if EXPORTER_THUMBNAIL_NAME in record:
+                thumb_file = record[EXPORTER_THUMBNAIL_NAME]
+                thumbnail_path = Path(os.path.join(self.source, thumb_file)).resolve()
+            else:
+                thumbnail_path = None
 
             if EXPORTER_ARCHIVE_NAME in record:
                 archive_file = record[EXPORTER_ARCHIVE_NAME]
@@ -212,19 +226,21 @@ class Command(BaseCommand):
 
                 shutil.copy2(document_path, document.source_path)
 
-                if thumbnail_path.suffix in {".png", ".PNG"}:
-                    run_convert(
-                        density=300,
-                        scale="500x5000>",
-                        alpha="remove",
-                        strip=True,
-                        trim=False,
-                        auto_orient=True,
-                        input_file=f"{thumbnail_path}[0]",
-                        output_file=str(document.thumbnail_path),
-                    )
-                else:
-                    shutil.copy2(thumbnail_path, document.thumbnail_path)
+                if thumbnail_path:
+                    if thumbnail_path.suffix in {".png", ".PNG"}:
+                        run_convert(
+                            density=300,
+                            scale="500x5000>",
+                            alpha="remove",
+                            strip=True,
+                            trim=False,
+                            auto_orient=True,
+                            input_file=f"{thumbnail_path}[0]",
+                            output_file=str(document.thumbnail_path),
+                        )
+                    else:
+                        shutil.copy2(thumbnail_path, document.thumbnail_path)
+
                 if archive_path:
                     create_source_path_directory(document.archive_path)
                     # TODO: this assumes that the export is valid and

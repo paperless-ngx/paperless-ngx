@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 ("task_id", models.CharField(max_length=128)),
-                ("name", models.CharField(max_length=256)),
+                ("name", models.CharField(max_length=256, null=True)),
                 (
                     "created",
                     models.DateTimeField(auto_now=True, verbose_name="created"),
