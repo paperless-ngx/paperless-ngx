@@ -152,8 +152,10 @@ following:
 
     ```shell-session
     $ cd src
-    $ python3 manage.py migrate
+    $ python3 manage.py migrate # (1)
     ```
+
+    1.  Including `sudo -Hu <paperless_user>` may be required
 
     This might not actually do anything. Not every new paperless version
     comes with new database migrations.
@@ -210,8 +212,10 @@ Bare metal:
 
 ```shell-session
 $ cd /path/to/paperless/src
-$ python3 manage.py <command> <arguments>
+$ python3 manage.py <command> <arguments> # (1)
 ```
+
+1.  Including `sudo -Hu <paperless_user>` may be required
 
 All commands have built-in help, which can be accessed by executing them
 with the argument `--help`.
