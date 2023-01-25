@@ -6,7 +6,7 @@ provides a browsable API for most of its endpoints, which you can
 inspect at `http://<paperless-host>:<port>/api/`. This also documents
 most of the available filters and ordering fields.
 
-The API provides 5 main endpoints:
+The API provides 7 main endpoints:
 
 - `/api/documents/`: Full CRUD support, except POSTing new documents.
   See below.
@@ -16,6 +16,8 @@ The API provides 5 main endpoints:
 - `/api/tags/`: Full CRUD support.
 - `/api/mail_accounts/`: Full CRUD support.
 - `/api/mail_rules/`: Full CRUD support.
+- `/api/users/`: Full CRUD support.
+- `/api/groups/`: Full CRUD support.
 
 All of these endpoints except for the logging endpoint allow you to
 fetch, edit and delete individual objects by appending their primary key
@@ -254,6 +256,7 @@ The endpoint supports the following optional form fields:
 - `document_type`: Similar to correspondent.
 - `tags`: Similar to correspondent. Specify this multiple times to
   have multiple tags added to the document.
+- `owner`: An optional user ID to set as the owner.
 
 The endpoint will immediately return "OK" if the document consumption
 process was started successfully. No additional status information about
