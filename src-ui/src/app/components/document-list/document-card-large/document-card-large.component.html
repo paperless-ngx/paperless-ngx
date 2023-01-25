@@ -26,7 +26,7 @@
         </div>
         <p class="card-text">
           <span *ngIf="document.__search_hit__ && document.__search_hit__.highlights" [innerHtml]="document.__search_hit__.highlights"></span>
-          <span *ngIf="document.__search_hit__ && document.__search_hit__.comment_highlights">
+          <span *ngIf="document.__search_hit__ && document.__search_hit__.comment_highlights" class="d-block">
             <svg width="1em" height="1em" fill="currentColor" class="me-2">
               <use xlink:href="assets/bootstrap-icons.svg#chat-left-text"/>
             </svg>
