@@ -504,14 +504,16 @@ class DocumentViewSet(
 class SearchResultSerializer(DocumentSerializer, PassUserMixin):
     def to_representation(self, instance):
         doc = Document.objects.get(id=instance["id"])
-        commentTerm = instance.results.q.subqueries[0]
-        comments = ",".join(
-            [
-                str(c.comment)
-                for c in Comment.objects.filter(document=instance["id"])
-                if commentTerm.text in c.comment
-            ],
-        )
+        comments = ""
+        if hasattr(instance.results.q, "subqueries"):
+            commentTerm = instance.results.q.subqueries[0]
+            comments = ",".join(
+                [
+                    str(c.comment)
+                    for c in Comment.objects.filter(document=instance["id"])
+                    if commentTerm.text in c.comment
+                ],
+            )
         r = super().to_representation(doc)
         r["__search_hit__"] = {
             "score": instance.score,

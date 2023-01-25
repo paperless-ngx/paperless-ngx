@@ -8,7 +8,7 @@
 ARG REPO="paperless-ngx/paperless-ngx"
 
 ARG QPDF_VERSION
-FROM ghcr.io/${REPO}/builder/qpdf:${QPDF_VERSION} as qpdf-builder
+FROM --platform=$BUILDPLATFORM ghcr.io/${REPO}/builder/qpdf:${QPDF_VERSION} as qpdf-builder
 
 # This does nothing, except provide a name for a copy below
 
