@@ -200,6 +200,39 @@ configured via `PAPERLESS_EMAIL_TASK_CRON` (see [software tweaks](/configuration
 You can also submit a document using the REST API, see [POSTing documents](/api#file-uploads)
 for details.
 
+## Permissions
+
+As of version 1.13.0 Paperless-ngx added core support for user / group permissions. Permissions is
+based around an object 'owner' and 'view' and 'edit' permissions can be granted to other users
+or groups.
+
+Permissions uses the built-in user model of the backend framework, Django.
+
+!!! note
+
+    After migration to version 1.13.0 all existing documents, tags etc. will have no explicit owner
+    set which means they will be visible / editable by all users. Once an object has an owner set,
+    only the owner can explicitly grant / revoke permissions.
+
+!!! note
+
+    When first migrating to permissions it is recommended to user a 'superuser' account (which
+    would usually have been setup during installation) to ensure you have full permissions.
+
+    Note that superusers have access to all objects.
+
+Permissions can be set using the new "Permissions" tab when editing documents, or bulk-applied
+in the UI by selecting documents and choosing the "Permissions" button. Owner can also optionally
+be set for documents uploaded via the API. Documents consumed via the consumption dir currently
+do not have an owner set.
+
+### Users and Groups
+
+Paperless-ngx versions after 1.13.0 allow creating and editing users and groups via the 'frontend' UI.
+These can be found under Settings > Users & Groups, assuming the user has access. If a user is designated
+as a member of a group those permissions will be inherited and this is reflected in the UI. Explicit
+permissions can be granted to limit access to certain parts of the UI (and corresponding API endpoints).
+
 ## Best practices {#basic-searching}
 
 Paperless offers a couple tools that help you organize your document
