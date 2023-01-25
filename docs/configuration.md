@@ -217,6 +217,11 @@ not include a trailing slash. E.g. <https://paperless.domain.com>
 
     Defaults to empty string, leaving the other settings unaffected.
 
+    !!! note
+
+        This value cannot contain a path (e.g. domain.com/path), even if
+        you are installing paperless-ngx at a subpath.
+
 `PAPERLESS_CSRF_TRUSTED_ORIGINS=<comma-separated-list>`
 
 : A list of trusted origins for unsafe requests (e.g. POST). As of
@@ -711,7 +716,7 @@ for details on how to set it.
 
 : Enables or disables the advanced natural language processing
 used during automatic classification. If disabled, paperless will
-still preform some basic text pre-processing before matching.
+still perform some basic text pre-processing before matching.
 
 : See also `PAPERLESS_NLTK_DIR`.
 

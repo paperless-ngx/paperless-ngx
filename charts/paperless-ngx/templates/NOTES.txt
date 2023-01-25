@@ -1,4 +1,0 @@
-{{- include "common.notes.defaultNotes" . }}
-2. Create a super user by running the command:
-  export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "common.names.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
-  kubectl exec -it --namespace {{ .Release.Namespace }} $POD_NAME -- bash -c "python manage.py createsuperuser"
