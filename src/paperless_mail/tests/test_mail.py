@@ -5,6 +5,7 @@ import uuid
 from collections import namedtuple
 from typing import ContextManager
 from typing import List
+from typing import Optional
 from typing import Union
 from unittest import mock
 
@@ -131,12 +132,20 @@ class BogusMailBox(ContextManager):
             from_ = criteria[criteria.index("FROM") + 1].strip('"')
             msg = filter(lambda m: from_ in m.from_, msg)
 
+        if "TO" in criteria:
+            to_ = criteria[criteria.index("TO") + 1].strip('"')
+            msg = []
+            for m in self.messages:
+                for to_addrs in m.to:
+                    if to_ in to_addrs:
+                        msg.append(m)
+
         if "UNFLAGGED" in criteria:
             msg = filter(lambda m: not m.flagged, msg)
 
         if "UNKEYWORD" in criteria:
             tag = criteria[criteria.index("UNKEYWORD") + 1].strip("'")
-            msg = filter(lambda m: "processed" not in m.flags, msg)
+            msg = filter(lambda m: tag not in m.flags, msg)
 
         if "(X-GM-LABELS" in criteria:  # ['NOT', '(X-GM-LABELS', '"processed"']
             msg = filter(lambda m: "processed" not in m.flags, msg)
@@ -205,15 +214,21 @@ class TestMail(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         body: str = "",
         subject: str = "the suject",
         from_: str = "noone@mail.com",
+        to: Optional[List[str]] = None,
         seen: bool = False,
         flagged: bool = False,
         processed: bool = False,
     ) -> MailMessage:
+
+        if to is None:
+            to = ["tosomeone@somewhere.com"]
+
         email_msg = email.message.EmailMessage()
         # TODO: This does NOT set the UID
         email_msg["Message-ID"] = str(uuid.uuid4())
         email_msg["Subject"] = subject
         email_msg["From"] = from_
+        email_msg["To"] = str(" ,".join(to))
         email_msg.set_content(body)
 
         # Either add some default number of attachments
@@ -266,6 +281,7 @@ class TestMail(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             self.create_message(
                 subject="Invoice 1",
                 from_="amazon@amazon.de",
+                to=["me@myselfandi.com", "helpdesk@mydomain.com"],
                 body="cables",
                 seen=True,
                 flagged=False,
@@ -276,6 +292,7 @@ class TestMail(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             self.create_message(
                 subject="Invoice 2",
                 body="from my favorite electronic store",
+                to=["invoices@mycompany.com"],
                 seen=False,
                 flagged=True,
                 processed=True,
@@ -285,6 +302,7 @@ class TestMail(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             self.create_message(
                 subject="Claim your $10M price now!",
                 from_="amazon@amazon-some-indian-site.org",
+                to="special@me.me",
                 seen=False,
             ),
         )
@@ -946,21 +964,26 @@ class TestMail(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             password="secret",
         )
 
-        for (f_body, f_from, f_subject, expected_mail_count) in [
-            (None, None, "Claim", 1),
-            ("electronic", None, None, 1),
-            (None, "amazon", None, 2),
-            ("cables", "amazon", "Invoice", 1),
+        for (f_body, f_from, f_to, f_subject, expected_mail_count) in [
+            (None, None, None, "Claim", 1),
+            ("electronic", None, None, None, 1),
+            (None, "amazon", None, None, 2),
+            ("cables", "amazon", None, "Invoice", 1),
+            (None, None, "test@email.com", None, 0),
+            (None, None, "invoices@mycompany.com", None, 1),
+            ("electronic", None, "invoices@mycompany.com", None, 1),
+            (None, "amazon", "me@myselfandi.com", None, 1),
         ]:
             with self.subTest(f_body=f_body, f_from=f_from, f_subject=f_subject):
                 MailRule.objects.all().delete()
-                rule = MailRule.objects.create(
+                _ = MailRule.objects.create(
                     name="testrule3",
                     account=account,
                     action=MailRule.MailAction.DELETE,
                     filter_subject=f_subject,
                     filter_body=f_body,
                     filter_from=f_from,
+                    filter_to=f_to,
                 )
                 self.reset_bogus_mailbox()
                 self._queue_consumption_tasks_mock.reset_mock()
