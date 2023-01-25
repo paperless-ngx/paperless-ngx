@@ -445,6 +445,10 @@ class DocumentViewSet(
                 )
                 c.save()
 
+                from documents import index
+
+                index.add_or_update_document(self.get_object())
+
                 return Response(self.getComments(doc))
             except Exception as e:
                 logger.warning(f"An error occurred saving comment: {str(e)}")
@@ -456,6 +460,11 @@ class DocumentViewSet(
         elif request.method == "DELETE":
             comment = Comment.objects.get(id=int(request.GET.get("id")))
             comment.delete()
+
+            from documents import index
+
+            index.add_or_update_document(self.get_object())
+
             return Response(self.getComments(doc))
 
         return Response(
