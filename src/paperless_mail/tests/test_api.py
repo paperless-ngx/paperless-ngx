@@ -201,6 +201,7 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
             account=account1,
             folder="INBOX",
             filter_from="from@example.com",
+            filter_to="someone@somewhere.com",
             filter_subject="subject",
             filter_body="body",
             filter_attachment_filename="file.pdf",
@@ -222,6 +223,7 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
         self.assertEqual(returned_rule1["account"], account1.pk)
         self.assertEqual(returned_rule1["folder"], rule1.folder)
         self.assertEqual(returned_rule1["filter_from"], rule1.filter_from)
+        self.assertEqual(returned_rule1["filter_to"], rule1.filter_to)
         self.assertEqual(returned_rule1["filter_subject"], rule1.filter_subject)
         self.assertEqual(returned_rule1["filter_body"], rule1.filter_body)
         self.assertEqual(
@@ -275,6 +277,7 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
             "account": account1.pk,
             "folder": "INBOX",
             "filter_from": "from@example.com",
+            "filter_to": "aperson@aplace.com",
             "filter_subject": "subject",
             "filter_body": "body",
             "filter_attachment_filename": "file.pdf",
@@ -307,6 +310,7 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
         self.assertEqual(returned_rule1["account"], account1.pk)
         self.assertEqual(returned_rule1["folder"], rule1["folder"])
         self.assertEqual(returned_rule1["filter_from"], rule1["filter_from"])
+        self.assertEqual(returned_rule1["filter_to"], rule1["filter_to"])
         self.assertEqual(returned_rule1["filter_subject"], rule1["filter_subject"])
         self.assertEqual(returned_rule1["filter_body"], rule1["filter_body"])
         self.assertEqual(
