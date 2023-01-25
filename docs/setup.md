@@ -395,13 +395,11 @@ supported.
     sudo chown paperless:paperless /opt/paperless/consume
     ```
 
-8.  Install python requirements from the `Pipfile` file using `pipenv`. It is
-    up to you if you wish to use a virtual environment or not.
+8.  Install python requirements from the `requirements.txt` file. It is
+    up to you if you wish to use a virtual environment or not. First you should update your pip, so it gets the actual packages.
 
     ```shell-session
-    sudo -Hu paperless pip3 install --upgrade pip
-    sudo -Hu paperless pip3 install pipenv
-    sudo -Hu paperless pipenv install
+    sudo -Hu paperless pip3 install -r requirements.txt
     ```
 
     This will install all python dependencies in the home directory of

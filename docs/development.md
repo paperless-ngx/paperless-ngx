@@ -349,7 +349,7 @@ If you want to build the documentation locally, this is how you do it:
 2.  Build the documentation
 
     ```bash
-    $ pipenv mkdocs build --config-file mkdocs.yml
+    $ mkdocs build --config-file mkdocs.yml
     ```
 
     _alternatively..._
@@ -360,7 +360,7 @@ If you want to build the documentation locally, this is how you do it:
     something.
 
     ```bash
-    $ pipenv mkdocs serve
+    $ mkdocs serve
     ```
 
 ## Building the Docker image
