@@ -212,12 +212,6 @@ jobs:
     name: Prepare Docker Pipeline Data
     if: github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/feature-') || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/beta' || contains(github.ref, 'beta.rc') || startsWith(github.ref, 'refs/tags/v'))
     runs-on: ubuntu-22.04
-    # If the push triggered the installer library workflow, wait for it to
-    # complete here.  This ensures the required versions for the final
-    # image have been built, while not waiting at all if the versions haven't changed
-    concurrency:
-      group: build-installer-library
-      cancel-in-progress: false
     needs:
       - documentation
       - tests-backend
