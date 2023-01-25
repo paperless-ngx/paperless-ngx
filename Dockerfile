@@ -10,7 +10,7 @@ ARG PIKEPDF_VERSION
 ARG PSYCOPG2_VERSION
 
 FROM ghcr.io/paperless-ngx/paperless-ngx/builder/jbig2enc:${JBIG2ENC_VERSION} as jbig2enc-builder
-FROM ghcr.io/paperless-ngx/paperless-ngx/builder/qpdf:${QPDF_VERSION} as qpdf-builder
+FROM --platform=$BUILDPLATFORM ghcr.io/paperless-ngx/paperless-ngx/builder/qpdf:${QPDF_VERSION} as qpdf-builder
 FROM ghcr.io/paperless-ngx/paperless-ngx/builder/pikepdf:${PIKEPDF_VERSION} as pikepdf-builder
 FROM ghcr.io/paperless-ngx/paperless-ngx/builder/psycopg2:${PSYCOPG2_VERSION} as psycopg2-builder
 
