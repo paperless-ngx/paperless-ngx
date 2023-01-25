@@ -22,6 +22,7 @@ export enum PermissionType {
   MailAccount = '%s_mailaccount',
   MailRule = '%s_mailrule',
   User = '%s_user',
+  Group = '%s_group',
   Admin = '%s_logentry',
 }
 
