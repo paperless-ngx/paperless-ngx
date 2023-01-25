@@ -82,7 +82,12 @@ class BaseMailAction:
         """
         return {}
 
-    def post_consume(self, M: MailBox, message_uid: str, parameter: str):
+    def post_consume(
+        self,
+        M: MailBox,
+        message_uid: str,
+        parameter: str,
+    ):  # pragma: nocover
         """
         Perform mail action on the given mail uid in the mailbox.
         """
@@ -160,7 +165,7 @@ class TagMailAction(BaseMailAction):
             return {"flagged": False}
         elif self.keyword:
             return AND(NOT(gmail_label=self.keyword), no_keyword=self.keyword)
-        else:
+        else:  # pragma: nocover
             raise ValueError("This should never happen.")
 
     def post_consume(self, M: MailBox, message_uid: str, parameter: str):
@@ -363,6 +368,8 @@ def make_criterias(rule):
         criterias["date_gte"] = maximum_age
     if rule.filter_from:
         criterias["from_"] = rule.filter_from
+    if rule.filter_to:
+        criterias["to"] = rule.filter_to
     if rule.filter_subject:
         criterias["subject"] = rule.filter_subject
     if rule.filter_body:
