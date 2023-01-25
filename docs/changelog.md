@@ -1,5 +1,100 @@
 # Changelog
 
+## paperless-ngx 1.12.0
+
+### Features
+
+- New document_exporter options [@mhelleboid](https://github.com/mhelleboid) ([#2448](https://github.com/paperless-ngx/paperless-ngx/pull/2448))
+- Read ASN from barcode on page [@peterkappelt](https://github.com/peterkappelt) ([#2437](https://github.com/paperless-ngx/paperless-ngx/pull/2437))
+- Add AppleMail color tag support [@clemensrieder](https://github.com/clemensrieder) ([#2407](https://github.com/paperless-ngx/paperless-ngx/pull/2407))
+- Feature: Retain original filename on upload [@stumpylog](https://github.com/stumpylog) ([#2404](https://github.com/paperless-ngx/paperless-ngx/pull/2404))
+- Feature: Control scheduled tasks via cron expressions [@stumpylog](https://github.com/stumpylog) ([#2403](https://github.com/paperless-ngx/paperless-ngx/pull/2403))
+- Simplify json parsing in build scripts [@tribut](https://github.com/tribut) ([#2370](https://github.com/paperless-ngx/paperless-ngx/pull/2370))
+- Feature: include comments in advanced search [@shamoon](https://github.com/shamoon) ([#2351](https://github.com/paperless-ngx/paperless-ngx/pull/2351))
+
+### Bug Fixes
+
+- Fix: limit asn integer size [@shamoon](https://github.com/shamoon) ([#2498](https://github.com/paperless-ngx/paperless-ngx/pull/2498))
+- Bugfix: Rescales images for better barcode locating [@stumpylog](https://github.com/stumpylog) ([#2468](https://github.com/paperless-ngx/paperless-ngx/pull/2468))
+- Fix: fix downgrade migration [@shamoon](https://github.com/shamoon) ([#2494](https://github.com/paperless-ngx/paperless-ngx/pull/2494))
+- Fix: Allow setting mailrule order from frontend [@shamoon](https://github.com/shamoon) ([#2459](https://github.com/paperless-ngx/paperless-ngx/pull/2459))
+- Fix: tag color ordering [@shamoon](https://github.com/shamoon) ([#2456](https://github.com/paperless-ngx/paperless-ngx/pull/2456))
+- Fix: Better Handle arbitrary ISO 8601 strings after celery serializing [@shamoon](https://github.com/shamoon) ([#2441](https://github.com/paperless-ngx/paperless-ngx/pull/2441))
+- Use correct canonical path for nltk_data [@amo13](https://github.com/amo13) ([#2429](https://github.com/paperless-ngx/paperless-ngx/pull/2429))
+- Fix: Include optional socket file in release [@stumpylog](https://github.com/stumpylog) ([#2409](https://github.com/paperless-ngx/paperless-ngx/pull/2409))
+- Fix: display rtl content in correct direction [@shamoon](https://github.com/shamoon) ([#2302](https://github.com/paperless-ngx/paperless-ngx/pull/2302))
+- Fixed endpoint count in Docs The REST API [@PascalSenn](https://github.com/PascalSenn) ([#2386](https://github.com/paperless-ngx/paperless-ngx/pull/2386))
+- Fix subpath for websockets [@tribut](https://github.com/tribut) ([#2371](https://github.com/paperless-ngx/paperless-ngx/pull/2371))
+- Fix: Make missing environment from file files informational only [@stumpylog](https://github.com/stumpylog) ([#2368](https://github.com/paperless-ngx/paperless-ngx/pull/2368))
+- Bugfix: Backend tests weren't using correct Python version [@stumpylog](https://github.com/stumpylog) ([#2363](https://github.com/paperless-ngx/paperless-ngx/pull/2363))
+- Fix: preview content remains hidden on mobile [@shamoon](https://github.com/shamoon) ([#2346](https://github.com/paperless-ngx/paperless-ngx/pull/2346))
+- Bugfix: Removal of alpha channel truncates multipage TIFFs [@stumpylog](https://github.com/stumpylog) ([#2335](https://github.com/paperless-ngx/paperless-ngx/pull/2335))
+- Documentation: update build instructions to remove deprecated [@shamoon](https://github.com/shamoon) ([#2334](https://github.com/paperless-ngx/paperless-ngx/pull/2334))
+
+### Documentation
+
+- Docs: Fix typo - docker-compose.yml file name in setup doc [@muli](https://github.com/muli) ([#2477](https://github.com/paperless-ngx/paperless-ngx/pull/2477))
+- document existence of document_thumbnails [@frrad](https://github.com/frrad) ([#2470](https://github.com/paperless-ngx/paperless-ngx/pull/2470))
+- Add optional sudo command to bare metal docs [@shamoon](https://github.com/shamoon) ([#2464](https://github.com/paperless-ngx/paperless-ngx/pull/2464))
+- Fix link [@edenhaus](https://github.com/edenhaus) ([#2458](https://github.com/paperless-ngx/paperless-ngx/pull/2458))
+- Documentation: Fix comment re bare metal runserver command [@shamoon](https://github.com/shamoon) ([#2420](https://github.com/paperless-ngx/paperless-ngx/pull/2420))
+- Fix formatting of config variable in docs [@peterkappelt](https://github.com/peterkappelt) ([#2445](https://github.com/paperless-ngx/paperless-ngx/pull/2445))
+- Update docs nginx reverse proxy example [@Sprinterfreak](https://github.com/Sprinterfreak) ([#2443](https://github.com/paperless-ngx/paperless-ngx/pull/2443))
+- [Documentation] Add note re for dev server [@shamoon](https://github.com/shamoon) ([#2387](https://github.com/paperless-ngx/paperless-ngx/pull/2387))
+- Fixed endpoint count in Docs The REST API [@PascalSenn](https://github.com/PascalSenn) ([#2386](https://github.com/paperless-ngx/paperless-ngx/pull/2386))
+- [ Docs] Update bare metal setup instructions [@natrius](https://github.com/natrius) ([#2281](https://github.com/paperless-ngx/paperless-ngx/pull/2281))
+- [Docs] Add Paperless Mobile app to docs [@astubenbord](https://github.com/astubenbord) ([#2378](https://github.com/paperless-ngx/paperless-ngx/pull/2378))
+- Tiny spelling change [@veverkap](https://github.com/veverkap) ([#2369](https://github.com/paperless-ngx/paperless-ngx/pull/2369))
+- Documentation: update build instructions to remove deprecated [@shamoon](https://github.com/shamoon) ([#2334](https://github.com/paperless-ngx/paperless-ngx/pull/2334))
+- [Documentation] Add note that PAPERLESS_URL cant contain a path [@shamoon](https://github.com/shamoon) ([#2319](https://github.com/paperless-ngx/paperless-ngx/pull/2319))
+- [Documentation] Add v1.11.3 changelog [@github-actions](https://github.com/github-actions) ([#2311](https://github.com/paperless-ngx/paperless-ngx/pull/2311))
+
+### Maintenance
+
+- Fix: Include optional socket file in release [@stumpylog](https://github.com/stumpylog) ([#2409](https://github.com/paperless-ngx/paperless-ngx/pull/2409))
+- Chore: remove helm chart code [@shamoon](https://github.com/shamoon) ([#2388](https://github.com/paperless-ngx/paperless-ngx/pull/2388))
+- Simplify json parsing in build scripts [@tribut](https://github.com/tribut) ([#2370](https://github.com/paperless-ngx/paperless-ngx/pull/2370))
+- Bugfix: Backend tests weren't using correct Python version [@stumpylog](https://github.com/stumpylog) ([#2363](https://github.com/paperless-ngx/paperless-ngx/pull/2363))
+- Bump tj-actions/changed-files from 34 to 35 [@dependabot](https://github.com/dependabot) ([#2303](https://github.com/paperless-ngx/paperless-ngx/pull/2303))
+
+### Dependencies
+
+<details>
+<summary>4 changes</summary>
+
+- Chore: Backend library updates [@stumpylog](https://github.com/stumpylog) ([#2401](https://github.com/paperless-ngx/paperless-ngx/pull/2401))
+- Bump tj-actions/changed-files from 34 to 35 [@dependabot](https://github.com/dependabot) ([#2303](https://github.com/paperless-ngx/paperless-ngx/pull/2303))
+- Bump [@<!---->typescript-eslint/parser from 5.43.0 to 5.47.1 in /src-ui @dependabot](https://github.com/<!---->typescript-eslint/parser from 5.43.0 to 5.47.1 in /src-ui @dependabot) ([#2306](https://github.com/paperless-ngx/paperless-ngx/pull/2306))
+- Bump [@<!---->typescript-eslint/eslint-plugin from 5.43.0 to 5.47.1 in /src-ui @dependabot](https://github.com/<!---->typescript-eslint/eslint-plugin from 5.43.0 to 5.47.1 in /src-ui @dependabot) ([#2308](https://github.com/paperless-ngx/paperless-ngx/pull/2308))
+</details>
+
+### All App Changes
+
+- New document_exporter options [@mhelleboid](https://github.com/mhelleboid) ([#2448](https://github.com/paperless-ngx/paperless-ngx/pull/2448))
+- Fix: limit asn integer size [@shamoon](https://github.com/shamoon) ([#2498](https://github.com/paperless-ngx/paperless-ngx/pull/2498))
+- Fix: fix downgrade migration [@shamoon](https://github.com/shamoon) ([#2494](https://github.com/paperless-ngx/paperless-ngx/pull/2494))
+- Read ASN from barcode on page [@peterkappelt](https://github.com/peterkappelt) ([#2437](https://github.com/paperless-ngx/paperless-ngx/pull/2437))
+- Fix: Allow setting mailrule order from frontend [@shamoon](https://github.com/shamoon) ([#2459](https://github.com/paperless-ngx/paperless-ngx/pull/2459))
+- Chore: Update to Angular 15 \& associated frontend deps [@shamoon](https://github.com/shamoon) ([#2411](https://github.com/paperless-ngx/paperless-ngx/pull/2411))
+- Fix: tag color ordering [@shamoon](https://github.com/shamoon) ([#2456](https://github.com/paperless-ngx/paperless-ngx/pull/2456))
+- Fix: Better Handle arbitrary ISO 8601 strings after celery serializing [@shamoon](https://github.com/shamoon) ([#2441](https://github.com/paperless-ngx/paperless-ngx/pull/2441))
+- Use correct canonical path for nltk_data [@amo13](https://github.com/amo13) ([#2429](https://github.com/paperless-ngx/paperless-ngx/pull/2429))
+- Add AppleMail color tag support [@clemensrieder](https://github.com/clemensrieder) ([#2407](https://github.com/paperless-ngx/paperless-ngx/pull/2407))
+- Chore: Convert document exporter to use pathlib [@stumpylog](https://github.com/stumpylog) ([#2416](https://github.com/paperless-ngx/paperless-ngx/pull/2416))
+- Feature: Retain original filename on upload [@stumpylog](https://github.com/stumpylog) ([#2404](https://github.com/paperless-ngx/paperless-ngx/pull/2404))
+- Feature: Control scheduled tasks via cron expressions [@stumpylog](https://github.com/stumpylog) ([#2403](https://github.com/paperless-ngx/paperless-ngx/pull/2403))
+- Fix: display rtl content in correct direction [@shamoon](https://github.com/shamoon) ([#2302](https://github.com/paperless-ngx/paperless-ngx/pull/2302))
+- Fix subpath for websockets [@tribut](https://github.com/tribut) ([#2371](https://github.com/paperless-ngx/paperless-ngx/pull/2371))
+- Bugfix: Backend tests weren't using correct Python version [@stumpylog](https://github.com/stumpylog) ([#2363](https://github.com/paperless-ngx/paperless-ngx/pull/2363))
+- Feature: include comments in advanced search [@shamoon](https://github.com/shamoon) ([#2351](https://github.com/paperless-ngx/paperless-ngx/pull/2351))
+- Chore: More frontend tests [@shamoon](https://github.com/shamoon) ([#2352](https://github.com/paperless-ngx/paperless-ngx/pull/2352))
+- Chore: Fixing up some minor annoyances [@stumpylog](https://github.com/stumpylog) ([#2348](https://github.com/paperless-ngx/paperless-ngx/pull/2348))
+- Bugfix: Removal of alpha channel truncates multipage TIFFs [@stumpylog](https://github.com/stumpylog) ([#2335](https://github.com/paperless-ngx/paperless-ngx/pull/2335))
+- Documentation: update build instructions to remove deprecated [@shamoon](https://github.com/shamoon) ([#2334](https://github.com/paperless-ngx/paperless-ngx/pull/2334))
+- Add Arabic language to frontend [@KhaledEmad7](https://github.com/KhaledEmad7) ([#2313](https://github.com/paperless-ngx/paperless-ngx/pull/2313))
+- Bump [@<!---->typescript-eslint/parser from 5.43.0 to 5.47.1 in /src-ui @dependabot](https://github.com/<!---->typescript-eslint/parser from 5.43.0 to 5.47.1 in /src-ui @dependabot) ([#2306](https://github.com/paperless-ngx/paperless-ngx/pull/2306))
+- Bump [@<!---->typescript-eslint/eslint-plugin from 5.43.0 to 5.47.1 in /src-ui @dependabot](https://github.com/<!---->typescript-eslint/eslint-plugin from 5.43.0 to 5.47.1 in /src-ui @dependabot) ([#2308](https://github.com/paperless-ngx/paperless-ngx/pull/2308))
+
 ## paperless-ngx 1.11.3
 
 ### Breaking Changes
