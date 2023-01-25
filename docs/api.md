@@ -6,7 +6,7 @@ provides a browsable API for most of its endpoints, which you can
 inspect at `http://<paperless-host>:<port>/api/`. This also documents
 most of the available filters and ordering fields.
 
-The API provides 5 main endpoints:
+The API provides 7 main endpoints:
 
 - `/api/documents/`: Full CRUD support, except POSTing new documents.
   See below.

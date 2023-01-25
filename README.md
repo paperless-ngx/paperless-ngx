@@ -108,15 +108,6 @@ Paperless has been around a while now, and people are starting to build stuff on
 - [Scan to Paperless](https://github.com/sbrunner/scan-to-paperless): Scan and prepare (crop, deskew, OCR, ...) your documents for Paperless.
 - [Paperless Mobile](https://github.com/astubenbord/paperless-mobile): A modern, feature rich mobile application for Paperless.
 
-These projects also exist, but their status and compatibility with paperless-ngx is unknown.
-
-- [paperless-cli](https://github.com/stgarf/paperless-cli): A golang command line binary to interact with a Paperless instance.
-
-This project also exists, but needs updates to be compatible with paperless-ngx.
-
-- [Paperless Desktop](https://github.com/thomasbrueggemann/paperless-desktop): A desktop UI for your Paperless installation. Runs on Mac, Linux, and Windows.
-  Known issues on Mac: (Could not load reminders and documents)
-
 # Important Note
 
 Document scanners are typically used to scan sensitive documents. Things like your social insurance number, tax records, invoices, etc. Everything is stored in the clear without encryption. This means that Paperless should never be run on an untrusted host. Instead, I recommend that if you do want to use it, run it locally on a server in your own home.
