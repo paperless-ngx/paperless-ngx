@@ -413,7 +413,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">176</context>
         </context-group>
-        <target state="needs-translation">Tags, correspondents, document types and storage paths can all be managed using these pages. They can also be created from the document edit view.</target>
+        <target state="translated">Labels, correspondenten, documenttypen en opslagpaden kunnen allemaal worden beheerd met behulp van deze pagina's. Ze kunnen ook worden aangemaakt vanuit de weergave voor documentbewerkingen.</target>
       </trans-unit>
       <trans-unit id="4680387114119209483" datatype="html">
         <source>File Tasks shows you documents that have been consumed, are waiting to be, or may have failed during the process.</source>
@@ -662,7 +662,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">152</context>
         </context-group>
-        <target state="translated">Opslag paden</target>
+        <target state="translated">Opslagpaden</target>
       </trans-unit>
       <trans-unit id="2991443309752293110" datatype="html">
         <source>File Tasks</source>
@@ -1234,7 +1234,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.html</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="needs-translation">Character Set</target>
+        <target state="translated">Karakterset</target>
       </trans-unit>
       <trans-unit id="451418349275958054" datatype="html">
         <source>No encryption</source>
@@ -1266,7 +1266,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.ts</context>
           <context context-type="linenumber">28</context>
         </context-group>
-        <target state="translated">Nieuwe mail account aanmaken</target>
+        <target state="translated">Nieuw e-mailaccount aanmaken</target>
       </trans-unit>
       <trans-unit id="5559445021532852612" datatype="html">
         <source>Edit mail account</source>
@@ -1274,7 +1274,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.ts</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="translated">Mail account bewerken</target>
+        <target state="translated">E-mailaccount bewerken</target>
       </trans-unit>
       <trans-unit id="4086606389696938932" datatype="html">
         <source>Account</source>
@@ -1326,7 +1326,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="needs-translation">Consumption scope</target>
+        <target state="translated">Verwerkingsscope</target>
       </trans-unit>
       <trans-unit id="56643687972548912" datatype="html">
         <source>See docs for .eml processing requirements</source>
@@ -1334,7 +1334,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="needs-translation">See docs for .eml processing requirements</target>
+        <target state="translated">Bekijk documentatie voor verwerkingsvereisten van .eml</target>
       </trans-unit>
       <trans-unit id="5488632521862493221" datatype="html">
         <source>Paperless will only process mails that match <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>all<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> of the filters specified below.</source>
@@ -1430,7 +1430,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="needs-translation">Assign correspondent from</target>
+        <target state="translated">Wijs correspondent toe van</target>
       </trans-unit>
       <trans-unit id="4875491778188965469" datatype="html">
         <source>Assign correspondent</source>
@@ -1438,7 +1438,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">31</context>
         </context-group>
-        <target state="needs-translation">Assign correspondent</target>
+        <target state="translated">Correspondent toewijzen</target>
       </trans-unit>
       <trans-unit id="1519954996184640001" datatype="html" approved="yes">
         <source>Error</source>
@@ -1462,7 +1462,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="needs-translation">Only process attachments</target>
+        <target state="translated">Alleen bijlagen verwerken</target>
       </trans-unit>
       <trans-unit id="936923743212522897" datatype="html">
         <source>Process all files, including &apos;inline&apos; attachments</source>
@@ -1470,7 +1470,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="needs-translation">Process all files, including 'inline' attachments</target>
+        <target state="translated">Verwerk alle bestanden, inclusief 'inline' bijlagen</target>
       </trans-unit>
       <trans-unit id="9025522236384167767" datatype="html">
         <source>Process message as .eml</source>
@@ -1478,7 +1478,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">40</context>
         </context-group>
-        <target state="needs-translation">Process message as .eml</target>
+        <target state="translated">Verwerk bericht als .eml</target>
       </trans-unit>
       <trans-unit id="7411485377918318115" datatype="html">
         <source>Process message as .eml and attachments separately</source>
@@ -1486,7 +1486,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">44</context>
         </context-group>
-        <target state="needs-translation">Process message as .eml and attachments separately</target>
+        <target state="translated">Bericht als .eml en bijlagen afzonderlijk verwerken</target>
       </trans-unit>
       <trans-unit id="7022070615528435141" datatype="html" approved="yes">
         <source>Delete</source>
@@ -1558,7 +1558,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">55</context>
         </context-group>
-        <target state="needs-translation">Move to specified folder</target>
+        <target state="translated">Verplaatsen naar opgegeven map</target>
       </trans-unit>
       <trans-unit id="4593278936733161020" datatype="html">
         <source>Mark as read, don&apos;t process read mails</source>
@@ -1590,7 +1590,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">74</context>
         </context-group>
-        <target state="needs-translation">Use subject as title</target>
+        <target state="translated">Gebruik onderwerp als titel</target>
       </trans-unit>
       <trans-unit id="8645471396972938185" datatype="html">
         <source>Use attachment filename as title</source>
@@ -1598,7 +1598,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">78</context>
         </context-group>
-        <target state="needs-translation">Use attachment filename as title</target>
+        <target state="translated">Gebruik bestandsnaam van bijlagen als titel</target>
       </trans-unit>
       <trans-unit id="1568902914205618549" datatype="html">
         <source>Do not assign a correspondent</source>
@@ -1606,7 +1606,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">85</context>
         </context-group>
-        <target state="needs-translation">Do not assign a correspondent</target>
+        <target state="translated">Geen correspondent toewijzen</target>
       </trans-unit>
       <trans-unit id="3567746385454588269" datatype="html">
         <source>Use mail address</source>
@@ -1630,7 +1630,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">97</context>
         </context-group>
-        <target state="needs-translation">Use correspondent selected below</target>
+        <target state="translated">Gebruik hieronder geselecteerde correspondent</target>
       </trans-unit>
       <trans-unit id="3147349817770432927" datatype="html">
         <source>Create new mail rule</source>
@@ -1638,7 +1638,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">137</context>
         </context-group>
-        <target state="translated">Maak een nieuwe e-mail regel</target>
+        <target state="translated">Maak een nieuwe e-mailregel</target>
       </trans-unit>
       <trans-unit id="3374331029704382439" datatype="html">
         <source>Edit mail rule</source>
@@ -1646,7 +1646,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">141</context>
         </context-group>
-        <target state="translated">Bewerk e-mail regel</target>
+        <target state="translated">Bewerk e-mailregel</target>
       </trans-unit>
       <trans-unit id="6036319582202941456" datatype="html">
         <source><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>Note that editing a path does not apply changes to stored files until you have run the &apos;document_renamer&apos; utility. See the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a target=&quot;_blank&quot; href=&quot;https://docs.paperless-ngx.com/administration/#renamer&quot;&gt;"/>documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></source>
@@ -1654,7 +1654,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.html</context>
           <context context-type="linenumber">10</context>
         </context-group>
-        <target state="needs-translation"><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>Note that editing a path does not apply changes to stored files until you have run the 'document_renamer' utility. See the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a target=&quot;_blank&quot; href=&quot;https://docs.paperless-ngx.com/administration/#renamer&quot;&gt;"/>documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></target>
+        <target state="translated"><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>Houd er rekening mee dat het bewerken van een pad geen wijzigingen toepast op opgeslagen bestanden totdat u het hulpprogramma 'document_renamer' hebt uitgevoerd. Raadpleeg de <x id="START_LINK" ctype="x-a" equiv-text="&lt;a target=&quot;_blank&quot; href=&quot;https://docs.paperless-ngx.com/administration/#renamer&quot;&gt;"/>documentatie<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></target>
       </trans-unit>
       <trans-unit id="8911059720204770105" datatype="html">
         <source>Path</source>
@@ -1698,7 +1698,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.ts</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="translated">Nieuw opslag pad maken</target>
+        <target state="translated">Nieuw opslagpad maken</target>
       </trans-unit>
       <trans-unit id="3754859110054016570" datatype="html">
         <source>Edit storage path</source>
@@ -1706,7 +1706,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.ts</context>
           <context context-type="linenumber">34</context>
         </context-group>
-        <target state="translated">Opslag pad bewerken</target>
+        <target state="translated">Opslagpad bewerken</target>
       </trans-unit>
       <trans-unit id="9011959596901584887" datatype="html" approved="yes">
         <source>Color</source>
@@ -1908,7 +1908,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Welcome to Paperless-ngx</target>
+        <target state="translated">Welkom bij Paperless-ngx</target>
       </trans-unit>
       <trans-unit id="2946624699882754313" datatype="html" approved="yes">
         <source>Show all</source>
@@ -2095,7 +2095,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">5</context>
         </context-group>
-        <target state="translated">Meer details over het gebruik van Paperless-ngx is altijd beschikbaar in de <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://docs.paperless-ngx.com&quot; target=&quot;_blank&quot;&gt;"/>documentatie<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</target>
+        <target state="translated">Meer details over het gebruik van Paperless-ngx zijn altijd beschikbaar in de <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://docs.paperless-ngx.com&quot; target=&quot;_blank&quot;&gt;"/>documentatie<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</target>
       </trans-unit>
       <trans-unit id="4294899532887357745" datatype="html">
         <source>Thanks for being a part of the Paperless-ngx community!</source>
@@ -2343,7 +2343,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">49</context>
         </context-group>
-        <target state="translated">Opslag pad</target>
+        <target state="translated">Opslagpad</target>
       </trans-unit>
       <trans-unit id="5607669932062416162" datatype="html">
         <source>Default</source>
@@ -2555,7 +2555,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">454</context>
         </context-group>
-        <target state="needs-translation">Redo OCR confirm</target>
+        <target state="translated">Bevestig OCR opnieuw uitvoeren</target>
       </trans-unit>
       <trans-unit id="9197453786953646058" datatype="html">
         <source>This operation will permanently redo OCR for this document.</source>
@@ -2563,7 +2563,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">483</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently redo OCR for this document.</target>
+        <target state="translated">Met deze bewerking wordt OCR permanent opnieuw uitgevoerd voor dit document.</target>
       </trans-unit>
       <trans-unit id="5641451190833696892" datatype="html" approved="yes">
         <source>This operation cannot be undone.</source>
@@ -2607,7 +2607,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">637</context>
         </context-group>
-        <target state="needs-translation">Proceed</target>
+        <target state="translated">Doorgaan</target>
       </trans-unit>
       <trans-unit id="5729001209753056399" datatype="html">
         <source>Redo OCR operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.</source>
@@ -2615,7 +2615,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">494</context>
         </context-group>
-        <target state="needs-translation">Redo OCR operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.</target>
+        <target state="translated">Opnieuw uitvoeren van OCR-bewerking begint op de achtergrond. Sluit en heropen of herlaad dit document nadat de bewerking is voltooid om nieuwe inhoud te zien.</target>
       </trans-unit>
       <trans-unit id="8008978164775353960" datatype="html">
         <source>Error executing operation: <x id="PH" equiv-text="JSON.stringify(                 error.error               )"/></source>
@@ -2687,7 +2687,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">50</context>
         </context-group>
-        <target state="needs-translation">Filter storage paths</target>
+        <target state="translated">Opslagpaden filteren</target>
       </trans-unit>
       <trans-unit id="3193976279273491157" datatype="html" approved="yes">
         <source>Actions</source>
@@ -2735,7 +2735,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">96</context>
         </context-group>
-        <target state="needs-translation">Include:</target>
+        <target state="translated">Inclusief:</target>
       </trans-unit>
       <trans-unit id="1208547554603365604" datatype="html">
         <source> Archived files </source>
@@ -2743,7 +2743,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">100,102</context>
         </context-group>
-        <target state="needs-translation"> Archived files </target>
+        <target state="translated"> Gearchiveerde bestanden </target>
       </trans-unit>
       <trans-unit id="6791570188945688785" datatype="html">
         <source> Original files </source>
@@ -2751,7 +2751,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">106,108</context>
         </context-group>
-        <target state="needs-translation"> Original files </target>
+        <target state="translated"> Originele bestanden </target>
       </trans-unit>
       <trans-unit id="3608345051493493574" datatype="html">
         <source> Use formatted filename </source>
@@ -2759,7 +2759,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">113,115</context>
         </context-group>
-        <target state="needs-translation"> Use formatted filename </target>
+        <target state="translated"> Gebruik geformatteerde bestandsnaam </target>
       </trans-unit>
       <trans-unit id="7985804062689412812" datatype="html">
         <source>Error executing bulk operation: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></source>
@@ -2901,7 +2901,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">388</context>
         </context-group>
-        <target state="needs-translation">Confirm storage path assignment</target>
+        <target state="translated">Bevestig toewijzing opslagpad</target>
       </trans-unit>
       <trans-unit id="8750527458618415924" datatype="html">
         <source>This operation will assign the storage path &quot;<x id="PH" equiv-text="storagePath.name"/>&quot; to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -2909,7 +2909,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">390</context>
         </context-group>
-        <target state="needs-translation">This operation will assign the storage path "<x id="PH" equiv-text="storagePath.name"/>" to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Het opslagpad <x id="PH" equiv-text="storagePath.name"/> zal toegewezen worden aan <x id="PH_1" equiv-text="this.list.selected.size"/> geselecteerd(e) document(en).</target>
       </trans-unit>
       <trans-unit id="60728365335056946" datatype="html">
         <source>This operation will remove the storage path from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -2917,7 +2917,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">392</context>
         </context-group>
-        <target state="needs-translation">This operation will remove the storage path from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Het opslagpad zal verwijderd worden van <x id="PH" equiv-text="this.list.selected.size"/> geselecteerd(e) document(en).</target>
       </trans-unit>
       <trans-unit id="749430623564850405" datatype="html" approved="yes">
         <source>Delete confirm</source>
@@ -2949,7 +2949,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">455</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently redo OCR for <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Met deze bewerking wordt OCR permanent opnieuw uitgevoerd voor <x id="PH" equiv-text="this.list.selected.size"/> geselecteerd(e) document(en).</target>
       </trans-unit>
       <trans-unit id="8076495233090006322" datatype="html" approved="yes">
         <source>Filter by correspondent</source>
@@ -3045,7 +3045,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">187</context>
         </context-group>
-        <target state="needs-translation">Filter by document type</target>
+        <target state="translated">Documenttypes filteren</target>
       </trans-unit>
       <trans-unit id="157572966557284263" datatype="html">
         <source>Filter by storage path</source>
@@ -3057,7 +3057,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">192</context>
         </context-group>
-        <target state="needs-translation">Filter by storage path</target>
+        <target state="translated">Filter op opslagpad</target>
       </trans-unit>
       <trans-unit id="3727324658595204357" datatype="html">
         <source>Created: <x id="INTERPOLATION" equiv-text="{{ document.created | customDate }}"/></source>
@@ -3069,7 +3069,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">48</context>
         </context-group>
-        <target state="needs-translation">Created: <x id="INTERPOLATION" equiv-text="{{ document.created | customDate }}"/></target>
+        <target state="translated">Aangemaakt: <x id="INTERPOLATION" equiv-text="{{ document.created | customDate }}"/></target>
       </trans-unit>
       <trans-unit id="2030261243264601523" datatype="html">
         <source>Added: <x id="INTERPOLATION" equiv-text="{{ document.added | customDate }}"/></source>
@@ -3081,7 +3081,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">49</context>
         </context-group>
-        <target state="needs-translation">Added: <x id="INTERPOLATION" equiv-text="{{ document.added | customDate }}"/></target>
+        <target state="translated">Toegevoegd: <x id="INTERPOLATION" equiv-text="{{ document.added | customDate }}"/></target>
       </trans-unit>
       <trans-unit id="4235671847487610290" datatype="html">
         <source>Modified: <x id="INTERPOLATION" equiv-text="{{ document.modified | customDate }}"/></source>
@@ -3093,7 +3093,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">50</context>
         </context-group>
-        <target state="needs-translation">Modified: <x id="INTERPOLATION" equiv-text="{{ document.modified | customDate }}"/></target>
+        <target state="translated">Gewijzigd: <x id="INTERPOLATION" equiv-text="{{ document.modified | customDate }}"/></target>
       </trans-unit>
       <trans-unit id="2332107018974972998" datatype="html">
         <source>Score:</source>
@@ -3125,7 +3125,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">31</context>
         </context-group>
-        <target state="needs-translation">Toggle document type filter</target>
+        <target state="translated">In-/uitschakelen documenttype filter</target>
       </trans-unit>
       <trans-unit id="8950368321707344185" datatype="html">
         <source>Toggle storage path filter</source>
@@ -3133,7 +3133,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">38</context>
         </context-group>
-        <target state="needs-translation">Toggle storage path filter</target>
+        <target state="translated">In- of uitschakelen opslagpad filter</target>
       </trans-unit>
       <trans-unit id="5145213156408463657" datatype="html" approved="yes">
         <source>Select none</source>
@@ -3261,7 +3261,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">182</context>
         </context-group>
-        <target state="needs-translation">Edit document</target>
+        <target state="translated">Document bewerken</target>
       </trans-unit>
       <trans-unit id="2155249406916744630" datatype="html" approved="yes">
         <source>View &quot;<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>&quot; saved successfully.</source>
@@ -3293,7 +3293,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">94,96</context>
         </context-group>
-        <target state="needs-translation">Correspondent: <x id="PH" equiv-text="this.correspondents.find((c) =&gt; c.id == +rule.value)?.name"/></target>
+        <target state="translated">Correspondent: <x id="PH" equiv-text="this.correspondents.find((c) =&gt; c.id == +rule.value)?.name"/></target>
       </trans-unit>
       <trans-unit id="8170755470576301659" datatype="html" approved="yes">
         <source>Without correspondent</source>
@@ -3469,7 +3469,7 @@
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.ts</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="needs-translation">correspondent</target>
+        <target state="translated">correspondent</target>
       </trans-unit>
       <trans-unit id="1612355304340685070" datatype="html">
         <source>correspondents</source>
@@ -3477,7 +3477,7 @@
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.ts</context>
           <context context-type="linenumber">34</context>
         </context-group>
-        <target state="needs-translation">correspondents</target>
+        <target state="translated">correspondenten</target>
       </trans-unit>
       <trans-unit id="6360600151505327572" datatype="html">
         <source>Last used</source>
@@ -3485,7 +3485,7 @@
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.ts</context>
           <context context-type="linenumber">38</context>
         </context-group>
-        <target state="needs-translation">Last used</target>
+        <target state="translated">Laatst gebruikt</target>
       </trans-unit>
       <trans-unit id="7427874343955308724" datatype="html" approved="yes">
         <source>Do you really want to delete the correspondent &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
@@ -3501,7 +3501,7 @@
           <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.ts</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="needs-translation">document type</target>
+        <target state="translated">documenttype</target>
       </trans-unit>
       <trans-unit id="2992451138146293104" datatype="html">
         <source>document types</source>
@@ -3509,7 +3509,7 @@
           <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.ts</context>
           <context context-type="linenumber">31</context>
         </context-group>
-        <target state="needs-translation">document types</target>
+        <target state="translated">documenttypen</target>
       </trans-unit>
       <trans-unit id="4990731724078522539" datatype="html" approved="yes">
         <source>Do you really want to delete the document type &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
@@ -3637,7 +3637,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
           <context context-type="linenumber">74</context>
         </context-group>
-        <target state="needs-translation">{VAR_PLURAL, plural, =1 {One <x id="INTERPOLATION"/>} other {<x id="INTERPOLATION_1"/> total <x id="INTERPOLATION_2"/>}}</target>
+        <target state="translated">{VAR_PLURAL, plural, =1 {Eén <x id="INTERPOLATION"/>} other {<x id="INTERPOLATION_1"/> totaal <x id="INTERPOLATION_2"/>}}</target>
       </trans-unit>
       <trans-unit id="810888510148304696" datatype="html" approved="yes">
         <source>Automatic</source>
@@ -4065,7 +4065,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">241</context>
         </context-group>
-        <target state="needs-translation">Add Account</target>
+        <target state="translated">Account toevoegen</target>
       </trans-unit>
       <trans-unit id="2188854519574316630" datatype="html">
         <source>Server</source>
@@ -4073,7 +4073,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">249</context>
         </context-group>
-        <target state="needs-translation">Server</target>
+        <target state="translated">Server</target>
       </trans-unit>
       <trans-unit id="6235247415162820954" datatype="html">
         <source>No mail accounts defined.</source>
@@ -4089,7 +4089,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">271</context>
         </context-group>
-        <target state="translated">E-mail regels</target>
+        <target state="translated">E-mailregels</target>
       </trans-unit>
       <trans-unit id="1372022816709469401" datatype="html">
         <source>Add Rule</source>
@@ -4097,7 +4097,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">276</context>
         </context-group>
-        <target state="needs-translation">Add Rule</target>
+        <target state="translated">Regel toevoegen</target>
       </trans-unit>
       <trans-unit id="6751234988479444294" datatype="html">
         <source>No mail rules defined.</source>
@@ -4105,7 +4105,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">302</context>
         </context-group>
-        <target state="needs-translation">No mail rules defined.</target>
+        <target state="translated">Geen e-mailregels gedefinieerd.</target>
       </trans-unit>
       <trans-unit id="5610279464668232148" datatype="html" approved="yes">
         <source>Saved view &quot;<x id="PH" equiv-text="savedView.name"/>&quot; deleted.</source>
@@ -4137,7 +4137,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">481</context>
         </context-group>
-        <target state="needs-translation">Settings were saved successfully. Reload is required to apply some changes.</target>
+        <target state="translated">Instellingen zijn succesvol opgeslagen. Herladen is vereist om sommige wijzigingen toe te passen.</target>
       </trans-unit>
       <trans-unit id="8491974984518503778" datatype="html">
         <source>Reload now</source>
@@ -4145,7 +4145,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">482</context>
         </context-group>
-        <target state="needs-translation">Reload now</target>
+        <target state="translated">Nu herladen</target>
       </trans-unit>
       <trans-unit id="6839066544204061364" datatype="html" approved="yes">
         <source>Use system language</source>
@@ -4169,7 +4169,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">527,529</context>
         </context-group>
-        <target state="needs-translation">Error while storing settings on server: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></target>
+        <target state="translated">Fout bij het opslaan van instellingen op server: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></target>
       </trans-unit>
       <trans-unit id="6327501535846658797" datatype="html">
         <source>Saved account &quot;<x id="PH" equiv-text="newMailAccount.name"/>&quot;.</source>
@@ -4177,7 +4177,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">554</context>
         </context-group>
-        <target state="needs-translation">Saved account "<x id="PH" equiv-text="newMailAccount.name"/>".</target>
+        <target state="translated">Account "<x id="PH" equiv-text="newMailAccount.name"/>" opgeslagen.</target>
       </trans-unit>
       <trans-unit id="6428427497555765743" datatype="html">
         <source>Error saving account: <x id="PH" equiv-text="e.toString()"/>.</source>
@@ -4185,7 +4185,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">564</context>
         </context-group>
-        <target state="needs-translation">Error saving account: <x id="PH" equiv-text="e.toString()"/>.</target>
+        <target state="translated">Fout bij opslaan account: <x id="PH" equiv-text="e.toString()"/>.</target>
       </trans-unit>
       <trans-unit id="5641934153807844674" datatype="html">
         <source>Confirm delete mail account</source>
@@ -4193,7 +4193,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">574</context>
         </context-group>
-        <target state="translated">Bevestig e-mail account verwijderen</target>
+        <target state="translated">Bevestig e-mailaccount verwijderen</target>
       </trans-unit>
       <trans-unit id="7176985344323395435" datatype="html">
         <source>This operation will permanently delete this mail account.</source>
@@ -4201,7 +4201,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">575</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently delete this mail account.</target>
+        <target state="translated">Met deze bewerking wordt dit e-mailaccount permanent verwijderd.</target>
       </trans-unit>
       <trans-unit id="4233826387148482123" datatype="html">
         <source>Deleted mail account</source>
@@ -4209,7 +4209,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">584</context>
         </context-group>
-        <target state="needs-translation">Deleted mail account</target>
+        <target state="translated">E-mailaccount verwijderd</target>
       </trans-unit>
       <trans-unit id="7443801450153832973" datatype="html">
         <source>Error deleting mail account: <x id="PH" equiv-text="e.toString()"/>.</source>
@@ -4217,7 +4217,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">593</context>
         </context-group>
-        <target state="needs-translation">Error deleting mail account: <x id="PH" equiv-text="e.toString()"/>.</target>
+        <target state="translated">Fout bij verwijderen van e-mailaccount: <x id="PH" equiv-text="e.toString()"/>.</target>
       </trans-unit>
       <trans-unit id="123368655395433699" datatype="html">
         <source>Saved rule &quot;<x id="PH" equiv-text="newMailRule.name"/>&quot;.</source>
@@ -4225,7 +4225,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">612</context>
         </context-group>
-        <target state="needs-translation">Saved rule "<x id="PH" equiv-text="newMailRule.name"/>".</target>
+        <target state="translated">Regel "<x id="PH" equiv-text="newMailRule.name"/>" opgeslagen.</target>
       </trans-unit>
       <trans-unit id="4741216051394823471" datatype="html">
         <source>Error saving rule: <x id="PH" equiv-text="e.toString()"/>.</source>
@@ -4233,7 +4233,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">623</context>
         </context-group>
-        <target state="needs-translation">Error saving rule: <x id="PH" equiv-text="e.toString()"/>.</target>
+        <target state="translated">Fout bij opslaan regel: <x id="PH" equiv-text="e.toString()"/>.</target>
       </trans-unit>
       <trans-unit id="3896080636020672118" datatype="html">
         <source>Confirm delete mail rule</source>
@@ -4241,7 +4241,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">633</context>
         </context-group>
-        <target state="needs-translation">Confirm delete mail rule</target>
+        <target state="translated">Bevestig e-mailregel verwijderen</target>
       </trans-unit>
       <trans-unit id="2250372580580310337" datatype="html">
         <source>This operation will permanently delete this mail rule.</source>
@@ -4249,7 +4249,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">634</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently delete this mail rule.</target>
+        <target state="translated">Met deze bewerking wordt dit e-mailregel permanent verwijderd.</target>
       </trans-unit>
       <trans-unit id="9077981247971516916" datatype="html">
         <source>Deleted mail rule</source>
@@ -4257,7 +4257,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">643</context>
         </context-group>
-        <target state="needs-translation">Deleted mail rule</target>
+        <target state="translated">E-mailregel verwijderd</target>
       </trans-unit>
       <trans-unit id="4740074357089345173" datatype="html">
         <source>Error deleting mail rule: <x id="PH" equiv-text="e.toString()"/>.</source>
@@ -4265,7 +4265,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">652</context>
         </context-group>
-        <target state="needs-translation">Error deleting mail rule: <x id="PH" equiv-text="e.toString()"/>.</target>
+        <target state="translated">Fout bij verwijderen e-mailregel: <x id="PH" equiv-text="e.toString()"/>.</target>
       </trans-unit>
       <trans-unit id="5101757640976222639" datatype="html">
         <source>storage path</source>
@@ -4273,7 +4273,7 @@
           <context context-type="sourcefile">src/app/components/manage/storage-path-list/storage-path-list.component.ts</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="needs-translation">storage path</target>
+        <target state="translated">opslagpad</target>
       </trans-unit>
       <trans-unit id="22235115124223314" datatype="html">
         <source>storage paths</source>
@@ -4281,7 +4281,7 @@
           <context context-type="sourcefile">src/app/components/manage/storage-path-list/storage-path-list.component.ts</context>
           <context context-type="linenumber">31</context>
         </context-group>
-        <target state="needs-translation">storage paths</target>
+        <target state="translated">opslagpaden</target>
       </trans-unit>
       <trans-unit id="1569070683025071137" datatype="html">
         <source>Do you really want to delete the storage path &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
@@ -4289,7 +4289,7 @@
           <context context-type="sourcefile">src/app/components/manage/storage-path-list/storage-path-list.component.ts</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="needs-translation">Do you really want to delete the storage path "<x id="PH" equiv-text="object.name"/>"?</target>
+        <target state="translated">Wil je dit opslagpad echt verwijderen "<x id="PH" equiv-text="object.name"/>"?</target>
       </trans-unit>
       <trans-unit id="6402703264596649214" datatype="html">
         <source>tag</source>
@@ -4547,7 +4547,7 @@
           <context context-type="sourcefile">src/app/guards/dirty-doc.guard.ts</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="needs-translation">Warning: You have unsaved changes to your document(s).</target>
+        <target state="translated">Waarschuwing: u heeft niet-opgeslagen wijzigingen in uw document(en).</target>
       </trans-unit>
       <trans-unit id="159901853873315050" datatype="html">
         <source>Unsaved Changes</source>
@@ -4603,7 +4603,7 @@
           <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="needs-translation">You have unsaved changes to the saved view</target>
+        <target state="translated">U heeft niet-opgeslagen wijzigingen in de opgeslagen weergave</target>
       </trans-unit>
       <trans-unit id="7282050913165342352" datatype="html">
         <source>Are you sure you want to close this saved view?</source>
@@ -4611,7 +4611,7 @@
           <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="needs-translation">Are you sure you want to close this saved view?</target>
+        <target state="translated">Weet u zeker dat u deze opgeslagen weergave wilt sluiten?</target>
       </trans-unit>
       <trans-unit id="856284624775342512" datatype="html">
         <source>Save and close</source>
@@ -4976,7 +4976,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">265</context>
         </context-group>
-        <target state="needs-translation">Chinese Simplified</target>
+        <target state="translated">Chinees (vereenvoudigd)</target>
       </trans-unit>
       <trans-unit id="4912706592792948707" datatype="html" approved="yes">
         <source>ISO 8601</source>
@@ -4992,7 +4992,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">393</context>
         </context-group>
-        <target state="needs-translation">Successfully completed one-time migratration of settings to the database!</target>
+        <target state="translated">Eenmalige migratie van instellingen naar de database is succesvol voltooid!</target>
       </trans-unit>
       <trans-unit id="5558341108007064934" datatype="html">
         <source>Unable to migrate settings to the database, please try saving manually.</source>
@@ -5000,7 +5000,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">394</context>
         </context-group>
-        <target state="needs-translation">Unable to migrate settings to the database, please try saving manually.</target>
+        <target state="translated">Kan instellingen niet migreren naar de database, probeer handmatig op te slaan.</target>
       </trans-unit>
       <trans-unit id="5037437391296624618" datatype="html" approved="yes">
         <source>Information</source>
