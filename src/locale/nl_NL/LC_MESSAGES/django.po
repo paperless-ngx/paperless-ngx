@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-09 21:50+0000\n"
-"PO-Revision-Date: 2023-01-23 12:37\n"
+"PO-Revision-Date: 2023-01-26 14:21\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
@@ -368,15 +368,15 @@ msgstr "heeft tags in"
 
 #: documents/models.py:410
 msgid "ASN greater than"
-msgstr ""
+msgstr "ASN groter dan"
 
 #: documents/models.py:411
 msgid "ASN less than"
-msgstr ""
+msgstr "ASN kleiner dan"
 
 #: documents/models.py:412
 msgid "storage path is"
-msgstr ""
+msgstr "opslagpad is"
 
 #: documents/models.py:422
 msgid "rule type"
@@ -396,15 +396,15 @@ msgstr "filterregels"
 
 #: documents/models.py:536
 msgid "Task ID"
-msgstr ""
+msgstr "Taak ID"
 
 #: documents/models.py:537
 msgid "Celery ID for the Task that was run"
-msgstr ""
+msgstr "Celery ID voor de taak die werd uitgevoerd"
 
 #: documents/models.py:542
 msgid "Acknowledged"
-msgstr ""
+msgstr "Bevestigd"
 
 #: documents/models.py:543
 msgid "If the task is acknowledged via the frontend or API"
