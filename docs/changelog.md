@@ -1,5 +1,25 @@
 # Changelog
 
+## paperless-ngx 1.12.1
+
+### Bug Fixes
+
+- Fix: comments not showing in search until after manual reindex in v1.12 [@shamoon](https://github.com/shamoon) ([#2513](https://github.com/paperless-ngx/paperless-ngx/pull/2513))
+- Fix: date range search broken in 1.12 [@shamoon](https://github.com/shamoon) ([#2509](https://github.com/paperless-ngx/paperless-ngx/pull/2509))
+
+### Documentation
+
+- [Documentation] Add v1.12.0 changelog [@github-actions](https://github.com/github-actions) ([#2507](https://github.com/paperless-ngx/paperless-ngx/pull/2507))
+
+### Maintenance
+
+- Moves back to the main release-drafter now that it does what we wanted [@stumpylog](https://github.com/stumpylog) ([#2503](https://github.com/paperless-ngx/paperless-ngx/pull/2503))
+
+### All App Changes
+
+- Fix: comments not showing in search until after manual reindex in v1.12 [@shamoon](https://github.com/shamoon) ([#2513](https://github.com/paperless-ngx/paperless-ngx/pull/2513))
+- Fix: date range search broken in 1.12 [@shamoon](https://github.com/shamoon) ([#2509](https://github.com/paperless-ngx/paperless-ngx/pull/2509))
+
 ## paperless-ngx 1.12.0
 
 ### Features
