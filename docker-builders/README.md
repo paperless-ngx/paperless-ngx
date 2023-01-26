@@ -12,6 +12,12 @@ JBIG is an image coding which can achieve better compression of images for PDFs.
 
 The Docker image builds a shared library file and utility, which is copied into the correct location in the final image.
 
+### Updating
+
+1. Ensure the given qpdf version is present in [Debian bookworm](https://packages.debian.org/bookworm/qpdf)
+2. Update `.build-config.json` to the given version
+3. If the Debian specific version has incremented, update `Dockerfile.qpdf`
+
 See Also:
 
 - [OCRMyPDF Documentation](https://ocrmypdf.readthedocs.io/en/latest/jbig2.html)
