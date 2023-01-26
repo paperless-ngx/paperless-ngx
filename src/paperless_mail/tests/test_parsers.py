@@ -573,8 +573,8 @@ class TestParser(TestCase):
             self.parser.gotenberg_server + "/forms/chromium/convert/html",
             mock_post.call_args.args[0],
         )
-        self.assertEqual({}, mock_post.call_args.kwargs["headers"])
-        self.assertEqual(
+        self.assertDictEqual({}, mock_post.call_args.kwargs["headers"])
+        self.assertDictEqual(
             {
                 "marginTop": "0.1",
                 "marginBottom": "0.1",
@@ -583,6 +583,7 @@ class TestParser(TestCase):
                 "paperWidth": "8.27",
                 "paperHeight": "11.7",
                 "scale": "1.0",
+                "pdfFormat": "PDF/A-2b",
             },
             mock_post.call_args.kwargs["data"],
         )
@@ -663,8 +664,8 @@ class TestParser(TestCase):
             self.parser.gotenberg_server + "/forms/chromium/convert/html",
             mock_post.call_args.args[0],
         )
-        self.assertEqual({}, mock_post.call_args.kwargs["headers"])
-        self.assertEqual(
+        self.assertDictEqual({}, mock_post.call_args.kwargs["headers"])
+        self.assertDictEqual(
             {
                 "marginTop": "0.1",
                 "marginBottom": "0.1",
