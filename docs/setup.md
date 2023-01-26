@@ -388,12 +388,7 @@ supported.
     ```
 
 8.  Install python requirements from the `requirements.txt` file. It is
-    up to you if you wish to use a virtual environment or not. First you
-    should update your pip, so it gets the actual packages.
-
-    ```shell-session
-    sudo -Hu paperless pip3 install --upgrade pip
-    ```
+    up to you if you wish to use a virtual environment or not. First you should update your pip, so it gets the actual packages.
 
     ```shell-session
     sudo -Hu paperless pip3 install -r requirements.txt
