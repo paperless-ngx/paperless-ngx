@@ -2,6 +2,9 @@
 
 ## paperless-ngx 1.12.1
 
+_Note: Version 1.12.x introduced searching of comments which will work for comments added after the upgrade but a reindex of the search index is required in order to be able to search
+older comments. The Docker image will automatically perform this reindex, bare metal installations will have to perform this manually, see [the docs](https://docs.paperless-ngx.com/administration/#index)._
+
 ### Bug Fixes
 
 - Fix: comments not showing in search until after manual reindex in v1.12 [@shamoon](https://github.com/shamoon) ([#2513](https://github.com/paperless-ngx/paperless-ngx/pull/2513))
