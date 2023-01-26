@@ -271,6 +271,16 @@ class MailDocumentParser(DocumentParser):
                 "paperHeight": "11.7",
                 "scale": "1.0",
             }
+
+            # Set the output format of the resulting PDF
+            # Valid inputs: https://gotenberg.dev/docs/modules/pdf-engines#uno
+            if settings.OCR_OUTPUT_TYPE in {"pdfa", "pdfa-2"}:
+                data["pdfFormat"] = "PDF/A-2b"
+            elif settings.OCR_OUTPUT_TYPE == "pdfa-1":
+                data["pdfFormat"] = "PDF/A-1a"
+            elif settings.OCR_OUTPUT_TYPE == "pdfa-3":
+                data["pdfFormat"] = "PDF/A-3b"
+
             try:
                 response = requests.post(
                     url,
