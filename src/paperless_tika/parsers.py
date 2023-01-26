@@ -95,9 +95,19 @@ class TikaDocumentParser(DocumentParser):
                 ),
             }
             headers = {}
+            data = {}
+
+            # Set the output format of the resulting PDF
+            # Valid inputs: https://gotenberg.dev/docs/modules/pdf-engines#uno
+            if settings.OCR_OUTPUT_TYPE in {"pdfa", "pdfa-2"}:
+                data["pdfFormat"] = "PDF/A-2b"
+            elif settings.OCR_OUTPUT_TYPE == "pdfa-1":
+                data["pdfFormat"] = "PDF/A-1a"
+            elif settings.OCR_OUTPUT_TYPE == "pdfa-3":
+                data["pdfFormat"] = "PDF/A-3b"
 
             try:
-                response = requests.post(url, files=files, headers=headers)
+                response = requests.post(url, files=files, headers=headers, data=data)
                 response.raise_for_status()  # ensure we notice bad responses
             except Exception as err:
                 raise ParseError(
