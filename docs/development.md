@@ -57,7 +57,8 @@ After you forked and cloned the code from GitHub you need to perform a
 first-time setup.
 
 !!! note
-Every command is executed directly from the root folder of the project unless specified otherwise.
+
+    Every command is executed directly from the root folder of the project unless specified otherwise.
 
 1.  Install prerequisites + pipenv as mentioned in
     [Bare metal route](/setup#bare_metal).
