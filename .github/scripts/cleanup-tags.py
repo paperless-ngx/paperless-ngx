@@ -155,8 +155,10 @@ class RegistryTagsCleaner:
                     proc = subprocess.run(
                         [
                             shutil.which("docker"),
-                            "manifest",
+                            "buildx",
+                            "imagetools",
                             "inspect",
+                            "--raw",
                             full_name,
                         ],
                         capture_output=True,
