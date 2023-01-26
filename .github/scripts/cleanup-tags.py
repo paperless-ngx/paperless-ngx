@@ -15,6 +15,8 @@ from github import ContainerPackage
 from github import GithubBranchApi
 from github import GithubContainerRegistryApi
 
+import docker
+
 logger = logging.getLogger("cleanup-tags")
 
 
@@ -151,6 +153,8 @@ class RegistryTagsCleaner:
             for tag in sorted(self.tags_to_keep):
                 full_name = f"ghcr.io/{self.repo_owner}/{self.package_name}:{tag}"
                 logger.info(f"Checking manifest for {full_name}")
+                # TODO: It would be nice to use RegistryData from docker
+                # except the ID doesn't map to anything in the manifest
                 try:
                     proc = subprocess.run(
                         [
@@ -242,6 +246,65 @@ class RegistryTagsCleaner:
         """
         # By default, keep anything which is tagged
         self.tags_to_keep = list(set(self.all_pkgs_tags_to_version.keys()))
+
+    def check_tags_pull(self):
+        """
+        This method uses the Docker Python SDK to confirm all tags which were
+        kept still pull, for all platforms.
+
+        TODO: This is much slower (although more comprehensive).  Maybe a Pool?
+        """
+        logger.info("Beginning confirmation step")
+        client = docker.from_env()
+        imgs = []
+        for tag in sorted(self.tags_to_keep):
+            repository = f"ghcr.io/{self.repo_owner}/{self.package_name}"
+            for arch, variant in [("amd64", None), ("arm64", None), ("arm", "v7")]:
+                # From 11.2.0 onwards, qpdf is cross compiled, so there is a single arch, amd64
+                # skip others in this case
+                if "qpdf" in self.package_name and arch != "amd64" and tag == "11.2.0":
+                    continue
+                # Skip beta and release candidate tags
+                elif "beta" in tag:
+                    continue
+
+                # Build the platform name
+                if variant is not None:
+                    platform = f"linux/{arch}/{variant}"
+                else:
+                    platform = f"linux/{arch}"
+
+                try:
+                    logger.info(f"Pulling {repository}:{tag} for {platform}")
+                    image = client.images.pull(
+                        repository=repository,
+                        tag=tag,
+                        platform=platform,
+                    )
+                    imgs.append(image)
+                except docker.errors.APIError as e:
+                    logger.error(
+                        f"Failed to pull {repository}:{tag}: {e}",
+                    )
+
+            # Prevent out of space errors by removing after a few
+            # pulls
+            if len(imgs) > 50:
+                for image in imgs:
+                    try:
+                        client.images.remove(image.id)
+                    except docker.errors.APIError as e:
+                        err_str = str(e)
+                        # Ignore attempts to remove images that are partly shared
+                        # Ignore images which are somehow gone already
+                        if (
+                            "must be forced" not in err_str
+                            and "No such image" not in err_str
+                        ):
+                            logger.error(
+                                f"Remove image ghcr.io/{self.repo_owner}/{self.package_name}:{tag} failed: {e}",
+                            )
+                imgs = []
 
 
 class MainImageTagsCleaner(RegistryTagsCleaner):
@@ -398,6 +461,10 @@ def _main():
 
             # Clean images which are untagged
             cleaner.clean_untagged(args.is_manifest)
+
+            # Verify remaining tags still pull
+            if args.is_manifest:
+                cleaner.check_tags_pull()
 
 
 if __name__ == "__main__":
