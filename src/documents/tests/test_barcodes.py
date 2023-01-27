@@ -1,6 +1,5 @@
 import os
 import shutil
-import tempfile
 from unittest import mock
 
 from django.conf import settings
@@ -197,58 +196,6 @@ class TestBarcode(DirectoriesMixin, TestCase):
         )
         img = Image.open(test_file)
         self.assertEqual(barcodes.barcode_reader(img), ["CUSTOM BARCODE"])
-
-    def test_barcode_reader_asn_normal(self):
-        """
-        GIVEN:
-            - Image containing standard ASNxxxxx barcode
-        WHEN:
-            - Image is scanned for barcodes
-        THEN:
-            - The barcode is located
-            - The barcode value is correct
-        """
-        test_file = os.path.join(
-            self.BARCODE_SAMPLE_DIR,
-            "barcode-39-asn-123.png",
-        )
-        img = Image.open(test_file)
-        self.assertEqual(barcodes.barcode_reader(img), ["ASN00123"])
-
-    def test_barcode_reader_asn_invalid(self):
-        """
-        GIVEN:
-            - Image containing invalid ASNxxxxx barcode
-            - The number portion of the ASN is not a number
-        WHEN:
-            - Image is scanned for barcodes
-        THEN:
-            - The barcode is located
-            - The barcode value is correct
-        """
-        test_file = os.path.join(
-            self.BARCODE_SAMPLE_DIR,
-            "barcode-39-asn-invalid.png",
-        )
-        img = Image.open(test_file)
-        self.assertEqual(barcodes.barcode_reader(img), ["ASNXYZXYZ"])
-
-    def test_barcode_reader_asn_custom_prefix(self):
-        """
-        GIVEN:
-            - Image containing custom prefix barcode
-        WHEN:
-            - Image is scanned for barcodes
-        THEN:
-            - The barcode is located
-            - The barcode value is correct
-        """
-        test_file = os.path.join(
-            self.BARCODE_SAMPLE_DIR,
-            "barcode-39-asn-custom-prefix.png",
-        )
-        img = Image.open(test_file)
-        self.assertEqual(barcodes.barcode_reader(img), ["CUSTOM-PREFIX-00123"])
 
     def test_get_mime_type(self):
         """
@@ -908,6 +855,144 @@ class TestBarcode(DirectoriesMixin, TestCase):
         self.assertEqual(doc_barcode_info.pdf_path, test_file)
         self.assertListEqual(separator_page_numbers, [])
 
+
+class TestAsnBarcodes(DirectoriesMixin, TestCase):
+
+    SAMPLE_DIR = os.path.join(
+        os.path.dirname(__file__),
+        "samples",
+    )
+
+    BARCODE_SAMPLE_DIR = os.path.join(SAMPLE_DIR, "barcodes")
+
+    def test_barcode_reader_asn_normal(self):
+        """
+        GIVEN:
+            - Image containing standard ASNxxxxx barcode
+        WHEN:
+            - Image is scanned for barcodes
+        THEN:
+            - The barcode is located
+            - The barcode value is correct
+        """
+        test_file = os.path.join(
+            self.BARCODE_SAMPLE_DIR,
+            "barcode-39-asn-123.png",
+        )
+        img = Image.open(test_file)
+        self.assertEqual(barcodes.barcode_reader(img), ["ASN00123"])
+
+    def test_barcode_reader_asn_invalid(self):
+        """
+        GIVEN:
+            - Image containing invalid ASNxxxxx barcode
+            - The number portion of the ASN is not a number
+        WHEN:
+            - Image is scanned for barcodes
+        THEN:
+            - The barcode is located
+            - The barcode value is correct
+        """
+        test_file = os.path.join(
+            self.BARCODE_SAMPLE_DIR,
+            "barcode-39-asn-invalid.png",
+        )
+        img = Image.open(test_file)
+        self.assertEqual(barcodes.barcode_reader(img), ["ASNXYZXYZ"])
+
+    def test_barcode_reader_asn_custom_prefix(self):
+        """
+        GIVEN:
+            - Image containing custom prefix barcode
+        WHEN:
+            - Image is scanned for barcodes
+        THEN:
+            - The barcode is located
+            - The barcode value is correct
+        """
+        test_file = os.path.join(
+            self.BARCODE_SAMPLE_DIR,
+            "barcode-39-asn-custom-prefix.png",
+        )
+        img = Image.open(test_file)
+        self.assertEqual(barcodes.barcode_reader(img), ["CUSTOM-PREFIX-00123"])
+
+    @override_settings(CONSUMER_ASN_BARCODE_PREFIX="CUSTOM-PREFIX-")
+    def test_scan_file_for_asn_custom_prefix(self):
+        """
+        GIVEN:
+            - PDF containing an ASN barcode with custom prefix
+            - The ASN value is 123
+        WHEN:
+            - File is scanned for barcodes
+        THEN:
+            - The ASN is located
+            - The ASN integer value is correct
+        """
+        test_file = os.path.join(
+            self.BARCODE_SAMPLE_DIR,
+            "barcode-39-asn-custom-prefix.pdf",
+        )
+        doc_barcode_info = barcodes.scan_file_for_barcodes(
+            test_file,
+        )
+        asn = barcodes.get_asn_from_barcodes(doc_barcode_info.barcodes)
+
+        self.assertEqual(doc_barcode_info.pdf_path, test_file)
+        self.assertEqual(asn, 123)
+
+    def test_scan_file_for_asn_barcode_invalid(self):
+        """
+        GIVEN:
+            - PDF containing an ASN barcode
+            - The ASN value is XYZXYZ
+        WHEN:
+            - File is scanned for barcodes
+        THEN:
+            - The ASN is located
+            - The ASN value is not used
+        """
+        test_file = os.path.join(
+            self.BARCODE_SAMPLE_DIR,
+            "barcode-39-asn-invalid.pdf",
+        )
+        doc_barcode_info = barcodes.scan_file_for_barcodes(
+            test_file,
+        )
+
+        asn = barcodes.get_asn_from_barcodes(doc_barcode_info.barcodes)
+
+        self.assertEqual(doc_barcode_info.pdf_path, test_file)
+        self.assertEqual(asn, None)
+
+    @override_settings(CONSUMER_ENABLE_ASN_BARCODE=True)
+    def test_consume_barcode_file_asn_assignment(self):
+        """
+        GIVEN:
+            - PDF containing an ASN barcode
+            - The ASN value is 123
+        WHEN:
+            - File is scanned for barcodes
+        THEN:
+            - The ASN is located
+            - The ASN integer value is correct
+            - The ASN is provided as the override value to the consumer
+        """
+        test_file = os.path.join(
+            self.BARCODE_SAMPLE_DIR,
+            "barcode-39-asn-123.pdf",
+        )
+
+        dst = os.path.join(settings.SCRATCH_DIR, "barcode-39-asn-123.pdf")
+        shutil.copy(test_file, dst)
+
+        with mock.patch("documents.consumer.Consumer.try_consume_file") as mocked_call:
+            tasks.consume_file(dst)
+
+            args, kwargs = mocked_call.call_args
+
+            self.assertEqual(kwargs["override_asn"], 123)
+
     def test_scan_file_for_asn_barcode(self):
         """
         GIVEN:
@@ -951,82 +1036,6 @@ class TestBarcode(DirectoriesMixin, TestCase):
 
         self.assertEqual(doc_barcode_info.pdf_path, test_file)
         self.assertEqual(asn, None)
-
-    def test_scan_file_for_asn_barcode_invalid(self):
-        """
-        GIVEN:
-            - PDF containing an ASN barcode
-            - The ASN value is XYZXYZ
-        WHEN:
-            - File is scanned for barcodes
-        THEN:
-            - The ASN is located
-            - The ASN value is not used
-        """
-        test_file = os.path.join(
-            self.BARCODE_SAMPLE_DIR,
-            "barcode-39-asn-invalid.pdf",
-        )
-        doc_barcode_info = barcodes.scan_file_for_barcodes(
-            test_file,
-        )
-
-        asn = barcodes.get_asn_from_barcodes(doc_barcode_info.barcodes)
-
-        self.assertEqual(doc_barcode_info.pdf_path, test_file)
-        self.assertEqual(asn, None)
-
-    @override_settings(CONSUMER_ASN_BARCODE_PREFIX="CUSTOM-PREFIX-")
-    def test_scan_file_for_asn_custom_prefix(self):
-        """
-        GIVEN:
-            - PDF containing an ASN barcode with custom prefix
-            - The ASN value is 123
-        WHEN:
-            - File is scanned for barcodes
-        THEN:
-            - The ASN is located
-            - The ASN integer value is correct
-        """
-        test_file = os.path.join(
-            self.BARCODE_SAMPLE_DIR,
-            "barcode-39-asn-custom-prefix.pdf",
-        )
-        doc_barcode_info = barcodes.scan_file_for_barcodes(
-            test_file,
-        )
-        asn = barcodes.get_asn_from_barcodes(doc_barcode_info.barcodes)
-
-        self.assertEqual(doc_barcode_info.pdf_path, test_file)
-        self.assertEqual(asn, 123)
-
-    @override_settings(CONSUMER_ENABLE_ASN_BARCODE=True)
-    def test_consume_barcode_file_asn_assignment(self):
-        """
-        GIVEN:
-            - PDF containing an ASN barcode
-            - The ASN value is 123
-        WHEN:
-            - File is scanned for barcodes
-        THEN:
-            - The ASN is located
-            - The ASN integer value is correct
-            - The ASN is provided as the override value to the consumer
-        """
-        test_file = os.path.join(
-            self.BARCODE_SAMPLE_DIR,
-            "barcode-39-asn-123.pdf",
-        )
-
-        dst = os.path.join(settings.SCRATCH_DIR, "barcode-39-asn-123.pdf")
-        shutil.copy(test_file, dst)
-
-        with mock.patch("documents.consumer.Consumer.try_consume_file") as mocked_call:
-            tasks.consume_file(dst)
-
-            args, kwargs = mocked_call.call_args
-
-            self.assertEqual(kwargs["override_asn"], 123)
 
     @override_settings(CONSUMER_ENABLE_ASN_BARCODE=True)
     def test_asn_too_large(self):
