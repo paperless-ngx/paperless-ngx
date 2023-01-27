@@ -3,7 +3,6 @@ import shutil
 import tempfile
 from unittest import mock
 
-import pikepdf
 from django.conf import settings
 from django.test import override_settings
 from django.test import TestCase
@@ -23,13 +22,29 @@ class TestBarcode(DirectoriesMixin, TestCase):
 
     BARCODE_SAMPLE_DIR = os.path.join(SAMPLE_DIR, "barcodes")
 
-    def test_barcode_reader(self):
+    def test_barcode_reader_png(self):
+        """
+        GIVEN:
+            - PNG file with separator barcode
+        WHEN:
+            - Image is scanned for codes
+        THEN:
+            - The barcode is detected
+        """
         test_file = os.path.join(self.BARCODE_SAMPLE_DIR, "barcode-39-PATCHT.png")
         img = Image.open(test_file)
-        separator_barcode = str(settings.CONSUMER_BARCODE_STRING)
+        separator_barcode = settings.CONSUMER_BARCODE_STRING
         self.assertEqual(barcodes.barcode_reader(img), [separator_barcode])
 
-    def test_barcode_reader2(self):
+    def test_barcode_reader_pbm(self):
+        """
+        GIVEN:
+            - Netpbm bitmap file with separator barcode
+        WHEN:
+            - Image is scanned for codes
+        THEN:
+            - The barcode is detected
+        """
         test_file = os.path.join(
             self.BARCODE_SAMPLE_DIR,
             "patch-code-t.pbm",
@@ -38,25 +53,49 @@ class TestBarcode(DirectoriesMixin, TestCase):
         separator_barcode = str(settings.CONSUMER_BARCODE_STRING)
         self.assertEqual(barcodes.barcode_reader(img), [separator_barcode])
 
-    def test_barcode_reader_distorsion(self):
+    def test_barcode_reader_distortion_scratchy(self):
+        """
+        GIVEN:
+            - Image containing high noise
+        WHEN:
+            - Image is scanned for codes
+        THEN:
+            - The barcode is detected
+        """
         test_file = os.path.join(
             self.BARCODE_SAMPLE_DIR,
-            "barcode-39-PATCHT-distorsion.png",
+            "barcode-39-PATCHT-distortion.png",
         )
         img = Image.open(test_file)
         separator_barcode = str(settings.CONSUMER_BARCODE_STRING)
         self.assertEqual(barcodes.barcode_reader(img), [separator_barcode])
 
-    def test_barcode_reader_distorsion2(self):
+    def test_barcode_reader_distortion_stretched(self):
+        """
+        GIVEN:
+            - Image with a stretched barcode
+        WHEN:
+            - Image is scanned for codes
+        THEN:
+            - The barcode is detected
+        """
         test_file = os.path.join(
             self.BARCODE_SAMPLE_DIR,
-            "barcode-39-PATCHT-distorsion2.png",
+            "barcode-39-PATCHT-distortion2.png",
         )
         img = Image.open(test_file)
         separator_barcode = str(settings.CONSUMER_BARCODE_STRING)
         self.assertEqual(barcodes.barcode_reader(img), [separator_barcode])
 
     def test_barcode_reader_unreadable(self):
+        """
+        GIVEN:
+            - Image with a truly unreadable barcode
+        WHEN:
+            - Image is scanned for codes
+        THEN:
+            - No barcode is detected
+        """
         test_file = os.path.join(
             self.BARCODE_SAMPLE_DIR,
             "barcode-39-PATCHT-unreadable.png",
@@ -65,6 +104,14 @@ class TestBarcode(DirectoriesMixin, TestCase):
         self.assertEqual(barcodes.barcode_reader(img), [])
 
     def test_barcode_reader_qr(self):
+        """
+        GIVEN:
+            - Image file with QR separator barcode
+        WHEN:
+            - Image is scanned for codes
+        THEN:
+            - The barcode is detected
+        """
         test_file = os.path.join(
             self.BARCODE_SAMPLE_DIR,
             "qr-code-PATCHT.png",
@@ -74,6 +121,14 @@ class TestBarcode(DirectoriesMixin, TestCase):
         self.assertEqual(barcodes.barcode_reader(img), [separator_barcode])
 
     def test_barcode_reader_128(self):
+        """
+        GIVEN:
+            - Image file with 128 style separator barcode
+        WHEN:
+            - Image is scanned for codes
+        THEN:
+            - The barcode is detected
+        """
         test_file = os.path.join(
             self.BARCODE_SAMPLE_DIR,
             "barcode-128-PATCHT.png",
@@ -83,11 +138,27 @@ class TestBarcode(DirectoriesMixin, TestCase):
         self.assertEqual(barcodes.barcode_reader(img), [separator_barcode])
 
     def test_barcode_reader_no_barcode(self):
+        """
+        GIVEN:
+            - Image file with no barcode
+        WHEN:
+            - Image is scanned for codes
+        THEN:
+            - No barcode is detected
+        """
         test_file = os.path.join(self.SAMPLE_DIR, "simple.png")
         img = Image.open(test_file)
-        self.assertEqual(barcodes.barcode_reader(img), [])
+        self.assertListEqual(barcodes.barcode_reader(img), [])
 
     def test_barcode_reader_custom_separator(self):
+        """
+        GIVEN:
+            - Image file with custom separator barcode value
+        WHEN:
+            - Image is scanned for codes
+        THEN:
+            - The barcode is detected
+        """
         test_file = os.path.join(
             self.BARCODE_SAMPLE_DIR,
             "barcode-39-custom.png",
@@ -96,6 +167,14 @@ class TestBarcode(DirectoriesMixin, TestCase):
         self.assertEqual(barcodes.barcode_reader(img), ["CUSTOM BARCODE"])
 
     def test_barcode_reader_custom_qr_separator(self):
+        """
+        GIVEN:
+            - Image file with custom separator barcode value as a QR code
+        WHEN:
+            - Image is scanned for codes
+        THEN:
+            - The barcode is detected
+        """
         test_file = os.path.join(
             self.BARCODE_SAMPLE_DIR,
             "barcode-qr-custom.png",
@@ -104,6 +183,14 @@ class TestBarcode(DirectoriesMixin, TestCase):
         self.assertEqual(barcodes.barcode_reader(img), ["CUSTOM BARCODE"])
 
     def test_barcode_reader_custom_128_separator(self):
+        """
+        GIVEN:
+            - Image file with custom separator 128 barcode value
+        WHEN:
+            - Image is scanned for codes
+        THEN:
+            - The barcode is detected
+        """
         test_file = os.path.join(
             self.BARCODE_SAMPLE_DIR,
             "barcode-128-custom.png",
@@ -164,6 +251,14 @@ class TestBarcode(DirectoriesMixin, TestCase):
         self.assertEqual(barcodes.barcode_reader(img), ["CUSTOM-PREFIX-00123"])
 
     def test_get_mime_type(self):
+        """
+        GIVEN:
+            -
+        WHEN:
+            -
+        THEN:
+            -
+        """
         tiff_file = os.path.join(
             self.SAMPLE_DIR,
             "simple.tiff",
@@ -194,6 +289,14 @@ class TestBarcode(DirectoriesMixin, TestCase):
         self.assertEqual(barcodes.get_file_mime_type(png_file), "image/png")
 
     def test_convert_from_tiff_to_pdf(self):
+        """
+        GIVEN:
+            -
+        WHEN:
+            -
+        THEN:
+            -
+        """
         test_file = os.path.join(
             os.path.dirname(__file__),
             "samples",
@@ -207,6 +310,14 @@ class TestBarcode(DirectoriesMixin, TestCase):
         self.assertEqual(file_extension, ".pdf")
 
     def test_convert_error_from_pdf_to_pdf(self):
+        """
+        GIVEN:
+            -
+        WHEN:
+            -
+        THEN:
+            -
+        """
         test_file = os.path.join(
             self.SAMPLE_DIR,
             "simple.pdf",
@@ -216,6 +327,14 @@ class TestBarcode(DirectoriesMixin, TestCase):
         self.assertIsNone(barcodes.convert_from_tiff_to_pdf(dst))
 
     def test_scan_file_for_separating_barcodes(self):
+        """
+        GIVEN:
+            -
+        WHEN:
+            -
+        THEN:
+            -
+        """
         test_file = os.path.join(
             self.BARCODE_SAMPLE_DIR,
             "patch-code-t.pdf",
@@ -231,6 +350,14 @@ class TestBarcode(DirectoriesMixin, TestCase):
         self.assertListEqual(separator_page_numbers, [0])
 
     def test_scan_file_for_separating_barcodes_none_present(self):
+        """
+        GIVEN:
+            -
+        WHEN:
+            -
+        THEN:
+            -
+        """
         test_file = os.path.join(self.SAMPLE_DIR, "simple.pdf")
         doc_barcode_info = barcodes.scan_file_for_barcodes(
             test_file,
@@ -242,7 +369,15 @@ class TestBarcode(DirectoriesMixin, TestCase):
         self.assertEqual(doc_barcode_info.pdf_path, test_file)
         self.assertListEqual(separator_page_numbers, [])
 
-    def test_scan_file_for_separating_barcodes3(self):
+    def test_scan_file_for_separating_barcodes_middle_page(self):
+        """
+        GIVEN:
+            - PDF file containing a separator on page 1 (zero indexed)
+        WHEN:
+            - File is scanned for barcodes
+        THEN:
+            - Barcode is detected on page 1 (zero indexed)
+        """
         test_file = os.path.join(
             self.BARCODE_SAMPLE_DIR,
             "patch-code-t-middle.pdf",
@@ -257,7 +392,15 @@ class TestBarcode(DirectoriesMixin, TestCase):
         self.assertEqual(doc_barcode_info.pdf_path, test_file)
         self.assertListEqual(separator_page_numbers, [1])
 
-    def test_scan_file_for_separating_barcodes4(self):
+    def test_scan_file_for_separating_barcodes_multiple_pages(self):
+        """
+        GIVEN:
+            - PDF file containing a separator on pages 2 and 5 (zero indexed)
+        WHEN:
+            - File is scanned for barcodes
+        THEN:
+            - Barcode is detected on pages 2 and 5 (zero indexed)
+        """
         test_file = os.path.join(
             self.BARCODE_SAMPLE_DIR,
             "several-patcht-codes.pdf",
@@ -272,7 +415,16 @@ class TestBarcode(DirectoriesMixin, TestCase):
         self.assertEqual(doc_barcode_info.pdf_path, test_file)
         self.assertListEqual(separator_page_numbers, [2, 5])
 
-    def test_scan_file_for_separating_barcodes_upsidedown(self):
+    def test_scan_file_for_separating_barcodes_upside_down(self):
+        """
+        GIVEN:
+            - PDF file containing a separator on page 1 (zero indexed)
+            - The barcode is upside down
+        WHEN:
+            - File is scanned for barcodes
+        THEN:
+            - Barcode is detected on page 1 (zero indexed)
+        """
         test_file = os.path.join(
             self.BARCODE_SAMPLE_DIR,
             "patch-code-t-middle_reverse.pdf",
@@ -286,66 +438,6 @@ class TestBarcode(DirectoriesMixin, TestCase):
 
         self.assertEqual(doc_barcode_info.pdf_path, test_file)
         self.assertListEqual(separator_page_numbers, [1])
-
-    def test_scan_file_for_barcodes_pillow_transcode_error(self):
-        """
-        GIVEN:
-            - A PDF containing an image which cannot be transcoded to a PIL image
-        WHEN:
-            - The image tries to be transcoded to a PIL image, but fails
-        THEN:
-            - The barcode reader is still called
-        """
-
-        def _build_device_n_pdf(self, save_path: str):
-            # Based on the pikepdf tests
-            # https://github.com/pikepdf/pikepdf/blob/abb35ebe17d579d76abe08265e00cf8890a12a95/tests/test_image_access.py
-            pdf = pikepdf.new()
-            pdf.add_blank_page(page_size=(72, 72))
-            imobj = pikepdf.Stream(
-                pdf,
-                bytes(range(0, 256)),
-                BitsPerComponent=8,
-                ColorSpace=pikepdf.Array(
-                    [
-                        pikepdf.Name.DeviceN,
-                        pikepdf.Array([pikepdf.Name.Black]),
-                        pikepdf.Name.DeviceCMYK,
-                        pikepdf.Stream(
-                            pdf,
-                            b"{0 0 0 4 -1 roll}",  # Colorspace conversion function
-                            FunctionType=4,
-                            Domain=[0.0, 1.0],
-                            Range=[0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0],
-                        ),
-                    ],
-                ),
-                Width=16,
-                Height=16,
-                Type=pikepdf.Name.XObject,
-                Subtype=pikepdf.Name.Image,
-            )
-            pim = pikepdf.PdfImage(imobj)
-            self.assertEqual(pim.mode, "DeviceN")
-            self.assertTrue(pim.is_device_n)
-
-            pdf.pages[0].Contents = pikepdf.Stream(pdf, b"72 0 0 72 0 0 cm /Im0 Do")
-            pdf.pages[0].Resources = pikepdf.Dictionary(
-                XObject=pikepdf.Dictionary(Im0=imobj),
-            )
-            pdf.save(save_path)
-
-        with tempfile.NamedTemporaryFile(suffix="pdf") as device_n_pdf:
-            # Build an offending file
-            _build_device_n_pdf(self, str(device_n_pdf.name))
-            with mock.patch("documents.barcodes.barcode_reader") as reader:
-                reader.return_value = list()
-
-                _ = barcodes.scan_file_for_barcodes(
-                    str(device_n_pdf.name),
-                )
-
-                reader.assert_called()
 
     def test_scan_file_for_separating_barcodes_fax_decode(self):
         """
@@ -371,6 +463,15 @@ class TestBarcode(DirectoriesMixin, TestCase):
         self.assertListEqual(separator_page_numbers, [1])
 
     def test_scan_file_for_separating_qr_barcodes(self):
+        """
+        GIVEN:
+            - PDF file containing a separator on page 0 (zero indexed)
+            - The barcode is a QR code
+        WHEN:
+            - File is scanned for barcodes
+        THEN:
+            - Barcode is detected on page 0 (zero indexed)
+        """
         test_file = os.path.join(
             self.BARCODE_SAMPLE_DIR,
             "patch-code-t-qr.pdf",
@@ -387,6 +488,15 @@ class TestBarcode(DirectoriesMixin, TestCase):
 
     @override_settings(CONSUMER_BARCODE_STRING="CUSTOM BARCODE")
     def test_scan_file_for_separating_custom_barcodes(self):
+        """
+        GIVEN:
+            - PDF file containing a separator on page 0 (zero indexed)
+            - The barcode separation value is customized
+        WHEN:
+            - File is scanned for barcodes
+        THEN:
+            - Barcode is detected on page 0 (zero indexed)
+        """
         test_file = os.path.join(
             self.BARCODE_SAMPLE_DIR,
             "barcode-39-custom.pdf",
@@ -403,6 +513,16 @@ class TestBarcode(DirectoriesMixin, TestCase):
 
     @override_settings(CONSUMER_BARCODE_STRING="CUSTOM BARCODE")
     def test_scan_file_for_separating_custom_qr_barcodes(self):
+        """
+        GIVEN:
+            - PDF file containing a separator on page 0 (zero indexed)
+            - The barcode separation value is customized
+            - The barcode is a QR code
+        WHEN:
+            - File is scanned for barcodes
+        THEN:
+            - Barcode is detected on page 0 (zero indexed)
+        """
         test_file = os.path.join(
             self.BARCODE_SAMPLE_DIR,
             "barcode-qr-custom.pdf",
@@ -419,6 +539,16 @@ class TestBarcode(DirectoriesMixin, TestCase):
 
     @override_settings(CONSUMER_BARCODE_STRING="CUSTOM BARCODE")
     def test_scan_file_for_separating_custom_128_barcodes(self):
+        """
+        GIVEN:
+            - PDF file containing a separator on page 0 (zero indexed)
+            - The barcode separation value is customized
+            - The barcode is a 128 code
+        WHEN:
+            - File is scanned for barcodes
+        THEN:
+            - Barcode is detected on page 0 (zero indexed)
+        """
         test_file = os.path.join(
             self.BARCODE_SAMPLE_DIR,
             "barcode-128-custom.pdf",
@@ -434,6 +564,16 @@ class TestBarcode(DirectoriesMixin, TestCase):
         self.assertListEqual(separator_page_numbers, [0])
 
     def test_scan_file_for_separating_wrong_qr_barcodes(self):
+        """
+        GIVEN:
+            - PDF file containing a separator on page 0 (zero indexed)
+            - The barcode value is customized
+            - The separation value is NOT customized
+        WHEN:
+            - File is scanned for barcodes
+        THEN:
+            - No split pages are detected
+        """
         test_file = os.path.join(
             self.BARCODE_SAMPLE_DIR,
             "barcode-39-custom.pdf",
@@ -474,13 +614,21 @@ class TestBarcode(DirectoriesMixin, TestCase):
         self.assertListEqual(separator_page_numbers, [1])
 
     def test_separate_pages(self):
+        """
+        GIVEN:
+            - Input PDF 2 pages after separation
+        WHEN:
+            - The input file separated at the barcode
+        THEN:
+            - Two new documents are produced
+        """
         test_file = os.path.join(
             self.BARCODE_SAMPLE_DIR,
             "patch-code-t-middle.pdf",
         )
-        pages = barcodes.separate_pages(test_file, [1])
+        documents = barcodes.separate_pages(test_file, [1])
 
-        self.assertEqual(len(pages), 2)
+        self.assertEqual(len(documents), 2)
 
     def test_separate_pages_double_code(self):
         """
@@ -493,8 +641,7 @@ class TestBarcode(DirectoriesMixin, TestCase):
         """
         test_file = os.path.join(
             os.path.dirname(__file__),
-            "samples",
-            "barcodes",
+            self.BARCODE_SAMPLE_DIR,
             "patch-code-t-double.pdf",
         )
         pages = barcodes.separate_pages(test_file, [1, 2])
@@ -502,6 +649,15 @@ class TestBarcode(DirectoriesMixin, TestCase):
         self.assertEqual(len(pages), 2)
 
     def test_separate_pages_no_list(self):
+        """
+        GIVEN:
+            - Input file to separate
+        WHEN:
+            - No separation pages are provided
+        THEN:
+            - No new documents are produced
+            - A warning is logged
+        """
         test_file = os.path.join(
             self.BARCODE_SAMPLE_DIR,
             "patch-code-t-middle.pdf",
@@ -517,16 +673,32 @@ class TestBarcode(DirectoriesMixin, TestCase):
             )
 
     def test_save_to_dir(self):
+        """
+        GIVEN:
+            - File to save to a directory
+        WHEN:
+            - The file is saved
+        THEN:
+            - The file exists
+        """
         test_file = os.path.join(
             self.BARCODE_SAMPLE_DIR,
             "patch-code-t.pdf",
         )
-        tempdir = tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR)
-        barcodes.save_to_dir(test_file, target_dir=tempdir)
-        target_file = os.path.join(tempdir, "patch-code-t.pdf")
+        barcodes.save_to_dir(test_file, target_dir=settings.SCRATCH_DIR)
+        target_file = os.path.join(settings.SCRATCH_DIR, "patch-code-t.pdf")
         self.assertTrue(os.path.isfile(target_file))
 
-    def test_save_to_dir2(self):
+    def test_save_to_dir_not_existing(self):
+        """
+        GIVEN:
+            - File to save to a directory
+            - The directory doesn't exist
+        WHEN:
+            - The file is saved
+        THEN:
+            - The file exists
+        """
         test_file = os.path.join(
             self.BARCODE_SAMPLE_DIR,
             "patch-code-t.pdf",
@@ -534,32 +706,51 @@ class TestBarcode(DirectoriesMixin, TestCase):
         nonexistingdir = "/nowhere"
         if os.path.isdir(nonexistingdir):
             self.fail("non-existing dir exists")
-        else:
-            with self.assertLogs("paperless.barcodes", level="WARNING") as cm:
-                barcodes.save_to_dir(test_file, target_dir=nonexistingdir)
-            self.assertEqual(
-                cm.output,
-                [
-                    f"WARNING:paperless.barcodes:{str(test_file)} or {str(nonexistingdir)} don't exist.",
-                ],
-            )
 
-    def test_save_to_dir3(self):
+        with self.assertLogs("paperless.barcodes", level="WARNING") as cm:
+            barcodes.save_to_dir(test_file, target_dir=nonexistingdir)
+        self.assertEqual(
+            cm.output,
+            [
+                f"WARNING:paperless.barcodes:{str(test_file)} or {str(nonexistingdir)} don't exist.",
+            ],
+        )
+
+    def test_save_to_dir_given_name(self):
+        """
+        GIVEN:
+            - File to save to a directory
+            - There is a name override
+        WHEN:
+            - The file is saved
+        THEN:
+            - The file exists
+        """
         test_file = os.path.join(
             self.BARCODE_SAMPLE_DIR,
             "patch-code-t.pdf",
         )
-        tempdir = tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR)
-        barcodes.save_to_dir(test_file, newname="newname.pdf", target_dir=tempdir)
-        target_file = os.path.join(tempdir, "newname.pdf")
+        barcodes.save_to_dir(
+            test_file,
+            newname="newname.pdf",
+            target_dir=settings.SCRATCH_DIR,
+        )
+        target_file = os.path.join(settings.SCRATCH_DIR, "newname.pdf")
         self.assertTrue(os.path.isfile(target_file))
 
     def test_barcode_splitter(self):
+        """
+        GIVEN:
+            - Input file containing barcodes
+        WHEN:
+            - Input file is split on barcodes
+        THEN:
+            - Correct number of files produced
+        """
         test_file = os.path.join(
             self.BARCODE_SAMPLE_DIR,
             "patch-code-t-middle.pdf",
         )
-        tempdir = tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR)
 
         doc_barcode_info = barcodes.scan_file_for_barcodes(
             test_file,
@@ -572,18 +763,33 @@ class TestBarcode(DirectoriesMixin, TestCase):
         self.assertTrue(len(separator_page_numbers) > 0)
 
         document_list = barcodes.separate_pages(test_file, separator_page_numbers)
-        self.assertTrue(document_list)
-        for document in document_list:
-            barcodes.save_to_dir(document, target_dir=tempdir)
+        self.assertGreater(len(document_list), 0)
 
-        target_file1 = os.path.join(tempdir, "patch-code-t-middle_document_0.pdf")
-        target_file2 = os.path.join(tempdir, "patch-code-t-middle_document_1.pdf")
+        for document in document_list:
+            barcodes.save_to_dir(document, target_dir=settings.SCRATCH_DIR)
+
+        target_file1 = os.path.join(
+            settings.SCRATCH_DIR,
+            "patch-code-t-middle_document_0.pdf",
+        )
+        target_file2 = os.path.join(
+            settings.SCRATCH_DIR,
+            "patch-code-t-middle_document_1.pdf",
+        )
 
         self.assertTrue(os.path.isfile(target_file1))
         self.assertTrue(os.path.isfile(target_file2))
 
     @override_settings(CONSUMER_ENABLE_BARCODES=True)
     def test_consume_barcode_file(self):
+        """
+        GIVEN:
+            - Input file with barcodes given to consume task
+        WHEN:
+            - Consume task returns
+        THEN:
+            - The file was split
+        """
         test_file = os.path.join(
             self.BARCODE_SAMPLE_DIR,
             "patch-code-t-middle.pdf",
@@ -600,6 +806,14 @@ class TestBarcode(DirectoriesMixin, TestCase):
         CONSUMER_BARCODE_TIFF_SUPPORT=True,
     )
     def test_consume_barcode_tiff_file(self):
+        """
+        GIVEN:
+            - TIFF image containing barcodes
+        WHEN:
+            - Consume task returns
+        THEN:
+            - The file was split
+        """
         test_file = os.path.join(
             self.BARCODE_SAMPLE_DIR,
             "patch-code-t-middle.tiff",
@@ -617,11 +831,13 @@ class TestBarcode(DirectoriesMixin, TestCase):
     @mock.patch("documents.consumer.Consumer.try_consume_file")
     def test_consume_barcode_unsupported_jpg_file(self, m):
         """
-        This test assumes barcode and TIFF support are enabled and
-        the user uploads an unsupported image file (e.g. jpg)
-
-        The function shouldn't try to scan for separating barcodes
-        and continue archiving the file as is.
+        GIVEN:
+            - JPEG image as input
+        WHEN:
+            - Consume task returns
+        THEN:
+            - Barcode reader reported warning
+            - Consumption continued with the file
         """
         test_file = os.path.join(
             self.SAMPLE_DIR,
@@ -629,8 +845,10 @@ class TestBarcode(DirectoriesMixin, TestCase):
         )
         dst = os.path.join(settings.SCRATCH_DIR, "simple.jpg")
         shutil.copy(test_file, dst)
+
         with self.assertLogs("paperless.barcodes", level="WARNING") as cm:
             self.assertIn("Success", tasks.consume_file(dst))
+
         self.assertListEqual(
             cm.output,
             [
@@ -652,8 +870,13 @@ class TestBarcode(DirectoriesMixin, TestCase):
     )
     def test_consume_barcode_supported_no_extension_file(self):
         """
-        This test assumes barcode and TIFF support are enabled and
-        the user uploads a supported image file, but without extension
+        GIVEN:
+            - TIFF image containing barcodes
+            - TIFF file is given without extension
+        WHEN:
+            - Consume task returns
+        THEN:
+            - The file was split
         """
         test_file = os.path.join(
             self.BARCODE_SAMPLE_DIR,
@@ -669,11 +892,10 @@ class TestBarcode(DirectoriesMixin, TestCase):
         """
         GIVEN:
             - Password protected PDF
-            - pikepdf based scanning
         WHEN:
             - File is scanned for barcode
         THEN:
-            - Scanning handles the exception without exception
+            - Scanning handles the exception without crashing
         """
         test_file = os.path.join(self.SAMPLE_DIR, "password-is-test.pdf")
         doc_barcode_info = barcodes.scan_file_for_barcodes(
@@ -808,7 +1030,15 @@ class TestBarcode(DirectoriesMixin, TestCase):
 
     @override_settings(CONSUMER_ENABLE_ASN_BARCODE=True)
     def test_asn_too_large(self):
-
+        """
+        GIVEN:
+            - ASN from barcode enabled
+            - Barcode contains too large an ASN value
+        WHEN:
+            - ASN from barcode checked for correctness
+        THEN:
+            - Exception is raised regarding size limits
+        """
         src = os.path.join(
             os.path.dirname(__file__),
             "samples",
