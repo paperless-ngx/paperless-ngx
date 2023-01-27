@@ -4,7 +4,6 @@ import shutil
 import tempfile
 from dataclasses import dataclass
 from functools import lru_cache
-from math import ceil
 from pathlib import Path
 from typing import List
 from typing import Optional
@@ -12,10 +11,9 @@ from typing import Optional
 import magic
 from django.conf import settings
 from pdf2image import convert_from_path
+from pdf2image.exceptions import PDFPageCountError
 from pikepdf import Page
-from pikepdf import PasswordError
 from pikepdf import Pdf
-from pikepdf import PdfImage
 from PIL import Image
 from PIL import ImageSequence
 from pyzbar import pyzbar
@@ -154,52 +152,15 @@ def scan_file_for_barcodes(
     (page_number, barcode_text) tuples
     """
 
-    def _pikepdf_barcode_scan(pdf_filepath: str) -> List[Barcode]:
-        detected_barcodes = []
-        with Pdf.open(pdf_filepath) as pdf:
-            for page_num, page in enumerate(pdf.pages):
-                for image_key in page.images:
-                    pdfimage = PdfImage(page.images[image_key])
-
-                    # This type is known to have issues:
-                    # https://github.com/pikepdf/pikepdf/issues/401
-                    if "/CCITTFaxDecode" in pdfimage.filters:
-                        raise BarcodeImageFormatError(
-                            "Unable to decode CCITTFaxDecode images",
-                        )
-
-                    # Not all images can be transcoded to a PIL image, which
-                    # is what pyzbar expects to receive, so this may
-                    # raise an exception, triggering fallback
-                    pillow_img = pdfimage.as_pil_image()
-
-                    # Scale the image down
-                    # See: https://github.com/paperless-ngx/paperless-ngx/issues/2385
-                    # TLDR: zbar has issues with larger images
-                    width, height = pillow_img.size
-                    if width > 1024:
-                        scaler = ceil(width / 1024)
-                        new_width = int(width / scaler)
-                        new_height = int(height / scaler)
-                        pillow_img = pillow_img.resize((new_width, new_height))
-
-                    width, height = pillow_img.size
-                    if height > 2048:
-                        scaler = ceil(height / 2048)
-                        new_width = int(width / scaler)
-                        new_height = int(height / scaler)
-                        pillow_img = pillow_img.resize((new_width, new_height))
-
-                    for barcode_value in barcode_reader(pillow_img):
-                        detected_barcodes.append(Barcode(page_num, barcode_value))
-
-        return detected_barcodes
-
     def _pdf2image_barcode_scan(pdf_filepath: str) -> List[Barcode]:
         detected_barcodes = []
         # use a temporary directory in case the file is too big to handle in memory
         with tempfile.TemporaryDirectory() as path:
-            pages_from_path = convert_from_path(pdf_filepath, output_folder=path)
+            pages_from_path = convert_from_path(
+                pdf_filepath,
+                dpi=300,
+                output_folder=path,
+            )
             for current_page_number, page in enumerate(pages_from_path):
                 for barcode_value in barcode_reader(page):
                     detected_barcodes.append(
@@ -219,27 +180,19 @@ def scan_file_for_barcodes(
         # Always try pikepdf first, it's usually fine, faster and
         # uses less memory
         try:
-            barcodes = _pikepdf_barcode_scan(pdf_filepath)
+            barcodes = _pdf2image_barcode_scan(pdf_filepath)
         # Password protected files can't be checked
-        except PasswordError as e:
+        # This is the exception raised for those
+        except PDFPageCountError as e:
             logger.warning(
                 f"File is likely password protected, not checking for barcodes: {e}",
             )
-        # Handle pikepdf related image decoding issues with a fallback to page
-        # by page conversion to images in a temporary directory
-        except Exception as e:
+        # This file is really borked, allow the consumption to continue
+        # but it may fail further on
+        except Exception as e:  # pragma: no cover
             logger.warning(
-                f"Falling back to pdf2image because: {e}",
+                f"Exception during barcode scanning: {e}",
             )
-            try:
-                barcodes = _pdf2image_barcode_scan(pdf_filepath)
-            # This file is really borked, allow the consumption to continue
-            # but it may fail further on
-            except Exception as e:  # pragma: no cover
-                logger.warning(
-                    f"Exception during barcode scanning: {e}",
-                )
-
     else:
         logger.warning(
             f"Unsupported file format for barcode reader: {str(mime_type)}",
