@@ -26,11 +26,11 @@
         </div>
         <p class="card-text">
           <span *ngIf="document.__search_hit__ && document.__search_hit__.highlights" [innerHtml]="document.__search_hit__.highlights"></span>
-          <span *ngIf="document.__search_hit__ && document.__search_hit__.comment_highlights">
+          <span *ngFor="let highlight of searchCommentHighlights" class="d-block">
             <svg width="1em" height="1em" fill="currentColor" class="me-2">
               <use xlink:href="assets/bootstrap-icons.svg#chat-left-text"/>
             </svg>
-            <span [innerHtml]="document.__search_hit__.comment_highlights"></span>
+            <span [innerHtml]="highlight"></span>
           </span>
           <span *ngIf="!document.__search_hit__" class="result-content">{{contentTrimmed}}</span>
         </p>

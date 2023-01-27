@@ -62,9 +62,9 @@ jobs:
         with:
           python-version: "3.10"
       -
-        name: Install httpx
+        name: Install Python libraries
         run: |
-          python -m pip install httpx
+          python -m pip install httpx docker
       #
       # Clean up primary package
       #
@@ -81,13 +81,3 @@ jobs:
         if: "${{ env.TOKEN != '' }}"
         run: |
           python ${GITHUB_WORKSPACE}/.github/scripts/cleanup-tags.py --untagged --delete "${{ matrix.cache-name }}"
-      #
-      # Verify tags which are left still pull
-      #
-      -
-        name: Check all tags still pull
-        run: |
-          ghcr_name=$(echo "ghcr.io/${GITHUB_REPOSITORY_OWNER}/${{ matrix.primary-name }}" | awk '{ print tolower($0) }')
-          echo "Pulling all tags of ${ghcr_name}"
-          docker pull --quiet --all-tags ${ghcr_name}
-          docker image list
