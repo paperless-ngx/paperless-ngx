@@ -2,7 +2,12 @@
 # Inputs:
 #    - PSYCOPG2_VERSION - Version to build
 
-FROM python:3.9-slim-bullseye as main
+#
+# Stage: builder
+# Purpose:
+#  - Build the psycopg2 wheel
+#
+FROM python:3.9-slim-bullseye as builder
 
 LABEL org.opencontainers.image.description="A intermediate image with psycopg2 wheel built"
 
@@ -48,3 +53,14 @@ RUN set -eux \
     && apt-get -y purge ${BUILD_PACKAGES} \
     && apt-get -y autoremove --purge \
     && rm -rf /var/lib/apt/lists/*
+
+#
+# Stage: package
+# Purpose: Holds the compiled .whl files in a tiny image to pull
+#
+FROM alpine:3.17 as package
+
+WORKDIR /usr/src/wheels/
+
+COPY --from=builder /usr/src/wheels/*.whl ./
+COPY --from=builder /usr/src/wheels/pkg-list.txt ./
