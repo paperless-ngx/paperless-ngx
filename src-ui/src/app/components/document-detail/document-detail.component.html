@@ -28,7 +28,7 @@
 
     </div>
 
-    <button *appIfOwner="document" type="button" class="btn btn-sm btn-outline-primary me-2" (click)="redoOcr()">
+    <button type="button" class="btn btn-sm btn-outline-primary me-2" (click)="redoOcr()" [disabled]="!userCanEdit">
         <svg class="buttonicon" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#arrow-counterclockwise" />
         </svg><span class="d-none d-lg-inline ps-1" i18n>Redo OCR</span>
