@@ -74,7 +74,7 @@
           <context context-type="linenumber">13</context>
         </context-group>
         <note priority="1" from="description">Currently selected slide number read by screen reader</note>
-        <target state="needs-translation"> Slide <x id="INTERPOLATION"/> of <x id="INTERPOLATION_1"/> </target>
+        <target state="translated"> Dia <x id="INTERPOLATION"/> van <x id="INTERPOLATION_1"/> </target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.hours" datatype="html">
         <source>Hours</source>
@@ -1341,7 +1341,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="needs-translation">Rule order</target>
+        <target state="translated">Regel volgorde</target>
       </trans-unit>
       <trans-unit id="5488632521862493221" datatype="html">
         <source>Paperless will only process mails that match <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>all<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> of the filters specified below.</source>
@@ -3920,7 +3920,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">144,146</context>
         </context-group>
-        <target state="needs-translation"><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="No track"/>No tracking data is collected by the app in any way.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></target>
+        <target state="translated"><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="No track"/>De app verzamelt geen trackinggegevens op welke manier dan ook.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></target>
       </trans-unit>
       <trans-unit id="5070799004079086984" datatype="html">
         <source>Enable update checking</source>
@@ -3936,7 +3936,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">146</context>
         </context-group>
-        <target state="needs-translation">Note that for users of third-party containers e.g. linuxserver.io this notification may be 'ahead' of the current third-party release.</target>
+        <target state="translated">Voor gebruikers van containers door derden zoals linuxserver.io, kan deze melding 'voorlopen' op de actuele release van de derde partij.</target>
       </trans-unit>
       <trans-unit id="8508424367627989968" datatype="html" approved="yes">
         <source>Bulk editing</source>
@@ -4666,7 +4666,7 @@
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="needs-translation">Document with ASN already exists.</target>
+        <target state="translated">Document met ASN bestaat al.</target>
       </trans-unit>
       <trans-unit id="148389968432135849" datatype="html" approved="yes">
         <source>File not found.</source>
@@ -4839,7 +4839,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">151</context>
         </context-group>
-        <target state="needs-translation">Arabic</target>
+        <target state="translated">Arabisch</target>
       </trans-unit>
       <trans-unit id="3098941349689899577" datatype="html">
         <source>Belarusian</source>
