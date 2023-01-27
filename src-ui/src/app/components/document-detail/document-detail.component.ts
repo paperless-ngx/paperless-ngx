@@ -204,6 +204,10 @@ export class DocumentDetailComponent
             )
             .subscribe({
               next: (titleValue) => {
+                // In the rare case when the field changed just after debounced event was fired.
+                // We dont want to overwrite whats actually in the text field, so just return
+                if (titleValue !== this.titleInput.value) return
+
                 this.title = titleValue
                 this.documentForm.patchValue({ title: titleValue })
               },
