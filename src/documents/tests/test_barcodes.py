@@ -845,9 +845,14 @@ class TestBarcode(DirectoriesMixin, TestCase):
             - Scanning handles the exception without crashing
         """
         test_file = os.path.join(self.SAMPLE_DIR, "password-is-test.pdf")
-        doc_barcode_info = barcodes.scan_file_for_barcodes(
-            test_file,
-        )
+        with self.assertLogs("paperless.barcodes", level="WARNING") as cm:
+            doc_barcode_info = barcodes.scan_file_for_barcodes(
+                test_file,
+            )
+            warning = cm.output[0]
+            expected_str = "WARNING:paperless.barcodes:File is likely password protected, not checking for barcodes"
+            self.assertTrue(warning.startswith(expected_str))
+
         separator_page_numbers = barcodes.get_separating_barcodes(
             doc_barcode_info.barcodes,
         )
