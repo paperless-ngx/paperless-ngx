@@ -3,6 +3,7 @@ import shutil
 import tempfile
 from collections import namedtuple
 from contextlib import contextmanager
+from unittest import mock
 
 from django.apps import apps
 from django.db import connection
@@ -84,6 +85,30 @@ class DirectoriesMixin:
     def tearDown(self) -> None:
         super().tearDown()
         remove_dirs(self.dirs)
+
+
+class ConsumerProgressMixin:
+    def setUp(self) -> None:
+        self.send_progress_patcher = mock.patch(
+            "documents.consumer.Consumer._send_progress",
+        )
+        self.send_progress_mock = self.send_progress_patcher.start()
+        super().setUp()
+
+    def tearDown(self) -> None:
+        super().tearDown()
+        self.send_progress_patcher.stop()
+
+
+class DocumentConsumeDelayMixin:
+    def setUp(self) -> None:
+        self.consume_file_patcher = mock.patch("documents.tasks.consume_file.delay")
+        self.consume_file_mock = self.consume_file_patcher.start()
+        super().setUp()
+
+    def tearDown(self) -> None:
+        super().tearDown()
+        self.consume_file_patcher.stop()
 
 
 class TestMigrations(TransactionTestCase):
