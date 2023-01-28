@@ -41,6 +41,7 @@ markdown_extensions:
       anchor_linenums: true
   - pymdownx.superfences
   - pymdownx.inlinehilite
+  - pymdownx.snippets
 strict: true
 nav:
     - index.md
