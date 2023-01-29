@@ -216,7 +216,9 @@ def get_separating_barcodes(barcodes: List[Barcode]) -> dict[int, bool]:
 
     # add the page numbers of the ASN barcodes
     # (except for first page, that might lead to infinite loops).
-    return separator_pages | {bc.page: True for bc in barcodes if bc.is_asn and bc.page != 0}
+    return separator_pages | {
+        bc.page: True for bc in barcodes if bc.is_asn and bc.page != 0
+    }
 
 
 def get_asn_from_barcodes(barcodes: List[Barcode]) -> Optional[int]:
