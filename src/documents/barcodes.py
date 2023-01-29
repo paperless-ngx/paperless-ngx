@@ -5,6 +5,7 @@ import tempfile
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
+from typing import Dict
 from typing import List
 from typing import Optional
 
@@ -201,7 +202,7 @@ def scan_file_for_barcodes(
     return DocumentBarcodeInfo(pdf_filepath, barcodes)
 
 
-def get_separating_barcodes(barcodes: List[Barcode]) -> dict[int, bool]:
+def get_separating_barcodes(barcodes: List[Barcode]) -> Dict[int, bool]:
     """
     Search the parsed barcodes for separators
     and returns a dict of page numbers, which
@@ -216,8 +217,9 @@ def get_separating_barcodes(barcodes: List[Barcode]) -> dict[int, bool]:
 
     # add the page numbers of the ASN barcodes
     # (except for first page, that might lead to infinite loops).
-    return separator_pages | {
-        bc.page: True for bc in barcodes if bc.is_asn and bc.page != 0
+    return {
+        **separator_pages,
+        **{bc.page: True for bc in barcodes if bc.is_asn and bc.page != 0},
     }
 
 
@@ -250,7 +252,7 @@ def get_asn_from_barcodes(barcodes: List[Barcode]) -> Optional[int]:
     return asn
 
 
-def separate_pages(filepath: str, pages_to_split_on: dict[int, bool]) -> List[str]:
+def separate_pages(filepath: str, pages_to_split_on: Dict[int, bool]) -> List[str]:
     """
     Separate the provided pdf file on the pages_to_split_on.
     The pages which are defined by the keys in page_numbers
