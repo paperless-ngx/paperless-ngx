@@ -833,7 +833,8 @@ class PreConsumeTestCase(TestCase):
         with tempfile.NamedTemporaryFile() as script:
             with override_settings(PRE_CONSUME_SCRIPT=script.name):
                 c = Consumer()
-                c.path = "path-to-file"
+                c.original_path = "path-to-file"
+                c.path = "/tmp/somewhere/path-to-file"
                 c.run_pre_consume_script()
 
                 m.assert_called_once()
@@ -841,9 +842,18 @@ class PreConsumeTestCase(TestCase):
                 args, kwargs = m.call_args
 
                 command = kwargs["args"]
+                environment = kwargs["env"]
 
                 self.assertEqual(command[0], script.name)
                 self.assertEqual(command[1], "path-to-file")
+
+                self.assertDictContainsSubset(
+                    {
+                        "DOCUMENT_SOURCE_PATH": c.original_path,
+                        "DOCUMENT_WORKING_PATH": c.path,
+                    },
+                    environment,
+                )
 
     @mock.patch("documents.consumer.Consumer.log")
     def test_script_with_output(self, mocked_log):
@@ -961,9 +971,10 @@ class PostConsumeTestCase(TestCase):
 
                 m.assert_called_once()
 
-                args, kwargs = m.call_args
+                _, kwargs = m.call_args
 
                 command = kwargs["args"]
+                environment = kwargs["env"]
 
                 self.assertEqual(command[0], script.name)
                 self.assertEqual(command[1], str(doc.pk))
@@ -971,6 +982,17 @@ class PostConsumeTestCase(TestCase):
                 self.assertEqual(command[6], f"/api/documents/{doc.pk}/thumb/")
                 self.assertEqual(command[7], "my_bank")
                 self.assertCountEqual(command[8].split(","), ["a", "b"])
+
+                self.assertDictContainsSubset(
+                    {
+                        "DOCUMENT_ID": str(doc.pk),
+                        "DOCUMENT_DOWNLOAD_URL": f"/api/documents/{doc.pk}/download/",
+                        "DOCUMENT_THUMBNAIL_URL": f"/api/documents/{doc.pk}/thumb/",
+                        "DOCUMENT_CORRESPONDENT": "my_bank",
+                        "DOCUMENT_TAGS": "a,b",
+                    },
+                    environment,
+                )
 
     def test_script_exit_non_zero(self):
         """
