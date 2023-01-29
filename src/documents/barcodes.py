@@ -201,16 +201,22 @@ def scan_file_for_barcodes(
     return DocumentBarcodeInfo(pdf_filepath, barcodes)
 
 
-def get_separating_barcodes(barcodes: List[Barcode]) -> List[int]:
+def get_separating_barcodes(barcodes: List[Barcode]) -> dict[int, bool]:
     """
     Search the parsed barcodes for separators
-    and returns a list of page numbers, which
-    separate the file into new files.
+    and returns a dict of page numbers, which
+    separate the file into new files, together
+    with the information whether to keep the page.
     """
     # filter all barcodes for the separator string
     # get the page numbers of the separating barcodes
+    separator_pages = {bc.page: False for bc in barcodes if bc.is_separator}
+    if not settings.CONSUMER_ENABLE_ASN_BARCODE:
+        return separator_pages
 
-    return list({bc.page for bc in barcodes if bc.is_separator})
+    # add the page numbers of the ASN barcodes
+    # (except for first page, that might lead to infinite loops).
+    return separator_pages | {bc.page: True for bc in barcodes if bc.is_asn and bc.page != 0}
 
 
 def get_asn_from_barcodes(barcodes: List[Barcode]) -> Optional[int]:
@@ -242,10 +248,11 @@ def get_asn_from_barcodes(barcodes: List[Barcode]) -> Optional[int]:
     return asn
 
 
-def separate_pages(filepath: str, pages_to_split_on: List[int]) -> List[str]:
+def separate_pages(filepath: str, pages_to_split_on: dict[int, bool]) -> List[str]:
     """
     Separate the provided pdf file on the pages_to_split_on.
-    The pages which are defined by page_numbers will be removed.
+    The pages which are defined by the keys in page_numbers
+    will be removed if the corresponding value is false.
     Returns a list of (temporary) filepaths to consume.
     These will need to be deleted later.
     """
@@ -261,26 +268,28 @@ def separate_pages(filepath: str, pages_to_split_on: List[int]) -> List[str]:
     fname = os.path.splitext(os.path.basename(filepath))[0]
     pdf = Pdf.open(filepath)
 
+    # Start with an empty document
+    current_document: List[Page] = []
     # A list of documents, ie a list of lists of pages
-    documents: List[List[Page]] = []
-    # A single document, ie a list of pages
-    document: List[Page] = []
+    documents: List[List[Page]] = [current_document]
 
     for idx, page in enumerate(pdf.pages):
         # Keep building the new PDF as long as it is not a
         # separator index
         if idx not in pages_to_split_on:
-            document.append(page)
-            # Make sure to append the very last document to the documents
-            if idx == (len(pdf.pages) - 1):
-                documents.append(document)
-                document = []
-        else:
-            # This is a split index, save the current PDF pages, and restart
-            # a new destination page listing
-            logger.debug(f"Starting new document at idx {idx}")
-            documents.append(document)
-            document = []
+            current_document.append(page)
+            continue
+
+        # This is a split index
+        # Start a new destination page listing
+        logger.debug(f"Starting new document at idx {idx}")
+        current_document = []
+        documents.append(current_document)
+        keep_page = pages_to_split_on[idx]
+        if keep_page:
+            # Keep the page
+            # (new document is started by asn barcode)
+            current_document.append(page)
 
     documents = [x for x in documents if len(x)]
 

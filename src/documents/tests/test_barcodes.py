@@ -294,7 +294,7 @@ class TestBarcode(DirectoriesMixin, TestCase):
         )
 
         self.assertEqual(doc_barcode_info.pdf_path, test_file)
-        self.assertListEqual(separator_page_numbers, [0])
+        self.assertDictEqual(separator_page_numbers, dict([(0, False)]))
 
     def test_scan_file_for_separating_barcodes_none_present(self):
         """
@@ -314,7 +314,7 @@ class TestBarcode(DirectoriesMixin, TestCase):
         )
 
         self.assertEqual(doc_barcode_info.pdf_path, test_file)
-        self.assertListEqual(separator_page_numbers, [])
+        self.assertDictEqual(separator_page_numbers, dict())
 
     def test_scan_file_for_separating_barcodes_middle_page(self):
         """
@@ -337,7 +337,7 @@ class TestBarcode(DirectoriesMixin, TestCase):
         )
 
         self.assertEqual(doc_barcode_info.pdf_path, test_file)
-        self.assertListEqual(separator_page_numbers, [1])
+        self.assertDictEqual(separator_page_numbers, dict([(1, False)]))
 
     def test_scan_file_for_separating_barcodes_multiple_pages(self):
         """
@@ -360,7 +360,7 @@ class TestBarcode(DirectoriesMixin, TestCase):
         )
 
         self.assertEqual(doc_barcode_info.pdf_path, test_file)
-        self.assertListEqual(separator_page_numbers, [2, 5])
+        self.assertDictEqual(separator_page_numbers, dict([(2, False), (5, False)]))
 
     def test_scan_file_for_separating_barcodes_upside_down(self):
         """
@@ -384,7 +384,7 @@ class TestBarcode(DirectoriesMixin, TestCase):
         )
 
         self.assertEqual(doc_barcode_info.pdf_path, test_file)
-        self.assertListEqual(separator_page_numbers, [1])
+        self.assertDictEqual(separator_page_numbers, dict([(1, False)]))
 
     def test_scan_file_for_separating_barcodes_fax_decode(self):
         """
@@ -407,7 +407,7 @@ class TestBarcode(DirectoriesMixin, TestCase):
         )
 
         self.assertEqual(doc_barcode_info.pdf_path, test_file)
-        self.assertListEqual(separator_page_numbers, [1])
+        self.assertDictEqual(separator_page_numbers, dict([(1, False)]))
 
     def test_scan_file_for_separating_qr_barcodes(self):
         """
@@ -431,7 +431,7 @@ class TestBarcode(DirectoriesMixin, TestCase):
         )
 
         self.assertEqual(doc_barcode_info.pdf_path, test_file)
-        self.assertListEqual(separator_page_numbers, [0])
+        self.assertDictEqual(separator_page_numbers, dict([(0, False)]))
 
     @override_settings(CONSUMER_BARCODE_STRING="CUSTOM BARCODE")
     def test_scan_file_for_separating_custom_barcodes(self):
@@ -456,7 +456,7 @@ class TestBarcode(DirectoriesMixin, TestCase):
         )
 
         self.assertEqual(doc_barcode_info.pdf_path, test_file)
-        self.assertListEqual(separator_page_numbers, [0])
+        self.assertDictEqual(separator_page_numbers, dict([(0, False)]))
 
     @override_settings(CONSUMER_BARCODE_STRING="CUSTOM BARCODE")
     def test_scan_file_for_separating_custom_qr_barcodes(self):
@@ -482,7 +482,7 @@ class TestBarcode(DirectoriesMixin, TestCase):
         )
 
         self.assertEqual(doc_barcode_info.pdf_path, test_file)
-        self.assertListEqual(separator_page_numbers, [0])
+        self.assertDictEqual(separator_page_numbers, dict([(0, False)]))
 
     @override_settings(CONSUMER_BARCODE_STRING="CUSTOM BARCODE")
     def test_scan_file_for_separating_custom_128_barcodes(self):
@@ -508,7 +508,7 @@ class TestBarcode(DirectoriesMixin, TestCase):
         )
 
         self.assertEqual(doc_barcode_info.pdf_path, test_file)
-        self.assertListEqual(separator_page_numbers, [0])
+        self.assertDictEqual(separator_page_numbers, dict([(0, False)]))
 
     def test_scan_file_for_separating_wrong_qr_barcodes(self):
         """
@@ -533,7 +533,7 @@ class TestBarcode(DirectoriesMixin, TestCase):
         )
 
         self.assertEqual(doc_barcode_info.pdf_path, test_file)
-        self.assertListEqual(separator_page_numbers, [])
+        self.assertDictEqual(separator_page_numbers, dict())
 
     @override_settings(CONSUMER_BARCODE_STRING="ADAR-NEXTDOC")
     def test_scan_file_for_separating_qr_barcodes(self):
@@ -558,7 +558,7 @@ class TestBarcode(DirectoriesMixin, TestCase):
         )
 
         self.assertGreater(len(doc_barcode_info.barcodes), 0)
-        self.assertListEqual(separator_page_numbers, [1])
+        self.assertDictEqual(separator_page_numbers, dict([(1, False)]))
 
     def test_separate_pages(self):
         """
@@ -573,7 +573,7 @@ class TestBarcode(DirectoriesMixin, TestCase):
             self.BARCODE_SAMPLE_DIR,
             "patch-code-t-middle.pdf",
         )
-        documents = barcodes.separate_pages(test_file, [1])
+        documents = barcodes.separate_pages(test_file, dict([(1, True)]))
 
         self.assertEqual(len(documents), 2)
 
@@ -591,7 +591,7 @@ class TestBarcode(DirectoriesMixin, TestCase):
             self.BARCODE_SAMPLE_DIR,
             "patch-code-t-double.pdf",
         )
-        pages = barcodes.separate_pages(test_file, [1, 2])
+        pages = barcodes.separate_pages(test_file, dict([(1, True), (2, True)]))
 
         self.assertEqual(len(pages), 2)
 
@@ -610,7 +610,7 @@ class TestBarcode(DirectoriesMixin, TestCase):
             "patch-code-t-middle.pdf",
         )
         with self.assertLogs("paperless.barcodes", level="WARNING") as cm:
-            pages = barcodes.separate_pages(test_file, [])
+            pages = barcodes.separate_pages(test_file, dict())
             self.assertEqual(pages, [])
             self.assertEqual(
                 cm.output,
@@ -858,7 +858,7 @@ class TestBarcode(DirectoriesMixin, TestCase):
         )
 
         self.assertEqual(doc_barcode_info.pdf_path, test_file)
-        self.assertListEqual(separator_page_numbers, [])
+        self.assertDictEqual(separator_page_numbers, dict())
 
 
 class TestAsnBarcodes(DirectoriesMixin, TestCase):
