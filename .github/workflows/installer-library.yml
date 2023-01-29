@@ -169,3 +169,142 @@ jobs:
         PIKEPDF_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.pikepdf-json).version }}
         PILLOW_VERSION=${{ needs.prepare-docker-build.outputs.pillow-version }}
         LXML_VERSION=${{ needs.prepare-docker-build.outputs.lxml-version }}
+
+  commit-binary-files:
+    name: Store installers
+    needs:
+      - prepare-docker-build
+      - build-qpdf-debs
+      - build-jbig2enc
+      - build-psycopg2-wheel
+      - build-pikepdf-wheel
+    runs-on: ubuntu-22.04
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: binary-library
+      -
+        name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+      -
+        name: Install system dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -qq --no-install-recommends tree
+      -
+        name: Extract qpdf files
+        run: |
+          version=${{ fromJSON(needs.prepare-docker-build.outputs.qpdf-json).version }}
+          tag=${{ fromJSON(needs.prepare-docker-build.outputs.qpdf-json).image_tag }}
+
+          docker pull --quiet ${tag}
+          docker create --name qpdf-extract ${tag}
+
+          mkdir --parents qpdf/${version}/amd64
+          docker cp qpdf-extract:/usr/src/qpdf/${version}/amd64 qpdf/${version}
+
+          mkdir --parents qpdf/${version}/arm64
+          docker cp qpdf-extract:/usr/src/qpdf/${version}/arm64 qpdf/${version}
+
+          mkdir --parents qpdf/${version}/armv7
+          docker cp qpdf-extract:/usr/src/qpdf/${version}/armv7 qpdf/${version}
+      -
+        name: Extract psycopg2 files
+        run: |
+          version=${{ fromJSON(needs.prepare-docker-build.outputs.psycopg2-json).version }}
+          tag=${{ fromJSON(needs.prepare-docker-build.outputs.psycopg2-json).image_tag }}
+
+          docker pull --quiet --platform linux/amd64 ${tag}
+          docker create --platform linux/amd64 --name psycopg2-extract ${tag}
+          mkdir --parents psycopg2/${version}/amd64
+          docker cp psycopg2-extract:/usr/src/wheels/ psycopg2/${version}/amd64
+          mv psycopg2/${version}/amd64/wheels/* psycopg2/${version}/amd64
+          rm -r psycopg2/${version}/amd64/wheels/
+          docker rm psycopg2-extract
+
+          docker pull --quiet --platform linux/arm64 ${tag}
+          docker create --platform linux/arm64 --name psycopg2-extract ${tag}
+          mkdir --parents psycopg2/${version}/arm64
+          docker cp psycopg2-extract:/usr/src/wheels/ psycopg2/${version}/arm64
+          mv psycopg2/${version}/arm64/wheels/* psycopg2/${version}/arm64
+          rm -r psycopg2/${version}/arm64/wheels/
+          docker rm psycopg2-extract
+
+          docker pull --quiet --platform linux/arm/v7 ${tag}
+          docker create --platform linux/arm/v7 --name psycopg2-extract ${tag}
+          mkdir --parents psycopg2/${version}/armv7
+          docker cp psycopg2-extract:/usr/src/wheels/ psycopg2/${version}/armv7
+          mv psycopg2/${version}/armv7/wheels/* psycopg2/${version}/armv7
+          rm -r psycopg2/${version}/armv7/wheels/
+          docker rm psycopg2-extract
+      -
+        name: Extract pikepdf files
+        run: |
+          version=${{ fromJSON(needs.prepare-docker-build.outputs.pikepdf-json).version }}
+          tag=${{ fromJSON(needs.prepare-docker-build.outputs.pikepdf-json).image_tag }}
+
+          docker pull --quiet --platform linux/amd64 ${tag}
+          docker create --platform linux/amd64 --name pikepdf-extract ${tag}
+          mkdir --parents pikepdf/${version}/amd64
+          docker cp pikepdf-extract:/usr/src/wheels/ pikepdf/${version}/amd64
+          mv pikepdf/${version}/amd64/wheels/* pikepdf/${version}/amd64
+          rm -r pikepdf/${version}/amd64/wheels/
+          docker rm pikepdf-extract
+
+          docker pull --quiet --platform linux/arm64 ${tag}
+          docker create --platform linux/arm64 --name pikepdf-extract ${tag}
+          mkdir --parents pikepdf/${version}/arm64
+          docker cp pikepdf-extract:/usr/src/wheels/ pikepdf/${version}/arm64
+          mv pikepdf/${version}/arm64/wheels/* pikepdf/${version}/arm64
+          rm -r pikepdf/${version}/arm64/wheels/
+          docker rm pikepdf-extract
+
+          docker pull --quiet --platform linux/arm/v7 ${tag}
+          docker create --platform linux/arm/v7 --name pikepdf-extract ${tag}
+          mkdir --parents pikepdf/${version}/armv7
+          docker cp pikepdf-extract:/usr/src/wheels/ pikepdf/${version}/armv7
+          mv pikepdf/${version}/armv7/wheels/* pikepdf/${version}/armv7
+          rm -r pikepdf/${version}/armv7/wheels/
+          docker rm pikepdf-extract
+      -
+        name: Extract jbig2enc files
+        run: |
+          version=${{ fromJSON(needs.prepare-docker-build.outputs.jbig2enc-json).version }}
+          tag=${{ fromJSON(needs.prepare-docker-build.outputs.jbig2enc-json).image_tag }}
+
+          docker pull --quiet --platform linux/amd64 ${tag}
+          docker create --platform linux/amd64 --name jbig2enc-extract ${tag}
+          mkdir --parents jbig2enc/${version}/amd64
+          docker cp jbig2enc-extract:/usr/src/jbig2enc/build jbig2enc/${version}/amd64/
+          mv jbig2enc/${version}/amd64/build/* jbig2enc/${version}/amd64/
+          docker rm jbig2enc-extract
+
+          docker pull --quiet --platform linux/arm64 ${tag}
+          docker create --platform linux/arm64 --name jbig2enc-extract ${tag}
+          mkdir --parents jbig2enc/${version}/arm64
+          docker cp jbig2enc-extract:/usr/src/jbig2enc/build jbig2enc/${version}/arm64
+          mv jbig2enc/${version}/arm64/build/* jbig2enc/${version}/arm64/
+          docker rm jbig2enc-extract
+
+          docker pull --quiet --platform linux/arm/v7 ${tag}
+          docker create --platform linux/arm/v7 --name jbig2enc-extract ${tag}
+          mkdir --parents jbig2enc/${version}/armv7
+          docker cp jbig2enc-extract:/usr/src/jbig2enc/build jbig2enc/${version}/armv7
+          mv jbig2enc/${version}/armv7/build/* jbig2enc/${version}/armv7/
+          docker rm jbig2enc-extract
+      -
+        name: Show file structure
+        run: |
+          tree .
+      -
+        name: Commit files
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pikepdf/ qpdf/ psycopg2/ jbig2enc/
+          git commit -m "Updating installer packages" || true
+          git push origin || true

@@ -70,6 +70,22 @@ export class DocumentCardLargeComponent {
     }
   }
 
+  get searchCommentHighlights() {
+    let highlights = []
+    if (
+      this.document['__search_hit__'] &&
+      this.document['__search_hit__'].comment_highlights
+    ) {
+      // only show comments with a match
+      highlights = (
+        this.document['__search_hit__'].comment_highlights as string
+      )
+        .split(',')
+        .filter((higlight) => higlight.includes('<span'))
+    }
+    return highlights
+  }
+
   getIsThumbInverted() {
     return this.settingsService.get(SETTINGS_KEYS.DARK_MODE_THUMB_INVERTED)
   }
