@@ -573,7 +573,7 @@ class TestBarcode(DirectoriesMixin, TestCase):
             self.BARCODE_SAMPLE_DIR,
             "patch-code-t-middle.pdf",
         )
-        documents = barcodes.separate_pages(test_file, dict([(1, True)]))
+        documents = barcodes.separate_pages(test_file, dict([(1, False)]))
 
         self.assertEqual(len(documents), 2)
 
@@ -591,7 +591,7 @@ class TestBarcode(DirectoriesMixin, TestCase):
             self.BARCODE_SAMPLE_DIR,
             "patch-code-t-double.pdf",
         )
-        pages = barcodes.separate_pages(test_file, dict([(1, True), (2, True)]))
+        pages = barcodes.separate_pages(test_file, dict([(1, False), (2, False)]))
 
         self.assertEqual(len(pages), 2)
 
