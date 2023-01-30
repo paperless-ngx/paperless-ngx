@@ -442,20 +442,46 @@ jobs:
       -
         name: Move files
         run: |
-          mkdir dist
-          mkdir dist/paperless-ngx
-          mkdir dist/paperless-ngx/scripts
-          cp .dockerignore .env Dockerfile Pipfile Pipfile.lock requirements.txt LICENSE README.md dist/paperless-ngx/
-          cp paperless.conf.example dist/paperless-ngx/paperless.conf
-          cp gunicorn.conf.py dist/paperless-ngx/gunicorn.conf.py
-          cp -r docker/ dist/paperless-ngx/docker
-          cp scripts/*.service scripts/*.sh scripts/*.socket dist/paperless-ngx/scripts/
-          cp -r src/ dist/paperless-ngx/src
-          cp -r docs/_build/html/ dist/paperless-ngx/docs
-          mv static dist/paperless-ngx
+          echo "Making dist folders"
+          for directory in dist \
+                          dist/paperless-ngx \
+                          dist/paperless-ngx/scripts;
+          do
+            mkdir --verbose --parents ${directory}
+          done
+
+          echo "Copying basic files"
+          for file_name in .dockerignore \
+                          .env \
+                          Dockerfile \
+                          Pipfile \
+                          Pipfile.lock \
+                          requirements.txt \
+                          LICENSE \
+                          README.md \
+                          paperless.conf.example \
+                          gunicorn.conf.py
+          do
+            cp --verbose ${file_name} dist/paperless-ngx/
+          done
+          mv --verbose dist/paperless-ngx/paperless.conf.example paperless.conf
+
+          echo "Copying Docker related files"
+          cp --recursive docker/ dist/paperless-ngx/docker
+
+          echo "Copying startup scripts"
+          cp --verbose scripts/*.service scripts/*.sh scripts/*.socket dist/paperless-ngx/scripts/
+
+          echo "Copying source files"
+          cp --recursive src/ dist/paperless-ngx/src
+          echo "Copying documentation"
+          cp --recursive docs/_build/html/ dist/paperless-ngx/docs
+
+          mv --verbose static dist/paperless-ngx
       -
         name: Make release package
         run: |
+          echo "Creating release archive"
           cd dist
           tar -cJf paperless-ngx.tar.xz paperless-ngx/
       -
