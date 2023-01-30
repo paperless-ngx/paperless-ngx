@@ -860,6 +860,87 @@ class TestBarcode(DirectoriesMixin, TestCase):
         self.assertEqual(doc_barcode_info.pdf_path, test_file)
         self.assertDictEqual(separator_page_numbers, {})
 
+    @override_settings(
+        CONSUMER_ENABLE_BARCODES=True,
+        CONSUMER_ENABLE_ASN_BARCODE=True,
+    )
+    def test_separate_pages_by_asn_barcodes_and_patcht(self):
+        """
+        GIVEN:
+            - Input PDF with a patch code on page 3 and ASN barcodes on pages 1,5,6,9,11
+        WHEN:
+            - Input file is split on barcodes
+        THEN:
+            - Correct number of files produced, split correctly by correct pages
+        """
+        test_file = os.path.join(
+            os.path.dirname(__file__),
+            self.BARCODE_SAMPLE_DIR,
+            "split-by-asn-2.pdf",
+        )
+
+        doc_barcode_info = barcodes.scan_file_for_barcodes(
+            test_file,
+        )
+        separator_page_numbers = barcodes.get_separating_barcodes(
+            doc_barcode_info.barcodes,
+        )
+
+        self.assertEqual(test_file, doc_barcode_info.pdf_path)
+        self.assertDictEqual(
+            separator_page_numbers,
+            {
+                2: False,
+                4: True,
+                5: True,
+                8: True,
+                10: True,
+            },
+        )
+
+        document_list = barcodes.separate_pages(test_file, separator_page_numbers)
+        self.assertEqual(len(document_list), 6)
+
+    @override_settings(
+        CONSUMER_ENABLE_BARCODES=True,
+        CONSUMER_ENABLE_ASN_BARCODE=True,
+    )
+    def test_separate_pages_by_asn_barcodes(self):
+        """
+        GIVEN:
+            - Input PDF with ASN barcodes on pages 1,3,4,7,9
+        WHEN:
+            - Input file is split on barcodes
+        THEN:
+            - Correct number of files produced, split correctly by correct pages
+        """
+        test_file = os.path.join(
+            os.path.dirname(__file__),
+            self.BARCODE_SAMPLE_DIR,
+            "split-by-asn-1.pdf",
+        )
+
+        doc_barcode_info = barcodes.scan_file_for_barcodes(
+            test_file,
+        )
+        separator_page_numbers = barcodes.get_separating_barcodes(
+            doc_barcode_info.barcodes,
+        )
+
+        self.assertEqual(test_file, doc_barcode_info.pdf_path)
+        self.assertDictEqual(
+            separator_page_numbers,
+            {
+                2: True,
+                3: True,
+                6: True,
+                8: True,
+            },
+        )
+
+        document_list = barcodes.separate_pages(test_file, separator_page_numbers)
+        self.assertEqual(len(document_list), 5)
+
 
 class TestAsnBarcodes(DirectoriesMixin, TestCase):
 
