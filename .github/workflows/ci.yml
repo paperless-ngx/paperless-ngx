@@ -173,14 +173,9 @@ jobs:
             echo "${file} was changed"
           done
       -
-        name: Publish coverage results
+        name: Upload coverage to Codecov
         if: matrix.python-version == ${{ env.DEFAULT_PYTHON_VERSION }} && steps.changed-files-specific.outputs.any_changed == 'true'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        # https://github.com/coveralls-clients/coveralls-python/issues/251
-        run: |
-          cd src/
-          pipenv --python ${{ steps.setup-python.outputs.python-version }} run coveralls --service=github
+        uses: codecov/codecov-action@v3
       -
         name: Stop containers
         if: always()
