@@ -61,10 +61,6 @@ ARG PSYCOPG2_VERSION
 
 # Packages need for running
 ARG RUNTIME_PACKAGES="\
-  # Python
-  python3 \
-  python3-pip \
-  python3-setuptools \
   # General utils
   curl \
   # Docker specific
