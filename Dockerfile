@@ -1,4 +1,5 @@
 # syntax=docker/dockerfile:1.4
+# https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/reference.md
 
 FROM --platform=$BUILDPLATFORM node:16-bullseye-slim AS compile-frontend
 
@@ -133,7 +134,6 @@ WORKDIR /usr/src/paperless/
 COPY gunicorn.conf.py .
 
 # setup docker-specific things
-# Use mounts to avoid copying installer files into the image
 # These change sometimes, but rarely
 WORKDIR /usr/src/paperless/src/docker/
 
@@ -175,7 +175,6 @@ RUN set -eux \
     && ./install_management_commands.sh
 
 # Install the built packages from the installer library images
-# Use mounts to avoid copying installer files into the image
 # These change sometimes
 RUN set -eux \
   && echo "Getting binaries" \
@@ -243,11 +242,12 @@ COPY ./src ./
 COPY --from=compile-frontend /src/src/documents/static/frontend/ ./documents/static/frontend/
 
 # add users, setup scripts
+# Mount the compiled frontend to expected location
 RUN set -eux \
   && addgroup --gid 1000 paperless \
   && useradd --uid 1000 --gid paperless --home-dir /usr/src/paperless paperless \
-  && chown -R paperless:paperless ../ \
-  && gosu paperless python3 manage.py collectstatic --clear --no-input \
+  && chown -R paperless:paperless /usr/src/paperless \
+  && gosu paperless python3 manage.py collectstatic --clear --no-input --link \
   && gosu paperless python3 manage.py compilemessages
 
 VOLUME ["/usr/src/paperless/data", \
