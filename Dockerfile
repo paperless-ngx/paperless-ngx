@@ -202,7 +202,8 @@ RUN set -eux \
     && python3 -m pip list \
   && echo "Cleaning up image layer" \
     && cd ../ \
-    && rm -rf paperless-ngx
+    && rm -rf paperless-ngx \
+    && rm paperless-ngx.tar.gz
 
 WORKDIR /usr/src/paperless/src/
 
