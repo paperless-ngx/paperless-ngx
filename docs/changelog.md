@@ -1,9 +1,40 @@
 # Changelog
 
-## paperless-ngx 1.12.1
+## paperless-ngx 1.12.2
 
 _Note: Version 1.12.x introduced searching of comments which will work for comments added after the upgrade but a reindex of the search index is required in order to be able to search
 older comments. The Docker image will automatically perform this reindex, bare metal installations will have to perform this manually, see [the docs](https://docs.paperless-ngx.com/administration/#index)._
+
+### Bug Fixes
+
+- Bugfix: Allow pre-consume scripts to modify incoming file [@stumpylog](https://github.com/stumpylog) ([#2547](https://github.com/paperless-ngx/paperless-ngx/pull/2547))
+- Bugfix: Return to page based barcode scanning [@stumpylog](https://github.com/stumpylog) ([#2544](https://github.com/paperless-ngx/paperless-ngx/pull/2544))
+- Fix: Try to prevent title debounce overwriting [@shamoon](https://github.com/shamoon) ([#2543](https://github.com/paperless-ngx/paperless-ngx/pull/2543))
+- Fix comment search highlight + multi-word search [@shamoon](https://github.com/shamoon) ([#2542](https://github.com/paperless-ngx/paperless-ngx/pull/2542))
+- Bugfix: Request PDF/A format from Gotenberg [@stumpylog](https://github.com/stumpylog) ([#2530](https://github.com/paperless-ngx/paperless-ngx/pull/2530))
+- Fix: Trigger reindex for pre-existing comments [@shamoon](https://github.com/shamoon) ([#2519](https://github.com/paperless-ngx/paperless-ngx/pull/2519))
+
+### Documentation
+
+- Bugfix: Allow pre-consume scripts to modify incoming file [@stumpylog](https://github.com/stumpylog) ([#2547](https://github.com/paperless-ngx/paperless-ngx/pull/2547))
+- Fix: Trigger reindex for pre-existing comments [@shamoon](https://github.com/shamoon) ([#2519](https://github.com/paperless-ngx/paperless-ngx/pull/2519))
+- Minor updates to development documentation [@clemensrieder](https://github.com/clemensrieder) ([#2474](https://github.com/paperless-ngx/paperless-ngx/pull/2474))
+- [Documentation] Add v1.12.1 changelog [@github-actions](https://github.com/github-actions) ([#2515](https://github.com/paperless-ngx/paperless-ngx/pull/2515))
+
+### Maintenance
+
+- Chore: Fix tag cleaner to work with attestations [@stumpylog](https://github.com/stumpylog) ([#2532](https://github.com/paperless-ngx/paperless-ngx/pull/2532))
+- Chore: Make installers statically versioned [@stumpylog](https://github.com/stumpylog) ([#2517](https://github.com/paperless-ngx/paperless-ngx/pull/2517))
+
+### All App Changes
+
+- Bugfix: Allow pre-consume scripts to modify incoming file [@stumpylog](https://github.com/stumpylog) ([#2547](https://github.com/paperless-ngx/paperless-ngx/pull/2547))
+- Bugfix: Return to page based barcode scanning [@stumpylog](https://github.com/stumpylog) ([#2544](https://github.com/paperless-ngx/paperless-ngx/pull/2544))
+- Fix: Try to prevent title debounce overwriting [@shamoon](https://github.com/shamoon) ([#2543](https://github.com/paperless-ngx/paperless-ngx/pull/2543))
+- Fix comment search highlight + multi-word search [@shamoon](https://github.com/shamoon) ([#2542](https://github.com/paperless-ngx/paperless-ngx/pull/2542))
+- Bugfix: Request PDF/A format from Gotenberg [@stumpylog](https://github.com/stumpylog) ([#2530](https://github.com/paperless-ngx/paperless-ngx/pull/2530))
+
+## paperless-ngx 1.12.1
 
 ### Bug Fixes
 
