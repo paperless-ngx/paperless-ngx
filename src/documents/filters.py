@@ -11,6 +11,7 @@ from .models import Log
 from .models import StoragePath
 from .models import Tag
 
+
 CHAR_KWARGS = ["istartswith", "iendswith", "icontains", "iexact"]
 ID_KWARGS = ["in", "exact"]
 INT_KWARGS = ["exact", "gt", "gte", "lt", "lte", "isnull"]
@@ -137,7 +138,7 @@ class StoragePathFilterSet(FilterSet):
         }
 
 
-class ObjectOwnedOrGrandtedPermissionsFilter(ObjectPermissionsFilter):
+class ObjectOwnedOrGrantedPermissionsFilter(ObjectPermissionsFilter):
     """
     A filter backend that limits results to those where the requesting user
     has read object level permissions, owns the objects, or objects without

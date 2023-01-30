@@ -31,7 +31,7 @@ from django.utils.translation import get_language
 from django.views.decorators.cache import cache_control
 from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
-from documents.filters import ObjectOwnedOrGrandtedPermissionsFilter
+from documents.filters import ObjectOwnedOrGrantedPermissionsFilter
 from documents.permissions import PaperlessAdminPermissions
 from documents.permissions import PaperlessObjectPermissions
 from documents.tasks import consume_file
@@ -166,7 +166,7 @@ class CorrespondentViewSet(ModelViewSet, PassUserMixin):
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
-        ObjectOwnedOrGrandtedPermissionsFilter,
+        ObjectOwnedOrGrantedPermissionsFilter,
     )
     filterset_class = CorrespondentFilterSet
     ordering_fields = (
@@ -198,7 +198,7 @@ class TagViewSet(ModelViewSet):
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
-        ObjectOwnedOrGrandtedPermissionsFilter,
+        ObjectOwnedOrGrantedPermissionsFilter,
     )
     filterset_class = TagFilterSet
     ordering_fields = ("color", "name", "matching_algorithm", "match", "document_count")
@@ -217,7 +217,7 @@ class DocumentTypeViewSet(ModelViewSet, PassUserMixin):
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
-        ObjectOwnedOrGrandtedPermissionsFilter,
+        ObjectOwnedOrGrantedPermissionsFilter,
     )
     filterset_class = DocumentTypeFilterSet
     ordering_fields = ("name", "matching_algorithm", "match", "document_count")
@@ -240,7 +240,7 @@ class DocumentViewSet(
         DjangoFilterBackend,
         SearchFilter,
         OrderingFilter,
-        ObjectOwnedOrGrandtedPermissionsFilter,
+        ObjectOwnedOrGrantedPermissionsFilter,
     )
     filterset_class = DocumentFilterSet
     search_fields = ("title", "correspondent__name", "content")

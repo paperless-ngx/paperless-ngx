@@ -3063,11 +3063,6 @@ class TestTasks(APITestCase):
         returned_task1 = response.data[1]
         returned_task2 = response.data[0]
 
-        from pprint import pprint
-
-        pprint(returned_task1)
-        pprint(returned_task2)
-
         self.assertEqual(returned_task1["task_id"], task1.task_id)
         self.assertEqual(returned_task1["status"], celery.states.PENDING)
         self.assertEqual(returned_task1["task_file_name"], task1.task_file_name)
@@ -3323,10 +3318,6 @@ class TestApiUser(APITestCase):
 
         returned_user1 = User.objects.get(username="testuser")
 
-        from pprint import pprint
-
-        pprint(returned_user1)
-
         self.assertEqual(returned_user1.username, user1["username"])
         self.assertEqual(returned_user1.first_name, user1["first_name"])
         self.assertEqual(returned_user1.last_name, user1["last_name"])
@@ -3348,7 +3339,7 @@ class TestApiUser(APITestCase):
             last_name="User",
         )
 
-        nUsers = len(User.objects.all())
+        nUsers = User.objects.count()
 
         response = self.client.delete(
             f"{self.ENDPOINT}{user1.pk}/",
@@ -3356,7 +3347,7 @@ class TestApiUser(APITestCase):
 
         self.assertEqual(response.status_code, 204)
 
-        self.assertEqual(len(User.objects.all()), nUsers - 1)
+        self.assertEqual(User.objects.count(), nUsers - 1)
 
     def test_update_user(self):
         """
@@ -3435,10 +3426,6 @@ class TestApiGroup(APITestCase):
         self.assertEqual(response.data["count"], 1)
         returned_group1 = response.data["results"][0]
 
-        from pprint import pprint
-
-        pprint(returned_group1)
-
         self.assertEqual(returned_group1["name"], group1.name)
 
     def test_create_group(self):
@@ -3461,10 +3448,6 @@ class TestApiGroup(APITestCase):
         self.assertEqual(response.status_code, 201)
 
         returned_group1 = Group.objects.get(name="Test Group")
-
-        from pprint import pprint
-
-        pprint(returned_group1)
 
         self.assertEqual(returned_group1.name, group1["name"])
 
