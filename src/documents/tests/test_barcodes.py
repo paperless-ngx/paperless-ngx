@@ -314,7 +314,7 @@ class TestBarcode(DirectoriesMixin, TestCase):
         )
 
         self.assertEqual(doc_barcode_info.pdf_path, test_file)
-        self.assertDictEqual(separator_page_numbers, dict())
+        self.assertDictEqual(separator_page_numbers, {})
 
     def test_scan_file_for_separating_barcodes_middle_page(self):
         """
@@ -533,7 +533,7 @@ class TestBarcode(DirectoriesMixin, TestCase):
         )
 
         self.assertEqual(doc_barcode_info.pdf_path, test_file)
-        self.assertDictEqual(separator_page_numbers, dict())
+        self.assertDictEqual(separator_page_numbers, {})
 
     @override_settings(CONSUMER_BARCODE_STRING="ADAR-NEXTDOC")
     def test_scan_file_for_separating_qr_barcodes(self):
@@ -610,7 +610,7 @@ class TestBarcode(DirectoriesMixin, TestCase):
             "patch-code-t-middle.pdf",
         )
         with self.assertLogs("paperless.barcodes", level="WARNING") as cm:
-            pages = barcodes.separate_pages(test_file, dict())
+            pages = barcodes.separate_pages(test_file, {})
             self.assertEqual(pages, [])
             self.assertEqual(
                 cm.output,
@@ -858,7 +858,7 @@ class TestBarcode(DirectoriesMixin, TestCase):
         )
 
         self.assertEqual(doc_barcode_info.pdf_path, test_file)
-        self.assertDictEqual(separator_page_numbers, dict())
+        self.assertDictEqual(separator_page_numbers, {})
 
 
 class TestAsnBarcodes(DirectoriesMixin, TestCase):
