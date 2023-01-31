@@ -113,8 +113,6 @@ jobs:
       PAPERLESS_MAIL_TEST_HOST: ${{ secrets.TEST_MAIL_HOST }}
       PAPERLESS_MAIL_TEST_USER: ${{ secrets.TEST_MAIL_USER }}
       PAPERLESS_MAIL_TEST_PASSWD: ${{ secrets.TEST_MAIL_PASSWD }}
-      # Skip Tests which require convert
-      PAPERLESS_TEST_SKIP_CONVERT: 1
       # Enable Gotenberg end to end testing
       GOTENBERG_LIVE: 1
     steps:
@@ -145,6 +143,10 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -qq --no-install-recommends unpaper tesseract-ocr imagemagick ghostscript libzbar0 poppler-utils
+      -
+        name: Configure ImageMagick
+        run: |
+          sudo cp docker/imagemagick-policy.xml /etc/ImageMagick-6/policy.xml
       -
         name: Install Python dependencies
         run: |
