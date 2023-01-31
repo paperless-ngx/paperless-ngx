@@ -470,6 +470,7 @@ jobs:
         run: |
           echo "Creating release archive"
           cd dist
+          sudo chown -R 1000:1000 paperless-ngx/
           tar -cJf paperless-ngx.tar.xz paperless-ngx/
       -
         name: Upload release artifact
