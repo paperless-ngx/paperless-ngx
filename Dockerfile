@@ -128,7 +128,7 @@ RUN set -eux \
     && apt-get install --yes --quiet --no-install-recommends ${RUNTIME_PACKAGES} \
     && rm -rf /var/lib/apt/lists/* \
   && echo "Installing supervisor" \
-    && python3 -m pip install --default-timeout=1000 --upgrade --no-cache-dir supervisor==4.2.4
+    && python3 -m pip install --default-timeout=1000 --upgrade --no-cache-dir supervisor==4.2.5
 
 # Copy gunicorn config
 # Changes very infrequently
