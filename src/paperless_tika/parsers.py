@@ -90,7 +90,7 @@ class TikaDocumentParser(DocumentParser):
         with open(document_path, "rb") as document_handle:
             files = {
                 "files": (
-                    os.path.splitext(document_path)[-1],
+                    "convert" + os.path.splitext(document_path)[-1],
                     document_handle,
                 ),
             }
