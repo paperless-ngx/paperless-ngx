@@ -5,6 +5,7 @@ from contextlib import contextmanager
 
 from dateutil.parser import isoparse
 from django.conf import settings
+from django.utils import timezone
 from documents.models import Comment
 from documents.models import Document
 from whoosh import classify
@@ -262,7 +263,7 @@ class DelayedFullTextQuery(DelayedQuery):
             ["content", "title", "correspondent", "tag", "type", "comments"],
             self.searcher.ixreader.schema,
         )
-        qp.add_plugin(DateParserPlugin())
+        qp.add_plugin(DateParserPlugin(basedate=timezone.now()))
         q = qp.parse(q_str)
 
         corrected = self.searcher.correct_query(q, q_str)
