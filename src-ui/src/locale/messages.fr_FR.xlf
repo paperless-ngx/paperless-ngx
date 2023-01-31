@@ -1335,13 +1335,13 @@
         </context-group>
         <target state="translated">Consulter la documentation pour les exigences de traitement des .eml</target>
       </trans-unit>
-      <trans-unit id="5163375362523428079" datatype="html">
+      <trans-unit id="5163375362523428079" datatype="html" approved="yes">
         <source>Rule order</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="translated">Ordre des règles</target>
+        <target state="final">Ordre des règles</target>
       </trans-unit>
       <trans-unit id="5488632521862493221" datatype="html">
         <source>Paperless will only process mails that match <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>all<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> of the filters specified below.</source>
@@ -2696,7 +2696,7 @@
         </context-group>
         <target state="final">Filtrer les chemins de stockage</target>
       </trans-unit>
-      <trans-unit id="3193976279273491157" datatype="html">
+      <trans-unit id="3193976279273491157" datatype="html" approved="yes">
         <source>Actions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -2734,7 +2734,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">44</context>
         </context-group>
-        <target state="translated">Actions</target>
+        <target state="final">Actions</target>
       </trans-unit>
       <trans-unit id="1015374532025907183" datatype="html">
         <source>Include:</source>
@@ -3606,7 +3606,7 @@
         </context-group>
         <target state="final">Nombre de documents</target>
       </trans-unit>
-      <trans-unit id="7376880254267897616" datatype="html">
+      <trans-unit id="7376880254267897616" datatype="html" approved="yes">
         <source>Filter Documents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
@@ -3624,7 +3624,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
           <context context-type="linenumber">44</context>
         </context-group>
-        <target state="translated">Filtrer les documents</target>
+        <target state="final">Filtrer les documents</target>
       </trans-unit>
       <trans-unit id="8095412801504464756" datatype="html">
         <source>{VAR_PLURAL, plural, =1 {One <x id="INTERPOLATION"/>} other {<x id="INTERPOLATION_1"/> total <x id="INTERPOLATION_2"/>}}</source>
@@ -3730,13 +3730,13 @@
         </context-group>
         <target state="translated">Ouvrir l'interface d'administration Django</target>
       </trans-unit>
-      <trans-unit id="6439365426343089851" datatype="html">
+      <trans-unit id="6439365426343089851" datatype="html" approved="yes">
         <source>General</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="translated">Général</target>
+        <target state="final">Général</target>
       </trans-unit>
       <trans-unit id="8671234314555525900" datatype="html" approved="yes">
         <source>Appearance</source>
@@ -3834,13 +3834,13 @@
         </context-group>
         <target state="final">Cette option est généralement plus rapide pour l'affichage de grands documents PDF, mais elle peut ne pas fonctionner sur certains navigateurs.</target>
       </trans-unit>
-      <trans-unit id="3982403428275430291" datatype="html">
+      <trans-unit id="3982403428275430291" datatype="html" approved="yes">
         <source>Sidebar</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">99</context>
         </context-group>
-        <target state="translated">Barre latérale</target>
+        <target state="final">Barre latérale</target>
       </trans-unit>
       <trans-unit id="4608457133854405683" datatype="html" approved="yes">
         <source>Use &apos;slim&apos; sidebar (icons only)</source>
@@ -4776,37 +4776,37 @@
         </context-group>
         <target state="final">Vous avez des modifications non enregistrées sur ce document</target>
       </trans-unit>
-      <trans-unit id="2089045849587358256" datatype="html">
+      <trans-unit id="2089045849587358256" datatype="html" approved="yes">
         <source>Are you sure you want to close this document?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
           <context context-type="linenumber">109</context>
         </context-group>
-        <target state="translated">Voulez-vous vraiment fermer ce document ?</target>
+        <target state="final">Voulez-vous vraiment fermer ce document ?</target>
       </trans-unit>
-      <trans-unit id="2885986061416655600" datatype="html">
+      <trans-unit id="2885986061416655600" datatype="html" approved="yes">
         <source>Close document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
           <context context-type="linenumber">111</context>
         </context-group>
-        <target state="translated">Fermer le document</target>
+        <target state="final">Fermer le document</target>
       </trans-unit>
-      <trans-unit id="6755718693176327396" datatype="html">
+      <trans-unit id="6755718693176327396" datatype="html" approved="yes">
         <source>Are you sure you want to close all documents?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
           <context context-type="linenumber">132</context>
         </context-group>
-        <target state="translated">Voulez-vous vraiment fermer tous les documents ?</target>
+        <target state="final">Voulez-vous vraiment fermer tous les documents ?</target>
       </trans-unit>
-      <trans-unit id="4215561719980781894" datatype="html">
+      <trans-unit id="4215561719980781894" datatype="html" approved="yes">
         <source>Close documents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
           <context context-type="linenumber">134</context>
         </context-group>
-        <target state="translated">Fermer tous les documents</target>
+        <target state="final">Fermer tous les documents</target>
       </trans-unit>
       <trans-unit id="3553216189604488439" datatype="html" approved="yes">
         <source>Modified</source>
