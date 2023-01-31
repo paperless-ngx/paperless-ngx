@@ -518,7 +518,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         WHEN:
             - Query for documents added in the last 7 days
         THEN:
-            - The two recent documents are returned
+            - All three recent documents are returned
         """
         d1 = Document.objects.create(
             title="invoice",
