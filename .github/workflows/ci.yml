@@ -119,8 +119,6 @@ jobs:
       -
         name: Checkout
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
       -
         name: Start containers
         run: |
@@ -162,27 +160,14 @@ jobs:
           cd src/
           pipenv --python ${{ steps.setup-python.outputs.python-version }} run pytest -ra
       -
-        name: Get changed files
-        id: changed-files-specific
-        uses: tj-actions/changed-files@v35
+        name: Upload coverage to Codecov
+        if: matrix.python-version == ${{ env.DEFAULT_PYTHON_VERSION }}
+        uses: codecov/codecov-action@v3
         with:
-          files: |
-            src/**
-      -
-        name: List all changed files
-        run: |
-          for file in ${{ steps.changed-files-specific.outputs.all_changed_files }}; do
-            echo "${file} was changed"
-          done
-      -
-        name: Publish coverage results
-        if: matrix.python-version == ${{ env.DEFAULT_PYTHON_VERSION }} && steps.changed-files-specific.outputs.any_changed == 'true'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        # https://github.com/coveralls-clients/coveralls-python/issues/251
-        run: |
-          cd src/
-          pipenv --python ${{ steps.setup-python.outputs.python-version }} run coveralls --service=github
+          # not required for public repos, but intermittently fails otherwise
+          token: ${{ secrets.CODECOV_TOKEN }}
+          # future expansion
+          flags: backend
       -
         name: Stop containers
         if: always()
