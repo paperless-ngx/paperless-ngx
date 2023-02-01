@@ -164,7 +164,7 @@ def consume_file(
                     # notify the sender, otherwise the progress bar
                     # in the UI stays stuck
                     payload = {
-                        "filename": override_filename,
+                        "filename": override_filename or path.name,
                         "task_id": task_id,
                         "current_progress": 100,
                         "max_progress": 100,
