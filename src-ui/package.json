@@ -61,7 +61,7 @@
     "wait-on": "~6.0.1"
   },
   "optionalDependencies": {
-    "@cypress/schematic": "^2.1.1",
+    "@cypress/schematic": "^2.5.0",
     "cypress": "~10.9.0"
   }
 }
