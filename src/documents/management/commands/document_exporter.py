@@ -311,8 +311,8 @@ class Command(BaseCommand):
                 archive_target = None
 
             # 3.4. write files to target folder
-            t = int(time.mktime(document.created.timetuple()))
             if document.storage_type == Document.STORAGE_TYPE_GPG:
+                t = int(time.mktime(document.created.timetuple()))
 
                 original_target.parent.mkdir(parents=True, exist_ok=True)
                 with document.source_file as out_file:
