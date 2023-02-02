@@ -121,28 +121,28 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         response = self.client.get("/api/documents/", format="json")
         self.assertEqual(response.status_code, 200)
         results_full = response.data["results"]
-        self.assertTrue("content" in results_full[0])
-        self.assertTrue("id" in results_full[0])
+        self.assertIn("content", results_full[0])
+        self.assertIn("id", results_full[0])
 
         response = self.client.get("/api/documents/?fields=id", format="json")
         self.assertEqual(response.status_code, 200)
         results = response.data["results"]
         self.assertFalse("content" in results[0])
-        self.assertTrue("id" in results[0])
+        self.assertIn("id", results[0])
         self.assertEqual(len(results[0]), 1)
 
         response = self.client.get("/api/documents/?fields=content", format="json")
         self.assertEqual(response.status_code, 200)
         results = response.data["results"]
-        self.assertTrue("content" in results[0])
+        self.assertIn("content", results[0])
         self.assertFalse("id" in results[0])
         self.assertEqual(len(results[0]), 1)
 
         response = self.client.get("/api/documents/?fields=id,content", format="json")
         self.assertEqual(response.status_code, 200)
         results = response.data["results"]
-        self.assertTrue("content" in results[0])
-        self.assertTrue("id" in results[0])
+        self.assertIn("content", results[0])
+        self.assertIn("id", results[0])
         self.assertEqual(len(results[0]), 2)
 
         response = self.client.get(
@@ -152,7 +152,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, 200)
         results = response.data["results"]
         self.assertFalse("content" in results[0])
-        self.assertTrue("id" in results[0])
+        self.assertIn("id", results[0])
         self.assertEqual(len(results[0]), 1)
 
         response = self.client.get("/api/documents/?fields=", format="json")
