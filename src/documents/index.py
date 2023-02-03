@@ -5,6 +5,7 @@ from contextlib import contextmanager
 
 from dateutil.parser import isoparse
 from django.conf import settings
+from django.utils import timezone
 from documents.models import Comment
 from documents.models import Document
 from guardian.shortcuts import get_users_with_perms
@@ -94,10 +95,22 @@ def open_index_searcher():
         searcher.close()
 
 
-def update_document(writer, doc):
+def update_document(writer: AsyncWriter, doc: Document):
     tags = ",".join([t.name for t in doc.tags.all()])
     tags_ids = ",".join([str(t.id) for t in doc.tags.all()])
     comments = ",".join([str(c.comment) for c in Comment.objects.filter(document=doc)])
+    asn = doc.archive_serial_number
+    if asn is not None and (
+        asn < Document.ARCHIVE_SERIAL_NUMBER_MIN
+        or asn > Document.ARCHIVE_SERIAL_NUMBER_MAX
+    ):
+        logger.error(
+            f"Not indexing Archive Serial Number {asn} of document {doc.pk}. "
+            f"ASN is out of range "
+            f"[{Document.ARCHIVE_SERIAL_NUMBER_MIN:,}, "
+            f"{Document.ARCHIVE_SERIAL_NUMBER_MAX:,}.",
+        )
+        asn = 0
     users_with_perms = get_users_with_perms(
         doc,
         only_with_perms_in=["view_document"],
@@ -118,7 +131,7 @@ def update_document(writer, doc):
         has_type=doc.document_type is not None,
         created=doc.created,
         added=doc.added,
-        asn=doc.archive_serial_number,
+        asn=asn,
         modified=doc.modified,
         path=doc.storage_path.name if doc.storage_path else None,
         path_id=doc.storage_path.id if doc.storage_path else None,
@@ -283,7 +296,7 @@ class DelayedFullTextQuery(DelayedQuery):
             ["content", "title", "correspondent", "tag", "type", "comments"],
             self.searcher.ixreader.schema,
         )
-        qp.add_plugin(DateParserPlugin())
+        qp.add_plugin(DateParserPlugin(basedate=timezone.now()))
         q = qp.parse(q_str)
 
         corrected = self.searcher.correct_query(q, q_str)

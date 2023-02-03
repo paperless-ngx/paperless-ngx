@@ -3,6 +3,7 @@ import logging
 import os
 import re
 from collections import OrderedDict
+from typing import Final
 from typing import Optional
 
 import dateutil.parser
@@ -242,6 +243,9 @@ class Document(ModelWithOwner):
         help_text=_("The original name of the file when it was uploaded"),
     )
 
+    ARCHIVE_SERIAL_NUMBER_MIN: Final[int] = 0
+    ARCHIVE_SERIAL_NUMBER_MAX: Final[int] = 0xFF_FF_FF_FF
+
     archive_serial_number = models.PositiveIntegerField(
         _("archive serial number"),
         blank=True,
@@ -249,8 +253,8 @@ class Document(ModelWithOwner):
         unique=True,
         db_index=True,
         validators=[
-            MaxValueValidator(0xFF_FF_FF_FF),
-            MinValueValidator(0),
+            MaxValueValidator(ARCHIVE_SERIAL_NUMBER_MAX),
+            MinValueValidator(ARCHIVE_SERIAL_NUMBER_MIN),
         ],
         help_text=_(
             "The position of this document in your physical document " "archive.",
@@ -567,7 +571,7 @@ class PaperlessTask(models.Model):
     task_file_name = models.CharField(
         null=True,
         max_length=255,
-        verbose_name=_("Task Name"),
+        verbose_name=_("Task Filename"),
         help_text=_("Name of the file which the Task was run for"),
     )
 
