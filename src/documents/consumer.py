@@ -1,7 +1,10 @@
 import datetime
 import hashlib
 import os
+import shutil
+import tempfile
 import uuid
+from pathlib import Path
 from subprocess import CompletedProcess
 from subprocess import run
 from typing import Optional
@@ -95,7 +98,8 @@ class Consumer(LoggingMixin):
 
     def __init__(self):
         super().__init__()
-        self.path = None
+        self.path: Optional[Path] = None
+        self.original_path: Optional[Path] = None
         self.filename = None
         self.override_title = None
         self.override_correspondent_id = None
@@ -144,11 +148,16 @@ class Consumer(LoggingMixin):
             return
         # Validate the range is above zero and less than uint32_t max
         # otherwise, Whoosh can't handle it in the index
-        if self.override_asn < 0 or self.override_asn > 0xFF_FF_FF_FF:
+        if (
+            self.override_asn < Document.ARCHIVE_SERIAL_NUMBER_MIN
+            or self.override_asn > Document.ARCHIVE_SERIAL_NUMBER_MAX
+        ):
             self._fail(
                 MESSAGE_ASN_RANGE,
                 f"Not consuming {self.filename}: "
-                f"Given ASN {self.override_asn} is out of range [0, 4,294,967,295]",
+                f"Given ASN {self.override_asn} is out of range "
+                f"[{Document.ARCHIVE_SERIAL_NUMBER_MIN:,}, "
+                f"{Document.ARCHIVE_SERIAL_NUMBER_MAX:,}]",
             )
         if Document.objects.filter(archive_serial_number=self.override_asn).exists():
             self._fail(
@@ -169,16 +178,18 @@ class Consumer(LoggingMixin):
 
         self.log("info", f"Executing pre-consume script {settings.PRE_CONSUME_SCRIPT}")
 
-        filepath_arg = os.path.normpath(self.path)
+        working_file_path = str(self.path)
+        original_file_path = str(self.original_path)
 
         script_env = os.environ.copy()
-        script_env["DOCUMENT_SOURCE_PATH"] = filepath_arg
+        script_env["DOCUMENT_SOURCE_PATH"] = original_file_path
+        script_env["DOCUMENT_WORKING_PATH"] = working_file_path
 
         try:
             completed_proc = run(
                 args=[
                     settings.PRE_CONSUME_SCRIPT,
-                    filepath_arg,
+                    original_file_path,
                 ],
                 env=script_env,
                 capture_output=True,
@@ -197,7 +208,7 @@ class Consumer(LoggingMixin):
                 exception=e,
             )
 
-    def run_post_consume_script(self, document):
+    def run_post_consume_script(self, document: Document):
         if not settings.POST_CONSUME_SCRIPT:
             return
 
@@ -288,8 +299,8 @@ class Consumer(LoggingMixin):
         Return the document object if it was successfully created.
         """
 
-        self.path = path
-        self.filename = override_filename or os.path.basename(path)
+        self.path = Path(path).resolve()
+        self.filename = override_filename or self.path.name
         self.override_title = override_title
         self.override_correspondent_id = override_correspondent_id
         self.override_document_type_id = override_document_type_id
@@ -314,6 +325,15 @@ class Consumer(LoggingMixin):
         self.pre_check_asn_value()
 
         self.log("info", f"Consuming {self.filename}")
+
+        # For the actual work, copy the file into a tempdir
+        self.original_path = self.path
+        tempdir = tempfile.TemporaryDirectory(
+            prefix="paperless-ngx",
+            dir=settings.SCRATCH_DIR,
+        )
+        self.path = Path(tempdir.name) / Path(self.filename)
+        shutil.copy(self.original_path, self.path)
 
         # Determine the parser class.
 
@@ -457,11 +477,12 @@ class Consumer(LoggingMixin):
                 # Delete the file only if it was successfully consumed
                 self.log("debug", f"Deleting file {self.path}")
                 os.unlink(self.path)
+                self.original_path.unlink()
 
                 # https://github.com/jonaswinkler/paperless-ng/discussions/1037
                 shadow_file = os.path.join(
-                    os.path.dirname(self.path),
-                    "._" + os.path.basename(self.path),
+                    os.path.dirname(self.original_path),
+                    "._" + os.path.basename(self.original_path),
                 )
 
                 if os.path.isfile(shadow_file):
@@ -478,6 +499,7 @@ class Consumer(LoggingMixin):
             )
         finally:
             document_parser.cleanup()
+            tempdir.cleanup()
 
         self.run_post_consume_script(document)
 

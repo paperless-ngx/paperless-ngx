@@ -1,0 +1,19 @@
+# https://docs.codecov.com/docs/pull-request-comments
+# codecov will only comment if coverage changes
+comment:
+  require_changes: true
+coverage:
+  status:
+    project:
+      default:
+        # https://docs.codecov.com/docs/commit-status#threshold
+        threshold: 1%
+        # https://docs.codecov.com/docs/commit-status#only_pulls
+        only_pulls: true
+    patch:
+      default:
+        # For the changed lines only, target 75% covered, but
+        # allow as low as 50%
+        target: 75%
+        threshold: 25%
+        only_pulls: true

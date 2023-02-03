@@ -141,7 +141,8 @@ directory.
 files created using "collectstatic" manager command are stored.
 
     Unless you're doing something fancy, there is no need to override
-    this.
+    this.  If this is changed, you may need to run
+    `collectstatic` again.
 
     Defaults to "../static/", relative to the "src" directory.
 
