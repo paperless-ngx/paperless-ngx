@@ -149,6 +149,11 @@ class TestRedisSocketConversion(TestCase):
 
 
 class TestCeleryScheduleParsing(TestCase):
+    MAIL_EXPIRE_TIME = 9.0 * 60.0
+    CLASSIFIER_EXPIRE_TIME = 59.0 * 60.0
+    INDEX_EXPIRE_TIME = 23.0 * 60.0 * 60.0
+    SANITY_EXPIRE_TIME = 7.0 * 23.0 * 60.0 * 60.0
+
     def test_schedule_configuration_default(self):
         """
         GIVEN:
@@ -165,18 +170,22 @@ class TestCeleryScheduleParsing(TestCase):
                 "Check all e-mail accounts": {
                     "task": "paperless_mail.tasks.process_mail_accounts",
                     "schedule": crontab(minute="*/10"),
+                    "options": {"expires": self.MAIL_EXPIRE_TIME},
                 },
                 "Train the classifier": {
                     "task": "documents.tasks.train_classifier",
                     "schedule": crontab(minute="5", hour="*/1"),
+                    "options": {"expires": self.CLASSIFIER_EXPIRE_TIME},
                 },
                 "Optimize the index": {
                     "task": "documents.tasks.index_optimize",
                     "schedule": crontab(minute=0, hour=0),
+                    "options": {"expires": self.INDEX_EXPIRE_TIME},
                 },
                 "Perform sanity check": {
                     "task": "documents.tasks.sanity_check",
                     "schedule": crontab(minute=30, hour=0, day_of_week="sun"),
+                    "options": {"expires": self.SANITY_EXPIRE_TIME},
                 },
             },
             schedule,
@@ -203,18 +212,22 @@ class TestCeleryScheduleParsing(TestCase):
                 "Check all e-mail accounts": {
                     "task": "paperless_mail.tasks.process_mail_accounts",
                     "schedule": crontab(minute="*/50", day_of_week="mon"),
+                    "options": {"expires": self.MAIL_EXPIRE_TIME},
                 },
                 "Train the classifier": {
                     "task": "documents.tasks.train_classifier",
                     "schedule": crontab(minute="5", hour="*/1"),
+                    "options": {"expires": self.CLASSIFIER_EXPIRE_TIME},
                 },
                 "Optimize the index": {
                     "task": "documents.tasks.index_optimize",
                     "schedule": crontab(minute=0, hour=0),
+                    "options": {"expires": self.INDEX_EXPIRE_TIME},
                 },
                 "Perform sanity check": {
                     "task": "documents.tasks.sanity_check",
                     "schedule": crontab(minute=30, hour=0, day_of_week="sun"),
+                    "options": {"expires": self.SANITY_EXPIRE_TIME},
                 },
             },
             schedule,
@@ -238,14 +251,17 @@ class TestCeleryScheduleParsing(TestCase):
                 "Check all e-mail accounts": {
                     "task": "paperless_mail.tasks.process_mail_accounts",
                     "schedule": crontab(minute="*/10"),
+                    "options": {"expires": self.MAIL_EXPIRE_TIME},
                 },
                 "Train the classifier": {
                     "task": "documents.tasks.train_classifier",
                     "schedule": crontab(minute="5", hour="*/1"),
+                    "options": {"expires": self.CLASSIFIER_EXPIRE_TIME},
                 },
                 "Perform sanity check": {
                     "task": "documents.tasks.sanity_check",
                     "schedule": crontab(minute=30, hour=0, day_of_week="sun"),
+                    "options": {"expires": self.SANITY_EXPIRE_TIME},
                 },
             },
             schedule,
