@@ -559,7 +559,7 @@ class PaperlessTask(models.Model):
     task_file_name = models.CharField(
         null=True,
         max_length=255,
-        verbose_name=_("Task Name"),
+        verbose_name=_("Task Filename"),
         help_text=_("Name of the file which the Task was run for"),
     )
 
