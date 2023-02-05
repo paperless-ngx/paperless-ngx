@@ -625,7 +625,7 @@ services:
     # ...
 
     gotenberg:
-      image: gotenberg/gotenberg:7.6
+      image: gotenberg/gotenberg:7.8
       restart: unless-stopped
       # The gotenberg chromium route is used to convert .eml files. We do not
       # want to allow external content like tracking pixels or even javascript.
