@@ -22,6 +22,7 @@ import {
   FILTER_ADDED_BEFORE,
   FILTER_ASN,
   FILTER_CORRESPONDENT,
+  FILTER_CORRESPONDENT_NAME,
   FILTER_CREATED_AFTER,
   FILTER_CREATED_BEFORE,
   FILTER_DOCUMENT_TYPE,
@@ -93,6 +94,15 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
           if (rule.value) {
             return $localize`Correspondent: ${
               this.correspondents.find((c) => c.id == +rule.value)?.name
+            }`
+          } else {
+            return $localize`Without correspondent`
+          }
+
+        case FILTER_CORRESPONDENT_NAME:
+          if (rule.value) {
+            return $localize`Correspondent: ${
+              this.correspondents.find((c) => c.name == rule.value)?.name
             }`
           } else {
             return $localize`Without correspondent`
@@ -357,6 +367,23 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
             false
           )
           break
+        case FILTER_CORRESPONDENT_NAME:
+          this.correspondentService
+            .listFiltered(
+              1,
+              1,
+              null,
+              null,
+              rule.value
+            )
+            .subscribe((c) => {
+              this.correspondentSelectionModel.set(
+                rule.value ? c.results[0]?.id : null,
+                ToggleableItemState.Selected,
+                false
+              )
+            })
+          break
         case FILTER_DOCUMENT_TYPE:
           this.documentTypeSelectionModel.set(
             rule.value ? +rule.value : null,
@@ -488,6 +515,14 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
         filterRules.push({
           rule_type: FILTER_CORRESPONDENT,
           value: correspondent.id?.toString(),
+        })
+      })
+    this.correspondentSelectionModel
+      .getSelectedItems()
+      .forEach((correspondent) => {
+        filterRules.push({
+          rule_type: FILTER_CORRESPONDENT_NAME,
+          value: correspondent.name?.toString(),
         })
       })
     this.documentTypeSelectionModel

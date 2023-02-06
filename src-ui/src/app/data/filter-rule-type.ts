@@ -8,6 +8,7 @@ export const FILTER_ASN_GT = 23
 export const FILTER_ASN_LT = 24
 
 export const FILTER_CORRESPONDENT = 3
+export const FILTER_CORRESPONDENT_NAME = 26
 
 export const FILTER_DOCUMENT_TYPE = 4
 
@@ -59,6 +60,13 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
   {
     id: FILTER_CORRESPONDENT,
     filtervar: 'correspondent__id',
+    isnull_filtervar: 'correspondent__isnull',
+    datatype: 'correspondent',
+    multi: false,
+  },
+  {
+    id: FILTER_CORRESPONDENT_NAME,
+    filtervar: 'correspondent__name__iexact',
     isnull_filtervar: 'correspondent__isnull',
     datatype: 'correspondent',
     multi: false,
