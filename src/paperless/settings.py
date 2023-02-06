@@ -263,6 +263,10 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+# Optional to enable compression
+if __get_boolean("PAPERLESS_ENABLE_COMPRESSION"):
+    MIDDLEWARE.insert(0, "compression_middleware.middleware.CompressionMiddleware")
+
 ROOT_URLCONF = "paperless.urls"
 
 FORCE_SCRIPT_NAME = os.getenv("PAPERLESS_FORCE_SCRIPT_NAME")
@@ -280,7 +284,6 @@ _CELERY_REDIS_URL, _CHANNELS_REDIS_URL = _parse_redis_url(
     os.getenv("PAPERLESS_REDIS", None),
 )
 
-# TODO: what is this used for?
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
