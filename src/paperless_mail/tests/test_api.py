@@ -2,12 +2,13 @@ from django.contrib.auth.models import User
 from documents.models import Correspondent
 from documents.models import DocumentType
 from documents.models import Tag
+from documents.tests.utils import DirectoriesMixin
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 from rest_framework.test import APITestCase
 
 
-class TestAPIMailAccounts(APITestCase):
+class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
     ENDPOINT = "/api/mail_accounts/"
 
     def setUp(self):
@@ -165,7 +166,7 @@ class TestAPIMailAccounts(APITestCase):
         self.assertEqual(returned_account2.password, "123xyz")
 
 
-class TestAPIMailRules(APITestCase):
+class TestAPIMailRules(DirectoriesMixin, APITestCase):
     ENDPOINT = "/api/mail_rules/"
 
     def setUp(self):

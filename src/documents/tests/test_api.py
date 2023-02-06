@@ -3200,7 +3200,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
         self.assertEqual(StoragePath.objects.count(), 1)
 
 
-class TestTasks(APITestCase):
+class TestTasks(DirectoriesMixin, APITestCase):
     ENDPOINT = "/api/tasks/"
     ENDPOINT_ACKNOWLEDGE = "/api/acknowledge_tasks/"
 
