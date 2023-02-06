@@ -758,6 +758,18 @@ should be a valid crontab(5) expression describing when to run.
 
     Defaults to `30 0 * * sun` or Sunday at 30 minutes past midnight.
 
+`PAPERLESS_ENABLE_COMPRESSION=<bool>`
+
+: Enables compression of the responses from the webserver.
+
+: Defaults to 0, disabling compression.
+
+    !!! note
+
+        If you are using a proxy such as nginx, it is likely more efficient
+        to enable compression in your proxy configuration rather than
+        the webserver
+
 ## Polling {#polling}
 
 `PAPERLESS_CONSUMER_POLLING=<num>`
