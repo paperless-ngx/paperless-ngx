@@ -342,6 +342,7 @@ class Consumer(LoggingMixin):
             mime_type,
         )
         if not parser_class:
+            tempdir.cleanup()
             self._fail(MESSAGE_UNSUPPORTED_TYPE, f"Unsupported mime type {mime_type}")
 
         # Notify all listeners that we're going to do some work.
@@ -400,6 +401,7 @@ class Consumer(LoggingMixin):
 
         except ParseError as e:
             document_parser.cleanup()
+            tempdir.cleanup()
             self._fail(
                 str(e),
                 f"Error while consuming document {self.filename}: {e}",
