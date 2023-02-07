@@ -359,7 +359,7 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertIsFile(os.path.join(self.target, "manifest.json"))
         self.assertIsFile(os.path.join(self.target, "wow2", "none.pdf"))
         self.assertIsFile(
-            (os.path.join(self.target, "wow2", "none_01.pdf")),
+            os.path.join(self.target, "wow2", "none_01.pdf"),
         )
 
     def test_export_missing_files(self):

@@ -19,6 +19,7 @@ from ..models import Document
 from ..models import DocumentType
 from ..models import StoragePath
 from .utils import DirectoriesMixin
+from .utils import FileSystemAssertsMixin
 
 
 class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
@@ -47,7 +48,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         # Test default source_path
         self.assertEqual(
             document.source_path,
-            os.path.join(settings.ORIGINALS_DIR, f"{document.pk:07d}.pdf"),
+            settings.ORIGINALS_DIR / f"{document.pk:07d}.pdf",
         )
 
         document.filename = generate_filename(document)
@@ -72,10 +73,14 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         document.save()
 
         # Check proper handling of files
-        self.assertIsDir(os.path.join(settings.ORIGINALS_DIR, "test"))
-        self.assertIsNotDir(os.path.join(settings.ORIGINALS_DIR, "none"))
+        self.assertIsDir(
+            settings.ORIGINALS_DIR / "test",
+        )
+        self.assertIsNotDir(
+            settings.ORIGINALS_DIR / "none",
+        )
         self.assertIsFile(
-            os.path.join(settings.ORIGINALS_DIR, "test/test.pdf.gpg"),
+            settings.ORIGINALS_DIR / "test" / "test.pdf.gpg",
         )
 
     @override_settings(FILENAME_FORMAT="{correspondent}/{correspondent}")
@@ -89,12 +94,12 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         document.filename = generate_filename(document)
         self.assertEqual(document.filename, "none/none.pdf")
         create_source_path_directory(document.source_path)
-        Path(document.source_path).touch()
+        document.source_path.touch()
 
         # Test source_path
         self.assertEqual(
             document.source_path,
-            os.path.join(settings.ORIGINALS_DIR, "none/none.pdf"),
+            settings.ORIGINALS_DIR / "none" / "none.pdf",
         )
 
         # Make the folder read- and execute-only (no writing and no renaming)
@@ -106,7 +111,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         # Check proper handling of files
         self.assertIsFile(
-            os.path.join(settings.ORIGINALS_DIR, "none/none.pdf"),
+            settings.ORIGINALS_DIR / "none" / "none.pdf",
         )
         self.assertEqual(document.filename, "none/none.pdf")
 
@@ -232,9 +237,9 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         create_source_path_directory(document.source_path)
 
-        Path(document.source_path).touch()
-        important_file = document.source_path + "test"
-        Path(important_file).touch()
+        document.source_path.touch()
+        important_file = document.source_path.with_suffix(".test")
+        important_file.touch()
 
         # Set a correspondent and save the document
         document.correspondent = Correspondent.objects.get_or_create(name="test")[0]
@@ -379,7 +384,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         self.assertEqual(
             doc.source_path,
-            os.path.join(settings.ORIGINALS_DIR, "etc", "something", "doc1.pdf"),
+            settings.ORIGINALS_DIR / "etc" / "something" / "doc1.pdf",
         )
 
     @override_settings(
@@ -599,11 +604,11 @@ class TestFileHandlingWithArchive(DirectoriesMixin, FileSystemAssertsMixin, Test
         self.assertIsFile(doc.archive_path)
         self.assertEqual(
             doc.source_path,
-            os.path.join(settings.ORIGINALS_DIR, "none", "my_doc.pdf"),
+            settings.ORIGINALS_DIR / "none" / "my_doc.pdf",
         )
         self.assertEqual(
             doc.archive_path,
-            os.path.join(settings.ARCHIVE_DIR, "none", "my_doc.pdf"),
+            settings.ARCHIVE_DIR / "none" / "my_doc.pdf",
         )
 
     @override_settings(FILENAME_FORMAT="{correspondent}/{title}")
@@ -698,7 +703,7 @@ class TestFileHandlingWithArchive(DirectoriesMixin, FileSystemAssertsMixin, Test
     @mock.patch("documents.signals.handlers.os.rename")
     def test_move_archive_error(self, m):
         def fake_rename(src, dst):
-            if "archive" in src:
+            if "archive" in str(src):
                 raise OSError()
             else:
                 os.remove(src)
@@ -749,7 +754,7 @@ class TestFileHandlingWithArchive(DirectoriesMixin, FileSystemAssertsMixin, Test
     @mock.patch("documents.signals.handlers.os.rename")
     def test_move_file_error(self, m):
         def fake_rename(src, dst):
-            if "original" in src:
+            if "original" in str(src):
                 raise OSError()
             else:
                 os.remove(src)

@@ -3,6 +3,7 @@ import logging
 import os
 import re
 from collections import OrderedDict
+from pathlib import Path
 from typing import Final
 from typing import Optional
 
@@ -282,7 +283,7 @@ class Document(ModelWithOwner):
         return res
 
     @property
-    def source_path(self) -> str:
+    def source_path(self) -> Path:
         if self.filename:
             fname = str(self.filename)
         else:
@@ -290,7 +291,7 @@ class Document(ModelWithOwner):
             if self.storage_type == self.STORAGE_TYPE_GPG:
                 fname += ".gpg"  # pragma: no cover
 
-        return os.path.join(settings.ORIGINALS_DIR, fname)
+        return (settings.ORIGINALS_DIR / Path(fname)).resolve()
 
     @property
     def source_file(self):
@@ -301,9 +302,9 @@ class Document(ModelWithOwner):
         return self.archive_filename is not None
 
     @property
-    def archive_path(self) -> Optional[str]:
+    def archive_path(self) -> Optional[Path]:
         if self.has_archive_version:
-            return os.path.join(settings.ARCHIVE_DIR, str(self.archive_filename))
+            return (settings.ARCHIVE_DIR / Path(str(self.archive_filename))).resolve()
         else:
             return None
 
@@ -335,14 +336,14 @@ class Document(ModelWithOwner):
         return get_default_file_extension(self.mime_type)
 
     @property
-    def thumbnail_path(self) -> str:
+    def thumbnail_path(self) -> Path:
         webp_file_name = f"{self.pk:07}.webp"
         if self.storage_type == self.STORAGE_TYPE_GPG:
             webp_file_name += ".gpg"
 
-        webp_file_path = os.path.join(settings.THUMBNAIL_DIR, webp_file_name)
+        webp_file_path = settings.THUMBNAIL_DIR / Path(webp_file_name)
 
-        return os.path.normpath(webp_file_path)
+        return webp_file_path.resolve()
 
     @property
     def thumbnail_file(self):

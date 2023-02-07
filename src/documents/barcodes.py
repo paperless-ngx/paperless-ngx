@@ -98,7 +98,7 @@ def barcode_reader(image: Image) -> List[str]:
     return barcodes
 
 
-def get_file_mime_type(path: str) -> str:
+def get_file_mime_type(path: Path) -> str:
     """
     Determines the file type, based on MIME type.
 
@@ -109,21 +109,20 @@ def get_file_mime_type(path: str) -> str:
     return mime_type
 
 
-def convert_from_tiff_to_pdf(filepath: str) -> str:
+def convert_from_tiff_to_pdf(filepath: Path) -> Path:
     """
     converts a given TIFF image file to pdf into a temporary directory.
 
     Returns the new pdf file.
     """
-    file_name = os.path.splitext(os.path.basename(filepath))[0]
     mime_type = get_file_mime_type(filepath)
     tempdir = tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR)
     # use old file name with pdf extension
     if mime_type == "image/tiff":
-        newpath = os.path.join(tempdir, file_name + ".pdf")
+        newpath = Path(tempdir) / Path(filepath.name).with_suffix(".pdf")
     else:
         logger.warning(
-            f"Cannot convert mime type {str(mime_type)} from {str(filepath)} to pdf.",
+            f"Cannot convert mime type {mime_type} from {filepath} to pdf.",
         )
         return None
     with Image.open(filepath) as image:
@@ -145,7 +144,7 @@ def convert_from_tiff_to_pdf(filepath: str) -> str:
 
 
 def scan_file_for_barcodes(
-    filepath: str,
+    filepath: Path,
 ) -> DocumentBarcodeInfo:
     """
     Scan the provided pdf file for any barcodes
@@ -252,7 +251,7 @@ def get_asn_from_barcodes(barcodes: List[Barcode]) -> Optional[int]:
     return asn
 
 
-def separate_pages(filepath: str, pages_to_split_on: Dict[int, bool]) -> List[str]:
+def separate_pages(filepath: Path, pages_to_split_on: Dict[int, bool]) -> List[Path]:
     """
     Separate the provided pdf file on the pages_to_split_on.
     The pages which are defined by the keys in page_numbers
@@ -268,8 +267,8 @@ def separate_pages(filepath: str, pages_to_split_on: Dict[int, bool]) -> List[st
         return document_paths
 
     os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
-    tempdir = tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR)
-    fname = os.path.splitext(os.path.basename(filepath))[0]
+    tempdir = Path(tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR))
+    fname = filepath.with_suffix("").name
     pdf = Pdf.open(filepath)
 
     # Start with an empty document
@@ -307,7 +306,7 @@ def separate_pages(filepath: str, pages_to_split_on: Dict[int, bool]) -> List[st
         output_filename = f"{fname}_document_{doc_idx}.pdf"
 
         logger.debug(f"pdf no:{doc_idx} has {len(dst.pages)} pages")
-        savepath = os.path.join(tempdir, output_filename)
+        savepath = tempdir / output_filename
         with open(savepath, "wb") as out:
             dst.save(out)
         document_paths.append(savepath)
@@ -316,18 +315,18 @@ def separate_pages(filepath: str, pages_to_split_on: Dict[int, bool]) -> List[st
 
 
 def save_to_dir(
-    filepath: str,
+    filepath: Path,
     newname: str = None,
-    target_dir: str = settings.CONSUMPTION_DIR,
+    target_dir: Path = settings.CONSUMPTION_DIR,
 ):
     """
     Copies filepath to target_dir.
     Optionally rename the file.
     """
-    if os.path.isfile(filepath) and os.path.isdir(target_dir):
+    if filepath.is_file() and target_dir.is_dir():
         dest = target_dir
         if newname is not None:
-            dest = os.path.join(dest, newname)
+            dest = dest / newname
         shutil.copy(filepath, dest)
         logging.debug(f"saved {str(filepath)} to {str(dest)}")
     else:
