@@ -84,3 +84,23 @@ black = "*"
 pre-commit = "*"
 imagehash = "*"
 mkdocs-material = "*"
+
+[typing-dev]
+mypy = "*"
+types-Pillow = "*"
+django-filter-stubs = "*"
+types-python-dateutil = "*"
+djangorestframework-stubs = {extras= ["compatible-mypy"], version="*"}
+celery-types = "*"
+django-stubs = {extras= ["compatible-mypy"], version="*"}
+types-dateparser = "*"
+types-bleach = "*"
+types-humanfriendly = "*"
+types-redis = "*"
+types-tqdm = "*"
+types-Markdown = "*"
+types-Pygments = "*"
+types-backports = "*"
+types-colorama = "*"
+types-psycopg2 = "*"
+types-setuptools = "*"
