@@ -58,8 +58,8 @@ class TestMakeThumbnails(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertIsNotFile(self.d1.thumbnail_path)
         self.assertIsNotFile(self.d2.thumbnail_path)
         call_command("document_thumbnails")
-        self.assertTrue(self.d1.thumbnail_path)
-        self.assertTrue(self.d2.thumbnail_path)
+        self.assertIsFile(self.d1.thumbnail_path)
+        self.assertIsFile(self.d2.thumbnail_path)
 
     def test_command_documentid(self):
         self.assertIsNotFile(self.d1.thumbnail_path)
