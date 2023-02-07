@@ -5,11 +5,14 @@ import multiprocessing
 import os
 import re
 import tempfile
+from os import PathLike
+from pathlib import Path
 from typing import Dict
 from typing import Final
 from typing import Optional
 from typing import Set
 from typing import Tuple
+from typing import Union
 from urllib.parse import urlparse
 
 from celery.schedules import crontab
@@ -63,11 +66,11 @@ def __get_float(key: str, default: float) -> float:
     return float(os.getenv(key, default))
 
 
-def __get_path(key: str, default: str) -> str:
+def __get_path(key: str, default: Union[PathLike, str]) -> Path:
     """
     Return a normalized, absolute path based on the environment variable or a default
     """
-    return os.path.abspath(os.path.normpath(os.environ.get(key, default)))
+    return Path(os.environ.get(key, default)).resolve()
 
 
 def _parse_redis_url(env_redis: Optional[str]) -> Tuple[str]:
@@ -201,16 +204,16 @@ DEBUG = __get_boolean("PAPERLESS_DEBUG", "NO")
 # Directories                                                                 #
 ###############################################################################
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR: Path = Path(__file__).resolve().parent.parent
 
-STATIC_ROOT = __get_path("PAPERLESS_STATICDIR", os.path.join(BASE_DIR, "..", "static"))
+STATIC_ROOT = __get_path("PAPERLESS_STATICDIR", BASE_DIR.parent / "static")
 
-MEDIA_ROOT = __get_path("PAPERLESS_MEDIA_ROOT", os.path.join(BASE_DIR, "..", "media"))
-ORIGINALS_DIR = os.path.join(MEDIA_ROOT, "documents", "originals")
-ARCHIVE_DIR = os.path.join(MEDIA_ROOT, "documents", "archive")
-THUMBNAIL_DIR = os.path.join(MEDIA_ROOT, "documents", "thumbnails")
+MEDIA_ROOT = __get_path("PAPERLESS_MEDIA_ROOT", BASE_DIR.parent / "media")
+ORIGINALS_DIR = MEDIA_ROOT / "documents" / "originals"
+ARCHIVE_DIR = MEDIA_ROOT / "documents" / "archive"
+THUMBNAIL_DIR = MEDIA_ROOT / "documents" / "thumbnails"
 
-DATA_DIR = __get_path("PAPERLESS_DATA_DIR", os.path.join(BASE_DIR, "..", "data"))
+DATA_DIR = __get_path("PAPERLESS_DATA_DIR", BASE_DIR.parent / "data")
 
 NLTK_DIR = __get_path("PAPERLESS_NLTK_DIR", "/usr/share/nltk_data")
 
@@ -218,21 +221,21 @@ TRASH_DIR = os.getenv("PAPERLESS_TRASH_DIR")
 
 # Lock file for synchronizing changes to the MEDIA directory across multiple
 # threads.
-MEDIA_LOCK = os.path.join(MEDIA_ROOT, "media.lock")
-INDEX_DIR = os.path.join(DATA_DIR, "index")
-MODEL_FILE = os.path.join(DATA_DIR, "classification_model.pickle")
+MEDIA_LOCK = MEDIA_ROOT / "media.lock"
+INDEX_DIR = DATA_DIR / "index"
+MODEL_FILE = DATA_DIR / "classification_model.pickle"
 
-LOGGING_DIR = __get_path("PAPERLESS_LOGGING_DIR", os.path.join(DATA_DIR, "log"))
+LOGGING_DIR = __get_path("PAPERLESS_LOGGING_DIR", DATA_DIR / "log")
 
 CONSUMPTION_DIR = __get_path(
     "PAPERLESS_CONSUMPTION_DIR",
-    os.path.join(BASE_DIR, "..", "consume"),
+    BASE_DIR.parent / "consume",
 )
 
 # This will be created if it doesn't exist
 SCRATCH_DIR = __get_path(
     "PAPERLESS_SCRATCH_DIR",
-    os.path.join(tempfile.gettempdir(), "paperless"),
+    Path(tempfile.gettempdir()) / "paperless",
 )
 
 ###############################################################################
