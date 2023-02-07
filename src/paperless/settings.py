@@ -264,7 +264,7 @@ MIDDLEWARE = [
 ]
 
 # Optional to enable compression
-if __get_boolean("PAPERLESS_ENABLE_COMPRESSION"):
+if __get_boolean("PAPERLESS_ENABLE_COMPRESSION", "yes"):  # pragma: nocover
     MIDDLEWARE.insert(0, "compression_middleware.middleware.CompressionMiddleware")
 
 ROOT_URLCONF = "paperless.urls"
