@@ -1,4 +1,3 @@
-import os
 import shutil
 import tempfile
 from collections import namedtuple
@@ -19,23 +18,22 @@ def setup_directories():
 
     dirs = namedtuple("Dirs", ())
 
-    dirs.data_dir = tempfile.mkdtemp()
-    dirs.scratch_dir = tempfile.mkdtemp()
-    dirs.media_dir = tempfile.mkdtemp()
-    dirs.consumption_dir = tempfile.mkdtemp()
-    dirs.static_dir = tempfile.mkdtemp()
-    dirs.index_dir = os.path.join(dirs.data_dir, "index")
-    dirs.originals_dir = os.path.join(dirs.media_dir, "documents", "originals")
-    dirs.thumbnail_dir = os.path.join(dirs.media_dir, "documents", "thumbnails")
-    dirs.archive_dir = os.path.join(dirs.media_dir, "documents", "archive")
-    dirs.logging_dir = os.path.join(dirs.data_dir, "log")
+    dirs.data_dir = Path(tempfile.mkdtemp())
+    dirs.scratch_dir = Path(tempfile.mkdtemp())
+    dirs.media_dir = Path(tempfile.mkdtemp())
+    dirs.consumption_dir = Path(tempfile.mkdtemp())
+    dirs.static_dir = Path(tempfile.mkdtemp())
+    dirs.index_dir = dirs.data_dir / "index"
+    dirs.originals_dir = dirs.media_dir / "documents" / "originals"
+    dirs.thumbnail_dir = dirs.media_dir / "documents" / "thumbnails"
+    dirs.archive_dir = dirs.media_dir / "documents" / "archive"
+    dirs.logging_dir = dirs.data_dir / "log"
 
-    os.makedirs(dirs.index_dir, exist_ok=True)
-    os.makedirs(dirs.originals_dir, exist_ok=True)
-    os.makedirs(dirs.thumbnail_dir, exist_ok=True)
-    os.makedirs(dirs.archive_dir, exist_ok=True)
-
-    os.makedirs(dirs.logging_dir, exist_ok=True)
+    dirs.index_dir.mkdir(parents=True, exist_ok=True)
+    dirs.originals_dir.mkdir(parents=True, exist_ok=True)
+    dirs.thumbnail_dir.mkdir(parents=True, exist_ok=True)
+    dirs.archive_dir.mkdir(parents=True, exist_ok=True)
+    dirs.logging_dir.mkdir(parents=True, exist_ok=True)
 
     dirs.settings_override = override_settings(
         DATA_DIR=dirs.data_dir,
@@ -48,8 +46,8 @@ def setup_directories():
         LOGGING_DIR=dirs.logging_dir,
         INDEX_DIR=dirs.index_dir,
         STATIC_ROOT=dirs.static_dir,
-        MODEL_FILE=os.path.join(dirs.data_dir, "classification_model.pickle"),
-        MEDIA_LOCK=os.path.join(dirs.media_dir, "media.lock"),
+        MODEL_FILE=dirs.data_dir / "classification_model.pickle",
+        MEDIA_LOCK=dirs.media_dir / "media.lock",
     )
     dirs.settings_override.enable()
 

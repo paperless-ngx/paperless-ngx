@@ -3,7 +3,6 @@ import logging
 import os
 import pickle
 import re
-import shutil
 import warnings
 from typing import List
 from typing import Optional
@@ -116,7 +115,7 @@ class DocumentClassifier:
 
     def save(self):
         target_file = settings.MODEL_FILE
-        target_file_temp = settings.MODEL_FILE + ".part"
+        target_file_temp = settings.MODEL_FILE.with_suffix(".pickle.part")
 
         with open(target_file_temp, "wb") as f:
             pickle.dump(self.FORMAT_VERSION, f)
@@ -130,9 +129,7 @@ class DocumentClassifier:
             pickle.dump(self.document_type_classifier, f)
             pickle.dump(self.storage_path_classifier, f)
 
-        if os.path.isfile(target_file):
-            os.unlink(target_file)
-        shutil.move(target_file_temp, target_file)
+        target_file_temp.rename(target_file)
 
     def train(self):
 
