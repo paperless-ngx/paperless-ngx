@@ -762,7 +762,7 @@ should be a valid crontab(5) expression describing when to run.
 
 : Enables compression of the responses from the webserver.
 
-: Defaults to 0, disabling compression.
+: Defaults to 1, enabling compression.
 
     !!! note
 
