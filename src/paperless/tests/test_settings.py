@@ -152,7 +152,7 @@ class TestCeleryScheduleParsing(TestCase):
     MAIL_EXPIRE_TIME = 9.0 * 60.0
     CLASSIFIER_EXPIRE_TIME = 59.0 * 60.0
     INDEX_EXPIRE_TIME = 23.0 * 60.0 * 60.0
-    SANITY_EXPIRE_TIME = 7.0 * 23.0 * 60.0 * 60.0
+    SANITY_EXPIRE_TIME = ((7.0 * 24.0) - 1.0) * 60.0 * 60.0
 
     def test_schedule_configuration_default(self):
         """
