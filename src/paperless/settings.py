@@ -166,8 +166,7 @@ def _parse_beat_schedule() -> Dict:
             "task": "documents.tasks.sanity_check",
             "options": {
                 # 1 hour before default schedule sends again
-                "expires": 7.0
-                * 23.0
+                "expires": ((7.0 * 24.0) - 1.0)
                 * 60.0
                 * 60.0,
             },
