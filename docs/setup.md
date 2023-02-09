@@ -46,7 +46,7 @@ steps described in [Docker setup](#docker_hub) automatically.
     page](https://github.com/paperless-ngx/paperless-ngx/tree/master/docker/compose)
     and download one of the `docker-compose.*.yml` files,
     depending on which database backend you want to use. Rename this
-    file to `docker-compose.*.yml`. If you want to enable
+    file to `docker-compose.yml`. If you want to enable
     optional support for Office documents, download a file with
     `-tika` in the file name. Download the
     `docker-compose.env` file and the `.env` file as well and store them
@@ -64,8 +64,7 @@ steps described in [Docker setup](#docker_hub) automatically.
 
         If you want to use the included `docker-compose.*.yml` file, you
         need to have at least Docker version **17.09.0** and docker-compose
-        version **1.17.0**. To check do: `docker-compose -v` or
-        `docker -v`
+        version **1.17.0**. To check do: `docker-compose -v` or `docker -v`
 
         See the [Docker installation guide](https://docs.docker.com/engine/install/) on how to install the current
         version of Docker for your operating system or Linux distribution of
@@ -144,7 +143,7 @@ steps described in [Docker setup](#docker_hub) automatically.
     !!! note
 
         You can copy any setting from the file `paperless.conf.example` and
-        paste it here. Have a look at [configuration](/configuration] to see what's available.
+        paste it here. Have a look at [configuration](/configuration) to see what's available.
 
     !!! note
 
@@ -306,14 +305,34 @@ supported.
         extension](https://code.djangoproject.com/wiki/JSON1Extension) is
         enabled. This is usually the case, but not always.
 
-4.  Get the release archive from
-    <https://github.com/paperless-ngx/paperless-ngx/releases>. Extract the
-    archive to a place from where you wish to execute it, such as
-    `/opt/paperless`. If you clone the git repo as it is, you also have to
+4.  Create a system user with a new home folder under which you wish
+    to run paperless.
+
+    ```shell-session
+    adduser paperless --system --home /opt/paperless --group
+    ```
+
+5.  Get the release archive from
+    <https://github.com/paperless-ngx/paperless-ngx/releases> for example with
+
+    ```shell-session
+    curl -O -L https://github.com/paperless-ngx/paperless-ngx/releases/download/v1.10.2/paperless-ngx-v1.10.2.tar.xz
+    ```
+
+    Extract the archive with
+
+    ```shell-session
+    tar -xf paperless-ngx-v1.10.2.tar.xz
+    ```
+
+    and copy the contents to the
+    home folder of the user you created before (`/opt/paperless`).
+
+    Optional: If you cloned the git repo, you will have to
     compile the frontend yourself, see [here](/development#front-end-development)
     and use the `build` step, not `serve`.
 
-5.  Configure paperless. See [configuration](/configuration) for details.
+6.  Configure paperless. See [configuration](/configuration) for details.
     Edit the included `paperless.conf` and adjust the settings to your
     needs. Required settings for getting
     paperless running are:
@@ -346,28 +365,30 @@ supported.
       documents are written in.
     - Set `PAPERLESS_TIME_ZONE` to your local time zone.
 
-6.  Create a system user under which you wish to run paperless.
-
-    ```shell-session
-    adduser paperless --system --home /opt/paperless --group
-    ```
-
-7.  Ensure that these directories exist and that the paperless user has
-    write permissions to the following directories:
+7.  Create the following directories if they are missing:
 
     - `/opt/paperless/media`
     - `/opt/paperless/data`
     - `/opt/paperless/consume`
 
     Adjust as necessary if you configured different folders.
-
-8.  Install python requirements from the `requirements.txt` file. It is
-    up to you if you wish to use a virtual environment or not. First you
-    should update your pip, so it gets the actual packages.
+    Ensure that the paperless user has write permissions for every one
+    of these folders with
 
     ```shell-session
-    sudo -Hu paperless pip3 install --upgrade pip
+    ls -l -d /opt/paperless/media
     ```
+
+    If needed, change the owner with
+
+    ```shell-session
+    sudo chown paperless:paperless /opt/paperless/media
+    sudo chown paperless:paperless /opt/paperless/data
+    sudo chown paperless:paperless /opt/paperless/consume
+    ```
+
+8.  Install python requirements from the `requirements.txt` file. It is
+    up to you if you wish to use a virtual environment or not. First you should update your pip, so it gets the actual packages.
 
     ```shell-session
     sudo -Hu paperless pip3 install -r requirements.txt
@@ -389,11 +410,15 @@ supported.
 10. Optional: Test that paperless is working by executing
 
     ```bash
-    # This collects static files from paperless and django.
+    # Manually starts the webserver
     sudo -Hu paperless python3 manage.py runserver
     ```
 
-    and pointing your browser to <http://localhost:8000/>.
+    and pointing your browser to http://localhost:8000 if
+    accessing from the same devices on which paperless is installed.
+    If accessing from another machine, set up systemd services. You may need
+    to set `PAPERLESS_DEBUG=true` in order for the development server to work
+    normally in your browser.
 
     !!! warning
 
@@ -443,6 +468,14 @@ supported.
 
         For instructions on how to use nginx for that,
         [see the instructions below](/setup#nginx).
+
+    !!! warning
+
+        If celery won't start (check with
+        `sudo systemctl status paperless-task-queue.service` for
+        paperless-task-queue.service and paperless-scheduler.service
+        ) you need to change the path in the files. Example:
+        `ExecStart=/opt/paperless/.local/bin/celery --app paperless worker --loglevel INFO`
 
 12. Optional: Install a samba server and make the consumption folder
     available as a network share.
@@ -738,7 +771,9 @@ with a few simple steps.
 
 Paperless-ngx modified the database schema slightly, however, these
 changes can be reverted while keeping your current data, so that your
-current data will be compatible with original Paperless.
+current data will be compatible with original Paperless. Thumbnails
+were also changed from PNG to WEBP format and will need to be
+re-generated.
 
 Execute this:
 
@@ -754,9 +789,9 @@ $ cd /path/to/paperless/src
 $ python3 manage.py migrate documents 0023
 ```
 
-After that, you need to clear your cookies (Paperless-ngx comes with
-updated dependencies that do cookie-processing differently) and probably
-your cache as well.
+After regenerating thumbnails, you'll need to clear your cookies
+(Paperless-ngx comes with updated dependencies that do cookie-processing
+differently) and probably your cache as well.
 
 # Considerations for less powerful devices {#less-powerful-devices}
 
@@ -835,6 +870,7 @@ http {
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Host $server_name;
+            add_header P3P 'CP=""'; # may not be required in all setups
         }
     }
 }

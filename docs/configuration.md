@@ -141,7 +141,8 @@ directory.
 files created using "collectstatic" manager command are stored.
 
     Unless you're doing something fancy, there is no need to override
-    this.
+    this.  If this is changed, you may need to run
+    `collectstatic` again.
 
     Defaults to "../static/", relative to the "src" directory.
 
@@ -179,7 +180,7 @@ Previously, the location defaulted to `PAPERLESS_DATA_DIR/nltk`.
 Unless you are using this in a bare metal install or other setup,
 this folder is no longer needed and can be removed manually.
 
-Defaults to `/usr/local/share/nltk_data`
+Defaults to `/usr/share/nltk_data`
 
 ## Logging
 
@@ -216,6 +217,11 @@ other options are set the values will be combined with this one. Do
 not include a trailing slash. E.g. <https://paperless.domain.com>
 
     Defaults to empty string, leaving the other settings unaffected.
+
+    !!! note
+
+        This value cannot contain a path (e.g. domain.com/path), even if
+        you are installing paperless-ngx at a subpath.
 
 `PAPERLESS_CSRF_TRUSTED_ORIGINS=<comma-separated-list>`
 
@@ -711,7 +717,7 @@ for details on how to set it.
 
 : Enables or disables the advanced natural language processing
 used during automatic classification. If disabled, paperless will
-still preform some basic text pre-processing before matching.
+still perform some basic text pre-processing before matching.
 
 : See also `PAPERLESS_NLTK_DIR`.
 
@@ -848,13 +854,38 @@ PAPERLESS_CONSUMER_ENABLE_BARCODES has been enabled.
 
     Defaults to false.
 
-PAPERLESS_CONSUMER_BARCODE_STRING=PATCHT
+`PAPERLESS_CONSUMER_BARCODE_STRING=PATCHT`
 
 : Defines the string to be detected as a separator barcode. If
 paperless is used with the PATCH-T separator pages, users shouldn't
 change this.
 
     Defaults to "PATCHT"
+
+`PAPERLESS_CONSUMER_ENABLE_ASN_BARCODE=<bool>`
+
+: Enables the detection of barcodes in the scanned document and
+setting the ASN (archive serial number) if a properly formatted
+barcode is detected.
+
+    The barcode must consist of a (configurable) prefix and the ASN
+    to be set, for instance `ASN00123`.
+
+    This option is compatible with barcode page separation, since
+    pages will be split up before reading the ASN.
+
+    If no ASN barcodes are detected in the uploaded file, no ASN will
+    be set. If a barcode with an already existing ASN is detected, no ASN
+    will be set either and a warning will be logged.
+
+    Defaults to false.
+
+`PAPERLESS_CONSUMER_ASN_BARCODE_PREFIX=ASN`
+
+: Defines the prefix that is used to identify a barcode as an ASN
+barcode.
+
+    Defaults to "ASN"
 
 `PAPERLESS_CONVERT_MEMORY_LIMIT=<num>`
 

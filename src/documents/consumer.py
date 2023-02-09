@@ -1,7 +1,10 @@
 import datetime
 import hashlib
 import os
+import shutil
+import tempfile
 import uuid
+from pathlib import Path
 from subprocess import CompletedProcess
 from subprocess import run
 from typing import Optional
@@ -39,6 +42,8 @@ class ConsumerError(Exception):
 
 
 MESSAGE_DOCUMENT_ALREADY_EXISTS = "document_already_exists"
+MESSAGE_ASN_ALREADY_EXISTS = "asn_already_exists"
+MESSAGE_ASN_RANGE = "asn_value_out_of_range"
 MESSAGE_FILE_NOT_FOUND = "file_not_found"
 MESSAGE_PRE_CONSUME_SCRIPT_NOT_FOUND = "pre_consume_script_not_found"
 MESSAGE_PRE_CONSUME_SCRIPT_ERROR = "pre_consume_script_error"
@@ -92,12 +97,14 @@ class Consumer(LoggingMixin):
 
     def __init__(self):
         super().__init__()
-        self.path = None
+        self.path: Optional[Path] = None
+        self.original_path: Optional[Path] = None
         self.filename = None
         self.override_title = None
         self.override_correspondent_id = None
         self.override_tag_ids = None
         self.override_document_type_id = None
+        self.override_asn = None
         self.task_id = None
 
         self.channel_layer = get_channel_layer()
@@ -130,6 +137,32 @@ class Consumer(LoggingMixin):
         os.makedirs(settings.ORIGINALS_DIR, exist_ok=True)
         os.makedirs(settings.ARCHIVE_DIR, exist_ok=True)
 
+    def pre_check_asn_value(self):
+        """
+        Check that if override_asn is given, it is unique and within a valid range
+        """
+        if not self.override_asn:
+            # check not necessary in case no ASN gets set
+            return
+        # Validate the range is above zero and less than uint32_t max
+        # otherwise, Whoosh can't handle it in the index
+        if (
+            self.override_asn < Document.ARCHIVE_SERIAL_NUMBER_MIN
+            or self.override_asn > Document.ARCHIVE_SERIAL_NUMBER_MAX
+        ):
+            self._fail(
+                MESSAGE_ASN_RANGE,
+                f"Not consuming {self.filename}: "
+                f"Given ASN {self.override_asn} is out of range "
+                f"[{Document.ARCHIVE_SERIAL_NUMBER_MIN:,}, "
+                f"{Document.ARCHIVE_SERIAL_NUMBER_MAX:,}]",
+            )
+        if Document.objects.filter(archive_serial_number=self.override_asn).exists():
+            self._fail(
+                MESSAGE_ASN_ALREADY_EXISTS,
+                f"Not consuming {self.filename}: Given ASN already exists!",
+            )
+
     def run_pre_consume_script(self):
         if not settings.PRE_CONSUME_SCRIPT:
             return
@@ -143,16 +176,18 @@ class Consumer(LoggingMixin):
 
         self.log("info", f"Executing pre-consume script {settings.PRE_CONSUME_SCRIPT}")
 
-        filepath_arg = os.path.normpath(self.path)
+        working_file_path = str(self.path)
+        original_file_path = str(self.original_path)
 
         script_env = os.environ.copy()
-        script_env["DOCUMENT_SOURCE_PATH"] = filepath_arg
+        script_env["DOCUMENT_SOURCE_PATH"] = original_file_path
+        script_env["DOCUMENT_WORKING_PATH"] = working_file_path
 
         try:
             completed_proc = run(
                 args=[
                     settings.PRE_CONSUME_SCRIPT,
-                    filepath_arg,
+                    original_file_path,
                 ],
                 env=script_env,
                 capture_output=True,
@@ -171,7 +206,7 @@ class Consumer(LoggingMixin):
                 exception=e,
             )
 
-    def run_post_consume_script(self, document):
+    def run_post_consume_script(self, document: Document):
         if not settings.POST_CONSUME_SCRIPT:
             return
 
@@ -255,19 +290,21 @@ class Consumer(LoggingMixin):
         override_tag_ids=None,
         task_id=None,
         override_created=None,
+        override_asn=None,
     ) -> Document:
         """
         Return the document object if it was successfully created.
         """
 
-        self.path = path
-        self.filename = override_filename or os.path.basename(path)
+        self.path = Path(path).resolve()
+        self.filename = override_filename or self.path.name
         self.override_title = override_title
         self.override_correspondent_id = override_correspondent_id
         self.override_document_type_id = override_document_type_id
         self.override_tag_ids = override_tag_ids
         self.task_id = task_id or str(uuid.uuid4())
         self.override_created = override_created
+        self.override_asn = override_asn
 
         self._send_progress(0, 100, "STARTING", MESSAGE_NEW_FILE)
 
@@ -281,8 +318,18 @@ class Consumer(LoggingMixin):
         self.pre_check_file_exists()
         self.pre_check_directories()
         self.pre_check_duplicate()
+        self.pre_check_asn_value()
 
         self.log("info", f"Consuming {self.filename}")
+
+        # For the actual work, copy the file into a tempdir
+        self.original_path = self.path
+        tempdir = tempfile.TemporaryDirectory(
+            prefix="paperless-ngx",
+            dir=settings.SCRATCH_DIR,
+        )
+        self.path = Path(tempdir.name) / Path(self.filename)
+        shutil.copy(self.original_path, self.path)
 
         # Determine the parser class.
 
@@ -426,11 +473,12 @@ class Consumer(LoggingMixin):
                 # Delete the file only if it was successfully consumed
                 self.log("debug", f"Deleting file {self.path}")
                 os.unlink(self.path)
+                self.original_path.unlink()
 
                 # https://github.com/jonaswinkler/paperless-ng/discussions/1037
                 shadow_file = os.path.join(
-                    os.path.dirname(self.path),
-                    "._" + os.path.basename(self.path),
+                    os.path.dirname(self.original_path),
+                    "._" + os.path.basename(self.original_path),
                 )
 
                 if os.path.isfile(shadow_file):
@@ -447,6 +495,7 @@ class Consumer(LoggingMixin):
             )
         finally:
             document_parser.cleanup()
+            tempdir.cleanup()
 
         self.run_post_consume_script(document)
 
@@ -525,6 +574,9 @@ class Consumer(LoggingMixin):
         if self.override_tag_ids:
             for tag_id in self.override_tag_ids:
                 document.tags.add(Tag.objects.get(pk=tag_id))
+
+        if self.override_asn:
+            document.archive_serial_number = self.override_asn
 
     def _write(self, storage_type, source, target):
         with open(source, "rb") as read_file:

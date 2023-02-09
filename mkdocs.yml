@@ -41,6 +41,7 @@ markdown_extensions:
       anchor_linenums: true
   - pymdownx.superfences
   - pymdownx.inlinehilite
+  - pymdownx.snippets
 strict: true
 nav:
     - index.md
@@ -54,7 +55,7 @@ nav:
     - 'FAQs': faq.md
     - troubleshooting.md
     - changelog.md
-copyright: Copyright &copy; 2016 - 2022 Daniel Quinn, Jonas Winkler, and the Paperless-ngx team
+copyright: Copyright &copy; 2016 - 2023 Daniel Quinn, Jonas Winkler, and the Paperless-ngx team
 extra:
   social:
     - icon: fontawesome/brands/github

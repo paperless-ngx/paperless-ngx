@@ -113,16 +113,12 @@ jobs:
       PAPERLESS_MAIL_TEST_HOST: ${{ secrets.TEST_MAIL_HOST }}
       PAPERLESS_MAIL_TEST_USER: ${{ secrets.TEST_MAIL_USER }}
       PAPERLESS_MAIL_TEST_PASSWD: ${{ secrets.TEST_MAIL_PASSWD }}
-      # Skip Tests which require convert
-      PAPERLESS_TEST_SKIP_CONVERT: 1
       # Enable Gotenberg end to end testing
       GOTENBERG_LIVE: 1
     steps:
       -
         name: Checkout
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
       -
         name: Start containers
         run: |
@@ -146,6 +142,10 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -qq --no-install-recommends unpaper tesseract-ocr imagemagick ghostscript libzbar0 poppler-utils
       -
+        name: Configure ImageMagick
+        run: |
+          sudo cp docker/imagemagick-policy.xml /etc/ImageMagick-6/policy.xml
+      -
         name: Install Python dependencies
         run: |
           pipenv --python ${{ steps.setup-python.outputs.python-version }} run python --version
@@ -160,27 +160,14 @@ jobs:
           cd src/
           pipenv --python ${{ steps.setup-python.outputs.python-version }} run pytest -ra
       -
-        name: Get changed files
-        id: changed-files-specific
-        uses: tj-actions/changed-files@v35
+        name: Upload coverage to Codecov
+        if: ${{ matrix.python-version == env.DEFAULT_PYTHON_VERSION }}
+        uses: codecov/codecov-action@v3
         with:
-          files: |
-            src/**
-      -
-        name: List all changed files
-        run: |
-          for file in ${{ steps.changed-files-specific.outputs.all_changed_files }}; do
-            echo "${file} was changed"
-          done
-      -
-        name: Publish coverage results
-        if: matrix.python-version == ${{ env.DEFAULT_PYTHON_VERSION }} && steps.changed-files-specific.outputs.any_changed == 'true'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        # https://github.com/coveralls-clients/coveralls-python/issues/251
-        run: |
-          cd src/
-          pipenv --python ${{ steps.setup-python.outputs.python-version }} run coveralls --service=github
+          # not required for public repos, but intermittently fails otherwise
+          token: ${{ secrets.CODECOV_TOKEN }}
+          # future expansion
+          flags: backend
       -
         name: Stop containers
         if: always()
@@ -212,12 +199,6 @@ jobs:
     name: Prepare Docker Pipeline Data
     if: github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/feature-') || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/beta' || contains(github.ref, 'beta.rc') || startsWith(github.ref, 'refs/tags/v'))
     runs-on: ubuntu-22.04
-    # If the push triggered the installer library workflow, wait for it to
-    # complete here.  This ensures the required versions for the final
-    # image have been built, while not waiting at all if the versions haven't changed
-    concurrency:
-      group: build-installer-library
-      cancel-in-progress: false
     needs:
       - documentation
       - tests-backend
@@ -353,7 +334,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
         name: Build and push
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           context: .
           file: ./Dockerfile
@@ -448,21 +429,48 @@ jobs:
       -
         name: Move files
         run: |
-          mkdir dist
-          mkdir dist/paperless-ngx
-          mkdir dist/paperless-ngx/scripts
-          cp .dockerignore .env Dockerfile Pipfile Pipfile.lock requirements.txt LICENSE README.md dist/paperless-ngx/
-          cp paperless.conf.example dist/paperless-ngx/paperless.conf
-          cp gunicorn.conf.py dist/paperless-ngx/gunicorn.conf.py
-          cp -r docker/ dist/paperless-ngx/docker
-          cp scripts/*.service scripts/*.sh scripts/*.socket dist/paperless-ngx/scripts/
-          cp -r src/ dist/paperless-ngx/src
-          cp -r docs/_build/html/ dist/paperless-ngx/docs
-          mv static dist/paperless-ngx
+          echo "Making dist folders"
+          for directory in dist \
+                          dist/paperless-ngx \
+                          dist/paperless-ngx/scripts;
+          do
+            mkdir --verbose --parents ${directory}
+          done
+
+          echo "Copying basic files"
+          for file_name in .dockerignore \
+                          .env \
+                          Dockerfile \
+                          Pipfile \
+                          Pipfile.lock \
+                          requirements.txt \
+                          LICENSE \
+                          README.md \
+                          paperless.conf.example \
+                          gunicorn.conf.py
+          do
+            cp --verbose ${file_name} dist/paperless-ngx/
+          done
+          mv --verbose dist/paperless-ngx/paperless.conf.example paperless.conf
+
+          echo "Copying Docker related files"
+          cp --recursive docker/ dist/paperless-ngx/docker
+
+          echo "Copying startup scripts"
+          cp --verbose scripts/*.service scripts/*.sh scripts/*.socket dist/paperless-ngx/scripts/
+
+          echo "Copying source files"
+          cp --recursive src/ dist/paperless-ngx/src
+          echo "Copying documentation"
+          cp --recursive docs/_build/html/ dist/paperless-ngx/docs
+
+          mv --verbose static dist/paperless-ngx
       -
         name: Make release package
         run: |
+          echo "Creating release archive"
           cd dist
+          sudo chown -R 1000:1000 paperless-ngx/
           tar -cJf paperless-ngx.tar.xz paperless-ngx/
       -
         name: Upload release artifact
@@ -500,7 +508,7 @@ jobs:
       -
         name: Create Release and Changelog
         id: create-release
-        uses: paperless-ngx/release-drafter@master
+        uses: release-drafter/release-drafter@v5
         with:
           name: Paperless-ngx ${{ steps.get_version.outputs.version }}
           tag: ${{ steps.get_version.outputs.version }}

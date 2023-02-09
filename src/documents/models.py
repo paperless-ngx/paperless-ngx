@@ -3,6 +3,7 @@ import logging
 import os
 import re
 from collections import OrderedDict
+from typing import Final
 from typing import Optional
 
 import dateutil.parser
@@ -10,6 +11,8 @@ import pathvalidate
 from celery import states
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.validators import MaxValueValidator
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -227,12 +230,19 @@ class Document(models.Model):
         help_text=_("The original name of the file when it was uploaded"),
     )
 
-    archive_serial_number = models.IntegerField(
+    ARCHIVE_SERIAL_NUMBER_MIN: Final[int] = 0
+    ARCHIVE_SERIAL_NUMBER_MAX: Final[int] = 0xFF_FF_FF_FF
+
+    archive_serial_number = models.PositiveIntegerField(
         _("archive serial number"),
         blank=True,
         null=True,
         unique=True,
         db_index=True,
+        validators=[
+            MaxValueValidator(ARCHIVE_SERIAL_NUMBER_MAX),
+            MinValueValidator(ARCHIVE_SERIAL_NUMBER_MIN),
+        ],
         help_text=_(
             "The position of this document in your physical document " "archive.",
         ),
@@ -549,7 +559,7 @@ class PaperlessTask(models.Model):
     task_file_name = models.CharField(
         null=True,
         max_length=255,
-        verbose_name=_("Task Name"),
+        verbose_name=_("Task Filename"),
         help_text=_("Name of the file which the Task was run for"),
     )
 

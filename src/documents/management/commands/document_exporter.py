@@ -4,6 +4,9 @@ import os
 import shutil
 import tempfile
 import time
+from pathlib import Path
+from typing import List
+from typing import Set
 
 import tqdm
 from django.conf import settings
@@ -61,15 +64,6 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
-            "-f",
-            "--use-filename-format",
-            default=False,
-            action="store_true",
-            help="Use PAPERLESS_FILENAME_FORMAT for storing files in the "
-            "export directory, if configured.",
-        )
-
-        parser.add_argument(
             "-d",
             "--delete",
             default=False,
@@ -80,10 +74,45 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
-            "--no-progress-bar",
+            "-f",
+            "--use-filename-format",
             default=False,
             action="store_true",
-            help="If set, the progress bar will not be shown",
+            help="Use PAPERLESS_FILENAME_FORMAT for storing files in the "
+            "export directory, if configured.",
+        )
+
+        parser.add_argument(
+            "-na",
+            "--no-archive",
+            default=False,
+            action="store_true",
+            help="Avoid exporting archive files",
+        )
+
+        parser.add_argument(
+            "-nt",
+            "--no-thumbnail",
+            default=False,
+            action="store_true",
+            help="Avoid exporting thumbnail files",
+        )
+
+        parser.add_argument(
+            "-p",
+            "--use-folder-prefix",
+            default=False,
+            action="store_true",
+            help="Export files in dedicated folders according to their nature: "
+            "archive, originals or thumbnails",
+        )
+
+        parser.add_argument(
+            "-sm",
+            "--split-manifest",
+            default=False,
+            action="store_true",
+            help="Export document information in individual manifest json files.",
         )
 
         parser.add_argument(
@@ -94,21 +123,36 @@ class Command(BaseCommand):
             help="Export the documents to a zip file in the given directory",
         )
 
+        parser.add_argument(
+            "--no-progress-bar",
+            default=False,
+            action="store_true",
+            help="If set, the progress bar will not be shown",
+        )
+
     def __init__(self, *args, **kwargs):
         BaseCommand.__init__(self, *args, **kwargs)
-        self.target = None
-        self.files_in_export_dir = []
-        self.exported_files = []
+        self.target: Path = None
+        self.split_manifest = False
+        self.files_in_export_dir: Set[Path] = set()
+        self.exported_files: List[Path] = []
         self.compare_checksums = False
         self.use_filename_format = False
+        self.use_folder_prefix = False
         self.delete = False
+        self.no_archive = False
+        self.no_thumbnail = False
 
     def handle(self, *args, **options):
 
-        self.target = options["target"]
+        self.target = Path(options["target"]).resolve()
+        self.split_manifest = options["split_manifest"]
         self.compare_checksums = options["compare_checksums"]
         self.use_filename_format = options["use_filename_format"]
+        self.use_folder_prefix = options["use_folder_prefix"]
         self.delete = options["delete"]
+        self.no_archive = options["no_archive"]
+        self.no_thumbnail = options["no_thumbnail"]
         zip_export: bool = options["zip"]
 
         # If zipping, save the original target for later and
@@ -121,10 +165,13 @@ class Command(BaseCommand):
                 dir=settings.SCRATCH_DIR,
                 prefix="paperless-export",
             )
-            self.target = temp_dir.name
+            self.target = Path(temp_dir.name).resolve()
 
-        if not os.path.exists(self.target):
+        if not self.target.exists():
             raise CommandError("That path doesn't exist")
+
+        if not self.target.is_dir():
+            raise CommandError("That path isn't a directory")
 
         if not os.access(self.target, os.W_OK):
             raise CommandError("That path doesn't appear to be writable")
@@ -152,10 +199,9 @@ class Command(BaseCommand):
 
     def dump(self, progress_bar_disable=False):
         # 1. Take a snapshot of what files exist in the current export folder
-        for root, dirs, files in os.walk(self.target):
-            self.files_in_export_dir.extend(
-                map(lambda f: os.path.abspath(os.path.join(root, f)), files),
-            )
+        for x in self.target.glob("**/*"):
+            if x.is_file():
+                self.files_in_export_dir.add(x.resolve())
 
         # 2. Create manifest, containing all correspondents, types, tags, storage paths
         # comments, documents and ui_settings
@@ -174,14 +220,17 @@ class Command(BaseCommand):
                 serializers.serialize("json", StoragePath.objects.all()),
             )
 
-            manifest += json.loads(
+            comments = json.loads(
                 serializers.serialize("json", Comment.objects.all()),
             )
+            if not self.split_manifest:
+                manifest += comments
 
             documents = Document.objects.order_by("id")
             document_map = {d.pk: d for d in documents}
             document_manifest = json.loads(serializers.serialize("json", documents))
-            manifest += document_manifest
+            if not self.split_manifest:
+                manifest += document_manifest
 
             manifest += json.loads(
                 serializers.serialize("json", MailAccount.objects.all()),
@@ -238,42 +287,49 @@ class Command(BaseCommand):
 
             # 3.3. write filenames into manifest
             original_name = base_name
-            original_target = os.path.join(self.target, original_name)
+            if self.use_folder_prefix:
+                original_name = os.path.join("originals", original_name)
+            original_target = (self.target / Path(original_name)).resolve()
             document_dict[EXPORTER_FILE_NAME] = original_name
 
-            thumbnail_name = base_name + "-thumbnail.webp"
-            thumbnail_target = os.path.join(self.target, thumbnail_name)
-            document_dict[EXPORTER_THUMBNAIL_NAME] = thumbnail_name
+            if not self.no_thumbnail:
+                thumbnail_name = base_name + "-thumbnail.webp"
+                if self.use_folder_prefix:
+                    thumbnail_name = os.path.join("thumbnails", thumbnail_name)
+                thumbnail_target = (self.target / Path(thumbnail_name)).resolve()
+                document_dict[EXPORTER_THUMBNAIL_NAME] = thumbnail_name
+            else:
+                thumbnail_target = None
 
-            if document.has_archive_version:
+            if not self.no_archive and document.has_archive_version:
                 archive_name = base_name + "-archive.pdf"
-                archive_target = os.path.join(self.target, archive_name)
+                if self.use_folder_prefix:
+                    archive_name = os.path.join("archive", archive_name)
+                archive_target = (self.target / Path(archive_name)).resolve()
                 document_dict[EXPORTER_ARCHIVE_NAME] = archive_name
             else:
                 archive_target = None
 
             # 3.4. write files to target folder
-            t = int(time.mktime(document.created.timetuple()))
             if document.storage_type == Document.STORAGE_TYPE_GPG:
+                t = int(time.mktime(document.created.timetuple()))
 
-                os.makedirs(os.path.dirname(original_target), exist_ok=True)
-                with open(original_target, "wb") as f:
-                    with document.source_file as out_file:
-                        f.write(GnuPG.decrypted(out_file))
-                        os.utime(original_target, times=(t, t))
+                original_target.parent.mkdir(parents=True, exist_ok=True)
+                with document.source_file as out_file:
+                    original_target.write_bytes(GnuPG.decrypted(out_file))
+                    os.utime(original_target, times=(t, t))
 
-                os.makedirs(os.path.dirname(thumbnail_target), exist_ok=True)
-                with open(thumbnail_target, "wb") as f:
+                if thumbnail_target:
+                    thumbnail_target.parent.mkdir(parents=True, exist_ok=True)
                     with document.thumbnail_file as out_file:
-                        f.write(GnuPG.decrypted(out_file))
+                        thumbnail_target.write_bytes(GnuPG.decrypted(out_file))
                         os.utime(thumbnail_target, times=(t, t))
 
                 if archive_target:
-                    os.makedirs(os.path.dirname(archive_target), exist_ok=True)
-                    with open(archive_target, "wb") as f:
-                        with document.archive_path as out_file:
-                            f.write(GnuPG.decrypted(out_file))
-                            os.utime(archive_target, times=(t, t))
+                    archive_target.parent.mkdir(parents=True, exist_ok=True)
+                    with document.archive_path as out_file:
+                        archive_target.write_bytes(GnuPG.decrypted(out_file))
+                        os.utime(archive_target, times=(t, t))
             else:
                 self.check_and_copy(
                     document.source_path,
@@ -281,7 +337,8 @@ class Command(BaseCommand):
                     original_target,
                 )
 
-                self.check_and_copy(document.thumbnail_path, None, thumbnail_target)
+                if thumbnail_target:
+                    self.check_and_copy(document.thumbnail_path, None, thumbnail_target)
 
                 if archive_target:
                     self.check_and_copy(
@@ -290,44 +347,59 @@ class Command(BaseCommand):
                         archive_target,
                     )
 
-        # 4.1 write manifest to target folder
-        manifest_path = os.path.abspath(os.path.join(self.target, "manifest.json"))
+            if self.split_manifest:
+                manifest_name = base_name + "-manifest.json"
+                if self.use_folder_prefix:
+                    manifest_name = os.path.join("json", manifest_name)
+                manifest_name = (self.target / Path(manifest_name)).resolve()
+                manifest_name.parent.mkdir(parents=True, exist_ok=True)
+                content = [document_manifest[index]]
+                content += list(
+                    filter(
+                        lambda d: d["fields"]["document"] == document_dict["pk"],
+                        comments,
+                    ),
+                )
+                manifest_name.write_text(json.dumps(content, indent=2))
+                if manifest_name in self.files_in_export_dir:
+                    self.files_in_export_dir.remove(manifest_name)
 
-        with open(manifest_path, "w") as f:
-            json.dump(manifest, f, indent=2)
+        # 4.1 write manifest to target folder
+        manifest_path = (self.target / Path("manifest.json")).resolve()
+        manifest_path.write_text(json.dumps(manifest, indent=2))
+        if manifest_path in self.files_in_export_dir:
+            self.files_in_export_dir.remove(manifest_path)
 
         # 4.2 write version information to target folder
-        version_path = os.path.abspath(os.path.join(self.target, "version.json"))
-
-        with open(version_path, "w") as f:
-            json.dump({"version": version.__full_version_str__}, f, indent=2)
+        version_path = (self.target / Path("version.json")).resolve()
+        version_path.write_text(
+            json.dumps({"version": version.__full_version_str__}, indent=2),
+        )
+        if version_path in self.files_in_export_dir:
+            self.files_in_export_dir.remove(version_path)
 
         if self.delete:
             # 5. Remove files which we did not explicitly export in this run
 
-            if manifest_path in self.files_in_export_dir:
-                self.files_in_export_dir.remove(manifest_path)
-
             for f in self.files_in_export_dir:
-                os.remove(f)
+                f.unlink()
 
                 delete_empty_directories(
-                    os.path.abspath(os.path.dirname(f)),
-                    os.path.abspath(self.target),
+                    f.parent,
+                    self.target,
                 )
 
-    def check_and_copy(self, source, source_checksum, target):
-        if os.path.abspath(target) in self.files_in_export_dir:
-            self.files_in_export_dir.remove(os.path.abspath(target))
+    def check_and_copy(self, source, source_checksum, target: Path):
+        if target in self.files_in_export_dir:
+            self.files_in_export_dir.remove(target)
 
         perform_copy = False
 
-        if os.path.exists(target):
+        if target.exists():
             source_stat = os.stat(source)
-            target_stat = os.stat(target)
+            target_stat = target.stat()
             if self.compare_checksums and source_checksum:
-                with open(target, "rb") as f:
-                    target_checksum = hashlib.md5(f.read()).hexdigest()
+                target_checksum = hashlib.md5(target.read_bytes()).hexdigest()
                 perform_copy = target_checksum != source_checksum
             elif source_stat.st_mtime != target_stat.st_mtime:
                 perform_copy = True
@@ -338,5 +410,5 @@ class Command(BaseCommand):
             perform_copy = True
 
         if perform_copy:
-            os.makedirs(os.path.dirname(target), exist_ok=True)
+            target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(source, target)

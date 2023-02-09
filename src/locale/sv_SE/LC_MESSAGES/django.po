@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-09 21:50+0000\n"
-"PO-Revision-Date: 2022-11-09 23:11\n"
+"PO-Revision-Date: 2023-01-10 22:57\n"
 "Last-Translator: \n"
 "Language-Team: Swedish\n"
 "Language: sv_SE\n"
@@ -100,15 +100,15 @@ msgstr "dokumenttyper"
 
 #: documents/models.py:93
 msgid "path"
-msgstr ""
+msgstr "sökväg"
 
 #: documents/models.py:99 documents/models.py:127
 msgid "storage path"
-msgstr ""
+msgstr "sökväg till lagring"
 
 #: documents/models.py:100
 msgid "storage paths"
-msgstr ""
+msgstr "sökvägar för lagring"
 
 #: documents/models.py:108
 msgid "Unencrypted"
@@ -184,11 +184,11 @@ msgstr "Nuvarande arkivfilnamn i lagringsutrymmet"
 
 #: documents/models.py:221
 msgid "original filename"
-msgstr ""
+msgstr "ursprungligt filnamn"
 
 #: documents/models.py:227
 msgid "The original name of the file when it was uploaded"
-msgstr ""
+msgstr "Det ursprungliga namnet på filen när den laddades upp"
 
 #: documents/models.py:231
 msgid "archive serial number"
@@ -212,7 +212,7 @@ msgstr "felsök"
 
 #: documents/models.py:332
 msgid "information"
-msgstr ""
+msgstr "information"
 
 #: documents/models.py:333
 msgid "warning"
@@ -364,19 +364,19 @@ msgstr "mer som detta"
 
 #: documents/models.py:409
 msgid "has tags in"
-msgstr ""
+msgstr "har taggar i"
 
 #: documents/models.py:410
 msgid "ASN greater than"
-msgstr ""
+msgstr "ASN större än"
 
 #: documents/models.py:411
 msgid "ASN less than"
-msgstr ""
+msgstr "ASN mindre än"
 
 #: documents/models.py:412
 msgid "storage path is"
-msgstr ""
+msgstr "sökväg till lagring är"
 
 #: documents/models.py:422
 msgid "rule type"
@@ -396,7 +396,7 @@ msgstr "filtrera regler"
 
 #: documents/models.py:536
 msgid "Task ID"
-msgstr ""
+msgstr "Uppgifts-ID"
 
 #: documents/models.py:537
 msgid "Celery ID for the Task that was run"
@@ -404,75 +404,75 @@ msgstr ""
 
 #: documents/models.py:542
 msgid "Acknowledged"
-msgstr ""
+msgstr "Bekräftad"
 
 #: documents/models.py:543
 msgid "If the task is acknowledged via the frontend or API"
-msgstr ""
+msgstr "Om uppgiften bekräftas via frontend eller API"
 
 #: documents/models.py:549 documents/models.py:556
 msgid "Task Name"
-msgstr ""
+msgstr "Uppgiftens namn"
 
 #: documents/models.py:550
 msgid "Name of the file which the Task was run for"
-msgstr ""
+msgstr "Namn på filen som aktiviteten kördes för"
 
 #: documents/models.py:557
 msgid "Name of the Task which was run"
-msgstr ""
+msgstr "Namn på uppgiften som kördes"
 
 #: documents/models.py:562
 msgid "Task Positional Arguments"
-msgstr ""
+msgstr "Uppgiftspositionellt Argument"
 
 #: documents/models.py:564
 msgid "JSON representation of the positional arguments used with the task"
-msgstr ""
+msgstr "JSON representation av positionsargumenten som användes med uppgiften"
 
 #: documents/models.py:569
 msgid "Task Named Arguments"
-msgstr ""
+msgstr "Uppgiftens namngivna argument"
 
 #: documents/models.py:571
 msgid "JSON representation of the named arguments used with the task"
-msgstr ""
+msgstr "JSON representation av de namngivna argument som används med uppgiften"
 
 #: documents/models.py:578
 msgid "Task State"
-msgstr ""
+msgstr "Uppgiftsstatus"
 
 #: documents/models.py:579
 msgid "Current state of the task being run"
-msgstr ""
+msgstr "Nuvarande tillstånd för uppgiften som körs"
 
 #: documents/models.py:584
 msgid "Created DateTime"
-msgstr ""
+msgstr "Skapad Datumtid"
 
 #: documents/models.py:585
 msgid "Datetime field when the task result was created in UTC"
-msgstr ""
+msgstr "Datumtidsfält när aktivitetsresultatet skapades i UTC"
 
 #: documents/models.py:590
 msgid "Started DateTime"
-msgstr ""
+msgstr "Startad datumtid"
 
 #: documents/models.py:591
 msgid "Datetime field when the task was started in UTC"
-msgstr ""
+msgstr "Datumfält när uppgiften startades i UTC"
 
 #: documents/models.py:596
 msgid "Completed DateTime"
-msgstr ""
+msgstr "Slutförd datumtid"
 
 #: documents/models.py:597
 msgid "Datetime field when the task was completed in UTC"
-msgstr ""
+msgstr "Datumtidsfält när uppgiften slutfördes i UTC"
 
 #: documents/models.py:602
 msgid "Result Data"
-msgstr ""
+msgstr "Resultatdata"
 
 #: documents/models.py:604
 msgid "The data returned by the task"

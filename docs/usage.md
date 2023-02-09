@@ -108,6 +108,8 @@ Furthermore, there is the [Paperless
 App](https://github.com/bauerj/paperless_app) as well, which not only
 has document upload, but also document browsing and download features.
 
+Another option is [Paperless Mobile](https://github.com/astubenbord/paperless-mobile), an Android app that supports document upload, scanning, management of labels and more.
+
 ### IMAP (Email) {#usage-email}
 
 You can tell paperless-ngx to consume documents from your email
@@ -150,6 +152,8 @@ different means. These are as follows:
   documents (the IMAP standard calls these "keywords"). Paperless
   will not consume mails already tagged. Not all mail servers support
   this feature!
+
+  - **Apple Mail support:** Apple Mail clients allow differently colored tags. For this to work use `apple:<color>` (e.g. _apple:green_) as a custom tag. Available colors are _red_, _orange_, _yellow_, _blue_, _green_, _violet_ and _grey_.
 
 !!! warning
 
@@ -358,6 +362,14 @@ documents in your inbox:
 4.  If the document has an ASN assigned, store it in a _single_ binder,
     sorted by ASN. Don't order this binder in any other way.
 5.  If the document has no ASN, throw it away. Yay!
+
+!!! tip
+
+    Instead of writing a number on the document by hand, you may also prepare
+    a spool of labels with barcodes with an ascending serial number, that are
+    formatted like `ASN00001`.
+    This also enables Paperless to automatically parse and process the ASN
+    (if enabled in the config), so that you don't need to manually assign it.
 
 Over time, you will notice that your physical binder will fill up. If it
 is full, label the binder with the range of ASNs in this binder (i.e.,

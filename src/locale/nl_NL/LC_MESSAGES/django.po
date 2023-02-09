@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-09 21:50+0000\n"
-"PO-Revision-Date: 2022-11-09 23:12\n"
+"PO-Revision-Date: 2023-01-23 12:37\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
@@ -184,11 +184,11 @@ msgstr "Huidige bestandsnaam in archief"
 
 #: documents/models.py:221
 msgid "original filename"
-msgstr ""
+msgstr "originele bestandsnaam"
 
 #: documents/models.py:227
 msgid "The original name of the file when it was uploaded"
-msgstr ""
+msgstr "De originele naam van het bestand wanneer het werd geüpload"
 
 #: documents/models.py:231
 msgid "archive serial number"

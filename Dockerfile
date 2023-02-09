@@ -1,18 +1,5 @@
 # syntax=docker/dockerfile:1.4
-
-# Pull the installer images from the library
-# These are all built previously
-# They provide either a .deb or .whl
-
-ARG JBIG2ENC_VERSION
-ARG QPDF_VERSION
-ARG PIKEPDF_VERSION
-ARG PSYCOPG2_VERSION
-
-FROM ghcr.io/paperless-ngx/paperless-ngx/builder/jbig2enc:${JBIG2ENC_VERSION} as jbig2enc-builder
-FROM ghcr.io/paperless-ngx/paperless-ngx/builder/qpdf:${QPDF_VERSION} as qpdf-builder
-FROM ghcr.io/paperless-ngx/paperless-ngx/builder/pikepdf:${PIKEPDF_VERSION} as pikepdf-builder
-FROM ghcr.io/paperless-ngx/paperless-ngx/builder/psycopg2:${PSYCOPG2_VERSION} as psycopg2-builder
+# https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/reference.md
 
 FROM --platform=$BUILDPLATFORM node:16-bullseye-slim AS compile-frontend
 
@@ -58,30 +45,23 @@ LABEL org.opencontainers.image.url="https://github.com/paperless-ngx/paperless-n
 LABEL org.opencontainers.image.licenses="GPL-3.0-only"
 
 ARG DEBIAN_FRONTEND=noninteractive
-# Buildx provided
+# Buildx provided, must be defined to use though
 ARG TARGETARCH
 ARG TARGETVARIANT
 
 # Workflow provided
+ARG JBIG2ENC_VERSION
 ARG QPDF_VERSION
+ARG PIKEPDF_VERSION
+ARG PSYCOPG2_VERSION
 
 #
 # Begin installation and configuration
 # Order the steps below from least often changed to most
 #
 
-# copy jbig2enc
-# Basically will never change again
-COPY --from=jbig2enc-builder /usr/src/jbig2enc/src/.libs/libjbig2enc* /usr/local/lib/
-COPY --from=jbig2enc-builder /usr/src/jbig2enc/src/jbig2 /usr/local/bin/
-COPY --from=jbig2enc-builder /usr/src/jbig2enc/src/*.h /usr/local/include/
-
 # Packages need for running
 ARG RUNTIME_PACKAGES="\
-  # Python
-  python3 \
-  python3-pip \
-  python3-setuptools \
   # General utils
   curl \
   # Docker specific
@@ -145,7 +125,7 @@ RUN set -eux \
     && apt-get install --yes --quiet --no-install-recommends ${RUNTIME_PACKAGES} \
     && rm -rf /var/lib/apt/lists/* \
   && echo "Installing supervisor" \
-    && python3 -m pip install --default-timeout=1000 --upgrade --no-cache-dir supervisor==4.2.4
+    && python3 -m pip install --default-timeout=1000 --upgrade --no-cache-dir supervisor==4.2.5
 
 # Copy gunicorn config
 # Changes very infrequently
@@ -154,7 +134,6 @@ WORKDIR /usr/src/paperless/
 COPY gunicorn.conf.py .
 
 # setup docker-specific things
-# Use mounts to avoid copying installer files into the image
 # These change sometimes, but rarely
 WORKDIR /usr/src/paperless/src/docker/
 
@@ -196,21 +175,31 @@ RUN set -eux \
     && ./install_management_commands.sh
 
 # Install the built packages from the installer library images
-# Use mounts to avoid copying installer files into the image
 # These change sometimes
-RUN --mount=type=bind,from=qpdf-builder,target=/qpdf \
-    --mount=type=bind,from=psycopg2-builder,target=/psycopg2 \
-    --mount=type=bind,from=pikepdf-builder,target=/pikepdf \
-  set -eux \
+RUN set -eux \
+  && echo "Getting binaries" \
+    && mkdir paperless-ngx \
+    && curl --fail --silent --show-error --output paperless-ngx.tar.gz --location https://github.com/paperless-ngx/paperless-ngx/archive/41d6e7e407af09a0882736d50c89b6e015997bff.tar.gz \
+    && tar -xf paperless-ngx.tar.gz --directory paperless-ngx --strip-components=1 \
+    && cd paperless-ngx \
+    # Setting a specific revision ensures we know what this installed
+    # and ensures cache breaking on changes
+  && echo "Installing jbig2enc" \
+    && cp ./jbig2enc/${JBIG2ENC_VERSION}/${TARGETARCH}${TARGETVARIANT}/jbig2 /usr/local/bin/ \
+    && cp ./jbig2enc/${JBIG2ENC_VERSION}/${TARGETARCH}${TARGETVARIANT}/libjbig2enc* /usr/local/lib/ \
   && echo "Installing qpdf" \
-    && apt-get install --yes --no-install-recommends /qpdf/usr/src/qpdf/${QPDF_VERSION}/${TARGETARCH}${TARGETVARIANT}/libqpdf29_*.deb \
-    && apt-get install --yes --no-install-recommends /qpdf/usr/src/qpdf/${QPDF_VERSION}/${TARGETARCH}${TARGETVARIANT}/qpdf_*.deb \
+    && apt-get install --yes --no-install-recommends ./qpdf/${QPDF_VERSION}/${TARGETARCH}${TARGETVARIANT}/libqpdf29_*.deb \
+    && apt-get install --yes --no-install-recommends ./qpdf/${QPDF_VERSION}/${TARGETARCH}${TARGETVARIANT}/qpdf_*.deb \
   && echo "Installing pikepdf and dependencies" \
-    && python3 -m pip install --no-cache-dir /pikepdf/usr/src/wheels/*.whl \
+    && python3 -m pip install --no-cache-dir ./pikepdf/${PIKEPDF_VERSION}/${TARGETARCH}${TARGETVARIANT}/*.whl \
     && python3 -m pip list \
   && echo "Installing psycopg2" \
-    && python3 -m pip install --no-cache-dir /psycopg2/usr/src/wheels/psycopg2*.whl \
-    && python3 -m pip list
+    && python3 -m pip install --no-cache-dir ./psycopg2/${PSYCOPG2_VERSION}/${TARGETARCH}${TARGETVARIANT}/psycopg2*.whl \
+    && python3 -m pip list \
+  && echo "Cleaning up image layer" \
+    && cd ../ \
+    && rm -rf paperless-ngx \
+    && rm paperless-ngx.tar.gz
 
 WORKDIR /usr/src/paperless/src/
 
@@ -234,9 +223,9 @@ RUN set -eux \
   && echo "Installing Python requirements" \
     && python3 -m pip install --default-timeout=1000 --no-cache-dir --requirement requirements.txt \
   && echo "Installing NLTK data" \
-    && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/local/share/nltk_data" snowball_data \
-    && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/local/share/nltk_data" stopwords \
-    && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/local/share/nltk_data" punkt \
+    && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/share/nltk_data" snowball_data \
+    && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/share/nltk_data" stopwords \
+    && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/share/nltk_data" punkt \
   && echo "Cleaning up image" \
     && apt-get -y purge ${BUILD_PACKAGES} \
     && apt-get -y autoremove --purge \
@@ -254,11 +243,12 @@ COPY ./src ./
 COPY --from=compile-frontend /src/src/documents/static/frontend/ ./documents/static/frontend/
 
 # add users, setup scripts
+# Mount the compiled frontend to expected location
 RUN set -eux \
   && addgroup --gid 1000 paperless \
   && useradd --uid 1000 --gid paperless --home-dir /usr/src/paperless paperless \
-  && chown -R paperless:paperless ../ \
-  && gosu paperless python3 manage.py collectstatic --clear --no-input \
+  && chown -R paperless:paperless /usr/src/paperless \
+  && gosu paperless python3 manage.py collectstatic --clear --no-input --link \
   && gosu paperless python3 manage.py compilemessages
 
 VOLUME ["/usr/src/paperless/data", \

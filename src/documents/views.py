@@ -176,7 +176,7 @@ class TagViewSet(ModelViewSet):
     permission_classes = (IsAuthenticated,)
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filterset_class = TagFilterSet
-    ordering_fields = ("name", "matching_algorithm", "match", "document_count")
+    ordering_fields = ("color", "name", "matching_algorithm", "match", "document_count")
 
 
 class DocumentTypeViewSet(ModelViewSet):
@@ -445,6 +445,10 @@ class DocumentViewSet(
                 )
                 c.save()
 
+                from documents import index
+
+                index.add_or_update_document(self.get_object())
+
                 return Response(self.getComments(doc))
             except Exception as e:
                 logger.warning(f"An error occurred saving comment: {str(e)}")
@@ -456,6 +460,11 @@ class DocumentViewSet(
         elif request.method == "DELETE":
             comment = Comment.objects.get(id=int(request.GET.get("id")))
             comment.delete()
+
+            from documents import index
+
+            index.add_or_update_document(self.get_object())
+
             return Response(self.getComments(doc))
 
         return Response(
@@ -468,19 +477,14 @@ class DocumentViewSet(
 class SearchResultSerializer(DocumentSerializer):
     def to_representation(self, instance):
         doc = Document.objects.get(id=instance["id"])
-        commentTerm = instance.results.q.subqueries[0]
         comments = ",".join(
-            [
-                str(c.comment)
-                for c in Comment.objects.filter(document=instance["id"])
-                if commentTerm.text in c.comment
-            ],
+            [str(c.comment) for c in Comment.objects.filter(document=instance["id"])],
         )
         r = super().to_representation(doc)
         r["__search_hit__"] = {
             "score": instance.score,
             "highlights": instance.highlights("content", text=doc.content),
-            "comment_highlights": instance.highlights("content", text=comments)
+            "comment_highlights": instance.highlights("comments", text=comments)
             if doc
             else None,
             "rank": instance.rank,

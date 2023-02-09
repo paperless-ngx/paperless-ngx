@@ -121,7 +121,17 @@ Executed after the consumer sees a new document in the consumption
 folder, but before any processing of the document is performed. This
 script can access the following relevant environment variables set:
 
-- `DOCUMENT_SOURCE_PATH`
+| Environment Variable    | Description                                                  |
+| ----------------------- | ------------------------------------------------------------ |
+| `DOCUMENT_SOURCE_PATH`  | Original path of the consumed document                       |
+| `DOCUMENT_WORKING_PATH` | Path to a copy of the original that consumption will work on |
+
+!!! note
+
+    Pre-consume scripts which modify the document should only change
+    the `DOCUMENT_WORKING_PATH` file or a second consume task may
+    be triggered, leading to failures as two tasks work on the
+    same document path
 
 A simple but common example for this would be creating a simple script
 like this:
@@ -130,7 +140,7 @@ like this:
 
 ```bash
 #!/usr/bin/env bash
-pdf2pdfocr.py -i ${DOCUMENT_SOURCE_PATH}
+pdf2pdfocr.py -i ${DOCUMENT_WORKING_PATH}
 ```
 
 `/etc/paperless.conf`
@@ -157,26 +167,36 @@ Executed after the consumer has successfully processed a document and
 has moved it into paperless. It receives the following environment
 variables:
 
-- `DOCUMENT_ID`
-- `DOCUMENT_FILE_NAME`
-- `DOCUMENT_CREATED`
-- `DOCUMENT_MODIFIED`
-- `DOCUMENT_ADDED`
-- `DOCUMENT_SOURCE_PATH`
-- `DOCUMENT_ARCHIVE_PATH`
-- `DOCUMENT_THUMBNAIL_PATH`
-- `DOCUMENT_DOWNLOAD_URL`
-- `DOCUMENT_THUMBNAIL_URL`
-- `DOCUMENT_CORRESPONDENT`
-- `DOCUMENT_TAGS`
-- `DOCUMENT_ORIGINAL_FILENAME`
+| Environment Variable         | Description                                   |
+| ---------------------------- | --------------------------------------------- |
+| `DOCUMENT_ID`                | Database primary key of the document          |
+| `DOCUMENT_FILE_NAME`         | Formatted filename, not including paths       |
+| `DOCUMENT_CREATED`           | Date & time when document created             |
+| `DOCUMENT_MODIFIED`          | Date & time when document was last modified   |
+| `DOCUMENT_ADDED`             | Date & time when document was added           |
+| `DOCUMENT_SOURCE_PATH`       | Path to the original document file            |
+| `DOCUMENT_ARCHIVE_PATH`      | Path to the generate archive file (if any)    |
+| `DOCUMENT_THUMBNAIL_PATH`    | Path to the generated thumbnail               |
+| `DOCUMENT_DOWNLOAD_URL`      | URL for document download                     |
+| `DOCUMENT_THUMBNAIL_URL`     | URL for the document thumbnail                |
+| `DOCUMENT_CORRESPONDENT`     | Assigned correspondent (if any)               |
+| `DOCUMENT_TAGS`              | Comma separated list of tags applied (if any) |
+| `DOCUMENT_ORIGINAL_FILENAME` | Filename of original document                 |
 
-The script can be in any language, but for a simple shell script
-example, you can take a look at
-[post-consumption-example.sh](https://github.com/paperless-ngx/paperless-ngx/blob/main/scripts/post-consumption-example.sh)
-in this project.
+The script can be in any language, A simple shell script example:
 
-The post consumption script cannot cancel the consumption process.
+```bash title="post-consumption-example"
+--8<-- "./scripts/post-consumption-example.sh"
+```
+
+!!! note
+
+    The post consumption script cannot cancel the consumption process.
+
+!!! warning
+
+    The post consumption script should not modify the document files
+    directly
 
 The script's stdout and stderr will be logged line by line to the
 webserver log, along with the exit code of the script.
@@ -336,6 +356,13 @@ value.
     However, keep in mind that inside docker, if files get stored outside of
     the predefined volumes, they will be lost after a restart of paperless.
 
+!!! warning
+
+    When file naming handling, in particular when using `{tag_list}`,
+    you may run into the limits of your operating system's maximum
+    path lengths.  Files will retain the previous path instead and
+    the issue logged.
+
 ## Storage paths
 
 One of the best things in Paperless is that you can not only access the
@@ -392,7 +419,7 @@ structure as in the previous example above.
     If you adjust the format of an existing storage path, old documents
     don't get relocated automatically. You need to run the
     [document renamer](/administration#renamer) to
-    adjust their pathes.
+    adjust their paths.
 
 ## Celery Monitoring {#celery-monitoring}
 
