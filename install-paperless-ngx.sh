@@ -346,7 +346,7 @@ read -r -a OCR_LANGUAGES_ARRAY <<< "${_split_langs}"
 	fi
 } > docker-compose.env
 
-sed -i "s/- 8000:8000/- $PORT:8000/g" docker-compose.yml
+sed -i "s/- 8000:8000/- \"$PORT:8000\"/g" docker-compose.yml
 
 sed -i "s#- \./consume:/usr/src/paperless/consume#- $CONSUME_FOLDER:/usr/src/paperless/consume#g" docker-compose.yml
 
