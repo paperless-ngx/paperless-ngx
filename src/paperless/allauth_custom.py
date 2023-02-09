@@ -11,7 +11,7 @@ from django.urls import reverse
 from django.urls import reverse_lazy
 from django.views.generic import RedirectView
 
-logger = logging.getLogger("paperless.handlers")
+logger = logging.getLogger("paperless.allauth")
 
 
 def raise_404(*args, **kwargs):
@@ -49,7 +49,7 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
 
     def is_auto_signup_allowed(self, *args, **kwargs):
         if getattr(settings, "SSO_AUTO_LINK_MULTIPLE", True):
-            # Skip allauth default logic of checkign for an existing user with
+            # Skip allauth default logic of checking for an existing user with
             # the same email address. This requires paperless administrators to
             # trust the SSO providers connected to paperless.
             return True

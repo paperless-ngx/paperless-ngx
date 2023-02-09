@@ -72,11 +72,20 @@ def __get_path(key: str, default: str) -> str:
     return os.path.abspath(os.path.normpath(os.environ.get(key, default)))
 
 
-def __get_list(key: str, default: Optional[List[str]] = None) -> List[str]:
+def __get_list(
+    key: str,
+    sep: str = ",",
+    default: Optional[List[str]] = None,
+) -> List[str]:
     """
-    Return a list of strings based on the environment variable or an empty list
+    Return a list of strings based on the environment variable or an given default
+    list, if provided or an empty list
     """
-    return os.getenv(key).split(",") if os.getenv(key) else []
+    if key in os.environ:
+        os.getenv(key).split(sep)
+    elif default is not None:
+        return default
+    return []
 
 
 def _parse_redis_url(env_redis: Optional[str]) -> Tuple[str]:
@@ -249,7 +258,7 @@ SCRATCH_DIR = __get_path(
 ###############################################################################
 
 
-def _get_oidc_server():
+def _get_oidc_server() -> Optional[Dict]:
     config_id = os.environ.get("PAPERLESS_SSO_OIDC_ID")
     name = os.environ.get("PAPERLESS_SSO_OIDC_NAME")
     url = os.environ.get("PAPERLESS_SSO_OIDC_URL")
@@ -265,6 +274,7 @@ def _get_oidc_server():
                 "secret": secret,
             },
         }
+    return None
 
 
 _allauth_provider_modules = set(__get_list("PAPERLESS_SSO_MODULES"))
@@ -946,6 +956,8 @@ if SSO_ENABLED:
         "PAPERLESS_SSO_AUTO_LINK_MULTIPLE",
         "yes",
     )
+
+    # TODO This setting is unused and not part of django-allauth
     SSO_SIGNUP_ONLY = __get_boolean(
         "PAPERLESS_SSO_SIGNUP_ONLY",
         "yes",
@@ -972,6 +984,7 @@ if SSO_ENABLED:
     SOCIALACCOUNT_ADAPTER = "paperless.allauth_custom.CustomSocialAccountAdapter"
     SOCIALACCOUNT_LOGIN_ON_GET = __get_boolean(
         "PAPERLESS_SSO_LOGIN_ON_GET",
+        "no",
     )
     SOCIALACCOUNT_PROVIDERS = json.loads(
         os.environ.get("PAPERLESS_SSO_PROVIDERS", "{}"),
