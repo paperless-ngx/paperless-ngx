@@ -278,13 +278,13 @@
           <context context-type="linenumber">13</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="7103632680753685326" datatype="html">
+      <trans-unit id="7103632680753685326" datatype="html" approved="yes">
         <source>Drop files to begin upload</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.html</context>
           <context context-type="linenumber">7</context>
         </context-group>
-        <target state="translated">Déposez des fichiers pour commencer l'envoi</target>
+        <target state="final">Déposez des fichiers pour commencer l'envoi</target>
       </trans-unit>
       <trans-unit id="9103526311244275943" datatype="html" approved="yes">
         <source>Document added</source>
@@ -3042,7 +3042,7 @@
         </context-group>
         <target state="final">Vue</target>
       </trans-unit>
-      <trans-unit id="78870852467682010" datatype="html">
+      <trans-unit id="78870852467682010" datatype="html" approved="yes">
         <source>Filter by document type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
@@ -3052,9 +3052,9 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">187</context>
         </context-group>
-        <target state="translated">Filtrer par type de document</target>
+        <target state="final">Filtrer par type de document</target>
       </trans-unit>
-      <trans-unit id="157572966557284263" datatype="html">
+      <trans-unit id="157572966557284263" datatype="html" approved="yes">
         <source>Filter by storage path</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
@@ -3064,7 +3064,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">192</context>
         </context-group>
-        <target state="translated">Filtrer par chemin de stockage</target>
+        <target state="final">Filtrer par chemin de stockage</target>
       </trans-unit>
       <trans-unit id="3727324658595204357" datatype="html">
         <source>Created: <x id="INTERPOLATION" equiv-text="{{ document.created | customDate }}"/></source>
@@ -3510,13 +3510,13 @@
         </context-group>
         <target state="translated">Type de document</target>
       </trans-unit>
-      <trans-unit id="2992451138146293104" datatype="html">
+      <trans-unit id="2992451138146293104" datatype="html" approved="yes">
         <source>document types</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.ts</context>
           <context context-type="linenumber">31</context>
         </context-group>
-        <target state="translated">types de document</target>
+        <target state="final">types de document</target>
       </trans-unit>
       <trans-unit id="4990731724078522539" datatype="html" approved="yes">
         <source>Do you really want to delete the document type &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
