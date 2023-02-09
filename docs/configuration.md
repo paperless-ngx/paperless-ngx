@@ -371,6 +371,89 @@ redirect the user back to the SSO application's logout page.
 
     Defaults to None, which disables this feature.
 
+### Single Sign On
+
+Paperless can be configured to utilize Single Sign On (SSO) through OpenID Connect (OIDC) or
+social account providers supported by django-allauth. Check its [providers listing](https://django-allauth.readthedocs.io/en/latest/providers.html)
+and [configuration](https://django-allauth.readthedocs.io/en/latest/configuration.html) for more details.
+
+Utilizing OIDC will also require configuration of the identity management tool, which varies depending
+on the tool used.
+
+For details, refer to the documentation of your identity provider. Some common tools include:
+
+- [Authelia](https://www.authelia.com/configuration/identity-providers/open-id-connect/)
+- [authentik](https://goauthentik.io/docs/providers/oauth2/
+
+`PAPERLESS_SSO_OIDC_NAME=<string>`
+
+: The name of your OIDC provider
+
+`PAPERLESS_SSO_OIDC_ID=<string>`
+
+: The ID of your OIDC provider
+
+: If not set, defaults based on `PAPERLESS_SSO_OIDC_NAME`.
+
+`PAPERLESS_SSO_OIDC_URL=<url>`
+
+: The URL of your OIDC provider.
+
+`PAPERLESS_SSO_OIDC_CLIENT_ID=<string>`
+
+: The client ID as configured for paperless in your OIDC provider.
+
+`PAPERLESS_SSO_OIDC_SECRET=<string>`
+
+: The shared secret as configured for paperless in your OIDC provider.
+
+`PAPERLESS_SSO_MODULES=<comma separated list>`
+
+: Account providers from `django-allauth`'s [supported providers](https://django-allauth.readthedocs.io/en/latest/providers.html)
+
+: Defaults to empty list, configuring no social account providers
+
+`PAPERLESS_SSO_AUTO_LINK=<bool>`
+
+: If True, paperless will create a user on successful login via configured external provider
+
+: Defaults to True if SSO is configured
+
+`PAPERLESS_SSO_AUTO_LINK_MULTIPLE=<bool>`
+
+: If True, paperless will skip checking for an existing user with the same email address.
+
+: Defaults to True if SSO is configured
+
+`PAPERLESS_LOGIN_ENABLE_SIGNUP=>bool>`
+
+: If False, disables new account signup
+
+: Defaults to False, if SSO is configured
+
+`PAPERLESS_LOGIN_HIDE_PASSWORD_FORM=<bool>`
+
+: If True, hides the sign-in form to display only the OIDC login.
+
+: Defaults to False, if SSO is configured
+
+`PAPERLESS_SSO_LOGIN_ON_GET=<bool>`
+
+: Sets `django-allauth` setting `SOCIALACCOUNT_LOGIN_ON_GET`.
+
+: See [django-allauth configuration](https://django-allauth.readthedocs.io/en/latest/configuration.html) for details.
+
+: Defaults to False
+
+`PAPERLESS_SSO_PROVIDERS=<json string>`
+
+: Sets `django-allauth` setting `SOCIALACCOUNT_PROVIDERS `, allowing configuration of
+provider specific settings.
+
+: See [django-allauth configuration](https://django-allauth.readthedocs.io/en/latest/configuration.html) for details.
+
+: Defaults to no configuration.
+
 ## OCR settings {#ocr}
 
 Paperless uses [OCRmyPDF](https://ocrmypdf.readthedocs.io/en/latest/)
