@@ -48,9 +48,7 @@ def __get_boolean(key: str, default: str = "NO") -> bool:
     Return a boolean value based on whatever the user has supplied in the
     environment based on whether the value "looks like" it's True or not.
     """
-    return bool(
-        os.getenv(key, default).lower() in ("yes", "y", "1", "t", "true"),
-    )
+    return bool(os.getenv(key, default).lower() in ("yes", "y", "1", "t", "true"))
 
 
 def __get_int(key: str, default: int) -> int:
@@ -214,23 +212,14 @@ DEBUG = __get_boolean("PAPERLESS_DEBUG", "NO")
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-STATIC_ROOT = __get_path(
-    "PAPERLESS_STATICDIR",
-    os.path.join(BASE_DIR, "..", "static"),
-)
+STATIC_ROOT = __get_path("PAPERLESS_STATICDIR", os.path.join(BASE_DIR, "..", "static"))
 
-MEDIA_ROOT = __get_path(
-    "PAPERLESS_MEDIA_ROOT",
-    os.path.join(BASE_DIR, "..", "media"),
-)
+MEDIA_ROOT = __get_path("PAPERLESS_MEDIA_ROOT", os.path.join(BASE_DIR, "..", "media"))
 ORIGINALS_DIR = os.path.join(MEDIA_ROOT, "documents", "originals")
 ARCHIVE_DIR = os.path.join(MEDIA_ROOT, "documents", "archive")
 THUMBNAIL_DIR = os.path.join(MEDIA_ROOT, "documents", "thumbnails")
 
-DATA_DIR = __get_path(
-    "PAPERLESS_DATA_DIR",
-    os.path.join(BASE_DIR, "..", "data"),
-)
+DATA_DIR = __get_path("PAPERLESS_DATA_DIR", os.path.join(BASE_DIR, "..", "data"))
 
 NLTK_DIR = __get_path("PAPERLESS_NLTK_DIR", "/usr/share/nltk_data")
 
@@ -242,10 +231,7 @@ MEDIA_LOCK = os.path.join(MEDIA_ROOT, "media.lock")
 INDEX_DIR = os.path.join(DATA_DIR, "index")
 MODEL_FILE = os.path.join(DATA_DIR, "classification_model.pickle")
 
-LOGGING_DIR = __get_path(
-    "PAPERLESS_LOGGING_DIR",
-    os.path.join(DATA_DIR, "log"),
-)
+LOGGING_DIR = __get_path("PAPERLESS_LOGGING_DIR", os.path.join(DATA_DIR, "log"))
 
 CONSUMPTION_DIR = __get_path(
     "PAPERLESS_CONSUMPTION_DIR",
@@ -414,9 +400,7 @@ CHANNEL_LAYERS = {
 AUTO_LOGIN_USERNAME = os.getenv("PAPERLESS_AUTO_LOGIN_USERNAME")
 
 if AUTO_LOGIN_USERNAME:
-    _index = MIDDLEWARE.index(
-        "django.contrib.auth.middleware.AuthenticationMiddleware",
-    )
+    _index = MIDDLEWARE.index("django.contrib.auth.middleware.AuthenticationMiddleware")
     # This overrides everything the auth middleware is doing but still allows
     # regular login in case the provided user does not exist.
     MIDDLEWARE.insert(_index + 1, "paperless.auth.AutoLoginMiddleware")
@@ -457,9 +441,7 @@ else:
 
 # We allow CORS from localhost:8000
 CORS_ALLOWED_ORIGINS = tuple(
-    os.getenv("PAPERLESS_CORS_ALLOWED_HOSTS", "http://localhost:8000").split(
-        ",",
-    ),
+    os.getenv("PAPERLESS_CORS_ALLOWED_HOSTS", "http://localhost:8000").split(","),
 )
 
 if DEBUG:
@@ -734,9 +716,7 @@ CONSUMER_INOTIFY_DELAY: Final[float] = __get_float(
     0.5,
 )
 
-CONSUMER_DELETE_DUPLICATES = __get_boolean(
-    "PAPERLESS_CONSUMER_DELETE_DUPLICATES",
-)
+CONSUMER_DELETE_DUPLICATES = __get_boolean("PAPERLESS_CONSUMER_DELETE_DUPLICATES")
 
 CONSUMER_RECURSIVE = __get_boolean("PAPERLESS_CONSUMER_RECURSIVE")
 
@@ -801,9 +781,7 @@ OCR_ROTATE_PAGES_THRESHOLD = float(
 
 OCR_MAX_IMAGE_PIXELS: Optional[int] = None
 if os.environ.get("PAPERLESS_OCR_MAX_IMAGE_PIXELS") is not None:
-    OCR_MAX_IMAGE_PIXELS: int = int(
-        os.environ.get("PAPERLESS_OCR_MAX_IMAGE_PIXELS"),
-    )
+    OCR_MAX_IMAGE_PIXELS: int = int(os.environ.get("PAPERLESS_OCR_MAX_IMAGE_PIXELS"))
 
 OCR_USER_ARGS = os.getenv("PAPERLESS_OCR_USER_ARGS", "{}")
 
