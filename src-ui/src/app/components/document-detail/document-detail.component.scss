@@ -22,6 +22,10 @@
   --page-margin: 1px 0 20px;
 }
 
+::ng-deep .ng-select-taggable {
+  max-width: calc(100% - 46px); // fudge factor for ng-select button width
+}
+
 .password-prompt {
   position: absolute;
   top: 30%;
