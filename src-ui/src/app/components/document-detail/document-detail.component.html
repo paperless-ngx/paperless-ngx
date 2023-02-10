@@ -17,7 +17,7 @@
             <svg class="buttonicon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#download" />
             </svg><span class="d-none d-lg-inline ps-1" i18n>Download</span>
-        </a>
+        </a>                
 
         <div class="btn-group" ngbDropdown role="group" *ngIf="metadata?.has_archive_version">
             <button class="btn btn-sm btn-outline-primary dropdown-toggle-split" ngbDropdownToggle></button>
@@ -27,6 +27,13 @@
         </div>
 
     </div>
+
+
+    <button type="button" class="btn btn-sm btn-outline-primary me-2" (click)="downloadContent(document)">
+        <svg class="buttonicon" fill="currentColor">
+            <use xlink:href="assets/bootstrap-icons.svg#download" />
+        </svg><span class="d-none d-lg-inline ps-1" i18n>Download OCR</span>
+    </button>
 
     <button type="button" class="btn btn-sm btn-outline-primary me-2" (click)="redoOcr()">
         <svg class="buttonicon" fill="currentColor">
@@ -87,13 +94,16 @@
                     </ng-template>
                 </li>
 
-                <li [ngbNavItem]="2">
+                <li [ngbNavItem]="2" >
                     <a ngbNavLink i18n>Content</a>
-                    <ng-template ngbNavContent>
+                    <ng-template ngbNavContent class="mb-3">
                         <div class="mb-3">
                             <textarea class="form-control" id="content" rows="20" formControlName='content' [class.rtl]="isRTL"></textarea>
                         </div>
+                        
                     </ng-template>
+                   
+            
                 </li>
 
                 <li [ngbNavItem]="3">

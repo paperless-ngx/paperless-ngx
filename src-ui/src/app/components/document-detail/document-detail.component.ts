@@ -260,6 +260,19 @@ export class DocumentDetailComponent
     this.unsubscribeNotifier.complete()
   }
 
+  downloadContent(doc: PaperlessDocument): void {
+    var element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(doc.content));
+    element.setAttribute('download', doc.title);
+  
+    element.style.display = 'none';
+    document.body.appendChild(element);
+  
+    element.click();
+  
+    document.body.removeChild(element);
+  }
+
   updateComponent(doc: PaperlessDocument) {
     this.document = doc
     this.requiresPassword = false
