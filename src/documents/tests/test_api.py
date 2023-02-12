@@ -3199,6 +3199,30 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(StoragePath.objects.count(), 1)
 
+    def test_api_storage_path_placeholders(self):
+        """
+        GIVEN:
+            - API request to create a storage path with placeholders
+            - Storage path is valid
+        WHEN:
+            - API is called
+        THEN:
+            - Correct HTTP response
+            - New storage path is created
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Storage path with placeholders",
+                    "path": "{title}/{correspondent}/{document_type}/{created}/{created_year}/{created_year_short}/{created_month}/{created_month_name}/{created_month_name_short}/{created_day}/{added}/{added_year}/{added_year_short}/{added_month}/{added_month_name}/{added_month_name_short}/{added_day}/{asn}/{tags}/{tag_list}/",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(StoragePath.objects.count(), 2)
+
 
 class TestTasks(DirectoriesMixin, APITestCase):
     ENDPOINT = "/api/tasks/"
