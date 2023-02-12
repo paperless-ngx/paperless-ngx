@@ -31,10 +31,9 @@
 version: "3.4"
 services:
   broker:
-    image: docker.io/library/redis:7
-    restart: unless-stopped
-    volumes:
-      - redisdata:/data
+    extends:
+      file: docker-compose.lib.yaml
+      service: broker
 
   db:
     image: docker.io/library/postgres:13
@@ -47,23 +46,12 @@ services:
       POSTGRES_PASSWORD: paperless
 
   webserver:
-    image: ghcr.io/paperless-ngx/paperless-ngx:latest
-    restart: unless-stopped
+    extends:
+      file: docker-compose.lib.yaml
+      service: webserver
     depends_on:
       - db
       - broker
-    ports:
-      - "8010:8000"
-    healthcheck:
-      test: ["CMD", "curl", "-fs", "-S", "--max-time", "2", "http://localhost:8000"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-    volumes:
-      - data:/usr/src/paperless/data
-      - media:/usr/src/paperless/media
-      - ./export:/usr/src/paperless/export
-      - ./consume:/usr/src/paperless/consume
     environment:
       PAPERLESS_REDIS: redis://broker:6379
       PAPERLESS_DBHOST: db

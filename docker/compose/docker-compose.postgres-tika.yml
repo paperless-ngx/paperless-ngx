@@ -33,42 +33,24 @@
 version: "3.4"
 services:
   broker:
-    image: docker.io/library/redis:7
-    restart: unless-stopped
-    volumes:
-      - redisdata:/data
+    extends:
+      file: docker-compose.lib.yaml
+      service: broker
 
   db:
-    image: docker.io/library/postgres:13
-    restart: unless-stopped
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    environment:
-      POSTGRES_DB: paperless
-      POSTGRES_USER: paperless
-      POSTGRES_PASSWORD: paperless
+    extends:
+      file: docker-compose.lib.yaml
+      service: postgres
 
   webserver:
-    image: ghcr.io/paperless-ngx/paperless-ngx:latest
-    restart: unless-stopped
+    extends:
+      file: docker-compose.lib.yaml
+      service: webserver
     depends_on:
       - db
       - broker
       - gotenberg
       - tika
-    ports:
-      - "8000:8000"
-    healthcheck:
-      test: ["CMD", "curl", "-fs", "-S", "--max-time", "2", "http://localhost:8000"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-    volumes:
-      - data:/usr/src/paperless/data
-      - media:/usr/src/paperless/media
-      - ./export:/usr/src/paperless/export
-      - ./consume:/usr/src/paperless/consume
-    env_file: docker-compose.env
     environment:
       PAPERLESS_REDIS: redis://broker:6379
       PAPERLESS_DBHOST: db
@@ -77,19 +59,14 @@ services:
       PAPERLESS_TIKA_ENDPOINT: http://tika:9998
 
   gotenberg:
-    image: docker.io/gotenberg/gotenberg:7.6
-    restart: unless-stopped
-
-    # The gotenberg chromium route is used to convert .eml files. We do not
-    # want to allow external content like tracking pixels or even javascript.
-    command:
-      - "gotenberg"
-      - "--chromium-disable-javascript=true"
-      - "--chromium-allow-list=file:///tmp/.*"
+    extends:
+      file: docker-compose.lib.yaml
+      service: gotenberg
 
   tika:
-    image: ghcr.io/paperless-ngx/tika:latest
-    restart: unless-stopped
+    extends:
+      file: docker-compose.lib.yaml
+      service: tika
 
 volumes:
   data:
