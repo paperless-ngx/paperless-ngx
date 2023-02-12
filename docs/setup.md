@@ -6,6 +6,7 @@ You can go multiple routes to setup and run Paperless:
 - [Pull the image from Docker Hub](#docker_hub)
 - [Build the Docker image yourself](#docker_build)
 - [Install Paperless directly on your system manually (bare metal)](#bare_metal)
+- [Install Paperless directly on your system using portainer](#portainer)
 
 The Docker routes are quick & easy. These are the recommended routes.
 This configures all the stuff from the above automatically so that it
@@ -882,3 +883,59 @@ reverse proxy. Please refer to the [hosting and security](/configuration#hosting
 Also read
 [this](https://channels.readthedocs.io/en/stable/deploying.html#nginx-supervisor-ubuntu),
 towards the end of the section.
+
+### Install on Protainer {#portainer}
+
+On the NAS supporting Docker we usually don't have docker-compose to install a Docker application.
+
+To be able to use it you can use [Protainer](https://www.portainer.io/).
+
+1. Install Portainer on your NAS, see the [official documentation](https://docs.portainer.io/start/install-ce/server/docker/linux).
+
+2. Open https://<nas host name>:9443.
+
+3. Click on the environment usualy `locale`.
+
+4. Click on `Stacks`.
+
+5. Click on `+ Add stack`.
+
+6. Click on `Repository`.
+
+7. Set the `Repository URL` to `https://github.com/paperless-ngx/paperless-ngx/`.
+
+8. Set the `Compose path` to `https://github.com/paperless-ngx/paperless-ngx/blob/main/docker/compose/docker-compose.<env>.yml`.
+   `<env>` define the sevice you will use, it can be `mariadb-tika.yml`,
+   `mariadb`, `portainer`, `postgres-tika`, `postgres`, `sqlite-tika`, `sqlite`.
+
+9. Fill the environment variables in `Environment variables`.
+
+   You should at leas have the following variables:
+
+   `USERMAP_UID` and `USERMAP_GID`
+   The UID and GID of the user used to run paperless in the container. Set this
+   to your UID and GID on the host so that you have write access to the
+   consumption directory.
+
+   `PAPERLESS_OCR_LANGUAGES`
+   Additional languages to install for text recognition, separated by a
+   whitespace. Note that this is
+   different from PAPERLESS_OCR_LANGUAGE (default=eng), which defines the
+   language used for OCR.
+   The container installs English, German, Italian, Spanish and French by
+   default.
+   See https://packages.debian.org/search?keywords=tesseract-ocr-&searchon=names&suite=buster
+   for available languages.
+
+   `PAPERLESS_SECRET_KEY`
+   Adjust this key if you plan to make paperless available publicly. It should
+   be a very long sequence of random characters. You don't need to remember it.
+
+   `PAPERLESS_TIME_ZONE`
+   Use this variable to set a timezone for the Paperless Docker containers. If not specified, defaults to UTC.
+
+   `PAPERLESS_OCR_LANGUAGE`
+   The default language to use for OCR. Set this to the language most of your
+   documents are written in.
+
+10. Click on `Deploy the stack`.
