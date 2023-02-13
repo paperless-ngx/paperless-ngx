@@ -892,50 +892,56 @@ To be able to use it you can use [Protainer](https://www.portainer.io/).
 
 1. Install Portainer on your NAS, see the [official documentation](https://docs.portainer.io/start/install-ce/server/docker/linux).
 
-2. Open https://<nas host name>:9443.
+2. Add the `paperless-ngx` stack.
 
-3. Click on the environment usualy `locale`.
+- Open https://<nas host name>:9443.
+- Click on the environment usualy `locale`.
+- Click on `Stacks`.
+- Click on `+ Add stack`.
+- Click on `Repository`.
+- Set the `Repository URL` to `https://github.com/paperless-ngx/paperless-ngx/`.
+- Set the `Compose path` to `https://github.com/paperless-ngx/paperless-ngx/blob/main/docker/portainer/docker-compose.<env>.yaml`.
+  `<env>` define the sevice you will use, it can be `mariadb-tika.yml`,
+  `mariadb`, `portainer`, `postgres-tika`, `postgres`, `sqlite-tika`, `sqlite`.
+- Fill the environment variables in `Environment variables`.
 
-4. Click on `Stacks`.
+  You should at leas have the following variables:
 
-5. Click on `+ Add stack`.
+  `PAPERLESS_FOLDER`
+  The directory where paperless will store its data.
+  The following directories should exist in your NAS:
 
-6. Click on `Repository`.
+  - ${PAPERLESS_FOLDER}/data
+  - ${PAPERLESS_FOLDER}/media
+  - ${PAPERLESS_FOLDER}/export
+  - ${PAPERLESS_FOLDER}/consume
+  - ${PAPERLESS_FOLDER}/pgdata # if you use postgres
+  - ${PAPERLESS_FOLDER}/dbdata # if you use mariadb
 
-7. Set the `Repository URL` to `https://github.com/paperless-ngx/paperless-ngx/`.
+  `USERMAP_UID` and `USERMAP_GID`
+  The UID and GID of the user used to run paperless in the container. Set this
+  to your UID and GID on the host so that you have write access to the
+  consumption directory.
 
-8. Set the `Compose path` to `https://github.com/paperless-ngx/paperless-ngx/blob/main/docker/compose/docker-compose.<env>.yml`.
-   `<env>` define the sevice you will use, it can be `mariadb-tika.yml`,
-   `mariadb`, `portainer`, `postgres-tika`, `postgres`, `sqlite-tika`, `sqlite`.
+  `PAPERLESS_OCR_LANGUAGES`
+  Additional languages to install for text recognition, separated by a
+  whitespace. Note that this is
+  different from PAPERLESS_OCR_LANGUAGE (default=eng), which defines the
+  language used for OCR.
+  The container installs English, German, Italian, Spanish and French by
+  default.
+  See https://packages.debian.org/search?keywords=tesseract-ocr-&searchon=names&suite=buster
+  for available languages.
 
-9. Fill the environment variables in `Environment variables`.
+  `PAPERLESS_SECRET_KEY`
+  Adjust this key if you plan to make paperless available publicly. It should
+  be a very long sequence of random characters. You don't need to remember it.
 
-   You should at leas have the following variables:
+  `PAPERLESS_TIME_ZONE`
+  Use this variable to set a timezone for the Paperless Docker containers. If not specified, defaults to UTC.
 
-   `USERMAP_UID` and `USERMAP_GID`
-   The UID and GID of the user used to run paperless in the container. Set this
-   to your UID and GID on the host so that you have write access to the
-   consumption directory.
+  `PAPERLESS_OCR_LANGUAGE`
+  The default language to use for OCR. Set this to the language most of your
+  documents are written in.
 
-   `PAPERLESS_OCR_LANGUAGES`
-   Additional languages to install for text recognition, separated by a
-   whitespace. Note that this is
-   different from PAPERLESS_OCR_LANGUAGE (default=eng), which defines the
-   language used for OCR.
-   The container installs English, German, Italian, Spanish and French by
-   default.
-   See https://packages.debian.org/search?keywords=tesseract-ocr-&searchon=names&suite=buster
-   for available languages.
-
-   `PAPERLESS_SECRET_KEY`
-   Adjust this key if you plan to make paperless available publicly. It should
-   be a very long sequence of random characters. You don't need to remember it.
-
-   `PAPERLESS_TIME_ZONE`
-   Use this variable to set a timezone for the Paperless Docker containers. If not specified, defaults to UTC.
-
-   `PAPERLESS_OCR_LANGUAGE`
-   The default language to use for OCR. Set this to the language most of your
-   documents are written in.
-
-10. Click on `Deploy the stack`.
+- Click on `Deploy the stack`.
