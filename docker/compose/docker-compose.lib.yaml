@@ -49,7 +49,7 @@ services:
       - MARIADB_AUTO_UPGRADE
       - MARIADB_DISABLE_UPGRADE_BACKUP
 
-  paperless: &paperless
+  paperless:
     image: ghcr.io/paperless-ngx/paperless-ngx:latest
     restart: unless-stopped
     ports:
