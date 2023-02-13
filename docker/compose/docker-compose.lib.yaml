@@ -15,17 +15,17 @@ services:
     volumes:
       - ${POSGRES_DATA_VOLUME}:/var/lib/postgresql/data
     environment:
-      - POSTGRES_DB
-      - POSTGRES_USER
-      - POSTGRES_PASSWORD
+      - POSTGRES_DB=paperless
+      - POSTGRES_USER=paperless
+      - POSTGRES_PASSWORD=paperless
       - POSTGRES_INITDB_ARGS
       - POSTGRES_INITDB_WALDIR
       - POSTGRES_HOST_AUTH_METHOD
       - PGDATA
       # To be able to use psql dirrectly
-      - PGDATABASE=${POSTGRES_DB}
-      - PGUSER=${POSTGRES_USER}
-      - PGPASSWORD=${POSTGRES_PASSWORD}
+      - PGDATABASE=paperless
+      - PGUSER=paperless
+      - PGPASSWORD=paperless
       - PGHOST=localhost
 
   mariadb:
@@ -34,16 +34,16 @@ services:
     volumes:
       - ${MARIADB_DATA_VOLUME}:/var/lib/mysql
     environment:
-      - MARIADB_ROOT_PASSWORD
+      - MARIADB_DATABASE=paperless
+      - MARIADB_USER=paperless
+      - MARIADB_PASSWORD=paperless
+      - MARIADB_ROOT_PASSWORD=paperless
       - MARIADB_ROOT_PASSWORD_HASH
       - MARIADB_ALLOW_EMPTY_ROOT_PASSWORD
       - MARIADB_RANDOM_ROOT_PASSWORD
       - MARIADB_ROOT_HOST
       - MARIADB_MYSQL_LOCALHOST_USER
       - MARIADB_MYSQL_LOCALHOST_GRANTS
-      - MARIADB_DATABASE
-      - MARIADB_USER
-      - MARIADB_PASSWORD
       - MARIADB_PASSWORD_HASH
       - MARIADB_INITDB_SKIP_TZINFO
       - MARIADB_AUTO_UPGRADE
