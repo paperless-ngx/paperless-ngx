@@ -73,7 +73,7 @@ services:
       - ${PAPERLESS_FOLDER}/export:/usr/src/paperless/export
       - ${PAPERLESS_FOLDER}/consume:/usr/src/paperless/consume
     environment:
-      - PAPERLESS_REDIS
+      - PAPERLESS_REDIS=redis://broker:6379
       - PAPERLESS_DBENGINE
       - PAPERLESS_DBHOST
       - PAPERLESS_DBPORT
