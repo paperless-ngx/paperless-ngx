@@ -7,13 +7,13 @@ services:
     image: docker.io/library/redis:7
     restart: unless-stopped
     volumes:
-      - redisdata:/data
+      - ${REDIS_DATA_VOLUME}:/data
 
   postgres:
     image: docker.io/library/postgres:13
     restart: unless-stopped
     volumes:
-      - ${PAPERLESS_FOLDER}/pgdata:/var/lib/postgresql/data
+      - ${POSGRES_DATA_VOLUME}:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB
       - POSTGRES_USER
@@ -31,7 +31,7 @@ services:
     image: docker.io/library/mariadb:10
     restart: unless-stopped
     volumes:
-      - ${PAPERLESS_FOLDER}/dbdata:/var/lib/mysql
+      - ${MARIADB_DATA_VOLUME}:/var/lib/mysql
     environment:
       - MARIADB_ROOT_PASSWORD
       - MYSQL_ROOT_PASSWORD
@@ -68,10 +68,10 @@ services:
       timeout: 10s
       retries: 5
     volumes:
-      - ${PAPERLESS_FOLDER}/data:/usr/src/paperless/data
-      - ${PAPERLESS_FOLDER}/media:/usr/src/paperless/media
-      - ${PAPERLESS_FOLDER}/export:/usr/src/paperless/export
-      - ${PAPERLESS_FOLDER}/consume:/usr/src/paperless/consume
+      - ${PAPERLESS_DATA_VOLUME}:/usr/src/paperless/data
+      - ${PAPERLESS_MEDIA_VOLUME}:/usr/src/paperless/media
+      - ${PAPERLESS_EXPORT_VOLUME}:/usr/src/paperless/export
+      - ${PAPERLESS_CONSUME_VOLUME}:/usr/src/paperless/consume
     environment:
       - PAPERLESS_REDIS=redis://broker:6379
       - PAPERLESS_DBENGINE
