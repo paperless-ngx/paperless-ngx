@@ -26,32 +26,18 @@
 version: "3.4"
 services:
   broker:
-    image: docker.io/library/redis:7
-    restart: unless-stopped
-    volumes:
-      - redisdata:/data
+    extends:
+      file: docker-compose.lib.yaml
+      service: redis
 
-  webserver:
-    image: ghcr.io/paperless-ngx/paperless-ngx:latest
-    restart: unless-stopped
+  paperless:
+    extends:
+      file: docker-compose.lib.yaml
+      service: paperless
     depends_on:
       - broker
-    ports:
-      - "8000:8000"
-    healthcheck:
-      test: ["CMD", "curl", "-fs", "-S", "--max-time", "2", "http://localhost:8000"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-    volumes:
-      - data:/usr/src/paperless/data
-      - media:/usr/src/paperless/media
-      - ./export:/usr/src/paperless/export
-      - ./consume:/usr/src/paperless/consume
-    env_file: docker-compose.env
     environment:
       PAPERLESS_REDIS: redis://broker:6379
-
 
 volumes:
   data:
