@@ -104,7 +104,7 @@ document is consumed using a couple simple hooks.
 
 Just write a script, put it somewhere that Paperless can read & execute,
 and then put the path to that script in `paperless.conf` or
-`docker-compose.env` with the variable name of either
+`.env` with the variable name of either
 `PAPERLESS_PRE_CONSUME_SCRIPT` or `PAPERLESS_POST_CONSUME_SCRIPT`.
 
 !!! info
@@ -228,7 +228,7 @@ webserver:
 
 1. The external scripts directory is mounted to a location inside the container.
 2. The internal location of the script is used to set the script to run
-3. This can also be set in `docker-compose.env`
+3. This can also be set in `.env`
 
 Troubleshooting:
 

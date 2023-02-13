@@ -89,7 +89,7 @@ body:
     id: config-changes
     attributes:
       label: Configuration changes
-      description: Any configuration changes you made in `docker-compose.yml`, `docker-compose.env` or `paperless.conf`.
+      description: Any configuration changes you made in `docker-compose.yml`, `.env` or `paperless.conf`.
   - type: input
     id: other
     attributes:

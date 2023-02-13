@@ -53,7 +53,7 @@ services:
     image: ghcr.io/paperless-ngx/paperless-ngx:latest
     restart: unless-stopped
     ports:
-      - 8000:8000
+      - ${PAPERLESS_PORT}:${PAPERLESS_INNER_PORT}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000"]
       interval: 30s
@@ -148,11 +148,12 @@ services:
       - PAPERLESS_WEBSERVER_WORKERS
       - PAPERLESS_BIND_ADDR
       - PAPERLESS_PORT
-      - USERMAP_UID
-      - USERMAP_GID
       - PAPERLESS_OCR_LANGUAGES
       - PAPERLESS_ENABLE_FLOWER
       - PAPERLESS_ENABLE_UPDATE_CHECK
+      - USERMAP_UID
+      - USERMAP_GID
+      - SENDFILE
       - OMP_SCHEDULE
       - OMP_NUM_THREADS
       - OMP_DYNAMIC

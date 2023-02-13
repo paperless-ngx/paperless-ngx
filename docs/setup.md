@@ -50,7 +50,7 @@ steps described in [Docker setup](#docker_hub) automatically.
     file to `docker-compose.yml`. If you want to enable
     optional support for Office documents, download a file with
     `-tika` in the file name. Download the
-    `docker-compose.env` file and the `.env` file as well and store them
+    `.env` file and the `docker-compose.lib.yml` file as well and store them
     in the same directory.
 
     !!! tip
@@ -73,19 +73,19 @@ steps described in [Docker setup](#docker_hub) automatically.
         [docker-compose installation guide](https://docs.docker.com/compose/install/linux/) if your package repository
         doesn't include it.
 
-4.  Modify `docker-compose.yml` to your preferences. You may want to
+4.  Modify `.env` to your preferences. You may want to
     change the path to the consumption directory. Find the line that
     specifies where to mount the consumption directory:
 
-    ```yaml
-    - ./consume:/usr/src/paperless/consume
+    ```
+    PAPERLESS_CONSUME_FOLDER=./consume
     ```
 
     Replace the part BEFORE the colon with a local directory of your
     choice:
 
-    ```yaml
-    - /home/jonaswinkler/paperless-inbox:/usr/src/paperless/consume
+    ```
+    PAPERLESS_CONSUME_FOLDER=/home/jonaswinkler/paperless-inbox
     ```
 
     Don't change the part after the colon or paperless wont find your
@@ -94,16 +94,14 @@ steps described in [Docker setup](#docker_hub) automatically.
     You may also need to change the default port that the webserver will
     use from the default (8000):
 
-    ```yaml
-    ports:
-      - 8000:8000
+    ```
+    PAPERLESS_PORT=8000
     ```
 
     Replace the part BEFORE the colon with a port of your choice:
 
-    ```yaml
-    ports:
-      - 8010:8000
+    ```
+    PAPERLESS_PORT=8010
     ```
 
     Don't change the part after the colon or edit other lines that
@@ -114,7 +112,7 @@ steps described in [Docker setup](#docker_hub) automatically.
     **Rootless**
 
     If you want to run Paperless as a rootless container, you will need
-    to do the following in your `docker-compose.yml`:
+    to do the following in your `.env`:
 
     - set the `user` running the container to map to the `paperless`
       user in the container. This value (`user_id` below), should be
@@ -122,7 +120,7 @@ steps described in [Docker setup](#docker_hub) automatically.
       the next step. See `USERMAP_UID` and `USERMAP_GID`
       [here](/configuration#docker).
 
-    Your entry for Paperless should contain something like:
+    Your entry in your `docker-compose.yml` for Paperless should contain something like:
 
     > ```
     > webserver:
@@ -130,7 +128,7 @@ steps described in [Docker setup](#docker_hub) automatically.
     >   user: <user_id>
     > ```
 
-5.  Modify `docker-compose.env`, following the comments in the file. The
+5.  Modify `.env`, following the comments in the file. The
     most important change is to set `USERMAP_UID` and `USERMAP_GID` to
     the uid and gid of your user on the host system. Use `id -u` and
     `id -g` to get these.
@@ -174,7 +172,7 @@ steps described in [Docker setup](#docker_hub) automatically.
     This will prompt you to set a username, an optional e-mail address
     and finally a password (at least 8 characters).
 
-8.  The default `docker-compose.yml` exports the webserver on your local
+8.  The default exports the webserver on your local
     port
 
     8000\. If you did not change this, you should now be able to visit
@@ -194,7 +192,7 @@ steps described in [Docker setup](#docker_hub) automatically.
 
 2.  Copy one of the `docker/compose/docker-compose.*.yml` to
     `docker-compose.yml` in the root folder, depending on which database
-    backend you want to use. Copy `docker-compose.env` into the project
+    backend you want to use. Copy `.env` and the `docker-compose-lib.yml` into the project
     root as well.
 
 3.  In the `docker-compose.yml` file, find the line that instructs
@@ -611,11 +609,11 @@ Migration to paperless-ngx is then performed in a few simple steps:
     `docker-compose.yml`. If you want to switch to PostgreSQL, do that
     after you migrated your existing SQLite database.
 
-5.  Adjust `docker-compose.yml` and `docker-compose.env` to your needs.
+5.  Adjust the `.env` to your needs.
     See [Docker setup](#docker_hub) details on
     which edits are advised.
 
-6.  [Update paperless.](/administration#updating)
+6.  [Update paperless](/administration#updating).
 
 7.  In order to find your existing documents with the new search
     feature, you need to invoke a one-time operation that will create
@@ -900,7 +898,7 @@ To be able to use it you can use [Protainer](https://www.portainer.io/).
 - Click on `+ Add stack`.
 - Click on `Repository`.
 - Set the `Repository URL` to `https://github.com/paperless-ngx/paperless-ngx/`.
-- Set the `Compose path` to `https://github.com/paperless-ngx/paperless-ngx/blob/main/docker/portainer/docker-compose.<env>.yaml`.
+- Set the `Compose path` to `https://github.com/paperless-ngx/paperless-ngx/blob/main/docker/portainer/docker-compose.<env>.yml`.
   `<env>` define the sevice you will use, it can be `mariadb-tika.yml`,
   `mariadb`, `portainer`, `postgres-tika`, `postgres`, `sqlite-tika`, `sqlite`.
 - Fill the environment variables in `Environment variables`.

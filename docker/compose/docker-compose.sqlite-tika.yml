@@ -12,12 +12,12 @@ version: "3.4"
 services:
   broker:
     extends:
-      file: docker-compose.lib.yaml
+      file: docker-compose.lib.yml
       service: redis
 
   paperless:
     extends:
-      file: docker-compose.lib.yaml
+      file: docker-compose.lib.yml
       service: paperless
     depends_on:
       - broker
@@ -31,12 +31,12 @@ services:
 
   gotenberg:
     extends:
-      file: docker-compose.lib.yaml
+      file: docker-compose.lib.yml
       service: gotenberg
 
   tika:
     extends:
-      file: docker-compose.lib.yaml
+      file: docker-compose.lib.yml
       service: tika
 
 volumes:

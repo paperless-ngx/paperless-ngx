@@ -222,7 +222,7 @@ This might have multiple reasons.
     SENDFILE=0
     ```
 
-    to your `docker-compose.env` file.
+    to your `.env` file.
 
 ## Error while reading metadata
 

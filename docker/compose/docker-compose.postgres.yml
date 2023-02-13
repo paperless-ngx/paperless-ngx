@@ -7,17 +7,17 @@ version: "3.4"
 services:
   broker:
     extends:
-      file: docker-compose.lib.yaml
+      file: docker-compose.lib.yml
       service: redis
 
   db:
     extends:
-      file: docker-compose.lib.yaml
+      file: docker-compose.lib.yml
       service: postgres
 
   paperless:
     extends:
-      file: docker-compose.lib.yaml
+      file: docker-compose.lib.yml
       service: paperless
     environment:
       PAPERLESS_REDIS: redis://broker:6379

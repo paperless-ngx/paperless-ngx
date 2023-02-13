@@ -5,7 +5,7 @@ run paperless, these settings have to be defined in different places.
 
 - If you run paperless on docker, `paperless.conf` is not used.
   Rather, configure paperless by copying necessary options to
-  `docker-compose.env`.
+  `.env`.
 
 - If you are running paperless on anything else, paperless will search
   for the configuration file in these locations and use the first one
@@ -641,7 +641,7 @@ services:
 ```
 
 Add the configuration variables to the environment of the webserver
-(alternatively put the configuration in the `docker-compose.env` file)
+(alternatively put the configuration in the `.env` file)
 and add the additional services below the webserver service. Watch out
 for indentation.
 
@@ -1017,7 +1017,7 @@ the literal path for that program.
 
 These options don't have any effect in `paperless.conf`. These options
 adjust the behavior of the docker container. Configure these in
-`docker-compose.env`.
+`.env`.
 
 `PAPERLESS_WEBSERVER_WORKERS=<num>`
 

@@ -21,7 +21,7 @@ All compose files of paperless configure paperless in the following way:
 
 To install and update paperless with this file, do the following:
 
-- Copy the chosen file as `docker-compose.yaml`, the `docker-compose.lib.yaml` and the files `.env`
+- Copy the chosen file as `docker-compose.yml`, the `docker-compose.lib.yml` and the files `.env`
   and `.env` into a folder.
 - Run `docker-compose pull`.
 - Run `docker-compose run --rm webserver createsuperuser` to create a user.
@@ -35,7 +35,7 @@ The configuration is done in the `.env` file, if you don't modify it, the other 
 
 ## Upgrade
 
-To Upgrade your project, you have to copy the chosen docker-compose file as `docker-compose.yaml` and the `docker-compose.lib.yaml` into your folder.
+To Upgrade your project, you have to copy the chosen docker-compose file as `docker-compose.yml` and the `docker-compose.lib.yml` into your folder.
 
 ## Upgrade from older version than 1.13
 
@@ -43,7 +43,7 @@ The structure change in the version 1.13.
 
 If you modify only the `docker-compose.env`, should do the following to upgrade your project:
 
-- Copy the new `.env`, the chosen docker-compose file as `docker-compose.yaml` and the `docker-compose.lib.yaml` into your folder.
+- Copy the new `.env`, the chosen docker-compose file as `docker-compose.yml` and the `docker-compose.lib.yml` into your folder.
 - In the `.env` file, replace everything after `# Paperless configuration` by the content of your `docker-compose.env`.
 - Remove your no more needed `docker-compose.env` file.
 

@@ -319,6 +319,7 @@ if [[ $TIKA_ENABLED == "yes" ]] ; then
 fi
 
 wget "https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/docker/compose/docker-compose.$DOCKER_COMPOSE_VERSION.yml" -O docker-compose.yml
+wget "https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/docker/compose/.docker-compose.lib.yml" -O .docker-compose.lib.yml
 wget "https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/docker/compose/.env" -O .env
 
 SECRET_KEY=$(tr -dc 'a-zA-Z0-9' < /dev/urandom | fold -w 64 | head -n 1)
@@ -344,7 +345,7 @@ read -r -a OCR_LANGUAGES_ARRAY <<< "${_split_langs}"
 	if [[ ! ${DEFAULT_LANGUAGES[*]} =~ ${OCR_LANGUAGES_ARRAY[*]} ]] ; then
 		echo "PAPERLESS_OCR_LANGUAGES=${OCR_LANGUAGES_ARRAY[*]}"
 	fi
-} > docker-compose.env
+} >> .env
 
 sed -i "s/- \"8000:8000\"/- \"$PORT:8000\"/g" docker-compose.yml
 
