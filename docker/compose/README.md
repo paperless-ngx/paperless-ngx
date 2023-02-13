@@ -1,6 +1,8 @@
 # Docker compose files
 
-This folder contains a set of docker-compose files for running paperless from the Docker Hub.
+## Introduction
+
+This folder contains a set of docker-compose files for running paperless from the Docker registries.
 
 Those files contain everything paperless needs to run.
 
@@ -25,10 +27,27 @@ To install and update paperless with this file, do the following:
 - Run `docker-compose run --rm webserver createsuperuser` to create a user.
 - Run `docker-compose up -d`.
 
-For more extensive installation and update instructions, refer to the
-documentation.
+For more extensive installation and update instructions, refer to the documentation.
+
+## Configuration
+
+The configuration is done in the `.env` file, if you don't modify it, the other files the migration will be easier.
+
+## Upgrade
+
+To Upgrade your project, you have to copy the chosen docker-compose file as `docker-compose.yaml` and the `docker-compose.lib.yaml` into your folder.
+
+## Upgrade from older version than 1.13
+
+The structure change in the version 1.13.
+
+If you modify only the `docker-compose.env`, should do the following to upgrade your project:
+
+- Copy the new `.env`, the chosen docker-compose file as `docker-compose.yaml` and the `docker-compose.lib.yaml` into your folder.
+- In the `.env` file, replace everything after `# Paperless configuration` by the content of your `docker-compose.env`.
+- Remove your no more needed `docker-compose.env` file.
 
 ## Portainer
 
-Docker compose files that are made to be used directly, especially with
-[Protainer](https://docs.portainer.io), the configuration is done just in the `.env` file.
+Those Docker compose files can be used directly, in
+[Protainer](https://docs.portainer.io), see the documentation for more information.
