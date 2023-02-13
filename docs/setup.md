@@ -81,8 +81,7 @@ steps described in [Docker setup](#docker_hub) automatically.
     PAPERLESS_CONSUME_FOLDER=./consume
     ```
 
-    Replace the part BEFORE the colon with a local directory of your
-    choice:
+    Replace with a local directory of your choice:
 
     ```
     PAPERLESS_CONSUME_FOLDER=/home/jonaswinkler/paperless-inbox
