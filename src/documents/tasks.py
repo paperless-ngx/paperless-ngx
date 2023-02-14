@@ -130,6 +130,18 @@ def consume_file(
                 )
 
                 if document_list:
+
+                    # If the file is an upload, it's in the scratch directory
+                    # Move it to consume directory to be picked up
+                    # Otherwise, use the current parent to keep possible tags
+                    # from subdirectories
+                    try:
+                        # is_relative_to would be nicer, but new in 3.9
+                        _ = path.relative_to(settings.SCRATCH_DIR)
+                        save_to_dir = settings.CONSUMPTION_DIR
+                    except ValueError:
+                        save_to_dir = path.parent
+
                     for n, document in enumerate(document_list):
                         # save to consumption dir
                         # rename it to the original filename  with number prefix
@@ -138,22 +150,17 @@ def consume_file(
                         else:
                             newname = None
 
-                        # If the file is an upload, it's in the scratch directory
-                        # Move it to consume directory to be picked up
-                        # Otherwise, use the current parent to keep possible tags
-                        # from subdirectories
-                        try:
-                            # is_relative_to would be nicer, but new in 3.9
-                            _ = path.relative_to(settings.SCRATCH_DIR)
-                            save_to_dir = settings.CONSUMPTION_DIR
-                        except ValueError:
-                            save_to_dir = path.parent
-
                         barcodes.save_to_dir(
                             document,
                             newname=newname,
                             target_dir=save_to_dir,
                         )
+
+                        # Split file has been copied safely, remove it
+                        os.remove(document)
+
+                    # And clean up the directory as well, now it's empty
+                    shutil.rmtree(os.path.dirname(document_list[0]))
 
                     # Delete the PDF file which was split
                     os.remove(doc_barcode_info.pdf_path)
