@@ -65,7 +65,7 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
 
   private _lastSearchTerm: string
 
-  getTag(id) {
+  getTag(id: number) {
     if (this.tags) {
       return this.tags.find((tag) => tag.id == id)
     } else {
@@ -73,8 +73,12 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
     }
   }
 
-  removeTag(id) {
+  removeTag(event: PointerEvent, id: number) {
     if (this.disabled) return
+
+    // prevent opening dropdown
+    event.stopImmediatePropagation()
+
     let index = this.value.indexOf(id)
     if (index > -1) {
       let oldValue = this.value

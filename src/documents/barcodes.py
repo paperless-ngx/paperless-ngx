@@ -325,11 +325,10 @@ def save_to_dir(
     Optionally rename the file.
     """
     if os.path.isfile(filepath) and os.path.isdir(target_dir):
-        dst = shutil.copy(filepath, target_dir)
-        logging.debug(f"saved {str(filepath)} to {str(dst)}")
-        if newname:
-            dst_new = os.path.join(target_dir, newname)
-            logger.debug(f"moving {str(dst)} to {str(dst_new)}")
-            os.rename(dst, dst_new)
+        dest = target_dir
+        if newname is not None:
+            dest = os.path.join(dest, newname)
+        shutil.copy(filepath, dest)
+        logging.debug(f"saved {str(filepath)} to {str(dest)}")
     else:
         logger.warning(f"{str(filepath)} or {str(target_dir)} don't exist.")

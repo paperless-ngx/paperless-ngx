@@ -847,13 +847,11 @@ class PreConsumeTestCase(TestCase):
                 self.assertEqual(command[0], script.name)
                 self.assertEqual(command[1], "path-to-file")
 
-                self.assertDictContainsSubset(
-                    {
-                        "DOCUMENT_SOURCE_PATH": c.original_path,
-                        "DOCUMENT_WORKING_PATH": c.path,
-                    },
-                    environment,
-                )
+                subset = {
+                    "DOCUMENT_SOURCE_PATH": c.original_path,
+                    "DOCUMENT_WORKING_PATH": c.path,
+                }
+                self.assertDictEqual(environment, {**environment, **subset})
 
     @mock.patch("documents.consumer.Consumer.log")
     def test_script_with_output(self, mocked_log):
@@ -983,16 +981,15 @@ class PostConsumeTestCase(TestCase):
                 self.assertEqual(command[7], "my_bank")
                 self.assertCountEqual(command[8].split(","), ["a", "b"])
 
-                self.assertDictContainsSubset(
-                    {
-                        "DOCUMENT_ID": str(doc.pk),
-                        "DOCUMENT_DOWNLOAD_URL": f"/api/documents/{doc.pk}/download/",
-                        "DOCUMENT_THUMBNAIL_URL": f"/api/documents/{doc.pk}/thumb/",
-                        "DOCUMENT_CORRESPONDENT": "my_bank",
-                        "DOCUMENT_TAGS": "a,b",
-                    },
-                    environment,
-                )
+                subset = {
+                    "DOCUMENT_ID": str(doc.pk),
+                    "DOCUMENT_DOWNLOAD_URL": f"/api/documents/{doc.pk}/download/",
+                    "DOCUMENT_THUMBNAIL_URL": f"/api/documents/{doc.pk}/thumb/",
+                    "DOCUMENT_CORRESPONDENT": "my_bank",
+                    "DOCUMENT_TAGS": "a,b",
+                }
+
+                self.assertDictEqual(environment, {**environment, **subset})
 
     def test_script_exit_non_zero(self):
         """

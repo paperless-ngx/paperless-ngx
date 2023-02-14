@@ -125,28 +125,28 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         response = self.client.get("/api/documents/", format="json")
         self.assertEqual(response.status_code, 200)
         results_full = response.data["results"]
-        self.assertTrue("content" in results_full[0])
-        self.assertTrue("id" in results_full[0])
+        self.assertIn("content", results_full[0])
+        self.assertIn("id", results_full[0])
 
         response = self.client.get("/api/documents/?fields=id", format="json")
         self.assertEqual(response.status_code, 200)
         results = response.data["results"]
         self.assertFalse("content" in results[0])
-        self.assertTrue("id" in results[0])
+        self.assertIn("id", results[0])
         self.assertEqual(len(results[0]), 1)
 
         response = self.client.get("/api/documents/?fields=content", format="json")
         self.assertEqual(response.status_code, 200)
         results = response.data["results"]
-        self.assertTrue("content" in results[0])
+        self.assertIn("content", results[0])
         self.assertFalse("id" in results[0])
         self.assertEqual(len(results[0]), 1)
 
         response = self.client.get("/api/documents/?fields=id,content", format="json")
         self.assertEqual(response.status_code, 200)
         results = response.data["results"]
-        self.assertTrue("content" in results[0])
-        self.assertTrue("id" in results[0])
+        self.assertIn("content", results[0])
+        self.assertIn("id", results[0])
         self.assertEqual(len(results[0]), 2)
 
         response = self.client.get(
@@ -156,7 +156,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, 200)
         results = response.data["results"]
         self.assertFalse("content" in results[0])
-        self.assertTrue("id" in results[0])
+        self.assertIn("id", results[0])
         self.assertEqual(len(results[0]), 1)
 
         response = self.client.get("/api/documents/?fields=", format="json")
@@ -3291,8 +3291,32 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(StoragePath.objects.count(), 1)
 
+    def test_api_storage_path_placeholders(self):
+        """
+        GIVEN:
+            - API request to create a storage path with placeholders
+            - Storage path is valid
+        WHEN:
+            - API is called
+        THEN:
+            - Correct HTTP response
+            - New storage path is created
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Storage path with placeholders",
+                    "path": "{title}/{correspondent}/{document_type}/{created}/{created_year}/{created_year_short}/{created_month}/{created_month_name}/{created_month_name_short}/{created_day}/{added}/{added_year}/{added_year_short}/{added_month}/{added_month_name}/{added_month_name_short}/{added_day}/{asn}/{tags}/{tag_list}/",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(StoragePath.objects.count(), 2)
 
-class TestTasks(APITestCase):
+
+class TestTasks(DirectoriesMixin, APITestCase):
     ENDPOINT = "/api/tasks/"
     ENDPOINT_ACKNOWLEDGE = "/api/acknowledge_tasks/"
 
