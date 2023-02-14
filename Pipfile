@@ -12,6 +12,7 @@ name = "piwheels"
 dateparser = "~=1.1"
 django = "~=4.1"
 django-cors-headers = "*"
+django-compression-middleware = "*"
 django-extensions = "*"
 django-filter = "~=22.1"
 djangorestframework = "~=3.14"
@@ -53,14 +54,11 @@ nltk = "*"
 pdf2image = "*"
 flower = "*"
 bleach = "*"
-
 #
 # Packages locked due to issues (try to check if these are fixed in a release every so often)
 #
-
 # Pin this until piwheels is building 1.9 (see https://www.piwheels.org/project/scipy/)
 scipy = "==1.8.1"
-
 # Newer versions aren't builting yet (see https://www.piwheels.org/project/cryptography/)
 cryptography = "==38.0.1"
 django-guardian = "*"
@@ -69,6 +67,7 @@ djangorestframework-guardian = "*"
 # Locked version until https://github.com/django/channels_redis/issues/332
 # is resolved
 channels-redis = "==3.4.1"
+
 
 [dev-packages]
 coveralls = "*"
