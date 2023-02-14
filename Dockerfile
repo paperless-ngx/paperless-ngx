@@ -1,12 +1,11 @@
 # syntax=docker/dockerfile:1.4
 # https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/reference.md
 
+# Stage: compile-frontend
+# Purpose: Compiles the frontend
+# Notes:
+#  - Does NPM stuff with Typescript and such
 FROM --platform=$BUILDPLATFORM node:16-bullseye-slim AS compile-frontend
-
-# This stage compiles the frontend
-# This stage runs once for the native platform, as the outputs are not
-# dependent on target arch
-# Inputs: None
 
 COPY ./src-ui /src/src-ui
 
@@ -17,14 +16,12 @@ RUN set -eux \
 RUN set -eux \
   && ./node_modules/.bin/ng build --configuration production
 
+# Stage: pipenv-base
+# Purpose: Generates a requirements.txt file for building
+# Comments:
+#  - pipenv dependencies are not left in the final image
+#  - pipenv can't touch the final image somehow
 FROM --platform=$BUILDPLATFORM python:3.9-slim-bullseye as pipenv-base
-
-# This stage generates the requirements.txt file using pipenv
-# This stage runs once for the native platform, as the outputs are not
-# dependent on target arch
-# This way, pipenv dependencies are not left in the final image
-# nor can pipenv mess up the final image somehow
-# Inputs: None
 
 WORKDIR /usr/src/pipenv
 
@@ -36,6 +33,10 @@ RUN set -eux \
   && echo "Generating requirement.txt" \
     && pipenv requirements > requirements.txt
 
+# Stage: main-app
+# Purpose: The final image
+# Comments:
+#  - Don't leave anything extra in here
 FROM python:3.9-slim-bullseye as main-app
 
 LABEL org.opencontainers.image.authors="paperless-ngx team <hello@paperless-ngx.com>"
