@@ -153,28 +153,6 @@ services:
       - PAPERLESS_ENABLE_UPDATE_CHECK
       - USERMAP_UID
       - USERMAP_GID
-      - SENDFILE
-      - OMP_SCHEDULE
-      - OMP_NUM_THREADS
-      - OMP_DYNAMIC
-      - OMP_PROC_BIND
-      - OMP_PLACES
-      - OMP_STACKSIZE
-      - OMP_WAIT_POLICY
-      - OMP_MAX_ACTIVE_LEVELS
-      - OMP_NESTED
-      - OMP_THREAD_LIMIT
-      - OMP_CANCELLATION
-      - OMP_DISPLAY_ENV
-      - OMP_DISPLAY_AFFINITY
-      - OMP_AFFINITY_FORMAT
-      - OMP_DEFAULT_DEVICE
-      - OMP_MAX_TASK_PRIORITY
-      - OMP_TARGET_OFFLOAD
-      - OMP_TOOL
-      - OMP_TOOL_LIBRARIES
-      - OMP_DEBUG
-      - OMP_ALLOCATOR
 
   gotenberg:
     image: docker.io/gotenberg/gotenberg:7.8
