@@ -74,7 +74,7 @@
           <context context-type="linenumber">13</context>
         </context-group>
         <note priority="1" from="description">Currently selected slide number read by screen reader</note>
-        <target state="needs-translation"> Slide <x id="INTERPOLATION"/> of <x id="INTERPOLATION_1"/> </target>
+        <target state="translated"> Liu'uta <x id="INTERPOLATION"/> / <x id="INTERPOLATION_1"/> </target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.hours" datatype="html">
         <source>Hours</source>
@@ -292,7 +292,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">78</context>
         </context-group>
-        <target state="translated">Dokumentti lisätty</target>
+        <target state="translated">Asiakirja lisätty</target>
       </trans-unit>
       <trans-unit id="9204248378636247318" datatype="html">
         <source>Document <x id="PH" equiv-text="status.filename"/> was added to paperless.</source>
@@ -344,7 +344,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">119</context>
         </context-group>
-        <target state="needs-translation">Prev</target>
+        <target state="translated">Edellinen</target>
       </trans-unit>
       <trans-unit id="3885497195825665706" datatype="html">
         <source>Next</source>
@@ -364,7 +364,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">121</context>
         </context-group>
-        <target state="needs-translation">End</target>
+        <target state="translated">Loppu</target>
       </trans-unit>
       <trans-unit id="3909462337752654810" datatype="html">
         <source>The dashboard can be used to show saved views, such as an &apos;Inbox&apos;. Those settings are found under Settings &gt; Saved Views once you have created some.</source>
@@ -372,7 +372,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">126</context>
         </context-group>
-        <target state="needs-translation">The dashboard can be used to show saved views, such as an 'Inbox'. Those settings are found under Settings &gt; Saved Views once you have created some.</target>
+        <target state="translated">Kojelautaa voidaan käyttää näytettäessä tallennettuja näkymiä, kuten 'Saapuneet'. Nämä asetukset löytyvät Asetuksista &gt; kohdasta Tallennetut näkymät.</target>
       </trans-unit>
       <trans-unit id="9075755296812854717" datatype="html">
         <source>Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Paperless-ngx will start training its machine learning algorithms.</source>
@@ -380,7 +380,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">136</context>
         </context-group>
-        <target state="needs-translation">Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Paperless-ngx will start training its machine learning algorithms.</target>
+        <target state="translated">Vedä ja pudota asiakirjoja tänne aloittaaksesi lataamisen tai siirrä ne noutohakemistoon. Voit myös pudottaa asiakirjoja missä tahansa muilla sivuilla. Kun teet niin, Paperless-ngx alkaa kouluttaa sen koneoppimisen algoritmeja.</target>
       </trans-unit>
       <trans-unit id="7495498057594070122" datatype="html">
         <source>The documents list shows all of your documents and allows for filtering as well as bulk-editing. There are three different view styles: list, small cards and large cards. A list of documents currently opened for editing is shown in the sidebar.</source>
@@ -388,7 +388,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">145</context>
         </context-group>
-        <target state="needs-translation">The documents list shows all of your documents and allows for filtering as well as bulk-editing. There are three different view styles: list, small cards and large cards. A list of documents currently opened for editing is shown in the sidebar.</target>
+        <target state="translated">Asiakirjaluettelo näyttää kaikki asiakirjat ja mahdollistaa suodattamisen ja massamuokkauksen. On olemassa kolme erilaista näkymää: luettelo, pienet kortit ja suuret kortit. Sivupalkissa näytetään luettelo tällä hetkellä avatuista asiakirjoista.</target>
       </trans-unit>
       <trans-unit id="1334220418719920556" datatype="html">
         <source>The filtering tools allow you to quickly find documents using various searches, dates, tags, etc.</source>
@@ -396,7 +396,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">157</context>
         </context-group>
-        <target state="needs-translation">The filtering tools allow you to quickly find documents using various searches, dates, tags, etc.</target>
+        <target state="translated">Suodatustyökalujen avulla voit löytää asiakirjoja nopeasti käyttämällä erilaisia hakuja, päivämääriä, tageja jne.</target>
       </trans-unit>
       <trans-unit id="5427326625898532358" datatype="html">
         <source>Any combination of filters can be saved as a &apos;view&apos; which can then be displayed on the dashboard and / or sidebar.</source>
@@ -404,7 +404,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">167</context>
         </context-group>
-        <target state="needs-translation">Any combination of filters can be saved as a 'view' which can then be displayed on the dashboard and / or sidebar.</target>
+        <target state="translated">Mikä tahansa suodattimien yhdistelmä voidaan tallentaa 'näkymäksi', joka voidaan näyttää hallintapaneelissa ja / tai sivupalkissa.</target>
       </trans-unit>
       <trans-unit id="2804886236408698479" datatype="html">
         <source>Tags, correspondents, document types and storage paths can all be managed using these pages. They can also be created from the document edit view.</source>
@@ -412,7 +412,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">176</context>
         </context-group>
-        <target state="needs-translation">Tags, correspondents, document types and storage paths can all be managed using these pages. They can also be created from the document edit view.</target>
+        <target state="translated">Tunnisteita, yhteyshenkilöitä, asiakirjatyyppejä ja tallennuspolkuja voidaan hallita näillä sivuilla. Niitä voidaan myös luoda asiakirjan muokkausnäkymästä.</target>
       </trans-unit>
       <trans-unit id="4680387114119209483" datatype="html">
         <source>File Tasks shows you documents that have been consumed, are waiting to be, or may have failed during the process.</source>
@@ -420,7 +420,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">185</context>
         </context-group>
-        <target state="needs-translation">File Tasks shows you documents that have been consumed, are waiting to be, or may have failed during the process.</target>
+        <target state="translated">Tiedostotehtävät näyttää asiakirjat, jotka on viety, odottavat tai ovat epäonnistuneet tehtävän aikana.</target>
       </trans-unit>
       <trans-unit id="8116994662047019809" datatype="html">
         <source>Check out the settings for various tweaks to the web app, toggle settings for saved views or setup e-mail checking.</source>
@@ -428,7 +428,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">194</context>
         </context-group>
-        <target state="needs-translation">Check out the settings for various tweaks to the web app, toggle settings for saved views or setup e-mail checking.</target>
+        <target state="translated">Tarkista asetukset erilaisille muutoksille web-sovelluksessa, muuta tallennettujen näkymien asetuksia tai määritä sähköpostitilin tarkistus.</target>
       </trans-unit>
       <trans-unit id="7172877665285340082" datatype="html">
         <source>Thank you! 🙏</source>
@@ -436,7 +436,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">203</context>
         </context-group>
-        <target state="needs-translation">Thank you! 🙏</target>
+        <target state="translated">Kiitos! 🙏</target>
       </trans-unit>
       <trans-unit id="7354947513482088740" datatype="html">
         <source>There are &lt;em&gt;tons&lt;/em&gt; more features and info we didn&apos;t cover here, but this should get you started. Check out the documentation or visit the project on GitHub to learn more or to report issues.</source>
@@ -444,7 +444,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">205</context>
         </context-group>
-        <target state="needs-translation">There are &lt;em&gt;tons&lt;/em&gt; more features and info we didn't cover here, but this should get you started. Check out the documentation or visit the project on GitHub to learn more or to report issues.</target>
+        <target state="translated">On &lt;em&gt;muitakin&lt;/em&gt; ominaisuuksia ja tietoja, joita ei lue täällä, mutta näillä pääset alkuun. Tutustu dokumentaatioon tai vieraile  GitHubissa oppiaksesi lisää tai raportoidaksesi ongelmista.</target>
       </trans-unit>
       <trans-unit id="4270528545616947218" datatype="html">
         <source>Lastly, on behalf of every contributor to this community-supported project, thank you for using Paperless-ngx!</source>
@@ -452,7 +452,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">207</context>
         </context-group>
-        <target state="needs-translation">Lastly, on behalf of every contributor to this community-supported project, thank you for using Paperless-ngx!</target>
+        <target state="translated">Lopuksi kiitän kaikkia osallistujia, jotka ovat käyttäneet Paperless-ngxia!</target>
       </trans-unit>
       <trans-unit id="5749300816154614125" datatype="html">
         <source>Initiating upload...</source>
@@ -649,7 +649,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">145</context>
         </context-group>
-        <target state="translated">Dokumenttityypit</target>
+        <target state="translated">Asiakirjatyypit</target>
       </trans-unit>
       <trans-unit id="8835528846812581148" datatype="html">
         <source>Storage paths</source>
@@ -681,7 +681,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">160</context>
         </context-group>
-        <target state="needs-translation">File Tasks<x id="START_TAG_SPAN_1" ctype="x-span_1" equiv-text="&lt;span *ngIf=&quot;tasksService.failedFileTasks.length &gt; 0&quot;&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-danger ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
+        <target state="translated">Tiedostotehtävät<x id="START_TAG_SPAN_1" ctype="x-span_1" equiv-text="&lt;span *ngIf=&quot;tasksService.failedFileTasks.length &gt; 0&quot;&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-danger ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
       </trans-unit>
       <trans-unit id="4804785061014590286" datatype="html">
         <source>Logs</source>
@@ -769,7 +769,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">214</context>
         </context-group>
-        <target state="needs-translation">Paperless-ngx can automatically check for updates</target>
+        <target state="translated">Paperless-ngx voi tarkistaa päivitykset automaattisesti</target>
       </trans-unit>
       <trans-unit id="894819944961861800" datatype="html">
         <source> How does this work? </source>
@@ -777,7 +777,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">221,223</context>
         </context-group>
-        <target state="needs-translation"> How does this work? </target>
+        <target state="translated"> Kuinka tämä toimii? </target>
       </trans-unit>
       <trans-unit id="509090351011426949" datatype="html">
         <source>Update available</source>
@@ -805,7 +805,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
           <context context-type="linenumber">216</context>
         </context-group>
-        <target state="needs-translation">An error occurred while saving update checking settings.</target>
+        <target state="translated">Virhe tallennettaessa päivitystarkistuksen asetuksia</target>
       </trans-unit>
       <trans-unit id="8700121026680200191" datatype="html">
         <source>Clear</source>
@@ -1193,7 +1193,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="needs-translation">IMAP Server</target>
+        <target state="translated">IMAP-palvelin</target>
       </trans-unit>
       <trans-unit id="6575044156016560168" datatype="html">
         <source>IMAP Port</source>
@@ -1201,7 +1201,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation">IMAP Port</target>
+        <target state="translated">IMAP-portti</target>
       </trans-unit>
       <trans-unit id="5418425343712813426" datatype="html">
         <source>IMAP Security</source>
@@ -1209,7 +1209,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">IMAP Security</target>
+        <target state="translated">IMAP-suojaus</target>
       </trans-unit>
       <trans-unit id="5248717555542428023" datatype="html">
         <source>Username</source>
@@ -1217,7 +1217,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.html</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="needs-translation">Username</target>
+        <target state="translated">Käyttäjänimi</target>
       </trans-unit>
       <trans-unit id="1431416938026210429" datatype="html">
         <source>Password</source>
@@ -1225,7 +1225,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.html</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="needs-translation">Password</target>
+        <target state="translated">Salasana</target>
       </trans-unit>
       <trans-unit id="6124167940736826613" datatype="html">
         <source>Character Set</source>
@@ -1233,7 +1233,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.html</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="needs-translation">Character Set</target>
+        <target state="translated">Merkistö</target>
       </trans-unit>
       <trans-unit id="451418349275958054" datatype="html">
         <source>No encryption</source>
@@ -1241,7 +1241,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.ts</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation">No encryption</target>
+        <target state="translated">Ei salausta</target>
       </trans-unit>
       <trans-unit id="3719080555538542367" datatype="html">
         <source>SSL</source>
@@ -1249,7 +1249,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">SSL</target>
+        <target state="translated">SSL</target>
       </trans-unit>
       <trans-unit id="2620794666957669114" datatype="html">
         <source>STARTTLS</source>
@@ -1257,7 +1257,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.ts</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="needs-translation">STARTTLS</target>
+        <target state="translated">STARTTLS</target>
       </trans-unit>
       <trans-unit id="8758081884575368561" datatype="html">
         <source>Create new mail account</source>
@@ -1265,7 +1265,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.ts</context>
           <context context-type="linenumber">28</context>
         </context-group>
-        <target state="needs-translation">Create new mail account</target>
+        <target state="translated">Lisää uusi sähköpostitili</target>
       </trans-unit>
       <trans-unit id="5559445021532852612" datatype="html">
         <source>Edit mail account</source>
@@ -1273,7 +1273,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.ts</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="needs-translation">Edit mail account</target>
+        <target state="translated">Muokkaa sähköpostitiliä</target>
       </trans-unit>
       <trans-unit id="4086606389696938932" datatype="html">
         <source>Account</source>
@@ -1285,7 +1285,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">284</context>
         </context-group>
-        <target state="needs-translation">Account</target>
+        <target state="translated">Tili</target>
       </trans-unit>
       <trans-unit id="7046259383943324039" datatype="html">
         <source>Folder</source>
@@ -1293,7 +1293,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation">Folder</target>
+        <target state="translated">Kansio</target>
       </trans-unit>
       <trans-unit id="1391527525114848695" datatype="html">
         <source>Subfolders must be separated by a delimiter, often a dot (&apos;.&apos;) or slash (&apos;/&apos;), but it varies by mail server.</source>
@@ -1301,7 +1301,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation">Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server.</target>
+        <target state="translated">Alikansiot on erotettava erottimella, usein pisteellä ('.') tai kauttaviivalla ('/'), vaihtelee sähköpostipalvelimen mukaan</target>
       </trans-unit>
       <trans-unit id="101686279614365671" datatype="html">
         <source>Maximum age (days)</source>
@@ -1309,7 +1309,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">Maximum age (days)</target>
+        <target state="translated">Enimmäisikä (päivää)</target>
       </trans-unit>
       <trans-unit id="7093509971705471817" datatype="html">
         <source>Attachment type</source>
@@ -1317,7 +1317,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="needs-translation">Attachment type</target>
+        <target state="translated">Liitteen tyyppi</target>
       </trans-unit>
       <trans-unit id="559099472394646919" datatype="html">
         <source>Consumption scope</source>
@@ -1325,7 +1325,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="needs-translation">Consumption scope</target>
+        <target state="translated">Sisäänluennan laajuus</target>
       </trans-unit>
       <trans-unit id="56643687972548912" datatype="html">
         <source>See docs for .eml processing requirements</source>
@@ -1333,7 +1333,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="needs-translation">See docs for .eml processing requirements</target>
+        <target state="translated">Katso ohje .eml tiedostojen käsittelyn vaatimuksiin</target>
       </trans-unit>
       <trans-unit id="5163375362523428079" datatype="html">
         <source>Rule order</source>
@@ -1341,7 +1341,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="needs-translation">Rule order</target>
+        <target state="translated">Sääntöjen järjestys</target>
       </trans-unit>
       <trans-unit id="5488632521862493221" datatype="html">
         <source>Paperless will only process mails that match <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>all<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> of the filters specified below.</source>
@@ -1349,7 +1349,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">19</context>
         </context-group>
-        <target state="needs-translation">Paperless will only process mails that match <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>all<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> of the filters specified below.</target>
+        <target state="translated">Paperless käsittelee vain sähköposteja, jotka vastaavat <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>kaikkia<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> alla määritettyjä suodattimia.</target>
       </trans-unit>
       <trans-unit id="6925928412364847639" datatype="html">
         <source>Filter from</source>
@@ -1357,7 +1357,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Filter from</target>
+        <target state="translated">Suodata lähettäjä-kenttä</target>
       </trans-unit>
       <trans-unit id="8497813481090627874" datatype="html">
         <source>Filter subject</source>
@@ -1365,7 +1365,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="needs-translation">Filter subject</target>
+        <target state="translated">Suodata aihe</target>
       </trans-unit>
       <trans-unit id="7314357616097563149" datatype="html">
         <source>Filter body</source>
@@ -1373,7 +1373,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="needs-translation">Filter body</target>
+        <target state="translated">Suodata runko</target>
       </trans-unit>
       <trans-unit id="5031687746498952417" datatype="html">
         <source>Filter attachment filename</source>
@@ -1381,7 +1381,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="needs-translation">Filter attachment filename</target>
+        <target state="translated">Suodata liitteen tiedostonimi</target>
       </trans-unit>
       <trans-unit id="4245210767172267486" datatype="html">
         <source>Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive.</source>
@@ -1389,7 +1389,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="needs-translation">Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive.</target>
+        <target state="translated">Tuo vain dokumentit jotka täsmäävät täysin tiedostonimen suhteen. Jokerimerkit kuten *.pdf tai *lasku* ovat sallittuja. Kirjainkoko ei merkitse.</target>
       </trans-unit>
       <trans-unit id="9216117865911519658" datatype="html">
         <source>Action</source>
@@ -1397,7 +1397,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="needs-translation">Action</target>
+        <target state="translated">Toiminto</target>
       </trans-unit>
       <trans-unit id="4274038999388817994" datatype="html">
         <source>Action is only performed when documents are consumed from the mail. Mails without attachments remain entirely untouched.</source>
@@ -1405,7 +1405,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="needs-translation">Action is only performed when documents are consumed from the mail. Mails without attachments remain entirely untouched.</target>
+        <target state="translated">Tämä toiminto suoritetaan vasta, kun asiakirjat on luettu sähköpostin kautta. Sähköpostit ilman liitteitä pysyvät täysin koskemattomina.</target>
       </trans-unit>
       <trans-unit id="1261794314435932203" datatype="html">
         <source>Action parameter</source>
@@ -1413,7 +1413,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">27</context>
         </context-group>
-        <target state="needs-translation">Action parameter</target>
+        <target state="translated">Toiminnon parametrit</target>
       </trans-unit>
       <trans-unit id="6093797930511670257" datatype="html">
         <source>Assign title from</source>
@@ -1421,7 +1421,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">28</context>
         </context-group>
-        <target state="needs-translation">Assign title from</target>
+        <target state="translated">Aseta otsikko kohteesta</target>
       </trans-unit>
       <trans-unit id="6695990587380209737" datatype="html">
         <source>Assign document type</source>
@@ -1429,7 +1429,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="needs-translation">Assign document type</target>
+        <target state="translated">Määritä asiakirjatyyppi</target>
       </trans-unit>
       <trans-unit id="4754802869258527587" datatype="html">
         <source>Assign correspondent from</source>
@@ -1437,7 +1437,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">31</context>
         </context-group>
-        <target state="needs-translation">Assign correspondent from</target>
+        <target state="translated">Määritä yhteyshenkilö</target>
       </trans-unit>
       <trans-unit id="4875491778188965469" datatype="html">
         <source>Assign correspondent</source>
@@ -1445,7 +1445,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="needs-translation">Assign correspondent</target>
+        <target state="translated">Määritä yhteyshenkilö</target>
       </trans-unit>
       <trans-unit id="1519954996184640001" datatype="html">
         <source>Error</source>
@@ -1469,7 +1469,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="needs-translation">Only process attachments</target>
+        <target state="translated">Käsittele vain liitteet</target>
       </trans-unit>
       <trans-unit id="936923743212522897" datatype="html">
         <source>Process all files, including &apos;inline&apos; attachments</source>
@@ -1477,7 +1477,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="needs-translation">Process all files, including 'inline' attachments</target>
+        <target state="translated">Käsittele kaikki tiedostot, mukaan lukien 'inline'-liitteet'</target>
       </trans-unit>
       <trans-unit id="9025522236384167767" datatype="html">
         <source>Process message as .eml</source>
@@ -1485,7 +1485,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">40</context>
         </context-group>
-        <target state="needs-translation">Process message as .eml</target>
+        <target state="translated">Käsittele viesti .eml muodossa</target>
       </trans-unit>
       <trans-unit id="7411485377918318115" datatype="html">
         <source>Process message as .eml and attachments separately</source>
@@ -1493,7 +1493,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">44</context>
         </context-group>
-        <target state="needs-translation">Process message as .eml and attachments separately</target>
+        <target state="translated">Käsittele viesti .eml muodossa ja liitetiedostot erikseen</target>
       </trans-unit>
       <trans-unit id="7022070615528435141" datatype="html">
         <source>Delete</source>
@@ -1565,7 +1565,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">55</context>
         </context-group>
-        <target state="needs-translation">Move to specified folder</target>
+        <target state="translated">Siirrä valittuun kansioon</target>
       </trans-unit>
       <trans-unit id="4593278936733161020" datatype="html">
         <source>Mark as read, don&apos;t process read mails</source>
@@ -1573,7 +1573,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">59</context>
         </context-group>
-        <target state="needs-translation">Mark as read, don't process read mails</target>
+        <target state="translated">Merkitse luetuksi, älä käsittele lukemia sähköposteja</target>
       </trans-unit>
       <trans-unit id="2378921144019636516" datatype="html">
         <source>Flag the mail, don&apos;t process flagged mails</source>
@@ -1581,7 +1581,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">63</context>
         </context-group>
-        <target state="needs-translation">Flag the mail, don't process flagged mails</target>
+        <target state="translated">Liputa sähköposti, älä käsittele liputettuja sähköposteja</target>
       </trans-unit>
       <trans-unit id="6457024618858980302" datatype="html">
         <source>Tag the mail with specified tag, don&apos;t process tagged mails</source>
@@ -1589,7 +1589,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">67</context>
         </context-group>
-        <target state="needs-translation">Tag the mail with specified tag, don't process tagged mails</target>
+        <target state="translated">Merkitse sähköposti tagilla, älä käsittele tagattuja sähköposteja</target>
       </trans-unit>
       <trans-unit id="4673329664686432878" datatype="html">
         <source>Use subject as title</source>
@@ -1597,7 +1597,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">74</context>
         </context-group>
-        <target state="needs-translation">Use subject as title</target>
+        <target state="translated">Käytä aihetta otsikkona</target>
       </trans-unit>
       <trans-unit id="8645471396972938185" datatype="html">
         <source>Use attachment filename as title</source>
@@ -1605,7 +1605,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">78</context>
         </context-group>
-        <target state="needs-translation">Use attachment filename as title</target>
+        <target state="translated">Käytä liitteen tiedostonimeä otsikkona</target>
       </trans-unit>
       <trans-unit id="1568902914205618549" datatype="html">
         <source>Do not assign a correspondent</source>
@@ -1613,7 +1613,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">85</context>
         </context-group>
-        <target state="needs-translation">Do not assign a correspondent</target>
+        <target state="translated">Älä määritä yhteyshenkilöä</target>
       </trans-unit>
       <trans-unit id="3567746385454588269" datatype="html">
         <source>Use mail address</source>
@@ -1621,7 +1621,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">89</context>
         </context-group>
-        <target state="needs-translation">Use mail address</target>
+        <target state="translated">Käytä sähköpostiosoitetta</target>
       </trans-unit>
       <trans-unit id="445154175758965852" datatype="html">
         <source>Use name (or mail address if not available)</source>
@@ -1629,7 +1629,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">93</context>
         </context-group>
-        <target state="needs-translation">Use name (or mail address if not available)</target>
+        <target state="translated">Käytä nimeä (tai sähköpostiosoitetta, jos ei ole saatavilla)</target>
       </trans-unit>
       <trans-unit id="1258862217749148424" datatype="html">
         <source>Use correspondent selected below</source>
@@ -1637,7 +1637,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">97</context>
         </context-group>
-        <target state="needs-translation">Use correspondent selected below</target>
+        <target state="translated">Käytä valittua yhteyshenkilöä</target>
       </trans-unit>
       <trans-unit id="3147349817770432927" datatype="html">
         <source>Create new mail rule</source>
@@ -1645,7 +1645,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">137</context>
         </context-group>
-        <target state="needs-translation">Create new mail rule</target>
+        <target state="translated">Luo uusi sähköpostisääntö</target>
       </trans-unit>
       <trans-unit id="3374331029704382439" datatype="html">
         <source>Edit mail rule</source>
@@ -1653,7 +1653,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">141</context>
         </context-group>
-        <target state="needs-translation">Edit mail rule</target>
+        <target state="translated">Muokkaa sähköpostisääntöä</target>
       </trans-unit>
       <trans-unit id="6036319582202941456" datatype="html">
         <source><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>Note that editing a path does not apply changes to stored files until you have run the &apos;document_renamer&apos; utility. See the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a target=&quot;_blank&quot; href=&quot;https://docs.paperless-ngx.com/administration/#renamer&quot;&gt;"/>documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></source>
@@ -1661,7 +1661,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.html</context>
           <context context-type="linenumber">10</context>
         </context-group>
-        <target state="needs-translation"><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>Note that editing a path does not apply changes to stored files until you have run the 'document_renamer' utility. See the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a target=&quot;_blank&quot; href=&quot;https://docs.paperless-ngx.com/administration/#renamer&quot;&gt;"/>documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></target>
+        <target state="translated"><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>Huomaa, että polun muokkaaminen ei tallenna muutoksia tiedostoon ennenkuin olet suorittanut 'document_renamer'-apuohjelman. Katso <x id="START_LINK" ctype="x-a" equiv-text="&lt;a target=&quot;_blank&quot; href=&quot;https://docs.paperless-ngx.com/administration/#renamer&quot;&gt;"/>dokumentaatio<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></target>
       </trans-unit>
       <trans-unit id="8911059720204770105" datatype="html">
         <source>Path</source>
@@ -1697,7 +1697,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.ts</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">See &lt;a target="_blank" href="https://docs.paperless-ngx.com/advanced_usage/#file-name-handling"&gt;documentation&lt;/a&gt; for full list.</target>
+        <target state="translated">Katso &lt;a target="_blank" href="https://docs.paperless-ngx.com/advanced_usage/#file-name-handling"&gt;dokumentaatio&lt;/a&gt;.</target>
       </trans-unit>
       <trans-unit id="6898961890896270754" datatype="html">
         <source>Create new storage path</source>
@@ -1907,7 +1907,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="needs-translation">Hello <x id="PH" equiv-text="this.settingsService.displayName"/>, welcome to Paperless-ngx</target>
+        <target state="translated">Hei <x id="PH" equiv-text="this.settingsService.displayName"/>, tervetuloa Paperless-ngx sovellukseen</target>
       </trans-unit>
       <trans-unit id="5334686081082652461" datatype="html">
         <source>Welcome to Paperless-ngx</source>
@@ -1915,7 +1915,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Welcome to Paperless-ngx</target>
+        <target state="translated">Tervetuloa Paperless-ngx sovellukseen</target>
       </trans-unit>
       <trans-unit id="2946624699882754313" datatype="html">
         <source>Show all</source>
@@ -2041,7 +2041,7 @@
           <context context-type="linenumber">25</context>
         </context-group>
         <note priority="1" from="description">This is shown as a summary line when there are more than 5 document in the processing pipeline.</note>
-        <target state="translated">{VAR_PLURAL, plural, one {} =1 {Vielä yksi dokumentti} other {<x id="INTERPOLATION"/> lisää dokumentteja}}</target>
+        <target state="translated">{VAR_PLURAL, plural, one {} =1 {Vielä yksi asiakirja} other {<x id="INTERPOLATION"/> lisää asiakirjoja}}</target>
       </trans-unit>
       <trans-unit id="6443586946875325554" datatype="html">
         <source>Processing: <x id="PH" equiv-text="countUploadingAndProcessing"/></source>
@@ -2086,7 +2086,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">3</context>
         </context-group>
-        <target state="needs-translation">Paperless-ngx is running!</target>
+        <target state="translated">Paperless-ngx on käynnissä!</target>
       </trans-unit>
       <trans-unit id="3326049540711826572" datatype="html">
         <source>You&apos;re ready to start uploading documents! Explore the various features of this web app on your own, or start a quick tour using the button below.</source>
@@ -2094,7 +2094,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="needs-translation">You're ready to start uploading documents! Explore the various features of this web app on your own, or start a quick tour using the button below.</target>
+        <target state="translated">Olet valmis aloittamaan asiakirjojen lataamisen! Tutustu tämän web-sovelluksen eri ominaisuuksiin tai aloita opastus käyttämällä alla olevaa painiketta.</target>
       </trans-unit>
       <trans-unit id="4474647174688421179" datatype="html">
         <source>More detail on how to use and configure Paperless-ngx is always available in the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://docs.paperless-ngx.com&quot; target=&quot;_blank&quot;&gt;"/>documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</source>
@@ -2102,7 +2102,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">5</context>
         </context-group>
-        <target state="needs-translation">More detail on how to use and configure Paperless-ngx is always available in the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://docs.paperless-ngx.com&quot; target=&quot;_blank&quot;&gt;"/>documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</target>
+        <target state="translated">Tarkempia tietoja Paperless-ngx sovelluksen käytöstä ja konfiguroinnista on saatavilla <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://docs.paperless-ngx.com&quot; target=&quot;_blank&quot;&gt;"/>dokumentaatiossa<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</target>
       </trans-unit>
       <trans-unit id="4294899532887357745" datatype="html">
         <source>Thanks for being a part of the Paperless-ngx community!</source>
@@ -2110,7 +2110,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">8</context>
         </context-group>
-        <target state="needs-translation">Thanks for being a part of the Paperless-ngx community!</target>
+        <target state="translated">Kiitos, että olette osana Paperless-ngx -yhteisöä!</target>
       </trans-unit>
       <trans-unit id="1415832194529539652" datatype="html">
         <source>Start the tour</source>
@@ -2118,7 +2118,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">9</context>
         </context-group>
-        <target state="needs-translation">Start the tour</target>
+        <target state="translated">Aloita opastus</target>
       </trans-unit>
       <trans-unit id="7822640317427130239" datatype="html">
         <source>Searching document with asn <x id="INTERPOLATION" equiv-text="{{asn}}"/></source>
@@ -2622,7 +2622,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">505</context>
         </context-group>
-        <target state="needs-translation">Redo OCR operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.</target>
+        <target state="translated">OCR-toiminto alkaa taustalla. Sulje ja avaa uudelleen tämä asiakirja tai lataa se uudelleen, kun toiminto on suoritettu nähdäksesi uuden sisällön.</target>
       </trans-unit>
       <trans-unit id="8008978164775353960" datatype="html">
         <source>Error executing operation: <x id="PH" equiv-text="JSON.stringify(                 error.error               )"/></source>
@@ -2742,7 +2742,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">96</context>
         </context-group>
-        <target state="needs-translation">Include:</target>
+        <target state="translated">Sisällytä:</target>
       </trans-unit>
       <trans-unit id="1208547554603365604" datatype="html">
         <source> Archived files </source>
@@ -2750,7 +2750,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">100,102</context>
         </context-group>
-        <target state="needs-translation"> Archived files </target>
+        <target state="translated"> Arkistoidut tiedostot </target>
       </trans-unit>
       <trans-unit id="6791570188945688785" datatype="html">
         <source> Original files </source>
@@ -2758,7 +2758,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">106,108</context>
         </context-group>
-        <target state="needs-translation"> Original files </target>
+        <target state="translated">Alkuperäiset tiedostot</target>
       </trans-unit>
       <trans-unit id="3608345051493493574" datatype="html">
         <source> Use formatted filename </source>
@@ -2766,7 +2766,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">113,115</context>
         </context-group>
-        <target state="needs-translation"> Use formatted filename </target>
+        <target state="translated"> Käytä muotoiltua tiedostonimeä </target>
       </trans-unit>
       <trans-unit id="7985804062689412812" datatype="html">
         <source>Error executing bulk operation: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></source>
@@ -2892,7 +2892,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">352</context>
         </context-group>
-        <target state="translated">Tämä toiminto lisää dokumenttityypin "<x id="PH" equiv-text="documentType.name"/>" <x id="PH_1" equiv-text="this.list.selected.size"/>:een valittuun asiakirjaan.</target>
+        <target state="translated">Tämä toiminto lisää asiakirjatyypin"<x id="PH" equiv-text="documentType.name"/>" <x id="PH_1" equiv-text="this.list.selected.size"/>:een valittuun asiakirjaan.</target>
       </trans-unit>
       <trans-unit id="2236642492594872779" datatype="html">
         <source>This operation will remove the document type from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -2900,7 +2900,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">354</context>
         </context-group>
-        <target state="translated">Tämä toiminto poistaa dokumenttityypin "<x id="PH" equiv-text="this.list.selected.size"/>":sta valitusta asiakirjasta.</target>
+        <target state="translated">Tämä toiminto poistaa asiakirjatyypin"<x id="PH" equiv-text="this.list.selected.size"/>":sta valitusta asiakirjasta.</target>
       </trans-unit>
       <trans-unit id="6386555513013840736" datatype="html">
         <source>Confirm storage path assignment</source>
@@ -2940,7 +2940,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">416</context>
         </context-group>
-        <target state="translated">Tämä toiminto poistaa pysyvästi "<x id="PH" equiv-text="this.list.selected.size"/>" valittua dokumenttia.</target>
+        <target state="translated">Tämä toiminto poistaa pysyvästi "<x id="PH" equiv-text="this.list.selected.size"/>" valitun asiakirjan.</target>
       </trans-unit>
       <trans-unit id="6734339521247847366" datatype="html">
         <source>Delete document(s)</source>
@@ -3052,7 +3052,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">187</context>
         </context-group>
-        <target state="translated">Suodata dokumenttityypin mukaan</target>
+        <target state="translated">Suodata asiakirjatyypin mukaan</target>
       </trans-unit>
       <trans-unit id="157572966557284263" datatype="html">
         <source>Filter by storage path</source>
@@ -3212,7 +3212,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">97</context>
         </context-group>
-        <target state="translated">{VAR_PLURAL, plural, one {}=1 {Yksi dokumentti} other {<x id="INTERPOLATION"/> dokumenttia}}</target>
+        <target state="translated">{VAR_PLURAL, plural, one {}=1 {Yksi asiakirja} other {<x id="INTERPOLATION"/> asiakirjaa}}</target>
       </trans-unit>
       <trans-unit id="2243770355958919528" datatype="html">
         <source>(filtered)</source>
@@ -3604,7 +3604,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="translated">Dokumenttien määrä</target>
+        <target state="translated">Asiakirjojen määrä</target>
       </trans-unit>
       <trans-unit id="7376880254267897616" datatype="html">
         <source>Filter Documents</source>
@@ -3664,7 +3664,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">127</context>
         </context-group>
-        <target state="needs-translation">Successfully created <x id="PH" equiv-text="this.typeName"/>.</target>
+        <target state="translated">Onnistuneesti luotu <x id="PH" equiv-text="this.typeName"/>.</target>
       </trans-unit>
       <trans-unit id="6328828522970676938" datatype="html">
         <source>Error occurred while creating <x id="PH" equiv-text="this.typeName"/> : <x id="PH_1" equiv-text="e.toString()"/>.</source>
@@ -3672,7 +3672,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">132,134</context>
         </context-group>
-        <target state="needs-translation">Error occurred while creating <x id="PH" equiv-text="this.typeName"/> : <x id="PH_1" equiv-text="e.toString()"/>.</target>
+        <target state="translated">Virhe luotaessa <x id="PH" equiv-text="this.typeName"/> : <x id="PH_1" equiv-text="e.toString()"/>.</target>
       </trans-unit>
       <trans-unit id="2541368547549828690" datatype="html">
         <source>Successfully updated <x id="PH" equiv-text="this.typeName"/>.</source>
@@ -3680,7 +3680,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">150</context>
         </context-group>
-        <target state="needs-translation">Successfully updated <x id="PH" equiv-text="this.typeName"/>.</target>
+        <target state="translated">Onnistuneesti päivitetty <x id="PH" equiv-text="this.typeName"/>.</target>
       </trans-unit>
       <trans-unit id="6151710751857751783" datatype="html">
         <source>Error occurred while saving <x id="PH" equiv-text="this.typeName"/> : <x id="PH_1" equiv-text="e.toString()"/>.</source>
@@ -3688,7 +3688,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">155,157</context>
         </context-group>
-        <target state="needs-translation">Error occurred while saving <x id="PH" equiv-text="this.typeName"/> : <x id="PH_1" equiv-text="e.toString()"/>.</target>
+        <target state="translated">Virhe tallennettaessa <x id="PH" equiv-text="this.typeName"/> : <x id="PH_1" equiv-text="e.toString()"/>.</target>
       </trans-unit>
       <trans-unit id="4012132330507560812" datatype="html">
         <source>Do you really want to delete the <x id="PH" equiv-text="this.typeName"/>?</source>
@@ -3720,7 +3720,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">2</context>
         </context-group>
-        <target state="needs-translation">Start tour</target>
+        <target state="translated">Aloita opastus</target>
       </trans-unit>
       <trans-unit id="4798013226763881638" datatype="html">
         <source>Open Django Admin</source>
@@ -3728,7 +3728,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="needs-translation">Open Django Admin</target>
+        <target state="translated">Avaa Django Admin</target>
       </trans-unit>
       <trans-unit id="6439365426343089851" datatype="html">
         <source>General</source>
@@ -3840,7 +3840,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">99</context>
         </context-group>
-        <target state="needs-translation">Sidebar</target>
+        <target state="translated">Sivupalkki</target>
       </trans-unit>
       <trans-unit id="4608457133854405683" datatype="html">
         <source>Use &apos;slim&apos; sidebar (icons only)</source>
@@ -3848,7 +3848,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">103</context>
         </context-group>
-        <target state="needs-translation">Use 'slim' sidebar (icons only)</target>
+        <target state="translated">Käytä pientä sivupalkkia (vain kuvakkeet)</target>
       </trans-unit>
       <trans-unit id="1356890996281769972" datatype="html">
         <source>Dark mode</source>
@@ -3904,7 +3904,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">135</context>
         </context-group>
-        <target state="needs-translation">Update checking</target>
+        <target state="translated">Tarkista päivitykset</target>
       </trans-unit>
       <trans-unit id="7890007688616707209" datatype="html">
         <source> Update checking works by pinging the the public <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;"/>Github API<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> for the latest release to determine whether a new version is available.<x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br/&gt;"/> Actual updating of the app must still be performed manually. </source>
@@ -3912,7 +3912,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">140,142</context>
         </context-group>
-        <target state="needs-translation"> Update checking works by pinging the the public <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;"/>Github API<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> for the latest release to determine whether a new version is available.<x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br/&gt;"/> Actual updating of the app must still be performed manually. </target>
+        <target state="translated"> Päivityksen tarkistaminen tapahtuu pingaamalla <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;"/>Github API<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> viimeisimmän version tarkistamiseksi.<x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br/&gt;"/> Sovelluksen varsinainen päivitys on silti suoritettava manuaalisesti. </target>
       </trans-unit>
       <trans-unit id="5489945693955857309" datatype="html">
         <source><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="No track"/>No tracking data is collected by the app in any way.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></source>
@@ -3920,7 +3920,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">144,146</context>
         </context-group>
-        <target state="needs-translation"><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="No track"/>No tracking data is collected by the app in any way.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></target>
+        <target state="translated"><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="No track"/>Sovellus ei kerää seurantatietoja.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></target>
       </trans-unit>
       <trans-unit id="5070799004079086984" datatype="html">
         <source>Enable update checking</source>
@@ -3928,7 +3928,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">146</context>
         </context-group>
-        <target state="needs-translation">Enable update checking</target>
+        <target state="translated">Ota päivityksen tarkistus käyttöön</target>
       </trans-unit>
       <trans-unit id="6645943458623480835" datatype="html">
         <source>Note that for users of third-party containers e.g. linuxserver.io this notification may be &apos;ahead&apos; of the current third-party release.</source>
@@ -3936,7 +3936,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">146</context>
         </context-group>
-        <target state="needs-translation">Note that for users of third-party containers e.g. linuxserver.io this notification may be 'ahead' of the current third-party release.</target>
+        <target state="translated">Huomaa, että kolmansien osapuolten konttien käyttäjille, esim. linuxserver.io, tämä ilmoitus voi olla edellä nykyisen kolmannen osapuolen julkaisusta.</target>
       </trans-unit>
       <trans-unit id="8508424367627989968" datatype="html">
         <source>Bulk editing</source>
@@ -4056,7 +4056,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">232,231</context>
         </context-group>
-        <target state="needs-translation">Mail</target>
+        <target state="translated">Sähköposti</target>
       </trans-unit>
       <trans-unit id="8913167930428886792" datatype="html">
         <source>Mail accounts</source>
@@ -4064,7 +4064,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">236</context>
         </context-group>
-        <target state="needs-translation">Mail accounts</target>
+        <target state="translated">Sähköpostitilit</target>
       </trans-unit>
       <trans-unit id="1259421956660976189" datatype="html">
         <source>Add Account</source>
@@ -4072,7 +4072,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">241</context>
         </context-group>
-        <target state="needs-translation">Add Account</target>
+        <target state="translated">Lisää tili</target>
       </trans-unit>
       <trans-unit id="2188854519574316630" datatype="html">
         <source>Server</source>
@@ -4080,7 +4080,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">249</context>
         </context-group>
-        <target state="needs-translation">Server</target>
+        <target state="translated">Palvelin</target>
       </trans-unit>
       <trans-unit id="6235247415162820954" datatype="html">
         <source>No mail accounts defined.</source>
@@ -4088,7 +4088,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">267</context>
         </context-group>
-        <target state="needs-translation">No mail accounts defined.</target>
+        <target state="translated">Sähköpostitilejä ei ole määritelty.</target>
       </trans-unit>
       <trans-unit id="5364020217520256833" datatype="html">
         <source>Mail rules</source>
@@ -4096,7 +4096,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">271</context>
         </context-group>
-        <target state="needs-translation">Mail rules</target>
+        <target state="translated">Sähköpostisäännöt</target>
       </trans-unit>
       <trans-unit id="1372022816709469401" datatype="html">
         <source>Add Rule</source>
@@ -4104,7 +4104,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">276</context>
         </context-group>
-        <target state="needs-translation">Add Rule</target>
+        <target state="translated">Lisää sääntö</target>
       </trans-unit>
       <trans-unit id="6751234988479444294" datatype="html">
         <source>No mail rules defined.</source>
@@ -4112,7 +4112,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">302</context>
         </context-group>
-        <target state="needs-translation">No mail rules defined.</target>
+        <target state="translated">Sähköpostisääntöjä ei ole määritelty.</target>
       </trans-unit>
       <trans-unit id="5610279464668232148" datatype="html">
         <source>Saved view &quot;<x id="PH" equiv-text="savedView.name"/>&quot; deleted.</source>
@@ -4184,7 +4184,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">554</context>
         </context-group>
-        <target state="needs-translation">Saved account "<x id="PH" equiv-text="newMailAccount.name"/>".</target>
+        <target state="translated">Tallennettu tili "<x id="PH" equiv-text="newMailAccount.name"/>".</target>
       </trans-unit>
       <trans-unit id="6428427497555765743" datatype="html">
         <source>Error saving account: <x id="PH" equiv-text="e.toString()"/>.</source>
@@ -4192,7 +4192,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">564</context>
         </context-group>
-        <target state="needs-translation">Error saving account: <x id="PH" equiv-text="e.toString()"/>.</target>
+        <target state="translated">Virhe tallennettaessa tiliä: <x id="PH" equiv-text="e.toString()"/>.</target>
       </trans-unit>
       <trans-unit id="5641934153807844674" datatype="html">
         <source>Confirm delete mail account</source>
@@ -4200,7 +4200,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">574</context>
         </context-group>
-        <target state="needs-translation">Confirm delete mail account</target>
+        <target state="translated">Vahvista sähköpostitilin poisto</target>
       </trans-unit>
       <trans-unit id="7176985344323395435" datatype="html">
         <source>This operation will permanently delete this mail account.</source>
@@ -4208,7 +4208,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">575</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently delete this mail account.</target>
+        <target state="translated">Tämä toiminto poistaa tämän sähköpostitilin pysyvästi.</target>
       </trans-unit>
       <trans-unit id="4233826387148482123" datatype="html">
         <source>Deleted mail account</source>
@@ -4216,7 +4216,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">584</context>
         </context-group>
-        <target state="needs-translation">Deleted mail account</target>
+        <target state="translated">Poistettu sähköpostitili</target>
       </trans-unit>
       <trans-unit id="7443801450153832973" datatype="html">
         <source>Error deleting mail account: <x id="PH" equiv-text="e.toString()"/>.</source>
@@ -4224,7 +4224,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">593</context>
         </context-group>
-        <target state="needs-translation">Error deleting mail account: <x id="PH" equiv-text="e.toString()"/>.</target>
+        <target state="translated">Virhe poistettaessa sähköpostitiliä: <x id="PH" equiv-text="e.toString()"/>.</target>
       </trans-unit>
       <trans-unit id="123368655395433699" datatype="html">
         <source>Saved rule &quot;<x id="PH" equiv-text="newMailRule.name"/>&quot;.</source>
@@ -4232,7 +4232,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">612</context>
         </context-group>
-        <target state="needs-translation">Saved rule "<x id="PH" equiv-text="newMailRule.name"/>".</target>
+        <target state="translated">Tallennettu sääntö "<x id="PH" equiv-text="newMailRule.name"/>".</target>
       </trans-unit>
       <trans-unit id="4741216051394823471" datatype="html">
         <source>Error saving rule: <x id="PH" equiv-text="e.toString()"/>.</source>
@@ -4240,7 +4240,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">623</context>
         </context-group>
-        <target state="needs-translation">Error saving rule: <x id="PH" equiv-text="e.toString()"/>.</target>
+        <target state="translated">Virhe tallennettaessa sääntöä: <x id="PH" equiv-text="e.toString()"/>.</target>
       </trans-unit>
       <trans-unit id="3896080636020672118" datatype="html">
         <source>Confirm delete mail rule</source>
@@ -4248,7 +4248,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">633</context>
         </context-group>
-        <target state="needs-translation">Confirm delete mail rule</target>
+        <target state="translated">Vahvista sähköpostisäännön poisto</target>
       </trans-unit>
       <trans-unit id="2250372580580310337" datatype="html">
         <source>This operation will permanently delete this mail rule.</source>
@@ -4256,7 +4256,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">634</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently delete this mail rule.</target>
+        <target state="translated">Tämä toiminto poistaa tämän sähköpostisäännön pysyvästi.</target>
       </trans-unit>
       <trans-unit id="9077981247971516916" datatype="html">
         <source>Deleted mail rule</source>
@@ -4264,7 +4264,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">643</context>
         </context-group>
-        <target state="needs-translation">Deleted mail rule</target>
+        <target state="translated">Poistettu sähköpostisääntö</target>
       </trans-unit>
       <trans-unit id="4740074357089345173" datatype="html">
         <source>Error deleting mail rule: <x id="PH" equiv-text="e.toString()"/>.</source>
@@ -4272,7 +4272,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">652</context>
         </context-group>
-        <target state="needs-translation">Error deleting mail rule: <x id="PH" equiv-text="e.toString()"/>.</target>
+        <target state="translated">Virhe poistettaessa sähköpostisääntöä: <x id="PH" equiv-text="e.toString()"/>.</target>
       </trans-unit>
       <trans-unit id="5101757640976222639" datatype="html">
         <source>storage path</source>
@@ -4382,7 +4382,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">86</context>
         </context-group>
-        <target state="needs-translation">Open Document</target>
+        <target state="translated">Avaa asiakirja</target>
       </trans-unit>
       <trans-unit id="6798650225457993016" datatype="html">
         <source>Failed <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.failedFileTasks.length &gt; 0&quot; class=&quot;badge bg-danger ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
@@ -4610,7 +4610,7 @@
           <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="needs-translation">You have unsaved changes to the saved view</target>
+        <target state="translated">Sinulla on tallentamattomia muutoksia tallennettuun näkymään</target>
       </trans-unit>
       <trans-unit id="7282050913165342352" datatype="html">
         <source>Are you sure you want to close this saved view?</source>
@@ -4618,7 +4618,7 @@
           <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="needs-translation">Are you sure you want to close this saved view?</target>
+        <target state="translated">Haluatko varmasti sulkea tämän näkymän?</target>
       </trans-unit>
       <trans-unit id="856284624775342512" datatype="html">
         <source>Save and close</source>
@@ -4626,7 +4626,7 @@
           <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
           <context context-type="linenumber">34</context>
         </context-group>
-        <target state="needs-translation">Save and close</target>
+        <target state="translated">Tallenna ja sulje</target>
       </trans-unit>
       <trans-unit id="7536524521722799066" datatype="html">
         <source>(no title)</source>
@@ -4666,7 +4666,7 @@
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="needs-translation">Document with ASN already exists.</target>
+        <target state="translated">Asiakirja ASN:llä on jo olemassa.</target>
       </trans-unit>
       <trans-unit id="148389968432135849" datatype="html">
         <source>File not found.</source>
@@ -4839,7 +4839,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">151</context>
         </context-group>
-        <target state="needs-translation">Arabic</target>
+        <target state="translated">Arabialainen</target>
       </trans-unit>
       <trans-unit id="3098941349689899577" datatype="html">
         <source>Belarusian</source>
