@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-09 21:50+0000\n"
-"PO-Revision-Date: 2023-02-16 21:18\n"
+"PO-Revision-Date: 2023-02-16 22:16\n"
 "Last-Translator: \n"
 "Language-Team: Finnish\n"
 "Language: fi_FI\n"
@@ -19,7 +19,7 @@ msgstr ""
 
 #: documents/apps.py:9
 msgid "Documents"
-msgstr "Dokumentit"
+msgstr "Asiakirjat"
 
 #: documents/models.py:32
 msgid "Any word"
@@ -196,11 +196,11 @@ msgstr "arkistointisarjanumero"
 
 #: documents/models.py:237
 msgid "The position of this document in your physical document archive."
-msgstr "Dokumentin sijainti fyysisessa dokumenttiarkistossa."
+msgstr "Asiakirjan sijainti fyysisessa arkistossa."
 
 #: documents/models.py:243 documents/models.py:628
 msgid "document"
-msgstr "dokumentti"
+msgstr "asiakirja"
 
 #: documents/models.py:244
 msgid "documents"
@@ -292,7 +292,7 @@ msgstr "yhteyshenkilö on"
 
 #: documents/models.py:391
 msgid "document type is"
-msgstr "dokumenttityyppi on"
+msgstr "asiakirjatyyppi on"
 
 #: documents/models.py:392
 msgid "is in inbox"
