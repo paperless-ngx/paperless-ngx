@@ -1,5 +1,45 @@
 # Changelog
 
+## paperless-ngx 1.13.0
+
+### Features
+
+- Feature: allow disable warn on close saved view with changes [@shamoon](https://github.com/shamoon) ([#2681](https://github.com/paperless-ngx/paperless-ngx/pull/2681))
+- Feature: Add option to enable response compression [@stumpylog](https://github.com/stumpylog) ([#2621](https://github.com/paperless-ngx/paperless-ngx/pull/2621))
+- Feature: split documents on ASN barcode [@muued](https://github.com/muued) ([#2554](https://github.com/paperless-ngx/paperless-ngx/pull/2554))
+
+### Bug Fixes
+
+- Fix: Ignore path filtering didn't handle sub directories [@stumpylog](https://github.com/stumpylog) ([#2674](https://github.com/paperless-ngx/paperless-ngx/pull/2674))
+- Bugfix: Generation of secret key hangs during install script [@stumpylog](https://github.com/stumpylog) ([#2657](https://github.com/paperless-ngx/paperless-ngx/pull/2657))
+- Fix: Remove files produced by barcode splitting when completed [@stumpylog](https://github.com/stumpylog) ([#2648](https://github.com/paperless-ngx/paperless-ngx/pull/2648))
+- Fix: add missing storage path placeholders [@shamoon](https://github.com/shamoon) ([#2651](https://github.com/paperless-ngx/paperless-ngx/pull/2651))
+- Fix long dropdown contents break document detail column view [@shamoon](https://github.com/shamoon) ([#2638](https://github.com/paperless-ngx/paperless-ngx/pull/2638))
+- Fix: tags dropdown should stay closed when removing [@shamoon](https://github.com/shamoon) ([#2625](https://github.com/paperless-ngx/paperless-ngx/pull/2625))
+- Bugfix: Configure scheduled tasks to expire after some time [@stumpylog](https://github.com/stumpylog) ([#2614](https://github.com/paperless-ngx/paperless-ngx/pull/2614))
+- Bugfix: Limit management list pagination maxSize to 5 [@Kaaybi](https://github.com/Kaaybi) ([#2618](https://github.com/paperless-ngx/paperless-ngx/pull/2618))
+- Fix: Don't crash on bad ASNs during indexing [@stumpylog](https://github.com/stumpylog) ([#2586](https://github.com/paperless-ngx/paperless-ngx/pull/2586))
+- Fix: Prevent mktime OverflowError except in even more rare caes [@stumpylog](https://github.com/stumpylog) ([#2574](https://github.com/paperless-ngx/paperless-ngx/pull/2574))
+- Bugfix: Whoosh relative date queries weren't handling timezones [@stumpylog](https://github.com/stumpylog) ([#2566](https://github.com/paperless-ngx/paperless-ngx/pull/2566))
+- Fix importing files with non-ascii names [@Kexogg](https://github.com/Kexogg) ([#2555](https://github.com/paperless-ngx/paperless-ngx/pull/2555))
+
+### Documentation
+
+- Chore: update recommended Gotenberg to 7.8, docs note possible incompatibility [@shamoon](https://github.com/shamoon) ([#2608](https://github.com/paperless-ngx/paperless-ngx/pull/2608))
+- [Documentation] Add v1.12.2 changelog [@github-actions](https://github.com/github-actions) ([#2553](https://github.com/paperless-ngx/paperless-ngx/pull/2553))
+
+### Maintenance
+
+- Chore: Faster Docker image cleanup [@stumpylog](https://github.com/stumpylog) ([#2687](https://github.com/paperless-ngx/paperless-ngx/pull/2687))
+- Chore: Remove duplicated folder [@stumpylog](https://github.com/stumpylog) ([#2561](https://github.com/paperless-ngx/paperless-ngx/pull/2561))
+- Chore: Switch test coverage to Codecov [@stumpylog](https://github.com/stumpylog) ([#2582](https://github.com/paperless-ngx/paperless-ngx/pull/2582))
+- Bump docker/build-push-action from 3 to 4 [@dependabot](https://github.com/dependabot) ([#2576](https://github.com/paperless-ngx/paperless-ngx/pull/2576))
+- Chore: Run tests which require convert in the CI [@stumpylog](https://github.com/stumpylog) ([#2570](https://github.com/paperless-ngx/paperless-ngx/pull/2570))
+
+- Feature: split documents on ASN barcode [@muued](https://github.com/muued) ([#2554](https://github.com/paperless-ngx/paperless-ngx/pull/2554))
+- Bugfix: Whoosh relative date queries weren't handling timezones [@stumpylog](https://github.com/stumpylog) ([#2566](https://github.com/paperless-ngx/paperless-ngx/pull/2566))
+- Fix importing files with non-ascii names [@Kexogg](https://github.com/Kexogg) ([#2555](https://github.com/paperless-ngx/paperless-ngx/pull/2555))
+
 ## paperless-ngx 1.12.2
 
 _Note: Version 1.12.x introduced searching of comments which will work for comments added after the upgrade but a reindex of the search index is required in order to be able to search
