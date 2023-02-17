@@ -301,6 +301,9 @@ export class DocumentDetailComponent
         },
         error: (error) => {
           this.metadata = null
+          this.toastService.showError(
+            $localize`Error retrieving metadata` + ': ' + error.toString()
+          )
         },
       })
     this.documentsService
@@ -312,6 +315,9 @@ export class DocumentDetailComponent
         },
         error: (error) => {
           this.suggestions = null
+          this.toastService.showError(
+            $localize`Error retrieving suggestions` + ': ' + error.toString()
+          )
         },
       })
     this.title = this.documentTitlePipe.transform(doc.title)
@@ -422,6 +428,11 @@ export class DocumentDetailComponent
         error: (error) => {
           this.networkActive = false
           this.error = error.error
+          this.toastService.showError(
+            $localize`Error saving document` +
+              ': ' +
+              (error.message ?? error.toString())
+          )
         },
       })
   }
@@ -461,6 +472,11 @@ export class DocumentDetailComponent
         error: (error) => {
           this.networkActive = false
           this.error = error.error
+          this.toastService.showError(
+            $localize`Error saving document` +
+              ': ' +
+              (error.message ?? error.toString())
+          )
         },
       })
   }
