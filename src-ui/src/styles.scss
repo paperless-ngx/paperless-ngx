@@ -255,6 +255,7 @@ a, a:hover,
 .paperless-input-tags {
   .ng-select.ng-select-multiple .ng-select-container .ng-value-container .ng-value {
     background-color: transparent;
+    border-color: transparent;
   }
 
   .ng-select.ng-select-multiple .ng-select-container .ng-value-container {
@@ -606,4 +607,19 @@ a.badge {
 
 code {
   color: var(--pngx-body-color-accent)
+}
+
+.accordion {
+  --bs-accordion-btn-padding-x: 0.75rem;
+  --bs-accordion-btn-padding-y: 0.375rem;
+  --bs-accordion-btn-bg: var(--bs-light);
+  --bs-accordion-btn-color: var(--bs-primary);
+  --bs-accordion-color: var(--bs-body-color);
+  --bs-accordion-bg: var(--bs-light);
+  --bs-accordion-active-color: var(--bs-primary);
+  --bs-accordion-active-bg: var(--pngx-bg-alt);
+}
+
+.accordion-button::after {
+  filter: invert(0.5) saturate(0);
 }

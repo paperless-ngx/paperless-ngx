@@ -1,17 +1,20 @@
 import { Component } from '@angular/core'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
 })
-export class DashboardComponent {
+export class DashboardComponent extends ComponentWithPermissions {
   constructor(
     public savedViewService: SavedViewService,
     public settingsService: SettingsService
-  ) {}
+  ) {
+    super()
+  }
 
   get subtitle() {
     if (this.settingsService.displayName) {

@@ -139,7 +139,7 @@ class TestExportImport(DirectoriesMixin, TestCase):
 
         manifest = self._do_export(use_filename_format=use_filename_format)
 
-        self.assertEqual(len(manifest), 11)
+        self.assertEqual(len(manifest), 12)
         self.assertEqual(
             len(list(filter(lambda e: e["model"] == "documents.document", manifest))),
             4,
