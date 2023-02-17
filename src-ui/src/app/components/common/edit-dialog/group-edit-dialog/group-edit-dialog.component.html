@@ -1,0 +1,19 @@
+<form [formGroup]="objectForm" (ngSubmit)="save()">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">{{getTitle()}}</h4>
+      <button type="button" [disabled]="!closeEnabled" class="btn-close" aria-label="Close" (click)="cancel()">
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="row">
+        <div class="col">
+          <app-input-text i18n-title title="Name" formControlName="name" [error]="error?.name"></app-input-text>
+          <app-permissions-select i18n-title title="Permissions" formControlName="permissions" [error]="error?.permissions"></app-permissions-select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-secondary" (click)="cancel()" i18n [disabled]="networkActive">Cancel</button>
+      <button type="submit" class="btn btn-primary" i18n [disabled]="networkActive">Save</button>
+    </div>
+  </form>

@@ -9,6 +9,11 @@ import { NgxFileDropEntry } from 'ngx-file-drop'
 import { UploadDocumentsService } from './services/upload-documents.service'
 import { TasksService } from './services/tasks.service'
 import { TourService } from 'ngx-ui-tour-ng-bootstrap'
+import {
+  PermissionAction,
+  PermissionsService,
+  PermissionType,
+} from './services/permissions.service'
 
 @Component({
   selector: 'app-root',
@@ -32,7 +37,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private uploadDocumentsService: UploadDocumentsService,
     private tasksService: TasksService,
     public tourService: TourService,
-    private renderer: Renderer2
+    private renderer: Renderer2,
+    private permissionsService: PermissionsService
   ) {
     let anyWindow = window as any
     anyWindow.pdfWorkerSrc = 'assets/js/pdf.worker.min.js'
@@ -74,15 +80,28 @@ export class AppComponent implements OnInit, OnDestroy {
         if (
           this.showNotification(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUCCESS)
         ) {
-          this.toastService.show({
-            title: $localize`Document added`,
-            delay: 10000,
-            content: $localize`Document ${status.filename} was added to paperless.`,
-            actionName: $localize`Open document`,
-            action: () => {
-              this.router.navigate(['documents', status.documentId])
-            },
-          })
+          if (
+            this.permissionsService.currentUserCan(
+              PermissionAction.View,
+              PermissionType.Document
+            )
+          ) {
+            this.toastService.show({
+              title: $localize`Document added`,
+              delay: 10000,
+              content: $localize`Document ${status.filename} was added to paperless.`,
+              actionName: $localize`Open document`,
+              action: () => {
+                this.router.navigate(['documents', status.documentId])
+              },
+            })
+          } else {
+            this.toastService.show({
+              title: $localize`Document added`,
+              delay: 10000,
+              content: $localize`Document ${status.filename} was added to paperless.`,
+            })
+          }
         }
       })
 
@@ -225,7 +244,13 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   public get dragDropEnabled(): boolean {
-    return !this.router.url.includes('dashboard')
+    return (
+      !this.router.url.includes('dashboard') &&
+      this.permissionsService.currentUserCan(
+        PermissionAction.Add,
+        PermissionType.Document
+      )
+    )
   }
 
   public fileOver() {

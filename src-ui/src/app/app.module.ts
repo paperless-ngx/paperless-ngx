@@ -42,6 +42,7 @@ import { CheckComponent } from './components/common/input/check/check.component'
 import { PasswordComponent } from './components/common/input/password/password.component'
 import { SaveViewConfigDialogComponent } from './components/document-list/save-view-config-dialog/save-view-config-dialog.component'
 import { TagsComponent } from './components/common/input/tags/tags.component'
+import { IfPermissionsDirective } from './directives/if-permissions.directive'
 import { SortableDirective } from './directives/sortable.directive'
 import { CookieService } from 'ngx-cookie-service'
 import { CsrfInterceptor } from './interceptors/csrf.interceptor'
@@ -70,6 +71,7 @@ import { ColorSliderModule } from 'ngx-color/slider'
 import { ColorComponent } from './components/common/input/color/color.component'
 import { DocumentAsnComponent } from './components/document-asn/document-asn.component'
 import { DocumentCommentsComponent } from './components/document-comments/document-comments.component'
+import { PermissionsGuard } from './guards/permissions.guard'
 import { DirtyDocGuard } from './guards/dirty-doc.guard'
 import { DirtySavedViewGuard } from './guards/dirty-saved-view.guard'
 import { StoragePathListComponent } from './components/manage/storage-path-list/storage-path-list.component'
@@ -77,8 +79,15 @@ import { StoragePathEditDialogComponent } from './components/common/edit-dialog/
 import { SettingsService } from './services/settings.service'
 import { TasksComponent } from './components/manage/tasks/tasks.component'
 import { TourNgBootstrapModule } from 'ngx-ui-tour-ng-bootstrap'
+import { UserEditDialogComponent } from './components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component'
+import { GroupEditDialogComponent } from './components/common/edit-dialog/group-edit-dialog/group-edit-dialog.component'
+import { PermissionsSelectComponent } from './components/common/permissions-select/permissions-select.component'
 import { MailAccountEditDialogComponent } from './components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component'
 import { MailRuleEditDialogComponent } from './components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component'
+import { PermissionsUserComponent } from './components/common/input/permissions/permissions-user/permissions-user.component'
+import { PermissionsGroupComponent } from './components/common/input/permissions/permissions-group/permissions-group.component'
+import { IfOwnerDirective } from './directives/if-owner.directive'
+import { IfObjectPermissionsDirective } from './directives/if-object-permissions.directive'
 
 import localeAr from '@angular/common/locales/ar'
 import localeBe from '@angular/common/locales/be'
@@ -100,6 +109,8 @@ import localeSr from '@angular/common/locales/sr'
 import localeSv from '@angular/common/locales/sv'
 import localeTr from '@angular/common/locales/tr'
 import localeZh from '@angular/common/locales/zh'
+import { PermissionsDialogComponent } from './components/common/permissions-dialog/permissions-dialog.component'
+import { PermissionsFormComponent } from './components/common/input/permissions/permissions-form/permissions-form.component'
 
 registerLocaleData(localeAr)
 registerLocaleData(localeBe)
@@ -165,6 +176,7 @@ function initializeApp(settings: SettingsService) {
     PasswordComponent,
     SaveViewConfigDialogComponent,
     TagsComponent,
+    IfPermissionsDirective,
     SortableDirective,
     SavedViewWidgetComponent,
     StatisticsWidgetComponent,
@@ -186,8 +198,17 @@ function initializeApp(settings: SettingsService) {
     DocumentAsnComponent,
     DocumentCommentsComponent,
     TasksComponent,
+    UserEditDialogComponent,
+    GroupEditDialogComponent,
+    PermissionsSelectComponent,
     MailAccountEditDialogComponent,
     MailRuleEditDialogComponent,
+    PermissionsUserComponent,
+    PermissionsGroupComponent,
+    IfOwnerDirective,
+    IfObjectPermissionsDirective,
+    PermissionsDialogComponent,
+    PermissionsFormComponent,
   ],
   imports: [
     BrowserModule,
@@ -225,6 +246,7 @@ function initializeApp(settings: SettingsService) {
     DocumentTitlePipe,
     { provide: NgbDateAdapter, useClass: ISODateAdapter },
     { provide: NgbDateParserFormatter, useClass: LocalizedDateParserFormatter },
+    PermissionsGuard,
     DirtyDocGuard,
     DirtySavedViewGuard,
   ],

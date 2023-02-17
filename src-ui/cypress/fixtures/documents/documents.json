@@ -14,11 +14,14 @@
                 4
             ],
             "created": "2022-03-22T07:24:18Z",
+            "created_date": "2022-03-22",
             "modified": "2022-03-22T07:24:23.264859Z",
             "added": "2022-03-22T07:24:22.922631Z",
             "archive_serial_number": null,
             "original_file_name": "2022-03-22 no latin title.pdf",
-            "archived_file_name": "2022-03-22 no latin title.pdf"
+            "archived_file_name": "2022-03-22 no latin title.pdf",
+            "owner": null,
+            "permissions": []
         },
         {
             "id": 2,
@@ -29,11 +32,14 @@
             "content": "Test document PDF",
             "tags": [],
             "created": "2022-03-23T07:24:18Z",
+            "created_date": "2022-03-23",
             "modified": "2022-03-23T07:24:23.264859Z",
             "added": "2022-03-23T07:24:22.922631Z",
             "archive_serial_number": 12345,
             "original_file_name": "2022-03-23 lorem ipsum dolor sit amet.pdf",
-            "archived_file_name": "2022-03-23 llorem ipsum dolor sit amet.pdf"
+            "archived_file_name": "2022-03-23 llorem ipsum dolor sit amet.pdf",
+            "owner": null,
+            "permissions": []
         },
         {
             "id": 3,
@@ -46,11 +52,14 @@
                 2
             ],
             "created": "2022-03-24T07:24:18Z",
+            "created_date": "2022-03-24",
             "modified": "2022-03-24T07:24:23.264859Z",
             "added": "2022-03-24T07:24:22.922631Z",
             "archive_serial_number": null,
             "original_file_name": "2022-03-24 dolor.pdf",
-            "archived_file_name": "2022-03-24 dolor.pdf"
+            "archived_file_name": "2022-03-24 dolor.pdf",
+            "owner": null,
+            "permissions": []
         },
         {
             "id": 4,
@@ -63,11 +72,14 @@
                 4, 5
             ],
             "created": "2022-06-01T07:24:18Z",
+            "created_date": "2022-06-01",
             "modified": "2022-06-01T07:24:23.264859Z",
             "added": "2022-06-01T07:24:22.922631Z",
             "archive_serial_number": 12347,
             "original_file_name": "2022-06-01 sit amet.pdf",
-            "archived_file_name": "2022-06-01 sit amet.pdf"
+            "archived_file_name": "2022-06-01 sit amet.pdf",
+            "owner": null,
+            "permissions": []
         }
     ]
 }

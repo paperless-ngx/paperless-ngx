@@ -2,6 +2,7 @@ import itertools
 import json
 import logging
 import os
+import re
 import tempfile
 import urllib
 import uuid
@@ -30,6 +31,9 @@ from django.utils.translation import get_language
 from django.views.decorators.cache import cache_control
 from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
+from documents.filters import ObjectOwnedOrGrantedPermissionsFilter
+from documents.permissions import PaperlessAdminPermissions
+from documents.permissions import PaperlessObjectPermissions
 from documents.tasks import consume_file
 from langdetect import detect
 from packaging import version as packaging_version
@@ -42,6 +46,7 @@ from rest_framework.exceptions import NotFound
 from rest_framework.filters import OrderingFilter
 from rest_framework.filters import SearchFilter
 from rest_framework.generics import GenericAPIView
+from rest_framework.mixins import CreateModelMixin
 from rest_framework.mixins import DestroyModelMixin
 from rest_framework.mixins import ListModelMixin
 from rest_framework.mixins import RetrieveModelMixin
@@ -137,7 +142,17 @@ class IndexView(TemplateView):
         return context
 
 
-class CorrespondentViewSet(ModelViewSet):
+class PassUserMixin(CreateModelMixin):
+    """
+    Pass a user object to serializer
+    """
+
+    def get_serializer(self, *args, **kwargs):
+        kwargs.setdefault("user", self.request.user)
+        return super().get_serializer(*args, **kwargs)
+
+
+class CorrespondentViewSet(ModelViewSet, PassUserMixin):
     model = Correspondent
 
     queryset = Correspondent.objects.annotate(
@@ -147,8 +162,12 @@ class CorrespondentViewSet(ModelViewSet):
 
     serializer_class = CorrespondentSerializer
     pagination_class = StandardPagination
-    permission_classes = (IsAuthenticated,)
-    filter_backends = (DjangoFilterBackend, OrderingFilter)
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+        ObjectOwnedOrGrantedPermissionsFilter,
+    )
     filterset_class = CorrespondentFilterSet
     ordering_fields = (
         "name",
@@ -166,20 +185,26 @@ class TagViewSet(ModelViewSet):
         Lower("name"),
     )
 
-    def get_serializer_class(self):
+    def get_serializer_class(self, *args, **kwargs):
+        # from UserPassMixin
+        kwargs.setdefault("user", self.request.user)
         if int(self.request.version) == 1:
             return TagSerializerVersion1
         else:
             return TagSerializer
 
     pagination_class = StandardPagination
-    permission_classes = (IsAuthenticated,)
-    filter_backends = (DjangoFilterBackend, OrderingFilter)
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+        ObjectOwnedOrGrantedPermissionsFilter,
+    )
     filterset_class = TagFilterSet
     ordering_fields = ("color", "name", "matching_algorithm", "match", "document_count")
 
 
-class DocumentTypeViewSet(ModelViewSet):
+class DocumentTypeViewSet(ModelViewSet, PassUserMixin):
     model = DocumentType
 
     queryset = DocumentType.objects.annotate(
@@ -188,13 +213,18 @@ class DocumentTypeViewSet(ModelViewSet):
 
     serializer_class = DocumentTypeSerializer
     pagination_class = StandardPagination
-    permission_classes = (IsAuthenticated,)
-    filter_backends = (DjangoFilterBackend, OrderingFilter)
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+        ObjectOwnedOrGrantedPermissionsFilter,
+    )
     filterset_class = DocumentTypeFilterSet
     ordering_fields = ("name", "matching_algorithm", "match", "document_count")
 
 
 class DocumentViewSet(
+    PassUserMixin,
     RetrieveModelMixin,
     UpdateModelMixin,
     DestroyModelMixin,
@@ -205,8 +235,13 @@ class DocumentViewSet(
     queryset = Document.objects.all()
     serializer_class = DocumentSerializer
     pagination_class = StandardPagination
-    permission_classes = (IsAuthenticated,)
-    filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter)
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    filter_backends = (
+        DjangoFilterBackend,
+        SearchFilter,
+        OrderingFilter,
+        ObjectOwnedOrGrantedPermissionsFilter,
+    )
     filterset_class = DocumentFilterSet
     search_fields = ("title", "correspondent__name", "content")
     ordering_fields = (
@@ -224,6 +259,7 @@ class DocumentViewSet(
         return Document.objects.distinct()
 
     def get_serializer(self, *args, **kwargs):
+        super().get_serializer(*args, **kwargs)
         fields_param = self.request.query_params.get("fields", None)
         if fields_param:
             fields = fields_param.split(",")
@@ -412,8 +448,8 @@ class DocumentViewSet(
                 "user": {
                     "id": c.user.id,
                     "username": c.user.username,
-                    "firstname": c.user.first_name,
-                    "lastname": c.user.last_name,
+                    "first_name": c.user.first_name,
+                    "last_name": c.user.last_name,
                 },
             }
             for c in Comment.objects.filter(document=doc).order_by("-created")
@@ -474,7 +510,7 @@ class DocumentViewSet(
         )
 
 
-class SearchResultSerializer(DocumentSerializer):
+class SearchResultSerializer(DocumentSerializer, PassUserMixin):
     def to_representation(self, instance):
         doc = Document.objects.get(id=instance["id"])
         comments = ",".join(
@@ -514,6 +550,12 @@ class UnifiedSearchViewSet(DocumentViewSet):
         if self._is_search_request():
             from documents import index
 
+            if hasattr(self.request, "user"):
+                # pass user to query for perms
+                self.request.query_params._mutable = True
+                self.request.query_params["user"] = self.request.user.id
+                self.request.query_params._mutable = False
+
             if "query" in self.request.query_params:
                 query_class = index.DelayedFullTextQuery
             elif "more_like_id" in self.request.query_params:
@@ -547,7 +589,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
 
 class LogViewSet(ViewSet):
 
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, PaperlessAdminPermissions)
 
     log_files = ["paperless", "mail"]
 
@@ -569,20 +611,20 @@ class LogViewSet(ViewSet):
         return Response(self.log_files)
 
 
-class SavedViewViewSet(ModelViewSet):
+class SavedViewViewSet(ModelViewSet, PassUserMixin):
     model = SavedView
 
     queryset = SavedView.objects.all()
     serializer_class = SavedViewSerializer
     pagination_class = StandardPagination
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
 
     def get_queryset(self):
         user = self.request.user
-        return SavedView.objects.filter(user=user)
+        return SavedView.objects.filter(owner=user)
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        serializer.save(owner=self.request.user)
 
 
 class BulkEditView(GenericAPIView):
@@ -624,6 +666,7 @@ class PostDocumentView(GenericAPIView):
         tag_ids = serializer.validated_data.get("tags")
         title = serializer.validated_data.get("title")
         created = serializer.validated_data.get("created")
+        owner_id = serializer.validated_data.get("owner")
 
         t = int(mktime(datetime.now().timetuple()))
 
@@ -648,6 +691,7 @@ class PostDocumentView(GenericAPIView):
             override_tag_ids=tag_ids,
             task_id=task_id,
             override_created=created,
+            override_owner_id=owner_id,
         )
 
         return Response(async_task.id)
@@ -842,7 +886,7 @@ class RemoteVersionView(GenericAPIView):
         )
 
 
-class StoragePathViewSet(ModelViewSet):
+class StoragePathViewSet(ModelViewSet, PassUserMixin):
     model = StoragePath
 
     queryset = StoragePath.objects.annotate(document_count=Count("documents")).order_by(
@@ -851,7 +895,7 @@ class StoragePathViewSet(ModelViewSet):
 
     serializer_class = StoragePathSerializer
     pagination_class = StandardPagination
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filterset_class = StoragePathFilterSet
     ordering_fields = ("name", "path", "matching_algorithm", "match", "document_count")
@@ -867,9 +911,6 @@ class UiSettingsView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
 
         user = User.objects.get(pk=request.user.id)
-        displayname = user.username
-        if user.first_name or user.last_name:
-            displayname = " ".join([user.first_name, user.last_name])
         ui_settings = {}
         if hasattr(user, "ui_settings"):
             ui_settings = user.ui_settings.settings
@@ -881,12 +922,14 @@ class UiSettingsView(GenericAPIView):
             ui_settings["update_checking"] = {
                 "backend_setting": settings.ENABLE_UPDATE_CHECK,
             }
+        # strip <app_label>.
+        roles = map(lambda perm: re.sub(r"^\w+.", "", perm), user.get_all_permissions())
         return Response(
             {
                 "user_id": user.id,
                 "username": user.username,
-                "display_name": displayname,
                 "settings": ui_settings,
+                "permissions": roles,
             },
         )
 
