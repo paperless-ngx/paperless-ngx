@@ -189,6 +189,14 @@
       <a ngbNavLink i18n>Saved views</a>
       <ng-template ngbNavContent>
 
+        <h4 i18n>Settings</h4>
+        <div class="row mb-3">
+          <div class="offset-md-3 col">
+            <app-input-check i18n-title title="Show warning when closing saved views with unsaved changes" formControlName="savedViewsWarnOnUnsavedChange"></app-input-check>
+          </div>
+        </div>
+
+        <h4 i18n>Views</h4>
         <div formGroupName="savedViews">
 
             <div *ngFor="let view of savedViews" [formGroupName]="view.id" class="row">
