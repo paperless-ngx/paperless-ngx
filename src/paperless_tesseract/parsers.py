@@ -161,7 +161,7 @@ class RasterisedDocumentParser(DocumentParser):
 
         except Exception:
             # TODO catch all for various issues with PDFminer.six.
-            #  If PDFminer fails, fall back to OCR.
+            #  If pdftotext fails, fall back to OCR.
             self.log(
                 "warning",
                 "Error while getting text from PDF document with " "pdfminer.six",

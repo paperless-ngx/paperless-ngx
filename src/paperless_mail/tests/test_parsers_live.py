@@ -67,11 +67,6 @@ class TestParserLive(TestCase):
 
         return result
 
-    # Only run if convert is available
-    @pytest.mark.skipif(
-        "PAPERLESS_TEST_SKIP_CONVERT" in os.environ,
-        reason="PAPERLESS_TEST_SKIP_CONVERT set, skipping Test",
-    )
     @mock.patch("paperless_mail.parsers.MailDocumentParser.generate_pdf")
     def test_get_thumbnail(self, mock_generate_pdf: mock.MagicMock):
         """
@@ -204,11 +199,6 @@ class TestParserLive(TestCase):
         "GOTENBERG_LIVE" not in os.environ,
         reason="No gotenberg server",
     )
-    # Only run if convert is available
-    @pytest.mark.skipif(
-        "PAPERLESS_TEST_SKIP_CONVERT" in os.environ,
-        reason="PAPERLESS_TEST_SKIP_CONVERT set, skipping Test",
-    )
     def test_generate_pdf_from_mail(self):
         """
         GIVEN:
@@ -300,11 +290,6 @@ class TestParserLive(TestCase):
     @pytest.mark.skipif(
         "GOTENBERG_LIVE" not in os.environ,
         reason="No gotenberg server",
-    )
-    # Only run if convert is available
-    @pytest.mark.skipif(
-        "PAPERLESS_TEST_SKIP_CONVERT" in os.environ,
-        reason="PAPERLESS_TEST_SKIP_CONVERT set, skipping Test",
     )
     def test_generate_pdf_from_html(self):
         """

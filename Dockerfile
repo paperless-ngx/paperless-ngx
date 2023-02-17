@@ -1,11 +1,11 @@
 # syntax=docker/dockerfile:1.4
+# https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/reference.md
 
+# Stage: compile-frontend
+# Purpose: Compiles the frontend
+# Notes:
+#  - Does NPM stuff with Typescript and such
 FROM --platform=$BUILDPLATFORM node:16-bullseye-slim AS compile-frontend
-
-# This stage compiles the frontend
-# This stage runs once for the native platform, as the outputs are not
-# dependent on target arch
-# Inputs: None
 
 COPY ./src-ui /src/src-ui
 
@@ -16,14 +16,12 @@ RUN set -eux \
 RUN set -eux \
   && ./node_modules/.bin/ng build --configuration production
 
+# Stage: pipenv-base
+# Purpose: Generates a requirements.txt file for building
+# Comments:
+#  - pipenv dependencies are not left in the final image
+#  - pipenv can't touch the final image somehow
 FROM --platform=$BUILDPLATFORM python:3.9-slim-bullseye as pipenv-base
-
-# This stage generates the requirements.txt file using pipenv
-# This stage runs once for the native platform, as the outputs are not
-# dependent on target arch
-# This way, pipenv dependencies are not left in the final image
-# nor can pipenv mess up the final image somehow
-# Inputs: None
 
 WORKDIR /usr/src/pipenv
 
@@ -35,6 +33,10 @@ RUN set -eux \
   && echo "Generating requirement.txt" \
     && pipenv requirements > requirements.txt
 
+# Stage: main-app
+# Purpose: The final image
+# Comments:
+#  - Don't leave anything extra in here
 FROM python:3.9-slim-bullseye as main-app
 
 LABEL org.opencontainers.image.authors="paperless-ngx team <hello@paperless-ngx.com>"
@@ -61,10 +63,6 @@ ARG PSYCOPG2_VERSION
 
 # Packages need for running
 ARG RUNTIME_PACKAGES="\
-  # Python
-  python3 \
-  python3-pip \
-  python3-setuptools \
   # General utils
   curl \
   # Docker specific
@@ -128,7 +126,7 @@ RUN set -eux \
     && apt-get install --yes --quiet --no-install-recommends ${RUNTIME_PACKAGES} \
     && rm -rf /var/lib/apt/lists/* \
   && echo "Installing supervisor" \
-    && python3 -m pip install --default-timeout=1000 --upgrade --no-cache-dir supervisor==4.2.4
+    && python3 -m pip install --default-timeout=1000 --upgrade --no-cache-dir supervisor==4.2.5
 
 # Copy gunicorn config
 # Changes very infrequently
@@ -137,7 +135,6 @@ WORKDIR /usr/src/paperless/
 COPY gunicorn.conf.py .
 
 # setup docker-specific things
-# Use mounts to avoid copying installer files into the image
 # These change sometimes, but rarely
 WORKDIR /usr/src/paperless/src/docker/
 
@@ -179,7 +176,6 @@ RUN set -eux \
     && ./install_management_commands.sh
 
 # Install the built packages from the installer library images
-# Use mounts to avoid copying installer files into the image
 # These change sometimes
 RUN set -eux \
   && echo "Getting binaries" \
@@ -203,7 +199,8 @@ RUN set -eux \
     && python3 -m pip list \
   && echo "Cleaning up image layer" \
     && cd ../ \
-    && rm -rf paperless-ngx
+    && rm -rf paperless-ngx \
+    && rm paperless-ngx.tar.gz
 
 WORKDIR /usr/src/paperless/src/
 
@@ -247,11 +244,12 @@ COPY ./src ./
 COPY --from=compile-frontend /src/src/documents/static/frontend/ ./documents/static/frontend/
 
 # add users, setup scripts
+# Mount the compiled frontend to expected location
 RUN set -eux \
   && addgroup --gid 1000 paperless \
   && useradd --uid 1000 --gid paperless --home-dir /usr/src/paperless paperless \
-  && chown -R paperless:paperless ../ \
-  && gosu paperless python3 manage.py collectstatic --clear --no-input \
+  && chown -R paperless:paperless /usr/src/paperless \
+  && gosu paperless python3 manage.py collectstatic --clear --no-input --link \
   && gosu paperless python3 manage.py compilemessages
 
 VOLUME ["/usr/src/paperless/data", \

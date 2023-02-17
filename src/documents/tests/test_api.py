@@ -7,6 +7,7 @@ import tempfile
 import urllib.request
 import uuid
 import zipfile
+from datetime import timedelta
 from pathlib import Path
 from unittest import mock
 from unittest.mock import MagicMock
@@ -23,6 +24,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import override_settings
 from django.utils import timezone
+from dateutil.relativedelta import relativedelta
 from documents import bulk_edit
 from documents import index
 from documents.models import Correspondent
@@ -119,28 +121,28 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         response = self.client.get("/api/documents/", format="json")
         self.assertEqual(response.status_code, 200)
         results_full = response.data["results"]
-        self.assertTrue("content" in results_full[0])
-        self.assertTrue("id" in results_full[0])
+        self.assertIn("content", results_full[0])
+        self.assertIn("id", results_full[0])
 
         response = self.client.get("/api/documents/?fields=id", format="json")
         self.assertEqual(response.status_code, 200)
         results = response.data["results"]
         self.assertFalse("content" in results[0])
-        self.assertTrue("id" in results[0])
+        self.assertIn("id", results[0])
         self.assertEqual(len(results[0]), 1)
 
         response = self.client.get("/api/documents/?fields=content", format="json")
         self.assertEqual(response.status_code, 200)
         results = response.data["results"]
-        self.assertTrue("content" in results[0])
+        self.assertIn("content", results[0])
         self.assertFalse("id" in results[0])
         self.assertEqual(len(results[0]), 1)
 
         response = self.client.get("/api/documents/?fields=id,content", format="json")
         self.assertEqual(response.status_code, 200)
         results = response.data["results"]
-        self.assertTrue("content" in results[0])
-        self.assertTrue("id" in results[0])
+        self.assertIn("content", results[0])
+        self.assertIn("id", results[0])
         self.assertEqual(len(results[0]), 2)
 
         response = self.client.get(
@@ -150,7 +152,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, 200)
         results = response.data["results"]
         self.assertFalse("content" in results[0])
-        self.assertTrue("id" in results[0])
+        self.assertIn("id", results[0])
         self.assertEqual(len(results[0]), 1)
 
         response = self.client.get("/api/documents/?fields=", format="json")
@@ -504,6 +506,270 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, 404)
         response = self.client.get("/api/documents/?query=content&page=3&page_size=10")
         self.assertEqual(response.status_code, 404)
+
+    @override_settings(
+        TIME_ZONE="UTC",
+    )
+    def test_search_added_in_last_week(self):
+        """
+        GIVEN:
+            - Three documents added right now
+            - The timezone is UTC time
+        WHEN:
+            - Query for documents added in the last 7 days
+        THEN:
+            - All three recent documents are returned
+        """
+        d1 = Document.objects.create(
+            title="invoice",
+            content="the thing i bought at a shop and paid with bank account",
+            checksum="A",
+            pk=1,
+        )
+        d2 = Document.objects.create(
+            title="bank statement 1",
+            content="things i paid for in august",
+            pk=2,
+            checksum="B",
+        )
+        d3 = Document.objects.create(
+            title="bank statement 3",
+            content="things i paid for in september",
+            pk=3,
+            checksum="C",
+        )
+        with index.open_index_writer() as writer:
+            index.update_document(writer, d1)
+            index.update_document(writer, d2)
+            index.update_document(writer, d3)
+
+        response = self.client.get("/api/documents/?query=added:[-1 week to now]")
+        results = response.data["results"]
+        # Expect 3 documents returned
+        self.assertEqual(len(results), 3)
+
+        for idx, subset in enumerate(
+            [
+                {"id": 1, "title": "invoice"},
+                {"id": 2, "title": "bank statement 1"},
+                {"id": 3, "title": "bank statement 3"},
+            ],
+        ):
+            result = results[idx]
+            # Assert subset in results
+            self.assertDictEqual(result, {**result, **subset})
+
+    @override_settings(
+        TIME_ZONE="America/Chicago",
+    )
+    def test_search_added_in_last_week_with_timezone_behind(self):
+        """
+        GIVEN:
+            - Two documents added right now
+            - One document added over a week ago
+            - The timezone is behind UTC time (-6)
+        WHEN:
+            - Query for documents added in the last 7 days
+        THEN:
+            - The two recent documents are returned
+        """
+        d1 = Document.objects.create(
+            title="invoice",
+            content="the thing i bought at a shop and paid with bank account",
+            checksum="A",
+            pk=1,
+        )
+        d2 = Document.objects.create(
+            title="bank statement 1",
+            content="things i paid for in august",
+            pk=2,
+            checksum="B",
+        )
+        d3 = Document.objects.create(
+            title="bank statement 3",
+            content="things i paid for in september",
+            pk=3,
+            checksum="C",
+            # 7 days, 1 hour and 1 minute ago
+            added=timezone.now() - timedelta(days=7, hours=1, minutes=1),
+        )
+        with index.open_index_writer() as writer:
+            index.update_document(writer, d1)
+            index.update_document(writer, d2)
+            index.update_document(writer, d3)
+
+        response = self.client.get("/api/documents/?query=added:[-1 week to now]")
+        results = response.data["results"]
+
+        # Expect 2 documents returned
+        self.assertEqual(len(results), 2)
+
+        for idx, subset in enumerate(
+            [{"id": 1, "title": "invoice"}, {"id": 2, "title": "bank statement 1"}],
+        ):
+            result = results[idx]
+            # Assert subset in results
+            self.assertDictEqual(result, {**result, **subset})
+
+    @override_settings(
+        TIME_ZONE="Europe/Sofia",
+    )
+    def test_search_added_in_last_week_with_timezone_ahead(self):
+        """
+        GIVEN:
+            - Two documents added right now
+            - One document added over a week ago
+            - The timezone is behind UTC time (+2)
+        WHEN:
+            - Query for documents added in the last 7 days
+        THEN:
+            - The two recent documents are returned
+        """
+        d1 = Document.objects.create(
+            title="invoice",
+            content="the thing i bought at a shop and paid with bank account",
+            checksum="A",
+            pk=1,
+        )
+        d2 = Document.objects.create(
+            title="bank statement 1",
+            content="things i paid for in august",
+            pk=2,
+            checksum="B",
+        )
+        d3 = Document.objects.create(
+            title="bank statement 3",
+            content="things i paid for in september",
+            pk=3,
+            checksum="C",
+            # 7 days, 1 hour and 1 minute ago
+            added=timezone.now() - timedelta(days=7, hours=1, minutes=1),
+        )
+        with index.open_index_writer() as writer:
+            index.update_document(writer, d1)
+            index.update_document(writer, d2)
+            index.update_document(writer, d3)
+
+        response = self.client.get("/api/documents/?query=added:[-1 week to now]")
+        results = response.data["results"]
+
+        # Expect 2 documents returned
+        self.assertEqual(len(results), 2)
+
+        for idx, subset in enumerate(
+            [{"id": 1, "title": "invoice"}, {"id": 2, "title": "bank statement 1"}],
+        ):
+            result = results[idx]
+            # Assert subset in results
+            self.assertDictEqual(result, {**result, **subset})
+
+    def test_search_added_in_last_month(self):
+        """
+        GIVEN:
+            - One document added right now
+            - One documents added about a week ago
+            - One document added over 1 month
+        WHEN:
+            - Query for documents added in the last month
+        THEN:
+            - The two recent documents are returned
+        """
+        d1 = Document.objects.create(
+            title="invoice",
+            content="the thing i bought at a shop and paid with bank account",
+            checksum="A",
+            pk=1,
+        )
+        d2 = Document.objects.create(
+            title="bank statement 1",
+            content="things i paid for in august",
+            pk=2,
+            checksum="B",
+            # 1 month, 1 day ago
+            added=timezone.now() - relativedelta(months=1, days=1),
+        )
+        d3 = Document.objects.create(
+            title="bank statement 3",
+            content="things i paid for in september",
+            pk=3,
+            checksum="C",
+            # 7 days, 1 hour and 1 minute ago
+            added=timezone.now() - timedelta(days=7, hours=1, minutes=1),
+        )
+
+        with index.open_index_writer() as writer:
+            index.update_document(writer, d1)
+            index.update_document(writer, d2)
+            index.update_document(writer, d3)
+
+        response = self.client.get("/api/documents/?query=added:[-1 month to now]")
+        results = response.data["results"]
+
+        # Expect 2 documents returned
+        self.assertEqual(len(results), 2)
+
+        for idx, subset in enumerate(
+            [{"id": 1, "title": "invoice"}, {"id": 3, "title": "bank statement 3"}],
+        ):
+            result = results[idx]
+            # Assert subset in results
+            self.assertDictEqual(result, {**result, **subset})
+
+    @override_settings(
+        TIME_ZONE="America/Denver",
+    )
+    def test_search_added_in_last_month_timezone_behind(self):
+        """
+        GIVEN:
+            - One document added right now
+            - One documents added about a week ago
+            - One document added over 1 month
+            - The timezone is behind UTC time (-6 or -7)
+        WHEN:
+            - Query for documents added in the last month
+        THEN:
+            - The two recent documents are returned
+        """
+        d1 = Document.objects.create(
+            title="invoice",
+            content="the thing i bought at a shop and paid with bank account",
+            checksum="A",
+            pk=1,
+        )
+        d2 = Document.objects.create(
+            title="bank statement 1",
+            content="things i paid for in august",
+            pk=2,
+            checksum="B",
+            # 1 month, 1 day ago
+            added=timezone.now() - relativedelta(months=1, days=1),
+        )
+        d3 = Document.objects.create(
+            title="bank statement 3",
+            content="things i paid for in september",
+            pk=3,
+            checksum="C",
+            # 7 days, 1 hour and 1 minute ago
+            added=timezone.now() - timedelta(days=7, hours=1, minutes=1),
+        )
+
+        with index.open_index_writer() as writer:
+            index.update_document(writer, d1)
+            index.update_document(writer, d2)
+            index.update_document(writer, d3)
+
+        response = self.client.get("/api/documents/?query=added:[-1 month to now]")
+        results = response.data["results"]
+
+        # Expect 2 documents returned
+        self.assertEqual(len(results), 2)
+
+        for idx, subset in enumerate(
+            [{"id": 1, "title": "invoice"}, {"id": 3, "title": "bank statement 3"}],
+        ):
+            result = results[idx]
+            # Assert subset in results
+            self.assertDictEqual(result, {**result, **subset})
 
     @mock.patch("documents.index.autocomplete")
     def test_search_autocomplete(self, m):
@@ -2933,8 +3199,32 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(StoragePath.objects.count(), 1)
 
+    def test_api_storage_path_placeholders(self):
+        """
+        GIVEN:
+            - API request to create a storage path with placeholders
+            - Storage path is valid
+        WHEN:
+            - API is called
+        THEN:
+            - Correct HTTP response
+            - New storage path is created
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Storage path with placeholders",
+                    "path": "{title}/{correspondent}/{document_type}/{created}/{created_year}/{created_year_short}/{created_month}/{created_month_name}/{created_month_name_short}/{created_day}/{added}/{added_year}/{added_year_short}/{added_month}/{added_month_name}/{added_month_name_short}/{added_day}/{asn}/{tags}/{tag_list}/",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(StoragePath.objects.count(), 2)
 
-class TestTasks(APITestCase):
+
+class TestTasks(DirectoriesMixin, APITestCase):
     ENDPOINT = "/api/tasks/"
     ENDPOINT_ACKNOWLEDGE = "/api/acknowledge_tasks/"
 

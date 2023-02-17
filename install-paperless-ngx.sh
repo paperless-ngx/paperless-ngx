@@ -321,7 +321,7 @@ fi
 wget "https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/docker/compose/docker-compose.$DOCKER_COMPOSE_VERSION.yml" -O docker-compose.yml
 wget "https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/docker/compose/.env" -O .env
 
-SECRET_KEY=$(tr -dc 'a-zA-Z0-9' < /dev/urandom | fold -w 64 | head -n 1)
+SECRET_KEY=$(tr --delete --complement 'a-zA-Z0-9' < /dev/urandom 2>/dev/null | head --bytes 64)
 
 DEFAULT_LANGUAGES=("deu eng fra ita spa")
 
@@ -346,7 +346,7 @@ read -r -a OCR_LANGUAGES_ARRAY <<< "${_split_langs}"
 	fi
 } > docker-compose.env
 
-sed -i "s/- 8000:8000/- $PORT:8000/g" docker-compose.yml
+sed -i "s/- \"8000:8000\"/- \"$PORT:8000\"/g" docker-compose.yml
 
 sed -i "s#- \./consume:/usr/src/paperless/consume#- $CONSUME_FOLDER:/usr/src/paperless/consume#g" docker-compose.yml
 

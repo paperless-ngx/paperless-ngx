@@ -146,11 +146,16 @@ class Consumer(LoggingMixin):
             return
         # Validate the range is above zero and less than uint32_t max
         # otherwise, Whoosh can't handle it in the index
-        if self.override_asn < 0 or self.override_asn > 0xFF_FF_FF_FF:
+        if (
+            self.override_asn < Document.ARCHIVE_SERIAL_NUMBER_MIN
+            or self.override_asn > Document.ARCHIVE_SERIAL_NUMBER_MAX
+        ):
             self._fail(
                 MESSAGE_ASN_RANGE,
                 f"Not consuming {self.filename}: "
-                f"Given ASN {self.override_asn} is out of range [0, 4,294,967,295]",
+                f"Given ASN {self.override_asn} is out of range "
+                f"[{Document.ARCHIVE_SERIAL_NUMBER_MIN:,}, "
+                f"{Document.ARCHIVE_SERIAL_NUMBER_MAX:,}]",
             )
         if Document.objects.filter(archive_serial_number=self.override_asn).exists():
             self._fail(
@@ -337,6 +342,7 @@ class Consumer(LoggingMixin):
             mime_type,
         )
         if not parser_class:
+            tempdir.cleanup()
             self._fail(MESSAGE_UNSUPPORTED_TYPE, f"Unsupported mime type {mime_type}")
 
         # Notify all listeners that we're going to do some work.
@@ -395,6 +401,7 @@ class Consumer(LoggingMixin):
 
         except ParseError as e:
             document_parser.cleanup()
+            tempdir.cleanup()
             self._fail(
                 str(e),
                 f"Error while consuming document {self.filename}: {e}",

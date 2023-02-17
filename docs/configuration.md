@@ -141,7 +141,8 @@ directory.
 files created using "collectstatic" manager command are stored.
 
     Unless you're doing something fancy, there is no need to override
-    this.
+    this.  If this is changed, you may need to run
+    `collectstatic` again.
 
     Defaults to "../static/", relative to the "src" directory.
 
@@ -757,6 +758,18 @@ should be a valid crontab(5) expression describing when to run.
 
     Defaults to `30 0 * * sun` or Sunday at 30 minutes past midnight.
 
+`PAPERLESS_ENABLE_COMPRESSION=<bool>`
+
+: Enables compression of the responses from the webserver.
+
+: Defaults to 1, enabling compression.
+
+    !!! note
+
+        If you are using a proxy such as nginx, it is likely more efficient
+        to enable compression in your proxy configuration rather than
+        the webserver
+
 ## Polling {#polling}
 
 `PAPERLESS_CONSUMER_POLLING=<num>`
@@ -986,13 +999,20 @@ within your documents.
 `PAPERLESS_CONSUMER_IGNORE_PATTERNS=<json>`
 
 : By default, paperless ignores certain files and folders in the
-consumption directory, such as system files created by the Mac OS.
+consumption directory, such as system files created by the Mac OS
+or hidden folders some tools use to store data.
 
     This can be adjusted by configuring a custom json array with
     patterns to exclude.
 
+    For example, `.DS_STORE/*` will ignore any files found in a folder
+    named `.DS_STORE`, including `.DS_STORE/bar.pdf` and `foo/.DS_STORE/bar.pdf`
+
+    A pattern like `._*` will ignore anything starting with `._`, including:
+    `._foo.pdf` and `._bar/foo.pdf`
+
     Defaults to
-    `[".DS_STORE/*", "._*", ".stfolder/*", ".stversions/*", ".localized/*", "desktop.ini"]`.
+    `[".DS_STORE/*", "._*", ".stfolder/*", ".stversions/*", ".localized/*", "desktop.ini", "@eaDir/*"]`.
 
 ## Binaries
 

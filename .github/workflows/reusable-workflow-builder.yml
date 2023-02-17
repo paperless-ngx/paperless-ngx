@@ -45,7 +45,7 @@ jobs:
         uses: docker/setup-qemu-action@v2
       -
         name: Build ${{ fromJSON(inputs.build-json).name }}
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           context: .
           file: ${{ inputs.dockerfile }}
