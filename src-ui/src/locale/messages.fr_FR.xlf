@@ -4048,7 +4048,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">195</context>
         </context-group>
-        <target state="needs-translation">Show warning when closing saved views with unsaved changes</target>
+        <target state="translated">Afficher un avertissement lors de la fermeture d’une vue enregistrée avec des modifications non enregistrées</target>
       </trans-unit>
       <trans-unit id="6925788033494878061" datatype="html" approved="yes">
         <source>Appears on</source>
