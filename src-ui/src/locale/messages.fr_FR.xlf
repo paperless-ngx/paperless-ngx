@@ -1555,7 +1555,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/toast.service.ts</context>
-          <context context-type="linenumber">32</context>
+          <context context-type="linenumber">35</context>
         </context-group>
         <target state="final">Erreur</target>
       </trans-unit>
@@ -2876,7 +2876,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">151</context>
         </context-group>
-        <target state="needs-translation">Preview</target>
+        <target state="translated">Prévisualisation</target>
       </trans-unit>
       <trans-unit id="8191371354890763172" datatype="html">
         <source>Enter Password</source>
@@ -2918,11 +2918,39 @@
         </context-group>
         <target state="final">Enregistrer &amp; suivant</target>
       </trans-unit>
+      <trans-unit id="5758784066858623886" datatype="html">
+        <source>Error retrieving metadata</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
+          <context context-type="linenumber">305</context>
+        </context-group>
+        <target state="needs-translation">Error retrieving metadata</target>
+      </trans-unit>
+      <trans-unit id="2374084708811774419" datatype="html">
+        <source>Error retrieving suggestions</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
+          <context context-type="linenumber">319</context>
+        </context-group>
+        <target state="needs-translation">Error retrieving suggestions</target>
+      </trans-unit>
+      <trans-unit id="448882439049417053" datatype="html">
+        <source>Error saving document</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
+          <context context-type="linenumber">432</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
+          <context context-type="linenumber">476</context>
+        </context-group>
+        <target state="needs-translation">Error saving document</target>
+      </trans-unit>
       <trans-unit id="9021887951960049161" datatype="html" approved="yes">
         <source>Confirm delete</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">489</context>
+          <context context-type="linenumber">505</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
@@ -2934,7 +2962,7 @@
         <source>Do you really want to delete document &quot;<x id="PH" equiv-text="this.document.title"/>&quot;?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">490</context>
+          <context context-type="linenumber">506</context>
         </context-group>
         <target state="final">Voulez-vous vraiment supprimer le document "<x id="PH" equiv-text="this.document.title"/>" ?</target>
       </trans-unit>
@@ -2942,7 +2970,7 @@
         <source>The files for this document will be deleted permanently. This operation cannot be undone.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">491</context>
+          <context context-type="linenumber">507</context>
         </context-group>
         <target state="final">Les fichiers liés à ce document seront supprimés définitivement. Cette action est irréversible.</target>
       </trans-unit>
@@ -2950,7 +2978,7 @@
         <source>Delete document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">493</context>
+          <context context-type="linenumber">509</context>
         </context-group>
         <target state="final">Supprimer le document</target>
       </trans-unit>
@@ -2958,7 +2986,7 @@
         <source>Error deleting document: <x id="PH" equiv-text="JSON.stringify(error)"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">509</context>
+          <context context-type="linenumber">525</context>
         </context-group>
         <target state="final">Une erreur s'est produite lors de la suppression du document : <x id="PH" equiv-text="JSON.stringify(error)"/></target>
       </trans-unit>
@@ -2966,7 +2994,7 @@
         <source>Redo OCR confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">529</context>
+          <context context-type="linenumber">545</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -2978,7 +3006,7 @@
         <source>This operation will permanently redo OCR for this document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">530</context>
+          <context context-type="linenumber">546</context>
         </context-group>
         <target state="translated">Cette opération écrasera la ROC pour ce document.</target>
       </trans-unit>
@@ -2986,7 +3014,7 @@
         <source>This operation cannot be undone.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">531</context>
+          <context context-type="linenumber">547</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -3018,7 +3046,7 @@
         <source>Proceed</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">533</context>
+          <context context-type="linenumber">549</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -3046,7 +3074,7 @@
         <source>Redo OCR operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">541</context>
+          <context context-type="linenumber">557</context>
         </context-group>
         <target state="translated">La relance de la ROC va démarrer en arrière-plan. Fermez et réouvrez ou recharger ce document une fois l'opération terminée pour voir le nouveau contenu.</target>
       </trans-unit>
@@ -3054,7 +3082,7 @@
         <source>Error executing operation: <x id="PH" equiv-text="JSON.stringify(                 error.error               )"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">552,554</context>
+          <context context-type="linenumber">568,570</context>
         </context-group>
         <target state="final">Erreur lors de l'exécution de l'opération : <x id="PH" equiv-text="JSON.stringify(                 error.error               )"/></target>
       </trans-unit>
@@ -5541,7 +5569,7 @@
         <source>Information</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/toast.service.ts</context>
-          <context context-type="linenumber">36</context>
+          <context context-type="linenumber">43</context>
         </context-group>
         <target state="final">Informations</target>
       </trans-unit>
