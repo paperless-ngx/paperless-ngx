@@ -10,6 +10,7 @@ import { DocumentService } from 'src/app/services/rest/document.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
 import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
+import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 
 @Component({
   selector: 'app-document-card-large',
@@ -19,11 +20,13 @@ import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
     '../popover-preview/popover-preview.scss',
   ],
 })
-export class DocumentCardLargeComponent {
+export class DocumentCardLargeComponent extends ComponentWithPermissions {
   constructor(
     private documentService: DocumentService,
     private settingsService: SettingsService
-  ) {}
+  ) {
+    super()
+  }
 
   @Input()
   selected = false

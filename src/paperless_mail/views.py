@@ -1,3 +1,4 @@
+from documents.views import PassUserMixin
 from paperless.views import StandardPagination
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
@@ -7,7 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
 
-class MailAccountViewSet(ModelViewSet):
+class MailAccountViewSet(ModelViewSet, PassUserMixin):
     model = MailAccount
 
     queryset = MailAccount.objects.all().order_by("pk")
@@ -15,27 +16,11 @@ class MailAccountViewSet(ModelViewSet):
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated,)
 
-    # TODO: user-scoped
-    # def get_queryset(self):
-    #     user = self.request.user
-    #     return MailAccount.objects.filter(user=user)
 
-    # def perform_create(self, serializer):
-    #     serializer.save(user=self.request.user)
-
-
-class MailRuleViewSet(ModelViewSet):
+class MailRuleViewSet(ModelViewSet, PassUserMixin):
     model = MailRule
 
     queryset = MailRule.objects.all().order_by("order")
     serializer_class = MailRuleSerializer
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated,)
-
-    # TODO: user-scoped
-    # def get_queryset(self):
-    #     user = self.request.user
-    #     return MailRule.objects.filter(user=user)
-
-    # def perform_create(self, serializer):
-    #     serializer.save(user=self.request.user)

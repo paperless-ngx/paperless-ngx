@@ -16,6 +16,10 @@
     <app-input-text *ngIf="patternRequired" i18n-title title="Matching pattern" formControlName="match" [error]="error?.match"></app-input-text>
     <app-input-check *ngIf="patternRequired" i18n-title title="Case insensitive" formControlName="is_insensitive"></app-input-check>
 
+    <div *appIfOwner="object">
+      <app-permissions-form [users]="users" accordion="true" formControlName="permissions_form"></app-permissions-form>
+    </div>
+
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-outline-secondary" (click)="cancel()" i18n [disabled]="networkActive">Cancel</button>

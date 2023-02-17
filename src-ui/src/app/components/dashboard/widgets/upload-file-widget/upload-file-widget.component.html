@@ -9,7 +9,7 @@
     </a>
   </div>
   <div content tourAnchor="tour.upload-widget">
-    <form>
+    <form *appIfPermissions="{ action: PermissionAction.Add, type: PermissionType.Document }">
       <ngx-file-drop dropZoneLabel="Drop documents here or" browseBtnLabel="Browse files" (onFileDrop)="dropped($event)"
         (onFileOver)="fileOver($event)" (onFileLeave)="fileLeave($event)" dropZoneClassName="bg-light card"
         multiple="true" contentClassName="justify-content-center d-flex align-items-center py-5 px-2" [showBrowseBtn]=true
@@ -40,13 +40,15 @@
     <h6 class="alert-heading">{{status.filename}}</h6>
     <p class="mb-0 pb-1" *ngIf="!isFinished(status) || (isFinished(status) && !status.documentId)">{{status.message}}</p>
     <ngb-progressbar [value]="status.getProgress()" [max]="1" [type]="getStatusColor(status)"></ngb-progressbar>
-    <div *ngIf="isFinished(status)">
-      <button *ngIf="status.documentId" class="btn btn-sm btn-outline-primary btn-open" routerLink="/documents/{{status.documentId}}" (click)="dismiss(status)">
-        <small i18n>Open document</small>
-        <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" fill="currentColor" class="bi bi-arrow-right-short" viewBox="0 0 16 16">
-          <path fill-rule="evenodd" d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5A.5.5 0 0 1 4 8z"/>
-        </svg>
-      </button>
+    <div *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
+      <div *ngIf="isFinished(status)">
+        <button *ngIf="status.documentId" class="btn btn-sm btn-outline-primary btn-open" routerLink="/documents/{{status.documentId}}" (click)="dismiss(status)">
+          <small i18n>Open document</small>
+          <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" fill="currentColor" class="bi bi-arrow-right-short" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5A.5.5 0 0 1 4 8z"/>
+          </svg>
+        </button>
+      </div>
     </div>
   </ngb-alert>
 </ng-template>
