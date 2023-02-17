@@ -1,9 +1,6 @@
 import datetime
-import hashlib
 import os
-import random
 import tempfile
-import uuid
 from pathlib import Path
 from unittest import mock
 
@@ -16,7 +13,6 @@ from django.utils import timezone
 from ..file_handling import create_source_path_directory
 from ..file_handling import delete_empty_directories
 from ..file_handling import generate_filename
-from ..file_handling import generate_unique_filename
 from ..models import Correspondent
 from ..models import Document
 from ..models import DocumentType
@@ -871,7 +867,7 @@ class TestFileHandlingWithArchive(DirectoriesMixin, TestCase):
         self.assertTrue(os.path.isfile(doc.archive_path))
 
 
-class TestFilenameGeneration(TestCase):
+class TestFilenameGeneration(DirectoriesMixin, TestCase):
     @override_settings(FILENAME_FORMAT="{title}")
     def test_invalid_characters(self):
 
@@ -1036,6 +1032,47 @@ class TestFilenameGeneration(TestCase):
         self.assertEqual(generate_filename(doc_a), "0000002.pdf")
         self.assertEqual(generate_filename(doc_b), "SomeImportantNone/2020-07-25.pdf")
 
+    def test_document_storage_path_changed(self):
+        """
+        GIVEN:
+            - Document with a defined storage path
+        WHEN:
+            - The storage path format is updated
+        THEN:
+            - Document is renamed to the new format
+        """
+        sp = StoragePath.objects.create(path="TestFolder/{created}")
+        document = Document.objects.create(
+            mime_type="application/pdf",
+            created=timezone.make_aware(datetime.datetime(2020, 6, 25, 7, 36, 51, 153)),
+            storage_path=sp,
+        )
+
+        # Ensure that filename is properly generated
+        document.filename = generate_filename(document)
+        self.assertEqual(
+            document.source_path,
+            os.path.join(settings.ORIGINALS_DIR, "TestFolder/2020-06-25.pdf"),
+        )
+
+        # Actually create the file
+        create_source_path_directory(document.source_path)
+        Path(document.source_path).touch()
+        self.assertTrue(os.path.isfile(document.source_path))
+        document.save()
+
+        # Change format
+        sp.path = "NewFolder/{created}"
+        sp.save()
+
+        document.refresh_from_db()
+
+        self.assertEqual(
+            document.source_path,
+            os.path.join(settings.ORIGINALS_DIR, "NewFolder/2020-06-25.pdf"),
+        )
+        self.assertTrue(os.path.isfile(document.source_path))
+
     @override_settings(
         FILENAME_FORMAT="{created_year_short}/{created_month_name_short}/{created_month_name}/{title}",
     )
@@ -1063,28 +1100,3 @@ class TestFilenameGeneration(TestCase):
             checksum="2",
         )
         self.assertEqual(generate_filename(doc), "84/August/Aug/The Title.pdf")
-
-
-def run():
-    doc = Document.objects.create(
-        checksum=str(uuid.uuid4()),
-        title=str(uuid.uuid4()),
-        content="wow",
-    )
-    doc.filename = generate_unique_filename(doc)
-    Path(doc.thumbnail_path).touch()
-    with open(doc.source_path, "w") as f:
-        f.write(str(uuid.uuid4()))
-    with open(doc.source_path, "rb") as f:
-        doc.checksum = hashlib.md5(f.read()).hexdigest()
-
-    with open(doc.archive_path, "w") as f:
-        f.write(str(uuid.uuid4()))
-    with open(doc.archive_path, "rb") as f:
-        doc.archive_checksum = hashlib.md5(f.read()).hexdigest()
-
-    doc.save()
-
-    for i in range(30):
-        doc.title = str(random.randrange(1, 5))
-        doc.save()

@@ -414,13 +414,6 @@ structure as in the previous example above.
     Defining a storage path is optional. If no storage path is defined for a
     document, the global `PAPERLESS_FILENAME_FORMAT` is applied.
 
-!!! warning
-
-    If you adjust the format of an existing storage path, old documents
-    don't get relocated automatically. You need to run the
-    [document renamer](/administration#renamer) to
-    adjust their paths.
-
 ## Celery Monitoring {#celery-monitoring}
 
 The monitoring tool
