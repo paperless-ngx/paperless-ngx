@@ -505,6 +505,10 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">192</context>
+        </context-group>
         <target state="final">Instellingen</target>
       </trans-unit>
       <trans-unit id="3797778920049399855" datatype="html" approved="yes">
@@ -795,7 +799,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">492</context>
+          <context context-type="linenumber">500</context>
         </context-group>
         <target state="translated">Er is een fout opgetreden bij het opslaan van de instellingen.</target>
       </trans-unit>
@@ -975,15 +979,15 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">196</context>
+          <context context-type="linenumber">204</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">248</context>
+          <context context-type="linenumber">256</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">283</context>
+          <context context-type="linenumber">291</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
@@ -1127,7 +1131,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">317</context>
+          <context context-type="linenumber">325</context>
         </context-group>
         <target state="final">Opslaan</target>
       </trans-unit>
@@ -1283,7 +1287,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">284</context>
+          <context context-type="linenumber">292</context>
         </context-group>
         <target state="translated">Account</target>
       </trans-unit>
@@ -1547,15 +1551,15 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">214</context>
+          <context context-type="linenumber">222</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">261</context>
+          <context context-type="linenumber">269</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">296</context>
+          <context context-type="linenumber">304</context>
         </context-group>
         <target state="final">Verwijderen</target>
       </trans-unit>
@@ -1885,11 +1889,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">222</context>
+          <context context-type="linenumber">230</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">308</context>
+          <context context-type="linenumber">316</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
@@ -2248,7 +2252,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
-          <context context-type="linenumber">32</context>
+          <context context-type="linenumber">40</context>
         </context-group>
         <target state="final">Sluiten</target>
       </trans-unit>
@@ -2588,11 +2592,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">576</context>
+          <context context-type="linenumber">584</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">635</context>
+          <context context-type="linenumber">643</context>
         </context-group>
         <target state="final">Deze actie kan niet ongedaan worden gemaakt.</target>
       </trans-unit>
@@ -2608,11 +2612,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">578</context>
+          <context context-type="linenumber">586</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">637</context>
+          <context context-type="linenumber">645</context>
         </context-group>
         <target state="translated">Doorgaan</target>
       </trans-unit>
@@ -2720,15 +2724,15 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">213</context>
+          <context context-type="linenumber">221</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">250</context>
+          <context context-type="linenumber">258</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">285</context>
+          <context context-type="linenumber">293</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
@@ -3026,11 +3030,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">260</context>
+          <context context-type="linenumber">268</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">295</context>
+          <context context-type="linenumber">303</context>
         </context-group>
         <target state="final">Bewerk</target>
       </trans-unit>
@@ -3179,6 +3183,10 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">64</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">199</context>
         </context-group>
         <target state="final">Weergaven</target>
       </trans-unit>
@@ -3438,7 +3446,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">208</context>
+          <context context-type="linenumber">216</context>
         </context-group>
         <target state="final">Toon in de zijbalk</target>
       </trans-unit>
@@ -3450,7 +3458,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">204</context>
+          <context context-type="linenumber">212</context>
         </context-group>
         <target state="final">Toon op het dashboard</target>
       </trans-unit>
@@ -4034,11 +4042,19 @@
         </context-group>
         <target state="final">Dit verbergt alle statusberichten op het dashboard die met het verwerken van documenten te maken hebben.</target>
       </trans-unit>
+      <trans-unit id="1595668988802980095" datatype="html">
+        <source>Show warning when closing saved views with unsaved changes</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">195</context>
+        </context-group>
+        <target state="needs-translation">Show warning when closing saved views with unsaved changes</target>
+      </trans-unit>
       <trans-unit id="6925788033494878061" datatype="html" approved="yes">
         <source>Appears on</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">201</context>
+          <context context-type="linenumber">209</context>
         </context-group>
         <target state="final">Komt voor bij</target>
       </trans-unit>
@@ -4046,7 +4062,7 @@
         <source>No saved views defined.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">218</context>
+          <context context-type="linenumber">226</context>
         </context-group>
         <target state="final">Geen opgeslagen views gedefinieerd.</target>
       </trans-unit>
@@ -4054,7 +4070,7 @@
         <source>Mail</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">232,231</context>
+          <context context-type="linenumber">240,239</context>
         </context-group>
         <target state="translated">E-mail</target>
       </trans-unit>
@@ -4062,7 +4078,7 @@
         <source>Mail accounts</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">236</context>
+          <context context-type="linenumber">244</context>
         </context-group>
         <target state="translated">E-mailaccounts</target>
       </trans-unit>
@@ -4070,7 +4086,7 @@
         <source>Add Account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">241</context>
+          <context context-type="linenumber">249</context>
         </context-group>
         <target state="translated">Account toevoegen</target>
       </trans-unit>
@@ -4078,7 +4094,7 @@
         <source>Server</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">249</context>
+          <context context-type="linenumber">257</context>
         </context-group>
         <target state="translated">Server</target>
       </trans-unit>
@@ -4086,7 +4102,7 @@
         <source>No mail accounts defined.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">267</context>
+          <context context-type="linenumber">275</context>
         </context-group>
         <target state="translated">Geen e-mailaccounts gedefinieerd.</target>
       </trans-unit>
@@ -4094,7 +4110,7 @@
         <source>Mail rules</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">271</context>
+          <context context-type="linenumber">279</context>
         </context-group>
         <target state="translated">E-mailregels</target>
       </trans-unit>
@@ -4102,7 +4118,7 @@
         <source>Add Rule</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">276</context>
+          <context context-type="linenumber">284</context>
         </context-group>
         <target state="translated">Regel toevoegen</target>
       </trans-unit>
@@ -4110,7 +4126,7 @@
         <source>No mail rules defined.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">302</context>
+          <context context-type="linenumber">310</context>
         </context-group>
         <target state="translated">Geen e-mailregels gedefinieerd.</target>
       </trans-unit>
@@ -4118,7 +4134,7 @@
         <source>Saved view &quot;<x id="PH" equiv-text="savedView.name"/>&quot; deleted.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">383</context>
+          <context context-type="linenumber">387</context>
         </context-group>
         <target state="final">Opgeslagen view "<x id="PH" equiv-text="savedView.name"/>" verwijderd.</target>
       </trans-unit>
@@ -4126,7 +4142,7 @@
         <source>Settings saved</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">476</context>
+          <context context-type="linenumber">484</context>
         </context-group>
         <target state="translated">Instellingen opgeslagen</target>
       </trans-unit>
@@ -4134,7 +4150,7 @@
         <source>Settings were saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">477</context>
+          <context context-type="linenumber">485</context>
         </context-group>
         <target state="translated">Instellingen zijn succesvol opgeslagen.</target>
       </trans-unit>
@@ -4142,7 +4158,7 @@
         <source>Settings were saved successfully. Reload is required to apply some changes.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">481</context>
+          <context context-type="linenumber">489</context>
         </context-group>
         <target state="translated">Instellingen zijn succesvol opgeslagen. Herladen is vereist om sommige wijzigingen toe te passen.</target>
       </trans-unit>
@@ -4150,7 +4166,7 @@
         <source>Reload now</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">482</context>
+          <context context-type="linenumber">490</context>
         </context-group>
         <target state="translated">Nu herladen</target>
       </trans-unit>
@@ -4158,7 +4174,7 @@
         <source>Use system language</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">500</context>
+          <context context-type="linenumber">508</context>
         </context-group>
         <target state="final">Gebruik de systeemtaal</target>
       </trans-unit>
@@ -4166,7 +4182,7 @@
         <source>Use date format of display language</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">507</context>
+          <context context-type="linenumber">515</context>
         </context-group>
         <target state="final">Datumopmaak van weergavetaal gebruiken</target>
       </trans-unit>
@@ -4174,7 +4190,7 @@
         <source>Error while storing settings on server: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">527,529</context>
+          <context context-type="linenumber">535,537</context>
         </context-group>
         <target state="translated">Fout bij het opslaan van instellingen op server: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></target>
       </trans-unit>
@@ -4182,7 +4198,7 @@
         <source>Saved account &quot;<x id="PH" equiv-text="newMailAccount.name"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">554</context>
+          <context context-type="linenumber">562</context>
         </context-group>
         <target state="translated">Account "<x id="PH" equiv-text="newMailAccount.name"/>" opgeslagen.</target>
       </trans-unit>
@@ -4190,7 +4206,7 @@
         <source>Error saving account: <x id="PH" equiv-text="e.toString()"/>.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">564</context>
+          <context context-type="linenumber">572</context>
         </context-group>
         <target state="translated">Fout bij opslaan account: <x id="PH" equiv-text="e.toString()"/>.</target>
       </trans-unit>
@@ -4198,7 +4214,7 @@
         <source>Confirm delete mail account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">574</context>
+          <context context-type="linenumber">582</context>
         </context-group>
         <target state="translated">Bevestig e-mailaccount verwijderen</target>
       </trans-unit>
@@ -4206,7 +4222,7 @@
         <source>This operation will permanently delete this mail account.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">575</context>
+          <context context-type="linenumber">583</context>
         </context-group>
         <target state="translated">Met deze bewerking wordt dit e-mailaccount permanent verwijderd.</target>
       </trans-unit>
@@ -4214,7 +4230,7 @@
         <source>Deleted mail account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">584</context>
+          <context context-type="linenumber">592</context>
         </context-group>
         <target state="translated">E-mailaccount verwijderd</target>
       </trans-unit>
@@ -4222,7 +4238,7 @@
         <source>Error deleting mail account: <x id="PH" equiv-text="e.toString()"/>.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">593</context>
+          <context context-type="linenumber">601</context>
         </context-group>
         <target state="translated">Fout bij verwijderen van e-mailaccount: <x id="PH" equiv-text="e.toString()"/>.</target>
       </trans-unit>
@@ -4230,7 +4246,7 @@
         <source>Saved rule &quot;<x id="PH" equiv-text="newMailRule.name"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">612</context>
+          <context context-type="linenumber">620</context>
         </context-group>
         <target state="translated">Regel "<x id="PH" equiv-text="newMailRule.name"/>" opgeslagen.</target>
       </trans-unit>
@@ -4238,7 +4254,7 @@
         <source>Error saving rule: <x id="PH" equiv-text="e.toString()"/>.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">623</context>
+          <context context-type="linenumber">631</context>
         </context-group>
         <target state="translated">Fout bij opslaan regel: <x id="PH" equiv-text="e.toString()"/>.</target>
       </trans-unit>
@@ -4246,7 +4262,7 @@
         <source>Confirm delete mail rule</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">633</context>
+          <context context-type="linenumber">641</context>
         </context-group>
         <target state="translated">Bevestig e-mailregel verwijderen</target>
       </trans-unit>
@@ -4254,7 +4270,7 @@
         <source>This operation will permanently delete this mail rule.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">634</context>
+          <context context-type="linenumber">642</context>
         </context-group>
         <target state="translated">Met deze bewerking wordt dit e-mailregel permanent verwijderd.</target>
       </trans-unit>
@@ -4262,7 +4278,7 @@
         <source>Deleted mail rule</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">643</context>
+          <context context-type="linenumber">651</context>
         </context-group>
         <target state="translated">E-mailregel verwijderd</target>
       </trans-unit>
@@ -4270,7 +4286,7 @@
         <source>Error deleting mail rule: <x id="PH" equiv-text="e.toString()"/>.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">652</context>
+          <context context-type="linenumber">660</context>
         </context-group>
         <target state="translated">Fout bij verwijderen e-mailregel: <x id="PH" equiv-text="e.toString()"/>.</target>
       </trans-unit>
@@ -4564,7 +4580,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
-          <context context-type="linenumber">24</context>
+          <context context-type="linenumber">32</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
@@ -4608,7 +4624,7 @@
         <source>You have unsaved changes to the saved view</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
-          <context context-type="linenumber">26</context>
+          <context context-type="linenumber">34</context>
         </context-group>
         <target state="translated">U heeft niet-opgeslagen wijzigingen in de opgeslagen weergave</target>
       </trans-unit>
@@ -4616,7 +4632,7 @@
         <source>Are you sure you want to close this saved view?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
-          <context context-type="linenumber">30</context>
+          <context context-type="linenumber">38</context>
         </context-group>
         <target state="translated">Weet u zeker dat u deze opgeslagen weergave wilt sluiten?</target>
       </trans-unit>
@@ -4624,7 +4640,7 @@
         <source>Save and close</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
-          <context context-type="linenumber">34</context>
+          <context context-type="linenumber">42</context>
         </context-group>
         <target state="translated">Opslaan en sluiten</target>
       </trans-unit>
