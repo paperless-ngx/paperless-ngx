@@ -247,22 +247,85 @@ class TestConsumer(DirectoriesMixin, ConsumerMixin, TransactionTestCase):
 
     def test_is_ignored(self):
         test_paths = [
-            (os.path.join(self.dirs.consumption_dir, "foo.pdf"), False),
-            (os.path.join(self.dirs.consumption_dir, "foo", "bar.pdf"), False),
-            (os.path.join(self.dirs.consumption_dir, ".DS_STORE", "foo.pdf"), True),
-            (
-                os.path.join(self.dirs.consumption_dir, "foo", ".DS_STORE", "bar.pdf"),
-                True,
-            ),
-            (os.path.join(self.dirs.consumption_dir, ".stfolder", "foo.pdf"), True),
-            (os.path.join(self.dirs.consumption_dir, "._foo.pdf"), True),
-            (os.path.join(self.dirs.consumption_dir, "._foo", "bar.pdf"), False),
+            {
+                "path": os.path.join(self.dirs.consumption_dir, "foo.pdf"),
+                "ignore": False,
+            },
+            {
+                "path": os.path.join(self.dirs.consumption_dir, "foo", "bar.pdf"),
+                "ignore": False,
+            },
+            {
+                "path": os.path.join(self.dirs.consumption_dir, ".DS_STORE", "foo.pdf"),
+                "ignore": True,
+            },
+            {
+                "path": os.path.join(
+                    self.dirs.consumption_dir,
+                    "foo",
+                    ".DS_STORE",
+                    "bar.pdf",
+                ),
+                "ignore": True,
+            },
+            {
+                "path": os.path.join(
+                    self.dirs.consumption_dir,
+                    ".DS_STORE",
+                    "foo",
+                    "bar.pdf",
+                ),
+                "ignore": True,
+            },
+            {
+                "path": os.path.join(self.dirs.consumption_dir, ".stfolder", "foo.pdf"),
+                "ignore": True,
+            },
+            {
+                "path": os.path.join(self.dirs.consumption_dir, ".stfolder.pdf"),
+                "ignore": False,
+            },
+            {
+                "path": os.path.join(
+                    self.dirs.consumption_dir,
+                    ".stversions",
+                    "foo.pdf",
+                ),
+                "ignore": True,
+            },
+            {
+                "path": os.path.join(self.dirs.consumption_dir, ".stversions.pdf"),
+                "ignore": False,
+            },
+            {
+                "path": os.path.join(self.dirs.consumption_dir, "._foo.pdf"),
+                "ignore": True,
+            },
+            {
+                "path": os.path.join(self.dirs.consumption_dir, "my_foo.pdf"),
+                "ignore": False,
+            },
+            {
+                "path": os.path.join(self.dirs.consumption_dir, "._foo", "bar.pdf"),
+                "ignore": True,
+            },
+            {
+                "path": os.path.join(
+                    self.dirs.consumption_dir,
+                    "@eaDir",
+                    "SYNO@.fileindexdb",
+                    "_1jk.fnm",
+                ),
+                "ignore": True,
+            },
         ]
-        for file_path, expected_ignored in test_paths:
+        for test_setup in test_paths:
+            filepath = test_setup["path"]
+            expected_ignored_result = test_setup["ignore"]
             self.assertEqual(
-                expected_ignored,
-                document_consumer._is_ignored(file_path),
-                f'_is_ignored("{file_path}") != {expected_ignored}',
+                expected_ignored_result,
+                document_consumer._is_ignored(filepath),
+                f'_is_ignored("{filepath}") != {expected_ignored_result}',
             )
 
     @mock.patch("documents.management.commands.document_consumer.open")

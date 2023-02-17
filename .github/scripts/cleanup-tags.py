@@ -7,6 +7,7 @@ import subprocess
 from argparse import ArgumentParser
 from typing import Dict
 from typing import Final
+from typing import Iterator
 from typing import List
 from typing import Optional
 
@@ -15,16 +16,17 @@ from github import ContainerPackage
 from github import GithubBranchApi
 from github import GithubContainerRegistryApi
 
-import docker
-
 logger = logging.getLogger("cleanup-tags")
 
 
-class DockerManifest2:
+class ImageProperties:
     """
-    Data class wrapping the Docker Image Manifest Version 2.
+    Data class wrapping the properties of an entry in the image index
+    manifests list.  It is NOT an actual image with layers, etc
 
-    See https://docs.docker.com/registry/spec/manifest-v2-2/
+    https://docs.docker.com/registry/spec/manifest-v2-2/
+    https://github.com/opencontainers/image-spec/blob/main/manifest.md
+    https://github.com/opencontainers/image-spec/blob/main/descriptor.md
     """
 
     def __init__(self, data: Dict) -> None:
@@ -39,6 +41,45 @@ class DockerManifest2:
             "",
         )
         self.platform = f"{platform_data_os}/{platform_arch}{platform_variant}"
+
+
+class ImageIndex:
+    """
+    Data class wrapping up logic for an OCI Image Index
+    JSON data.  Primary use is to access the manifests listing
+
+    See https://github.com/opencontainers/image-spec/blob/main/image-index.md
+    """
+
+    def __init__(self, package_url: str, tag: str) -> None:
+        self.qualified_name = f"{package_url}:{tag}"
+        logger.info(f"Getting image index for {self.qualified_name}")
+        try:
+            proc = subprocess.run(
+                [
+                    shutil.which("docker"),
+                    "buildx",
+                    "imagetools",
+                    "inspect",
+                    "--raw",
+                    self.qualified_name,
+                ],
+                capture_output=True,
+                check=True,
+            )
+
+            self._data = json.loads(proc.stdout)
+
+        except subprocess.CalledProcessError as e:
+            logger.error(
+                f"Failed to get image index for {self.qualified_name}: {e.stderr}",
+            )
+            raise e
+
+    @property
+    def image_pointers(self) -> Iterator[ImageProperties]:
+        for manifest_data in self._data["manifests"]:
+            yield ImageProperties(manifest_data)
 
 
 class RegistryTagsCleaner:
@@ -87,7 +128,10 @@ class RegistryTagsCleaner:
 
     def clean(self):
         """
-        This method will delete image versions, based on the selected tags to delete
+        This method will delete image versions, based on the selected tags to delete.
+        It behaves more like an unlinking than actual deletion.  Removing the tag
+        simply removes a pointer to an image, but the actual image data remains accessible
+        if one has the sha256 digest of it.
         """
         for tag_to_delete in self.tags_to_delete:
             package_version_info = self.all_pkgs_tags_to_version[tag_to_delete]
@@ -151,31 +195,17 @@ class RegistryTagsCleaner:
 
             # Parse manifests to locate digests pointed to
             for tag in sorted(self.tags_to_keep):
-                full_name = f"ghcr.io/{self.repo_owner}/{self.package_name}:{tag}"
-                logger.info(f"Checking manifest for {full_name}")
-                # TODO: It would be nice to use RegistryData from docker
-                # except the ID doesn't map to anything in the manifest
                 try:
-                    proc = subprocess.run(
-                        [
-                            shutil.which("docker"),
-                            "buildx",
-                            "imagetools",
-                            "inspect",
-                            "--raw",
-                            full_name,
-                        ],
-                        capture_output=True,
+                    image_index = ImageIndex(
+                        f"ghcr.io/{self.repo_owner}/{self.package_name}",
+                        tag,
                     )
-
-                    manifest_list = json.loads(proc.stdout)
-                    for manifest_data in manifest_list["manifests"]:
-                        manifest = DockerManifest2(manifest_data)
+                    for manifest in image_index.image_pointers:
 
                         if manifest.digest in untagged_versions:
                             logger.info(
                                 f"Skipping deletion of {manifest.digest},"
-                                f" referred to by {full_name}"
+                                f" referred to by {image_index.qualified_name}"
                                 f" for {manifest.platform}",
                             )
                             del untagged_versions[manifest.digest]
@@ -247,64 +277,54 @@ class RegistryTagsCleaner:
         # By default, keep anything which is tagged
         self.tags_to_keep = list(set(self.all_pkgs_tags_to_version.keys()))
 
-    def check_tags_pull(self):
+    def check_remaining_tags_valid(self):
         """
-        This method uses the Docker Python SDK to confirm all tags which were
-        kept still pull, for all platforms.
+        Checks the non-deleted tags are still valid.  The assumption is if the
+        manifest is can be inspected and each image manifest if points to can be
+        inspected, the image will still pull.
 
-        TODO: This is much slower (although more comprehensive).  Maybe a Pool?
+        https://github.com/opencontainers/image-spec/blob/main/image-index.md
         """
         logger.info("Beginning confirmation step")
-        client = docker.from_env()
-        imgs = []
+        a_tag_failed = False
         for tag in sorted(self.tags_to_keep):
-            repository = f"ghcr.io/{self.repo_owner}/{self.package_name}"
-            for arch, variant in [("amd64", None), ("arm64", None), ("arm", "v7")]:
-                # From 11.2.0 onwards, qpdf is cross compiled, so there is a single arch, amd64
-                # skip others in this case
-                if "qpdf" in self.package_name and arch != "amd64" and tag == "11.2.0":
-                    continue
-                # Skip beta and release candidate tags
-                elif "beta" in tag:
-                    continue
 
-                # Build the platform name
-                if variant is not None:
-                    platform = f"linux/{arch}/{variant}"
-                else:
-                    platform = f"linux/{arch}"
+            try:
+                image_index = ImageIndex(
+                    f"ghcr.io/{self.repo_owner}/{self.package_name}",
+                    tag,
+                )
+                for manifest in image_index.image_pointers:
+                    logger.info(f"Checking {manifest.digest} for {manifest.platform}")
 
-                try:
-                    logger.info(f"Pulling {repository}:{tag} for {platform}")
-                    image = client.images.pull(
-                        repository=repository,
-                        tag=tag,
-                        platform=platform,
-                    )
-                    imgs.append(image)
-                except docker.errors.APIError as e:
-                    logger.error(
-                        f"Failed to pull {repository}:{tag}: {e}",
-                    )
+                    # This follows the pointer from the index to an actual image, layers and all
+                    # Note the format is @
+                    digest_name = f"ghcr.io/{self.repo_owner}/{self.package_name}@{manifest.digest}"
 
-            # Prevent out of space errors by removing after a few
-            # pulls
-            if len(imgs) > 50:
-                for image in imgs:
                     try:
-                        client.images.remove(image.id)
-                    except docker.errors.APIError as e:
-                        err_str = str(e)
-                        # Ignore attempts to remove images that are partly shared
-                        # Ignore images which are somehow gone already
-                        if (
-                            "must be forced" not in err_str
-                            and "No such image" not in err_str
-                        ):
-                            logger.error(
-                                f"Remove image ghcr.io/{self.repo_owner}/{self.package_name}:{tag} failed: {e}",
-                            )
-                imgs = []
+
+                        subprocess.run(
+                            [
+                                shutil.which("docker"),
+                                "buildx",
+                                "imagetools",
+                                "inspect",
+                                "--raw",
+                                digest_name,
+                            ],
+                            capture_output=True,
+                            check=True,
+                        )
+                    except subprocess.CalledProcessError as e:
+                        logger.error(f"Failed to inspect digest: {e.stderr}")
+                        a_tag_failed = True
+            except subprocess.CalledProcessError as e:
+                a_tag_failed = True
+                logger.error(f"Failed to inspect: {e.stderr}")
+                continue
+
+        if a_tag_failed:
+            raise Exception("At least one image tag failed to inspect")
 
 
 class MainImageTagsCleaner(RegistryTagsCleaner):
@@ -366,7 +386,7 @@ class MainImageTagsCleaner(RegistryTagsCleaner):
 
 class LibraryTagsCleaner(RegistryTagsCleaner):
     """
-    Exists for the off change that someday, the installer library images
+    Exists for the off chance that someday, the installer library images
     will need their own logic
     """
 
@@ -464,7 +484,7 @@ def _main():
 
             # Verify remaining tags still pull
             if args.is_manifest:
-                cleaner.check_tags_pull()
+                cleaner.check_remaining_tags_valid()
 
 
 if __name__ == "__main__":

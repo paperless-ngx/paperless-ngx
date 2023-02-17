@@ -95,6 +95,7 @@ export class SettingsComponent
     usersGroup: this.usersGroup,
     groupsGroup: this.groupsGroup,
 
+    savedViewsWarnOnUnsavedChange: new FormControl(null),
     savedViews: this.savedViewGroup,
 
     mailAccounts: this.mailAccountGroup,
@@ -210,6 +211,9 @@ export class SettingsComponent
       ),
       notificationsConsumerSuppressOnDashboard: this.settings.get(
         SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUPPRESS_ON_DASHBOARD
+      ),
+      savedViewsWarnOnUnsavedChange: this.settings.get(
+        SETTINGS_KEYS.SAVED_VIEWS_WARN_ON_UNSAVED_CHANGE
       ),
       usersGroup: {},
       groupsGroup: {},
@@ -535,6 +539,10 @@ export class SettingsComponent
     this.settings.set(
       SETTINGS_KEYS.UPDATE_CHECKING_ENABLED,
       this.settingsForm.value.updateCheckingEnabled
+    )
+    this.settings.set(
+      SETTINGS_KEYS.SAVED_VIEWS_WARN_ON_UNSAVED_CHANGE,
+      this.settingsForm.value.savedViewsWarnOnUnsavedChange
     )
     this.settings.setLanguage(this.settingsForm.value.displayLanguage)
     this.settings

@@ -501,3 +501,9 @@ You can also set the default for new tables (this does NOT affect
 existing tables) with:
 
 `ALTER DATABASE <db_name> CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;`
+
+!!! warning
+
+    Using mariadb version 10.4+ is recommended. Using the `utf8mb3` character set on
+    an older system may fix issues that can arise while setting up Paperless-ngx but
+    `utf8mb3` can cause issues with consumption (where `utf8mb4` does not).
