@@ -698,13 +698,6 @@ paperless will process in parallel on a single document.
 on large documents within the default 1800 seconds. So extending
 this timeout may prove to be useful on weak hardware setups.
 
-`PAPERLESS_WORKER_RETRY=<num>`
-
-: If PAPERLESS_WORKER_TIMEOUT has been configured, the retry time for
-a task can also be configured. By default, this value will be set to
-10s more than the worker timeout. This value should never be set
-less than the worker timeout.
-
 `PAPERLESS_TIME_ZONE=<timezone>`
 
 : Set the time zone here. See
