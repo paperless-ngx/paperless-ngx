@@ -41,6 +41,8 @@ export const SETTINGS_KEYS = {
   UPDATE_CHECKING_ENABLED: 'general-settings:update-checking:enabled',
   UPDATE_CHECKING_BACKEND_SETTING:
     'general-settings:update-checking:backend-setting',
+  SAVED_VIEWS_WARN_ON_UNSAVED_CHANGE:
+    'general-settings:saved-views:warn-on-unsaved-change',
 }
 
 export const SETTINGS: PaperlessUiSetting[] = [
@@ -138,5 +140,10 @@ export const SETTINGS: PaperlessUiSetting[] = [
     key: SETTINGS_KEYS.UPDATE_CHECKING_BACKEND_SETTING,
     type: 'string',
     default: '',
+  },
+  {
+    key: SETTINGS_KEYS.SAVED_VIEWS_WARN_ON_UNSAVED_CHANGE,
+    type: 'boolean',
+    default: true,
   },
 ]

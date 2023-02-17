@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-09 21:50+0000\n"
-"PO-Revision-Date: 2023-01-23 12:37\n"
+"PO-Revision-Date: 2023-01-27 19:22\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
@@ -368,15 +368,15 @@ msgstr "heeft tags in"
 
 #: documents/models.py:410
 msgid "ASN greater than"
-msgstr ""
+msgstr "ASN groter dan"
 
 #: documents/models.py:411
 msgid "ASN less than"
-msgstr ""
+msgstr "ASN kleiner dan"
 
 #: documents/models.py:412
 msgid "storage path is"
-msgstr ""
+msgstr "opslagpad is"
 
 #: documents/models.py:422
 msgid "rule type"
@@ -396,99 +396,99 @@ msgstr "filterregels"
 
 #: documents/models.py:536
 msgid "Task ID"
-msgstr ""
+msgstr "Taak ID"
 
 #: documents/models.py:537
 msgid "Celery ID for the Task that was run"
-msgstr ""
+msgstr "Celery ID voor de taak die werd uitgevoerd"
 
 #: documents/models.py:542
 msgid "Acknowledged"
-msgstr ""
+msgstr "Bevestigd"
 
 #: documents/models.py:543
 msgid "If the task is acknowledged via the frontend or API"
-msgstr ""
+msgstr "Of de taak is bevestigd via de frontend of de API"
 
 #: documents/models.py:549 documents/models.py:556
 msgid "Task Name"
-msgstr ""
+msgstr "Taaknaam"
 
 #: documents/models.py:550
 msgid "Name of the file which the Task was run for"
-msgstr ""
+msgstr "Naam van het bestand waarvoor de taak werd uitgevoerd"
 
 #: documents/models.py:557
 msgid "Name of the Task which was run"
-msgstr ""
+msgstr "Naam van de uitgevoerde taak"
 
 #: documents/models.py:562
 msgid "Task Positional Arguments"
-msgstr ""
+msgstr "Positionele argumenten voor taak"
 
 #: documents/models.py:564
 msgid "JSON representation of the positional arguments used with the task"
-msgstr ""
+msgstr "JSON weergave van de positionele argumenten die gebruikt worden voor de taak"
 
 #: documents/models.py:569
 msgid "Task Named Arguments"
-msgstr ""
+msgstr "Argumenten met naam voor taak"
 
 #: documents/models.py:571
 msgid "JSON representation of the named arguments used with the task"
-msgstr ""
+msgstr "JSON weergave van de argumenten met naam die gebruikt worden voor de taak"
 
 #: documents/models.py:578
 msgid "Task State"
-msgstr ""
+msgstr "Taakstatus"
 
 #: documents/models.py:579
 msgid "Current state of the task being run"
-msgstr ""
+msgstr "Huidige status van de taak die wordt uitgevoerd"
 
 #: documents/models.py:584
 msgid "Created DateTime"
-msgstr ""
+msgstr "Aangemaakt DateTime"
 
 #: documents/models.py:585
 msgid "Datetime field when the task result was created in UTC"
-msgstr ""
+msgstr "Datetime veld wanneer het resultaat van de taak werd aangemaakt in UTC"
 
 #: documents/models.py:590
 msgid "Started DateTime"
-msgstr ""
+msgstr "Gestart DateTime"
 
 #: documents/models.py:591
 msgid "Datetime field when the task was started in UTC"
-msgstr ""
+msgstr "Datetime veld wanneer de taak werd gestart in UTC"
 
 #: documents/models.py:596
 msgid "Completed DateTime"
-msgstr ""
+msgstr "Voltooid DateTime"
 
 #: documents/models.py:597
 msgid "Datetime field when the task was completed in UTC"
-msgstr ""
+msgstr "Datetime veld wanneer de taak werd voltooid in UTC"
 
 #: documents/models.py:602
 msgid "Result Data"
-msgstr ""
+msgstr "Resultaatgegevens"
 
 #: documents/models.py:604
 msgid "The data returned by the task"
-msgstr ""
+msgstr "Gegevens geretourneerd door de taak"
 
 #: documents/models.py:613
 msgid "Comment for the document"
-msgstr ""
+msgstr "Commentaar op het document"
 
 #: documents/models.py:642
 msgid "comment"
-msgstr ""
+msgstr "opmerking"
 
 #: documents/models.py:643
 msgid "comments"
-msgstr ""
+msgstr "opmerkingen"
 
 #: documents/serialisers.py:72
 #, python-format

@@ -14,15 +14,14 @@ TEST_CHANNEL_LAYERS = {
 }
 
 
+@override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
 class TestWebSockets(TestCase):
-    @override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
     async def test_no_auth(self):
         communicator = WebsocketCommunicator(application, "/ws/status/")
         connected, subprotocol = await communicator.connect()
         self.assertFalse(connected)
         await communicator.disconnect()
 
-    @override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
     @mock.patch("paperless.consumers.StatusConsumer._authenticated")
     async def test_auth(self, _authenticated):
         _authenticated.return_value = True
@@ -33,7 +32,6 @@ class TestWebSockets(TestCase):
 
         await communicator.disconnect()
 
-    @override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
     @mock.patch("paperless.consumers.StatusConsumer._authenticated")
     async def test_receive(self, _authenticated):
         _authenticated.return_value = True

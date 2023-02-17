@@ -109,6 +109,16 @@ def _parse_redis_url(env_redis: Optional[str]) -> Tuple[str]:
 
 
 def _parse_beat_schedule() -> Dict:
+    """
+    Configures the scheduled tasks, according to default or
+    environment variables.  Task expiration is configured so the task will
+    expire (and not run), shortly before the default frequency will put another
+    of the same task into the queue
+
+
+    https://docs.celeryq.dev/en/stable/userguide/periodic-tasks.html#beat-entries
+    https://docs.celeryq.dev/en/latest/userguide/calling.html#expiration
+    """
     schedule = {}
     tasks = [
         {
@@ -117,6 +127,11 @@ def _parse_beat_schedule() -> Dict:
             # Default every ten minutes
             "env_default": "*/10 * * * *",
             "task": "paperless_mail.tasks.process_mail_accounts",
+            "options": {
+                # 1 minute before default schedule sends again
+                "expires": 9.0
+                * 60.0,
+            },
         },
         {
             "name": "Train the classifier",
@@ -124,6 +139,11 @@ def _parse_beat_schedule() -> Dict:
             # Default hourly at 5 minutes past the hour
             "env_default": "5 */1 * * *",
             "task": "documents.tasks.train_classifier",
+            "options": {
+                # 1 minute before default schedule sends again
+                "expires": 59.0
+                * 60.0,
+            },
         },
         {
             "name": "Optimize the index",
@@ -131,6 +151,12 @@ def _parse_beat_schedule() -> Dict:
             # Default daily at midnight
             "env_default": "0 0 * * *",
             "task": "documents.tasks.index_optimize",
+            "options": {
+                # 1 hour before default schedule sends again
+                "expires": 23.0
+                * 60.0
+                * 60.0,
+            },
         },
         {
             "name": "Perform sanity check",
@@ -138,6 +164,12 @@ def _parse_beat_schedule() -> Dict:
             # Default Sunday at 00:30
             "env_default": "30 0 * * sun",
             "task": "documents.tasks.sanity_check",
+            "options": {
+                # 1 hour before default schedule sends again
+                "expires": ((7.0 * 24.0) - 1.0)
+                * 60.0
+                * 60.0,
+            },
         },
     ]
     for task in tasks:
@@ -151,9 +183,11 @@ def _parse_beat_schedule() -> Dict:
         #   - five time-and-date fields
         #   - separated by at least one blank
         minute, hour, day_month, month, day_week = value.split(" ")
+
         schedule[task["name"]] = {
             "task": task["task"],
             "schedule": crontab(minute, hour, day_week, day_month, month),
+            "options": task["options"],
         }
 
     return schedule
@@ -263,6 +297,10 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+# Optional to enable compression
+if __get_boolean("PAPERLESS_ENABLE_COMPRESSION", "yes"):  # pragma: nocover
+    MIDDLEWARE.insert(0, "compression_middleware.middleware.CompressionMiddleware")
+
 ROOT_URLCONF = "paperless.urls"
 
 FORCE_SCRIPT_NAME = os.getenv("PAPERLESS_FORCE_SCRIPT_NAME")
@@ -280,7 +318,6 @@ _CELERY_REDIS_URL, _CHANNELS_REDIS_URL = _parse_redis_url(
     os.getenv("PAPERLESS_REDIS", None),
 )
 
-# TODO: what is this used for?
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -561,22 +598,21 @@ LOGGING = {
 # Task queue                                                                  #
 ###############################################################################
 
-TASK_WORKERS = __get_int("PAPERLESS_TASK_WORKERS", 1)
-
-WORKER_TIMEOUT: Final[int] = __get_int("PAPERLESS_WORKER_TIMEOUT", 1800)
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html
 
 CELERY_BROKER_URL = _CELERY_REDIS_URL
 CELERY_TIMEZONE = TIME_ZONE
 
 CELERY_WORKER_HIJACK_ROOT_LOGGER = False
-CELERY_WORKER_CONCURRENCY = TASK_WORKERS
+CELERY_WORKER_CONCURRENCY: Final[int] = __get_int("PAPERLESS_TASK_WORKERS", 1)
+TASK_WORKERS = CELERY_WORKER_CONCURRENCY
 CELERY_WORKER_MAX_TASKS_PER_CHILD = 1
 CELERY_WORKER_SEND_TASK_EVENTS = True
-
+CELERY_TASK_SEND_SENT_EVENT = True
 CELERY_SEND_TASK_SENT_EVENT = True
 
 CELERY_TASK_TRACK_STARTED = True
-CELERY_TASK_TIME_LIMIT = WORKER_TIMEOUT
+CELERY_TASK_TIME_LIMIT: Final[int] = __get_int("PAPERLESS_WORKER_TIMEOUT", 1800)
 
 CELERY_RESULT_EXTENDED = True
 CELERY_RESULT_BACKEND = "django-db"
@@ -608,7 +644,7 @@ def default_threads_per_worker(task_workers) -> int:
 
 THREADS_PER_WORKER = os.getenv(
     "PAPERLESS_THREADS_PER_WORKER",
-    default_threads_per_worker(TASK_WORKERS),
+    default_threads_per_worker(CELERY_WORKER_CONCURRENCY),
 )
 
 ###############################################################################
@@ -637,7 +673,7 @@ CONSUMER_IGNORE_PATTERNS = list(
     json.loads(
         os.getenv(
             "PAPERLESS_CONSUMER_IGNORE_PATTERNS",
-            '[".DS_STORE/*", "._*", ".stfolder/*", ".stversions/*", ".localized/*", "desktop.ini"]',  # noqa: E501
+            '[".DS_STORE/*", "._*", ".stfolder/*", ".stversions/*", ".localized/*", "desktop.ini", "@eaDir/*"]',  # noqa: E501
         ),
     ),
 )
