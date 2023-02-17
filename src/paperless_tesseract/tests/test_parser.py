@@ -364,7 +364,7 @@ class TestParser(DirectoriesMixin, TestCase):
         )
         self.assertTrue(os.path.isfile(parser.archive_path))
         self.assertContainsStrings(parser.get_text().lower(), ["page 1", "page 2"])
-        self.assertFalse("page 3" in parser.get_text().lower())
+        self.assertNotIn("page 3", parser.get_text().lower())
 
     @override_settings(OCR_PAGES=1, OCR_MODE="force")
     def test_multi_page_analog_pages_force(self):
@@ -386,8 +386,8 @@ class TestParser(DirectoriesMixin, TestCase):
         )
         self.assertTrue(os.path.isfile(parser.archive_path))
         self.assertContainsStrings(parser.get_text().lower(), ["page 1"])
-        self.assertFalse("page 2" in parser.get_text().lower())
-        self.assertFalse("page 3" in parser.get_text().lower())
+        self.assertNotIn("page 2", parser.get_text().lower())
+        self.assertNotIn("page 3", parser.get_text().lower())
 
     @override_settings(OCR_MODE="skip_noarchive")
     def test_skip_noarchive_withtext(self):
@@ -659,6 +659,15 @@ class TestParser(DirectoriesMixin, TestCase):
         with override_settings(OCR_DESKEW=False, OCR_MODE="skip"):
             params = parser.construct_ocrmypdf_parameters("", "", "", "")
             self.assertNotIn("deskew", params)
+
+        with override_settings(OCR_MAX_IMAGE_PIXELS=1_000_001.0):
+            params = parser.construct_ocrmypdf_parameters("", "", "", "")
+            self.assertIn("max_image_mpixels", params)
+            self.assertAlmostEqual(params["max_image_mpixels"], 1, places=4)
+
+        with override_settings(OCR_MAX_IMAGE_PIXELS=-1_000_001.0):
+            params = parser.construct_ocrmypdf_parameters("", "", "", "")
+            self.assertNotIn("max_image_mpixels", params)
 
     def test_rtl_language_detection(self):
         """

@@ -1,5 +1,6 @@
 import logging
 import os
+from fnmatch import filter
 from pathlib import Path
 from pathlib import PurePath
 from threading import Event
@@ -7,6 +8,7 @@ from threading import Thread
 from time import monotonic
 from time import sleep
 from typing import Final
+from typing import Set
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -25,15 +27,15 @@ except ImportError:  # pragma: nocover
 logger = logging.getLogger("paperless.management.consumer")
 
 
-def _tags_from_path(filepath):
-    """Walk up the directory tree from filepath to CONSUMPTION_DIR
-    and get or create Tag IDs for every directory.
+def _tags_from_path(filepath) -> Set[Tag]:
     """
-    normalized_consumption_dir = os.path.abspath(
-        os.path.normpath(settings.CONSUMPTION_DIR),
-    )
+    Walk up the directory tree from filepath to CONSUMPTION_DIR
+    and get or create Tag IDs for every directory.
+
+    Returns set of Tag models
+    """
     tag_ids = set()
-    path_parts = Path(filepath).relative_to(normalized_consumption_dir).parent.parts
+    path_parts = Path(filepath).relative_to(settings.CONSUMPTION_DIR).parent.parts
     for part in path_parts:
         tag_ids.add(
             Tag.objects.get_or_create(name__iexact=part, defaults={"name": part})[0].pk,
@@ -43,14 +45,41 @@ def _tags_from_path(filepath):
 
 
 def _is_ignored(filepath: str) -> bool:
-    normalized_consumption_dir = os.path.abspath(
-        os.path.normpath(settings.CONSUMPTION_DIR),
+    """
+    Checks if the given file should be ignored, based on configured
+    patterns.
+
+    Returns True if the file is ignored, False otherwise
+    """
+    filepath = os.path.abspath(
+        os.path.normpath(filepath),
     )
-    filepath_relative = PurePath(filepath).relative_to(normalized_consumption_dir)
-    return any(filepath_relative.match(p) for p in settings.CONSUMER_IGNORE_PATTERNS)
+
+    # Trim out the consume directory, leaving only filename and it's
+    # path relative to the consume directory
+    filepath_relative = PurePath(filepath).relative_to(settings.CONSUMPTION_DIR)
+
+    # March through the components of the path, including directories and the filename
+    # looking for anything matching
+    # foo/bar/baz/file.pdf -> (foo, bar, baz, file.pdf)
+    parts = []
+    for part in filepath_relative.parts:
+        # If the part is not the name (ie, it's a dir)
+        # Need to append the trailing slash or fnmatch doesn't match
+        # fnmatch("dir", "dir/*") == False
+        # fnmatch("dir/", "dir/*") == True
+        if part != filepath_relative.name:
+            part = part + "/"
+        parts.append(part)
+
+    for pattern in settings.CONSUMER_IGNORE_PATTERNS:
+        if len(filter(parts, pattern)):
+            return True
+
+    return False
 
 
-def _consume(filepath):
+def _consume(filepath: str) -> None:
     if os.path.isdir(filepath) or _is_ignored(filepath):
         return
 
@@ -103,7 +132,13 @@ def _consume(filepath):
         logger.exception("Error while consuming document")
 
 
-def _consume_wait_unmodified(file):
+def _consume_wait_unmodified(file: str) -> None:
+    """
+    Waits for the given file to appear unmodified based on file size
+    and modification time.  Will wait a configured number of seconds
+    and retry a configured number of times before either consuming or
+    giving up
+    """
     if _is_ignored(file):
         return
 

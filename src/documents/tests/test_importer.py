@@ -25,7 +25,7 @@ class TestImporter(TestCase):
         cmd.manifest = [{"model": "documents.document"}]
         with self.assertRaises(CommandError) as cm:
             cmd._check_manifest()
-        self.assertTrue("The manifest file contains a record" in str(cm.exception))
+        self.assertIn("The manifest file contains a record", str(cm.exception))
 
         cmd.manifest = [
             {"model": "documents.document", EXPORTER_FILE_NAME: "noexist.pdf"},
@@ -33,6 +33,7 @@ class TestImporter(TestCase):
         # self.assertRaises(CommandError, cmd._check_manifest)
         with self.assertRaises(CommandError) as cm:
             cmd._check_manifest()
-        self.assertTrue(
-            'The manifest file refers to "noexist.pdf"' in str(cm.exception),
+        self.assertIn(
+            'The manifest file refers to "noexist.pdf"',
+            str(cm.exception),
         )
