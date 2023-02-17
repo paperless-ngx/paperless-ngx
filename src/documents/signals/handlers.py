@@ -27,6 +27,7 @@ from ..file_handling import generate_unique_filename
 from ..models import Document
 from ..models import MatchingModel
 from ..models import PaperlessTask
+from ..models import StoragePath
 from ..models import Tag
 
 logger = logging.getLogger("paperless.handlers")
@@ -493,6 +494,16 @@ def update_filename_and_move_files(sender, instance, **kwargs):
                 os.path.dirname(old_archive_path),
                 root=settings.ARCHIVE_DIR,
             )
+
+
+@receiver(models.signals.post_save, sender=StoragePath)
+def update_document_storage_path(sender, instance, **kwargs):
+    """
+    Triggers when a storage path is changed, running against any documents using
+    the path, and checks to see if they need to be renamed
+    """
+    for document in instance.documents.all():
+        update_filename_and_move_files(None, document)
 
 
 def set_log_entry(sender, document=None, logging_group=None, **kwargs):
