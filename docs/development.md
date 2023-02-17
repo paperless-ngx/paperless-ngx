@@ -251,7 +251,7 @@ these parts have to be translated separately.
 - The translated strings need to be placed in the
   `src-ui/src/locale/` folder.
 - In order to extract added or changed strings from the source files,
-  call `ng xi18n --ivy`.
+  call `ng extract-i18n`.
 
 Adding new languages requires adding the translated files in the
 `src-ui/src/locale/` folder and adjusting a couple files.
