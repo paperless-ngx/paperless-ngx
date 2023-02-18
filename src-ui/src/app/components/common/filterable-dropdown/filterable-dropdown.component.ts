@@ -358,6 +358,7 @@ export class FilterableDropdownComponent {
       }, 0)
       if (this.editing) {
         this.selectionModel.reset()
+        this.modelIsDirty = false
       }
       this.opened.next(this)
     } else {
