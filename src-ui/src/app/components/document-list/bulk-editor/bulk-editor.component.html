@@ -34,6 +34,7 @@
         [applyOnClose]="applyOnClose"
         (opened)="openTagsDropdown()"
         [(selectionModel)]="tagSelectionModel"
+        [documentCounts]="tagDocumentCounts"
         (apply)="setTags($event)">
       </app-filterable-dropdown>
       <app-filterable-dropdown class="me-2 me-md-3" title="Correspondent" icon="person-fill" i18n-title
@@ -44,6 +45,7 @@
         [applyOnClose]="applyOnClose"
         (opened)="openCorrespondentDropdown()"
         [(selectionModel)]="correspondentSelectionModel"
+        [documentCounts]="correspondentDocumentCounts"
         (apply)="setCorrespondents($event)">
       </app-filterable-dropdown>
       <app-filterable-dropdown class="me-2 me-md-3" title="Document type" icon="file-earmark-fill" i18n-title
@@ -54,6 +56,7 @@
         [applyOnClose]="applyOnClose"
         (opened)="openDocumentTypeDropdown()"
         [(selectionModel)]="documentTypeSelectionModel"
+        [documentCounts]="documentTypeDocumentCounts"
         (apply)="setDocumentTypes($event)">
       </app-filterable-dropdown>
       <app-filterable-dropdown class="me-2 me-md-3" title="Storage path" icon="folder-fill" i18n-title
@@ -64,6 +67,7 @@
         [applyOnClose]="applyOnClose"
         (opened)="openStoragePathDropdown()"
         [(selectionModel)]="storagePathsSelectionModel"
+        [documentCounts]="storagePathDocumentCounts"
         (apply)="setStoragePaths($event)">
       </app-filterable-dropdown>
     </div>

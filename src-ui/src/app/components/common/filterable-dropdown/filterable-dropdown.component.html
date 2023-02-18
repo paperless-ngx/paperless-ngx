@@ -25,7 +25,7 @@
       </div>
       <div *ngIf="selectionModel.items" class="items">
         <ng-container *ngFor="let item of selectionModel.itemsSorted | filter: filterText">
-          <app-toggleable-dropdown-button *ngIf="allowSelectNone || item.id" [item]="item" [state]="selectionModel.get(item.id)" (toggle)="selectionModel.toggle(item.id)" (exclude)="excludeClicked(item.id)" [disabled]="disabled"></app-toggleable-dropdown-button>
+          <app-toggleable-dropdown-button *ngIf="allowSelectNone || item.id" [item]="item" [state]="selectionModel.get(item.id)" [count]="getUpdatedDocumentCount(item.id)" (toggle)="selectionModel.toggle(item.id)" (exclude)="excludeClicked(item.id)" [disabled]="disabled"></app-toggleable-dropdown-button>
         </ng-container>
       </div>
       <button *ngIf="editing" class="list-group-item list-group-item-action bg-light" (click)="applyClicked()" [disabled]="!modelIsDirty || disabled">

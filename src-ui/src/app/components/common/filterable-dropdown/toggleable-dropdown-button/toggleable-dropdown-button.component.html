@@ -20,5 +20,5 @@
     <app-tag *ngIf="isTag; else displayName" [tag]="item" [clickable]="false"></app-tag>
     <ng-template #displayName><small>{{item.name}}</small></ng-template>
   </div>
-  <div class="badge badge-light rounded-pill ms-auto me-1">{{item.document_count}}</div>
+  <div class="badge badge-light rounded-pill ms-auto me-1">{{count ?? item.document_count}}</div>
 </button>
