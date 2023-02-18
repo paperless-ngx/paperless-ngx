@@ -10,6 +10,7 @@ from django.test import override_settings
 from django.test import TestCase
 from django.utils import timezone
 
+from ..bulk_edit import bulk_update_documents
 from ..file_handling import create_source_path_directory
 from ..file_handling import delete_empty_directories
 from ..file_handling import generate_filename
@@ -1032,7 +1033,8 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
         self.assertEqual(generate_filename(doc_a), "0000002.pdf")
         self.assertEqual(generate_filename(doc_b), "SomeImportantNone/2020-07-25.pdf")
 
-    def test_document_storage_path_changed(self):
+    @mock.patch("documents.bulk_edit.bulk_update_documents.delay")
+    def test_document_storage_path_changed_with_doc(self, bulk_update_mock):
         """
         GIVEN:
             - Document with a defined storage path
@@ -1062,6 +1064,9 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
         document.save()
 
         # Change format
+        bulk_update_mock.side_effect = (
+            bulk_update_documents  # call through, no Redis needed
+        )
         sp.path = "NewFolder/{created}"
         sp.save()
 
@@ -1070,6 +1075,50 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
         self.assertEqual(
             document.source_path,
             os.path.join(settings.ORIGINALS_DIR, "NewFolder/2020-06-25.pdf"),
+        )
+        self.assertTrue(os.path.isfile(document.source_path))
+
+    @mock.patch("documents.bulk_edit.bulk_update_documents.delay")
+    def test_document_storage_path_changed_with_no_doc(self, bulk_update_mock):
+        """
+        GIVEN:
+            - Document with no storage path
+            - Storage path exist
+        WHEN:
+            - The storage path format is updated
+        THEN:
+            - No changes to document
+        """
+        sp = StoragePath.objects.create(path="TestFolder/{created}")
+        document = Document.objects.create(
+            mime_type="application/pdf",
+            created=timezone.make_aware(datetime.datetime(2021, 6, 25, 7, 36, 51, 153)),
+        )
+
+        # Ensure that filename is properly generated
+        document.filename = generate_filename(document)
+        self.assertEqual(
+            document.source_path,
+            os.path.join(settings.ORIGINALS_DIR, f"{document.pk:07}.pdf"),
+        )
+
+        # Actually create the file
+        create_source_path_directory(document.source_path)
+        Path(document.source_path).touch()
+        self.assertTrue(os.path.isfile(document.source_path))
+        document.save()
+
+        # Change format
+        sp.path = "NewFolder/{created}"
+        sp.save()
+
+        bulk_update_mock.assert_not_called()
+
+        document.refresh_from_db()
+
+        self.assertEqual(
+            document.source_path,
+            os.path.join(settings.ORIGINALS_DIR, f"{document.pk:07}.pdf"),
         )
         self.assertTrue(os.path.isfile(document.source_path))
 

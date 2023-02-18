@@ -21,6 +21,7 @@ from django.utils import timezone
 from filelock import FileLock
 
 from .. import matching
+from ..bulk_edit import bulk_update_documents
 from ..file_handling import create_source_path_directory
 from ..file_handling import delete_empty_directories
 from ..file_handling import generate_unique_filename
@@ -385,7 +386,7 @@ def validate_move(instance, old_path, new_path):
 
 @receiver(models.signals.m2m_changed, sender=Document.tags.through)
 @receiver(models.signals.post_save, sender=Document)
-def update_filename_and_move_files(sender, instance, **kwargs):
+def update_filename_and_move_files(sender, instance: Document, **kwargs):
 
     if not instance.filename:
         # Can't update the filename if there is no filename to begin with
@@ -497,13 +498,14 @@ def update_filename_and_move_files(sender, instance, **kwargs):
 
 
 @receiver(models.signals.post_save, sender=StoragePath)
-def update_document_storage_path(sender, instance, **kwargs):
+def update_document_storage_path(sender, instance: StoragePath, **kwargs):
     """
     Triggers when a storage path is changed, running against any documents using
     the path, and checks to see if they need to be renamed
     """
-    for document in instance.documents.all():
-        update_filename_and_move_files(None, document)
+    doc_ids = [doc.id for doc in instance.documents.all()]
+    if len(doc_ids):
+        bulk_update_documents.delay(doc_ids)
 
 
 def set_log_entry(sender, document=None, logging_group=None, **kwargs):
