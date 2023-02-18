@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-09 21:50+0000\n"
-"PO-Revision-Date: 2022-12-21 11:37\n"
+"PO-Revision-Date: 2023-02-18 03:40\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -412,7 +412,7 @@ msgstr ""
 
 #: documents/models.py:549 documents/models.py:556
 msgid "Task Name"
-msgstr ""
+msgstr "Название Задачи"
 
 #: documents/models.py:550
 msgid "Name of the file which the Task was run for"
