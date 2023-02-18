@@ -82,7 +82,7 @@
 </app-page-header>
 
 <div class="row sticky-top pt-3 pt-sm-4 pb-2 pb-lg-4 bg-body">
-  <app-filter-editor [hidden]="isBulkEditing" [(filterRules)]="list.filterRules" [unmodifiedFilterRules]="unmodifiedFilterRules" #filterEditor></app-filter-editor>
+  <app-filter-editor [hidden]="isBulkEditing" [(filterRules)]="list.filterRules" [unmodifiedFilterRules]="unmodifiedFilterRules" [selectionData]="list.selectionData" #filterEditor></app-filter-editor>
   <app-bulk-editor [hidden]="!isBulkEditing"></app-bulk-editor>
 </div>
 

@@ -27,10 +27,11 @@
           <app-filterable-dropdown class="flex-fill" title="Tags" icon="tag-fill" i18n-title
             filterPlaceholder="Filter tags" i18n-filterPlaceholder
             [items]="tags"
+            [multiple]="true"
             [(selectionModel)]="tagSelectionModel"
             (selectionModelChange)="updateRules()"
-            [multiple]="true"
             (opened)="onTagsDropdownOpen()"
+            [documentCounts]="tagDocumentCounts"
             [allowSelectNone]="true"></app-filterable-dropdown>
           <app-filterable-dropdown class="flex-fill" title="Correspondent" icon="person-fill" i18n-title
             filterPlaceholder="Filter correspondents" i18n-filterPlaceholder
@@ -38,20 +39,23 @@
             [(selectionModel)]="correspondentSelectionModel"
             (selectionModelChange)="updateRules()"
             (opened)="onCorrespondentDropdownOpen()"
+            [documentCounts]="correspondentDocumentCounts"
             [allowSelectNone]="true"></app-filterable-dropdown>
           <app-filterable-dropdown class="flex-fill" title="Document type" icon="file-earmark-fill" i18n-title
             filterPlaceholder="Filter document types" i18n-filterPlaceholder
             [items]="documentTypes"
             [(selectionModel)]="documentTypeSelectionModel"
-            (opened)="onDocumentTypeDropdownOpen()"
             (selectionModelChange)="updateRules()"
+            (opened)="onDocumentTypeDropdownOpen()"
+            [documentCounts]="documentTypeDocumentCounts"
             [allowSelectNone]="true"></app-filterable-dropdown>
           <app-filterable-dropdown class="me-2 flex-fill" title="Storage path" icon="folder-fill" i18n-title
             filterPlaceholder="Filter storage paths" i18n-filterPlaceholder
             [items]="storagePaths"
             [(selectionModel)]="storagePathSelectionModel"
-            (opened)="onStoragePathDropdownOpen()"
             (selectionModelChange)="updateRules()"
+            (opened)="onStoragePathDropdownOpen()"
+            [documentCounts]="storagePathDocumentCounts"
             [allowSelectNone]="true"></app-filterable-dropdown>
         </div>
         <div class="d-flex flex-wrap">
