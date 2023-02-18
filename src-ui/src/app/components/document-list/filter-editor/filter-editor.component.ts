@@ -40,7 +40,11 @@ import {
 } from 'src/app/data/filter-rule-type'
 import { FilterableDropdownSelectionModel } from '../../common/filterable-dropdown/filterable-dropdown.component'
 import { ToggleableItemState } from '../../common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component'
-import { DocumentService } from 'src/app/services/rest/document.service'
+import {
+  DocumentService,
+  SelectionData,
+  SelectionDataItem,
+} from 'src/app/services/rest/document.service'
 import { PaperlessDocument } from 'src/app/data/paperless-document'
 import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
@@ -143,6 +147,11 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   correspondents: PaperlessCorrespondent[] = []
   documentTypes: PaperlessDocumentType[] = []
   storagePaths: PaperlessStoragePath[] = []
+
+  tagDocumentCounts: SelectionDataItem[]
+  correspondentDocumentCounts: SelectionDataItem[]
+  documentTypeDocumentCounts: SelectionDataItem[]
+  storagePathDocumentCounts: SelectionDataItem[]
 
   _textFilter = ''
   _moreLikeId: number
@@ -617,6 +626,17 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   @Output()
   filterRulesChange = new EventEmitter<FilterRule[]>()
 
+  @Input()
+  set selectionData(selectionData: SelectionData) {
+    this.tagDocumentCounts = selectionData?.selected_tags ?? null
+    this.documentTypeDocumentCounts =
+      selectionData?.selected_document_types ?? null
+    this.correspondentDocumentCounts =
+      selectionData?.selected_correspondents ?? null
+    this.storagePathDocumentCounts =
+      selectionData?.selected_storage_paths ?? null
+  }
+
   rulesModified: boolean = false
 
   updateRules() {
@@ -692,6 +712,8 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   }
 
   onCorrespondentDropdownOpen() {
+    console.log(this.correspondentSelectionModel)
+
     this.correspondentSelectionModel.apply()
   }
 
