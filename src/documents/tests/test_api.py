@@ -3235,7 +3235,6 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
             - Existing storage paths are returned
         """
         response = self.client.get(self.ENDPOINT, format="json")
-        self.assertEqual(response.status_code, 200)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["count"], 1)
@@ -3307,13 +3306,47 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
             json.dumps(
                 {
                     "name": "Storage path with placeholders",
-                    "path": "{title}/{correspondent}/{document_type}/{created}/{created_year}/{created_year_short}/{created_month}/{created_month_name}/{created_month_name_short}/{created_day}/{added}/{added_year}/{added_year_short}/{added_month}/{added_month_name}/{added_month_name_short}/{added_day}/{asn}/{tags}/{tag_list}/",
+                    "path": "{title}/{correspondent}/{document_type}/{created}/{created_year}"
+                    "/{created_year_short}/{created_month}/{created_month_name}"
+                    "/{created_month_name_short}/{created_day}/{added}/{added_year}"
+                    "/{added_year_short}/{added_month}/{added_month_name}"
+                    "/{added_month_name_short}/{added_day}/{asn}/{tags}"
+                    "/{tag_list}/",
                 },
             ),
             content_type="application/json",
         )
         self.assertEqual(response.status_code, 201)
         self.assertEqual(StoragePath.objects.count(), 2)
+
+    @mock.patch("documents.bulk_edit.bulk_update_documents.delay")
+    def test_api_update_storage_path(self, bulk_update_mock):
+        """
+        GIVEN:
+            - API request to get all storage paths
+        WHEN:
+            - API is called
+        THEN:
+            - Existing storage paths are returned
+        """
+        document = Document.objects.create(
+            mime_type="application/pdf",
+            storage_path=self.sp1,
+        )
+        response = self.client.patch(
+            f"{self.ENDPOINT}{self.sp1.pk}/",
+            data={
+                "path": "somewhere/{created} - {title}",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        bulk_update_mock.assert_called_once()
+
+        args, _ = bulk_update_mock.call_args
+
+        self.assertCountEqual([document.pk], args[0])
 
 
 class TestTasks(DirectoriesMixin, APITestCase):

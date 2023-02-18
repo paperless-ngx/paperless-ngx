@@ -21,14 +21,12 @@ from django.utils import timezone
 from filelock import FileLock
 
 from .. import matching
-from ..bulk_edit import bulk_update_documents
 from ..file_handling import create_source_path_directory
 from ..file_handling import delete_empty_directories
 from ..file_handling import generate_unique_filename
 from ..models import Document
 from ..models import MatchingModel
 from ..models import PaperlessTask
-from ..models import StoragePath
 from ..models import Tag
 
 logger = logging.getLogger("paperless.handlers")
@@ -495,17 +493,6 @@ def update_filename_and_move_files(sender, instance: Document, **kwargs):
                 os.path.dirname(old_archive_path),
                 root=settings.ARCHIVE_DIR,
             )
-
-
-@receiver(models.signals.post_save, sender=StoragePath)
-def update_document_storage_path(sender, instance: StoragePath, **kwargs):
-    """
-    Triggers when a storage path is changed, running against any documents using
-    the path, and checks to see if they need to be renamed
-    """
-    doc_ids = [doc.id for doc in instance.documents.all()]
-    if len(doc_ids):
-        bulk_update_documents.delay(doc_ids)
 
 
 def set_log_entry(sender, document=None, logging_group=None, **kwargs):
