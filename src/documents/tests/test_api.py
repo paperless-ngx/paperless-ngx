@@ -21,6 +21,8 @@ except ImportError:
 
 import pytest
 from django.conf import settings
+from django.contrib.auth.models import Group
+from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.test import override_settings
 from django.utils import timezone
@@ -40,6 +42,8 @@ from documents.tests.utils import DirectoriesMixin
 from paperless import version
 from rest_framework.test import APITestCase
 from whoosh.writing import AsyncWriter
+
+from guardian.shortcuts import get_users_with_perms
 
 
 class TestDocumentApi(DirectoriesMixin, APITestCase):
@@ -158,7 +162,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         response = self.client.get("/api/documents/?fields=", format="json")
         self.assertEqual(response.status_code, 200)
         results = response.data["results"]
-        self.assertEqual(results_full, results)
+        self.assertEqual(len(results_full[0]), len(results[0]))
 
         response = self.client.get("/api/documents/?fields=dgfhs", format="json")
         self.assertEqual(response.status_code, 200)
@@ -1454,25 +1458,25 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         )
 
     def test_saved_views(self):
-        u1 = User.objects.create_user("user1")
-        u2 = User.objects.create_user("user2")
+        u1 = User.objects.create_superuser("user1")
+        u2 = User.objects.create_superuser("user2")
 
         v1 = SavedView.objects.create(
-            user=u1,
+            owner=u1,
             name="test1",
             sort_field="",
             show_on_dashboard=False,
             show_in_sidebar=False,
         )
         v2 = SavedView.objects.create(
-            user=u2,
+            owner=u2,
             name="test2",
             sort_field="",
             show_on_dashboard=False,
             show_in_sidebar=False,
         )
         v3 = SavedView.objects.create(
-            user=u2,
+            owner=u2,
             name="test3",
             sort_field="",
             show_on_dashboard=False,
@@ -1519,7 +1523,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         v1 = SavedView.objects.get(name="test")
         self.assertEqual(v1.sort_field, "created2")
         self.assertEqual(v1.filter_rules.count(), 1)
-        self.assertEqual(v1.user, self.user)
+        self.assertEqual(v1.owner, self.user)
 
         response = self.client.patch(
             f"/api/saved_views/{v1.id}/",
@@ -1702,8 +1706,8 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
                 "user": {
                     "id": comment.user.id,
                     "username": comment.user.username,
-                    "firstname": comment.user.first_name,
-                    "lastname": comment.user.last_name,
+                    "first_name": comment.user.first_name,
+                    "last_name": comment.user.last_name,
                 },
             },
         )
@@ -2629,6 +2633,41 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
             ],
         )
 
+    @mock.patch("documents.serialisers.bulk_edit.set_permissions")
+    def test_set_permissions(self, m):
+        m.return_value = "OK"
+        user1 = User.objects.create(username="user1")
+        user2 = User.objects.create(username="user2")
+        permissions = {
+            "view": {
+                "users": [user1.id, user2.id],
+                "groups": None,
+            },
+            "change": {
+                "users": [user1.id],
+                "groups": None,
+            },
+        }
+
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id, self.doc3.id],
+                    "method": "set_permissions",
+                    "parameters": {"set_permissions": permissions},
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        m.assert_called_once()
+        args, kwargs = m.call_args
+        self.assertCountEqual(args[0], [self.doc2.id, self.doc3.id])
+        self.assertEqual(len(kwargs["set_permissions"]["view"]["users"]), 2)
+
 
 class TestBulkDownload(DirectoriesMixin, APITestCase):
 
@@ -3003,6 +3042,59 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
         self.assertIn("X-Api-Version", response)
         self.assertIn("X-Version", response)
 
+    def test_api_insufficient_permissions(self):
+        user = User.objects.create_user(username="test")
+        self.client.force_authenticate(user)
+
+        d = Document.objects.create(title="Test")
+
+        self.assertEqual(self.client.get("/api/documents/").status_code, 403)
+
+        self.assertEqual(self.client.get("/api/tags/").status_code, 403)
+        self.assertEqual(self.client.get("/api/correspondents/").status_code, 403)
+        self.assertEqual(self.client.get("/api/document_types/").status_code, 403)
+
+        self.assertEqual(self.client.get("/api/logs/").status_code, 403)
+        self.assertEqual(self.client.get("/api/saved_views/").status_code, 403)
+
+    def test_api_sufficient_permissions(self):
+        user = User.objects.create_user(username="test")
+        user.user_permissions.add(*Permission.objects.all())
+        self.client.force_authenticate(user)
+
+        d = Document.objects.create(title="Test")
+
+        self.assertEqual(self.client.get("/api/documents/").status_code, 200)
+
+        self.assertEqual(self.client.get("/api/tags/").status_code, 200)
+        self.assertEqual(self.client.get("/api/correspondents/").status_code, 200)
+        self.assertEqual(self.client.get("/api/document_types/").status_code, 200)
+
+        self.assertEqual(self.client.get("/api/logs/").status_code, 200)
+        self.assertEqual(self.client.get("/api/saved_views/").status_code, 200)
+
+    def test_object_permissions(self):
+        user1 = User.objects.create_user(username="test1")
+        user2 = User.objects.create_user(username="test2")
+        user1.user_permissions.add(*Permission.objects.filter(codename="view_document"))
+        self.client.force_authenticate(user1)
+
+        self.assertEqual(self.client.get("/api/documents/").status_code, 200)
+
+        d = Document.objects.create(title="Test", content="the content 1", checksum="1")
+
+        # no owner
+        self.assertEqual(self.client.get(f"/api/documents/{d.id}/").status_code, 200)
+
+        d2 = Document.objects.create(
+            title="Test 2",
+            content="the content 2",
+            checksum="2",
+            owner=user2,
+        )
+
+        self.assertEqual(self.client.get(f"/api/documents/{d2.id}/").status_code, 404)
+
 
 class TestApiRemoteVersion(DirectoriesMixin, APITestCase):
     ENDPOINT = "/api/remote_version/"
@@ -3128,7 +3220,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        user = User.objects.create(username="temp_admin")
+        user = User.objects.create_superuser(username="temp_admin")
         self.client.force_authenticate(user=user)
 
         self.sp1 = StoragePath.objects.create(name="sp1", path="Something/{checksum}")
@@ -3143,7 +3235,6 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
             - Existing storage paths are returned
         """
         response = self.client.get(self.ENDPOINT, format="json")
-        self.assertEqual(response.status_code, 200)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["count"], 1)
@@ -3215,13 +3306,47 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
             json.dumps(
                 {
                     "name": "Storage path with placeholders",
-                    "path": "{title}/{correspondent}/{document_type}/{created}/{created_year}/{created_year_short}/{created_month}/{created_month_name}/{created_month_name_short}/{created_day}/{added}/{added_year}/{added_year_short}/{added_month}/{added_month_name}/{added_month_name_short}/{added_day}/{asn}/{tags}/{tag_list}/",
+                    "path": "{title}/{correspondent}/{document_type}/{created}/{created_year}"
+                    "/{created_year_short}/{created_month}/{created_month_name}"
+                    "/{created_month_name_short}/{created_day}/{added}/{added_year}"
+                    "/{added_year_short}/{added_month}/{added_month_name}"
+                    "/{added_month_name_short}/{added_day}/{asn}/{tags}"
+                    "/{tag_list}/",
                 },
             ),
             content_type="application/json",
         )
         self.assertEqual(response.status_code, 201)
         self.assertEqual(StoragePath.objects.count(), 2)
+
+    @mock.patch("documents.bulk_edit.bulk_update_documents.delay")
+    def test_api_update_storage_path(self, bulk_update_mock):
+        """
+        GIVEN:
+            - API request to get all storage paths
+        WHEN:
+            - API is called
+        THEN:
+            - Existing storage paths are returned
+        """
+        document = Document.objects.create(
+            mime_type="application/pdf",
+            storage_path=self.sp1,
+        )
+        response = self.client.patch(
+            f"{self.ENDPOINT}{self.sp1.pk}/",
+            data={
+                "path": "somewhere/{created} - {title}",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        bulk_update_mock.assert_called_once()
+
+        args, _ = bulk_update_mock.call_args
+
+        self.assertCountEqual([document.pk], args[0])
 
 
 class TestTasks(DirectoriesMixin, APITestCase):
@@ -3260,11 +3385,6 @@ class TestTasks(DirectoriesMixin, APITestCase):
         self.assertEqual(len(response.data), 2)
         returned_task1 = response.data[1]
         returned_task2 = response.data[0]
-
-        from pprint import pprint
-
-        pprint(returned_task1)
-        pprint(returned_task2)
 
         self.assertEqual(returned_task1["task_id"], task1.task_id)
         self.assertEqual(returned_task1["status"], celery.states.PENDING)
@@ -3458,3 +3578,246 @@ class TestTasks(DirectoriesMixin, APITestCase):
         returned_data = response.data[0]
 
         self.assertEqual(returned_data["task_file_name"], "anothertest.pdf")
+
+
+class TestApiUser(APITestCase):
+    ENDPOINT = "/api/users/"
+
+    def setUp(self):
+        super().setUp()
+
+        self.user = User.objects.create_superuser(username="temp_admin")
+        self.client.force_authenticate(user=self.user)
+
+    def test_get_users(self):
+        """
+        GIVEN:
+            - Configured users
+        WHEN:
+            - API call is made to get users
+        THEN:
+            - Configured users are provided
+        """
+
+        user1 = User.objects.create(
+            username="testuser",
+            password="test",
+            first_name="Test",
+            last_name="User",
+        )
+
+        response = self.client.get(self.ENDPOINT)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["count"], 2)
+        returned_user2 = response.data["results"][1]
+
+        self.assertEqual(returned_user2["username"], user1.username)
+        self.assertEqual(returned_user2["password"], "**********")
+        self.assertEqual(returned_user2["first_name"], user1.first_name)
+        self.assertEqual(returned_user2["last_name"], user1.last_name)
+
+    def test_create_user(self):
+        """
+        WHEN:
+            - API request is made to add a user account
+        THEN:
+            - A new user account is created
+        """
+
+        user1 = {
+            "username": "testuser",
+            "password": "test",
+            "first_name": "Test",
+            "last_name": "User",
+        }
+
+        response = self.client.post(
+            self.ENDPOINT,
+            data=user1,
+        )
+
+        self.assertEqual(response.status_code, 201)
+
+        returned_user1 = User.objects.get(username="testuser")
+
+        self.assertEqual(returned_user1.username, user1["username"])
+        self.assertEqual(returned_user1.first_name, user1["first_name"])
+        self.assertEqual(returned_user1.last_name, user1["last_name"])
+
+    def test_delete_user(self):
+        """
+        GIVEN:
+            - Existing user account
+        WHEN:
+            - API request is made to delete a user account
+        THEN:
+            - Account is deleted
+        """
+
+        user1 = User.objects.create(
+            username="testuser",
+            password="test",
+            first_name="Test",
+            last_name="User",
+        )
+
+        nUsers = User.objects.count()
+
+        response = self.client.delete(
+            f"{self.ENDPOINT}{user1.pk}/",
+        )
+
+        self.assertEqual(response.status_code, 204)
+
+        self.assertEqual(User.objects.count(), nUsers - 1)
+
+    def test_update_user(self):
+        """
+        GIVEN:
+            - Existing user accounts
+        WHEN:
+            - API request is made to update user account
+        THEN:
+            - The user account is updated, password only updated if not '****'
+        """
+
+        user1 = User.objects.create(
+            username="testuser",
+            password="test",
+            first_name="Test",
+            last_name="User",
+        )
+
+        initial_password = user1.password
+
+        response = self.client.patch(
+            f"{self.ENDPOINT}{user1.pk}/",
+            data={
+                "first_name": "Updated Name 1",
+                "password": "******",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        returned_user1 = User.objects.get(pk=user1.pk)
+        self.assertEqual(returned_user1.first_name, "Updated Name 1")
+        self.assertEqual(returned_user1.password, initial_password)
+
+        response = self.client.patch(
+            f"{self.ENDPOINT}{user1.pk}/",
+            data={
+                "first_name": "Updated Name 2",
+                "password": "123xyz",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        returned_user2 = User.objects.get(pk=user1.pk)
+        self.assertEqual(returned_user2.first_name, "Updated Name 2")
+        self.assertNotEqual(returned_user2.password, initial_password)
+
+
+class TestApiGroup(APITestCase):
+    ENDPOINT = "/api/groups/"
+
+    def setUp(self):
+        super().setUp()
+
+        self.user = User.objects.create_superuser(username="temp_admin")
+        self.client.force_authenticate(user=self.user)
+
+    def test_get_groups(self):
+        """
+        GIVEN:
+            - Configured groups
+        WHEN:
+            - API call is made to get groups
+        THEN:
+            - Configured groups are provided
+        """
+
+        group1 = Group.objects.create(
+            name="Test Group",
+        )
+
+        response = self.client.get(self.ENDPOINT)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["count"], 1)
+        returned_group1 = response.data["results"][0]
+
+        self.assertEqual(returned_group1["name"], group1.name)
+
+    def test_create_group(self):
+        """
+        WHEN:
+            - API request is made to add a group
+        THEN:
+            - A new group is created
+        """
+
+        group1 = {
+            "name": "Test Group",
+        }
+
+        response = self.client.post(
+            self.ENDPOINT,
+            data=group1,
+        )
+
+        self.assertEqual(response.status_code, 201)
+
+        returned_group1 = Group.objects.get(name="Test Group")
+
+        self.assertEqual(returned_group1.name, group1["name"])
+
+    def test_delete_group(self):
+        """
+        GIVEN:
+            - Existing group
+        WHEN:
+            - API request is made to delete a group
+        THEN:
+            - Group is deleted
+        """
+
+        group1 = Group.objects.create(
+            name="Test Group",
+        )
+
+        response = self.client.delete(
+            f"{self.ENDPOINT}{group1.pk}/",
+        )
+
+        self.assertEqual(response.status_code, 204)
+
+        self.assertEqual(len(Group.objects.all()), 0)
+
+    def test_update_group(self):
+        """
+        GIVEN:
+            - Existing groups
+        WHEN:
+            - API request is made to update group
+        THEN:
+            - The group is updated
+        """
+
+        group1 = Group.objects.create(
+            name="Test Group",
+        )
+
+        response = self.client.patch(
+            f"{self.ENDPOINT}{group1.pk}/",
+            data={
+                "name": "Updated Name 1",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        returned_group1 = Group.objects.get(pk=group1.pk)
+        self.assertEqual(returned_group1.name, "Updated Name 1")

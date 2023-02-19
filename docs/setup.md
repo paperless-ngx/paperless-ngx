@@ -708,6 +708,12 @@ below use PostgreSQL, but are applicable to MySQL/MariaDB with the
     MySQL also enforces limits on maximum lengths, but does so differently than
     PostgreSQL.  It may not be possible to migrate to MySQL due to this.
 
+!!! warning
+
+    Using mariadb version 10.4+ is recommended. Using the `utf8mb3` character set on
+    an older system may fix issues that can arise while setting up Paperless-ngx but
+    `utf8mb3` can cause issues with consumption (where `utf8mb4` does not).
+
 1.  Stop paperless, if it is running.
 
 2.  Tell paperless to use PostgreSQL:

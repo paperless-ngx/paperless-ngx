@@ -1,9 +1,9 @@
 import { PaperlessCorrespondent } from './paperless-correspondent'
-import { ObjectWithId } from './object-with-id'
 import { PaperlessTag } from './paperless-tag'
 import { PaperlessDocumentType } from './paperless-document-type'
 import { Observable } from 'rxjs'
 import { PaperlessStoragePath } from './paperless-storage-path'
+import { ObjectWithPermissions } from './object-with-permissions'
 
 export interface SearchHit {
   score?: number
@@ -13,7 +13,7 @@ export interface SearchHit {
   comment_highlights?: string
 }
 
-export interface PaperlessDocument extends ObjectWithId {
+export interface PaperlessDocument extends ObjectWithPermissions {
   correspondent$?: Observable<PaperlessCorrespondent>
 
   correspondent?: number

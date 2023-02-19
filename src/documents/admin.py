@@ -1,4 +1,5 @@
 from django.contrib import admin
+from guardian.admin import GuardedModelAdmin
 
 from .models import Correspondent
 from .models import Document
@@ -10,28 +11,28 @@ from .models import StoragePath
 from .models import Tag
 
 
-class CorrespondentAdmin(admin.ModelAdmin):
+class CorrespondentAdmin(GuardedModelAdmin):
 
     list_display = ("name", "match", "matching_algorithm")
     list_filter = ("matching_algorithm",)
     list_editable = ("match", "matching_algorithm")
 
 
-class TagAdmin(admin.ModelAdmin):
+class TagAdmin(GuardedModelAdmin):
 
     list_display = ("name", "color", "match", "matching_algorithm")
     list_filter = ("color", "matching_algorithm")
     list_editable = ("color", "match", "matching_algorithm")
 
 
-class DocumentTypeAdmin(admin.ModelAdmin):
+class DocumentTypeAdmin(GuardedModelAdmin):
 
     list_display = ("name", "match", "matching_algorithm")
     list_filter = ("matching_algorithm",)
     list_editable = ("match", "matching_algorithm")
 
 
-class DocumentAdmin(admin.ModelAdmin):
+class DocumentAdmin(GuardedModelAdmin):
 
     search_fields = ("correspondent__name", "title", "content", "tags__name")
     readonly_fields = (
@@ -96,9 +97,9 @@ class RuleInline(admin.TabularInline):
     model = SavedViewFilterRule
 
 
-class SavedViewAdmin(admin.ModelAdmin):
+class SavedViewAdmin(GuardedModelAdmin):
 
-    list_display = ("name", "user")
+    list_display = ("name", "owner")
 
     inlines = [RuleInline]
 
@@ -107,7 +108,7 @@ class StoragePathInline(admin.TabularInline):
     model = StoragePath
 
 
-class StoragePathAdmin(admin.ModelAdmin):
+class StoragePathAdmin(GuardedModelAdmin):
     list_display = ("name", "path", "match", "matching_algorithm")
     list_filter = ("path", "matching_algorithm")
     list_editable = ("path", "match", "matching_algorithm")

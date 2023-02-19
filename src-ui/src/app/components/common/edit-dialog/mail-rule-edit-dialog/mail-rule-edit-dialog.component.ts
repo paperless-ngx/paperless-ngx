@@ -18,6 +18,7 @@ import { CorrespondentService } from 'src/app/services/rest/correspondent.servic
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { MailAccountService } from 'src/app/services/rest/mail-account.service'
 import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
+import { UserService } from 'src/app/services/rest/user.service'
 
 const ATTACHMENT_TYPE_OPTIONS = [
   {
@@ -113,9 +114,10 @@ export class MailRuleEditDialogComponent extends EditDialogComponent<PaperlessMa
     activeModal: NgbActiveModal,
     accountService: MailAccountService,
     correspondentService: CorrespondentService,
-    documentTypeService: DocumentTypeService
+    documentTypeService: DocumentTypeService,
+    userService: UserService
   ) {
-    super(service, activeModal)
+    super(service, activeModal, userService)
 
     accountService
       .listAll()

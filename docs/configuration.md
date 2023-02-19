@@ -262,6 +262,14 @@ do CORS calls. Set this to your public domain name.
 
     Defaults to "<http://localhost:8000>".
 
+`PAPERLESS_TRUSTED_PROXIES=<comma-separated-list>`
+
+: This may be needed to prevent IP address spoofing if you are using e.g.
+fail2ban with log entries for failed authorization attempts. Value should be
+IP address(es).
+
+    Defaults to empty string.
+
 `PAPERLESS_FORCE_SCRIPT_NAME=<path>`
 
 : To host paperless under a subpath url like example.com/paperless you
@@ -626,7 +634,7 @@ services:
     # ...
 
     gotenberg:
-      image: gotenberg/gotenberg:7.6
+      image: gotenberg/gotenberg:7.8
       restart: unless-stopped
       # The gotenberg chromium route is used to convert .eml files. We do not
       # want to allow external content like tracking pixels or even javascript.
@@ -999,13 +1007,20 @@ within your documents.
 `PAPERLESS_CONSUMER_IGNORE_PATTERNS=<json>`
 
 : By default, paperless ignores certain files and folders in the
-consumption directory, such as system files created by the Mac OS.
+consumption directory, such as system files created by the Mac OS
+or hidden folders some tools use to store data.
 
     This can be adjusted by configuring a custom json array with
     patterns to exclude.
 
+    For example, `.DS_STORE/*` will ignore any files found in a folder
+    named `.DS_STORE`, including `.DS_STORE/bar.pdf` and `foo/.DS_STORE/bar.pdf`
+
+    A pattern like `._*` will ignore anything starting with `._`, including:
+    `._foo.pdf` and `._bar/foo.pdf`
+
     Defaults to
-    `[".DS_STORE/*", "._*", ".stfolder/*", ".stversions/*", ".localized/*", "desktop.ini"]`.
+    `[".DS_STORE/*", "._*", ".stfolder/*", ".stversions/*", ".localized/*", "desktop.ini", "@eaDir/*"]`.
 
 ## Binaries
 

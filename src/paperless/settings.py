@@ -260,6 +260,7 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     "django_filters",
     "django_celery_results",
+    "guardian",
 ] + env_apps
 
 if DEBUG:
@@ -349,6 +350,11 @@ CHANNEL_LAYERS = {
 # Security                                                                    #
 ###############################################################################
 
+AUTHENTICATION_BACKENDS = [
+    "guardian.backends.ObjectPermissionBackend",
+    "django.contrib.auth.backends.ModelBackend",
+]
+
 AUTO_LOGIN_USERNAME = os.getenv("PAPERLESS_AUTO_LOGIN_USERNAME")
 
 if AUTO_LOGIN_USERNAME:
@@ -365,10 +371,7 @@ HTTP_REMOTE_USER_HEADER_NAME = os.getenv(
 
 if ENABLE_HTTP_REMOTE_USER:
     MIDDLEWARE.append("paperless.auth.HttpRemoteUserMiddleware")
-    AUTHENTICATION_BACKENDS = [
-        "django.contrib.auth.backends.RemoteUserBackend",
-        "django.contrib.auth.backends.ModelBackend",
-    ]
+    AUTHENTICATION_BACKENDS.insert(0, "django.contrib.auth.backends.RemoteUserBackend")
     REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"].append(
         "rest_framework.authentication.RemoteUserAuthentication",
     )
@@ -412,6 +415,13 @@ if _paperless_url:
     else:
         # always allow localhost. Necessary e.g. for healthcheck in docker.
         ALLOWED_HOSTS = [_paperless_uri.hostname] + ["localhost"]
+
+# For use with trusted proxies
+_trusted_proxies = os.getenv("PAPERLESS_TRUSTED_PROXIES")
+if _trusted_proxies:
+    TRUSTED_PROXIES = _trusted_proxies.split(",")
+else:
+    TRUSTED_PROXIES = []
 
 # The secret key has a default that should be fine so long as you're hosting
 # Paperless on a closed network.  However, if you're putting this anywhere
@@ -673,7 +683,7 @@ CONSUMER_IGNORE_PATTERNS = list(
     json.loads(
         os.getenv(
             "PAPERLESS_CONSUMER_IGNORE_PATTERNS",
-            '[".DS_STORE/*", "._*", ".stfolder/*", ".stversions/*", ".localized/*", "desktop.ini"]',  # noqa: E501
+            '[".DS_STORE/*", "._*", ".stfolder/*", ".stversions/*", ".localized/*", "desktop.ini", "@eaDir/*"]',  # noqa: E501
         ),
     ),
 )

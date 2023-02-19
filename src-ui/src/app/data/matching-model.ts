@@ -1,4 +1,4 @@
-import { ObjectWithId } from './object-with-id'
+import { ObjectWithPermissions } from './object-with-permissions'
 
 export const MATCH_ANY = 1
 export const MATCH_ALL = 2
@@ -41,7 +41,7 @@ export const MATCHING_ALGORITHMS = [
   },
 ]
 
-export interface MatchingModel extends ObjectWithId {
+export interface MatchingModel extends ObjectWithPermissions {
   name?: string
 
   slug?: string

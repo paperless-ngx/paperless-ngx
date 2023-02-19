@@ -1,6 +1,6 @@
 <app-page-header title="Settings" i18n-title>
   <button class="btn btn-sm btn-outline-primary" (click)="tourService.start()"><ng-container i18n>Start tour</ng-container></button>
-  <a class="btn btn-sm btn-primary ms-3" href="admin/" target="_blank">
+  <a *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.Admin }" class="btn btn-sm btn-primary ms-3" href="admin/" target="_blank">
       <ng-container i18n>Open Django Admin</ng-container>
       <svg class="sidebaricon ms-1" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#arrow-up-right"/>
@@ -189,6 +189,14 @@
       <a ngbNavLink i18n>Saved views</a>
       <ng-template ngbNavContent>
 
+        <h4 i18n>Settings</h4>
+        <div class="row mb-3">
+          <div class="offset-md-3 col">
+            <app-input-check i18n-title title="Show warning when closing saved views with unsaved changes" formControlName="savedViewsWarnOnUnsavedChange"></app-input-check>
+          </div>
+        </div>
+
+        <h4 i18n>Views</h4>
         <div formGroupName="savedViews">
 
             <div *ngFor="let view of savedViews" [formGroupName]="view.id" class="row">
@@ -211,7 +219,7 @@
 
               <div class="mb-2 col-auto">
                 <label class="form-label" for="name_{{view.id}}" i18n>Actions</label>
-                <button type="button" class="btn btn-sm btn-outline-danger form-control" (click)="deleteSavedView(view)" i18n>Delete</button>
+                <button type="button" class="btn btn-sm btn-outline-danger form-control" (click)="deleteSavedView(view)" *appIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.SavedView }" i18n>Delete</button>
               </div>
             </div>
 
@@ -227,80 +235,84 @@
       </ng-template>
     </li>
 
-    <li [ngbNavItem]="SettingsNavIDs.Mail" (mouseover)="maybeInitializeTab(SettingsNavIDs.Mail)" (focusin)="maybeInitializeTab(SettingsNavIDs.Mail)">
+    <li *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.MailRule }" [ngbNavItem]="SettingsNavIDs.Mail" (mouseover)="maybeInitializeTab(SettingsNavIDs.Mail)" (focusin)="maybeInitializeTab(SettingsNavIDs.Mail)">
       <a ngbNavLink i18n>Mail</a>
       <ng-template ngbNavContent>
 
         <ng-container *ngIf="mailAccounts && mailRules">
-          <h4>
-            <ng-container i18n>Mail accounts</ng-container>
-            <button type="button" class="btn btn-sm btn-primary ms-4" (click)="editMailAccount()">
-              <svg class="sidebaricon me-1" fill="currentColor">
-                <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
-              </svg>
-              <ng-container i18n>Add Account</ng-container>
-            </button>
-          </h4>
-          <ul class="list-group" formGroupName="mailAccounts">
+          <ng-container *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.MailAccount }">
+            <h4>
+              <ng-container i18n>Mail accounts</ng-container>
+              <button type="button" class="btn btn-sm btn-primary ms-4" (click)="editMailAccount()">
+                <svg class="sidebaricon me-1" fill="currentColor">
+                  <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
+                </svg>
+                <ng-container i18n>Add Account</ng-container>
+              </button>
+            </h4>
+            <ul class="list-group" formGroupName="mailAccounts">
 
-              <li class="list-group-item">
-                <div class="row">
-                  <div class="col" i18n>Name</div>
-                  <div class="col" i18n>Server</div>
-                  <div class="col" i18n>Actions</div>
-                </div>
-              </li>
+                <li class="list-group-item">
+                  <div class="row">
+                    <div class="col" i18n>Name</div>
+                    <div class="col" i18n>Server</div>
+                    <div class="col" i18n>Actions</div>
+                  </div>
+                </li>
 
-              <li *ngFor="let account of mailAccounts" class="list-group-item" [formGroupName]="account.id">
-                <div class="row">
-                  <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editMailAccount(account)">{{account.name}}</button></div>
-                  <div class="col d-flex align-items-center">{{account.imap_server}}</div>
-                  <div class="col">
-                    <div class="btn-group">
-                      <button class="btn btn-sm btn-primary" type="button" (click)="editMailAccount(account)" i18n>Edit</button>
-                      <button class="btn btn-sm btn-outline-danger" type="button" (click)="deleteMailAccount(account)" i18n>Delete</button>
+                <li *ngFor="let account of mailAccounts" class="list-group-item" [formGroupName]="account.id">
+                  <div class="row">
+                    <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editMailAccount(account)">{{account.name}}</button></div>
+                    <div class="col d-flex align-items-center">{{account.imap_server}}</div>
+                    <div class="col">
+                      <div class="btn-group">
+                        <button *appIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailAccount }" class="btn btn-sm btn-primary" type="button" (click)="editMailAccount(account)" i18n>Edit</button>
+                        <button *appIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailAccount }" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteMailAccount(account)" i18n>Delete</button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </li>
+                </li>
 
-              <div *ngIf="mailAccounts.length === 0" i18n>No mail accounts defined.</div>
-          </ul>
+                <div *ngIf="mailAccounts.length === 0" i18n>No mail accounts defined.</div>
+            </ul>
+          </ng-container>
 
-          <h4 class="mt-4">
-            <ng-container i18n>Mail rules</ng-container>
-            <button type="button" class="btn btn-sm btn-primary ms-4" (click)="editMailRule()">
-              <svg class="sidebaricon me-1" fill="currentColor">
-                <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
-              </svg>
-              <ng-container i18n>Add Rule</ng-container>
-            </button>
-          </h4>
-          <ul class="list-group" formGroupName="mailRules">
+          <ng-container *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.MailRule }">
+            <h4 class="mt-4">
+              <ng-container i18n>Mail rules</ng-container>
+              <button type="button" class="btn btn-sm btn-primary ms-4" (click)="editMailRule()">
+                <svg class="sidebaricon me-1" fill="currentColor">
+                  <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
+                </svg>
+                <ng-container i18n>Add Rule</ng-container>
+              </button>
+            </h4>
+            <ul class="list-group" formGroupName="mailRules">
 
-              <li class="list-group-item">
-                <div class="row">
-                  <div class="col" i18n>Name</div>
-                  <div class="col" i18n>Account</div>
-                  <div class="col" i18n>Actions</div>
-                </div>
-              </li>
+                <li class="list-group-item">
+                  <div class="row">
+                    <div class="col" i18n>Name</div>
+                    <div class="col" i18n>Account</div>
+                    <div class="col" i18n>Actions</div>
+                  </div>
+                </li>
 
-              <li *ngFor="let rule of mailRules" class="list-group-item" [formGroupName]="rule.id">
-                <div class="row">
-                  <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editMailRule(rule)">{{rule.name}}</button></div>
-                  <div class="col d-flex align-items-center">{{(mailAccountService.getCached(rule.account) | async)?.name}}</div>
-                  <div class="col">
-                    <div class="btn-group">
-                      <button class="btn btn-sm btn-primary" type="button" (click)="editMailRule(rule)" i18n>Edit</button>
-                      <button class="btn btn-sm btn-outline-danger" type="button" (click)="deleteMailRule(rule)" i18n>Delete</button>
+                <li *ngFor="let rule of mailRules" class="list-group-item" [formGroupName]="rule.id">
+                  <div class="row">
+                    <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editMailRule(rule)">{{rule.name}}</button></div>
+                    <div class="col d-flex align-items-center">{{(mailAccountService.getCached(rule.account) | async)?.name}}</div>
+                    <div class="col">
+                      <div class="btn-group">
+                        <button *appIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailRule }" class="btn btn-sm btn-primary" type="button" (click)="editMailRule(rule)" i18n>Edit</button>
+                        <button *appIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailRule }" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteMailRule(rule)" i18n>Delete</button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </li>
+                </li>
 
-              <div *ngIf="mailRules.length === 0" i18n>No mail rules defined.</div>
-          </ul>
+                <div *ngIf="mailRules.length === 0" i18n>No mail rules defined.</div>
+            </ul>
+          </ng-container>
         </ng-container>
 
         <div *ngIf="!mailAccounts || !mailRules">
@@ -310,9 +322,95 @@
 
       </ng-template>
     </li>
+
+    <li [ngbNavItem]="SettingsNavIDs.UsersGroups" *appIfPermissions="{ action: PermissionAction.Add, type: PermissionType.User }" (mouseover)="maybeInitializeTab(SettingsNavIDs.UsersGroups)" (focusin)="maybeInitializeTab(SettingsNavIDs.UsersGroups)">
+      <a ngbNavLink i18n>Users & Groups</a>
+      <ng-template ngbNavContent>
+
+      <ng-container *ngIf="users && groups">
+        <h4 class="d-flex">
+          <ng-container i18n>Users</ng-container>
+          <button type="button" class="btn btn-sm btn-primary ms-4" (click)="editUser()">
+            <svg class="sidebaricon me-1" fill="currentColor">
+              <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
+            </svg>
+            <ng-container i18n>Add User</ng-container>
+          </button>
+        </h4>
+        <ul class="list-group" formGroupName="usersGroup">
+
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col" i18n>Username</div>
+              <div class="col" i18n>Name</div>
+              <div class="col" i18n>Groups</div>
+              <div class="col" i18n>Actions</div>
+            </div>
+          </li>
+
+          <li *ngFor="let user of users" class="list-group-item" [formGroupName]="user.id">
+            <div class="row">
+              <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editUser(user)">{{user.username}}</button></div>
+              <div class="col d-flex align-items-center">{{user.first_name}} {{user.last_name}}</div>
+              <div class="col d-flex align-items-center">{{user.groups?.map(getGroupName, this).join(', ')}}</div>
+              <div class="col">
+                <div class="btn-group">
+                  <button class="btn btn-sm btn-primary" type="button" (click)="editUser(user)" i18n>Edit</button>
+                  <button class="btn btn-sm btn-outline-danger" type="button" (click)="deleteUser(user)" i18n>Delete</button>
+                </div>
+              </div>
+            </div>
+          </li>
+        </ul>
+
+        <h4 class="mt-4 d-flex">
+          <ng-container i18n>Groups</ng-container>
+          <button type="button" class="btn btn-sm btn-primary ms-4" (click)="editGroup()">
+            <svg class="sidebaricon me-1" fill="currentColor">
+              <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
+            </svg>
+            <ng-container i18n>Add Group</ng-container>
+          </button>
+        </h4>
+        <ul *ngIf="groups.length > 0" class="list-group" formGroupName="groupsGroup">
+
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col" i18n>Name</div>
+              <div class="col"></div>
+              <div class="col"></div>
+              <div class="col" i18n>Actions</div>
+            </div>
+          </li>
+
+          <li *ngFor="let group of groups" class="list-group-item" [formGroupName]="group.id">
+            <div class="row">
+              <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editGroup(group)">{{group.name}}</button></div>
+              <div class="col"></div>
+              <div class="col"></div>
+              <div class="col">
+                <div class="btn-group">
+                  <button class="btn btn-sm btn-primary" type="button" (click)="editGroup(group)" i18n>Edit</button>
+                  <button class="btn btn-sm btn-outline-danger" type="button" (click)="deleteGroup(group)" i18n>Delete</button>
+                </div>
+              </div>
+            </div>
+          </li>
+        </ul>
+
+        <div *ngIf="groups.length === 0">No groups defined</div>
+      </ng-container>
+
+      <div *ngIf="!users || !groups">
+        <div class="spinner-border spinner-border-sm fw-normal ms-2 me-auto" role="status"></div>
+        <div class="visually-hidden" i18n>Loading...</div>
+      </div>
+
+      </ng-template>
+    </li>
   </ul>
 
   <div [ngbNavOutlet]="nav" class="border-start border-end border-bottom p-3 mb-3 shadow-sm"></div>
 
-  <button type="submit" class="btn btn-primary mb-2" [disabled]="(isDirty$ | async) === false" i18n>Save</button>
+  <button type="submit" class="btn btn-primary mb-2" *appIfPermissions="{ action: PermissionAction.Change, type: PermissionType.UISettings }" [disabled]="(isDirty$ | async) === false" i18n>Save</button>
 </form>
