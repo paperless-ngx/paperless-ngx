@@ -6,8 +6,8 @@
         "user": {
             "id": 1,
             "username": "user2",
-            "firstname": "",
-            "lastname": ""
+            "first_name": "",
+            "last_name": ""
         }
     },
     {
@@ -17,8 +17,8 @@
         "user": {
             "id": 2,
             "username": "user1",
-            "firstname": "",
-            "lastname": ""
+            "first_name": "",
+            "last_name": ""
         }
     },
     {
@@ -28,8 +28,8 @@
         "user": {
             "id": 2,
             "username": "user33",
-            "firstname": "",
-            "lastname": ""
+            "first_name": "",
+            "last_name": ""
         }
     },
     {
@@ -39,8 +39,8 @@
         "user": {
             "id": 3,
             "username": "admin",
-            "firstname": "",
-            "lastname": ""
+            "first_name": "",
+            "last_name": ""
         }
     }
 ]

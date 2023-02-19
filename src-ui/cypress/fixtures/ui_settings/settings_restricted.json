@@ -1,0 +1,84 @@
+{
+    "user_id": 1,
+    "username": "admin",
+    "settings": {
+        "language": "",
+        "bulk_edit": {
+            "confirmation_dialogs": true,
+            "apply_on_close": false
+        },
+        "documentListSize": 50,
+        "dark_mode": {
+            "use_system": true,
+            "enabled": "false",
+            "thumb_inverted": "true"
+        },
+        "theme": {
+            "color": "#b198e5"
+        },
+        "document_details": {
+            "native_pdf_viewer": false
+        },
+        "date_display": {
+            "date_locale": "",
+            "date_format": "mediumDate"
+        },
+        "notifications": {
+            "consumer_new_documents": true,
+            "consumer_success": true,
+            "consumer_failed": true,
+            "consumer_suppress_on_dashboard": true
+        }
+    },
+    "permissions": [
+        "add_token",
+        "change_token",
+        "delete_token",
+        "view_token",
+        "add_tokenproxy",
+        "change_tokenproxy",
+        "delete_tokenproxy",
+        "view_tokenproxy",
+        "add_contenttype",
+        "change_contenttype",
+        "delete_contenttype",
+        "view_contenttype",
+        "add_chordcounter",
+        "change_chordcounter",
+        "delete_chordcounter",
+        "view_chordcounter",
+        "add_groupresult",
+        "change_groupresult",
+        "delete_groupresult",
+        "view_groupresult",
+        "add_failure",
+        "change_failure",
+        "delete_failure",
+        "view_failure",
+        "add_ormq",
+        "change_ormq",
+        "delete_ormq",
+        "view_ormq",
+        "add_schedule",
+        "change_schedule",
+        "delete_schedule",
+        "view_schedule",
+        "add_success",
+        "change_success",
+        "delete_success",
+        "view_success",
+        "add_task",
+        "change_task",
+        "delete_task",
+        "view_task",
+        "add_comment",
+        "add_frontendsettings",
+        "change_frontendsettings",
+        "delete_frontendsettings",
+        "view_frontendsettings",
+        "add_session",
+        "change_session",
+        "delete_session",
+        "view_session"
+    ]
+}

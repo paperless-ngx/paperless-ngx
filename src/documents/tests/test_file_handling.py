@@ -1,9 +1,6 @@
 import datetime
-import hashlib
 import os
-import random
 import tempfile
-import uuid
 from pathlib import Path
 from unittest import mock
 
@@ -13,10 +10,10 @@ from django.test import override_settings
 from django.test import TestCase
 from django.utils import timezone
 
+from ..bulk_edit import bulk_update_documents
 from ..file_handling import create_source_path_directory
 from ..file_handling import delete_empty_directories
 from ..file_handling import generate_filename
-from ..file_handling import generate_unique_filename
 from ..models import Correspondent
 from ..models import Document
 from ..models import DocumentType
@@ -871,7 +868,7 @@ class TestFileHandlingWithArchive(DirectoriesMixin, TestCase):
         self.assertTrue(os.path.isfile(doc.archive_path))
 
 
-class TestFilenameGeneration(TestCase):
+class TestFilenameGeneration(DirectoriesMixin, TestCase):
     @override_settings(FILENAME_FORMAT="{title}")
     def test_invalid_characters(self):
 
@@ -1063,28 +1060,3 @@ class TestFilenameGeneration(TestCase):
             checksum="2",
         )
         self.assertEqual(generate_filename(doc), "84/August/Aug/The Title.pdf")
-
-
-def run():
-    doc = Document.objects.create(
-        checksum=str(uuid.uuid4()),
-        title=str(uuid.uuid4()),
-        content="wow",
-    )
-    doc.filename = generate_unique_filename(doc)
-    Path(doc.thumbnail_path).touch()
-    with open(doc.source_path, "w") as f:
-        f.write(str(uuid.uuid4()))
-    with open(doc.source_path, "rb") as f:
-        doc.checksum = hashlib.md5(f.read()).hexdigest()
-
-    with open(doc.archive_path, "w") as f:
-        f.write(str(uuid.uuid4()))
-    with open(doc.archive_path, "rb") as f:
-        doc.archive_checksum = hashlib.md5(f.read()).hexdigest()
-
-    doc.save()
-
-    for i in range(30):
-        doc.title = str(random.randrange(1, 5))
-        doc.save()

@@ -1,6 +1,6 @@
 <app-widget-frame [title]="savedView.name" [loading]="loading">
 
-  <a class="btn-link" header-buttons [routerLink]="[]" (click)="showAll()" i18n>Show all</a>
+  <a class="btn-link" header-buttons [routerLink]="[]" (click)="showAll()" *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }" i18n>Show all</a>
 
 
   <table content class="table table-sm table-hover table-borderless mb-0">
@@ -10,7 +10,7 @@
         <th scope="col" i18n>Title</th>
       </tr>
     </thead>
-    <tbody>
+    <tbody *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
       <tr *ngFor="let doc of documents">
         <td><a routerLink="/documents/{{doc.id}}" class="d-block text-dark text-decoration-none">{{doc.created_date | customDate}}</a></td>
         <td><a routerLink="/documents/{{doc.id}}" class="d-block text-dark text-decoration-none">{{doc.title | documentTitle}}<app-tag [tag]="t" *ngFor="let t of doc.tags$ | async" class="ms-1" (click)="clickTag(t, $event)"></app-tag></a></td>

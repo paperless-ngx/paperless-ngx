@@ -384,7 +384,7 @@ def validate_move(instance, old_path, new_path):
 
 @receiver(models.signals.m2m_changed, sender=Document.tags.through)
 @receiver(models.signals.post_save, sender=Document)
-def update_filename_and_move_files(sender, instance, **kwargs):
+def update_filename_and_move_files(sender, instance: Document, **kwargs):
 
     if not instance.filename:
         # Can't update the filename if there is no filename to begin with

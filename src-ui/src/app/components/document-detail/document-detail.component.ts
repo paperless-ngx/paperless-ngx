@@ -35,6 +35,13 @@ import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
 import { StoragePathEditDialogComponent } from '../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
 import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
+import {
+  PermissionAction,
+  PermissionsService,
+  PermissionType,
+} from 'src/app/services/permissions.service'
+import { PaperlessUser } from 'src/app/data/paperless-user'
+import { UserService } from 'src/app/services/rest/user.service'
 
 @Component({
   selector: 'app-document-detail',
@@ -58,6 +65,7 @@ export class DocumentDetailComponent
   document: PaperlessDocument
   metadata: PaperlessDocumentMetadata
   suggestions: PaperlessDocumentSuggestions
+  users: PaperlessUser[]
 
   title: string
   titleSubject: Subject<string> = new Subject()
@@ -78,6 +86,7 @@ export class DocumentDetailComponent
     storage_path: new FormControl(),
     archive_serial_number: new FormControl(),
     tags: new FormControl([]),
+    permissions_form: new FormControl(null),
   })
 
   previewCurrentPage: number = 1
@@ -106,6 +115,9 @@ export class DocumentDetailComponent
     }
   }
 
+  PermissionAction = PermissionAction
+  PermissionType = PermissionType
+
   constructor(
     private documentsService: DocumentService,
     private route: ActivatedRoute,
@@ -118,7 +130,9 @@ export class DocumentDetailComponent
     private documentTitlePipe: DocumentTitlePipe,
     private toastService: ToastService,
     private settings: SettingsService,
-    private storagePathService: StoragePathService
+    private storagePathService: StoragePathService,
+    private permissionsService: PermissionsService,
+    private userService: UserService
   ) {}
 
   titleKeyUp(event) {
@@ -147,7 +161,13 @@ export class DocumentDetailComponent
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
         this.error = null
-        Object.assign(this.document, this.documentForm.value)
+        const docValues = Object.assign({}, this.documentForm.value)
+        docValues['owner'] =
+          this.documentForm.get('permissions_form').value['owner']
+        docValues['set_permissions'] =
+          this.documentForm.get('permissions_form').value['set_permissions']
+        delete docValues['permissions_form']
+        Object.assign(this.document, docValues)
       })
 
     this.correspondentService
@@ -164,6 +184,11 @@ export class DocumentDetailComponent
       .listAll()
       .pipe(first())
       .subscribe((result) => (this.storagePaths = result.results))
+
+    this.userService
+      .listAll()
+      .pipe(first())
+      .subscribe((result) => (this.users = result.results))
 
     this.route.paramMap
       .pipe(
@@ -232,6 +257,10 @@ export class DocumentDetailComponent
             storage_path: doc.storage_path,
             archive_serial_number: doc.archive_serial_number,
             tags: [...doc.tags],
+            permissions_form: {
+              owner: doc.owner,
+              set_permissions: doc.permissions,
+            },
           })
 
           this.isDirty$ = dirtyCheck(
@@ -272,6 +301,9 @@ export class DocumentDetailComponent
         },
         error: (error) => {
           this.metadata = null
+          this.toastService.showError(
+            $localize`Error retrieving metadata` + ': ' + error.toString()
+          )
         },
       })
     this.documentsService
@@ -283,10 +315,20 @@ export class DocumentDetailComponent
         },
         error: (error) => {
           this.suggestions = null
+          this.toastService.showError(
+            $localize`Error retrieving suggestions` + ': ' + error.toString()
+          )
         },
       })
     this.title = this.documentTitlePipe.transform(doc.title)
-    this.documentForm.patchValue(doc)
+    const docFormValues = Object.assign({}, doc)
+    docFormValues['permissions_form'] = {
+      owner: doc.owner,
+      set_permissions: doc.permissions,
+    }
+
+    this.documentForm.patchValue(docFormValues, { emitEvent: false })
+    if (!this.userCanEdit) this.documentForm.disable()
   }
 
   createDocumentType(newName: string) {
@@ -378,7 +420,7 @@ export class DocumentDetailComponent
       .update(this.document)
       .pipe(first())
       .subscribe({
-        next: (result) => {
+        next: () => {
           this.close()
           this.networkActive = false
           this.error = null
@@ -386,6 +428,11 @@ export class DocumentDetailComponent
         error: (error) => {
           this.networkActive = false
           this.error = error.error
+          this.toastService.showError(
+            $localize`Error saving document` +
+              ': ' +
+              (error.message ?? error.toString())
+          )
         },
       })
   }
@@ -425,6 +472,11 @@ export class DocumentDetailComponent
         error: (error) => {
           this.networkActive = false
           this.error = error.error
+          this.toastService.showError(
+            $localize`Error saving document` +
+              ': ' +
+              (error.message ?? error.toString())
+          )
         },
       })
   }
@@ -564,6 +616,36 @@ export class DocumentDetailComponent
   }
 
   get commentsEnabled(): boolean {
-    return this.settings.get(SETTINGS_KEYS.COMMENTS_ENABLED)
+    return (
+      this.settings.get(SETTINGS_KEYS.COMMENTS_ENABLED) &&
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.Document
+      )
+    )
+  }
+
+  get userIsOwner(): boolean {
+    let doc: PaperlessDocument = Object.assign({}, this.document)
+    // dont disable while editing
+    if (this.document && this.store?.value.owner) {
+      doc.owner = this.store?.value.owner
+    }
+    return !this.document || this.permissionsService.currentUserOwnsObject(doc)
+  }
+
+  get userCanEdit(): boolean {
+    let doc: PaperlessDocument = Object.assign({}, this.document)
+    // dont disable while editing
+    if (this.document && this.store?.value.owner) {
+      doc.owner = this.store?.value.owner
+    }
+    return (
+      !this.document ||
+      this.permissionsService.currentUserHasObjectPermissions(
+        PermissionAction.Change,
+        doc
+      )
+    )
   }
 }
