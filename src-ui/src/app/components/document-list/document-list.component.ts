@@ -30,6 +30,7 @@ import {
 } from 'src/app/services/rest/document.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { ToastService } from 'src/app/services/toast.service'
+import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { FilterEditorComponent } from './filter-editor/filter-editor.component'
 import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-view-config-dialog.component'
 
@@ -38,7 +39,10 @@ import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-vi
   templateUrl: './document-list.component.html',
   styleUrls: ['./document-list.component.scss'],
 })
-export class DocumentListComponent implements OnInit, OnDestroy {
+export class DocumentListComponent
+  extends ComponentWithPermissions
+  implements OnInit, OnDestroy
+{
   constructor(
     public list: DocumentListViewService,
     public savedViewService: SavedViewService,
@@ -48,7 +52,9 @@ export class DocumentListComponent implements OnInit, OnDestroy {
     private modalService: NgbModal,
     private consumerStatusService: ConsumerStatusService,
     public openDocumentsService: OpenDocumentsService
-  ) {}
+  ) {
+    super()
+  }
 
   @ViewChild('filterEditor')
   private filterEditor: FilterEditorComponent

@@ -1,4 +1,4 @@
-<button class="list-group-item list-group-item-action d-flex align-items-center p-2 border-top-0 border-start-0 border-end-0 border-bottom" role="menuitem" (click)="toggleItem($event)">
+<button class="list-group-item list-group-item-action d-flex align-items-center p-2 border-top-0 border-start-0 border-end-0 border-bottom" role="menuitem" (click)="toggleItem($event)" [disabled]="disabled">
   <div class="selected-icon me-1">
     <ng-container *ngIf="isChecked()">
       <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-check" viewBox="0 0 16 16">

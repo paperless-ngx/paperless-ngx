@@ -515,6 +515,7 @@ class MailAccountHandler(LoggingMixin):
                     else None,
                     override_document_type_id=doc_type.id if doc_type else None,
                     override_tag_ids=tag_ids,
+                    override_owner_id=rule.owner.id if rule.owner else None,
                 )
 
                 consume_tasks.append(consume_task)
@@ -592,6 +593,7 @@ class MailAccountHandler(LoggingMixin):
             override_correspondent_id=correspondent.id if correspondent else None,
             override_document_type_id=doc_type.id if doc_type else None,
             override_tag_ids=tag_ids,
+            override_owner_id=rule.owner.id if rule.owner else None,
         )
 
         mail_action_task = apply_mail_action.s(

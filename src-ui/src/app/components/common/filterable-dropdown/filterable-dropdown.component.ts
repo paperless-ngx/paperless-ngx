@@ -317,6 +317,9 @@ export class FilterableDropdownComponent {
   @Input()
   applyOnClose = false
 
+  @Input()
+  disabled = false
+
   @Output()
   apply = new EventEmitter<ChangedItems>()
 

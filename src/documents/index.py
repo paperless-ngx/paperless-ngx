@@ -8,6 +8,7 @@ from django.conf import settings
 from django.utils import timezone
 from documents.models import Comment
 from documents.models import Document
+from guardian.shortcuts import get_users_with_perms
 from whoosh import classify
 from whoosh import highlight
 from whoosh import query
@@ -52,6 +53,10 @@ def get_schema():
         path_id=NUMERIC(),
         has_path=BOOLEAN(),
         comments=TEXT(),
+        owner=TEXT(),
+        owner_id=NUMERIC(),
+        has_owner=BOOLEAN(),
+        viewer_id=KEYWORD(commas=True),
     )
 
 
@@ -106,6 +111,11 @@ def update_document(writer: AsyncWriter, doc: Document):
             f"{Document.ARCHIVE_SERIAL_NUMBER_MAX:,}.",
         )
         asn = 0
+    users_with_perms = get_users_with_perms(
+        doc,
+        only_with_perms_in=["view_document"],
+    )
+    viewer_ids = ",".join([str(u.id) for u in users_with_perms])
     writer.update_document(
         id=doc.pk,
         title=doc.title,
@@ -127,6 +137,10 @@ def update_document(writer: AsyncWriter, doc: Document):
         path_id=doc.storage_path.id if doc.storage_path else None,
         has_path=doc.storage_path is not None,
         comments=comments,
+        owner=doc.owner.username if doc.owner else None,
+        owner_id=doc.owner.id if doc.owner else None,
+        has_owner=doc.owner is not None,
+        viewer_id=viewer_ids if viewer_ids else None,
     )
 
 
@@ -188,10 +202,17 @@ class DelayedQuery:
             elif k == "storage_path__isnull":
                 criterias.append(query.Term("has_path", v == "false"))
 
+        user_criterias = [query.Term("has_owner", False)]
+        if "user" in self.query_params:
+            user_criterias.append(query.Term("owner_id", self.query_params["user"]))
+            user_criterias.append(
+                query.Term("viewer_id", str(self.query_params["user"])),
+            )
         if len(criterias) > 0:
+            criterias.append(query.Or(user_criterias))
             return query.And(criterias)
         else:
-            return None
+            return query.Or(user_criterias)
 
     def _get_query_sortedby(self):
         if "ordering" not in self.query_params:

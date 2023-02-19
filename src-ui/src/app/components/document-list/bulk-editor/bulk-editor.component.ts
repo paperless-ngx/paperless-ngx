@@ -25,6 +25,9 @@ import { saveAs } from 'file-saver'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
 import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
+import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
+import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
+import { PermissionsService } from 'src/app/services/permissions.service'
 import { FormControl, FormGroup } from '@angular/forms'
 import { first, Subject, takeUntil } from 'rxjs'
 
@@ -33,7 +36,10 @@ import { first, Subject, takeUntil } from 'rxjs'
   templateUrl: './bulk-editor.component.html',
   styleUrls: ['./bulk-editor.component.scss'],
 })
-export class BulkEditorComponent implements OnInit, OnDestroy {
+export class BulkEditorComponent
+  extends ComponentWithPermissions
+  implements OnInit, OnDestroy
+{
   tags: PaperlessTag[]
   correspondents: PaperlessCorrespondent[]
   documentTypes: PaperlessDocumentType[]
@@ -63,8 +69,11 @@ export class BulkEditorComponent implements OnInit, OnDestroy {
     private openDocumentService: OpenDocumentsService,
     private settings: SettingsService,
     private toastService: ToastService,
-    private storagePathService: StoragePathService
-  ) {}
+    private storagePathService: StoragePathService,
+    private permissionService: PermissionsService
+  ) {
+    super()
+  }
 
   applyOnClose: boolean = this.settings.get(
     SETTINGS_KEYS.BULK_EDIT_APPLY_ON_CLOSE
@@ -72,6 +81,25 @@ export class BulkEditorComponent implements OnInit, OnDestroy {
   showConfirmationDialogs: boolean = this.settings.get(
     SETTINGS_KEYS.BULK_EDIT_CONFIRMATION_DIALOGS
   )
+
+  get userCanEditAll(): boolean {
+    let canEdit: boolean = true
+    const docs = this.list.documents.filter((d) => this.list.selected.has(d.id))
+    canEdit = docs.every((d) =>
+      this.permissionService.currentUserHasObjectPermissions(
+        this.PermissionAction.Change,
+        d
+      )
+    )
+    return canEdit
+  }
+
+  get userOwnsAll(): boolean {
+    let ownsAll: boolean = true
+    const docs = this.list.documents.filter((d) => this.list.selected.has(d.id))
+    ownsAll = docs.every((d) => this.permissionService.currentUserOwnsObject(d))
+    return ownsAll
+  }
 
   ngOnInit() {
     this.tagService
@@ -462,5 +490,15 @@ export class BulkEditorComponent implements OnInit, OnDestroy {
         modal.componentInstance.buttonsEnabled = false
         this.executeBulkOperation(modal, 'redo_ocr', {})
       })
+  }
+
+  setPermissions() {
+    let modal = this.modalService.open(PermissionsDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.confirmClicked.subscribe((permissions) => {
+      modal.componentInstance.buttonsEnabled = false
+      this.executeBulkOperation(modal, 'set_permissions', permissions)
+    })
   }
 }
