@@ -262,6 +262,14 @@ do CORS calls. Set this to your public domain name.
 
     Defaults to "<http://localhost:8000>".
 
+`PAPERLESS_TRUSTED_PROXIES=<comma-separated-list>`
+
+: This may be needed to prevent IP address spoofing if you are using e.g.
+fail2ban with log entries for failed authorization attempts. Value should be
+IP address(es).
+
+    Defaults to empty string.
+
 `PAPERLESS_FORCE_SCRIPT_NAME=<path>`
 
 : To host paperless under a subpath url like example.com/paperless you
