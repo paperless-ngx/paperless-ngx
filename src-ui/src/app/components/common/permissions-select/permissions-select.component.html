@@ -18,7 +18,7 @@
       </div>
 
       <div *ngFor="let action of PermissionAction | keyvalue" class="col form-check form-check-inline" [ngbPopover]="inheritedWarning" [disablePopover]="!isInherited(type.key, action.key)" placement="left" triggers="mouseenter:mouseleave">
-        <input type="checkbox" class="form-check-input" id="{{type.key}}_{{action.key}}" formControlName="{{action.key}}" [attr.disabled]="isDisabled(type.key, action.key)">
+        <input type="checkbox" class="form-check-input" id="{{type.key}}_{{action.key}}" formControlName="{{action.key}}">
         <label class="form-check-label visually-hidden" for="{{type.key}}_{{action.key}}" i18n>{{action.key}}</label>
       </div>
     </li>
