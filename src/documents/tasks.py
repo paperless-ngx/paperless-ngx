@@ -4,6 +4,7 @@ import os
 import shutil
 import uuid
 from pathlib import Path
+from typing import Optional
 from typing import Type
 
 import dateutil.parser
@@ -97,6 +98,7 @@ def consume_file(
     task_id=None,
     override_created=None,
     override_owner_id=None,
+    override_archive_serial_num: Optional[int] = None,
 ):
 
     path = Path(path).resolve()
@@ -207,7 +209,7 @@ def consume_file(
         override_tag_ids=override_tag_ids,
         task_id=task_id,
         override_created=override_created,
-        override_asn=asn,
+        override_asn=override_archive_serial_num or asn,
         override_owner_id=override_owner_id,
     )
 
