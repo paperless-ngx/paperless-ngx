@@ -69,6 +69,10 @@ export class PermissionsSelectComponent
   }
 
   writeValue(permissions: string[]): void {
+    if (this.permissions === permissions) {
+      return
+    }
+
     this.permissions = permissions ?? []
     const allPerms = this._inheritedPermissions.concat(this.permissions)
 
@@ -138,7 +142,10 @@ export class PermissionsSelectComponent
           this.typesWithAllActions.delete(typeKey)
         }
       })
-      this.onChange(permissions)
+
+      this.onChange(
+        permissions.filter((p) => !this._inheritedPermissions.includes(p))
+      )
     })
   }
 
