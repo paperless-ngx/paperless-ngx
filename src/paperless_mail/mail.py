@@ -9,7 +9,8 @@ from typing import Dict
 
 import magic
 import pathvalidate
-from celery import chord, shared_task
+from celery import chord
+from celery import shared_task
 from django.conf import settings
 from django.db import DatabaseError
 from documents.loggers import LoggingMixin
@@ -399,7 +400,7 @@ class MailAccountHandler(LoggingMixin):
 
         for message in messages:
             try:
-                processed_files = self.handle_message(M, message, rule)
+                processed_files = self.handle_message(message, rule)
 
                 total_processed_files += processed_files
                 mails_processed += 1
@@ -414,7 +415,7 @@ class MailAccountHandler(LoggingMixin):
 
         return total_processed_files
 
-    def handle_message(self, M: MailBox, message, rule: MailRule) -> int:
+    def handle_message(self, message, rule: MailRule) -> int:
         processed_elements = 0
 
         # Skip Message handling when only attachments are to be processed but
@@ -441,7 +442,6 @@ class MailAccountHandler(LoggingMixin):
             or rule.consumption_scope == MailRule.ConsumptionScope.EVERYTHING
         ):
             processed_elements += self.process_eml(
-                M,
                 message,
                 rule,
                 correspondent,
@@ -454,7 +454,6 @@ class MailAccountHandler(LoggingMixin):
             or rule.consumption_scope == MailRule.ConsumptionScope.EVERYTHING
         ):
             processed_elements += self.process_attachments(
-                M,
                 message,
                 rule,
                 correspondent,
@@ -466,7 +465,6 @@ class MailAccountHandler(LoggingMixin):
 
     def process_attachments(
         self,
-        M: MailBox,
         message: MailMessage,
         rule: MailRule,
         correspondent,
@@ -561,7 +559,6 @@ class MailAccountHandler(LoggingMixin):
 
     def process_eml(
         self,
-        M: MailBox,
         message: MailMessage,
         rule: MailRule,
         correspondent,
