@@ -30,6 +30,7 @@ from ..parsers import DocumentParser
 from ..parsers import ParseError
 from ..tasks import sanity_check
 from .utils import DirectoriesMixin
+from documents.tests.utils import FileSystemAssertsMixin
 
 
 class TestAttributes(TestCase):
@@ -241,7 +242,7 @@ def fake_magic_from_file(file, mime=False):
 
 
 @mock.patch("documents.consumer.magic.from_file", fake_magic_from_file)
-class TestConsumer(DirectoriesMixin, TestCase):
+class TestConsumer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     def _assert_first_last_send_progress(
         self,
         first_status="STARTING",
@@ -346,16 +347,16 @@ class TestConsumer(DirectoriesMixin, TestCase):
         self.assertEqual(document.filename, "0000001.pdf")
         self.assertEqual(document.archive_filename, "0000001.pdf")
 
-        self.assertTrue(os.path.isfile(document.source_path))
+        self.assertIsFile(document.source_path)
 
-        self.assertTrue(os.path.isfile(document.thumbnail_path))
+        self.assertIsFile(document.thumbnail_path)
 
-        self.assertTrue(os.path.isfile(document.archive_path))
+        self.assertIsFile(document.archive_path)
 
         self.assertEqual(document.checksum, "42995833e01aea9b3edee44bbfdd7ce1")
         self.assertEqual(document.archive_checksum, "62acb0bcbfbcaa62ca6ad3668e4e404b")
 
-        self.assertFalse(os.path.isfile(filename))
+        self.assertIsNotFile(filename)
 
         self._assert_first_last_send_progress()
 
@@ -383,14 +384,14 @@ class TestConsumer(DirectoriesMixin, TestCase):
 
         shutil.copy(filename, shadow_file)
 
-        self.assertTrue(os.path.isfile(shadow_file))
+        self.assertIsFile(shadow_file)
 
         document = self.consumer.try_consume_file(filename)
 
-        self.assertTrue(os.path.isfile(document.source_path))
+        self.assertIsFile(document.source_path)
 
-        self.assertFalse(os.path.isfile(shadow_file))
-        self.assertFalse(os.path.isfile(filename))
+        self.assertIsNotFile(shadow_file)
+        self.assertIsNotFile(filename)
 
     def testOverrideFilename(self):
         filename = self.get_test_file()
@@ -536,7 +537,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
         self._assert_first_last_send_progress(last_status="FAILED")
 
         # file not deleted
-        self.assertTrue(os.path.isfile(filename))
+        self.assertIsFile(filename)
 
         # Database empty
         self.assertEqual(len(Document.objects.all()), 0)
@@ -573,9 +574,9 @@ class TestConsumer(DirectoriesMixin, TestCase):
         document = self.consumer.try_consume_file(filename, override_title="new docs")
 
         self.assertEqual(document.title, "new docs")
-        self.assertIsNotNone(os.path.isfile(document.title))
-        self.assertTrue(os.path.isfile(document.source_path))
-        self.assertTrue(os.path.isfile(document.archive_path))
+        self.assertIsNotNone(document.title)
+        self.assertIsFile(document.source_path)
+        self.assertIsFile(document.archive_path)
 
         self._assert_first_last_send_progress()
 
@@ -603,35 +604,35 @@ class TestConsumer(DirectoriesMixin, TestCase):
     @override_settings(CONSUMER_DELETE_DUPLICATES=True)
     def test_delete_duplicate(self):
         dst = self.get_test_file()
-        self.assertTrue(os.path.isfile(dst))
+        self.assertIsFile(dst)
         doc = self.consumer.try_consume_file(dst)
 
         self._assert_first_last_send_progress()
 
-        self.assertFalse(os.path.isfile(dst))
+        self.assertIsNotFile(dst)
         self.assertIsNotNone(doc)
 
         self._send_progress.reset_mock()
 
         dst = self.get_test_file()
-        self.assertTrue(os.path.isfile(dst))
+        self.assertIsFile(dst)
         self.assertRaises(ConsumerError, self.consumer.try_consume_file, dst)
-        self.assertFalse(os.path.isfile(dst))
+        self.assertIsNotFile(dst)
         self._assert_first_last_send_progress(last_status="FAILED")
 
     @override_settings(CONSUMER_DELETE_DUPLICATES=False)
     def test_no_delete_duplicate(self):
         dst = self.get_test_file()
-        self.assertTrue(os.path.isfile(dst))
+        self.assertIsFile(dst)
         doc = self.consumer.try_consume_file(dst)
 
-        self.assertFalse(os.path.isfile(dst))
+        self.assertIsNotFile(dst)
         self.assertIsNotNone(doc)
 
         dst = self.get_test_file()
-        self.assertTrue(os.path.isfile(dst))
+        self.assertIsFile(dst)
         self.assertRaises(ConsumerError, self.consumer.try_consume_file, dst)
-        self.assertTrue(os.path.isfile(dst))
+        self.assertIsFile(dst)
 
         self._assert_first_last_send_progress(last_status="FAILED")
 

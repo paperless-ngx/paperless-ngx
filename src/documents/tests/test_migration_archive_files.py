@@ -8,6 +8,7 @@ from django.conf import settings
 from django.test import override_settings
 from documents.parsers import ParseError
 from documents.tests.utils import DirectoriesMixin
+from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import TestMigrations
 
 
@@ -112,7 +113,7 @@ simple_png2 = os.path.join(os.path.dirname(__file__), "examples", "no-text.png")
 
 
 @override_settings(FILENAME_FORMAT="")
-class TestMigrateArchiveFiles(DirectoriesMixin, TestMigrations):
+class TestMigrateArchiveFiles(DirectoriesMixin, FileSystemAssertsMixin, TestMigrations):
 
     migrate_from = "1011_auto_20210101_2340"
     migrate_to = "1012_fix_archive_files"
@@ -189,7 +190,7 @@ class TestMigrateArchiveFiles(DirectoriesMixin, TestMigrations):
         for doc in Document.objects.all():
             if doc.archive_checksum:
                 self.assertIsNotNone(doc.archive_filename)
-                self.assertTrue(os.path.isfile(archive_path_new(doc)))
+                self.assertIsFile(archive_path_new(doc))
             else:
                 self.assertIsNone(doc.archive_filename)
 
@@ -198,7 +199,7 @@ class TestMigrateArchiveFiles(DirectoriesMixin, TestMigrations):
             self.assertEqual(original_checksum, doc.checksum)
 
             if doc.archive_checksum:
-                self.assertTrue(os.path.isfile(archive_path_new(doc)))
+                self.assertIsFile(archive_path_new(doc))
                 with open(archive_path_new(doc), "rb") as f:
                     archive_checksum = hashlib.md5(f.read()).hexdigest()
                 self.assertEqual(archive_checksum, doc.archive_checksum)
@@ -448,7 +449,11 @@ class TestMigrateArchiveFilesErrors(DirectoriesMixin, TestMigrations):
 
 
 @override_settings(FILENAME_FORMAT="")
-class TestMigrateArchiveFilesBackwards(DirectoriesMixin, TestMigrations):
+class TestMigrateArchiveFilesBackwards(
+    DirectoriesMixin,
+    FileSystemAssertsMixin,
+    TestMigrations,
+):
 
     migrate_from = "1012_fix_archive_files"
     migrate_to = "1011_auto_20210101_2340"
@@ -488,13 +493,13 @@ class TestMigrateArchiveFilesBackwards(DirectoriesMixin, TestMigrations):
 
         for doc in Document.objects.all():
             if doc.archive_checksum:
-                self.assertTrue(os.path.isfile(archive_path_old(doc)))
+                self.assertIsFile(archive_path_old(doc))
             with open(source_path(doc), "rb") as f:
                 original_checksum = hashlib.md5(f.read()).hexdigest()
             self.assertEqual(original_checksum, doc.checksum)
 
             if doc.archive_checksum:
-                self.assertTrue(os.path.isfile(archive_path_old(doc)))
+                self.assertIsFile(archive_path_old(doc))
                 with open(archive_path_old(doc), "rb") as f:
                     archive_checksum = hashlib.md5(f.read()).hexdigest()
                 self.assertEqual(archive_checksum, doc.archive_checksum)
