@@ -92,20 +92,16 @@ class DirectoriesMixin:
 
 class FileSystemAssertsMixin:
     def assertIsFile(self, path: Union[PathLike, str]):
-        if not Path(path).resolve().is_file():
-            raise AssertionError(f"File does not exist: {path}")
+        self.assertTrue(Path(path).resolve().is_file(), f"File does not exist: {path}")
 
     def assertIsNotFile(self, path: Union[PathLike, str]):
-        if Path(path).resolve().is_file():
-            raise AssertionError(f"File does exist: {path}")
+        self.assertFalse(Path(path).resolve().is_file(), f"File does exist: {path}")
 
     def assertIsDir(self, path: Union[PathLike, str]):
-        if not Path(path).resolve().is_dir():
-            raise AssertionError(f"Dir does not exist: {path}")
+        self.assertTrue(Path(path).resolve().is_dir(), f"Dir does not exist: {path}")
 
     def assertIsNotDir(self, path: Union[PathLike, str]):
-        if Path(path).resolve().is_dir():
-            raise AssertionError(f"Dir does exist: {path}")
+        self.assertFalse(Path(path).resolve().is_dir(), f"Dir does exist: {path}")
 
 
 class ConsumerProgressMixin:
