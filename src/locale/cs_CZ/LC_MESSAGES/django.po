@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-09 21:50+0000\n"
-"PO-Revision-Date: 2022-11-09 23:11\n"
+"PO-Revision-Date: 2023-02-20 13:46\n"
 "Last-Translator: \n"
 "Language-Team: Czech\n"
 "Language: cs_CZ\n"
@@ -184,7 +184,7 @@ msgstr "Aktuální název souboru archivu v úložišti"
 
 #: documents/models.py:221
 msgid "original filename"
-msgstr ""
+msgstr "původní název souboru"
 
 #: documents/models.py:227
 msgid "The original name of the file when it was uploaded"
@@ -368,15 +368,15 @@ msgstr "má značky v"
 
 #: documents/models.py:410
 msgid "ASN greater than"
-msgstr ""
+msgstr "ASN větší než"
 
 #: documents/models.py:411
 msgid "ASN less than"
-msgstr ""
+msgstr "ASN menší než"
 
 #: documents/models.py:412
 msgid "storage path is"
-msgstr ""
+msgstr "cesta k úložišti je"
 
 #: documents/models.py:422
 msgid "rule type"
@@ -396,35 +396,35 @@ msgstr "filtrovací pravidla"
 
 #: documents/models.py:536
 msgid "Task ID"
-msgstr ""
+msgstr "ID Úlohy"
 
 #: documents/models.py:537
 msgid "Celery ID for the Task that was run"
-msgstr ""
+msgstr "Celery ID pro úlohu, která byla spuštěna"
 
 #: documents/models.py:542
 msgid "Acknowledged"
-msgstr ""
+msgstr "Potvrzeno"
 
 #: documents/models.py:543
 msgid "If the task is acknowledged via the frontend or API"
-msgstr ""
+msgstr "Pokud je úloha potvrzena prostřednictvím webu nebo API"
 
 #: documents/models.py:549 documents/models.py:556
 msgid "Task Name"
-msgstr ""
+msgstr "Název Úlohy"
 
 #: documents/models.py:550
 msgid "Name of the file which the Task was run for"
-msgstr ""
+msgstr "Název souboru, pro který byla úloha spuštěna"
 
 #: documents/models.py:557
 msgid "Name of the Task which was run"
-msgstr ""
+msgstr "Název úlohy, která byla spuštěna"
 
 #: documents/models.py:562
 msgid "Task Positional Arguments"
-msgstr ""
+msgstr "Poziční Argumenty Úlohy"
 
 #: documents/models.py:564
 msgid "JSON representation of the positional arguments used with the task"
