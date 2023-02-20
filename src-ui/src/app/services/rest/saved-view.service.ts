@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core'
 import { combineLatest, Observable } from 'rxjs'
 import { tap } from 'rxjs/operators'
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
+import { PermissionsService } from '../permissions.service'
 import { AbstractPaperlessService } from './abstract-paperless-service'
 
 @Injectable({
@@ -11,8 +12,11 @@ import { AbstractPaperlessService } from './abstract-paperless-service'
 export class SavedViewService extends AbstractPaperlessService<PaperlessSavedView> {
   loading: boolean
 
-  constructor(http: HttpClient) {
+  constructor(http: HttpClient, permissionService: PermissionsService) {
     super(http, 'saved_views')
+  }
+
+  public initialize() {
     this.reload()
   }
 
