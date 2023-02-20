@@ -5,6 +5,7 @@ from documents.models import Tag
 from documents.tests.utils import DirectoriesMixin
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
+from rest_framework import status
 from rest_framework.test import APITestCase
 
 
@@ -39,7 +40,7 @@ class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
 
         response = self.client.get(self.ENDPOINT)
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["count"], 1)
         returned_account1 = response.data["results"][0]
 
@@ -77,7 +78,7 @@ class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
             data=account1,
         )
 
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         returned_account1 = MailAccount.objects.get(name="Email1")
 
@@ -113,7 +114,7 @@ class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
             f"{self.ENDPOINT}{account1.pk}/",
         )
 
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
         self.assertEqual(len(MailAccount.objects.all()), 0)
 
@@ -145,7 +146,7 @@ class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         returned_account1 = MailAccount.objects.get(pk=account1.pk)
         self.assertEqual(returned_account1.name, "Updated Name 1")
@@ -159,7 +160,7 @@ class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         returned_account2 = MailAccount.objects.get(pk=account1.pk)
         self.assertEqual(returned_account2.name, "Updated Name 2")
@@ -213,7 +214,7 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
 
         response = self.client.get(self.ENDPOINT)
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["count"], 1)
         returned_rule1 = response.data["results"][0]
 
@@ -294,11 +295,11 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
             data=rule1,
         )
 
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         response = self.client.get(self.ENDPOINT)
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["count"], 1)
         returned_rule1 = response.data["results"][0]
 
@@ -375,7 +376,7 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
             f"{self.ENDPOINT}{rule1.pk}/",
         )
 
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
         self.assertEqual(len(MailRule.objects.all()), 0)
 
@@ -423,7 +424,7 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         returned_rule1 = MailRule.objects.get(pk=rule1.pk)
         self.assertEqual(returned_rule1.name, "Updated Name 1")
