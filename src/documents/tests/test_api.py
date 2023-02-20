@@ -1318,6 +1318,34 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
         self.assertEqual(kwargs["override_created"], created)
 
+    @mock.patch("documents.views.consume_file.delay")
+    def test_upload_with_asn(self, m):
+
+        m.return_value = celery.result.AsyncResult(id=str(uuid.uuid4()))
+
+        with open(
+            os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"),
+            "rb",
+        ) as f:
+            response = self.client.post(
+                "/api/documents/post_document/",
+                {"document": f, "archive_serial_number": 500},
+            )
+
+        self.assertEqual(response.status_code, 200)
+
+        m.assert_called_once()
+
+        args, kwargs = m.call_args
+        file_path = Path(args[0])
+        self.assertEqual(file_path.name, "simple.pdf")
+        self.assertIn(Path(settings.SCRATCH_DIR), file_path.parents)
+        self.assertIsNone(kwargs["override_title"])
+        self.assertIsNone(kwargs["override_correspondent_id"])
+        self.assertIsNone(kwargs["override_document_type_id"])
+        self.assertIsNone(kwargs["override_tag_ids"])
+        self.assertEqual(500, kwargs["override_archive_serial_num"])
+
     def test_get_metadata(self):
         doc = Document.objects.create(
             title="test",
@@ -3580,7 +3608,7 @@ class TestTasks(DirectoriesMixin, APITestCase):
         self.assertEqual(returned_data["task_file_name"], "anothertest.pdf")
 
 
-class TestApiUser(APITestCase):
+class TestApiUser(DirectoriesMixin, APITestCase):
     ENDPOINT = "/api/users/"
 
     def setUp(self):
@@ -3720,7 +3748,7 @@ class TestApiUser(APITestCase):
         self.assertNotEqual(returned_user2.password, initial_password)
 
 
-class TestApiGroup(APITestCase):
+class TestApiGroup(DirectoriesMixin, APITestCase):
     ENDPOINT = "/api/groups/"
 
     def setUp(self):

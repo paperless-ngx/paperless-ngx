@@ -667,6 +667,7 @@ class PostDocumentView(GenericAPIView):
         title = serializer.validated_data.get("title")
         created = serializer.validated_data.get("created")
         owner_id = serializer.validated_data.get("owner")
+        archive_serial_number = serializer.validated_data.get("archive_serial_number")
 
         t = int(mktime(datetime.now().timetuple()))
 
@@ -692,6 +693,7 @@ class PostDocumentView(GenericAPIView):
             task_id=task_id,
             override_created=created,
             override_owner_id=owner_id,
+            override_archive_serial_num=archive_serial_number,
         )
 
         return Response(async_task.id)
