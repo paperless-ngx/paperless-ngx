@@ -1331,7 +1331,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
                 {"document": f, "archive_serial_number": 500},
             )
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         m.assert_called_once()
 
