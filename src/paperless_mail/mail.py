@@ -9,7 +9,7 @@ from typing import Dict
 
 import magic
 import pathvalidate
-from celery import chord
+from celery import chord, shared_task
 from django.conf import settings
 from django.db import DatabaseError
 from documents.loggers import LoggingMixin
@@ -26,7 +26,6 @@ from imap_tools import NOT
 from imap_tools.mailbox import MailBoxTls
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
-from paperless_mail.tasks import apply_mail_action
 
 # Apple Mail sets multiple IMAP KEYWORD and the general "\Flagged" FLAG
 # imaplib => conn.fetch(b"<message_id>", "FLAGS")
@@ -143,6 +142,27 @@ class TagMailAction(BaseMailAction):
 
         else:
             raise MailError("No keyword specified.")
+
+
+@shared_task
+def apply_mail_action(
+    result: str,
+    rule_id: int,
+    message_uid: str,
+):
+    rule = MailRule.objects.get(pk=rule_id)
+    account = MailAccount.objects.get(pk=rule.account.pk)
+
+    action = get_rule_action(rule)
+
+    with get_mailbox(
+        server=account.imap_server,
+        port=account.imap_port,
+        security=account.imap_security,
+    ) as M:
+        M.login(username=account.username, password=account.password)
+        M.folder.set(rule.folder)
+        action.post_consume(M, message_uid, rule.action_parameter)
 
 
 def get_rule_action(rule) -> BaseMailAction:
@@ -531,10 +551,8 @@ class MailAccountHandler(LoggingMixin):
                 )
 
         mail_action_task = apply_mail_action.s(
-            M=M,
-            action=get_rule_action(rule),
+            rule_id=rule.pk,
             message_uid=message.uid,
-            parameter=rule.action_parameter,
         )
 
         chord(header=consume_tasks, body=mail_action_task).delay()
@@ -597,10 +615,8 @@ class MailAccountHandler(LoggingMixin):
         )
 
         mail_action_task = apply_mail_action.s(
-            M=M,
-            action=get_rule_action(rule),
+            rule_id=rule.pk,
             message_uid=message.uid,
-            parameter=rule.action_parameter,
         )
 
         (consume_task | mail_action_task).delay()
