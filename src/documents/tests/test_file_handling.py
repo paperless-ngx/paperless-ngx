@@ -9,8 +9,8 @@ from django.db import DatabaseError
 from django.test import override_settings
 from django.test import TestCase
 from django.utils import timezone
+from documents.tests.utils import FileSystemAssertsMixin
 
-from ..bulk_edit import bulk_update_documents
 from ..file_handling import create_source_path_directory
 from ..file_handling import delete_empty_directories
 from ..file_handling import generate_filename
@@ -21,7 +21,7 @@ from ..models import StoragePath
 from .utils import DirectoriesMixin
 
 
-class TestFileHandling(DirectoriesMixin, TestCase):
+class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     @override_settings(FILENAME_FORMAT="")
     def test_generate_source_filename(self):
         document = Document()
@@ -47,7 +47,7 @@ class TestFileHandling(DirectoriesMixin, TestCase):
         # Test default source_path
         self.assertEqual(
             document.source_path,
-            settings.ORIGINALS_DIR + f"/{document.pk:07d}.pdf",
+            os.path.join(settings.ORIGINALS_DIR, f"{document.pk:07d}.pdf"),
         )
 
         document.filename = generate_filename(document)
@@ -65,18 +65,17 @@ class TestFileHandling(DirectoriesMixin, TestCase):
         # test that creating dirs for the source_path creates the correct directory
         create_source_path_directory(document.source_path)
         Path(document.source_path).touch()
-        self.assertEqual(os.path.isdir(settings.ORIGINALS_DIR + "/none"), True)
+        self.assertIsDir(os.path.join(settings.ORIGINALS_DIR, "none"))
 
         # Set a correspondent and save the document
         document.correspondent = Correspondent.objects.get_or_create(name="test")[0]
         document.save()
 
         # Check proper handling of files
-        self.assertEqual(os.path.isdir(settings.ORIGINALS_DIR + "/test"), True)
-        self.assertEqual(os.path.isdir(settings.ORIGINALS_DIR + "/none"), False)
-        self.assertEqual(
-            os.path.isfile(settings.ORIGINALS_DIR + "/test/test.pdf.gpg"),
-            True,
+        self.assertIsDir(os.path.join(settings.ORIGINALS_DIR, "test"))
+        self.assertIsNotDir(os.path.join(settings.ORIGINALS_DIR, "none"))
+        self.assertIsFile(
+            os.path.join(settings.ORIGINALS_DIR, "test/test.pdf.gpg"),
         )
 
     @override_settings(FILENAME_FORMAT="{correspondent}/{correspondent}")
@@ -95,24 +94,23 @@ class TestFileHandling(DirectoriesMixin, TestCase):
         # Test source_path
         self.assertEqual(
             document.source_path,
-            settings.ORIGINALS_DIR + "/none/none.pdf",
+            os.path.join(settings.ORIGINALS_DIR, "none/none.pdf"),
         )
 
         # Make the folder read- and execute-only (no writing and no renaming)
-        os.chmod(settings.ORIGINALS_DIR + "/none", 0o555)
+        os.chmod(os.path.join(settings.ORIGINALS_DIR, "none"), 0o555)
 
         # Set a correspondent and save the document
         document.correspondent = Correspondent.objects.get_or_create(name="test")[0]
         document.save()
 
         # Check proper handling of files
-        self.assertEqual(
-            os.path.isfile(settings.ORIGINALS_DIR + "/none/none.pdf"),
-            True,
+        self.assertIsFile(
+            os.path.join(settings.ORIGINALS_DIR, "none/none.pdf"),
         )
         self.assertEqual(document.filename, "none/none.pdf")
 
-        os.chmod(settings.ORIGINALS_DIR + "/none", 0o777)
+        os.chmod(os.path.join(settings.ORIGINALS_DIR, "none"), 0o777)
 
     @override_settings(FILENAME_FORMAT="{correspondent}/{correspondent}")
     def test_file_renaming_database_error(self):
@@ -136,7 +134,7 @@ class TestFileHandling(DirectoriesMixin, TestCase):
         Path(document.source_path).touch()
 
         # Test source_path
-        self.assertTrue(os.path.isfile(document.source_path))
+        self.assertIsFile(document.source_path)
 
         # Set a correspondent and save the document
         document.correspondent = Correspondent.objects.get_or_create(name="test")[0]
@@ -146,10 +144,9 @@ class TestFileHandling(DirectoriesMixin, TestCase):
             document.save()
 
             # Check proper handling of files
-            self.assertTrue(os.path.isfile(document.source_path))
-            self.assertEqual(
-                os.path.isfile(settings.ORIGINALS_DIR + "/none/none.pdf"),
-                True,
+            self.assertIsFile(document.source_path)
+            self.assertIsFile(
+                os.path.join(settings.ORIGINALS_DIR, "none/none.pdf"),
             )
             self.assertEqual(document.filename, "none/none.pdf")
 
@@ -170,11 +167,10 @@ class TestFileHandling(DirectoriesMixin, TestCase):
         # Ensure file deletion after delete
         pk = document.pk
         document.delete()
-        self.assertEqual(
-            os.path.isfile(settings.ORIGINALS_DIR + "/none/none.pdf"),
-            False,
+        self.assertIsNotFile(
+            os.path.join(settings.ORIGINALS_DIR, "none", "none.pdf"),
         )
-        self.assertEqual(os.path.isdir(settings.ORIGINALS_DIR + "/none"), False)
+        self.assertIsNotDir(os.path.join(settings.ORIGINALS_DIR, "none"))
 
     @override_settings(
         FILENAME_FORMAT="{correspondent}/{correspondent}",
@@ -194,15 +190,14 @@ class TestFileHandling(DirectoriesMixin, TestCase):
         Path(document.source_path).touch()
 
         # Ensure file was moved to trash after delete
-        self.assertEqual(os.path.isfile(settings.TRASH_DIR + "/none/none.pdf"), False)
+        self.assertIsNotFile(os.path.join(settings.TRASH_DIR, "none", "none.pdf"))
         document.delete()
-        self.assertEqual(
-            os.path.isfile(settings.ORIGINALS_DIR + "/none/none.pdf"),
-            False,
+        self.assertIsNotFile(
+            os.path.join(settings.ORIGINALS_DIR, "none", "none.pdf"),
         )
-        self.assertEqual(os.path.isdir(settings.ORIGINALS_DIR + "/none"), False)
-        self.assertEqual(os.path.isfile(settings.TRASH_DIR + "/none.pdf"), True)
-        self.assertEqual(os.path.isfile(settings.TRASH_DIR + "/none_01.pdf"), False)
+        self.assertIsNotDir(os.path.join(settings.ORIGINALS_DIR, "none"))
+        self.assertIsFile(os.path.join(settings.TRASH_DIR, "none.pdf"))
+        self.assertIsNotFile(os.path.join(settings.TRASH_DIR, "none_01.pdf"))
 
         # Create an identical document and ensure it is trashed under a new name
         document = Document()
@@ -213,7 +208,7 @@ class TestFileHandling(DirectoriesMixin, TestCase):
         create_source_path_directory(document.source_path)
         Path(document.source_path).touch()
         document.delete()
-        self.assertEqual(os.path.isfile(settings.TRASH_DIR + "/none_01.pdf"), True)
+        self.assertIsFile(os.path.join(settings.TRASH_DIR, "none_01.pdf"))
 
     @override_settings(FILENAME_FORMAT="{correspondent}/{correspondent}")
     def test_document_delete_nofile(self):
@@ -246,9 +241,9 @@ class TestFileHandling(DirectoriesMixin, TestCase):
         document.save()
 
         # Check proper handling of files
-        self.assertEqual(os.path.isdir(settings.ORIGINALS_DIR + "/test"), True)
-        self.assertEqual(os.path.isdir(settings.ORIGINALS_DIR + "/none"), True)
-        self.assertTrue(os.path.isfile(important_file))
+        self.assertIsDir(os.path.join(settings.ORIGINALS_DIR, "test"))
+        self.assertIsDir(os.path.join(settings.ORIGINALS_DIR, "none"))
+        self.assertIsFile(important_file)
 
     @override_settings(FILENAME_FORMAT="{document_type} - {title}")
     def test_document_type(self):
@@ -437,18 +432,17 @@ class TestFileHandling(DirectoriesMixin, TestCase):
         Path(document.source_path).touch()
 
         # Check proper handling of files
-        self.assertEqual(os.path.isdir(settings.ORIGINALS_DIR + "/none/none"), True)
+        self.assertIsDir(os.path.join(settings.ORIGINALS_DIR, "none/none"))
 
         pk = document.pk
         document.delete()
 
-        self.assertEqual(
-            os.path.isfile(settings.ORIGINALS_DIR + "/none/none/none.pdf"),
-            False,
+        self.assertIsNotFile(
+            os.path.join(settings.ORIGINALS_DIR, "none/none/none.pdf"),
         )
-        self.assertEqual(os.path.isdir(settings.ORIGINALS_DIR + "/none/none"), False)
-        self.assertEqual(os.path.isdir(settings.ORIGINALS_DIR + "/none"), False)
-        self.assertEqual(os.path.isdir(settings.ORIGINALS_DIR), True)
+        self.assertIsNotDir(os.path.join(settings.ORIGINALS_DIR, "none/none"))
+        self.assertIsNotDir(os.path.join(settings.ORIGINALS_DIR, "none"))
+        self.assertIsDir(settings.ORIGINALS_DIR)
 
     @override_settings(FILENAME_FORMAT=None)
     def test_format_none(self):
@@ -472,9 +466,9 @@ class TestFileHandling(DirectoriesMixin, TestCase):
             os.path.join(tmp, "notempty", "empty"),
             root=settings.ORIGINALS_DIR,
         )
-        self.assertEqual(os.path.isdir(os.path.join(tmp, "notempty")), True)
-        self.assertEqual(os.path.isfile(os.path.join(tmp, "notempty", "file")), True)
-        self.assertEqual(os.path.isdir(os.path.join(tmp, "notempty", "empty")), False)
+        self.assertIsDir(os.path.join(tmp, "notempty"))
+        self.assertIsFile(os.path.join(tmp, "notempty", "file"))
+        self.assertIsNotDir(os.path.join(tmp, "notempty", "empty"))
 
     @override_settings(FILENAME_FORMAT="{created/[title]")
     def test_invalid_format(self):
@@ -513,36 +507,36 @@ class TestFileHandling(DirectoriesMixin, TestCase):
         document.filename = "0000001.pdf"
         document.save()
 
-        self.assertTrue(os.path.isfile(document.source_path))
+        self.assertIsFile(document.source_path)
         self.assertEqual(document.filename, "qwe.pdf")
 
         document2.filename = "0000002.pdf"
         document2.save()
 
-        self.assertTrue(os.path.isfile(document.source_path))
+        self.assertIsFile(document.source_path)
         self.assertEqual(document2.filename, "qwe_01.pdf")
 
         # saving should not change the file names.
 
         document.save()
 
-        self.assertTrue(os.path.isfile(document.source_path))
+        self.assertIsFile(document.source_path)
         self.assertEqual(document.filename, "qwe.pdf")
 
         document2.save()
 
-        self.assertTrue(os.path.isfile(document.source_path))
+        self.assertIsFile(document.source_path)
         self.assertEqual(document2.filename, "qwe_01.pdf")
 
         document.delete()
 
-        self.assertFalse(os.path.isfile(document.source_path))
+        self.assertIsNotFile(document.source_path)
 
         # filename free, should remove _01 suffix
 
         document2.save()
 
-        self.assertTrue(os.path.isfile(document.source_path))
+        self.assertIsFile(document.source_path)
         self.assertEqual(document2.filename, "qwe.pdf")
 
     @override_settings(FILENAME_FORMAT="{title}")
@@ -564,7 +558,7 @@ class TestFileHandling(DirectoriesMixin, TestCase):
         m.assert_not_called()
 
 
-class TestFileHandlingWithArchive(DirectoriesMixin, TestCase):
+class TestFileHandlingWithArchive(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     @override_settings(FILENAME_FORMAT=None)
     def test_create_no_format(self):
         original = os.path.join(settings.ORIGINALS_DIR, "0000001.pdf")
@@ -579,10 +573,10 @@ class TestFileHandlingWithArchive(DirectoriesMixin, TestCase):
             archive_checksum="B",
         )
 
-        self.assertTrue(os.path.isfile(original))
-        self.assertTrue(os.path.isfile(archive))
-        self.assertTrue(os.path.isfile(doc.source_path))
-        self.assertTrue(os.path.isfile(doc.archive_path))
+        self.assertIsFile(original)
+        self.assertIsFile(archive)
+        self.assertIsFile(doc.source_path)
+        self.assertIsFile(doc.archive_path)
 
     @override_settings(FILENAME_FORMAT="{correspondent}/{title}")
     def test_create_with_format(self):
@@ -599,10 +593,10 @@ class TestFileHandlingWithArchive(DirectoriesMixin, TestCase):
             archive_filename="0000001.pdf",
         )
 
-        self.assertFalse(os.path.isfile(original))
-        self.assertFalse(os.path.isfile(archive))
-        self.assertTrue(os.path.isfile(doc.source_path))
-        self.assertTrue(os.path.isfile(doc.archive_path))
+        self.assertIsNotFile(original)
+        self.assertIsNotFile(archive)
+        self.assertIsFile(doc.source_path)
+        self.assertIsFile(doc.archive_path)
         self.assertEqual(
             doc.source_path,
             os.path.join(settings.ORIGINALS_DIR, "none", "my_doc.pdf"),
@@ -626,10 +620,10 @@ class TestFileHandlingWithArchive(DirectoriesMixin, TestCase):
             archive_filename="0000001.pdf",
         )
 
-        self.assertTrue(os.path.isfile(original))
-        self.assertFalse(os.path.isfile(archive))
-        self.assertTrue(os.path.isfile(doc.source_path))
-        self.assertFalse(os.path.isfile(doc.archive_path))
+        self.assertIsFile(original)
+        self.assertIsNotFile(archive)
+        self.assertIsFile(doc.source_path)
+        self.assertIsNotFile(doc.archive_path)
 
     @override_settings(FILENAME_FORMAT="{correspondent}/{title}")
     def test_move_archive_exists(self):
@@ -649,11 +643,11 @@ class TestFileHandlingWithArchive(DirectoriesMixin, TestCase):
             archive_filename="0000001.pdf",
         )
 
-        self.assertFalse(os.path.isfile(original))
-        self.assertFalse(os.path.isfile(archive))
-        self.assertTrue(os.path.isfile(doc.source_path))
-        self.assertTrue(os.path.isfile(doc.archive_path))
-        self.assertTrue(os.path.isfile(existing_archive_file))
+        self.assertIsNotFile(original)
+        self.assertIsNotFile(archive)
+        self.assertIsFile(doc.source_path)
+        self.assertIsFile(doc.archive_path)
+        self.assertIsFile(existing_archive_file)
         self.assertEqual(doc.archive_filename, "none/my_doc_01.pdf")
 
     @override_settings(FILENAME_FORMAT="{title}")
@@ -675,8 +669,8 @@ class TestFileHandlingWithArchive(DirectoriesMixin, TestCase):
         self.assertEqual(doc.filename, "document.pdf")
         self.assertEqual(doc.archive_filename, "document.pdf")
 
-        self.assertTrue(os.path.isfile(doc.source_path))
-        self.assertTrue(os.path.isfile(doc.archive_path))
+        self.assertIsFile(doc.source_path)
+        self.assertIsFile(doc.archive_path)
 
     @override_settings(FILENAME_FORMAT="{title}")
     def test_move_archive_only(self):
@@ -697,8 +691,8 @@ class TestFileHandlingWithArchive(DirectoriesMixin, TestCase):
         self.assertEqual(doc.filename, "document.pdf")
         self.assertEqual(doc.archive_filename, "document.pdf")
 
-        self.assertTrue(os.path.isfile(doc.source_path))
-        self.assertTrue(os.path.isfile(doc.archive_path))
+        self.assertIsFile(doc.source_path)
+        self.assertIsFile(doc.archive_path)
 
     @override_settings(FILENAME_FORMAT="{correspondent}/{title}")
     @mock.patch("documents.signals.handlers.os.rename")
@@ -726,10 +720,10 @@ class TestFileHandlingWithArchive(DirectoriesMixin, TestCase):
         )
 
         m.assert_called()
-        self.assertTrue(os.path.isfile(original))
-        self.assertTrue(os.path.isfile(archive))
-        self.assertTrue(os.path.isfile(doc.source_path))
-        self.assertTrue(os.path.isfile(doc.archive_path))
+        self.assertIsFile(original)
+        self.assertIsFile(archive)
+        self.assertIsFile(doc.source_path)
+        self.assertIsFile(doc.archive_path)
 
     @override_settings(FILENAME_FORMAT="{correspondent}/{title}")
     def test_move_file_gone(self):
@@ -746,10 +740,10 @@ class TestFileHandlingWithArchive(DirectoriesMixin, TestCase):
             archive_checksum="B",
         )
 
-        self.assertFalse(os.path.isfile(original))
-        self.assertTrue(os.path.isfile(archive))
-        self.assertFalse(os.path.isfile(doc.source_path))
-        self.assertTrue(os.path.isfile(doc.archive_path))
+        self.assertIsNotFile(original)
+        self.assertIsFile(archive)
+        self.assertIsNotFile(doc.source_path)
+        self.assertIsFile(doc.archive_path)
 
     @override_settings(FILENAME_FORMAT="{correspondent}/{title}")
     @mock.patch("documents.signals.handlers.os.rename")
@@ -777,10 +771,10 @@ class TestFileHandlingWithArchive(DirectoriesMixin, TestCase):
         )
 
         m.assert_called()
-        self.assertTrue(os.path.isfile(original))
-        self.assertTrue(os.path.isfile(archive))
-        self.assertTrue(os.path.isfile(doc.source_path))
-        self.assertTrue(os.path.isfile(doc.archive_path))
+        self.assertIsFile(original)
+        self.assertIsFile(archive)
+        self.assertIsFile(doc.source_path)
+        self.assertIsFile(doc.archive_path)
 
     @override_settings(FILENAME_FORMAT="")
     def test_archive_deleted(self):
@@ -797,17 +791,17 @@ class TestFileHandlingWithArchive(DirectoriesMixin, TestCase):
             archive_filename="0000001.pdf",
         )
 
-        self.assertTrue(os.path.isfile(original))
-        self.assertTrue(os.path.isfile(archive))
-        self.assertTrue(os.path.isfile(doc.source_path))
-        self.assertTrue(os.path.isfile(doc.archive_path))
+        self.assertIsFile(original)
+        self.assertIsFile(archive)
+        self.assertIsFile(doc.source_path)
+        self.assertIsFile(doc.archive_path)
 
         doc.delete()
 
-        self.assertFalse(os.path.isfile(original))
-        self.assertFalse(os.path.isfile(archive))
-        self.assertFalse(os.path.isfile(doc.source_path))
-        self.assertFalse(os.path.isfile(doc.archive_path))
+        self.assertIsNotFile(original)
+        self.assertIsNotFile(archive)
+        self.assertIsNotFile(doc.source_path)
+        self.assertIsNotFile(doc.archive_path)
 
     @override_settings(FILENAME_FORMAT="{title}")
     def test_archive_deleted2(self):
@@ -833,15 +827,15 @@ class TestFileHandlingWithArchive(DirectoriesMixin, TestCase):
             checksum="C",
         )
 
-        self.assertTrue(os.path.isfile(doc1.source_path))
-        self.assertTrue(os.path.isfile(doc1.archive_path))
-        self.assertTrue(os.path.isfile(doc2.source_path))
+        self.assertIsFile(doc1.source_path)
+        self.assertIsFile(doc1.archive_path)
+        self.assertIsFile(doc2.source_path)
 
         doc2.delete()
 
-        self.assertTrue(os.path.isfile(doc1.source_path))
-        self.assertTrue(os.path.isfile(doc1.archive_path))
-        self.assertFalse(os.path.isfile(doc2.source_path))
+        self.assertIsFile(doc1.source_path)
+        self.assertIsFile(doc1.archive_path)
+        self.assertIsNotFile(doc2.source_path)
 
     @override_settings(FILENAME_FORMAT="{correspondent}/{title}")
     def test_database_error(self):
@@ -862,10 +856,10 @@ class TestFileHandlingWithArchive(DirectoriesMixin, TestCase):
             m.side_effect = DatabaseError()
             doc.save()
 
-        self.assertTrue(os.path.isfile(original))
-        self.assertTrue(os.path.isfile(archive))
-        self.assertTrue(os.path.isfile(doc.source_path))
-        self.assertTrue(os.path.isfile(doc.archive_path))
+        self.assertIsFile(original)
+        self.assertIsFile(archive)
+        self.assertIsFile(doc.source_path)
+        self.assertIsFile(doc.archive_path)
 
 
 class TestFilenameGeneration(DirectoriesMixin, TestCase):

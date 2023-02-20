@@ -4,10 +4,11 @@ from unittest import mock
 
 from django.test import TestCase
 from documents.parsers import ParseError
+from documents.tests.utils import FileSystemAssertsMixin
 from paperless_mail.parsers import MailDocumentParser
 
 
-class TestParser(TestCase):
+class TestParser(FileSystemAssertsMixin, TestCase):
     SAMPLE_FILES = os.path.join(os.path.dirname(__file__), "samples")
 
     def setUp(self) -> None:
@@ -331,7 +332,7 @@ class TestParser(TestCase):
         )
 
     @mock.patch("paperless_mail.parsers.MailDocumentParser.generate_pdf")
-    def test_parse_simple_eml(self, n):
+    def test_parse_simple_eml(self, m: mock.MagicMock):
         """
         GIVEN:
             - Fresh start
@@ -361,8 +362,8 @@ class TestParser(TestCase):
             self.parser.date,
         )
 
-        # Just check if file exists, the unittest for generate_pdf() goes deeper.
-        self.assertTrue(os.path.isfile(self.parser.archive_path))
+        # Just check if tried to generate archive, the unittest for generate_pdf() goes deeper.
+        m.assert_called()
 
     @mock.patch("paperless_mail.parsers.parser.from_buffer")
     def test_tika_parse_unsuccessful(self, mock_from_buffer: mock.MagicMock):
@@ -494,7 +495,7 @@ class TestParser(TestCase):
         mock_response.content = b"Content"
         mock_post.return_value = mock_response
         pdf_path = self.parser.generate_pdf(os.path.join(self.SAMPLE_FILES, "html.eml"))
-        self.assertTrue(os.path.isfile(pdf_path))
+        self.assertIsFile(pdf_path)
 
         mock_generate_pdf_from_mail.assert_called_once_with(
             self.parser.get_parsed(None),
