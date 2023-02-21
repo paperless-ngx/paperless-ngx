@@ -863,19 +863,19 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">307</context>
+          <context context-type="linenumber">316</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">347</context>
+          <context context-type="linenumber">356</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">385</context>
+          <context context-type="linenumber">394</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">423</context>
+          <context context-type="linenumber">432</context>
         </context-group>
         <target state="final">Bekräfta</target>
       </trans-unit>
@@ -2469,7 +2469,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">252</context>
+          <context context-type="linenumber">261</context>
         </context-group>
         <note priority="1" from="description">this string is used to separate processing, failed and added on the file upload widget</note>
         <target state="needs-translation">, </target>
@@ -2990,7 +2990,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">482</context>
+          <context context-type="linenumber">491</context>
         </context-group>
         <target state="needs-translation">Redo OCR confirm</target>
       </trans-unit>
@@ -3010,11 +3010,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">445</context>
+          <context context-type="linenumber">454</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">484</context>
+          <context context-type="linenumber">493</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
@@ -3042,7 +3042,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">486</context>
+          <context context-type="linenumber">495</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
@@ -3226,7 +3226,7 @@
         <source>Error executing bulk operation: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">172,174</context>
+          <context context-type="linenumber">181,183</context>
         </context-group>
         <target state="needs-translation">Error executing bulk operation: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></target>
       </trans-unit>
@@ -3234,11 +3234,11 @@
         <source>&quot;<x id="PH" equiv-text="items[0].name"/>&quot;</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">244</context>
+          <context context-type="linenumber">253</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">250</context>
+          <context context-type="linenumber">259</context>
         </context-group>
         <target state="needs-translation">"<x id="PH" equiv-text="items[0].name"/>"</target>
       </trans-unit>
@@ -3246,7 +3246,7 @@
         <source>&quot;<x id="PH" equiv-text="items[0].name"/>&quot; and &quot;<x id="PH_1" equiv-text="items[1].name"/>&quot;</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">246</context>
+          <context context-type="linenumber">255</context>
         </context-group>
         <note priority="1" from="description">This is for messages like 'modify "tag1" and "tag2"'</note>
         <target state="final">"<x id="PH" equiv-text="items[0].name"/>" och "<x id="PH_1" equiv-text="items[1].name"/>"</target>
@@ -3255,7 +3255,7 @@
         <source><x id="PH" equiv-text="list"/> and &quot;<x id="PH_1" equiv-text="items[items.length - 1].name"/>&quot;</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">254,256</context>
+          <context context-type="linenumber">263,265</context>
         </context-group>
         <note priority="1" from="description">this is for messages like 'modify "tag1", "tag2" and "tag3"'</note>
         <target state="final"><x id="PH" equiv-text="list"/>" och "<x id="PH_1" equiv-text="items[items.length - 1].name"/>"</target>
@@ -3264,7 +3264,7 @@
         <source>Confirm tags assignment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">271</context>
+          <context context-type="linenumber">280</context>
         </context-group>
         <target state="final">Bekräfta tilldelning av taggar</target>
       </trans-unit>
@@ -3272,7 +3272,7 @@
         <source>This operation will add the tag &quot;<x id="PH" equiv-text="tag.name"/>&quot; to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">277</context>
+          <context context-type="linenumber">286</context>
         </context-group>
         <target state="final">Denna åtgärd kommer att lägga till taggen "<x id="PH" equiv-text="tag.name"/>" till <x id="PH_1" equiv-text="this.list.selected.size"/> valda dokument.</target>
       </trans-unit>
@@ -3280,7 +3280,7 @@
         <source>This operation will add the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">282,284</context>
+          <context context-type="linenumber">291,293</context>
         </context-group>
         <target state="needs-translation">This operation will add the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
       </trans-unit>
@@ -3288,7 +3288,7 @@
         <source>This operation will remove the tag &quot;<x id="PH" equiv-text="tag.name"/>&quot; from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">290</context>
+          <context context-type="linenumber">299</context>
         </context-group>
         <target state="final">Denna åtgärd kommer att ta bort taggen "<x id="PH" equiv-text="tag.name"/>" från <x id="PH_1" equiv-text="this.list.selected.size"/> valda dokument.</target>
       </trans-unit>
@@ -3296,7 +3296,7 @@
         <source>This operation will remove the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">295,297</context>
+          <context context-type="linenumber">304,306</context>
         </context-group>
         <target state="needs-translation">This operation will remove the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
       </trans-unit>
@@ -3304,7 +3304,7 @@
         <source>This operation will add the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> and remove the tags <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> on <x id="PH_2" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">299,303</context>
+          <context context-type="linenumber">308,312</context>
         </context-group>
         <target state="needs-translation">This operation will add the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> and remove the tags <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> on <x id="PH_2" equiv-text="this.list.selected.size"/> selected document(s).</target>
       </trans-unit>
@@ -3312,7 +3312,7 @@
         <source>Confirm correspondent assignment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">340</context>
+          <context context-type="linenumber">349</context>
         </context-group>
         <target state="final">Bekräfta korrespondenttilldelning</target>
       </trans-unit>
@@ -3320,7 +3320,7 @@
         <source>This operation will assign the correspondent &quot;<x id="PH" equiv-text="correspondent.name"/>&quot; to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">342</context>
+          <context context-type="linenumber">351</context>
         </context-group>
         <target state="final">Den här åtgärden kommer att tilldela korrespondenten "<x id="PH" equiv-text="correspondent.name"/>" till <x id="PH_1" equiv-text="this.list.selected.size"/> valda dokument.</target>
       </trans-unit>
@@ -3328,7 +3328,7 @@
         <source>This operation will remove the correspondent from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">344</context>
+          <context context-type="linenumber">353</context>
         </context-group>
         <target state="final">Den här åtgärden kommer att ta bort korrespondenten från <x id="PH" equiv-text="this.list.selected.size"/> valda dokument.</target>
       </trans-unit>
@@ -3336,7 +3336,7 @@
         <source>Confirm document type assignment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">378</context>
+          <context context-type="linenumber">387</context>
         </context-group>
         <target state="final">Bekräfta tilldelning av dokumenttyp</target>
       </trans-unit>
@@ -3344,7 +3344,7 @@
         <source>This operation will assign the document type &quot;<x id="PH" equiv-text="documentType.name"/>&quot; to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">380</context>
+          <context context-type="linenumber">389</context>
         </context-group>
         <target state="final">Den här åtgärden kommer att tilldela dokumenttypen "<x id="PH" equiv-text="documentType.name"/>" till <x id="PH_1" equiv-text="this.list.selected.size"/> valda dokument.</target>
       </trans-unit>
@@ -3352,7 +3352,7 @@
         <source>This operation will remove the document type from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">382</context>
+          <context context-type="linenumber">391</context>
         </context-group>
         <target state="final">Den här åtgärden kommer att ta bort dokumenttypen från <x id="PH" equiv-text="this.list.selected.size"/> valda dokument.</target>
       </trans-unit>
@@ -3360,7 +3360,7 @@
         <source>Confirm storage path assignment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">416</context>
+          <context context-type="linenumber">425</context>
         </context-group>
         <target state="needs-translation">Confirm storage path assignment</target>
       </trans-unit>
@@ -3368,7 +3368,7 @@
         <source>This operation will assign the storage path &quot;<x id="PH" equiv-text="storagePath.name"/>&quot; to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">418</context>
+          <context context-type="linenumber">427</context>
         </context-group>
         <target state="needs-translation">This operation will assign the storage path "<x id="PH" equiv-text="storagePath.name"/>" to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
       </trans-unit>
@@ -3376,7 +3376,7 @@
         <source>This operation will remove the storage path from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">420</context>
+          <context context-type="linenumber">429</context>
         </context-group>
         <target state="needs-translation">This operation will remove the storage path from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</target>
       </trans-unit>
@@ -3384,7 +3384,7 @@
         <source>Delete confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">443</context>
+          <context context-type="linenumber">452</context>
         </context-group>
         <target state="final">Bekräfta borttagning</target>
       </trans-unit>
@@ -3392,7 +3392,7 @@
         <source>This operation will permanently delete <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">444</context>
+          <context context-type="linenumber">453</context>
         </context-group>
         <target state="final">Den här åtgärden kommer att permanent ta bort <x id="PH" equiv-text="this.list.selected.size"/> markerade dokument.</target>
       </trans-unit>
@@ -3400,7 +3400,7 @@
         <source>Delete document(s)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">447</context>
+          <context context-type="linenumber">456</context>
         </context-group>
         <target state="final">Ta bort dokument</target>
       </trans-unit>
@@ -3408,7 +3408,7 @@
         <source>This operation will permanently redo OCR for <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">483</context>
+          <context context-type="linenumber">492</context>
         </context-group>
         <target state="needs-translation">This operation will permanently redo OCR for <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</target>
       </trans-unit>
@@ -4640,13 +4640,13 @@
         </context-group>
         <target state="needs-translation">Confirm delete user account</target>
       </trans-unit>
-      <trans-unit id="6445517555346570490" datatype="html">
-        <source>This operation will permanently this user account.</source>
+      <trans-unit id="8133663925694885325" datatype="html">
+        <source>This operation will permanently delete this user account.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">656</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently this user account.</target>
+        <target state="needs-translation">This operation will permanently delete this user account.</target>
       </trans-unit>
       <trans-unit id="857903183180440990" datatype="html">
         <source>Deleted user</source>
@@ -4688,13 +4688,13 @@
         </context-group>
         <target state="needs-translation">Confirm delete user group</target>
       </trans-unit>
-      <trans-unit id="39609314779740277" datatype="html">
-        <source>This operation will permanently this user group.</source>
+      <trans-unit id="7710984639498518244" datatype="html">
+        <source>This operation will permanently delete this user group.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">710</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently this user group.</target>
+        <target state="needs-translation">This operation will permanently delete this user group.</target>
       </trans-unit>
       <trans-unit id="6834066329827670963" datatype="html">
         <source>Deleted group</source>
