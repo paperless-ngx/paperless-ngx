@@ -3,6 +3,7 @@ from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
+from paperless_mail.models import ProcessedMail
 
 
 class MailAccountAdminForm(forms.ModelForm):
@@ -105,5 +106,31 @@ class MailRuleAdmin(admin.ModelAdmin):
     ordering = ["order"]
 
 
+class ProcessedMailAdmin(admin.ModelAdmin):
+    class Meta:
+
+        model = ProcessedMail
+        fields = "__all__"
+
+    list_display = ("rule", "processed", "status", "subject", "received")
+
+    ordering = ["-processed"]
+
+    readonly_fields = [
+        "owner",
+        "processed",
+        "received",
+        "status",
+        "subject",
+        "error",
+        "uid",
+        "folder",
+        "rule",
+    ]
+
+    list_filter = ("status",)
+
+
 admin.site.register(MailAccount, MailAccountAdmin)
 admin.site.register(MailRule, MailRuleAdmin)
+admin.site.register(ProcessedMail, ProcessedMailAdmin)
