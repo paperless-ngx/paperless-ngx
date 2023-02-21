@@ -8,6 +8,7 @@ from datetime import date
 from datetime import timedelta
 from fnmatch import fnmatch
 from typing import Dict
+from typing import List
 
 import magic
 import pathvalidate
@@ -151,7 +152,7 @@ class TagMailAction(BaseMailAction):
 
 @shared_task
 def apply_mail_action(
-    result: str,
+    result: List[str],
     rule_id: int,
     message_uid: str,
     message_subject: str,
