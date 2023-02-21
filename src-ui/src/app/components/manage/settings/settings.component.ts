@@ -653,7 +653,7 @@ export class SettingsComponent
       backdrop: 'static',
     })
     modal.componentInstance.title = $localize`Confirm delete user account`
-    modal.componentInstance.messageBold = $localize`This operation will permanently this user account.`
+    modal.componentInstance.messageBold = $localize`This operation will permanently delete this user account.`
     modal.componentInstance.message = $localize`This operation cannot be undone.`
     modal.componentInstance.btnClass = 'btn-danger'
     modal.componentInstance.btnCaption = $localize`Proceed`
@@ -707,7 +707,7 @@ export class SettingsComponent
       backdrop: 'static',
     })
     modal.componentInstance.title = $localize`Confirm delete user group`
-    modal.componentInstance.messageBold = $localize`This operation will permanently this user group.`
+    modal.componentInstance.messageBold = $localize`This operation will permanently delete this user group.`
     modal.componentInstance.message = $localize`This operation cannot be undone.`
     modal.componentInstance.btnClass = 'btn-danger'
     modal.componentInstance.btnCaption = $localize`Proceed`
