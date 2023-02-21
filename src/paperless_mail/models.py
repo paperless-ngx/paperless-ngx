@@ -1,5 +1,6 @@
 import documents.models as document_models
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 
@@ -223,6 +224,7 @@ class ProcessedMail(document_models.ModelWithOwner):
         null=False,
         blank=False,
         on_delete=models.CASCADE,
+        editable=False,
     )
 
     folder = models.CharField(
@@ -230,13 +232,36 @@ class ProcessedMail(document_models.ModelWithOwner):
         null=False,
         blank=False,
         max_length=256,
+        editable=False,
     )
 
     uid = models.CharField(
-        _("folder"),
+        _("uid"),
         null=False,
         blank=False,
         max_length=256,
+        editable=False,
+    )
+
+    subject = models.CharField(
+        _("subject"),
+        null=False,
+        blank=False,
+        max_length=256,
+        editable=False,
+    )
+
+    received = models.DateTimeField(
+        _("received"),
+        null=False,
+        blank=False,
+        editable=False,
+    )
+
+    processed = models.DateTimeField(
+        _("processed"),
+        default=timezone.now,
+        editable=False,
     )
 
     status = models.CharField(
@@ -244,10 +269,12 @@ class ProcessedMail(document_models.ModelWithOwner):
         null=False,
         blank=False,
         max_length=256,
+        editable=False,
     )
 
     error = models.TextField(
         _("error"),
         null=True,
         blank=True,
+        editable=False,
     )

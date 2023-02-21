@@ -1,3 +1,4 @@
+import datetime
 import itertools
 import os
 import re
@@ -153,6 +154,8 @@ def apply_mail_action(
     result: str,
     rule_id: int,
     message_uid: str,
+    message_subject: str,
+    message_date: datetime.datetime,
 ):
     rule = MailRule.objects.get(pk=rule_id)
     account = MailAccount.objects.get(pk=rule.account.pk)
@@ -171,17 +174,23 @@ def apply_mail_action(
             action.post_consume(M, message_uid, rule.action_parameter)
 
         ProcessedMail.objects.create(
+            owner=rule.owner,
             rule=rule,
             folder=rule.folder,
             uid=message_uid,
+            subject=message_subject,
+            received=message_date,
             status="SUCCESS",
         )
 
     except Exception as e:
         ProcessedMail.objects.create(
+            owner=rule.owner,
             rule=rule,
             folder=rule.folder,
             uid=message_uid,
+            subject=message_subject,
+            received=message_date,
             status="FAILED",
             error=traceback.format_exc(),
         )
@@ -189,13 +198,23 @@ def apply_mail_action(
 
 
 @shared_task
-def error_callback(request, exc, tb, rule_id: int, message_uid: str):
+def error_callback(
+    request,
+    exc,
+    tb,
+    rule_id: int,
+    message_uid: str,
+    message_subject: str,
+    message_date: datetime.datetime,
+):
     rule = MailRule.objects.get(pk=rule_id)
 
     ProcessedMail.objects.create(
         rule=rule,
         folder=rule.folder,
         uid=message_uid,
+        subject=message_subject,
+        received=message_date,
         status="FAILED",
         error=traceback.format_exc(),
     )
@@ -204,14 +223,21 @@ def error_callback(request, exc, tb, rule_id: int, message_uid: str):
 def queue_consumption_tasks(
     consume_tasks: list[Signature],
     rule: MailRule,
-    message_uid: str,
+    message: MailMessage,
 ):
     mail_action_task = apply_mail_action.s(
         rule_id=rule.pk,
-        message_uid=message_uid,
+        message_uid=message.uid,
+        message_subject=message.subject,
+        message_date=message.date,
     )
     chord(header=consume_tasks, body=mail_action_task).on_error(
-        error_callback.s(rule_id=rule.pk, message_uid=message_uid),
+        error_callback.s(
+            rule_id=rule.pk,
+            message_uid=message.uid,
+            message_subject=message.subject,
+            message_date=message.date,
+        ),
     ).delay()
 
 
@@ -605,7 +631,7 @@ class MailAccountHandler(LoggingMixin):
                     f"by paperless",
                 )
 
-        queue_consumption_tasks(consume_tasks, rule, message.uid)
+        queue_consumption_tasks(consume_tasks, rule, message)
 
         return processed_attachments
 
@@ -663,7 +689,7 @@ class MailAccountHandler(LoggingMixin):
             override_owner_id=rule.owner.id if rule.owner else None,
         )
 
-        queue_consumption_tasks([consume_task], rule, message.uid)
+        queue_consumption_tasks([consume_task], rule, message)
 
         processed_elements = 1
         return processed_elements
