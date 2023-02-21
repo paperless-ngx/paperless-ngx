@@ -27,6 +27,7 @@ from django.contrib.auth.models import User
 from django.test import override_settings
 from django.utils import timezone
 from dateutil.relativedelta import relativedelta
+from rest_framework import status
 from documents import bulk_edit
 from documents import index
 from documents.models import Correspondent
@@ -42,8 +43,6 @@ from documents.tests.utils import DirectoriesMixin
 from paperless import version
 from rest_framework.test import APITestCase
 from whoosh.writing import AsyncWriter
-
-from guardian.shortcuts import get_users_with_perms
 
 
 class TestDocumentApi(DirectoriesMixin, APITestCase):
@@ -75,7 +74,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         doc.tags.add(tag)
 
         response = self.client.get("/api/documents/", format="json")
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["count"], 1)
 
         returned_doc = response.data["results"][0]
@@ -96,7 +95,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
             format="json",
         )
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         doc_after_save = Document.objects.get(id=doc.id)
 
@@ -123,27 +122,27 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         )
 
         response = self.client.get("/api/documents/", format="json")
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         results_full = response.data["results"]
         self.assertIn("content", results_full[0])
         self.assertIn("id", results_full[0])
 
         response = self.client.get("/api/documents/?fields=id", format="json")
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data["results"]
         self.assertFalse("content" in results[0])
         self.assertIn("id", results[0])
         self.assertEqual(len(results[0]), 1)
 
         response = self.client.get("/api/documents/?fields=content", format="json")
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data["results"]
         self.assertIn("content", results[0])
         self.assertFalse("id" in results[0])
         self.assertEqual(len(results[0]), 1)
 
         response = self.client.get("/api/documents/?fields=id,content", format="json")
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data["results"]
         self.assertIn("content", results[0])
         self.assertIn("id", results[0])
@@ -153,19 +152,19 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
             "/api/documents/?fields=id,conteasdnt",
             format="json",
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data["results"]
         self.assertFalse("content" in results[0])
         self.assertIn("id", results[0])
         self.assertEqual(len(results[0]), 1)
 
         response = self.client.get("/api/documents/?fields=", format="json")
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data["results"]
         self.assertEqual(len(results_full[0]), len(results[0]))
 
         response = self.client.get("/api/documents/?fields=dgfhs", format="json")
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data["results"]
         self.assertEqual(len(results[0]), 0)
 
@@ -193,17 +192,17 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
         response = self.client.get(f"/api/documents/{doc.pk}/download/")
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.content, content)
 
         response = self.client.get(f"/api/documents/{doc.pk}/preview/")
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.content, content)
 
         response = self.client.get(f"/api/documents/{doc.pk}/thumb/")
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.content, content_thumbnail)
 
     @override_settings(FILENAME_FORMAT="")
@@ -227,26 +226,26 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
         response = self.client.get(f"/api/documents/{doc.pk}/download/")
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.content, content_archive)
 
         response = self.client.get(
             f"/api/documents/{doc.pk}/download/?original=true",
         )
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.content, content)
 
         response = self.client.get(f"/api/documents/{doc.pk}/preview/")
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.content, content_archive)
 
         response = self.client.get(
             f"/api/documents/{doc.pk}/preview/?original=true",
         )
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.content, content)
 
     def test_document_actions_not_existing_file(self):
@@ -258,13 +257,13 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         )
 
         response = self.client.get(f"/api/documents/{doc.pk}/download/")
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
         response = self.client.get(f"/api/documents/{doc.pk}/preview/")
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
         response = self.client.get(f"/api/documents/{doc.pk}/thumb/")
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_document_filters(self):
 
@@ -294,13 +293,13 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         doc3.tags.add(tag_3)
 
         response = self.client.get("/api/documents/?is_in_inbox=true")
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data["results"]
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]["id"], doc1.id)
 
         response = self.client.get("/api/documents/?is_in_inbox=false")
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data["results"]
         self.assertEqual(len(results), 2)
         self.assertCountEqual([results[0]["id"], results[1]["id"]], [doc2.id, doc3.id])
@@ -308,7 +307,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         response = self.client.get(
             f"/api/documents/?tags__id__in={tag_inbox.id},{tag_3.id}",
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data["results"]
         self.assertEqual(len(results), 2)
         self.assertCountEqual([results[0]["id"], results[1]["id"]], [doc1.id, doc3.id])
@@ -316,7 +315,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         response = self.client.get(
             f"/api/documents/?tags__id__in={tag_2.id},{tag_3.id}",
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data["results"]
         self.assertEqual(len(results), 2)
         self.assertCountEqual([results[0]["id"], results[1]["id"]], [doc2.id, doc3.id])
@@ -324,7 +323,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         response = self.client.get(
             f"/api/documents/?tags__id__all={tag_2.id},{tag_3.id}",
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data["results"]
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]["id"], doc3.id)
@@ -332,19 +331,19 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         response = self.client.get(
             f"/api/documents/?tags__id__all={tag_inbox.id},{tag_3.id}",
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data["results"]
         self.assertEqual(len(results), 0)
 
         response = self.client.get(
             f"/api/documents/?tags__id__all={tag_inbox.id}a{tag_3.id}",
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data["results"]
         self.assertEqual(len(results), 3)
 
         response = self.client.get(f"/api/documents/?tags__id__none={tag_3.id}")
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data["results"]
         self.assertEqual(len(results), 2)
         self.assertCountEqual([results[0]["id"], results[1]["id"]], [doc1.id, doc2.id])
@@ -352,7 +351,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         response = self.client.get(
             f"/api/documents/?tags__id__none={tag_3.id},{tag_2.id}",
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data["results"]
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]["id"], doc1.id)
@@ -360,7 +359,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         response = self.client.get(
             f"/api/documents/?tags__id__none={tag_2.id},{tag_inbox.id}",
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data["results"]
         self.assertEqual(len(results), 0)
 
@@ -392,7 +391,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         )
 
         response = self.client.get("/api/documents/?title_content=A")
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data["results"]
         self.assertEqual(len(results), 3)
         self.assertCountEqual(
@@ -401,7 +400,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         )
 
         response = self.client.get("/api/documents/?title_content=B")
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data["results"]
         self.assertEqual(len(results), 3)
         self.assertCountEqual(
@@ -410,7 +409,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         )
 
         response = self.client.get("/api/documents/?title_content=X")
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data["results"]
         self.assertEqual(len(results), 0)
 
@@ -507,9 +506,9 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
                 index.update_document(writer, doc)
 
         response = self.client.get("/api/documents/?query=content&page=0&page_size=10")
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         response = self.client.get("/api/documents/?query=content&page=3&page_size=10")
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     @override_settings(
         TIME_ZONE="UTC",
@@ -780,21 +779,21 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         m.side_effect = lambda ix, term, limit: [term for _ in range(limit)]
 
         response = self.client.get("/api/search/autocomplete/?term=test")
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 10)
 
         response = self.client.get("/api/search/autocomplete/?term=test&limit=20")
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 20)
 
         response = self.client.get("/api/search/autocomplete/?term=test&limit=-1")
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
         response = self.client.get("/api/search/autocomplete/")
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
         response = self.client.get("/api/search/autocomplete/?term=")
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 10)
 
     @pytest.mark.skip(reason="Not implemented yet")
@@ -845,7 +844,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
         response = self.client.get(f"/api/documents/?more_like_id={d2.id}")
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         results = response.data["results"]
 
@@ -886,7 +885,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
         def search_query(q):
             r = self.client.get("/api/documents/?query=test" + q)
-            self.assertEqual(r.status_code, 200)
+            self.assertEqual(r.status_code, status.HTTP_200_OK)
             return [hit["id"] for hit in r.data["results"]]
 
         self.assertCountEqual(
@@ -1016,7 +1015,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
         def search_query(q):
             r = self.client.get("/api/documents/?query=test" + q)
-            self.assertEqual(r.status_code, 200)
+            self.assertEqual(r.status_code, status.HTTP_200_OK)
             return [hit["id"] for hit in r.data["results"]]
 
         self.assertListEqual(
@@ -1049,7 +1048,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         doc1.tags.add(tag_inbox)
 
         response = self.client.get("/api/statistics/")
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["documents_total"], 3)
         self.assertEqual(response.data["documents_inbox"], 1)
 
@@ -1057,7 +1056,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         Document.objects.create(title="none1", checksum="A")
 
         response = self.client.get("/api/statistics/")
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["documents_inbox"], None)
 
     @mock.patch("documents.views.consume_file.delay")
@@ -1074,7 +1073,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
                 {"document": f},
             )
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         m.assert_called_once()
 
@@ -1101,7 +1100,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
                 {"document": f, "title": "", "correspondent": "", "document_type": ""},
             )
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         m.assert_called_once()
 
@@ -1127,7 +1126,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
                 "/api/documents/post_document/",
                 {"documenst": f},
             )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         m.assert_not_called()
 
     @mock.patch("documents.views.consume_file.delay")
@@ -1143,7 +1142,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
                 "/api/documents/post_document/",
                 {"document": f},
             )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         m.assert_not_called()
 
     @mock.patch("documents.views.consume_file.delay")
@@ -1159,7 +1158,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
                 "/api/documents/post_document/",
                 {"document": f, "title": "my custom title"},
             )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         async_task.assert_called_once()
 
@@ -1181,7 +1180,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
                 "/api/documents/post_document/",
                 {"document": f, "correspondent": c.id},
             )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         async_task.assert_called_once()
 
@@ -1202,7 +1201,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
                 "/api/documents/post_document/",
                 {"document": f, "correspondent": 3456},
             )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
         async_task.assert_not_called()
 
@@ -1220,7 +1219,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
                 "/api/documents/post_document/",
                 {"document": f, "document_type": dt.id},
             )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         async_task.assert_called_once()
 
@@ -1241,7 +1240,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
                 "/api/documents/post_document/",
                 {"document": f, "document_type": 34578},
             )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
         async_task.assert_not_called()
 
@@ -1260,7 +1259,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
                 "/api/documents/post_document/",
                 {"document": f, "tags": [t2.id, t1.id]},
             )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         async_task.assert_called_once()
 
@@ -1283,7 +1282,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
                 "/api/documents/post_document/",
                 {"document": f, "tags": [t2.id, t1.id, 734563]},
             )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
         async_task.assert_not_called()
 
@@ -1310,13 +1309,41 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
                 "/api/documents/post_document/",
                 {"document": f, "created": created},
             )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         async_task.assert_called_once()
 
         args, kwargs = async_task.call_args
 
         self.assertEqual(kwargs["override_created"], created)
+
+    @mock.patch("documents.views.consume_file.delay")
+    def test_upload_with_asn(self, m):
+
+        m.return_value = celery.result.AsyncResult(id=str(uuid.uuid4()))
+
+        with open(
+            os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"),
+            "rb",
+        ) as f:
+            response = self.client.post(
+                "/api/documents/post_document/",
+                {"document": f, "archive_serial_number": 500},
+            )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        m.assert_called_once()
+
+        args, kwargs = m.call_args
+        file_path = Path(args[0])
+        self.assertEqual(file_path.name, "simple.pdf")
+        self.assertIn(Path(settings.SCRATCH_DIR), file_path.parents)
+        self.assertIsNone(kwargs["override_title"])
+        self.assertIsNone(kwargs["override_correspondent_id"])
+        self.assertIsNone(kwargs["override_document_type_id"])
+        self.assertIsNone(kwargs["override_tag_ids"])
+        self.assertEqual(500, kwargs["override_archive_serial_num"])
 
     def test_get_metadata(self):
         doc = Document.objects.create(
@@ -1340,7 +1367,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         shutil.copy(archive_file, doc.archive_path)
 
         response = self.client.get(f"/api/documents/{doc.pk}/metadata/")
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         meta = response.data
 
@@ -1355,7 +1382,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
     def test_get_metadata_invalid_doc(self):
         response = self.client.get("/api/documents/34576/metadata/")
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_get_metadata_no_archive(self):
         doc = Document.objects.create(
@@ -1370,7 +1397,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         )
 
         response = self.client.get(f"/api/documents/{doc.pk}/metadata/")
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         meta = response.data
 
@@ -1391,7 +1418,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         )
 
         response = self.client.get(f"/api/documents/{doc.pk}/metadata/")
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         meta = response.data
 
@@ -1406,7 +1433,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
         response = self.client.get(f"/api/documents/{doc.pk}/suggestions/")
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
             response.data,
             {
@@ -1420,7 +1447,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
     def test_get_suggestions_invalid_doc(self):
         response = self.client.get("/api/documents/34676/suggestions/")
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     @mock.patch("documents.views.match_storage_paths")
     @mock.patch("documents.views.match_document_types")
@@ -1484,26 +1511,35 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         )
 
         response = self.client.get("/api/saved_views/")
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["count"], 0)
 
-        self.assertEqual(self.client.get(f"/api/saved_views/{v1.id}/").status_code, 404)
+        self.assertEqual(
+            self.client.get(f"/api/saved_views/{v1.id}/").status_code,
+            status.HTTP_404_NOT_FOUND,
+        )
 
         self.client.force_authenticate(user=u1)
 
         response = self.client.get("/api/saved_views/")
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["count"], 1)
 
-        self.assertEqual(self.client.get(f"/api/saved_views/{v1.id}/").status_code, 200)
+        self.assertEqual(
+            self.client.get(f"/api/saved_views/{v1.id}/").status_code,
+            status.HTTP_200_OK,
+        )
 
         self.client.force_authenticate(user=u2)
 
         response = self.client.get("/api/saved_views/")
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["count"], 2)
 
-        self.assertEqual(self.client.get(f"/api/saved_views/{v1.id}/").status_code, 404)
+        self.assertEqual(
+            self.client.get(f"/api/saved_views/{v1.id}/").status_code,
+            status.HTTP_404_NOT_FOUND,
+        )
 
     def test_create_update_patch(self):
 
@@ -1518,7 +1554,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         }
 
         response = self.client.post("/api/saved_views/", view, format="json")
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         v1 = SavedView.objects.get(name="test")
         self.assertEqual(v1.sort_field, "created2")
@@ -1532,14 +1568,14 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         )
 
         v1 = SavedView.objects.get(id=v1.id)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertFalse(v1.show_in_sidebar)
         self.assertEqual(v1.filter_rules.count(), 1)
 
         view["filter_rules"] = [{"rule_type": 12, "value": "secret"}]
 
         response = self.client.put(f"/api/saved_views/{v1.id}/", view, format="json")
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         v1 = SavedView.objects.get(id=v1.id)
         self.assertEqual(v1.filter_rules.count(), 1)
@@ -1548,31 +1584,31 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         view["filter_rules"] = []
 
         response = self.client.put(f"/api/saved_views/{v1.id}/", view, format="json")
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         v1 = SavedView.objects.get(id=v1.id)
         self.assertEqual(v1.filter_rules.count(), 0)
 
     def test_get_logs(self):
         response = self.client.get("/api/logs/")
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertCountEqual(response.data, ["mail", "paperless"])
 
     def test_get_invalid_log(self):
         response = self.client.get("/api/logs/bogus_log/")
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     @override_settings(LOGGING_DIR="bogus_dir")
     def test_get_nonexistent_log(self):
         response = self.client.get("/api/logs/paperless/")
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_get_log(self):
         log_data = "test\ntest2\n"
         with open(os.path.join(settings.LOGGING_DIR, "paperless.log"), "w") as f:
             f.write(log_data)
         response = self.client.get("/api/logs/paperless/")
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertListEqual(response.data, ["test", "test2"])
 
     def test_invalid_regex_other_algorithm(self):
@@ -1586,7 +1622,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
                 },
                 format="json",
             )
-            self.assertEqual(response.status_code, 201, endpoint)
+            self.assertEqual(response.status_code, status.HTTP_201_CREATED, endpoint)
 
     def test_invalid_regex(self):
         for endpoint in ["correspondents", "tags", "document_types"]:
@@ -1599,7 +1635,11 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
                 },
                 format="json",
             )
-            self.assertEqual(response.status_code, 400, endpoint)
+            self.assertEqual(
+                response.status_code,
+                status.HTTP_400_BAD_REQUEST,
+                endpoint,
+            )
 
     def test_valid_regex(self):
         for endpoint in ["correspondents", "tags", "document_types"]:
@@ -1612,7 +1652,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
                 },
                 format="json",
             )
-            self.assertEqual(response.status_code, 201, endpoint)
+            self.assertEqual(response.status_code, status.HTTP_201_CREATED, endpoint)
 
     def test_regex_no_algorithm(self):
         for endpoint in ["correspondents", "tags", "document_types"]:
@@ -1621,11 +1661,11 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
                 {"name": "test", "match": "[0-9]"},
                 format="json",
             )
-            self.assertEqual(response.status_code, 201, endpoint)
+            self.assertEqual(response.status_code, status.HTTP_201_CREATED, endpoint)
 
     def test_tag_color_default(self):
         response = self.client.post("/api/tags/", {"name": "tag"}, format="json")
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Tag.objects.get(id=response.data["id"]).color, "#a6cee3")
         self.assertEqual(
             self.client.get(f"/api/tags/{response.data['id']}/", format="json").data[
@@ -1640,7 +1680,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
             {"name": "tag", "colour": 3},
             format="json",
         )
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Tag.objects.get(id=response.data["id"]).color, "#b2df8a")
         self.assertEqual(
             self.client.get(f"/api/tags/{response.data['id']}/", format="json").data[
@@ -1655,7 +1695,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
             {"name": "tag", "colour": 34},
             format="json",
         )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_tag_color_custom(self):
         tag = Tag.objects.create(name="test", color="#abcdef")
@@ -1689,7 +1729,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
             format="json",
         )
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         resp_data = response.json()
 
@@ -1730,14 +1770,14 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
             f"/api/documents/{doc.pk}/comments/",
             data={"comment": "this is a posted comment"},
         )
-        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
         response = self.client.get(
             f"/api/documents/{doc.pk}/comments/",
             format="json",
         )
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         resp_data = response.json()
 
@@ -1772,7 +1812,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
             format="json",
         )
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         self.assertEqual(len(Comment.objects.all()), 0)
 
@@ -1783,13 +1823,13 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         WHEN:
             - API request for document comments is made
         THEN:
-            - HTTP 404 is returned
+            - HTTP status.HTTP_404_NOT_FOUND is returned
         """
         response = self.client.get(
             "/api/documents/500/comments/",
             format="json",
         )
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
 class TestDocumentApiV2(DirectoriesMixin, APITestCase):
@@ -1808,7 +1848,7 @@ class TestDocumentApiV2(DirectoriesMixin, APITestCase):
                 {"name": "test", "color": "#12fFaA"},
                 format="json",
             ).status_code,
-            201,
+            status.HTTP_201_CREATED,
         )
 
         self.assertEqual(
@@ -1817,7 +1857,7 @@ class TestDocumentApiV2(DirectoriesMixin, APITestCase):
                 {"name": "test1", "color": "abcdef"},
                 format="json",
             ).status_code,
-            400,
+            status.HTTP_400_BAD_REQUEST,
         )
         self.assertEqual(
             self.client.post(
@@ -1825,7 +1865,7 @@ class TestDocumentApiV2(DirectoriesMixin, APITestCase):
                 {"name": "test2", "color": "#abcdfg"},
                 format="json",
             ).status_code,
-            400,
+            status.HTTP_400_BAD_REQUEST,
         )
         self.assertEqual(
             self.client.post(
@@ -1833,7 +1873,7 @@ class TestDocumentApiV2(DirectoriesMixin, APITestCase):
                 {"name": "test3", "color": "#asd"},
                 format="json",
             ).status_code,
-            400,
+            status.HTTP_400_BAD_REQUEST,
         )
         self.assertEqual(
             self.client.post(
@@ -1841,7 +1881,7 @@ class TestDocumentApiV2(DirectoriesMixin, APITestCase):
                 {"name": "test4", "color": "#12121212"},
                 format="json",
             ).status_code,
-            400,
+            status.HTTP_400_BAD_REQUEST,
         )
 
     def test_tag_text_color(self):
@@ -1884,7 +1924,7 @@ class TestApiUiSettings(DirectoriesMixin, APITestCase):
 
     def test_api_get_ui_settings(self):
         response = self.client.get(self.ENDPOINT, format="json")
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertDictEqual(
             response.data["settings"],
             {
@@ -1909,7 +1949,7 @@ class TestApiUiSettings(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         ui_settings = self.test_user.ui_settings
         self.assertDictEqual(
@@ -2106,7 +2146,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
             ),
             content_type="application/json",
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         m.assert_called_once()
         args, kwargs = m.call_args
         self.assertEqual(args[0], [self.doc1.id])
@@ -2126,7 +2166,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
             ),
             content_type="application/json",
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         m.assert_called_once()
         args, kwargs = m.call_args
         self.assertEqual(args[0], [self.doc1.id])
@@ -2146,7 +2186,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
             ),
             content_type="application/json",
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         m.assert_called_once()
         args, kwargs = m.call_args
         self.assertEqual(args[0], [self.doc1.id])
@@ -2166,7 +2206,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
             ),
             content_type="application/json",
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         m.assert_called_once()
         args, kwargs = m.call_args
         self.assertEqual(args[0], [self.doc1.id])
@@ -2186,7 +2226,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
             ),
             content_type="application/json",
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         m.assert_called_once()
         args, kwargs = m.call_args
         self.assertEqual(args[0], [self.doc1.id])
@@ -2206,7 +2246,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
             ),
             content_type="application/json",
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         m.assert_called_once()
         args, kwargs = m.call_args
         self.assertEqual(args[0], [self.doc1.id])
@@ -2229,7 +2269,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
             ),
             content_type="application/json",
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         m.assert_called_once()
         args, kwargs = m.call_args
         self.assertListEqual(args[0], [self.doc1.id, self.doc3.id])
@@ -2261,7 +2301,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
             ),
             content_type="application/json",
         )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         m.assert_not_called()
 
     @mock.patch("documents.serialisers.bulk_edit.delete")
@@ -2274,7 +2314,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
             ),
             content_type="application/json",
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         m.assert_called_once()
         args, kwargs = m.call_args
         self.assertEqual(args[0], [self.doc1.id])
@@ -2304,7 +2344,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         m.assert_called_once()
         args, kwargs = m.call_args
 
@@ -2335,7 +2375,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         m.assert_called_once()
         args, kwargs = m.call_args
 
@@ -2364,7 +2404,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
 
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.async_task.assert_not_called()
 
     def test_api_set_storage_path_not_provided(self):
@@ -2389,7 +2429,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
 
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.async_task.assert_not_called()
 
     def test_api_invalid_doc(self):
@@ -2399,7 +2439,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
             json.dumps({"documents": [-235], "method": "delete", "parameters": {}}),
             content_type="application/json",
         )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(Document.objects.count(), 5)
 
     def test_api_invalid_method(self):
@@ -2415,7 +2455,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
             ),
             content_type="application/json",
         )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(Document.objects.count(), 5)
 
     def test_api_invalid_correspondent(self):
@@ -2431,7 +2471,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
             ),
             content_type="application/json",
         )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
         doc2 = Document.objects.get(id=self.doc2.id)
         self.assertEqual(doc2.correspondent, self.c1)
@@ -2448,7 +2488,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
             ),
             content_type="application/json",
         )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_api_invalid_document_type(self):
         self.assertEqual(self.doc2.document_type, self.dt1)
@@ -2463,7 +2503,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
             ),
             content_type="application/json",
         )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
         doc2 = Document.objects.get(id=self.doc2.id)
         self.assertEqual(doc2.document_type, self.dt1)
@@ -2480,7 +2520,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
             ),
             content_type="application/json",
         )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_api_add_invalid_tag(self):
         self.assertEqual(list(self.doc2.tags.all()), [self.t1])
@@ -2495,7 +2535,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
             ),
             content_type="application/json",
         )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
         self.assertEqual(list(self.doc2.tags.all()), [self.t1])
 
@@ -2507,7 +2547,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
             ),
             content_type="application/json",
         )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_api_delete_invalid_tag(self):
         self.assertEqual(list(self.doc2.tags.all()), [self.t1])
@@ -2522,7 +2562,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
             ),
             content_type="application/json",
         )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
         self.assertEqual(list(self.doc2.tags.all()), [self.t1])
 
@@ -2534,7 +2574,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
             ),
             content_type="application/json",
         )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_api_modify_invalid_tags(self):
         self.assertEqual(list(self.doc2.tags.all()), [self.t1])
@@ -2552,7 +2592,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
             ),
             content_type="application/json",
         )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_api_modify_tags_no_tags(self):
         response = self.client.post(
@@ -2566,7 +2606,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
             ),
             content_type="application/json",
         )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
         response = self.client.post(
             "/api/documents/bulk_edit/",
@@ -2579,7 +2619,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
             ),
             content_type="application/json",
         )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_api_selection_data_empty(self):
         response = self.client.post(
@@ -2587,7 +2627,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
             json.dumps({"documents": []}),
             content_type="application/json",
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         for field, Entity in [
             ("selected_correspondents", Correspondent),
             ("selected_tags", Tag),
@@ -2609,7 +2649,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
             ),
             content_type="application/json",
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         self.assertCountEqual(
             response.data["selected_correspondents"],
@@ -2661,7 +2701,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         m.assert_called_once()
         args, kwargs = m.call_args
@@ -2730,7 +2770,7 @@ class TestBulkDownload(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response["Content-Type"], "application/zip")
 
         with zipfile.ZipFile(io.BytesIO(response.content)) as zipf:
@@ -2751,7 +2791,7 @@ class TestBulkDownload(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response["Content-Type"], "application/zip")
 
         with zipfile.ZipFile(io.BytesIO(response.content)) as zipf:
@@ -2772,7 +2812,7 @@ class TestBulkDownload(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response["Content-Type"], "application/zip")
 
         with zipfile.ZipFile(io.BytesIO(response.content)) as zipf:
@@ -2806,7 +2846,7 @@ class TestBulkDownload(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response["Content-Type"], "application/zip")
 
         with zipfile.ZipFile(io.BytesIO(response.content)) as zipf:
@@ -2865,7 +2905,7 @@ class TestBulkDownload(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response["Content-Type"], "application/zip")
 
         with zipfile.ZipFile(io.BytesIO(response.content)) as zipf:
@@ -2913,7 +2953,7 @@ class TestBulkDownload(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response["Content-Type"], "application/zip")
 
         with zipfile.ZipFile(io.BytesIO(response.content)) as zipf:
@@ -2962,7 +3002,7 @@ class TestBulkDownload(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response["Content-Type"], "application/zip")
 
         with zipfile.ZipFile(io.BytesIO(response.content)) as zipf:
@@ -2995,38 +3035,65 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
 
         d = Document.objects.create(title="Test")
 
-        self.assertEqual(self.client.get("/api/documents/").status_code, 401)
+        self.assertEqual(
+            self.client.get("/api/documents/").status_code,
+            status.HTTP_401_UNAUTHORIZED,
+        )
 
-        self.assertEqual(self.client.get(f"/api/documents/{d.id}/").status_code, 401)
+        self.assertEqual(
+            self.client.get(f"/api/documents/{d.id}/").status_code,
+            status.HTTP_401_UNAUTHORIZED,
+        )
         self.assertEqual(
             self.client.get(f"/api/documents/{d.id}/download/").status_code,
-            401,
+            status.HTTP_401_UNAUTHORIZED,
         )
         self.assertEqual(
             self.client.get(f"/api/documents/{d.id}/preview/").status_code,
-            401,
+            status.HTTP_401_UNAUTHORIZED,
         )
         self.assertEqual(
             self.client.get(f"/api/documents/{d.id}/thumb/").status_code,
-            401,
+            status.HTTP_401_UNAUTHORIZED,
         )
 
-        self.assertEqual(self.client.get("/api/tags/").status_code, 401)
-        self.assertEqual(self.client.get("/api/correspondents/").status_code, 401)
-        self.assertEqual(self.client.get("/api/document_types/").status_code, 401)
+        self.assertEqual(
+            self.client.get("/api/tags/").status_code,
+            status.HTTP_401_UNAUTHORIZED,
+        )
+        self.assertEqual(
+            self.client.get("/api/correspondents/").status_code,
+            status.HTTP_401_UNAUTHORIZED,
+        )
+        self.assertEqual(
+            self.client.get("/api/document_types/").status_code,
+            status.HTTP_401_UNAUTHORIZED,
+        )
 
-        self.assertEqual(self.client.get("/api/logs/").status_code, 401)
-        self.assertEqual(self.client.get("/api/saved_views/").status_code, 401)
+        self.assertEqual(
+            self.client.get("/api/logs/").status_code,
+            status.HTTP_401_UNAUTHORIZED,
+        )
+        self.assertEqual(
+            self.client.get("/api/saved_views/").status_code,
+            status.HTTP_401_UNAUTHORIZED,
+        )
 
-        self.assertEqual(self.client.get("/api/search/autocomplete/").status_code, 401)
-        self.assertEqual(self.client.get("/api/documents/bulk_edit/").status_code, 401)
+        self.assertEqual(
+            self.client.get("/api/search/autocomplete/").status_code,
+            status.HTTP_401_UNAUTHORIZED,
+        )
+        self.assertEqual(
+            self.client.get("/api/documents/bulk_edit/").status_code,
+            status.HTTP_401_UNAUTHORIZED,
+        )
         self.assertEqual(
             self.client.get("/api/documents/bulk_download/").status_code,
-            401,
+            status.HTTP_401_UNAUTHORIZED,
         )
         self.assertEqual(
             self.client.get("/api/documents/selection_data/").status_code,
-            401,
+            status.HTTP_401_UNAUTHORIZED,
         )
 
     def test_api_version_no_auth(self):
@@ -3048,14 +3115,32 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
 
         d = Document.objects.create(title="Test")
 
-        self.assertEqual(self.client.get("/api/documents/").status_code, 403)
+        self.assertEqual(
+            self.client.get("/api/documents/").status_code,
+            status.HTTP_403_FORBIDDEN,
+        )
 
-        self.assertEqual(self.client.get("/api/tags/").status_code, 403)
-        self.assertEqual(self.client.get("/api/correspondents/").status_code, 403)
-        self.assertEqual(self.client.get("/api/document_types/").status_code, 403)
+        self.assertEqual(
+            self.client.get("/api/tags/").status_code,
+            status.HTTP_403_FORBIDDEN,
+        )
+        self.assertEqual(
+            self.client.get("/api/correspondents/").status_code,
+            status.HTTP_403_FORBIDDEN,
+        )
+        self.assertEqual(
+            self.client.get("/api/document_types/").status_code,
+            status.HTTP_403_FORBIDDEN,
+        )
 
-        self.assertEqual(self.client.get("/api/logs/").status_code, 403)
-        self.assertEqual(self.client.get("/api/saved_views/").status_code, 403)
+        self.assertEqual(
+            self.client.get("/api/logs/").status_code,
+            status.HTTP_403_FORBIDDEN,
+        )
+        self.assertEqual(
+            self.client.get("/api/saved_views/").status_code,
+            status.HTTP_403_FORBIDDEN,
+        )
 
     def test_api_sufficient_permissions(self):
         user = User.objects.create_user(username="test")
@@ -3064,14 +3149,26 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
 
         d = Document.objects.create(title="Test")
 
-        self.assertEqual(self.client.get("/api/documents/").status_code, 200)
+        self.assertEqual(
+            self.client.get("/api/documents/").status_code,
+            status.HTTP_200_OK,
+        )
 
-        self.assertEqual(self.client.get("/api/tags/").status_code, 200)
-        self.assertEqual(self.client.get("/api/correspondents/").status_code, 200)
-        self.assertEqual(self.client.get("/api/document_types/").status_code, 200)
+        self.assertEqual(self.client.get("/api/tags/").status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            self.client.get("/api/correspondents/").status_code,
+            status.HTTP_200_OK,
+        )
+        self.assertEqual(
+            self.client.get("/api/document_types/").status_code,
+            status.HTTP_200_OK,
+        )
 
-        self.assertEqual(self.client.get("/api/logs/").status_code, 200)
-        self.assertEqual(self.client.get("/api/saved_views/").status_code, 200)
+        self.assertEqual(self.client.get("/api/logs/").status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            self.client.get("/api/saved_views/").status_code,
+            status.HTTP_200_OK,
+        )
 
     def test_object_permissions(self):
         user1 = User.objects.create_user(username="test1")
@@ -3079,12 +3176,18 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
         user1.user_permissions.add(*Permission.objects.filter(codename="view_document"))
         self.client.force_authenticate(user1)
 
-        self.assertEqual(self.client.get("/api/documents/").status_code, 200)
+        self.assertEqual(
+            self.client.get("/api/documents/").status_code,
+            status.HTTP_200_OK,
+        )
 
         d = Document.objects.create(title="Test", content="the content 1", checksum="1")
 
         # no owner
-        self.assertEqual(self.client.get(f"/api/documents/{d.id}/").status_code, 200)
+        self.assertEqual(
+            self.client.get(f"/api/documents/{d.id}/").status_code,
+            status.HTTP_200_OK,
+        )
 
         d2 = Document.objects.create(
             title="Test 2",
@@ -3093,7 +3196,10 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
             owner=user2,
         )
 
-        self.assertEqual(self.client.get(f"/api/documents/{d2.id}/").status_code, 404)
+        self.assertEqual(
+            self.client.get(f"/api/documents/{d2.id}/").status_code,
+            status.HTTP_404_NOT_FOUND,
+        )
 
 
 class TestApiRemoteVersion(DirectoriesMixin, APITestCase):
@@ -3106,14 +3212,14 @@ class TestApiRemoteVersion(DirectoriesMixin, APITestCase):
     def test_remote_version_enabled_no_update_prefix(self, urlopen_mock):
 
         cm = MagicMock()
-        cm.getcode.return_value = 200
+        cm.getcode.return_value = status.HTTP_200_OK
         cm.read.return_value = json.dumps({"tag_name": "ngx-1.6.0"}).encode()
         cm.__enter__.return_value = cm
         urlopen_mock.return_value = cm
 
         response = self.client.get(self.ENDPOINT)
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertDictEqual(
             response.data,
             {
@@ -3126,7 +3232,7 @@ class TestApiRemoteVersion(DirectoriesMixin, APITestCase):
     def test_remote_version_enabled_no_update_no_prefix(self, urlopen_mock):
 
         cm = MagicMock()
-        cm.getcode.return_value = 200
+        cm.getcode.return_value = status.HTTP_200_OK
         cm.read.return_value = json.dumps(
             {"tag_name": version.__full_version_str__},
         ).encode()
@@ -3135,7 +3241,7 @@ class TestApiRemoteVersion(DirectoriesMixin, APITestCase):
 
         response = self.client.get(self.ENDPOINT)
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertDictEqual(
             response.data,
             {
@@ -3155,7 +3261,7 @@ class TestApiRemoteVersion(DirectoriesMixin, APITestCase):
         new_version_str = ".".join(map(str, new_version))
 
         cm = MagicMock()
-        cm.getcode.return_value = 200
+        cm.getcode.return_value = status.HTTP_200_OK
         cm.read.return_value = json.dumps(
             {"tag_name": new_version_str},
         ).encode()
@@ -3164,7 +3270,7 @@ class TestApiRemoteVersion(DirectoriesMixin, APITestCase):
 
         response = self.client.get(self.ENDPOINT)
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertDictEqual(
             response.data,
             {
@@ -3177,14 +3283,14 @@ class TestApiRemoteVersion(DirectoriesMixin, APITestCase):
     def test_remote_version_bad_json(self, urlopen_mock):
 
         cm = MagicMock()
-        cm.getcode.return_value = 200
+        cm.getcode.return_value = status.HTTP_200_OK
         cm.read.return_value = b'{ "blah":'
         cm.__enter__.return_value = cm
         urlopen_mock.return_value = cm
 
         response = self.client.get(self.ENDPOINT)
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertDictEqual(
             response.data,
             {
@@ -3197,14 +3303,14 @@ class TestApiRemoteVersion(DirectoriesMixin, APITestCase):
     def test_remote_version_exception(self, urlopen_mock):
 
         cm = MagicMock()
-        cm.getcode.return_value = 200
+        cm.getcode.return_value = status.HTTP_200_OK
         cm.read.side_effect = urllib.error.URLError("an error")
         cm.__enter__.return_value = cm
         urlopen_mock.return_value = cm
 
         response = self.client.get(self.ENDPOINT)
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertDictEqual(
             response.data,
             {
@@ -3236,7 +3342,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
         """
         response = self.client.get(self.ENDPOINT, format="json")
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["count"], 1)
 
         resp_storage_path = response.data["results"][0]
@@ -3263,7 +3369,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
             ),
             content_type="application/json",
         )
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(StoragePath.objects.count(), 2)
 
     def test_api_create_invalid_storage_path(self):
@@ -3287,7 +3393,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
             ),
             content_type="application/json",
         )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(StoragePath.objects.count(), 1)
 
     def test_api_storage_path_placeholders(self):
@@ -3316,7 +3422,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
             ),
             content_type="application/json",
         )
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(StoragePath.objects.count(), 2)
 
     @mock.patch("documents.bulk_edit.bulk_update_documents.delay")
@@ -3340,7 +3446,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         bulk_update_mock.assert_called_once()
 
@@ -3381,7 +3487,7 @@ class TestTasks(DirectoriesMixin, APITestCase):
 
         response = self.client.get(self.ENDPOINT)
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)
         returned_task1 = response.data[1]
         returned_task2 = response.data[0]
@@ -3417,7 +3523,7 @@ class TestTasks(DirectoriesMixin, APITestCase):
 
         response = self.client.get(self.ENDPOINT + f"?task_id={id1}")
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
         returned_task1 = response.data[0]
 
@@ -3444,7 +3550,7 @@ class TestTasks(DirectoriesMixin, APITestCase):
 
         response = self.client.get(self.ENDPOINT + "?task_id=bad-task-id")
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 0)
 
     def test_acknowledge_tasks(self):
@@ -3468,7 +3574,7 @@ class TestTasks(DirectoriesMixin, APITestCase):
             self.ENDPOINT_ACKNOWLEDGE,
             {"tasks": [task.id]},
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         response = self.client.get(self.ENDPOINT)
         self.assertEqual(len(response.data), 0)
@@ -3491,7 +3597,7 @@ class TestTasks(DirectoriesMixin, APITestCase):
 
         response = self.client.get(self.ENDPOINT)
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
 
         returned_data = response.data[0]
@@ -3517,7 +3623,7 @@ class TestTasks(DirectoriesMixin, APITestCase):
 
         response = self.client.get(self.ENDPOINT)
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
 
         returned_data = response.data[0]
@@ -3546,7 +3652,7 @@ class TestTasks(DirectoriesMixin, APITestCase):
 
         response = self.client.get(self.ENDPOINT)
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
 
         returned_data = response.data[0]
@@ -3572,7 +3678,7 @@ class TestTasks(DirectoriesMixin, APITestCase):
 
         response = self.client.get(self.ENDPOINT)
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
 
         returned_data = response.data[0]
@@ -3580,7 +3686,7 @@ class TestTasks(DirectoriesMixin, APITestCase):
         self.assertEqual(returned_data["task_file_name"], "anothertest.pdf")
 
 
-class TestApiUser(APITestCase):
+class TestApiUser(DirectoriesMixin, APITestCase):
     ENDPOINT = "/api/users/"
 
     def setUp(self):
@@ -3608,7 +3714,7 @@ class TestApiUser(APITestCase):
 
         response = self.client.get(self.ENDPOINT)
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["count"], 2)
         returned_user2 = response.data["results"][1]
 
@@ -3637,7 +3743,7 @@ class TestApiUser(APITestCase):
             data=user1,
         )
 
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         returned_user1 = User.objects.get(username="testuser")
 
@@ -3668,7 +3774,7 @@ class TestApiUser(APITestCase):
             f"{self.ENDPOINT}{user1.pk}/",
         )
 
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
         self.assertEqual(User.objects.count(), nUsers - 1)
 
@@ -3699,7 +3805,7 @@ class TestApiUser(APITestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         returned_user1 = User.objects.get(pk=user1.pk)
         self.assertEqual(returned_user1.first_name, "Updated Name 1")
@@ -3713,14 +3819,14 @@ class TestApiUser(APITestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         returned_user2 = User.objects.get(pk=user1.pk)
         self.assertEqual(returned_user2.first_name, "Updated Name 2")
         self.assertNotEqual(returned_user2.password, initial_password)
 
 
-class TestApiGroup(APITestCase):
+class TestApiGroup(DirectoriesMixin, APITestCase):
     ENDPOINT = "/api/groups/"
 
     def setUp(self):
@@ -3745,7 +3851,7 @@ class TestApiGroup(APITestCase):
 
         response = self.client.get(self.ENDPOINT)
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["count"], 1)
         returned_group1 = response.data["results"][0]
 
@@ -3768,7 +3874,7 @@ class TestApiGroup(APITestCase):
             data=group1,
         )
 
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         returned_group1 = Group.objects.get(name="Test Group")
 
@@ -3792,7 +3898,7 @@ class TestApiGroup(APITestCase):
             f"{self.ENDPOINT}{group1.pk}/",
         )
 
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
         self.assertEqual(len(Group.objects.all()), 0)
 
@@ -3817,7 +3923,7 @@ class TestApiGroup(APITestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         returned_group1 = Group.objects.get(pk=group1.pk)
         self.assertEqual(returned_group1.name, "Updated Name 1")

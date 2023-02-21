@@ -23,10 +23,11 @@ from documents.models import User
 from documents.sanity_checker import check_sanity
 from documents.settings import EXPORTER_FILE_NAME
 from documents.tests.utils import DirectoriesMixin
+from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import paperless_environment
 
 
-class TestExportImport(DirectoriesMixin, TestCase):
+class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     def setUp(self) -> None:
         self.target = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, self.target)
@@ -145,7 +146,7 @@ class TestExportImport(DirectoriesMixin, TestCase):
             4,
         )
 
-        self.assertTrue(os.path.exists(os.path.join(self.target, "manifest.json")))
+        self.assertIsFile(os.path.join(self.target, "manifest.json"))
 
         self.assertEqual(
             self._get_document_from_manifest(manifest, self.d1.id)["fields"]["title"],
@@ -170,13 +171,11 @@ class TestExportImport(DirectoriesMixin, TestCase):
                     self.target,
                     element[document_exporter.EXPORTER_FILE_NAME],
                 )
-                self.assertTrue(os.path.exists(fname))
-                self.assertTrue(
-                    os.path.exists(
-                        os.path.join(
-                            self.target,
-                            element[document_exporter.EXPORTER_THUMBNAIL_NAME],
-                        ),
+                self.assertIsFile(fname)
+                self.assertIsFile(
+                    os.path.join(
+                        self.target,
+                        element[document_exporter.EXPORTER_THUMBNAIL_NAME],
                     ),
                 )
 
@@ -194,7 +193,7 @@ class TestExportImport(DirectoriesMixin, TestCase):
                         self.target,
                         element[document_exporter.EXPORTER_ARCHIVE_NAME],
                     )
-                    self.assertTrue(os.path.exists(fname))
+                    self.assertIsFile(fname)
 
                     with open(fname, "rb") as f:
                         checksum = hashlib.md5(f.read()).hexdigest()
@@ -247,7 +246,7 @@ class TestExportImport(DirectoriesMixin, TestCase):
         )
 
         self._do_export()
-        self.assertTrue(os.path.exists(os.path.join(self.target, "manifest.json")))
+        self.assertIsFile(os.path.join(self.target, "manifest.json"))
 
         st_mtime_1 = os.stat(os.path.join(self.target, "manifest.json")).st_mtime
 
@@ -257,7 +256,7 @@ class TestExportImport(DirectoriesMixin, TestCase):
             self._do_export()
             m.assert_not_called()
 
-        self.assertTrue(os.path.exists(os.path.join(self.target, "manifest.json")))
+        self.assertIsFile(os.path.join(self.target, "manifest.json"))
         st_mtime_2 = os.stat(os.path.join(self.target, "manifest.json")).st_mtime
 
         Path(self.d1.source_path).touch()
@@ -269,7 +268,7 @@ class TestExportImport(DirectoriesMixin, TestCase):
             self.assertEqual(m.call_count, 1)
 
         st_mtime_3 = os.stat(os.path.join(self.target, "manifest.json")).st_mtime
-        self.assertTrue(os.path.exists(os.path.join(self.target, "manifest.json")))
+        self.assertIsFile(os.path.join(self.target, "manifest.json"))
 
         self.assertNotEqual(st_mtime_1, st_mtime_2)
         self.assertNotEqual(st_mtime_2, st_mtime_3)
@@ -283,7 +282,7 @@ class TestExportImport(DirectoriesMixin, TestCase):
 
         self._do_export()
 
-        self.assertTrue(os.path.exists(os.path.join(self.target, "manifest.json")))
+        self.assertIsFile(os.path.join(self.target, "manifest.json"))
 
         with mock.patch(
             "documents.management.commands.document_exporter.shutil.copy2",
@@ -291,7 +290,7 @@ class TestExportImport(DirectoriesMixin, TestCase):
             self._do_export()
             m.assert_not_called()
 
-        self.assertTrue(os.path.exists(os.path.join(self.target, "manifest.json")))
+        self.assertIsFile(os.path.join(self.target, "manifest.json"))
 
         self.d2.checksum = "asdfasdgf3"
         self.d2.save()
@@ -302,7 +301,7 @@ class TestExportImport(DirectoriesMixin, TestCase):
             self._do_export(compare_checksums=True)
             self.assertEqual(m.call_count, 1)
 
-        self.assertTrue(os.path.exists(os.path.join(self.target, "manifest.json")))
+        self.assertIsFile(os.path.join(self.target, "manifest.json"))
 
     def test_update_export_deleted_document(self):
         shutil.rmtree(os.path.join(self.dirs.media_dir, "documents"))
@@ -315,10 +314,8 @@ class TestExportImport(DirectoriesMixin, TestCase):
 
         self.assertTrue(len(manifest), 7)
         doc_from_manifest = self._get_document_from_manifest(manifest, self.d3.id)
-        self.assertTrue(
-            os.path.isfile(
-                os.path.join(self.target, doc_from_manifest[EXPORTER_FILE_NAME]),
-            ),
+        self.assertIsFile(
+            os.path.join(self.target, doc_from_manifest[EXPORTER_FILE_NAME]),
         )
         self.d3.delete()
 
@@ -329,17 +326,13 @@ class TestExportImport(DirectoriesMixin, TestCase):
             manifest,
             self.d3.id,
         )
-        self.assertTrue(
-            os.path.isfile(
-                os.path.join(self.target, doc_from_manifest[EXPORTER_FILE_NAME]),
-            ),
+        self.assertIsFile(
+            os.path.join(self.target, doc_from_manifest[EXPORTER_FILE_NAME]),
         )
 
         manifest = self._do_export(delete=True)
-        self.assertFalse(
-            os.path.isfile(
-                os.path.join(self.target, doc_from_manifest[EXPORTER_FILE_NAME]),
-            ),
+        self.assertIsNotFile(
+            os.path.join(self.target, doc_from_manifest[EXPORTER_FILE_NAME]),
         )
 
         self.assertTrue(len(manifest), 6)
@@ -353,20 +346,20 @@ class TestExportImport(DirectoriesMixin, TestCase):
         )
 
         m = self._do_export(use_filename_format=True)
-        self.assertTrue(os.path.isfile(os.path.join(self.target, "wow1", "c.pdf")))
+        self.assertIsFile(os.path.join(self.target, "wow1", "c.pdf"))
 
-        self.assertTrue(os.path.exists(os.path.join(self.target, "manifest.json")))
+        self.assertIsFile(os.path.join(self.target, "manifest.json"))
 
         self.d1.title = "new_title"
         self.d1.save()
         self._do_export(use_filename_format=True, delete=True)
-        self.assertFalse(os.path.isfile(os.path.join(self.target, "wow1", "c.pdf")))
-        self.assertFalse(os.path.isdir(os.path.join(self.target, "wow1")))
-        self.assertTrue(os.path.isfile(os.path.join(self.target, "new_title", "c.pdf")))
-        self.assertTrue(os.path.exists(os.path.join(self.target, "manifest.json")))
-        self.assertTrue(os.path.isfile(os.path.join(self.target, "wow2", "none.pdf")))
-        self.assertTrue(
-            os.path.isfile(os.path.join(self.target, "wow2", "none_01.pdf")),
+        self.assertIsNotFile(os.path.join(self.target, "wow1", "c.pdf"))
+        self.assertIsNotDir(os.path.join(self.target, "wow1"))
+        self.assertIsFile(os.path.join(self.target, "new_title", "c.pdf"))
+        self.assertIsFile(os.path.join(self.target, "manifest.json"))
+        self.assertIsFile(os.path.join(self.target, "wow2", "none.pdf"))
+        self.assertIsFile(
+            (os.path.join(self.target, "wow2", "none_01.pdf")),
         )
 
     def test_export_missing_files(self):
@@ -407,7 +400,7 @@ class TestExportImport(DirectoriesMixin, TestCase):
             f"export-{timezone.localdate().isoformat()}.zip",
         )
 
-        self.assertTrue(os.path.isfile(expected_file))
+        self.assertIsFile(expected_file)
 
         with ZipFile(expected_file) as zip:
             self.assertEqual(len(zip.namelist()), 11)
@@ -444,7 +437,7 @@ class TestExportImport(DirectoriesMixin, TestCase):
             f"export-{timezone.localdate().isoformat()}.zip",
         )
 
-        self.assertTrue(os.path.isfile(expected_file))
+        self.assertIsFile(expected_file)
 
         with ZipFile(expected_file) as zip:
             # Extras are from the directories, which also appear in the listing

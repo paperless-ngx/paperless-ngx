@@ -3,6 +3,9 @@ import shutil
 import tempfile
 from collections import namedtuple
 from contextlib import contextmanager
+from os import PathLike
+from pathlib import Path
+from typing import Union
 from unittest import mock
 
 from django.apps import apps
@@ -85,6 +88,20 @@ class DirectoriesMixin:
     def tearDown(self) -> None:
         super().tearDown()
         remove_dirs(self.dirs)
+
+
+class FileSystemAssertsMixin:
+    def assertIsFile(self, path: Union[PathLike, str]):
+        self.assertTrue(Path(path).resolve().is_file(), f"File does not exist: {path}")
+
+    def assertIsNotFile(self, path: Union[PathLike, str]):
+        self.assertFalse(Path(path).resolve().is_file(), f"File does exist: {path}")
+
+    def assertIsDir(self, path: Union[PathLike, str]):
+        self.assertTrue(Path(path).resolve().is_dir(), f"Dir does not exist: {path}")
+
+    def assertIsNotDir(self, path: Union[PathLike, str]):
+        self.assertFalse(Path(path).resolve().is_dir(), f"Dir does exist: {path}")
 
 
 class ConsumerProgressMixin:

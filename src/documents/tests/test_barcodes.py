@@ -9,10 +9,11 @@ from documents import barcodes
 from documents import tasks
 from documents.consumer import ConsumerError
 from documents.tests.utils import DirectoriesMixin
+from documents.tests.utils import FileSystemAssertsMixin
 from PIL import Image
 
 
-class TestBarcode(DirectoriesMixin, TestCase):
+class TestBarcode(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
     SAMPLE_DIR = os.path.join(
         os.path.dirname(__file__),
@@ -253,7 +254,7 @@ class TestBarcode(DirectoriesMixin, TestCase):
         shutil.copy(test_file, dst)
         target_file = barcodes.convert_from_tiff_to_pdf(dst)
         file_extension = os.path.splitext(os.path.basename(target_file))[1]
-        self.assertTrue(os.path.isfile(target_file))
+        self.assertIsFile(target_file)
         self.assertEqual(file_extension, ".pdf")
 
     def test_convert_error_from_pdf_to_pdf(self):
@@ -634,7 +635,7 @@ class TestBarcode(DirectoriesMixin, TestCase):
         )
         barcodes.save_to_dir(test_file, target_dir=settings.SCRATCH_DIR)
         target_file = os.path.join(settings.SCRATCH_DIR, "patch-code-t.pdf")
-        self.assertTrue(os.path.isfile(target_file))
+        self.assertIsFile(target_file)
 
     def test_save_to_dir_not_existing(self):
         """
@@ -651,8 +652,7 @@ class TestBarcode(DirectoriesMixin, TestCase):
             "patch-code-t.pdf",
         )
         nonexistingdir = "/nowhere"
-        if os.path.isdir(nonexistingdir):
-            self.fail("non-existing dir exists")
+        self.assertIsNotDir(nonexistingdir)
 
         with self.assertLogs("paperless.barcodes", level="WARNING") as cm:
             barcodes.save_to_dir(test_file, target_dir=nonexistingdir)
@@ -683,7 +683,7 @@ class TestBarcode(DirectoriesMixin, TestCase):
             target_dir=settings.SCRATCH_DIR,
         )
         target_file = os.path.join(settings.SCRATCH_DIR, "newname.pdf")
-        self.assertTrue(os.path.isfile(target_file))
+        self.assertIsFile(target_file)
 
     def test_barcode_splitter(self):
         """
@@ -724,8 +724,8 @@ class TestBarcode(DirectoriesMixin, TestCase):
             "patch-code-t-middle_document_1.pdf",
         )
 
-        self.assertTrue(os.path.isfile(target_file1))
-        self.assertTrue(os.path.isfile(target_file2))
+        self.assertIsFile(target_file1)
+        self.assertIsFile(target_file2)
 
     @override_settings(CONSUMER_ENABLE_BARCODES=True)
     def test_consume_barcode_file(self):
