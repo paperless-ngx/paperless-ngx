@@ -27,7 +27,11 @@ import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
 import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
-import { PermissionsService } from 'src/app/services/permissions.service'
+import {
+  PermissionAction,
+  PermissionsService,
+  PermissionType,
+} from 'src/app/services/permissions.service'
 import { FormControl, FormGroup } from '@angular/forms'
 import { first, Subject, takeUntil } from 'rxjs'
 
@@ -83,7 +87,12 @@ export class BulkEditorComponent
   )
 
   get userCanEditAll(): boolean {
-    let canEdit: boolean = true
+    let canEdit: boolean = this.permissionService.currentUserCan(
+      PermissionAction.Change,
+      PermissionType.Document
+    )
+    if (!canEdit) return false
+
     const docs = this.list.documents.filter((d) => this.list.selected.has(d.id))
     canEdit = docs.every((d) =>
       this.permissionService.currentUserHasObjectPermissions(

@@ -14,6 +14,7 @@ from django.db import DatabaseError
 from django.test import TestCase
 from documents.models import Correspondent
 from documents.tests.utils import DirectoriesMixin
+from documents.tests.utils import FileSystemAssertsMixin
 from imap_tools import EmailAddress
 from imap_tools import FolderInfo
 from imap_tools import MailboxFolderSelectError
@@ -241,7 +242,7 @@ def fake_magic_from_buffer(buffer, mime=False):
 
 
 @mock.patch("paperless_mail.mail.magic.from_buffer", fake_magic_from_buffer)
-class TestMail(DirectoriesMixin, TestCase):
+class TestMail(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     def setUp(self):
         patcher = mock.patch("paperless_mail.mail.MailBox")
         m = patcher.start()
@@ -389,12 +390,12 @@ class TestMail(DirectoriesMixin, TestCase):
         args1, kwargs1 = self.async_task.call_args_list[0]
         args2, kwargs2 = self.async_task.call_args_list[1]
 
-        self.assertTrue(os.path.isfile(kwargs1["path"]), kwargs1["path"])
+        self.assertIsFile(kwargs1["path"])
 
         self.assertEqual(kwargs1["override_title"], "file_0")
         self.assertEqual(kwargs1["override_filename"], "file_0.pdf")
 
-        self.assertTrue(os.path.isfile(kwargs2["path"]), kwargs1["path"])
+        self.assertIsFile(kwargs2["path"])
 
         self.assertEqual(kwargs2["override_title"], "file_1")
         self.assertEqual(kwargs2["override_filename"], "file_1.pdf")
@@ -435,7 +436,7 @@ class TestMail(DirectoriesMixin, TestCase):
         self.assertEqual(self.async_task.call_count, 1)
 
         args, kwargs = self.async_task.call_args
-        self.assertTrue(os.path.isfile(kwargs["path"]), kwargs["path"])
+        self.assertIsFile(kwargs["path"])
         self.assertEqual(kwargs["override_filename"], "f1.pdf")
 
     def test_handle_disposition(self):

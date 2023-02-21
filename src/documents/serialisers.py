@@ -691,6 +691,14 @@ class PostDocumentSerializer(serializers.Serializer):
         required=False,
     )
 
+    archive_serial_number = serializers.IntegerField(
+        label="ASN",
+        write_only=True,
+        required=False,
+        min_value=Document.ARCHIVE_SERIAL_NUMBER_MIN,
+        max_value=Document.ARCHIVE_SERIAL_NUMBER_MAX,
+    )
+
     def validate_document(self, document):
         document_data = document.file.read()
         mime_type = magic.from_buffer(document_data, mime=True)
