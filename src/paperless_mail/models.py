@@ -214,3 +214,40 @@ class MailRule(document_models.ModelWithOwner):
 
     def __str__(self):
         return f"{self.account.name}.{self.name}"
+
+
+class ProcessedMail(document_models.ModelWithOwner):
+
+    rule = models.ForeignKey(
+        MailRule,
+        null=False,
+        blank=False,
+        on_delete=models.CASCADE,
+    )
+
+    folder = models.CharField(
+        _("folder"),
+        null=False,
+        blank=False,
+        max_length=256,
+    )
+
+    uid = models.CharField(
+        _("folder"),
+        null=False,
+        blank=False,
+        max_length=256,
+    )
+
+    status = models.CharField(
+        _("status"),
+        null=False,
+        blank=False,
+        max_length=256,
+    )
+
+    error = models.TextField(
+        _("error"),
+        null=True,
+        blank=True,
+    )
