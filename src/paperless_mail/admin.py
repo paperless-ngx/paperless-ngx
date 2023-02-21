@@ -118,17 +118,17 @@ class ProcessedMailAdmin(admin.ModelAdmin):
 
     readonly_fields = [
         "owner",
-        "processed",
-        "received",
-        "status",
-        "subject",
-        "error",
-        "uid",
-        "folder",
         "rule",
+        "folder",
+        "uid",
+        "subject",
+        "received",
+        "processed",
+        "status",
+        "error",
     ]
 
-    list_filter = ("status",)
+    list_filter = ("status", "rule")
 
 
 admin.site.register(MailAccount, MailAccountAdmin)
