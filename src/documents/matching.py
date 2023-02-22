@@ -86,7 +86,10 @@ def matches(matching_model, document):
     if matching_model.is_insensitive:
         search_kwargs = {"flags": re.IGNORECASE}
 
-    if matching_model.matching_algorithm == MatchingModel.MATCH_ALL:
+    if matching_model.matching_algorithm == MatchingModel.MATCH_NONE:
+        return False
+
+    elif matching_model.matching_algorithm == MatchingModel.MATCH_ALL:
         for word in _split_match(matching_model):
             search_result = re.search(rf"\b{word}\b", document_content, **search_kwargs)
             if not search_result:
