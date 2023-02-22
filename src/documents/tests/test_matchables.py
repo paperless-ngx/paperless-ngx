@@ -47,6 +47,18 @@ class _TestMatchingBase(TestCase):
 
 
 class TestMatching(_TestMatchingBase):
+    def test_match_none(self):
+
+        self._test_matching(
+            "",
+            "MATCH_NONE",
+            (),
+            (
+                "no",
+                "match",
+            ),
+        )
+
     def test_match_all(self):
 
         self._test_matching(
