@@ -438,6 +438,52 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         self.assertIsNotNone(parser.archive_path)
 
+    @override_settings(OCR_MODE="skip_neverarchive")
+    def test_skip_neverarchive_withtext(self):
+        """
+        GIVEN:
+            - File with existing text layer
+            - OCR mode set to skip_neverarchive
+        WHEN:
+            - Document is parsed
+        THEN:
+            - Text from images is extracted
+            - No archive file is created
+        """
+        parser = RasterisedDocumentParser(None)
+        parser.parse(
+            os.path.join(self.SAMPLE_FILES, "multi-page-digital.pdf"),
+            "application/pdf",
+        )
+        self.assertIsNone(parser.archive_path)
+        self.assertContainsStrings(
+            parser.get_text().lower(),
+            ["page 1", "page 2", "page 3"],
+        )
+
+    @override_settings(OCR_MODE="skip_neverarchive")
+    def test_skip_neverarchive_notext(self):
+        """
+        GIVEN:
+            - File with text contained in images but no text layer
+            - OCR mode set to skip_neverarchive
+        WHEN:
+            - Document is parsed
+        THEN:
+            - Text from images is extracted
+            - No archive file is created
+        """
+        parser = RasterisedDocumentParser(None)
+        parser.parse(
+            os.path.join(self.SAMPLE_FILES, "multi-page-images.pdf"),
+            "application/pdf",
+        )
+        self.assertIsNone(parser.archive_path)
+        self.assertContainsStrings(
+            parser.get_text().lower(),
+            ["page 1", "page 2", "page 3"],
+        )
+
     @override_settings(OCR_MODE="skip")
     def test_multi_page_mixed(self):
         """

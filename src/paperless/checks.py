@@ -127,7 +127,13 @@ def settings_values_check(app_configs, **kwargs):
                 Error(f'OCR output type "{settings.OCR_OUTPUT_TYPE}" is not valid'),
             )
 
-        if settings.OCR_MODE not in {"force", "skip", "redo", "skip_noarchive"}:
+        if settings.OCR_MODE not in {
+            "force",
+            "skip",
+            "redo",
+            "skip_noarchive",
+            "skip_neverarchive",
+        }:
             msgs.append(Error(f'OCR output mode "{settings.OCR_MODE}" is not valid'))
 
         if settings.OCR_CLEAN not in {"clean", "clean-final", "none"}:
