@@ -2,7 +2,11 @@ import { Directive, EventEmitter, Input, OnInit, Output } from '@angular/core'
 import { FormGroup } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { Observable } from 'rxjs'
-import { MATCHING_ALGORITHMS, MATCH_AUTO } from 'src/app/data/matching-model'
+import {
+  MATCHING_ALGORITHMS,
+  MATCH_AUTO,
+  MATCH_NONE,
+} from 'src/app/data/matching-model'
 import { ObjectWithId } from 'src/app/data/object-with-id'
 import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
 import { PaperlessUser } from 'src/app/data/paperless-user'
@@ -91,7 +95,10 @@ export abstract class EditDialogComponent<
   }
 
   get patternRequired(): boolean {
-    return this.objectForm?.value.matching_algorithm !== MATCH_AUTO
+    return (
+      this.objectForm?.value.matching_algorithm !== MATCH_AUTO &&
+      this.objectForm?.value.matching_algorithm !== MATCH_NONE
+    )
   }
 
   save() {

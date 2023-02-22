@@ -12,6 +12,7 @@ import {
   MatchingModel,
   MATCHING_ALGORITHMS,
   MATCH_AUTO,
+  MATCH_NONE,
 } from 'src/app/data/matching-model'
 import { ObjectWithId } from 'src/app/data/object-with-id'
 import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
@@ -96,6 +97,8 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
   getMatching(o: MatchingModel) {
     if (o.matching_algorithm == MATCH_AUTO) {
       return $localize`Automatic`
+    } else if (o.matching_algorithm == MATCH_NONE) {
+      return $localize`None`
     } else if (o.match && o.match.length > 0) {
       return `${
         MATCHING_ALGORITHMS.find((a) => a.id == o.matching_algorithm).shortName
