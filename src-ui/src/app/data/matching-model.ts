@@ -1,5 +1,6 @@
 import { ObjectWithPermissions } from './object-with-permissions'
 
+export const MATCH_NONE = 0
 export const MATCH_ANY = 1
 export const MATCH_ALL = 2
 export const MATCH_LITERAL = 3
@@ -9,6 +10,11 @@ export const MATCH_AUTO = 6
 export const DEFAULT_MATCHING_ALGORITHM = MATCH_AUTO
 
 export const MATCHING_ALGORITHMS = [
+  {
+    id: MATCH_NONE,
+    shortName: $localize`None`,
+    name: $localize`None: Disable matching`,
+  },
   {
     id: MATCH_ANY,
     shortName: $localize`Any word`,

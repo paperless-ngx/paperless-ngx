@@ -24,6 +24,7 @@ TASK_STATE_CHOICES = sorted(zip(ALL_STATES, ALL_STATES))
 
 class MatchingModel(models.Model):
 
+    MATCH_NONE = 0
     MATCH_ANY = 1
     MATCH_ALL = 2
     MATCH_LITERAL = 3
@@ -32,6 +33,7 @@ class MatchingModel(models.Model):
     MATCH_AUTO = 6
 
     MATCHING_ALGORITHMS = (
+        (MATCH_NONE, _("None")),
         (MATCH_ANY, _("Any word")),
         (MATCH_ALL, _("All words")),
         (MATCH_LITERAL, _("Exact match")),
