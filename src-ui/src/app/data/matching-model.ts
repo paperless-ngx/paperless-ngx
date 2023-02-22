@@ -1,4 +1,4 @@
-import { ObjectWithPermissions } from './object-with-permissions'
+import { ObjectWithId } from './object-with-id'
 
 export const MATCH_NONE = 0
 export const MATCH_ANY = 1
@@ -11,9 +11,9 @@ export const DEFAULT_MATCHING_ALGORITHM = MATCH_AUTO
 
 export const MATCHING_ALGORITHMS = [
   {
-    id: MATCH_NONE,
-    shortName: $localize`None`,
-    name: $localize`None: Disable matching`,
+    id: MATCH_AUTO,
+    shortName: $localize`Automatic`,
+    name: $localize`Auto: Learn matching automatically`,
   },
   {
     id: MATCH_ANY,
@@ -41,13 +41,13 @@ export const MATCHING_ALGORITHMS = [
     name: $localize`Fuzzy: Document contains a word similar to this word`,
   },
   {
-    id: MATCH_AUTO,
-    shortName: $localize`Automatic`,
-    name: $localize`Auto: Learn matching automatically`,
+    id: MATCH_NONE,
+    shortName: $localize`None`,
+    name: $localize`None: Disable matching`,
   },
 ]
 
-export interface MatchingModel extends ObjectWithPermissions {
+export interface MatchingModel extends ObjectWithId {
   name?: string
 
   slug?: string
