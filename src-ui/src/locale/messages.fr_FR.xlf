@@ -1235,7 +1235,7 @@
         </context-group>
         <target state="final">Impossible d'enregistrer l'élément : <x id="PH" equiv-text="error"/></target>
       </trans-unit>
-      <trans-unit id="7314814725704332646" datatype="html">
+      <trans-unit id="7314814725704332646" datatype="html" approved="yes">
         <source>Permissions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/group-edit-dialog/group-edit-dialog.component.html</context>
@@ -1257,23 +1257,23 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">77</context>
         </context-group>
-        <target state="needs-translation">Permissions</target>
+        <target state="final">Droits d'accès</target>
       </trans-unit>
-      <trans-unit id="7878445132438733225" datatype="html">
+      <trans-unit id="7878445132438733225" datatype="html" approved="yes">
         <source>Create new user group</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/group-edit-dialog/group-edit-dialog.component.ts</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="needs-translation">Create new user group</target>
+        <target state="final">Créer un nouveau groupe d'utilisateurs</target>
       </trans-unit>
-      <trans-unit id="200893957904793797" datatype="html">
+      <trans-unit id="200893957904793797" datatype="html" approved="yes">
         <source>Edit user group</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/group-edit-dialog/group-edit-dialog.component.ts</context>
           <context context-type="linenumber">28</context>
         </context-group>
-        <target state="needs-translation">Edit user group</target>
+        <target state="final">Modifier le groupe d'utilisateurs</target>
       </trans-unit>
       <trans-unit id="1505107477868159986" datatype="html" approved="yes">
         <source>IMAP Server</source>
@@ -1863,55 +1863,55 @@
         </context-group>
         <target state="final">Éditer l'étiquette</target>
       </trans-unit>
-      <trans-unit id="4768749765465246664" datatype="html">
+      <trans-unit id="4768749765465246664" datatype="html" approved="yes">
         <source>Email</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="needs-translation">Email</target>
+        <target state="final">Adresse électronique</target>
       </trans-unit>
-      <trans-unit id="5342432350421167093" datatype="html">
+      <trans-unit id="5342432350421167093" datatype="html" approved="yes">
         <source>First name</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">First name</target>
+        <target state="final">Prénom</target>
       </trans-unit>
-      <trans-unit id="3586674587150281199" datatype="html">
+      <trans-unit id="3586674587150281199" datatype="html" approved="yes">
         <source>Last name</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.html</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="needs-translation">Last name</target>
+        <target state="final">Nom</target>
       </trans-unit>
-      <trans-unit id="8204176479746810612" datatype="html">
+      <trans-unit id="8204176479746810612" datatype="html" approved="yes">
         <source>Active</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.html</context>
           <context context-type="linenumber">19</context>
         </context-group>
-        <target state="needs-translation">Active</target>
+        <target state="final">Actif</target>
       </trans-unit>
-      <trans-unit id="1808271538028523977" datatype="html">
+      <trans-unit id="1808271538028523977" datatype="html" approved="yes">
         <source>Superuser</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.html</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="needs-translation">Superuser</target>
+        <target state="final">Superutilisateur</target>
       </trans-unit>
-      <trans-unit id="1403759966357927756" datatype="html">
+      <trans-unit id="1403759966357927756" datatype="html" approved="yes">
         <source>(Grants all permissions and can view objects)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.html</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="needs-translation">(Grants all permissions and can view objects)</target>
+        <target state="final">(accorde tous les droits et permet de voir les objets)</target>
       </trans-unit>
-      <trans-unit id="5944812089887969249" datatype="html">
+      <trans-unit id="5944812089887969249" datatype="html" approved="yes">
         <source>Groups</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.html</context>
@@ -1925,23 +1925,23 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">367</context>
         </context-group>
-        <target state="needs-translation">Groups</target>
+        <target state="final">Groupes</target>
       </trans-unit>
-      <trans-unit id="1436831433675346331" datatype="html">
+      <trans-unit id="1436831433675346331" datatype="html" approved="yes">
         <source>Create new user account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.ts</context>
           <context context-type="linenumber">41</context>
         </context-group>
-        <target state="needs-translation">Create new user account</target>
+        <target state="final">Créer un nouveau compte utilisateur</target>
       </trans-unit>
-      <trans-unit id="2887331217965896363" datatype="html">
+      <trans-unit id="2887331217965896363" datatype="html" approved="yes">
         <source>Edit user account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.ts</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="needs-translation">Edit user account</target>
+        <target state="final">Modifier le compte utilisateur</target>
       </trans-unit>
       <trans-unit id="1616102757855967475" datatype="html" approved="yes">
         <source>All</source>
@@ -2020,29 +2020,29 @@
         </context-group>
         <target state="final">Suggestions : </target>
       </trans-unit>
-      <trans-unit id="594042705136125260" datatype="html">
+      <trans-unit id="594042705136125260" datatype="html" approved="yes">
         <source>Edit Permissions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/permissions/permissions-form/permissions-form.component.html</context>
           <context context-type="linenumber">7</context>
         </context-group>
-        <target state="needs-translation">Edit Permissions</target>
+        <target state="final">Modifier les droits d'accès</target>
       </trans-unit>
-      <trans-unit id="6035283612400841811" datatype="html">
+      <trans-unit id="6035283612400841811" datatype="html" approved="yes">
         <source>Owner:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/permissions/permissions-form/permissions-form.component.html</context>
           <context context-type="linenumber">19</context>
         </context-group>
-        <target state="needs-translation">Owner:</target>
+        <target state="final">Propriétaire : </target>
       </trans-unit>
-      <trans-unit id="734147282056744882" datatype="html">
+      <trans-unit id="734147282056744882" datatype="html" approved="yes">
         <source>Objects without an owner can be viewed and edited by all users</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/permissions/permissions-form/permissions-form.component.html</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">Objects without an owner can be viewed and edited by all users</target>
+        <target state="final">Les objets sans propriétaire peuvent être consultés et édités par tous les utilisateurs</target>
       </trans-unit>
       <trans-unit id="2509141182388535183" datatype="html" approved="yes">
         <source>View</source>
@@ -2060,7 +2060,7 @@
         </context-group>
         <target state="final">Vue</target>
       </trans-unit>
-      <trans-unit id="2191775412581217688" datatype="html">
+      <trans-unit id="2191775412581217688" datatype="html" approved="yes">
         <source>Users:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/permissions/permissions-form/permissions-form.component.html</context>
@@ -2070,9 +2070,9 @@
           <context context-type="sourcefile">src/app/components/common/input/permissions/permissions-form/permissions-form.component.html</context>
           <context context-type="linenumber">50</context>
         </context-group>
-        <target state="needs-translation">Users:</target>
+        <target state="final">Utilisateurs : </target>
       </trans-unit>
-      <trans-unit id="239911470633002624" datatype="html">
+      <trans-unit id="239911470633002624" datatype="html" approved="yes">
         <source>Groups:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/permissions/permissions-form/permissions-form.component.html</context>
@@ -2082,7 +2082,7 @@
           <context context-type="sourcefile">src/app/components/common/input/permissions/permissions-form/permissions-form.component.html</context>
           <context context-type="linenumber">58</context>
         </context-group>
-        <target state="needs-translation">Groups:</target>
+        <target state="final">Groupes : </target>
       </trans-unit>
       <trans-unit id="7585826646011739428" datatype="html" approved="yes">
         <source>Edit</source>
@@ -2148,13 +2148,13 @@
         </context-group>
         <target state="final">Éditer</target>
       </trans-unit>
-      <trans-unit id="3728984448750213892" datatype="html">
+      <trans-unit id="3728984448750213892" datatype="html" approved="yes">
         <source>Edit permissions also grant viewing permissions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/permissions/permissions-form/permissions-form.component.html</context>
           <context context-type="linenumber">64</context>
         </context-group>
-        <target state="needs-translation">Edit permissions also grant viewing permissions</target>
+        <target state="final">Modifier les droits d'accès accorde également les droits de lecture</target>
       </trans-unit>
       <trans-unit id="2722549756198502062" datatype="html" approved="yes">
         <source>Add item</source>
@@ -2173,47 +2173,47 @@
         </context-group>
         <target state="final">Ajouter une étiquette</target>
       </trans-unit>
-      <trans-unit id="8105421668262723483" datatype="html">
+      <trans-unit id="8105421668262723483" datatype="html" approved="yes">
         <source>Set Permissions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-dialog/permissions-dialog.component.ts</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="needs-translation">Set Permissions</target>
+        <target state="final">Définir les droits d'accès</target>
       </trans-unit>
-      <trans-unit id="8283439432608484491" datatype="html">
+      <trans-unit id="8283439432608484491" datatype="html" approved="yes">
         <source>Note that permissions set here will override any existing permissions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-dialog/permissions-dialog.component.ts</context>
           <context context-type="linenumber">41</context>
         </context-group>
-        <target state="needs-translation">Note that permissions set here will override any existing permissions</target>
+        <target state="final">Notez que les droits d'accès définis ici écraseront tous les droits d'accès existants</target>
       </trans-unit>
-      <trans-unit id="8650499415827640724" datatype="html">
+      <trans-unit id="8650499415827640724" datatype="html" approved="yes">
         <source>Type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
           <context context-type="linenumber">5</context>
         </context-group>
-        <target state="needs-translation">Type</target>
+        <target state="final">Type</target>
       </trans-unit>
-      <trans-unit id="3249513483374643425" datatype="html">
+      <trans-unit id="3249513483374643425" datatype="html" approved="yes">
         <source>Add</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
           <context context-type="linenumber">7</context>
         </context-group>
-        <target state="needs-translation">Add</target>
+        <target state="final">Ajouter</target>
       </trans-unit>
-      <trans-unit id="1230154438678955604" datatype="html">
+      <trans-unit id="1230154438678955604" datatype="html" approved="yes">
         <source>Change</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
           <context context-type="linenumber">8</context>
         </context-group>
-        <target state="needs-translation">Change</target>
+        <target state="final">Modifier</target>
       </trans-unit>
-      <trans-unit id="187187500641108332" datatype="html">
+      <trans-unit id="187187500641108332" datatype="html" approved="yes">
         <source>
           <x id="INTERPOLATION" equiv-text="{{action.key}}"/>
         </source>
@@ -2225,15 +2225,15 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="needs-translation"><x id="INTERPOLATION" equiv-text="{{action.key}}"/></target>
+        <target state="final"><x id="INTERPOLATION" equiv-text="{{action.key}}"/></target>
       </trans-unit>
-      <trans-unit id="3776388302418428342" datatype="html">
+      <trans-unit id="3776388302418428342" datatype="html" approved="yes">
         <source>Inerhited from group</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.ts</context>
           <context context-type="linenumber">59</context>
         </context-group>
-        <target state="needs-translation">Inerhited from group</target>
+        <target state="final">Hérité du groupe</target>
       </trans-unit>
       <trans-unit id="3797570084942068182" datatype="html" approved="yes">
         <source>Select</source>
@@ -2910,23 +2910,23 @@
         </context-group>
         <target state="final">Enregistrer &amp; suivant</target>
       </trans-unit>
-      <trans-unit id="5758784066858623886" datatype="html">
+      <trans-unit id="5758784066858623886" datatype="html" approved="yes">
         <source>Error retrieving metadata</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">305</context>
         </context-group>
-        <target state="needs-translation">Error retrieving metadata</target>
+        <target state="final">Erreur lors de la récupération des métadonnées</target>
       </trans-unit>
-      <trans-unit id="2374084708811774419" datatype="html">
+      <trans-unit id="2374084708811774419" datatype="html" approved="yes">
         <source>Error retrieving suggestions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">319</context>
         </context-group>
-        <target state="needs-translation">Error retrieving suggestions</target>
+        <target state="final">Erreur lors de la récupération des suggestions</target>
       </trans-unit>
-      <trans-unit id="448882439049417053" datatype="html">
+      <trans-unit id="448882439049417053" datatype="html" approved="yes">
         <source>Error saving document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
@@ -2936,7 +2936,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">476</context>
         </context-group>
-        <target state="needs-translation">Error saving document</target>
+        <target state="final">Erreur lors de la sauvegarde du document</target>
       </trans-unit>
       <trans-unit id="9021887951960049161" datatype="html" approved="yes">
         <source>Confirm delete</source>
@@ -4056,7 +4056,7 @@
         </context-group>
         <target state="final">Automatique</target>
       </trans-unit>
-      <trans-unit id="6252070156626006029" datatype="html">
+      <trans-unit id="6252070156626006029" datatype="html" approved="yes">
         <source>None</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
@@ -4066,7 +4066,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="needs-translation">None</target>
+        <target state="final">Aucun</target>
       </trans-unit>
       <trans-unit id="211408744872436427" datatype="html">
         <source>Successfully created <x id="PH" equiv-text="this.typeName"/>.</source>
@@ -4532,37 +4532,37 @@
         </context-group>
         <target state="translated">Aucune règle de courriel définie.</target>
       </trans-unit>
-      <trans-unit id="8119815638230251386" datatype="html">
+      <trans-unit id="8119815638230251386" datatype="html" approved="yes">
         <source>Users &amp; Groups</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">327</context>
         </context-group>
-        <target state="needs-translation">Users &amp; Groups</target>
+        <target state="final">Utilisateurs &amp; Groupes</target>
       </trans-unit>
-      <trans-unit id="4555457172864212828" datatype="html">
+      <trans-unit id="4555457172864212828" datatype="html" approved="yes">
         <source>Users</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">332</context>
         </context-group>
-        <target state="needs-translation">Users</target>
+        <target state="final">Utilisateurs</target>
       </trans-unit>
-      <trans-unit id="2941198503117307737" datatype="html">
+      <trans-unit id="2941198503117307737" datatype="html" approved="yes">
         <source>Add User</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">337</context>
         </context-group>
-        <target state="needs-translation">Add User</target>
+        <target state="final">Ajouter un utilisateur</target>
       </trans-unit>
-      <trans-unit id="9124347207158517893" datatype="html">
+      <trans-unit id="9124347207158517893" datatype="html" approved="yes">
         <source>Add Group</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">372</context>
         </context-group>
-        <target state="needs-translation">Add Group</target>
+        <target state="final">Ajouter un groupe</target>
       </trans-unit>
       <trans-unit id="5610279464668232148" datatype="html" approved="yes">
         <source>Saved view &quot;<x id="PH" equiv-text="savedView.name"/>&quot; deleted.</source>
@@ -4628,21 +4628,21 @@
         </context-group>
         <target state="translated">Une erreur s'est produite lors de l'enregistrement des paramètres sur le serveur : <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></target>
       </trans-unit>
-      <trans-unit id="2753185112875184719" datatype="html">
+      <trans-unit id="2753185112875184719" datatype="html" approved="yes">
         <source>Saved user &quot;<x id="PH" equiv-text="newUser.username"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">636</context>
         </context-group>
-        <target state="needs-translation">Saved user "<x id="PH" equiv-text="newUser.username"/>".</target>
+        <target state="final">Utilisateur « <x id="PH" equiv-text="newUser.username"/> » enregistré.</target>
       </trans-unit>
-      <trans-unit id="1417528376639710155" datatype="html">
+      <trans-unit id="1417528376639710155" datatype="html" approved="yes">
         <source>Error saving user: <x id="PH" equiv-text="e.toString()"/>.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">645</context>
         </context-group>
-        <target state="needs-translation">Error saving user: <x id="PH" equiv-text="e.toString()"/>.</target>
+        <target state="final">Erreur lors de l'enregistrement de l'utilisateur : <x id="PH" equiv-text="e.toString()"/>.</target>
       </trans-unit>
       <trans-unit id="5565868288871970148" datatype="html">
         <source>Confirm delete user account</source>
@@ -4650,47 +4650,47 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">655</context>
         </context-group>
-        <target state="needs-translation">Confirm delete user account</target>
+        <target state="translated">Confirmer la suppression du compte utilisateur</target>
       </trans-unit>
-      <trans-unit id="8133663925694885325" datatype="html">
+      <trans-unit id="8133663925694885325" datatype="html" approved="yes">
         <source>This operation will permanently delete this user account.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">656</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently delete this user account.</target>
+        <target state="final">Cette opération supprimera définitivement ce compte utilisateur.</target>
       </trans-unit>
-      <trans-unit id="857903183180440990" datatype="html">
+      <trans-unit id="857903183180440990" datatype="html" approved="yes">
         <source>Deleted user</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">665</context>
         </context-group>
-        <target state="needs-translation">Deleted user</target>
+        <target state="final">Utilisateur supprimé</target>
       </trans-unit>
-      <trans-unit id="48515337028145748" datatype="html">
+      <trans-unit id="48515337028145748" datatype="html" approved="yes">
         <source>Error deleting user: <x id="PH" equiv-text="e.toString()"/>.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">673</context>
         </context-group>
-        <target state="needs-translation">Error deleting user: <x id="PH" equiv-text="e.toString()"/>.</target>
+        <target state="final">Une erreur s'est produite lors de la suppression de l'utilisateur : <x id="PH" equiv-text="e.toString()"/>.</target>
       </trans-unit>
-      <trans-unit id="5766640174051730159" datatype="html">
+      <trans-unit id="5766640174051730159" datatype="html" approved="yes">
         <source>Saved group &quot;<x id="PH" equiv-text="newGroup.name"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">691</context>
         </context-group>
-        <target state="needs-translation">Saved group "<x id="PH" equiv-text="newGroup.name"/>".</target>
+        <target state="final">Groupe « <x id="PH" equiv-text="newGroup.name"/> » enregistré.</target>
       </trans-unit>
-      <trans-unit id="6311554806836269999" datatype="html">
+      <trans-unit id="6311554806836269999" datatype="html" approved="yes">
         <source>Error saving group: <x id="PH" equiv-text="e.toString()"/>.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">699</context>
         </context-group>
-        <target state="needs-translation">Error saving group: <x id="PH" equiv-text="e.toString()"/>.</target>
+        <target state="final">Erreur lors de l'enregistrement du groupe : <x id="PH" equiv-text="e.toString()"/>.</target>
       </trans-unit>
       <trans-unit id="6538873300613683004" datatype="html">
         <source>Confirm delete user group</source>
@@ -4698,31 +4698,31 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">709</context>
         </context-group>
-        <target state="needs-translation">Confirm delete user group</target>
+        <target state="translated">Confirmer la suppression du groupe d'utilisateurs</target>
       </trans-unit>
-      <trans-unit id="7710984639498518244" datatype="html">
+      <trans-unit id="7710984639498518244" datatype="html" approved="yes">
         <source>This operation will permanently delete this user group.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">710</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently delete this user group.</target>
+        <target state="final">Cette opération supprimera définitivement ce groupe d'utilisateurs.</target>
       </trans-unit>
-      <trans-unit id="6834066329827670963" datatype="html">
+      <trans-unit id="6834066329827670963" datatype="html" approved="yes">
         <source>Deleted group</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">719</context>
         </context-group>
-        <target state="needs-translation">Deleted group</target>
+        <target state="final">Groupe supprimé</target>
       </trans-unit>
-      <trans-unit id="6654036276412987870" datatype="html">
+      <trans-unit id="6654036276412987870" datatype="html" approved="yes">
         <source>Error deleting group: <x id="PH" equiv-text="e.toString()"/>.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">727</context>
         </context-group>
-        <target state="needs-translation">Error deleting group: <x id="PH" equiv-text="e.toString()"/>.</target>
+        <target state="final">Une erreur s'est produite lors de la suppression du groupe : <x id="PH" equiv-text="e.toString()"/>.</target>
       </trans-unit>
       <trans-unit id="6327501535846658797" datatype="html">
         <source>Saved account &quot;<x id="PH" equiv-text="newMailAccount.name"/>&quot;.</source>
@@ -5084,13 +5084,13 @@
         </context-group>
         <target state="final">Mot approximatif : contient un mot similaire à ce mot</target>
       </trans-unit>
-      <trans-unit id="8233576851457338601" datatype="html">
+      <trans-unit id="8233576851457338601" datatype="html" approved="yes">
         <source>None: Disable matching</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">46</context>
         </context-group>
-        <target state="needs-translation">None: Disable matching</target>
+        <target state="final">Aucun : désactiver le rapprochement</target>
       </trans-unit>
       <trans-unit id="5948496158474272829" datatype="html" approved="yes">
         <source>Warning: You have unsaved changes to your document(s).</source>
@@ -5172,13 +5172,13 @@
         </context-group>
         <target state="final">Sauvegarder et fermer</target>
       </trans-unit>
-      <trans-unit id="8311312207500500516" datatype="html">
+      <trans-unit id="8311312207500500516" datatype="html" approved="yes">
         <source>You don&apos;t have permissions to do that</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/guards/permissions.guard.ts</context>
           <context context-type="linenumber">31</context>
         </context-group>
-        <target state="needs-translation">You don't have permissions to do that</target>
+        <target state="final">Vous n'avez pas la permission de faire cela</target>
       </trans-unit>
       <trans-unit id="7536524521722799066" datatype="html" approved="yes">
         <source>(no title)</source>
