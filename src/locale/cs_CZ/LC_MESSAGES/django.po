@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-09 21:50+0000\n"
-"PO-Revision-Date: 2023-02-20 13:46\n"
+"PO-Revision-Date: 2023-02-23 11:39\n"
 "Last-Translator: \n"
 "Language-Team: Czech\n"
 "Language: cs_CZ\n"
@@ -84,7 +84,7 @@ msgstr "Označí tento tag jako tag pro příchozí: Všechny nově zkonzumovan�
 
 #: documents/models.py:81
 msgid "tag"
-msgstr "tagy"
+msgstr "štítek"
 
 #: documents/models.py:82 documents/models.py:156
 msgid "tags"
@@ -108,7 +108,7 @@ msgstr "cesta k úložišti"
 
 #: documents/models.py:100
 msgid "storage paths"
-msgstr "cesta k úložišti"
+msgstr "cesty k úložišti"
 
 #: documents/models.py:108
 msgid "Unencrypted"
@@ -188,7 +188,7 @@ msgstr "původní název souboru"
 
 #: documents/models.py:227
 msgid "The original name of the file when it was uploaded"
-msgstr ""
+msgstr "Původní název souboru při jeho nahrání"
 
 #: documents/models.py:231
 msgid "archive serial number"
@@ -364,7 +364,7 @@ msgstr "Podobné"
 
 #: documents/models.py:409
 msgid "has tags in"
-msgstr "má značky v"
+msgstr "má štítky v"
 
 #: documents/models.py:410
 msgid "ASN greater than"
@@ -428,67 +428,67 @@ msgstr "Poziční Argumenty Úlohy"
 
 #: documents/models.py:564
 msgid "JSON representation of the positional arguments used with the task"
-msgstr ""
+msgstr "JSON reprezentace objektových argumentů použitých při úkolu"
 
 #: documents/models.py:569
 msgid "Task Named Arguments"
-msgstr ""
+msgstr "Pojmenované argumenty úkolu"
 
 #: documents/models.py:571
 msgid "JSON representation of the named arguments used with the task"
-msgstr ""
+msgstr "JSON reprezentace pojmenovaných argumentů použitých při úkolu"
 
 #: documents/models.py:578
 msgid "Task State"
-msgstr ""
+msgstr "Stav úkolu"
 
 #: documents/models.py:579
 msgid "Current state of the task being run"
-msgstr ""
+msgstr "Aktuální stav spuštěného úkolu"
 
 #: documents/models.py:584
 msgid "Created DateTime"
-msgstr ""
+msgstr "Datum a čas vytvoření"
 
 #: documents/models.py:585
 msgid "Datetime field when the task result was created in UTC"
-msgstr ""
+msgstr "Datum a čas, kdy byl výsledek úkolu vytvořen v UTC"
 
 #: documents/models.py:590
 msgid "Started DateTime"
-msgstr ""
+msgstr "Datum a čas zahájení"
 
 #: documents/models.py:591
 msgid "Datetime field when the task was started in UTC"
-msgstr ""
+msgstr "Datum a čas, kdy byla úloha spuštěna v UTC"
 
 #: documents/models.py:596
 msgid "Completed DateTime"
-msgstr ""
+msgstr "Datum a čas dokončení"
 
 #: documents/models.py:597
 msgid "Datetime field when the task was completed in UTC"
-msgstr ""
+msgstr "Datum a čas, kdy byl úkol dokončen v UTC"
 
 #: documents/models.py:602
 msgid "Result Data"
-msgstr ""
+msgstr "Data výsledku"
 
 #: documents/models.py:604
 msgid "The data returned by the task"
-msgstr ""
+msgstr "Data vrácena úlohou"
 
 #: documents/models.py:613
 msgid "Comment for the document"
-msgstr ""
+msgstr "Komentář k dokumentu"
 
 #: documents/models.py:642
 msgid "comment"
-msgstr ""
+msgstr "komentář"
 
 #: documents/models.py:643
 msgid "comments"
-msgstr ""
+msgstr "komentáře"
 
 #: documents/serialisers.py:72
 #, python-format
