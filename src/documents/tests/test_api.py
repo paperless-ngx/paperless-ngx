@@ -1590,9 +1590,22 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(v1.filter_rules.count(), 0)
 
     def test_get_logs(self):
+        log_data = "test\ntest2\n"
+        with open(os.path.join(settings.LOGGING_DIR, "mail.log"), "w") as f:
+            f.write(log_data)
+        with open(os.path.join(settings.LOGGING_DIR, "paperless.log"), "w") as f:
+            f.write(log_data)
         response = self.client.get("/api/logs/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertCountEqual(response.data, ["mail", "paperless"])
+
+    def test_get_logs_only_when_exist(self):
+        log_data = "test\ntest2\n"
+        with open(os.path.join(settings.LOGGING_DIR, "paperless.log"), "w") as f:
+            f.write(log_data)
+        response = self.client.get("/api/logs/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertCountEqual(response.data, ["paperless"])
 
     def test_get_invalid_log(self):
         response = self.client.get("/api/logs/bogus_log/")
