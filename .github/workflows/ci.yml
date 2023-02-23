@@ -451,7 +451,7 @@ jobs:
           do
             cp --verbose ${file_name} dist/paperless-ngx/
           done
-          mv --verbose dist/paperless-ngx/paperless.conf.example paperless.conf
+          mv --verbose dist/paperless-ngx/paperless.conf.example dist/paperless-ngx/paperless.conf
 
           echo "Copying Docker related files"
           cp --recursive docker/ dist/paperless-ngx/docker
