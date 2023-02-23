@@ -302,7 +302,7 @@ def error_callback(
 
 def queue_consumption_tasks(
     *,
-    consume_tasks: list[Signature],
+    consume_tasks: List[Signature],
     rule: MailRule,
     message: MailMessage,
 ):
