@@ -2488,7 +2488,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="needs-translation">You're ready to start uploading documents! Explore the various features of this web app on your own, or start a quick tour using the button below.</target>
+        <target state="translated">Jste připraveni začít nahrávat dokumenty! Prozkoumejte různé funkce této webové aplikace sami, nebo začněte rychlou prohlídku pomocí tlačítka níže.</target>
       </trans-unit>
       <trans-unit id="4474647174688421179" datatype="html">
         <source>More detail on how to use and configure Paperless-ngx is always available in the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://docs.paperless-ngx.com&quot; target=&quot;_blank&quot;&gt;"/>documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</source>
@@ -2496,7 +2496,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">5</context>
         </context-group>
-        <target state="needs-translation">More detail on how to use and configure Paperless-ngx is always available in the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://docs.paperless-ngx.com&quot; target=&quot;_blank&quot;&gt;"/>documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</target>
+        <target state="translated">Podrobnější informace o používání a konfiguraci Paperless-ngx jsou vždy k dispozici v <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://docs.paperless-ngx.com&quot; target=&quot;_blank&quot;&gt;"/>dokumentaci<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</target>
       </trans-unit>
       <trans-unit id="4294899532887357745" datatype="html">
         <source>Thanks for being a part of the Paperless-ngx community!</source>
@@ -2504,7 +2504,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">8</context>
         </context-group>
-        <target state="needs-translation">Thanks for being a part of the Paperless-ngx community!</target>
+        <target state="translated">Děkujeme, že jste součástí komunity Paperless-ngx!</target>
       </trans-unit>
       <trans-unit id="1415832194529539652" datatype="html">
         <source>Start the tour</source>
@@ -2512,7 +2512,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">9</context>
         </context-group>
-        <target state="needs-translation">Start the tour</target>
+        <target state="translated">Spustit prohlídku</target>
       </trans-unit>
       <trans-unit id="7822640317427130239" datatype="html" approved="yes">
         <source>Searching document with asn <x id="INTERPOLATION" equiv-text="{{asn}}"/></source>
@@ -2528,7 +2528,7 @@
           <context context-type="sourcefile">src/app/components/document-comments/document-comments.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="needs-translation">Enter comment</target>
+        <target state="translated">Zadejte komentář</target>
       </trans-unit>
       <trans-unit id="4025397324401332794" datatype="html">
         <source> Please enter a comment. </source>
@@ -2536,7 +2536,7 @@
           <context context-type="sourcefile">src/app/components/document-comments/document-comments.component.html</context>
           <context context-type="linenumber">5,7</context>
         </context-group>
-        <target state="needs-translation"> Please enter a comment. </target>
+        <target state="translated"> Prosím zadejte komentář. </target>
       </trans-unit>
       <trans-unit id="2337485514607640701" datatype="html">
         <source>Add comment</source>
@@ -2544,7 +2544,7 @@
           <context context-type="sourcefile">src/app/components/document-comments/document-comments.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="needs-translation">Add comment</target>
+        <target state="translated">Přidat komentář</target>
       </trans-unit>
       <trans-unit id="5438997040668245251" datatype="html">
         <source>Error saving comment: <x id="PH" equiv-text="e.toString()"/></source>
@@ -3794,7 +3794,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">190</context>
         </context-group>
-        <target state="needs-translation">is empty</target>
+        <target state="translated">is empty</target>
       </trans-unit>
       <trans-unit id="6166785695326182482" datatype="html">
         <source>is not empty</source>
@@ -3802,7 +3802,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">194</context>
         </context-group>
-        <target state="needs-translation">is not empty</target>
+        <target state="translated">není prázdný</target>
       </trans-unit>
       <trans-unit id="4686622206659266699" datatype="html">
         <source>greater than</source>
@@ -3810,7 +3810,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">198</context>
         </context-group>
-        <target state="needs-translation">greater than</target>
+        <target state="translated">větší než</target>
       </trans-unit>
       <trans-unit id="8014012170270529279" datatype="html">
         <source>less than</source>
@@ -3818,7 +3818,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">202</context>
         </context-group>
-        <target state="needs-translation">less than</target>
+        <target state="translated">menší než</target>
       </trans-unit>
       <trans-unit id="7210076240260527720" datatype="html" approved="yes">
         <source>Save current view</source>
@@ -3858,7 +3858,7 @@
           <context context-type="sourcefile">src/app/components/document-list/save-view-config-dialog/save-view-config-dialog.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation">Filter rules error occurred while saving this view</target>
+        <target state="translated">Při ukládání tohoto zobrazení došlo k chybě pravidel filtru</target>
       </trans-unit>
       <trans-unit id="6438839705789707938" datatype="html">
         <source>The error returned was</source>
@@ -3866,7 +3866,7 @@
           <context context-type="sourcefile">src/app/components/document-list/save-view-config-dialog/save-view-config-dialog.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">The error returned was</target>
+        <target state="translated">Vrácená chyba byla</target>
       </trans-unit>
       <trans-unit id="6316128875819022658" datatype="html">
         <source>correspondent</source>
@@ -3874,7 +3874,7 @@
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.ts</context>
           <context context-type="linenumber">39</context>
         </context-group>
-        <target state="needs-translation">correspondent</target>
+        <target state="translated">korespondent</target>
       </trans-unit>
       <trans-unit id="1612355304340685070" datatype="html">
         <source>correspondents</source>
@@ -3882,7 +3882,7 @@
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.ts</context>
           <context context-type="linenumber">40</context>
         </context-group>
-        <target state="needs-translation">correspondents</target>
+        <target state="translated">korespondenti</target>
       </trans-unit>
       <trans-unit id="6360600151505327572" datatype="html">
         <source>Last used</source>
@@ -3890,7 +3890,7 @@
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.ts</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="needs-translation">Last used</target>
+        <target state="translated">Naposledy použito</target>
       </trans-unit>
       <trans-unit id="7427874343955308724" datatype="html" approved="yes">
         <source>Do you really want to delete the correspondent &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
@@ -3906,7 +3906,7 @@
           <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.ts</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="needs-translation">document type</target>
+        <target state="translated">typ dokumentu</target>
       </trans-unit>
       <trans-unit id="2992451138146293104" datatype="html">
         <source>document types</source>
@@ -3914,7 +3914,7 @@
           <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.ts</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="needs-translation">document types</target>
+        <target state="translated">typy dokumentu</target>
       </trans-unit>
       <trans-unit id="4990731724078522539" datatype="html" approved="yes">
         <source>Do you really want to delete the document type &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
@@ -4022,7 +4022,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
           <context context-type="linenumber">44</context>
         </context-group>
-        <target state="needs-translation">Filter Documents</target>
+        <target state="translated">Filtrovat dokumenty</target>
       </trans-unit>
       <trans-unit id="8095412801504464756" datatype="html">
         <source>{VAR_PLURAL, plural, =1 {One <x id="INTERPOLATION"/>} other {<x id="INTERPOLATION_1"/> total <x id="INTERPOLATION_2"/>}}</source>
