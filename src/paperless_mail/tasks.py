@@ -1,7 +1,6 @@
 import logging
 
 from celery import shared_task
-
 from paperless_mail.mail import MailAccountHandler
 from paperless_mail.mail import MailError
 from paperless_mail.models import MailAccount
