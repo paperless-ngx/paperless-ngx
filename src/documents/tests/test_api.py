@@ -1948,6 +1948,29 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             },
         )
 
+    @mock.patch("documents.parsers.parse_date_generator")
+    @override_settings(NUMBER_OF_SUGGESTED_DATES=0)
+    def test_get_suggestions_dates_disabled(
+        self,
+        parse_date_generator,
+    ):
+        """
+        GIVEN:
+            - NUMBER_OF_SUGGESTED_DATES = 0 (disables feature)
+        WHEN:
+            - API reuqest for document suggestions
+        THEN:
+            - Dont check for suggested dates at all
+        """
+        doc = Document.objects.create(
+            title="test",
+            mime_type="application/pdf",
+            content="this is an invoice from 12.04.2022!",
+        )
+
+        self.client.get(f"/api/documents/{doc.pk}/suggestions/")
+        self.assertFalse(parse_date_generator.called)
+
     def test_saved_views(self):
         u1 = User.objects.create_superuser("user1")
         u2 = User.objects.create_superuser("user2")
