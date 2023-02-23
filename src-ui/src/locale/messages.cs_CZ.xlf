@@ -352,7 +352,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">138</context>
         </context-group>
-        <target state="needs-translation">Prev</target>
+        <target state="translated">Předchozí</target>
       </trans-unit>
       <trans-unit id="3885497195825665706" datatype="html">
         <source>Next</source>
@@ -364,7 +364,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">55</context>
         </context-group>
-        <target state="needs-translation">Next</target>
+        <target state="translated">Další</target>
       </trans-unit>
       <trans-unit id="1241348629231510663" datatype="html">
         <source>End</source>
@@ -372,7 +372,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">140</context>
         </context-group>
-        <target state="needs-translation">End</target>
+        <target state="translated">Konec</target>
       </trans-unit>
       <trans-unit id="3909462337752654810" datatype="html">
         <source>The dashboard can be used to show saved views, such as an &apos;Inbox&apos;. Those settings are found under Settings &gt; Saved Views once you have created some.</source>
@@ -444,7 +444,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">222</context>
         </context-group>
-        <target state="needs-translation">Thank you! 🙏</target>
+        <target state="translated">Děkujeme! 🙏</target>
       </trans-unit>
       <trans-unit id="7354947513482088740" datatype="html">
         <source>There are &lt;em&gt;tons&lt;/em&gt; more features and info we didn&apos;t cover here, but this should get you started. Check out the documentation or visit the project on GitHub to learn more or to report issues.</source>
@@ -477,7 +477,7 @@
           <context context-type="linenumber">11</context>
         </context-group>
         <note priority="1" from="description">app title</note>
-        <target state="needs-translation">Paperless-ngx</target>
+        <target state="translated">Paperless-ngx</target>
       </trans-unit>
       <trans-unit id="7100953725264790651" datatype="html" approved="yes">
         <source>Search documents</source>
@@ -673,7 +673,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">155</context>
         </context-group>
-        <target state="needs-translation">Storage paths</target>
+        <target state="translated">Cesty k úložišti</target>
       </trans-unit>
       <trans-unit id="2991443309752293110" datatype="html">
         <source>File Tasks</source>
@@ -685,7 +685,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="needs-translation">File Tasks</target>
+        <target state="translated">Úlohy souboru</target>
       </trans-unit>
       <trans-unit id="5537285341303594392" datatype="html">
         <source>File Tasks<x id="START_TAG_SPAN_1" ctype="x-span_1" equiv-text="&lt;span *ngIf=&quot;tasksService.failedFileTasks.length &gt; 0&quot;&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-danger ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
@@ -745,7 +745,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">198</context>
         </context-group>
-        <target state="needs-translation">GitHub</target>
+        <target state="translated">GitHub</target>
       </trans-unit>
       <trans-unit id="5612903193691847840" datatype="html" approved="yes">
         <source>Suggest an idea</source>
@@ -765,7 +765,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">213</context>
         </context-group>
-        <target state="needs-translation">is available.</target>
+        <target state="translated">je k dispozici.</target>
       </trans-unit>
       <trans-unit id="1175891574282637937" datatype="html">
         <source>Click to view.</source>
@@ -773,7 +773,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">213</context>
         </context-group>
-        <target state="needs-translation">Click to view.</target>
+        <target state="translated">Klikni pro zobrazení.</target>
       </trans-unit>
       <trans-unit id="9811291095862612" datatype="html">
         <source>Paperless-ngx can automatically check for updates</source>
@@ -781,7 +781,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">217</context>
         </context-group>
-        <target state="needs-translation">Paperless-ngx can automatically check for updates</target>
+        <target state="translated">Paperless-ngx umí automaticky kontrolovat aktualizace</target>
       </trans-unit>
       <trans-unit id="894819944961861800" datatype="html">
         <source> How does this work? </source>
@@ -789,7 +789,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">224,226</context>
         </context-group>
-        <target state="needs-translation"> How does this work? </target>
+        <target state="translated"> Jak to funguje? </target>
       </trans-unit>
       <trans-unit id="509090351011426949" datatype="html">
         <source>Update available</source>
@@ -797,7 +797,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">235</context>
         </context-group>
-        <target state="needs-translation">Update available</target>
+        <target state="translated">K dispozici je aktualizace</target>
       </trans-unit>
       <trans-unit id="3011185103048412841" datatype="html">
         <source>An error occurred while saving settings.</source>
@@ -809,7 +809,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">574</context>
         </context-group>
-        <target state="needs-translation">An error occurred while saving settings.</target>
+        <target state="translated">Nastala chyba při ukládání uživatelských nastavení.</target>
       </trans-unit>
       <trans-unit id="2526035785704676448" datatype="html">
         <source>An error occurred while saving update checking settings.</source>
@@ -817,7 +817,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
           <context context-type="linenumber">222</context>
         </context-group>
-        <target state="needs-translation">An error occurred while saving update checking settings.</target>
+        <target state="translated">Došlo k chybě při ukládání nastavení kontroly aktualizací.</target>
       </trans-unit>
       <trans-unit id="8700121026680200191" datatype="html" approved="yes">
         <source>Clear</source>
@@ -1257,7 +1257,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">77</context>
         </context-group>
-        <target state="needs-translation">Permissions</target>
+        <target state="translated">Oprávnění</target>
       </trans-unit>
       <trans-unit id="7878445132438733225" datatype="html">
         <source>Create new user group</source>
@@ -1265,7 +1265,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/group-edit-dialog/group-edit-dialog.component.ts</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="needs-translation">Create new user group</target>
+        <target state="translated">Vytvořit novou uživatelskou skupinu</target>
       </trans-unit>
       <trans-unit id="200893957904793797" datatype="html">
         <source>Edit user group</source>
@@ -1273,7 +1273,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/group-edit-dialog/group-edit-dialog.component.ts</context>
           <context context-type="linenumber">28</context>
         </context-group>
-        <target state="needs-translation">Edit user group</target>
+        <target state="translated">Upravit uživatelskou skupinu</target>
       </trans-unit>
       <trans-unit id="1505107477868159986" datatype="html">
         <source>IMAP Server</source>
@@ -1281,7 +1281,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="needs-translation">IMAP Server</target>
+        <target state="translated">IMAP server</target>
       </trans-unit>
       <trans-unit id="6575044156016560168" datatype="html">
         <source>IMAP Port</source>
@@ -1289,7 +1289,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation">IMAP Port</target>
+        <target state="translated">IMAP port</target>
       </trans-unit>
       <trans-unit id="5418425343712813426" datatype="html">
         <source>IMAP Security</source>
@@ -1297,7 +1297,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">IMAP Security</target>
+        <target state="translated">Zabezpečení IMAP</target>
       </trans-unit>
       <trans-unit id="5248717555542428023" datatype="html">
         <source>Username</source>
@@ -1313,7 +1313,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">344</context>
         </context-group>
-        <target state="needs-translation">Username</target>
+        <target state="translated">Uživatelské jméno</target>
       </trans-unit>
       <trans-unit id="1431416938026210429" datatype="html">
         <source>Password</source>
@@ -1325,7 +1325,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation">Password</target>
+        <target state="translated">Heslo</target>
       </trans-unit>
       <trans-unit id="6124167940736826613" datatype="html">
         <source>Character Set</source>
@@ -1333,7 +1333,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.html</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="needs-translation">Character Set</target>
+        <target state="translated">Znaková sada</target>
       </trans-unit>
       <trans-unit id="451418349275958054" datatype="html">
         <source>No encryption</source>
@@ -1341,7 +1341,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">No encryption</target>
+        <target state="translated">Žádné šifrování</target>
       </trans-unit>
       <trans-unit id="3719080555538542367" datatype="html">
         <source>SSL</source>
@@ -1349,7 +1349,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.ts</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="needs-translation">SSL</target>
+        <target state="translated">SSL</target>
       </trans-unit>
       <trans-unit id="2620794666957669114" datatype="html">
         <source>STARTTLS</source>
@@ -1357,7 +1357,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.ts</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="needs-translation">STARTTLS</target>
+        <target state="translated">STARTTLS</target>
       </trans-unit>
       <trans-unit id="8758081884575368561" datatype="html">
         <source>Create new mail account</source>
@@ -1365,7 +1365,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.ts</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="needs-translation">Create new mail account</target>
+        <target state="translated">Vytvořit nový e-mailový účet</target>
       </trans-unit>
       <trans-unit id="5559445021532852612" datatype="html">
         <source>Edit mail account</source>
@@ -1373,7 +1373,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.ts</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="needs-translation">Edit mail account</target>
+        <target state="translated">Upravit e-mailový účet</target>
       </trans-unit>
       <trans-unit id="4086606389696938932" datatype="html">
         <source>Account</source>
@@ -1709,7 +1709,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">75</context>
         </context-group>
-        <target state="needs-translation">Use subject as title</target>
+        <target state="translated">Použít předmět jako titulek</target>
       </trans-unit>
       <trans-unit id="8645471396972938185" datatype="html">
         <source>Use attachment filename as title</source>
@@ -1717,7 +1717,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">79</context>
         </context-group>
-        <target state="needs-translation">Use attachment filename as title</target>
+        <target state="translated">Použít název souboru u přílohy jako titulek</target>
       </trans-unit>
       <trans-unit id="1568902914205618549" datatype="html">
         <source>Do not assign a correspondent</source>
@@ -1725,7 +1725,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">86</context>
         </context-group>
-        <target state="needs-translation">Do not assign a correspondent</target>
+        <target state="translated">Nepřiřazovat korespondenta</target>
       </trans-unit>
       <trans-unit id="3567746385454588269" datatype="html">
         <source>Use mail address</source>
@@ -1733,7 +1733,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">90</context>
         </context-group>
-        <target state="needs-translation">Use mail address</target>
+        <target state="translated">Použít emailovou adresu</target>
       </trans-unit>
       <trans-unit id="445154175758965852" datatype="html">
         <source>Use name (or mail address if not available)</source>
@@ -1741,7 +1741,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">94</context>
         </context-group>
-        <target state="needs-translation">Use name (or mail address if not available)</target>
+        <target state="translated">Použít jméno (nebo e-mailovou adresu, pokud není k dispozici)</target>
       </trans-unit>
       <trans-unit id="1258862217749148424" datatype="html">
         <source>Use correspondent selected below</source>
@@ -1749,7 +1749,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">98</context>
         </context-group>
-        <target state="needs-translation">Use correspondent selected below</target>
+        <target state="translated">Použít korespondenta vybraného níže</target>
       </trans-unit>
       <trans-unit id="3147349817770432927" datatype="html">
         <source>Create new mail rule</source>
@@ -1757,7 +1757,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">139</context>
         </context-group>
-        <target state="needs-translation">Create new mail rule</target>
+        <target state="translated">Vytvořit nové pravidlo pošty</target>
       </trans-unit>
       <trans-unit id="3374331029704382439" datatype="html">
         <source>Edit mail rule</source>
@@ -1765,7 +1765,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">143</context>
         </context-group>
-        <target state="needs-translation">Edit mail rule</target>
+        <target state="translated">Upravit pravidlo pošty</target>
       </trans-unit>
       <trans-unit id="8911059720204770105" datatype="html">
         <source>Path</source>
@@ -1777,7 +1777,7 @@
           <context context-type="sourcefile">src/app/components/manage/storage-path-list/storage-path-list.component.ts</context>
           <context context-type="linenumber">42</context>
         </context-group>
-        <target state="needs-translation">Path</target>
+        <target state="translated">Cesta</target>
       </trans-unit>
       <trans-unit id="6625768491622252297" datatype="html">
         <source>e.g.</source>
@@ -1785,7 +1785,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.ts</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="needs-translation">e.g.</target>
+        <target state="translated">např.</target>
       </trans-unit>
       <trans-unit id="1918584360573970155" datatype="html">
         <source>or use slashes to add directories e.g.</source>
@@ -1793,7 +1793,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.ts</context>
           <context context-type="linenumber">28</context>
         </context-group>
-        <target state="needs-translation">or use slashes to add directories e.g.</target>
+        <target state="translated">nebo použijte lomítka pro přidání adresářů, např.</target>
       </trans-unit>
       <trans-unit id="7871464228487558644" datatype="html">
         <source>See &lt;a target=&quot;_blank&quot; href=&quot;https://docs.paperless-ngx.com/advanced_usage/#file-name-handling&quot;&gt;documentation&lt;/a&gt; for full list.</source>
@@ -1809,7 +1809,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.ts</context>
           <context context-type="linenumber">35</context>
         </context-group>
-        <target state="needs-translation">Create new storage path</target>
+        <target state="translated">Vytvořit novou cestu k úložišti</target>
       </trans-unit>
       <trans-unit id="3754859110054016570" datatype="html">
         <source>Edit storage path</source>
@@ -1817,7 +1817,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.ts</context>
           <context context-type="linenumber">39</context>
         </context-group>
-        <target state="needs-translation">Edit storage path</target>
+        <target state="translated">Upravit cestu k úložiště</target>
       </trans-unit>
       <trans-unit id="9011959596901584887" datatype="html" approved="yes">
         <source>Color</source>
@@ -1869,7 +1869,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="needs-translation">Email</target>
+        <target state="translated">Email</target>
       </trans-unit>
       <trans-unit id="5342432350421167093" datatype="html">
         <source>First name</source>
@@ -1877,7 +1877,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">First name</target>
+        <target state="translated">Křestní jméno</target>
       </trans-unit>
       <trans-unit id="3586674587150281199" datatype="html">
         <source>Last name</source>
@@ -1885,7 +1885,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.html</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="needs-translation">Last name</target>
+        <target state="translated">Příjmení</target>
       </trans-unit>
       <trans-unit id="8204176479746810612" datatype="html">
         <source>Active</source>
@@ -1893,7 +1893,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.html</context>
           <context context-type="linenumber">19</context>
         </context-group>
-        <target state="needs-translation">Active</target>
+        <target state="translated">Aktivní</target>
       </trans-unit>
       <trans-unit id="1808271538028523977" datatype="html">
         <source>Superuser</source>
@@ -1901,7 +1901,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.html</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="needs-translation">Superuser</target>
+        <target state="translated">Superuživatel</target>
       </trans-unit>
       <trans-unit id="1403759966357927756" datatype="html">
         <source>(Grants all permissions and can view objects)</source>
@@ -1909,7 +1909,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.html</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="needs-translation">(Grants all permissions and can view objects)</target>
+        <target state="translated">(Přidává všechna oprávnění a umí zobrazit objekty)</target>
       </trans-unit>
       <trans-unit id="5944812089887969249" datatype="html">
         <source>Groups</source>
@@ -1925,7 +1925,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">367</context>
         </context-group>
-        <target state="needs-translation">Groups</target>
+        <target state="translated">Skupiny</target>
       </trans-unit>
       <trans-unit id="1436831433675346331" datatype="html">
         <source>Create new user account</source>
@@ -1933,7 +1933,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.ts</context>
           <context context-type="linenumber">41</context>
         </context-group>
-        <target state="needs-translation">Create new user account</target>
+        <target state="translated">Vytvořen nový uživatelský účet</target>
       </trans-unit>
       <trans-unit id="2887331217965896363" datatype="html">
         <source>Edit user account</source>
@@ -1941,7 +1941,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.ts</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="needs-translation">Edit user account</target>
+        <target state="translated">Upravit uživatelský účet</target>
       </trans-unit>
       <trans-unit id="1616102757855967475" datatype="html" approved="yes">
         <source>All</source>
@@ -1969,7 +1969,7 @@
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="needs-translation">Any</target>
+        <target state="translated">Jakýkoliv</target>
       </trans-unit>
       <trans-unit id="4391289919356861627" datatype="html" approved="yes">
         <source>Apply</source>
@@ -1985,7 +1985,7 @@
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
           <context context-type="linenumber">38</context>
         </context-group>
-        <target state="needs-translation">Click again to exclude items.</target>
+        <target state="translated">Klikněte znovu pro vyloučení položek.</target>
       </trans-unit>
       <trans-unit id="7593728289020204896" datatype="html" approved="yes">
         <source>Not assigned</source>
@@ -2026,7 +2026,7 @@
           <context context-type="sourcefile">src/app/components/common/input/permissions/permissions-form/permissions-form.component.html</context>
           <context context-type="linenumber">7</context>
         </context-group>
-        <target state="needs-translation">Edit Permissions</target>
+        <target state="translated">Upravit oprávnění</target>
       </trans-unit>
       <trans-unit id="6035283612400841811" datatype="html">
         <source>Owner:</source>
@@ -2034,7 +2034,7 @@
           <context context-type="sourcefile">src/app/components/common/input/permissions/permissions-form/permissions-form.component.html</context>
           <context context-type="linenumber">19</context>
         </context-group>
-        <target state="needs-translation">Owner:</target>
+        <target state="translated">Vlastník:</target>
       </trans-unit>
       <trans-unit id="734147282056744882" datatype="html">
         <source>Objects without an owner can be viewed and edited by all users</source>
@@ -2042,7 +2042,7 @@
           <context context-type="sourcefile">src/app/components/common/input/permissions/permissions-form/permissions-form.component.html</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">Objects without an owner can be viewed and edited by all users</target>
+        <target state="translated">Objekty bez vlastníka mohou být zobrazeny a editovány všemi uživateli</target>
       </trans-unit>
       <trans-unit id="2509141182388535183" datatype="html" approved="yes">
         <source>View</source>
@@ -2070,7 +2070,7 @@
           <context context-type="sourcefile">src/app/components/common/input/permissions/permissions-form/permissions-form.component.html</context>
           <context context-type="linenumber">50</context>
         </context-group>
-        <target state="needs-translation">Users:</target>
+        <target state="translated">Uživatelé:</target>
       </trans-unit>
       <trans-unit id="239911470633002624" datatype="html">
         <source>Groups:</source>
@@ -2082,7 +2082,7 @@
           <context context-type="sourcefile">src/app/components/common/input/permissions/permissions-form/permissions-form.component.html</context>
           <context context-type="linenumber">58</context>
         </context-group>
-        <target state="needs-translation">Groups:</target>
+        <target state="translated">Skupiny:</target>
       </trans-unit>
       <trans-unit id="7585826646011739428" datatype="html" approved="yes">
         <source>Edit</source>
@@ -2154,7 +2154,7 @@
           <context context-type="sourcefile">src/app/components/common/input/permissions/permissions-form/permissions-form.component.html</context>
           <context context-type="linenumber">64</context>
         </context-group>
-        <target state="needs-translation">Edit permissions also grant viewing permissions</target>
+        <target state="translated">Oprávnění editovat také přidá oprávnění prohlížet</target>
       </trans-unit>
       <trans-unit id="2722549756198502062" datatype="html" approved="yes">
         <source>Add item</source>
@@ -2179,7 +2179,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-dialog/permissions-dialog.component.ts</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="needs-translation">Set Permissions</target>
+        <target state="translated">Nastavit oprávnění</target>
       </trans-unit>
       <trans-unit id="8283439432608484491" datatype="html">
         <source>Note that permissions set here will override any existing permissions</source>
@@ -2187,7 +2187,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-dialog/permissions-dialog.component.ts</context>
           <context context-type="linenumber">41</context>
         </context-group>
-        <target state="needs-translation">Note that permissions set here will override any existing permissions</target>
+        <target state="translated">Upozorňujeme, že zde nastavená oprávnění přepíší všechna existující oprávnění</target>
       </trans-unit>
       <trans-unit id="8650499415827640724" datatype="html">
         <source>Type</source>
@@ -2195,7 +2195,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
           <context context-type="linenumber">5</context>
         </context-group>
-        <target state="needs-translation">Type</target>
+        <target state="translated">Typ</target>
       </trans-unit>
       <trans-unit id="3249513483374643425" datatype="html">
         <source>Add</source>
@@ -2203,7 +2203,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
           <context context-type="linenumber">7</context>
         </context-group>
-        <target state="needs-translation">Add</target>
+        <target state="translated">Přidat</target>
       </trans-unit>
       <trans-unit id="1230154438678955604" datatype="html">
         <source>Change</source>
@@ -2211,7 +2211,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
           <context context-type="linenumber">8</context>
         </context-group>
-        <target state="needs-translation">Change</target>
+        <target state="translated">Změnit</target>
       </trans-unit>
       <trans-unit id="187187500641108332" datatype="html">
         <source>
@@ -2225,7 +2225,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="needs-translation"><x id="INTERPOLATION" equiv-text="{{action.key}}"/></target>
+        <target state="translated"><x id="INTERPOLATION" equiv-text="{{action.key}}"/></target>
       </trans-unit>
       <trans-unit id="3776388302418428342" datatype="html">
         <source>Inerhited from group</source>
@@ -2233,7 +2233,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.ts</context>
           <context context-type="linenumber">59</context>
         </context-group>
-        <target state="needs-translation">Inerhited from group</target>
+        <target state="translated">Zděděno ze skupiny</target>
       </trans-unit>
       <trans-unit id="3797570084942068182" datatype="html" approved="yes">
         <source>Select</source>
@@ -2293,7 +2293,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">27</context>
         </context-group>
-        <target state="needs-translation">Loading...</target>
+        <target state="translated">Načítání...</target>
       </trans-unit>
       <trans-unit id="1865646076514070962" datatype="html">
         <source>Hello <x id="PH" equiv-text="this.settingsService.displayName"/>, welcome to Paperless-ngx</source>
@@ -2301,7 +2301,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="needs-translation">Hello <x id="PH" equiv-text="this.settingsService.displayName"/>, welcome to Paperless-ngx</target>
+        <target state="translated">Ahoj <x id="PH" equiv-text="this.settingsService.displayName"/>, vítej v Paperless-ngx</target>
       </trans-unit>
       <trans-unit id="5334686081082652461" datatype="html">
         <source>Welcome to Paperless-ngx</source>
@@ -2309,7 +2309,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="needs-translation">Welcome to Paperless-ngx</target>
+        <target state="translated">Vítej v Paperless-ngx</target>
       </trans-unit>
       <trans-unit id="2946624699882754313" datatype="html" approved="yes">
         <source>Show all</source>
@@ -2472,7 +2472,7 @@
           <context context-type="linenumber">261</context>
         </context-group>
         <note priority="1" from="description">this string is used to separate processing, failed and added on the file upload widget</note>
-        <target state="needs-translation">, </target>
+        <target state="translated">, </target>
       </trans-unit>
       <trans-unit id="7915903586014997661" datatype="html">
         <source>Paperless-ngx is running!</source>
@@ -2480,7 +2480,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">3</context>
         </context-group>
-        <target state="needs-translation">Paperless-ngx is running!</target>
+        <target state="translated">Paperless-ngx běží!</target>
       </trans-unit>
       <trans-unit id="3326049540711826572" datatype="html">
         <source>You&apos;re ready to start uploading documents! Explore the various features of this web app on your own, or start a quick tour using the button below.</source>
