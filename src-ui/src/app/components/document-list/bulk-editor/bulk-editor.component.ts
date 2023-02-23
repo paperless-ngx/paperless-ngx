@@ -53,6 +53,10 @@ export class BulkEditorComponent
   correspondentSelectionModel = new FilterableDropdownSelectionModel()
   documentTypeSelectionModel = new FilterableDropdownSelectionModel()
   storagePathsSelectionModel = new FilterableDropdownSelectionModel()
+  tagDocumentCounts: SelectionDataItem[]
+  correspondentDocumentCounts: SelectionDataItem[]
+  documentTypeDocumentCounts: SelectionDataItem[]
+  storagePathDocumentCounts: SelectionDataItem[]
   awaitingDownload: boolean
 
   unsubscribeNotifier: Subject<any> = new Subject()
@@ -206,6 +210,7 @@ export class BulkEditorComponent
       .getSelectionData(Array.from(this.list.selected))
       .pipe(first())
       .subscribe((s) => {
+        this.tagDocumentCounts = s.selected_tags
         this.applySelectionData(s.selected_tags, this.tagSelectionModel)
       })
   }
@@ -215,6 +220,7 @@ export class BulkEditorComponent
       .getSelectionData(Array.from(this.list.selected))
       .pipe(first())
       .subscribe((s) => {
+        this.documentTypeDocumentCounts = s.selected_document_types
         this.applySelectionData(
           s.selected_document_types,
           this.documentTypeSelectionModel
@@ -227,6 +233,7 @@ export class BulkEditorComponent
       .getSelectionData(Array.from(this.list.selected))
       .pipe(first())
       .subscribe((s) => {
+        this.correspondentDocumentCounts = s.selected_correspondents
         this.applySelectionData(
           s.selected_correspondents,
           this.correspondentSelectionModel
@@ -239,6 +246,7 @@ export class BulkEditorComponent
       .getSelectionData(Array.from(this.list.selected))
       .pipe(first())
       .subscribe((s) => {
+        this.storagePathDocumentCounts = s.selected_storage_paths
         this.applySelectionData(
           s.selected_storage_paths,
           this.storagePathsSelectionModel
