@@ -1,5 +1,6 @@
 import datetime
 import itertools
+import logging
 import os
 import re
 import tempfile
@@ -91,7 +92,7 @@ class DeleteMailAction(BaseMailAction):
     A mail action that deletes mails after processing.
     """
 
-    def post_consume(self, M, message_uid, parameter):
+    def post_consume(self, M: MailBox, message_uid: str, parameter: str):
         M.delete(message_uid)
 
 
@@ -103,7 +104,7 @@ class MarkReadMailAction(BaseMailAction):
     def get_criteria(self):
         return {"seen": False}
 
-    def post_consume(self, M, message_uid, parameter):
+    def post_consume(self, M: MailBox, message_uid: str, parameter: str):
         M.flag(message_uid, [MailMessageFlags.SEEN], True)
 
 
@@ -124,7 +125,7 @@ class FlagMailAction(BaseMailAction):
     def get_criteria(self):
         return {"flagged": False}
 
-    def post_consume(self, M, message_uid, parameter):
+    def post_consume(self, M: MailBox, message_uid: str, parameter: str):
         M.flag(message_uid, [MailMessageFlags.FLAGGED], True)
 
 
@@ -160,10 +161,9 @@ class TagMailAction(BaseMailAction):
         else:
             raise ValueError("This should never happen.")
 
-    def post_consume(self, M: MailBox, message_uid, parameter):
+    def post_consume(self, M: MailBox, message_uid: str, parameter: str):
         if re.search(r"gmail\.com$|googlemail\.com$", M._host):
-            for uid in message_uid:
-                M.client.uid("STORE", uid, "X-GM-LABELS", self.keyword)
+            M.client.uid("STORE", message_uid, "X-GM-LABELS", self.keyword)
 
         # AppleMail
         elif self.color:
@@ -188,6 +188,35 @@ class TagMailAction(BaseMailAction):
 
         else:
             raise MailError("No keyword specified.")
+
+
+def mailbox_login(mailbox: MailBox, account: MailAccount):
+    logger = logging.getLogger("paperless_mail")
+
+    try:
+
+        mailbox.login(account.username, account.password)
+
+    except UnicodeEncodeError:
+        logger.debug("Falling back to AUTH=PLAIN")
+
+        try:
+            mailbox.login_utf8(account.username, account.password)
+        except Exception as e:
+            logger.error(
+                "Unable to authenticate with mail server using AUTH=PLAIN",
+            )
+            raise MailError(
+                f"Error while authenticating account {account}",
+            ) from e
+    except Exception as e:
+        logger.error(
+            f"Error while authenticating account {account}: {e}",
+            exc_info=False,
+        )
+        raise MailError(
+            f"Error while authenticating account {account}",
+        ) from e
 
 
 @shared_task
@@ -216,7 +245,7 @@ def apply_mail_action(
             port=account.imap_port,
             security=account.imap_security,
         ) as M:
-            M.login(username=account.username, password=account.password)
+            mailbox_login(M, account)
             M.folder.set(rule.folder)
             action.post_consume(M, message_uid, rule.action_parameter)
 
@@ -436,32 +465,7 @@ class MailAccountHandler(LoggingMixin):
                 self.log("debug", f"GMAIL Label Support: {supports_gmail_labels}")
                 self.log("debug", f"AUTH=PLAIN Support: {supports_auth_plain}")
 
-                try:
-
-                    M.login(account.username, account.password)
-
-                except UnicodeEncodeError:
-                    self.log("debug", "Falling back to AUTH=PLAIN")
-
-                    try:
-                        M.login_utf8(account.username, account.password)
-                    except Exception as e:
-                        self.log(
-                            "error",
-                            "Unable to authenticate with mail server using AUTH=PLAIN",
-                        )
-                        raise MailError(
-                            f"Error while authenticating account {account}",
-                        ) from e
-                except Exception as e:
-                    self.log(
-                        "error",
-                        f"Error while authenticating account {account}: {e}",
-                        exc_info=False,
-                    )
-                    raise MailError(
-                        f"Error while authenticating account {account}",
-                    ) from e
+                mailbox_login(M, account)
 
                 self.log(
                     "debug",

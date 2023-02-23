@@ -912,13 +912,17 @@ class TestMail(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.mail_account_handler.handle_mail_account(account)
 
         self._queue_consumption_tasks_mock.assert_called_once()
-        args, kwargs = self.async_task.call_args
 
         c = Correspondent.objects.get(name="amazon@amazon.de")
-        # should work
-        self.assertEqual(kwargs["override_correspondent_id"], c.id)
+        self.verify_queue_consumption_tasks_call_args(
+            [
+                [
+                    {"override_correspondent_id": c.id},
+                ],
+            ],
+        )
 
-        self.async_task.reset_mock()
+        self._queue_consumption_tasks_mock.reset_mock()
         self.reset_bogus_mailbox()
 
         with mock.patch("paperless_mail.mail.Correspondent.objects.get_or_create") as m:
@@ -926,9 +930,13 @@ class TestMail(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
             self.mail_account_handler.handle_mail_account(account)
 
-        args, kwargs = self.async_task.call_args
-        self.async_task.assert_called_once()
-        self.assertEqual(kwargs["override_correspondent_id"], None)
+        self.verify_queue_consumption_tasks_call_args(
+            [
+                [
+                    {"override_correspondent_id": None},
+                ],
+            ],
+        )
 
     def test_filters(self):
 
