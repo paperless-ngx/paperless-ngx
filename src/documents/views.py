@@ -593,11 +593,14 @@ class LogViewSet(ViewSet):
 
     log_files = ["paperless", "mail"]
 
+    def get_log_filename(self, log):
+        return os.path.join(settings.LOGGING_DIR, f"{log}.log")
+
     def retrieve(self, request, pk=None, *args, **kwargs):
         if pk not in self.log_files:
             raise Http404()
 
-        filename = os.path.join(settings.LOGGING_DIR, f"{pk}.log")
+        filename = self.get_log_filename(pk)
 
         if not os.path.isfile(filename):
             raise Http404()
@@ -608,7 +611,10 @@ class LogViewSet(ViewSet):
         return Response(lines)
 
     def list(self, request, *args, **kwargs):
-        return Response(self.log_files)
+        exist = [
+            log for log in self.log_files if os.path.isfile(self.get_log_filename(log))
+        ]
+        return Response(exist)
 
 
 class SavedViewViewSet(ModelViewSet, PassUserMixin):
