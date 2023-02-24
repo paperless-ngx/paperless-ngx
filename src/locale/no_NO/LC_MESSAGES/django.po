@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-09 21:50+0000\n"
-"PO-Revision-Date: 2022-11-29 08:29\n"
+"PO-Revision-Date: 2023-02-24 00:08\n"
 "Last-Translator: \n"
 "Language-Team: Norwegian\n"
 "Language: no_NO\n"
@@ -428,7 +428,7 @@ msgstr ""
 
 #: documents/models.py:564
 msgid "JSON representation of the positional arguments used with the task"
-msgstr ""
+msgstr "JSON-representasjon av posisjonsargumentene brukt i oppgaven"
 
 #: documents/models.py:569
 msgid "Task Named Arguments"
