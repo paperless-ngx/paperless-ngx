@@ -419,10 +419,7 @@ modes are available:
         an archived version of your documents when it finds any text in
         them. This is useful if you don't want to have two
         almost-identical versions of your digital documents in the media
-        folder.
-
-    -   `skip_neverarchive`: In addition to skip, paperless will never
-        create an archive version of your documents. This is the fastest option.
+        folder. This is the fastest option.
 
     -   `redo`: Paperless will OCR all pages of your documents and
         attempt to replace any existing text layers with new text. This
