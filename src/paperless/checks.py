@@ -133,8 +133,8 @@ def settings_values_check(app_configs, **kwargs):
         if settings.OCR_MODE == "skip_noarchive":
             msgs.append(
                 Warning(
-                    'OCR output mode "skip_noarchive" is deprecated and will be'
-                    "removed in a future version. Please use"
+                    'OCR output mode "skip_noarchive" is deprecated and will be '
+                    "removed in a future version. Please use "
                     "PAPERLESS_OCR_SKIP_ARCHIVE_FILE instead.",
                 ),
             )
