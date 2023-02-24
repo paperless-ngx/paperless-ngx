@@ -386,7 +386,7 @@ class TestMail(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         self.assertEqual(result, 2)
 
-        self.verify_queue_consumption_tasks_call_args(
+        self.assert_queue_consumption_tasks_call_args(
             [
                 [
                     {"override_title": "file_0", "override_filename": "file_0.pdf"},
@@ -428,7 +428,7 @@ class TestMail(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         result = self.mail_account_handler._handle_message(message, rule)
 
         self.assertEqual(result, 1)
-        self.verify_queue_consumption_tasks_call_args(
+        self.assert_queue_consumption_tasks_call_args(
             [
                 [
                     {"override_filename": "f1.pdf"},
@@ -457,7 +457,7 @@ class TestMail(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         result = self.mail_account_handler._handle_message(message, rule)
         self.assertEqual(result, 1)
-        self.verify_queue_consumption_tasks_call_args(
+        self.assert_queue_consumption_tasks_call_args(
             [
                 [
                     {"override_filename": "f2.pdf"},
@@ -487,7 +487,7 @@ class TestMail(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         result = self.mail_account_handler._handle_message(message, rule)
         self.assertEqual(result, 2)
-        self.verify_queue_consumption_tasks_call_args(
+        self.assert_queue_consumption_tasks_call_args(
             [
                 [
                     {"override_filename": "f1.pdf"},
@@ -531,7 +531,7 @@ class TestMail(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
                 rule.save()
 
                 self.mail_account_handler._handle_message(message, rule)
-                self.verify_queue_consumption_tasks_call_args(
+                self.assert_queue_consumption_tasks_call_args(
                     [
                         [{"override_filename": m} for m in matches],
                     ],
@@ -914,7 +914,7 @@ class TestMail(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self._queue_consumption_tasks_mock.assert_called_once()
 
         c = Correspondent.objects.get(name="amazon@amazon.de")
-        self.verify_queue_consumption_tasks_call_args(
+        self.assert_queue_consumption_tasks_call_args(
             [
                 [
                     {"override_correspondent_id": c.id},
@@ -930,7 +930,7 @@ class TestMail(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
             self.mail_account_handler.handle_mail_account(account)
 
-        self.verify_queue_consumption_tasks_call_args(
+        self.assert_queue_consumption_tasks_call_args(
             [
                 [
                     {"override_correspondent_id": None},
@@ -1042,29 +1042,49 @@ class TestMail(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             account,
         )
 
-    def verify_queue_consumption_tasks_call_args(self, params):
+    def assert_queue_consumption_tasks_call_args(self, expected_call_args: List):
+        """
+        Verifies that queue_consumption_tasks has been called with the expected arguments.
 
+        expected_call_args is the following format:
+
+        * List of calls to queue_consumption_tasks, called once per mail, where each element is:
+        * List of signatures for the consume_file task, where each element is:
+        * dictionary containing arguments that need to be present in the consume_file signature.
+
+        """
+
+        # assert number of calls to queue_consumption_tasks mathc
         self.assertEqual(
             len(self._queue_consumption_tasks_mock.call_args_list),
-            len(params),
+            len(expected_call_args),
         )
 
-        for (args, kwargs), param in zip(
+        for (mock_args, mock_kwargs), expected_signatures in zip(
             self._queue_consumption_tasks_mock.call_args_list,
-            params,
+            expected_call_args,
         ):
+            consume_tasks = mock_kwargs["consume_tasks"]
 
-            consume_tasks = kwargs["consume_tasks"]
+            # assert number of consume_file tasks match
+            self.assertEqual(len(consume_tasks), len(expected_signatures))
 
-            self.assertEqual(len(consume_tasks), len(param))
-
-            for consume_task, p in zip(consume_tasks, param):
+            for consume_task, expected_signature in zip(
+                consume_tasks,
+                expected_signatures,
+            ):
+                # assert the file exists
                 self.assertIsFile(consume_task.kwargs["path"])
-                for key, value in p.items():
+
+                # assert all expected arguments are present in the signature
+                for key, value in expected_signature.items():
                     self.assertIn(key, consume_task.kwargs)
                     self.assertEqual(consume_task.kwargs[key], value)
 
     def apply_mail_actions(self):
+        """
+        Applies pending actions to mails by inspecting calls to the queue_consumption_tasks method.
+        """
         for args, kwargs in self._queue_consumption_tasks_mock.call_args_list:
             message = kwargs["message"]
             rule = kwargs["rule"]
