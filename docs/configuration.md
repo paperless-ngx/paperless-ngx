@@ -415,12 +415,6 @@ modes are available:
     -   `skip`: Paperless skips all pages and will perform ocr only on
         pages where no text is present. This is the safest option.
 
-    -   `skip_noarchive`: In addition to skip, paperless won't create
-        an archived version of your documents when it finds any text in
-        them. This is useful if you don't want to have two
-        almost-identical versions of your digital documents in the media
-        folder. This is the fastest option.
-
     -   `redo`: Paperless will OCR all pages of your documents and
         attempt to replace any existing text layers with new text. This
         will be useful for documents from scanners that already
@@ -442,6 +436,19 @@ modes are available:
 
     Read more about this in the [OCRmyPDF
     documentation](https://ocrmypdf.readthedocs.io/en/latest/advanced.html#when-ocr-is-skipped).
+
+`PAPERLESS_OCR_SKIP_ARCHIVE_FILE=<mode>`
+
+: Specify when you would like paperless to skip creating an archived
+version of your documents. This is useful if you don't want to have two
+almost-identical versions of your documents in the media folder.
+
+    -   `never`: Never skip creating an archived version.
+    -   `with_text`: Skip creating an archived version for documents
+    that already have embedded text.
+    -   `always`: Always skip creating an archived version.
+
+    The default is `never`.
 
 `PAPERLESS_OCR_CLEAN=<mode>`
 
