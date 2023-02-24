@@ -294,7 +294,11 @@ class RasterisedDocumentParser(DocumentParser):
 
         # If the original has text, and the user doesn't want an archive,
         # we're done here
-        if settings.OCR_MODE == "skip_noarchive" and original_has_text:
+        skip_archive_for_text = (
+            settings.OCR_MODE == "skip_noarchive"
+            or settings.OCR_SKIP_ARCHIVE_FILE in ["with_text", "always"]
+        )
+        if skip_archive_for_text and original_has_text:
             self.log("debug", "Document has text, skipping OCRmyPDF entirely.")
             self.text = text_original
             return
@@ -320,7 +324,8 @@ class RasterisedDocumentParser(DocumentParser):
             self.log("debug", f"Calling OCRmyPDF with args: {args}")
             ocrmypdf.ocr(**args)
 
-            self.archive_path = archive_path
+            if settings.OCR_SKIP_ARCHIVE_FILE != "always":
+                self.archive_path = archive_path
 
             self.text = self.extract_text(sidecar_file, archive_path)
 
