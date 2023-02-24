@@ -257,11 +257,12 @@ supported.
     - `mime-support` for mime type detection
     - `libzbar0` for barcode detection
     - `poppler-utils` for barcode detection
+    - `celery` for task queue
 
     Use this list for your preferred package management:
 
     ```
-    python3 python3-pip python3-dev imagemagick fonts-liberation gnupg libpq-dev default-libmysqlclient-dev libmagic-dev mime-support libzbar0 poppler-utils
+    python3 python3-pip python3-dev imagemagick fonts-liberation gnupg libpq-dev default-libmysqlclient-dev libmagic-dev mime-support libzbar0 poppler-utils celery
     ```
 
     These dependencies are required for OCRmyPDF, which is used for text
