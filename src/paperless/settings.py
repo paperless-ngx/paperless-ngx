@@ -725,6 +725,8 @@ OCR_OUTPUT_TYPE = os.getenv("PAPERLESS_OCR_OUTPUT_TYPE", "pdfa")
 # skip. redo, force
 OCR_MODE = os.getenv("PAPERLESS_OCR_MODE", "skip")
 
+OCR_SKIP_ARCHIVE_FILE = os.getenv("PAPERLESS_OCR_SKIP_ARCHIVE_FILE", "never")
+
 OCR_IMAGE_DPI = os.getenv("PAPERLESS_OCR_IMAGE_DPI")
 
 OCR_CLEAN = os.getenv("PAPERLESS_OCR_CLEAN", "clean")
