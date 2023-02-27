@@ -818,9 +818,10 @@ performance immensely:
   other tasks).
 - Keep `PAPERLESS_OCR_MODE` at its default value `skip` and consider
   OCR'ing your documents before feeding them into paperless. Some
-  scanners are able to do this! You might want to even specify
-  `skip_noarchive` to skip archive file generation for already ocr'ed
-  documents entirely.
+  scanners are able to do this!
+- Set `PAPERLESS_OCR_SKIP_ARCHIVE_FILE` to `with_text` to skip archive
+  file generation for already ocr'ed documents, or `always` to skip it
+  for all documents.
 - If you want to perform OCR on the device, consider using
   `PAPERLESS_OCR_CLEAN=none`. This will speed up OCR times and use
   less memory at the expense of slightly worse OCR results.
