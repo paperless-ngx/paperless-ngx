@@ -192,7 +192,7 @@ class RasterisedDocumentParser(DocumentParser):
 
         if settings.OCR_MODE == "force" or safe_fallback:
             ocrmypdf_args["force_ocr"] = True
-        elif settings.OCR_MODE in ["skip", "skip_noarchive", "skip_neverarchive"]:
+        elif settings.OCR_MODE in ["skip", "skip_noarchive"]:
             ocrmypdf_args["skip_text"] = True
         elif settings.OCR_MODE == "redo":
             ocrmypdf_args["redo_ocr"] = True
@@ -294,10 +294,11 @@ class RasterisedDocumentParser(DocumentParser):
 
         # If the original has text, and the user doesn't want an archive,
         # we're done here
-        if (
-            settings.OCR_MODE in ["skip_noarchive", "skip_neverarchive"]
-            and original_has_text
-        ):
+        skip_archive_for_text = (
+            settings.OCR_MODE == "skip_noarchive"
+            or settings.OCR_SKIP_ARCHIVE_FILE in ["with_text", "always"]
+        )
+        if skip_archive_for_text and original_has_text:
             self.log("debug", "Document has text, skipping OCRmyPDF entirely.")
             self.text = text_original
             return
@@ -323,8 +324,7 @@ class RasterisedDocumentParser(DocumentParser):
             self.log("debug", f"Calling OCRmyPDF with args: {args}")
             ocrmypdf.ocr(**args)
 
-            # Only create archive file if archiving isn't being skipped
-            if settings.OCR_MODE != "skip_neverarchive":
+            if settings.OCR_SKIP_ARCHIVE_FILE != "always":
                 self.archive_path = archive_path
 
             self.text = self.extract_text(sidecar_file, archive_path)

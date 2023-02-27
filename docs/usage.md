@@ -60,8 +60,8 @@ following operations on your documents:
 
     This process can be configured to fit your needs. If you don't want
     paperless to create archived versions for digital documents, you can
-    configure that by configuring `PAPERLESS_OCR_MODE=skip_noarchive`.
-    Please read the
+    configure that by configuring
+    `PAPERLESS_OCR_SKIP_ARCHIVE_FILE=with_text`. Please read the
     [relevant section in the documentation](/configuration#ocr).
 
 !!! note

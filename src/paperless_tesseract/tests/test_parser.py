@@ -332,7 +332,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             ["page 1", "page 2", "page 3"],
         )
 
-    @override_settings(OOCR_MODE="skip")
+    @override_settings(OCR_MODE="skip")
     def test_multi_page_analog_pages_skip(self):
         parser = RasterisedDocumentParser(None)
         parser.parse(
@@ -438,16 +438,62 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         self.assertIsNotNone(parser.archive_path)
 
-    @override_settings(OCR_MODE="skip_neverarchive")
-    def test_skip_neverarchive_withtext(self):
+    @override_settings(OCR_SKIP_ARCHIVE_FILE="never")
+    def test_skip_archive_never_withtext(self):
         """
         GIVEN:
             - File with existing text layer
-            - OCR mode set to skip_neverarchive
+            - OCR_SKIP_ARCHIVE_FILE set to never
+        WHEN:
+            - Document is parsed
+        THEN:
+            - Text from text layer is extracted
+            - Archive file is created
+        """
+        parser = RasterisedDocumentParser(None)
+        parser.parse(
+            os.path.join(self.SAMPLE_FILES, "multi-page-digital.pdf"),
+            "application/pdf",
+        )
+        self.assertIsNotNone(parser.archive_path)
+        self.assertContainsStrings(
+            parser.get_text().lower(),
+            ["page 1", "page 2", "page 3"],
+        )
+
+    @override_settings(OCR_SKIP_ARCHIVE_FILE="never")
+    def test_skip_archive_never_withimages(self):
+        """
+        GIVEN:
+            - File with text contained in images but no text layer
+            - OCR_SKIP_ARCHIVE_FILE set to never
         WHEN:
             - Document is parsed
         THEN:
             - Text from images is extracted
+            - Archive file is created
+        """
+        parser = RasterisedDocumentParser(None)
+        parser.parse(
+            os.path.join(self.SAMPLE_FILES, "multi-page-images.pdf"),
+            "application/pdf",
+        )
+        self.assertIsNotNone(parser.archive_path)
+        self.assertContainsStrings(
+            parser.get_text().lower(),
+            ["page 1", "page 2", "page 3"],
+        )
+
+    @override_settings(OCR_SKIP_ARCHIVE_FILE="with_text")
+    def test_skip_archive_withtext_withtext(self):
+        """
+        GIVEN:
+            - File with existing text layer
+            - OCR_SKIP_ARCHIVE_FILE set to with_text
+        WHEN:
+            - Document is parsed
+        THEN:
+            - Text from text layer is extracted
             - No archive file is created
         """
         parser = RasterisedDocumentParser(None)
@@ -461,12 +507,58 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             ["page 1", "page 2", "page 3"],
         )
 
-    @override_settings(OCR_MODE="skip_neverarchive")
-    def test_skip_neverarchive_notext(self):
+    @override_settings(OCR_SKIP_ARCHIVE_FILE="with_text")
+    def test_skip_archive_withtext_withimages(self):
         """
         GIVEN:
             - File with text contained in images but no text layer
-            - OCR mode set to skip_neverarchive
+            - OCR_SKIP_ARCHIVE_FILE set to with_text
+        WHEN:
+            - Document is parsed
+        THEN:
+            - Text from images is extracted
+            - Archive file is created
+        """
+        parser = RasterisedDocumentParser(None)
+        parser.parse(
+            os.path.join(self.SAMPLE_FILES, "multi-page-images.pdf"),
+            "application/pdf",
+        )
+        self.assertIsNotNone(parser.archive_path)
+        self.assertContainsStrings(
+            parser.get_text().lower(),
+            ["page 1", "page 2", "page 3"],
+        )
+
+    @override_settings(OCR_SKIP_ARCHIVE_FILE="always")
+    def test_skip_archive_always_withtext(self):
+        """
+        GIVEN:
+            - File with existing text layer
+            - OCR_SKIP_ARCHIVE_FILE set to always
+        WHEN:
+            - Document is parsed
+        THEN:
+            - Text from text layer is extracted
+            - No archive file is created
+        """
+        parser = RasterisedDocumentParser(None)
+        parser.parse(
+            os.path.join(self.SAMPLE_FILES, "multi-page-digital.pdf"),
+            "application/pdf",
+        )
+        self.assertIsNone(parser.archive_path)
+        self.assertContainsStrings(
+            parser.get_text().lower(),
+            ["page 1", "page 2", "page 3"],
+        )
+
+    @override_settings(OCR_SKIP_ARCHIVE_FILE="always")
+    def test_skip_archive_always_withimages(self):
+        """
+        GIVEN:
+            - File with text contained in images but no text layer
+            - OCR_SKIP_ARCHIVE_FILE set to always
         WHEN:
             - Document is parsed
         THEN:

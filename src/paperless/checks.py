@@ -127,14 +127,25 @@ def settings_values_check(app_configs, **kwargs):
                 Error(f'OCR output type "{settings.OCR_OUTPUT_TYPE}" is not valid'),
             )
 
-        if settings.OCR_MODE not in {
-            "force",
-            "skip",
-            "redo",
-            "skip_noarchive",
-            "skip_neverarchive",
-        }:
+        if settings.OCR_MODE not in {"force", "skip", "redo", "skip_noarchive"}:
             msgs.append(Error(f'OCR output mode "{settings.OCR_MODE}" is not valid'))
+
+        if settings.OCR_MODE == "skip_noarchive":
+            msgs.append(
+                Warning(
+                    'OCR output mode "skip_noarchive" is deprecated and will be '
+                    "removed in a future version. Please use "
+                    "PAPERLESS_OCR_SKIP_ARCHIVE_FILE instead.",
+                ),
+            )
+
+        if settings.OCR_SKIP_ARCHIVE_FILE not in {"never", "with_text", "always"}:
+            msgs.append(
+                Error(
+                    "OCR_SKIP_ARCHIVE_FILE setting "
+                    f'"{settings.OCR_SKIP_ARCHIVE_FILE}" is not valid',
+                ),
+            )
 
         if settings.OCR_CLEAN not in {"clean", "clean-final", "none"}:
             msgs.append(Error(f'OCR clean mode "{settings.OCR_CLEAN}" is not valid'))
