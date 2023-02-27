@@ -5,6 +5,7 @@ import re
 import shutil
 import warnings
 from datetime import datetime
+from hashlib import sha256
 from typing import Iterator
 from typing import List
 from typing import Optional
@@ -51,7 +52,7 @@ def load_classifier() -> Optional["DocumentClassifier"]:
     except OSError:
         logger.exception("IO error while loading document classification model")
         classifier = None
-    except Exception:
+    except Exception:  # pragma: nocover
         logger.exception("Unknown error while loading document classification model")
         classifier = None
 
@@ -62,13 +63,14 @@ class DocumentClassifier:
 
     # v7 - Updated scikit-learn package version
     # v8 - Added storage path classifier
-    # v9 - Changed from hash to time for training data check
+    # v9 - Changed from hashing to time/ids for re-train check
     FORMAT_VERSION = 9
 
     def __init__(self):
-        # last time training data was calculated. used to prevent re-training when the
-        # training data has not changed.
-        self.last_data_change: Optional[datetime] = None
+        # last time a document changed and therefore training might be required
+        self.last_doc_change_time: Optional[datetime] = None
+        # Hash of primary keys of AUTO matching values last used in training
+        self.last_auto_type_hash: Optional[bytes] = None
 
         self.data_vectorizer = None
         self.tags_binarizer = None
@@ -92,7 +94,9 @@ class DocumentClassifier:
                     )
                 else:
                     try:
-                        self.last_data_change = pickle.load(f)
+                        self.last_doc_change_time = pickle.load(f)
+                        self.last_auto_type_hash = pickle.load(f)
+
                         self.data_vectorizer = pickle.load(f)
                         self.tags_binarizer = pickle.load(f)
 
@@ -122,7 +126,9 @@ class DocumentClassifier:
 
         with open(target_file_temp, "wb") as f:
             pickle.dump(self.FORMAT_VERSION, f)
-            pickle.dump(self.last_data_change, f)
+            pickle.dump(self.last_doc_change_time, f)
+            pickle.dump(self.last_auto_type_hash, f)
+
             pickle.dump(self.data_vectorizer, f)
 
             pickle.dump(self.tags_binarizer, f)
@@ -139,19 +145,13 @@ class DocumentClassifier:
     def train(self):
 
         # Get non-inbox documents
-        docs_queryset = Document.objects.exclude(tags__is_inbox_tag=True)
+        docs_queryset = Document.objects.exclude(
+            tags__is_inbox_tag=True,
+        )
 
         # No documents exit to train against
         if docs_queryset.count() == 0:
             raise ValueError("No training data available.")
-
-        # No documents have changed since classifier was trained
-        latest_doc_change = docs_queryset.latest("modified").modified
-        if (
-            self.last_data_change is not None
-            and self.last_data_change >= latest_doc_change
-        ):
-            return False
 
         labels_tags = []
         labels_correspondent = []
@@ -160,18 +160,21 @@ class DocumentClassifier:
 
         # Step 1: Extract and preprocess training data from the database.
         logger.debug("Gathering data from database...")
+        hasher = sha256()
         for doc in docs_queryset:
 
             y = -1
             dt = doc.document_type
             if dt and dt.matching_algorithm == MatchingModel.MATCH_AUTO:
                 y = dt.pk
+            hasher.update(y.to_bytes(4, "little", signed=True))
             labels_document_type.append(y)
 
             y = -1
             cor = doc.correspondent
             if cor and cor.matching_algorithm == MatchingModel.MATCH_AUTO:
                 y = cor.pk
+            hasher.update(y.to_bytes(4, "little", signed=True))
             labels_correspondent.append(y)
 
             tags = sorted(
@@ -180,17 +183,30 @@ class DocumentClassifier:
                     matching_algorithm=MatchingModel.MATCH_AUTO,
                 )
             )
+            for tag in tags:
+                hasher.update(tag.to_bytes(4, "little", signed=True))
             labels_tags.append(tags)
 
             y = -1
-            sd = doc.storage_path
-            if sd and sd.matching_algorithm == MatchingModel.MATCH_AUTO:
-                y = sd.pk
+            sp = doc.storage_path
+            if sp and sp.matching_algorithm == MatchingModel.MATCH_AUTO:
+                y = sp.pk
+            hasher.update(y.to_bytes(4, "little", signed=True))
             labels_storage_path.append(y)
 
         labels_tags_unique = {tag for tags in labels_tags for tag in tags}
 
         num_tags = len(labels_tags_unique)
+
+        # Check if retraining is actually required.
+        # A document has been updated since the classifier was trained
+        # New auto tags, types, correspondent, storage paths exist
+        latest_doc_change = docs_queryset.latest("modified").modified
+        if (
+            self.last_doc_change_time is not None
+            and self.last_doc_change_time >= latest_doc_change
+        ) and self.last_auto_type_hash == hasher.digest():
+            return False
 
         # substract 1 since -1 (null) is also part of the classes.
 
@@ -301,11 +317,12 @@ class DocumentClassifier:
                 "There are no storage paths. Not training storage path classifier.",
             )
 
-        self.last_data_change = latest_doc_change
+        self.last_doc_change_time = latest_doc_change
+        self.last_auto_type_hash = hasher.digest()
 
         return True
 
-    def preprocess_content(self, content: str) -> str:
+    def preprocess_content(self, content: str) -> str:  # pragma: nocover
         """
         Process to contents of a document, distilling it down into
         words which are meaningful to the content
