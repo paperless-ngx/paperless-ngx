@@ -156,11 +156,13 @@ class Command(BaseCommand):
         zip_export: bool = options["zip"]
 
         # If zipping, save the original target for later and
-        # get a temporary directory for the target
+        # get a temporary directory for the target instead
         temp_dir = None
         original_target = None
         if zip_export:
             original_target = self.target
+
+            os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
             temp_dir = tempfile.TemporaryDirectory(
                 dir=settings.SCRATCH_DIR,
                 prefix="paperless-export",
