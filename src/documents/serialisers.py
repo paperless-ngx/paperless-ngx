@@ -683,14 +683,6 @@ class PostDocumentSerializer(serializers.Serializer):
         required=False,
     )
 
-    owner = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(),
-        label="Owner",
-        allow_null=True,
-        write_only=True,
-        required=False,
-    )
-
     archive_serial_number = serializers.IntegerField(
         label="ASN",
         write_only=True,
@@ -725,12 +717,6 @@ class PostDocumentSerializer(serializers.Serializer):
     def validate_tags(self, tags):
         if tags:
             return [tag.id for tag in tags]
-        else:
-            return None
-
-    def validate_owner(self, owner):
-        if owner:
-            return owner.id
         else:
             return None
 
