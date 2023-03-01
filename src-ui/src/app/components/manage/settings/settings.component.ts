@@ -282,6 +282,8 @@ export class SettingsComponent
     let storeData = this.getCurrentSettings()
 
     if (this.savedViews) {
+      this.emptyGroup(this.savedViewGroup)
+
       for (let view of this.savedViews) {
         storeData.savedViews[view.id.toString()] = {
           id: view.id,
@@ -302,6 +304,9 @@ export class SettingsComponent
     }
 
     if (this.users && this.groups) {
+      this.emptyGroup(this.usersGroup)
+      this.emptyGroup(this.groupsGroup)
+
       for (let user of this.users) {
         storeData.usersGroup[user.id.toString()] = {
           id: user.id,
@@ -346,6 +351,9 @@ export class SettingsComponent
     }
 
     if (this.mailAccounts && this.mailRules) {
+      this.emptyGroup(this.mailAccountGroup)
+      this.emptyGroup(this.mailRuleGroup)
+
       for (let account of this.mailAccounts) {
         storeData.mailAccounts[account.id.toString()] = {
           id: account.id,
@@ -448,6 +456,10 @@ export class SettingsComponent
     }
   }
 
+  private emptyGroup(group: FormGroup) {
+    Object.keys(group.controls).forEach((key) => group.removeControl(key))
+  }
+
   ngOnDestroy() {
     if (this.isDirty) this.settings.updateAppearanceSettings() // in case user changed appearance but didnt save
     this.storeSub && this.storeSub.unsubscribe()
@@ -460,6 +472,11 @@ export class SettingsComponent
       this.toastService.showInfo(
         $localize`Saved view "${savedView.name}" deleted.`
       )
+      this.savedViewService.clearCache()
+      this.savedViewService.listAll().subscribe((r) => {
+        this.savedViews = r.results
+        this.initialize(true)
+      })
     })
   }
 
@@ -665,7 +682,7 @@ export class SettingsComponent
           this.toastService.showInfo($localize`Deleted user`)
           this.usersService.listAll().subscribe((r) => {
             this.users = r.results
-            this.initialize()
+            this.initialize(true)
           })
         },
         error: (e) => {
@@ -719,7 +736,7 @@ export class SettingsComponent
           this.toastService.showInfo($localize`Deleted group`)
           this.groupsService.listAll().subscribe((r) => {
             this.groups = r.results
-            this.initialize()
+            this.initialize(true)
           })
         },
         error: (e) => {
@@ -781,7 +798,7 @@ export class SettingsComponent
           this.mailAccountService.clearCache()
           this.mailAccountService.listAll().subscribe((r) => {
             this.mailAccounts = r.results
-            this.initialize()
+            this.initialize(true)
           })
         },
         error: (e) => {
@@ -811,7 +828,7 @@ export class SettingsComponent
           this.mailRuleService.listAll().subscribe((r) => {
             this.mailRules = r.results
 
-            this.initialize()
+            this.initialize(true)
           })
         },
         error: (e) => {
@@ -840,7 +857,7 @@ export class SettingsComponent
           this.mailRuleService.clearCache()
           this.mailRuleService.listAll().subscribe((r) => {
             this.mailRules = r.results
-            this.initialize()
+            this.initialize(true)
           })
         },
         error: (e) => {
