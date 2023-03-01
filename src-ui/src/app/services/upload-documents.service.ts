@@ -28,7 +28,6 @@ export class UploadDocumentsService {
         fileEntry.file((file: File) => {
           let formData = new FormData()
           formData.append('document', file, file.name)
-          formData.set('owner', this.settings.currentUser.id.toString())
           let status = this.consumerStatusService.newFileUpload(file.name)
 
           status.message = $localize`Connecting...`
