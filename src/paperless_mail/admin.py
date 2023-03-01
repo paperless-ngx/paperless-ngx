@@ -128,6 +128,8 @@ class ProcessedMailAdmin(admin.ModelAdmin):
         "error",
     ]
 
+    list_display_links = ["subject"]
+
     list_filter = ("status", "rule")
 
 
