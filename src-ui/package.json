@@ -35,7 +35,7 @@
     "rxjs": "^7.8.0",
     "tslib": "^2.4.1",
     "uuid": "^9.0.0",
-    "zone.js": "~0.11.8"
+    "zone.js": "~0.12.0"
   },
   "devDependencies": {
     "@angular-builders/jest": "15.0.0",
