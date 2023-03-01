@@ -2,6 +2,7 @@ import { defineConfig } from 'cypress'
 
 export default defineConfig({
   videosFolder: 'cypress/videos',
+  video: false,
   screenshotsFolder: 'cypress/screenshots',
   fixturesFolder: 'cypress/fixtures',
   e2e: {
