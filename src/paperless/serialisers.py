@@ -23,6 +23,7 @@ class UserSerializer(serializers.ModelSerializer):
         many=True,
         queryset=Permission.objects.all(),
         slug_field="codename",
+        required=False,
     )
     inherited_permissions = serializers.SerializerMethodField()
 
