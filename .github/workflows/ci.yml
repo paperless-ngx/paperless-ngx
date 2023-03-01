@@ -190,6 +190,8 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: 'src-ui/package-lock.json'
       - run: cd src-ui && npm ci
       - run: cd src-ui && npm run lint
       - run: cd src-ui && npm run test
