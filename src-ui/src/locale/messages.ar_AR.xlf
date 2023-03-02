@@ -3866,7 +3866,7 @@
           <context context-type="sourcefile">src/app/components/document-list/save-view-config-dialog/save-view-config-dialog.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="translated">الخطأ الذي أرجع كان</target>
+        <target state="translated">الخطأ الذي تم إرجاعه كان</target>
       </trans-unit>
       <trans-unit id="6316128875819022658" datatype="html">
         <source>correspondent</source>
@@ -3874,7 +3874,7 @@
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.ts</context>
           <context context-type="linenumber">39</context>
         </context-group>
-        <target state="translated">مراسل</target>
+        <target state="translated">جهة التراسل</target>
       </trans-unit>
       <trans-unit id="1612355304340685070" datatype="html">
         <source>correspondents</source>
@@ -3882,7 +3882,7 @@
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.ts</context>
           <context context-type="linenumber">40</context>
         </context-group>
-        <target state="translated">مراسلون</target>
+        <target state="translated">جهات التراسل</target>
       </trans-unit>
       <trans-unit id="6360600151505327572" datatype="html">
         <source>Last used</source>
@@ -3898,7 +3898,7 @@
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.ts</context>
           <context context-type="linenumber">55</context>
         </context-group>
-        <target state="translated">هل تريد حقاً حذف المراسل"<x id="PH" equiv-text="object.name"/>"؟</target>
+        <target state="translated">هل تريد حقاً حذف جهة التراسل"<x id="PH" equiv-text="object.name"/>"؟</target>
       </trans-unit>
       <trans-unit id="8084492669582894778" datatype="html">
         <source>document type</source>
