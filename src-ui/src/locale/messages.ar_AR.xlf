@@ -114,7 +114,8 @@
           <context context-type="sourcefile">node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="translated">»</target>
+        <target state="translated">»
+</target>
       </trans-unit>
       <trans-unit id="ngb.datepicker.select-year" datatype="html">
         <source>Select year</source>
@@ -388,7 +389,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">155</context>
         </context-group>
-        <target state="translated">سحب وإسقاط المستندات هنا للبدء في تحميلها أو وضعها في المجلد المستهلك. يمكنك أيضًا سحب وإسقاط المستندات في أي مكان على جميع الصفحات الأخرى من تطبيق الويب. بمجرد ذلك، سيبدأ Paperless-ngx في تدريب خوارزميات تعلم الآلات.</target>
+        <target state="translated">سحب وإسقاط المستندات هنا للبدء في تحميلها أو وضعها في المجلد المستهلك. يمكنك أيضًا سحب وإسقاط المستندات في أي مكان على جميع الصفحات الأخرى من تطبيق الويب. بمجرد ذلك، سيبدأ paperless-ngx في تدريب خوارزميات تعلم الآلات.</target>
       </trans-unit>
       <trans-unit id="7495498057594070122" datatype="html">
         <source>The documents list shows all of your documents and allows for filtering as well as bulk-editing. There are three different view styles: list, small cards and large cards. A list of documents currently opened for editing is shown in the sidebar.</source>
@@ -428,7 +429,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">204</context>
         </context-group>
-        <target state="translated">ملف المهام يظهر لك المستندات المستهلكة، أو تنتظر أن تكون، أو يكون أخفق في أثناء العملية.</target>
+        <target state="translated"> ملف المهام يظهر لك المستندات المستهلكة، أو تنتظر أن تكون، أو يكون أخفق في أثناء العملية.</target>
       </trans-unit>
       <trans-unit id="8116994662047019809" datatype="html">
         <source>Check out the settings for various tweaks to the web app, toggle settings for saved views or setup e-mail checking.</source>
@@ -436,7 +437,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">213</context>
         </context-group>
-        <target state="translated">تحقق من إعدادات التعديلات المختلفة على تطبيق الويب، أو تبديل إعدادات العروض المحفوظة أو إعداد التحقق من البريد الإلكتروني.</target>
+        <target state="translated">التحقق من إعدادات التعديلات المختلفة على تطبيق الويب، أو تبديل إعدادات العروض المحفوظة أو إعداد التحقق من البريد الإلكتروني.</target>
       </trans-unit>
       <trans-unit id="7172877665285340082" datatype="html">
         <source>Thank you! 🙏</source>
@@ -452,7 +453,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">224</context>
         </context-group>
-        <target state="translated">هناك &lt;em&gt;أطنان&lt;/em&gt; المزيد من الميزات والمعلومات التي لم نغطيها هنا، ولكن يجب يكون هذا كافيا لك للبداية. تحقق من المستندات أو زيارة المشروع على GitHub لمعرفة المزيد أو للإبلاغ عن المشكلات.</target>
+        <target state="translated">هناك &lt;em&gt;أطنان&lt;/em&gt; المزيد من الميزات والمعلومات التي لم نغطيها هنا، ولكن يجب يكون هذا كافيا لك للبداية. يرجى مراجعة المستندات أو زيارة المشروع على GitHub لمعرفة المزيد أو للإبلاغ عن المشكلات.</target>
       </trans-unit>
       <trans-unit id="4270528545616947218" datatype="html">
         <source>Lastly, on behalf of every contributor to this community-supported project, thank you for using Paperless-ngx!</source>
@@ -468,7 +469,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">281</context>
         </context-group>
-        <target state="translated">بدء التحميل...</target>
+        <target state="translated">جارٍ تهيئة الرفع...</target>
       </trans-unit>
       <trans-unit id="2173456130768795374" datatype="html">
         <source>Paperless-ngx</source>
@@ -477,7 +478,7 @@
           <context context-type="linenumber">11</context>
         </context-group>
         <note priority="1" from="description">app title</note>
-        <target state="translated">Paperless-ngx</target>
+        <target state="translated">paperless-ngx</target>
       </trans-unit>
       <trans-unit id="7100953725264790651" datatype="html" approved="yes">
         <source>Search documents</source>
@@ -1869,7 +1870,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="translated">البريد الالكتروني</target>
+        <target state="translated">البريد الإلكتروني</target>
       </trans-unit>
       <trans-unit id="5342432350421167093" datatype="html">
         <source>First name</source>
