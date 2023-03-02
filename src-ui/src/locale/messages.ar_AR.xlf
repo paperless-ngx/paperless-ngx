@@ -4346,7 +4346,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">146</context>
         </context-group>
-        <target state="translated">لاحظ أنه بالنسبة لمستخدمي حاويات الطرف الثالث، مثل linuxserver.io قد يكون هذا الإشعار "أمام" من الإصدار الحالي من طرف ثالث.</target>
+        <target state="translated">لاحظ أنه بالنسبة لمستخدمي حاويات الطرف الثالث "third-party containers"، مثل linuxserver.io قد 'يسبق' هذا الإشعار إصدار الطرف الثالث "third-party release" الحالي.</target>
       </trans-unit>
       <trans-unit id="8508424367627989968" datatype="html">
         <source>Bulk editing</source>
@@ -5178,7 +5178,7 @@
           <context context-type="sourcefile">src/app/guards/permissions.guard.ts</context>
           <context context-type="linenumber">31</context>
         </context-group>
-        <target state="translated">لا تملك الصلاحيّات للقيام بذلك</target>
+        <target state="translated">لا تملك صلاحيّات تنفيذ ذلك</target>
       </trans-unit>
       <trans-unit id="7536524521722799066" datatype="html" approved="yes">
         <source>(no title)</source>
