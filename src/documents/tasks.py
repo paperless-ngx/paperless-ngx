@@ -13,7 +13,6 @@ from asgiref.sync import async_to_sync
 from celery import shared_task
 from channels.layers import get_channel_layer
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.db import transaction
 from django.db.models.signals import post_save
 from documents import barcodes
@@ -312,12 +311,3 @@ def update_document_archive_file(document_id):
         )
     finally:
         parser.cleanup()
-
-
-@shared_task
-def update_owner_for_object(document_ids, owner):
-    documents = Document.objects.filter(id__in=document_ids)
-    ownerUser = User.objects.get(pk=owner) if owner is not None else None
-    for document in documents:
-        document.owner = ownerUser if owner is not None else None
-        document.save()
