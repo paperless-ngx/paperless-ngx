@@ -131,6 +131,7 @@ export abstract class EditDialogComponent<
       error: (error) => {
         this.error = error.error
         this.networkActive = false
+        this.succeeded.error(error)
       },
     })
   }
