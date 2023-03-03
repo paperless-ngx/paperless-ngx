@@ -102,6 +102,7 @@ export abstract class EditDialogComponent<
   }
 
   save() {
+    this.error = null
     const formValues = Object.assign({}, this.objectForm.value)
     const permissionsObject: PermissionsFormObject =
       this.objectForm.get('permissions_form')?.value
@@ -131,7 +132,7 @@ export abstract class EditDialogComponent<
       error: (error) => {
         this.error = error.error
         this.networkActive = false
-        this.succeeded.error(error)
+        this.succeeded.next(error)
       },
     })
   }

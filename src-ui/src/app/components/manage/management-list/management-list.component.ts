@@ -28,6 +28,7 @@ import {
 import { AbstractNameFilterService } from 'src/app/services/rest/abstract-name-filter-service'
 import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
+import { EditDialogComponent } from '../../common/edit-dialog/edit-dialog.component'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 
 export interface ManagementListColumn {
@@ -136,16 +137,22 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
     activeModal.componentInstance.dialogMode = 'create'
     activeModal.componentInstance.succeeded.subscribe({
       next: () => {
-        this.reloadData()
-        this.toastService.showInfo(
-          $localize`Successfully created ${this.typeName}.`
-        )
+        if (activeModal.componentInstance.error) {
+          this.toastService.showInfo(
+            $localize`Error occurred while creating ${this.typeName} : ${activeModal.componentInstance.error}.`
+          )
+        } else {
+          this.reloadData()
+          this.toastService.showInfo(
+            $localize`Successfully created ${this.typeName}.`
+          )
+        }
       },
       error: (e) => {
         this.toastService.showInfo(
-          $localize`Error occurred while creating ${
-            this.typeName
-          } : ${e.toString()}.`
+          $localize`Error occurred while creating ${this.typeName} : ${
+            e.error ?? e.message ?? e.toString()
+          }.`
         )
       },
     })
@@ -159,10 +166,16 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
     activeModal.componentInstance.dialogMode = 'edit'
     activeModal.componentInstance.succeeded.subscribe({
       next: () => {
-        this.reloadData()
-        this.toastService.showInfo(
-          $localize`Successfully updated ${this.typeName}.`
-        )
+        if (activeModal.componentInstance.error) {
+          this.toastService.showInfo(
+            $localize`Error occurred while saving ${this.typeName} : ${activeModal.componentInstance.error}.`
+          )
+        } else {
+          this.reloadData()
+          this.toastService.showInfo(
+            $localize`Successfully updated ${this.typeName}.`
+          )
+        }
       },
       error: (e) => {
         this.toastService.showInfo(
