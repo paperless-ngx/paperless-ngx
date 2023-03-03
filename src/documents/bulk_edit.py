@@ -8,7 +8,6 @@ from documents.models import StoragePath
 from documents.permissions import set_permissions_for_object
 from documents.tasks import bulk_update_documents
 from documents.tasks import update_document_archive_file
-from documents.tasks import update_owner_for_object
 
 
 def set_correspondent(doc_ids, correspondent):
@@ -136,7 +135,7 @@ def set_permissions(doc_ids, set_permissions, owner=None):
 
     qs = Document.objects.filter(id__in=doc_ids)
 
-    update_owner_for_object.delay(document_ids=doc_ids, owner=owner)
+    qs.update(owner=owner)
 
     for doc in qs:
         set_permissions_for_object(set_permissions, doc)
