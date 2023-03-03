@@ -112,7 +112,7 @@ class ProcessedMailAdmin(admin.ModelAdmin):
         model = ProcessedMail
         fields = "__all__"
 
-    list_display = ("rule", "processed", "status", "subject", "received")
+    list_display = ("subject", "status", "processed", "received", "rule")
 
     ordering = ["-processed"]
 
