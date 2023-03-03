@@ -306,20 +306,27 @@ export class DocumentDetailComponent
           )
         },
       })
-    this.documentsService
-      .getSuggestions(doc.id)
-      .pipe(first())
-      .subscribe({
-        next: (result) => {
-          this.suggestions = result
-        },
-        error: (error) => {
-          this.suggestions = null
-          this.toastService.showError(
-            $localize`Error retrieving suggestions` + ': ' + error.toString()
-          )
-        },
-      })
+    if (
+      this.permissionsService.currentUserHasObjectPermissions(
+        PermissionAction.Change,
+        doc
+      )
+    ) {
+      this.documentsService
+        .getSuggestions(doc.id)
+        .pipe(first())
+        .subscribe({
+          next: (result) => {
+            this.suggestions = result
+          },
+          error: (error) => {
+            this.suggestions = null
+            this.toastService.showError(
+              $localize`Error retrieving suggestions` + ': ' + error.toString()
+            )
+          },
+        })
+    }
     this.title = this.documentTitlePipe.transform(doc.title)
     const docFormValues = Object.assign({}, doc)
     docFormValues['permissions_form'] = {
