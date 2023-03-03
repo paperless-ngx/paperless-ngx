@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-03-03 20:41\n"
+"PO-Revision-Date: 2023-03-03 22:32\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -23,7 +23,7 @@ msgstr "Dokumente"
 
 #: documents/models.py:36
 msgid "None"
-msgstr ""
+msgstr "Nichts"
 
 #: documents/models.py:37
 msgid "Any word"
@@ -68,7 +68,7 @@ msgstr "Groß-/Kleinschreibung irrelevant"
 
 #: documents/models.py:71
 msgid "owner"
-msgstr ""
+msgstr "Besitzer"
 
 #: documents/models.py:81 documents/models.py:136
 msgid "correspondent"
@@ -416,7 +416,7 @@ msgstr "Wenn die Aufgabe über das Frontend oder die API bestätigt wird"
 
 #: documents/models.py:576
 msgid "Task Filename"
-msgstr ""
+msgstr "Aufgaben-Dateiname"
 
 #: documents/models.py:577
 msgid "Name of the file which the Task was run for"
@@ -554,7 +554,7 @@ msgstr "Anmelden"
 
 #: paperless/apps.py:9
 msgid "Paperless"
-msgstr ""
+msgstr "Paperless"
 
 #: paperless/settings.py:521
 msgid "English (US)"
@@ -562,7 +562,7 @@ msgstr "Englisch (US)"
 
 #: paperless/settings.py:522
 msgid "Arabic"
-msgstr ""
+msgstr "Arabisch"
 
 #: paperless/settings.py:523
 msgid "Belarusian"
@@ -894,21 +894,21 @@ msgstr "Diesen Korrespondent zuweisen"
 
 #: paperless_mail/models.py:239
 msgid "uid"
-msgstr ""
+msgstr "UID"
 
 #: paperless_mail/models.py:247
 msgid "subject"
-msgstr ""
+msgstr "Betreff"
 
 #: paperless_mail/models.py:255
 msgid "received"
-msgstr ""
+msgstr "Empfangen"
 
 #: paperless_mail/models.py:262
 msgid "processed"
-msgstr ""
+msgstr "Verarbeitet"
 
 #: paperless_mail/models.py:268
 msgid "status"
-msgstr ""
+msgstr "Status"
 
