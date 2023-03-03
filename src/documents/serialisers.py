@@ -186,6 +186,18 @@ class OwnedObjectSerializer(serializers.ModelSerializer, SetPermissionsMixin):
     def update(self, instance, validated_data):
         if "set_permissions" in validated_data:
             self._set_permissions(validated_data["set_permissions"], instance)
+        if "owner" in validated_data and "name" in self.Meta.fields:
+            name = validated_data["name"] if "name" in validated_data else instance.name
+            print(name)
+            not_unique = (
+                self.Meta.model.objects.exclude(pk=instance.pk)
+                .filter(owner=validated_data["owner"], name=name)
+                .exists()
+            )
+            if not_unique:
+                raise serializers.ValidationError(
+                    "Object violates owner / name unique constraint",
+                )
         return super().update(instance, validated_data)
 
 
