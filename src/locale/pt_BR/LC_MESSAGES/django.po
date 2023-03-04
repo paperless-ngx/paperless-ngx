@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-03-03 20:41\n"
+"PO-Revision-Date: 2023-03-04 19:07\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
@@ -23,7 +23,7 @@ msgstr "Documentos"
 
 #: documents/models.py:36
 msgid "None"
-msgstr ""
+msgstr "Nenhum"
 
 #: documents/models.py:37
 msgid "Any word"
@@ -68,7 +68,7 @@ msgstr "diferencia maiúsculas de minúsculas"
 
 #: documents/models.py:71
 msgid "owner"
-msgstr ""
+msgstr "proprietário"
 
 #: documents/models.py:81 documents/models.py:136
 msgid "correspondent"
@@ -108,15 +108,15 @@ msgstr "tipos de documento"
 
 #: documents/models.py:111
 msgid "path"
-msgstr ""
+msgstr "caminho"
 
 #: documents/models.py:117 documents/models.py:145
 msgid "storage path"
-msgstr ""
+msgstr "caminho de armazenamento"
 
 #: documents/models.py:118
 msgid "storage paths"
-msgstr ""
+msgstr "caminhos de armazenamento"
 
 #: documents/models.py:126
 msgid "Unencrypted"
@@ -192,11 +192,11 @@ msgstr "Nome do arquivo para arquivamento armazenado"
 
 #: documents/models.py:239
 msgid "original filename"
-msgstr ""
+msgstr "nome do arquivo original"
 
 #: documents/models.py:245
 msgid "The original name of the file when it was uploaded"
-msgstr ""
+msgstr "O nome original do arquivo quando ele foi carregado"
 
 #: documents/models.py:252
 msgid "archive serial number"
@@ -380,7 +380,7 @@ msgstr ""
 
 #: documents/models.py:439
 msgid "storage path is"
-msgstr ""
+msgstr "caminho de armazenamento é"
 
 #: documents/models.py:449
 msgid "rule type"
@@ -480,11 +480,11 @@ msgstr "usuário"
 
 #: documents/models.py:655
 msgid "comment"
-msgstr ""
+msgstr "comentário"
 
 #: documents/models.py:656
 msgid "comments"
-msgstr ""
+msgstr "comentários"
 
 #: documents/serialisers.py:80
 #, python-format
@@ -502,7 +502,7 @@ msgstr "Tipo de arquivo %(type)s não suportado"
 
 #: documents/serialisers.py:794
 msgid "Invalid variable detected."
-msgstr ""
+msgstr "Variável inválida detectada."
 
 #: documents/templates/index.html:78
 msgid "Paperless-ngx is loading..."
@@ -510,11 +510,11 @@ msgstr "Paperless-ngx está carregando..."
 
 #: documents/templates/index.html:79
 msgid "Still here?! Hmm, something might be wrong."
-msgstr ""
+msgstr "Ainda aqui?! Hmm, algo pode estar errado."
 
 #: documents/templates/index.html:79
 msgid "Here's a link to the docs."
-msgstr ""
+msgstr "Aqui está um link para a documentação."
 
 #: documents/templates/registration/logged_out.html:14
 msgid "Paperless-ngx signed out"
@@ -554,7 +554,7 @@ msgstr "Entrar"
 
 #: paperless/apps.py:9
 msgid "Paperless"
-msgstr ""
+msgstr "Paperless"
 
 #: paperless/settings.py:521
 msgid "English (US)"
@@ -895,21 +895,21 @@ msgstr "atribuir este correspondente"
 
 #: paperless_mail/models.py:239
 msgid "uid"
-msgstr ""
+msgstr "uid"
 
 #: paperless_mail/models.py:247
 msgid "subject"
-msgstr ""
+msgstr "assunto"
 
 #: paperless_mail/models.py:255
 msgid "received"
-msgstr ""
+msgstr "recebido"
 
 #: paperless_mail/models.py:262
 msgid "processed"
-msgstr ""
+msgstr "processado"
 
 #: paperless_mail/models.py:268
 msgid "status"
-msgstr ""
+msgstr "status"
 
