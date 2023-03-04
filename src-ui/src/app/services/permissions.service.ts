@@ -46,7 +46,12 @@ export class PermissionsService {
   }
 
   public currentUserOwnsObject(object: ObjectWithPermissions): boolean {
-    return !object || !object.owner || object.owner === this.currentUser.id
+    return (
+      !object ||
+      !object.owner ||
+      this.currentUser.is_superuser ||
+      object.owner === this.currentUser.id
+    )
   }
 
   public currentUserHasObjectPermissions(
