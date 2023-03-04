@@ -13,6 +13,6 @@
 
   </div>
   <div class="modal-footer">
-    <button type="button" class="btn btn-outline-primary" (click)="cancelClicked()" i18n>Cancel</button>
-    <button type="button" class="btn btn-primary" (click)="confirmClicked.emit(permissions)" i18n>Confirm</button>
+    <button type="button" class="btn btn-outline-primary" (click)="cancelClicked()" [disabled]="!buttonsEnabled" i18n>Cancel</button>
+    <button type="button" class="btn btn-primary" (click)="confirmClicked.emit(permissions)" [disabled]="!buttonsEnabled" i18n>Confirm</button>
   </div>
