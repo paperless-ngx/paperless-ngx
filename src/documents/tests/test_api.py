@@ -20,6 +20,8 @@ except ImportError:
     import backports.zoneinfo as zoneinfo
 
 import pytest
+from django.db import transaction
+from django.db.utils import IntegrityError
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
@@ -1843,6 +1845,45 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_tag_unique_name_and_owner(self):
+        user1 = User.objects.create_user(username="test1")
+        user2 = User.objects.create_user(username="test2")
+
+        self.client.post("/api/tags/", {"name": "tag 1"}, format="json")
+
+        with transaction.atomic():
+            with self.assertRaises(IntegrityError):
+                self.client.post("/api/tags/", {"name": "tag 1"}, format="json")
+
+        self.client.post(
+            "/api/tags/",
+            {"name": "tag 2", "owner": user1.pk},
+            format="json",
+        )
+
+        try:
+            self.client.post(
+                "/api/tags/",
+                {"name": "tag 2", "owner": user2.pk},
+                format="json",
+            )
+        except IntegrityError as e:
+            assert False, f"Exception {e}"
+
+    def test_tag_unique_name_and_owner_enforced_on_update(self):
+        user1 = User.objects.create_user(username="test1")
+        user2 = User.objects.create_user(username="test2")
+
+        Tag.objects.create(name="tag 1", owner=user1)
+        tag2 = Tag.objects.create(name="tag 1", owner=user2)
+
+        response = self.client.patch(
+            f"/api/tags/{tag2.id}/",
+            {"owner": user1.pk},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
 class TestDocumentApiV2(DirectoriesMixin, APITestCase):
