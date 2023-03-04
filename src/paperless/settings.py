@@ -9,6 +9,7 @@ from os import PathLike
 from pathlib import Path
 from typing import Dict
 from typing import Final
+from typing import List
 from typing import Optional
 from typing import Set
 from typing import Tuple
@@ -71,6 +72,23 @@ def __get_path(key: str, default: Union[PathLike, str]) -> Path:
     Return a normalized, absolute path based on the environment variable or a default
     """
     return Path(os.environ.get(key, default)).resolve()
+
+
+def __get_list(
+    key: str,
+    default: Optional[List[str]] = None,
+    sep: str = ",",
+) -> List[str]:
+    """
+    Return a list of elements from the environment, as separated by the given
+    string, or the default if the key does not exist
+    """
+    if key in os.environ:
+        return os.environ[key].split(sep)
+    elif default is not None:
+        return default
+    else:
+        return []
 
 
 def _parse_redis_url(env_redis: Optional[str]) -> Tuple[str]:
@@ -242,7 +260,7 @@ SCRATCH_DIR = __get_path(
 # Application Definition                                                      #
 ###############################################################################
 
-env_apps = os.getenv("PAPERLESS_APPS").split(",") if os.getenv("PAPERLESS_APPS") else []
+env_apps = __get_list("PAPERLESS_APPS")
 
 INSTALLED_APPS = [
     "whitenoise.runserver_nostatic",
@@ -387,44 +405,33 @@ else:
 
 
 # The next 3 settings can also be set using just PAPERLESS_URL
-_csrf_origins = os.getenv("PAPERLESS_CSRF_TRUSTED_ORIGINS")
-if _csrf_origins:
-    CSRF_TRUSTED_ORIGINS = _csrf_origins.split(",")
-else:
-    CSRF_TRUSTED_ORIGINS = []
+CSRF_TRUSTED_ORIGINS = __get_list("PAPERLESS_CSRF_TRUSTED_ORIGINS")
 
 # We allow CORS from localhost:8000
-CORS_ALLOWED_ORIGINS = tuple(
-    os.getenv("PAPERLESS_CORS_ALLOWED_HOSTS", "http://localhost:8000").split(","),
+CORS_ALLOWED_ORIGINS = __get_list(
+    "PAPERLESS_CORS_ALLOWED_HOSTS",
+    ["http://localhost:8000"],
 )
 
 if DEBUG:
     # Allow access from the angular development server during debugging
-    CORS_ALLOWED_ORIGINS += ("http://localhost:4200",)
+    CORS_ALLOWED_ORIGINS.append("http://localhost:4200")
 
-_allowed_hosts = os.getenv("PAPERLESS_ALLOWED_HOSTS")
-if _allowed_hosts:
-    ALLOWED_HOSTS = _allowed_hosts.split(",")
-else:
-    ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = __get_list("PAPERLESS_ALLOWED_HOSTS", ["*"])
 
 _paperless_url = os.getenv("PAPERLESS_URL")
 if _paperless_url:
     _paperless_uri = urlparse(_paperless_url)
     CSRF_TRUSTED_ORIGINS.append(_paperless_url)
-    CORS_ALLOWED_ORIGINS += (_paperless_url,)
-    if _allowed_hosts:
+    CORS_ALLOWED_ORIGINS.append(_paperless_url)
+    if ALLOWED_HOSTS != ["*"]:
         ALLOWED_HOSTS.append(_paperless_uri.hostname)
     else:
         # always allow localhost. Necessary e.g. for healthcheck in docker.
         ALLOWED_HOSTS = [_paperless_uri.hostname] + ["localhost"]
 
 # For use with trusted proxies
-_trusted_proxies = os.getenv("PAPERLESS_TRUSTED_PROXIES")
-if _trusted_proxies:
-    TRUSTED_PROXIES = _trusted_proxies.split(",")
-else:
-    TRUSTED_PROXIES = []
+TRUSTED_PROXIES = __get_list("PAPERLESS_TRUSTED_PROXIES")
 
 # The secret key has a default that should be fine so long as you're hosting
 # Paperless on a closed network.  However, if you're putting this anywhere
