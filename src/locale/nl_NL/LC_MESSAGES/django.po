@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-03-03 20:41\n"
+"PO-Revision-Date: 2023-03-05 22:50\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
@@ -23,7 +23,7 @@ msgstr "Documenten"
 
 #: documents/models.py:36
 msgid "None"
-msgstr ""
+msgstr "Geen"
 
 #: documents/models.py:37
 msgid "Any word"
@@ -68,7 +68,7 @@ msgstr "is niet hoofdlettergevoelig"
 
 #: documents/models.py:71
 msgid "owner"
-msgstr ""
+msgstr "eigenaar"
 
 #: documents/models.py:81 documents/models.py:136
 msgid "correspondent"
@@ -416,7 +416,7 @@ msgstr "Of de taak is bevestigd via de frontend of de API"
 
 #: documents/models.py:576
 msgid "Task Filename"
-msgstr ""
+msgstr "Bestandsnaam taak "
 
 #: documents/models.py:577
 msgid "Name of the file which the Task was run for"
