@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-03-05 22:50\n"
+"PO-Revision-Date: 2023-03-05 23:45\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
@@ -554,7 +554,7 @@ msgstr "Aanmelden"
 
 #: paperless/apps.py:9
 msgid "Paperless"
-msgstr ""
+msgstr "Paperless"
 
 #: paperless/settings.py:521
 msgid "English (US)"
@@ -562,7 +562,7 @@ msgstr "Engels (US)"
 
 #: paperless/settings.py:522
 msgid "Arabic"
-msgstr ""
+msgstr "Arabisch"
 
 #: paperless/settings.py:523
 msgid "Belarusian"
@@ -898,17 +898,17 @@ msgstr ""
 
 #: paperless_mail/models.py:247
 msgid "subject"
-msgstr ""
+msgstr "onderwerp"
 
 #: paperless_mail/models.py:255
 msgid "received"
-msgstr ""
+msgstr "ontvangen"
 
 #: paperless_mail/models.py:262
 msgid "processed"
-msgstr ""
+msgstr "verwerkt"
 
 #: paperless_mail/models.py:268
 msgid "status"
-msgstr ""
+msgstr "status"
 
