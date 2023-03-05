@@ -588,5 +588,5 @@ jobs:
               owner,
               repo,
               issue_number: result.data.number,
-              labels: ['documentation']
+              labels: ['documentation', 'skip-changelog']
             });
