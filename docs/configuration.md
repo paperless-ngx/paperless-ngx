@@ -383,21 +383,20 @@ needs.
 : Customize the language that paperless will attempt to use when
 parsing documents.
 
-    It should be a 3-letter language code consistent with ISO 639:
-    https://www.loc.gov/standards/iso639-2/php/code_list.php
+    It should be a 3-letter code, see the list of [languages Tesseract supports](https://tesseract-ocr.github.io/tessdoc/Data-Files-in-different-versions.html).
 
     Set this to the language most of your documents are written in.
 
     This can be a combination of multiple languages such as `deu+eng`,
-    in which case tesseract will use whatever language matches best.
-    Keep in mind that tesseract uses much more cpu time with multiple
+    in which case Tesseract will use whatever language matches best.
+    Keep in mind that Tesseract uses much more CPU time with multiple
     languages enabled.
 
     Defaults to "eng".
 
     !!! note
 
-        If your language contains a '-' such as chi-sim, you must use chi_sim
+        If your language contains a '-' such as chi-sim, you must use `chi_sim`.
 
 `PAPERLESS_OCR_MODE=<mode>`
 
