@@ -474,12 +474,17 @@ export class DocumentDetailComponent
         },
         error: (error) => {
           this.networkActive = false
-          this.error = error.error
-          this.toastService.showError(
-            $localize`Error saving document` +
-              ': ' +
-              (error.message ?? error.toString())
-          )
+          if (!this.userCanEdit) {
+            this.toastService.showInfo($localize`Document saved successfully.`)
+            this.close()
+          } else {
+            this.error = error.error
+            this.toastService.showError(
+              $localize`Error saving document` +
+                ': ' +
+                (error.message ?? error.toString())
+            )
+          }
         },
       })
   }
