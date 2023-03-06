@@ -29,6 +29,8 @@ export class PermissionsDialogComponent {
     permissions_form: new FormControl(),
   })
 
+  buttonsEnabled: boolean = true
+
   get permissions() {
     return {
       owner: this.form.get('permissions_form').value?.owner ?? null,
