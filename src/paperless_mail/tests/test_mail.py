@@ -1,6 +1,5 @@
 import dataclasses
 import email.contentmanager
-import os
 import random
 import uuid
 from collections import namedtuple
