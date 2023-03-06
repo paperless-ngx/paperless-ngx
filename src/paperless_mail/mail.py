@@ -19,6 +19,8 @@ from celery import shared_task
 from celery.canvas import Signature
 from django.conf import settings
 from django.db import DatabaseError
+from django.utils.timezone import is_naive
+from django.utils.timezone import make_aware
 from documents.loggers import LoggingMixin
 from documents.models import Correspondent
 from documents.parsers import is_mime_type_supported
@@ -235,6 +237,10 @@ def apply_mail_action(
 
     rule = MailRule.objects.get(pk=rule_id)
     account = MailAccount.objects.get(pk=rule.account.pk)
+
+    # Ensure the date is properly timezone aware
+    if is_naive(message_date):
+        message_date = make_aware(message_date)
 
     try:
 
