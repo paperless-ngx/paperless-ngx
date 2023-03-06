@@ -1096,11 +1096,13 @@ actual group ID on the host system, which you can get by executing
 : Additional OCR languages to install. By default, paperless comes
 with English, German, Italian, Spanish and French. If your language
 is not in this list, install additional languages with this
-configuration option:
+configuration option ([find the right LangCodes](https://tesseract-ocr.github.io/tessdoc/Data-Files-in-different-versions.html)):
 
     ``` bash
     PAPERLESS_OCR_LANGUAGES=tur ces
     ```
+
+    Make sure it's a space separated list when using several values.
 
     To actually use these languages, also set the default OCR language
     of paperless:
