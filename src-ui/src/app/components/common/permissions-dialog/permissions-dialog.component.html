@@ -13,6 +13,10 @@
 
   </div>
   <div class="modal-footer">
+    <ng-container *ngIf="!buttonsEnabled">
+      <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+      <span class="visually-hidden" i18n>Loading...</span>
+    </ng-container>
     <button type="button" class="btn btn-outline-primary" (click)="cancelClicked()" [disabled]="!buttonsEnabled" i18n>Cancel</button>
     <button type="button" class="btn btn-primary" (click)="confirmClicked.emit(permissions)" [disabled]="!buttonsEnabled" i18n>Confirm</button>
   </div>
