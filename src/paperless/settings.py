@@ -628,6 +628,11 @@ CELERY_RESULT_EXTENDED = True
 CELERY_RESULT_BACKEND = "django-db"
 CELERY_CACHE_BACKEND = "default"
 
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#task-serializer
+CELERY_TASK_SERIALIZER = "pickle"
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#std-setting-accept_content
+CELERY_ACCEPT_CONTENT = ["application/json", "application/x-python-serialize"]
+
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html#beat-schedule
 CELERY_BEAT_SCHEDULE = _parse_beat_schedule()
 
