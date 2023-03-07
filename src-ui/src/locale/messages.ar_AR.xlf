@@ -388,7 +388,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">155</context>
         </context-group>
-        <target state="translated">سحب وإسقاط المستندات هنا للبدء في تحميلها أو وضعها في المجلد المستهلك. يمكنك أيضًا سحب وإسقاط المستندات في أي مكان على جميع الصفحات الأخرى من تطبيق الويب. بمجرد ذلك، سيبدأ paperless-ngx في تدريب خوارزميات تعلم الآلات.</target>
+        <target state="translated">سحب وإسقاط المستندات هنا للبدء في تحميلها أو وضعها في المجلد المستهلك. يمكنك أيضًا سحب وإسقاط المستندات في أي مكان على جميع الصفحات الأخرى من تطبيق الويب. بمجرد ذلك، سيبدأ هذا التطبيق في تدريب خوارزميات تعلم الآلات.</target>
       </trans-unit>
       <trans-unit id="7495498057594070122" datatype="html">
         <source>The documents list shows all of your documents and allows for filtering as well as bulk-editing. There are three different view styles: list, small cards and large cards. A list of documents currently opened for editing is shown in the sidebar.</source>
@@ -468,7 +468,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">281</context>
         </context-group>
-        <target state="translated">جارٍ تهيئة الرفع...</target>
+        <target state="translated">بَدْء التحميل...</target>
       </trans-unit>
       <trans-unit id="2173456130768795374" datatype="html">
         <source>Paperless-ngx</source>
@@ -4078,7 +4078,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">155,157</context>
         </context-group>
-        <target state="needs-translation">Error occurred while creating <x id="PH" equiv-text="this.typeName"/> : <x id="PH_1" equiv-text="activeModal.componentInstance.error"/>.</target>
+        <target state="translated">حدث خطأ في أثناء إنشاء<x id="PH" equiv-text="this.typeName"/>:<x id="PH_1" equiv-text="activeModal.componentInstance.error"/>.</target>
       </trans-unit>
       <trans-unit id="211408744872436427" datatype="html">
         <source>Successfully created <x id="PH" equiv-text="this.typeName"/>.</source>
@@ -4086,7 +4086,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">149</context>
         </context-group>
-        <target state="translated">أنشئ بنجاح <x id="PH" equiv-text="this.typeName"/>.</target>
+        <target state="translated">أنشئ بنجاح<x id="PH" equiv-text="this.typeName"/>.</target>
       </trans-unit>
       <trans-unit id="6151710751857751783" datatype="html">
         <source>Error occurred while saving <x id="PH" equiv-text="this.typeName"/> : <x id="PH_1" equiv-text="activeModal.componentInstance.error"/>.</source>
@@ -4098,7 +4098,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">187,189</context>
         </context-group>
-        <target state="needs-translation">Error occurred while saving <x id="PH" equiv-text="this.typeName"/> : <x id="PH_1" equiv-text="activeModal.componentInstance.error"/>.</target>
+        <target state="translated">حدث خطأ في أثناء حفظ <x id="PH" equiv-text="this.typeName"/>:<x id="PH_1" equiv-text="activeModal.componentInstance.error"/>.</target>
       </trans-unit>
       <trans-unit id="2541368547549828690" datatype="html">
         <source>Successfully updated <x id="PH" equiv-text="this.typeName"/>.</source>
@@ -4114,7 +4114,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">196</context>
         </context-group>
-        <target state="translated">هل تريد حقاً حذف <x id="PH" equiv-text="this.typeName"/>؟</target>
+        <target state="translated">هل تريد حقاً حذف<x id="PH" equiv-text="this.typeName"/>؟</target>
       </trans-unit>
       <trans-unit id="8371896857609524947" datatype="html">
         <source>Associated documents will not be deleted.</source>
@@ -4138,7 +4138,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">2</context>
         </context-group>
-        <target state="translated">بدء جولة</target>
+        <target state="translated">ابدأ جولة</target>
       </trans-unit>
       <trans-unit id="4798013226763881638" datatype="html">
         <source>Open Django Admin</source>
