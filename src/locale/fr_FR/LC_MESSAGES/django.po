@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-03-03 20:41\n"
+"PO-Revision-Date: 2023-03-07 04:36\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -23,7 +23,7 @@ msgstr "Documents"
 
 #: documents/models.py:36
 msgid "None"
-msgstr ""
+msgstr "Aucun élément"
 
 #: documents/models.py:37
 msgid "Any word"
@@ -68,7 +68,7 @@ msgstr "est insensible à la casse"
 
 #: documents/models.py:71
 msgid "owner"
-msgstr ""
+msgstr "propriétaire"
 
 #: documents/models.py:81 documents/models.py:136
 msgid "correspondent"
@@ -416,7 +416,7 @@ msgstr "Si la tâche est prise en compte via l'interface utilisateur ou l'API"
 
 #: documents/models.py:576
 msgid "Task Filename"
-msgstr ""
+msgstr "Nom du fichier de tâche"
 
 #: documents/models.py:577
 msgid "Name of the file which the Task was run for"
@@ -562,7 +562,7 @@ msgstr "Anglais (US)"
 
 #: paperless/settings.py:522
 msgid "Arabic"
-msgstr ""
+msgstr "Arabe"
 
 #: paperless/settings.py:523
 msgid "Belarusian"
@@ -858,7 +858,7 @@ msgstr "Les pièces jointes en ligne comprennent les images intégrées, il est 
 
 #: paperless_mail/models.py:158
 msgid "consumption scope"
-msgstr ""
+msgstr "périmètre de consommation"
 
 #: paperless_mail/models.py:164
 msgid "action"
@@ -894,21 +894,21 @@ msgstr "affecter ce correspondant"
 
 #: paperless_mail/models.py:239
 msgid "uid"
-msgstr ""
+msgstr "uid"
 
 #: paperless_mail/models.py:247
 msgid "subject"
-msgstr ""
+msgstr "sujet"
 
 #: paperless_mail/models.py:255
 msgid "received"
-msgstr ""
+msgstr "reçu"
 
 #: paperless_mail/models.py:262
 msgid "processed"
-msgstr ""
+msgstr "traités"
 
 #: paperless_mail/models.py:268
 msgid "status"
-msgstr ""
+msgstr "état"
 
