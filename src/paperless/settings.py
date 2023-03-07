@@ -81,7 +81,7 @@ def __get_list(
     string, or the default if the key does not exist
     """
     if key in os.environ:
-        return os.environ[key].split(sep)
+        return list(filter(None, os.environ[key].split(sep)))
     elif default is not None:
         return default
     else:
