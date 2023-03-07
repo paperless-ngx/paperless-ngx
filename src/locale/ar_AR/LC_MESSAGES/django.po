@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-03-03 20:41\n"
+"PO-Revision-Date: 2023-03-07 19:40\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -23,7 +23,7 @@ msgstr "المستندات"
 
 #: documents/models.py:36
 msgid "None"
-msgstr ""
+msgstr "لا شيء"
 
 #: documents/models.py:37
 msgid "Any word"
@@ -68,7 +68,7 @@ msgstr "غير حساس"
 
 #: documents/models.py:71
 msgid "owner"
-msgstr ""
+msgstr "مالك"
 
 #: documents/models.py:81 documents/models.py:136
 msgid "correspondent"
@@ -416,7 +416,7 @@ msgstr "إذا عرف على المهمة عبر الواجهة الأمامية
 
 #: documents/models.py:576
 msgid "Task Filename"
-msgstr ""
+msgstr "اسم ملف المهمة"
 
 #: documents/models.py:577
 msgid "Name of the file which the Task was run for"
@@ -554,7 +554,7 @@ msgstr "تسجيل الدخول"
 
 #: paperless/apps.py:9
 msgid "Paperless"
-msgstr ""
+msgstr "لا ورقي"
 
 #: paperless/settings.py:521
 msgid "English (US)"
@@ -562,7 +562,7 @@ msgstr "الإنجليزية (الولايات المتحدة)"
 
 #: paperless/settings.py:522
 msgid "Arabic"
-msgstr ""
+msgstr "العربية"
 
 #: paperless/settings.py:523
 msgid "Belarusian"
@@ -670,7 +670,7 @@ msgstr "إجراءات"
 
 #: paperless_mail/admin.py:69
 msgid "The action applied to the mail. This action is only performed when the mail body or attachments were consumed from the mail."
-msgstr ""
+msgstr "الإجراء المطبق على البريد. يتم تنفيذ هذا الإجراء فقط عندما يتم إستهلاك البريد أو المرفقات من البريد."
 
 #: paperless_mail/admin.py:77
 msgid "Metadata"
@@ -750,11 +750,11 @@ msgstr "معالجة المرفقات فقط."
 
 #: paperless_mail/models.py:62
 msgid "Process full Mail (with embedded attachments in file) as .eml"
-msgstr ""
+msgstr "معالجة البريد الكامل (مع المرفقات المضمنة في الملف) مثل .eml"
 
 #: paperless_mail/models.py:64
 msgid "Process full Mail (with embedded attachments in file) as .eml + process attachments as separate documents"
-msgstr ""
+msgstr "معالجة البريد الكامل (مع المرفقات المضمنة في الملف) مثل .eml + معالجة المرفقات كوثائق منفصلة"
 
 #: paperless_mail/models.py:70
 msgid "Process all files, including 'inline' attachments."
@@ -858,7 +858,7 @@ msgstr "تتضمن المرفقات المضمنة صورا مضمنة، لذا 
 
 #: paperless_mail/models.py:158
 msgid "consumption scope"
-msgstr ""
+msgstr "نطاق الاستهلاك"
 
 #: paperless_mail/models.py:164
 msgid "action"
@@ -894,21 +894,21 @@ msgstr "تعيين هذا المراسل"
 
 #: paperless_mail/models.py:239
 msgid "uid"
-msgstr ""
+msgstr "المعرّف‫ الفريد (UID)"
 
 #: paperless_mail/models.py:247
 msgid "subject"
-msgstr ""
+msgstr "موضوع"
 
 #: paperless_mail/models.py:255
 msgid "received"
-msgstr ""
+msgstr "الواردة"
 
 #: paperless_mail/models.py:262
 msgid "processed"
-msgstr ""
+msgstr "المعالجة"
 
 #: paperless_mail/models.py:268
 msgid "status"
-msgstr ""
+msgstr "حالة"
 
