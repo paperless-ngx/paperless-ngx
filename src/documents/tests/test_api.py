@@ -1850,11 +1850,11 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         user1 = User.objects.create_user(username="test1")
         user2 = User.objects.create_user(username="test2")
 
-        self.client.post("/api/tags/", {"name": "tag 1"}, format="json")
+        response = self.client.post("/api/tags/", {"name": "tag 1"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        with transaction.atomic():
-            with self.assertRaises(IntegrityError):
-                self.client.post("/api/tags/", {"name": "tag 1"}, format="json")
+        response = self.client.post("/api/tags/", {"name": "tag 1"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
         self.client.post(
             "/api/tags/",
@@ -1862,14 +1862,26 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
             format="json",
         )
 
-        try:
-            self.client.post(
-                "/api/tags/",
-                {"name": "tag 2", "owner": user2.pk},
-                format="json",
-            )
-        except IntegrityError as e:
-            assert False, f"Exception {e}"
+        response = self.client.post(
+            "/api/tags/",
+            {"name": "tag 2", "owner": user1.pk},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        self.client.post(
+            "/api/tags/",
+            {"name": "tag 3", "owner": user1.pk},
+            format="json",
+        )
+
+        response = self.client.post(
+            "/api/tags/",
+            {"name": "tag 3", "owner": user2.pk},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_tag_unique_name_and_owner_enforced_on_update(self):
         user1 = User.objects.create_user(username="test1")
