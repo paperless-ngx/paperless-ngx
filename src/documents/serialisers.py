@@ -68,6 +68,25 @@ class MatchingModelSerializer(serializers.ModelSerializer):
 
     slug = SerializerMethodField()
 
+    def validate(self, data):
+        # see https://github.com/encode/django-rest-framework/issues/7173
+        name = data["name"] if "name" in data else self.instance.name
+        owner = (
+            data["owner"]
+            if "owner" in data
+            else self.user
+            if hasattr(self, "user")
+            else None
+        )
+        if ("name" in data or "owner" in data) and self.Meta.model.objects.filter(
+            name=name,
+            owner=owner,
+        ).exists():
+            raise serializers.ValidationError(
+                {"error": "Object violates owner / name unique constraint"},
+            )
+        return data
+
     def validate_match(self, match):
         if (
             "matching_algorithm" in self.initial_data
@@ -188,7 +207,6 @@ class OwnedObjectSerializer(serializers.ModelSerializer, SetPermissionsMixin):
             self._set_permissions(validated_data["set_permissions"], instance)
         if "owner" in validated_data and "name" in self.Meta.fields:
             name = validated_data["name"] if "name" in validated_data else instance.name
-            print(name)
             not_unique = (
                 self.Meta.model.objects.exclude(pk=instance.pk)
                 .filter(owner=validated_data["owner"], name=name)
@@ -196,7 +214,7 @@ class OwnedObjectSerializer(serializers.ModelSerializer, SetPermissionsMixin):
             )
             if not_unique:
                 raise serializers.ValidationError(
-                    "Object violates owner / name unique constraint",
+                    {"error": "Object violates owner / name unique constraint"},
                 )
         return super().update(instance, validated_data)
 
