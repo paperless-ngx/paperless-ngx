@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-03-03 20:41\n"
+"PO-Revision-Date: 2023-03-09 17:42\n"
 "Last-Translator: \n"
 "Language-Team: Norwegian\n"
 "Language: no_NO\n"
@@ -68,7 +68,7 @@ msgstr "er insensitiv"
 
 #: documents/models.py:71
 msgid "owner"
-msgstr ""
+msgstr "eier"
 
 #: documents/models.py:81 documents/models.py:136
 msgid "correspondent"
@@ -440,7 +440,7 @@ msgstr ""
 
 #: documents/models.py:597
 msgid "Created DateTime"
-msgstr ""
+msgstr "Opprettet DatoTid"
 
 #: documents/models.py:598
 msgid "Datetime field when the task result was created in UTC"
@@ -448,7 +448,7 @@ msgstr ""
 
 #: documents/models.py:603
 msgid "Started DateTime"
-msgstr ""
+msgstr "Startet DatoTid"
 
 #: documents/models.py:604
 msgid "Datetime field when the task was started in UTC"
@@ -480,11 +480,11 @@ msgstr "bruker"
 
 #: documents/models.py:655
 msgid "comment"
-msgstr ""
+msgstr "kommentar"
 
 #: documents/models.py:656
 msgid "comments"
-msgstr ""
+msgstr "kommentarer"
 
 #: documents/serialisers.py:80
 #, python-format
@@ -554,7 +554,7 @@ msgstr "Logg inn"
 
 #: paperless/apps.py:9
 msgid "Paperless"
-msgstr ""
+msgstr "Paperless"
 
 #: paperless/settings.py:521
 msgid "English (US)"
@@ -562,7 +562,7 @@ msgstr "Engelsk (US)"
 
 #: paperless/settings.py:522
 msgid "Arabic"
-msgstr ""
+msgstr "Arabisk"
 
 #: paperless/settings.py:523
 msgid "Belarusian"
@@ -894,21 +894,21 @@ msgstr "Tildel denne korrespondenten"
 
 #: paperless_mail/models.py:239
 msgid "uid"
-msgstr ""
+msgstr "uid"
 
 #: paperless_mail/models.py:247
 msgid "subject"
-msgstr ""
+msgstr "emne"
 
 #: paperless_mail/models.py:255
 msgid "received"
-msgstr ""
+msgstr "mottatt"
 
 #: paperless_mail/models.py:262
 msgid "processed"
-msgstr ""
+msgstr "behandlet"
 
 #: paperless_mail/models.py:268
 msgid "status"
-msgstr ""
+msgstr "status"
 
