@@ -178,7 +178,7 @@ class CorrespondentViewSet(ModelViewSet, PassUserMixin):
     )
 
 
-class TagViewSet(ModelViewSet):
+class TagViewSet(ModelViewSet, PassUserMixin):
     model = Tag
 
     queryset = Tag.objects.annotate(document_count=Count("documents")).order_by(
@@ -186,8 +186,6 @@ class TagViewSet(ModelViewSet):
     )
 
     def get_serializer_class(self, *args, **kwargs):
-        # from UserPassMixin
-        kwargs.setdefault("user", self.request.user)
         if int(self.request.version) == 1:
             return TagSerializerVersion1
         else:
