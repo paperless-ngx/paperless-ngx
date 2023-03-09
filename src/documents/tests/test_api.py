@@ -1847,49 +1847,92 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_tag_unique_name_and_owner(self):
+        """
+        GIVEN:
+            - Multiple users
+            - Tags owned by particular users
+        WHEN:
+            - API request for creating items which are unique by name and owner
+        THEN:
+            - Unique items are created
+            - Non-unique items are not allowed
+        """
         user1 = User.objects.create_user(username="test1")
+        user1.user_permissions.add(*Permission.objects.filter(codename="add_tag"))
+        user1.save()
+
         user2 = User.objects.create_user(username="test2")
+        user2.user_permissions.add(*Permission.objects.filter(codename="add_tag"))
+        user2.save()
 
+        # User 1 creates tag 1 owned by user 1 by default
+        # No issue
+        self.client.force_authenticate(user1)
         response = self.client.post("/api/tags/", {"name": "tag 1"}, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
+        # User 2 creates tag 1 owned by user 2 by default
+        # No issue
+        self.client.force_authenticate(user2)
         response = self.client.post("/api/tags/", {"name": "tag 1"}, format="json")
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        self.client.post(
+        # User 2 creates tag 2 owned by user 1
+        # No issue
+        self.client.force_authenticate(user2)
+        response = self.client.post(
             "/api/tags/",
             {"name": "tag 2", "owner": user1.pk},
             format="json",
         )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
+        # User 1 creates tag 2 owned by user 1 by default
+        # Not allowed, would create tag2/user1 which already exists
+        self.client.force_authenticate(user1)
+        response = self.client.post(
+            "/api/tags/",
+            {"name": "tag 2"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # User 1 creates tag 2 owned by user 1
+        # Not allowed, would create tag2/user1 which already exists
         response = self.client.post(
             "/api/tags/",
             {"name": "tag 2", "owner": user1.pk},
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-        self.client.post(
-            "/api/tags/",
-            {"name": "tag 3", "owner": user1.pk},
-            format="json",
-        )
-
-        response = self.client.post(
-            "/api/tags/",
-            {"name": "tag 3", "owner": user2.pk},
-            format="json",
-        )
-
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_tag_unique_name_and_owner_enforced_on_update(self):
+        """
+        GIVEN:
+            - Multiple users
+            - Tags owned by particular users
+        WHEN:
+            - API request for to update tag in such as way as makes it non-unqiue
+        THEN:
+            - Unique items are created
+            - Non-unique items are not allowed on update
+        """
         user1 = User.objects.create_user(username="test1")
-        user2 = User.objects.create_user(username="test2")
+        user1.user_permissions.add(*Permission.objects.filter(codename="change_tag"))
+        user1.save()
 
+        user2 = User.objects.create_user(username="test2")
+        user2.user_permissions.add(*Permission.objects.filter(codename="change_tag"))
+        user2.save()
+
+        # Create name tag 1 owned by user 1
+        # Create name tag 1 owned by user 2
         Tag.objects.create(name="tag 1", owner=user1)
         tag2 = Tag.objects.create(name="tag 1", owner=user2)
 
+        # User 2 attempts to change the owner of tag to user 1
+        # Not allowed, would change to tag1/user1 which already exists
+        self.client.force_authenticate(user2)
         response = self.client.patch(
             f"/api/tags/{tag2.id}/",
             {"owner": user1.pk},
