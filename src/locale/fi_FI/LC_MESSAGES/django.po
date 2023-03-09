@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-03-09 07:08\n"
+"PO-Revision-Date: 2023-03-09 08:14\n"
 "Last-Translator: \n"
 "Language-Team: Finnish\n"
 "Language: fi_FI\n"
@@ -754,7 +754,7 @@ msgstr "Käsittele koko sähköposti (johon on upotettu liitetiedostoja) kuten .
 
 #: paperless_mail/models.py:64
 msgid "Process full Mail (with embedded attachments in file) as .eml + process attachments as separate documents"
-msgstr ""
+msgstr "Käsittele koko sähköposti (johon on upotettu liitetiedostoja) kuten .eml ja käsittele liitteet erillisinä asiakirjoina"
 
 #: paperless_mail/models.py:70
 msgid "Process all files, including 'inline' attachments."
@@ -858,7 +858,7 @@ msgstr "Sisäiset liitteet sisältävät upotettuja kuvia, joten on parasta yhdi
 
 #: paperless_mail/models.py:158
 msgid "consumption scope"
-msgstr ""
+msgstr "tuonnin laajuus"
 
 #: paperless_mail/models.py:164
 msgid "action"
@@ -894,21 +894,21 @@ msgstr "määritä tämä kirjeenvaihtaja"
 
 #: paperless_mail/models.py:239
 msgid "uid"
-msgstr ""
+msgstr "uid"
 
 #: paperless_mail/models.py:247
 msgid "subject"
-msgstr ""
+msgstr "aihe"
 
 #: paperless_mail/models.py:255
 msgid "received"
-msgstr ""
+msgstr "vastaanotettu"
 
 #: paperless_mail/models.py:262
 msgid "processed"
-msgstr ""
+msgstr "käsitelty"
 
 #: paperless_mail/models.py:268
 msgid "status"
-msgstr ""
+msgstr "tila"
 
