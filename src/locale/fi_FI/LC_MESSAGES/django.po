@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-03-03 20:41\n"
+"PO-Revision-Date: 2023-03-09 07:08\n"
 "Last-Translator: \n"
 "Language-Team: Finnish\n"
 "Language: fi_FI\n"
@@ -23,7 +23,7 @@ msgstr "Asiakirjat"
 
 #: documents/models.py:36
 msgid "None"
-msgstr ""
+msgstr "Ei mitään"
 
 #: documents/models.py:37
 msgid "Any word"
@@ -68,7 +68,7 @@ msgstr "ei ole herkkä"
 
 #: documents/models.py:71
 msgid "owner"
-msgstr ""
+msgstr "omistaja"
 
 #: documents/models.py:81 documents/models.py:136
 msgid "correspondent"
@@ -416,7 +416,7 @@ msgstr "Jos tehtävä on vahvistettu frontendin tai API:n kautta"
 
 #: documents/models.py:576
 msgid "Task Filename"
-msgstr ""
+msgstr "Tehtävän tiedostonimi"
 
 #: documents/models.py:577
 msgid "Name of the file which the Task was run for"
@@ -554,7 +554,7 @@ msgstr "Kirjaudu sisään"
 
 #: paperless/apps.py:9
 msgid "Paperless"
-msgstr ""
+msgstr "Paperless"
 
 #: paperless/settings.py:521
 msgid "English (US)"
@@ -562,7 +562,7 @@ msgstr "Englanti (US)"
 
 #: paperless/settings.py:522
 msgid "Arabic"
-msgstr ""
+msgstr "Arabialainen"
 
 #: paperless/settings.py:523
 msgid "Belarusian"
@@ -670,7 +670,7 @@ msgstr "Toiminnot"
 
 #: paperless_mail/admin.py:69
 msgid "The action applied to the mail. This action is only performed when the mail body or attachments were consumed from the mail."
-msgstr ""
+msgstr "Sähköpostiin suoritettava toiminto. Tämä toiminto suoritetaan vasta, kun sähköpostin sisältö tai liitteet on syötetty postin kautta."
 
 #: paperless_mail/admin.py:77
 msgid "Metadata"
@@ -750,7 +750,7 @@ msgstr "Prosessoi vain liitteet."
 
 #: paperless_mail/models.py:62
 msgid "Process full Mail (with embedded attachments in file) as .eml"
-msgstr ""
+msgstr "Käsittele koko sähköposti (johon on upotettu liitetiedostoja) kuten .eml"
 
 #: paperless_mail/models.py:64
 msgid "Process full Mail (with embedded attachments in file) as .eml + process attachments as separate documents"
