@@ -165,7 +165,7 @@ class TagMailAction(BaseMailAction):
 
     def post_consume(self, M: MailBox, message_uid: str, parameter: str):
         if re.search(r"gmail\.com$|googlemail\.com$", M._host):
-            M.client.uid("STORE", message_uid, "X-GM-LABELS", self.keyword)
+            M.client.uid("STORE", message_uid, "+X-GM-LABELS", self.keyword)
 
         # AppleMail
         elif self.color:
