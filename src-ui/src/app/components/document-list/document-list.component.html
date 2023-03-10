@@ -14,19 +14,19 @@
     </div>
   </div>
   <div class="btn-group flex-fill" role="group">
-    <input type="radio" class="btn-check" [(ngModel)]="displayMode" value="details" (ngModelChange)="saveDisplayMode()" id="displayModeDetails">
+    <input type="radio" class="btn-check" [(ngModel)]="displayMode" value="details" (ngModelChange)="saveDisplayMode()" id="displayModeDetails" name="displayModeDetails">
     <label for="displayModeDetails" class="btn btn-outline-primary btn-sm">
       <svg class="toolbaricon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#list-ul" />
       </svg>
     </label>
-    <input type="radio" class="btn-check" [(ngModel)]="displayMode" value="smallCards" (ngModelChange)="saveDisplayMode()" id="displayModeSmall">
+    <input type="radio" class="btn-check" [(ngModel)]="displayMode" value="smallCards" (ngModelChange)="saveDisplayMode()" id="displayModeSmall" name="displayModeSmall">
     <label for="displayModeSmall" class="btn btn-outline-primary btn-sm">
       <svg class="toolbaricon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#grid" />
       </svg>
     </label>
-    <input type="radio" class="btn-check" [(ngModel)]="displayMode" value="largeCards" (ngModelChange)="saveDisplayMode()" id="displayModeLarge">
+    <input type="radio" class="btn-check" [(ngModel)]="displayMode" value="largeCards" (ngModelChange)="saveDisplayMode()" id="displayModeLarge" name="displayModeLarge">
     <label for="displayModeLarge" class="btn btn-outline-primary btn-sm">
       <svg class="toolbaricon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#hdd-stack" />
