@@ -23,7 +23,20 @@ ALL_STATES = sorted(states.ALL_STATES)
 TASK_STATE_CHOICES = sorted(zip(ALL_STATES, ALL_STATES))
 
 
-class MatchingModel(models.Model):
+class ModelWithOwner(models.Model):
+    owner = models.ForeignKey(
+        User,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        verbose_name=_("owner"),
+    )
+
+    class Meta:
+        abstract = True
+
+
+class MatchingModel(ModelWithOwner):
 
     MATCH_NONE = 0
     MATCH_ANY = 1
@@ -43,7 +56,7 @@ class MatchingModel(models.Model):
         (MATCH_AUTO, _("Automatic")),
     )
 
-    name = models.CharField(_("name"), max_length=128, unique=True)
+    name = models.CharField(_("name"), max_length=128)
 
     match = models.CharField(_("match"), max_length=256, blank=True)
 
@@ -58,32 +71,29 @@ class MatchingModel(models.Model):
     class Meta:
         abstract = True
         ordering = ("name",)
+        constraints = [
+            models.UniqueConstraint(
+                fields=["name", "owner"],
+                name="%(app_label)s_%(class)s_unique_name_owner",
+            ),
+            models.UniqueConstraint(
+                name="%(app_label)s_%(class)s_name_uniq",
+                fields=["name"],
+                condition=models.Q(owner__isnull=True),
+            ),
+        ]
 
     def __str__(self):
         return self.name
 
 
-class ModelWithOwner(models.Model):
-    owner = models.ForeignKey(
-        User,
-        blank=True,
-        null=True,
-        on_delete=models.SET_NULL,
-        verbose_name=_("owner"),
-    )
-
-    class Meta:
-        abstract = True
-
-
-class Correspondent(MatchingModel, ModelWithOwner):
-    class Meta:
-        ordering = ("name",)
+class Correspondent(MatchingModel):
+    class Meta(MatchingModel.Meta):
         verbose_name = _("correspondent")
         verbose_name_plural = _("correspondents")
 
 
-class Tag(MatchingModel, ModelWithOwner):
+class Tag(MatchingModel):
 
     color = models.CharField(_("color"), max_length=7, default="#a6cee3")
 
@@ -96,25 +106,24 @@ class Tag(MatchingModel, ModelWithOwner):
         ),
     )
 
-    class Meta:
+    class Meta(MatchingModel.Meta):
         verbose_name = _("tag")
         verbose_name_plural = _("tags")
 
 
-class DocumentType(MatchingModel, ModelWithOwner):
-    class Meta:
+class DocumentType(MatchingModel):
+    class Meta(MatchingModel.Meta):
         verbose_name = _("document type")
         verbose_name_plural = _("document types")
 
 
-class StoragePath(MatchingModel, ModelWithOwner):
+class StoragePath(MatchingModel):
     path = models.CharField(
         _("path"),
         max_length=512,
     )
 
-    class Meta:
-        ordering = ("name",)
+    class Meta(MatchingModel.Meta):
         verbose_name = _("storage path")
         verbose_name_plural = _("storage paths")
 
