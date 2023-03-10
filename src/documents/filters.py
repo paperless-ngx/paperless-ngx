@@ -36,29 +36,30 @@ class DocumentTypeFilterSet(FilterSet):
         fields = {"name": CHAR_KWARGS}
 
 
-class TagsFilter(Filter):
-    def __init__(self, exclude=False, in_list=False):
+class ObjectFilter(Filter):
+    def __init__(self, exclude=False, in_list=False, field_name=""):
         super().__init__()
         self.exclude = exclude
         self.in_list = in_list
+        self.field_name = field_name
 
     def filter(self, qs, value):
         if not value:
             return qs
 
         try:
-            tag_ids = [int(x) for x in value.split(",")]
+            object_ids = [int(x) for x in value.split(",")]
         except ValueError:
             return qs
 
         if self.in_list:
-            qs = qs.filter(tags__id__in=tag_ids).distinct()
+            qs = qs.filter(**{f"{self.field_name}__id__in": object_ids}).distinct()
         else:
-            for tag_id in tag_ids:
+            for obj_id in object_ids:
                 if self.exclude:
-                    qs = qs.exclude(tags__id=tag_id)
+                    qs = qs.exclude(**{f"{self.field_name}__id": obj_id})
                 else:
-                    qs = qs.filter(tags__id=tag_id)
+                    qs = qs.filter(**{f"{self.field_name}__id": obj_id})
 
         return qs
 
@@ -90,11 +91,17 @@ class DocumentFilterSet(FilterSet):
         exclude=True,
     )
 
-    tags__id__all = TagsFilter()
+    tags__id__all = ObjectFilter(field_name="tags")
 
-    tags__id__none = TagsFilter(exclude=True)
+    tags__id__none = ObjectFilter(field_name="tags", exclude=True)
 
-    tags__id__in = TagsFilter(in_list=True)
+    tags__id__in = ObjectFilter(field_name="tags", in_list=True)
+
+    correspondent__id__none = ObjectFilter(field_name="correspondent", exclude=True)
+
+    document_type__id__none = ObjectFilter(field_name="document_type", exclude=True)
+
+    storage_path__id__none = ObjectFilter(field_name="storage_path", exclude=True)
 
     is_in_inbox = InboxFilter()
 
