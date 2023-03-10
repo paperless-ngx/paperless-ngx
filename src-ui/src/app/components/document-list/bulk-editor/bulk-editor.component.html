@@ -30,7 +30,7 @@
         [items]="tags"
         [disabled]="!userCanEditAll"
         [editing]="true"
-        [multiple]="true"
+        [manyToOne]="true"
         [applyOnClose]="applyOnClose"
         (opened)="openTagsDropdown()"
         [(selectionModel)]="tagSelectionModel"
