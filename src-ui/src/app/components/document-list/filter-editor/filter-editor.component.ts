@@ -712,8 +712,6 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   }
 
   onCorrespondentDropdownOpen() {
-    console.log(this.correspondentSelectionModel)
-
     this.correspondentSelectionModel.apply()
   }
 
