@@ -1,6 +1,9 @@
 {
-    "user_id": 1,
-    "username": "admin",
+    "user": {
+        "id": 1,
+        "username": "admin",
+        "is_superuser": true
+    },
     "settings": {
         "language": "",
         "bulk_edit": {

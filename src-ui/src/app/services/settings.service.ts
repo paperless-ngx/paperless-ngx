@@ -75,10 +75,7 @@ export class SettingsService {
         // to update lang cookie
         if (this.settings['language']?.length)
           this.setLanguage(this.settings['language'])
-        this.currentUser = {
-          id: uisettings['user_id'],
-          username: uisettings['username'],
-        }
+        this.currentUser = uisettings.user
         this.permissionsService.initialize(
           uisettings.permissions,
           this.currentUser

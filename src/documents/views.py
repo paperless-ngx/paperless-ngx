@@ -931,8 +931,11 @@ class UiSettingsView(GenericAPIView):
         roles = map(lambda perm: re.sub(r"^\w+.", "", perm), user.get_all_permissions())
         return Response(
             {
-                "user_id": user.id,
-                "username": user.username,
+                "user": {
+                    "id": user.id,
+                    "username": user.username,
+                    "is_superuser": user.is_superuser,
+                },
                 "settings": ui_settings,
                 "permissions": roles,
             },
