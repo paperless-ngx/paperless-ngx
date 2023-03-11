@@ -1,6 +1,7 @@
+import { PaperlessUser } from './paperless-user'
+
 export interface PaperlessUiSettings {
-  user_id: number
-  username: string
+  user: PaperlessUser
   settings: Object
   permissions: string[]
 }
