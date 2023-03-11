@@ -648,14 +648,26 @@ export class SettingsComponent
     modal.componentInstance.succeeded
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
-        next: (newUser) => {
-          this.toastService.showInfo(
-            $localize`Saved user "${newUser.username}".`
-          )
-          this.usersService.listAll().subscribe((r) => {
-            this.users = r.results
-            this.initialize()
-          })
+        next: (newUser: PaperlessUser) => {
+          if (
+            newUser.id === this.settings.currentUser.id &&
+            (modal.componentInstance as UserEditDialogComponent).passwordIsSet
+          ) {
+            this.toastService.showInfo(
+              $localize`Password has been changed, you will be logged out momentarily.`
+            )
+            setTimeout(() => {
+              window.location.href = `${window.location.origin}/accounts/logout/?next=/accounts/login/`
+            }, 2500)
+          } else {
+            this.toastService.showInfo(
+              $localize`Saved user "${newUser.username}".`
+            )
+            this.usersService.listAll().subscribe((r) => {
+              this.users = r.results
+              this.initialize()
+            })
+          }
         },
         error: (e) => {
           this.toastService.showError(

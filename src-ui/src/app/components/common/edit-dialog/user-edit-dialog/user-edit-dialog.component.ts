@@ -18,6 +18,7 @@ export class UserEditDialogComponent
   implements OnInit
 {
   groups: PaperlessGroup[]
+  passwordIsSet: boolean = false
 
   constructor(
     service: UserService,
@@ -75,5 +76,12 @@ export class UserEditDialogComponent
       return groupsVal.flatMap(
         (id) => this.groups.find((g) => g.id == id)?.permissions
       )
+  }
+
+  save(): void {
+    this.passwordIsSet =
+      this.objectForm.get('password').value?.toString().replaceAll('*', '')
+        .length > 0
+    super.save()
   }
 }
