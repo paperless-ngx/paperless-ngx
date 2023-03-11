@@ -160,8 +160,7 @@ steps described in [Docker setup](#docker_hub) automatically.
         `PAPERLESS_CONSUMER_POLLING`, which will disable inotify. See
         [here](/configuration#polling).
 
-6.  Run `docker-compose pull`, followed by `docker-compose up -d`. This
-    will pull the image, create and start the necessary containers.
+6.  Run `docker-compose pull`. This will pull the image.
 
 7.  To be able to login, you will need a super user. To create it,
     execute the following command:
@@ -173,7 +172,9 @@ steps described in [Docker setup](#docker_hub) automatically.
     This will prompt you to set a username, an optional e-mail address
     and finally a password (at least 8 characters).
 
-8.  The default `docker-compose.yml` exports the webserver on your local
+8.  Run `docker-compose up -d`. This will create and start the necessary containers.
+
+9.  The default `docker-compose.yml` exports the webserver on your local
     port
 
     8000\. If you did not change this, you should now be able to visit
