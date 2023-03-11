@@ -368,7 +368,7 @@ value.
 One of the best things in Paperless is that you can not only access the
 documents via the web interface, but also via the file system.
 
-When as single storage layout is not sufficient for your use case,
+When a single storage layout is not sufficient for your use case,
 storage paths come to the rescue. Storage paths allow you to configure
 more precisely where each document is stored in the file system.
 
