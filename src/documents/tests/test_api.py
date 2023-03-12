@@ -20,8 +20,6 @@ except ImportError:
     import backports.zoneinfo as zoneinfo
 
 import pytest
-from django.db import transaction
-from django.db.utils import IntegrityError
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission

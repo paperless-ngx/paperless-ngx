@@ -818,6 +818,8 @@ class StoragePathSerializer(MatchingModelSerializer, OwnedObjectSerializer):
                 asn="asn",
                 tags="tags",
                 tag_list="tag_list",
+                owner_username="someone",
+                original_name="testfile",
             )
 
         except (KeyError):
