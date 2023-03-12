@@ -365,6 +365,10 @@ supported.
       documents are written in.
     - Set `PAPERLESS_TIME_ZONE` to your local time zone.
 
+    !!! warning
+
+        Ensure your Redis instance [is secured](https://redis.io/docs/getting-started/#securing-redis).
+
 7.  Create the following directories if they are missing:
 
     - `/opt/paperless/media`
