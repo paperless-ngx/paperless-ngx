@@ -5,6 +5,7 @@ from pathlib import Path
 from unittest import mock
 
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.db import DatabaseError
 from django.test import override_settings
 from django.test import TestCase
@@ -1059,3 +1060,93 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
             checksum="2",
         )
         self.assertEqual(generate_filename(doc), "84/August/Aug/The Title.pdf")
+
+    @override_settings(
+        FILENAME_FORMAT="{owner_username}/{title}",
+    )
+    def test_document_owner_string(self):
+        """
+        GIVEN:
+            - Document with an other
+            - Document without an owner
+            - Filename format string includes owner
+        WHEN:
+            - Filename is generated for each document
+        THEN:
+            - Owned document includes username
+            - Document without owner returns "none"
+        """
+
+        u1 = User.objects.create_user("user1")
+
+        owned_doc = Document.objects.create(
+            title="The Title",
+            mime_type="application/pdf",
+            checksum="2",
+            owner=u1,
+        )
+
+        no_owner_doc = Document.objects.create(
+            title="does matter",
+            mime_type="application/pdf",
+            checksum="3",
+        )
+
+        self.assertEqual(generate_filename(owned_doc), "user1/The Title.pdf")
+        self.assertEqual(generate_filename(no_owner_doc), "none/does matter.pdf")
+
+    @override_settings(
+        FILENAME_FORMAT="{original_name}",
+    )
+    def test_document_original_filename(self):
+        """
+        GIVEN:
+            - Document with an original filename
+            - Document without an original filename
+            - Document which was plain text document
+            - Filename format string includes original filename
+        WHEN:
+            - Filename is generated for each document
+        THEN:
+            - Document with original name uses it, dropping suffix
+            - Document without original name returns "none"
+            - Text document returns extension of .txt
+            - Text document archive returns extension of .pdf
+            - No extensions are doubled
+        """
+        doc_with_original = Document.objects.create(
+            title="does matter",
+            mime_type="application/pdf",
+            checksum="3",
+            original_filename="someepdf.pdf",
+        )
+        tricky_with_original = Document.objects.create(
+            title="does matter",
+            mime_type="application/pdf",
+            checksum="1",
+            original_filename="some pdf with spaces and stuff.pdf",
+        )
+        no_original = Document.objects.create(
+            title="does matter",
+            mime_type="application/pdf",
+            checksum="2",
+        )
+
+        text_doc = Document.objects.create(
+            title="does matter",
+            mime_type="text/plain",
+            checksum="4",
+            original_filename="logs.txt",
+        )
+
+        self.assertEqual(generate_filename(doc_with_original), "someepdf.pdf")
+
+        self.assertEqual(
+            generate_filename(tricky_with_original),
+            "some pdf with spaces and stuff.pdf",
+        )
+
+        self.assertEqual(generate_filename(no_original), "none.pdf")
+
+        self.assertEqual(generate_filename(text_doc), "logs.txt")
+        self.assertEqual(generate_filename(text_doc, archive_filename=True), "logs.pdf")
