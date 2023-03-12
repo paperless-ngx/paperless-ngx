@@ -309,6 +309,8 @@ Paperless provides the following placeholders within filenames:
 - `{added_month_name_short}`: Month added abbreviated name, as per
   locale
 - `{added_day}`: Day added only (number 01-31).
+- `{owner_username}`: Username of document owner, if any, or "none"
+- `{original_name}`: Document original filename, minus the extension, if any, or "none"
 
 Paperless will try to conserve the information from your database as
 much as possible. However, some characters that you can use in document
