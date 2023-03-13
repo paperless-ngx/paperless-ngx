@@ -824,8 +824,7 @@ performance immensely:
 - If you want to perform OCR on the device, consider using
   `PAPERLESS_OCR_CLEAN=none`. This will speed up OCR times and use
   less memory at the expense of slightly worse OCR results.
-- If using docker, consider setting `PAPERLESS_WEBSERVER_WORKERS` to
-  1.  This will save some memory.
+- If using docker, consider setting `PAPERLESS_WEBSERVER_WORKERS` to 1. This will save some memory.
 - Consider setting `PAPERLESS_ENABLE_NLTK` to false, to disable the
   more advanced language processing, which can take more memory and
   processing time.
