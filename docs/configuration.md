@@ -129,46 +129,15 @@ configure their endpoints, and enable the feature.
     Defaults to "<http://localhost:3000>".
 
 If you run paperless on docker, you can add those services to the
-docker-compose file (see the provided `docker-compose.sqlite-tika.yml`
-file for reference). The changes requires are as follows:
+docker-compose file (see the provided
+[`docker-compose.sqlite-tika.yml`](https://github.com/paperless-ngx/paperless-ngx/blob/main/docker/compose/docker-compose.sqlite-tika.yml)
+file for reference).
 
-```yaml
-services:
-  # ...
-
-  webserver:
-    # ...
-
-    environment:
-      # ...
-
-      PAPERLESS_TIKA_ENABLED: 1
-      PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
-      PAPERLESS_TIKA_ENDPOINT: http://tika:9998
-
-    # ...
-
-    gotenberg:
-      image: gotenberg/gotenberg:7.8
-      restart: unless-stopped
-      # The gotenberg chromium route is used to convert .eml files. We do not
-      # want to allow external content like tracking pixels or even javascript.
-      command:
-        - 'gotenberg'
-        - '--chromium-disable-javascript=true'
-        - '--chromium-allow-list=file:///tmp/.*'
-
-  tika:
-    image: ghcr.io/paperless-ngx/tika:latest
-    restart: unless-stopped
-```
-
-Add the configuration variables to the environment of the webserver
-(alternatively put the configuration in the `docker-compose.env` file)
-and add the additional services below the webserver service. Watch out
-for indentation.
-
-Make sure to use the correct format `PAPERLESS_TIKA_ENABLED = 1` so python_dotenv can parse the statement correctly.
+Add all three configuration parameters to your configuration. If using
+Docker, this may be the `environment` key of the webserver or a
+`docker-compose.env` file. Bare metal installations may have a `.conf` file
+containing the configuration parameters. Be sure to use the correct format
+and watch out for indentation if editing the YAML file.
 
 ## Paths and folders
 
@@ -1022,7 +991,7 @@ barcode is detected.
 
     Defaults to false.
 
-`PAPERLESS_CONSUMER_ASN_BARCODE_PREFIX=ASN`
+`PAPERLESS_CONSUMER_ASN_BARCODE_PREFIX=<string>`
 
 : Defines the prefix that is used to identify a barcode as an ASN
 barcode.
