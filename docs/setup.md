@@ -43,7 +43,7 @@ steps described in [Docker setup](#docker_hub) automatically.
     ```
 
 2.  Go to the [/docker/compose directory on the project
-    page](https://github.com/paperless-ngx/paperless-ngx/tree/master/docker/compose)
+    page](https://github.com/paperless-ngx/paperless-ngx/tree/main/docker/compose)
     and download one of the `docker-compose.*.yml` files,
     depending on which database backend you want to use. Rename this
     file to `docker-compose.yml`. If you want to enable
@@ -190,7 +190,7 @@ steps described in [Docker setup](#docker_hub) automatically.
     git clone https://github.com/paperless-ngx/paperless-ngx
     ```
 
-    The master branch always reflects the latest stable version.
+    The main branch always reflects the latest stable version.
 
 2.  Copy one of the `docker/compose/docker-compose.*.yml` to
     `docker-compose.yml` in the root folder, depending on which database
@@ -590,7 +590,7 @@ Migration to paperless-ngx is then performed in a few simple steps:
 
 3.  Download the latest release of paperless-ngx. You can either go with
     the docker-compose files from
-    [here](https://github.com/paperless-ngx/paperless-ngx/tree/master/docker/compose)
+    [here](https://github.com/paperless-ngx/paperless-ngx/tree/main/docker/compose)
     or clone the repository to build the image yourself (see
     [above](#docker_build)). You can
     either replace your current paperless folder or put paperless-ngx in
