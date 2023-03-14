@@ -12,17 +12,20 @@ name = "piwheels"
 dateparser = "~=1.1"
 django = "~=4.1"
 django-cors-headers = "*"
+django-celery-results = "*"
 django-compression-middleware = "*"
+django-guardian = "*"
 django-extensions = "*"
 django-filter = "~=22.1"
 djangorestframework = "~=3.14"
+djangorestframework-guardian = "*"
 django-ipware = "*"
 filelock = "*"
 gunicorn = "*"
 imap-tools = "*"
 langdetect = "*"
 pathvalidate = "*"
-pillow = "~=9.3"
+pillow = "~=9.4"
 pikepdf = "*"
 python-gnupg = "*"
 python-dotenv = "*"
@@ -31,10 +34,10 @@ python-magic = "*"
 psycopg2 = "*"
 rapidfuzz = "*"
 redis = {extras = ["hiredis"], version = "*"}
-scikit-learn = "~=1.1"
+scikit-learn = "~=1.2"
 numpy = "*"
-whitenoise = "~=6.2"
-watchdog = "~=2.1"
+whitenoise = "~=6.3"
+watchdog = "~=2.2"
 whoosh="~=2.7"
 inotifyrecursive = "~=0.3"
 ocrmypdf = "~=14.0"
@@ -49,7 +52,6 @@ concurrent-log-handler = "*"
 pyzbar = "*"
 mysqlclient = "*"
 celery = {extras = ["redis"], version = "*"}
-django-celery-results = "*"
 setproctitle = "*"
 nltk = "*"
 pdf2image = "*"
@@ -60,16 +62,9 @@ bleach = "*"
 #
 # Pin this until piwheels is building 1.9 (see https://www.piwheels.org/project/scipy/)
 scipy = "==1.8.1"
-# Newer versions aren't builting yet (see https://www.piwheels.org/project/cryptography/)
-cryptography = "==38.0.1"
-django-guardian = "*"
-djangorestframework-guardian = "*"
-
 # Locked version until https://github.com/django/channels_redis/issues/332
 # is resolved
 channels-redis = "==3.4.1"
-
-
 
 [dev-packages]
 coveralls = "*"
