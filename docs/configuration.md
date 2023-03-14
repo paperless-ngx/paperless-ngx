@@ -429,7 +429,7 @@ applications.
 
 `PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME=<str>`
 
-: If "PAPERLESS*ENABLE_HTTP_REMOTE_USER" is enabled, this
+: If "PAPERLESS_ENABLE_HTTP_REMOTE_USER" is enabled, this
 property allows to customize the name of the HTTP header from which
 the authenticated username is extracted. Values are in terms of
 [HttpRequest.META](https://docs.djangoproject.com/en/4.1/ref/request-response/#django.http.HttpRequest.META).
@@ -996,7 +996,7 @@ PAPERLESS_CONSUMER_ENABLE_BARCODES has been enabled.
 
     Defaults to false.
 
-`PAPERLESS_CONSUMER_BARCODE_STRING=PATCHT`
+`PAPERLESS_CONSUMER_BARCODE_STRING=<string>`
 
 : Defines the string to be detected as a separator barcode. If
 paperless is used with the PATCH-T separator pages, users shouldn't
