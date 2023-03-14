@@ -119,7 +119,9 @@ first-time setup.
 
 ## Back end development
 
-The back end is a [Django](https://www.djangoproject.com/) application. [PyCharm](https://www.jetbrains.com/de-de/pycharm/) as well as [Visual Studio Code](https://code.visualstudio.com) work well for development, but you can use whatever you want.
+The back end is a [Django](https://www.djangoproject.com/) application.
+[PyCharm](https://www.jetbrains.com/de-de/pycharm/) as well as [Visual Studio Code](https://code.visualstudio.com)
+work well for development, but you can use whatever you want.
 
 Configure the IDE to use the `src/`-folder as the base source folder.
 Configure the following launch configurations in your IDE:
@@ -138,7 +140,10 @@ $ python3 manage.py runserver & \
   celery --app paperless worker -l DEBUG
 ```
 
-You might need the front end to test your back end code. This assumes that you have AngularJS installed on your system. Go to the [Front end development](#front-end-development) section for further details. To build the front end once use this commmand:
+You might need the front end to test your back end code.
+This assumes that you have AngularJS installed on your system.
+Go to the [Front end development](#front-end-development) section for further details.
+To build the front end once use this command:
 
 ```bash
 # src-ui/
