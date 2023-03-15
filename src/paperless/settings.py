@@ -509,7 +509,12 @@ if os.getenv("PAPERLESS_DBHOST"):
 
     else:  # Default to PostgresDB
         engine = "django.db.backends.postgresql_psycopg2"
-        options = {"sslmode": os.getenv("PAPERLESS_DBSSLMODE", "prefer")}
+        options = {
+            "sslmode": os.getenv("PAPERLESS_DBSSLMODE", "prefer"),
+            "sslrootcert": os.getenv("PAPERLESS_DBSSLROOTCERT", None),
+            "sslcert": os.getenv("PAPERLESS_DBSSLCERT", None),
+            "sslkey": os.getenv("PAPERLESS_DBSSLKEY", None),
+        }
 
     DATABASES["default"]["ENGINE"] = engine
     DATABASES["default"]["OPTIONS"].update(options)
