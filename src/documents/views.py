@@ -311,7 +311,11 @@ class DocumentViewSet(
         # Firefox is not able to handle unicode characters in filename field
         # RFC 5987 addresses this issue
         # see https://datatracker.ietf.org/doc/html/rfc5987#section-4.2
-        filename_normalized = normalize("NFKD", filename).encode("ascii", "ignore")
+        # Chromium cannot handle commas in the filename
+        filename_normalized = normalize("NFKD", filename.replace(",", "_")).encode(
+            "ascii",
+            "ignore",
+        )
         filename_encoded = quote(filename)
         content_disposition = (
             f"{disposition}; "
