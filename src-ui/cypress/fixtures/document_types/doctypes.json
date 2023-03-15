@@ -1,1 +1,25 @@
-{"count":1,"next":null,"previous":null,"results":[{"id":1,"slug":"test","name":"Test Doc Type","match":"","matching_algorithm":1,"is_insensitive":true,"document_count":0}]}
+{
+    "count": 2,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": 1,
+            "slug": "test",
+            "name": "Test Doc Type",
+            "match": "",
+            "matching_algorithm": 1,
+            "is_insensitive": true,
+            "document_count": 1
+        },
+        {
+            "id": 2,
+            "slug": "test2",
+            "name": "Test Doc Type 2",
+            "match": "",
+            "matching_algorithm": 1,
+            "is_insensitive": true,
+            "document_count": 1
+        }
+    ]
+}
