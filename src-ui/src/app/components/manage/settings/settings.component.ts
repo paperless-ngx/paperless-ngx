@@ -576,7 +576,7 @@ export class SettingsComponent
           let savedToast: Toast = {
             title: $localize`Settings saved`,
             content: $localize`Settings were saved successfully.`,
-            delay: 500000,
+            delay: 5000,
           }
           if (reloadRequired) {
             ;(savedToast.content = $localize`Settings were saved successfully. Reload is required to apply some changes.`),
