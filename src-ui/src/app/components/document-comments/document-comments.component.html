@@ -18,10 +18,11 @@
         </div>
         <div class="d-flex card-footer small bg-light text-primary justify-content-between align-items-center">
             <span>{{displayName(comment)}} - {{ comment.created | customDate}}</span>
-            <button type="button" class="btn btn-link btn-sm p-0 fade" (click)="deleteComment(comment.id)" *appIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Comment }">
+            <button type="button" class="btn btn-link btn-sm p-0 fade" title="Delete comment" i18n-title (click)="deleteComment(comment.id)" *appIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Comment }">
                 <svg width="13" height="13" fill="currentColor">
                     <use xlink:href="assets/bootstrap-icons.svg#trash" />
                 </svg>
+                <span class="visually-hidden" i18n>Delete comment</span>
             </button>
         </div>
     </div>

@@ -65,24 +65,31 @@
             </a>
           </div>
 
+
           <div class="list-group list-group-horizontal border-0 card-info ms-md-auto mt-2 mt-md-0">
+            <button *ngIf="document.n_comments" class="list-group-item btn btn-sm bg-light text-dark p-1 border-0 me-2" title="View comments" i18n-title>
+              <svg class="metadata-icon me-2 text-muted" fill="currentColor">
+                <use xlink:href="assets/bootstrap-icons.svg#chat-left-text"/>
+              </svg>
+              <small i18n>{{document.n_comments}} Comments</small>
+            </button>
             <button *ngIf="document.document_type" type="button" class="list-group-item btn btn-sm bg-light text-dark p-1 border-0 me-2" title="Filter by document type" i18n-title
              (click)="clickDocumentType.emit(document.document_type);$event.stopPropagation()">
-              <svg class="metadata-icon me-2 text-muted bi bi-file-earmark" viewBox="0 0 16 16" fill="currentColor">
-                <path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zm-3 0A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5h-2z"/>
+              <svg class="metadata-icon me-2 text-muted" fill="currentColor">
+                <use xlink:href="assets/bootstrap-icons.svg#file-earmark"/>
               </svg>
               <small>{{(document.document_type$ | async)?.name}}</small>
             </button>
             <button *ngIf="document.storage_path" type="button" class="list-group-item btn btn-sm bg-light text-dark p-1 border-0 me-2" title="Filter by storage path" i18n-title
              (click)="clickStoragePath.emit(document.storage_path);$event.stopPropagation()">
-              <svg class="metadata-icon me-2 text-muted bi bi-folder" viewBox="0 0 16 16" fill="currentColor">
-                <path d="M0 2a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1v7.5a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 1 12.5V5a1 1 0 0 1-1-1V2zm2 3v7.5A1.5 1.5 0 0 0 3.5 14h9a1.5 1.5 0 0 0 1.5-1.5V5H2zm13-3H1v2h14V2zM5 7.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z"/>
+              <svg class="metadata-icon me-2 text-muted" fill="currentColor">
+                <use xlink:href="assets/bootstrap-icons.svg#archive"/>
               </svg>
               <small>{{(document.storage_path$ | async)?.name}}</small>
             </button>
             <div *ngIf="document.archive_serial_number" class="list-group-item me-2 bg-light text-dark p-1 border-0">
-              <svg class="metadata-icon me-2 text-muted bi bi-upc-scan" viewBox="0 0 16 16" fill="currentColor">
-                <path d="M1.5 1a.5.5 0 0 0-.5.5v3a.5.5 0 0 1-1 0v-3A1.5 1.5 0 0 1 1.5 0h3a.5.5 0 0 1 0 1h-3zM11 .5a.5.5 0 0 1 .5-.5h3A1.5 1.5 0 0 1 16 1.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 1-.5-.5zM.5 11a.5.5 0 0 1 .5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 1 0 1h-3A1.5 1.5 0 0 1 0 14.5v-3a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v3a1.5 1.5 0 0 1-1.5 1.5h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 1 .5-.5zM3 4.5a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0v-7zm2 0a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0v-7zm2 0a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0v-7zm2 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-7zm3 0a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0v-7z"/>
+              <svg class="metadata-icon me-2 text-muted" fill="currentColor">
+                <use xlink:href="assets/bootstrap-icons.svg#upc-scan"/>
               </svg>
               <small>#{{document.archive_serial_number}}</small>
             </div>
@@ -94,9 +101,8 @@
               </div>
             </ng-template>
             <div class="list-group-item bg-light text-dark p-1 border-0" [ngbTooltip]="dateTooltip">
-              <svg class="metadata-icon me-2 text-muted bi bi-calendar-event" viewBox="0 0 16 16" fill="currentColor">
-                <path d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z"/>
-                <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+              <svg class="metadata-icon me-2 text-muted" fill="currentColor">
+                <use xlink:href="assets/bootstrap-icons.svg#calendar-event"/>
               </svg>
               <small>{{document.created_date | customDate:'mediumDate'}}</small>
             </div>

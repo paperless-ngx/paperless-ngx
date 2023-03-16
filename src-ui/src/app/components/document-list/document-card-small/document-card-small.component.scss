@@ -34,6 +34,12 @@
   display: block;
 }
 
+.document-card-comments {
+  position: absolute;
+  right: 0;
+  bottom: 170px;
+}
+
 .card-selected {
   border-color:var(--bs-primary);
 
@@ -58,12 +64,12 @@
       color: var(--bs-primary);
     }
   }
+}
 
-  .metadata-icon {
-    width: 0.9rem;
-    height: 0.9rem;
-    padding: 0.05rem;
-  }
+.metadata-icon {
+  width: 0.9rem;
+  height: 0.9rem;
+  padding: 0.05rem;
 }
 
 .card-footer .btn {

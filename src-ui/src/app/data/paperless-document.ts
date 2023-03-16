@@ -54,5 +54,7 @@ export interface PaperlessDocument extends ObjectWithPermissions {
 
   archive_serial_number?: number
 
+  n_comments?: number
+
   __search_hit__?: SearchHit
 }
