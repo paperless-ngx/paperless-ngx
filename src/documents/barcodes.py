@@ -17,7 +17,6 @@ from pikepdf import Page
 from pikepdf import Pdf
 from PIL import Image
 from PIL import ImageSequence
-from pyzbar import pyzbar
 
 logger = logging.getLogger("paperless.barcodes")
 
@@ -83,18 +82,35 @@ def barcode_reader(image: Image) -> List[str]:
     Returns a list containing all found barcodes
     """
     barcodes = []
-    # Decode the barcode image
-    detected_barcodes = pyzbar.decode(image)
 
-    if detected_barcodes:
-        # Traverse through all the detected barcodes in image
+    if settings.CONSUMER_BARCODE_SCANNER == "PYZBAR":
+        logger.debug("Scanning for barcodes using PYZBAR")
+        from pyzbar import pyzbar
+
+        # Decode the barcode image
+        detected_barcodes = pyzbar.decode(image)
+
+        if detected_barcodes:
+            # Traverse through all the detected barcodes in image
+            for barcode in detected_barcodes:
+                if barcode.data:
+                    decoded_barcode = barcode.data.decode("utf-8")
+                    barcodes.append(decoded_barcode)
+                    logger.debug(
+                        f"Barcode of type {str(barcode.type)} found: {decoded_barcode}",
+                    )
+    elif settings.CONSUMER_BARCODE_SCANNER == "ZXING":
+        logger.debug("Scanning for barcodes using ZXING")
+        import zxingcpp
+
+        detected_barcodes = zxingcpp.read_barcodes(image)
         for barcode in detected_barcodes:
-            if barcode.data:
-                decoded_barcode = barcode.data.decode("utf-8")
-                barcodes.append(decoded_barcode)
+            if barcode.text:
+                barcodes.append(barcode.text)
                 logger.debug(
-                    f"Barcode of type {str(barcode.type)} found: {decoded_barcode}",
+                    f"Barcode of type {str(barcode.format)} found: {barcode.text}",
                 )
+
     return barcodes
 
 

@@ -872,6 +872,16 @@ file, which are separated by one or multiple barcode pages.
 
     Defaults to false.
 
+`PAPERLESS_CONSUMER_BARCODE_SCANNER=<string>`
+
+: Sets the barcode scanner used for barcode functionality.
+
+    Currently, "PYZBAR" (the default) or "ZXING" might be selected.
+    If you have problems that your Barcodes/QR-Codes are not detected
+    (especially with bad scan quality and/or small codes), try the other one.
+
+    zxing is not available on all platforms.
+
 `PAPERLESS_CONSUMER_BARCODE_TIFF_SUPPORT=<bool>`
 
 : Whether TIFF image files should be scanned for barcodes. This will
