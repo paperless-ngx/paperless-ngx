@@ -133,6 +133,10 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
     filter: brightness(.8);
   }
 
+  .badge.bg-light.border {
+    border-color: rgba(0,0,0,0) !important;
+  }
+
   .doc-img {
     mix-blend-mode: normal;
     border-radius: 0;
