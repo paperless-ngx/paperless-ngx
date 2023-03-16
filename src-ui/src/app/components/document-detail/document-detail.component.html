@@ -172,9 +172,9 @@
                 </li>
 
                 <li [ngbNavItem]="5" *ngIf="commentsEnabled">
-                    <a ngbNavLink i18n>Comments</a>
+                    <a ngbNavLink i18n>Comments <span *ngIf="document?.n_comments" class="badge text-bg-secondary ms-1">{{document.n_comments}}</span></a>
                     <ng-template ngbNavContent>
-                        <app-document-comments [documentId]="documentId"></app-document-comments>
+                        <app-document-comments [documentId]="documentId" (updated)="commentsUpdated($event)"></app-document-comments>
                     </ng-template>
                 </li>
 

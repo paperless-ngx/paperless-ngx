@@ -18,6 +18,14 @@
       </div>
     </div>
 
+    <div *ngIf="document.n_comments" class="document-card-comments pe-none py-2 px-1">
+    <span class="badge rounded-pill bg-light border text-primary">
+      <svg class="metadata-icon ms-1 me-1" fill="currentColor">
+        <use xlink:href="assets/bootstrap-icons.svg#chat-left-text"/>
+      </svg>
+      {{document.n_comments}}</span>
+    </div>
+
     <div class="card-body p-2">
       <p class="card-text">
         <ng-container *ngIf="document.correspondent">

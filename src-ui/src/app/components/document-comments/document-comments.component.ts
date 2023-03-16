@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core'
+import { Component, Input, Output, EventEmitter } from '@angular/core'
 import { DocumentCommentsService } from 'src/app/services/rest/document-comments.service'
 import { PaperlessDocumentComment } from 'src/app/data/paperless-document-comment'
 import { FormControl, FormGroup } from '@angular/forms'
@@ -29,6 +29,9 @@ export class DocumentCommentsComponent extends ComponentWithPermissions {
       this.update()
     }
   }
+
+  @Output()
+  updated: EventEmitter<number> = new EventEmitter<number>()
 
   constructor(
     private commentsService: DocumentCommentsService,
@@ -64,6 +67,7 @@ export class DocumentCommentsComponent extends ComponentWithPermissions {
         this.comments = result
         this.commentForm.get('newComment').reset()
         this.networkActive = false
+        this.updated.emit(this.comments.length)
       },
       error: (e) => {
         this.networkActive = false
@@ -79,6 +83,7 @@ export class DocumentCommentsComponent extends ComponentWithPermissions {
       next: (result) => {
         this.comments = result
         this.networkActive = false
+        this.updated.emit(this.comments.length)
       },
       error: (e) => {
         this.networkActive = false

@@ -74,11 +74,12 @@ export class DocumentCardSmallComponent extends ComponentWithPermissions {
   }
 
   getTagsLimited$() {
+    const limit = this.document.n_comments > 0 ? 6 : 7
     return this.document.tags$.pipe(
       map((tags) => {
-        if (tags.length > 7) {
-          this.moreTags = tags.length - 6
-          return tags.slice(0, 6)
+        if (tags.length > limit) {
+          this.moreTags = tags.length - (limit - 1)
+          return tags.slice(0, limit - 1)
         } else {
           return tags
         }

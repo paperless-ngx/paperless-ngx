@@ -16,6 +16,7 @@ from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
 from . import bulk_edit
+from .models import Comment
 from .models import Correspondent
 from .models import Document
 from .models import DocumentType
@@ -382,6 +383,8 @@ class DocumentSerializer(OwnedObjectSerializer, DynamicFieldsModelSerializer):
     archived_file_name = SerializerMethodField()
     created_date = serializers.DateField(required=False)
 
+    n_comments = SerializerMethodField()
+
     owner = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(),
         required=False,
@@ -396,6 +399,9 @@ class DocumentSerializer(OwnedObjectSerializer, DynamicFieldsModelSerializer):
             return obj.get_public_filename(archive=True)
         else:
             return None
+
+    def get_n_comments(self, obj):
+        return Comment.objects.filter(document=obj).count()
 
     def to_representation(self, instance):
         doc = super().to_representation(instance)
@@ -442,6 +448,7 @@ class DocumentSerializer(OwnedObjectSerializer, DynamicFieldsModelSerializer):
             "owner",
             "permissions",
             "set_permissions",
+            "n_comments",
         )
 
 
