@@ -65,6 +65,7 @@ scipy = "==1.8.1"
 # Locked version until https://github.com/django/channels_redis/issues/332
 # is resolved
 channels-redis = "==3.4.1"
+zxing-cpp = "*"
 
 [dev-packages]
 coveralls = "*"

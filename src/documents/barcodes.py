@@ -17,7 +17,13 @@ from pikepdf import Page
 from pikepdf import Pdf
 from PIL import Image
 from PIL import ImageSequence
-from pyzbar import pyzbar
+
+scanner_type = settings.CONSUMER_BARCODE_SCANNER.upper()
+
+if scanner_type == "PYZBAR":
+    from pyzbar import pyzbar
+if scanner_type == "ZXING":
+    import zxingcpp
 
 logger = logging.getLogger("paperless.barcodes")
 
@@ -83,18 +89,35 @@ def barcode_reader(image: Image) -> List[str]:
     Returns a list containing all found barcodes
     """
     barcodes = []
-    # Decode the barcode image
-    detected_barcodes = pyzbar.decode(image)
 
-    if detected_barcodes:
-        # Traverse through all the detected barcodes in image
+    if scanner_type == "PYZBAR":
+        logger.debug("Scanning for barcodes using PYZBAR")
+        # Decode the barcode image
+        detected_barcodes = pyzbar.decode(image)
+
+        if detected_barcodes:
+            # Traverse through all the detected barcodes in image
+            for barcode in detected_barcodes:
+                if barcode.data:
+                    decoded_barcode = barcode.data.decode("utf-8")
+                    barcodes.append(decoded_barcode)
+                    logger.debug(
+                        f"Barcode of type {str(barcode.type)} found: {decoded_barcode}",
+                    )
+    elif scanner_type == "ZXING":
+        logger.debug("Scanning for barcodes using ZXING")
+        detected_barcodes = zxingcpp.read_barcodes(image)
         for barcode in detected_barcodes:
-            if barcode.data:
-                decoded_barcode = barcode.data.decode("utf-8")
-                barcodes.append(decoded_barcode)
+            if barcode.text:
+                barcodes.append(barcode.text)
                 logger.debug(
-                    f"Barcode of type {str(barcode.type)} found: {decoded_barcode}",
+                    f"Barcode of type {str(barcode.format)} found: {barcode.text}",
                 )
+    else:
+        logger.warn(
+            f"Invalid Barcode Scanner {scanner_type}, not scanning for barcodes!",
+        )
+
     return barcodes
 
 
