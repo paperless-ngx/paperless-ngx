@@ -74,7 +74,7 @@ export class DocumentCardSmallComponent extends ComponentWithPermissions {
   }
 
   getTagsLimited$() {
-    const limit = this.document.n_comments > 0 ? 6 : 7
+    const limit = this.document.comments.length > 0 ? 6 : 7
     return this.document.tags$.pipe(
       map((tags) => {
         if (tags.length > limit) {
