@@ -67,7 +67,7 @@
 
 
           <div class="list-group list-group-horizontal border-0 card-info ms-md-auto mt-2 mt-md-0">
-            <button *ngIf="document.n_comments" class="list-group-item btn btn-sm bg-light text-dark p-1 border-0 me-2" title="View comments" i18n-title>
+            <button routerLink="/documents/{{document.id}}/comments" *ngIf="document.n_comments" class="list-group-item btn btn-sm bg-light text-dark p-1 border-0 me-2" title="View comments" i18n-title>
               <svg class="metadata-icon me-2 text-muted" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#chat-left-text"/>
               </svg>

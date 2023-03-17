@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core'
 import { FormControl, FormGroup } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
-import { NgbModal, NgbNav } from '@ng-bootstrap/ng-bootstrap'
+import { NgbModal, NgbNav, NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap'
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent'
 import { PaperlessDocument } from 'src/app/data/paperless-document'
 import { PaperlessDocumentMetadata } from 'src/app/data/paperless-document-metadata'
@@ -42,6 +42,15 @@ import {
 } from 'src/app/services/permissions.service'
 import { PaperlessUser } from 'src/app/data/paperless-user'
 import { UserService } from 'src/app/services/rest/user.service'
+
+enum DocumentDetailNavIDs {
+  Details = 1,
+  Content = 2,
+  Metadata = 3,
+  Preview = 4,
+  Comments = 5,
+  Permissions = 6,
+}
 
 @Component({
   selector: 'app-document-detail',
@@ -117,6 +126,8 @@ export class DocumentDetailComponent
 
   PermissionAction = PermissionAction
   PermissionType = PermissionType
+  DocumentDetailNavIDs = DocumentDetailNavIDs
+  activeNavID: number
 
   constructor(
     private documentsService: DocumentService,
@@ -282,11 +293,35 @@ export class DocumentDetailComponent
           this.router.navigate(['404'])
         },
       })
+
+    this.route.paramMap.subscribe((paramMap) => {
+      const section = paramMap.get('section')
+      if (section) {
+        const navIDKey: string = Object.keys(DocumentDetailNavIDs).find(
+          (navID) => navID.toLowerCase() == section
+        )
+        if (navIDKey) {
+          this.activeNavID = DocumentDetailNavIDs[navIDKey]
+        }
+      }
+    })
   }
 
   ngOnDestroy(): void {
     this.unsubscribeNotifier.next(this)
     this.unsubscribeNotifier.complete()
+  }
+
+  onNavChange(navChangeEvent: NgbNavChangeEvent) {
+    const [foundNavIDkey] = Object.entries(DocumentDetailNavIDs).find(
+      ([, navIDValue]) => navIDValue == navChangeEvent.nextId
+    )
+    if (foundNavIDkey)
+      this.router.navigate([
+        'documents',
+        this.documentId,
+        foundNavIDkey.toLowerCase(),
+      ])
   }
 
   updateComponent(doc: PaperlessDocument) {

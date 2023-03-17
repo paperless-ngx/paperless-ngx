@@ -67,8 +67,8 @@
 
         <form [formGroup]='documentForm' (ngSubmit)="save()">
 
-            <ul ngbNav #nav="ngbNav" class="nav-tabs">
-                <li [ngbNavItem]="1">
+            <ul ngbNav #nav="ngbNav" class="nav-tabs" (navChange)="onNavChange($event)" [(activeId)]="activeNavID">
+                <li [ngbNavItem]="DocumentDetailNavIDs.Details">
                     <a ngbNavLink i18n>Details</a>
                     <ng-template ngbNavContent>
 
@@ -87,7 +87,7 @@
                     </ng-template>
                 </li>
 
-                <li [ngbNavItem]="2">
+                <li [ngbNavItem]="DocumentDetailNavIDs.Content">
                     <a ngbNavLink i18n>Content</a>
                     <ng-template ngbNavContent>
                         <div class="mb-3">
@@ -96,7 +96,7 @@
                     </ng-template>
                 </li>
 
-                <li [ngbNavItem]="3">
+                <li [ngbNavItem]="DocumentDetailNavIDs.Metadata">
                     <a ngbNavLink i18n>Metadata</a>
                     <ng-template ngbNavContent>
 
@@ -147,7 +147,7 @@
                     </ng-template>
                 </li>
 
-                <li [ngbNavItem]="4" class="d-md-none">
+                <li [ngbNavItem]="DocumentDetailNavIDs.Preview" class="d-md-none">
                     <a ngbNavLink i18n>Preview</a>
                     <ng-template ngbNavContent *ngIf="!pdfPreview.offsetParent">
                         <div class="position-relative">
@@ -171,14 +171,14 @@
                     </ng-template>
                 </li>
 
-                <li [ngbNavItem]="5" *ngIf="commentsEnabled">
+                <li [ngbNavItem]="DocumentDetailNavIDs.Comments" *ngIf="commentsEnabled">
                     <a ngbNavLink i18n>Comments <span *ngIf="document?.n_comments" class="badge text-bg-secondary ms-1">{{document.n_comments}}</span></a>
                     <ng-template ngbNavContent>
                         <app-document-comments [documentId]="documentId" (updated)="commentsUpdated($event)"></app-document-comments>
                     </ng-template>
                 </li>
 
-                <li [ngbNavItem]="6" *appIfOwner="document">
+                <li [ngbNavItem]="DocumentDetailNavIDs.Permissions" *appIfOwner="document">
                     <a ngbNavLink i18n>Permissions</a>
                     <ng-template ngbNavContent>
                         <div class="mb-3">
