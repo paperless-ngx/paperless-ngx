@@ -171,10 +171,10 @@
                     </ng-template>
                 </li>
 
-                <li [ngbNavItem]="DocumentDetailNavIDs.Comments" *ngIf="commentsEnabled">
-                    <a ngbNavLink i18n>Comments <span *ngIf="document?.comments.length" class="badge text-bg-secondary ms-1">{{document.comments.length}}</span></a>
+                <li [ngbNavItem]="DocumentDetailNavIDs.Notes" *ngIf="notesEnabled">
+                    <a ngbNavLink i18n>Notes <span *ngIf="document?.notes.length" class="badge text-bg-secondary ms-1">{{document.notes.length}}</span></a>
                     <ng-template ngbNavContent>
-                        <app-document-comments [documentId]="documentId" [comments]="document?.comments" (updated)="commentsUpdated($event)"></app-document-comments>
+                        <app-document-notes [documentId]="documentId" [notes]="document?.notes" (updated)="notesUpdated($event)"></app-document-notes>
                     </ng-template>
                 </li>
 

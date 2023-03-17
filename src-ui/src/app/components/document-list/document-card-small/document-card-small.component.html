@@ -13,20 +13,20 @@
       <div class="tags d-flex flex-column text-end position-absolute me-1 fs-6">
         <app-tag *ngFor="let t of getTagsLimited$() | async" [tag]="t" (click)="clickTag.emit(t.id);$event.stopPropagation()" [clickable]="true" linkTitle="Toggle tag filter" i18n-linkTitle></app-tag>
         <div *ngIf="moreTags">
-          <span class="badge badge-secondary">+ {{moreTags}}</span>
+          <span class="badge text-dark">+ {{moreTags}}</span>
         </div>
       </div>
     </div>
 
-    <a routerLink="/documents/{{document.id}}/comments" *ngIf="document.comments.length" class="document-card-comments py-2 px-1">
+    <a *ngIf="notesEnabled && document.notes.length" routerLink="/documents/{{document.id}}/notes" class="document-card-notes py-2 px-1">
       <span class="badge rounded-pill bg-light border text-primary">
       <svg class="metadata-icon ms-1 me-1" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#chat-left-text"/>
       </svg>
-      {{document.comments.length}}</span>
+      {{document.notes.length}}</span>
     </a>
 
-    <div class="card-body p-2">
+    <div class="card-body bg-light p-2">
       <p class="card-text">
         <ng-container *ngIf="document.correspondent">
           <a title="Toggle correspondent filter" i18n-title (click)="clickCorrespondent.emit(document.correspondent);$event.stopPropagation()" class="fw-bold btn-link">{{(document.correspondent$ | async)?.name}}</a>:

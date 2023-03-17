@@ -13,10 +13,10 @@ from django.test import override_settings
 from django.test import TestCase
 from django.utils import timezone
 from documents.management.commands import document_exporter
-from documents.models import Comment
 from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import Note
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import User
@@ -66,8 +66,8 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             storage_type=Document.STORAGE_TYPE_GPG,
         )
 
-        self.comment = Comment.objects.create(
-            comment="This is a comment. amaze.",
+        self.note = Note.objects.create(
+            note="This is a note. amaze.",
             document=self.d1,
             user=self.user,
         )
@@ -199,8 +199,8 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
                         checksum = hashlib.md5(f.read()).hexdigest()
                     self.assertEqual(checksum, element["fields"]["archive_checksum"])
 
-            elif element["model"] == "documents.comment":
-                self.assertEqual(element["fields"]["comment"], self.comment.comment)
+            elif element["model"] == "documents.note":
+                self.assertEqual(element["fields"]["note"], self.note.note)
                 self.assertEqual(element["fields"]["document"], self.d1.id)
                 self.assertEqual(element["fields"]["user"], self.user.id)
 

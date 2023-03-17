@@ -74,7 +74,7 @@ export class DocumentCardSmallComponent extends ComponentWithPermissions {
   }
 
   getTagsLimited$() {
-    const limit = this.document.comments.length > 0 ? 6 : 7
+    const limit = this.document.notes.length > 0 ? 6 : 7
     return this.document.tags$.pipe(
       map((tags) => {
         if (tags.length > limit) {
@@ -110,5 +110,9 @@ export class DocumentCardSmallComponent extends ComponentWithPermissions {
 
   mouseLeaveCard() {
     this.popover.close()
+  }
+
+  get notesEnabled(): boolean {
+    return this.settingsService.get(SETTINGS_KEYS.NOTES_ENABLED)
   }
 }

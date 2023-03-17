@@ -85,7 +85,7 @@ export class SettingsComponent
     displayLanguage: new FormControl(null),
     dateLocale: new FormControl(null),
     dateFormat: new FormControl(null),
-    commentsEnabled: new FormControl(null),
+    notesEnabled: new FormControl(null),
     updateCheckingEnabled: new FormControl(null),
 
     notificationsConsumerNewDocument: new FormControl(null),
@@ -196,7 +196,7 @@ export class SettingsComponent
       displayLanguage: this.settings.getLanguage(),
       dateLocale: this.settings.get(SETTINGS_KEYS.DATE_LOCALE),
       dateFormat: this.settings.get(SETTINGS_KEYS.DATE_FORMAT),
-      commentsEnabled: this.settings.get(SETTINGS_KEYS.COMMENTS_ENABLED),
+      notesEnabled: this.settings.get(SETTINGS_KEYS.NOTES_ENABLED),
       updateCheckingEnabled: this.settings.get(
         SETTINGS_KEYS.UPDATE_CHECKING_ENABLED
       ),
@@ -552,8 +552,8 @@ export class SettingsComponent
       this.settingsForm.value.notificationsConsumerSuppressOnDashboard
     )
     this.settings.set(
-      SETTINGS_KEYS.COMMENTS_ENABLED,
-      this.settingsForm.value.commentsEnabled
+      SETTINGS_KEYS.NOTES_ENABLED,
+      this.settingsForm.value.notesEnabled
     )
     this.settings.set(
       SETTINGS_KEYS.UPDATE_CHECKING_ENABLED,
