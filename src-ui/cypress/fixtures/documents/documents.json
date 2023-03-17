@@ -21,7 +21,8 @@
             "original_file_name": "2022-03-22 no latin title.pdf",
             "archived_file_name": "2022-03-22 no latin title.pdf",
             "owner": null,
-            "permissions": []
+            "permissions": [],
+            "n_comments": 3
         },
         {
             "id": 2,
@@ -39,7 +40,8 @@
             "original_file_name": "2022-03-23 lorem ipsum dolor sit amet.pdf",
             "archived_file_name": "2022-03-23 llorem ipsum dolor sit amet.pdf",
             "owner": null,
-            "permissions": []
+            "permissions": [],
+            "n_comments": 0
         },
         {
             "id": 3,
@@ -59,7 +61,8 @@
             "original_file_name": "2022-03-24 dolor.pdf",
             "archived_file_name": "2022-03-24 dolor.pdf",
             "owner": null,
-            "permissions": []
+            "permissions": [],
+            "n_comments": 0
         },
         {
             "id": 4,
@@ -79,7 +82,8 @@
             "original_file_name": "2022-06-01 sit amet.pdf",
             "archived_file_name": "2022-06-01 sit amet.pdf",
             "owner": null,
-            "permissions": []
+            "permissions": [],
+            "n_comments": 0
         }
     ]
 }

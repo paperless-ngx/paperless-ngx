@@ -104,4 +104,19 @@ describe('document-detail', () => {
     cy.get('app-document-comments').find('form button').click().wait(1500)
     cy.get('app-document-comments').find('.card').its('length').should('eq', 4)
   })
+
+  it('should support navigation to comments tab by url', () => {
+    cy.visit('/documents/1/comments')
+    cy.get('app-document-comments').should('exist')
+  })
+
+  it('should dynamically update comment counts', () => {
+    cy.visit('/documents/1/comments')
+    cy.get('app-document-comments').within(() => cy.contains('Delete').click())
+    cy.get('ul.nav')
+      .find('li')
+      .contains('Comments')
+      .find('.badge')
+      .contains('2')
+  })
 })
