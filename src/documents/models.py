@@ -652,7 +652,7 @@ class Comment(models.Model):
         Document,
         blank=True,
         null=True,
-        related_name="documents",
+        related_name="comments",
         on_delete=models.CASCADE,
         verbose_name=_("document"),
     )
@@ -661,7 +661,7 @@ class Comment(models.Model):
         User,
         blank=True,
         null=True,
-        related_name="users",
+        related_name="comments",
         on_delete=models.SET_NULL,
         verbose_name=_("user"),
     )

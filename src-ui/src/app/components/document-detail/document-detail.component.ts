@@ -42,6 +42,7 @@ import {
 } from 'src/app/services/permissions.service'
 import { PaperlessUser } from 'src/app/data/paperless-user'
 import { UserService } from 'src/app/services/rest/user.service'
+import { PaperlessDocumentComment } from 'src/app/data/paperless-document-comment'
 
 enum DocumentDetailNavIDs {
   Details = 1,
@@ -667,8 +668,8 @@ export class DocumentDetailComponent
     )
   }
 
-  commentsUpdated(n_comments: number) {
-    this.document.n_comments = n_comments
+  commentsUpdated(comments: PaperlessDocumentComment[]) {
+    this.document.comments = comments
     this.openDocumentService.refreshDocument(this.documentId)
   }
 

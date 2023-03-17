@@ -230,7 +230,7 @@ class DocumentViewSet(
     GenericViewSet,
 ):
     model = Document
-    queryset = Document.objects.all()
+    queryset = Document.objects.annotate(num_comments=Count("comments"))
     serializer_class = DocumentSerializer
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
@@ -251,6 +251,7 @@ class DocumentViewSet(
         "modified",
         "added",
         "archive_serial_number",
+        "num_comments",
     )
 
     def get_queryset(self):
