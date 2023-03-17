@@ -492,7 +492,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">94</context>
+          <context context-type="linenumber">97</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
@@ -1826,7 +1826,7 @@
         <source>Not assigned</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.ts</context>
-          <context context-type="linenumber">321</context>
+          <context context-type="linenumber">335</context>
         </context-group>
         <note priority="1" from="description">Filter drop down element to filter for documents with no correspondent/type/tag assigned</note>
       </trans-unit>
@@ -2328,52 +2328,6 @@
           <context context-type="linenumber">1</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="2122666445936087317" datatype="html">
-        <source>Enter comment</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-comments/document-comments.component.html</context>
-          <context context-type="linenumber">4</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="4025397324401332794" datatype="html">
-        <source> Please enter a comment. </source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-comments/document-comments.component.html</context>
-          <context context-type="linenumber">5,7</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="2337485514607640701" datatype="html">
-        <source>Add comment</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-comments/document-comments.component.html</context>
-          <context context-type="linenumber">11</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="7978668497183230348" datatype="html">
-        <source>Delete comment</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-comments/document-comments.component.html</context>
-          <context context-type="linenumber">21</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-comments/document-comments.component.html</context>
-          <context context-type="linenumber">25</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="5438997040668245251" datatype="html">
-        <source>Error saving comment: <x id="PH" equiv-text="e.toString()"/></source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-comments/document-comments.component.ts</context>
-          <context context-type="linenumber">59</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="7593210124183303626" datatype="html">
-        <source>Error deleting comment: <x id="PH" equiv-text="e.toString()"/></source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-comments/document-comments.component.ts</context>
-          <context context-type="linenumber">75</context>
-        </context-group>
-      </trans-unit>
       <trans-unit id="1407560924967345762" datatype="html">
         <source>Page</source>
         <context-group purpose="location">
@@ -2664,8 +2618,8 @@
           <context context-type="linenumber">215</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="8403302283555274795" datatype="html">
-        <source>Comments <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;document?.comments.length&quot; class=&quot;badge text-bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text=".length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/a&gt;"/></source>
+      <trans-unit id="8460995830263484763" datatype="html">
+        <source>Notes <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;document?.notes.length&quot; class=&quot;badge text-bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="ngth}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/a&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">175,176</context>
@@ -3173,15 +3127,15 @@
           <context context-type="linenumber">191</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="3758078190163790058" datatype="html">
-        <source>View comments</source>
+      <trans-unit id="106713086593101376" datatype="html">
+        <source>View notes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
           <context context-type="linenumber">70</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="6326693689225506833" datatype="html">
-        <source><x id="INTERPOLATION" equiv-text="omments.length}}"/> Comments</source>
+      <trans-unit id="8778002102373462277" datatype="html">
+        <source><x id="INTERPOLATION" equiv-text="otes.length}}"/> Notes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
           <context context-type="linenumber">74</context>
@@ -3373,8 +3327,8 @@
           <context context-type="linenumber">18</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="3807699453257291879" datatype="html">
-        <source>Comments</source>
+      <trans-unit id="8104421162933956065" datatype="html">
+        <source>Notes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">147</context>
@@ -3382,6 +3336,10 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">159</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
+          <context context-type="linenumber">25</context>
         </context-group>
       </trans-unit>
       <trans-unit id="231679111972850796" datatype="html">
@@ -3410,14 +3368,14 @@
         <source>View &quot;<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>&quot; saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">202</context>
+          <context context-type="linenumber">205</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6837554170707123455" datatype="html">
         <source>View &quot;<x id="PH" equiv-text="savedView.name"/>&quot; created successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">243</context>
+          <context context-type="linenumber">246</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6849725902312323996" datatype="html">
@@ -3580,6 +3538,52 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/save-view-config-dialog/save-view-config-dialog.component.html</context>
           <context context-type="linenumber">13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1044349881182559852" datatype="html">
+        <source>Enter note</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-notes/document-notes.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7770536883443596194" datatype="html">
+        <source> Please enter a note. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-notes/document-notes.component.html</context>
+          <context context-type="linenumber">5,7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8433732438274024544" datatype="html">
+        <source>Add note</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-notes/document-notes.component.html</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8428006099054244235" datatype="html">
+        <source>Delete note</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-notes/document-notes.component.html</context>
+          <context context-type="linenumber">21</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-notes/document-notes.component.html</context>
+          <context context-type="linenumber">25</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="207390237682956115" datatype="html">
+        <source>Error saving note: <x id="PH" equiv-text="e.toString()"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-notes/document-notes.component.ts</context>
+          <context context-type="linenumber">65</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5682285129543775369" datatype="html">
+        <source>Error deleting note: <x id="PH" equiv-text="e.toString()"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-notes/document-notes.component.ts</context>
+          <context context-type="linenumber">81</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6316128875819022658" datatype="html">
@@ -4050,8 +4054,8 @@
           <context context-type="linenumber">155</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="4666858503087488647" datatype="html">
-        <source>Enable comments</source>
+      <trans-unit id="293524471897878391" datatype="html">
+        <source>Enable notes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">163</context>
@@ -4931,7 +4935,7 @@
         <source>Search score</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
-          <context context-type="linenumber">31</context>
+          <context context-type="linenumber">32</context>
         </context-group>
         <note priority="1" from="description">Score is a value returned by the full text search engine and specifies how well a result matches the given query</note>
       </trans-unit>

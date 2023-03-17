@@ -22,39 +22,24 @@
             "archived_file_name": "2022-03-22 no latin title.pdf",
             "owner": null,
             "permissions": [],
-            "comments": [
+            "notes": [
                 {
-                    "id": 30,
-                    "comment": "One more time",
-                    "created": "2023-03-17T22:02:14.357575Z",
-                    "user": {
-                        "id": 2,
-                        "username": "username",
-                        "first_name": "",
-                        "last_name": ""
-                    }
+                    "id": 9,
+                    "note": "Testing one more time",
+                    "created": "2022-02-18T04:24:55.176008Z",
+                    "user": 15
                 },
                 {
-                    "id": 6,
-                    "comment": "Lets keep going",
-                    "created": "2023-03-16T06:57:32.014027Z",
-                    "user": {
-                        "id": 2,
-                        "username": "username",
-                        "first_name": "",
-                        "last_name": ""
-                    }
+                    "id": 8,
+                    "note": "Another note",
+                    "created": "2021-11-08T04:24:47.925042Z",
+                    "user": 3
                 },
                 {
-                    "id": 5,
-                    "comment": "And just one more",
-                    "created": "2023-03-16T06:57:27.022729Z",
-                    "user": {
-                        "id": 2,
-                        "username": "username",
-                        "first_name": "",
-                        "last_name": ""
-                    }
+                    "id": 7,
+                    "note": "Cupcake ipsum dolor sit amet cheesecake candy cookie tiramisu. Donut chocolate chupa chups macaroon brownie halvah pie cheesecake gummies. Sweet chocolate bar candy donut gummi bears bear claw liquorice bonbon shortbread.\n\nDonut chocolate bar candy wafer wafer tiramisu. Gummies chocolate cake muffin toffee carrot cake macaroon. Toffee toffee jelly beans danish lollipop cake.",
+                    "created": "2021-02-08T02:37:49.724132Z",
+                    "user": 3
                 }
             ]
         },
@@ -75,7 +60,7 @@
             "archived_file_name": "2022-03-23 llorem ipsum dolor sit amet.pdf",
             "owner": null,
             "permissions": [],
-            "comments": []
+            "notes": []
         },
         {
             "id": 3,
@@ -96,7 +81,7 @@
             "archived_file_name": "2022-03-24 dolor.pdf",
             "owner": null,
             "permissions": [],
-            "comments": []
+            "notes": []
         },
         {
             "id": 4,
@@ -117,7 +102,7 @@
             "archived_file_name": "2022-06-01 sit amet.pdf",
             "owner": null,
             "permissions": [],
-            "comments": []
+            "notes": []
         }
     ]
 }

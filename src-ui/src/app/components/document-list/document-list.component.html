@@ -139,12 +139,12 @@
         [currentSortReverse]="list.sortReverse"
         (sort)="onSort($event)"
         i18n>Title</th>
-      <th class="d-none d-xl-table-cell"
-        appSortable="num_comments"
+      <th *ngIf="notesEnabled" class="d-none d-xl-table-cell"
+        appSortable="num_notes"
         [currentSortField]="list.sortField"
         [currentSortReverse]="list.sortReverse"
         (sort)="onSort($event)"
-        i18n>Comments</th>
+        i18n>Notes</th>
       <th class="d-none d-xl-table-cell"
         appSortable="document_type__name"
         [currentSortField]="list.sortField"
@@ -190,13 +190,13 @@
           <a routerLink="/documents/{{d.id}}" title="Edit document" i18n-title style="overflow-wrap: anywhere;">{{d.title | documentTitle}}</a>
           <app-tag [tag]="t" *ngFor="let t of d.tags$ | async" class="ms-1" clickable="true" linkTitle="Filter by tag" i18n-linkTitle (click)="clickTag(t.id);$event.stopPropagation()"></app-tag>
         </td>
-        <td class="d-none d-xl-table-cell">
-          <a routerLink="/documents/{{d.id}}/comments" *ngIf="d.comments.length" class="btn btn-sm p-0">
+        <td *ngIf="notesEnabled" class="d-none d-xl-table-cell">
+          <a *ngIf="d.notes.length" routerLink="/documents/{{d.id}}/notes" class="btn btn-sm p-0">
             <span class="badge rounded-pill bg-light border text-primary">
             <svg class="metadata-icon ms-1 me-1" fill="currentColor">
               <use xlink:href="assets/bootstrap-icons.svg#chat-left-text"/>
             </svg>
-            {{d.comments.length}}</span>
+            {{d.notes.length}}</span>
           </a>
         </td>
         <td class="d-none d-xl-table-cell">

@@ -42,14 +42,14 @@ import {
 } from 'src/app/services/permissions.service'
 import { PaperlessUser } from 'src/app/data/paperless-user'
 import { UserService } from 'src/app/services/rest/user.service'
-import { PaperlessDocumentComment } from 'src/app/data/paperless-document-comment'
+import { PaperlessDocumentNote } from 'src/app/data/paperless-document-note'
 
 enum DocumentDetailNavIDs {
   Details = 1,
   Content = 2,
   Metadata = 3,
   Preview = 4,
-  Comments = 5,
+  Notes = 5,
   Permissions = 6,
 }
 
@@ -658,9 +658,9 @@ export class DocumentDetailComponent
     }
   }
 
-  get commentsEnabled(): boolean {
+  get notesEnabled(): boolean {
     return (
-      this.settings.get(SETTINGS_KEYS.COMMENTS_ENABLED) &&
+      this.settings.get(SETTINGS_KEYS.NOTES_ENABLED) &&
       this.permissionsService.currentUserCan(
         PermissionAction.View,
         PermissionType.Document
@@ -668,8 +668,8 @@ export class DocumentDetailComponent
     )
   }
 
-  commentsUpdated(comments: PaperlessDocumentComment[]) {
-    this.document.comments = comments
+  notesUpdated(notes: PaperlessDocumentNote[]) {
+    this.document.notes = notes
     this.openDocumentService.refreshDocument(this.documentId)
   }
 

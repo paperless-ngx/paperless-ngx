@@ -17,10 +17,10 @@ from django.core.management.base import BaseCommand
 from django.core.management.base import CommandError
 from django.db import transaction
 from django.utils import timezone
-from documents.models import Comment
 from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import Note
 from documents.models import SavedView
 from documents.models import SavedViewFilterRule
 from documents.models import StoragePath
@@ -206,7 +206,7 @@ class Command(BaseCommand):
                 self.files_in_export_dir.add(x.resolve())
 
         # 2. Create manifest, containing all correspondents, types, tags, storage paths
-        # comments, documents and ui_settings
+        # note, documents and ui_settings
         with transaction.atomic():
             manifest = json.loads(
                 serializers.serialize("json", Correspondent.objects.all()),
@@ -222,11 +222,11 @@ class Command(BaseCommand):
                 serializers.serialize("json", StoragePath.objects.all()),
             )
 
-            comments = json.loads(
-                serializers.serialize("json", Comment.objects.all()),
+            notes = json.loads(
+                serializers.serialize("json", Note.objects.all()),
             )
             if not self.split_manifest:
-                manifest += comments
+                manifest += notes
 
             documents = Document.objects.order_by("id")
             document_map = {d.pk: d for d in documents}
@@ -359,7 +359,7 @@ class Command(BaseCommand):
                 content += list(
                     filter(
                         lambda d: d["fields"]["document"] == document_dict["pk"],
-                        comments,
+                        notes,
                     ),
                 )
                 manifest_name.write_text(json.dumps(content, indent=2))

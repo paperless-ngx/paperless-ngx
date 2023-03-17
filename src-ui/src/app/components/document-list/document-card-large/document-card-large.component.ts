@@ -73,16 +73,14 @@ export class DocumentCardLargeComponent extends ComponentWithPermissions {
     }
   }
 
-  get searchCommentHighlights() {
+  get searchNoteHighlights() {
     let highlights = []
     if (
       this.document['__search_hit__'] &&
-      this.document['__search_hit__'].comment_highlights
+      this.document['__search_hit__'].note_highlights
     ) {
-      // only show comments with a match
-      highlights = (
-        this.document['__search_hit__'].comment_highlights as string
-      )
+      // only show notes with a match
+      highlights = (this.document['__search_hit__'].note_highlights as string)
         .split(',')
         .filter((higlight) => higlight.includes('<span'))
     }
@@ -135,5 +133,9 @@ export class DocumentCardLargeComponent extends ComponentWithPermissions {
       this.document.content.substr(0, 500) +
       (this.document.content.length > 500 ? '...' : '')
     )
+  }
+
+  get notesEnabled(): boolean {
+    return this.settingsService.get(SETTINGS_KEYS.NOTES_ENABLED)
   }
 }

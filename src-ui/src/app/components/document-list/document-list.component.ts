@@ -17,6 +17,7 @@ import {
 import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type'
 import { PaperlessDocument } from 'src/app/data/paperless-document'
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
+import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 import {
   SortableDirective,
   SortEvent,
@@ -29,6 +30,7 @@ import {
   DOCUMENT_SORT_FIELDS_FULLTEXT,
 } from 'src/app/services/rest/document.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
+import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { FilterEditorComponent } from './filter-editor/filter-editor.component'
@@ -51,7 +53,8 @@ export class DocumentListComponent
     private toastService: ToastService,
     private modalService: NgbModal,
     private consumerStatusService: ConsumerStatusService,
-    public openDocumentsService: OpenDocumentsService
+    public openDocumentsService: OpenDocumentsService,
+    private settingsService: SettingsService
   ) {
     super()
   }
@@ -288,5 +291,9 @@ export class DocumentListComponent
 
   trackByDocumentId(index, item: PaperlessDocument) {
     return item.id
+  }
+
+  get notesEnabled(): boolean {
+    return this.settingsService.get(SETTINGS_KEYS.NOTES_ENABLED)
   }
 }
