@@ -5,7 +5,7 @@
 .doc-img {
   object-fit: cover;
   object-position: top left;
-  height: 175px;
+  height: 180px;
   mix-blend-mode: multiply;
 }
 
@@ -64,12 +64,6 @@
       color: var(--bs-primary);
     }
   }
-}
-
-.metadata-icon {
-  width: 0.9rem;
-  height: 0.9rem;
-  padding: 0.05rem;
 }
 
 .card-footer .btn {

@@ -140,6 +140,12 @@
         (sort)="onSort($event)"
         i18n>Title</th>
       <th class="d-none d-xl-table-cell"
+        appSortable="n_comments"
+        [currentSortField]="list.sortField"
+        [currentSortReverse]="list.sortReverse"
+        (sort)="onSort($event)"
+        i18n>Comments</th>
+      <th class="d-none d-xl-table-cell"
         appSortable="document_type__name"
         [currentSortField]="list.sortField"
         [currentSortReverse]="list.sortReverse"
@@ -183,6 +189,15 @@
         <td>
           <a routerLink="/documents/{{d.id}}" title="Edit document" i18n-title style="overflow-wrap: anywhere;">{{d.title | documentTitle}}</a>
           <app-tag [tag]="t" *ngFor="let t of d.tags$ | async" class="ms-1" clickable="true" linkTitle="Filter by tag" i18n-linkTitle (click)="clickTag(t.id);$event.stopPropagation()"></app-tag>
+        </td>
+        <td class="d-none d-xl-table-cell">
+          <a routerLink="/documents/{{d.id}}/comments" *ngIf="d.n_comments" class="btn btn-sm p-0">
+            <span class="badge rounded-pill bg-light border text-primary">
+            <svg class="metadata-icon ms-1 me-1" fill="currentColor">
+              <use xlink:href="assets/bootstrap-icons.svg#chat-left-text"/>
+            </svg>
+            {{d.n_comments}}</span>
+          </a>
         </td>
         <td class="d-none d-xl-table-cell">
           <ng-container *ngIf="d.document_type">
