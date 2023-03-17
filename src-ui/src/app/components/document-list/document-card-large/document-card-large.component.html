@@ -26,7 +26,7 @@
         </div>
         <p class="card-text">
           <span *ngIf="document.__search_hit__ && document.__search_hit__.highlights" [innerHtml]="document.__search_hit__.highlights"></span>
-          <span *ngFor="let highlight of searchCommentHighlights" class="d-block">
+          <span *ngFor="let highlight of searchNoteHighlights" class="d-block">
             <svg width="1em" height="1em" fill="currentColor" class="me-2">
               <use xlink:href="assets/bootstrap-icons.svg#chat-left-text"/>
             </svg>
@@ -67,11 +67,11 @@
 
 
           <div class="list-group list-group-horizontal border-0 card-info ms-md-auto mt-2 mt-md-0">
-            <button routerLink="/documents/{{document.id}}/comments" *ngIf="document.comments.length" class="list-group-item btn btn-sm bg-light text-dark p-1 border-0 me-2" title="View comments" i18n-title>
+            <button *ngIf="notesEnabled && document.notes.length" routerLink="/documents/{{document.id}}/notes" class="list-group-item btn btn-sm bg-light text-dark p-1 border-0 me-2" title="View notes" i18n-title>
               <svg class="metadata-icon me-2 text-muted" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#chat-left-text"/>
               </svg>
-              <small i18n>{{document.comments.length}} Comments</small>
+              <small i18n>{{document.notes.length}} Notes</small>
             </button>
             <button *ngIf="document.document_type" type="button" class="list-group-item btn btn-sm bg-light text-dark p-1 border-0 me-2" title="Filter by document type" i18n-title
              (click)="clickDocumentType.emit(document.document_type);$event.stopPropagation()">

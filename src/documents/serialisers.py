@@ -382,8 +382,6 @@ class DocumentSerializer(OwnedObjectSerializer, DynamicFieldsModelSerializer):
     archived_file_name = SerializerMethodField()
     created_date = serializers.DateField(required=False)
 
-    num_comments = serializers.IntegerField(read_only=True)
-
     owner = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(),
         required=False,
@@ -444,8 +442,7 @@ class DocumentSerializer(OwnedObjectSerializer, DynamicFieldsModelSerializer):
             "owner",
             "permissions",
             "set_permissions",
-            "comments",
-            "num_comments",
+            "notes",
         )
 
 

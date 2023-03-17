@@ -18,7 +18,7 @@ export enum PermissionType {
   SavedView = '%s_savedview',
   PaperlessTask = '%s_paperlesstask',
   UISettings = '%s_uisettings',
-  Comment = '%s_comment',
+  Note = '%s_note',
   MailAccount = '%s_mailaccount',
   MailRule = '%s_mailrule',
   User = '%s_user',
