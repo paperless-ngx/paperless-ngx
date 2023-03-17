@@ -17,38 +17,22 @@ export class DocumentCommentsComponent extends ComponentWithPermissions {
   })
 
   networkActive = false
-  comments: PaperlessDocumentComment[] = []
   newCommentError: boolean = false
 
-  private _documentId: number
+  @Input()
+  documentId: number
 
   @Input()
-  set documentId(id: number) {
-    if (id != this._documentId) {
-      this._documentId = id
-      this.update()
-    }
-  }
+  comments: PaperlessDocumentComment[] = []
 
   @Output()
-  updated: EventEmitter<number> = new EventEmitter<number>()
+  updated: EventEmitter<PaperlessDocumentComment[]> = new EventEmitter()
 
   constructor(
     private commentsService: DocumentCommentsService,
     private toastService: ToastService
   ) {
     super()
-  }
-
-  update(): void {
-    this.networkActive = true
-    this.commentsService
-      .getComments(this._documentId)
-      .pipe(first())
-      .subscribe((comments) => {
-        this.comments = comments
-        this.networkActive = false
-      })
   }
 
   addComment() {
@@ -62,12 +46,12 @@ export class DocumentCommentsComponent extends ComponentWithPermissions {
     }
     this.newCommentError = false
     this.networkActive = true
-    this.commentsService.addComment(this._documentId, comment).subscribe({
+    this.commentsService.addComment(this.documentId, comment).subscribe({
       next: (result) => {
         this.comments = result
         this.commentForm.get('newComment').reset()
         this.networkActive = false
-        this.updated.emit(this.comments.length)
+        this.updated.emit(this.comments)
       },
       error: (e) => {
         this.networkActive = false
@@ -79,11 +63,11 @@ export class DocumentCommentsComponent extends ComponentWithPermissions {
   }
 
   deleteComment(commentId: number) {
-    this.commentsService.deleteComment(this._documentId, commentId).subscribe({
+    this.commentsService.deleteComment(this.documentId, commentId).subscribe({
       next: (result) => {
         this.comments = result
         this.networkActive = false
-        this.updated.emit(this.comments.length)
+        this.updated.emit(this.comments)
       },
       error: (e) => {
         this.networkActive = false

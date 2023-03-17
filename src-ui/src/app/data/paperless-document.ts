@@ -4,6 +4,7 @@ import { PaperlessDocumentType } from './paperless-document-type'
 import { Observable } from 'rxjs'
 import { PaperlessStoragePath } from './paperless-storage-path'
 import { ObjectWithPermissions } from './object-with-permissions'
+import { PaperlessDocumentComment } from './paperless-document-comment'
 
 export interface SearchHit {
   score?: number
@@ -54,7 +55,7 @@ export interface PaperlessDocument extends ObjectWithPermissions {
 
   archive_serial_number?: number
 
-  n_comments?: number
+  comments?: PaperlessDocumentComment[]
 
   __search_hit__?: SearchHit
 }
