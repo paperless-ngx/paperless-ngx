@@ -12,3 +12,8 @@
         }
     }
 }
+
+::ng-deep .private .ng-value-container {
+    font-style: italic;
+    opacity: .75;
+}
