@@ -1,7 +1,7 @@
 <div *ngIf="comments">
     <form [formGroup]="commentForm" class="needs-validation mt-3" *appIfPermissions="{ action: PermissionAction.Add, type: PermissionType.Comment }" novalidate>
         <div class="form-group">
-            <textarea class="form-control form-control-sm" [class.is-invalid]="newCommentError" rows="3" formControlName="newComment" placeholder="Enter comment" i18n-placeholder required></textarea>
+            <textarea class="form-control form-control-sm" [class.is-invalid]="newCommentError" rows="3" formControlName="newComment" placeholder="Enter comment" i18n-placeholder (keydown)="commentFormKeydown($event)" required></textarea>
             <div class="invalid-feedback" i18n>
                 Please enter a comment.
             </div>

@@ -106,4 +106,10 @@ export class DocumentCommentsComponent extends ComponentWithPermissions {
     }
     return nameComponents.join(' ')
   }
+
+  commentFormKeydown(event: KeyboardEvent) {
+    if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+      this.addComment()
+    }
+  }
 }
