@@ -1,6 +1,46 @@
 <app-widget-frame title="Statistics" [loading]="loading" i18n-title>
   <ng-container content>
-    <p class="card-text" i18n *ngIf="statistics?.documents_inbox !== null">Documents in inbox: {{statistics?.documents_inbox}}</p>
-    <p class="card-text" i18n>Total documents: {{statistics?.documents_total}}</p>
+    <div class="list-group border-light">
+      <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" title="Go to inbox" i18n-title href="javascript:void()" *ngIf="statistics?.documents_inbox !== null" (click)="goToInbox()">
+        <ng-container i18n>Documents in inbox</ng-container>:
+        <span class="badge rounded-pill" [class.bg-primary]="statistics?.documents_inbox > 0" [class.bg-muted]="statistics?.documents_inbox === 0">{{statistics?.documents_inbox}}</span>
+      </a>
+      <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" title="Go to documents" i18n-title routerLink="/documents/">
+        <ng-container i18n>Total documents</ng-container>:
+        <span class="badge bg-primary rounded-pill">{{statistics?.documents_total}}</span>
+      </a>
+      <div class="list-group-item d-flex justify-content-between align-items-center" routerLink="/documents/">
+        <ng-container i18n>Total characters</ng-container>:
+        <span class="badge bg-secondary text-light rounded-pill">{{statistics?.character_count | number}}</span>
+      </div>
+      <div class="list-group-item d-flex justify-content-between align-items-center">
+        <div class="flex-grow-1"><ng-container i18n>File types</ng-container>:</div>
+        <div class="d-flex flex-column flex-grow-1">
+          <div *ngFor="let filetype of statistics?.document_file_type_counts; let i = index" class="d-flex justify-content-between align-items-center">
+            <span class="fst-italic text-muted">{{filetype.mime_type}}</span>
+            <span class="badge bg-secondary text-light rounded-pill">{{getFileTypePercent(filetype) | number: '1.0-1'}}%</span>
+          </div>
+        </div>
+      </div>
+      <!-- <div class="list-group-item border-dark d-flex justify-content-between align-items-center">
+        <span class="me-3" i18n>File types:</span>
+        <div class="progress flex-grow-1">
+          <div *ngFor="let filetype of statistics?.document_file_type_counts; let i = index"
+            class="progress-bar bg-primary text-primary-contrast"
+            [class.me-1]="i < statistics?.document_file_type_counts.length - 1"
+            role="progressbar"
+            [ngbPopover]="filetype.mime_type"
+            i18n-ngbPopover
+            triggers="mouseenter:mouseleave"
+            [attr.aria-label]="filetype.mime_type"
+            [style.width]="getFileTypePercent(filetype) + '%'"
+            [attr.aria-valuenow]="getFileTypePercent(filetype)"
+            aria-valuemin="0"
+            aria-valuemax="100">
+            <ng-container *ngIf="getFileTypePercent(filetype) > 25">{{filetype.mime_type}}</ng-container>
+          </div>
+        </div>
+      </div> -->
+    </div>
   </ng-container>
 </app-widget-frame>

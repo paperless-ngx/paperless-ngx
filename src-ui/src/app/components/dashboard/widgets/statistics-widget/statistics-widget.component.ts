@@ -1,12 +1,25 @@
 import { HttpClient } from '@angular/common/http'
 import { Component, OnDestroy, OnInit } from '@angular/core'
 import { Observable, Subscription } from 'rxjs'
+import {
+  FILTER_HAS_TAGS_ALL,
+  FILTER_IS_IN_INBOX,
+} from 'src/app/data/filter-rule-type'
 import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
+import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { environment } from 'src/environments/environment'
 
 export interface Statistics {
   documents_total?: number
   documents_inbox?: number
+  inbox_tag?: number
+  document_file_type_counts?: DocumentFileType[]
+  character_count?: number
+}
+
+interface DocumentFileType {
+  mime_type: string
+  mime_type_count: number
 }
 
 @Component({
@@ -19,7 +32,8 @@ export class StatisticsWidgetComponent implements OnInit, OnDestroy {
 
   constructor(
     private http: HttpClient,
-    private consumerStatusService: ConsumerStatusService
+    private consumerStatusService: ConsumerStatusService,
+    private documentListViewService: DocumentListViewService
   ) {}
 
   statistics: Statistics = {}
@@ -49,5 +63,18 @@ export class StatisticsWidgetComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe()
+  }
+
+  goToInbox() {
+    this.documentListViewService.quickFilter([
+      {
+        rule_type: FILTER_HAS_TAGS_ALL,
+        value: this.statistics.inbox_tag.toString(),
+      },
+    ])
+  }
+
+  getFileTypePercent(filetype: DocumentFileType): number {
+    return (filetype.mime_type_count / this.statistics?.documents_total) * 100
   }
 }
