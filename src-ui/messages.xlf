@@ -1794,25 +1794,39 @@
           <context context-type="linenumber">18</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="6381578200008167206" datatype="html">
+        <source>Include</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5668077948386857930" datatype="html">
+        <source>Exclude</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="4391289919356861627" datatype="html">
         <source>Apply</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
-          <context context-type="linenumber">32</context>
+          <context context-type="linenumber">40</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7780041345210191160" datatype="html">
         <source>Click again to exclude items.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
-          <context context-type="linenumber">38</context>
+          <context context-type="linenumber">46</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7593728289020204896" datatype="html">
         <source>Not assigned</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.ts</context>
-          <context context-type="linenumber">262</context>
+          <context context-type="linenumber">321</context>
         </context-group>
         <note priority="1" from="description">Filter drop down element to filter for documents with no correspondent/type/tag assigned</note>
       </trans-unit>
@@ -2174,7 +2188,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">162</context>
+          <context context-type="linenumber">172</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
@@ -3331,7 +3345,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">167</context>
+          <context context-type="linenumber">177</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
@@ -3385,112 +3399,112 @@
         <source>Correspondent: <x id="PH" equiv-text="this.correspondents.find((c) =&gt; c.id == +rule.value)?.name"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">98,100</context>
+          <context context-type="linenumber">108,110</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8170755470576301659" datatype="html">
         <source>Without correspondent</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">102</context>
+          <context context-type="linenumber">112</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8705701325879965907" datatype="html">
         <source>Type: <x id="PH" equiv-text="this.documentTypes.find((dt) =&gt; dt.id == +rule.value)?.name"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">107,109</context>
+          <context context-type="linenumber">117,119</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4362173610367509215" datatype="html">
         <source>Without document type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">111</context>
+          <context context-type="linenumber">121</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8180755793012580465" datatype="html">
         <source>Tag: <x id="PH" equiv-text="this.tags.find((t) =&gt; t.id == +rule.value)?.name"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">115,117</context>
+          <context context-type="linenumber">125,127</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6494566478302448576" datatype="html">
         <source>Without any tag</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">121</context>
+          <context context-type="linenumber">131</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6523384805359286307" datatype="html">
         <source>Title: <x id="PH" equiv-text="rule.value"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">125</context>
+          <context context-type="linenumber">135</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1872523635812236432" datatype="html">
         <source>ASN: <x id="PH" equiv-text="rule.value"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">128</context>
+          <context context-type="linenumber">138</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3100631071441658964" datatype="html">
         <source>Title &amp; content</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">165</context>
+          <context context-type="linenumber">175</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1010505078885609376" datatype="html">
         <source>Advanced search</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">170</context>
+          <context context-type="linenumber">180</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2649431021108393503" datatype="html">
         <source>More like</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">176</context>
+          <context context-type="linenumber">186</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3697582909018473071" datatype="html">
         <source>equals</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">195</context>
+          <context context-type="linenumber">205</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5325481293405718739" datatype="html">
         <source>is empty</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">199</context>
+          <context context-type="linenumber">209</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6166785695326182482" datatype="html">
         <source>is not empty</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">203</context>
+          <context context-type="linenumber">213</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4686622206659266699" datatype="html">
         <source>greater than</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">207</context>
+          <context context-type="linenumber">217</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8014012170270529279" datatype="html">
         <source>less than</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">211</context>
+          <context context-type="linenumber">221</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7210076240260527720" datatype="html">
