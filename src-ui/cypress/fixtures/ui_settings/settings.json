@@ -2,7 +2,8 @@
     "user": {
         "id": 1,
         "username": "admin",
-        "is_superuser": true
+        "is_superuser": true,
+        "groups": []
     },
     "settings": {
         "language": "",
