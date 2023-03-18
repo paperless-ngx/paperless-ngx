@@ -1039,9 +1039,24 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
     def test_statistics(self):
 
-        doc1 = Document.objects.create(title="none1", checksum="A")
-        doc2 = Document.objects.create(title="none2", checksum="B")
-        doc3 = Document.objects.create(title="none3", checksum="C")
+        doc1 = Document.objects.create(
+            title="none1",
+            checksum="A",
+            mime_type="application/pdf",
+            content="abc",
+        )
+        doc2 = Document.objects.create(
+            title="none2",
+            checksum="B",
+            mime_type="application/pdf",
+            content="123",
+        )
+        doc3 = Document.objects.create(
+            title="none3",
+            checksum="C",
+            mime_type="text/plain",
+            content="hello",
+        )
 
         tag_inbox = Tag.objects.create(name="t1", is_inbox_tag=True)
 
@@ -1051,6 +1066,16 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["documents_total"], 3)
         self.assertEqual(response.data["documents_inbox"], 1)
+        self.assertEqual(response.data["inbox_tag"], tag_inbox.pk)
+        self.assertEqual(
+            response.data["document_file_type_counts"][0]["mime_type_count"],
+            2,
+        )
+        self.assertEqual(
+            response.data["document_file_type_counts"][1]["mime_type_count"],
+            1,
+        )
+        self.assertEqual(response.data["character_count"], 11)
 
     def test_statistics_no_inbox_tag(self):
         Document.objects.create(title="none1", checksum="A")
@@ -1058,6 +1083,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         response = self.client.get("/api/statistics/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["documents_inbox"], None)
+        self.assertEqual(response.data["inbox_tag"], None)
 
     @mock.patch("documents.views.consume_file.delay")
     def test_upload(self, m):
