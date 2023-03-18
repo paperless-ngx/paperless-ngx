@@ -161,6 +161,7 @@ class OwnedObjectSerializer(serializers.ModelSerializer, SetPermissionsMixin):
                 "users": get_users_with_perms(
                     obj,
                     only_with_perms_in=[view_codename],
+                    with_group_users=False,
                 ).values_list("id", flat=True),
                 "groups": get_groups_with_only_permission(
                     obj,
@@ -171,6 +172,7 @@ class OwnedObjectSerializer(serializers.ModelSerializer, SetPermissionsMixin):
                 "users": get_users_with_perms(
                     obj,
                     only_with_perms_in=[change_codename],
+                    with_group_users=False,
                 ).values_list("id", flat=True),
                 "groups": get_groups_with_only_permission(
                     obj,
