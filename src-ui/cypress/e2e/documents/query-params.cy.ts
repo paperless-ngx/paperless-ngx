@@ -232,6 +232,11 @@ describe('documents query params', () => {
 
   it('should show a list of documents filtered by document type', () => {
     cy.visit('/documents?sort=created&reverse=true&document_type__id=1')
+    cy.contains('2 documents')
+  })
+
+  it('should show a list of documents filtered by multiple correspondents', () => {
+    cy.visit('/documents?sort=created&reverse=true&document_type__id__in=1,2')
     cy.contains('3 documents')
   })
 
@@ -245,9 +250,14 @@ describe('documents query params', () => {
     cy.contains('2 documents')
   })
 
+  it('should show a list of documents filtered by multiple correspondents', () => {
+    cy.visit('/documents?sort=created&reverse=true&correspondent__id__in=9,14')
+    cy.contains('3 documents')
+  })
+
   it('should show a list of documents filtered by no correspondent', () => {
     cy.visit('/documents?sort=created&reverse=true&correspondent__isnull=1')
-    cy.contains('2 documents')
+    cy.contains('One document')
   })
 
   it('should show a list of documents filtered by storage path', () => {

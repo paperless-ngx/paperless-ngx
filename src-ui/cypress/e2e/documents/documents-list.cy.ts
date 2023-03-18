@@ -48,6 +48,26 @@ describe('documents-list', () => {
             (d.tags as Array<number>).includes(tag_id)
           )
           response.count = response.results.length
+        } else if (req.query.hasOwnProperty('correspondent__id__in')) {
+          // filtering e.g. http://localhost:8000/api/documents/?page=1&page_size=50&ordering=-created&correspondent__id__in=9,14
+          const correspondent_ids = req.query['correspondent__id__in']
+            .toString()
+            .split(',')
+            .map((c) => +c)
+          response.results = (documentsJson.results as Array<any>).filter((d) =>
+            correspondent_ids.includes(d.correspondent)
+          )
+          response.count = response.results.length
+        } else if (req.query.hasOwnProperty('correspondent__id__none')) {
+          // filtering e.g. http://localhost:8000/api/documents/?page=1&page_size=50&ordering=-created&correspondent__id__none=9,14
+          const correspondent_ids = req.query['correspondent__id__none']
+            .toString()
+            .split(',')
+            .map((c) => +c)
+          response.results = (documentsJson.results as Array<any>).filter(
+            (d) => !correspondent_ids.includes(d.correspondent)
+          )
+          response.count = response.results.length
         }
 
         req.reply(response)
@@ -109,6 +129,27 @@ describe('documents-list', () => {
         cy.contains('button', 'Tag 2').click()
       }
     )
+    cy.contains('One document')
+  })
+
+  it('should filter including multiple correspondents', () => {
+    cy.get('app-filter-editor app-filterable-dropdown[title="Correspondent"]')
+      .click()
+      .within(() => {
+        cy.contains('button', 'ABC Test Correspondent').click()
+        cy.contains('button', 'Corresp 11').click()
+      })
+    cy.contains('3 documents')
+  })
+
+  it('should filter excluding multiple correspondents', () => {
+    cy.get('app-filter-editor app-filterable-dropdown[title="Correspondent"]')
+      .click()
+      .within(() => {
+        cy.contains('button', 'ABC Test Correspondent').click()
+        cy.contains('button', 'Corresp 11').click()
+        cy.contains('label', 'Exclude').click()
+      })
     cy.contains('One document')
   })
 

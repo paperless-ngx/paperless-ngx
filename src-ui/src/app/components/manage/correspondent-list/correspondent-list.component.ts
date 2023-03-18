@@ -1,6 +1,6 @@
 import { Component } from '@angular/core'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
-import { FILTER_CORRESPONDENT } from 'src/app/data/filter-rule-type'
+import { FILTER_HAS_CORRESPONDENT_ANY } from 'src/app/data/filter-rule-type'
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
@@ -35,7 +35,7 @@ export class CorrespondentListComponent extends ManagementListComponent<Paperles
       toastService,
       documentListViewService,
       permissionsService,
-      FILTER_CORRESPONDENT,
+      FILTER_HAS_CORRESPONDENT_ANY,
       $localize`correspondent`,
       $localize`correspondents`,
       PermissionType.Correspondent,
