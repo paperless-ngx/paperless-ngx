@@ -48,6 +48,20 @@ export class StatisticsWidgetComponent implements OnInit, OnDestroy {
     this.loading = true
     this.getStatistics().subscribe((statistics) => {
       this.loading = false
+      // truncate the list and sum others
+      if (statistics.document_file_type_counts?.length > 4) {
+        let others = statistics.document_file_type_counts.slice(4)
+        statistics.document_file_type_counts =
+          statistics.document_file_type_counts.slice(0, 4)
+        statistics.document_file_type_counts.push({
+          mime_type: $localize`other`,
+          mime_type_count: others.reduce(
+            (currentValue, documentFileType) =>
+              documentFileType.mime_type_count + currentValue,
+            0
+          ),
+        })
+      }
       this.statistics = statistics
     })
   }
