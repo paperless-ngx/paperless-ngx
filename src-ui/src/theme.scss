@@ -223,6 +223,14 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
   .dropdown-menu {
     --bs-dropdown-color: var(--bs-body-color);
   }
+
+  .card .list-group-item {
+    --bs-border-color: rgb(var(--bs-dark-rgb));
+
+    .bg-secondary {
+      background-color: rgb(var(--bs-dark-rgb)) !important;
+    }
+  }
 }
 
 body.color-scheme-dark {
