@@ -447,6 +447,12 @@ class SavedViewFilterRule(models.Model):
         (23, _("ASN greater than")),
         (24, _("ASN less than")),
         (25, _("storage path is")),
+        (26, _("has correspondent in")),
+        (27, _("does not have correspondent in")),
+        (28, _("has document type in")),
+        (29, _("does not have document type in")),
+        (30, _("has storage path in")),
+        (31, _("does not have storage path in")),
     ]
 
     saved_view = models.ForeignKey(
