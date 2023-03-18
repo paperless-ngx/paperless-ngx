@@ -15,32 +15,13 @@
       </div>
       <div class="list-group-item d-flex justify-content-between align-items-center">
         <div class="flex-grow-1"><ng-container i18n>File types</ng-container>:</div>
-        <div class="d-flex flex-column flex-grow-1">
+        <div class="d-flex flex-column flex-grow-1 filetypes-list">
           <div *ngFor="let filetype of statistics?.document_file_type_counts; let i = index" class="d-flex justify-content-between align-items-center">
-            <span class="fst-italic text-muted">{{filetype.mime_type}}</span>
+            <span class="fst-italic text-muted text-truncate pe-3">{{filetype.mime_type}}</span>
             <span class="badge bg-secondary text-light rounded-pill">{{getFileTypePercent(filetype) | number: '1.0-1'}}%</span>
           </div>
         </div>
       </div>
-      <!-- <div class="list-group-item border-dark d-flex justify-content-between align-items-center">
-        <span class="me-3" i18n>File types:</span>
-        <div class="progress flex-grow-1">
-          <div *ngFor="let filetype of statistics?.document_file_type_counts; let i = index"
-            class="progress-bar bg-primary text-primary-contrast"
-            [class.me-1]="i < statistics?.document_file_type_counts.length - 1"
-            role="progressbar"
-            [ngbPopover]="filetype.mime_type"
-            i18n-ngbPopover
-            triggers="mouseenter:mouseleave"
-            [attr.aria-label]="filetype.mime_type"
-            [style.width]="getFileTypePercent(filetype) + '%'"
-            [attr.aria-valuenow]="getFileTypePercent(filetype)"
-            aria-valuemin="0"
-            aria-valuemax="100">
-            <ng-container *ngIf="getFileTypePercent(filetype) > 25">{{filetype.mime_type}}</ng-container>
-          </div>
-        </div>
-      </div> -->
     </div>
   </ng-container>
 </app-widget-frame>
