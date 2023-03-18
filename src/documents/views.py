@@ -20,6 +20,7 @@ from django.db.models import Case
 from django.db.models import Count
 from django.db.models import IntegerField
 from django.db.models import Max
+from django.db.models import Sum
 from django.db.models import When
 from django.db.models.functions import Length
 from django.db.models.functions import Lower
@@ -814,14 +815,11 @@ class StatisticsView(APIView):
         )
 
         character_count = (
-            sum(
-                Document.objects.annotate(characters=Length("content")).values_list(
-                    "characters",
-                    flat=True,
-                ),
+            Document.objects.annotate(
+                characters=Length("content"),
             )
-            if documents_total > 0
-            else 0
+            .aggregate(Sum("characters"))
+            .get("characters__sum")
         )
 
         return Response(
