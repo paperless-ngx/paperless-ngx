@@ -442,6 +442,7 @@ class DocumentSerializer(OwnedObjectSerializer, DynamicFieldsModelSerializer):
             "owner",
             "permissions",
             "set_permissions",
+            "notes",
         )
 
 
