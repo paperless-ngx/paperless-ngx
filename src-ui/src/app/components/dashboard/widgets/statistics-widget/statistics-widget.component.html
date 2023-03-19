@@ -13,14 +13,33 @@
         <ng-container i18n>Total characters</ng-container>:
         <span class="badge bg-secondary text-light rounded-pill">{{statistics?.character_count | number}}</span>
       </div>
-      <div class="list-group-item d-flex justify-content-between align-items-center">
-        <div class="flex-grow-1"><ng-container i18n>File types</ng-container>:</div>
-        <div class="d-flex flex-column flex-grow-1 filetypes-list">
-          <div *ngFor="let filetype of statistics?.document_file_type_counts; let i = index" class="d-flex justify-content-between align-items-center">
-            <span class="fst-italic text-muted text-truncate pe-3">{{filetype.mime_type}}</span>
-            <span class="badge bg-secondary text-light rounded-pill">{{getFileTypePercent(filetype) | number: '1.0-1'}}%</span>
-          </div>
+
+      <div class="list-group-item widget-container">
+        <div class="file-type-bar">
+          <ng-container
+            *ngFor="
+              let fileType of fileTypeDataArray;
+              let isFirst = first;
+              let isLast = last
+            "
+          >
+            <div
+              class="file-type"
+              [style.width.%]="fileType.percentage"
+              [style.backgroundColor]="fileType.color"
+              [ngClass]="{ 'rounded-left': isFirst, 'rounded-right': isLast }"
+            ></div>
+          </ng-container>
         </div>
+        <ng-container *ngFor="let fileType of fileTypeDataArray">
+          <div class="file-type-label">
+            <div
+              class="file-type-color"
+              [style.backgroundColor]="fileType.color"
+            ></div>
+            <span>{{ fileType.name }} ({{ fileType.percentage }}%)</span>
+          </div>
+        </ng-container>
       </div>
     </div>
   </ng-container>
