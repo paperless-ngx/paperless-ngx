@@ -11,10 +11,10 @@
                 "change_user",
                 "delete_user",
                 "view_user",
-                "add_comment",
-                "change_comment",
-                "delete_comment",
-                "view_comment"
+                "add_note",
+                "change_note",
+                "delete_note",
+                "view_note"
             ]
         },
         {
@@ -73,10 +73,10 @@
                 "change_task",
                 "delete_task",
                 "view_task",
-                "add_comment",
-                "change_comment",
-                "delete_comment",
-                "view_comment",
+                "add_note",
+                "change_note",
+                "delete_note",
+                "view_note",
                 "add_correspondent",
                 "change_correspondent",
                 "delete_correspondent",

@@ -38,7 +38,7 @@ from documents.models import PaperlessTask
 from documents.models import SavedView
 from documents.models import StoragePath
 from documents.models import Tag
-from documents.models import Comment
+from documents.models import Note
 from documents.tests.utils import DirectoriesMixin
 from paperless import version
 from rest_framework.test import APITestCase
@@ -1717,28 +1717,28 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
             1,
         )
 
-    def test_get_existing_comments(self):
+    def test_get_existing_notes(self):
         """
         GIVEN:
-            - A document with a single comment
+            - A document with a single note
         WHEN:
-            - API reuqest for document comments is made
+            - API reuqest for document notes is made
         THEN:
-            - The associated comment is returned
+            - The associated note is returned
         """
         doc = Document.objects.create(
             title="test",
             mime_type="application/pdf",
-            content="this is a document which will have comments!",
+            content="this is a document which will have notes!",
         )
-        comment = Comment.objects.create(
-            comment="This is a comment.",
+        note = Note.objects.create(
+            note="This is a note.",
             document=doc,
             user=self.user,
         )
 
         response = self.client.get(
-            f"/api/documents/{doc.pk}/comments/",
+            f"/api/documents/{doc.pk}/notes/",
             format="json",
         )
 
@@ -1754,39 +1754,39 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertDictEqual(
             resp_data,
             {
-                "id": comment.id,
-                "comment": comment.comment,
+                "id": note.id,
+                "note": note.note,
                 "user": {
-                    "id": comment.user.id,
-                    "username": comment.user.username,
-                    "first_name": comment.user.first_name,
-                    "last_name": comment.user.last_name,
+                    "id": note.user.id,
+                    "username": note.user.username,
+                    "first_name": note.user.first_name,
+                    "last_name": note.user.last_name,
                 },
             },
         )
 
-    def test_create_comment(self):
+    def test_create_note(self):
         """
         GIVEN:
             - Existing document
         WHEN:
-            - API request is made to add a comment
+            - API request is made to add a note
         THEN:
-            - Comment is created and associated with document
+            - note is created and associated with document
         """
         doc = Document.objects.create(
             title="test",
             mime_type="application/pdf",
-            content="this is a document which will have comments added",
+            content="this is a document which will have notes added",
         )
         resp = self.client.post(
-            f"/api/documents/{doc.pk}/comments/",
-            data={"comment": "this is a posted comment"},
+            f"/api/documents/{doc.pk}/notes/",
+            data={"note": "this is a posted note"},
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
         response = self.client.get(
-            f"/api/documents/{doc.pk}/comments/",
+            f"/api/documents/{doc.pk}/notes/",
             format="json",
         )
 
@@ -1798,48 +1798,48 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
         resp_data = resp_data[0]
 
-        self.assertEqual(resp_data["comment"], "this is a posted comment")
+        self.assertEqual(resp_data["note"], "this is a posted note")
 
-    def test_delete_comment(self):
+    def test_delete_note(self):
         """
         GIVEN:
             - Existing document
         WHEN:
-            - API request is made to add a comment
+            - API request is made to add a note
         THEN:
-            - Comment is created and associated with document
+            - note is created and associated with document
         """
         doc = Document.objects.create(
             title="test",
             mime_type="application/pdf",
-            content="this is a document which will have comments!",
+            content="this is a document which will have notes!",
         )
-        comment = Comment.objects.create(
-            comment="This is a comment.",
+        note = Note.objects.create(
+            note="This is a note.",
             document=doc,
             user=self.user,
         )
 
         response = self.client.delete(
-            f"/api/documents/{doc.pk}/comments/?id={comment.pk}",
+            f"/api/documents/{doc.pk}/notes/?id={note.pk}",
             format="json",
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        self.assertEqual(len(Comment.objects.all()), 0)
+        self.assertEqual(len(Note.objects.all()), 0)
 
-    def test_get_comments_no_doc(self):
+    def test_get_notes_no_doc(self):
         """
         GIVEN:
-            - A request to get comments from a non-existent document
+            - A request to get notes from a non-existent document
         WHEN:
-            - API request for document comments is made
+            - API request for document notes is made
         THEN:
             - HTTP status.HTTP_404_NOT_FOUND is returned
         """
         response = self.client.get(
-            "/api/documents/500/comments/",
+            "/api/documents/500/notes/",
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
