@@ -672,6 +672,10 @@ class TestBarcode(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         CONSUMER_ENABLE_BARCODES=True,
         CONSUMER_BARCODE_TIFF_SUPPORT=True,
     )
+    @pytest.mark.skipif(
+        settings.CONSUMER_BARCODE_SCANNER == "ZXING",
+        reason="zxingcpp has issues with tiff",
+    )
     def test_consume_barcode_tiff_file(self):
         """
         GIVEN:
@@ -730,6 +734,10 @@ class TestBarcode(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     @override_settings(
         CONSUMER_ENABLE_BARCODES=True,
         CONSUMER_BARCODE_TIFF_SUPPORT=True,
+    )
+    @pytest.mark.skipif(
+        settings.CONSUMER_BARCODE_SCANNER == "ZXING",
+        reason="zxingcpp has issues with tiff",
     )
     def test_consume_barcode_supported_no_extension_file(self):
         """
