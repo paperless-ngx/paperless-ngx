@@ -629,3 +629,7 @@ code {
 .accordion-button::after {
   filter: invert(0.5) saturate(0);
 }
+
+.me-1px {
+  margin-right: 1px !important;
+}
