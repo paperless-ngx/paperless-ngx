@@ -5,10 +5,12 @@ import tempfile
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
+from subprocess import run
 from typing import Dict
 from typing import List
 from typing import Optional
 
+import img2pdf
 import magic
 from django.conf import settings
 from pdf2image import convert_from_path
@@ -16,7 +18,6 @@ from pdf2image.exceptions import PDFPageCountError
 from pikepdf import Page
 from pikepdf import Pdf
 from PIL import Image
-from PIL import ImageSequence
 
 logger = logging.getLogger("paperless.barcodes")
 
@@ -141,21 +142,21 @@ def convert_from_tiff_to_pdf(filepath: Path) -> Path:
             f"Cannot convert mime type {mime_type} from {filepath} to pdf.",
         )
         return None
-    with Image.open(filepath) as image:
-        images = []
-        for i, page in enumerate(ImageSequence.Iterator(image)):
-            page = page.convert("RGB")
-            images.append(page)
-        try:
-            if len(images) == 1:
-                images[0].save(newpath)
-            else:
-                images[0].save(newpath, save_all=True, append_images=images[1:])
-        except OSError as e:  # pragma: no cover
-            logger.warning(
-                f"Could not save the file as pdf. Error: {str(e)}",
-            )
-            return None
+    with Image.open(filepath) as im:
+        has_alpha_layer = im.mode in ("RGBA", "LA")
+    if has_alpha_layer:
+        run(
+            [
+                settings.CONVERT_BINARY,
+                "-alpha",
+                "off",
+                filepath,
+                filepath,
+            ],
+        )
+    with filepath.open("rb") as img_file:
+        with newpath.open("wb") as pdf_file:
+            pdf_file.write(img2pdf.convert(img_file))
     return newpath
 
 
