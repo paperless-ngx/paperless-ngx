@@ -2423,21 +2423,53 @@
         </context-group>
         <target state="translated">الإحصائيات</target>
       </trans-unit>
-      <trans-unit id="1171694977288479084" datatype="html">
-        <source>Documents in inbox: <x id="INTERPOLATION" equiv-text="{{statistics?.documents_inbox}}"/></source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
-          <context context-type="linenumber">3</context>
-        </context-group>
-        <target state="translated">المستندات في علبة الواردة: <x id="INTERPOLATION" equiv-text="{{statistics?.documents_inbox}}"/></target>
-      </trans-unit>
-      <trans-unit id="4207135462646354574" datatype="html">
-        <source>Total documents: <x id="INTERPOLATION" equiv-text="{{statistics?.documents_total}}"/></source>
+      <trans-unit id="2028517964701399614" datatype="html">
+        <source>Go to inbox</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="translated">إجمالي المستندات: <x id="INTERPOLATION" equiv-text="{{statistics?.documents_total}}"/></target>
+        <target state="needs-translation">Go to inbox</target>
+      </trans-unit>
+      <trans-unit id="3497361602348932709" datatype="html">
+        <source>Documents in inbox</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
+          <context context-type="linenumber">5</context>
+        </context-group>
+        <target state="needs-translation">Documents in inbox</target>
+      </trans-unit>
+      <trans-unit id="8809281703097241399" datatype="html">
+        <source>Go to documents</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+        <target state="needs-translation">Go to documents</target>
+      </trans-unit>
+      <trans-unit id="3823413855067727192" datatype="html">
+        <source>Total documents</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+        <target state="needs-translation">Total documents</target>
+      </trans-unit>
+      <trans-unit id="6503529145162789855" datatype="html">
+        <source>Total characters</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+        <target state="needs-translation">Total characters</target>
+      </trans-unit>
+      <trans-unit id="8693603235657020323" datatype="html">
+        <source>Other</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.ts</context>
+          <context context-type="linenumber">87</context>
+        </context-group>
+        <target state="needs-translation">Other</target>
       </trans-unit>
       <trans-unit id="8187573012244728580" datatype="html">
         <source>Upload new documents</source>
