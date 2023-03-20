@@ -14,6 +14,13 @@ from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
 from PIL import Image
 
+try:
+    import zxingcpp
+
+    ZXING_AVAILIBLE = True
+except ImportError:
+    ZXING_AVAILIBLE = False
+
 
 @override_settings(CONSUMER_BARCODE_SCANNER="PYZBAR")
 class TestBarcode(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
@@ -672,10 +679,6 @@ class TestBarcode(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         CONSUMER_ENABLE_BARCODES=True,
         CONSUMER_BARCODE_TIFF_SUPPORT=True,
     )
-    @pytest.mark.skipif(
-        settings.CONSUMER_BARCODE_SCANNER == "ZXING",
-        reason="zxingcpp has issues with tiff",
-    )
     def test_consume_barcode_tiff_file(self):
         """
         GIVEN:
@@ -734,10 +737,6 @@ class TestBarcode(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     @override_settings(
         CONSUMER_ENABLE_BARCODES=True,
         CONSUMER_BARCODE_TIFF_SUPPORT=True,
-    )
-    @pytest.mark.skipif(
-        settings.CONSUMER_BARCODE_SCANNER == "ZXING",
-        reason="zxingcpp has issues with tiff",
     )
     def test_consume_barcode_supported_no_extension_file(self):
         """
@@ -1042,12 +1041,13 @@ class TestAsnBarcodes(DirectoriesMixin, TestCase):
             )
 
 
-try:
-    import zxingcpp
-
-    ZXING_AVAILIBLE = True
-except ImportError:
-    ZXING_AVAILIBLE = False
+@pytest.mark.skipif(
+    not ZXING_AVAILIBLE,
+    reason="No zxingcpp",
+)
+@override_settings(CONSUMER_BARCODE_SCANNER="ZXING")
+class TestBarcodeZxing(TestBarcode):
+    pass
 
 
 @pytest.mark.skipif(
@@ -1055,5 +1055,5 @@ except ImportError:
     reason="No zxingcpp",
 )
 @override_settings(CONSUMER_BARCODE_SCANNER="ZXING")
-class TestBarcodeZxing(TestBarcode):
+class TestAsnBarcodesZxing(TestAsnBarcodes):
     pass
