@@ -2237,18 +2237,11 @@
           <context context-type="linenumber">13</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="6125391559813574136" datatype="html">
-        <source>File types</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
-          <context context-type="linenumber">17</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="3881818169480672345" datatype="html">
-        <source>other</source>
+      <trans-unit id="8693603235657020323" datatype="html">
+        <source>Other</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.ts</context>
-          <context context-type="linenumber">56</context>
+          <context context-type="linenumber">87</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8187573012244728580" datatype="html">
