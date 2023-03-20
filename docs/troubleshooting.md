@@ -332,3 +332,16 @@ change the port gunicorn listens on.
 
 To fix this, set `PAPERLESS_PORT` again to your desired port, or the
 default of 8000.
+
+## Database Warns about unique constraint "documents_tag_name_uniq
+
+You may see database log lines like:
+
+```
+ERROR:  duplicate key value violates unique constraint "documents_tag_name_uniq"
+DETAIL:  Key (name)=(NameF) already exists.
+STATEMENT:  INSERT INTO "documents_tag" ("owner_id", "name", "match", "matching_algorithm", "is_insensitive", "color", "is_inbox_tag") VALUES (NULL, 'NameF', '', 1, true, '#a6cee3', false) RETURNING "documents_tag"."id"
+```
+
+This can happen during heavy consumption when using polling. Paperless will handle it correctly and the file
+will still be consumed
