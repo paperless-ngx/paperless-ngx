@@ -13,33 +13,33 @@
         <ng-container i18n>Total characters</ng-container>:
         <span class="badge bg-secondary text-light rounded-pill">{{statistics?.character_count | number}}</span>
       </div>
-
-      <div class="list-group-item widget-container">
-        <div class="file-type-bar">
-          <ng-container
-            *ngFor="
-              let fileType of fileTypeDataArray;
-              let isFirst = first;
-              let isLast = last
-            "
-          >
-            <div
-              class="file-type"
-              [style.width.%]="fileType.percentage"
-              [style.backgroundColor]="fileType.color"
-              [ngClass]="{ 'rounded-left': isFirst, 'rounded-right': isLast }"
-            ></div>
-          </ng-container>
-        </div>
-        <ng-container *ngFor="let fileType of fileTypeDataArray">
-          <div class="file-type-label">
-            <div
-              class="file-type-color"
-              [style.backgroundColor]="fileType.color"
-            ></div>
-            <span>{{ fileType.name }} ({{ fileType.percentage }}%)</span>
+      <div *ngIf="statistics?.document_file_type_counts?.length > 1" class="list-group-item filetypes">
+        <div class="d-flex justify-content-between align-items-center my-2">
+          <div class="progress flex-grow-1">
+            <div *ngFor="let filetype of statistics?.document_file_type_counts; let i = index; let last = last"
+              class="progress-bar bg-primary text-primary-contrast"
+              role="progressbar"
+              [ngbPopover]="getFileTypeName(filetype)"
+              i18n-ngbPopover
+              triggers="mouseenter:mouseleave"
+              [attr.aria-label]="getFileTypeName(filetype)"
+              [class.me-1px]="!last"
+              [style.width]="getFileTypePercent(filetype) + '%'"
+              [style.opacity]="getItemOpacity(i)"
+              [attr.aria-valuenow]="getFileTypePercent(filetype)"
+              aria-valuemin="0"
+              aria-valuemax="100">
+            </div>
           </div>
-        </ng-container>
+        </div>
+        <div class="d-flex flex-wrap align-items-start">
+          <div class="d-flex" *ngFor="let filetype of statistics?.document_file_type_counts; let i = index">
+            <div class="text-nowrap me-2">
+              <span class="badge rounded-pill bg-primary d-inline-block p-0 me-1" [style.opacity]="getItemOpacity(i)"></span>
+              <small class="text-nowrap"><span class="fw-bold">{{ getFileTypeExtension(filetype) }}</span>&nbsp;<span class="text-muted">({{getFileTypePercent(filetype) | number: '1.0-1'}}%)</span></small>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </ng-container>

@@ -1,26 +1,10 @@
-.file-type-bar {
-  display: flex;
-  height: 10px;
-  margin-bottom: 10px;
-}
-.file-type {
-  height: 100%;
-}
-.file-type-label {
-  align-items: center;
-  float: left;
-  padding-right: 10px;
-}
-.file-type-color {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  display: inline-block;
-  margin-right: 5px;
-}
-.rounded-left {
-  border-radius: 5px 0 0 5px;
-}
-.rounded-right {
-  border-radius: 0 5px 5px 0;
+.filetypes {
+    .progress {
+        height: 0.6rem;
+    }
+
+    .badge {
+        height: 0.6rem;
+        width: 0.6rem;
+    }
 }
