@@ -44,15 +44,26 @@ export class StatisticsWidgetComponent implements OnInit, OnDestroy {
     return this.http.get(`${environment.apiBaseUrl}statistics/`)
   }
 
+  fileTypeDataArray = []
+
+  private fileTypeColors = [
+    '#e84118', // red
+    '#00a8ff', // blue
+    '#4cd137', // green
+    '#9c88ff', // purple
+    '#fbc531', // yellow
+    '#7f8fa6', // gray
+  ]
+
   reload() {
     this.loading = true
     this.getStatistics().subscribe((statistics) => {
       this.loading = false
-      // truncate the list and sum others
-      if (statistics.document_file_type_counts?.length > 4) {
-        let others = statistics.document_file_type_counts.slice(4)
+      const fileTypeMax = 5
+      if (statistics.document_file_type_counts?.length > fileTypeMax) {
+        let others = statistics.document_file_type_counts.slice(fileTypeMax)
         statistics.document_file_type_counts =
-          statistics.document_file_type_counts.slice(0, 4)
+          statistics.document_file_type_counts.slice(0, fileTypeMax)
         statistics.document_file_type_counts.push({
           mime_type: $localize`other`,
           mime_type_count: others.reduce(
@@ -63,7 +74,24 @@ export class StatisticsWidgetComponent implements OnInit, OnDestroy {
         })
       }
       this.statistics = statistics
+
+      this.updateFileTypePercentages()
     })
+  }
+
+  private updateFileTypePercentages() {
+    let colorIndex = 0
+    this.fileTypeDataArray = this.statistics.document_file_type_counts.map(
+      (fileType) => {
+        const percentage =
+          (fileType.mime_type_count / this.statistics?.documents_total) * 100
+        return {
+          name: this.getMimeTypeName(fileType.mime_type),
+          percentage: percentage.toFixed(2),
+          color: this.fileTypeColors[colorIndex++],
+        }
+      }
+    )
   }
 
   ngOnInit(): void {
@@ -88,7 +116,33 @@ export class StatisticsWidgetComponent implements OnInit, OnDestroy {
     ])
   }
 
-  getFileTypePercent(filetype: DocumentFileType): number {
-    return (filetype.mime_type_count / this.statistics?.documents_total) * 100
+  getMimeTypeName(mimeType: string): string {
+    const mimeTypesMap: { [key: string]: string } = {
+      'application/msword': 'Microsoft Word',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+        'Microsoft Word',
+      'application/vnd.ms-excel': 'Microsoft Excel',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+        'Microsoft Excel',
+      'application/vnd.ms-powerpoint': 'Microsoft PowerPoint',
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation':
+        'Microsoft PowerPoint',
+      'application/pdf': 'PDF',
+      'application/vnd.oasis.opendocument.text': 'OpenDocument Text',
+      'application/vnd.oasis.opendocument.spreadsheet':
+        'OpenDocument Spreadsheet',
+      'application/vnd.oasis.opendocument.presentation':
+        'OpenDocument Presentation',
+      'application/vnd.oasis.opendocument.graphics': 'OpenDocument Graphics',
+      'application/rtf': 'Rich Text Format',
+      'text/plain': 'Plain Text',
+      'text/csv': 'CSV',
+      'image/jpeg': 'JPEG',
+      'image/png': 'PNG',
+      'image/gif': 'GIF',
+      'image/svg+xml': 'SVG',
+    }
+
+    return mimeTypesMap[mimeType] || mimeType
   }
 }
