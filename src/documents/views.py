@@ -20,7 +20,9 @@ from django.db.models import Case
 from django.db.models import Count
 from django.db.models import IntegerField
 from django.db.models import Max
+from django.db.models import Sum
 from django.db.models import When
+from django.db.models.functions import Length
 from django.db.models.functions import Lower
 from django.http import Http404
 from django.http import HttpResponse
@@ -186,6 +188,7 @@ class TagViewSet(ModelViewSet, PassUserMixin):
     )
 
     def get_serializer_class(self, *args, **kwargs):
+        print(self.request.version)
         if int(self.request.version) == 1:
             return TagSerializerVersion1
         else:
@@ -795,17 +798,38 @@ class StatisticsView(APIView):
 
     def get(self, request, format=None):
         documents_total = Document.objects.all().count()
-        if Tag.objects.filter(is_inbox_tag=True).exists():
-            documents_inbox = (
-                Document.objects.filter(tags__is_inbox_tag=True).distinct().count()
+
+        inbox_tag = Tag.objects.filter(is_inbox_tag=True)
+
+        documents_inbox = (
+            Document.objects.filter(tags__is_inbox_tag=True).distinct().count()
+            if inbox_tag.exists()
+            else None
+        )
+
+        document_file_type_counts = (
+            Document.objects.values("mime_type")
+            .annotate(mime_type_count=Count("mime_type"))
+            .order_by("-mime_type_count")
+            if documents_total > 0
+            else 0
+        )
+
+        character_count = (
+            Document.objects.annotate(
+                characters=Length("content"),
             )
-        else:
-            documents_inbox = None
+            .aggregate(Sum("characters"))
+            .get("characters__sum")
+        )
 
         return Response(
             {
                 "documents_total": documents_total,
                 "documents_inbox": documents_inbox,
+                "inbox_tag": inbox_tag.first().pk if inbox_tag.exists() else None,
+                "document_file_type_counts": document_file_type_counts,
+                "character_count": character_count,
             },
         )
 
