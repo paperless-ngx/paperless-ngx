@@ -176,3 +176,26 @@ class TestSettingsChecks(DirectoriesMixin, TestCase):
         msg = msgs[0]
 
         self.assertIn('Timezone "TheMoon\\MyCrater"', msg.msg)
+
+    @override_settings(CONSUMER_BARCODE_SCANNER="Invalid")
+    def test_barcode_scanner_invalid(self):
+        msgs = settings_values_check(None)
+        self.assertEqual(len(msgs), 1)
+
+        msg = msgs[0]
+
+        self.assertIn('Invalid Barcode Scanner "Invalid"', msg.msg)
+
+    @override_settings(CONSUMER_BARCODE_SCANNER="")
+    def test_barcode_scanner_empty(self):
+        msgs = settings_values_check(None)
+        self.assertEqual(len(msgs), 1)
+
+        msg = msgs[0]
+
+        self.assertIn('Invalid Barcode Scanner ""', msg.msg)
+
+    @override_settings(CONSUMER_BARCODE_SCANNER="PYZBAR")
+    def test_barcode_scanner_valid(self):
+        msgs = settings_values_check(None)
+        self.assertEqual(len(msgs), 0)
