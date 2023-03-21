@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-03-03 22:32\n"
+"PO-Revision-Date: 2023-03-21 15:15\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -670,7 +670,7 @@ msgstr "Aktionen"
 
 #: paperless_mail/admin.py:69
 msgid "The action applied to the mail. This action is only performed when the mail body or attachments were consumed from the mail."
-msgstr ""
+msgstr "Die auf die E-Mail angewandte Aktion. Diese Aktion wird nur ausgeführt, wenn der Mailtext oder die Anhänge aus der Mail verwendet wurden."
 
 #: paperless_mail/admin.py:77
 msgid "Metadata"
@@ -750,11 +750,11 @@ msgstr "Nur Anhänge verarbeiten."
 
 #: paperless_mail/models.py:62
 msgid "Process full Mail (with embedded attachments in file) as .eml"
-msgstr ""
+msgstr "Vollständige E-Mail (mit eingebetteten Anhängen in der Datei) als .eml verarbeiten"
 
 #: paperless_mail/models.py:64
 msgid "Process full Mail (with embedded attachments in file) as .eml + process attachments as separate documents"
-msgstr ""
+msgstr "Vollständige Mail (mit eingebetteten Anhängen in der Datei) als .eml verarbeiten + Anhänge als separate Dokumente verarbeiten"
 
 #: paperless_mail/models.py:70
 msgid "Process all files, including 'inline' attachments."
