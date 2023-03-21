@@ -1273,7 +1273,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/group-edit-dialog/group-edit-dialog.component.ts</context>
           <context context-type="linenumber">28</context>
         </context-group>
-        <target state="needs-translation">Edit user group</target>
+        <target state="translated">Редактировать группу пользователей</target>
       </trans-unit>
       <trans-unit id="1505107477868159986" datatype="html">
         <source>IMAP Server</source>
@@ -1465,7 +1465,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="needs-translation">Filter to</target>
+        <target state="translated">Отфильтровать по</target>
       </trans-unit>
       <trans-unit id="8497813481090627874" datatype="html">
         <source>Filter subject</source>
@@ -1877,7 +1877,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="needs-translation">Email</target>
+        <target state="translated">Электронная почта</target>
       </trans-unit>
       <trans-unit id="5342432350421167093" datatype="html">
         <source>First name</source>
@@ -1901,7 +1901,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.html</context>
           <context context-type="linenumber">19</context>
         </context-group>
-        <target state="needs-translation">Active</target>
+        <target state="translated">Активный</target>
       </trans-unit>
       <trans-unit id="1808271538028523977" datatype="html">
         <source>Superuser</source>
@@ -1909,7 +1909,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.html</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="needs-translation">Superuser</target>
+        <target state="translated">Суперпользователь</target>
       </trans-unit>
       <trans-unit id="1403759966357927756" datatype="html">
         <source>(Grants all permissions and can view objects)</source>
@@ -1917,7 +1917,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.html</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="needs-translation">(Grants all permissions and can view objects)</target>
+        <target state="translated">(Даёт все разрешения и может просматривать объекты)</target>
       </trans-unit>
       <trans-unit id="5944812089887969249" datatype="html">
         <source>Groups</source>
@@ -1941,7 +1941,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.ts</context>
           <context context-type="linenumber">42</context>
         </context-group>
-        <target state="needs-translation">Create new user account</target>
+        <target state="translated">Создать новую учетную запись пользователя</target>
       </trans-unit>
       <trans-unit id="2887331217965896363" datatype="html">
         <source>Edit user account</source>
@@ -1949,7 +1949,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.ts</context>
           <context context-type="linenumber">46</context>
         </context-group>
-        <target state="needs-translation">Edit user account</target>
+        <target state="translated">Редактировать учетную запись пользователя</target>
       </trans-unit>
       <trans-unit id="1616102757855967475" datatype="html" approved="yes">
         <source>All</source>
@@ -1985,7 +1985,7 @@
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="needs-translation">Include</target>
+        <target state="translated">Включить</target>
       </trans-unit>
       <trans-unit id="5668077948386857930" datatype="html">
         <source>Exclude</source>
@@ -1993,7 +1993,7 @@
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="needs-translation">Exclude</target>
+        <target state="translated">Исключить</target>
       </trans-unit>
       <trans-unit id="4391289919356861627" datatype="html" approved="yes">
         <source>Apply</source>
@@ -2050,7 +2050,7 @@
           <context context-type="sourcefile">src/app/components/common/input/permissions/permissions-form/permissions-form.component.html</context>
           <context context-type="linenumber">7</context>
         </context-group>
-        <target state="needs-translation">Edit Permissions</target>
+        <target state="translated">Редактировать права доступа</target>
       </trans-unit>
       <trans-unit id="6035283612400841811" datatype="html">
         <source>Owner:</source>
@@ -2066,7 +2066,7 @@
           <context context-type="sourcefile">src/app/components/common/input/permissions/permissions-form/permissions-form.component.html</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">Objects without an owner can be viewed and edited by all users</target>
+        <target state="translated">Объекты без владельца могут просматриваться и редактироваться всеми пользователями</target>
       </trans-unit>
       <trans-unit id="2509141182388535183" datatype="html" approved="yes">
         <source>View</source>
@@ -2178,7 +2178,7 @@
           <context context-type="sourcefile">src/app/components/common/input/permissions/permissions-form/permissions-form.component.html</context>
           <context context-type="linenumber">64</context>
         </context-group>
-        <target state="needs-translation">Edit permissions also grant viewing permissions</target>
+        <target state="translated">Право на редактирование также дает право на просмотр</target>
       </trans-unit>
       <trans-unit id="2722549756198502062" datatype="html" approved="yes">
         <source>Add item</source>
@@ -2203,7 +2203,7 @@
           <context context-type="sourcefile">src/app/components/common/tag/tag.component.html</context>
           <context context-type="linenumber">8</context>
         </context-group>
-        <target state="needs-translation">Private</target>
+        <target state="translated">Личный</target>
       </trans-unit>
       <trans-unit id="6560126119609945418" datatype="html" approved="yes">
         <source>Add tag</source>
@@ -2259,7 +2259,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-dialog/permissions-dialog.component.ts</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="needs-translation">Set Permissions</target>
+        <target state="translated">Установить разрешения</target>
       </trans-unit>
       <trans-unit id="8283439432608484491" datatype="html">
         <source>Note that permissions set here will override any existing permissions</source>
@@ -2267,7 +2267,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-dialog/permissions-dialog.component.ts</context>
           <context context-type="linenumber">43</context>
         </context-group>
-        <target state="needs-translation">Note that permissions set here will override any existing permissions</target>
+        <target state="translated">Обратите внимание, что права доступа, заданные здесь, заменяют все существующие права доступа</target>
       </trans-unit>
       <trans-unit id="8650499415827640724" datatype="html">
         <source>Type</source>
@@ -2275,7 +2275,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
           <context context-type="linenumber">5</context>
         </context-group>
-        <target state="needs-translation">Type</target>
+        <target state="translated">Тип</target>
       </trans-unit>
       <trans-unit id="3249513483374643425" datatype="html">
         <source>Add</source>
@@ -2305,7 +2305,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="needs-translation"><x id="INTERPOLATION" equiv-text="{{action.key}}"/></target>
+        <target state="translated"><x id="INTERPOLATION" equiv-text="{{action.key}}"/></target>
       </trans-unit>
       <trans-unit id="3776388302418428342" datatype="html">
         <source>Inerhited from group</source>
@@ -2429,7 +2429,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="needs-translation">Go to inbox</target>
+        <target state="translated">Перейти во Входящие</target>
       </trans-unit>
       <trans-unit id="3497361602348932709" datatype="html">
         <source>Documents in inbox</source>
@@ -2437,7 +2437,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">5</context>
         </context-group>
-        <target state="needs-translation">Documents in inbox</target>
+        <target state="translated">Документы в папке входящих сообщений</target>
       </trans-unit>
       <trans-unit id="8809281703097241399" datatype="html">
         <source>Go to documents</source>
@@ -2445,7 +2445,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">8</context>
         </context-group>
-        <target state="needs-translation">Go to documents</target>
+        <target state="translated">Перейти к документам</target>
       </trans-unit>
       <trans-unit id="3823413855067727192" datatype="html">
         <source>Total documents</source>
@@ -2453,7 +2453,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">9</context>
         </context-group>
-        <target state="needs-translation">Total documents</target>
+        <target state="translated">Всего документов</target>
       </trans-unit>
       <trans-unit id="6503529145162789855" datatype="html">
         <source>Total characters</source>
@@ -2461,7 +2461,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">Total characters</target>
+        <target state="translated">Всего символов</target>
       </trans-unit>
       <trans-unit id="8693603235657020323" datatype="html">
         <source>Other</source>
@@ -2469,7 +2469,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.ts</context>
           <context context-type="linenumber">87</context>
         </context-group>
-        <target state="needs-translation">Other</target>
+        <target state="translated">Прочее</target>
       </trans-unit>
       <trans-unit id="8187573012244728580" datatype="html" approved="yes">
         <source>Upload new documents</source>
