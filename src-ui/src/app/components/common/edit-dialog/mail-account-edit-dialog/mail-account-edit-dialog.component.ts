@@ -45,6 +45,7 @@ export class MailAccountEditDialogComponent extends EditDialogComponent<Paperles
       imap_security: new FormControl(IMAPSecurity.SSL),
       username: new FormControl(null),
       password: new FormControl(null),
+      is_token: new FormControl(false),
       character_set: new FormControl('UTF-8'),
     })
   }
