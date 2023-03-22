@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-03-21 15:15\n"
+"PO-Revision-Date: 2023-03-22 22:41\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -858,7 +858,7 @@ msgstr "'Inline'-Anhänge schließen eingebettete Bilder mit ein, daher sollte d
 
 #: paperless_mail/models.py:158
 msgid "consumption scope"
-msgstr ""
+msgstr "Konsumumfang"
 
 #: paperless_mail/models.py:164
 msgid "action"
