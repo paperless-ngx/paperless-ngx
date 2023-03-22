@@ -5310,7 +5310,7 @@
           <context context-type="sourcefile">src/app/guards/permissions.guard.ts</context>
           <context context-type="linenumber">31</context>
         </context-group>
-        <target state="needs-translation">You don't have permissions to do that</target>
+        <target state="translated">У вас нет разрешения на выполнение этого действия</target>
       </trans-unit>
       <trans-unit id="7536524521722799066" datatype="html" approved="yes">
         <source>(no title)</source>
