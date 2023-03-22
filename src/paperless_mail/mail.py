@@ -202,20 +202,21 @@ def mailbox_login(mailbox: MailBox, account: MailAccount):
 
     try:
 
-        mailbox.login(account.username, account.password)
+        if account.is_token:
+            mailbox.xoauth2(account.username, account.password)
+        else:
+            try:
+                _ = account.password.encode("ascii")
+                use_ascii_login = True
+            except UnicodeEncodeError:
+                use_ascii_login = False
 
-    except UnicodeEncodeError:
-        logger.debug("Falling back to AUTH=PLAIN")
+            if use_ascii_login:
+                mailbox.login(account.username, account.password)
+            else:
+                logger.debug("Falling back to AUTH=PLAIN")
+                mailbox.login_utf8(account.username, account.password)
 
-        try:
-            mailbox.login_utf8(account.username, account.password)
-        except Exception as e:
-            logger.error(
-                "Unable to authenticate with mail server using AUTH=PLAIN",
-            )
-            raise MailError(
-                f"Error while authenticating account {account}",
-            ) from e
     except Exception as e:
         logger.error(
             f"Error while authenticating account {account}: {e}",
