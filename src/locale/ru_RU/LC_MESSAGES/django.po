@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-03-03 20:41\n"
+"PO-Revision-Date: 2023-03-22 22:41\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -23,7 +23,7 @@ msgstr "Документы"
 
 #: documents/models.py:36
 msgid "None"
-msgstr ""
+msgstr "Ничего"
 
 #: documents/models.py:37
 msgid "Any word"
@@ -68,7 +68,7 @@ msgstr "без учёта регистра"
 
 #: documents/models.py:71
 msgid "owner"
-msgstr ""
+msgstr "владелец"
 
 #: documents/models.py:81 documents/models.py:136
 msgid "correspondent"
@@ -380,7 +380,7 @@ msgstr "ASN меньше чем"
 
 #: documents/models.py:439
 msgid "storage path is"
-msgstr ""
+msgstr "путь хранения является"
 
 #: documents/models.py:449
 msgid "rule type"
@@ -400,27 +400,27 @@ msgstr "правила фильтрации"
 
 #: documents/models.py:563
 msgid "Task ID"
-msgstr ""
+msgstr "ИД задачи"
 
 #: documents/models.py:564
 msgid "Celery ID for the Task that was run"
-msgstr ""
+msgstr "ИД Celery для задачи, которая была выполнена"
 
 #: documents/models.py:569
 msgid "Acknowledged"
-msgstr ""
+msgstr "Подтверждено"
 
 #: documents/models.py:570
 msgid "If the task is acknowledged via the frontend or API"
-msgstr ""
+msgstr "Если задание подтверждено через интерфейс сайта или API"
 
 #: documents/models.py:576
 msgid "Task Filename"
-msgstr ""
+msgstr "Имя файла задачи"
 
 #: documents/models.py:577
 msgid "Name of the file which the Task was run for"
-msgstr ""
+msgstr "Имя файла, для которого была запущена задача"
 
 #: documents/models.py:583
 msgid "Task Name"
@@ -428,39 +428,39 @@ msgstr "Название Задачи"
 
 #: documents/models.py:584
 msgid "Name of the Task which was run"
-msgstr ""
+msgstr "Название задачи, которая была запущена"
 
 #: documents/models.py:591
 msgid "Task State"
-msgstr ""
+msgstr "Состояние задачи"
 
 #: documents/models.py:592
 msgid "Current state of the task being run"
-msgstr ""
+msgstr "Текущее состояние выполняемой задачи"
 
 #: documents/models.py:597
 msgid "Created DateTime"
-msgstr ""
+msgstr "Дата и время создания"
 
 #: documents/models.py:598
 msgid "Datetime field when the task result was created in UTC"
-msgstr ""
+msgstr "Поле времени даты, когда результат задачи был создан в формате UTC"
 
 #: documents/models.py:603
 msgid "Started DateTime"
-msgstr ""
+msgstr "Дата и время начала"
 
 #: documents/models.py:604
 msgid "Datetime field when the task was started in UTC"
-msgstr ""
+msgstr "Поле времени и даты начала выполнения задачи в формате UTC"
 
 #: documents/models.py:609
 msgid "Completed DateTime"
-msgstr ""
+msgstr "Дата и время завершения"
 
 #: documents/models.py:610
 msgid "Datetime field when the task was completed in UTC"
-msgstr ""
+msgstr "Поле времени и даты, когда задание было выполнено в формате UTC"
 
 #: documents/models.py:615
 msgid "Result Data"
@@ -554,7 +554,7 @@ msgstr "Вход"
 
 #: paperless/apps.py:9
 msgid "Paperless"
-msgstr ""
+msgstr "Paperless"
 
 #: paperless/settings.py:521
 msgid "English (US)"
@@ -562,7 +562,7 @@ msgstr "Английский (США)"
 
 #: paperless/settings.py:522
 msgid "Arabic"
-msgstr ""
+msgstr "Арабский"
 
 #: paperless/settings.py:523
 msgid "Belarusian"
@@ -670,7 +670,7 @@ msgstr "Действия"
 
 #: paperless_mail/admin.py:69
 msgid "The action applied to the mail. This action is only performed when the mail body or attachments were consumed from the mail."
-msgstr ""
+msgstr "Действие, примененное к письму. Это действие выполняется только в том случае, если содержимое или вложения были извлечены из письма."
 
 #: paperless_mail/admin.py:77
 msgid "Metadata"
@@ -750,11 +750,11 @@ msgstr "Обрабатывать только вложения."
 
 #: paperless_mail/models.py:62
 msgid "Process full Mail (with embedded attachments in file) as .eml"
-msgstr ""
+msgstr "Обработка всей почты (со вложенными файлами) как .eml"
 
 #: paperless_mail/models.py:64
 msgid "Process full Mail (with embedded attachments in file) as .eml + process attachments as separate documents"
-msgstr ""
+msgstr "Обработка всей почты (со вложенными файлами) как .eml + обрабатывать вложения как отдельные документы"
 
 #: paperless_mail/models.py:70
 msgid "Process all files, including 'inline' attachments."
@@ -858,7 +858,7 @@ msgstr "Вложенные вложения включая встраиваем�
 
 #: paperless_mail/models.py:158
 msgid "consumption scope"
-msgstr ""
+msgstr "рамки потребления"
 
 #: paperless_mail/models.py:164
 msgid "action"
@@ -894,21 +894,21 @@ msgstr "назначить этого корреспондента"
 
 #: paperless_mail/models.py:239
 msgid "uid"
-msgstr ""
+msgstr "uid"
 
 #: paperless_mail/models.py:247
 msgid "subject"
-msgstr ""
+msgstr "предмет"
 
 #: paperless_mail/models.py:255
 msgid "received"
-msgstr ""
+msgstr "получено"
 
 #: paperless_mail/models.py:262
 msgid "processed"
-msgstr ""
+msgstr "обработано"
 
 #: paperless_mail/models.py:268
 msgid "status"
-msgstr ""
+msgstr "статус"
 
