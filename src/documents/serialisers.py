@@ -78,10 +78,11 @@ class MatchingModelSerializer(serializers.ModelSerializer):
             if hasattr(self, "user")
             else None
         )
+        pk = self.instance.pk if hasattr(self.instance, "pk") else None
         if ("name" in data or "owner" in data) and self.Meta.model.objects.filter(
             name=name,
             owner=owner,
-        ).exists():
+        ).exclude(pk=pk).exists():
             raise serializers.ValidationError(
                 {"error": "Object violates owner / name unique constraint"},
             )
