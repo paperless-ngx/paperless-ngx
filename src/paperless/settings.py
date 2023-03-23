@@ -358,7 +358,7 @@ TEMPLATES = [
 
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "BACKEND": "channels_redis.pubsub.RedisPubSubChannelLayer",
         "CONFIG": {
             "hosts": [_CHANNELS_REDIS_URL],
             "capacity": 2000,  # default 100
