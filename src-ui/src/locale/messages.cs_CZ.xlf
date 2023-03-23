@@ -1655,7 +1655,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">208</context>
+          <context context-type="linenumber">213</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
@@ -2307,13 +2307,13 @@
         </context-group>
         <target state="translated"><x id="INTERPOLATION" equiv-text="{{action.key}}"/></target>
       </trans-unit>
-      <trans-unit id="3776388302418428342" datatype="html">
-        <source>Inerhited from group</source>
+      <trans-unit id="6895273602775249942" datatype="html">
+        <source>Inherited from group</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.ts</context>
           <context context-type="linenumber">62</context>
         </context-group>
-        <target state="translated">Zděděno ze skupiny</target>
+        <target state="needs-translation">Inherited from group</target>
       </trans-unit>
       <trans-unit id="3797570084942068182" datatype="html" approved="yes">
         <source>Select</source>
@@ -2467,7 +2467,7 @@
         <source>Other</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.ts</context>
-          <context context-type="linenumber">87</context>
+          <context context-type="linenumber">55</context>
         </context-group>
         <target state="needs-translation">Other</target>
       </trans-unit>
@@ -2978,7 +2978,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">204</context>
+          <context context-type="linenumber">209</context>
         </context-group>
         <target state="final">Potvrdit smazání</target>
       </trans-unit>
@@ -4204,31 +4204,35 @@
         </context-group>
         <target state="needs-translation">Successfully created <x id="PH" equiv-text="this.typeName"/>.</target>
       </trans-unit>
-      <trans-unit id="6151710751857751783" datatype="html">
-        <source>Error occurred while saving <x id="PH" equiv-text="this.typeName"/> : <x id="PH_1" equiv-text="activeModal.componentInstance.error"/>.</source>
+      <trans-unit id="1370653329436185913" datatype="html">
+        <source>Error occurred while saving <x id="PH" equiv-text="this.typeName"/><x id="PH_1" equiv-text="errorDetail ? &apos;: &apos; + errorDetail : &apos;&apos;"/>.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">171</context>
+          <context context-type="linenumber">174,176</context>
         </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">182,184</context>
-        </context-group>
-        <target state="needs-translation">Error occurred while saving <x id="PH" equiv-text="this.typeName"/> : <x id="PH_1" equiv-text="activeModal.componentInstance.error"/>.</target>
+        <target state="needs-translation">Error occurred while saving <x id="PH" equiv-text="this.typeName"/><x id="PH_1" equiv-text="errorDetail ? ': ' + errorDetail : ''"/>.</target>
       </trans-unit>
       <trans-unit id="2541368547549828690" datatype="html">
         <source>Successfully updated <x id="PH" equiv-text="this.typeName"/>.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">176</context>
+          <context context-type="linenumber">181</context>
         </context-group>
         <target state="needs-translation">Successfully updated <x id="PH" equiv-text="this.typeName"/>.</target>
+      </trans-unit>
+      <trans-unit id="6151710751857751783" datatype="html">
+        <source>Error occurred while saving <x id="PH" equiv-text="this.typeName"/> : <x id="PH_1" equiv-text="e.toString()"/>.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
+          <context context-type="linenumber">187,189</context>
+        </context-group>
+        <target state="needs-translation">Error occurred while saving <x id="PH" equiv-text="this.typeName"/> : <x id="PH_1" equiv-text="e.toString()"/>.</target>
       </trans-unit>
       <trans-unit id="4012132330507560812" datatype="html">
         <source>Do you really want to delete the <x id="PH" equiv-text="this.typeName"/>?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">191</context>
+          <context context-type="linenumber">196</context>
         </context-group>
         <target state="needs-translation">Do you really want to delete the <x id="PH" equiv-text="this.typeName"/>?</target>
       </trans-unit>
@@ -4236,7 +4240,7 @@
         <source>Associated documents will not be deleted.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">206</context>
+          <context context-type="linenumber">211</context>
         </context-group>
         <target state="final">Přidružené dokumenty nebudou smazány.</target>
       </trans-unit>
@@ -4244,7 +4248,7 @@
         <source>Error while deleting element: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">219,221</context>
+          <context context-type="linenumber">224,226</context>
         </context-group>
         <target state="needs-translation">Error while deleting element: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></target>
       </trans-unit>
