@@ -475,12 +475,13 @@ mail_fetcher
 The command takes no arguments and processes all your mail accounts and
 rules.
 
-!!! note
+!!! tip
 
-    As of October 2022 Microsoft no longer supports IMAP authentication
-    for Exchange servers, thus Exchange is no longer supported until a
-    solution is implemented in the Python IMAP library used by Paperless.
-    See [learn.microsoft.com](https://learn.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/deprecation-of-basic-authentication-exchange-online)
+    To use OAuth access tokens for mail fetching,
+    select the box to indicate the password is actually
+    a token when creating or editing a mail account. The
+    details for creating a token depend on your email
+    provider.
 
 ### Creating archived documents {#archiver}
 
