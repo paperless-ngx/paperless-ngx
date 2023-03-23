@@ -380,7 +380,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">145</context>
         </context-group>
-        <target state="translated">Auf dem Dashboard können gespeicherte Ansichten angezeigt werden, z. B. ein "Posteingang". Diese Einstellungen finden Sie unter Einstellungen &gt; Gespeicherte Ansichten, sobald Sie einige erstellt haben.</target>
+        <target state="translated">Das Dashboard kann zum Anzeigen von gespeicherten Ansichten verwendet werden, wie zum Beispiel einem 'Posteingang'. Diese Einstellungen finden Sie unter Einstellungen &gt; Gespeicherte Ansichten, sobald Sie mindestens eine eigene Ansicht erstellt haben.</target>
       </trans-unit>
       <trans-unit id="9075755296812854717" datatype="html">
         <source>Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Paperless-ngx will start training its machine learning algorithms.</source>
