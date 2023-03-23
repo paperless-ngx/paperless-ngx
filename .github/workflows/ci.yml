@@ -16,7 +16,7 @@ on:
 env:
   # This is the version of pipenv all the steps will use
   # If changing this, change Dockerfile
-  DEFAULT_PIP_ENV_VERSION: "2022.11.30"
+  DEFAULT_PIP_ENV_VERSION: "2023.3.20"
   # This is the default version of Python to use in most steps
   # If changing this, change Dockerfile
   DEFAULT_PYTHON_VERSION: "3.9"
