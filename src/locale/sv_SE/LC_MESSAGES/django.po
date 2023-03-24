@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-03-03 20:41\n"
+"PO-Revision-Date: 2023-03-24 15:12\n"
 "Last-Translator: \n"
 "Language-Team: Swedish\n"
 "Language: sv_SE\n"
@@ -472,7 +472,7 @@ msgstr ""
 
 #: documents/models.py:626
 msgid "Comment for the document"
-msgstr ""
+msgstr "Kommentar för dokumentet"
 
 #: documents/models.py:650
 msgid "user"
@@ -480,11 +480,11 @@ msgstr "användare"
 
 #: documents/models.py:655
 msgid "comment"
-msgstr ""
+msgstr "kommentar"
 
 #: documents/models.py:656
 msgid "comments"
-msgstr ""
+msgstr "kommentarer"
 
 #: documents/serialisers.py:80
 #, python-format
