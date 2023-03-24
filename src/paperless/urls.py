@@ -29,6 +29,7 @@ from paperless.consumers import StatusConsumer
 from paperless.views import FaviconView
 from paperless.views import GroupViewSet
 from paperless.views import UserViewSet
+from paperless_mail.views import MailAccountTestView
 from paperless_mail.views import MailAccountViewSet
 from paperless_mail.views import MailRuleViewSet
 from rest_framework.authtoken import views
@@ -101,6 +102,11 @@ urlpatterns = [
                     r"^acknowledge_tasks/",
                     AcknowledgeTasksView.as_view(),
                     name="acknowledge_tasks",
+                ),
+                re_path(
+                    r"^mail_accounts/test/",
+                    MailAccountTestView.as_view(),
+                    name="mail_accounts_test",
                 ),
                 path("token/", views.obtain_auth_token),
             ]
