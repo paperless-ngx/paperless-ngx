@@ -21,6 +21,16 @@
     </div>
   </div>
   <div class="modal-footer">
+    <div class="m-0 me-2">
+      <ngb-alert #testResultAlert *ngIf="testResult" [type]="testResult" class="mb-0 py-2" (closed)="testResult = null">{{testResultMessage}}</ngb-alert>
+    </div>
+    <button type="button" class="btn btn-outline-primary" (click)="test()" [disabled]="networkActive || testActive">
+      <ng-container *ngIf="testActive">
+        <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+        <span class="visually-hidden mr-1" i18n>Loading...</span>
+      </ng-container>
+      <ng-container i18n>Test</ng-container>
+    </button>
     <button type="button" class="btn btn-outline-secondary" (click)="cancel()" i18n [disabled]="networkActive">Cancel</button>
     <button type="submit" class="btn btn-primary" i18n [disabled]="networkActive">Save</button>
   </div>
