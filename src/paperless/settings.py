@@ -611,11 +611,20 @@ LOGGING = {
             "maxBytes": LOGROTATE_MAX_SIZE,
             "backupCount": LOGROTATE_MAX_BACKUPS,
         },
+        "file_celery": {
+            "class": "concurrent_log_handler.ConcurrentRotatingFileHandler",
+            "formatter": "verbose",
+            "filename": os.path.join(LOGGING_DIR, "celery.log"),
+            "maxBytes": LOGROTATE_MAX_SIZE,
+            "backupCount": LOGROTATE_MAX_BACKUPS,
+        },
     },
     "root": {"handlers": ["console"]},
     "loggers": {
         "paperless": {"handlers": ["file_paperless"], "level": "DEBUG"},
         "paperless_mail": {"handlers": ["file_mail"], "level": "DEBUG"},
+        "celery": {"handlers": ["file_celery"], "level": "DEBUG"},
+        "kombu": {"handlers": ["file_celery"], "level": "DEBUG"},
     },
 }
 
