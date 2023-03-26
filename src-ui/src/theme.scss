@@ -16,6 +16,7 @@ body {
   --pngx-primary-darken-15: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) - 15%));
   --pngx-primary-darken-18: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) - 18%));
   --pngx-primary-darken-27: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) - 27%));
+  --pngx-success-darken-10: hsl(152, 69%, 11%); // based on success #198754
   --pngx-bg-alt: #fff;
   --pngx-bg-darker: var(--bs-gray-100);
   --pngx-focus-alpha: 0.3;
@@ -202,6 +203,12 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
   .alert-primary {
     --bs-alert-color: var(--pngx-primary-text-contrast);
     --bs-alert-bg: var(--pngx-primary-darken-27);
+    --bs-alert-border-color: var(--pngx-bg-darker);
+  }
+
+  .alert-success {
+    --bs-alert-color: var(--pngx-body-color-accent);
+    --bs-alert-bg: var(--pngx-success-darken-10);
     --bs-alert-border-color: var(--pngx-bg-darker);
   }
 
