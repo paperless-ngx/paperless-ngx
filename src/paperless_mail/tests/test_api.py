@@ -1,3 +1,6 @@
+import json
+from unittest import mock
+
 from django.contrib.auth.models import User
 from documents.models import Correspondent
 from documents.models import DocumentType
@@ -5,6 +8,7 @@ from documents.models import Tag
 from documents.tests.utils import DirectoriesMixin
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
+from paperless_mail.tests.test_mail import BogusMailBox
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -13,6 +17,13 @@ class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
     ENDPOINT = "/api/mail_accounts/"
 
     def setUp(self):
+        self.bogus_mailbox = BogusMailBox()
+
+        patcher = mock.patch("paperless_mail.mail.MailBox")
+        m = patcher.start()
+        m.return_value = self.bogus_mailbox
+        self.addCleanup(patcher.stop)
+
         super().setUp()
 
         self.user = User.objects.create_superuser(username="temp_admin")
@@ -165,6 +176,94 @@ class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
         returned_account2 = MailAccount.objects.get(pk=account1.pk)
         self.assertEqual(returned_account2.name, "Updated Name 2")
         self.assertEqual(returned_account2.password, "123xyz")
+
+    def test_mail_account_test_fail(self):
+        """
+        GIVEN:
+            - Errnoeous mail account details
+        WHEN:
+            - API call is made to test account
+        THEN:
+            - API returns 400 bad request
+        """
+
+        response = self.client.post(
+            f"{self.ENDPOINT}test/",
+            json.dumps(
+                {
+                    "imap_server": "server.example.com",
+                    "imap_port": 443,
+                    "imap_security": MailAccount.ImapSecurity.SSL,
+                    "username": "admin",
+                    "password": "notcorrect",
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_mail_account_test_success(self):
+        """
+        GIVEN:
+            - Working mail account details
+        WHEN:
+            - API call is made to test account
+        THEN:
+            - API returns success
+        """
+
+        response = self.client.post(
+            f"{self.ENDPOINT}test/",
+            json.dumps(
+                {
+                    "imap_server": "server.example.com",
+                    "imap_port": 443,
+                    "imap_security": MailAccount.ImapSecurity.SSL,
+                    "username": "admin",
+                    "password": "secret",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["success"], True)
+
+    def test_mail_account_test_existing(self):
+        """
+        GIVEN:
+            - Testing server details for an existing account with obfuscated password (***)
+        WHEN:
+            - API call is made to test account
+        THEN:
+            - API returns success
+        """
+        account = MailAccount.objects.create(
+            name="Email1",
+            username="admin",
+            password="secret",
+            imap_server="server.example.com",
+            imap_port=443,
+            imap_security=MailAccount.ImapSecurity.SSL,
+            character_set="UTF-8",
+        )
+
+        response = self.client.post(
+            f"{self.ENDPOINT}test/",
+            json.dumps(
+                {
+                    "id": account.pk,
+                    "imap_server": "server.example.com",
+                    "imap_port": 443,
+                    "imap_security": MailAccount.ImapSecurity.SSL,
+                    "username": "admin",
+                    "password": "******",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["success"], True)
 
 
 class TestAPIMailRules(DirectoriesMixin, APITestCase):
