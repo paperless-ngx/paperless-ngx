@@ -56,7 +56,7 @@ class RasterisedDocumentParser(DocumentParser):
                 except Exception as e:
                     self.log(
                         "warning",
-                        f"Error while reading metadata {key}: {value}. Error: " f"{e}",
+                        f"Error while reading metadata {key}: {value}. Error: {e}",
                     )
         return result
 
@@ -160,11 +160,10 @@ class RasterisedDocumentParser(DocumentParser):
             return post_process_text(text)
 
         except Exception:
-            # TODO catch all for various issues with PDFminer.six.
             #  If pdftotext fails, fall back to OCR.
             self.log(
                 "warning",
-                "Error while getting text from PDF document with " "pdfminer.six",
+                "Error while getting text from PDF document with pdftotext",
                 exc_info=True,
             )
             # probably not a PDF file.
@@ -284,10 +283,13 @@ class RasterisedDocumentParser(DocumentParser):
     def parse(self, document_path: Path, mime_type, file_name=None):
         # This forces tesseract to use one core per page.
         os.environ["OMP_THREAD_LIMIT"] = "1"
+        VALID_TEXT_LENGTH = 50
 
         if mime_type == "application/pdf":
             text_original = self.extract_text(None, document_path)
-            original_has_text = text_original is not None and len(text_original) > 50
+            original_has_text = (
+                text_original is not None and len(text_original) > VALID_TEXT_LENGTH
+            )
         else:
             text_original = None
             original_has_text = False

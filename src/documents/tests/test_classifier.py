@@ -386,7 +386,6 @@ class TestClassifier(DirectoriesMixin, TestCase):
         # rebuilding the file and committing that.  Not developer friendly
         # Need to rethink how to pass the load through to a file with a single
         # old model?
-        pass
 
     def test_one_correspondent_predict(self):
         c1 = Correspondent.objects.create(
@@ -516,7 +515,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
         self.assertListEqual(self.classifier.predict_tags(doc1.content), [t1.pk])
 
     def test_one_tag_predict_unassigned(self):
-        t1 = Tag.objects.create(name="t1", matching_algorithm=Tag.MATCH_AUTO, pk=12)
+        Tag.objects.create(name="t1", matching_algorithm=Tag.MATCH_AUTO, pk=12)
 
         doc1 = Document.objects.create(
             title="doc1",
@@ -643,7 +642,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
         self.assertIsNotNone(classifier)
 
         with mock.patch("documents.classifier.DocumentClassifier.load") as load:
-            classifier2 = load_classifier()
+            load_classifier()
             load.assert_not_called()
 
     @mock.patch("documents.classifier.DocumentClassifier.load")

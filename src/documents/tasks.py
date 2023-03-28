@@ -297,7 +297,7 @@ def update_document_archive_file(document_id):
 
     except Exception:
         logger.exception(
-            f"Error while parsing document {document} " f"(ID: {document_id})",
+            f"Error while parsing document {document} (ID: {document_id})",
         )
     finally:
         parser.cleanup()

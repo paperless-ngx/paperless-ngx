@@ -10,17 +10,16 @@ from django.db import DatabaseError
 from django.test import override_settings
 from django.test import TestCase
 from django.utils import timezone
-from documents.tests.utils import FileSystemAssertsMixin
 
-from ..file_handling import create_source_path_directory
-from ..file_handling import delete_empty_directories
-from ..file_handling import generate_filename
-from ..models import Correspondent
-from ..models import Document
-from ..models import DocumentType
-from ..models import StoragePath
-from .utils import DirectoriesMixin
-from .utils import FileSystemAssertsMixin
+from documents.file_handling import create_source_path_directory
+from documents.file_handling import delete_empty_directories
+from documents.file_handling import generate_filename
+from documents.models import Correspondent
+from documents.models import Document
+from documents.models import DocumentType
+from documents.models import StoragePath
+from documents.tests.utils import DirectoriesMixin
+from documents.tests.utils import FileSystemAssertsMixin
 
 
 class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
@@ -121,7 +120,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     @override_settings(FILENAME_FORMAT="{correspondent}/{correspondent}")
     def test_file_renaming_database_error(self):
 
-        document1 = Document.objects.create(
+        Document.objects.create(
             mime_type="application/pdf",
             storage_type=Document.STORAGE_TYPE_UNENCRYPTED,
             checksum="AAAAA",
@@ -171,7 +170,6 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         Path(document.source_path).touch()
 
         # Ensure file deletion after delete
-        pk = document.pk
         document.delete()
         self.assertIsNotFile(
             os.path.join(settings.ORIGINALS_DIR, "none", "none.pdf"),
@@ -440,7 +438,6 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         # Check proper handling of files
         self.assertIsDir(os.path.join(settings.ORIGINALS_DIR, "none/none"))
 
-        pk = document.pk
         document.delete()
 
         self.assertIsNotFile(
@@ -705,7 +702,7 @@ class TestFileHandlingWithArchive(DirectoriesMixin, FileSystemAssertsMixin, Test
     def test_move_archive_error(self, m):
         def fake_rename(src, dst):
             if "archive" in str(src):
-                raise OSError()
+                raise OSError
             else:
                 os.remove(src)
                 Path(dst).touch()
@@ -756,7 +753,7 @@ class TestFileHandlingWithArchive(DirectoriesMixin, FileSystemAssertsMixin, Test
     def test_move_file_error(self, m):
         def fake_rename(src, dst):
             if "original" in str(src):
-                raise OSError()
+                raise OSError
             else:
                 os.remove(src)
                 Path(dst).touch()

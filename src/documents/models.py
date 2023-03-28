@@ -269,7 +269,7 @@ class Document(ModelWithOwner):
             MinValueValidator(ARCHIVE_SERIAL_NUMBER_MIN),
         ],
         help_text=_(
-            "The position of this document in your physical document " "archive.",
+            "The position of this document in your physical document archive.",
         ),
     )
 
@@ -470,6 +470,9 @@ class SavedViewFilterRule(models.Model):
         verbose_name = _("filter rule")
         verbose_name_plural = _("filter rules")
 
+    def __str__(self) -> str:
+        return f"SavedViewFilterRule: {self.rule_type} : {self.value}"
+
 
 # TODO: why is this in the models file?
 # TODO: how about, what is this and where is it documented?
@@ -483,7 +486,7 @@ class FileInfo:
             (
                 "created-title",
                 re.compile(
-                    r"^(?P<created>\d{8}(\d{6})?Z) - " r"(?P<title>.*)$",
+                    r"^(?P<created>\d{8}(\d{6})?Z) - (?P<title>.*)$",
                     flags=re.IGNORECASE,
                 ),
             ),
@@ -633,6 +636,9 @@ class PaperlessTask(models.Model):
             "The data returned by the task",
         ),
     )
+
+    def __str__(self) -> str:
+        return f"Task {self.task_id}"
 
 
 class Note(models.Model):

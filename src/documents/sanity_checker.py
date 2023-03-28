@@ -94,7 +94,7 @@ def check_sanity(progress=False) -> SanityCheckMessages:
             except OSError as e:
                 messages.error(doc.pk, f"Cannot read original file of document: {e}")
             else:
-                if not checksum == doc.checksum:
+                if checksum != doc.checksum:
                     messages.error(
                         doc.pk,
                         "Checksum mismatch. "
@@ -127,7 +127,7 @@ def check_sanity(progress=False) -> SanityCheckMessages:
                         f"Cannot read archive file of document : {e}",
                     )
                 else:
-                    if not checksum == doc.archive_checksum:
+                    if checksum != doc.archive_checksum:
                         messages.error(
                             doc.pk,
                             "Checksum mismatch of archived document. "

@@ -8,12 +8,12 @@ from django.contrib.auth.models import User
 from django.test import override_settings
 from django.test import TestCase
 
-from .. import matching
-from ..models import Correspondent
-from ..models import Document
-from ..models import DocumentType
-from ..models import Tag
-from ..signals import document_consumption_finished
+from documents import matching
+from documents.models import Correspondent
+from documents.models import Document
+from documents.models import DocumentType
+from documents.models import Tag
+from documents.signals import document_consumption_finished
 
 
 class _TestMatchingBase(TestCase):
