@@ -282,7 +282,8 @@ INSTALLED_APPS = [
     "django_filters",
     "django_celery_results",
     "guardian",
-] + env_apps
+    *env_apps,
+]
 
 if DEBUG:
     INSTALLED_APPS.append("channels")
@@ -398,10 +399,7 @@ if ENABLE_HTTP_REMOTE_USER:
     )
 
 # X-Frame options for embedded PDF display:
-if DEBUG:
-    X_FRAME_OPTIONS = "ANY"
-else:
-    X_FRAME_OPTIONS = "SAMEORIGIN"
+X_FRAME_OPTIONS = "ANY" if DEBUG else "SAMEORIGIN"
 
 
 # The next 3 settings can also be set using just PAPERLESS_URL
@@ -424,7 +422,7 @@ if _paperless_url:
     _paperless_uri = urlparse(_paperless_url)
     CSRF_TRUSTED_ORIGINS.append(_paperless_url)
     CORS_ALLOWED_ORIGINS.append(_paperless_url)
-    if ALLOWED_HOSTS != ["*"]:
+    if ["*"] != ALLOWED_HOSTS:
         ALLOWED_HOSTS.append(_paperless_uri.hostname)
     else:
         # always allow localhost. Necessary e.g. for healthcheck in docker.

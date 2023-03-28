@@ -47,7 +47,7 @@ class TestViews(TestCase):
                 self.client.cookies.load(
                     {settings.LANGUAGE_COOKIE_NAME: language_given},
                 )
-            elif settings.LANGUAGE_COOKIE_NAME in self.client.cookies.keys():
+            elif settings.LANGUAGE_COOKIE_NAME in self.client.cookies:
                 self.client.cookies.pop(settings.LANGUAGE_COOKIE_NAME)
 
             response = self.client.get(

@@ -104,7 +104,7 @@ class DocumentClassifier:
                         self.document_type_classifier = pickle.load(f)
                         self.storage_path_classifier = pickle.load(f)
                     except Exception as err:
-                        raise ClassifierModelCorruptError() from err
+                        raise ClassifierModelCorruptError from err
 
             # Check for the warning about unpickling from differing versions
             # and consider it incompatible
@@ -117,7 +117,7 @@ class DocumentClassifier:
                 if issubclass(warning.category, UserWarning):
                     w_msg = str(warning.message)
                     if sk_learn_warning_url in w_msg:
-                        raise IncompatibleClassifierVersionError()
+                        raise IncompatibleClassifierVersionError
 
     def save(self):
         target_file = settings.MODEL_FILE

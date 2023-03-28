@@ -43,7 +43,9 @@ class Migration(migrations.Migration):
             model_name="note",
             name="note",
             field=models.TextField(
-                blank=True, help_text="Note for the document", verbose_name="content"
+                blank=True,
+                help_text="Note for the document",
+                verbose_name="content",
             ),
         ),
         migrations.AlterField(

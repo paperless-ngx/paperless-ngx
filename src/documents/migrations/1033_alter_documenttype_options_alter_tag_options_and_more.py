@@ -79,7 +79,8 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="storagepath",
             constraint=models.UniqueConstraint(
-                fields=("name", "owner"), name="documents_storagepath_unique_name_owner"
+                fields=("name", "owner"),
+                name="documents_storagepath_unique_name_owner",
             ),
         ),
         migrations.AddConstraint(
@@ -93,7 +94,8 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="tag",
             constraint=models.UniqueConstraint(
-                fields=("name", "owner"), name="documents_tag_unique_name_owner"
+                fields=("name", "owner"),
+                name="documents_tag_unique_name_owner",
             ),
         ),
         migrations.AddConstraint(

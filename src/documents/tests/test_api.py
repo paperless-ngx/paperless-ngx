@@ -17,7 +17,7 @@ import celery
 try:
     import zoneinfo
 except ImportError:
-    import backports.zoneinfo as zoneinfo
+    from backports import zoneinfo
 
 import pytest
 from django.conf import settings
@@ -110,9 +110,9 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
     def test_document_fields(self):
         c = Correspondent.objects.create(name="c", pk=41)
         dt = DocumentType.objects.create(name="dt", pk=63)
-        tag = Tag.objects.create(name="t", pk=85)
+        Tag.objects.create(name="t", pk=85)
         storage_path = StoragePath.objects.create(name="sp", pk=77, path="p")
-        doc = Document.objects.create(
+        Document.objects.create(
             title="WOW",
             content="the content",
             correspondent=c,
@@ -877,7 +877,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             added=timezone.make_aware(datetime.datetime(2020, 7, 13)),
             content="test",
         )
-        d6 = Document.objects.create(checksum="6", content="test2")
+        Document.objects.create(checksum="6", content="test2")
         d7 = Document.objects.create(checksum="7", storage_path=sp, content="test")
 
         with AsyncWriter(index.open_index()) as writer:
@@ -1046,13 +1046,13 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             mime_type="application/pdf",
             content="abc",
         )
-        doc2 = Document.objects.create(
+        Document.objects.create(
             title="none2",
             checksum="B",
             mime_type="application/pdf",
             content="123",
         )
-        doc3 = Document.objects.create(
+        Document.objects.create(
             title="none3",
             checksum="C",
             mime_type="text/plain",
@@ -1546,14 +1546,14 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             show_on_dashboard=False,
             show_in_sidebar=False,
         )
-        v2 = SavedView.objects.create(
+        SavedView.objects.create(
             owner=u2,
             name="test2",
             sort_field="",
             show_on_dashboard=False,
             show_in_sidebar=False,
         )
-        v3 = SavedView.objects.create(
+        SavedView.objects.create(
             owner=u2,
             name="test3",
             sort_field="",
@@ -1594,7 +1594,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
     def test_create_update_patch(self):
 
-        u1 = User.objects.create_user("user1")
+        User.objects.create_user("user1")
 
         view = {
             "name": "test",
@@ -3020,7 +3020,7 @@ class TestBulkDownload(DirectoriesMixin, APITestCase):
                 self.assertEqual(f.read(), zipf.read("2021-01-01 document A_01.pdf"))
 
     def test_compression(self):
-        response = self.client.post(
+        self.client.post(
             self.ENDPOINT,
             json.dumps(
                 {"documents": [self.doc2.id, self.doc2b.id], "compression": "lzma"},
@@ -3271,7 +3271,7 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
         user = User.objects.create_user(username="test")
         self.client.force_authenticate(user)
 
-        d = Document.objects.create(title="Test")
+        Document.objects.create(title="Test")
 
         self.assertEqual(
             self.client.get("/api/documents/").status_code,
@@ -3305,7 +3305,7 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
         user.user_permissions.add(*Permission.objects.all())
         self.client.force_authenticate(user)
 
-        d = Document.objects.create(title="Test")
+        Document.objects.create(title="Test")
 
         self.assertEqual(
             self.client.get("/api/documents/").status_code,
@@ -3696,7 +3696,7 @@ class TestTasks(DirectoriesMixin, APITestCase):
         THEN:
             - No task data is returned
         """
-        task1 = PaperlessTask.objects.create(
+        PaperlessTask.objects.create(
             task_id=str(uuid.uuid4()),
             task_file_name="task_one.pdf",
         )
@@ -3746,7 +3746,7 @@ class TestTasks(DirectoriesMixin, APITestCase):
         THEN:
             - The returned data includes the task result
         """
-        task = PaperlessTask.objects.create(
+        PaperlessTask.objects.create(
             task_id=str(uuid.uuid4()),
             task_file_name="task_one.pdf",
             status=celery.states.SUCCESS,
@@ -3772,7 +3772,7 @@ class TestTasks(DirectoriesMixin, APITestCase):
         THEN:
             - The returned result is the exception info
         """
-        task = PaperlessTask.objects.create(
+        PaperlessTask.objects.create(
             task_id=str(uuid.uuid4()),
             task_file_name="task_one.pdf",
             status=celery.states.FAILURE,
@@ -3801,7 +3801,7 @@ class TestTasks(DirectoriesMixin, APITestCase):
         THEN:
             - Returned data include the filename
         """
-        task = PaperlessTask.objects.create(
+        PaperlessTask.objects.create(
             task_id=str(uuid.uuid4()),
             task_file_name="test.pdf",
             task_name="documents.tasks.some_task",
@@ -3827,7 +3827,7 @@ class TestTasks(DirectoriesMixin, APITestCase):
         THEN:
             - Returned data include the filename
         """
-        task = PaperlessTask.objects.create(
+        PaperlessTask.objects.create(
             task_id=str(uuid.uuid4()),
             task_file_name="anothertest.pdf",
             task_name="documents.tasks.some_task",

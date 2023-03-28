@@ -39,7 +39,7 @@ class TikaDocumentParser(DocumentParser):
         except Exception as e:
             self.log(
                 "warning",
-                f"Error while fetching document metadata for " f"{document_path}: {e}",
+                f"Error while fetching document metadata for {document_path}: {e}",
             )
             return []
 
@@ -76,7 +76,7 @@ class TikaDocumentParser(DocumentParser):
         except Exception as e:
             self.log(
                 "warning",
-                f"Unable to extract date for document " f"{document_path}: {e}",
+                f"Unable to extract date for document {document_path}: {e}",
             )
 
         self.archive_path = self.convert_to_pdf(document_path, file_name)

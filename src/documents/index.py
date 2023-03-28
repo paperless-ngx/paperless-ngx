@@ -164,7 +164,7 @@ def remove_document_from_index(document):
 
 class DelayedQuery:
     def _get_query(self):
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def _get_query_filter(self):
         criterias = []

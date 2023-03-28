@@ -46,12 +46,15 @@ class Migration(migrations.Migration):
         # Drop the django-q tables entirely
         # Must be done last or there could be references here
         migrations.RunSQL(
-            "DROP TABLE IF EXISTS django_q_ormq", reverse_sql=migrations.RunSQL.noop
+            "DROP TABLE IF EXISTS django_q_ormq",
+            reverse_sql=migrations.RunSQL.noop,
         ),
         migrations.RunSQL(
-            "DROP TABLE IF EXISTS django_q_schedule", reverse_sql=migrations.RunSQL.noop
+            "DROP TABLE IF EXISTS django_q_schedule",
+            reverse_sql=migrations.RunSQL.noop,
         ),
         migrations.RunSQL(
-            "DROP TABLE IF EXISTS django_q_task", reverse_sql=migrations.RunSQL.noop
+            "DROP TABLE IF EXISTS django_q_task",
+            reverse_sql=migrations.RunSQL.noop,
         ),
     ]

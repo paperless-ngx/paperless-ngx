@@ -65,9 +65,8 @@ class MailAccountTestView(GenericAPIView):
             try:
                 mailbox_login(M, account)
                 return Response({"success": True})
-            except MailError as e:
+            except MailError:
                 logger.error(
-                    f"Mail account {account} test failed: {e}",
-                    exc_info=False,
+                    f"Mail account {account} test failed",
                 )
                 return HttpResponseBadRequest("Unable to connect to server")

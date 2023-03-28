@@ -149,7 +149,7 @@ class TestSanityCheck(DirectoriesMixin, TestCase):
         )
 
     def test_orphaned_file(self):
-        doc = self.make_test_data()
+        self.make_test_data()
         Path(self.dirs.originals_dir, "orphaned").touch()
         messages = check_sanity()
         self.assertTrue(messages.has_warning)

@@ -8,7 +8,7 @@ from paperless_tesseract import check_default_language_available
 
 class TestChecks(TestCase):
     def test_default_language(self):
-        msgs = check_default_language_available(None)
+        check_default_language_available(None)
 
     @override_settings(OCR_LANGUAGE="")
     def test_no_language(self):

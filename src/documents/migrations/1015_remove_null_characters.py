@@ -25,5 +25,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(remove_null_characters, migrations.RunPython.noop)
+        migrations.RunPython(remove_null_characters, migrations.RunPython.noop),
     ]

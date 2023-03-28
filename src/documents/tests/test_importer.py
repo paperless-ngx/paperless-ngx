@@ -2,7 +2,7 @@ from django.core.management.base import CommandError
 from django.test import TestCase
 from documents.settings import EXPORTER_FILE_NAME
 
-from ..management.commands.document_importer import Command
+from documents.management.commands.document_importer import Command
 
 
 class TestImporter(TestCase):

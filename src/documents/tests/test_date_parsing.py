@@ -46,7 +46,7 @@ class TestDate(TestCase):
         )
 
     def test_date_format_5(self):
-        text = "lorem ipsum 130218, 2018, 20180213 and lorem 13.02.2018 lorem " "ipsum"
+        text = "lorem ipsum 130218, 2018, 20180213 and lorem 13.02.2018 lorem ipsum"
         date = parse_date("", text)
         self.assertEqual(
             date,
@@ -68,7 +68,7 @@ class TestDate(TestCase):
         self.assertEqual(parse_date("", text), None)
 
     def test_date_format_7(self):
-        text = "lorem ipsum\n" "März 2019\n" "lorem ipsum"
+        text = "lorem ipsum\nMärz 2019\nlorem ipsum"
         date = parse_date("", text)
         self.assertEqual(
             date,
@@ -95,7 +95,7 @@ class TestDate(TestCase):
 
     @override_settings(SCRATCH_DIR=SCRATCH)
     def test_date_format_9(self):
-        text = "lorem ipsum\n" "27. Nullmonth 2020\n" "März 2020\n" "lorem ipsum"
+        text = "lorem ipsum\n27. Nullmonth 2020\nMärz 2020\nlorem ipsum"
         self.assertEqual(
             parse_date("", text),
             datetime.datetime(2020, 3, 1, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
@@ -262,7 +262,7 @@ class TestDate(TestCase):
         THEN:
             - Should parse the date non-ignored date from content
         """
-        text = "lorem ipsum 110319, 20200117 and lorem 13.02.2018 lorem " "ipsum"
+        text = "lorem ipsum 110319, 20200117 and lorem 13.02.2018 lorem ipsum"
         self.assertEqual(
             parse_date("", text),
             datetime.datetime(2018, 2, 13, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
@@ -283,7 +283,7 @@ class TestDate(TestCase):
         THEN:
             - Should parse the date non-ignored date from content
         """
-        text = "lorem ipsum 190311, 20200117 and lorem 13.02.2018 lorem " "ipsum"
+        text = "lorem ipsum 190311, 20200117 and lorem 13.02.2018 lorem ipsum"
 
         self.assertEqual(
             parse_date("", text),

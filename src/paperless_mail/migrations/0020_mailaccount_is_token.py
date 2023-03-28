@@ -13,7 +13,8 @@ class Migration(migrations.Migration):
             model_name="mailaccount",
             name="is_token",
             field=models.BooleanField(
-                default=False, verbose_name="Is token authentication"
+                default=False,
+                verbose_name="Is token authentication",
             ),
         ),
     ]

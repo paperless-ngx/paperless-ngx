@@ -27,7 +27,8 @@ class Migration(migrations.Migration):
             model_name="mailrule",
             name="maximum_age",
             field=models.PositiveIntegerField(
-                default=30, help_text="Specified in days."
+                default=30,
+                help_text="Specified in days.",
             ),
         ),
     ]
