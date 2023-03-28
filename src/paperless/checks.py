@@ -42,7 +42,7 @@ def path_check(var, directory):
                     Error(
                         writeable_message.format(var),
                         writeable_hint.format(
-                            f"\n{dir_mode} {dir_owner} {dir_group} " f"{directory}\n",
+                            f"\n{dir_mode} {dir_owner} {dir_group} {directory}\n",
                         ),
                     ),
                 )
@@ -158,7 +158,7 @@ def settings_values_check(app_configs, **kwargs):
         try:
             import zoneinfo
         except ImportError:  # pragma: nocover
-            import backports.zoneinfo as zoneinfo
+            from backports import zoneinfo
         msgs = []
         if settings.TIME_ZONE not in zoneinfo.available_timezones():
             msgs.append(

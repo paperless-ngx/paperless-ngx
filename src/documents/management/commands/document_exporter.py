@@ -35,8 +35,8 @@ from paperless.db import GnuPG
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 
-from ...file_handling import delete_empty_directories
-from ...file_handling import generate_filename
+from documents.file_handling import delete_empty_directories
+from documents.file_handling import generate_filename
 
 
 class Command(BaseCommand):
@@ -403,9 +403,10 @@ class Command(BaseCommand):
             if self.compare_checksums and source_checksum:
                 target_checksum = hashlib.md5(target.read_bytes()).hexdigest()
                 perform_copy = target_checksum != source_checksum
-            elif source_stat.st_mtime != target_stat.st_mtime:
-                perform_copy = True
-            elif source_stat.st_size != target_stat.st_size:
+            elif (
+                source_stat.st_mtime != target_stat.st_mtime
+                or source_stat.st_size != target_stat.st_size
+            ):
                 perform_copy = True
         else:
             # Copy if it does not exist

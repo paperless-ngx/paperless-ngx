@@ -160,35 +160,48 @@ class Migration(migrations.Migration):
             model_name="mailrule",
             name="filter_body",
             field=models.CharField(
-                blank=True, max_length=256, null=True, verbose_name="filter body"
+                blank=True,
+                max_length=256,
+                null=True,
+                verbose_name="filter body",
             ),
         ),
         migrations.AlterField(
             model_name="mailrule",
             name="filter_from",
             field=models.CharField(
-                blank=True, max_length=256, null=True, verbose_name="filter from"
+                blank=True,
+                max_length=256,
+                null=True,
+                verbose_name="filter from",
             ),
         ),
         migrations.AlterField(
             model_name="mailrule",
             name="filter_subject",
             field=models.CharField(
-                blank=True, max_length=256, null=True, verbose_name="filter subject"
+                blank=True,
+                max_length=256,
+                null=True,
+                verbose_name="filter subject",
             ),
         ),
         migrations.AlterField(
             model_name="mailrule",
             name="folder",
             field=models.CharField(
-                default="INBOX", max_length=256, verbose_name="folder"
+                default="INBOX",
+                max_length=256,
+                verbose_name="folder",
             ),
         ),
         migrations.AlterField(
             model_name="mailrule",
             name="maximum_age",
             field=models.PositiveIntegerField(
-                default=30, help_text="Specified in days.", verbose_name="maximum age"
+                default=30,
+                help_text="Specified in days.",
+                verbose_name="maximum age",
             ),
         ),
         migrations.AlterField(

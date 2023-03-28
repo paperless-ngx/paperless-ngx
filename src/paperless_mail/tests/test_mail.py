@@ -12,11 +12,8 @@ from unittest import mock
 from django.core.management import call_command
 from django.db import DatabaseError
 from django.test import TestCase
-from documents.data_models import ConsumableDocument
-from documents.data_models import DocumentMetadataOverrides
 from documents.models import Correspondent
 from documents.tests.utils import DirectoriesMixin
-from documents.tests.utils import DocumentConsumeDelayMixin
 from documents.tests.utils import FileSystemAssertsMixin
 from imap_tools import EmailAddress
 from imap_tools import FolderInfo
@@ -183,7 +180,7 @@ class BogusMailBox(ContextManager):
             )
             self.messages = list(filter(lambda m: m.uid not in uid_list, self.messages))
         else:
-            raise Exception()
+            raise Exception
 
 
 def fake_magic_from_buffer(buffer, mime=False):
@@ -769,7 +766,7 @@ class TestMail(
         with self.assertRaisesRegex(
             MailError,
             "Error while authenticating account",
-        ) as context:
+        ):
             self.mail_account_handler.handle_mail_account(account)
 
     def test_error_skip_account(self):

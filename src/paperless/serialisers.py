@@ -65,9 +65,11 @@ class UserSerializer(serializers.ModelSerializer):
         if "user_permissions" in validated_data:
             user_permissions = validated_data.pop("user_permissions")
         password = None
-        if "password" in validated_data:
-            if len(validated_data.get("password").replace("*", "")) > 0:
-                password = validated_data.pop("password")
+        if (
+            "password" in validated_data
+            and len(validated_data.get("password").replace("*", "")) > 0
+        ):
+            password = validated_data.pop("password")
         user = User.objects.create(**validated_data)
         # set groups
         if groups:

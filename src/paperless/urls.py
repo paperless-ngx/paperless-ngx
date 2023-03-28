@@ -56,61 +56,57 @@ urlpatterns = [
         include(
             [
                 re_path(
-                    r"^auth/",
+                    "^auth/",
                     include(
                         ("rest_framework.urls", "rest_framework"),
                         namespace="rest_framework",
                     ),
                 ),
                 re_path(
-                    r"^search/autocomplete/",
+                    "^search/autocomplete/",
                     SearchAutoCompleteView.as_view(),
                     name="autocomplete",
                 ),
-                re_path(r"^statistics/", StatisticsView.as_view(), name="statistics"),
+                re_path("^statistics/", StatisticsView.as_view(), name="statistics"),
                 re_path(
-                    r"^documents/post_document/",
+                    "^documents/post_document/",
                     PostDocumentView.as_view(),
                     name="post_document",
                 ),
                 re_path(
-                    r"^documents/bulk_edit/",
+                    "^documents/bulk_edit/",
                     BulkEditView.as_view(),
                     name="bulk_edit",
                 ),
                 re_path(
-                    r"^documents/selection_data/",
+                    "^documents/selection_data/",
                     SelectionDataView.as_view(),
                     name="selection_data",
                 ),
                 re_path(
-                    r"^documents/bulk_download/",
+                    "^documents/bulk_download/",
                     BulkDownloadView.as_view(),
                     name="bulk_download",
                 ),
                 re_path(
-                    r"^remote_version/",
+                    "^remote_version/",
                     RemoteVersionView.as_view(),
                     name="remoteversion",
                 ),
+                re_path("^ui_settings/", UiSettingsView.as_view(), name="ui_settings"),
                 re_path(
-                    r"^ui_settings/",
-                    UiSettingsView.as_view(),
-                    name="ui_settings",
-                ),
-                re_path(
-                    r"^acknowledge_tasks/",
+                    "^acknowledge_tasks/",
                     AcknowledgeTasksView.as_view(),
                     name="acknowledge_tasks",
                 ),
                 re_path(
-                    r"^mail_accounts/test/",
+                    "^mail_accounts/test/",
                     MailAccountTestView.as_view(),
                     name="mail_accounts_test",
                 ),
                 path("token/", views.obtain_auth_token),
-            ]
-            + api_router.urls,
+                *api_router.urls,
+            ],
         ),
     ),
     re_path(r"^favicon.ico$", FaviconView.as_view(), name="favicon"),

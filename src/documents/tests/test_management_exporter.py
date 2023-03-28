@@ -204,7 +204,7 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
                 self.assertEqual(element["fields"]["document"], self.d1.id)
                 self.assertEqual(element["fields"]["user"], self.user.id)
 
-        with paperless_environment() as dirs:
+        with paperless_environment():
             self.assertEqual(Document.objects.count(), 4)
             Document.objects.all().delete()
             Correspondent.objects.all().delete()
@@ -345,7 +345,7 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             os.path.join(self.dirs.media_dir, "documents"),
         )
 
-        m = self._do_export(use_filename_format=True)
+        self._do_export(use_filename_format=True)
         self.assertIsFile(os.path.join(self.target, "wow1", "c.pdf"))
 
         self.assertIsFile(os.path.join(self.target, "manifest.json"))
@@ -537,7 +537,7 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
                 )
         self.assertFalse(has_archive)
 
-        with paperless_environment() as dirs:
+        with paperless_environment():
             self.assertEqual(Document.objects.count(), 4)
             Document.objects.all().delete()
             self.assertEqual(Document.objects.count(), 0)
@@ -580,7 +580,7 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
                 )
         self.assertFalse(has_thumbnail)
 
-        with paperless_environment() as dirs:
+        with paperless_environment():
             self.assertEqual(Document.objects.count(), 4)
             Document.objects.all().delete()
             self.assertEqual(Document.objects.count(), 0)
@@ -609,7 +609,7 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             has_document = has_document or element["model"] == "documents.document"
         self.assertFalse(has_document)
 
-        with paperless_environment() as dirs:
+        with paperless_environment():
             self.assertEqual(Document.objects.count(), 4)
             Document.objects.all().delete()
             self.assertEqual(Document.objects.count(), 0)
@@ -631,9 +631,9 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             os.path.join(self.dirs.media_dir, "documents"),
         )
 
-        manifest = self._do_export(use_folder_prefix=True)
+        self._do_export(use_folder_prefix=True)
 
-        with paperless_environment() as dirs:
+        with paperless_environment():
             self.assertEqual(Document.objects.count(), 4)
             Document.objects.all().delete()
             self.assertEqual(Document.objects.count(), 0)

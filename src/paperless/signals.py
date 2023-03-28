@@ -15,18 +15,18 @@ def handle_failed_login(sender, credentials, request, **kwargs):
     if client_ip is None:
         logger.info(
             f"Login failed for user `{credentials['username']}`."
-            + " Unable to determine IP address.",
+            " Unable to determine IP address.",
         )
     else:
         if is_routable:
             # We got the client's IP address
             logger.info(
                 f"Login failed for user `{credentials['username']}`"
-                + f" from IP `{client_ip}.`",
+                f" from IP `{client_ip}.`",
             )
         else:
             # The client's IP address is private
             logger.info(
                 f"Login failed for user `{credentials['username']}`"
-                + f" from private IP `{client_ip}.`",
+                f" from private IP `{client_ip}.`",
             )

@@ -1,14 +1,14 @@
 from django.test import TestCase
 
-from ..models import Correspondent
-from ..models import Document
+from documents.models import Correspondent
+from documents.models import Document
 from .factories import CorrespondentFactory
 from .factories import DocumentFactory
 
 
 class CorrespondentTestCase(TestCase):
     def test___str__(self):
-        for s in ("test", "οχι", "test with fun_charÅc'\"terß"):
+        for s in ("test", "oχi", "test with fun_charÅc'\"terß"):
             correspondent = CorrespondentFactory.create(name=s)
             self.assertEqual(str(correspondent), s)
 

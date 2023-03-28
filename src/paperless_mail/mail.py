@@ -94,7 +94,7 @@ class BaseMailAction:
         """
         Perform mail action on the given mail uid in the mailbox.
         """
-        raise NotImplementedError()
+        raise NotImplementedError
 
 
 class DeleteMailAction(BaseMailAction):
@@ -152,7 +152,7 @@ class TagMailAction(BaseMailAction):
             _, self.color = parameter.split(":")
             self.color = self.color.strip()
 
-            if not self.color.lower() in APPLE_MAIL_TAG_COLORS.keys():
+            if self.color.lower() not in APPLE_MAIL_TAG_COLORS.keys():
                 raise MailError("Not a valid AppleMail tag color.")
 
             self.keyword = None
@@ -274,7 +274,7 @@ def apply_mail_action(
             status="SUCCESS",
         )
 
-    except Exception as e:
+    except Exception:
         ProcessedMail.objects.create(
             owner=rule.owner,
             rule=rule,
@@ -285,7 +285,7 @@ def apply_mail_action(
             status="FAILED",
             error=traceback.format_exc(),
         )
-        raise e
+        raise
 
 
 @shared_task
@@ -548,7 +548,7 @@ class MailAccountHandler(LoggingMixin):
 
         self.log(
             "debug",
-            f"Rule {rule}: Searching folder with criteria " f"{str(criterias)}",
+            f"Rule {rule}: Searching folder with criteria {str(criterias)}",
         )
 
         try:
@@ -582,7 +582,7 @@ class MailAccountHandler(LoggingMixin):
             except Exception as e:
                 self.log(
                     "error",
-                    f"Rule {rule}: Error while processing mail " f"{message.uid}: {e}",
+                    f"Rule {rule}: Error while processing mail {message.uid}: {e}",
                     exc_info=True,
                 )
 
@@ -653,7 +653,7 @@ class MailAccountHandler(LoggingMixin):
         for att in message.attachments:
 
             if (
-                not att.content_disposition == "attachment"
+                att.content_disposition != "attachment"
                 and rule.attachment_type
                 == MailRule.AttachmentProcessing.ATTACHMENTS_ONLY
             ):
@@ -665,14 +665,13 @@ class MailAccountHandler(LoggingMixin):
                 )
                 continue
 
-            if rule.filter_attachment_filename:
+            if rule.filter_attachment_filename and not fnmatch(
+                att.filename.lower(),
+                rule.filter_attachment_filename.lower(),
+            ):
                 # Force the filename and pattern to the lowercase
                 # as this is system dependent otherwise
-                if not fnmatch(
-                    att.filename.lower(),
-                    rule.filter_attachment_filename.lower(),
-                ):
-                    continue
+                continue
 
             title = self._get_title(message, att, rule)
 

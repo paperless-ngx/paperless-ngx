@@ -38,7 +38,7 @@ class MailDocumentParser(DocumentParser):
             except Exception as err:
                 raise ParseError(
                     f"Could not parse {document_path}: {err}",
-                )
+                ) from err
             if not self._parsed.from_values:
                 self._parsed = None
                 raise ParseError(
@@ -65,7 +65,7 @@ class MailDocumentParser(DocumentParser):
         except ParseError as e:
             self.log(
                 "warning",
-                f"Error while fetching document metadata for " f"{document_path}: {e}",
+                f"Error while fetching document metadata for {document_path}: {e}",
             )
             return result
 
@@ -132,7 +132,7 @@ class MailDocumentParser(DocumentParser):
 
             self.text += f"Attachments: {', '.join(att)}\n\n"
 
-        if mail.html != "":
+        if mail.html:
             self.text += "HTML content: " + strip_text(self.tika_parse(mail.html))
 
         self.text += f"\n\n{strip_text(mail.text)}"
@@ -153,7 +153,7 @@ class MailDocumentParser(DocumentParser):
             raise ParseError(
                 f"Could not parse content with tika server at "
                 f"{self.tika_server}: {err}",
-            )
+            ) from err
         if parsed["content"]:
             return parsed["content"]
         else:
@@ -167,7 +167,7 @@ class MailDocumentParser(DocumentParser):
 
         pdf_collection.append(("1_mail.pdf", self.generate_pdf_from_mail(mail)))
 
-        if mail.html == "":
+        if not mail.html:
             with open(pdf_path, "wb") as file:
                 file.write(pdf_collection[0][1])
                 file.close()
@@ -188,7 +188,7 @@ class MailDocumentParser(DocumentParser):
             response = requests.post(url_merge, files=files, headers=headers)
             response.raise_for_status()  # ensure we notice bad responses
         except Exception as err:
-            raise ParseError(f"Error while converting document to PDF: {err}")
+            raise ParseError(f"Error while converting document to PDF: {err}") from err
 
         with open(pdf_path, "wb") as file:
             file.write(response.content)
@@ -212,26 +212,26 @@ class MailDocumentParser(DocumentParser):
             return text
 
         data["subject"] = clean_html(mail.subject)
-        if data["subject"] != "":
+        if data["subject"]:
             data["subject_label"] = "Subject"
         data["from"] = clean_html(mail.from_values.full)
-        if data["from"] != "":
+        if data["from"]:
             data["from_label"] = "From"
         data["to"] = clean_html(", ".join(address.full for address in mail.to_values))
-        if data["to"] != "":
+        if data["to"]:
             data["to_label"] = "To"
         data["cc"] = clean_html(", ".join(address.full for address in mail.cc_values))
-        if data["cc"] != "":
+        if data["cc"]:
             data["cc_label"] = "CC"
         data["bcc"] = clean_html(", ".join(address.full for address in mail.bcc_values))
-        if data["bcc"] != "":
+        if data["bcc"]:
             data["bcc_label"] = "BCC"
 
         att = []
         for a in mail.attachments:
             att.append(f"{a.filename} ({format_size(a.size, binary=True)})")
         data["attachments"] = clean_html(", ".join(att))
-        if data["attachments"] != "":
+        if data["attachments"]:
             data["attachments_label"] = "Attachments"
 
         data["date"] = clean_html(mail.date.astimezone().strftime("%Y-%m-%d %H:%M"))
@@ -290,7 +290,9 @@ class MailDocumentParser(DocumentParser):
                 )
                 response.raise_for_status()  # ensure we notice bad responses
             except Exception as err:
-                raise ParseError(f"Error while converting document to PDF: {err}")
+                raise ParseError(
+                    f"Error while converting document to PDF: {err}",
+                ) from err
 
         return response.content
 
@@ -344,6 +346,6 @@ class MailDocumentParser(DocumentParser):
             )
             response.raise_for_status()  # ensure we notice bad responses
         except Exception as err:
-            raise ParseError(f"Error while converting document to PDF: {err}")
+            raise ParseError(f"Error while converting document to PDF: {err}") from err
 
         return response.content

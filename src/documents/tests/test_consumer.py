@@ -12,23 +12,23 @@ from dateutil import tz
 try:
     import zoneinfo
 except ImportError:
-    import backports.zoneinfo as zoneinfo
+    from backports import zoneinfo
 
 from django.conf import settings
 from django.utils import timezone
 from django.test import override_settings
 from django.test import TestCase
 
-from ..consumer import Consumer
-from ..consumer import ConsumerError
-from ..models import Correspondent
-from ..models import Document
-from ..models import DocumentType
-from ..models import FileInfo
-from ..models import Tag
-from ..parsers import DocumentParser
-from ..parsers import ParseError
-from ..tasks import sanity_check
+from documents.consumer import Consumer
+from documents.consumer import ConsumerError
+from documents.models import Correspondent
+from documents.models import Document
+from documents.models import DocumentType
+from documents.models import FileInfo
+from documents.models import Tag
+from documents.parsers import DocumentParser
+from documents.parsers import ParseError
+from documents.tasks import sanity_check
 from .utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
 
@@ -72,8 +72,8 @@ class TestFieldPermutations(TestCase):
         "20150102030405Z",
         "20150102Z",
     )
-    valid_correspondents = ["timmy", "Dr. McWheelie", "Dash Gor-don", "ο Θερμαστής", ""]
-    valid_titles = ["title", "Title w Spaces", "Title a-dash", "Τίτλος", ""]
+    valid_correspondents = ["timmy", "Dr. McWheelie", "Dash Gor-don", "o Θεpμaoτής", ""]
+    valid_titles = ["title", "Title w Spaces", "Title a-dash", "Tίτλoς", ""]
     valid_tags = ["tag", "tig,tag", "tag1,tag2,tag-3"]
 
     def _test_guessed_attributes(
@@ -135,9 +135,7 @@ class TestFieldPermutations(TestCase):
         filename = "tag1,tag2_20190908_180610_0001.pdf"
         all_patt = re.compile("^.*$")
         none_patt = re.compile("$a")
-        exact_patt = re.compile("^([a-z0-9,]+)_(\\d{8})_(\\d{6})_([0-9]+)\\.")
-        repl1 = " - \\4 - \\1."  # (empty) corrspondent, title and tags
-        repl2 = "\\2Z - " + repl1  # creation date + repl1
+        re.compile("^([a-z0-9,]+)_(\\d{8})_(\\d{6})_([0-9]+)\\.")
 
         # No transformations configured (= default)
         info = FileInfo.from_filename(filename)
@@ -177,10 +175,6 @@ class TestFieldPermutations(TestCase):
 
 
 class DummyParser(DocumentParser):
-    def get_thumbnail(self, document_path, mime_type, file_name=None):
-        # not important during tests
-        raise NotImplementedError()
-
     def __init__(self, logging_group, scratch_dir, archive_path):
         super().__init__(logging_group, None)
         _, self.fake_thumb = tempfile.mkstemp(suffix=".webp", dir=scratch_dir)
@@ -197,9 +191,6 @@ class CopyParser(DocumentParser):
     def get_thumbnail(self, document_path, mime_type, file_name=None):
         return self.fake_thumb
 
-    def get_thumbnail(self, document_path, mime_type, file_name=None):
-        return self.fake_thumb
-
     def __init__(self, logging_group, progress_callback=None):
         super().__init__(logging_group, progress_callback)
         _, self.fake_thumb = tempfile.mkstemp(suffix=".webp", dir=self.tempdir)
@@ -211,10 +202,6 @@ class CopyParser(DocumentParser):
 
 
 class FaultyParser(DocumentParser):
-    def get_thumbnail(self, document_path, mime_type, file_name=None):
-        # not important during tests
-        raise NotImplementedError()
-
     def __init__(self, logging_group, scratch_dir):
         super().__init__(logging_group)
         _, self.fake_thumb = tempfile.mkstemp(suffix=".webp", dir=scratch_dir)

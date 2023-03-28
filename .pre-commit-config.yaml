@@ -36,39 +36,14 @@ repos:
           - markdown
         exclude: "(^Pipfile\\.lock$)"
   # Python hooks
-  - repo: https://github.com/asottile/reorder_python_imports
-    rev: v3.9.0
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: 'v0.0.259'
     hooks:
-      - id: reorder-python-imports
-        exclude: "(migrations)"
-  - repo: https://github.com/asottile/yesqa
-    rev: "v1.4.0"
-    hooks:
-      - id: yesqa
-        exclude: "(migrations)"
-  - repo: https://github.com/asottile/add-trailing-comma
-    rev: "v2.4.0"
-    hooks:
-      - id: add-trailing-comma
-        exclude: "(migrations)"
-  - repo: https://github.com/PyCQA/flake8
-    rev: 6.0.0
-    hooks:
-      - id: flake8
-        files: ^src/
-        args:
-          - "--config=./src/setup.cfg"
+      - id: ruff
   - repo: https://github.com/psf/black
     rev: 22.12.0
     hooks:
       - id: black
-  - repo: https://github.com/asottile/pyupgrade
-    rev: v3.3.1
-    hooks:
-      - id: pyupgrade
-        exclude: "(migrations)"
-        args:
-          - "--py38-plus"
   # Dockerfile hooks
   - repo: https://github.com/AleksaC/hadolint-py
     rev: v2.10.0

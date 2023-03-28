@@ -7,7 +7,7 @@ from celery import states
 try:
     import zoneinfo
 except ImportError:
-    import backports.zoneinfo as zoneinfo
+    from backports import zoneinfo
 import magic
 from django.conf import settings
 from django.utils.text import slugify
@@ -152,7 +152,7 @@ class SetPermissionsMixin:
 class OwnedObjectSerializer(serializers.ModelSerializer, SetPermissionsMixin):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user", None)
-        return super().__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def get_permissions(self, obj):
         view_codename = f"view_{obj.__class__.__name__.lower()}"
@@ -282,7 +282,7 @@ class ColorField(serializers.Field):
         for id, color in self.COLOURS:
             if id == data:
                 return color
-        raise serializers.ValidationError()
+        raise serializers.ValidationError
 
     def to_representation(self, value):
         for id, color in self.COLOURS:
@@ -513,12 +513,12 @@ class DocumentListSerializer(serializers.Serializer):
     def _validate_document_id_list(self, documents, name="documents"):
         if not type(documents) == list:
             raise serializers.ValidationError(f"{name} must be a list")
-        if not all([type(i) == int for i in documents]):
+        if not all(type(i) == int for i in documents):
             raise serializers.ValidationError(f"{name} must be a list of integers")
         count = Document.objects.filter(id__in=documents).count()
         if not count == len(documents):
             raise serializers.ValidationError(
-                f"Some documents in {name} don't exist or were " f"specified twice.",
+                f"Some documents in {name} don't exist or were specified twice.",
             )
 
     def validate_documents(self, documents):
@@ -549,7 +549,7 @@ class BulkEditSerializer(DocumentListSerializer, SetPermissionsMixin):
     def _validate_tag_id_list(self, tags, name="tags"):
         if not type(tags) == list:
             raise serializers.ValidationError(f"{name} must be a list")
-        if not all([type(i) == int for i in tags]):
+        if not all(type(i) == int for i in tags):
             raise serializers.ValidationError(f"{name} must be a list of integers")
         count = Tag.objects.filter(id__in=tags).count()
         if not count == len(tags):
@@ -826,8 +826,8 @@ class StoragePathSerializer(MatchingModelSerializer, OwnedObjectSerializer):
                 original_name="testfile",
             )
 
-        except (KeyError):
-            raise serializers.ValidationError(_("Invalid variable detected."))
+        except KeyError as err:
+            raise serializers.ValidationError(_("Invalid variable detected.")) from err
 
         return path
 
@@ -919,7 +919,7 @@ class AcknowledgeTasksViewSerializer(serializers.Serializer):
         pass
         if not type(tasks) == list:
             raise serializers.ValidationError(f"{name} must be a list")
-        if not all([type(i) == int for i in tasks]):
+        if not all(type(i) == int for i in tasks):
             raise serializers.ValidationError(f"{name} must be a list of integers")
         count = PaperlessTask.objects.filter(id__in=tasks).count()
         if not count == len(tasks):

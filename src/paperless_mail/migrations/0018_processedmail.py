@@ -29,19 +29,25 @@ class Migration(migrations.Migration):
                 (
                     "folder",
                     models.CharField(
-                        editable=False, max_length=256, verbose_name="folder"
+                        editable=False,
+                        max_length=256,
+                        verbose_name="folder",
                     ),
                 ),
                 (
                     "uid",
                     models.CharField(
-                        editable=False, max_length=256, verbose_name="uid"
+                        editable=False,
+                        max_length=256,
+                        verbose_name="uid",
                     ),
                 ),
                 (
                     "subject",
                     models.CharField(
-                        editable=False, max_length=256, verbose_name="subject"
+                        editable=False,
+                        max_length=256,
+                        verbose_name="subject",
                     ),
                 ),
                 (
@@ -59,13 +65,18 @@ class Migration(migrations.Migration):
                 (
                     "status",
                     models.CharField(
-                        editable=False, max_length=256, verbose_name="status"
+                        editable=False,
+                        max_length=256,
+                        verbose_name="status",
                     ),
                 ),
                 (
                     "error",
                     models.TextField(
-                        blank=True, editable=False, null=True, verbose_name="error"
+                        blank=True,
+                        editable=False,
+                        null=True,
+                        verbose_name="error",
                     ),
                 ),
                 (
