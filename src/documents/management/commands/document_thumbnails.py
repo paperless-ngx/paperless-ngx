@@ -7,7 +7,7 @@ from django import db
 from django.core.management.base import BaseCommand
 from documents.models import Document
 
-from ...parsers import get_parser_class_for_mime_type
+from documents.parsers import get_parser_class_for_mime_type
 
 
 def _process_document(doc_in):

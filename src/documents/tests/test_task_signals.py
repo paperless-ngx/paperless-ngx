@@ -4,7 +4,6 @@ from unittest import mock
 import celery
 from django.test import TestCase
 from documents.data_models import ConsumableDocument
-from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
 from documents.models import PaperlessTask
 from documents.signals.handlers import before_task_publish_handler

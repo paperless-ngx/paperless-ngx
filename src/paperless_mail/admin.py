@@ -18,7 +18,16 @@ class MailAccountAdminForm(forms.ModelForm):
         widgets = {
             "password": forms.PasswordInput(),
         }
-        fields = "__all__"
+        fields = [
+            "name",
+            "imap_server",
+            "username",
+            "imap_security",
+            "username",
+            "password",
+            "is_token",
+            "character_set",
+        ]
 
 
 class MailAccountAdmin(admin.ModelAdmin):
@@ -27,7 +36,10 @@ class MailAccountAdmin(admin.ModelAdmin):
 
     fieldsets = [
         (None, {"fields": ["name", "imap_server", "imap_port"]}),
-        (_("Authentication"), {"fields": ["imap_security", "username", "password"]}),
+        (
+            _("Authentication"),
+            {"fields": ["imap_security", "username", "password", "is_token"]},
+        ),
         (_("Advanced settings"), {"fields": ["character_set"]}),
     ]
     form = MailAccountAdminForm

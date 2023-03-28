@@ -13,7 +13,6 @@ from django.test import override_settings
 from django.test import TransactionTestCase
 from documents.consumer import ConsumerError
 from documents.data_models import ConsumableDocument
-from documents.data_models import DocumentMetadataOverrides
 from documents.management.commands import document_consumer
 from documents.models import Tag
 from documents.tests.utils import DirectoriesMixin

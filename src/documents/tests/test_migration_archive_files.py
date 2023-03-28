@@ -310,7 +310,7 @@ class TestMigrateArchiveFilesErrors(DirectoriesMixin, TestMigrations):
     def test_parser_missing(self):
         Document = self.apps.get_model("documents", "Document")
 
-        doc1 = make_test_document(
+        make_test_document(
             Document,
             "document",
             "invalid/typesss768",
@@ -318,7 +318,7 @@ class TestMigrateArchiveFilesErrors(DirectoriesMixin, TestMigrations):
             "document.png",
             simple_pdf,
         )
-        doc2 = make_test_document(
+        make_test_document(
             Document,
             "document",
             "invalid/typesss768",
@@ -462,7 +462,7 @@ class TestMigrateArchiveFilesBackwards(
 
         Document = apps.get_model("documents", "Document")
 
-        doc_unrelated = make_test_document(
+        make_test_document(
             Document,
             "unrelated",
             "application/pdf",
@@ -471,14 +471,14 @@ class TestMigrateArchiveFilesBackwards(
             simple_pdf2,
             "unrelated.pdf",
         )
-        doc_no_archive = make_test_document(
+        make_test_document(
             Document,
             "no_archive",
             "text/plain",
             simple_txt,
             "no_archive.txt",
         )
-        clashB = make_test_document(
+        make_test_document(
             Document,
             "clash",
             "image/jpeg",

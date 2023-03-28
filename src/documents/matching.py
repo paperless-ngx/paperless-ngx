@@ -20,10 +20,7 @@ def log_reason(matching_model, document, reason):
 
 
 def match_correspondents(document, classifier):
-    if classifier:
-        pred_id = classifier.predict_correspondent(document.content)
-    else:
-        pred_id = None
+    pred_id = classifier.predict_correspondent(document.content) if classifier else None
 
     correspondents = Correspondent.objects.all()
 
@@ -33,10 +30,7 @@ def match_correspondents(document, classifier):
 
 
 def match_document_types(document, classifier):
-    if classifier:
-        pred_id = classifier.predict_document_type(document.content)
-    else:
-        pred_id = None
+    pred_id = classifier.predict_document_type(document.content) if classifier else None
 
     document_types = DocumentType.objects.all()
 
@@ -46,10 +40,7 @@ def match_document_types(document, classifier):
 
 
 def match_tags(document, classifier):
-    if classifier:
-        predicted_tag_ids = classifier.predict_tags(document.content)
-    else:
-        predicted_tag_ids = []
+    predicted_tag_ids = classifier.predict_tags(document.content) if classifier else []
 
     tags = Tag.objects.all()
 
@@ -59,10 +50,7 @@ def match_tags(document, classifier):
 
 
 def match_storage_paths(document, classifier):
-    if classifier:
-        pred_id = classifier.predict_storage_path(document.content)
-    else:
-        pred_id = None
+    pred_id = classifier.predict_storage_path(document.content) if classifier else None
 
     storage_paths = StoragePath.objects.all()
 
@@ -80,7 +68,7 @@ def matches(matching_model, document):
     document_content = document.content
 
     # Check that match is not empty
-    if matching_model.match.strip() == "":
+    if not matching_model.match.strip():
         return False
 
     if matching_model.is_insensitive:
@@ -132,7 +120,7 @@ def matches(matching_model, document):
             )
         except re.error:
             logger.error(
-                f"Error while processing regular expression " f"{matching_model.match}",
+                f"Error while processing regular expression {matching_model.match}",
             )
             return False
         if match:

@@ -78,6 +78,7 @@ black = "*"
 pre-commit = "*"
 imagehash = "*"
 mkdocs-material = "*"
+ruff = "*"
 
 [typing-dev]
 mypy = "*"

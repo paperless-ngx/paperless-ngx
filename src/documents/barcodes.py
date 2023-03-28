@@ -136,9 +136,8 @@ def convert_from_tiff_to_pdf(filepath: Path) -> Path:
                 filepath,
             ],
         )
-    with filepath.open("rb") as img_file:
-        with newpath.open("wb") as pdf_file:
-            pdf_file.write(img2pdf.convert(img_file))
+    with filepath.open("rb") as img_file, newpath.open("wb") as pdf_file:
+        pdf_file.write(img2pdf.convert(img_file))
     return newpath
 
 

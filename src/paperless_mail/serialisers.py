@@ -38,9 +38,11 @@ class MailAccountSerializer(OwnedObjectSerializer):
         ]
 
     def update(self, instance, validated_data):
-        if "password" in validated_data:
-            if len(validated_data.get("password").replace("*", "")) == 0:
-                validated_data.pop("password")
+        if (
+            "password" in validated_data
+            and len(validated_data.get("password").replace("*", "")) == 0
+        ):
+            validated_data.pop("password")
         super().update(instance, validated_data)
         return instance
 

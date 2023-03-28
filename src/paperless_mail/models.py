@@ -69,7 +69,7 @@ class MailRule(document_models.ModelWithOwner):
 
     class AttachmentProcessing(models.IntegerChoices):
         ATTACHMENTS_ONLY = 1, _("Only process attachments.")
-        EVERYTHING = 2, _("Process all files, including 'inline' " "attachments.")
+        EVERYTHING = 2, _("Process all files, including 'inline' attachments.")
 
     class MailAction(models.IntegerChoices):
         DELETE = 1, _("Delete")

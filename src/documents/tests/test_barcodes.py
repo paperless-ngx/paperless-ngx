@@ -1,7 +1,7 @@
-import os
 import shutil
 from pathlib import Path
 from unittest import mock
+import platform
 
 import pytest
 from django.conf import settings
@@ -11,18 +11,10 @@ from documents import barcodes
 from documents import tasks
 from documents.consumer import ConsumerError
 from documents.data_models import ConsumableDocument
-from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
 from PIL import Image
-
-try:
-    import zxingcpp
-
-    ZXING_AVAILIBLE = True
-except ImportError:
-    ZXING_AVAILIBLE = False
 
 
 @override_settings(CONSUMER_BARCODE_SCANNER="PYZBAR")
@@ -459,7 +451,7 @@ class TestBarcode(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertDictEqual(separator_page_numbers, {})
 
     @override_settings(CONSUMER_BARCODE_STRING="ADAR-NEXTDOC")
-    def test_scan_file_for_separating_qr_barcodes(self):
+    def test_scan_file_qr_barcodes_was_problem(self):
         """
         GIVEN:
             - Input PDF with certain QR codes that aren't detected at current size
@@ -1068,7 +1060,7 @@ class TestAsnBarcode(DirectoriesMixin, TestCase):
 
 
 @pytest.mark.skipif(
-    not ZXING_AVAILIBLE,
+    platform.machine().upper() not in {"AMD64"},
     reason="No zxingcpp",
 )
 @override_settings(CONSUMER_BARCODE_SCANNER="ZXING")
@@ -1077,7 +1069,7 @@ class TestBarcodeZxing(TestBarcode):
 
 
 @pytest.mark.skipif(
-    not ZXING_AVAILIBLE,
+    platform.machine().upper() not in {"AMD64"},
     reason="No zxingcpp",
 )
 @override_settings(CONSUMER_BARCODE_SCANNER="ZXING")

@@ -73,7 +73,7 @@ class Migration(migrations.Migration):
                             (15, "Modified before"),
                             (16, "Modified after"),
                             (17, "Does not have tag"),
-                        ]
+                        ],
                     ),
                 ),
                 ("value", models.CharField(max_length=128)),
