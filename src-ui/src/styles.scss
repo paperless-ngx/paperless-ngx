@@ -436,6 +436,12 @@ textarea,
   height: 12px;
 }
 
+.metadata-icon {
+  width: 0.9rem;
+  height: 0.9rem;
+  padding: 0.05rem;
+}
+
 table.table {
   color: var(--bs-body-color);
 
@@ -622,4 +628,8 @@ code {
 
 .accordion-button::after {
   filter: invert(0.5) saturate(0);
+}
+
+.me-1px {
+  margin-right: 1px !important;
 }

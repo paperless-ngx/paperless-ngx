@@ -26,8 +26,23 @@ export class SelectComponent extends AbstractInputComponent<number> {
     this.addItemRef = this.addItem.bind(this)
   }
 
+  _items: any[]
+
   @Input()
-  items: any[]
+  set items(items) {
+    if (this.value && items.find((i) => i.id === this.value) === undefined) {
+      items.push({
+        id: this.value,
+        name: $localize`Private`,
+        private: true,
+      })
+    }
+    this._items = items
+  }
+
+  get items(): any[] {
+    return this._items
+  }
 
   @Input()
   textColor: any
@@ -59,6 +74,10 @@ export class SelectComponent extends AbstractInputComponent<number> {
 
   get allowCreateNew(): boolean {
     return this.createNew.observers.length > 0
+  }
+
+  get isPrivate(): boolean {
+    return this.items?.find((i) => i.id === this.value)?.private
   }
 
   getSuggestions() {

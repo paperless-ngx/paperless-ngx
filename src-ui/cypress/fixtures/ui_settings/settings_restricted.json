@@ -74,7 +74,7 @@
         "change_task",
         "delete_task",
         "view_task",
-        "add_comment",
+        "add_note",
         "add_frontendsettings",
         "change_frontendsettings",
         "delete_frontendsettings",

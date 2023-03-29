@@ -167,8 +167,13 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
     activeModal.componentInstance.succeeded.subscribe({
       next: () => {
         if (activeModal.componentInstance.error) {
+          const errorDetail = activeModal.componentInstance.error.error
+            ? activeModal.componentInstance.error.error[0]
+            : null
           this.toastService.showInfo(
-            $localize`Error occurred while saving ${this.typeName} : ${activeModal.componentInstance.error}.`
+            $localize`Error occurred while saving ${this.typeName}${
+              errorDetail ? ': ' + errorDetail : ''
+            }.`
           )
         } else {
           this.reloadData()

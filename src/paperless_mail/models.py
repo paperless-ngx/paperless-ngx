@@ -38,6 +38,8 @@ class MailAccount(document_models.ModelWithOwner):
 
     password = models.CharField(_("password"), max_length=256)
 
+    is_token = models.BooleanField(_("Is token authentication"), default=False)
+
     character_set = models.CharField(
         _("character set"),
         max_length=256,

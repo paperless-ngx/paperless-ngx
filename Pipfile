@@ -46,6 +46,7 @@ tika = "*"
 # TODO: This will sadly also install daphne+dependencies,
 #  which an ASGI server we don't need. Adds about 15MB image size.
 channels = "~=3.0"
+channels-redis = "*"
 uvicorn = {extras = ["standard"], version = "*"}
 concurrent-log-handler = "*"
 "pdfminer.six" = "*"
@@ -57,15 +58,12 @@ nltk = "*"
 pdf2image = "*"
 flower = "*"
 bleach = "*"
+zxing-cpp = {version = "*", platform_machine = "== 'x86_64'"}
 #
 # Packages locked due to issues (try to check if these are fixed in a release every so often)
 #
 # Pin this until piwheels is building 1.9 (see https://www.piwheels.org/project/scipy/)
 scipy = "==1.8.1"
-# Locked version until https://github.com/django/channels_redis/issues/332
-# is resolved
-channels-redis = "==3.4.1"
-zxing-cpp = {version = "*", platform_machine = "== 'x86_64'"}
 
 [dev-packages]
 coveralls = "*"

@@ -21,10 +21,10 @@ import {
   FILTER_ADDED_AFTER,
   FILTER_ADDED_BEFORE,
   FILTER_ASN,
-  FILTER_CORRESPONDENT,
+  FILTER_HAS_CORRESPONDENT_ANY,
   FILTER_CREATED_AFTER,
   FILTER_CREATED_BEFORE,
-  FILTER_DOCUMENT_TYPE,
+  FILTER_HAS_DOCUMENT_TYPE_ANY,
   FILTER_FULLTEXT_MORELIKE,
   FILTER_FULLTEXT_QUERY,
   FILTER_HAS_ANY_TAG,
@@ -33,12 +33,22 @@ import {
   FILTER_DOES_NOT_HAVE_TAG,
   FILTER_TITLE,
   FILTER_TITLE_CONTENT,
-  FILTER_STORAGE_PATH,
+  FILTER_HAS_STORAGE_PATH_ANY,
   FILTER_ASN_ISNULL,
   FILTER_ASN_GT,
   FILTER_ASN_LT,
+  FILTER_DOES_NOT_HAVE_CORRESPONDENT,
+  FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE,
+  FILTER_DOES_NOT_HAVE_STORAGE_PATH,
+  FILTER_DOCUMENT_TYPE,
+  FILTER_CORRESPONDENT,
+  FILTER_STORAGE_PATH,
 } from 'src/app/data/filter-rule-type'
-import { FilterableDropdownSelectionModel } from '../../common/filterable-dropdown/filterable-dropdown.component'
+import {
+  FilterableDropdownSelectionModel,
+  Intersection,
+  LogicalOperator,
+} from '../../common/filterable-dropdown/filterable-dropdown.component'
 import { ToggleableItemState } from '../../common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component'
 import {
   DocumentService,
@@ -93,7 +103,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     if (this.filterRules.length == 1) {
       let rule = this.filterRules[0]
       switch (this.filterRules[0].rule_type) {
-        case FILTER_CORRESPONDENT:
+        case FILTER_HAS_CORRESPONDENT_ANY:
           if (rule.value) {
             return $localize`Correspondent: ${
               this.correspondents.find((c) => c.id == +rule.value)?.name
@@ -102,7 +112,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
             return $localize`Without correspondent`
           }
 
-        case FILTER_DOCUMENT_TYPE:
+        case FILTER_HAS_DOCUMENT_TYPE_ANY:
           if (rule.value) {
             return $localize`Type: ${
               this.documentTypes.find((dt) => dt.id == +rule.value)?.name
@@ -335,6 +345,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
           this.dateAddedBefore = rule.value
           break
         case FILTER_HAS_TAGS_ALL:
+          this.tagSelectionModel.logicalOperator = LogicalOperator.And
           this.tagSelectionModel.set(
             rule.value ? +rule.value : null,
             ToggleableItemState.Selected,
@@ -342,7 +353,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
           )
           break
         case FILTER_HAS_TAGS_ANY:
-          this.tagSelectionModel.logicalOperator = 'or'
+          this.tagSelectionModel.logicalOperator = LogicalOperator.Or
           this.tagSelectionModel.set(
             rule.value ? +rule.value : null,
             ToggleableItemState.Selected,
@@ -360,23 +371,56 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
           )
           break
         case FILTER_CORRESPONDENT:
+        case FILTER_HAS_CORRESPONDENT_ANY:
+          this.correspondentSelectionModel.logicalOperator = LogicalOperator.Or
+          this.correspondentSelectionModel.intersection = Intersection.Include
           this.correspondentSelectionModel.set(
             rule.value ? +rule.value : null,
             ToggleableItemState.Selected,
             false
           )
           break
+        case FILTER_DOES_NOT_HAVE_CORRESPONDENT:
+          this.correspondentSelectionModel.intersection = Intersection.Exclude
+          this.correspondentSelectionModel.set(
+            rule.value ? +rule.value : null,
+            ToggleableItemState.Excluded,
+            false
+          )
+          break
         case FILTER_DOCUMENT_TYPE:
+        case FILTER_HAS_DOCUMENT_TYPE_ANY:
+          this.documentTypeSelectionModel.logicalOperator = LogicalOperator.Or
+          this.documentTypeSelectionModel.intersection = Intersection.Include
           this.documentTypeSelectionModel.set(
             rule.value ? +rule.value : null,
             ToggleableItemState.Selected,
             false
           )
           break
+        case FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE:
+          this.documentTypeSelectionModel.intersection = Intersection.Exclude
+          this.documentTypeSelectionModel.set(
+            rule.value ? +rule.value : null,
+            ToggleableItemState.Excluded,
+            false
+          )
+          break
         case FILTER_STORAGE_PATH:
+        case FILTER_HAS_STORAGE_PATH_ANY:
+          this.storagePathSelectionModel.logicalOperator = LogicalOperator.Or
+          this.storagePathSelectionModel.intersection = Intersection.Include
           this.storagePathSelectionModel.set(
             rule.value ? +rule.value : null,
             ToggleableItemState.Selected,
+            false
+          )
+          break
+        case FILTER_DOES_NOT_HAVE_STORAGE_PATH:
+          this.storagePathSelectionModel.intersection = Intersection.Exclude
+          this.storagePathSelectionModel.set(
+            rule.value ? +rule.value : null,
+            ToggleableItemState.Excluded,
             false
           )
           break
@@ -469,7 +513,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
       filterRules.push({ rule_type: FILTER_HAS_ANY_TAG, value: 'false' })
     } else {
       const tagFilterType =
-        this.tagSelectionModel.logicalOperator == 'and'
+        this.tagSelectionModel.logicalOperator == LogicalOperator.And
           ? FILTER_HAS_TAGS_ALL
           : FILTER_HAS_TAGS_ANY
       this.tagSelectionModel
@@ -491,28 +535,66 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
           })
         })
     }
-    this.correspondentSelectionModel
-      .getSelectedItems()
-      .forEach((correspondent) => {
-        filterRules.push({
-          rule_type: FILTER_CORRESPONDENT,
-          value: correspondent.id?.toString(),
+    if (this.correspondentSelectionModel.isNoneSelected()) {
+      filterRules.push({ rule_type: FILTER_CORRESPONDENT, value: null })
+    } else {
+      this.correspondentSelectionModel
+        .getSelectedItems()
+        .forEach((correspondent) => {
+          filterRules.push({
+            rule_type: FILTER_HAS_CORRESPONDENT_ANY,
+            value: correspondent.id?.toString(),
+          })
         })
-      })
-    this.documentTypeSelectionModel
-      .getSelectedItems()
-      .forEach((documentType) => {
-        filterRules.push({
-          rule_type: FILTER_DOCUMENT_TYPE,
-          value: documentType.id?.toString(),
+      this.correspondentSelectionModel
+        .getExcludedItems()
+        .forEach((correspondent) => {
+          filterRules.push({
+            rule_type: FILTER_DOES_NOT_HAVE_CORRESPONDENT,
+            value: correspondent.id?.toString(),
+          })
         })
-      })
-    this.storagePathSelectionModel.getSelectedItems().forEach((storagePath) => {
-      filterRules.push({
-        rule_type: FILTER_STORAGE_PATH,
-        value: storagePath.id?.toString(),
-      })
-    })
+    }
+    if (this.documentTypeSelectionModel.isNoneSelected()) {
+      filterRules.push({ rule_type: FILTER_DOCUMENT_TYPE, value: null })
+    } else {
+      this.documentTypeSelectionModel
+        .getSelectedItems()
+        .forEach((documentType) => {
+          filterRules.push({
+            rule_type: FILTER_HAS_DOCUMENT_TYPE_ANY,
+            value: documentType.id?.toString(),
+          })
+        })
+      this.documentTypeSelectionModel
+        .getExcludedItems()
+        .forEach((documentType) => {
+          filterRules.push({
+            rule_type: FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE,
+            value: documentType.id?.toString(),
+          })
+        })
+    }
+    if (this.storagePathSelectionModel.isNoneSelected()) {
+      filterRules.push({ rule_type: FILTER_STORAGE_PATH, value: null })
+    } else {
+      this.storagePathSelectionModel
+        .getSelectedItems()
+        .forEach((storagePath) => {
+          filterRules.push({
+            rule_type: FILTER_HAS_STORAGE_PATH_ANY,
+            value: storagePath.id?.toString(),
+          })
+        })
+      this.storagePathSelectionModel
+        .getExcludedItems()
+        .forEach((storagePath) => {
+          filterRules.push({
+            rule_type: FILTER_DOES_NOT_HAVE_STORAGE_PATH,
+            value: storagePath.id?.toString(),
+          })
+        })
+    }
     if (this.dateCreatedBefore) {
       filterRules.push({
         rule_type: FILTER_CREATED_BEFORE,

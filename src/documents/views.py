@@ -20,7 +20,9 @@ from django.db.models import Case
 from django.db.models import Count
 from django.db.models import IntegerField
 from django.db.models import Max
+from django.db.models import Sum
 from django.db.models import When
+from django.db.models.functions import Length
 from django.db.models.functions import Lower
 from django.http import Http404
 from django.http import HttpResponse
@@ -72,10 +74,10 @@ from .matching import match_correspondents
 from .matching import match_document_types
 from .matching import match_storage_paths
 from .matching import match_tags
-from .models import Comment
 from .models import Correspondent
 from .models import Document
 from .models import DocumentType
+from .models import Note
 from .models import PaperlessTask
 from .models import SavedView
 from .models import StoragePath
@@ -186,6 +188,7 @@ class TagViewSet(ModelViewSet, PassUserMixin):
     )
 
     def get_serializer_class(self, *args, **kwargs):
+        print(self.request.version)
         if int(self.request.version) == 1:
             return TagSerializerVersion1
         else:
@@ -230,7 +233,7 @@ class DocumentViewSet(
     GenericViewSet,
 ):
     model = Document
-    queryset = Document.objects.all()
+    queryset = Document.objects.annotate(num_notes=Count("notes"))
     serializer_class = DocumentSerializer
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
@@ -251,10 +254,11 @@ class DocumentViewSet(
         "modified",
         "added",
         "archive_serial_number",
+        "num_notes",
     )
 
     def get_queryset(self):
-        return Document.objects.distinct()
+        return Document.objects.distinct().annotate(num_notes=Count("notes"))
 
     def get_serializer(self, *args, **kwargs):
         super().get_serializer(*args, **kwargs)
@@ -441,11 +445,11 @@ class DocumentViewSet(
         except (FileNotFoundError, Document.DoesNotExist):
             raise Http404()
 
-    def getComments(self, doc):
+    def getNotes(self, doc):
         return [
             {
                 "id": c.id,
-                "comment": c.comment,
+                "note": c.note,
                 "created": c.created,
                 "user": {
                     "id": c.user.id,
@@ -454,11 +458,11 @@ class DocumentViewSet(
                     "last_name": c.user.last_name,
                 },
             }
-            for c in Comment.objects.filter(document=doc).order_by("-created")
+            for c in Note.objects.filter(document=doc).order_by("-created")
         ]
 
     @action(methods=["get", "post", "delete"], detail=True)
-    def comments(self, request, pk=None):
+    def notes(self, request, pk=None):
         try:
             doc = Document.objects.get(pk=pk)
         except Document.DoesNotExist:
@@ -468,17 +472,17 @@ class DocumentViewSet(
 
         if request.method == "GET":
             try:
-                return Response(self.getComments(doc))
+                return Response(self.getNotes(doc))
             except Exception as e:
-                logger.warning(f"An error occurred retrieving comments: {str(e)}")
+                logger.warning(f"An error occurred retrieving notes: {str(e)}")
                 return Response(
-                    {"error": "Error retreiving comments, check logs for more detail."},
+                    {"error": "Error retreiving notes, check logs for more detail."},
                 )
         elif request.method == "POST":
             try:
-                c = Comment.objects.create(
+                c = Note.objects.create(
                     document=doc,
-                    comment=request.data["comment"],
+                    note=request.data["note"],
                     user=currentUser,
                 )
                 c.save()
@@ -487,23 +491,23 @@ class DocumentViewSet(
 
                 index.add_or_update_document(self.get_object())
 
-                return Response(self.getComments(doc))
+                return Response(self.getNotes(doc))
             except Exception as e:
-                logger.warning(f"An error occurred saving comment: {str(e)}")
+                logger.warning(f"An error occurred saving note: {str(e)}")
                 return Response(
                     {
-                        "error": "Error saving comment, check logs for more detail.",
+                        "error": "Error saving note, check logs for more detail.",
                     },
                 )
         elif request.method == "DELETE":
-            comment = Comment.objects.get(id=int(request.GET.get("id")))
-            comment.delete()
+            note = Note.objects.get(id=int(request.GET.get("id")))
+            note.delete()
 
             from documents import index
 
             index.add_or_update_document(self.get_object())
 
-            return Response(self.getComments(doc))
+            return Response(self.getNotes(doc))
 
         return Response(
             {
@@ -515,14 +519,14 @@ class DocumentViewSet(
 class SearchResultSerializer(DocumentSerializer, PassUserMixin):
     def to_representation(self, instance):
         doc = Document.objects.get(id=instance["id"])
-        comments = ",".join(
-            [str(c.comment) for c in Comment.objects.filter(document=instance["id"])],
+        notes = ",".join(
+            [str(c.note) for c in Note.objects.filter(document=instance["id"])],
         )
         r = super().to_representation(doc)
         r["__search_hit__"] = {
             "score": instance.score,
             "highlights": instance.highlights("content", text=doc.content),
-            "comment_highlights": instance.highlights("comments", text=comments)
+            "note_highlights": instance.highlights("notes", text=notes)
             if doc
             else None,
             "rank": instance.rank,
@@ -794,17 +798,38 @@ class StatisticsView(APIView):
 
     def get(self, request, format=None):
         documents_total = Document.objects.all().count()
-        if Tag.objects.filter(is_inbox_tag=True).exists():
-            documents_inbox = (
-                Document.objects.filter(tags__is_inbox_tag=True).distinct().count()
+
+        inbox_tag = Tag.objects.filter(is_inbox_tag=True)
+
+        documents_inbox = (
+            Document.objects.filter(tags__is_inbox_tag=True).distinct().count()
+            if inbox_tag.exists()
+            else None
+        )
+
+        document_file_type_counts = (
+            Document.objects.values("mime_type")
+            .annotate(mime_type_count=Count("mime_type"))
+            .order_by("-mime_type_count")
+            if documents_total > 0
+            else 0
+        )
+
+        character_count = (
+            Document.objects.annotate(
+                characters=Length("content"),
             )
-        else:
-            documents_inbox = None
+            .aggregate(Sum("characters"))
+            .get("characters__sum")
+        )
 
         return Response(
             {
                 "documents_total": documents_total,
                 "documents_inbox": documents_inbox,
+                "inbox_tag": inbox_tag.first().pk if inbox_tag.exists() else None,
+                "document_file_type_counts": document_file_type_counts,
+                "character_count": character_count,
             },
         )
 
