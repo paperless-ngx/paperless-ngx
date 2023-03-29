@@ -358,7 +358,7 @@ TEMPLATES = [
 
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "BACKEND": "channels_redis.pubsub.RedisPubSubChannelLayer",
         "CONFIG": {
             "hosts": [_CHANNELS_REDIS_URL],
             "capacity": 2000,  # default 100
@@ -509,7 +509,12 @@ if os.getenv("PAPERLESS_DBHOST"):
 
     else:  # Default to PostgresDB
         engine = "django.db.backends.postgresql_psycopg2"
-        options = {"sslmode": os.getenv("PAPERLESS_DBSSLMODE", "prefer")}
+        options = {
+            "sslmode": os.getenv("PAPERLESS_DBSSLMODE", "prefer"),
+            "sslrootcert": os.getenv("PAPERLESS_DBSSLROOTCERT", None),
+            "sslcert": os.getenv("PAPERLESS_DBSSLCERT", None),
+            "sslkey": os.getenv("PAPERLESS_DBSSLKEY", None),
+        }
 
     DATABASES["default"]["ENGINE"] = engine
     DATABASES["default"]["OPTIONS"].update(options)
@@ -606,11 +611,20 @@ LOGGING = {
             "maxBytes": LOGROTATE_MAX_SIZE,
             "backupCount": LOGROTATE_MAX_BACKUPS,
         },
+        "file_celery": {
+            "class": "concurrent_log_handler.ConcurrentRotatingFileHandler",
+            "formatter": "verbose",
+            "filename": os.path.join(LOGGING_DIR, "celery.log"),
+            "maxBytes": LOGROTATE_MAX_SIZE,
+            "backupCount": LOGROTATE_MAX_BACKUPS,
+        },
     },
     "root": {"handlers": ["console"]},
     "loggers": {
         "paperless": {"handlers": ["file_paperless"], "level": "DEBUG"},
         "paperless_mail": {"handlers": ["file_mail"], "level": "DEBUG"},
+        "celery": {"handlers": ["file_celery"], "level": "DEBUG"},
+        "kombu": {"handlers": ["file_celery"], "level": "DEBUG"},
     },
 }
 

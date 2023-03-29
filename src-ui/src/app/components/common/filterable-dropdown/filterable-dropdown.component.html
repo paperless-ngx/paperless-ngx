@@ -1,21 +1,29 @@
 <div class="btn-group w-100" ngbDropdown role="group" (openChange)="dropdownOpenChange($event)" #dropdown="ngbDropdown">
-  <button class="btn btn-sm" id="dropdown{{title}}" ngbDropdownToggle [ngClass]="!editing && selectionModel.selectionSize() > 0 ? 'btn-primary' : 'btn-outline-primary'" [disabled]="disabled">
+  <button class="btn btn-sm" id="dropdown_{{name}}" ngbDropdownToggle [ngClass]="!editing && selectionModel.selectionSize() > 0 ? 'btn-primary' : 'btn-outline-primary'" [disabled]="disabled">
     <svg class="toolbaricon" fill="currentColor">
       <use attr.xlink:href="assets/bootstrap-icons.svg#{{icon}}" />
     </svg>
     <div class="d-none d-sm-inline">&nbsp;{{title}}</div>
     <ng-container *ngIf="!editing && selectionModel.totalCount > 0">
-      <app-clearable-badge [number]="multiple ? selectionModel.totalCount : undefined" [selected]="!multiple && selectionModel.selectionSize() > 0" (cleared)="reset()"></app-clearable-badge>
+      <app-clearable-badge [number]="selectionModel.totalCount" [selected]="selectionModel.selectionSize() > 0" (cleared)="reset()"></app-clearable-badge>
     </ng-container>
   </button>
-  <div class="dropdown-menu py-0 shadow" ngbDropdownMenu attr.aria-labelledby="dropdown{{title}}">
+  <div class="dropdown-menu py-0 shadow" ngbDropdownMenu attr.aria-labelledby="dropdown_{{name}}">
     <div class="list-group list-group-flush">
-      <div *ngIf="!editing && multiple" class="list-group-item d-flex">
-        <div class="btn-group btn-group-xs flex-fill">
-          <input [(ngModel)]="selectionModel.logicalOperator" [disabled]="!operatorToggleEnabled" (ngModelChange)="selectionModel.toggleOperator()" type="radio" class="btn-check" id="logicalOperatorAnd" value="and">
-          <label class="btn btn-outline-primary" for="logicalOperatorAnd" i18n>All</label>
-          <input [(ngModel)]="selectionModel.logicalOperator" [disabled]="!operatorToggleEnabled" (ngModelChange)="selectionModel.toggleOperator()" type="radio" class="btn-check" id="logicalOperatorOr" value="or">
-          <label class="btn btn-outline-primary" for="logicalOperatorOr" i18n>Any</label>
+      <div *ngIf="!editing && manyToOne" class="list-group-item d-flex">
+        <div class="btn-group btn-group-xs flex-fill" role="group">
+          <input [(ngModel)]="selectionModel.logicalOperator" [disabled]="!modifierToggleEnabled" (ngModelChange)="selectionModel.toggleOperator()" type="radio" class="btn-check" id="logicalOperatorAnd_{{name}}" name="logicalOperatorAnd_{{name}}" value="and">
+          <label class="btn btn-outline-primary" for="logicalOperatorAnd_{{name}}" i18n>All</label>
+          <input [(ngModel)]="selectionModel.logicalOperator" [disabled]="!modifierToggleEnabled" (ngModelChange)="selectionModel.toggleOperator()" type="radio" class="btn-check" id="logicalOperatorOr_{{name}}" name="logicalOperatorOr_{{name}}" value="or">
+          <label class="btn btn-outline-primary" for="logicalOperatorOr_{{name}}" i18n>Any</label>
+        </div>
+      </div>
+      <div *ngIf="!editing && !manyToOne" class="list-group-item d-flex">
+        <div class="btn-group btn-group-xs flex-fill" role="group">
+          <input [(ngModel)]="selectionModel.intersection" [disabled]="!modifierToggleEnabled" (ngModelChange)="selectionModel.toggleIntersection()" type="radio" class="btn-check" id="intersectionInclude_{{name}}" name="intersectionInclude_{{name}}" value="include">
+          <label class="btn btn-outline-primary" for="intersectionInclude_{{name}}" i18n>Include</label>
+          <input [(ngModel)]="selectionModel.intersection" [disabled]="!modifierToggleEnabled" (ngModelChange)="selectionModel.toggleIntersection()" type="radio" class="btn-check" id="intersectionExclude_{{name}}" name="intersectionExclude_{{name}}" value="exclude">
+          <label class="btn btn-outline-primary" for="intersectionExclude_{{name}}" i18n>Exclude</label>
         </div>
       </div>
       <div class="list-group-item">
@@ -34,7 +42,7 @@
           <use xlink:href="assets/bootstrap-icons.svg#arrow-right" />
         </svg>
       </button>
-      <div *ngIf="!editing && multiple" class="list-group-item list-group-item-note pt-1 pb-2">
+      <div *ngIf="!editing && manyToOne" class="list-group-item list-group-item-note pt-1 pb-2">
         <small i18n>Click again to exclude items.</small>
       </div>
     </div>

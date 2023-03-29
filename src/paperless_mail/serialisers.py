@@ -34,6 +34,7 @@ class MailAccountSerializer(OwnedObjectSerializer):
             "username",
             "password",
             "character_set",
+            "is_token",
         ]
 
     def update(self, instance, validated_data):

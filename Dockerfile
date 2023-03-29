@@ -29,7 +29,7 @@ COPY Pipfile* ./
 
 RUN set -eux \
   && echo "Installing pipenv" \
-    && python3 -m pip install --no-cache-dir --upgrade pipenv==2022.11.30 \
+    && python3 -m pip install --no-cache-dir --upgrade pipenv==2023.3.20 \
   && echo "Generating requirement.txt" \
     && pipenv requirements > requirements.txt
 
@@ -46,15 +46,6 @@ LABEL org.opencontainers.image.url="https://github.com/paperless-ngx/paperless-n
 LABEL org.opencontainers.image.licenses="GPL-3.0-only"
 
 ARG DEBIAN_FRONTEND=noninteractive
-# Buildx provided, must be defined to use though
-ARG TARGETARCH
-ARG TARGETVARIANT
-
-# Workflow provided
-ARG JBIG2ENC_VERSION
-ARG QPDF_VERSION
-ARG PIKEPDF_VERSION
-ARG PSYCOPG2_VERSION
 
 #
 # Begin installation and configuration
@@ -175,12 +166,22 @@ RUN set -eux \
     && chmod +x install_management_commands.sh \
     && ./install_management_commands.sh
 
+# Buildx provided, must be defined to use though
+ARG TARGETARCH
+ARG TARGETVARIANT
+
+# Workflow provided, defaults set for manual building
+ARG JBIG2ENC_VERSION=0.29
+ARG QPDF_VERSION=11.3.0
+ARG PIKEPDF_VERSION=7.1.1
+ARG PSYCOPG2_VERSION=2.9.5
+
 # Install the built packages from the installer library images
 # These change sometimes
 RUN set -eux \
   && echo "Getting binaries" \
     && mkdir paperless-ngx \
-    && curl --fail --silent --show-error --output paperless-ngx.tar.gz --location https://github.com/paperless-ngx/paperless-ngx/archive/40895f1cdb7702d8cd4b9c3b1d1d7a886018ccd2.tar.gz \
+    && curl --fail --silent --show-error --output paperless-ngx.tar.gz --location https://github.com/paperless-ngx/paperless-ngx/archive/ba28a1e16c27d121b644b4f6bdb78855a2850561.tar.gz \
     && tar -xf paperless-ngx.tar.gz --directory paperless-ngx --strip-components=1 \
     && cd paperless-ngx \
     # Setting a specific revision ensures we know what this installed

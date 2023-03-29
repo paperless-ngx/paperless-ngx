@@ -66,6 +66,17 @@ const routes: Routes = [
         },
       },
       {
+        path: 'documents/:id/:section',
+        component: DocumentDetailComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.Document,
+          },
+        },
+      },
+      {
         path: 'asn/:id',
         component: DocumentAsnComponent,
         canActivate: [PermissionsGuard],
@@ -144,17 +155,6 @@ const routes: Routes = [
         },
       },
       {
-        path: 'tasks',
-        component: TasksComponent,
-        canActivate: [PermissionsGuard],
-        data: {
-          requiredPermission: {
-            action: PermissionAction.View,
-            type: PermissionType.PaperlessTask,
-          },
-        },
-      },
-      {
         path: 'settings/:section',
         component: SettingsComponent,
         canDeactivate: [DirtyFormGuard],
@@ -170,6 +170,17 @@ const routes: Routes = [
         path: 'settings/:section',
         component: SettingsComponent,
         canDeactivate: [DirtyFormGuard],
+      },
+      {
+        path: 'tasks',
+        component: TasksComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.PaperlessTask,
+          },
+        },
       },
       { path: 'tasks', component: TasksComponent },
     ],

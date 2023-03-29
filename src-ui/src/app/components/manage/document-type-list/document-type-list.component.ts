@@ -1,6 +1,6 @@
 import { Component } from '@angular/core'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
-import { FILTER_DOCUMENT_TYPE } from 'src/app/data/filter-rule-type'
+import { FILTER_HAS_DOCUMENT_TYPE_ANY } from 'src/app/data/filter-rule-type'
 import { PaperlessDocumentType } from 'src/app/data/paperless-document-type'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import {
@@ -32,7 +32,7 @@ export class DocumentTypeListComponent extends ManagementListComponent<Paperless
       toastService,
       documentListViewService,
       permissionsService,
-      FILTER_DOCUMENT_TYPE,
+      FILTER_HAS_DOCUMENT_TYPE_ANY,
       $localize`document type`,
       $localize`document types`,
       PermissionType.DocumentType,

@@ -5,7 +5,7 @@
 .doc-img {
   object-fit: cover;
   object-position: top left;
-  height: 175px;
+  height: 180px;
   mix-blend-mode: multiply;
 }
 
@@ -34,6 +34,12 @@
   display: block;
 }
 
+.document-card-notes {
+  position: absolute;
+  right: 0;
+  top: 142px;
+}
+
 .card-selected {
   border-color:var(--bs-primary);
 
@@ -57,12 +63,6 @@
       background-color: transparent !important;
       color: var(--bs-primary);
     }
-  }
-
-  .metadata-icon {
-    width: 0.9rem;
-    height: 0.9rem;
-    padding: 0.05rem;
   }
 }
 

@@ -4,6 +4,7 @@ from guardian.admin import GuardedModelAdmin
 from .models import Correspondent
 from .models import Document
 from .models import DocumentType
+from .models import Note
 from .models import PaperlessTask
 from .models import SavedView
 from .models import SavedViewFilterRule
@@ -131,6 +132,13 @@ class TaskAdmin(admin.ModelAdmin):
     )
 
 
+class NotesAdmin(GuardedModelAdmin):
+
+    list_display = ("user", "created", "note", "document")
+    list_filter = ("created", "user")
+    list_display_links = ("created",)
+
+
 admin.site.register(Correspondent, CorrespondentAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(DocumentType, DocumentTypeAdmin)
@@ -138,3 +146,4 @@ admin.site.register(Document, DocumentAdmin)
 admin.site.register(SavedView, SavedViewAdmin)
 admin.site.register(StoragePath, StoragePathAdmin)
 admin.site.register(PaperlessTask, TaskAdmin)
+admin.site.register(Note, NotesAdmin)

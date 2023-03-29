@@ -59,7 +59,7 @@ export class PermissionsSelectComponent
     this.updateDisabledStates()
   }
 
-  inheritedWarning: string = $localize`Inerhited from group`
+  inheritedWarning: string = $localize`Inherited from group`
 
   constructor(private readonly permissionsService: PermissionsService) {
     for (const type in PermissionType) {
