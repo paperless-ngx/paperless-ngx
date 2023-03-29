@@ -58,6 +58,7 @@ nltk = "*"
 pdf2image = "*"
 flower = "*"
 bleach = "*"
+zxing-cpp = {version = "*", platform_machine = "== 'x86_64'"}
 #
 # Packages locked due to issues (try to check if these are fixed in a release every so often)
 #
