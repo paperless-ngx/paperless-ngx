@@ -5,10 +5,12 @@ import tempfile
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
+from subprocess import run
 from typing import Dict
 from typing import List
 from typing import Optional
 
+import img2pdf
 import magic
 from django.conf import settings
 from pdf2image import convert_from_path
@@ -16,8 +18,6 @@ from pdf2image.exceptions import PDFPageCountError
 from pikepdf import Page
 from pikepdf import Pdf
 from PIL import Image
-from PIL import ImageSequence
-from pyzbar import pyzbar
 
 logger = logging.getLogger("paperless.barcodes")
 
@@ -83,18 +83,35 @@ def barcode_reader(image: Image) -> List[str]:
     Returns a list containing all found barcodes
     """
     barcodes = []
-    # Decode the barcode image
-    detected_barcodes = pyzbar.decode(image)
 
-    if detected_barcodes:
-        # Traverse through all the detected barcodes in image
+    if settings.CONSUMER_BARCODE_SCANNER == "PYZBAR":
+        logger.debug("Scanning for barcodes using PYZBAR")
+        from pyzbar import pyzbar
+
+        # Decode the barcode image
+        detected_barcodes = pyzbar.decode(image)
+
+        if detected_barcodes:
+            # Traverse through all the detected barcodes in image
+            for barcode in detected_barcodes:
+                if barcode.data:
+                    decoded_barcode = barcode.data.decode("utf-8")
+                    barcodes.append(decoded_barcode)
+                    logger.debug(
+                        f"Barcode of type {str(barcode.type)} found: {decoded_barcode}",
+                    )
+    elif settings.CONSUMER_BARCODE_SCANNER == "ZXING":
+        logger.debug("Scanning for barcodes using ZXING")
+        import zxingcpp
+
+        detected_barcodes = zxingcpp.read_barcodes(image)
         for barcode in detected_barcodes:
-            if barcode.data:
-                decoded_barcode = barcode.data.decode("utf-8")
-                barcodes.append(decoded_barcode)
+            if barcode.text:
+                barcodes.append(barcode.text)
                 logger.debug(
-                    f"Barcode of type {str(barcode.type)} found: {decoded_barcode}",
+                    f"Barcode of type {str(barcode.format)} found: {barcode.text}",
                 )
+
     return barcodes
 
 
@@ -125,21 +142,21 @@ def convert_from_tiff_to_pdf(filepath: Path) -> Path:
             f"Cannot convert mime type {mime_type} from {filepath} to pdf.",
         )
         return None
-    with Image.open(filepath) as image:
-        images = []
-        for i, page in enumerate(ImageSequence.Iterator(image)):
-            page = page.convert("RGB")
-            images.append(page)
-        try:
-            if len(images) == 1:
-                images[0].save(newpath)
-            else:
-                images[0].save(newpath, save_all=True, append_images=images[1:])
-        except OSError as e:  # pragma: no cover
-            logger.warning(
-                f"Could not save the file as pdf. Error: {str(e)}",
-            )
-            return None
+    with Image.open(filepath) as im:
+        has_alpha_layer = im.mode in ("RGBA", "LA")
+    if has_alpha_layer:
+        run(
+            [
+                settings.CONVERT_BINARY,
+                "-alpha",
+                "off",
+                filepath,
+                filepath,
+            ],
+        )
+    with filepath.open("rb") as img_file:
+        with newpath.open("wb") as pdf_file:
+            pdf_file.write(img2pdf.convert(img_file))
     return newpath
 
 

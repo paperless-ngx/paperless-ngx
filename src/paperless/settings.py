@@ -732,6 +732,12 @@ CONSUMER_BARCODE_STRING: Final[str] = os.getenv(
     "PATCHT",
 )
 
+consumer_barcode_scanner_tmp: Final[str] = os.getenv(
+    "PAPERLESS_CONSUMER_BARCODE_SCANNER",
+    "PYZBAR",
+)
+CONSUMER_BARCODE_SCANNER = consumer_barcode_scanner_tmp.upper()
+
 CONSUMER_ENABLE_ASN_BARCODE: Final[bool] = __get_boolean(
     "PAPERLESS_CONSUMER_ENABLE_ASN_BARCODE",
 )

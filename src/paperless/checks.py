@@ -166,4 +166,17 @@ def settings_values_check(app_configs, **kwargs):
             )
         return msgs
 
-    return _ocrmypdf_settings_check() + _timezone_validate()
+    def _barcode_scanner_validate():
+        """
+        Validates the barcode scanner type
+        """
+        msgs = []
+        if settings.CONSUMER_BARCODE_SCANNER not in ["PYZBAR", "ZXING"]:
+            msgs.append(
+                Error(f'Invalid Barcode Scanner "{settings.CONSUMER_BARCODE_SCANNER}"'),
+            )
+        return msgs
+
+    return (
+        _ocrmypdf_settings_check() + _timezone_validate() + _barcode_scanner_validate()
+    )
