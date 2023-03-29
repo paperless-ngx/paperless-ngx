@@ -123,48 +123,56 @@
       <th></th>
       <th class="d-none d-lg-table-cell"
         appSortable="archive_serial_number"
+        title="Sort by ASN" i18n-title
         [currentSortField]="list.sortField"
         [currentSortReverse]="list.sortReverse"
         (sort)="onSort($event)"
         i18n>ASN</th>
       <th class="d-none d-md-table-cell"
         appSortable="correspondent__name"
+        title="Sort by correspondent" i18n-title
         [currentSortField]="list.sortField"
         [currentSortReverse]="list.sortReverse"
         (sort)="onSort($event)"
         i18n>Correspondent</th>
       <th
         appSortable="title"
+        title="Sort by title" i18n-title
         [currentSortField]="list.sortField"
         [currentSortReverse]="list.sortReverse"
         (sort)="onSort($event)"
         i18n>Title</th>
       <th *ngIf="notesEnabled" class="d-none d-xl-table-cell"
         appSortable="num_notes"
+        title="Sort by notes" i18n-title
         [currentSortField]="list.sortField"
         [currentSortReverse]="list.sortReverse"
         (sort)="onSort($event)"
         i18n>Notes</th>
       <th class="d-none d-xl-table-cell"
         appSortable="document_type__name"
+        title="Sort by document type" i18n-title
         [currentSortField]="list.sortField"
         [currentSortReverse]="list.sortReverse"
         (sort)="onSort($event)"
         i18n>Document type</th>
       <th class="d-none d-xl-table-cell"
         appSortable="storage_path__name"
+        title="Sort by storage path" i18n-title
         [currentSortField]="list.sortField"
         [currentSortReverse]="list.sortReverse"
         (sort)="onSort($event)"
         i18n>Storage path</th>
       <th
         appSortable="created"
+        title="Sort by created date" i18n-title
         [currentSortField]="list.sortField"
         [currentSortReverse]="list.sortReverse"
         (sort)="onSort($event)"
         i18n>Created</th>
       <th class="d-none d-xl-table-cell"
         appSortable="added"
+        title="Sort by added date" i18n-title
         [currentSortField]="list.sortField"
         [currentSortReverse]="list.sortReverse"
         (sort)="onSort($event)"
