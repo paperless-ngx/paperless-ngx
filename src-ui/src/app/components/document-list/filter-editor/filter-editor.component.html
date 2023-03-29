@@ -27,7 +27,7 @@
           <app-filterable-dropdown class="flex-fill" title="Tags" icon="tag-fill" i18n-title
             filterPlaceholder="Filter tags" i18n-filterPlaceholder
             [items]="tags"
-            [multiple]="true"
+            [manyToOne]="true"
             [(selectionModel)]="tagSelectionModel"
             (selectionModelChange)="updateRules()"
             (opened)="onTagsDropdownOpen()"

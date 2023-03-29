@@ -447,6 +447,12 @@ class SavedViewFilterRule(models.Model):
         (23, _("ASN greater than")),
         (24, _("ASN less than")),
         (25, _("storage path is")),
+        (26, _("has correspondent in")),
+        (27, _("does not have correspondent in")),
+        (28, _("has document type in")),
+        (29, _("does not have document type in")),
+        (30, _("has storage path in")),
+        (31, _("does not have storage path in")),
     ]
 
     saved_view = models.ForeignKey(
@@ -629,11 +635,11 @@ class PaperlessTask(models.Model):
     )
 
 
-class Comment(models.Model):
-    comment = models.TextField(
+class Note(models.Model):
+    note = models.TextField(
         _("content"),
         blank=True,
-        help_text=_("Comment for the document"),
+        help_text=_("Note for the document"),
     )
 
     created = models.DateTimeField(
@@ -646,7 +652,7 @@ class Comment(models.Model):
         Document,
         blank=True,
         null=True,
-        related_name="documents",
+        related_name="notes",
         on_delete=models.CASCADE,
         verbose_name=_("document"),
     )
@@ -655,15 +661,15 @@ class Comment(models.Model):
         User,
         blank=True,
         null=True,
-        related_name="users",
+        related_name="notes",
         on_delete=models.SET_NULL,
         verbose_name=_("user"),
     )
 
     class Meta:
         ordering = ("created",)
-        verbose_name = _("comment")
-        verbose_name_plural = _("comments")
+        verbose_name = _("note")
+        verbose_name_plural = _("notes")
 
     def __str__(self):
-        return self.content
+        return self.note

@@ -86,6 +86,36 @@ changed here.
 
     Default is `prefer`.
 
+`PAPERLESS_DBSSLROOTCERT=<ca-path>`
+
+: SSL root certificate path
+
+    See [the official documentation about
+    sslmode](https://www.postgresql.org/docs/current/libpq-ssl.html).
+    Changes path of `root.crt`.
+
+    Defaults to unset, using the documented path in the home directory.
+
+`PAPERLESS_DBSSLCERT=<client-cert-path>`
+
+: SSL client certificate path
+
+    See [the official documentation about
+    sslmode](https://www.postgresql.org/docs/current/libpq-ssl.html).
+    Changes path of `postgresql.crt`.
+
+    Defaults to unset, using the documented path in the home directory.
+
+`PAPERLESS_DBSSLKEY=<client-cert-key>`
+
+: SSL client key path
+
+    See [the official documentation about
+    sslmode](https://www.postgresql.org/docs/current/libpq-ssl.html).
+    Changes path of `postgresql.key`.
+
+    Defaults to unset, using the documented path in the home directory.
+
 `PAPERLESS_DB_TIMEOUT=<float>`
 
 : Amount of time for a database connection to wait for the database to

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
-import { FILTER_STORAGE_PATH } from 'src/app/data/filter-rule-type'
+import { FILTER_HAS_STORAGE_PATH_ANY } from 'src/app/data/filter-rule-type'
 import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import {
@@ -32,7 +32,7 @@ export class StoragePathListComponent extends ManagementListComponent<PaperlessS
       toastService,
       documentListViewService,
       permissionsService,
-      FILTER_STORAGE_PATH,
+      FILTER_HAS_STORAGE_PATH_ANY,
       $localize`storage path`,
       $localize`storage paths`,
       PermissionType.StoragePath,

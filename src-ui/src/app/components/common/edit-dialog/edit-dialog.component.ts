@@ -20,7 +20,7 @@ export abstract class EditDialogComponent<
 > implements OnInit
 {
   constructor(
-    private service: AbstractPaperlessService<T>,
+    protected service: AbstractPaperlessService<T>,
     private activeModal: NgbActiveModal,
     private userService: UserService
   ) {}

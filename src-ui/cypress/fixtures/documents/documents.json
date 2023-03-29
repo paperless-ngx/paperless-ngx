@@ -21,7 +21,27 @@
             "original_file_name": "2022-03-22 no latin title.pdf",
             "archived_file_name": "2022-03-22 no latin title.pdf",
             "owner": null,
-            "permissions": []
+            "permissions": [],
+            "notes": [
+                {
+                    "id": 9,
+                    "note": "Testing one more time",
+                    "created": "2022-02-18T04:24:55.176008Z",
+                    "user": 15
+                },
+                {
+                    "id": 8,
+                    "note": "Another note",
+                    "created": "2021-11-08T04:24:47.925042Z",
+                    "user": 3
+                },
+                {
+                    "id": 7,
+                    "note": "Cupcake ipsum dolor sit amet cheesecake candy cookie tiramisu. Donut chocolate chupa chups macaroon brownie halvah pie cheesecake gummies. Sweet chocolate bar candy donut gummi bears bear claw liquorice bonbon shortbread.\n\nDonut chocolate bar candy wafer wafer tiramisu. Gummies chocolate cake muffin toffee carrot cake macaroon. Toffee toffee jelly beans danish lollipop cake.",
+                    "created": "2021-02-08T02:37:49.724132Z",
+                    "user": 3
+                }
+            ]
         },
         {
             "id": 2,
@@ -39,11 +59,12 @@
             "original_file_name": "2022-03-23 lorem ipsum dolor sit amet.pdf",
             "archived_file_name": "2022-03-23 llorem ipsum dolor sit amet.pdf",
             "owner": null,
-            "permissions": []
+            "permissions": [],
+            "notes": []
         },
         {
             "id": 3,
-            "correspondent": null,
+            "correspondent": 14,
             "document_type": 1,
             "storage_path": null,
             "title": "dolor",
@@ -59,12 +80,13 @@
             "original_file_name": "2022-03-24 dolor.pdf",
             "archived_file_name": "2022-03-24 dolor.pdf",
             "owner": null,
-            "permissions": []
+            "permissions": [],
+            "notes": []
         },
         {
             "id": 4,
             "correspondent": 9,
-            "document_type": 1,
+            "document_type": 2,
             "storage_path": null,
             "title": "sit amet",
             "content": "Test document PDF",
@@ -79,7 +101,8 @@
             "original_file_name": "2022-06-01 sit amet.pdf",
             "archived_file_name": "2022-06-01 sit amet.pdf",
             "owner": null,
-            "permissions": []
+            "permissions": [],
+            "notes": []
         }
     ]
 }

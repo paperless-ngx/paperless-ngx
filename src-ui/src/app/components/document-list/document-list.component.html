@@ -14,19 +14,19 @@
     </div>
   </div>
   <div class="btn-group flex-fill" role="group">
-    <input type="radio" class="btn-check" [(ngModel)]="displayMode" value="details" (ngModelChange)="saveDisplayMode()" id="displayModeDetails">
+    <input type="radio" class="btn-check" [(ngModel)]="displayMode" value="details" (ngModelChange)="saveDisplayMode()" id="displayModeDetails" name="displayModeDetails">
     <label for="displayModeDetails" class="btn btn-outline-primary btn-sm">
       <svg class="toolbaricon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#list-ul" />
       </svg>
     </label>
-    <input type="radio" class="btn-check" [(ngModel)]="displayMode" value="smallCards" (ngModelChange)="saveDisplayMode()" id="displayModeSmall">
+    <input type="radio" class="btn-check" [(ngModel)]="displayMode" value="smallCards" (ngModelChange)="saveDisplayMode()" id="displayModeSmall" name="displayModeSmall">
     <label for="displayModeSmall" class="btn btn-outline-primary btn-sm">
       <svg class="toolbaricon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#grid" />
       </svg>
     </label>
-    <input type="radio" class="btn-check" [(ngModel)]="displayMode" value="largeCards" (ngModelChange)="saveDisplayMode()" id="displayModeLarge">
+    <input type="radio" class="btn-check" [(ngModel)]="displayMode" value="largeCards" (ngModelChange)="saveDisplayMode()" id="displayModeLarge" name="displayModeLarge">
     <label for="displayModeLarge" class="btn btn-outline-primary btn-sm">
       <svg class="toolbaricon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#hdd-stack" />
@@ -123,42 +123,56 @@
       <th></th>
       <th class="d-none d-lg-table-cell"
         appSortable="archive_serial_number"
+        title="Sort by ASN" i18n-title
         [currentSortField]="list.sortField"
         [currentSortReverse]="list.sortReverse"
         (sort)="onSort($event)"
         i18n>ASN</th>
       <th class="d-none d-md-table-cell"
         appSortable="correspondent__name"
+        title="Sort by correspondent" i18n-title
         [currentSortField]="list.sortField"
         [currentSortReverse]="list.sortReverse"
         (sort)="onSort($event)"
         i18n>Correspondent</th>
       <th
         appSortable="title"
+        title="Sort by title" i18n-title
         [currentSortField]="list.sortField"
         [currentSortReverse]="list.sortReverse"
         (sort)="onSort($event)"
         i18n>Title</th>
+      <th *ngIf="notesEnabled" class="d-none d-xl-table-cell"
+        appSortable="num_notes"
+        title="Sort by notes" i18n-title
+        [currentSortField]="list.sortField"
+        [currentSortReverse]="list.sortReverse"
+        (sort)="onSort($event)"
+        i18n>Notes</th>
       <th class="d-none d-xl-table-cell"
         appSortable="document_type__name"
+        title="Sort by document type" i18n-title
         [currentSortField]="list.sortField"
         [currentSortReverse]="list.sortReverse"
         (sort)="onSort($event)"
         i18n>Document type</th>
       <th class="d-none d-xl-table-cell"
         appSortable="storage_path__name"
+        title="Sort by storage path" i18n-title
         [currentSortField]="list.sortField"
         [currentSortReverse]="list.sortReverse"
         (sort)="onSort($event)"
         i18n>Storage path</th>
       <th
         appSortable="created"
+        title="Sort by created date" i18n-title
         [currentSortField]="list.sortField"
         [currentSortReverse]="list.sortReverse"
         (sort)="onSort($event)"
         i18n>Created</th>
       <th class="d-none d-xl-table-cell"
         appSortable="added"
+        title="Sort by added date" i18n-title
         [currentSortField]="list.sortField"
         [currentSortReverse]="list.sortReverse"
         (sort)="onSort($event)"
@@ -183,6 +197,15 @@
         <td>
           <a routerLink="/documents/{{d.id}}" title="Edit document" i18n-title style="overflow-wrap: anywhere;">{{d.title | documentTitle}}</a>
           <app-tag [tag]="t" *ngFor="let t of d.tags$ | async" class="ms-1" clickable="true" linkTitle="Filter by tag" i18n-linkTitle (click)="clickTag(t.id);$event.stopPropagation()"></app-tag>
+        </td>
+        <td *ngIf="notesEnabled" class="d-none d-xl-table-cell">
+          <a *ngIf="d.notes.length" routerLink="/documents/{{d.id}}/notes" class="btn btn-sm p-0">
+            <span class="badge rounded-pill bg-light border text-primary">
+            <svg class="metadata-icon ms-1 me-1" fill="currentColor">
+              <use xlink:href="assets/bootstrap-icons.svg#chat-left-text"/>
+            </svg>
+            {{d.notes.length}}</span>
+          </a>
         </td>
         <td class="d-none d-xl-table-cell">
           <ng-container *ngIf="d.document_type">

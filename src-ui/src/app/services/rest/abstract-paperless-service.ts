@@ -2,10 +2,8 @@ import { HttpClient, HttpParams } from '@angular/common/http'
 import { Observable } from 'rxjs'
 import { map, publishReplay, refCount } from 'rxjs/operators'
 import { ObjectWithId } from 'src/app/data/object-with-id'
-import { PaperlessUser } from 'src/app/data/paperless-user'
 import { Results } from 'src/app/data/results'
 import { environment } from 'src/environments/environment'
-import { PermissionAction, PermissionType } from '../permissions.service'
 
 export abstract class AbstractPaperlessService<T extends ObjectWithId> {
   protected baseUrl: string = environment.apiBaseUrl
