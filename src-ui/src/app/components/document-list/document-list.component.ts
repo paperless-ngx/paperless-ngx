@@ -258,6 +258,10 @@ export class DocumentListComponent
     })
   }
 
+  openDocumentDetail(document: PaperlessDocument) {
+    this.router.navigate(['documents', document.id])
+  }
+
   toggleSelected(document: PaperlessDocument, event: MouseEvent): void {
     if (!event.shiftKey) this.list.toggleSelected(document)
     else this.list.selectRangeTo(document)

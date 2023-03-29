@@ -1,6 +1,6 @@
 <div class="card mb-3 shadow-sm" [class.card-selected]="selected" [class.document-card]="selectable" [class.popover-hidden]="popoverHidden" (mouseleave)="mouseLeaveCard()">
   <div class="row g-0">
-    <div class="col-md-2 doc-img-background rounded-start" [class.doc-img-background-selected]="selected" (click)="this.toggleSelected.emit($event)">
+    <div class="col-md-2 doc-img-background rounded-start" [class.doc-img-background-selected]="selected" (click)="this.toggleSelected.emit($event)" (dblclick)="dblClickDocument.emit()">
       <img [src]="getThumbUrl()" class="card-img doc-img border-end rounded-start" [class.inverted]="getIsThumbInverted()">
 
       <div class="border-end border-bottom bg-light document-card-check">

@@ -42,6 +42,9 @@ export class DocumentCardLargeComponent extends ComponentWithPermissions {
   document: PaperlessDocument
 
   @Output()
+  dblClickDocument = new EventEmitter()
+
+  @Output()
   clickTag = new EventEmitter<number>()
 
   @Output()
