@@ -303,6 +303,7 @@ jobs:
           images: |
             ghcr.io/${{ needs.prepare-docker-build.outputs.ghcr-repository }}
             name=paperlessngx/paperless-ngx,enable=${{ steps.docker-hub.outputs.enable }}
+            name=quay.io/paperlessngx/paperless-ngx,enable=${{ steps.docker-hub.outputs.enable }}
           tags: |
             # Tag branches with branch name
             type=ref,event=branch
@@ -334,6 +335,15 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      -
+        name: Login to Quay.io
+        uses: docker/login-action@v2
+        # Don't attempt to login is not pushing to Docker Hub
+        if: steps.docker-hub.outputs.enable == 'true'
+        with:
+          registry: quay.io
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_ROBOT_TOKEN }}
       -
         name: Build and push
         uses: docker/build-push-action@v4
