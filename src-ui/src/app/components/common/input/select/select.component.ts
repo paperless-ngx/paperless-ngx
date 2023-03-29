@@ -77,7 +77,7 @@ export class SelectComponent extends AbstractInputComponent<number> {
   }
 
   get isPrivate(): boolean {
-    return this.items.find((i) => i.id === this.value)?.private
+    return this.items?.find((i) => i.id === this.value)?.private
   }
 
   getSuggestions() {
