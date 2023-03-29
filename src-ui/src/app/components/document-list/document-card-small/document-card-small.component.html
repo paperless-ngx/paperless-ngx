@@ -1,6 +1,6 @@
 <div class="col p-2 h-100">
   <div class="card h-100 shadow-sm document-card" [class.card-selected]="selected" [class.popover-hidden]="popoverHidden" (mouseleave)="mouseLeaveCard()">
-    <div class="border-bottom doc-img-container" [class.doc-img-background-selected]="selected" (click)="this.toggleSelected.emit($event)">
+    <div class="border-bottom doc-img-container" [class.doc-img-background-selected]="selected" (click)="this.toggleSelected.emit($event)" (dblclick)="dblClickDocument.emit(this)">
       <img class="card-img doc-img rounded-top" [class.inverted]="getIsThumbInverted()" [src]="getThumbUrl()">
 
       <div class="border-end border-bottom bg-light py-1 px-2 document-card-check">
