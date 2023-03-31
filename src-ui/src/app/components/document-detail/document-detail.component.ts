@@ -446,6 +446,10 @@ export class DocumentDetailComponent
       .subscribe({
         next: (doc) => {
           Object.assign(this.document, doc)
+          doc['permissions_form'] = {
+            owner: doc.owner,
+            set_permissions: doc.permissions,
+          }
           this.title = doc.title
           this.documentForm.patchValue(doc)
           this.openDocumentService.setDirty(doc, false)
@@ -470,12 +474,17 @@ export class DocumentDetailComponent
         },
         error: (error) => {
           this.networkActive = false
-          this.error = error.error
-          this.toastService.showError(
-            $localize`Error saving document` +
-              ': ' +
-              (error.message ?? error.toString())
-          )
+          if (!this.userCanEdit) {
+            this.toastService.showInfo($localize`Document saved successfully.`)
+            this.close()
+          } else {
+            this.error = error.error
+            this.toastService.showError(
+              $localize`Error saving document` +
+                ': ' +
+                (error.message ?? error.toString())
+            )
+          }
         },
       })
   }
@@ -676,8 +685,8 @@ export class DocumentDetailComponent
   get userIsOwner(): boolean {
     let doc: PaperlessDocument = Object.assign({}, this.document)
     // dont disable while editing
-    if (this.document && this.store?.value.owner) {
-      doc.owner = this.store?.value.owner
+    if (this.document && this.store?.value.permissions_form?.owner) {
+      doc.owner = this.store?.value.permissions_form?.owner
     }
     return !this.document || this.permissionsService.currentUserOwnsObject(doc)
   }
@@ -685,8 +694,8 @@ export class DocumentDetailComponent
   get userCanEdit(): boolean {
     let doc: PaperlessDocument = Object.assign({}, this.document)
     // dont disable while editing
-    if (this.document && this.store?.value.owner) {
-      doc.owner = this.store?.value.owner
+    if (this.document && this.store?.value.permissions_form?.owner) {
+      doc.owner = this.store?.value.permissions_form?.owner
     }
     return (
       !this.document ||

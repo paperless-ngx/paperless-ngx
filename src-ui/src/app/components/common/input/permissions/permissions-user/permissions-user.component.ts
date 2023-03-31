@@ -28,11 +28,6 @@ export class PermissionsUserComponent extends AbstractInputComponent<
     userService
       .listAll()
       .pipe(first())
-      .subscribe(
-        (result) =>
-          (this.users = result.results.filter(
-            (u) => u.id !== settings.currentUser.id
-          ))
-      )
+      .subscribe((result) => (this.users = result.results))
   }
 }
