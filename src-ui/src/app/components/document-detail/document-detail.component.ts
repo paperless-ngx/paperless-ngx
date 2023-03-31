@@ -462,12 +462,13 @@ export class DocumentDetailComponent
 
   save() {
     this.networkActive = true
-    this.store.next(this.documentForm.value)
     this.documentsService
       .update(this.document)
       .pipe(first())
       .subscribe({
         next: () => {
+          this.store.next(this.documentForm.value)
+          this.toastService.showInfo($localize`Document saved successfully.`)
           this.close()
           this.networkActive = false
           this.error = null

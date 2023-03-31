@@ -192,8 +192,8 @@
 
             <ng-container>
                 <button type="button" class="btn btn-outline-secondary" (click)="discard()" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Discard</button>&nbsp;
-                <button type="button" class="btn btn-outline-primary" (click)="saveEditNext()" *ngIf="hasNext()" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true || error">Save & next</button>&nbsp;
-                <button type="submit" class="btn btn-primary" *appIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true || error">Save</button>&nbsp;
+                <button type="button" class="btn btn-outline-primary" (click)="saveEditNext()" *ngIf="hasNext()" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Save & next</button>&nbsp;
+                <button type="submit" class="btn btn-primary" *appIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Save</button>&nbsp;
             </ng-container>
         </form>
     </div>
