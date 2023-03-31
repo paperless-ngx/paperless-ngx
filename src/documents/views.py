@@ -964,6 +964,7 @@ class UiSettingsView(GenericAPIView):
                     "id": user.id,
                     "username": user.username,
                     "is_superuser": user.is_superuser,
+                    "groups": user.groups.values_list("id", flat=True),
                 },
                 "settings": ui_settings,
                 "permissions": roles,
