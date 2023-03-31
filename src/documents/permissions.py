@@ -63,6 +63,7 @@ def set_permissions_for_object(permissions, object):
         users_to_remove = get_users_with_perms(
             object,
             only_with_perms_in=[permission],
+            with_group_users=False,
         )
         if len(users_to_add) > 0 and len(users_to_remove) > 0:
             users_to_remove = users_to_remove.difference(users_to_add)

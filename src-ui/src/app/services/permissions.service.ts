@@ -58,11 +58,16 @@ export class PermissionsService {
     action: string,
     object: ObjectWithPermissions
   ): boolean {
+    let actionObject = null
+    if (action === PermissionAction.View) actionObject = object.permissions.view
+    else if (action === PermissionAction.Change)
+      actionObject = object.permissions.change
+    if (!actionObject) return false
     return (
       this.currentUserOwnsObject(object) ||
-      (object.permissions[action]['users'] as Array<number>)?.includes(
-        this.currentUser.id
-      )
+      actionObject.users.includes(this.currentUser.id) ||
+      actionObject.groups.filter((g) => this.currentUser.groups.includes(g))
+        .length > 0
     )
   }
 

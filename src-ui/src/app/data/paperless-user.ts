@@ -9,7 +9,7 @@ export interface PaperlessUser extends ObjectWithId {
   is_staff?: boolean
   is_active?: boolean
   is_superuser?: boolean
-  groups?: PaperlessGroup[]
+  groups?: number[] // PaperlessGroup[]
   user_permissions?: string[]
   inherited_permissions?: string[]
 }
