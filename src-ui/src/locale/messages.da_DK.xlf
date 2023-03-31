@@ -3002,15 +3002,23 @@
         </context-group>
         <target state="needs-translation">Error retrieving suggestions</target>
       </trans-unit>
+      <trans-unit id="8348337312757497317" datatype="html">
+        <source>Document saved successfully.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
+          <context context-type="linenumber">478</context>
+        </context-group>
+        <target state="needs-translation">Document saved successfully.</target>
+      </trans-unit>
       <trans-unit id="448882439049417053" datatype="html">
         <source>Error saving document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">475</context>
+          <context context-type="linenumber">483</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">519</context>
+          <context context-type="linenumber">528</context>
         </context-group>
         <target state="needs-translation">Error saving document</target>
       </trans-unit>
@@ -3018,7 +3026,7 @@
         <source>Confirm delete</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">548</context>
+          <context context-type="linenumber">557</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
@@ -3030,7 +3038,7 @@
         <source>Do you really want to delete document &quot;<x id="PH" equiv-text="this.document.title"/>&quot;?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">549</context>
+          <context context-type="linenumber">558</context>
         </context-group>
         <target state="final">Er du sikker på, at du vil slette dokument "<x id="PH" equiv-text="this.document.title"/>"?</target>
       </trans-unit>
@@ -3038,7 +3046,7 @@
         <source>The files for this document will be deleted permanently. This operation cannot be undone.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">550</context>
+          <context context-type="linenumber">559</context>
         </context-group>
         <target state="final">Filerne for dette dokument vil blive slettet permanent. Denne handling kan ikke fortrydes.</target>
       </trans-unit>
@@ -3046,7 +3054,7 @@
         <source>Delete document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">552</context>
+          <context context-type="linenumber">561</context>
         </context-group>
         <target state="final">Slet dokument</target>
       </trans-unit>
@@ -3054,7 +3062,7 @@
         <source>Error deleting document: <x id="PH" equiv-text="JSON.stringify(error)"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">568</context>
+          <context context-type="linenumber">577</context>
         </context-group>
         <target state="final">Fejl ved sletning af dokument: <x id="PH" equiv-text="JSON.stringify(error)"/></target>
       </trans-unit>
@@ -3062,7 +3070,7 @@
         <source>Redo OCR confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">588</context>
+          <context context-type="linenumber">597</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -3074,7 +3082,7 @@
         <source>This operation will permanently redo OCR for this document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">589</context>
+          <context context-type="linenumber">598</context>
         </context-group>
         <target state="needs-translation">This operation will permanently redo OCR for this document.</target>
       </trans-unit>
@@ -3082,7 +3090,7 @@
         <source>This operation cannot be undone.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">590</context>
+          <context context-type="linenumber">599</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -3114,7 +3122,7 @@
         <source>Proceed</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">592</context>
+          <context context-type="linenumber">601</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -3142,7 +3150,7 @@
         <source>Redo OCR operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">600</context>
+          <context context-type="linenumber">609</context>
         </context-group>
         <target state="needs-translation">Redo OCR operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.</target>
       </trans-unit>
@@ -3150,7 +3158,7 @@
         <source>Error executing operation: <x id="PH" equiv-text="JSON.stringify(                 error.error               )"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">611,613</context>
+          <context context-type="linenumber">620,622</context>
         </context-group>
         <target state="needs-translation">Error executing operation: <x id="PH" equiv-text="JSON.stringify(                 error.error               )"/></target>
       </trans-unit>
