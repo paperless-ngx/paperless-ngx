@@ -66,7 +66,7 @@ def set_permissions_for_object(permissions, object):
             with_group_users=False,
         )
         if len(users_to_add) > 0 and len(users_to_remove) > 0:
-            users_to_remove = users_to_remove.difference(users_to_add)
+            users_to_remove = users_to_remove.exclude(id__in=users_to_add)
         if len(users_to_remove) > 0:
             for user in users_to_remove:
                 remove_perm(permission, user, object)
@@ -87,7 +87,7 @@ def set_permissions_for_object(permissions, object):
             permission,
         )
         if len(groups_to_add) > 0 and len(groups_to_remove) > 0:
-            groups_to_remove = groups_to_remove.difference(groups_to_add)
+            groups_to_remove = groups_to_remove.exclude(id__in=groups_to_add)
         if len(groups_to_remove) > 0:
             for group in groups_to_remove:
                 remove_perm(permission, group, object)
