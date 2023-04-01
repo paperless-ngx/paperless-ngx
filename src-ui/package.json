@@ -22,7 +22,7 @@
     "@angular/platform-browser-dynamic": "~15.2.1",
     "@angular/router": "~15.2.1",
     "@ng-bootstrap/ng-bootstrap": "^14.0.1",
-    "@ng-select/ng-select": "^10.0.1",
+    "@ng-select/ng-select": "^10.0.4",
     "@ngneat/dirty-check-forms": "^3.0.3",
     "@popperjs/core": "^2.11.6",
     "bootstrap": "^5.2.3",
