@@ -1,7 +1,6 @@
 import shutil
 from pathlib import Path
 from unittest import mock
-import platform
 
 import pytest
 from django.conf import settings
@@ -16,10 +15,16 @@ from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
 from PIL import Image
 
+try:
+    import zxingcpp  # noqa: F401
+
+    HAS_ZXING_LIB = True
+except ImportError:
+    HAS_ZXING_LIB = False
+
 
 @override_settings(CONSUMER_BARCODE_SCANNER="PYZBAR")
 class TestBarcode(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
-
     SAMPLE_DIR = Path(__file__).parent / "samples"
 
     BARCODE_SAMPLE_DIR = SAMPLE_DIR / "barcodes"
@@ -859,7 +864,6 @@ class TestBarcode(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
 
 class TestAsnBarcode(DirectoriesMixin, TestCase):
-
     SAMPLE_DIR = Path(__file__).parent / "samples"
 
     BARCODE_SAMPLE_DIR = SAMPLE_DIR / "barcodes"
@@ -1060,7 +1064,7 @@ class TestAsnBarcode(DirectoriesMixin, TestCase):
 
 
 @pytest.mark.skipif(
-    platform.machine().upper() not in {"AMD64"},
+    not HAS_ZXING_LIB,
     reason="No zxingcpp",
 )
 @override_settings(CONSUMER_BARCODE_SCANNER="ZXING")
@@ -1069,7 +1073,7 @@ class TestBarcodeZxing(TestBarcode):
 
 
 @pytest.mark.skipif(
-    platform.machine().upper() not in {"AMD64"},
+    not HAS_ZXING_LIB,
     reason="No zxingcpp",
 )
 @override_settings(CONSUMER_BARCODE_SCANNER="ZXING")
