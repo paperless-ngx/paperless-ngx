@@ -371,7 +371,7 @@ value.
 One of the best things in Paperless is that you can not only access the
 documents via the web interface, but also via the file system.
 
-When as single storage layout is not sufficient for your use case,
+When a single storage layout is not sufficient for your use case,
 storage paths come to the rescue. Storage paths allow you to configure
 more precisely where each document is stored in the file system.
 
@@ -503,3 +503,43 @@ existing tables) with:
     Using mariadb version 10.4+ is recommended. Using the `utf8mb3` character set on
     an older system may fix issues that can arise while setting up Paperless-ngx but
     `utf8mb3` can cause issues with consumption (where `utf8mb4` does not).
+
+## Barcodes {#barcodes}
+
+Paperless is able to utilize barcodes for automatically preforming some tasks.
+
+At this time, the library utilized for detection of bacodes supports the following types:
+
+- AN-13/UPC-A
+- UPC-E
+- EAN-8
+- Code 128
+- Code 93
+- Code 39
+- Codabar
+- Interleaved 2 of 5
+- QR Code
+- SQ Code
+
+You may check for updates on the [zbar library homepage](https://github.com/mchehab/zbar).
+For usage in Paperless, the type of barcode does not matter, only the contents of it.
+
+For how to enable barcode usage, see [the configuration](/configuration#barcodes).
+The two settings may be enabled independently, but do have interactions as explained
+below.
+
+### Document Splitting
+
+When enabled, Paperless will look for a barcode with the configured value and create a new document
+starting from the next page. The page with the barcode on it will _not_ be retained. It
+is expected to be a page existing only for triggering the split.
+
+### Archive Serial Number Assignment
+
+When enabled, the value of the barcode (as an integer) will be used to set the document's
+archive serial number, allowing quick reference back to the original, paper document.
+
+If document splitting via barcode is also enabled, documents will be split when an ASN
+barcode is located. However, differing from the splitting, the page with the
+barcode _will_ be retained. This allows application of a barcode to any page, including
+one which holds data to keep in the document.
