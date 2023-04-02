@@ -17,6 +17,8 @@ run paperless, these settings have to be defined in different places.
 
 ## Required services
 
+### Redis Broker
+
 `PAPERLESS_REDIS=<url>`
 
 : This is required for processing scheduled tasks such as email
@@ -32,6 +34,8 @@ matcher.
     Instance](https://redis.io/docs/getting-started/#securing-redis).
 
     Defaults to `redis://localhost:6379`.
+
+### Database
 
 `PAPERLESS_DBENGINE=<engine_name>`
 
@@ -123,6 +127,47 @@ unlock. Mostly applicable for an sqlite based installation, consider
 changing to postgresql if you need to increase this.
 
     Defaults to unset, keeping the Django defaults.
+
+## Optional Services
+
+### Tika {#tika}
+
+Paperless can make use of [Tika](https://tika.apache.org/) and
+[Gotenberg](https://gotenberg.dev/) for parsing and converting
+"Office" documents (such as ".doc", ".xlsx" and ".odt").
+Tika and Gotenberg are also needed to allow parsing of E-Mails (.eml).
+
+If you wish to use this, you must provide a Tika server and a Gotenberg server,
+configure their endpoints, and enable the feature.
+
+`PAPERLESS_TIKA_ENABLED=<bool>`
+
+: Enable (or disable) the Tika parser.
+
+    Defaults to false.
+
+`PAPERLESS_TIKA_ENDPOINT=<url>`
+
+: Set the endpoint URL were Paperless can reach your Tika server.
+
+    Defaults to "<http://localhost:9998>".
+
+`PAPERLESS_TIKA_GOTENBERG_ENDPOINT=<url>`
+
+: Set the endpoint URL were Paperless can reach your Gotenberg server.
+
+    Defaults to "<http://localhost:3000>".
+
+If you run paperless on docker, you can add those services to the
+docker-compose file (see the provided
+[`docker-compose.sqlite-tika.yml`](https://github.com/paperless-ngx/paperless-ngx/blob/main/docker/compose/docker-compose.sqlite-tika.yml)
+file for reference).
+
+Add all three configuration parameters to your configuration. If using
+Docker, this may be the `environment` key of the webserver or a
+`docker-compose.env` file. Bare metal installations may have a `.conf` file
+containing the configuration parameters. Be sure to use the correct format
+and watch out for indentation if editing the YAML file.
 
 ## Paths and folders
 
@@ -257,8 +302,7 @@ not include a trailing slash. E.g. <https://paperless.domain.com>
 
 : A list of trusted origins for unsafe requests (e.g. POST). As of
 Django 4.0 this is required to access the Django admin via the web.
-See
-<https://docs.djangoproject.com/en/4.0/ref/settings/#csrf-trusted-origins>
+See the [Django project documentation on the settings](https://docs.djangoproject.com/en/4.1/ref/settings/#csrf-trusted-origins)
 
     Can also be set using PAPERLESS_URL (see above).
 
@@ -269,8 +313,8 @@ See
 
 : If you're planning on putting Paperless on the open internet, then
 you really should set this value to the domain name you're using.
-Failing to do so leaves you open to HTTP host header attacks:
-<https://docs.djangoproject.com/en/3.1/topics/security/#host-header-validation>
+Failing to do so leaves you open to HTTP host header attacks.
+You can read more about this in [the Django project's documentation](https://docs.djangoproject.com/en/4.1/topics/security/#host-header-validation)
 
     Just remember that this is a comma-separated list, so
     "example.com" is fine, as is "example.com,www.example.com", but
@@ -386,16 +430,16 @@ applications.
         If you're exposing paperless to the internet directly, do not use
         this.
 
-        Also see the warning [in the official documentation](https://docs.djangoproject.com/en/3.1/howto/auth-remote-user/#configuration).
+        Also see the warning [in the official documentation](https://docs.djangoproject.com/en/4.1/howto/auth-remote-user/#configuration).
 
     Defaults to "false" which disables this feature.
 
 `PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME=<str>`
 
-: If "PAPERLESS*ENABLE_HTTP_REMOTE_USER" is enabled, this
+: If "PAPERLESS_ENABLE_HTTP_REMOTE_USER" is enabled, this
 property allows to customize the name of the HTTP header from which
 the authenticated username is extracted. Values are in terms of
-[HttpRequest.META](https://docs.djangoproject.com/en/3.1/ref/request-response/#django.http.HttpRequest.META).
+[HttpRequest.META](https://docs.djangoproject.com/en/4.1/ref/request-response/#django.http.HttpRequest.META).
 Thus, the configured value must start with `HTTP*`
 followed by the normalized actual header name.
 
@@ -421,21 +465,20 @@ needs.
 : Customize the language that paperless will attempt to use when
 parsing documents.
 
-    It should be a 3-letter language code consistent with ISO 639:
-    https://www.loc.gov/standards/iso639-2/php/code_list.php
+    It should be a 3-letter code, see the list of [languages Tesseract supports](https://tesseract-ocr.github.io/tessdoc/Data-Files-in-different-versions.html).
 
     Set this to the language most of your documents are written in.
 
     This can be a combination of multiple languages such as `deu+eng`,
-    in which case tesseract will use whatever language matches best.
-    Keep in mind that tesseract uses much more cpu time with multiple
+    in which case Tesseract will use whatever language matches best.
+    Keep in mind that Tesseract uses much more CPU time with multiple
     languages enabled.
 
     Defaults to "eng".
 
     !!! note
 
-        If your language contains a '-' such as chi-sim, you must use chi_sim
+        If your language contains a '-' such as chi-sim, you must use `chi_sim`.
 
 `PAPERLESS_OCR_MODE=<mode>`
 
@@ -622,76 +665,6 @@ they use underscores instead of dashes.
     {"deskew": true, "optimize": 3, "unpaper_args": "--pre-rotate 90"}
     ```
 
-## Tika settings {#tika}
-
-Paperless can make use of [Tika](https://tika.apache.org/) and
-[Gotenberg](https://gotenberg.dev/) for parsing and converting
-"Office" documents (such as ".doc", ".xlsx" and ".odt").
-Tika and Gotenberg are also needed to allow parsing of E-Mails (.eml).
-
-If you wish to use this, you must provide a Tika server and a Gotenberg server,
-configure their endpoints, and enable the feature.
-
-`PAPERLESS_TIKA_ENABLED=<bool>`
-
-: Enable (or disable) the Tika parser.
-
-    Defaults to false.
-
-`PAPERLESS_TIKA_ENDPOINT=<url>`
-
-: Set the endpoint URL were Paperless can reach your Tika server.
-
-    Defaults to "<http://localhost:9998>".
-
-`PAPERLESS_TIKA_GOTENBERG_ENDPOINT=<url>`
-
-: Set the endpoint URL were Paperless can reach your Gotenberg server.
-
-    Defaults to "<http://localhost:3000>".
-
-If you run paperless on docker, you can add those services to the
-docker-compose file (see the provided `docker-compose.sqlite-tika.yml`
-file for reference). The changes requires are as follows:
-
-```yaml
-services:
-  # ...
-
-  webserver:
-    # ...
-
-    environment:
-      # ...
-
-      PAPERLESS_TIKA_ENABLED: 1
-      PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
-      PAPERLESS_TIKA_ENDPOINT: http://tika:9998
-
-    # ...
-
-    gotenberg:
-      image: gotenberg/gotenberg:7.8
-      restart: unless-stopped
-      # The gotenberg chromium route is used to convert .eml files. We do not
-      # want to allow external content like tracking pixels or even javascript.
-      command:
-        - 'gotenberg'
-        - '--chromium-disable-javascript=true'
-        - '--chromium-allow-list=file:///tmp/.*'
-
-  tika:
-    image: ghcr.io/paperless-ngx/tika:latest
-    restart: unless-stopped
-```
-
-Add the configuration variables to the environment of the webserver
-(alternatively put the configuration in the `docker-compose.env` file)
-and add the additional services below the webserver service. Watch out
-for indentation.
-
-Make sure to use the correct format `PAPERLESS_TIKA_ENABLED = 1` so python_dotenv can parse the statement correctly.
-
 ## Software tweaks {#software_tweaks}
 
 `PAPERLESS_TASK_WORKERS=<num>`
@@ -743,17 +716,10 @@ paperless will process in parallel on a single document.
 on large documents within the default 1800 seconds. So extending
 this timeout may prove to be useful on weak hardware setups.
 
-`PAPERLESS_WORKER_RETRY=<num>`
-
-: If PAPERLESS_WORKER_TIMEOUT has been configured, the retry time for
-a task can also be configured. By default, this value will be set to
-10s more than the worker timeout. This value should never be set
-less than the worker timeout.
-
 `PAPERLESS_TIME_ZONE=<timezone>`
 
-: Set the time zone here. See
-<https://docs.djangoproject.com/en/3.1/ref/settings/#std:setting-TIME_ZONE>
+: Set the time zone here. See more details on
+why and how to set it [in the Django project documentation](https://docs.djangoproject.com/en/4.1/ref/settings/#std:setting-TIME_ZONE)
 for details on how to set it.
 
     Defaults to UTC.
@@ -815,46 +781,33 @@ should be a valid crontab(5) expression describing when to run.
         to enable compression in your proxy configuration rather than
         the webserver
 
-## Polling {#polling}
+`PAPERLESS_CONVERT_MEMORY_LIMIT=<num>`
 
-`PAPERLESS_CONSUMER_POLLING=<num>`
+: On smaller systems, or even in the case of Very Large Documents, the
+consumer may explode, complaining about how it's "unable to extend
+pixel cache". In such cases, try setting this to a reasonably low
+value, like 32. The default is to use whatever is necessary to do
+everything without writing to disk, and units are in megabytes.
 
-: If paperless won't find documents added to your consume folder, it
-might not be able to automatically detect filesystem changes. In
-that case, specify a polling interval in seconds here, which will
-then cause paperless to periodically check your consumption
-directory for changes. This will also disable listening for file
-system changes with `inotify`.
+    For more information on how to use this value, you should search the
+    web for "MAGICK_MEMORY_LIMIT".
 
-    Defaults to 0, which disables polling and uses filesystem
-    notifications.
+    Defaults to 0, which disables the limit.
 
-`PAPERLESS_CONSUMER_POLLING_RETRY_COUNT=<num>`
+`PAPERLESS_CONVERT_TMPDIR=<path>`
 
-: If consumer polling is enabled, sets the number of times paperless
-will check for a file to remain unmodified.
+: Similar to the memory limit, if you've got a small system and your
+OS mounts /tmp as tmpfs, you should set this to a path that's on a
+physical disk, like /home/your_user/tmp or something. ImageMagick
+will use this as scratch space when crunching through very large
+documents.
 
-    Defaults to 5.
+    For more information on how to use this value, you should search the
+    web for "MAGICK_TMPDIR".
 
-`PAPERLESS_CONSUMER_POLLING_DELAY=<num>`
+    Default is none, which disables the temporary directory.
 
-: If consumer polling is enabled, sets the delay in seconds between
-each check (above) paperless will do while waiting for a file to
-remain unmodified.
-
-    Defaults to 5.
-
-## iNotify {#inotify}
-
-`PAPERLESS_CONSUMER_INOTIFY_DELAY=<num>`
-
-: Sets the time in seconds the consumer will wait for additional
-events from inotify before the consumer will consider a file ready
-and begin consumption. Certain scanners or network setups may
-generate multiple events for a single file, leading to multiple
-consumers working on the same file. Configure this to prevent that.
-
-    Defaults to 0.5 seconds.
+## Document Consumption {#consume_config}
 
 `PAPERLESS_CONSUMER_DELETE_DUPLICATES=<bool>`
 
@@ -885,22 +838,23 @@ don't exist yet.
 
     Defaults to false.
 
-`PAPERLESS_CONSUMER_ENABLE_BARCODES=<bool>`
+`PAPERLESS_CONSUMER_IGNORE_PATTERNS=<json>`
 
-: Enables the scanning and page separation based on detected barcodes.
-This allows for scanning and adding multiple documents per uploaded
-file, which are separated by one or multiple barcode pages.
+: By default, paperless ignores certain files and folders in the
+consumption directory, such as system files created by the Mac OS
+or hidden folders some tools use to store data.
 
-    For ease of use, it is suggested to use a standardized separation
-    page, e.g. [here](https://www.alliancegroup.co.uk/patch-codes.htm).
+    This can be adjusted by configuring a custom json array with
+    patterns to exclude.
 
-    If no barcodes are detected in the uploaded file, no page separation
-    will happen.
+    For example, `.DS_STORE/*` will ignore any files found in a folder
+    named `.DS_STORE`, including `.DS_STORE/bar.pdf` and `foo/.DS_STORE/bar.pdf`
 
-    The original document will be removed and the separated pages will
-    be saved as pdf.
+    A pattern like `._*` will ignore anything starting with `._`, including:
+    `._foo.pdf` and `._bar/foo.pdf`
 
-    Defaults to false.
+    Defaults to
+    `[".DS_STORE/*", "._*", ".stfolder/*", ".stversions/*", ".localized/*", "desktop.ini", "@eaDir/*"]`.
 
 `PAPERLESS_CONSUMER_BARCODE_SCANNER=<string>`
 
@@ -912,79 +866,23 @@ file, which are separated by one or multiple barcode pages.
 
     zxing is not available on all platforms.
 
-`PAPERLESS_CONSUMER_BARCODE_TIFF_SUPPORT=<bool>`
+`PAPERLESS_PRE_CONSUME_SCRIPT=<filename>`
 
-: Whether TIFF image files should be scanned for barcodes. This will
-automatically convert any TIFF image(s) to pdfs for later
-processing. This only has an effect, if
-PAPERLESS_CONSUMER_ENABLE_BARCODES has been enabled.
+: After some initial validation, Paperless can trigger an arbitrary
+script if you like before beginning consumption. This script will be provided
+data for it to work with via the environment.
 
-    Defaults to false.
+    For more information, take a look at [pre-consumption script](/advanced_usage#pre-consume-script).
 
-`PAPERLESS_CONSUMER_BARCODE_STRING=PATCHT`
-
-: Defines the string to be detected as a separator barcode. If
-paperless is used with the PATCH-T separator pages, users shouldn't
-change this.
-
-    Defaults to "PATCHT"
-
-`PAPERLESS_CONSUMER_ENABLE_ASN_BARCODE=<bool>`
-
-: Enables the detection of barcodes in the scanned document and
-setting the ASN (archive serial number) if a properly formatted
-barcode is detected.
-
-    The barcode must consist of a (configurable) prefix and the ASN
-    to be set, for instance `ASN00123`.
-
-    This option is compatible with barcode page separation, since
-    pages will be split up before reading the ASN.
-
-    If no ASN barcodes are detected in the uploaded file, no ASN will
-    be set. If a barcode with an already existing ASN is detected, no ASN
-    will be set either and a warning will be logged.
-
-    Defaults to false.
-
-`PAPERLESS_CONSUMER_ASN_BARCODE_PREFIX=ASN`
-
-: Defines the prefix that is used to identify a barcode as an ASN
-barcode.
-
-    Defaults to "ASN"
-
-`PAPERLESS_CONVERT_MEMORY_LIMIT=<num>`
-
-: On smaller systems, or even in the case of Very Large Documents, the
-consumer may explode, complaining about how it's "unable to extend
-pixel cache". In such cases, try setting this to a reasonably low
-value, like 32. The default is to use whatever is necessary to do
-everything without writing to disk, and units are in megabytes.
-
-    For more information on how to use this value, you should search the
-    web for "MAGICK_MEMORY_LIMIT".
-
-    Defaults to 0, which disables the limit.
-
-`PAPERLESS_CONVERT_TMPDIR=<path>`
-
-: Similar to the memory limit, if you've got a small system and your
-OS mounts /tmp as tmpfs, you should set this to a path that's on a
-physical disk, like /home/your_user/tmp or something. ImageMagick
-will use this as scratch space when crunching through very large
-documents.
-
-    For more information on how to use this value, you should search the
-    web for "MAGICK_TMPDIR".
-
-    Default is none, which disables the temporary directory.
+    The default is blank, which means nothing will be executed.
 
 `PAPERLESS_POST_CONSUME_SCRIPT=<filename>`
 
 : After a document is consumed, Paperless can trigger an arbitrary
-script if you like. This script will be passed a number of arguments
-for you to work with. For more information, take a look at [Post-consumption script](/advanced_usage#post-consume-script).
+script if you like. This script will be provided
+data for it to work with via the environment.
+
+    For more information, take a look at [Post-consumption script](/advanced_usage#post-consume-script).
 
     The default is blank, which means nothing will be executed.
 
@@ -1051,23 +949,109 @@ within your documents.
     second, and year last order. Characters D, M, or Y can be shuffled
     to meet the required order.
 
-`PAPERLESS_CONSUMER_IGNORE_PATTERNS=<json>`
+### Polling {#polling}
 
-: By default, paperless ignores certain files and folders in the
-consumption directory, such as system files created by the Mac OS
-or hidden folders some tools use to store data.
+`PAPERLESS_CONSUMER_POLLING=<num>`
 
-    This can be adjusted by configuring a custom json array with
-    patterns to exclude.
+: If paperless won't find documents added to your consume folder, it
+might not be able to automatically detect filesystem changes. In
+that case, specify a polling interval in seconds here, which will
+then cause paperless to periodically check your consumption
+directory for changes. This will also disable listening for file
+system changes with `inotify`.
 
-    For example, `.DS_STORE/*` will ignore any files found in a folder
-    named `.DS_STORE`, including `.DS_STORE/bar.pdf` and `foo/.DS_STORE/bar.pdf`
+    Defaults to 0, which disables polling and uses filesystem
+    notifications.
 
-    A pattern like `._*` will ignore anything starting with `._`, including:
-    `._foo.pdf` and `._bar/foo.pdf`
+`PAPERLESS_CONSUMER_POLLING_RETRY_COUNT=<num>`
 
-    Defaults to
-    `[".DS_STORE/*", "._*", ".stfolder/*", ".stversions/*", ".localized/*", "desktop.ini", "@eaDir/*"]`.
+: If consumer polling is enabled, sets the number of times paperless
+will check for a file to remain unmodified.
+
+    Defaults to 5.
+
+`PAPERLESS_CONSUMER_POLLING_DELAY=<num>`
+
+: If consumer polling is enabled, sets the delay in seconds between
+each check (above) paperless will do while waiting for a file to
+remain unmodified.
+
+    Defaults to 5.
+
+### iNotify {#inotify}
+
+`PAPERLESS_CONSUMER_INOTIFY_DELAY=<num>`
+
+: Sets the time in seconds the consumer will wait for additional
+events from inotify before the consumer will consider a file ready
+and begin consumption. Certain scanners or network setups may
+generate multiple events for a single file, leading to multiple
+consumers working on the same file. Configure this to prevent that.
+
+    Defaults to 0.5 seconds.
+
+## Barcodes {#barcodes}
+
+`PAPERLESS_CONSUMER_ENABLE_BARCODES=<bool>`
+
+: Enables the scanning and page separation based on detected barcodes.
+This allows for scanning and adding multiple documents per uploaded
+file, which are separated by one or multiple barcode pages.
+
+    For ease of use, it is suggested to use a standardized separation
+    page, e.g. [here](https://www.alliancegroup.co.uk/patch-codes.htm).
+
+    If no barcodes are detected in the uploaded file, no page separation
+    will happen.
+
+    The original document will be removed and the separated pages will
+    be saved as pdf.
+
+    See additional information in the [advanced usage documentation](/advanced_usage#barcodes)
+
+    Defaults to false.
+
+`PAPERLESS_CONSUMER_BARCODE_TIFF_SUPPORT=<bool>`
+
+: Whether TIFF image files should be scanned for barcodes. This will
+automatically convert any TIFF image(s) to pdfs for later
+processing. This only has an effect, if
+PAPERLESS_CONSUMER_ENABLE_BARCODES has been enabled.
+
+    Defaults to false.
+
+`PAPERLESS_CONSUMER_BARCODE_STRING=<string>`
+
+: Defines the string to be detected as a separator barcode. If
+paperless is used with the PATCH-T separator pages, users shouldn't
+change this.
+
+    Defaults to "PATCHT"
+
+`PAPERLESS_CONSUMER_ENABLE_ASN_BARCODE=<bool>`
+
+: Enables the detection of barcodes in the scanned document and
+setting the ASN (archive serial number) if a properly formatted
+barcode is detected.
+
+    The barcode must consist of a (configurable) prefix and the ASN
+    to be set, for instance `ASN00123`.
+
+    This option is compatible with barcode page separation, since
+    pages will be split up before reading the ASN.
+
+    If no ASN barcodes are detected in the uploaded file, no ASN will
+    be set. If a barcode with an already existing ASN is detected, no ASN
+    will be set either and a warning will be logged.
+
+    Defaults to false.
+
+`PAPERLESS_CONSUMER_ASN_BARCODE_PREFIX=<string>`
+
+: Defines the prefix that is used to identify a barcode as an ASN
+barcode.
+
+    Defaults to "ASN"
 
 ## Binaries
 
@@ -1159,11 +1143,13 @@ actual group ID on the host system, which you can get by executing
 : Additional OCR languages to install. By default, paperless comes
 with English, German, Italian, Spanish and French. If your language
 is not in this list, install additional languages with this
-configuration option:
+configuration option ([find the right LangCodes](https://tesseract-ocr.github.io/tessdoc/Data-Files-in-different-versions.html)):
 
     ``` bash
     PAPERLESS_OCR_LANGUAGES=tur ces
     ```
+
+    Make sure it's a space separated list when using several values.
 
     To actually use these languages, also set the default OCR language
     of paperless:

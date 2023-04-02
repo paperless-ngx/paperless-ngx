@@ -54,6 +54,8 @@ include-labels:
   - 'ci-cd'
   - 'breaking-change'
   - 'notable'
+exclude-labels:
+  - 'skip-changelog'
 category-template: '### $TITLE'
 change-template: '- $TITLE @$AUTHOR ([#$NUMBER]($URL))'
 change-title-escapes: '\<*_&#@'
