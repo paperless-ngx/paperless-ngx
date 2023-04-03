@@ -43,6 +43,7 @@ import {
 import { PaperlessUser } from 'src/app/data/paperless-user'
 import { UserService } from 'src/app/services/rest/user.service'
 import { PaperlessDocumentNote } from 'src/app/data/paperless-document-note'
+import { HttpClient } from '@angular/common/http'
 
 enum DocumentDetailNavIDs {
   Details = 1,
@@ -80,6 +81,7 @@ export class DocumentDetailComponent
   title: string
   titleSubject: Subject<string> = new Subject()
   previewUrl: string
+  _previewHtml: string
   downloadUrl: string
   downloadOriginalUrl: string
 
@@ -144,7 +146,8 @@ export class DocumentDetailComponent
     private settings: SettingsService,
     private storagePathService: StoragePathService,
     private permissionsService: PermissionsService,
-    private userService: UserService
+    private userService: UserService,
+    private http: HttpClient
   ) {}
 
   titleKeyUp(event) {
@@ -215,6 +218,16 @@ export class DocumentDetailComponent
         switchMap((doc) => {
           this.documentId = doc.id
           this.previewUrl = this.documentsService.getPreviewUrl(this.documentId)
+          this.http.get(this.previewUrl, { responseType: 'text' }).subscribe({
+            next: (res) => {
+              this._previewHtml = res.toString()
+            },
+            error: (err) => {
+              this._previewHtml = $localize`An error occurred loading content: ${
+                err.message ?? err.toString()
+              }`
+            },
+          })
           this.downloadUrl = this.documentsService.getDownloadUrl(
             this.documentId
           )
@@ -705,5 +718,9 @@ export class DocumentDetailComponent
         doc
       )
     )
+  }
+
+  get previewHtml(): string {
+    return this._previewHtml
   }
 }
