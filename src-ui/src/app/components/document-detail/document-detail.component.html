@@ -208,7 +208,7 @@
             </ng-template>
         </ng-container>
         <ng-container *ngIf="getContentType() === 'text/plain'">
-            <object [data]="previewUrl | safeUrl" type="text/plain" class="preview-sticky bg-white" width="100%"></object>
+            <object [data]="previewUrl | safeUrl" type="text/plain" class="preview-sticky bg-light" width="100%"></object>
         </ng-container>
         <div *ngIf="requiresPassword" class="password-prompt">
             <form>

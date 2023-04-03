@@ -246,10 +246,6 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
       background-color: rgb(var(--bs-dark-rgb)) !important;
     }
   }
-
-  .preview-sticky.bg-white {
-    background-color: var(--pngx-bg-darker) !important;
-  }
 }
 
 body.color-scheme-dark {
@@ -279,5 +275,27 @@ body.color-scheme-dark {
     }
 
     @include dark-mode;
+  }
+}
+
+// For bkgd of plain text docs OS color scheme sets text color see #3012
+@media (prefers-color-scheme: dark) {
+  .preview-sticky.bg-light {
+    background-color: var(--bs-gray-800) !important; // dark --bs-light
+  }
+
+  body.color-scheme-system,
+  body.color-scheme-dark {
+    .preview-sticky.bg-light {
+      background-color: var(--pngx-bg-darker) !important;
+    }
+  }
+}
+
+@media not (prefers-color-scheme: dark) {
+  body.color-scheme-dark {
+    .preview-sticky.bg-light {
+      background-color: var(--bs-gray-400) !important;
+    }
   }
 }
