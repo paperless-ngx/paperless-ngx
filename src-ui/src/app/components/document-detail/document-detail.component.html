@@ -5,7 +5,7 @@
       <div class="input-group-text" i18n>of {{previewNumPages}}</div>
     </div>
 
-    <button type="button" class="btn btn-sm btn-outline-danger me-2 ms-auto" (click)="delete()" [disabled]="!userIsOwner">
+    <button type="button" class="btn btn-sm btn-outline-danger me-2 ms-auto" (click)="delete()" [disabled]="!userIsOwner" *appIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Document }">
         <svg class="buttonicon" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#trash" />
         </svg><span class="d-none d-lg-inline ps-1" i18n>Delete</span>
