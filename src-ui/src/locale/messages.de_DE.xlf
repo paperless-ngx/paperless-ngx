@@ -380,7 +380,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">145</context>
         </context-group>
-        <target state="translated">Das Dashboard kann zum Anzeigen von gespeicherten Ansichten verwendet werden, wie zum Beispiel einem 'Posteingang'. Diese Einstellungen finden Sie unter Einstellungen &gt; Gespeicherte Ansichten, sobald Sie mindestens eine eigene Ansicht erstellt haben.</target>
+        <target state="translated">Das Dashboard kann zum Anzeigen von gespeicherten Ansichten verwendet werden, wie zum Beispiel einem ‚Posteingang‘. Diese Einstellungen finden Sie unter Einstellungen &gt; Gespeicherte Ansichten, sobald Sie mindestens eine eigene Ansicht erstellt haben.</target>
       </trans-unit>
       <trans-unit id="9075755296812854717" datatype="html">
         <source>Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Paperless-ngx will start training its machine learning algorithms.</source>
@@ -388,7 +388,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">155</context>
         </context-group>
-        <target state="translated">Ziehen Sie hier Dokumente hinein, um mit dem Hochladen zu beginnen oder kopieren Sie Dateien in den 'consume' Ordner. Sie können auch Dokumente überall auf allen anderen Seiten der Web-App ziehen. Wenn Sie dies tun, startet Paperless-ngx seine Algorithmen.</target>
+        <target state="translated">Ziehen Sie hier Dokumente hinein, um mit dem Hochladen zu beginnen oder kopieren Sie Dateien in den ‚consume‘-Ordner. Sie können auch überall Dokumente auf alle anderen Seiten der Web-App ziehen. Wenn Sie dies tun, startet Paperless-ngx seine Algorithmen.</target>
       </trans-unit>
       <trans-unit id="7495498057594070122" datatype="html">
         <source>The documents list shows all of your documents and allows for filtering as well as bulk-editing. There are three different view styles: list, small cards and large cards. A list of documents currently opened for editing is shown in the sidebar.</source>
@@ -412,7 +412,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">186</context>
         </context-group>
-        <target state="translated">Jede Kombination von Filterkriterien kann als 'Ansicht' gespeichert werden, die dann auf dem Dashboard und / oder der Seitenleiste angezeigt werden können.</target>
+        <target state="translated">Jede Kombination von Filterkriterien kann als ‚Ansicht‘ gespeichert werden, die dann auf dem Dashboard und/oder der Seitenleiste angezeigt werden können.</target>
       </trans-unit>
       <trans-unit id="2804886236408698479" datatype="html">
         <source>Tags, correspondents, document types and storage paths can all be managed using these pages. They can also be created from the document edit view.</source>
@@ -428,7 +428,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">204</context>
         </context-group>
-        <target state="translated">Die Dateiaufgaben zeigen Ihnen Dokumente, die verarbeitet wurden, auf Verarbeitung warten oder während der Verarbeitung fehlgeschlagen sind.</target>
+        <target state="translated">Die ‚Dateiaufgaben‘ zeigen Ihnen Dokumente an, die verarbeitet worden sind, auf ihre Verarbeitung warten oder deren Verarbeitung fehlgeschlagen ist.</target>
       </trans-unit>
       <trans-unit id="8116994662047019809" datatype="html">
         <source>Check out the settings for various tweaks to the web app, toggle settings for saved views or setup e-mail checking.</source>
