@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-04-04 22:55\n"
+"PO-Revision-Date: 2023-04-05 00:21\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -898,17 +898,17 @@ msgstr "uid"
 
 #: paperless_mail/models.py:247
 msgid "subject"
-msgstr ""
+msgstr "asunto"
 
 #: paperless_mail/models.py:255
 msgid "received"
-msgstr ""
+msgstr "recibido"
 
 #: paperless_mail/models.py:262
 msgid "processed"
-msgstr ""
+msgstr "procesado"
 
 #: paperless_mail/models.py:268
 msgid "status"
-msgstr ""
+msgstr "estado"
 
