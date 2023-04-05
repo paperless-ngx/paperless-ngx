@@ -2990,7 +2990,7 @@
         <source>An error occurred loading content: <x id="PH" equiv-text="err.message ?? err.toString()"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">228</context>
+          <context context-type="linenumber">226,228</context>
         </context-group>
         <target state="needs-translation">An error occurred loading content: <x id="PH" equiv-text="err.message ?? err.toString()"/></target>
       </trans-unit>
