@@ -452,7 +452,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">224</context>
         </context-group>
-        <target state="translated">Es gibt noch &lt;em&gt;erheblich&lt;/em&gt; mehr Funktionen und Informationen, die nicht in der Tour abgedeckt wurden, nach der Tour sollten Sie jedoch direkt loslegen können. Schauen Sie sich die Dokumentation an oder besuchen Sie das Projekt auf GitHub um mehr zu erfahren oder Probleme zu melden.</target>
+        <target state="translated">Es gibt noch &lt;em&gt;erheblich&lt;/em&gt; mehr Funktionen und Informationen, die mit der Tour nicht abgedeckt wurden. Nach der Tour sollten Sie jedoch direkt loslegen können. Schauen Sie sich die Dokumentation an oder besuchen Sie das Projekt auf GitHub, um mehr zu erfahren oder Probleme zu melden.</target>
       </trans-unit>
       <trans-unit id="4270528545616947218" datatype="html">
         <source>Lastly, on behalf of every contributor to this community-supported project, thank you for using Paperless-ngx!</source>
@@ -460,7 +460,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">226</context>
         </context-group>
-        <target state="translated">Im Namen jedes Beitragenden zu diesem von der Gemeinschaft unterstützten Projekt, sagen wir, Danke, dass Sie Paperless-ngx benutzen!</target>
+        <target state="translated">Im Namen eines jeden Beitragenden zu diesem von der Gemeinschaft unterstützten Projekt, sagen wir Danke, dass Sie Paperless-ngx benutzen!</target>
       </trans-unit>
       <trans-unit id="5749300816154614125" datatype="html">
         <source>Initiating upload...</source>
@@ -1485,7 +1485,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="translated">Unterordner müssen durch einen Trennzeichen getrennt werden, oft durch einen Punkt ('.') oder einen Schrägstrich ('/'), aber dies variiert je nach Mail-Server.</target>
+        <target state="translated">Unterordner müssen durch ein Trennzeichen getrennt werden, oft durch einen Punkt (‚.‘) oder einen Schrägstrich (‚/‘), dies variiert jedoch je nach Mailserver.</target>
       </trans-unit>
       <trans-unit id="101686279614365671" datatype="html">
         <source>Maximum age (days)</source>
@@ -1597,7 +1597,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">27</context>
         </context-group>
-        <target state="translated">Die Aktion wird nur ausgeführt, wenn Dokumente über E-Mail konsumiert werden. E-Mails ohne Anhänge bleiben völlig unberührt.</target>
+        <target state="translated">Die Aktion wird nur ausgeführt, wenn Dokumente aus E-Mails verarbeitet werden. E-Mails ohne Anhänge bleiben vollkommen unberührt.</target>
       </trans-unit>
       <trans-unit id="1261794314435932203" datatype="html">
         <source>Action parameter</source>
@@ -1785,7 +1785,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">64</context>
         </context-group>
-        <target state="translated">Als wichtig markieren, verarbeite wichtig markierte E-Mails nicht</target>
+        <target state="translated">Als wichtig markieren, verarbeite als wichtig markierte E-Mails nicht</target>
       </trans-unit>
       <trans-unit id="6457024618858980302" datatype="html">
         <source>Tag the mail with specified tag, don&apos;t process tagged mails</source>
@@ -1793,7 +1793,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">68</context>
         </context-group>
-        <target state="translated">Markiere die Mail mit dem angegebenen Tag, verarbeite markierte E-Mails nicht</target>
+        <target state="translated">Markiere die E-Mail mit dem angegebenen Tag, verarbeite markierte E-Mails nicht</target>
       </trans-unit>
       <trans-unit id="4673329664686432878" datatype="html">
         <source>Use subject as title</source>
@@ -5042,7 +5042,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">839</context>
         </context-group>
-        <target state="translated">Regel "<x id="PH" equiv-text="newMailRule.name"/> " gespeichert.</target>
+        <target state="translated">Regel „<x id="PH" equiv-text="newMailRule.name"/>“ gespeichert.</target>
       </trans-unit>
       <trans-unit id="4741216051394823471" datatype="html">
         <source>Error saving rule: <x id="PH" equiv-text="e.toString()"/>.</source>
