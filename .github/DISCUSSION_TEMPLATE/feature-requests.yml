@@ -1,0 +1,14 @@
+title: "[Feature Request] "
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear and concise description of what you would like to see.
+    validations:
+      required: true
+  - type: textarea
+    id: other
+    attributes:
+      label: Other
+      description: Add any other context or information about the feature request here.
