@@ -347,70 +347,70 @@
         <source>The documents list shows all of your documents and allows for filtering as well as bulk-editing. There are three different view styles: list, small cards and large cards. A list of documents currently opened for editing is shown in the sidebar.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">164</context>
+          <context context-type="linenumber">165</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1334220418719920556" datatype="html">
         <source>The filtering tools allow you to quickly find documents using various searches, dates, tags, etc.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">176</context>
+          <context context-type="linenumber">178</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5427326625898532358" datatype="html">
         <source>Any combination of filters can be saved as a &apos;view&apos; which can then be displayed on the dashboard and / or sidebar.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">186</context>
+          <context context-type="linenumber">189</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2804886236408698479" datatype="html">
         <source>Tags, correspondents, document types and storage paths can all be managed using these pages. They can also be created from the document edit view.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">195</context>
+          <context context-type="linenumber">199</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4680387114119209483" datatype="html">
         <source>File Tasks shows you documents that have been consumed, are waiting to be, or may have failed during the process.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">204</context>
+          <context context-type="linenumber">209</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8116994662047019809" datatype="html">
         <source>Check out the settings for various tweaks to the web app, toggle settings for saved views or setup e-mail checking.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">213</context>
+          <context context-type="linenumber">219</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7172877665285340082" datatype="html">
         <source>Thank you! 🙏</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">222</context>
+          <context context-type="linenumber">229</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7354947513482088740" datatype="html">
         <source>There are &lt;em&gt;tons&lt;/em&gt; more features and info we didn&apos;t cover here, but this should get you started. Check out the documentation or visit the project on GitHub to learn more or to report issues.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">224</context>
+          <context context-type="linenumber">231</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4270528545616947218" datatype="html">
         <source>Lastly, on behalf of every contributor to this community-supported project, thank you for using Paperless-ngx!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">226</context>
+          <context context-type="linenumber">233</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5749300816154614125" datatype="html">
         <source>Initiating upload...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">281</context>
+          <context context-type="linenumber">288</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2173456130768795374" datatype="html">
@@ -2782,17 +2782,17 @@
         </context-group>
       </trans-unit>
       <trans-unit id="1844801255494293730" datatype="html">
-        <source>Error deleting document: <x id="PH" equiv-text="JSON.stringify(error)"/></source>
+        <source>Error deleting document: <x id="PH" equiv-text="error.error?.detail ?? error.message ?? JSON.stringify(error)"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">591</context>
+          <context context-type="linenumber">595,597</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7362691899087997122" datatype="html">
         <source>Redo OCR confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">611</context>
+          <context context-type="linenumber">618</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -2803,14 +2803,14 @@
         <source>This operation will permanently redo OCR for this document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">612</context>
+          <context context-type="linenumber">619</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5641451190833696892" datatype="html">
         <source>This operation cannot be undone.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">613</context>
+          <context context-type="linenumber">620</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -2841,7 +2841,7 @@
         <source>Proceed</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">615</context>
+          <context context-type="linenumber">622</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -2868,7 +2868,7 @@
         <source>Redo OCR operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">623</context>
+          <context context-type="linenumber">630</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8008978164775353960" datatype="html">
@@ -2877,7 +2877,7 @@
               )"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">634,636</context>
+          <context context-type="linenumber">641,643</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6857598786757174736" datatype="html">
@@ -4907,7 +4907,7 @@
         <source>You don&apos;t have permissions to do that</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/guards/permissions.guard.ts</context>
-          <context context-type="linenumber">31</context>
+          <context context-type="linenumber">35</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7536524521722799066" datatype="html">
