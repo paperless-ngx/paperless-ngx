@@ -178,7 +178,7 @@
                     </ng-template>
                 </li>
 
-                <li [ngbNavItem]="DocumentDetailNavIDs.Permissions" *appIfOwner="document">
+                <li [ngbNavItem]="DocumentDetailNavIDs.Permissions" *ngIf="showPermissions">
                     <a ngbNavLink i18n>Permissions</a>
                     <ng-template ngbNavContent>
                         <div class="mb-3">

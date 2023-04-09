@@ -688,12 +688,21 @@ export class DocumentDetailComponent
     }
   }
 
+  get showPermissions(): boolean {
+    return (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.User
+      ) && this.userIsOwner
+    )
+  }
+
   get notesEnabled(): boolean {
     return (
       this.settings.get(SETTINGS_KEYS.NOTES_ENABLED) &&
       this.permissionsService.currentUserCan(
         PermissionAction.View,
-        PermissionType.Document
+        PermissionType.Note
       )
     )
   }
