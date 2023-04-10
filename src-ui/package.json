@@ -52,7 +52,7 @@
     "@types/node": "^18.15.11",
     "@typescript-eslint/eslint-plugin": "^5.57.1",
     "@typescript-eslint/parser": "^5.57.1",
-    "concurrently": "7.4.0",
+    "concurrently": "^8.0.1",
     "eslint": "^8.38.0",
     "jest": "28.1.3",
     "jest-environment-jsdom": "^29.5.0",
