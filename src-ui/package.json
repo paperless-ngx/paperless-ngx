@@ -51,7 +51,7 @@
     "@types/jest": "^29.5.0",
     "@types/node": "^18.15.11",
     "@typescript-eslint/eslint-plugin": "^5.57.1",
-    "@typescript-eslint/parser": "^5.57.1",
+    "@typescript-eslint/parser": "^5.58.0",
     "concurrently": "^8.0.1",
     "eslint": "^8.38.0",
     "jest": "28.1.3",
