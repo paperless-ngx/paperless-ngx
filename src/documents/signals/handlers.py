@@ -4,6 +4,7 @@ import shutil
 
 from celery import states
 from celery.signals import before_task_publish
+from celery.signals import task_failure
 from celery.signals import task_postrun
 from celery.signals import task_prerun
 from django.conf import settings
@@ -590,4 +591,30 @@ def task_postrun_handler(
     except Exception:  # pragma: no cover
         # Don't let an exception in the signal handlers prevent
         # a document from being consumed.
+        logger.exception("Updating PaperlessTask failed")
+
+
+@task_failure.connect
+def task_failure_handler(
+    sender=None,
+    task_id=None,
+    exception=None,
+    args=None,
+    traceback=None,
+    **kwargs,
+):
+    """
+    Updates the result of a failed PaperlessTask.
+
+    https://docs.celeryq.dev/en/stable/userguide/signals.html#task-failure
+    """
+    try:
+        task_instance = PaperlessTask.objects.filter(task_id=task_id).first()
+
+        if task_instance is not None and task_instance.result is None:
+            task_instance.status = states.FAILURE
+            task_instance.result = traceback
+            task_instance.date_done = timezone.now()
+            task_instance.save()
+    except Exception:  # pragma: no cover
         logger.exception("Updating PaperlessTask failed")
