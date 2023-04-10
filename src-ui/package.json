@@ -24,7 +24,7 @@
     "@ng-bootstrap/ng-bootstrap": "^14.0.1",
     "@ng-select/ng-select": "^10.0.4",
     "@ngneat/dirty-check-forms": "^3.0.3",
-    "@popperjs/core": "^2.11.6",
+    "@popperjs/core": "^2.11.7",
     "bootstrap": "^5.2.3",
     "file-saver": "^2.0.5",
     "mime-names": "^1.0.0",
