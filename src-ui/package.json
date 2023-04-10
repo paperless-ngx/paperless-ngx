@@ -50,7 +50,7 @@
     "@angular/compiler-cli": "~15.2.5",
     "@types/jest": "28.1.6",
     "@types/node": "^18.15.11",
-    "@typescript-eslint/eslint-plugin": "^5.57.0",
+    "@typescript-eslint/eslint-plugin": "^5.57.1",
     "@typescript-eslint/parser": "^5.54.0",
     "concurrently": "7.4.0",
     "eslint": "^8.31.0",
