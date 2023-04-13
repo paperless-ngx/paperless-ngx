@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-04-13 13:57\n"
+"PO-Revision-Date: 2023-04-13 15:06\n"
 "Last-Translator: \n"
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
@@ -19,19 +19,19 @@ msgstr ""
 
 #: documents/apps.py:9
 msgid "Documents"
-msgstr ""
+msgstr "Dokumen"
 
 #: documents/models.py:36
 msgid "None"
-msgstr ""
+msgstr "Tidak ada"
 
 #: documents/models.py:37
 msgid "Any word"
-msgstr ""
+msgstr "Kata apapun"
 
 #: documents/models.py:38
 msgid "All words"
-msgstr ""
+msgstr "Semua kata"
 
 #: documents/models.py:39
 msgid "Exact match"
@@ -39,7 +39,7 @@ msgstr ""
 
 #: documents/models.py:40
 msgid "Regular expression"
-msgstr ""
+msgstr "Ekspresi reguler"
 
 #: documents/models.py:41
 msgid "Fuzzy word"
@@ -47,20 +47,20 @@ msgstr ""
 
 #: documents/models.py:42
 msgid "Automatic"
-msgstr ""
+msgstr "Otomatis"
 
 #: documents/models.py:45 documents/models.py:394 paperless_mail/models.py:17
 #: paperless_mail/models.py:89
 msgid "name"
-msgstr ""
+msgstr "nama"
 
 #: documents/models.py:47
 msgid "match"
-msgstr ""
+msgstr "cocok"
 
 #: documents/models.py:50
 msgid "matching algorithm"
-msgstr ""
+msgstr "mencocokkan algoritma"
 
 #: documents/models.py:55
 msgid "is insensitive"
@@ -68,7 +68,7 @@ msgstr ""
 
 #: documents/models.py:71
 msgid "owner"
-msgstr ""
+msgstr "pemilik"
 
 #: documents/models.py:81 documents/models.py:136
 msgid "correspondent"
@@ -80,7 +80,7 @@ msgstr ""
 
 #: documents/models.py:87
 msgid "color"
-msgstr ""
+msgstr "warna"
 
 #: documents/models.py:90
 msgid "is inbox tag"
@@ -100,11 +100,11 @@ msgstr ""
 
 #: documents/models.py:105 documents/models.py:156
 msgid "document type"
-msgstr ""
+msgstr "jenis dokumen"
 
 #: documents/models.py:106
 msgid "document types"
-msgstr ""
+msgstr "jenis dokumen"
 
 #: documents/models.py:111
 msgid "path"
@@ -112,15 +112,15 @@ msgstr ""
 
 #: documents/models.py:117 documents/models.py:145
 msgid "storage path"
-msgstr ""
+msgstr "lokasi penyimpanan"
 
 #: documents/models.py:118
 msgid "storage paths"
-msgstr ""
+msgstr "lokasi penyimpanan"
 
 #: documents/models.py:126
 msgid "Unencrypted"
-msgstr ""
+msgstr "Tidak terenkripsi"
 
 #: documents/models.py:127
 msgid "Encrypted with GNU Privacy Guard"
@@ -128,11 +128,11 @@ msgstr ""
 
 #: documents/models.py:148
 msgid "title"
-msgstr ""
+msgstr "judul"
 
 #: documents/models.py:160 documents/models.py:624
 msgid "content"
-msgstr ""
+msgstr "konten"
 
 #: documents/models.py:163
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
