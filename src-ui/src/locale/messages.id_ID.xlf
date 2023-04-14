@@ -16,7 +16,7 @@
           <context context-type="sourcefile">node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">HH</target>
+        <target state="translated">HH</target>
       </trans-unit>
       <trans-unit id="ngb.toast.close-aria" datatype="html">
         <source>Close</source>
@@ -32,7 +32,7 @@
           <context context-type="sourcefile">node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">««</target>
+        <target state="translated">««</target>
       </trans-unit>
       <trans-unit id="ngb.datepicker.select-month" datatype="html">
         <source>Select month</source>
@@ -44,7 +44,7 @@
           <context context-type="sourcefile">node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">Select month</target>
+        <target state="translated">Pilih bulan</target>
       </trans-unit>
       <trans-unit id="ngb.datepicker.previous-month" datatype="html">
         <source>Previous month</source>
@@ -56,7 +56,7 @@
           <context context-type="sourcefile">node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">Previous month</target>
+        <target state="translated">Bulan sebelumnya</target>
       </trans-unit>
       <trans-unit id="ngb.progressbar.value" datatype="html">
         <source>
@@ -90,7 +90,7 @@
           <context context-type="sourcefile">node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">«</target>
+        <target state="translated">«</target>
       </trans-unit>
       <trans-unit id="ngb.carousel.previous" datatype="html">
         <source>Previous</source>
@@ -106,7 +106,7 @@
           <context context-type="sourcefile">node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">MM</target>
+        <target state="translated">MM</target>
       </trans-unit>
       <trans-unit id="ngb.pagination.next" datatype="html">
         <source>»</source>
@@ -114,7 +114,7 @@
           <context context-type="sourcefile">node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">»</target>
+        <target state="translated">»</target>
       </trans-unit>
       <trans-unit id="ngb.datepicker.select-year" datatype="html">
         <source>Select year</source>
@@ -162,7 +162,7 @@
           <context context-type="sourcefile">node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">»»</target>
+        <target state="translated">»»</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.increment-hours" datatype="html">
         <source>Increment hours</source>
@@ -178,7 +178,7 @@
           <context context-type="sourcefile">node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">First</target>
+        <target state="translated">Pertama</target>
       </trans-unit>
       <trans-unit id="ngb.pagination.previous-aria" datatype="html">
         <source>Previous</source>
@@ -186,7 +186,7 @@
           <context context-type="sourcefile">node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">Previous</target>
+        <target state="translated">Sebelumnya</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.decrement-hours" datatype="html">
         <source>Decrement hours</source>
