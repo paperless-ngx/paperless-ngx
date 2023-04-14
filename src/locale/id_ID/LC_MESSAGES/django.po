@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-04-13 15:06\n"
+"PO-Revision-Date: 2023-04-14 09:03\n"
 "Last-Translator: \n"
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
@@ -35,7 +35,7 @@ msgstr "Semua kata"
 
 #: documents/models.py:39
 msgid "Exact match"
-msgstr ""
+msgstr "Sama persis"
 
 #: documents/models.py:40
 msgid "Regular expression"
@@ -72,11 +72,11 @@ msgstr "pemilik"
 
 #: documents/models.py:81 documents/models.py:136
 msgid "correspondent"
-msgstr ""
+msgstr "koresponden"
 
 #: documents/models.py:82
 msgid "correspondents"
-msgstr ""
+msgstr "koresponden"
 
 #: documents/models.py:87
 msgid "color"
@@ -108,7 +108,7 @@ msgstr "jenis dokumen"
 
 #: documents/models.py:111
 msgid "path"
-msgstr ""
+msgstr "lokasi"
 
 #: documents/models.py:117 documents/models.py:145
 msgid "storage path"
@@ -124,7 +124,7 @@ msgstr "Tidak terenkripsi"
 
 #: documents/models.py:127
 msgid "Encrypted with GNU Privacy Guard"
-msgstr ""
+msgstr "Terenkripsi dengan GNU Privacy Guard"
 
 #: documents/models.py:148
 msgid "title"
@@ -160,23 +160,23 @@ msgstr ""
 
 #: documents/models.py:194 documents/models.py:376 documents/models.py:630
 msgid "created"
-msgstr ""
+msgstr "dibuat"
 
 #: documents/models.py:197
 msgid "modified"
-msgstr ""
+msgstr "dimodifikasi"
 
 #: documents/models.py:204
 msgid "storage type"
-msgstr ""
+msgstr "jenis penyimpanan"
 
 #: documents/models.py:212
 msgid "added"
-msgstr ""
+msgstr "menambahkan"
 
 #: documents/models.py:219
 msgid "filename"
-msgstr ""
+msgstr "nama berkas"
 
 #: documents/models.py:225
 msgid "Current filename in storage"
@@ -208,7 +208,7 @@ msgstr ""
 
 #: documents/models.py:268 documents/models.py:641
 msgid "document"
-msgstr ""
+msgstr "dokumen"
 
 #: documents/models.py:269
 msgid "documents"
@@ -220,7 +220,7 @@ msgstr ""
 
 #: documents/models.py:360
 msgid "information"
-msgstr ""
+msgstr "informasi"
 
 #: documents/models.py:361
 msgid "warning"
@@ -228,7 +228,7 @@ msgstr ""
 
 #: documents/models.py:362 paperless_mail/models.py:276
 msgid "error"
-msgstr ""
+msgstr "kesalahan"
 
 #: documents/models.py:363
 msgid "critical"
@@ -236,11 +236,11 @@ msgstr ""
 
 #: documents/models.py:366
 msgid "group"
-msgstr ""
+msgstr "grup"
 
 #: documents/models.py:368
 msgid "message"
-msgstr ""
+msgstr "pesan"
 
 #: documents/models.py:371
 msgid "level"
@@ -264,7 +264,7 @@ msgstr ""
 
 #: documents/models.py:397
 msgid "show on dashboard"
-msgstr ""
+msgstr "tampilkan di dasbor"
 
 #: documents/models.py:400
 msgid "show in sidebar"
