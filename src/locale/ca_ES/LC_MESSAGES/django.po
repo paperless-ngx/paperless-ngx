@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-04-15 14:00\n"
+"PO-Revision-Date: 2023-04-15 15:03\n"
 "Last-Translator: \n"
 "Language-Team: Catalan\n"
 "Language: ca_ES\n"
@@ -19,108 +19,108 @@ msgstr ""
 
 #: documents/apps.py:9
 msgid "Documents"
-msgstr ""
+msgstr "Documents"
 
 #: documents/models.py:36
 msgid "None"
-msgstr ""
+msgstr "Cap"
 
 #: documents/models.py:37
 msgid "Any word"
-msgstr ""
+msgstr "Qualsevol paraula"
 
 #: documents/models.py:38
 msgid "All words"
-msgstr ""
+msgstr "Totes paraules"
 
 #: documents/models.py:39
 msgid "Exact match"
-msgstr ""
+msgstr "Coincidència exacte"
 
 #: documents/models.py:40
 msgid "Regular expression"
-msgstr ""
+msgstr "Expressió Regular"
 
 #: documents/models.py:41
 msgid "Fuzzy word"
-msgstr ""
+msgstr "Paraula difusa"
 
 #: documents/models.py:42
 msgid "Automatic"
-msgstr ""
+msgstr "Automàtic"
 
 #: documents/models.py:45 documents/models.py:394 paperless_mail/models.py:17
 #: paperless_mail/models.py:89
 msgid "name"
-msgstr ""
+msgstr "nom"
 
 #: documents/models.py:47
 msgid "match"
-msgstr ""
+msgstr "coincidència"
 
 #: documents/models.py:50
 msgid "matching algorithm"
-msgstr ""
+msgstr "algoritme coincident"
 
 #: documents/models.py:55
 msgid "is insensitive"
-msgstr ""
+msgstr "no distingeix entre majúscules i minúscules"
 
 #: documents/models.py:71
 msgid "owner"
-msgstr ""
+msgstr "propietari"
 
 #: documents/models.py:81 documents/models.py:136
 msgid "correspondent"
-msgstr ""
+msgstr "corresponsal"
 
 #: documents/models.py:82
 msgid "correspondents"
-msgstr ""
+msgstr "corresponsals"
 
 #: documents/models.py:87
 msgid "color"
-msgstr ""
+msgstr "color"
 
 #: documents/models.py:90
 msgid "is inbox tag"
-msgstr ""
+msgstr "etiqueta entrada"
 
 #: documents/models.py:93
 msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
-msgstr ""
+msgstr "Marca aquesta etiqueta com a etiqueta de safata d'entrada: tots els documents consumits s'etiquetaran amb etiquetes d'entrada."
 
 #: documents/models.py:99
 msgid "tag"
-msgstr ""
+msgstr "etiqueta"
 
 #: documents/models.py:100 documents/models.py:174
 msgid "tags"
-msgstr ""
+msgstr "etiquetes"
 
 #: documents/models.py:105 documents/models.py:156
 msgid "document type"
-msgstr ""
+msgstr "tipus document"
 
 #: documents/models.py:106
 msgid "document types"
-msgstr ""
+msgstr "tipus document"
 
 #: documents/models.py:111
 msgid "path"
-msgstr ""
+msgstr "camí"
 
 #: documents/models.py:117 documents/models.py:145
 msgid "storage path"
-msgstr ""
+msgstr "ruta emmagatzematge"
 
 #: documents/models.py:118
 msgid "storage paths"
-msgstr ""
+msgstr "rutes emmagatzematge"
 
 #: documents/models.py:126
 msgid "Unencrypted"
-msgstr ""
+msgstr "No Encriptat"
 
 #: documents/models.py:127
 msgid "Encrypted with GNU Privacy Guard"
