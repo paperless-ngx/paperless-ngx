@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-04-15 15:03\n"
+"PO-Revision-Date: 2023-04-15 16:17\n"
 "Last-Translator: \n"
 "Language-Team: Catalan\n"
 "Language: ca_ES\n"
@@ -124,203 +124,203 @@ msgstr "No Encriptat"
 
 #: documents/models.py:127
 msgid "Encrypted with GNU Privacy Guard"
-msgstr ""
+msgstr "Xifrat amb GNU Privacy Guard"
 
 #: documents/models.py:148
 msgid "title"
-msgstr ""
+msgstr "títol"
 
 #: documents/models.py:160 documents/models.py:624
 msgid "content"
-msgstr ""
+msgstr "contingut"
 
 #: documents/models.py:163
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
-msgstr ""
+msgstr "Les dades en brut del document només és text. Aquest camp s'utilitza principalment per a la cerca."
 
 #: documents/models.py:168
 msgid "mime type"
-msgstr ""
+msgstr "topus mimètic"
 
 #: documents/models.py:178
 msgid "checksum"
-msgstr ""
+msgstr "checksum"
 
 #: documents/models.py:182
 msgid "The checksum of the original document."
-msgstr ""
+msgstr "Checksum del document original."
 
 #: documents/models.py:186
 msgid "archive checksum"
-msgstr ""
+msgstr "arxiva checksum"
 
 #: documents/models.py:191
 msgid "The checksum of the archived document."
-msgstr ""
+msgstr "El checksum del document arxivat."
 
 #: documents/models.py:194 documents/models.py:376 documents/models.py:630
 msgid "created"
-msgstr ""
+msgstr "creat"
 
 #: documents/models.py:197
 msgid "modified"
-msgstr ""
+msgstr "modificat"
 
 #: documents/models.py:204
 msgid "storage type"
-msgstr ""
+msgstr "tipus emmagatzematge"
 
 #: documents/models.py:212
 msgid "added"
-msgstr ""
+msgstr "afegit"
 
 #: documents/models.py:219
 msgid "filename"
-msgstr ""
+msgstr "nom arxiu"
 
 #: documents/models.py:225
 msgid "Current filename in storage"
-msgstr ""
+msgstr "Nom arxiu a emmagatzematge"
 
 #: documents/models.py:229
 msgid "archive filename"
-msgstr ""
+msgstr "nom arxiu arxivat"
 
 #: documents/models.py:235
 msgid "Current archive filename in storage"
-msgstr ""
+msgstr "Nom arxiu arxivat a emmagatzematge"
 
 #: documents/models.py:239
 msgid "original filename"
-msgstr ""
+msgstr "nom arxiu original"
 
 #: documents/models.py:245
 msgid "The original name of the file when it was uploaded"
-msgstr ""
+msgstr "El nom original del fitxer quan es va pujar"
 
 #: documents/models.py:252
 msgid "archive serial number"
-msgstr ""
+msgstr "número de sèrie de l'arxiu"
 
 #: documents/models.py:262
 msgid "The position of this document in your physical document archive."
-msgstr ""
+msgstr "Posició d'aquest document al vostre arxiu físic de documents."
 
 #: documents/models.py:268 documents/models.py:641
 msgid "document"
-msgstr ""
+msgstr "document"
 
 #: documents/models.py:269
 msgid "documents"
-msgstr ""
+msgstr "documents"
 
 #: documents/models.py:359
 msgid "debug"
-msgstr ""
+msgstr "depura"
 
 #: documents/models.py:360
 msgid "information"
-msgstr ""
+msgstr "informació"
 
 #: documents/models.py:361
 msgid "warning"
-msgstr ""
+msgstr "alerta"
 
 #: documents/models.py:362 paperless_mail/models.py:276
 msgid "error"
-msgstr ""
+msgstr "error"
 
 #: documents/models.py:363
 msgid "critical"
-msgstr ""
+msgstr "crític"
 
 #: documents/models.py:366
 msgid "group"
-msgstr ""
+msgstr "grup"
 
 #: documents/models.py:368
 msgid "message"
-msgstr ""
+msgstr "missatge"
 
 #: documents/models.py:371
 msgid "level"
-msgstr ""
+msgstr "nivell"
 
 #: documents/models.py:380
 msgid "log"
-msgstr ""
+msgstr "log"
 
 #: documents/models.py:381
 msgid "logs"
-msgstr ""
+msgstr "logs"
 
 #: documents/models.py:391 documents/models.py:446
 msgid "saved view"
-msgstr ""
+msgstr "vista guardada"
 
 #: documents/models.py:392
 msgid "saved views"
-msgstr ""
+msgstr "vistes guardades"
 
 #: documents/models.py:397
 msgid "show on dashboard"
-msgstr ""
+msgstr "mostra al panell"
 
 #: documents/models.py:400
 msgid "show in sidebar"
-msgstr ""
+msgstr "mostra barra lateral"
 
 #: documents/models.py:404
 msgid "sort field"
-msgstr ""
+msgstr "camp ordenació"
 
 #: documents/models.py:409
 msgid "sort reverse"
-msgstr ""
+msgstr "ordenament invers"
 
 #: documents/models.py:414
 msgid "title contains"
-msgstr ""
+msgstr "títol conté"
 
 #: documents/models.py:415
 msgid "content contains"
-msgstr ""
+msgstr "contingut conté"
 
 #: documents/models.py:416
 msgid "ASN is"
-msgstr ""
+msgstr "ASN és"
 
 #: documents/models.py:417
 msgid "correspondent is"
-msgstr ""
+msgstr "corresponsal és"
 
 #: documents/models.py:418
 msgid "document type is"
-msgstr ""
+msgstr "tipus document és"
 
 #: documents/models.py:419
 msgid "is in inbox"
-msgstr ""
+msgstr "està safata entrada"
 
 #: documents/models.py:420
 msgid "has tag"
-msgstr ""
+msgstr "té etiqueta"
 
 #: documents/models.py:421
 msgid "has any tag"
-msgstr ""
+msgstr "qualsevol etiqueta"
 
 #: documents/models.py:422
 msgid "created before"
-msgstr ""
+msgstr "creat abans"
 
 #: documents/models.py:423
 msgid "created after"
-msgstr ""
+msgstr "creat després"
 
 #: documents/models.py:424
 msgid "created year is"
-msgstr ""
+msgstr "any creació és"
 
 #: documents/models.py:425
 msgid "created month is"
@@ -526,203 +526,203 @@ msgstr ""
 
 #: documents/templates/registration/logged_out.html:60
 msgid "Sign in again"
-msgstr ""
+msgstr "Entra de nou"
 
 #: documents/templates/registration/login.html:15
 msgid "Paperless-ngx sign in"
-msgstr ""
+msgstr "Paperless-ngx sign in"
 
 #: documents/templates/registration/login.html:61
 msgid "Please sign in."
-msgstr ""
+msgstr "Siusplau valida't."
 
 #: documents/templates/registration/login.html:64
 msgid "Your username and password didn't match. Please try again."
-msgstr ""
+msgstr "Nom usuari / contrasenya no coincideixen. Siusplau torna a provar."
 
 #: documents/templates/registration/login.html:67
 msgid "Username"
-msgstr ""
+msgstr "Nom usuari"
 
 #: documents/templates/registration/login.html:68
 msgid "Password"
-msgstr ""
+msgstr "Contrasenya"
 
 #: documents/templates/registration/login.html:73
 msgid "Sign in"
-msgstr ""
+msgstr "Validació"
 
 #: paperless/apps.py:9
 msgid "Paperless"
-msgstr ""
+msgstr "Paperless"
 
 #: paperless/settings.py:521
 msgid "English (US)"
-msgstr ""
+msgstr "English (US)"
 
 #: paperless/settings.py:522
 msgid "Arabic"
-msgstr ""
+msgstr "Àrab"
 
 #: paperless/settings.py:523
 msgid "Belarusian"
-msgstr ""
+msgstr "Bielorús"
 
 #: paperless/settings.py:524
 msgid "Czech"
-msgstr ""
+msgstr "Txec"
 
 #: paperless/settings.py:525
 msgid "Danish"
-msgstr ""
+msgstr "Danès"
 
 #: paperless/settings.py:526
 msgid "German"
-msgstr ""
+msgstr "Alemany"
 
 #: paperless/settings.py:527
 msgid "English (GB)"
-msgstr ""
+msgstr "Anglès (GB)"
 
 #: paperless/settings.py:528
 msgid "Spanish"
-msgstr ""
+msgstr "Espanyol"
 
 #: paperless/settings.py:529
 msgid "French"
-msgstr ""
+msgstr "Francès"
 
 #: paperless/settings.py:530
 msgid "Italian"
-msgstr ""
+msgstr "Italià"
 
 #: paperless/settings.py:531
 msgid "Luxembourgish"
-msgstr ""
+msgstr "Luxemburguès"
 
 #: paperless/settings.py:532
 msgid "Dutch"
-msgstr ""
+msgstr "Holandès"
 
 #: paperless/settings.py:533
 msgid "Polish"
-msgstr ""
+msgstr "Polac"
 
 #: paperless/settings.py:534
 msgid "Portuguese (Brazil)"
-msgstr ""
+msgstr "Portuguès (BZ)"
 
 #: paperless/settings.py:535
 msgid "Portuguese"
-msgstr ""
+msgstr "Portuguès"
 
 #: paperless/settings.py:536
 msgid "Romanian"
-msgstr ""
+msgstr "Romanès"
 
 #: paperless/settings.py:537
 msgid "Russian"
-msgstr ""
+msgstr "Rus"
 
 #: paperless/settings.py:538
 msgid "Slovenian"
-msgstr ""
+msgstr "Eslovè"
 
 #: paperless/settings.py:539
 msgid "Serbian"
-msgstr ""
+msgstr "Serbi"
 
 #: paperless/settings.py:540
 msgid "Swedish"
-msgstr ""
+msgstr "Suec"
 
 #: paperless/settings.py:541
 msgid "Turkish"
-msgstr ""
+msgstr "Turc"
 
 #: paperless/settings.py:542
 msgid "Chinese Simplified"
-msgstr ""
+msgstr "Xinès Simplificat"
 
 #: paperless/urls.py:169
 msgid "Paperless-ngx administration"
-msgstr ""
+msgstr "Administració Paperless-ngx"
 
 #: paperless_mail/admin.py:30
 msgid "Authentication"
-msgstr ""
+msgstr "Autentificació"
 
 #: paperless_mail/admin.py:31
 msgid "Advanced settings"
-msgstr ""
+msgstr "Opcions avançades"
 
 #: paperless_mail/admin.py:48
 msgid "Filter"
-msgstr ""
+msgstr "Filtre"
 
 #: paperless_mail/admin.py:51
 msgid "Paperless will only process mails that match ALL of the filters given below."
-msgstr ""
+msgstr "Només es processaran els correus que coincideixin amb TOTS els filtres indicats."
 
 #: paperless_mail/admin.py:66
 msgid "Actions"
-msgstr ""
+msgstr "Accions"
 
 #: paperless_mail/admin.py:69
 msgid "The action applied to the mail. This action is only performed when the mail body or attachments were consumed from the mail."
-msgstr ""
+msgstr "Acció aplicada al correu. Aquesta acció només es realitza quan el cos del correu o els fitxers adjunts s'han consumit."
 
 #: paperless_mail/admin.py:77
 msgid "Metadata"
-msgstr ""
+msgstr "Matadades"
 
 #: paperless_mail/admin.py:80
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
-msgstr ""
+msgstr "Assigna metadades als documents consumits d'aquesta regla automàticament. Si no assigneu etiquetes, tipus o corresponsals aquí, es processaran totes les regles de concordança que hàgiu definit."
 
 #: paperless_mail/apps.py:10
 msgid "Paperless mail"
-msgstr ""
+msgstr "Paperless mail"
 
 #: paperless_mail/models.py:9
 msgid "mail account"
-msgstr ""
+msgstr "compte correu"
 
 #: paperless_mail/models.py:10
 msgid "mail accounts"
-msgstr ""
+msgstr "comptes correu"
 
 #: paperless_mail/models.py:13
 msgid "No encryption"
-msgstr ""
+msgstr "Sense encriptació"
 
 #: paperless_mail/models.py:14
 msgid "Use SSL"
-msgstr ""
+msgstr "SSL"
 
 #: paperless_mail/models.py:15
 msgid "Use STARTTLS"
-msgstr ""
+msgstr "STARTTLS"
 
 #: paperless_mail/models.py:19
 msgid "IMAP server"
-msgstr ""
+msgstr "Servidor IMAP"
 
 #: paperless_mail/models.py:22
 msgid "IMAP port"
-msgstr ""
+msgstr "port IMAP"
 
 #: paperless_mail/models.py:26
 msgid "This is usually 143 for unencrypted and STARTTLS connections, and 993 for SSL connections."
-msgstr ""
+msgstr "Normalment 143 sense encriptació i STARTTLS i 993 per a SSL."
 
 #: paperless_mail/models.py:32
 msgid "IMAP security"
-msgstr ""
+msgstr "Seguretat IMAP"
 
 #: paperless_mail/models.py:37
 msgid "username"
-msgstr ""
+msgstr "nom usuari"
 
 #: paperless_mail/models.py:39
 msgid "password"
