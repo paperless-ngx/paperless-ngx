@@ -986,8 +986,8 @@ barcode is detected.
     pages will be split up before reading the ASN.
 
     If no ASN barcodes are detected in the uploaded file, no ASN will
-    be set. If a barcode with an already existing ASN is detected, no ASN
-    will be set either and a warning will be logged.
+    be set. If a barcode with an existing ASN is detected, the
+    document will not be consumed and an error logged.
 
     Defaults to false.
 
