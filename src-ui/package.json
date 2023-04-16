@@ -46,7 +46,7 @@
     "@angular-eslint/eslint-plugin-template": "15.2.1",
     "@angular-eslint/schematics": "15.2.1",
     "@angular-eslint/template-parser": "15.2.1",
-    "@angular/cli": "~15.2.5",
+    "@angular/cli": "~15.2.6",
     "@angular/compiler-cli": "~15.2.6",
     "@types/jest": "^29.5.0",
     "@types/node": "^18.15.11",
