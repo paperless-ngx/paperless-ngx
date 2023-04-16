@@ -40,7 +40,7 @@
   },
   "devDependencies": {
     "@angular-builders/jest": "15.0.0",
-    "@angular-devkit/build-angular": "~15.2.5",
+    "@angular-devkit/build-angular": "~15.2.6",
     "@angular-eslint/builder": "15.2.1",
     "@angular-eslint/eslint-plugin": "15.2.1",
     "@angular-eslint/eslint-plugin-template": "15.2.1",
