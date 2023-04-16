@@ -38,11 +38,41 @@ jobs:
         name: Check files
         uses: pre-commit/action@v3.0.0
 
+  changes:
+    runs-on: ubuntu-latest
+    name: "Categorize File Changes"
+    permissions:
+      pull-requests: read
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+      docs: ${{ steps.filter.outputs.docs }}
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            backend:
+              - 'src/**'
+              - 'Pipfile'
+              - 'Pipfile.lock'
+              - 'gunicorn.conf.py'
+            frontend:
+              - 'src-ui/**'
+            docs:
+              - 'docs/**'
+              - 'resources/**'
+
   documentation:
     name: "Build Documentation"
     runs-on: ubuntu-22.04
+    if: ${{ needs.changes.outputs.docs == 'true' }}
     needs:
       - pre-commit
+      - changes
     steps:
       -
         name: Checkout
@@ -102,6 +132,8 @@ jobs:
     runs-on: ubuntu-22.04
     needs:
       - pre-commit
+      - changes
+    if: ${{ needs.changes.outputs.backend == 'true' }}
     strategy:
       matrix:
         python-version: ['3.8', '3.9', '3.10']
@@ -175,8 +207,10 @@ jobs:
   tests-frontend:
     name: "Tests Frontend"
     runs-on: ubuntu-22.04
+    if: ${{ needs.changes.outputs.frontend == 'true' }}
     needs:
       - pre-commit
+      - changes
     strategy:
       matrix:
         node-version: [16.x]
