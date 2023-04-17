@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-04-14 09:03\n"
+"PO-Revision-Date: 2023-04-17 05:24\n"
 "Last-Translator: \n"
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
@@ -192,11 +192,11 @@ msgstr ""
 
 #: documents/models.py:239
 msgid "original filename"
-msgstr ""
+msgstr "nama file asli"
 
 #: documents/models.py:245
 msgid "The original name of the file when it was uploaded"
-msgstr ""
+msgstr "Nama awal file pada saat diunggah"
 
 #: documents/models.py:252
 msgid "archive serial number"
@@ -364,7 +364,7 @@ msgstr ""
 
 #: documents/models.py:435
 msgid "more like this"
-msgstr ""
+msgstr "lebih seperti ini"
 
 #: documents/models.py:436
 msgid "has tags in"
@@ -388,7 +388,7 @@ msgstr ""
 
 #: documents/models.py:451
 msgid "value"
-msgstr ""
+msgstr "nilai"
 
 #: documents/models.py:454
 msgid "filter rule"
@@ -416,7 +416,7 @@ msgstr ""
 
 #: documents/models.py:576
 msgid "Task Filename"
-msgstr ""
+msgstr "Nama File Tugas"
 
 #: documents/models.py:577
 msgid "Name of the file which the Task was run for"
@@ -424,7 +424,7 @@ msgstr ""
 
 #: documents/models.py:583
 msgid "Task Name"
-msgstr ""
+msgstr "Nama Tugas"
 
 #: documents/models.py:584
 msgid "Name of the Task which was run"
