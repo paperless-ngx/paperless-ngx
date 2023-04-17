@@ -1041,8 +1041,8 @@ barcode is detected.
     pages will be split up before reading the ASN.
 
     If no ASN barcodes are detected in the uploaded file, no ASN will
-    be set. If a barcode with an already existing ASN is detected, no ASN
-    will be set either and a warning will be logged.
+    be set. If a barcode with an existing ASN is detected, the
+    document will not be consumed and an error logged.
 
     Defaults to false.
 
@@ -1143,10 +1143,13 @@ actual group ID on the host system, which you can get by executing
 : Additional OCR languages to install. By default, paperless comes
 with English, German, Italian, Spanish and French. If your language
 is not in this list, install additional languages with this
-configuration option ([find the right LangCodes](https://tesseract-ocr.github.io/tessdoc/Data-Files-in-different-versions.html)):
+configuration option. You will need to [find the right LangCodes](https://tesseract-ocr.github.io/tessdoc/Data-Files-in-different-versions.html)
+but note that (tesseract-ocr-\* package names)[https://packages.debian.org/bullseye/graphics/]
+do not always correspond with the language codes e.g. "chi_tra" should be
+specified as "chi-tra".
 
     ``` bash
-    PAPERLESS_OCR_LANGUAGES=tur ces
+    PAPERLESS_OCR_LANGUAGES=tur ces chi-tra
     ```
 
     Make sure it's a space separated list when using several values.
