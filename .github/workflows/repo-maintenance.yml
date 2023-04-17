@@ -1,4 +1,4 @@
-name: 'Lock Old Threads'
+name: 'Repository Maintenance'
 
 on:
   schedule:
@@ -13,7 +13,23 @@ concurrency:
   group: lock
 
 jobs:
-  action:
+  stale:
+    name: 'Stale'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v8
+        with:
+          days-before-stale: 30
+          days-before-close: 7
+          only-labels: 'cant-reproduce'
+          stale-issue-label: stale
+          stale-pr-label: stale
+          stale-issue-message: >
+            This issue has been automatically marked as stale because it has not had
+            recent activity. It will be closed if no further activity occurs. Thank you
+            for your contributions.
+  lock-threads:
+    name: 'Lock Old Threads'
     runs-on: ubuntu-latest
     steps:
       - uses: dessant/lock-threads@v4
