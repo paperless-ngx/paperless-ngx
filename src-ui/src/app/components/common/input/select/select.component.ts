@@ -27,21 +27,31 @@ export class SelectComponent extends AbstractInputComponent<number> {
   }
 
   _items: any[]
+  privateItems: any[] = []
 
   @Input()
   set items(items) {
-    if (this.value && items.find((i) => i.id === this.value) === undefined) {
-      items.push({
-        id: this.value,
+    this._items = items
+    if (this.value) this.checkForPrivateItem(this.value)
+  }
+
+  writeValue(newValue: any): void {
+    if (newValue && this._items) this.checkForPrivateItem(newValue)
+    super.writeValue(newValue)
+  }
+
+  checkForPrivateItem(value) {
+    if (this._items.find((i) => i.id === value) === undefined) {
+      this.privateItems.push({
+        id: value,
         name: $localize`Private`,
         private: true,
       })
     }
-    this._items = items
   }
 
   get items(): any[] {
-    return this._items
+    return this._items?.concat(this.privateItems)
   }
 
   @Input()
