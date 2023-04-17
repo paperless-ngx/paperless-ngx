@@ -403,7 +403,7 @@ structure as in the previous example above.
      Statement January.pdf
      Statement February.pdf
 
- Insurances/                           # Insurances
+Insurances/                             # Insurances
    Healthcare 123/
      2022-01-01 Statement January.pdf
      2022-02-02 Letter.pdf
