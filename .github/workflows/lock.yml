@@ -19,6 +19,8 @@ jobs:
       - uses: dessant/lock-threads@v4
         with:
           issue-inactive-days: '30'
+          pr-inactive-days: '30'
+          log-output: true
           issue-comment: >
             This issue has been automatically locked since there
             has not been any recent activity after it was closed.
