@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-04-15 16:17\n"
+"PO-Revision-Date: 2023-04-18 14:37\n"
 "Last-Translator: \n"
 "Language-Team: Catalan\n"
 "Language: ca_ES\n"
@@ -324,123 +324,123 @@ msgstr "any creació és"
 
 #: documents/models.py:425
 msgid "created month is"
-msgstr ""
+msgstr "mes creació és"
 
 #: documents/models.py:426
 msgid "created day is"
-msgstr ""
+msgstr "dia creació és"
 
 #: documents/models.py:427
 msgid "added before"
-msgstr ""
+msgstr "afegit abans"
 
 #: documents/models.py:428
 msgid "added after"
-msgstr ""
+msgstr "afegit després"
 
 #: documents/models.py:429
 msgid "modified before"
-msgstr ""
+msgstr "modificat abans"
 
 #: documents/models.py:430
 msgid "modified after"
-msgstr ""
+msgstr "modificat després"
 
 #: documents/models.py:431
 msgid "does not have tag"
-msgstr ""
+msgstr "no té etiqueta"
 
 #: documents/models.py:432
 msgid "does not have ASN"
-msgstr ""
+msgstr "no té ASN"
 
 #: documents/models.py:433
 msgid "title or content contains"
-msgstr ""
+msgstr "títol o contingut conté"
 
 #: documents/models.py:434
 msgid "fulltext query"
-msgstr ""
+msgstr "consulta de text complet"
 
 #: documents/models.py:435
 msgid "more like this"
-msgstr ""
+msgstr "més com aquest"
 
 #: documents/models.py:436
 msgid "has tags in"
-msgstr ""
+msgstr "té etiquetes a"
 
 #: documents/models.py:437
 msgid "ASN greater than"
-msgstr ""
+msgstr "ASN més gran que"
 
 #: documents/models.py:438
 msgid "ASN less than"
-msgstr ""
+msgstr "ASN menor que"
 
 #: documents/models.py:439
 msgid "storage path is"
-msgstr ""
+msgstr "emmagatzematge és"
 
 #: documents/models.py:449
 msgid "rule type"
-msgstr ""
+msgstr "tipus de regla"
 
 #: documents/models.py:451
 msgid "value"
-msgstr ""
+msgstr "valor"
 
 #: documents/models.py:454
 msgid "filter rule"
-msgstr ""
+msgstr "regla de filtre"
 
 #: documents/models.py:455
 msgid "filter rules"
-msgstr ""
+msgstr "regla de filtres"
 
 #: documents/models.py:563
 msgid "Task ID"
-msgstr ""
+msgstr "ID Tasca"
 
 #: documents/models.py:564
 msgid "Celery ID for the Task that was run"
-msgstr ""
+msgstr "Celery ID per la tasca que es va executar"
 
 #: documents/models.py:569
 msgid "Acknowledged"
-msgstr ""
+msgstr "Reconegut"
 
 #: documents/models.py:570
 msgid "If the task is acknowledged via the frontend or API"
-msgstr ""
+msgstr "Si la tasca es reconeix mitjançant la interfície o l'API"
 
 #: documents/models.py:576
 msgid "Task Filename"
-msgstr ""
+msgstr "Nom Arxiu tasca"
 
 #: documents/models.py:577
 msgid "Name of the file which the Task was run for"
-msgstr ""
+msgstr "Nom del fitxer per al qual s'ha executat la tasca"
 
 #: documents/models.py:583
 msgid "Task Name"
-msgstr ""
+msgstr "Nom tasca"
 
 #: documents/models.py:584
 msgid "Name of the Task which was run"
-msgstr ""
+msgstr "Nom de la tasca que s'ha executat"
 
 #: documents/models.py:591
 msgid "Task State"
-msgstr ""
+msgstr "Estat de tasca"
 
 #: documents/models.py:592
 msgid "Current state of the task being run"
-msgstr ""
+msgstr "Estat actual de la tasca que s'està executant"
 
 #: documents/models.py:597
 msgid "Created DateTime"
-msgstr ""
+msgstr "Data Hora Creació"
 
 #: documents/models.py:598
 msgid "Datetime field when the task result was created in UTC"
