@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-04-18 14:37\n"
+"PO-Revision-Date: 2023-04-18 15:36\n"
 "Last-Translator: \n"
 "Language-Team: Catalan\n"
 "Language: ca_ES\n"
@@ -493,7 +493,7 @@ msgstr ""
 
 #: documents/serialisers.py:320
 msgid "Invalid color."
-msgstr ""
+msgstr "Color Invàlid."
 
 #: documents/serialisers.py:700
 #, python-format
@@ -506,19 +506,19 @@ msgstr ""
 
 #: documents/templates/index.html:78
 msgid "Paperless-ngx is loading..."
-msgstr ""
+msgstr "Paperless-ngx carregant..."
 
 #: documents/templates/index.html:79
 msgid "Still here?! Hmm, something might be wrong."
-msgstr ""
+msgstr "Encara Aquí?! Hmm, alguna cosa pot estar malament."
 
 #: documents/templates/index.html:79
 msgid "Here's a link to the docs."
-msgstr ""
+msgstr "Link als documents."
 
 #: documents/templates/registration/logged_out.html:14
 msgid "Paperless-ngx signed out"
-msgstr ""
+msgstr "Deslogat de Paperless-ngx"
 
 #: documents/templates/registration/logged_out.html:59
 msgid "You have been successfully logged out. Bye!"
