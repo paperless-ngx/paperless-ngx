@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-03-07 04:36\n"
+"PO-Revision-Date: 2023-04-17 05:24\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -372,15 +372,15 @@ msgstr "porte une étiquette parmi"
 
 #: documents/models.py:437
 msgid "ASN greater than"
-msgstr "est supérieur à"
+msgstr "ASN supérieur à"
 
 #: documents/models.py:438
 msgid "ASN less than"
-msgstr "est inférieur à"
+msgstr "ASN inférieur à"
 
 #: documents/models.py:439
 msgid "storage path is"
-msgstr "chemin d'accès au stockage"
+msgstr "chemin de stockage est"
 
 #: documents/models.py:449
 msgid "rule type"
@@ -408,7 +408,7 @@ msgstr "Identifiant Celery pour la tâche qui a été exécutée"
 
 #: documents/models.py:569
 msgid "Acknowledged"
-msgstr "Prise en compte"
+msgstr "Confirmer"
 
 #: documents/models.py:570
 msgid "If the task is acknowledged via the frontend or API"
@@ -428,7 +428,7 @@ msgstr "Nom de la tâche"
 
 #: documents/models.py:584
 msgid "Name of the Task which was run"
-msgstr "Nom de la tâche exécutée"
+msgstr "Nom de la tâche qui a été exécuté"
 
 #: documents/models.py:591
 msgid "Task State"
@@ -436,7 +436,7 @@ msgstr "État de la tâche"
 
 #: documents/models.py:592
 msgid "Current state of the task being run"
-msgstr "Etat actuel de la tâche en cours d'exécution"
+msgstr "État actuel de la tâche en cours d'exécution"
 
 #: documents/models.py:597
 msgid "Created DateTime"
@@ -444,7 +444,7 @@ msgstr "Date de création"
 
 #: documents/models.py:598
 msgid "Datetime field when the task result was created in UTC"
-msgstr "Champ de date lorsque le résultat de la tâche a été créé (UTC)"
+msgstr "Champ de date lorsque le résultat de la tâche a été créé en UTC"
 
 #: documents/models.py:603
 msgid "Started DateTime"
@@ -452,7 +452,7 @@ msgstr "Date de début"
 
 #: documents/models.py:604
 msgid "Datetime field when the task was started in UTC"
-msgstr "Champ de date lorsque la tâche a été créé (UTC)"
+msgstr "Champ de date lorsque le résultat de la tâche a été créé en UTC"
 
 #: documents/models.py:609
 msgid "Completed DateTime"
@@ -460,11 +460,11 @@ msgstr "Date de fin"
 
 #: documents/models.py:610
 msgid "Datetime field when the task was completed in UTC"
-msgstr "Champ de date lorsque la tâche a été terminée (UTC)"
+msgstr "Champ de date lorsque le résultat de la tâche a été créé en UTC"
 
 #: documents/models.py:615
 msgid "Result Data"
-msgstr "Données de résultat"
+msgstr "Données du résultat"
 
 #: documents/models.py:617
 msgid "The data returned by the task"
@@ -502,7 +502,7 @@ msgstr "Type de fichier %(type)s non pris en charge"
 
 #: documents/serialisers.py:794
 msgid "Invalid variable detected."
-msgstr "Variable non valide détectée."
+msgstr "Variable invalide détectée."
 
 #: documents/templates/index.html:78
 msgid "Paperless-ngx is loading..."
@@ -514,7 +514,7 @@ msgstr "Toujours ici ? Hum, quelque chose a dû mal se passer."
 
 #: documents/templates/index.html:79
 msgid "Here's a link to the docs."
-msgstr "Lien vers la documentation."
+msgstr "Voici un lien vers la documentation."
 
 #: documents/templates/registration/logged_out.html:14
 msgid "Paperless-ngx signed out"
@@ -554,7 +554,7 @@ msgstr "S'identifier"
 
 #: paperless/apps.py:9
 msgid "Paperless"
-msgstr ""
+msgstr "Paperless"
 
 #: paperless/settings.py:521
 msgid "English (US)"
@@ -670,7 +670,7 @@ msgstr "Actions"
 
 #: paperless_mail/admin.py:69
 msgid "The action applied to the mail. This action is only performed when the mail body or attachments were consumed from the mail."
-msgstr ""
+msgstr "L'action appliquée au courrier. Cette action n'est effectuée que lorsque le corps du courrier ou les pièces jointes ont été consommés par le courrier."
 
 #: paperless_mail/admin.py:77
 msgid "Metadata"
@@ -750,11 +750,11 @@ msgstr "Ne traiter que les pièces jointes."
 
 #: paperless_mail/models.py:62
 msgid "Process full Mail (with embedded attachments in file) as .eml"
-msgstr ""
+msgstr "Traiter le courrier complet (avec des pièces jointes intégrées dans le fichier) en tant que .eml"
 
 #: paperless_mail/models.py:64
 msgid "Process full Mail (with embedded attachments in file) as .eml + process attachments as separate documents"
-msgstr ""
+msgstr "Traiter le courrier complet (avec des pièces jointes intégrées dans le fichier) en .eml + traiter les pièces jointes en tant que documents séparés"
 
 #: paperless_mail/models.py:70
 msgid "Process all files, including 'inline' attachments."
@@ -778,7 +778,7 @@ msgstr "Marquer le courriel, ne pas traiter les courriels marqués"
 
 #: paperless_mail/models.py:77
 msgid "Tag the mail with specified tag, don't process tagged mails"
-msgstr "Affecter l’étiquette spécifée au courrier, ne pas traiter les courriels étiquetés"
+msgstr "Affecter l’étiquette spécifiée au courrier, ne pas traiter les courriels étiquetés"
 
 #: paperless_mail/models.py:80
 msgid "Use subject as title"
@@ -858,7 +858,7 @@ msgstr "Les pièces jointes en ligne comprennent les images intégrées, il est 
 
 #: paperless_mail/models.py:158
 msgid "consumption scope"
-msgstr "périmètre de consommation"
+msgstr "portée de la consommation"
 
 #: paperless_mail/models.py:164
 msgid "action"

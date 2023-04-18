@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-03-03 20:41\n"
+"PO-Revision-Date: 2023-04-13 23:41\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -23,7 +23,7 @@ msgstr "Dokumenty"
 
 #: documents/models.py:36
 msgid "None"
-msgstr ""
+msgstr "Brak"
 
 #: documents/models.py:37
 msgid "Any word"
@@ -68,7 +68,7 @@ msgstr "bez rozróżniania wielkości znaków"
 
 #: documents/models.py:71
 msgid "owner"
-msgstr ""
+msgstr "właściciel"
 
 #: documents/models.py:81 documents/models.py:136
 msgid "correspondent"
@@ -416,11 +416,11 @@ msgstr "Jeśli zadanie jest potwierdzone przez frontend lub API"
 
 #: documents/models.py:576
 msgid "Task Filename"
-msgstr ""
+msgstr "Nazwa Pliku Zadania"
 
 #: documents/models.py:577
 msgid "Name of the file which the Task was run for"
-msgstr ""
+msgstr "Nazwa pliku, na którym zostało wykonane Zadanie"
 
 #: documents/models.py:583
 msgid "Task Name"
@@ -428,7 +428,7 @@ msgstr "Nazwa zadania"
 
 #: documents/models.py:584
 msgid "Name of the Task which was run"
-msgstr ""
+msgstr "Nazwa uruchomionego Zadania"
 
 #: documents/models.py:591
 msgid "Task State"
@@ -436,11 +436,11 @@ msgstr "Stan zadania"
 
 #: documents/models.py:592
 msgid "Current state of the task being run"
-msgstr ""
+msgstr "Aktualny stan zadania"
 
 #: documents/models.py:597
 msgid "Created DateTime"
-msgstr ""
+msgstr "Data i czas utworzenia"
 
 #: documents/models.py:598
 msgid "Datetime field when the task result was created in UTC"
@@ -554,7 +554,7 @@ msgstr "Zaloguj się"
 
 #: paperless/apps.py:9
 msgid "Paperless"
-msgstr ""
+msgstr "Paperless"
 
 #: paperless/settings.py:521
 msgid "English (US)"
@@ -562,7 +562,7 @@ msgstr "Angielski (USA)"
 
 #: paperless/settings.py:522
 msgid "Arabic"
-msgstr ""
+msgstr "arabski"
 
 #: paperless/settings.py:523
 msgid "Belarusian"
@@ -894,21 +894,21 @@ msgstr "przypisz tego korespondenta"
 
 #: paperless_mail/models.py:239
 msgid "uid"
-msgstr ""
+msgstr "uid"
 
 #: paperless_mail/models.py:247
 msgid "subject"
-msgstr ""
+msgstr "temat"
 
 #: paperless_mail/models.py:255
 msgid "received"
-msgstr ""
+msgstr "otrzymano"
 
 #: paperless_mail/models.py:262
 msgid "processed"
-msgstr ""
+msgstr "przetworzono"
 
 #: paperless_mail/models.py:268
 msgid "status"
-msgstr ""
+msgstr "status"
 
