@@ -27,23 +27,33 @@ export class SelectComponent extends AbstractInputComponent<number> {
   }
 
   _items: any[]
-  privateItems: any[] = []
 
   @Input()
   set items(items) {
     this._items = items
-    if (this.value) this.checkForPrivateItem(this.value)
+    if (items && this.value) this.checkForPrivateItems(this.value)
   }
 
   writeValue(newValue: any): void {
-    if (newValue && this._items) this.checkForPrivateItem(newValue)
+    if (newValue && this._items) {
+      this.checkForPrivateItems(newValue)
+      this.items = [...this._items] // we need to explicitly re-set items
+    }
     super.writeValue(newValue)
   }
 
-  checkForPrivateItem(value) {
-    if (this._items.find((i) => i.id === value) === undefined) {
-      this.privateItems.push({
-        id: value,
+  checkForPrivateItems(value: any) {
+    if (Array.isArray(value) && value.length > 0) {
+      value.forEach((id) => this.checkForPrivateItem(id))
+    } else {
+      this.checkForPrivateItem(value)
+    }
+  }
+
+  checkForPrivateItem(id) {
+    if (this._items.find((i) => i.id === id) === undefined) {
+      this._items.push({
+        id: id,
         name: $localize`Private`,
         private: true,
       })
@@ -51,7 +61,7 @@ export class SelectComponent extends AbstractInputComponent<number> {
   }
 
   get items(): any[] {
-    return this._items?.concat(this.privateItems)
+    return this._items
   }
 
   @Input()
