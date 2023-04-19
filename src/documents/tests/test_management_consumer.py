@@ -271,25 +271,11 @@ class TestConsumer(DirectoriesMixin, ConsumerThreadMixin, TransactionTestCase):
                 "ignore": False,
             },
             {
-                "path": os.path.join(self.dirs.consumption_dir, ".DS_STORE", "foo.pdf"),
+                "path": os.path.join(self.dirs.consumption_dir, ".DS_STORE"),
                 "ignore": True,
             },
             {
-                "path": os.path.join(
-                    self.dirs.consumption_dir,
-                    "foo",
-                    ".DS_STORE",
-                    "bar.pdf",
-                ),
-                "ignore": True,
-            },
-            {
-                "path": os.path.join(
-                    self.dirs.consumption_dir,
-                    ".DS_STORE",
-                    "foo",
-                    "bar.pdf",
-                ),
+                "path": os.path.join(self.dirs.consumption_dir, ".DS_Store"),
                 "ignore": True,
             },
             {
