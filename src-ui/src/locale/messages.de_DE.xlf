@@ -709,7 +709,7 @@
           <context context-type="sourcefile">src/app/components/manage/logs/logs.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="final">Protokoll</target>
+        <target state="final">Protokolle</target>
       </trans-unit>
       <trans-unit id="314315645942131479" datatype="html">
         <source>Info</source>
@@ -3638,7 +3638,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">39</context>
         </context-group>
-        <target state="translated">Dokumententyp Filter umschalten</target>
+        <target state="translated">Dokumenttyp-Filter umschalten</target>
       </trans-unit>
       <trans-unit id="8950368321707344185" datatype="html">
         <source>Toggle storage path filter</source>
@@ -3654,7 +3654,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="final">Nichts auswählen</target>
+        <target state="final">Auswahl leeren</target>
       </trans-unit>
       <trans-unit id="1512866475468373520" datatype="html" approved="yes">
         <source>Select page</source>
@@ -3826,7 +3826,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">168</context>
         </context-group>
-        <target state="translated">Nach ‚ausgestellt am‘ sortieren</target>
+        <target state="translated">Nach „Ausgestellt am“ sortieren</target>
       </trans-unit>
       <trans-unit id="3769035778779263084" datatype="html">
         <source>Sort by added date</source>
@@ -3834,7 +3834,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">175</context>
         </context-group>
-        <target state="translated">Nach ‚hinzugefügt am‘ sortieren</target>
+        <target state="translated">Nach „Hinzugefügt am“ sortieren</target>
       </trans-unit>
       <trans-unit id="231679111972850796" datatype="html" approved="yes">
         <source>Added</source>
@@ -4150,7 +4150,7 @@
           <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.ts</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="translated">dokumenttypen</target>
+        <target state="translated">Dokumenttyp</target>
       </trans-unit>
       <trans-unit id="2992451138146293104" datatype="html">
         <source>document types</source>
@@ -4514,7 +4514,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">103</context>
         </context-group>
-        <target state="translated">Benutze Seitenleiste (nur Icons)</target>
+        <target state="translated">Benutze schlanke Seitenleiste (nur Icons)</target>
       </trans-unit>
       <trans-unit id="1356890996281769972" datatype="html" approved="yes">
         <source>Dark mode</source>
@@ -4858,7 +4858,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">583</context>
         </context-group>
-        <target state="translated">Jetzt neuladen</target>
+        <target state="translated">Jetzt neu laden</target>
       </trans-unit>
       <trans-unit id="6839066544204061364" datatype="html" approved="yes">
         <source>Use system language</source>
@@ -5162,7 +5162,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">66</context>
         </context-group>
-        <target state="translated">für vollständige Ausgabe anklicken</target>
+        <target state="translated">Für vollständige Ausgabe anklicken</target>
       </trans-unit>
       <trans-unit id="1536087519743707362" datatype="html">
         <source>Dismiss</source>
@@ -5354,7 +5354,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">46</context>
         </context-group>
-        <target state="translated">Keine: Deaktiviere Übereinstimmung</target>
+        <target state="translated">Keine: Deaktiviere automatische Zuweisung</target>
       </trans-unit>
       <trans-unit id="5948496158474272829" datatype="html">
         <source>Warning: You have unsaved changes to your document(s).</source>
@@ -5402,7 +5402,7 @@
           <context context-type="sourcefile">src/app/guards/dirty-form.guard.ts</context>
           <context context-type="linenumber">19</context>
         </context-group>
-        <target state="translated">Sind Sie sicher, dass Sie gehen möchten?</target>
+        <target state="translated">Sind Sie sicher, dass Sie diese Seite verlassen möchten?</target>
       </trans-unit>
       <trans-unit id="729881853265307704" datatype="html">
         <source>Leave page</source>
@@ -5426,7 +5426,7 @@
           <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
           <context context-type="linenumber">38</context>
         </context-group>
-        <target state="translated">Sind Sie sicher, dass Sie diese gespeicherte Ansicht schließen wollen?</target>
+        <target state="translated">Sind Sie sicher, dass Sie diese gespeicherte Ansicht schließen möchten?</target>
       </trans-unit>
       <trans-unit id="856284624775342512" datatype="html">
         <source>Save and close</source>
@@ -5434,7 +5434,7 @@
           <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
           <context context-type="linenumber">42</context>
         </context-group>
-        <target state="translated">Speichern und Schließen</target>
+        <target state="translated">Speichern und schließen</target>
       </trans-unit>
       <trans-unit id="8311312207500500516" datatype="html">
         <source>You don&apos;t have permissions to do that</source>
@@ -5482,7 +5482,7 @@
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="translated">Dokument existiert bereits.</target>
+        <target state="translated">Ein Dokument mit dieser ASN existiert bereits.</target>
       </trans-unit>
       <trans-unit id="148389968432135849" datatype="html" approved="yes">
         <source>File not found.</source>
