@@ -431,6 +431,14 @@ if _paperless_url:
 # For use with trusted proxies
 TRUSTED_PROXIES = __get_list("PAPERLESS_TRUSTED_PROXIES")
 
+USE_X_FORWARDED_HOST = __get_boolean("PAPERLESS_USE_X_FORWARD_HOST", "false")
+USE_X_FORWARDED_PORT = __get_boolean("PAPERLESS_USE_X_FORWARD_PORT", "false")
+SECURE_PROXY_SSL_HEADER = (
+    tuple(json.loads(os.environ["PAPERLESS_PROXY_SSL_HEADER"]))
+    if "PAPERLESS_PROXY_SSL_HEADER" in os.environ
+    else None
+)
+
 # The secret key has a default that should be fine so long as you're hosting
 # Paperless on a closed network.  However, if you're putting this anywhere
 # public, you should change the key to something unique and verbose.
