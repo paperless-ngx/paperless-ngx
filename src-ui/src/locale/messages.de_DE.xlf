@@ -673,7 +673,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">155</context>
         </context-group>
-        <target state="translated">Speicherpfad</target>
+        <target state="translated">Speicherpfade</target>
       </trans-unit>
       <trans-unit id="2991443309752293110" datatype="html">
         <source>File Tasks</source>
@@ -809,7 +809,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">593</context>
         </context-group>
-        <target state="translated">Ein Fehler ist beim Speichern der Einstellungen aufgetreten.</target>
+        <target state="translated">Es ist ein Fehler beim Speichern der Einstellungen aufgetreten.</target>
       </trans-unit>
       <trans-unit id="2526035785704676448" datatype="html">
         <source>An error occurred while saving update checking settings.</source>
@@ -817,7 +817,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
           <context context-type="linenumber">222</context>
         </context-group>
-        <target state="translated">Es ist ein Fehler beim Speichern der Update Einstellungen aufgetreten.</target>
+        <target state="translated">Es ist ein Fehler beim Speichern der Update-Einstellungen aufgetreten.</target>
       </trans-unit>
       <trans-unit id="8700121026680200191" datatype="html" approved="yes">
         <source>Clear</source>
@@ -1677,7 +1677,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">41</context>
         </context-group>
-        <target state="translated">E-mail als .eml verarbeiten</target>
+        <target state="translated">E-Mail als .eml verarbeiten</target>
       </trans-unit>
       <trans-unit id="7411485377918318115" datatype="html">
         <source>Process message as .eml and attachments separately</source>
@@ -1685,7 +1685,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="translated">E-mail als .eml und Anhänge separat verarbeiten</target>
+        <target state="translated">E-Mail als .eml und Anhänge separat verarbeiten</target>
       </trans-unit>
       <trans-unit id="7022070615528435141" datatype="html" approved="yes">
         <source>Delete</source>
