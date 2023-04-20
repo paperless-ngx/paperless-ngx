@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-04-17 05:24\n"
+"PO-Revision-Date: 2023-04-20 13:20\n"
 "Last-Translator: \n"
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
@@ -43,7 +43,7 @@ msgstr "Ekspresi reguler"
 
 #: documents/models.py:41
 msgid "Fuzzy word"
-msgstr ""
+msgstr "Kata samar"
 
 #: documents/models.py:42
 msgid "Automatic"
@@ -64,7 +64,7 @@ msgstr "mencocokkan algoritma"
 
 #: documents/models.py:55
 msgid "is insensitive"
-msgstr ""
+msgstr "tidak sensitif"
 
 #: documents/models.py:71
 msgid "owner"
@@ -84,19 +84,19 @@ msgstr "warna"
 
 #: documents/models.py:90
 msgid "is inbox tag"
-msgstr ""
+msgstr "tag kotak masuk"
 
 #: documents/models.py:93
 msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
-msgstr ""
+msgstr "Tandai tag ini sebagai tag kotak masuk: Semua dokumen yang baru akan di tag dengan tag kotak masuk."
 
 #: documents/models.py:99
 msgid "tag"
-msgstr ""
+msgstr "tag"
 
 #: documents/models.py:100 documents/models.py:174
 msgid "tags"
-msgstr ""
+msgstr "tandai"
 
 #: documents/models.py:105 documents/models.py:156
 msgid "document type"
@@ -136,27 +136,27 @@ msgstr "konten"
 
 #: documents/models.py:163
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
-msgstr ""
+msgstr "Raw, hanya data text dari dokumen. Bagian ini adalah bagian utama yang di gunakan untuk pencarian."
 
 #: documents/models.py:168
 msgid "mime type"
-msgstr ""
+msgstr "mime type"
 
 #: documents/models.py:178
 msgid "checksum"
-msgstr ""
+msgstr "checksum"
 
 #: documents/models.py:182
 msgid "The checksum of the original document."
-msgstr ""
+msgstr "Checksum dari dokumen yang asli."
 
 #: documents/models.py:186
 msgid "archive checksum"
-msgstr ""
+msgstr "checksum arsip"
 
 #: documents/models.py:191
 msgid "The checksum of the archived document."
-msgstr ""
+msgstr "Checksum dari dokumen yang di arsip."
 
 #: documents/models.py:194 documents/models.py:376 documents/models.py:630
 msgid "created"
@@ -180,15 +180,15 @@ msgstr "nama berkas"
 
 #: documents/models.py:225
 msgid "Current filename in storage"
-msgstr ""
+msgstr "Nama file saat ini yang tersimpan"
 
 #: documents/models.py:229
 msgid "archive filename"
-msgstr ""
+msgstr "nama file arsip"
 
 #: documents/models.py:235
 msgid "Current archive filename in storage"
-msgstr ""
+msgstr "Nama file arsip saat ini yang tersimpan"
 
 #: documents/models.py:239
 msgid "original filename"
@@ -200,11 +200,11 @@ msgstr "Nama awal file pada saat diunggah"
 
 #: documents/models.py:252
 msgid "archive serial number"
-msgstr ""
+msgstr "nomor serial arsip"
 
 #: documents/models.py:262
 msgid "The position of this document in your physical document archive."
-msgstr ""
+msgstr "Posisi dokumen ini pada arsip fisik dokumen yang di binder."
 
 #: documents/models.py:268 documents/models.py:641
 msgid "document"
