@@ -10,31 +10,29 @@ except ImportError:
     from backports import zoneinfo
 import magic
 from django.conf import settings
+from django.contrib.auth.models import Group
+from django.contrib.auth.models import User
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
+from guardian.shortcuts import get_users_with_perms
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
+
+from documents.permissions import get_groups_with_only_permission
+from documents.permissions import set_permissions_for_object
 
 from . import bulk_edit
 from .models import Correspondent
 from .models import Document
 from .models import DocumentType
 from .models import MatchingModel
+from .models import PaperlessTask
 from .models import SavedView
 from .models import SavedViewFilterRule
 from .models import StoragePath
 from .models import Tag
 from .models import UiSettings
-from .models import PaperlessTask
 from .parsers import is_mime_type_supported
-
-from guardian.shortcuts import get_users_with_perms
-
-from django.contrib.auth.models import User
-from django.contrib.auth.models import Group
-
-from documents.permissions import get_groups_with_only_permission
-from documents.permissions import set_permissions_for_object
 
 
 # https://www.django-rest-framework.org/api-guide/serializers/#example

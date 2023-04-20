@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
+
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 from paperless_mail.models import ProcessedMail

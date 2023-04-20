@@ -8,8 +8,8 @@ try:
 except ImportError:
     from backports import zoneinfo
 
-from django.test import override_settings
 from django.test import TestCase
+from django.test import override_settings
 from django.utils import timezone
 
 from documents.models import Correspondent

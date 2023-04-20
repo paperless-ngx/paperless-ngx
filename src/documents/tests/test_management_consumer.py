@@ -7,10 +7,11 @@ from time import sleep
 from unittest import mock
 
 from django.conf import settings
-from django.core.management import call_command
 from django.core.management import CommandError
-from django.test import override_settings
+from django.core.management import call_command
 from django.test import TransactionTestCase
+from django.test import override_settings
+
 from documents.consumer import ConsumerError
 from documents.data_models import ConsumableDocument
 from documents.management.commands import document_consumer

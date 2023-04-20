@@ -14,6 +14,7 @@ from typing import Set
 
 from django.conf import settings
 from django.utils import timezone
+
 from documents.loggers import LoggingMixin
 from documents.signals import document_consumer_declaration
 

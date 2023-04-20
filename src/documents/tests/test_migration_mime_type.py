@@ -3,6 +3,7 @@ import shutil
 
 from django.conf import settings
 from django.test import override_settings
+
 from documents.parsers import get_default_file_extension
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import TestMigrations

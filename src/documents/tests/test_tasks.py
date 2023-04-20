@@ -4,6 +4,7 @@ from unittest import mock
 from django.conf import settings
 from django.test import TestCase
 from django.utils import timezone
+
 from documents import tasks
 from documents.models import Correspondent
 from documents.models import Document

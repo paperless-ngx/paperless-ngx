@@ -7,8 +7,8 @@ from unittest import mock
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import DatabaseError
-from django.test import override_settings
 from django.test import TestCase
+from django.test import override_settings
 from django.utils import timezone
 
 from documents.file_handling import create_source_path_directory

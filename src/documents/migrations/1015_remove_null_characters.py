@@ -3,7 +3,6 @@ import logging
 
 from django.db import migrations
 
-
 logger = logging.getLogger("paperless.migrations")
 
 

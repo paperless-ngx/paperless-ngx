@@ -5,8 +5,9 @@ from uuid import uuid4
 
 from dateutil import tz
 from django.conf import settings
-from django.test import override_settings
 from django.test import TestCase
+from django.test import override_settings
+
 from documents.parsers import parse_date
 from documents.parsers import parse_date_generator
 

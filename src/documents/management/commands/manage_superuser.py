@@ -4,7 +4,6 @@ import os
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 
-
 logger = logging.getLogger("paperless.management.superuser")
 
 

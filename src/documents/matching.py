@@ -8,7 +8,6 @@ from documents.models import StoragePath
 from documents.models import Tag
 from documents.permissions import get_objects_for_user_owner_aware
 
-
 logger = logging.getLogger("paperless.matching")
 
 

@@ -9,9 +9,10 @@ from zipfile import ZipFile
 
 from django.core.management import call_command
 from django.core.management.base import CommandError
-from django.test import override_settings
 from django.test import TestCase
+from django.test import override_settings
 from django.utils import timezone
+
 from documents.management.commands import document_exporter
 from documents.models import Correspondent
 from documents.models import Document

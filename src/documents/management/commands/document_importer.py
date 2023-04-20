@@ -14,16 +14,16 @@ from django.core.management.base import CommandError
 from django.core.serializers.base import DeserializationError
 from django.db.models.signals import m2m_changed
 from django.db.models.signals import post_save
+from filelock import FileLock
+
+from documents.file_handling import create_source_path_directory
 from documents.models import Document
 from documents.parsers import run_convert
 from documents.settings import EXPORTER_ARCHIVE_NAME
 from documents.settings import EXPORTER_FILE_NAME
 from documents.settings import EXPORTER_THUMBNAIL_NAME
-from filelock import FileLock
-from paperless import version
-
-from documents.file_handling import create_source_path_directory
 from documents.signals.handlers import update_filename_and_move_files
+from paperless import version
 
 
 @contextmanager

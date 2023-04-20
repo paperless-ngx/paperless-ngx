@@ -2,10 +2,12 @@ import os
 
 import pytest
 from django.test import TestCase
+
 from paperless_mail.mail import MailAccountHandler
 from paperless_mail.mail import MailError
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
+
 
 # Only run if the environment is setup
 # And the environment is not empty (forks, I think)

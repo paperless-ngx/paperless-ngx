@@ -1,5 +1,6 @@
 from django.apps import AppConfig
 from django.conf import settings
+
 from paperless_tika.signals import tika_consumer_declaration
 
 
