@@ -1,4 +1,5 @@
 from django.core.management.base import BaseCommand
+
 from documents.sanity_checker import check_sanity
 
 

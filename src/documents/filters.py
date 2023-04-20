@@ -11,7 +11,6 @@ from .models import Log
 from .models import StoragePath
 from .models import Tag
 
-
 CHAR_KWARGS = ["istartswith", "iendswith", "icontains", "iexact"]
 ID_KWARGS = ["in", "exact"]
 INT_KWARGS = ["exact", "gt", "gte", "lt", "lte", "isnull"]

@@ -12,21 +12,22 @@ from unittest import mock
 from django.core.management import call_command
 from django.db import DatabaseError
 from django.test import TestCase
-from documents.models import Correspondent
-from documents.tests.utils import DirectoriesMixin
-from documents.tests.utils import FileSystemAssertsMixin
+from imap_tools import NOT
 from imap_tools import EmailAddress
 from imap_tools import FolderInfo
 from imap_tools import MailboxFolderSelectError
 from imap_tools import MailboxLoginError
 from imap_tools import MailMessage
 from imap_tools import MailMessageFlags
-from imap_tools import NOT
+
+from documents.models import Correspondent
+from documents.tests.utils import DirectoriesMixin
+from documents.tests.utils import FileSystemAssertsMixin
 from paperless_mail import tasks
-from paperless_mail.mail import apply_mail_action
 from paperless_mail.mail import MailAccountHandler
 from paperless_mail.mail import MailError
 from paperless_mail.mail import TagMailAction
+from paperless_mail.mail import apply_mail_action
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 

@@ -17,6 +17,7 @@ from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+
 from documents.parsers import get_default_file_extension
 
 ALL_STATES = sorted(states.ALL_STATES)

@@ -2,14 +2,13 @@ import logging
 
 import tqdm
 from django.core.management.base import BaseCommand
+
 from documents.classifier import load_classifier
 from documents.models import Document
-
 from documents.signals.handlers import set_correspondent
 from documents.signals.handlers import set_document_type
 from documents.signals.handlers import set_storage_path
 from documents.signals.handlers import set_tags
-
 
 logger = logging.getLogger("paperless.management.retagger")
 

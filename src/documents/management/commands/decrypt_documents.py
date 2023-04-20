@@ -3,6 +3,7 @@ import os
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.core.management.base import CommandError
+
 from documents.models import Document
 from paperless.db import GnuPG
 

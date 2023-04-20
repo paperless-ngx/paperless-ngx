@@ -15,9 +15,9 @@ except ImportError:
     from backports import zoneinfo
 
 from django.conf import settings
-from django.utils import timezone
-from django.test import override_settings
 from django.test import TestCase
+from django.test import override_settings
+from django.utils import timezone
 
 from documents.consumer import Consumer
 from documents.consumer import ConsumerError
@@ -29,8 +29,9 @@ from documents.models import Tag
 from documents.parsers import DocumentParser
 from documents.parsers import ParseError
 from documents.tasks import sanity_check
-from .utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
+
+from .utils import DirectoriesMixin
 
 
 class TestAttributes(TestCase):

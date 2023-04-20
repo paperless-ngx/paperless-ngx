@@ -5,8 +5,9 @@ from pathlib import Path
 from typing import Final
 
 from django.conf import settings
-from documents.models import Document
 from tqdm import tqdm
+
+from documents.models import Document
 
 
 class SanityCheckMessages:

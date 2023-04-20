@@ -6,9 +6,9 @@ import tqdm
 from django import db
 from django.conf import settings
 from django.core.management.base import BaseCommand
+
 from documents.models import Document
 from documents.tasks import update_document_archive_file
-
 
 logger = logging.getLogger("paperless.management.archiver")
 

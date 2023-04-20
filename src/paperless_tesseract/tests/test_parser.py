@@ -5,14 +5,15 @@ import uuid
 from typing import ContextManager
 from unittest import mock
 
-from django.test import override_settings
 from django.test import TestCase
+from django.test import override_settings
+
 from documents.parsers import ParseError
 from documents.parsers import run_convert
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
-from paperless_tesseract.parsers import post_process_text
 from paperless_tesseract.parsers import RasterisedDocumentParser
+from paperless_tesseract.parsers import post_process_text
 
 image_to_string_calls = []
 

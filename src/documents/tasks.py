@@ -12,6 +12,10 @@ from channels.layers import get_channel_layer
 from django.conf import settings
 from django.db import transaction
 from django.db.models.signals import post_save
+from filelock import FileLock
+from redis.exceptions import ConnectionError
+from whoosh.writing import AsyncWriter
+
 from documents import barcodes
 from documents import index
 from documents import sanity_checker
@@ -32,10 +36,6 @@ from documents.models import Tag
 from documents.parsers import DocumentParser
 from documents.parsers import get_parser_class_for_mime_type
 from documents.sanity_checker import SanityCheckFailedException
-from filelock import FileLock
-from redis.exceptions import ConnectionError
-from whoosh.writing import AsyncWriter
-
 
 logger = logging.getLogger("paperless.tasks")
 

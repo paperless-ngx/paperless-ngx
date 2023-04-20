@@ -7,6 +7,9 @@ from django.urls import re_path
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import RedirectView
+from rest_framework.authtoken import views
+from rest_framework.routers import DefaultRouter
+
 from documents.views import AcknowledgeTasksView
 from documents.views import BulkDownloadView
 from documents.views import BulkEditView
@@ -32,8 +35,6 @@ from paperless.views import UserViewSet
 from paperless_mail.views import MailAccountTestView
 from paperless_mail.views import MailAccountViewSet
 from paperless_mail.views import MailRuleViewSet
-from rest_framework.authtoken import views
-from rest_framework.routers import DefaultRouter
 
 api_router = DefaultRouter()
 api_router.register(r"correspondents", CorrespondentViewSet)

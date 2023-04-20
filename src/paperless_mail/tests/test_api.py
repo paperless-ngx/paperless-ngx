@@ -2,6 +2,9 @@ import json
 from unittest import mock
 
 from django.contrib.auth.models import User
+from rest_framework import status
+from rest_framework.test import APITestCase
+
 from documents.models import Correspondent
 from documents.models import DocumentType
 from documents.models import Tag
@@ -9,8 +12,6 @@ from documents.tests.utils import DirectoriesMixin
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 from paperless_mail.tests.test_mail import BogusMailBox
-from rest_framework import status
-from rest_framework.test import APITestCase
 
 
 class TestAPIMailAccounts(DirectoriesMixin, APITestCase):

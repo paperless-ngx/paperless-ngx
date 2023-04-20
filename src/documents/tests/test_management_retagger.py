@@ -1,5 +1,6 @@
 from django.core.management import call_command
 from django.test import TestCase
+
 from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
