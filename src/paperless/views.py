@@ -6,15 +6,16 @@ from django.db.models.functions import Lower
 from django.http import HttpResponse
 from django.views.generic import View
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import OrderingFilter
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.viewsets import ModelViewSet
+
 from documents.permissions import PaperlessObjectPermissions
 from paperless.filters import GroupFilterSet
 from paperless.filters import UserFilterSet
 from paperless.serialisers import GroupSerializer
 from paperless.serialisers import UserSerializer
-from rest_framework.filters import OrderingFilter
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.viewsets import ModelViewSet
 
 
 class StandardPagination(PageNumberPagination):

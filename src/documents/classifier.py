@@ -10,6 +10,7 @@ from typing import List
 from typing import Optional
 
 from django.conf import settings
+
 from documents.models import Document
 from documents.models import MatchingModel
 
@@ -336,10 +337,9 @@ class DocumentClassifier:
         if settings.NLTK_LANGUAGE is not None and settings.NLTK_ENABLED:
 
             import nltk
-
-            from nltk.tokenize import word_tokenize
             from nltk.corpus import stopwords
             from nltk.stem import SnowballStemmer
+            from nltk.tokenize import word_tokenize
 
             # Not really hacky, since it isn't private and is documented, but
             # set the search path for NLTK data to the single location it should be in

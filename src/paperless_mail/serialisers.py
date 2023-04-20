@@ -1,10 +1,11 @@
+from rest_framework import serializers
+
 from documents.serialisers import CorrespondentField
 from documents.serialisers import DocumentTypeField
 from documents.serialisers import OwnedObjectSerializer
 from documents.serialisers import TagsField
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
-from rest_framework import serializers
 
 
 class ObfuscatedPasswordField(serializers.Field):

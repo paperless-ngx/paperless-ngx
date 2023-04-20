@@ -1,4 +1,5 @@
 from django.apps import AppConfig
+
 from paperless_tesseract.signals import tesseract_consumer_declaration
 
 

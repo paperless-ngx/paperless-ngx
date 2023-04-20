@@ -5,8 +5,9 @@ from unittest import mock
 
 import pytest
 from django.conf import settings
-from django.test import override_settings
 from django.test import TestCase
+from django.test import override_settings
+
 from documents.classifier import ClassifierModelCorruptError
 from documents.classifier import DocumentClassifier
 from documents.classifier import IncompatibleClassifierVersionError

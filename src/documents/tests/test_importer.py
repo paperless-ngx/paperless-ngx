@@ -1,12 +1,13 @@
+import tempfile
+from pathlib import Path
+
+from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import TestCase
-from documents.settings import EXPORTER_FILE_NAME
-from documents.settings import EXPORTER_ARCHIVE_NAME
-from pathlib import Path
-import tempfile
-from django.core.management import call_command
 
 from documents.management.commands.document_importer import Command
+from documents.settings import EXPORTER_ARCHIVE_NAME
+from documents.settings import EXPORTER_FILE_NAME
 
 
 class TestImporter(TestCase):

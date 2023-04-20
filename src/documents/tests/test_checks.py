@@ -2,8 +2,9 @@ import textwrap
 from unittest import mock
 
 from django.core.checks import Error
-from django.test import override_settings
 from django.test import TestCase
+from django.test import override_settings
+
 from documents.checks import changed_password_check
 from documents.checks import parser_check
 from documents.models import Document

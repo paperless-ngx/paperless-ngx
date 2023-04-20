@@ -10,12 +10,13 @@ from bleach import linkify
 from django.conf import settings
 from django.utils.timezone import is_naive
 from django.utils.timezone import make_aware
-from documents.parsers import DocumentParser
-from documents.parsers import make_thumbnail_from_pdf
-from documents.parsers import ParseError
 from humanfriendly import format_size
 from imap_tools import MailMessage
 from tika import parser
+
+from documents.parsers import DocumentParser
+from documents.parsers import ParseError
+from documents.parsers import make_thumbnail_from_pdf
 
 
 class MailDocumentParser(DocumentParser):

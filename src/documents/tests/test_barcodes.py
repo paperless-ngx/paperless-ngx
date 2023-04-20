@@ -4,8 +4,10 @@ from unittest import mock
 
 import pytest
 from django.conf import settings
-from django.test import override_settings
 from django.test import TestCase
+from django.test import override_settings
+from PIL import Image
+
 from documents import barcodes
 from documents import tasks
 from documents.consumer import ConsumerError
@@ -13,7 +15,6 @@ from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentSource
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
-from PIL import Image
 
 try:
     import zxingcpp  # noqa: F401
