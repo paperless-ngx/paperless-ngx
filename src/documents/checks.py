@@ -6,6 +6,7 @@ from django.core.checks import register
 from django.core.exceptions import FieldError
 from django.db.utils import OperationalError
 from django.db.utils import ProgrammingError
+
 from documents.signals import document_consumer_declaration
 
 

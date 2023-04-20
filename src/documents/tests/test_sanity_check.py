@@ -6,6 +6,7 @@ from pathlib import Path
 import filelock
 from django.conf import settings
 from django.test import TestCase
+
 from documents.models import Document
 from documents.sanity_checker import check_sanity
 from documents.tests.utils import DirectoriesMixin

@@ -1,4 +1,5 @@
 from django.core.management.base import BaseCommand
+
 from paperless_mail import tasks
 
 

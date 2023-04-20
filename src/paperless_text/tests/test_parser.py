@@ -1,6 +1,7 @@
 import os
 
 from django.test import TestCase
+
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
 from paperless_text.parsers import TextDocumentParser

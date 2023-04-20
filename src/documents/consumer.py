@@ -31,9 +31,9 @@ from .models import DocumentType
 from .models import FileInfo
 from .models import Tag
 from .parsers import DocumentParser
+from .parsers import ParseError
 from .parsers import get_parser_class_for_mime_type
 from .parsers import parse_date
-from .parsers import ParseError
 from .signals import document_consumption_finished
 from .signals import document_consumption_started
 

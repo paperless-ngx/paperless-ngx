@@ -5,8 +5,8 @@ import shutil
 import tqdm
 from django import db
 from django.core.management.base import BaseCommand
-from documents.models import Document
 
+from documents.models import Document
 from documents.parsers import get_parser_class_for_mime_type
 
 

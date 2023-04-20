@@ -7,10 +7,11 @@ from pathlib import Path
 from typing import Optional
 
 from django.conf import settings
-from documents.parsers import DocumentParser
-from documents.parsers import make_thumbnail_from_pdf
-from documents.parsers import ParseError
 from PIL import Image
+
+from documents.parsers import DocumentParser
+from documents.parsers import ParseError
+from documents.parsers import make_thumbnail_from_pdf
 
 
 class NoTextFoundException(Exception):
@@ -310,7 +311,8 @@ class RasterisedDocumentParser(DocumentParser):
         # text located via OCR
 
         import ocrmypdf
-        from ocrmypdf import InputFileError, EncryptedPdfError
+        from ocrmypdf import EncryptedPdfError
+        from ocrmypdf import InputFileError
 
         archive_path = Path(os.path.join(self.tempdir, "archive.pdf"))
         sidecar_file = Path(os.path.join(self.tempdir, "sidecar.txt"))

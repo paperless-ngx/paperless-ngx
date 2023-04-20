@@ -1,6 +1,7 @@
 import itertools
 
 from django.db.models import Q
+
 from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType

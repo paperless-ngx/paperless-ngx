@@ -20,30 +20,31 @@ except ImportError:
     from backports import zoneinfo
 
 import pytest
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.test import override_settings
 from django.utils import timezone
-from dateutil.relativedelta import relativedelta
 from rest_framework import status
+from rest_framework.test import APITestCase
+from whoosh.writing import AsyncWriter
+
 from documents import bulk_edit
 from documents import index
 from documents.models import Correspondent
 from documents.models import Document
-from documents.tests.utils import DocumentConsumeDelayMixin
 from documents.models import DocumentType
 from documents.models import MatchingModel
+from documents.models import Note
 from documents.models import PaperlessTask
 from documents.models import SavedView
 from documents.models import StoragePath
 from documents.models import Tag
-from documents.models import Note
 from documents.tests.utils import DirectoriesMixin
+from documents.tests.utils import DocumentConsumeDelayMixin
 from paperless import version
-from rest_framework.test import APITestCase
-from whoosh.writing import AsyncWriter
 
 
 class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):

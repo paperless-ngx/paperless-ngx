@@ -21,6 +21,16 @@ from django.conf import settings
 from django.db import DatabaseError
 from django.utils.timezone import is_naive
 from django.utils.timezone import make_aware
+from imap_tools import AND
+from imap_tools import NOT
+from imap_tools import MailBox
+from imap_tools import MailboxFolderSelectError
+from imap_tools import MailBoxUnencrypted
+from imap_tools import MailMessage
+from imap_tools import MailMessageFlags
+from imap_tools.mailbox import MailBoxTls
+from imap_tools.query import LogicOperator
+
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
@@ -28,15 +38,6 @@ from documents.loggers import LoggingMixin
 from documents.models import Correspondent
 from documents.parsers import is_mime_type_supported
 from documents.tasks import consume_file
-from imap_tools import AND
-from imap_tools import MailBox
-from imap_tools import MailboxFolderSelectError
-from imap_tools import MailBoxUnencrypted
-from imap_tools import MailMessage
-from imap_tools import MailMessageFlags
-from imap_tools import NOT
-from imap_tools.mailbox import MailBoxTls
-from imap_tools.query import LogicOperator
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 from paperless_mail.models import ProcessedMail
