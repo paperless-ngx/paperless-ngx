@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-04-20 15:45\n"
+"PO-Revision-Date: 2023-04-21 06:12\n"
 "Last-Translator: \n"
 "Language-Team: Catalan\n"
 "Language: ca_ES\n"
@@ -444,7 +444,7 @@ msgstr "Data Hora Creació"
 
 #: documents/models.py:598
 msgid "Datetime field when the task result was created in UTC"
-msgstr ""
+msgstr "Camp data i hora en què es va iniciar la tasca UTC"
 
 #: documents/models.py:603
 msgid "Started DateTime"
@@ -794,11 +794,11 @@ msgstr ""
 
 #: paperless_mail/models.py:85
 msgid "Use mail address"
-msgstr ""
+msgstr "Utilitza adreça correu"
 
 #: paperless_mail/models.py:86
 msgid "Use name (or mail address if not available)"
-msgstr ""
+msgstr "Utilitza nom (o adreça de correu si no disponible)"
 
 #: paperless_mail/models.py:87
 msgid "Use correspondent selected below"
@@ -874,23 +874,23 @@ msgstr ""
 
 #: paperless_mail/models.py:183
 msgid "assign title from"
-msgstr ""
+msgstr "assignar títol desde"
 
 #: paperless_mail/models.py:191
 msgid "assign this tag"
-msgstr ""
+msgstr "assigna aquesta etiqueta"
 
 #: paperless_mail/models.py:199
 msgid "assign this document type"
-msgstr ""
+msgstr "assigna aquest tipus de document"
 
 #: paperless_mail/models.py:203
 msgid "assign correspondent from"
-msgstr ""
+msgstr "assigna corresponsal des de"
 
 #: paperless_mail/models.py:213
 msgid "assign this correspondent"
-msgstr ""
+msgstr "assigna aquest corresponsal"
 
 #: paperless_mail/models.py:239
 msgid "uid"
