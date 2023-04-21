@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-04-21 11:08\n"
+"PO-Revision-Date: 2023-04-21 14:51\n"
 "Last-Translator: \n"
 "Language-Team: Catalan\n"
 "Language: ca_ES\n"
@@ -750,15 +750,15 @@ msgstr "Només processa adjunts."
 
 #: paperless_mail/models.py:62
 msgid "Process full Mail (with embedded attachments in file) as .eml"
-msgstr ""
+msgstr "Processa el correu complet (amb fitxers adjunts incrustats al fitxer) com a .eml"
 
 #: paperless_mail/models.py:64
 msgid "Process full Mail (with embedded attachments in file) as .eml + process attachments as separate documents"
-msgstr ""
+msgstr "Processa el correu complet (amb fitxers adjunts incrustats al fitxer) com a .eml + processa adjunts com a documents separats"
 
 #: paperless_mail/models.py:70
 msgid "Process all files, including 'inline' attachments."
-msgstr ""
+msgstr "Processa tots els fitxers, inclosos els fitxers adjunts 'in line'."
 
 #: paperless_mail/models.py:73
 msgid "Delete"
@@ -770,15 +770,15 @@ msgstr "Mou a carpeta especificada"
 
 #: paperless_mail/models.py:75
 msgid "Mark as read, don't process read mails"
-msgstr ""
+msgstr "Marca com a llegit, no processeu els correus llegits"
 
 #: paperless_mail/models.py:76
 msgid "Flag the mail, don't process flagged mails"
-msgstr ""
+msgstr "Marca el correu, no processeu els missatges marcats"
 
 #: paperless_mail/models.py:77
 msgid "Tag the mail with specified tag, don't process tagged mails"
-msgstr ""
+msgstr "Etiqueta el correu amb l'etiqueta especificada, no processeu correus etiquetats"
 
 #: paperless_mail/models.py:80
 msgid "Use subject as title"
@@ -786,11 +786,11 @@ msgstr "Utilitza assumpte com a títol"
 
 #: paperless_mail/models.py:81
 msgid "Use attachment filename as title"
-msgstr ""
+msgstr "Utilitzeu el nom del fitxer adjunt com a títol"
 
 #: paperless_mail/models.py:84
 msgid "Do not assign a correspondent"
-msgstr ""
+msgstr "No assignar corresponsal"
 
 #: paperless_mail/models.py:85
 msgid "Use mail address"
@@ -802,7 +802,7 @@ msgstr "Utilitza nom (o adreça de correu si no disponible)"
 
 #: paperless_mail/models.py:87
 msgid "Use correspondent selected below"
-msgstr ""
+msgstr "Utilitza el corresponsal seleccionat a continuació"
 
 #: paperless_mail/models.py:91
 msgid "order"
@@ -818,7 +818,7 @@ msgstr "carpeta"
 
 #: paperless_mail/models.py:105
 msgid "Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server."
-msgstr ""
+msgstr "Subcarpetes han d'estar separades per un delimitador, sovint un punt ('.') o una barra inclinada ('/'), però varia segons el servidor de correu."
 
 #: paperless_mail/models.py:111
 msgid "filter from"
@@ -838,11 +838,11 @@ msgstr "filtra nom adjunt"
 
 #: paperless_mail/models.py:135
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr ""
+msgstr "Consumiu només documents que coincideixin completament amb aquest nom de fitxer si s'especifica. Es permeten els comodins com ara *.pdf o *factura*. Cas insensitiu."
 
 #: paperless_mail/models.py:142
 msgid "maximum age"
-msgstr ""
+msgstr "temps màxim"
 
 #: paperless_mail/models.py:144
 msgid "Specified in days."
@@ -854,7 +854,7 @@ msgstr "tipus de fitxer adjunt"
 
 #: paperless_mail/models.py:152
 msgid "Inline attachments include embedded images, so it's best to combine this option with a filename filter."
-msgstr ""
+msgstr "Els fitxers adjunts inline inclouen imatges incrustades, per la qual cosa és millor combinar aquesta opció amb un filtre de nom de fitxer."
 
 #: paperless_mail/models.py:158
 msgid "consumption scope"
@@ -870,7 +870,7 @@ msgstr "paràmetre d'accío"
 
 #: paperless_mail/models.py:175
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
-msgstr ""
+msgstr "Paràmetre addicional per a l'acció seleccionada anteriorment, la carpeta de destinació de l'acció de moure a la carpeta. Les subcarpetes han d'estar separades per punts."
 
 #: paperless_mail/models.py:183
 msgid "assign title from"
