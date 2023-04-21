@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-04-21 07:13\n"
+"PO-Revision-Date: 2023-04-21 11:08\n"
 "Last-Translator: \n"
 "Language-Team: Catalan\n"
 "Language: ca_ES\n"
@@ -468,11 +468,11 @@ msgstr "Dades del resultat"
 
 #: documents/models.py:617
 msgid "The data returned by the task"
-msgstr ""
+msgstr "Dades retornades per la tasca"
 
 #: documents/models.py:626
 msgid "Comment for the document"
-msgstr ""
+msgstr "Comentari pel document"
 
 #: documents/models.py:650
 msgid "user"
@@ -489,7 +489,7 @@ msgstr "comentaris"
 #: documents/serialisers.py:80
 #, python-format
 msgid "Invalid regular expression: %(error)s"
-msgstr ""
+msgstr "Expressió regular invàlida: %(error)s"
 
 #: documents/serialisers.py:320
 msgid "Invalid color."
@@ -498,11 +498,11 @@ msgstr "Color Invàlid."
 #: documents/serialisers.py:700
 #, python-format
 msgid "File type %(type)s not supported"
-msgstr ""
+msgstr "Tipus arxiu %(type)s no suportat"
 
 #: documents/serialisers.py:794
 msgid "Invalid variable detected."
-msgstr ""
+msgstr "Variable detectada invàlida."
 
 #: documents/templates/index.html:78
 msgid "Paperless-ngx is loading..."
@@ -522,7 +522,7 @@ msgstr "Deslogat de Paperless-ngx"
 
 #: documents/templates/registration/logged_out.html:59
 msgid "You have been successfully logged out. Bye!"
-msgstr ""
+msgstr "Deslogat correctament. Adéu!"
 
 #: documents/templates/registration/logged_out.html:60
 msgid "Sign in again"
@@ -734,7 +734,7 @@ msgstr "joc de caràcters"
 
 #: paperless_mail/models.py:46
 msgid "The character set to use when communicating with the mail server, such as 'UTF-8' or 'US-ASCII'."
-msgstr ""
+msgstr "El joc de caràcters utilitzat per comunicar amb el servidor de correu, com 'UTF-8' or 'US-ASCII'."
 
 #: paperless_mail/models.py:57
 msgid "mail rule"
@@ -858,7 +858,7 @@ msgstr ""
 
 #: paperless_mail/models.py:158
 msgid "consumption scope"
-msgstr ""
+msgstr "àmbit de consum"
 
 #: paperless_mail/models.py:164
 msgid "action"
@@ -866,7 +866,7 @@ msgstr "acció"
 
 #: paperless_mail/models.py:170
 msgid "action parameter"
-msgstr ""
+msgstr "paràmetre d'accío"
 
 #: paperless_mail/models.py:175
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
