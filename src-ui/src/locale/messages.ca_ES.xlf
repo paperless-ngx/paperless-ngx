@@ -4378,7 +4378,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">224,226</context>
         </context-group>
-        <target state="needs-translation">Error while deleting element: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></target>
+        <target state="translated">Error esborrant element: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></target>
       </trans-unit>
       <trans-unit id="1685061484835793745" datatype="html">
         <source>Start tour</source>
@@ -4426,7 +4426,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="needs-translation">You need to reload the page after applying a new language.</target>
+        <target state="translated">Has de recarregar la pàgina per aplicar una nova llengua.</target>
       </trans-unit>
       <trans-unit id="3766032098416558788" datatype="html">
         <source>Date display</source>
@@ -4490,7 +4490,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">92</context>
         </context-group>
-        <target state="needs-translation">Use PDF viewer provided by the browser</target>
+        <target state="translated">Utilitza el visor PDF del navegador</target>
       </trans-unit>
       <trans-unit id="9003921625412907981" datatype="html">
         <source>This is usually faster for displaying large PDF documents, but it might not work on some browsers.</source>
@@ -4594,7 +4594,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">146</context>
         </context-group>
-        <target state="needs-translation">Enable update checking</target>
+        <target state="translated">Habilita la cerca d'actualitzacions</target>
       </trans-unit>
       <trans-unit id="6645943458623480835" datatype="html">
         <source>Note that for users of third-party containers e.g. linuxserver.io this notification may be &apos;ahead&apos; of the current third-party release.</source>
@@ -4826,7 +4826,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">475</context>
         </context-group>
-        <target state="needs-translation">Saved view "<x id="PH" equiv-text="savedView.name"/>" deleted.</target>
+        <target state="translated">Vista Guardada "<x id="PH" equiv-text="savedView.name"/>" esborrada.</target>
       </trans-unit>
       <trans-unit id="3891152409365583719" datatype="html">
         <source>Settings saved</source>
@@ -4874,7 +4874,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">608</context>
         </context-group>
-        <target state="needs-translation">Use date format of display language</target>
+        <target state="translated">Utilitza el format de data de la llengua</target>
       </trans-unit>
       <trans-unit id="8488620293789898901" datatype="html">
         <source>Error while storing settings on server: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></source>
@@ -5394,7 +5394,7 @@
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
           <context context-type="linenumber">132</context>
         </context-group>
-        <target state="needs-translation">You have unsaved changes.</target>
+        <target state="translated">Hi han canvis sense desar.</target>
       </trans-unit>
       <trans-unit id="3305084982600522070" datatype="html">
         <source>Are you sure you want to leave?</source>
@@ -5598,7 +5598,7 @@
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
           <context context-type="linenumber">110</context>
         </context-group>
-        <target state="needs-translation">Are you sure you want to close this document?</target>
+        <target state="translated">Segur que vols tancar el document?</target>
       </trans-unit>
       <trans-unit id="2885986061416655600" datatype="html">
         <source>Close document</source>
@@ -5614,7 +5614,7 @@
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
           <context context-type="linenumber">133</context>
         </context-group>
-        <target state="needs-translation">Are you sure you want to close all documents?</target>
+        <target state="translated">Segur que vols tancar tots els documents?</target>
       </trans-unit>
       <trans-unit id="4215561719980781894" datatype="html">
         <source>Close documents</source>
@@ -5639,7 +5639,7 @@
           <context context-type="linenumber">32</context>
         </context-group>
         <note priority="1" from="description">Score is a value returned by the full text search engine and specifies how well a result matches the given query</note>
-        <target state="needs-translation">Search score</target>
+        <target state="translated">Puntuació de cerca</target>
       </trans-unit>
       <trans-unit id="1206520795340730278" datatype="html">
         <source>English (US)</source>
