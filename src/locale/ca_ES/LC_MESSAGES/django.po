@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-04-21 06:12\n"
+"PO-Revision-Date: 2023-04-21 07:13\n"
 "Last-Translator: \n"
 "Language-Team: Catalan\n"
 "Language: ca_ES\n"
@@ -846,7 +846,7 @@ msgstr ""
 
 #: paperless_mail/models.py:144
 msgid "Specified in days."
-msgstr ""
+msgstr "Especificat en dies."
 
 #: paperless_mail/models.py:148
 msgid "attachment type"
