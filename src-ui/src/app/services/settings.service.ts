@@ -173,6 +173,12 @@ export class SettingsService {
         dateInputFormat: 'dd.mm.yyyy',
       },
       {
+        code: 'ca-es',
+        name: $localize`Catalan`,
+        englishName: 'Catalan',
+        dateInputFormat: 'dd/mm/yyyy',
+      },
+      {
         code: 'cs-cz',
         name: $localize`Czech`,
         englishName: 'Czech',
