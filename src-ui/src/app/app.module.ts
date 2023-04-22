@@ -91,6 +91,7 @@ import { IfObjectPermissionsDirective } from './directives/if-object-permissions
 
 import localeAr from '@angular/common/locales/ar'
 import localeBe from '@angular/common/locales/be'
+import localeCa from '@angular/common/locales/ca'
 import localeCs from '@angular/common/locales/cs'
 import localeDa from '@angular/common/locales/da'
 import localeDe from '@angular/common/locales/de'
@@ -114,6 +115,7 @@ import { PermissionsFormComponent } from './components/common/input/permissions/
 
 registerLocaleData(localeAr)
 registerLocaleData(localeBe)
+registerLocaleData(localeCa)
 registerLocaleData(localeCs)
 registerLocaleData(localeDa)
 registerLocaleData(localeDe)
