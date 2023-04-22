@@ -394,7 +394,7 @@
         <source>The documents list shows all of your documents and allows for filtering as well as bulk-editing. There are three different view styles: list, small cards and large cards. A list of documents currently opened for editing is shown in the sidebar.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">164</context>
+          <context context-type="linenumber">165</context>
         </context-group>
         <target state="translated">Спіс дакументаў паказвае ўсе вашы дакументы і дазваляе фільтраваць, а таксама масава рэдагаваць. Ёсць тры розныя стылі прагляду: спіс, маленькія карты і вялікія карты. Спіс дакументаў, адкрытых для рэдагавання, паказаны на бакавой панэлі.</target>
       </trans-unit>
@@ -402,7 +402,7 @@
         <source>The filtering tools allow you to quickly find documents using various searches, dates, tags, etc.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">176</context>
+          <context context-type="linenumber">178</context>
         </context-group>
         <target state="translated">Інструменты фільтрацыі дазваляюць хутка знаходзіць дакументы па розных пошуках, датах, тэгах і г.д.</target>
       </trans-unit>
@@ -410,7 +410,7 @@
         <source>Any combination of filters can be saved as a &apos;view&apos; which can then be displayed on the dashboard and / or sidebar.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">186</context>
+          <context context-type="linenumber">189</context>
         </context-group>
         <target state="translated">Любую камбінацыю фільтраў можна захаваць у выглядзе 'прагляда', які потым можа адлюстроўвацца на прыборнай панэлі і/або бакавой панэлі.</target>
       </trans-unit>
@@ -418,7 +418,7 @@
         <source>Tags, correspondents, document types and storage paths can all be managed using these pages. They can also be created from the document edit view.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">195</context>
+          <context context-type="linenumber">199</context>
         </context-group>
         <target state="translated">З дапамогай гэтых старонак можна кіраваць тэгамі, карэспандэнтамі, тыпамі дакументаў і шляхамі захоўвання. Іх таксама можна стварыць з прагляду рэдагавання дакумента.</target>
       </trans-unit>
@@ -426,7 +426,7 @@
         <source>File Tasks shows you documents that have been consumed, are waiting to be, or may have failed during the process.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">204</context>
+          <context context-type="linenumber">209</context>
         </context-group>
         <target state="translated">Файлавыя задачы паказваюць вам дакументы, якія былі спажыты, чакаюць або пацярпелі збой падчас працэсу.</target>
       </trans-unit>
@@ -434,7 +434,7 @@
         <source>Check out the settings for various tweaks to the web app, toggle settings for saved views or setup e-mail checking.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">213</context>
+          <context context-type="linenumber">219</context>
         </context-group>
         <target state="needs-translation">Check out the settings for various tweaks to the web app, toggle settings for saved views or setup e-mail checking.</target>
       </trans-unit>
@@ -442,7 +442,7 @@
         <source>Thank you! 🙏</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">222</context>
+          <context context-type="linenumber">229</context>
         </context-group>
         <target state="translated">Дзякуй! 🙏</target>
       </trans-unit>
@@ -450,7 +450,7 @@
         <source>There are &lt;em&gt;tons&lt;/em&gt; more features and info we didn&apos;t cover here, but this should get you started. Check out the documentation or visit the project on GitHub to learn more or to report issues.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">224</context>
+          <context context-type="linenumber">231</context>
         </context-group>
         <target state="translated">Ёсць &lt;em&gt;тоны&lt;/em&gt; дадатковыя магчымасці і інфармацыя, якую мы тут не разглядалі, але гэта дапаможа вам пачаць. Праверце дакументацыю або наведайце праект на GitHub, каб даведацца больш або паведаміць аб праблемах.</target>
       </trans-unit>
@@ -458,7 +458,7 @@
         <source>Lastly, on behalf of every contributor to this community-supported project, thank you for using Paperless-ngx!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">226</context>
+          <context context-type="linenumber">233</context>
         </context-group>
         <target state="translated">Нарэшце, ад імя кожнага ўдзельніка гэтага праекта, які падтрымліваецца супольнасцю, дзякуй за выкарыстанне Paperless-ngx!</target>
       </trans-unit>
@@ -466,7 +466,7 @@
         <source>Initiating upload...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">281</context>
+          <context context-type="linenumber">288</context>
         </context-group>
         <target state="translated">Пачатак загрузкі...</target>
       </trans-unit>
@@ -2277,7 +2277,7 @@
         <source>Private</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/select/select.component.ts</context>
-          <context context-type="linenumber">36</context>
+          <context context-type="linenumber">57</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/tag/tag.component.html</context>
@@ -3071,18 +3071,18 @@
         <target state="translated">Выдаліць дакумент</target>
       </trans-unit>
       <trans-unit id="1844801255494293730" datatype="html">
-        <source>Error deleting document: <x id="PH" equiv-text="JSON.stringify(error)"/></source>
+        <source>Error deleting document: <x id="PH" equiv-text="error.error?.detail ?? error.message ?? JSON.stringify(error)"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">591</context>
+          <context context-type="linenumber">595,597</context>
         </context-group>
-        <target state="needs-translation">Error deleting document: <x id="PH" equiv-text="JSON.stringify(error)"/></target>
+        <target state="needs-translation">Error deleting document: <x id="PH" equiv-text="error.error?.detail ?? error.message ?? JSON.stringify(error)"/></target>
       </trans-unit>
       <trans-unit id="7362691899087997122" datatype="html">
         <source>Redo OCR confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">611</context>
+          <context context-type="linenumber">618</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -3094,7 +3094,7 @@
         <source>This operation will permanently redo OCR for this document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">612</context>
+          <context context-type="linenumber">619</context>
         </context-group>
         <target state="translated">Гэтая аперацыя назаўсёды паўторыць OCR для гэтага дакумента.</target>
       </trans-unit>
@@ -3102,7 +3102,7 @@
         <source>This operation cannot be undone.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">613</context>
+          <context context-type="linenumber">620</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -3134,7 +3134,7 @@
         <source>Proceed</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">615</context>
+          <context context-type="linenumber">622</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -3162,7 +3162,7 @@
         <source>Redo OCR operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">623</context>
+          <context context-type="linenumber">630</context>
         </context-group>
         <target state="needs-translation">Redo OCR operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.</target>
       </trans-unit>
@@ -3170,7 +3170,7 @@
         <source>Error executing operation: <x id="PH" equiv-text="JSON.stringify(                 error.error               )"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">634,636</context>
+          <context context-type="linenumber">641,643</context>
         </context-group>
         <target state="translated">Памылка выканання аперацыі: <x id="PH" equiv-text="JSON.stringify( error.error )"/></target>
       </trans-unit>
@@ -5440,7 +5440,7 @@
         <source>You don&apos;t have permissions to do that</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/guards/permissions.guard.ts</context>
-          <context context-type="linenumber">31</context>
+          <context context-type="linenumber">35</context>
         </context-group>
         <target state="needs-translation">You don't have permissions to do that</target>
       </trans-unit>
@@ -5665,11 +5665,19 @@
         </context-group>
         <target state="translated">Беларуская</target>
       </trans-unit>
+      <trans-unit id="1001043467371963032" datatype="html">
+        <source>Catalan</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">177</context>
+        </context-group>
+        <target state="needs-translation">Catalan</target>
+      </trans-unit>
       <trans-unit id="2719780722934172508" datatype="html">
         <source>Czech</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">177</context>
+          <context context-type="linenumber">183</context>
         </context-group>
         <target state="translated">Чэшская</target>
       </trans-unit>
@@ -5677,7 +5685,7 @@
         <source>Danish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">183</context>
+          <context context-type="linenumber">189</context>
         </context-group>
         <target state="translated">Дацкая</target>
       </trans-unit>
@@ -5685,7 +5693,7 @@
         <source>German</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">189</context>
+          <context context-type="linenumber">195</context>
         </context-group>
         <target state="translated">Нямецкая</target>
       </trans-unit>
@@ -5693,7 +5701,7 @@
         <source>English (GB)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">195</context>
+          <context context-type="linenumber">201</context>
         </context-group>
         <target state="translated">Англійская (Вялікабрытанія)</target>
       </trans-unit>
@@ -5701,7 +5709,7 @@
         <source>Spanish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">201</context>
+          <context context-type="linenumber">207</context>
         </context-group>
         <target state="translated">Іспанская</target>
       </trans-unit>
@@ -5709,7 +5717,7 @@
         <source>French</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">207</context>
+          <context context-type="linenumber">213</context>
         </context-group>
         <target state="translated">Французская</target>
       </trans-unit>
@@ -5717,7 +5725,7 @@
         <source>Italian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">213</context>
+          <context context-type="linenumber">219</context>
         </context-group>
         <target state="translated">Італьянская</target>
       </trans-unit>
@@ -5725,7 +5733,7 @@
         <source>Luxembourgish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">219</context>
+          <context context-type="linenumber">225</context>
         </context-group>
         <target state="translated">Люксембургская</target>
       </trans-unit>
@@ -5733,7 +5741,7 @@
         <source>Dutch</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">225</context>
+          <context context-type="linenumber">231</context>
         </context-group>
         <target state="translated">Нідэрландская</target>
       </trans-unit>
@@ -5741,7 +5749,7 @@
         <source>Polish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">231</context>
+          <context context-type="linenumber">237</context>
         </context-group>
         <target state="translated">Польская</target>
       </trans-unit>
@@ -5749,7 +5757,7 @@
         <source>Portuguese (Brazil)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">237</context>
+          <context context-type="linenumber">243</context>
         </context-group>
         <target state="translated">Партугальская (Бразілія)</target>
       </trans-unit>
@@ -5757,7 +5765,7 @@
         <source>Portuguese</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">243</context>
+          <context context-type="linenumber">249</context>
         </context-group>
         <target state="translated">Партугальская</target>
       </trans-unit>
@@ -5765,7 +5773,7 @@
         <source>Romanian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">249</context>
+          <context context-type="linenumber">255</context>
         </context-group>
         <target state="translated">Румынская</target>
       </trans-unit>
@@ -5773,7 +5781,7 @@
         <source>Russian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">255</context>
+          <context context-type="linenumber">261</context>
         </context-group>
         <target state="translated">Руская</target>
       </trans-unit>
@@ -5781,7 +5789,7 @@
         <source>Slovenian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">261</context>
+          <context context-type="linenumber">267</context>
         </context-group>
         <target state="translated">Славенская</target>
       </trans-unit>
@@ -5789,7 +5797,7 @@
         <source>Serbian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">267</context>
+          <context context-type="linenumber">273</context>
         </context-group>
         <target state="translated">Сербская</target>
       </trans-unit>
@@ -5797,7 +5805,7 @@
         <source>Swedish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">273</context>
+          <context context-type="linenumber">279</context>
         </context-group>
         <target state="translated">Шведская</target>
       </trans-unit>
@@ -5805,7 +5813,7 @@
         <source>Turkish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">279</context>
+          <context context-type="linenumber">285</context>
         </context-group>
         <target state="translated">Турэцкая</target>
       </trans-unit>
@@ -5813,7 +5821,7 @@
         <source>Chinese Simplified</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">285</context>
+          <context context-type="linenumber">291</context>
         </context-group>
         <target state="translated">Кітайская спрошчаная</target>
       </trans-unit>
@@ -5821,7 +5829,7 @@
         <source>ISO 8601</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">302</context>
+          <context context-type="linenumber">308</context>
         </context-group>
         <target state="translated">ISO 8601</target>
       </trans-unit>
@@ -5829,7 +5837,7 @@
         <source>Successfully completed one-time migratration of settings to the database!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">413</context>
+          <context context-type="linenumber">419</context>
         </context-group>
         <target state="translated">Паспяхова выканана аднаразовая міграцыя налад у базу!</target>
       </trans-unit>
@@ -5837,7 +5845,7 @@
         <source>Unable to migrate settings to the database, please try saving manually.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">414</context>
+          <context context-type="linenumber">420</context>
         </context-group>
         <target state="translated">Немагчыма перанесці налады ў базу дадзеных, паспрабуйце захаваць уручную.</target>
       </trans-unit>
