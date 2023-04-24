@@ -42,7 +42,7 @@ def path_check(var, directory):
                     Error(
                         writeable_message.format(var),
                         writeable_hint.format(
-                            f"\n{dir_mode} {dir_owner} {dir_group} " f"{directory}\n",
+                            f"\n{dir_mode} {dir_owner} {dir_group} {directory}\n",
                         ),
                     ),
                 )
@@ -130,6 +130,23 @@ def settings_values_check(app_configs, **kwargs):
         if settings.OCR_MODE not in {"force", "skip", "redo", "skip_noarchive"}:
             msgs.append(Error(f'OCR output mode "{settings.OCR_MODE}" is not valid'))
 
+        if settings.OCR_MODE == "skip_noarchive":
+            msgs.append(
+                Warning(
+                    'OCR output mode "skip_noarchive" is deprecated and will be '
+                    "removed in a future version. Please use "
+                    "PAPERLESS_OCR_SKIP_ARCHIVE_FILE instead.",
+                ),
+            )
+
+        if settings.OCR_SKIP_ARCHIVE_FILE not in {"never", "with_text", "always"}:
+            msgs.append(
+                Error(
+                    "OCR_SKIP_ARCHIVE_FILE setting "
+                    f'"{settings.OCR_SKIP_ARCHIVE_FILE}" is not valid',
+                ),
+            )
+
         if settings.OCR_CLEAN not in {"clean", "clean-final", "none"}:
             msgs.append(Error(f'OCR clean mode "{settings.OCR_CLEAN}" is not valid'))
         return msgs
@@ -141,7 +158,7 @@ def settings_values_check(app_configs, **kwargs):
         try:
             import zoneinfo
         except ImportError:  # pragma: nocover
-            import backports.zoneinfo as zoneinfo
+            from backports import zoneinfo
         msgs = []
         if settings.TIME_ZONE not in zoneinfo.available_timezones():
             msgs.append(
@@ -149,4 +166,17 @@ def settings_values_check(app_configs, **kwargs):
             )
         return msgs
 
-    return _ocrmypdf_settings_check() + _timezone_validate()
+    def _barcode_scanner_validate():
+        """
+        Validates the barcode scanner type
+        """
+        msgs = []
+        if settings.CONSUMER_BARCODE_SCANNER not in ["PYZBAR", "ZXING"]:
+            msgs.append(
+                Error(f'Invalid Barcode Scanner "{settings.CONSUMER_BARCODE_SCANNER}"'),
+            )
+        return msgs
+
+    return (
+        _ocrmypdf_settings_check() + _timezone_validate() + _barcode_scanner_validate()
+    )

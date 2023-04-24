@@ -1,8 +1,12 @@
-import os
 import shutil
 import tempfile
 from collections import namedtuple
 from contextlib import contextmanager
+from os import PathLike
+from pathlib import Path
+from typing import Iterator
+from typing import Tuple
+from typing import Union
 from unittest import mock
 
 from django.apps import apps
@@ -10,29 +14,30 @@ from django.db import connection
 from django.db.migrations.executor import MigrationExecutor
 from django.test import override_settings
 from django.test import TransactionTestCase
+from documents.data_models import ConsumableDocument
+from documents.data_models import DocumentMetadataOverrides
 
 
 def setup_directories():
 
     dirs = namedtuple("Dirs", ())
 
-    dirs.data_dir = tempfile.mkdtemp()
-    dirs.scratch_dir = tempfile.mkdtemp()
-    dirs.media_dir = tempfile.mkdtemp()
-    dirs.consumption_dir = tempfile.mkdtemp()
-    dirs.static_dir = tempfile.mkdtemp()
-    dirs.index_dir = os.path.join(dirs.data_dir, "index")
-    dirs.originals_dir = os.path.join(dirs.media_dir, "documents", "originals")
-    dirs.thumbnail_dir = os.path.join(dirs.media_dir, "documents", "thumbnails")
-    dirs.archive_dir = os.path.join(dirs.media_dir, "documents", "archive")
-    dirs.logging_dir = os.path.join(dirs.data_dir, "log")
+    dirs.data_dir = Path(tempfile.mkdtemp())
+    dirs.scratch_dir = Path(tempfile.mkdtemp())
+    dirs.media_dir = Path(tempfile.mkdtemp())
+    dirs.consumption_dir = Path(tempfile.mkdtemp())
+    dirs.static_dir = Path(tempfile.mkdtemp())
+    dirs.index_dir = dirs.data_dir / "index"
+    dirs.originals_dir = dirs.media_dir / "documents" / "originals"
+    dirs.thumbnail_dir = dirs.media_dir / "documents" / "thumbnails"
+    dirs.archive_dir = dirs.media_dir / "documents" / "archive"
+    dirs.logging_dir = dirs.data_dir / "log"
 
-    os.makedirs(dirs.index_dir, exist_ok=True)
-    os.makedirs(dirs.originals_dir, exist_ok=True)
-    os.makedirs(dirs.thumbnail_dir, exist_ok=True)
-    os.makedirs(dirs.archive_dir, exist_ok=True)
-
-    os.makedirs(dirs.logging_dir, exist_ok=True)
+    dirs.index_dir.mkdir(parents=True, exist_ok=True)
+    dirs.originals_dir.mkdir(parents=True, exist_ok=True)
+    dirs.thumbnail_dir.mkdir(parents=True, exist_ok=True)
+    dirs.archive_dir.mkdir(parents=True, exist_ok=True)
+    dirs.logging_dir.mkdir(parents=True, exist_ok=True)
 
     dirs.settings_override = override_settings(
         DATA_DIR=dirs.data_dir,
@@ -45,8 +50,8 @@ def setup_directories():
         LOGGING_DIR=dirs.logging_dir,
         INDEX_DIR=dirs.index_dir,
         STATIC_ROOT=dirs.static_dir,
-        MODEL_FILE=os.path.join(dirs.data_dir, "classification_model.pickle"),
-        MEDIA_LOCK=os.path.join(dirs.media_dir, "media.lock"),
+        MODEL_FILE=dirs.data_dir / "classification_model.pickle",
+        MEDIA_LOCK=dirs.media_dir / "media.lock",
     )
     dirs.settings_override.enable()
 
@@ -87,6 +92,20 @@ class DirectoriesMixin:
         remove_dirs(self.dirs)
 
 
+class FileSystemAssertsMixin:
+    def assertIsFile(self, path: Union[PathLike, str]):
+        self.assertTrue(Path(path).resolve().is_file(), f"File does not exist: {path}")
+
+    def assertIsNotFile(self, path: Union[PathLike, str]):
+        self.assertFalse(Path(path).resolve().is_file(), f"File does exist: {path}")
+
+    def assertIsDir(self, path: Union[PathLike, str]):
+        self.assertTrue(Path(path).resolve().is_dir(), f"Dir does not exist: {path}")
+
+    def assertIsNotDir(self, path: Union[PathLike, str]):
+        self.assertFalse(Path(path).resolve().is_dir(), f"Dir does exist: {path}")
+
+
 class ConsumerProgressMixin:
     def setUp(self) -> None:
         self.send_progress_patcher = mock.patch(
@@ -101,6 +120,11 @@ class ConsumerProgressMixin:
 
 
 class DocumentConsumeDelayMixin:
+    """
+    Provides mocking of the consume_file asynchronous task and useful utilities
+    for decoding its arguments
+    """
+
     def setUp(self) -> None:
         self.consume_file_patcher = mock.patch("documents.tasks.consume_file.delay")
         self.consume_file_mock = self.consume_file_patcher.start()
@@ -109,6 +133,47 @@ class DocumentConsumeDelayMixin:
     def tearDown(self) -> None:
         super().tearDown()
         self.consume_file_patcher.stop()
+
+    def get_last_consume_delay_call_args(
+        self,
+    ) -> Tuple[ConsumableDocument, DocumentMetadataOverrides]:
+        """
+        Returns the most recent arguments to the async task
+        """
+        # Must be at least 1 call
+        self.consume_file_mock.assert_called()
+
+        args, _ = self.consume_file_mock.call_args
+        input_doc, overrides = args
+
+        return (input_doc, overrides)
+
+    def get_all_consume_delay_call_args(
+        self,
+    ) -> Iterator[Tuple[ConsumableDocument, DocumentMetadataOverrides]]:
+        """
+        Iterates over all calls to the async task and returns the arguments
+        """
+
+        for args, _ in self.consume_file_mock.call_args_list:
+            input_doc, overrides = args
+
+            yield (input_doc, overrides)
+
+    def get_specific_consume_delay_call_args(
+        self,
+        index: int,
+    ) -> Iterator[Tuple[ConsumableDocument, DocumentMetadataOverrides]]:
+        """
+        Returns the arguments of a specific call to the async task
+        """
+        # Must be at least 1 call
+        self.consume_file_mock.assert_called()
+
+        args, _ = self.consume_file_mock.call_args_list[index]
+        input_doc, overrides = args
+
+        return (input_doc, overrides)
 
 
 class TestMigrations(TransactionTestCase):
@@ -125,7 +190,7 @@ class TestMigrations(TransactionTestCase):
 
         assert (
             self.migrate_from and self.migrate_to
-        ), "TestCase '{}' must define migrate_from and migrate_to     properties".format(
+        ), "TestCase '{}' must define migrate_from and migrate_to properties".format(
             type(self).__name__,
         )
         self.migrate_from = [(self.app, self.migrate_from)]

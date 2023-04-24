@@ -18,6 +18,7 @@
         "locales": {
           "ar-AR": "src/locale/messages.ar_AR.xlf",
           "be-BY": "src/locale/messages.be_BY.xlf",
+          "ca-ES": "src/locale/messages.ca_ES.xlf",
           "cs-CZ": "src/locale/messages.cs_CZ.xlf",
           "da-DK": "src/locale/messages.da_DK.xlf",
           "de-DE": "src/locale/messages.de_DE.xlf",

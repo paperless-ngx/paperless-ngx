@@ -7,13 +7,14 @@ from urllib.request import urlopen
 import pytest
 from django.test import TestCase
 from documents.parsers import run_convert
+from documents.tests.utils import FileSystemAssertsMixin
 from imagehash import average_hash
 from paperless_mail.parsers import MailDocumentParser
 from pdfminer.high_level import extract_text
 from PIL import Image
 
 
-class TestParserLive(TestCase):
+class TestParserLive(FileSystemAssertsMixin, TestCase):
     SAMPLE_FILES = os.path.join(os.path.dirname(__file__), "samples")
 
     def setUp(self) -> None:
@@ -85,7 +86,7 @@ class TestParserLive(TestCase):
             os.path.join(self.SAMPLE_FILES, "simple_text.eml"),
             "message/rfc822",
         )
-        self.assertTrue(os.path.isfile(thumb))
+        self.assertIsFile(thumb)
 
         expected = os.path.join(self.SAMPLE_FILES, "simple_text.eml.pdf.webp")
 
@@ -161,7 +162,7 @@ class TestParserLive(TestCase):
             self.parser.generate_pdf,
             [os.path.join(self.SAMPLE_FILES, "html.eml")],
         )
-        self.assertTrue(os.path.isfile(pdf_path))
+        self.assertIsFile(pdf_path)
 
         extracted = extract_text(pdf_path)
         expected = (
@@ -232,7 +233,7 @@ class TestParserLive(TestCase):
             output_file=converted,
             logging_group=None,
         )
-        self.assertTrue(os.path.isfile(converted))
+        self.assertIsFile(converted)
         thumb_hash = self.imagehash(converted)
 
         # The created pdf is not reproducible. But the converted image should always look the same.
@@ -337,7 +338,7 @@ class TestParserLive(TestCase):
             output_file=converted,
             logging_group=None,
         )
-        self.assertTrue(os.path.isfile(converted))
+        self.assertIsFile(converted)
         thumb_hash = self.imagehash(converted)
 
         # The created pdf is not reproducible. But the converted image should always look the same.

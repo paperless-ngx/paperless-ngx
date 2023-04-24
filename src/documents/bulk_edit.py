@@ -5,6 +5,7 @@ from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
+from documents.permissions import set_permissions_for_object
 from documents.tasks import bulk_update_documents
 from documents.tasks import update_document_archive_file
 
@@ -126,5 +127,21 @@ def redo_ocr(doc_ids):
         update_document_archive_file.delay(
             document_id=document_id,
         )
+
+    return "OK"
+
+
+def set_permissions(doc_ids, set_permissions, owner=None):
+
+    qs = Document.objects.filter(id__in=doc_ids)
+
+    qs.update(owner=owner)
+
+    for doc in qs:
+        set_permissions_for_object(set_permissions, doc)
+
+    affected_docs = [doc.id for doc in qs]
+
+    bulk_update_documents.delay(document_ids=affected_docs)
 
     return "OK"

@@ -105,6 +105,42 @@ class TestSettingsChecks(DirectoriesMixin, TestCase):
 
         self.assertIn('OCR output mode "makeitso"', msg.msg)
 
+    @override_settings(OCR_MODE="skip_noarchive")
+    def test_deprecated_ocr_type(self):
+        """
+        GIVEN:
+            - Default settings
+            - OCR type is deprecated
+        WHEN:
+            - Settings are validated
+        THEN:
+            - deprecation warning reported for OCR type
+        """
+        msgs = settings_values_check(None)
+        self.assertEqual(len(msgs), 1)
+
+        msg = msgs[0]
+
+        self.assertIn("deprecated", msg.msg)
+
+    @override_settings(OCR_SKIP_ARCHIVE_FILE="invalid")
+    def test_invalid_ocr_skip_archive_file(self):
+        """
+        GIVEN:
+            - Default settings
+            - OCR_SKIP_ARCHIVE_FILE is invalid
+        WHEN:
+            - Settings are validated
+        THEN:
+            - system check error reported for OCR_SKIP_ARCHIVE_FILE
+        """
+        msgs = settings_values_check(None)
+        self.assertEqual(len(msgs), 1)
+
+        msg = msgs[0]
+
+        self.assertIn('OCR_SKIP_ARCHIVE_FILE setting "invalid"', msg.msg)
+
     @override_settings(OCR_CLEAN="cleanme")
     def test_invalid_ocr_clean(self):
         """
@@ -140,3 +176,26 @@ class TestSettingsChecks(DirectoriesMixin, TestCase):
         msg = msgs[0]
 
         self.assertIn('Timezone "TheMoon\\MyCrater"', msg.msg)
+
+    @override_settings(CONSUMER_BARCODE_SCANNER="Invalid")
+    def test_barcode_scanner_invalid(self):
+        msgs = settings_values_check(None)
+        self.assertEqual(len(msgs), 1)
+
+        msg = msgs[0]
+
+        self.assertIn('Invalid Barcode Scanner "Invalid"', msg.msg)
+
+    @override_settings(CONSUMER_BARCODE_SCANNER="")
+    def test_barcode_scanner_empty(self):
+        msgs = settings_values_check(None)
+        self.assertEqual(len(msgs), 1)
+
+        msg = msgs[0]
+
+        self.assertIn('Invalid Barcode Scanner ""', msg.msg)
+
+    @override_settings(CONSUMER_BARCODE_SCANNER="PYZBAR")
+    def test_barcode_scanner_valid(self):
+        msgs = settings_values_check(None)
+        self.assertEqual(len(msgs), 0)

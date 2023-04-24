@@ -47,7 +47,7 @@ class TestMailLiveServer(TestCase):
 
         except MailError as e:
             self.fail(f"Failure: {e}")
-        except Exception as e:
+        except Exception:
             pass
 
     def test_process_non_gmail_server_tag(self):
@@ -66,5 +66,5 @@ class TestMailLiveServer(TestCase):
 
         except MailError as e:
             self.fail(f"Failure: {e}")
-        except Exception as e:
+        except Exception:
             pass

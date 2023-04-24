@@ -8,6 +8,7 @@ from django.test import TestCase
 from documents.parsers import ParseError
 from paperless_tika.parsers import TikaDocumentParser
 from requests import Response
+from rest_framework import status
 
 
 class TestTikaParser(TestCase):
@@ -26,7 +27,7 @@ class TestTikaParser(TestCase):
         }
         response = Response()
         response._content = b"PDF document"
-        response.status_code = 200
+        response.status_code = status.HTTP_200_OK
         post.return_value = response
 
         file = os.path.join(self.parser.tempdir, "input.odt")
@@ -74,7 +75,7 @@ class TestTikaParser(TestCase):
         }
         response = Response()
         response._content = b"PDF document"
-        response.status_code = 500
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         post.return_value = response
 
         file = os.path.join(self.parser.tempdir, "input.odt")
@@ -98,7 +99,7 @@ class TestTikaParser(TestCase):
 
         response = Response()
         response._content = b"PDF document"
-        response.status_code = 200
+        response.status_code = status.HTTP_200_OK
         post.return_value = response
 
         for setting, expected_key in [

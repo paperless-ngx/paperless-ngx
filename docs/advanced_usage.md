@@ -9,7 +9,7 @@ Paperless will compare the matching algorithms defined by every tag,
 correspondent, document type, and storage path in your database to see
 if they apply to the text in a document. In other words, if you define a
 tag called `Home Utility` that had a `match` property of `bc hydro` and
-a `matching_algorithm` of `literal`, Paperless will automatically tag
+a `matching_algorithm` of `Exact`, Paperless will automatically tag
 your newly-consumed document with your `Home Utility` tag so long as the
 text `bc hydro` appears in the body of the document somewhere.
 
@@ -25,12 +25,13 @@ documents.
 
 The following algorithms are available:
 
+- **None:** No matching will be performed.
 - **Any:** Looks for any occurrence of any word provided in match in
   the PDF. If you define the match as `Bank1 Bank2`, it will match
   documents containing either of these terms.
 - **All:** Requires that every word provided appears in the PDF,
   albeit not in the order provided.
-- **Literal:** Matches only if the match appears exactly as provided
+- **Exact:** Matches only if the match appears exactly as provided
   (i.e. preserve ordering) in the PDF.
 - **Regular expression:** Parses the match as a regular expression and
   tries to find a match within the document.
@@ -308,6 +309,8 @@ Paperless provides the following placeholders within filenames:
 - `{added_month_name_short}`: Month added abbreviated name, as per
   locale
 - `{added_day}`: Day added only (number 01-31).
+- `{owner_username}`: Username of document owner, if any, or "none"
+- `{original_name}`: Document original filename, minus the extension, if any, or "none"
 
 Paperless will try to conserve the information from your database as
 much as possible. However, some characters that you can use in document
@@ -413,13 +416,6 @@ Insurances/                             # Insurances
 
     Defining a storage path is optional. If no storage path is defined for a
     document, the global `PAPERLESS_FILENAME_FORMAT` is applied.
-
-!!! warning
-
-    If you adjust the format of an existing storage path, old documents
-    don't get relocated automatically. You need to run the
-    [document renamer](/administration#renamer) to
-    adjust their paths.
 
 ## Celery Monitoring {#celery-monitoring}
 

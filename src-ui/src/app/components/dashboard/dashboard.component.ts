@@ -1,17 +1,35 @@
 import { Component } from '@angular/core'
+import {
+  PermissionAction,
+  PermissionsService,
+  PermissionType,
+} from 'src/app/services/permissions.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
 })
-export class DashboardComponent {
+export class DashboardComponent extends ComponentWithPermissions {
   constructor(
-    public savedViewService: SavedViewService,
-    public settingsService: SettingsService
-  ) {}
+    public settingsService: SettingsService,
+    private permissionsService: PermissionsService,
+    public savedViewService: SavedViewService
+  ) {
+    super()
+
+    if (
+      permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.SavedView
+      )
+    ) {
+      savedViewService.initialize()
+    }
+  }
 
   get subtitle() {
     if (this.settingsService.displayName) {

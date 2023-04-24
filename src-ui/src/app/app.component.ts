@@ -9,6 +9,11 @@ import { NgxFileDropEntry } from 'ngx-file-drop'
 import { UploadDocumentsService } from './services/upload-documents.service'
 import { TasksService } from './services/tasks.service'
 import { TourService } from 'ngx-ui-tour-ng-bootstrap'
+import {
+  PermissionAction,
+  PermissionsService,
+  PermissionType,
+} from './services/permissions.service'
 
 @Component({
   selector: 'app-root',
@@ -32,7 +37,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private uploadDocumentsService: UploadDocumentsService,
     private tasksService: TasksService,
     public tourService: TourService,
-    private renderer: Renderer2
+    private renderer: Renderer2,
+    private permissionsService: PermissionsService
   ) {
     let anyWindow = window as any
     anyWindow.pdfWorkerSrc = 'assets/js/pdf.worker.min.js'
@@ -74,15 +80,28 @@ export class AppComponent implements OnInit, OnDestroy {
         if (
           this.showNotification(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUCCESS)
         ) {
-          this.toastService.show({
-            title: $localize`Document added`,
-            delay: 10000,
-            content: $localize`Document ${status.filename} was added to paperless.`,
-            actionName: $localize`Open document`,
-            action: () => {
-              this.router.navigate(['documents', status.documentId])
-            },
-          })
+          if (
+            this.permissionsService.currentUserCan(
+              PermissionAction.View,
+              PermissionType.Document
+            )
+          ) {
+            this.toastService.show({
+              title: $localize`Document added`,
+              delay: 10000,
+              content: $localize`Document ${status.filename} was added to paperless.`,
+              actionName: $localize`Open document`,
+              action: () => {
+                this.router.navigate(['documents', status.documentId])
+              },
+            })
+          } else {
+            this.toastService.show({
+              title: $localize`Document added`,
+              delay: 10000,
+              content: $localize`Document ${status.filename} was added to paperless.`,
+            })
+          }
         }
       })
 
@@ -136,6 +155,7 @@ export class AppComponent implements OnInit, OnDestroy {
         content: $localize`Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Paperless-ngx will start training its machine learning algorithms.`,
         route: '/dashboard',
         enableBackdrop: true,
+        isOptional: true,
         prevBtnTitle,
         nextBtnTitle,
         endBtnTitle,
@@ -148,6 +168,7 @@ export class AppComponent implements OnInit, OnDestroy {
         placement: 'bottom',
         enableBackdrop: true,
         disableScrollToAnchor: true,
+        isOptional: true,
         prevBtnTitle,
         nextBtnTitle,
         endBtnTitle,
@@ -158,6 +179,7 @@ export class AppComponent implements OnInit, OnDestroy {
         route: '/documents?sort=created&reverse=1&page=1',
         placement: 'bottom',
         enableBackdrop: true,
+        isOptional: true,
         prevBtnTitle,
         nextBtnTitle,
         endBtnTitle,
@@ -167,6 +189,7 @@ export class AppComponent implements OnInit, OnDestroy {
         content: $localize`Any combination of filters can be saved as a 'view' which can then be displayed on the dashboard and / or sidebar.`,
         route: '/documents?sort=created&reverse=1&page=1',
         enableBackdrop: true,
+        isOptional: true,
         prevBtnTitle,
         nextBtnTitle,
         endBtnTitle,
@@ -176,6 +199,7 @@ export class AppComponent implements OnInit, OnDestroy {
         content: $localize`Tags, correspondents, document types and storage paths can all be managed using these pages. They can also be created from the document edit view.`,
         route: '/tags',
         enableBackdrop: true,
+        isOptional: true,
         prevBtnTitle,
         nextBtnTitle,
         endBtnTitle,
@@ -185,6 +209,7 @@ export class AppComponent implements OnInit, OnDestroy {
         content: $localize`File Tasks shows you documents that have been consumed, are waiting to be, or may have failed during the process.`,
         route: '/tasks',
         enableBackdrop: true,
+        isOptional: true,
         prevBtnTitle,
         nextBtnTitle,
         endBtnTitle,
@@ -194,6 +219,7 @@ export class AppComponent implements OnInit, OnDestroy {
         content: $localize`Check out the settings for various tweaks to the web app, toggle settings for saved views or setup e-mail checking.`,
         route: '/settings',
         enableBackdrop: true,
+        isOptional: true,
         prevBtnTitle,
         nextBtnTitle,
         endBtnTitle,
@@ -225,7 +251,13 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   public get dragDropEnabled(): boolean {
-    return !this.router.url.includes('dashboard')
+    return (
+      !this.router.url.includes('dashboard') &&
+      this.permissionsService.currentUserCan(
+        PermissionAction.Add,
+        PermissionType.Document
+      )
+    )
   }
 
   public fileOver() {

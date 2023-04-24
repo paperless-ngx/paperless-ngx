@@ -2,9 +2,9 @@ import itertools
 import json
 import logging
 import os
+import re
 import tempfile
 import urllib
-import uuid
 import zipfile
 from datetime import datetime
 from pathlib import Path
@@ -19,7 +19,9 @@ from django.db.models import Case
 from django.db.models import Count
 from django.db.models import IntegerField
 from django.db.models import Max
+from django.db.models import Sum
 from django.db.models import When
+from django.db.models.functions import Length
 from django.db.models.functions import Lower
 from django.http import Http404
 from django.http import HttpResponse
@@ -30,6 +32,9 @@ from django.utils.translation import get_language
 from django.views.decorators.cache import cache_control
 from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
+from documents.filters import ObjectOwnedOrGrantedPermissionsFilter
+from documents.permissions import PaperlessAdminPermissions
+from documents.permissions import PaperlessObjectPermissions
 from documents.tasks import consume_file
 from langdetect import detect
 from packaging import version as packaging_version
@@ -42,6 +47,7 @@ from rest_framework.exceptions import NotFound
 from rest_framework.filters import OrderingFilter
 from rest_framework.filters import SearchFilter
 from rest_framework.generics import GenericAPIView
+from rest_framework.mixins import CreateModelMixin
 from rest_framework.mixins import DestroyModelMixin
 from rest_framework.mixins import ListModelMixin
 from rest_framework.mixins import RetrieveModelMixin
@@ -58,6 +64,9 @@ from .bulk_download import ArchiveOnlyStrategy
 from .bulk_download import OriginalAndArchiveStrategy
 from .bulk_download import OriginalsOnlyStrategy
 from .classifier import load_classifier
+from .data_models import ConsumableDocument
+from .data_models import DocumentMetadataOverrides
+from .data_models import DocumentSource
 from .filters import CorrespondentFilterSet
 from .filters import DocumentFilterSet
 from .filters import DocumentTypeFilterSet
@@ -67,10 +76,10 @@ from .matching import match_correspondents
 from .matching import match_document_types
 from .matching import match_storage_paths
 from .matching import match_tags
-from .models import Comment
 from .models import Correspondent
 from .models import Document
 from .models import DocumentType
+from .models import Note
 from .models import PaperlessTask
 from .models import SavedView
 from .models import StoragePath
@@ -137,7 +146,17 @@ class IndexView(TemplateView):
         return context
 
 
-class CorrespondentViewSet(ModelViewSet):
+class PassUserMixin(CreateModelMixin):
+    """
+    Pass a user object to serializer
+    """
+
+    def get_serializer(self, *args, **kwargs):
+        kwargs.setdefault("user", self.request.user)
+        return super().get_serializer(*args, **kwargs)
+
+
+class CorrespondentViewSet(ModelViewSet, PassUserMixin):
     model = Correspondent
 
     queryset = Correspondent.objects.annotate(
@@ -147,8 +166,12 @@ class CorrespondentViewSet(ModelViewSet):
 
     serializer_class = CorrespondentSerializer
     pagination_class = StandardPagination
-    permission_classes = (IsAuthenticated,)
-    filter_backends = (DjangoFilterBackend, OrderingFilter)
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+        ObjectOwnedOrGrantedPermissionsFilter,
+    )
     filterset_class = CorrespondentFilterSet
     ordering_fields = (
         "name",
@@ -159,27 +182,32 @@ class CorrespondentViewSet(ModelViewSet):
     )
 
 
-class TagViewSet(ModelViewSet):
+class TagViewSet(ModelViewSet, PassUserMixin):
     model = Tag
 
     queryset = Tag.objects.annotate(document_count=Count("documents")).order_by(
         Lower("name"),
     )
 
-    def get_serializer_class(self):
+    def get_serializer_class(self, *args, **kwargs):
+        print(self.request.version)
         if int(self.request.version) == 1:
             return TagSerializerVersion1
         else:
             return TagSerializer
 
     pagination_class = StandardPagination
-    permission_classes = (IsAuthenticated,)
-    filter_backends = (DjangoFilterBackend, OrderingFilter)
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+        ObjectOwnedOrGrantedPermissionsFilter,
+    )
     filterset_class = TagFilterSet
     ordering_fields = ("color", "name", "matching_algorithm", "match", "document_count")
 
 
-class DocumentTypeViewSet(ModelViewSet):
+class DocumentTypeViewSet(ModelViewSet, PassUserMixin):
     model = DocumentType
 
     queryset = DocumentType.objects.annotate(
@@ -188,13 +216,18 @@ class DocumentTypeViewSet(ModelViewSet):
 
     serializer_class = DocumentTypeSerializer
     pagination_class = StandardPagination
-    permission_classes = (IsAuthenticated,)
-    filter_backends = (DjangoFilterBackend, OrderingFilter)
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+        ObjectOwnedOrGrantedPermissionsFilter,
+    )
     filterset_class = DocumentTypeFilterSet
     ordering_fields = ("name", "matching_algorithm", "match", "document_count")
 
 
 class DocumentViewSet(
+    PassUserMixin,
     RetrieveModelMixin,
     UpdateModelMixin,
     DestroyModelMixin,
@@ -202,11 +235,16 @@ class DocumentViewSet(
     GenericViewSet,
 ):
     model = Document
-    queryset = Document.objects.all()
+    queryset = Document.objects.annotate(num_notes=Count("notes"))
     serializer_class = DocumentSerializer
     pagination_class = StandardPagination
-    permission_classes = (IsAuthenticated,)
-    filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter)
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    filter_backends = (
+        DjangoFilterBackend,
+        SearchFilter,
+        OrderingFilter,
+        ObjectOwnedOrGrantedPermissionsFilter,
+    )
     filterset_class = DocumentFilterSet
     search_fields = ("title", "correspondent__name", "content")
     ordering_fields = (
@@ -218,17 +256,16 @@ class DocumentViewSet(
         "modified",
         "added",
         "archive_serial_number",
+        "num_notes",
     )
 
     def get_queryset(self):
-        return Document.objects.distinct()
+        return Document.objects.distinct().annotate(num_notes=Count("notes"))
 
     def get_serializer(self, *args, **kwargs):
+        super().get_serializer(*args, **kwargs)
         fields_param = self.request.query_params.get("fields", None)
-        if fields_param:
-            fields = fields_param.split(",")
-        else:
-            fields = None
+        fields = fields_param.split(",") if fields_param else None
         truncate_content = self.request.query_params.get("truncate_content", "False")
         serializer_class = self.get_serializer_class()
         kwargs.setdefault("context", self.get_serializer_context())
@@ -277,7 +314,11 @@ class DocumentViewSet(
         # Firefox is not able to handle unicode characters in filename field
         # RFC 5987 addresses this issue
         # see https://datatracker.ietf.org/doc/html/rfc5987#section-4.2
-        filename_normalized = normalize("NFKD", filename).encode("ascii", "ignore")
+        # Chromium cannot handle commas in the filename
+        filename_normalized = normalize("NFKD", filename.replace(",", "_")).encode(
+            "ascii",
+            "ignore",
+        )
         filename_encoded = quote(filename)
         content_disposition = (
             f"{disposition}; "
@@ -314,7 +355,7 @@ class DocumentViewSet(
         try:
             doc = Document.objects.get(pk=pk)
         except Document.DoesNotExist:
-            raise Http404()
+            raise Http404
 
         meta = {
             "original_checksum": doc.checksum,
@@ -360,12 +401,16 @@ class DocumentViewSet(
 
         return Response(
             {
-                "correspondents": [c.id for c in match_correspondents(doc, classifier)],
-                "tags": [t.id for t in match_tags(doc, classifier)],
-                "document_types": [
-                    dt.id for dt in match_document_types(doc, classifier)
+                "correspondents": [
+                    c.id for c in match_correspondents(doc, classifier, request.user)
                 ],
-                "storage_paths": [dt.id for dt in match_storage_paths(doc, classifier)],
+                "tags": [t.id for t in match_tags(doc, classifier, request.user)],
+                "document_types": [
+                    dt.id for dt in match_document_types(doc, classifier, request.user)
+                ],
+                "storage_paths": [
+                    dt.id for dt in match_storage_paths(doc, classifier, request.user)
+                ],
                 "dates": [
                     date.strftime("%Y-%m-%d") for date in dates if date is not None
                 ],
@@ -378,7 +423,7 @@ class DocumentViewSet(
             response = self.file_response(pk, request, "inline")
             return response
         except (FileNotFoundError, Document.DoesNotExist):
-            raise Http404()
+            raise Http404
 
     @action(methods=["get"], detail=True)
     @method_decorator(cache_control(public=False, max_age=315360000))
@@ -394,53 +439,53 @@ class DocumentViewSet(
 
             return HttpResponse(handle, content_type="image/webp")
         except (FileNotFoundError, Document.DoesNotExist):
-            raise Http404()
+            raise Http404
 
     @action(methods=["get"], detail=True)
     def download(self, request, pk=None):
         try:
             return self.file_response(pk, request, "attachment")
         except (FileNotFoundError, Document.DoesNotExist):
-            raise Http404()
+            raise Http404
 
-    def getComments(self, doc):
+    def getNotes(self, doc):
         return [
             {
                 "id": c.id,
-                "comment": c.comment,
+                "note": c.note,
                 "created": c.created,
                 "user": {
                     "id": c.user.id,
                     "username": c.user.username,
-                    "firstname": c.user.first_name,
-                    "lastname": c.user.last_name,
+                    "first_name": c.user.first_name,
+                    "last_name": c.user.last_name,
                 },
             }
-            for c in Comment.objects.filter(document=doc).order_by("-created")
+            for c in Note.objects.filter(document=doc).order_by("-created")
         ]
 
     @action(methods=["get", "post", "delete"], detail=True)
-    def comments(self, request, pk=None):
+    def notes(self, request, pk=None):
         try:
             doc = Document.objects.get(pk=pk)
         except Document.DoesNotExist:
-            raise Http404()
+            raise Http404
 
         currentUser = request.user
 
         if request.method == "GET":
             try:
-                return Response(self.getComments(doc))
+                return Response(self.getNotes(doc))
             except Exception as e:
-                logger.warning(f"An error occurred retrieving comments: {str(e)}")
+                logger.warning(f"An error occurred retrieving notes: {str(e)}")
                 return Response(
-                    {"error": "Error retreiving comments, check logs for more detail."},
+                    {"error": "Error retreiving notes, check logs for more detail."},
                 )
         elif request.method == "POST":
             try:
-                c = Comment.objects.create(
+                c = Note.objects.create(
                     document=doc,
-                    comment=request.data["comment"],
+                    note=request.data["note"],
                     user=currentUser,
                 )
                 c.save()
@@ -449,23 +494,23 @@ class DocumentViewSet(
 
                 index.add_or_update_document(self.get_object())
 
-                return Response(self.getComments(doc))
+                return Response(self.getNotes(doc))
             except Exception as e:
-                logger.warning(f"An error occurred saving comment: {str(e)}")
+                logger.warning(f"An error occurred saving note: {str(e)}")
                 return Response(
                     {
-                        "error": "Error saving comment, check logs for more detail.",
+                        "error": "Error saving note, check logs for more detail.",
                     },
                 )
         elif request.method == "DELETE":
-            comment = Comment.objects.get(id=int(request.GET.get("id")))
-            comment.delete()
+            note = Note.objects.get(id=int(request.GET.get("id")))
+            note.delete()
 
             from documents import index
 
             index.add_or_update_document(self.get_object())
 
-            return Response(self.getComments(doc))
+            return Response(self.getNotes(doc))
 
         return Response(
             {
@@ -474,17 +519,17 @@ class DocumentViewSet(
         )
 
 
-class SearchResultSerializer(DocumentSerializer):
+class SearchResultSerializer(DocumentSerializer, PassUserMixin):
     def to_representation(self, instance):
         doc = Document.objects.get(id=instance["id"])
-        comments = ",".join(
-            [str(c.comment) for c in Comment.objects.filter(document=instance["id"])],
+        notes = ",".join(
+            [str(c.note) for c in Note.objects.filter(document=instance["id"])],
         )
         r = super().to_representation(doc)
         r["__search_hit__"] = {
             "score": instance.score,
             "highlights": instance.highlights("content", text=doc.content),
-            "comment_highlights": instance.highlights("comments", text=comments)
+            "note_highlights": instance.highlights("notes", text=notes)
             if doc
             else None,
             "rank": instance.rank,
@@ -514,12 +559,18 @@ class UnifiedSearchViewSet(DocumentViewSet):
         if self._is_search_request():
             from documents import index
 
+            if hasattr(self.request, "user"):
+                # pass user to query for perms
+                self.request.query_params._mutable = True
+                self.request.query_params["user"] = self.request.user.id
+                self.request.query_params._mutable = False
+
             if "query" in self.request.query_params:
                 query_class = index.DelayedFullTextQuery
             elif "more_like_id" in self.request.query_params:
                 query_class = index.DelayedMoreLikeThisQuery
             else:
-                raise ValueError()
+                raise ValueError
 
             return query_class(
                 self.searcher,
@@ -547,18 +598,21 @@ class UnifiedSearchViewSet(DocumentViewSet):
 
 class LogViewSet(ViewSet):
 
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, PaperlessAdminPermissions)
 
     log_files = ["paperless", "mail"]
 
+    def get_log_filename(self, log):
+        return os.path.join(settings.LOGGING_DIR, f"{log}.log")
+
     def retrieve(self, request, pk=None, *args, **kwargs):
         if pk not in self.log_files:
-            raise Http404()
+            raise Http404
 
-        filename = os.path.join(settings.LOGGING_DIR, f"{pk}.log")
+        filename = self.get_log_filename(pk)
 
         if not os.path.isfile(filename):
-            raise Http404()
+            raise Http404
 
         with open(filename) as f:
             lines = [line.rstrip() for line in f.readlines()]
@@ -566,23 +620,26 @@ class LogViewSet(ViewSet):
         return Response(lines)
 
     def list(self, request, *args, **kwargs):
-        return Response(self.log_files)
+        exist = [
+            log for log in self.log_files if os.path.isfile(self.get_log_filename(log))
+        ]
+        return Response(exist)
 
 
-class SavedViewViewSet(ModelViewSet):
+class SavedViewViewSet(ModelViewSet, PassUserMixin):
     model = SavedView
 
     queryset = SavedView.objects.all()
     serializer_class = SavedViewSerializer
     pagination_class = StandardPagination
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
 
     def get_queryset(self):
         user = self.request.user
-        return SavedView.objects.filter(user=user)
+        return SavedView.objects.filter(owner=user)
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        serializer.save(owner=self.request.user)
 
 
 class BulkEditView(GenericAPIView):
@@ -624,6 +681,7 @@ class PostDocumentView(GenericAPIView):
         tag_ids = serializer.validated_data.get("tags")
         title = serializer.validated_data.get("title")
         created = serializer.validated_data.get("created")
+        archive_serial_number = serializer.validated_data.get("archive_serial_number")
 
         t = int(mktime(datetime.now().timetuple()))
 
@@ -637,17 +695,24 @@ class PostDocumentView(GenericAPIView):
 
         os.utime(temp_file_path, times=(t, t))
 
-        task_id = str(uuid.uuid4())
+        input_doc = ConsumableDocument(
+            source=DocumentSource.ApiUpload,
+            original_file=temp_file_path,
+        )
+        input_doc_overrides = DocumentMetadataOverrides(
+            filename=doc_name,
+            title=title,
+            correspondent_id=correspondent_id,
+            document_type_id=document_type_id,
+            tag_ids=tag_ids,
+            created=created,
+            asn=archive_serial_number,
+            owner_id=request.user.id,
+        )
 
         async_task = consume_file.delay(
-            # Paths are not JSON friendly
-            str(temp_file_path),
-            override_title=title,
-            override_correspondent_id=correspondent_id,
-            override_document_type_id=document_type_id,
-            override_tag_ids=tag_ids,
-            task_id=task_id,
-            override_created=created,
+            input_doc,
+            input_doc_overrides,
         )
 
         return Response(async_task.id)
@@ -741,17 +806,38 @@ class StatisticsView(APIView):
 
     def get(self, request, format=None):
         documents_total = Document.objects.all().count()
-        if Tag.objects.filter(is_inbox_tag=True).exists():
-            documents_inbox = (
-                Document.objects.filter(tags__is_inbox_tag=True).distinct().count()
+
+        inbox_tag = Tag.objects.filter(is_inbox_tag=True)
+
+        documents_inbox = (
+            Document.objects.filter(tags__is_inbox_tag=True).distinct().count()
+            if inbox_tag.exists()
+            else None
+        )
+
+        document_file_type_counts = (
+            Document.objects.values("mime_type")
+            .annotate(mime_type_count=Count("mime_type"))
+            .order_by("-mime_type_count")
+            if documents_total > 0
+            else 0
+        )
+
+        character_count = (
+            Document.objects.annotate(
+                characters=Length("content"),
             )
-        else:
-            documents_inbox = None
+            .aggregate(Sum("characters"))
+            .get("characters__sum")
+        )
 
         return Response(
             {
                 "documents_total": documents_total,
                 "documents_inbox": documents_inbox,
+                "inbox_tag": inbox_tag.first().pk if inbox_tag.exists() else None,
+                "document_file_type_counts": document_file_type_counts,
+                "character_count": character_count,
             },
         )
 
@@ -842,7 +928,7 @@ class RemoteVersionView(GenericAPIView):
         )
 
 
-class StoragePathViewSet(ModelViewSet):
+class StoragePathViewSet(ModelViewSet, PassUserMixin):
     model = StoragePath
 
     queryset = StoragePath.objects.annotate(document_count=Count("documents")).order_by(
@@ -851,7 +937,7 @@ class StoragePathViewSet(ModelViewSet):
 
     serializer_class = StoragePathSerializer
     pagination_class = StandardPagination
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filterset_class = StoragePathFilterSet
     ordering_fields = ("name", "path", "matching_algorithm", "match", "document_count")
@@ -867,9 +953,6 @@ class UiSettingsView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
 
         user = User.objects.get(pk=request.user.id)
-        displayname = user.username
-        if user.first_name or user.last_name:
-            displayname = " ".join([user.first_name, user.last_name])
         ui_settings = {}
         if hasattr(user, "ui_settings"):
             ui_settings = user.ui_settings.settings
@@ -881,12 +964,18 @@ class UiSettingsView(GenericAPIView):
             ui_settings["update_checking"] = {
                 "backend_setting": settings.ENABLE_UPDATE_CHECK,
             }
+        # strip <app_label>.
+        roles = map(lambda perm: re.sub(r"^\w+.", "", perm), user.get_all_permissions())
         return Response(
             {
-                "user_id": user.id,
-                "username": user.username,
-                "display_name": displayname,
+                "user": {
+                    "id": user.id,
+                    "username": user.username,
+                    "is_superuser": user.is_superuser,
+                    "groups": user.groups.values_list("id", flat=True),
+                },
                 "settings": ui_settings,
+                "permissions": roles,
             },
         )
 

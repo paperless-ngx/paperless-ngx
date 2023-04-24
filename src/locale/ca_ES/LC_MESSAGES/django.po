@@ -1,0 +1,914 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: paperless-ngx\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-03-03 19:15+0000\n"
+"PO-Revision-Date: 2023-04-21 14:51\n"
+"Last-Translator: \n"
+"Language-Team: Catalan\n"
+"Language: ca_ES\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Crowdin-Project: paperless-ngx\n"
+"X-Crowdin-Project-ID: 500308\n"
+"X-Crowdin-Language: ca\n"
+"X-Crowdin-File: /dev/src/locale/en_US/LC_MESSAGES/django.po\n"
+"X-Crowdin-File-ID: 14\n"
+
+#: documents/apps.py:9
+msgid "Documents"
+msgstr "Documents"
+
+#: documents/models.py:36
+msgid "None"
+msgstr "Cap"
+
+#: documents/models.py:37
+msgid "Any word"
+msgstr "Qualsevol paraula"
+
+#: documents/models.py:38
+msgid "All words"
+msgstr "Totes paraules"
+
+#: documents/models.py:39
+msgid "Exact match"
+msgstr "Coincidència exacte"
+
+#: documents/models.py:40
+msgid "Regular expression"
+msgstr "Expressió Regular"
+
+#: documents/models.py:41
+msgid "Fuzzy word"
+msgstr "Paraula difusa"
+
+#: documents/models.py:42
+msgid "Automatic"
+msgstr "Automàtic"
+
+#: documents/models.py:45 documents/models.py:394 paperless_mail/models.py:17
+#: paperless_mail/models.py:89
+msgid "name"
+msgstr "nom"
+
+#: documents/models.py:47
+msgid "match"
+msgstr "coincidència"
+
+#: documents/models.py:50
+msgid "matching algorithm"
+msgstr "algoritme coincident"
+
+#: documents/models.py:55
+msgid "is insensitive"
+msgstr "no distingeix entre majúscules i minúscules"
+
+#: documents/models.py:71
+msgid "owner"
+msgstr "propietari"
+
+#: documents/models.py:81 documents/models.py:136
+msgid "correspondent"
+msgstr "corresponsal"
+
+#: documents/models.py:82
+msgid "correspondents"
+msgstr "corresponsals"
+
+#: documents/models.py:87
+msgid "color"
+msgstr "color"
+
+#: documents/models.py:90
+msgid "is inbox tag"
+msgstr "etiqueta entrada"
+
+#: documents/models.py:93
+msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
+msgstr "Marca aquesta etiqueta com a etiqueta de safata d'entrada: tots els documents consumits s'etiquetaran amb etiquetes d'entrada."
+
+#: documents/models.py:99
+msgid "tag"
+msgstr "etiqueta"
+
+#: documents/models.py:100 documents/models.py:174
+msgid "tags"
+msgstr "etiquetes"
+
+#: documents/models.py:105 documents/models.py:156
+msgid "document type"
+msgstr "tipus document"
+
+#: documents/models.py:106
+msgid "document types"
+msgstr "tipus document"
+
+#: documents/models.py:111
+msgid "path"
+msgstr "camí"
+
+#: documents/models.py:117 documents/models.py:145
+msgid "storage path"
+msgstr "ruta emmagatzematge"
+
+#: documents/models.py:118
+msgid "storage paths"
+msgstr "rutes emmagatzematge"
+
+#: documents/models.py:126
+msgid "Unencrypted"
+msgstr "No Encriptat"
+
+#: documents/models.py:127
+msgid "Encrypted with GNU Privacy Guard"
+msgstr "Xifrat amb GNU Privacy Guard"
+
+#: documents/models.py:148
+msgid "title"
+msgstr "títol"
+
+#: documents/models.py:160 documents/models.py:624
+msgid "content"
+msgstr "contingut"
+
+#: documents/models.py:163
+msgid "The raw, text-only data of the document. This field is primarily used for searching."
+msgstr "Les dades en brut del document només és text. Aquest camp s'utilitza principalment per a la cerca."
+
+#: documents/models.py:168
+msgid "mime type"
+msgstr "topus mimètic"
+
+#: documents/models.py:178
+msgid "checksum"
+msgstr "checksum"
+
+#: documents/models.py:182
+msgid "The checksum of the original document."
+msgstr "Checksum del document original."
+
+#: documents/models.py:186
+msgid "archive checksum"
+msgstr "arxiva checksum"
+
+#: documents/models.py:191
+msgid "The checksum of the archived document."
+msgstr "El checksum del document arxivat."
+
+#: documents/models.py:194 documents/models.py:376 documents/models.py:630
+msgid "created"
+msgstr "creat"
+
+#: documents/models.py:197
+msgid "modified"
+msgstr "modificat"
+
+#: documents/models.py:204
+msgid "storage type"
+msgstr "tipus emmagatzematge"
+
+#: documents/models.py:212
+msgid "added"
+msgstr "afegit"
+
+#: documents/models.py:219
+msgid "filename"
+msgstr "nom arxiu"
+
+#: documents/models.py:225
+msgid "Current filename in storage"
+msgstr "Nom arxiu a emmagatzematge"
+
+#: documents/models.py:229
+msgid "archive filename"
+msgstr "nom arxiu arxivat"
+
+#: documents/models.py:235
+msgid "Current archive filename in storage"
+msgstr "Nom arxiu arxivat a emmagatzematge"
+
+#: documents/models.py:239
+msgid "original filename"
+msgstr "nom arxiu original"
+
+#: documents/models.py:245
+msgid "The original name of the file when it was uploaded"
+msgstr "El nom original del fitxer quan es va pujar"
+
+#: documents/models.py:252
+msgid "archive serial number"
+msgstr "número de sèrie de l'arxiu"
+
+#: documents/models.py:262
+msgid "The position of this document in your physical document archive."
+msgstr "Posició d'aquest document al vostre arxiu físic de documents."
+
+#: documents/models.py:268 documents/models.py:641
+msgid "document"
+msgstr "document"
+
+#: documents/models.py:269
+msgid "documents"
+msgstr "documents"
+
+#: documents/models.py:359
+msgid "debug"
+msgstr "depura"
+
+#: documents/models.py:360
+msgid "information"
+msgstr "informació"
+
+#: documents/models.py:361
+msgid "warning"
+msgstr "alerta"
+
+#: documents/models.py:362 paperless_mail/models.py:276
+msgid "error"
+msgstr "error"
+
+#: documents/models.py:363
+msgid "critical"
+msgstr "crític"
+
+#: documents/models.py:366
+msgid "group"
+msgstr "grup"
+
+#: documents/models.py:368
+msgid "message"
+msgstr "missatge"
+
+#: documents/models.py:371
+msgid "level"
+msgstr "nivell"
+
+#: documents/models.py:380
+msgid "log"
+msgstr "log"
+
+#: documents/models.py:381
+msgid "logs"
+msgstr "logs"
+
+#: documents/models.py:391 documents/models.py:446
+msgid "saved view"
+msgstr "vista guardada"
+
+#: documents/models.py:392
+msgid "saved views"
+msgstr "vistes guardades"
+
+#: documents/models.py:397
+msgid "show on dashboard"
+msgstr "mostra al panell"
+
+#: documents/models.py:400
+msgid "show in sidebar"
+msgstr "mostra barra lateral"
+
+#: documents/models.py:404
+msgid "sort field"
+msgstr "camp ordenació"
+
+#: documents/models.py:409
+msgid "sort reverse"
+msgstr "ordenament invers"
+
+#: documents/models.py:414
+msgid "title contains"
+msgstr "títol conté"
+
+#: documents/models.py:415
+msgid "content contains"
+msgstr "contingut conté"
+
+#: documents/models.py:416
+msgid "ASN is"
+msgstr "ASN és"
+
+#: documents/models.py:417
+msgid "correspondent is"
+msgstr "corresponsal és"
+
+#: documents/models.py:418
+msgid "document type is"
+msgstr "tipus document és"
+
+#: documents/models.py:419
+msgid "is in inbox"
+msgstr "està safata entrada"
+
+#: documents/models.py:420
+msgid "has tag"
+msgstr "té etiqueta"
+
+#: documents/models.py:421
+msgid "has any tag"
+msgstr "qualsevol etiqueta"
+
+#: documents/models.py:422
+msgid "created before"
+msgstr "creat abans"
+
+#: documents/models.py:423
+msgid "created after"
+msgstr "creat després"
+
+#: documents/models.py:424
+msgid "created year is"
+msgstr "any creació és"
+
+#: documents/models.py:425
+msgid "created month is"
+msgstr "mes creació és"
+
+#: documents/models.py:426
+msgid "created day is"
+msgstr "dia creació és"
+
+#: documents/models.py:427
+msgid "added before"
+msgstr "afegit abans"
+
+#: documents/models.py:428
+msgid "added after"
+msgstr "afegit després"
+
+#: documents/models.py:429
+msgid "modified before"
+msgstr "modificat abans"
+
+#: documents/models.py:430
+msgid "modified after"
+msgstr "modificat després"
+
+#: documents/models.py:431
+msgid "does not have tag"
+msgstr "no té etiqueta"
+
+#: documents/models.py:432
+msgid "does not have ASN"
+msgstr "no té ASN"
+
+#: documents/models.py:433
+msgid "title or content contains"
+msgstr "títol o contingut conté"
+
+#: documents/models.py:434
+msgid "fulltext query"
+msgstr "consulta de text complet"
+
+#: documents/models.py:435
+msgid "more like this"
+msgstr "més com aquest"
+
+#: documents/models.py:436
+msgid "has tags in"
+msgstr "té etiquetes a"
+
+#: documents/models.py:437
+msgid "ASN greater than"
+msgstr "ASN més gran que"
+
+#: documents/models.py:438
+msgid "ASN less than"
+msgstr "ASN menor que"
+
+#: documents/models.py:439
+msgid "storage path is"
+msgstr "emmagatzematge és"
+
+#: documents/models.py:449
+msgid "rule type"
+msgstr "tipus de regla"
+
+#: documents/models.py:451
+msgid "value"
+msgstr "valor"
+
+#: documents/models.py:454
+msgid "filter rule"
+msgstr "regla de filtre"
+
+#: documents/models.py:455
+msgid "filter rules"
+msgstr "regla de filtres"
+
+#: documents/models.py:563
+msgid "Task ID"
+msgstr "ID Tasca"
+
+#: documents/models.py:564
+msgid "Celery ID for the Task that was run"
+msgstr "Celery ID per la tasca que es va executar"
+
+#: documents/models.py:569
+msgid "Acknowledged"
+msgstr "Reconegut"
+
+#: documents/models.py:570
+msgid "If the task is acknowledged via the frontend or API"
+msgstr "Si la tasca es reconeix mitjançant la interfície o l'API"
+
+#: documents/models.py:576
+msgid "Task Filename"
+msgstr "Nom Arxiu tasca"
+
+#: documents/models.py:577
+msgid "Name of the file which the Task was run for"
+msgstr "Nom del fitxer per al qual s'ha executat la tasca"
+
+#: documents/models.py:583
+msgid "Task Name"
+msgstr "Nom tasca"
+
+#: documents/models.py:584
+msgid "Name of the Task which was run"
+msgstr "Nom de la tasca que s'ha executat"
+
+#: documents/models.py:591
+msgid "Task State"
+msgstr "Estat de tasca"
+
+#: documents/models.py:592
+msgid "Current state of the task being run"
+msgstr "Estat actual de la tasca que s'està executant"
+
+#: documents/models.py:597
+msgid "Created DateTime"
+msgstr "Data Hora Creació"
+
+#: documents/models.py:598
+msgid "Datetime field when the task result was created in UTC"
+msgstr "Camp data i hora en què es va iniciar la tasca UTC"
+
+#: documents/models.py:603
+msgid "Started DateTime"
+msgstr "Data Hora Creació"
+
+#: documents/models.py:604
+msgid "Datetime field when the task was started in UTC"
+msgstr "Camp data i hora en què es va iniciar la tasca UTC"
+
+#: documents/models.py:609
+msgid "Completed DateTime"
+msgstr "Data Hora completada"
+
+#: documents/models.py:610
+msgid "Datetime field when the task was completed in UTC"
+msgstr "Camp data i hora en què es va completar la tasca UTC"
+
+#: documents/models.py:615
+msgid "Result Data"
+msgstr "Dades del resultat"
+
+#: documents/models.py:617
+msgid "The data returned by the task"
+msgstr "Dades retornades per la tasca"
+
+#: documents/models.py:626
+msgid "Comment for the document"
+msgstr "Comentari pel document"
+
+#: documents/models.py:650
+msgid "user"
+msgstr "usuari"
+
+#: documents/models.py:655
+msgid "comment"
+msgstr "comentari"
+
+#: documents/models.py:656
+msgid "comments"
+msgstr "comentaris"
+
+#: documents/serialisers.py:80
+#, python-format
+msgid "Invalid regular expression: %(error)s"
+msgstr "Expressió regular invàlida: %(error)s"
+
+#: documents/serialisers.py:320
+msgid "Invalid color."
+msgstr "Color Invàlid."
+
+#: documents/serialisers.py:700
+#, python-format
+msgid "File type %(type)s not supported"
+msgstr "Tipus arxiu %(type)s no suportat"
+
+#: documents/serialisers.py:794
+msgid "Invalid variable detected."
+msgstr "Variable detectada invàlida."
+
+#: documents/templates/index.html:78
+msgid "Paperless-ngx is loading..."
+msgstr "Paperless-ngx carregant..."
+
+#: documents/templates/index.html:79
+msgid "Still here?! Hmm, something might be wrong."
+msgstr "Encara Aquí?! Hmm, alguna cosa pot estar malament."
+
+#: documents/templates/index.html:79
+msgid "Here's a link to the docs."
+msgstr "Link als documents."
+
+#: documents/templates/registration/logged_out.html:14
+msgid "Paperless-ngx signed out"
+msgstr "Deslogat de Paperless-ngx"
+
+#: documents/templates/registration/logged_out.html:59
+msgid "You have been successfully logged out. Bye!"
+msgstr "Deslogat correctament. Adéu!"
+
+#: documents/templates/registration/logged_out.html:60
+msgid "Sign in again"
+msgstr "Entra de nou"
+
+#: documents/templates/registration/login.html:15
+msgid "Paperless-ngx sign in"
+msgstr "Paperless-ngx sign in"
+
+#: documents/templates/registration/login.html:61
+msgid "Please sign in."
+msgstr "Siusplau valida't."
+
+#: documents/templates/registration/login.html:64
+msgid "Your username and password didn't match. Please try again."
+msgstr "Nom usuari / contrasenya no coincideixen. Siusplau torna a provar."
+
+#: documents/templates/registration/login.html:67
+msgid "Username"
+msgstr "Nom usuari"
+
+#: documents/templates/registration/login.html:68
+msgid "Password"
+msgstr "Contrasenya"
+
+#: documents/templates/registration/login.html:73
+msgid "Sign in"
+msgstr "Validació"
+
+#: paperless/apps.py:9
+msgid "Paperless"
+msgstr "Paperless"
+
+#: paperless/settings.py:521
+msgid "English (US)"
+msgstr "English (US)"
+
+#: paperless/settings.py:522
+msgid "Arabic"
+msgstr "Àrab"
+
+#: paperless/settings.py:523
+msgid "Belarusian"
+msgstr "Bielorús"
+
+#: paperless/settings.py:524
+msgid "Czech"
+msgstr "Txec"
+
+#: paperless/settings.py:525
+msgid "Danish"
+msgstr "Danès"
+
+#: paperless/settings.py:526
+msgid "German"
+msgstr "Alemany"
+
+#: paperless/settings.py:527
+msgid "English (GB)"
+msgstr "Anglès (GB)"
+
+#: paperless/settings.py:528
+msgid "Spanish"
+msgstr "Espanyol"
+
+#: paperless/settings.py:529
+msgid "French"
+msgstr "Francès"
+
+#: paperless/settings.py:530
+msgid "Italian"
+msgstr "Italià"
+
+#: paperless/settings.py:531
+msgid "Luxembourgish"
+msgstr "Luxemburguès"
+
+#: paperless/settings.py:532
+msgid "Dutch"
+msgstr "Holandès"
+
+#: paperless/settings.py:533
+msgid "Polish"
+msgstr "Polac"
+
+#: paperless/settings.py:534
+msgid "Portuguese (Brazil)"
+msgstr "Portuguès (BZ)"
+
+#: paperless/settings.py:535
+msgid "Portuguese"
+msgstr "Portuguès"
+
+#: paperless/settings.py:536
+msgid "Romanian"
+msgstr "Romanès"
+
+#: paperless/settings.py:537
+msgid "Russian"
+msgstr "Rus"
+
+#: paperless/settings.py:538
+msgid "Slovenian"
+msgstr "Eslovè"
+
+#: paperless/settings.py:539
+msgid "Serbian"
+msgstr "Serbi"
+
+#: paperless/settings.py:540
+msgid "Swedish"
+msgstr "Suec"
+
+#: paperless/settings.py:541
+msgid "Turkish"
+msgstr "Turc"
+
+#: paperless/settings.py:542
+msgid "Chinese Simplified"
+msgstr "Xinès Simplificat"
+
+#: paperless/urls.py:169
+msgid "Paperless-ngx administration"
+msgstr "Administració Paperless-ngx"
+
+#: paperless_mail/admin.py:30
+msgid "Authentication"
+msgstr "Autentificació"
+
+#: paperless_mail/admin.py:31
+msgid "Advanced settings"
+msgstr "Opcions avançades"
+
+#: paperless_mail/admin.py:48
+msgid "Filter"
+msgstr "Filtre"
+
+#: paperless_mail/admin.py:51
+msgid "Paperless will only process mails that match ALL of the filters given below."
+msgstr "Només es processaran els correus que coincideixin amb TOTS els filtres indicats."
+
+#: paperless_mail/admin.py:66
+msgid "Actions"
+msgstr "Accions"
+
+#: paperless_mail/admin.py:69
+msgid "The action applied to the mail. This action is only performed when the mail body or attachments were consumed from the mail."
+msgstr "Acció aplicada al correu. Aquesta acció només es realitza quan el cos del correu o els fitxers adjunts s'han consumit."
+
+#: paperless_mail/admin.py:77
+msgid "Metadata"
+msgstr "Matadades"
+
+#: paperless_mail/admin.py:80
+msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
+msgstr "Assigna metadades als documents consumits d'aquesta regla automàticament. Si no assigneu etiquetes, tipus o corresponsals aquí, es processaran totes les regles de concordança que hàgiu definit."
+
+#: paperless_mail/apps.py:10
+msgid "Paperless mail"
+msgstr "Paperless mail"
+
+#: paperless_mail/models.py:9
+msgid "mail account"
+msgstr "compte correu"
+
+#: paperless_mail/models.py:10
+msgid "mail accounts"
+msgstr "comptes correu"
+
+#: paperless_mail/models.py:13
+msgid "No encryption"
+msgstr "Sense encriptació"
+
+#: paperless_mail/models.py:14
+msgid "Use SSL"
+msgstr "SSL"
+
+#: paperless_mail/models.py:15
+msgid "Use STARTTLS"
+msgstr "STARTTLS"
+
+#: paperless_mail/models.py:19
+msgid "IMAP server"
+msgstr "Servidor IMAP"
+
+#: paperless_mail/models.py:22
+msgid "IMAP port"
+msgstr "port IMAP"
+
+#: paperless_mail/models.py:26
+msgid "This is usually 143 for unencrypted and STARTTLS connections, and 993 for SSL connections."
+msgstr "Normalment 143 sense encriptació i STARTTLS i 993 per a SSL."
+
+#: paperless_mail/models.py:32
+msgid "IMAP security"
+msgstr "Seguretat IMAP"
+
+#: paperless_mail/models.py:37
+msgid "username"
+msgstr "nom usuari"
+
+#: paperless_mail/models.py:39
+msgid "password"
+msgstr "contrasenya"
+
+#: paperless_mail/models.py:42
+msgid "character set"
+msgstr "joc de caràcters"
+
+#: paperless_mail/models.py:46
+msgid "The character set to use when communicating with the mail server, such as 'UTF-8' or 'US-ASCII'."
+msgstr "El joc de caràcters utilitzat per comunicar amb el servidor de correu, com 'UTF-8' or 'US-ASCII'."
+
+#: paperless_mail/models.py:57
+msgid "mail rule"
+msgstr "norma e-mail"
+
+#: paperless_mail/models.py:58
+msgid "mail rules"
+msgstr "normes e-mail"
+
+#: paperless_mail/models.py:61 paperless_mail/models.py:69
+msgid "Only process attachments."
+msgstr "Només processa adjunts."
+
+#: paperless_mail/models.py:62
+msgid "Process full Mail (with embedded attachments in file) as .eml"
+msgstr "Processa el correu complet (amb fitxers adjunts incrustats al fitxer) com a .eml"
+
+#: paperless_mail/models.py:64
+msgid "Process full Mail (with embedded attachments in file) as .eml + process attachments as separate documents"
+msgstr "Processa el correu complet (amb fitxers adjunts incrustats al fitxer) com a .eml + processa adjunts com a documents separats"
+
+#: paperless_mail/models.py:70
+msgid "Process all files, including 'inline' attachments."
+msgstr "Processa tots els fitxers, inclosos els fitxers adjunts 'in line'."
+
+#: paperless_mail/models.py:73
+msgid "Delete"
+msgstr "Esborra"
+
+#: paperless_mail/models.py:74
+msgid "Move to specified folder"
+msgstr "Mou a carpeta especificada"
+
+#: paperless_mail/models.py:75
+msgid "Mark as read, don't process read mails"
+msgstr "Marca com a llegit, no processeu els correus llegits"
+
+#: paperless_mail/models.py:76
+msgid "Flag the mail, don't process flagged mails"
+msgstr "Marca el correu, no processeu els missatges marcats"
+
+#: paperless_mail/models.py:77
+msgid "Tag the mail with specified tag, don't process tagged mails"
+msgstr "Etiqueta el correu amb l'etiqueta especificada, no processeu correus etiquetats"
+
+#: paperless_mail/models.py:80
+msgid "Use subject as title"
+msgstr "Utilitza assumpte com a títol"
+
+#: paperless_mail/models.py:81
+msgid "Use attachment filename as title"
+msgstr "Utilitzeu el nom del fitxer adjunt com a títol"
+
+#: paperless_mail/models.py:84
+msgid "Do not assign a correspondent"
+msgstr "No assignar corresponsal"
+
+#: paperless_mail/models.py:85
+msgid "Use mail address"
+msgstr "Utilitza adreça correu"
+
+#: paperless_mail/models.py:86
+msgid "Use name (or mail address if not available)"
+msgstr "Utilitza nom (o adreça de correu si no disponible)"
+
+#: paperless_mail/models.py:87
+msgid "Use correspondent selected below"
+msgstr "Utilitza el corresponsal seleccionat a continuació"
+
+#: paperless_mail/models.py:91
+msgid "order"
+msgstr "ordena"
+
+#: paperless_mail/models.py:97
+msgid "account"
+msgstr "compte"
+
+#: paperless_mail/models.py:101 paperless_mail/models.py:231
+msgid "folder"
+msgstr "carpeta"
+
+#: paperless_mail/models.py:105
+msgid "Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server."
+msgstr "Subcarpetes han d'estar separades per un delimitador, sovint un punt ('.') o una barra inclinada ('/'), però varia segons el servidor de correu."
+
+#: paperless_mail/models.py:111
+msgid "filter from"
+msgstr "filtra de"
+
+#: paperless_mail/models.py:117
+msgid "filter subject"
+msgstr "filtra assumpte"
+
+#: paperless_mail/models.py:123
+msgid "filter body"
+msgstr "filtra cos"
+
+#: paperless_mail/models.py:130
+msgid "filter attachment filename"
+msgstr "filtra nom adjunt"
+
+#: paperless_mail/models.py:135
+msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
+msgstr "Consumiu només documents que coincideixin completament amb aquest nom de fitxer si s'especifica. Es permeten els comodins com ara *.pdf o *factura*. Cas insensitiu."
+
+#: paperless_mail/models.py:142
+msgid "maximum age"
+msgstr "temps màxim"
+
+#: paperless_mail/models.py:144
+msgid "Specified in days."
+msgstr "Especificat en dies."
+
+#: paperless_mail/models.py:148
+msgid "attachment type"
+msgstr "tipus de fitxer adjunt"
+
+#: paperless_mail/models.py:152
+msgid "Inline attachments include embedded images, so it's best to combine this option with a filename filter."
+msgstr "Els fitxers adjunts inline inclouen imatges incrustades, per la qual cosa és millor combinar aquesta opció amb un filtre de nom de fitxer."
+
+#: paperless_mail/models.py:158
+msgid "consumption scope"
+msgstr "àmbit de consum"
+
+#: paperless_mail/models.py:164
+msgid "action"
+msgstr "acció"
+
+#: paperless_mail/models.py:170
+msgid "action parameter"
+msgstr "paràmetre d'accío"
+
+#: paperless_mail/models.py:175
+msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
+msgstr "Paràmetre addicional per a l'acció seleccionada anteriorment, la carpeta de destinació de l'acció de moure a la carpeta. Les subcarpetes han d'estar separades per punts."
+
+#: paperless_mail/models.py:183
+msgid "assign title from"
+msgstr "assignar títol desde"
+
+#: paperless_mail/models.py:191
+msgid "assign this tag"
+msgstr "assigna aquesta etiqueta"
+
+#: paperless_mail/models.py:199
+msgid "assign this document type"
+msgstr "assigna aquest tipus de document"
+
+#: paperless_mail/models.py:203
+msgid "assign correspondent from"
+msgstr "assigna corresponsal des de"
+
+#: paperless_mail/models.py:213
+msgid "assign this correspondent"
+msgstr "assigna aquest corresponsal"
+
+#: paperless_mail/models.py:239
+msgid "uid"
+msgstr "uid"
+
+#: paperless_mail/models.py:247
+msgid "subject"
+msgstr "assumpte"
+
+#: paperless_mail/models.py:255
+msgid "received"
+msgstr "rebut"
+
+#: paperless_mail/models.py:262
+msgid "processed"
+msgstr "processat"
+
+#: paperless_mail/models.py:268
+msgid "status"
+msgstr "estat"
+

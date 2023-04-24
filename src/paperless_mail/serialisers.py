@@ -1,5 +1,6 @@
 from documents.serialisers import CorrespondentField
 from documents.serialisers import DocumentTypeField
+from documents.serialisers import OwnedObjectSerializer
 from documents.serialisers import TagsField
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
@@ -18,7 +19,7 @@ class ObfuscatedPasswordField(serializers.Field):
         return data
 
 
-class MailAccountSerializer(serializers.ModelSerializer):
+class MailAccountSerializer(OwnedObjectSerializer):
     password = ObfuscatedPasswordField()
 
     class Meta:
@@ -33,18 +34,17 @@ class MailAccountSerializer(serializers.ModelSerializer):
             "username",
             "password",
             "character_set",
+            "is_token",
         ]
 
     def update(self, instance, validated_data):
-        if "password" in validated_data:
-            if len(validated_data.get("password").replace("*", "")) == 0:
-                validated_data.pop("password")
+        if (
+            "password" in validated_data
+            and len(validated_data.get("password").replace("*", "")) == 0
+        ):
+            validated_data.pop("password")
         super().update(instance, validated_data)
         return instance
-
-    def create(self, validated_data):
-        mail_account = MailAccount.objects.create(**validated_data)
-        return mail_account
 
 
 class AccountField(serializers.PrimaryKeyRelatedField):
@@ -52,7 +52,7 @@ class AccountField(serializers.PrimaryKeyRelatedField):
         return MailAccount.objects.all().order_by("-id")
 
 
-class MailRuleSerializer(serializers.ModelSerializer):
+class MailRuleSerializer(OwnedObjectSerializer):
     account = AccountField(required=True)
     action_parameter = serializers.CharField(
         allow_null=True,
@@ -73,6 +73,7 @@ class MailRuleSerializer(serializers.ModelSerializer):
             "account",
             "folder",
             "filter_from",
+            "filter_to",
             "filter_subject",
             "filter_body",
             "filter_attachment_filename",
@@ -96,7 +97,7 @@ class MailRuleSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         if "assign_tags" in validated_data:
             assign_tags = validated_data.pop("assign_tags")
-        mail_rule = MailRule.objects.create(**validated_data)
+        mail_rule = super().create(validated_data)
         if assign_tags:
             mail_rule.assign_tags.set(assign_tags)
         return mail_rule

@@ -323,7 +323,7 @@ class DocumentParser(LoggingMixin):
         return []
 
     def parse(self, document_path, mime_type, file_name=None):
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def get_archive_path(self):
         return self.archive_path
@@ -332,7 +332,7 @@ class DocumentParser(LoggingMixin):
         """
         Returns the path to a file we can use as a thumbnail for this document.
         """
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def get_text(self):
         return self.text

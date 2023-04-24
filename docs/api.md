@@ -14,12 +14,15 @@ The API provides 7 main endpoints:
 - `/api/document_types/`: Full CRUD support.
 - `/api/logs/`: Read-Only.
 - `/api/tags/`: Full CRUD support.
+- `/api/tasks/`: Read-only.
 - `/api/mail_accounts/`: Full CRUD support.
 - `/api/mail_rules/`: Full CRUD support.
+- `/api/users/`: Full CRUD support.
+- `/api/groups/`: Full CRUD support.
 
 All of these endpoints except for the logging endpoint allow you to
-fetch, edit and delete individual objects by appending their primary key
-to the path, for example `/api/documents/454/`.
+fetch (and edit and delete where appropriate) individual objects by
+appending their primary key to the path, e.g. `/api/documents/454/`.
 
 The objects served by the document endpoint contain the following
 fields:
@@ -254,11 +257,16 @@ The endpoint supports the following optional form fields:
 - `document_type`: Similar to correspondent.
 - `tags`: Similar to correspondent. Specify this multiple times to
   have multiple tags added to the document.
+- `owner`: An optional user ID to set as the owner.
+- `archive_serial_number`: An optional archive serial number to set.
 
-The endpoint will immediately return "OK" if the document consumption
-process was started successfully. No additional status information about
-the consumption process itself is available, since that happens in a
-different process.
+The endpoint will immediately return HTTP 200 if the document consumption
+process was started successfully, with the UUID of the consumption task
+as the data. No additional status information about the consumption process
+itself is available immediately, since that happens in a different process.
+However, querying the tasks endpoint with the returned UUID e.g.
+`/api/tasks/?task_id={uuid}` will provide information on the state of the
+consumption including the ID of a created document if consumption succeeded.
 
 ## API Versioning
 

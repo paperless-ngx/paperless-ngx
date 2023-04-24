@@ -5,6 +5,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import override_settings
 from django.test import TestCase
+from rest_framework import status
 
 
 class TestViews(TestCase):
@@ -28,7 +29,7 @@ class TestViews(TestCase):
 
     def test_login_redirect(self):
         response = self.client.get("/")
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
         self.assertEqual(response.url, "/accounts/login/?next=/")
 
     def test_index(self):
@@ -46,13 +47,13 @@ class TestViews(TestCase):
                 self.client.cookies.load(
                     {settings.LANGUAGE_COOKIE_NAME: language_given},
                 )
-            elif settings.LANGUAGE_COOKIE_NAME in self.client.cookies.keys():
+            elif settings.LANGUAGE_COOKIE_NAME in self.client.cookies:
                 self.client.cookies.pop(settings.LANGUAGE_COOKIE_NAME)
 
             response = self.client.get(
                 "/",
             )
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertEqual(
                 response.context_data["webmanifest"],
                 f"frontend/{language_actual}/manifest.webmanifest",

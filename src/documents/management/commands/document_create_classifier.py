@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from ...tasks import train_classifier
+from documents.tasks import train_classifier
 
 
 class Command(BaseCommand):

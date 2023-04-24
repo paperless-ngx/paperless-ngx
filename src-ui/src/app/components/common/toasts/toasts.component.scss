@@ -9,3 +9,14 @@
 .toast:not(.show) {
   display: block; // this corrects an ng-bootstrap bug that prevented animations
 }
+
+::ng-deep .toast.error .toast-header {
+  background-color: hsla(350, 79%, 40%, 0.8); // bg-danger
+  border-color: black;
+}
+
+::ng-deep .toast.error .toast-body {
+  background-color: hsla(350, 79%, 40%, 0.8); // bg-danger
+  border-bottom-left-radius: inherit;
+  border-bottom-right-radius: inherit;
+}

@@ -16,6 +16,7 @@ body {
   --pngx-primary-darken-15: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) - 15%));
   --pngx-primary-darken-18: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) - 18%));
   --pngx-primary-darken-27: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) - 27%));
+  --pngx-success-darken-10: hsl(152, 69%, 11%); // based on success #198754
   --pngx-bg-alt: #fff;
   --pngx-bg-darker: var(--bs-gray-100);
   --pngx-focus-alpha: 0.3;
@@ -133,6 +134,14 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
     filter: brightness(.8);
   }
 
+  .badge.bg-light.border {
+    border-color: rgba(0,0,0,0) !important;
+  }
+
+  .document-card .card-body.bg-light {
+    background-color: var(--bs-body-bg);
+  }
+
   .doc-img {
     mix-blend-mode: normal;
     border-radius: 0;
@@ -155,6 +164,19 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
   .ng-dropdown-panel .ng-dropdown-panel-items .ng-option:hover,
   .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-marked {
     background-color: var(--bs-light);
+  }
+
+  .ng-select-multiple .ng-select-container .ng-value-container .ng-value {
+    background-color: var(--pngx-bg-alt);
+    color: var(--bs-body-color);
+
+    .ng-value-icon.left {
+      border-color: var(--pngx-bg-alt);
+
+      &:hover {
+        background-color: var(--pngx-primary-lighten-30);
+      }
+    }
   }
 
   table {
@@ -184,6 +206,12 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
     --bs-alert-border-color: var(--pngx-bg-darker);
   }
 
+  .alert-success {
+    --bs-alert-color: var(--pngx-body-color-accent);
+    --bs-alert-bg: var(--pngx-success-darken-10);
+    --bs-alert-border-color: var(--pngx-bg-darker);
+  }
+
   .table-striped > tbody > tr:nth-of-type(odd) > * {
     color: var(--pngx-body-color-accent);
   }
@@ -209,6 +237,14 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
 
   .dropdown-menu {
     --bs-dropdown-color: var(--bs-body-color);
+  }
+
+  .card .list-group-item {
+    --bs-border-color: rgb(var(--bs-dark-rgb));
+
+    .bg-secondary {
+      background-color: rgb(var(--bs-dark-rgb)) !important;
+    }
   }
 }
 
