@@ -170,6 +170,12 @@ steps described in [Docker setup](#docker_hub) automatically.
     $ docker-compose run --rm webserver createsuperuser
     ```
 
+    or using docker exec from within the container:
+
+    ```shell-session
+    $ python3 manage.py createsuperuser
+    ```
+
     This will prompt you to set a username, an optional e-mail address
     and finally a password (at least 8 characters).
 
