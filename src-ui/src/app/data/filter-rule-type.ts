@@ -8,8 +8,12 @@ export const FILTER_ASN_GT = 23
 export const FILTER_ASN_LT = 24
 
 export const FILTER_CORRESPONDENT = 3
+export const FILTER_HAS_CORRESPONDENT_ANY = 26
+export const FILTER_DOES_NOT_HAVE_CORRESPONDENT = 27
 
 export const FILTER_DOCUMENT_TYPE = 4
+export const FILTER_HAS_DOCUMENT_TYPE_ANY = 28
+export const FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE = 29
 
 export const FILTER_IS_IN_INBOX = 5
 export const FILTER_HAS_TAGS_ALL = 6
@@ -18,6 +22,8 @@ export const FILTER_DOES_NOT_HAVE_TAG = 17
 export const FILTER_HAS_TAGS_ANY = 22
 
 export const FILTER_STORAGE_PATH = 25
+export const FILTER_HAS_STORAGE_PATH_ANY = 30
+export const FILTER_DOES_NOT_HAVE_STORAGE_PATH = 31
 
 export const FILTER_CREATED_BEFORE = 8
 export const FILTER_CREATED_AFTER = 9
@@ -64,6 +70,18 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
     multi: false,
   },
   {
+    id: FILTER_HAS_CORRESPONDENT_ANY,
+    filtervar: 'correspondent__id__in',
+    datatype: 'correspondent',
+    multi: true,
+  },
+  {
+    id: FILTER_DOES_NOT_HAVE_CORRESPONDENT,
+    filtervar: 'correspondent__id__none',
+    datatype: 'correspondent',
+    multi: true,
+  },
+  {
     id: FILTER_STORAGE_PATH,
     filtervar: 'storage_path__id',
     isnull_filtervar: 'storage_path__isnull',
@@ -71,11 +89,35 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
     multi: false,
   },
   {
+    id: FILTER_HAS_STORAGE_PATH_ANY,
+    filtervar: 'storage_path__id__in',
+    datatype: 'storage_path',
+    multi: true,
+  },
+  {
+    id: FILTER_DOES_NOT_HAVE_STORAGE_PATH,
+    filtervar: 'storage_path__id__none',
+    datatype: 'storage_path',
+    multi: true,
+  },
+  {
     id: FILTER_DOCUMENT_TYPE,
     filtervar: 'document_type__id',
     isnull_filtervar: 'document_type__isnull',
     datatype: 'document_type',
     multi: false,
+  },
+  {
+    id: FILTER_HAS_DOCUMENT_TYPE_ANY,
+    filtervar: 'document_type__id__in',
+    datatype: 'document_type',
+    multi: true,
+  },
+  {
+    id: FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE,
+    filtervar: 'document_type__id__none',
+    datatype: 'document_type',
+    multi: true,
   },
   {
     id: FILTER_IS_IN_INBOX,

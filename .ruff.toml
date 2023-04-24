@@ -1,0 +1,23 @@
+# https://beta.ruff.rs/docs/settings/
+# https://beta.ruff.rs/docs/rules/
+select = ["F", "E", "W", "UP", "COM", "DJ", "EXE", "ISC", "ICN", "G201", "INP", "PIE", "RSE", "SIM", "TID", "PLC", "PLE", "RUF"]
+# TODO PTH
+ignore = ["DJ001", "SIM105"]
+fix = true
+line-length = 88
+respect-gitignore = true
+src = ["src"]
+target-version = "py38"
+format = "grouped"
+show-fixes = true
+
+[per-file-ignores]
+".github/scripts/*.py" = ["E501", "INP001", "SIM117"]
+"docker/wait-for-redis.py" = ["INP001"]
+"*/tests/*.py" = ["E501", "SIM117"]
+"*/migrations/*.py" = ["E501", "SIM"]
+"src/paperless_tesseract/tests/test_parser.py" = ["RUF001"]
+"src/documents/models.py" = ["SIM115"]
+
+[isort]
+force-single-line = true

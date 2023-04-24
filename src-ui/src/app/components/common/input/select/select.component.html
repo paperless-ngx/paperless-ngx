@@ -1,17 +1,19 @@
-<div class="mb-3 paperless-input-select">
-  <label class="form-label" [for]="inputId">{{title}}</label>
+<div class="mb-3 paperless-input-select" [class.disabled]="disabled">
+  <label *ngIf="title" class="form-label" [for]="inputId">{{title}}</label>
     <div [class.input-group]="allowCreateNew">
       <ng-select name="inputId" [(ngModel)]="value"
         [disabled]="disabled"
         [style.color]="textColor"
         [style.background]="backgroundColor"
+        [class.private]="isPrivate"
         [clearable]="allowNull"
         [items]="items"
         [addTag]="allowCreateNew && addItemRef"
         addTagText="Add item"
         i18n-addTagText="Used for both types, correspondents, storage paths"
         [placeholder]="placeholder"
-        bindLabel="name"
+        [multiple]="multiple"
+        [bindLabel]="bindLabel"
         bindValue="id"
         (change)="onChange(value)"
         (search)="onSearch($event)"
@@ -19,7 +21,7 @@
         (clear)="clearLastSearchTerm()"
         (blur)="onBlur()">
       </ng-select>
-      <button *ngIf="allowCreateNew" class="btn btn-outline-secondary" type="button" (click)="addItem()">
+      <button *ngIf="allowCreateNew" class="btn btn-outline-secondary" type="button" (click)="addItem()" [disabled]="disabled">
         <svg class="buttonicon" fill="currentColor">
           <use xlink:href="assets/bootstrap-icons.svg#plus" />
         </svg>

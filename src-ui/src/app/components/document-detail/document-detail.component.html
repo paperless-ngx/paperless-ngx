@@ -5,7 +5,7 @@
       <div class="input-group-text" i18n>of {{previewNumPages}}</div>
     </div>
 
-    <button type="button" class="btn btn-sm btn-outline-danger me-2 ms-auto" (click)="delete()">
+    <button type="button" class="btn btn-sm btn-outline-danger me-2 ms-auto" (click)="delete()" [disabled]="!userIsOwner" *appIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Document }">
         <svg class="buttonicon" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#trash" />
         </svg><span class="d-none d-lg-inline ps-1" i18n>Delete</span>
@@ -20,7 +20,7 @@
         </a>
 
         <div class="btn-group" ngbDropdown role="group" *ngIf="metadata?.has_archive_version">
-            <button class="btn btn-sm btn-outline-primary dropdown-toggle-split" ngbDropdownToggle></button>
+            <button class="btn btn-sm btn-outline-primary dropdown-toggle" ngbDropdownToggle></button>
             <div class="dropdown-menu shadow" ngbDropdownMenu>
                 <a ngbDropdownItem [href]="downloadOriginalUrl" i18n>Download original</a>
             </div>
@@ -28,7 +28,7 @@
 
     </div>
 
-    <button type="button" class="btn btn-sm btn-outline-primary me-2" (click)="redoOcr()">
+    <button type="button" class="btn btn-sm btn-outline-primary me-2" (click)="redoOcr()" [disabled]="!userCanEdit">
         <svg class="buttonicon" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#arrow-counterclockwise" />
         </svg><span class="d-none d-lg-inline ps-1" i18n>Redo OCR</span>
@@ -67,8 +67,8 @@
 
         <form [formGroup]='documentForm' (ngSubmit)="save()">
 
-            <ul ngbNav #nav="ngbNav" class="nav-tabs">
-                <li [ngbNavItem]="1">
+            <ul ngbNav #nav="ngbNav" class="nav-tabs" (navChange)="onNavChange($event)" [(activeId)]="activeNavID">
+                <li [ngbNavItem]="DocumentDetailNavIDs.Details">
                     <a ngbNavLink i18n>Details</a>
                     <ng-template ngbNavContent>
 
@@ -77,17 +77,17 @@
                         <app-input-date i18n-title title="Date created" formControlName="created_date" [suggestions]="suggestions?.dates"
                             [error]="error?.created_date"></app-input-date>
                         <app-input-select [items]="correspondents" i18n-title title="Correspondent" formControlName="correspondent" [allowNull]="true"
-                            (createNew)="createCorrespondent($event)" [suggestions]="suggestions?.correspondents"></app-input-select>
+                            (createNew)="createCorrespondent($event)" [suggestions]="suggestions?.correspondents" *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.Correspondent }"></app-input-select>
                         <app-input-select [items]="documentTypes" i18n-title title="Document type" formControlName="document_type" [allowNull]="true"
-                            (createNew)="createDocumentType($event)" [suggestions]="suggestions?.document_types"></app-input-select>
+                            (createNew)="createDocumentType($event)" [suggestions]="suggestions?.document_types" *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.DocumentType }"></app-input-select>
                         <app-input-select [items]="storagePaths" i18n-title title="Storage path" formControlName="storage_path" [allowNull]="true"
-                            (createNew)="createStoragePath($event)" [suggestions]="suggestions?.storage_paths" i18n-placeholder placeholder="Default"></app-input-select>
-                        <app-input-tags formControlName="tags" [suggestions]="suggestions?.tags"></app-input-tags>
+                            (createNew)="createStoragePath($event)" [suggestions]="suggestions?.storage_paths" i18n-placeholder placeholder="Default" *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.StoragePath }"></app-input-select>
+                        <app-input-tags formControlName="tags" [suggestions]="suggestions?.tags" *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.Tag }"></app-input-tags>
 
                     </ng-template>
                 </li>
 
-                <li [ngbNavItem]="2">
+                <li [ngbNavItem]="DocumentDetailNavIDs.Content">
                     <a ngbNavLink i18n>Content</a>
                     <ng-template ngbNavContent>
                         <div class="mb-3">
@@ -96,7 +96,7 @@
                     </ng-template>
                 </li>
 
-                <li [ngbNavItem]="3">
+                <li [ngbNavItem]="DocumentDetailNavIDs.Metadata">
                     <a ngbNavLink i18n>Metadata</a>
                     <ng-template ngbNavContent>
 
@@ -147,8 +147,8 @@
                     </ng-template>
                 </li>
 
-                <li [ngbNavItem]="4" class="d-md-none">
-                    <a ngbNavLink>Preview</a>
+                <li [ngbNavItem]="DocumentDetailNavIDs.Preview" class="d-md-none">
+                    <a ngbNavLink i18n>Preview</a>
                     <ng-template ngbNavContent *ngIf="!pdfPreview.offsetParent">
                         <div class="position-relative">
                             <ng-container *ngIf="getContentType() === 'application/pdf'">
@@ -170,19 +170,31 @@
                         </div>
                     </ng-template>
                 </li>
-                <li [ngbNavItem]="5" *ngIf="commentsEnabled">
-                    <a ngbNavLink i18n>Comments</a>
+
+                <li [ngbNavItem]="DocumentDetailNavIDs.Notes" *ngIf="notesEnabled">
+                    <a ngbNavLink i18n>Notes <span *ngIf="document?.notes.length" class="badge text-bg-secondary ms-1">{{document.notes.length}}</span></a>
                     <ng-template ngbNavContent>
-                        <app-document-comments [documentId]="documentId"></app-document-comments>
+                        <app-document-notes [documentId]="documentId" [notes]="document?.notes" (updated)="notesUpdated($event)"></app-document-notes>
+                    </ng-template>
+                </li>
+
+                <li [ngbNavItem]="DocumentDetailNavIDs.Permissions" *ngIf="showPermissions">
+                    <a ngbNavLink i18n>Permissions</a>
+                    <ng-template ngbNavContent>
+                        <div class="mb-3">
+                            <app-permissions-form [users]="users" formControlName="permissions_form"></app-permissions-form>
+                        </div>
                     </ng-template>
                 </li>
             </ul>
 
             <div [ngbNavOutlet]="nav" class="mt-2"></div>
 
-            <button type="button" class="btn btn-outline-secondary" (click)="discard()" i18n [disabled]="networkActive || (isDirty$ | async) !== true">Discard</button>&nbsp;
-            <button type="button" class="btn btn-outline-primary" (click)="saveEditNext()" *ngIf="hasNext()" i18n [disabled]="networkActive || (isDirty$ | async) !== true || error">Save & next</button>&nbsp;
-            <button type="submit" class="btn btn-primary" i18n [disabled]="networkActive || (isDirty$ | async) !== true || error">Save</button>&nbsp;
+            <ng-container>
+                <button type="button" class="btn btn-outline-secondary" (click)="discard()" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Discard</button>&nbsp;
+                <button type="button" class="btn btn-outline-primary" (click)="saveEditNext()" *ngIf="hasNext()" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Save & next</button>&nbsp;
+                <button type="submit" class="btn btn-primary" *appIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Save</button>&nbsp;
+            </ng-container>
         </form>
     </div>
 
@@ -196,7 +208,7 @@
             </ng-template>
         </ng-container>
         <ng-container *ngIf="getContentType() === 'text/plain'">
-            <object [data]="previewUrl | safeUrl" type="text/plain" class="preview-sticky bg-white" width="100%"></object>
+            <div [innerHTML]="previewHtml | safeHtml" class="preview-sticky bg-light p-3" width="100%"></div>
         </ng-container>
         <div *ngIf="requiresPassword" class="password-prompt">
             <form>

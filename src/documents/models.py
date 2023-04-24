@@ -3,6 +3,7 @@ import logging
 import os
 import re
 from collections import OrderedDict
+from pathlib import Path
 from typing import Final
 from typing import Optional
 
@@ -22,8 +23,22 @@ ALL_STATES = sorted(states.ALL_STATES)
 TASK_STATE_CHOICES = sorted(zip(ALL_STATES, ALL_STATES))
 
 
-class MatchingModel(models.Model):
+class ModelWithOwner(models.Model):
+    owner = models.ForeignKey(
+        User,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        verbose_name=_("owner"),
+    )
 
+    class Meta:
+        abstract = True
+
+
+class MatchingModel(ModelWithOwner):
+
+    MATCH_NONE = 0
     MATCH_ANY = 1
     MATCH_ALL = 2
     MATCH_LITERAL = 3
@@ -32,6 +47,7 @@ class MatchingModel(models.Model):
     MATCH_AUTO = 6
 
     MATCHING_ALGORITHMS = (
+        (MATCH_NONE, _("None")),
         (MATCH_ANY, _("Any word")),
         (MATCH_ALL, _("All words")),
         (MATCH_LITERAL, _("Exact match")),
@@ -40,7 +56,7 @@ class MatchingModel(models.Model):
         (MATCH_AUTO, _("Automatic")),
     )
 
-    name = models.CharField(_("name"), max_length=128, unique=True)
+    name = models.CharField(_("name"), max_length=128)
 
     match = models.CharField(_("match"), max_length=256, blank=True)
 
@@ -55,14 +71,24 @@ class MatchingModel(models.Model):
     class Meta:
         abstract = True
         ordering = ("name",)
+        constraints = [
+            models.UniqueConstraint(
+                fields=["name", "owner"],
+                name="%(app_label)s_%(class)s_unique_name_owner",
+            ),
+            models.UniqueConstraint(
+                name="%(app_label)s_%(class)s_name_uniq",
+                fields=["name"],
+                condition=models.Q(owner__isnull=True),
+            ),
+        ]
 
     def __str__(self):
         return self.name
 
 
 class Correspondent(MatchingModel):
-    class Meta:
-        ordering = ("name",)
+    class Meta(MatchingModel.Meta):
         verbose_name = _("correspondent")
         verbose_name_plural = _("correspondents")
 
@@ -80,13 +106,13 @@ class Tag(MatchingModel):
         ),
     )
 
-    class Meta:
+    class Meta(MatchingModel.Meta):
         verbose_name = _("tag")
         verbose_name_plural = _("tags")
 
 
 class DocumentType(MatchingModel):
-    class Meta:
+    class Meta(MatchingModel.Meta):
         verbose_name = _("document type")
         verbose_name_plural = _("document types")
 
@@ -97,13 +123,12 @@ class StoragePath(MatchingModel):
         max_length=512,
     )
 
-    class Meta:
-        ordering = ("name",)
+    class Meta(MatchingModel.Meta):
         verbose_name = _("storage path")
         verbose_name_plural = _("storage paths")
 
 
-class Document(models.Model):
+class Document(ModelWithOwner):
 
     STORAGE_TYPE_UNENCRYPTED = "unencrypted"
     STORAGE_TYPE_GPG = "gpg"
@@ -244,7 +269,7 @@ class Document(models.Model):
             MinValueValidator(ARCHIVE_SERIAL_NUMBER_MIN),
         ],
         help_text=_(
-            "The position of this document in your physical document " "archive.",
+            "The position of this document in your physical document archive.",
         ),
     )
 
@@ -267,7 +292,7 @@ class Document(models.Model):
         return res
 
     @property
-    def source_path(self) -> str:
+    def source_path(self) -> Path:
         if self.filename:
             fname = str(self.filename)
         else:
@@ -275,7 +300,7 @@ class Document(models.Model):
             if self.storage_type == self.STORAGE_TYPE_GPG:
                 fname += ".gpg"  # pragma: no cover
 
-        return os.path.join(settings.ORIGINALS_DIR, fname)
+        return (settings.ORIGINALS_DIR / Path(fname)).resolve()
 
     @property
     def source_file(self):
@@ -286,9 +311,9 @@ class Document(models.Model):
         return self.archive_filename is not None
 
     @property
-    def archive_path(self) -> Optional[str]:
+    def archive_path(self) -> Optional[Path]:
         if self.has_archive_version:
-            return os.path.join(settings.ARCHIVE_DIR, str(self.archive_filename))
+            return (settings.ARCHIVE_DIR / Path(str(self.archive_filename))).resolve()
         else:
             return None
 
@@ -320,14 +345,14 @@ class Document(models.Model):
         return get_default_file_extension(self.mime_type)
 
     @property
-    def thumbnail_path(self) -> str:
+    def thumbnail_path(self) -> Path:
         webp_file_name = f"{self.pk:07}.webp"
         if self.storage_type == self.STORAGE_TYPE_GPG:
             webp_file_name += ".gpg"
 
-        webp_file_path = os.path.join(settings.THUMBNAIL_DIR, webp_file_name)
+        webp_file_path = settings.THUMBNAIL_DIR / Path(webp_file_name)
 
-        return os.path.normpath(webp_file_path)
+        return webp_file_path.resolve()
 
     @property
     def thumbnail_file(self):
@@ -369,14 +394,13 @@ class Log(models.Model):
         return self.message
 
 
-class SavedView(models.Model):
+class SavedView(ModelWithOwner):
     class Meta:
 
         ordering = ("name",)
         verbose_name = _("saved view")
         verbose_name_plural = _("saved views")
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_("user"))
     name = models.CharField(_("name"), max_length=128)
 
     show_on_dashboard = models.BooleanField(
@@ -423,6 +447,12 @@ class SavedViewFilterRule(models.Model):
         (23, _("ASN greater than")),
         (24, _("ASN less than")),
         (25, _("storage path is")),
+        (26, _("has correspondent in")),
+        (27, _("does not have correspondent in")),
+        (28, _("has document type in")),
+        (29, _("does not have document type in")),
+        (30, _("has storage path in")),
+        (31, _("does not have storage path in")),
     ]
 
     saved_view = models.ForeignKey(
@@ -440,6 +470,9 @@ class SavedViewFilterRule(models.Model):
         verbose_name = _("filter rule")
         verbose_name_plural = _("filter rules")
 
+    def __str__(self) -> str:
+        return f"SavedViewFilterRule: {self.rule_type} : {self.value}"
+
 
 # TODO: why is this in the models file?
 # TODO: how about, what is this and where is it documented?
@@ -453,7 +486,7 @@ class FileInfo:
             (
                 "created-title",
                 re.compile(
-                    r"^(?P<created>\d{8}(\d{6})?Z) - " r"(?P<title>.*)$",
+                    r"^(?P<created>\d{8}(\d{6})?Z) - (?P<title>.*)$",
                     flags=re.IGNORECASE,
                 ),
             ),
@@ -604,12 +637,15 @@ class PaperlessTask(models.Model):
         ),
     )
 
+    def __str__(self) -> str:
+        return f"Task {self.task_id}"
 
-class Comment(models.Model):
-    comment = models.TextField(
+
+class Note(models.Model):
+    note = models.TextField(
         _("content"),
         blank=True,
-        help_text=_("Comment for the document"),
+        help_text=_("Note for the document"),
     )
 
     created = models.DateTimeField(
@@ -622,7 +658,7 @@ class Comment(models.Model):
         Document,
         blank=True,
         null=True,
-        related_name="documents",
+        related_name="notes",
         on_delete=models.CASCADE,
         verbose_name=_("document"),
     )
@@ -631,15 +667,15 @@ class Comment(models.Model):
         User,
         blank=True,
         null=True,
-        related_name="users",
+        related_name="notes",
         on_delete=models.SET_NULL,
         verbose_name=_("user"),
     )
 
     class Meta:
         ordering = ("created",)
-        verbose_name = _("comment")
-        verbose_name_plural = _("comments")
+        verbose_name = _("note")
+        verbose_name_plural = _("notes")
 
     def __str__(self):
-        return self.content
+        return self.note

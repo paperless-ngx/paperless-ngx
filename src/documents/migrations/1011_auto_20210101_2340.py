@@ -165,7 +165,9 @@ class Migration(migrations.Migration):
             model_name="document",
             name="created",
             field=models.DateTimeField(
-                db_index=True, default=django.utils.timezone.now, verbose_name="created"
+                db_index=True,
+                default=django.utils.timezone.now,
+                verbose_name="created",
             ),
         ),
         migrations.AlterField(
@@ -196,14 +198,18 @@ class Migration(migrations.Migration):
             model_name="document",
             name="mime_type",
             field=models.CharField(
-                editable=False, max_length=256, verbose_name="mime type"
+                editable=False,
+                max_length=256,
+                verbose_name="mime type",
             ),
         ),
         migrations.AlterField(
             model_name="document",
             name="modified",
             field=models.DateTimeField(
-                auto_now=True, db_index=True, verbose_name="modified"
+                auto_now=True,
+                db_index=True,
+                verbose_name="modified",
             ),
         ),
         migrations.AlterField(
@@ -234,7 +240,10 @@ class Migration(migrations.Migration):
             model_name="document",
             name="title",
             field=models.CharField(
-                blank=True, db_index=True, max_length=128, verbose_name="title"
+                blank=True,
+                db_index=True,
+                max_length=128,
+                verbose_name="title",
             ),
         ),
         migrations.AlterField(
@@ -373,7 +382,10 @@ class Migration(migrations.Migration):
             model_name="savedviewfilterrule",
             name="value",
             field=models.CharField(
-                blank=True, max_length=128, null=True, verbose_name="value"
+                blank=True,
+                max_length=128,
+                null=True,
+                verbose_name="value",
             ),
         ),
         migrations.AlterField(

@@ -1,10 +1,10 @@
 import logging
 import os
+from concurrent.futures import ThreadPoolExecutor
 from fnmatch import filter
 from pathlib import Path
 from pathlib import PurePath
 from threading import Event
-from threading import Thread
 from time import monotonic
 from time import sleep
 from typing import Final
@@ -13,6 +13,9 @@ from typing import Set
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.core.management.base import CommandError
+from documents.data_models import ConsumableDocument
+from documents.data_models import DocumentMetadataOverrides
+from documents.data_models import DocumentSource
 from documents.models import Tag
 from documents.parsers import is_file_ext_supported
 from documents.tasks import consume_file
@@ -122,8 +125,11 @@ def _consume(filepath: str) -> None:
     try:
         logger.info(f"Adding {filepath} to the task queue.")
         consume_file.delay(
-            filepath,
-            override_tag_ids=list(tag_ids) if tag_ids else None,
+            ConsumableDocument(
+                source=DocumentSource.ConsumeFolder,
+                original_file=filepath,
+            ),
+            DocumentMetadataOverrides(tag_ids=tag_ids),
         )
     except Exception:
         # Catch all so that the consumer won't crash.
@@ -153,7 +159,7 @@ def _consume_wait_unmodified(file: str) -> None:
             new_size = stat_data.st_size
         except FileNotFoundError:
             logger.debug(
-                f"File {file} moved while waiting for it to remain " f"unmodified.",
+                f"File {file} moved while waiting for it to remain unmodified.",
             )
             return
         if new_mtime == mtime and new_size == size:
@@ -168,11 +174,15 @@ def _consume_wait_unmodified(file: str) -> None:
 
 
 class Handler(FileSystemEventHandler):
+    def __init__(self, pool: ThreadPoolExecutor) -> None:
+        super().__init__()
+        self._pool = pool
+
     def on_created(self, event):
-        Thread(target=_consume_wait_unmodified, args=(event.src_path,)).start()
+        self._pool.submit(_consume_wait_unmodified, event.src_path)
 
     def on_moved(self, event):
-        Thread(target=_consume_wait_unmodified, args=(event.dest_path,)).start()
+        self._pool.submit(_consume_wait_unmodified, event.dest_path)
 
 
 class Command(BaseCommand):
@@ -246,17 +256,18 @@ class Command(BaseCommand):
             timeout = self.testing_timeout_s
             logger.debug(f"Configuring timeout to {timeout}s")
 
-        observer = PollingObserver(timeout=settings.CONSUMER_POLLING)
-        observer.schedule(Handler(), directory, recursive=recursive)
-        observer.start()
-        try:
-            while observer.is_alive():
-                observer.join(timeout)
-                if self.stop_flag.is_set():
-                    observer.stop()
-        except KeyboardInterrupt:
-            observer.stop()
-        observer.join()
+        with ThreadPoolExecutor(max_workers=4) as pool:
+            observer = PollingObserver(timeout=settings.CONSUMER_POLLING)
+            observer.schedule(Handler(pool), directory, recursive=recursive)
+            observer.start()
+            try:
+                while observer.is_alive():
+                    observer.join(timeout)
+                    if self.stop_flag.is_set():
+                        observer.stop()
+            except KeyboardInterrupt:
+                observer.stop()
+            observer.join()
 
     def handle_inotify(self, directory, recursive, is_testing: bool):
         logger.info(f"Using inotify to watch directory for changes: {directory}")
@@ -282,10 +293,7 @@ class Command(BaseCommand):
         while not finished:
             try:
                 for event in inotify.read(timeout=timeout):
-                    if recursive:
-                        path = inotify.get_path(event.wd)
-                    else:
-                        path = directory
+                    path = inotify.get_path(event.wd) if recursive else directory
                     filepath = os.path.join(path, event.name)
                     notified_files[filepath] = monotonic()
 

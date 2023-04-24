@@ -43,7 +43,7 @@ steps described in [Docker setup](#docker_hub) automatically.
     ```
 
 2.  Go to the [/docker/compose directory on the project
-    page](https://github.com/paperless-ngx/paperless-ngx/tree/master/docker/compose)
+    page](https://github.com/paperless-ngx/paperless-ngx/tree/main/docker/compose)
     and download one of the `docker-compose.*.yml` files,
     depending on which database backend you want to use. Rename this
     file to `docker-compose.yml`. If you want to enable
@@ -160,8 +160,7 @@ steps described in [Docker setup](#docker_hub) automatically.
         `PAPERLESS_CONSUMER_POLLING`, which will disable inotify. See
         [here](/configuration#polling).
 
-6.  Run `docker-compose pull`, followed by `docker-compose up -d`. This
-    will pull the image, create and start the necessary containers.
+6.  Run `docker-compose pull`. This will pull the image.
 
 7.  To be able to login, you will need a super user. To create it,
     execute the following command:
@@ -179,7 +178,9 @@ steps described in [Docker setup](#docker_hub) automatically.
     This will prompt you to set a username, an optional e-mail address
     and finally a password (at least 8 characters).
 
-8.  The default `docker-compose.yml` exports the webserver on your local
+8.  Run `docker-compose up -d`. This will create and start the necessary containers.
+
+9.  The default `docker-compose.yml` exports the webserver on your local
     port
 
     8000\. If you did not change this, you should now be able to visit
@@ -195,7 +196,7 @@ steps described in [Docker setup](#docker_hub) automatically.
     git clone https://github.com/paperless-ngx/paperless-ngx
     ```
 
-    The master branch always reflects the latest stable version.
+    The main branch always reflects the latest stable version.
 
 2.  Copy one of the `docker/compose/docker-compose.*.yml` to
     `docker-compose.yml` in the root folder, depending on which database
@@ -370,6 +371,10 @@ supported.
     - Set `PAPERLESS_OCR_LANGUAGE` to the language most of your
       documents are written in.
     - Set `PAPERLESS_TIME_ZONE` to your local time zone.
+
+    !!! warning
+
+        Ensure your Redis instance [is secured](https://redis.io/docs/getting-started/#securing-redis).
 
 7.  Create the following directories if they are missing:
 
@@ -591,7 +596,7 @@ Migration to paperless-ngx is then performed in a few simple steps:
 
 3.  Download the latest release of paperless-ngx. You can either go with
     the docker-compose files from
-    [here](https://github.com/paperless-ngx/paperless-ngx/tree/master/docker/compose)
+    [here](https://github.com/paperless-ngx/paperless-ngx/tree/main/docker/compose)
     or clone the repository to build the image yourself (see
     [above](#docker_build)). You can
     either replace your current paperless folder or put paperless-ngx in
@@ -824,9 +829,10 @@ performance immensely:
   other tasks).
 - Keep `PAPERLESS_OCR_MODE` at its default value `skip` and consider
   OCR'ing your documents before feeding them into paperless. Some
-  scanners are able to do this! You might want to even specify
-  `skip_noarchive` to skip archive file generation for already ocr'ed
-  documents entirely.
+  scanners are able to do this!
+- Set `PAPERLESS_OCR_SKIP_ARCHIVE_FILE` to `with_text` to skip archive
+  file generation for already ocr'ed documents, or `always` to skip it
+  for all documents.
 - If you want to perform OCR on the device, consider using
   `PAPERLESS_OCR_CLEAN=none`. This will speed up OCR times and use
   less memory at the expense of slightly worse OCR results.

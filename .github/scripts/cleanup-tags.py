@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import json
 import logging
 import os
@@ -389,8 +388,6 @@ class LibraryTagsCleaner(RegistryTagsCleaner):
     Exists for the off chance that someday, the installer library images
     will need their own logic
     """
-
-    pass
 
 
 def _main():

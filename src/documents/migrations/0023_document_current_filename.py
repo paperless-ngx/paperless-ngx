@@ -6,7 +6,7 @@ from django.db import migrations, models
 def set_filename(apps, schema_editor):
     Document = apps.get_model("documents", "Document")
     for doc in Document.objects.all():
-        file_name = "{:07}.{}".format(doc.pk, doc.file_type)
+        file_name = f"{doc.pk:07}.{doc.file_type}"
         if doc.storage_type == "gpg":
             file_name += ".gpg"
 

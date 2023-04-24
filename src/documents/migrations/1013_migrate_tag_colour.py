@@ -61,7 +61,9 @@ class Migration(migrations.Migration):
             model_name="tag",
             name="color",
             field=models.CharField(
-                default="#a6cee3", max_length=7, verbose_name="color"
+                default="#a6cee3",
+                max_length=7,
+                verbose_name="color",
             ),
         ),
         migrations.RunPython(forward, reverse),

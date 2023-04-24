@@ -14,7 +14,9 @@ class Migration(migrations.Migration):
             model_name="mailrule",
             name="assign_tags",
             field=models.ManyToManyField(
-                blank=True, to="documents.Tag", verbose_name="assign this tag"
+                blank=True,
+                to="documents.Tag",
+                verbose_name="assign this tag",
             ),
         ),
     ]

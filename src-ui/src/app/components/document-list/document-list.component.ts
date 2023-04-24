@@ -17,6 +17,7 @@ import {
 import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type'
 import { PaperlessDocument } from 'src/app/data/paperless-document'
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
+import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 import {
   SortableDirective,
   SortEvent,
@@ -29,7 +30,9 @@ import {
   DOCUMENT_SORT_FIELDS_FULLTEXT,
 } from 'src/app/services/rest/document.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
+import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
+import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { FilterEditorComponent } from './filter-editor/filter-editor.component'
 import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-view-config-dialog.component'
 
@@ -38,7 +41,10 @@ import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-vi
   templateUrl: './document-list.component.html',
   styleUrls: ['./document-list.component.scss'],
 })
-export class DocumentListComponent implements OnInit, OnDestroy {
+export class DocumentListComponent
+  extends ComponentWithPermissions
+  implements OnInit, OnDestroy
+{
   constructor(
     public list: DocumentListViewService,
     public savedViewService: SavedViewService,
@@ -47,8 +53,11 @@ export class DocumentListComponent implements OnInit, OnDestroy {
     private toastService: ToastService,
     private modalService: NgbModal,
     private consumerStatusService: ConsumerStatusService,
-    public openDocumentsService: OpenDocumentsService
-  ) {}
+    public openDocumentsService: OpenDocumentsService,
+    private settingsService: SettingsService
+  ) {
+    super()
+  }
 
   @ViewChild('filterEditor')
   private filterEditor: FilterEditorComponent
@@ -249,6 +258,10 @@ export class DocumentListComponent implements OnInit, OnDestroy {
     })
   }
 
+  openDocumentDetail(document: PaperlessDocument) {
+    this.router.navigate(['documents', document.id])
+  }
+
   toggleSelected(document: PaperlessDocument, event: MouseEvent): void {
     if (!event.shiftKey) this.list.toggleSelected(document)
     else this.list.selectRangeTo(document)
@@ -282,5 +295,9 @@ export class DocumentListComponent implements OnInit, OnDestroy {
 
   trackByDocumentId(index, item: PaperlessDocument) {
     return item.id
+  }
+
+  get notesEnabled(): boolean {
+    return this.settingsService.get(SETTINGS_KEYS.NOTES_ENABLED)
   }
 }

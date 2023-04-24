@@ -1,6 +1,6 @@
 <div class="col p-2 h-100">
   <div class="card h-100 shadow-sm document-card" [class.card-selected]="selected" [class.popover-hidden]="popoverHidden" (mouseleave)="mouseLeaveCard()">
-    <div class="border-bottom doc-img-container" [class.doc-img-background-selected]="selected" (click)="this.toggleSelected.emit($event)">
+    <div class="border-bottom doc-img-container" [class.doc-img-background-selected]="selected" (click)="this.toggleSelected.emit($event)" (dblclick)="dblClickDocument.emit(this)">
       <img class="card-img doc-img rounded-top" [class.inverted]="getIsThumbInverted()" [src]="getThumbUrl()">
 
       <div class="border-end border-bottom bg-light py-1 px-2 document-card-check">
@@ -13,12 +13,20 @@
       <div class="tags d-flex flex-column text-end position-absolute me-1 fs-6">
         <app-tag *ngFor="let t of getTagsLimited$() | async" [tag]="t" (click)="clickTag.emit(t.id);$event.stopPropagation()" [clickable]="true" linkTitle="Toggle tag filter" i18n-linkTitle></app-tag>
         <div *ngIf="moreTags">
-          <span class="badge badge-secondary">+ {{moreTags}}</span>
+          <span class="badge text-dark">+ {{moreTags}}</span>
         </div>
       </div>
     </div>
 
-    <div class="card-body p-2">
+    <a *ngIf="notesEnabled && document.notes.length" routerLink="/documents/{{document.id}}/notes" class="document-card-notes py-2 px-1">
+      <span class="badge rounded-pill bg-light border text-primary">
+      <svg class="metadata-icon ms-1 me-1" fill="currentColor">
+        <use xlink:href="assets/bootstrap-icons.svg#chat-left-text"/>
+      </svg>
+      {{document.notes.length}}</span>
+    </a>
+
+    <div class="card-body bg-light p-2">
       <p class="card-text">
         <ng-container *ngIf="document.correspondent">
           <a title="Toggle correspondent filter" i18n-title (click)="clickCorrespondent.emit(document.correspondent);$event.stopPropagation()" class="fw-bold btn-link">{{(document.correspondent$ | async)?.name}}</a>:
@@ -67,7 +75,7 @@
       </div>
       <div class="d-flex justify-content-between align-items-center">
         <div class="btn-group w-100">
-          <a routerLink="/documents/{{document.id}}" class="btn btn-sm btn-outline-secondary" title="Edit" i18n-title>
+          <a routerLink="/documents/{{document.id}}" class="btn btn-sm btn-outline-secondary" title="Edit" i18n-title *appIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }" i18n-title>
             <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-pencil" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
               <path fill-rule="evenodd" d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5L13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175l-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
             </svg>

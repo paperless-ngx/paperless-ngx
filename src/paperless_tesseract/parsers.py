@@ -56,7 +56,7 @@ class RasterisedDocumentParser(DocumentParser):
                 except Exception as e:
                     self.log(
                         "warning",
-                        f"Error while reading metadata {key}: {value}. Error: " f"{e}",
+                        f"Error while reading metadata {key}: {value}. Error: {e}",
                     )
         return result
 
@@ -160,11 +160,10 @@ class RasterisedDocumentParser(DocumentParser):
             return post_process_text(text)
 
         except Exception:
-            # TODO catch all for various issues with PDFminer.six.
             #  If pdftotext fails, fall back to OCR.
             self.log(
                 "warning",
-                "Error while getting text from PDF document with " "pdfminer.six",
+                "Error while getting text from PDF document with pdftotext",
                 exc_info=True,
             )
             # probably not a PDF file.
@@ -284,17 +283,24 @@ class RasterisedDocumentParser(DocumentParser):
     def parse(self, document_path: Path, mime_type, file_name=None):
         # This forces tesseract to use one core per page.
         os.environ["OMP_THREAD_LIMIT"] = "1"
+        VALID_TEXT_LENGTH = 50
 
         if mime_type == "application/pdf":
             text_original = self.extract_text(None, document_path)
-            original_has_text = text_original is not None and len(text_original) > 50
+            original_has_text = (
+                text_original is not None and len(text_original) > VALID_TEXT_LENGTH
+            )
         else:
             text_original = None
             original_has_text = False
 
         # If the original has text, and the user doesn't want an archive,
         # we're done here
-        if settings.OCR_MODE == "skip_noarchive" and original_has_text:
+        skip_archive_for_text = (
+            settings.OCR_MODE == "skip_noarchive"
+            or settings.OCR_SKIP_ARCHIVE_FILE in ["with_text", "always"]
+        )
+        if skip_archive_for_text and original_has_text:
             self.log("debug", "Document has text, skipping OCRmyPDF entirely.")
             self.text = text_original
             return
@@ -320,7 +326,8 @@ class RasterisedDocumentParser(DocumentParser):
             self.log("debug", f"Calling OCRmyPDF with args: {args}")
             ocrmypdf.ocr(**args)
 
-            self.archive_path = archive_path
+            if settings.OCR_SKIP_ARCHIVE_FILE != "always":
+                self.archive_path = archive_path
 
             self.text = self.extract_text(sidecar_file, archive_path)
 

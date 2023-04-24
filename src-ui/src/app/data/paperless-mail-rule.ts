@@ -42,6 +42,8 @@ export interface PaperlessMailRule extends ObjectWithId {
 
   filter_from: string
 
+  filter_to: string
+
   filter_subject: string
 
   filter_body: string
