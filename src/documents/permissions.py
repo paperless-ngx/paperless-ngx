@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from guardian.models import GroupObjectPermission
 from guardian.shortcuts import assign_perm
+from guardian.shortcuts import get_objects_for_user
 from guardian.shortcuts import get_users_with_perms
 from guardian.shortcuts import remove_perm
 from rest_framework.permissions import BasePermission
@@ -101,3 +102,15 @@ def set_permissions_for_object(permissions, object):
                         group,
                         object,
                     )
+
+
+def get_objects_for_user_owner_aware(user, perms, Model):
+    objects_owned = Model.objects.filter(owner=user)
+    objects_unowned = Model.objects.filter(owner__isnull=True)
+    objects_with_perms = get_objects_for_user(
+        user=user,
+        perms=perms,
+        klass=Model,
+        accept_global_perms=False,
+    )
+    return objects_owned | objects_unowned | objects_with_perms
