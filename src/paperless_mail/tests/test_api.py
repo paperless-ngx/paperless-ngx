@@ -1,3 +1,6 @@
+import json
+from unittest import mock
+
 from django.contrib.auth.models import User
 from documents.models import Correspondent
 from documents.models import DocumentType
@@ -5,6 +8,8 @@ from documents.models import Tag
 from documents.tests.utils import DirectoriesMixin
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
+from paperless_mail.tests.test_mail import BogusMailBox
+from rest_framework import status
 from rest_framework.test import APITestCase
 
 
@@ -12,6 +17,13 @@ class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
     ENDPOINT = "/api/mail_accounts/"
 
     def setUp(self):
+        self.bogus_mailbox = BogusMailBox()
+
+        patcher = mock.patch("paperless_mail.mail.MailBox")
+        m = patcher.start()
+        m.return_value = self.bogus_mailbox
+        self.addCleanup(patcher.stop)
+
         super().setUp()
 
         self.user = User.objects.create_superuser(username="temp_admin")
@@ -39,7 +51,7 @@ class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
 
         response = self.client.get(self.ENDPOINT)
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["count"], 1)
         returned_account1 = response.data["results"][0]
 
@@ -77,7 +89,7 @@ class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
             data=account1,
         )
 
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         returned_account1 = MailAccount.objects.get(name="Email1")
 
@@ -113,7 +125,7 @@ class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
             f"{self.ENDPOINT}{account1.pk}/",
         )
 
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
         self.assertEqual(len(MailAccount.objects.all()), 0)
 
@@ -145,7 +157,7 @@ class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         returned_account1 = MailAccount.objects.get(pk=account1.pk)
         self.assertEqual(returned_account1.name, "Updated Name 1")
@@ -159,11 +171,99 @@ class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         returned_account2 = MailAccount.objects.get(pk=account1.pk)
         self.assertEqual(returned_account2.name, "Updated Name 2")
         self.assertEqual(returned_account2.password, "123xyz")
+
+    def test_mail_account_test_fail(self):
+        """
+        GIVEN:
+            - Errnoeous mail account details
+        WHEN:
+            - API call is made to test account
+        THEN:
+            - API returns 400 bad request
+        """
+
+        response = self.client.post(
+            f"{self.ENDPOINT}test/",
+            json.dumps(
+                {
+                    "imap_server": "server.example.com",
+                    "imap_port": 443,
+                    "imap_security": MailAccount.ImapSecurity.SSL,
+                    "username": "admin",
+                    "password": "notcorrect",
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_mail_account_test_success(self):
+        """
+        GIVEN:
+            - Working mail account details
+        WHEN:
+            - API call is made to test account
+        THEN:
+            - API returns success
+        """
+
+        response = self.client.post(
+            f"{self.ENDPOINT}test/",
+            json.dumps(
+                {
+                    "imap_server": "server.example.com",
+                    "imap_port": 443,
+                    "imap_security": MailAccount.ImapSecurity.SSL,
+                    "username": "admin",
+                    "password": "secret",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["success"], True)
+
+    def test_mail_account_test_existing(self):
+        """
+        GIVEN:
+            - Testing server details for an existing account with obfuscated password (***)
+        WHEN:
+            - API call is made to test account
+        THEN:
+            - API returns success
+        """
+        account = MailAccount.objects.create(
+            name="Email1",
+            username="admin",
+            password="secret",
+            imap_server="server.example.com",
+            imap_port=443,
+            imap_security=MailAccount.ImapSecurity.SSL,
+            character_set="UTF-8",
+        )
+
+        response = self.client.post(
+            f"{self.ENDPOINT}test/",
+            json.dumps(
+                {
+                    "id": account.pk,
+                    "imap_server": "server.example.com",
+                    "imap_port": 443,
+                    "imap_security": MailAccount.ImapSecurity.SSL,
+                    "username": "admin",
+                    "password": "******",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["success"], True)
 
 
 class TestAPIMailRules(DirectoriesMixin, APITestCase):
@@ -200,6 +300,7 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
             account=account1,
             folder="INBOX",
             filter_from="from@example.com",
+            filter_to="someone@somewhere.com",
             filter_subject="subject",
             filter_body="body",
             filter_attachment_filename="file.pdf",
@@ -213,7 +314,7 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
 
         response = self.client.get(self.ENDPOINT)
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["count"], 1)
         returned_rule1 = response.data["results"][0]
 
@@ -221,6 +322,7 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
         self.assertEqual(returned_rule1["account"], account1.pk)
         self.assertEqual(returned_rule1["folder"], rule1.folder)
         self.assertEqual(returned_rule1["filter_from"], rule1.filter_from)
+        self.assertEqual(returned_rule1["filter_to"], rule1.filter_to)
         self.assertEqual(returned_rule1["filter_subject"], rule1.filter_subject)
         self.assertEqual(returned_rule1["filter_body"], rule1.filter_body)
         self.assertEqual(
@@ -274,6 +376,7 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
             "account": account1.pk,
             "folder": "INBOX",
             "filter_from": "from@example.com",
+            "filter_to": "aperson@aplace.com",
             "filter_subject": "subject",
             "filter_body": "body",
             "filter_attachment_filename": "file.pdf",
@@ -294,11 +397,11 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
             data=rule1,
         )
 
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         response = self.client.get(self.ENDPOINT)
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["count"], 1)
         returned_rule1 = response.data["results"][0]
 
@@ -306,6 +409,7 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
         self.assertEqual(returned_rule1["account"], account1.pk)
         self.assertEqual(returned_rule1["folder"], rule1["folder"])
         self.assertEqual(returned_rule1["filter_from"], rule1["filter_from"])
+        self.assertEqual(returned_rule1["filter_to"], rule1["filter_to"])
         self.assertEqual(returned_rule1["filter_subject"], rule1["filter_subject"])
         self.assertEqual(returned_rule1["filter_body"], rule1["filter_body"])
         self.assertEqual(
@@ -375,7 +479,7 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
             f"{self.ENDPOINT}{rule1.pk}/",
         )
 
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
         self.assertEqual(len(MailRule.objects.all()), 0)
 
@@ -423,7 +527,7 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         returned_rule1 = MailRule.objects.get(pk=rule1.pk)
         self.assertEqual(returned_rule1.name, "Updated Name 1")

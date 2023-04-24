@@ -14,11 +14,43 @@
                 4
             ],
             "created": "2022-03-22T07:24:18Z",
+            "created_date": "2022-03-22",
             "modified": "2022-03-22T07:24:23.264859Z",
             "added": "2022-03-22T07:24:22.922631Z",
             "archive_serial_number": null,
             "original_file_name": "2022-03-22 no latin title.pdf",
-            "archived_file_name": "2022-03-22 no latin title.pdf"
+            "archived_file_name": "2022-03-22 no latin title.pdf",
+            "owner": null,
+            "permissions": {
+                "view": {
+                    "users": [],
+                    "groups": []
+                },
+                "change": {
+                    "users": [],
+                    "groups": []
+                }
+            },
+            "notes": [
+                {
+                    "id": 9,
+                    "note": "Testing one more time",
+                    "created": "2022-02-18T04:24:55.176008Z",
+                    "user": 15
+                },
+                {
+                    "id": 8,
+                    "note": "Another note",
+                    "created": "2021-11-08T04:24:47.925042Z",
+                    "user": 3
+                },
+                {
+                    "id": 7,
+                    "note": "Cupcake ipsum dolor sit amet cheesecake candy cookie tiramisu. Donut chocolate chupa chups macaroon brownie halvah pie cheesecake gummies. Sweet chocolate bar candy donut gummi bears bear claw liquorice bonbon shortbread.\n\nDonut chocolate bar candy wafer wafer tiramisu. Gummies chocolate cake muffin toffee carrot cake macaroon. Toffee toffee jelly beans danish lollipop cake.",
+                    "created": "2021-02-08T02:37:49.724132Z",
+                    "user": 3
+                }
+            ]
         },
         {
             "id": 2,
@@ -29,15 +61,28 @@
             "content": "Test document PDF",
             "tags": [],
             "created": "2022-03-23T07:24:18Z",
+            "created_date": "2022-03-23",
             "modified": "2022-03-23T07:24:23.264859Z",
             "added": "2022-03-23T07:24:22.922631Z",
             "archive_serial_number": 12345,
             "original_file_name": "2022-03-23 lorem ipsum dolor sit amet.pdf",
-            "archived_file_name": "2022-03-23 llorem ipsum dolor sit amet.pdf"
+            "archived_file_name": "2022-03-23 llorem ipsum dolor sit amet.pdf",
+            "owner": null,
+            "permissions": {
+                "view": {
+                    "users": [],
+                    "groups": []
+                },
+                "change": {
+                    "users": [],
+                    "groups": []
+                }
+            },
+            "notes": []
         },
         {
             "id": 3,
-            "correspondent": null,
+            "correspondent": 14,
             "document_type": 1,
             "storage_path": null,
             "title": "dolor",
@@ -46,16 +91,29 @@
                 2
             ],
             "created": "2022-03-24T07:24:18Z",
+            "created_date": "2022-03-24",
             "modified": "2022-03-24T07:24:23.264859Z",
             "added": "2022-03-24T07:24:22.922631Z",
             "archive_serial_number": null,
             "original_file_name": "2022-03-24 dolor.pdf",
-            "archived_file_name": "2022-03-24 dolor.pdf"
+            "archived_file_name": "2022-03-24 dolor.pdf",
+            "owner": null,
+            "permissions": {
+                "view": {
+                    "users": [],
+                    "groups": []
+                },
+                "change": {
+                    "users": [],
+                    "groups": []
+                }
+            },
+            "notes": []
         },
         {
             "id": 4,
             "correspondent": 9,
-            "document_type": 1,
+            "document_type": 2,
             "storage_path": null,
             "title": "sit amet",
             "content": "Test document PDF",
@@ -63,11 +121,24 @@
                 4, 5
             ],
             "created": "2022-06-01T07:24:18Z",
+            "created_date": "2022-06-01",
             "modified": "2022-06-01T07:24:23.264859Z",
             "added": "2022-06-01T07:24:22.922631Z",
             "archive_serial_number": 12347,
             "original_file_name": "2022-06-01 sit amet.pdf",
-            "archived_file_name": "2022-06-01 sit amet.pdf"
+            "archived_file_name": "2022-06-01 sit amet.pdf",
+            "owner": null,
+            "permissions": {
+                "view": {
+                    "users": [],
+                    "groups": []
+                },
+                "change": {
+                    "users": [],
+                    "groups": []
+                }
+            },
+            "notes": []
         }
     ]
 }

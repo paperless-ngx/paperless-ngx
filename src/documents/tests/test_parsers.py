@@ -94,7 +94,7 @@ class TestParserDiscovery(TestCase):
             - No parser class is returned
         """
         m.return_value = []
-        with TemporaryDirectory() as tmpdir:
+        with TemporaryDirectory():
             self.assertIsNone(get_parser_class_for_mime_type("application/pdf"))
 
     @mock.patch("documents.parsers.document_consumer_declaration.send")

@@ -1,12 +1,13 @@
 import logging
 import os
 from collections import defaultdict
+from pathlib import PurePath
 
 import pathvalidate
 from django.conf import settings
 from django.template.defaultfilters import slugify
 from django.utils import timezone
-
+from documents.models import Document
 
 logger = logging.getLogger("paperless.filehandling")
 
@@ -125,7 +126,12 @@ def generate_unique_filename(doc, archive_filename=False):
             return new_filename
 
 
-def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
+def generate_filename(
+    doc: Document,
+    counter=0,
+    append_gpg=True,
+    archive_filename=False,
+):
     path = ""
     filename_format = settings.FILENAME_FORMAT
 
@@ -150,13 +156,15 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
                 replacement_text="-",
             )
 
+            no_value_default = "-none-"
+
             if doc.correspondent:
                 correspondent = pathvalidate.sanitize_filename(
                     doc.correspondent.name,
                     replacement_text="-",
                 )
             else:
-                correspondent = "-none-"
+                correspondent = no_value_default
 
             if doc.document_type:
                 document_type = pathvalidate.sanitize_filename(
@@ -164,12 +172,23 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
                     replacement_text="-",
                 )
             else:
-                document_type = "-none-"
+                document_type = no_value_default
 
             if doc.archive_serial_number:
                 asn = str(doc.archive_serial_number)
             else:
-                asn = "-none-"
+                asn = no_value_default
+
+            if doc.owner is not None:
+                owner_username_str = str(doc.owner.username)
+            else:
+                owner_username_str = no_value_default
+
+            if doc.original_filename is not None:
+                # No extension
+                original_name = PurePath(doc.original_filename).with_suffix("").name
+            else:
+                original_name = no_value_default
 
             # Convert UTC database datetime to localized date
             local_added = timezone.localdate(doc.added)
@@ -196,6 +215,8 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
                 asn=asn,
                 tags=tags,
                 tag_list=tag_list,
+                owner_username=owner_username_str,
+                original_name=original_name,
             ).strip()
 
             if settings.FILENAME_FORMAT_REMOVE_NONE:

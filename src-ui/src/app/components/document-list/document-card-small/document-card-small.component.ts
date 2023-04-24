@@ -11,6 +11,7 @@ import { DocumentService } from 'src/app/services/rest/document.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
 import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
+import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 
 @Component({
   selector: 'app-document-card-small',
@@ -20,11 +21,13 @@ import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
     '../popover-preview/popover-preview.scss',
   ],
 })
-export class DocumentCardSmallComponent {
+export class DocumentCardSmallComponent extends ComponentWithPermissions {
   constructor(
     private documentService: DocumentService,
     private settingsService: SettingsService
-  ) {}
+  ) {
+    super()
+  }
 
   @Input()
   selected = false
@@ -34,6 +37,9 @@ export class DocumentCardSmallComponent {
 
   @Input()
   document: PaperlessDocument
+
+  @Output()
+  dblClickDocument = new EventEmitter()
 
   @Output()
   clickTag = new EventEmitter<number>()
@@ -71,11 +77,12 @@ export class DocumentCardSmallComponent {
   }
 
   getTagsLimited$() {
+    const limit = this.document.notes.length > 0 ? 6 : 7
     return this.document.tags$.pipe(
       map((tags) => {
-        if (tags.length > 7) {
-          this.moreTags = tags.length - 6
-          return tags.slice(0, 6)
+        if (tags.length > limit) {
+          this.moreTags = tags.length - (limit - 1)
+          return tags.slice(0, limit - 1)
         } else {
           return tags
         }
@@ -106,5 +113,9 @@ export class DocumentCardSmallComponent {
 
   mouseLeaveCard() {
     this.popover.close()
+  }
+
+  get notesEnabled(): boolean {
+    return this.settingsService.get(SETTINGS_KEYS.NOTES_ENABLED)
   }
 }

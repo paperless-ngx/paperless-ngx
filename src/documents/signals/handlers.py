@@ -1,10 +1,10 @@
 import logging
 import os
 import shutil
-from pathlib import Path
 
 from celery import states
 from celery.signals import before_task_publish
+from celery.signals import task_failure
 from celery.signals import task_postrun
 from celery.signals import task_prerun
 from django.conf import settings
@@ -20,14 +20,14 @@ from django.utils import termcolors
 from django.utils import timezone
 from filelock import FileLock
 
-from .. import matching
-from ..file_handling import create_source_path_directory
-from ..file_handling import delete_empty_directories
-from ..file_handling import generate_unique_filename
-from ..models import Document
-from ..models import MatchingModel
-from ..models import PaperlessTask
-from ..models import Tag
+from documents import matching
+from documents.file_handling import create_source_path_directory
+from documents.file_handling import delete_empty_directories
+from documents.file_handling import generate_unique_filename
+from documents.models import Document
+from documents.models import MatchingModel
+from documents.models import PaperlessTask
+from documents.models import Tag
 
 logger = logging.getLogger("paperless.handlers")
 
@@ -55,10 +55,7 @@ def set_correspondent(
     potential_correspondents = matching.match_correspondents(document, classifier)
 
     potential_count = len(potential_correspondents)
-    if potential_correspondents:
-        selected = potential_correspondents[0]
-    else:
-        selected = None
+    selected = potential_correspondents[0] if potential_correspondents else None
     if potential_count > 1:
         if use_first:
             logger.debug(
@@ -121,10 +118,7 @@ def set_document_type(
     potential_document_type = matching.match_document_types(document, classifier)
 
     potential_count = len(potential_document_type)
-    if potential_document_type:
-        selected = potential_document_type[0]
-    else:
-        selected = None
+    selected = potential_document_type[0] if potential_document_type else None
 
     if potential_count > 1:
         if use_first:
@@ -256,10 +250,7 @@ def set_storage_path(
     )
 
     potential_count = len(potential_storage_path)
-    if potential_storage_path:
-        selected = potential_storage_path[0]
-    else:
-        selected = None
+    selected = potential_storage_path[0] if potential_storage_path else None
 
     if potential_count > 1:
         if use_first:
@@ -371,7 +362,7 @@ def validate_move(instance, old_path, new_path):
     if not os.path.isfile(old_path):
         # Can't do anything if the old file does not exist anymore.
         logger.fatal(f"Document {str(instance)}: File {old_path} has gone.")
-        raise CannotMoveFilesException()
+        raise CannotMoveFilesException
 
     if os.path.isfile(new_path):
         # Can't do anything if the new file already exists. Skip updating file.
@@ -379,12 +370,12 @@ def validate_move(instance, old_path, new_path):
             f"Document {str(instance)}: Cannot rename file "
             f"since target path {new_path} already exists.",
         )
-        raise CannotMoveFilesException()
+        raise CannotMoveFilesException
 
 
 @receiver(models.signals.m2m_changed, sender=Document.tags.through)
 @receiver(models.signals.post_save, sender=Document)
-def update_filename_and_move_files(sender, instance, **kwargs):
+def update_filename_and_move_files(sender, instance: Document, **kwargs):
 
     if not instance.filename:
         # Can't update the filename if there is no filename to begin with
@@ -533,17 +524,9 @@ def before_task_publish_handler(sender=None, headers=None, body=None, **kwargs):
 
     try:
         task_args = body[0]
-        task_kwargs = body[1]
+        input_doc, _ = task_args
 
-        task_file_name = ""
-        if "override_filename" in task_kwargs:
-            task_file_name = task_kwargs["override_filename"]
-
-        # Nothing was found, report the task first argument
-        if not len(task_file_name):
-            # There are always some arguments to the consume, first is always filename
-            filepath = Path(task_args[0])
-            task_file_name = filepath.name
+        task_file_name = input_doc.original_file.name
 
         PaperlessTask.objects.create(
             task_id=headers["id"],
@@ -555,10 +538,10 @@ def before_task_publish_handler(sender=None, headers=None, body=None, **kwargs):
             date_started=None,
             date_done=None,
         )
-    except Exception as e:  # pragma: no cover
+    except Exception:  # pragma: no cover
         # Don't let an exception in the signal handlers prevent
         # a document from being consumed.
-        logger.error(f"Creating PaperlessTask failed: {e}", exc_info=True)
+        logger.exception("Creating PaperlessTask failed")
 
 
 @task_prerun.connect
@@ -577,15 +560,20 @@ def task_prerun_handler(sender=None, task_id=None, task=None, **kwargs):
             task_instance.status = states.STARTED
             task_instance.date_started = timezone.now()
             task_instance.save()
-    except Exception as e:  # pragma: no cover
+    except Exception:  # pragma: no cover
         # Don't let an exception in the signal handlers prevent
         # a document from being consumed.
-        logger.error(f"Setting PaperlessTask started failed: {e}", exc_info=True)
+        logger.exception("Setting PaperlessTask started failed")
 
 
 @task_postrun.connect
 def task_postrun_handler(
-    sender=None, task_id=None, task=None, retval=None, state=None, **kwargs
+    sender=None,
+    task_id=None,
+    task=None,
+    retval=None,
+    state=None,
+    **kwargs,
 ):
     """
     Updates the result of the PaperlessTask.
@@ -600,7 +588,33 @@ def task_postrun_handler(
             task_instance.result = retval
             task_instance.date_done = timezone.now()
             task_instance.save()
-    except Exception as e:  # pragma: no cover
+    except Exception:  # pragma: no cover
         # Don't let an exception in the signal handlers prevent
         # a document from being consumed.
-        logger.error(f"Updating PaperlessTask failed: {e}", exc_info=True)
+        logger.exception("Updating PaperlessTask failed")
+
+
+@task_failure.connect
+def task_failure_handler(
+    sender=None,
+    task_id=None,
+    exception=None,
+    args=None,
+    traceback=None,
+    **kwargs,
+):
+    """
+    Updates the result of a failed PaperlessTask.
+
+    https://docs.celeryq.dev/en/stable/userguide/signals.html#task-failure
+    """
+    try:
+        task_instance = PaperlessTask.objects.filter(task_id=task_id).first()
+
+        if task_instance is not None and task_instance.result is None:
+            task_instance.status = states.FAILURE
+            task_instance.result = traceback
+            task_instance.date_done = timezone.now()
+            task_instance.save()
+    except Exception:  # pragma: no cover
+        logger.exception("Updating PaperlessTask failed")

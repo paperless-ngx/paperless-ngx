@@ -29,15 +29,21 @@ import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 import { ActivatedRoute, Router } from '@angular/router'
 import { ViewportScroller } from '@angular/common'
 import { TourService } from 'ngx-ui-tour-ng-bootstrap'
+import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
+import { NgbModal, NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap'
+import { UserService } from 'src/app/services/rest/user.service'
+import { GroupService } from 'src/app/services/rest/group.service'
+import { PaperlessUser } from 'src/app/data/paperless-user'
+import { PaperlessGroup } from 'src/app/data/paperless-group'
+import { UserEditDialogComponent } from '../../common/edit-dialog/user-edit-dialog/user-edit-dialog.component'
+import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
+import { GroupEditDialogComponent } from '../../common/edit-dialog/group-edit-dialog/group-edit-dialog.component'
 import { PaperlessMailAccount } from 'src/app/data/paperless-mail-account'
 import { PaperlessMailRule } from 'src/app/data/paperless-mail-rule'
 import { MailAccountService } from 'src/app/services/rest/mail-account.service'
 import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { MailAccountEditDialogComponent } from '../../common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component'
 import { MailRuleEditDialogComponent } from '../../common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component'
-import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
-import { NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap'
 
 enum SettingsNavIDs {
   General = 1,
@@ -53,12 +59,15 @@ enum SettingsNavIDs {
   styleUrls: ['./settings.component.scss'],
 })
 export class SettingsComponent
+  extends ComponentWithPermissions
   implements OnInit, AfterViewInit, OnDestroy, DirtyComponent
 {
   SettingsNavIDs = SettingsNavIDs
   activeNavID: number
 
   savedViewGroup = new FormGroup({})
+  usersGroup = new FormGroup({})
+  groupsGroup = new FormGroup({})
 
   mailAccountGroup = new FormGroup({})
   mailRuleGroup = new FormGroup({})
@@ -76,13 +85,15 @@ export class SettingsComponent
     displayLanguage: new FormControl(null),
     dateLocale: new FormControl(null),
     dateFormat: new FormControl(null),
-    commentsEnabled: new FormControl(null),
+    notesEnabled: new FormControl(null),
     updateCheckingEnabled: new FormControl(null),
 
     notificationsConsumerNewDocument: new FormControl(null),
     notificationsConsumerSuccess: new FormControl(null),
     notificationsConsumerFailed: new FormControl(null),
     notificationsConsumerSuppressOnDashboard: new FormControl(null),
+    usersGroup: this.usersGroup,
+    groupsGroup: this.groupsGroup,
 
     savedViewsWarnOnUnsavedChange: new FormControl(null),
     savedViews: this.savedViewGroup,
@@ -103,6 +114,9 @@ export class SettingsComponent
   unsubscribeNotifier: Subject<any> = new Subject()
   savePending: boolean = false
 
+  users: PaperlessUser[]
+  groups: PaperlessGroup[]
+
   get computedDateLocale(): string {
     return (
       this.settingsForm.value.dateLocale ||
@@ -121,10 +135,13 @@ export class SettingsComponent
     @Inject(LOCALE_ID) public currentLocale: string,
     private viewportScroller: ViewportScroller,
     private activatedRoute: ActivatedRoute,
-    private router: Router,
     public readonly tourService: TourService,
+    private usersService: UserService,
+    private groupsService: GroupService,
+    private router: Router,
     private modalService: NgbModal
   ) {
+    super()
     this.settings.settingsSaved.subscribe(() => {
       if (!this.savePending) this.initialize()
     })
@@ -179,7 +196,7 @@ export class SettingsComponent
       displayLanguage: this.settings.getLanguage(),
       dateLocale: this.settings.get(SETTINGS_KEYS.DATE_LOCALE),
       dateFormat: this.settings.get(SETTINGS_KEYS.DATE_FORMAT),
-      commentsEnabled: this.settings.get(SETTINGS_KEYS.COMMENTS_ENABLED),
+      notesEnabled: this.settings.get(SETTINGS_KEYS.NOTES_ENABLED),
       updateCheckingEnabled: this.settings.get(
         SETTINGS_KEYS.UPDATE_CHECKING_ENABLED
       ),
@@ -198,6 +215,8 @@ export class SettingsComponent
       savedViewsWarnOnUnsavedChange: this.settings.get(
         SETTINGS_KEYS.SAVED_VIEWS_WARN_ON_UNSAVED_CHANGE
       ),
+      usersGroup: {},
+      groupsGroup: {},
       savedViews: {},
       mailAccounts: {},
       mailRules: {},
@@ -230,6 +249,17 @@ export class SettingsComponent
         this.initialize(false)
       })
     } else if (
+      navID == SettingsNavIDs.UsersGroups &&
+      (!this.users || !this.groups)
+    ) {
+      this.usersService.listAll().subscribe((r) => {
+        this.users = r.results
+        this.groupsService.listAll().subscribe((r) => {
+          this.groups = r.results
+          this.initialize(false)
+        })
+      })
+    } else if (
       navID == SettingsNavIDs.Mail &&
       (!this.mailAccounts || !this.mailRules)
     ) {
@@ -252,6 +282,8 @@ export class SettingsComponent
     let storeData = this.getCurrentSettings()
 
     if (this.savedViews) {
+      this.emptyGroup(this.savedViewGroup)
+
       for (let view of this.savedViews) {
         storeData.savedViews[view.id.toString()] = {
           id: view.id,
@@ -271,7 +303,57 @@ export class SettingsComponent
       }
     }
 
+    if (this.users && this.groups) {
+      this.emptyGroup(this.usersGroup)
+      this.emptyGroup(this.groupsGroup)
+
+      for (let user of this.users) {
+        storeData.usersGroup[user.id.toString()] = {
+          id: user.id,
+          username: user.username,
+          first_name: user.first_name,
+          last_name: user.last_name,
+          is_active: user.is_active,
+          is_superuser: user.is_superuser,
+          groups: user.groups,
+          user_permissions: user.user_permissions,
+        }
+        this.usersGroup.addControl(
+          user.id.toString(),
+          new FormGroup({
+            id: new FormControl(null),
+            username: new FormControl(null),
+            first_name: new FormControl(null),
+            last_name: new FormControl(null),
+            is_active: new FormControl(null),
+            is_superuser: new FormControl(null),
+            groups: new FormControl(null),
+            user_permissions: new FormControl(null),
+          })
+        )
+      }
+
+      for (let group of this.groups) {
+        storeData.groupsGroup[group.id.toString()] = {
+          id: group.id,
+          name: group.name,
+          permissions: group.permissions,
+        }
+        this.groupsGroup.addControl(
+          group.id.toString(),
+          new FormGroup({
+            id: new FormControl(null),
+            name: new FormControl(null),
+            permissions: new FormControl(null),
+          })
+        )
+      }
+    }
+
     if (this.mailAccounts && this.mailRules) {
+      this.emptyGroup(this.mailAccountGroup)
+      this.emptyGroup(this.mailRuleGroup)
+
       for (let account of this.mailAccounts) {
         storeData.mailAccounts[account.id.toString()] = {
           id: account.id,
@@ -304,6 +386,7 @@ export class SettingsComponent
           account: rule.account,
           folder: rule.folder,
           filter_from: rule.filter_from,
+          filter_to: rule.filter_to,
           filter_subject: rule.filter_subject,
           filter_body: rule.filter_body,
           filter_attachment_filename: rule.filter_attachment_filename,
@@ -324,6 +407,7 @@ export class SettingsComponent
             account: new FormControl(null),
             folder: new FormControl(null),
             filter_from: new FormControl(null),
+            filter_to: new FormControl(null),
             filter_subject: new FormControl(null),
             filter_body: new FormControl(null),
             filter_attachment_filename: new FormControl(null),
@@ -374,6 +458,10 @@ export class SettingsComponent
     }
   }
 
+  private emptyGroup(group: FormGroup) {
+    Object.keys(group.controls).forEach((key) => group.removeControl(key))
+  }
+
   ngOnDestroy() {
     if (this.isDirty) this.settings.updateAppearanceSettings() // in case user changed appearance but didnt save
     this.storeSub && this.storeSub.unsubscribe()
@@ -386,6 +474,11 @@ export class SettingsComponent
       this.toastService.showInfo(
         $localize`Saved view "${savedView.name}" deleted.`
       )
+      this.savedViewService.clearCache()
+      this.savedViewService.listAll().subscribe((r) => {
+        this.savedViews = r.results
+        this.initialize(true)
+      })
     })
   }
 
@@ -459,8 +552,8 @@ export class SettingsComponent
       this.settingsForm.value.notificationsConsumerSuppressOnDashboard
     )
     this.settings.set(
-      SETTINGS_KEYS.COMMENTS_ENABLED,
-      this.settingsForm.value.commentsEnabled
+      SETTINGS_KEYS.NOTES_ENABLED,
+      this.settingsForm.value.notesEnabled
     )
     this.settings.set(
       SETTINGS_KEYS.UPDATE_CHECKING_ENABLED,
@@ -483,7 +576,7 @@ export class SettingsComponent
           let savedToast: Toast = {
             title: $localize`Settings saved`,
             content: $localize`Settings were saved successfully.`,
-            delay: 500000,
+            delay: 5000,
           }
           if (reloadRequired) {
             ;(savedToast.content = $localize`Settings were saved successfully. Reload is required to apply some changes.`),
@@ -547,6 +640,132 @@ export class SettingsComponent
     this.settingsForm.get('themeColor').patchValue('')
   }
 
+  editUser(user: PaperlessUser) {
+    var modal = this.modalService.open(UserEditDialogComponent, {
+      backdrop: 'static',
+      size: 'xl',
+    })
+    modal.componentInstance.dialogMode = user ? 'edit' : 'create'
+    modal.componentInstance.object = user
+    modal.componentInstance.succeeded
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe({
+        next: (newUser: PaperlessUser) => {
+          if (
+            newUser.id === this.settings.currentUser.id &&
+            (modal.componentInstance as UserEditDialogComponent).passwordIsSet
+          ) {
+            this.toastService.showInfo(
+              $localize`Password has been changed, you will be logged out momentarily.`
+            )
+            setTimeout(() => {
+              window.location.href = `${window.location.origin}/accounts/logout/?next=/accounts/login/`
+            }, 2500)
+          } else {
+            this.toastService.showInfo(
+              $localize`Saved user "${newUser.username}".`
+            )
+            this.usersService.listAll().subscribe((r) => {
+              this.users = r.results
+              this.initialize()
+            })
+          }
+        },
+        error: (e) => {
+          this.toastService.showError(
+            $localize`Error saving user: ${e.toString()}.`
+          )
+        },
+      })
+  }
+
+  deleteUser(user: PaperlessUser) {
+    let modal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.title = $localize`Confirm delete user account`
+    modal.componentInstance.messageBold = $localize`This operation will permanently delete this user account.`
+    modal.componentInstance.message = $localize`This operation cannot be undone.`
+    modal.componentInstance.btnClass = 'btn-danger'
+    modal.componentInstance.btnCaption = $localize`Proceed`
+    modal.componentInstance.confirmClicked.subscribe(() => {
+      modal.componentInstance.buttonsEnabled = false
+      this.usersService.delete(user).subscribe({
+        next: () => {
+          modal.close()
+          this.toastService.showInfo($localize`Deleted user`)
+          this.usersService.listAll().subscribe((r) => {
+            this.users = r.results
+            this.initialize(true)
+          })
+        },
+        error: (e) => {
+          this.toastService.showError(
+            $localize`Error deleting user: ${e.toString()}.`
+          )
+        },
+      })
+    })
+  }
+
+  editGroup(group: PaperlessGroup) {
+    var modal = this.modalService.open(GroupEditDialogComponent, {
+      backdrop: 'static',
+      size: 'lg',
+    })
+    modal.componentInstance.dialogMode = group ? 'edit' : 'create'
+    modal.componentInstance.object = group
+    modal.componentInstance.succeeded
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe({
+        next: (newGroup) => {
+          this.toastService.showInfo($localize`Saved group "${newGroup.name}".`)
+          this.groupsService.listAll().subscribe((r) => {
+            this.groups = r.results
+            this.initialize()
+          })
+        },
+        error: (e) => {
+          this.toastService.showError(
+            $localize`Error saving group: ${e.toString()}.`
+          )
+        },
+      })
+  }
+
+  deleteGroup(group: PaperlessGroup) {
+    let modal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.title = $localize`Confirm delete user group`
+    modal.componentInstance.messageBold = $localize`This operation will permanently delete this user group.`
+    modal.componentInstance.message = $localize`This operation cannot be undone.`
+    modal.componentInstance.btnClass = 'btn-danger'
+    modal.componentInstance.btnCaption = $localize`Proceed`
+    modal.componentInstance.confirmClicked.subscribe(() => {
+      modal.componentInstance.buttonsEnabled = false
+      this.groupsService.delete(group).subscribe({
+        next: () => {
+          modal.close()
+          this.toastService.showInfo($localize`Deleted group`)
+          this.groupsService.listAll().subscribe((r) => {
+            this.groups = r.results
+            this.initialize(true)
+          })
+        },
+        error: (e) => {
+          this.toastService.showError(
+            $localize`Error deleting group: ${e.toString()}.`
+          )
+        },
+      })
+    })
+  }
+
+  getGroupName(id: number): string {
+    return this.groups?.find((g) => g.id === id)?.name ?? ''
+  }
+
   editMailAccount(account: PaperlessMailAccount) {
     const modal = this.modalService.open(MailAccountEditDialogComponent, {
       backdrop: 'static',
@@ -593,7 +812,7 @@ export class SettingsComponent
           this.mailAccountService.clearCache()
           this.mailAccountService.listAll().subscribe((r) => {
             this.mailAccounts = r.results
-            this.initialize()
+            this.initialize(true)
           })
         },
         error: (e) => {
@@ -623,7 +842,7 @@ export class SettingsComponent
           this.mailRuleService.listAll().subscribe((r) => {
             this.mailRules = r.results
 
-            this.initialize()
+            this.initialize(true)
           })
         },
         error: (e) => {
@@ -652,7 +871,7 @@ export class SettingsComponent
           this.mailRuleService.clearCache()
           this.mailRuleService.listAll().subscribe((r) => {
             this.mailRules = r.results
-            this.initialize()
+            this.initialize(true)
           })
         },
         error: (e) => {

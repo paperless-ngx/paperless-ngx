@@ -6,14 +6,14 @@ from unittest import mock
 try:
     import zoneinfo
 except ImportError:
-    import backports.zoneinfo as zoneinfo
+    from backports import zoneinfo
 
 from django.test import override_settings
 from django.test import TestCase
 from django.utils import timezone
 
-from ..models import Correspondent
-from ..models import Document
+from documents.models import Correspondent
+from documents.models import Document
 
 
 class TestDocument(TestCase):

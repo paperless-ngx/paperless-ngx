@@ -17,10 +17,10 @@ from django.core.management.base import BaseCommand
 from django.core.management.base import CommandError
 from django.db import transaction
 from django.utils import timezone
-from documents.models import Comment
 from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import Note
 from documents.models import SavedView
 from documents.models import SavedViewFilterRule
 from documents.models import StoragePath
@@ -35,8 +35,8 @@ from paperless.db import GnuPG
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 
-from ...file_handling import delete_empty_directories
-from ...file_handling import generate_filename
+from documents.file_handling import delete_empty_directories
+from documents.file_handling import generate_filename
 
 
 class Command(BaseCommand):
@@ -156,11 +156,13 @@ class Command(BaseCommand):
         zip_export: bool = options["zip"]
 
         # If zipping, save the original target for later and
-        # get a temporary directory for the target
+        # get a temporary directory for the target instead
         temp_dir = None
         original_target = None
         if zip_export:
             original_target = self.target
+
+            os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
             temp_dir = tempfile.TemporaryDirectory(
                 dir=settings.SCRATCH_DIR,
                 prefix="paperless-export",
@@ -204,7 +206,7 @@ class Command(BaseCommand):
                 self.files_in_export_dir.add(x.resolve())
 
         # 2. Create manifest, containing all correspondents, types, tags, storage paths
-        # comments, documents and ui_settings
+        # note, documents and ui_settings
         with transaction.atomic():
             manifest = json.loads(
                 serializers.serialize("json", Correspondent.objects.all()),
@@ -220,11 +222,11 @@ class Command(BaseCommand):
                 serializers.serialize("json", StoragePath.objects.all()),
             )
 
-            comments = json.loads(
-                serializers.serialize("json", Comment.objects.all()),
+            notes = json.loads(
+                serializers.serialize("json", Note.objects.all()),
             )
             if not self.split_manifest:
-                manifest += comments
+                manifest += notes
 
             documents = Document.objects.order_by("id")
             document_map = {d.pk: d for d in documents}
@@ -357,7 +359,7 @@ class Command(BaseCommand):
                 content += list(
                     filter(
                         lambda d: d["fields"]["document"] == document_dict["pk"],
-                        comments,
+                        notes,
                     ),
                 )
                 manifest_name.write_text(json.dumps(content, indent=2))
@@ -401,9 +403,10 @@ class Command(BaseCommand):
             if self.compare_checksums and source_checksum:
                 target_checksum = hashlib.md5(target.read_bytes()).hexdigest()
                 perform_copy = target_checksum != source_checksum
-            elif source_stat.st_mtime != target_stat.st_mtime:
-                perform_copy = True
-            elif source_stat.st_size != target_stat.st_size:
+            elif (
+                source_stat.st_mtime != target_stat.st_mtime
+                or source_stat.st_size != target_stat.st_size
+            ):
                 perform_copy = True
         else:
             # Copy if it does not exist

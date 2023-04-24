@@ -22,8 +22,8 @@ from documents.settings import EXPORTER_THUMBNAIL_NAME
 from filelock import FileLock
 from paperless import version
 
-from ...file_handling import create_source_path_directory
-from ...signals.handlers import update_filename_and_move_files
+from documents.file_handling import create_source_path_directory
+from documents.signals.handlers import update_filename_and_move_files
 
 
 @contextmanager
@@ -111,37 +111,36 @@ class Command(BaseCommand):
             post_save,
             receiver=update_filename_and_move_files,
             sender=Document,
+        ), disable_signal(
+            m2m_changed,
+            receiver=update_filename_and_move_files,
+            sender=Document.tags.through,
         ):
-            with disable_signal(
-                m2m_changed,
-                receiver=update_filename_and_move_files,
-                sender=Document.tags.through,
-            ):
-                # Fill up the database with whatever is in the manifest
-                try:
-                    for manifest_path in manifest_paths:
-                        call_command("loaddata", manifest_path)
-                except (FieldDoesNotExist, DeserializationError) as e:
-                    self.stdout.write(self.style.ERROR("Database import failed"))
-                    if (
-                        self.version is not None
-                        and self.version != version.__full_version_str__
-                    ):
-                        self.stdout.write(
-                            self.style.ERROR(
-                                "Version mismatch: "
-                                f"Currently {version.__full_version_str__},"
-                                f" importing {self.version}",
-                            ),
-                        )
-                        raise e
-                    else:
-                        self.stdout.write(
-                            self.style.ERROR("No version information present"),
-                        )
-                        raise e
+            # Fill up the database with whatever is in the manifest
+            try:
+                for manifest_path in manifest_paths:
+                    call_command("loaddata", manifest_path)
+            except (FieldDoesNotExist, DeserializationError) as e:
+                self.stdout.write(self.style.ERROR("Database import failed"))
+                if (
+                    self.version is not None
+                    and self.version != version.__full_version_str__
+                ):
+                    self.stdout.write(
+                        self.style.ERROR(
+                            "Version mismatch: "
+                            f"Currently {version.__full_version_str__},"
+                            f" importing {self.version}",
+                        ),
+                    )
+                    raise e
+                else:
+                    self.stdout.write(
+                        self.style.ERROR("No version information present"),
+                    )
+                    raise e
 
-                self._import_files_from_manifest(options["no_progress_bar"])
+            self._import_files_from_manifest(options["no_progress_bar"])
 
         self.stdout.write("Updating search index...")
         call_command(
@@ -154,14 +153,14 @@ class Command(BaseCommand):
     def _check_manifest_exists(path):
         if not os.path.exists(path):
             raise CommandError(
-                "That directory doesn't appear to contain a manifest.json " "file.",
+                "That directory doesn't appear to contain a manifest.json file.",
             )
 
     def _check_manifest(self):
 
         for record in self.manifest:
 
-            if not record["model"] == "documents.document":
+            if record["model"] != "documents.document":
                 continue
 
             if EXPORTER_FILE_NAME not in record:
