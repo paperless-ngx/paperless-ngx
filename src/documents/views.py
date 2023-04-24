@@ -401,12 +401,16 @@ class DocumentViewSet(
 
         return Response(
             {
-                "correspondents": [c.id for c in match_correspondents(doc, classifier)],
-                "tags": [t.id for t in match_tags(doc, classifier)],
-                "document_types": [
-                    dt.id for dt in match_document_types(doc, classifier)
+                "correspondents": [
+                    c.id for c in match_correspondents(doc, classifier, request.user)
                 ],
-                "storage_paths": [dt.id for dt in match_storage_paths(doc, classifier)],
+                "tags": [t.id for t in match_tags(doc, classifier, request.user)],
+                "document_types": [
+                    dt.id for dt in match_document_types(doc, classifier, request.user)
+                ],
+                "storage_paths": [
+                    dt.id for dt in match_storage_paths(doc, classifier, request.user)
+                ],
                 "dates": [
                     date.strftime("%Y-%m-%d") for date in dates if date is not None
                 ],
