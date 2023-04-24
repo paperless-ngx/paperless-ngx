@@ -9,6 +9,7 @@ from documents.models import PaperlessTask
 from documents.signals.handlers import before_task_publish_handler
 from documents.signals.handlers import task_postrun_handler
 from documents.signals.handlers import task_prerun_handler
+from documents.signals.handlers import task_failure_handler
 from documents.tests.test_consumer import fake_magic_from_file
 from documents.tests.utils import DirectoriesMixin
 
@@ -146,3 +147,44 @@ class TestTaskSignalHandler(DirectoriesMixin, TestCase):
         task = PaperlessTask.objects.get()
 
         self.assertEqual(celery.states.SUCCESS, task.status)
+
+    def test_task_failure_handler(self):
+        """
+        GIVEN:
+            - A celery task is started via the consume folder
+        WHEN:
+            - Task failed execution
+        THEN:
+            - The task is marked as failed
+        """
+        headers = {
+            "id": str(uuid.uuid4()),
+            "task": "documents.tasks.consume_file",
+        }
+        body = (
+            # args
+            (
+                ConsumableDocument(
+                    source=DocumentSource.ConsumeFolder,
+                    original_file="/consume/hello-9.pdf",
+                ),
+                None,
+            ),
+            # kwargs
+            {},
+            # celery stuff
+            {"callbacks": None, "errbacks": None, "chain": None, "chord": None},
+        )
+        self.util_call_before_task_publish_handler(
+            headers_to_use=headers,
+            body_to_use=body,
+        )
+
+        task_failure_handler(
+            task_id=headers["id"],
+            exception="Example failure",
+        )
+
+        task = PaperlessTask.objects.get()
+
+        self.assertEqual(celery.states.FAILURE, task.status)

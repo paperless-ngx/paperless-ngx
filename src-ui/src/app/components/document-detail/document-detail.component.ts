@@ -496,7 +496,7 @@ export class DocumentDetailComponent
             this.toastService.showError(
               $localize`Error saving document` +
                 ': ' +
-                (error.message ?? error.toString())
+                (error.error?.detail ?? error.message ?? JSON.stringify(error))
             )
           }
         },
@@ -541,7 +541,7 @@ export class DocumentDetailComponent
           this.toastService.showError(
             $localize`Error saving document` +
               ': ' +
-              (error.message ?? error.toString())
+              (error.error?.detail ?? error.message ?? JSON.stringify(error))
           )
         },
       })
@@ -573,6 +573,10 @@ export class DocumentDetailComponent
     modal.componentInstance.message = $localize`The files for this document will be deleted permanently. This operation cannot be undone.`
     modal.componentInstance.btnClass = 'btn-danger'
     modal.componentInstance.btnCaption = $localize`Delete document`
+    this.subscribeModalDelete(modal) // so can be re-subscribed if error
+  }
+
+  subscribeModalDelete(modal) {
     modal.componentInstance.confirmClicked
       .pipe(
         switchMap(() => {
@@ -581,18 +585,21 @@ export class DocumentDetailComponent
         })
       )
       .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe(
-        () => {
+      .subscribe({
+        next: () => {
           modal.close()
           this.close()
         },
-        (error) => {
+        error: (error) => {
           this.toastService.showError(
-            $localize`Error deleting document: ${JSON.stringify(error)}`
+            $localize`Error deleting document: ${
+              error.error?.detail ?? error.message ?? JSON.stringify(error)
+            }`
           )
           modal.componentInstance.buttonsEnabled = true
-        }
-      )
+          this.subscribeModalDelete(modal)
+        },
+      })
   }
 
   moreLike() {
@@ -681,12 +688,21 @@ export class DocumentDetailComponent
     }
   }
 
+  get showPermissions(): boolean {
+    return (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.User
+      ) && this.userIsOwner
+    )
+  }
+
   get notesEnabled(): boolean {
     return (
       this.settings.get(SETTINGS_KEYS.NOTES_ENABLED) &&
       this.permissionsService.currentUserCan(
         PermissionAction.View,
-        PermissionType.Document
+        PermissionType.Note
       )
     )
   }

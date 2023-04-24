@@ -453,6 +453,33 @@ redirect the user back to the SSO application's logout page.
 
     Defaults to None, which disables this feature.
 
+`PAPERLESS_USE_X_FORWARD_HOST=<bool>`
+
+: Configures the Django setting [USE_X_FORWARDED_HOST](https://docs.djangoproject.com/en/4.2/ref/settings/#use-x-forwarded-host)
+which may be needed for hosting behind a proxy.
+
+    Defaults to False
+
+`PAPERLESS_USE_X_FORWARD_PORT=<bool>`
+
+: Configures the Django setting [USE_X_FORWARDED_PORT](https://docs.djangoproject.com/en/4.2/ref/settings/#use-x-forwarded-port)
+which may be needed for hosting behind a proxy.
+
+    Defaults to False
+
+`PAPERLESS_PROXY_SSL_HEADER=<json-list>`
+
+: Configures the Django setting [SECURE_PROXY_SSL_HEADER](https://docs.djangoproject.com/en/4.2/ref/settings/#secure-proxy-ssl-header)
+which may be needed for hosting behind a proxy. The two values in the list will form the tuple of
+HTTP header/value expected by Django, eg `'["HTTP_X_FORWARDED_PROTO", "https"]'`.
+
+    Defaults to None
+
+!!! warning
+
+    Settings this value has security implications.  Read the Django documentation
+    and be sure you understand its usage before setting it.
+
 ## OCR settings {#ocr}
 
 Paperless uses [OCRmyPDF](https://ocrmypdf.readthedocs.io/en/latest/)
