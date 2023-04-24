@@ -673,7 +673,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">155</context>
         </context-group>
-        <target state="translated">Speicherpfad</target>
+        <target state="translated">Speicherpfade</target>
       </trans-unit>
       <trans-unit id="2991443309752293110" datatype="html">
         <source>File Tasks</source>
@@ -709,7 +709,7 @@
           <context context-type="sourcefile">src/app/components/manage/logs/logs.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="final">Protokoll</target>
+        <target state="final">Protokolle</target>
       </trans-unit>
       <trans-unit id="314315645942131479" datatype="html">
         <source>Info</source>
@@ -809,7 +809,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">593</context>
         </context-group>
-        <target state="translated">Ein Fehler ist beim Speichern der Einstellungen aufgetreten.</target>
+        <target state="translated">Es ist ein Fehler beim Speichern der Einstellungen aufgetreten.</target>
       </trans-unit>
       <trans-unit id="2526035785704676448" datatype="html">
         <source>An error occurred while saving update checking settings.</source>
@@ -817,7 +817,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
           <context context-type="linenumber">222</context>
         </context-group>
-        <target state="translated">Es ist ein Fehler beim Speichern der Update Einstellungen aufgetreten.</target>
+        <target state="translated">Es ist ein Fehler beim Speichern der Update-Einstellungen aufgetreten.</target>
       </trans-unit>
       <trans-unit id="8700121026680200191" datatype="html" approved="yes">
         <source>Clear</source>
@@ -1677,7 +1677,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">41</context>
         </context-group>
-        <target state="translated">E-mail als .eml verarbeiten</target>
+        <target state="translated">E-Mail als .eml verarbeiten</target>
       </trans-unit>
       <trans-unit id="7411485377918318115" datatype="html">
         <source>Process message as .eml and attachments separately</source>
@@ -1685,7 +1685,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="translated">E-mail als .eml und Anhänge separat verarbeiten</target>
+        <target state="translated">E-Mail als .eml und Anhänge separat verarbeiten</target>
       </trans-unit>
       <trans-unit id="7022070615528435141" datatype="html" approved="yes">
         <source>Delete</source>
@@ -3076,7 +3076,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">595,597</context>
         </context-group>
-        <target state="translated">Fehler beim Löschen des Dokuments <x id="PH" equiv-text="error.error?.detail ?? error.message ?? JSON.stringify(error)"/></target>
+        <target state="needs-translation">Error deleting document: <x id="PH" equiv-text="error.error?.detail ?? error.message ?? JSON.stringify(error)"/></target>
       </trans-unit>
       <trans-unit id="7362691899087997122" datatype="html">
         <source>Redo OCR confirm</source>
@@ -3506,7 +3506,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">500</context>
         </context-group>
-        <target state="translated">Diese Aktion wird OCR permanent für <x id="PH" equiv-text="this.list.selected.size"/> ausgewählte(s) Dokument(e) wiederholen.</target>
+        <target state="translated">Diese Aktion wird die Texterkennung für <x id="PH" equiv-text="this.list.selected.size"/> ausgewählte(s) Dokument(e) wiederholen.</target>
       </trans-unit>
       <trans-unit id="8076495233090006322" datatype="html" approved="yes">
         <source>Filter by correspondent</source>
@@ -3638,7 +3638,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">39</context>
         </context-group>
-        <target state="translated">Dokumententyp Filter umschalten</target>
+        <target state="translated">Dokumenttyp-Filter umschalten</target>
       </trans-unit>
       <trans-unit id="8950368321707344185" datatype="html">
         <source>Toggle storage path filter</source>
@@ -3654,7 +3654,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="final">Nichts auswählen</target>
+        <target state="final">Auswahl leeren</target>
       </trans-unit>
       <trans-unit id="1512866475468373520" datatype="html" approved="yes">
         <source>Select page</source>
@@ -3826,7 +3826,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">168</context>
         </context-group>
-        <target state="translated">Nach ‚ausgestellt am‘ sortieren</target>
+        <target state="translated">Nach „Ausgestellt am“ sortieren</target>
       </trans-unit>
       <trans-unit id="3769035778779263084" datatype="html">
         <source>Sort by added date</source>
@@ -3834,7 +3834,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">175</context>
         </context-group>
-        <target state="translated">Nach ‚hinzugefügt am‘ sortieren</target>
+        <target state="translated">Nach „Hinzugefügt am“ sortieren</target>
       </trans-unit>
       <trans-unit id="231679111972850796" datatype="html" approved="yes">
         <source>Added</source>
@@ -4150,7 +4150,7 @@
           <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.ts</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="translated">dokumenttypen</target>
+        <target state="translated">Dokumenttyp</target>
       </trans-unit>
       <trans-unit id="2992451138146293104" datatype="html">
         <source>document types</source>
@@ -4514,7 +4514,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">103</context>
         </context-group>
-        <target state="translated">Benutze Seitenleiste (nur Icons)</target>
+        <target state="translated">Benutze schlanke Seitenleiste (nur Icons)</target>
       </trans-unit>
       <trans-unit id="1356890996281769972" datatype="html" approved="yes">
         <source>Dark mode</source>
@@ -4572,13 +4572,13 @@
         </context-group>
         <target state="translated">Überprüfung auf Updates</target>
       </trans-unit>
-      <trans-unit id="7890007688616707209" datatype="html">
-        <source> Update checking works by pinging the the public <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;"/>Github API<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> for the latest release to determine whether a new version is available.<x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br/&gt;"/> Actual updating of the app must still be performed manually. </source>
+      <trans-unit id="7578076359386888824" datatype="html">
+        <source> Update checking works by pinging the public <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;"/>Github API<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> for the latest release to determine whether a new version is available.<x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br/&gt;"/> Actual updating of the app must still be performed manually. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">140,142</context>
         </context-group>
-        <target state="translated"> Die Überprüfung auf Updates erfolgt über Anfragen an die öffentliche <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;"/>Github API<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>, um zu ermitteln, ob eine neue Version verfügbar ist.<x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br/&gt;"/> Das eigentliche Update der Anwendung muss weiterhin per Hand durchgeführt werden. </target>
+        <target state="needs-translation"> Update checking works by pinging the public <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;"/>Github API<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> for the latest release to determine whether a new version is available.<x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br/&gt;"/> Actual updating of the app must still be performed manually. </target>
       </trans-unit>
       <trans-unit id="5489945693955857309" datatype="html">
         <source><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="No track"/>No tracking data is collected by the app in any way.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></source>
@@ -4858,7 +4858,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">583</context>
         </context-group>
-        <target state="translated">Jetzt neuladen</target>
+        <target state="translated">Jetzt neu laden</target>
       </trans-unit>
       <trans-unit id="6839066544204061364" datatype="html" approved="yes">
         <source>Use system language</source>
@@ -5162,7 +5162,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">66</context>
         </context-group>
-        <target state="translated">für vollständige Ausgabe anklicken</target>
+        <target state="translated">Für vollständige Ausgabe anklicken</target>
       </trans-unit>
       <trans-unit id="1536087519743707362" datatype="html">
         <source>Dismiss</source>
@@ -5354,7 +5354,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">46</context>
         </context-group>
-        <target state="translated">Keine: Deaktiviere Übereinstimmung</target>
+        <target state="translated">Keine: Deaktiviere automatische Zuweisung</target>
       </trans-unit>
       <trans-unit id="5948496158474272829" datatype="html">
         <source>Warning: You have unsaved changes to your document(s).</source>
@@ -5402,7 +5402,7 @@
           <context context-type="sourcefile">src/app/guards/dirty-form.guard.ts</context>
           <context context-type="linenumber">19</context>
         </context-group>
-        <target state="translated">Sind Sie sicher, dass Sie gehen möchten?</target>
+        <target state="translated">Sind Sie sicher, dass Sie diese Seite verlassen möchten?</target>
       </trans-unit>
       <trans-unit id="729881853265307704" datatype="html">
         <source>Leave page</source>
@@ -5426,7 +5426,7 @@
           <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
           <context context-type="linenumber">38</context>
         </context-group>
-        <target state="translated">Sind Sie sicher, dass Sie diese gespeicherte Ansicht schließen wollen?</target>
+        <target state="translated">Sind Sie sicher, dass Sie diese gespeicherte Ansicht schließen möchten?</target>
       </trans-unit>
       <trans-unit id="856284624775342512" datatype="html">
         <source>Save and close</source>
@@ -5434,7 +5434,7 @@
           <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
           <context context-type="linenumber">42</context>
         </context-group>
-        <target state="translated">Speichern und Schließen</target>
+        <target state="translated">Speichern und schließen</target>
       </trans-unit>
       <trans-unit id="8311312207500500516" datatype="html">
         <source>You don&apos;t have permissions to do that</source>
@@ -5482,7 +5482,7 @@
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="translated">Dokument existiert bereits.</target>
+        <target state="translated">Ein Dokument mit dieser ASN existiert bereits.</target>
       </trans-unit>
       <trans-unit id="148389968432135849" datatype="html" approved="yes">
         <source>File not found.</source>
@@ -5665,11 +5665,19 @@
         </context-group>
         <target state="translated">Belarussisch</target>
       </trans-unit>
+      <trans-unit id="1001043467371963032" datatype="html">
+        <source>Catalan</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">177</context>
+        </context-group>
+        <target state="needs-translation">Catalan</target>
+      </trans-unit>
       <trans-unit id="2719780722934172508" datatype="html">
         <source>Czech</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">177</context>
+          <context context-type="linenumber">183</context>
         </context-group>
         <target state="translated">Tschechisch</target>
       </trans-unit>
@@ -5677,7 +5685,7 @@
         <source>Danish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">183</context>
+          <context context-type="linenumber">189</context>
         </context-group>
         <target state="translated">Dänisch</target>
       </trans-unit>
@@ -5685,7 +5693,7 @@
         <source>German</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">189</context>
+          <context context-type="linenumber">195</context>
         </context-group>
         <target state="final">Deutsch</target>
       </trans-unit>
@@ -5693,7 +5701,7 @@
         <source>English (GB)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">195</context>
+          <context context-type="linenumber">201</context>
         </context-group>
         <target state="final">Englisch (UK)</target>
       </trans-unit>
@@ -5701,7 +5709,7 @@
         <source>Spanish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">201</context>
+          <context context-type="linenumber">207</context>
         </context-group>
         <target state="final">Spanisch</target>
       </trans-unit>
@@ -5709,7 +5717,7 @@
         <source>French</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">207</context>
+          <context context-type="linenumber">213</context>
         </context-group>
         <target state="final">Französisch</target>
       </trans-unit>
@@ -5717,7 +5725,7 @@
         <source>Italian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">213</context>
+          <context context-type="linenumber">219</context>
         </context-group>
         <target state="final">Italienisch</target>
       </trans-unit>
@@ -5725,7 +5733,7 @@
         <source>Luxembourgish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">219</context>
+          <context context-type="linenumber">225</context>
         </context-group>
         <target state="translated">Luxemburgisch</target>
       </trans-unit>
@@ -5733,7 +5741,7 @@
         <source>Dutch</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">225</context>
+          <context context-type="linenumber">231</context>
         </context-group>
         <target state="final">Niederländisch</target>
       </trans-unit>
@@ -5741,7 +5749,7 @@
         <source>Polish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">231</context>
+          <context context-type="linenumber">237</context>
         </context-group>
         <target state="final">Polnisch</target>
       </trans-unit>
@@ -5749,7 +5757,7 @@
         <source>Portuguese (Brazil)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">237</context>
+          <context context-type="linenumber">243</context>
         </context-group>
         <target state="final">Portugiesisch (Brasilien)</target>
       </trans-unit>
@@ -5757,7 +5765,7 @@
         <source>Portuguese</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">243</context>
+          <context context-type="linenumber">249</context>
         </context-group>
         <target state="final">Portugiesisch</target>
       </trans-unit>
@@ -5765,7 +5773,7 @@
         <source>Romanian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">249</context>
+          <context context-type="linenumber">255</context>
         </context-group>
         <target state="final">Rumänisch</target>
       </trans-unit>
@@ -5773,7 +5781,7 @@
         <source>Russian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">255</context>
+          <context context-type="linenumber">261</context>
         </context-group>
         <target state="final">Russisch</target>
       </trans-unit>
@@ -5781,7 +5789,7 @@
         <source>Slovenian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">261</context>
+          <context context-type="linenumber">267</context>
         </context-group>
         <target state="translated">Slowenisch</target>
       </trans-unit>
@@ -5789,7 +5797,7 @@
         <source>Serbian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">267</context>
+          <context context-type="linenumber">273</context>
         </context-group>
         <target state="translated">Serbisch</target>
       </trans-unit>
@@ -5797,7 +5805,7 @@
         <source>Swedish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">273</context>
+          <context context-type="linenumber">279</context>
         </context-group>
         <target state="final">Schwedisch</target>
       </trans-unit>
@@ -5805,7 +5813,7 @@
         <source>Turkish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">279</context>
+          <context context-type="linenumber">285</context>
         </context-group>
         <target state="translated">Türkisch</target>
       </trans-unit>
@@ -5813,7 +5821,7 @@
         <source>Chinese Simplified</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">285</context>
+          <context context-type="linenumber">291</context>
         </context-group>
         <target state="translated">Chinesisch (vereinfacht)</target>
       </trans-unit>
@@ -5821,7 +5829,7 @@
         <source>ISO 8601</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">302</context>
+          <context context-type="linenumber">308</context>
         </context-group>
         <target state="translated">ISO 8601</target>
       </trans-unit>
@@ -5829,7 +5837,7 @@
         <source>Successfully completed one-time migratration of settings to the database!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">413</context>
+          <context context-type="linenumber">419</context>
         </context-group>
         <target state="translated">Einmalige Migration der Einstellungen in die Datenbank erfolgreich abgeschlossen!</target>
       </trans-unit>
@@ -5837,7 +5845,7 @@
         <source>Unable to migrate settings to the database, please try saving manually.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">414</context>
+          <context context-type="linenumber">420</context>
         </context-group>
         <target state="translated">Einstellungen konnten nicht in die Datenbank migriert werden, bitte versuchen Sie es manuell.</target>
       </trans-unit>
