@@ -175,7 +175,6 @@ def set_tags(
     color=False,
     **kwargs,
 ):
-
     if replace:
         Document.tags.through.objects.filter(document=document).exclude(
             Q(tag__is_inbox_tag=True),
@@ -376,7 +375,6 @@ def validate_move(instance, old_path, new_path):
 @receiver(models.signals.m2m_changed, sender=Document.tags.through)
 @receiver(models.signals.post_save, sender=Document)
 def update_filename_and_move_files(sender, instance: Document, **kwargs):
-
     if not instance.filename:
         # Can't update the filename if there is no filename to begin with
         # This happens when the consumer creates a new document.
@@ -390,7 +388,6 @@ def update_filename_and_move_files(sender, instance: Document, **kwargs):
 
     with FileLock(settings.MEDIA_LOCK):
         try:
-
             # If this was waiting for the lock, the filename or archive_filename
             # of this document may have been updated.  This happens if multiple updates
             # get queued from the UI for the same document
@@ -407,7 +404,6 @@ def update_filename_and_move_files(sender, instance: Document, **kwargs):
             old_archive_path = instance.archive_path
 
             if instance.has_archive_version:
-
                 instance.archive_filename = generate_unique_filename(
                     instance,
                     archive_filename=True,
@@ -487,7 +483,6 @@ def update_filename_and_move_files(sender, instance: Document, **kwargs):
 
 
 def set_log_entry(sender, document=None, logging_group=None, **kwargs):
-
     ct = ContentType.objects.get(model="document")
     user = User.objects.get(username="consumer")
 

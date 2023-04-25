@@ -15,7 +15,6 @@ def logs_set_default_group(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("documents", "0023_document_current_filename"),
     ]

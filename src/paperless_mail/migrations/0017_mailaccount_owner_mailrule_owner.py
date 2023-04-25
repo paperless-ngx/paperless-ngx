@@ -7,7 +7,6 @@ from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ("paperless_mail", "0016_mailrule_consumption_scope"),

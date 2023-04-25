@@ -5,7 +5,6 @@ from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("paperless_mail", "0015_alter_mailrule_action"),
     ]

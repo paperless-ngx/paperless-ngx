@@ -5,7 +5,6 @@ from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("documents", "1033_alter_documenttype_options_alter_tag_options_and_more"),
     ]

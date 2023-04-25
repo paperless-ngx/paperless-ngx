@@ -13,28 +13,24 @@ from .models import Tag
 
 
 class CorrespondentAdmin(GuardedModelAdmin):
-
     list_display = ("name", "match", "matching_algorithm")
     list_filter = ("matching_algorithm",)
     list_editable = ("match", "matching_algorithm")
 
 
 class TagAdmin(GuardedModelAdmin):
-
     list_display = ("name", "color", "match", "matching_algorithm")
     list_filter = ("color", "matching_algorithm")
     list_editable = ("color", "match", "matching_algorithm")
 
 
 class DocumentTypeAdmin(GuardedModelAdmin):
-
     list_display = ("name", "match", "matching_algorithm")
     list_filter = ("matching_algorithm",)
     list_editable = ("match", "matching_algorithm")
 
 
 class DocumentAdmin(GuardedModelAdmin):
-
     search_fields = ("correspondent__name", "title", "content", "tags__name")
     readonly_fields = (
         "added",
@@ -99,7 +95,6 @@ class RuleInline(admin.TabularInline):
 
 
 class SavedViewAdmin(GuardedModelAdmin):
-
     list_display = ("name", "owner")
 
     inlines = [RuleInline]
@@ -116,7 +111,6 @@ class StoragePathAdmin(GuardedModelAdmin):
 
 
 class TaskAdmin(admin.ModelAdmin):
-
     list_display = ("task_id", "task_file_name", "task_name", "date_done", "status")
     list_filter = ("status", "date_done", "task_file_name", "task_name")
     search_fields = ("task_name", "task_id", "status")
@@ -133,7 +127,6 @@ class TaskAdmin(admin.ModelAdmin):
 
 
 class NotesAdmin(GuardedModelAdmin):
-
     list_display = ("user", "created", "note", "document")
     list_filter = ("created", "user")
     list_display_links = ("created",)

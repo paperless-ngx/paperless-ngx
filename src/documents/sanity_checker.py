@@ -33,7 +33,6 @@ class SanityCheckMessages:
         if len(self._messages) == 0:
             logger.info("Sanity checker detected no issues.")
         else:
-
             # Query once
             all_docs = Document.objects.all()
 

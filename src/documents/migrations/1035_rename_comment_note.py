@@ -7,7 +7,6 @@ from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ("documents", "1034_alter_savedviewfilterrule_rule_type"),

@@ -34,7 +34,6 @@ class GnuPG:
 
 
 def move_documents_and_create_thumbnails(apps, schema_editor):
-
     os.makedirs(
         os.path.join(settings.MEDIA_ROOT, "documents", "originals"),
         exist_ok=True,
@@ -67,7 +66,6 @@ def move_documents_and_create_thumbnails(apps, schema_editor):
         pass
 
     for f in sorted(documents):
-
         if not f.endswith("gpg"):
             continue
 

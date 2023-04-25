@@ -8,7 +8,6 @@ logger = logging.getLogger("paperless.management.superuser")
 
 
 class Command(BaseCommand):
-
     help = """
         Creates a Django superuser:
         User named: admin
@@ -24,7 +23,6 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
-
         username = os.getenv("PAPERLESS_ADMIN_USER", "admin")
         mail = os.getenv("PAPERLESS_ADMIN_MAIL", "root@localhost")
         password = os.getenv("PAPERLESS_ADMIN_PASSWORD")

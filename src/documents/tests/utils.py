@@ -20,7 +20,6 @@ from documents.data_models import DocumentMetadataOverrides
 
 
 def setup_directories():
-
     dirs = namedtuple("Dirs", ())
 
     dirs.data_dir = Path(tempfile.mkdtemp())

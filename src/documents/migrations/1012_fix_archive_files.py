@@ -254,7 +254,6 @@ def move_old_to_new_locations(apps, schema_editor):
             )
 
     for doc in Document.objects.filter(archive_checksum__isnull=False):
-
         if doc.id in affected_document_ids:
             old_path = archive_path_old(doc)
             # remove affected archive versions
@@ -304,7 +303,6 @@ def move_new_to_old_locations(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("documents", "1011_auto_20210101_2340"),
     ]

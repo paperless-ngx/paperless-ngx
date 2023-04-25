@@ -4,7 +4,6 @@ from documents.sanity_checker import check_sanity
 
 
 class Command(BaseCommand):
-
     help = """
         This command checks your document archive for issues.
     """.replace(
@@ -21,7 +20,6 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-
         messages = check_sanity(progress=not options["no_progress_bar"])
 
         messages.log_messages()

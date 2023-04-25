@@ -5,7 +5,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("documents", "1007_savedview_savedviewfilterrule"),
     ]

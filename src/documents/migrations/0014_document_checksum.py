@@ -75,7 +75,6 @@ class Document:
 
 
 def set_checksums(apps, schema_editor):
-
     document_model = apps.get_model("documents", "Document")
 
     if not document_model.objects.all().exists():
@@ -95,7 +94,6 @@ def set_checksums(apps, schema_editor):
 
     sums = {}
     for d in document_model.objects.all():
-
         document = Document(d)
 
         print(

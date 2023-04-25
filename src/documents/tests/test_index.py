@@ -9,7 +9,6 @@ from documents.tests.utils import DirectoriesMixin
 
 class TestAutoComplete(DirectoriesMixin, TestCase):
     def test_auto_complete(self):
-
         doc1 = Document.objects.create(
             title="doc1",
             checksum="A",
