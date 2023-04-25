@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "8395f25f876a71a7307a55dd542e69a4cdcb3be3be38c4e89ed06ce3d52a5345"
+            "sha256": "77248fee6dad10b9e5189e9ba80f7c506c9f49c875bac8b259e90dadecba03f1"
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -1508,11 +1508,11 @@
                 "hiredis"
             ],
             "hashes": [
-                "sha256:56732e156fe31801c4f43396bd3ca0c2a7f6f83d7936798531b9848d103381aa",
-                "sha256:7df17a0a2b72a4c8895b462dd07616c51b1dcb48fdd7ecb7b6f4bf39ecb2e94e"
+                "sha256:2c19e6767c474f2e85167909061d525ed65bea9301c0770bb151e041b7ac89a2",
+                "sha256:73ec35da4da267d6847e47f68730fdd5f62e2ca69e3ef5885c6a78a9374c3893"
             ],
             "index": "pypi",
-            "version": "==4.5.3"
+            "version": "==4.5.4"
         },
         "regex": {
             "hashes": [
