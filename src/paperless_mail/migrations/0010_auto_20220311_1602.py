@@ -30,7 +30,6 @@ def migrate_tags_to_tag(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("paperless_mail", "0009_mailrule_assign_tags"),
     ]

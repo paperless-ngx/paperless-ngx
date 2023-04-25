@@ -20,7 +20,6 @@ def re_slug_all_the_things(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("documents", "0021_document_storage_type"),
     ]

@@ -78,7 +78,6 @@ class BogusClient:
 
 
 class BogusMailBox(ContextManager):
-
     # Common values so tests don't need to remember an accepted login
     USERNAME: str = "admin"
     ASCII_PASSWORD: str = "secret"
@@ -230,7 +229,6 @@ class TestMail(
         flagged: bool = False,
         processed: bool = False,
     ) -> MailMessage:
-
         if to is None:
             to = ["tosomeone@somewhere.com"]
 
@@ -546,7 +544,7 @@ class TestMail(
             ("*.png", ["f2.png"]),
         ]
 
-        for (pattern, matches) in tests:
+        for pattern, matches in tests:
             with self.subTest(msg=pattern):
                 self._queue_consumption_tasks_mock.reset_mock()
                 account = MailAccount(name=str(uuid.uuid4()))
@@ -567,7 +565,6 @@ class TestMail(
                 )
 
     def test_handle_mail_account_mark_read(self):
-
         account = MailAccount.objects.create(
             name="test",
             imap_server="",
@@ -591,7 +588,6 @@ class TestMail(
         self.assertEqual(len(self.bogus_mailbox.messages), 3)
 
     def test_handle_mail_account_delete(self):
-
         account = MailAccount.objects.create(
             name="test",
             imap_server="",
@@ -614,7 +610,6 @@ class TestMail(
         self.assertEqual(len(self.bogus_mailbox.messages), 1)
 
     def test_handle_mail_account_delete_no_filters(self):
-
         account = MailAccount.objects.create(
             name="test",
             imap_server="",
@@ -738,7 +733,6 @@ class TestMail(
         self.assertEqual(len(self.bogus_mailbox.messages), 3)
 
     def test_tag_mail_action_applemail_wrong_input(self):
-
         self.assertRaises(
             MailError,
             TagMailAction,
@@ -822,7 +816,6 @@ class TestMail(
         self.assertEqual(len(self.bogus_mailbox.messages_spam), 1)
 
     def test_error_skip_rule(self):
-
         account = MailAccount.objects.create(
             name="test2",
             imap_server="",
@@ -953,7 +946,6 @@ class TestMail(
         self.assertEqual(self.bogus_mailbox.messages[0].from_, "amazon@amazon.de")
 
     def test_error_create_correspondent(self):
-
         account = MailAccount.objects.create(
             name="test2",
             imap_server="",
@@ -999,7 +991,6 @@ class TestMail(
         )
 
     def test_filters(self):
-
         account = MailAccount.objects.create(
             name="test3",
             imap_server="",
@@ -1007,7 +998,7 @@ class TestMail(
             password="secret",
         )
 
-        for (f_body, f_from, f_to, f_subject, expected_mail_count) in [
+        for f_body, f_from, f_to, f_subject, expected_mail_count in [
             (None, None, None, "Claim", 1),
             ("electronic", None, None, None, 1),
             (None, "amazon", None, None, 2),

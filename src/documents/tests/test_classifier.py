@@ -326,7 +326,6 @@ class TestClassifier(DirectoriesMixin, TestCase):
             classifier2.load()
 
     def testSaveClassifier(self):
-
         self.generate_train_and_save()
 
         new_classifier = DocumentClassifier()
@@ -336,7 +335,6 @@ class TestClassifier(DirectoriesMixin, TestCase):
         self.assertFalse(new_classifier.train())
 
     def test_load_and_classify(self):
-
         self.generate_train_and_save()
 
         new_classifier = DocumentClassifier()

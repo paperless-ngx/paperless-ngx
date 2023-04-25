@@ -36,7 +36,6 @@ def disable_signal(sig, receiver, sender):
 
 
 class Command(BaseCommand):
-
     help = """
         Using a manifest.json file, load the data from there, and import the
         documents it refers to.
@@ -61,7 +60,6 @@ class Command(BaseCommand):
         self.version = None
 
     def handle(self, *args, **options):
-
         logging.getLogger().handlers[0].level = logging.ERROR
 
         self.source = Path(options["source"]).resolve()
@@ -163,7 +161,6 @@ class Command(BaseCommand):
         """
         self.stdout.write("Checking the manifest")
         for record in self.manifest:
-
             if record["model"] != "documents.document":
                 continue
 
@@ -205,7 +202,6 @@ class Command(BaseCommand):
                     ) from e
 
     def _import_files_from_manifest(self, progress_bar_disable):
-
         os.makedirs(settings.ORIGINALS_DIR, exist_ok=True)
         os.makedirs(settings.THUMBNAIL_DIR, exist_ok=True)
         os.makedirs(settings.ARCHIVE_DIR, exist_ok=True)
@@ -217,7 +213,6 @@ class Command(BaseCommand):
         )
 
         for record in tqdm.tqdm(manifest_documents, disable=progress_bar_disable):
-
             document = Document.objects.get(pk=record["pk"])
 
             doc_file = record[EXPORTER_FILE_NAME]

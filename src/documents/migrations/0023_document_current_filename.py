@@ -19,7 +19,6 @@ def set_filename(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("documents", "0022_auto_20181007_1420"),
     ]

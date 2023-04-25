@@ -150,7 +150,6 @@ class TestConsumer(DirectoriesMixin, ConsumerThreadMixin, TransactionTestCase):
 
     @mock.patch("documents.management.commands.document_consumer.logger.error")
     def test_slow_write_pdf(self, error_logger):
-
         self.consume_file_mock.side_effect = self.bogus_task
 
         self.t_start()
@@ -171,7 +170,6 @@ class TestConsumer(DirectoriesMixin, ConsumerThreadMixin, TransactionTestCase):
 
     @mock.patch("documents.management.commands.document_consumer.logger.error")
     def test_slow_write_and_move(self, error_logger):
-
         self.consume_file_mock.side_effect = self.bogus_task
 
         self.t_start()
@@ -194,7 +192,6 @@ class TestConsumer(DirectoriesMixin, ConsumerThreadMixin, TransactionTestCase):
 
     @mock.patch("documents.management.commands.document_consumer.logger.error")
     def test_slow_write_incomplete(self, error_logger):
-
         self.consume_file_mock.side_effect = self.bogus_task
 
         self.t_start()
@@ -215,12 +212,10 @@ class TestConsumer(DirectoriesMixin, ConsumerThreadMixin, TransactionTestCase):
 
     @override_settings(CONSUMPTION_DIR="does_not_exist")
     def test_consumption_directory_invalid(self):
-
         self.assertRaises(CommandError, call_command, "document_consumer", "--oneshot")
 
     @override_settings(CONSUMPTION_DIR="")
     def test_consumption_directory_unset(self):
-
         self.assertRaises(CommandError, call_command, "document_consumer", "--oneshot")
 
     def test_mac_write(self):
@@ -332,7 +327,6 @@ class TestConsumer(DirectoriesMixin, ConsumerThreadMixin, TransactionTestCase):
 
     @mock.patch("documents.management.commands.document_consumer.open")
     def test_consume_file_busy(self, open_mock):
-
         # Calling this mock always raises this
         open_mock.side_effect = OSError
 
@@ -378,7 +372,6 @@ class TestConsumerRecursivePolling(TestConsumer):
 class TestConsumerTags(DirectoriesMixin, ConsumerThreadMixin, TransactionTestCase):
     @override_settings(CONSUMER_RECURSIVE=True, CONSUMER_SUBDIRS_AS_TAGS=True)
     def test_consume_file_with_path_tags(self):
-
         tag_names = ("existingTag", "Space Tag")
         # Create a Tag prior to consuming a file using it in path
         tag_ids = [

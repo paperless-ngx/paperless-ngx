@@ -12,7 +12,6 @@ from typing import Final
 from redis import Redis
 
 if __name__ == "__main__":
-
     MAX_RETRY_COUNT: Final[int] = 5
     RETRY_SLEEP_SECONDS: Final[int] = 5
 

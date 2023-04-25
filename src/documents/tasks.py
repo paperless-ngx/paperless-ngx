@@ -65,7 +65,6 @@ def train_classifier():
         and not Correspondent.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
         and not StoragePath.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
     ):
-
         return
 
     classifier = load_classifier()
@@ -91,7 +90,6 @@ def consume_file(
     input_doc: ConsumableDocument,
     overrides: Optional[DocumentMetadataOverrides] = None,
 ):
-
     # Default no overrides
     if overrides is None:
         overrides = DocumentMetadataOverrides()
@@ -117,7 +115,6 @@ def consume_file(
                 )
 
                 if document_list:
-
                     # If the file is an upload, it's in the scratch directory
                     # Move it to consume directory to be picked up
                     # Otherwise, use the current parent to keep possible tags

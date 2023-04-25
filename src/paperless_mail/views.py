@@ -37,7 +37,6 @@ class MailRuleViewSet(ModelViewSet, PassUserMixin):
 
 
 class MailAccountTestView(GenericAPIView):
-
     permission_classes = (IsAuthenticated,)
     serializer_class = MailAccountSerializer
 

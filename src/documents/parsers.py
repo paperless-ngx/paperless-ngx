@@ -140,7 +140,6 @@ def run_convert(
     extra=None,
     logging_group=None,
 ) -> None:
-
     environment = os.environ.copy()
     if settings.CONVERT_MEMORY_LIMIT:
         environment["MAGICK_MEMORY_LIMIT"] = settings.CONVERT_MEMORY_LIMIT
