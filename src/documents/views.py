@@ -23,7 +23,7 @@ from django.db.models import Sum
 from django.db.models import When
 from django.db.models.functions import Length
 from django.db.models.functions import Lower
-from django.http import Http404
+from django.http import Http404, HttpResponseForbidden
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
 from django.shortcuts import get_object_or_404
@@ -33,7 +33,7 @@ from django.views.decorators.cache import cache_control
 from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
 from documents.filters import ObjectOwnedOrGrantedPermissionsFilter
-from documents.permissions import PaperlessAdminPermissions
+from documents.permissions import PaperlessAdminPermissions, has_perms_owner_aware
 from documents.permissions import PaperlessObjectPermissions
 from documents.tasks import consume_file
 from langdetect import detect
@@ -59,7 +59,6 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.viewsets import ViewSet
-
 from .bulk_download import ArchiveOnlyStrategy
 from .bulk_download import OriginalAndArchiveStrategy
 from .bulk_download import OriginalsOnlyStrategy
@@ -295,6 +294,12 @@ class DocumentViewSet(
 
     def file_response(self, pk, request, disposition):
         doc = Document.objects.get(id=pk)
+        if request.user is not None and not has_perms_owner_aware(
+            request.user,
+            "view_document",
+            doc,
+        ):
+            return HttpResponseForbidden("Insufficient permissions")
         if not self.original_requested(request) and doc.has_archive_version:
             file_handle = doc.archive_file
             filename = doc.get_public_filename(archive=True)
@@ -354,6 +359,12 @@ class DocumentViewSet(
     def metadata(self, request, pk=None):
         try:
             doc = Document.objects.get(pk=pk)
+            if request.user is not None and not has_perms_owner_aware(
+                request.user,
+                "view_document",
+                doc,
+            ):
+                return HttpResponseForbidden("Insufficient permissions")
         except Document.DoesNotExist:
             raise Http404
 
@@ -391,6 +402,12 @@ class DocumentViewSet(
     @action(methods=["get"], detail=True)
     def suggestions(self, request, pk=None):
         doc = get_object_or_404(Document, pk=pk)
+        if request.user is not None and not has_perms_owner_aware(
+            request.user,
+            "view_document",
+            doc,
+        ):
+            return HttpResponseForbidden("Insufficient permissions")
 
         classifier = load_classifier()
 
@@ -430,6 +447,12 @@ class DocumentViewSet(
     def thumb(self, request, pk=None):
         try:
             doc = Document.objects.get(id=pk)
+            if request.user is not None and not has_perms_owner_aware(
+                request.user,
+                "view_document",
+                doc,
+            ):
+                return HttpResponseForbidden("Insufficient permissions")
             if doc.storage_type == Document.STORAGE_TYPE_GPG:
                 handle = GnuPG.decrypted(doc.thumbnail_file)
             else:
@@ -468,6 +491,12 @@ class DocumentViewSet(
     def notes(self, request, pk=None):
         try:
             doc = Document.objects.get(pk=pk)
+            if request.user is not None and not has_perms_owner_aware(
+                request.user,
+                "view_document",
+                doc,
+            ):
+                return HttpResponseForbidden("Insufficient permissions")
         except Document.DoesNotExist:
             raise Http404
 
