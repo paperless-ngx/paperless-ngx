@@ -47,7 +47,6 @@ def reverse(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("documents", "1012_fix_archive_files"),
     ]

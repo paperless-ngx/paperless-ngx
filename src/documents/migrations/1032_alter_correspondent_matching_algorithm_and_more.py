@@ -5,7 +5,6 @@ from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("documents", "1031_remove_savedview_user_correspondent_owner_and_more"),
     ]

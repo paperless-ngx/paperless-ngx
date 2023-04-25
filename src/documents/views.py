@@ -23,24 +23,18 @@ from django.db.models import Sum
 from django.db.models import When
 from django.db.models.functions import Length
 from django.db.models.functions import Lower
-from django.http import Http404, HttpResponseForbidden
+from django.http import Http404
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
+from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.utils.translation import get_language
 from django.views.decorators.cache import cache_control
 from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
-from documents.filters import ObjectOwnedOrGrantedPermissionsFilter
-from documents.permissions import PaperlessAdminPermissions, has_perms_owner_aware
-from documents.permissions import PaperlessObjectPermissions
-from documents.tasks import consume_file
 from langdetect import detect
 from packaging import version as packaging_version
-from paperless import version
-from paperless.db import GnuPG
-from paperless.views import StandardPagination
 from rest_framework import parsers
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
@@ -59,6 +53,16 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.viewsets import ViewSet
+
+from documents.filters import ObjectOwnedOrGrantedPermissionsFilter
+from documents.permissions import PaperlessAdminPermissions
+from documents.permissions import PaperlessObjectPermissions
+from documents.permissions import has_perms_owner_aware
+from documents.tasks import consume_file
+from paperless import version
+from paperless.db import GnuPG
+from paperless.views import StandardPagination
+
 from .bulk_download import ArchiveOnlyStrategy
 from .bulk_download import OriginalAndArchiveStrategy
 from .bulk_download import OriginalsOnlyStrategy

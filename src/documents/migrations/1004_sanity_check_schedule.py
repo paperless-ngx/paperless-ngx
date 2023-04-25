@@ -5,7 +5,6 @@ from django.db.migrations import RunPython
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("documents", "1003_mime_types"),
     ]

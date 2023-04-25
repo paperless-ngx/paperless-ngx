@@ -230,7 +230,6 @@ class MailRule(document_models.ModelWithOwner):
 
 
 class ProcessedMail(document_models.ModelWithOwner):
-
     rule = models.ForeignKey(
         MailRule,
         null=False,

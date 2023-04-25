@@ -39,7 +39,6 @@ class FakeImageFile(ContextManager):
 
 
 class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
-
     SAMPLE_FILES = os.path.join(os.path.dirname(__file__), "samples")
 
     def assertContainsStrings(self, content, strings):
@@ -53,7 +52,6 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertListEqual(indices, sorted(indices))
 
     def test_post_process_text(self):
-
         text_cases = [
             ("simple     string", "simple string"),
             ("simple    newline\n   testing string", "simple newline\ntesting string"),
@@ -830,7 +828,6 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
 
 class TestParserFileTypes(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
-
     SAMPLE_FILES = os.path.join(os.path.dirname(__file__), "samples")
 
     def test_bmp(self):

@@ -23,7 +23,6 @@ def changed_password_check(app_configs, **kwargs):
         return []  # No documents table yet
 
     if encrypted_doc:
-
         if not settings.PASSPHRASE:
             return [
                 Error(
@@ -53,7 +52,6 @@ def changed_password_check(app_configs, **kwargs):
 
 @register()
 def parser_check(app_configs, **kwargs):
-
     parsers = []
     for response in document_consumer_declaration.send(None):
         parsers.append(response[1])

@@ -40,7 +40,6 @@ from paperless_mail.models import MailRule
 
 
 class Command(BaseCommand):
-
     help = """
         Decrypt and rename all files in our collection into a given target
         directory.  And include a manifest file containing document data for
@@ -144,7 +143,6 @@ class Command(BaseCommand):
         self.no_thumbnail = False
 
     def handle(self, *args, **options):
-
         self.target = Path(options["target"]).resolve()
         self.split_manifest = options["split_manifest"]
         self.compare_checksums = options["compare_checksums"]

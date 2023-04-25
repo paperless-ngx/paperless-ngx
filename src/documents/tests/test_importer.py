@@ -23,7 +23,6 @@ class TestImporter(TestCase):
         )
 
     def test_check_manifest(self):
-
         cmd = Command()
         cmd.source = Path("/tmp")
 
@@ -54,7 +53,6 @@ class TestImporter(TestCase):
             - CommandError is raised indicating the issue
         """
         with tempfile.TemporaryDirectory() as temp_dir:
-
             # Create empty files
             original_path = Path(temp_dir) / "original.pdf"
             archive_path = Path(temp_dir) / "archive.pdf"

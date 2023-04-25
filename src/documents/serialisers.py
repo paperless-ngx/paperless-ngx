@@ -58,7 +58,6 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
 
 
 class MatchingModelSerializer(serializers.ModelSerializer):
-
     document_count = serializers.IntegerField(read_only=True)
 
     def get_slug(self, obj):
@@ -221,7 +220,6 @@ class OwnedObjectSerializer(serializers.ModelSerializer, SetPermissionsMixin):
 
 
 class CorrespondentSerializer(MatchingModelSerializer, OwnedObjectSerializer):
-
     last_correspondence = serializers.DateTimeField(read_only=True)
 
     class Meta:
@@ -259,7 +257,6 @@ class DocumentTypeSerializer(MatchingModelSerializer, OwnedObjectSerializer):
 
 
 class ColorField(serializers.Field):
-
     COLOURS = (
         (1, "#a6cee3"),
         (2, "#1f78b4"),
@@ -290,7 +287,6 @@ class ColorField(serializers.Field):
 
 
 class TagSerializerVersion1(MatchingModelSerializer, OwnedObjectSerializer):
-
     colour = ColorField(source="color", default="#a6cee3")
 
     class Meta:
@@ -373,7 +369,6 @@ class StoragePathField(serializers.PrimaryKeyRelatedField):
 
 
 class DocumentSerializer(OwnedObjectSerializer, DynamicFieldsModelSerializer):
-
     correspondent = CorrespondentField(allow_null=True)
     tags = TagsField(many=True)
     document_type = DocumentTypeField(allow_null=True)
@@ -454,7 +449,6 @@ class SavedViewFilterRuleSerializer(serializers.ModelSerializer):
 
 
 class SavedViewSerializer(OwnedObjectSerializer):
-
     filter_rules = SavedViewFilterRuleSerializer(many=True)
 
     class Meta:
@@ -500,7 +494,6 @@ class SavedViewSerializer(OwnedObjectSerializer):
 
 
 class DocumentListSerializer(serializers.Serializer):
-
     documents = serializers.ListField(
         required=True,
         label="Documents",
@@ -525,7 +518,6 @@ class DocumentListSerializer(serializers.Serializer):
 
 
 class BulkEditSerializer(DocumentListSerializer, SetPermissionsMixin):
-
     method = serializers.ChoiceField(
         choices=[
             "set_correspondent",
@@ -651,7 +643,6 @@ class BulkEditSerializer(DocumentListSerializer, SetPermissionsMixin):
             self._validate_owner(parameters["owner"])
 
     def validate(self, attrs):
-
         method = attrs["method"]
         parameters = attrs["parameters"]
 
@@ -672,7 +663,6 @@ class BulkEditSerializer(DocumentListSerializer, SetPermissionsMixin):
 
 
 class PostDocumentSerializer(serializers.Serializer):
-
     created = serializers.DateTimeField(
         label="Created",
         allow_null=True,
@@ -754,7 +744,6 @@ class PostDocumentSerializer(serializers.Serializer):
 
 
 class BulkDownloadSerializer(DocumentListSerializer):
-
     content = serializers.ChoiceField(
         choices=["archive", "originals", "both"],
         default="archive",
@@ -905,7 +894,6 @@ class TasksViewSerializer(serializers.ModelSerializer):
 
 
 class AcknowledgeTasksViewSerializer(serializers.Serializer):
-
     tasks = serializers.ListField(
         required=True,
         label="Tasks",

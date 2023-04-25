@@ -119,7 +119,6 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
     @override_settings(FILENAME_FORMAT="{correspondent}/{correspondent}")
     def test_file_renaming_database_error(self):
-
         Document.objects.create(
             mime_type="application/pdf",
             storage_type=Document.STORAGE_TYPE_UNENCRYPTED,
@@ -842,7 +841,6 @@ class TestFileHandlingWithArchive(DirectoriesMixin, FileSystemAssertsMixin, Test
 
     @override_settings(FILENAME_FORMAT="{correspondent}/{title}")
     def test_database_error(self):
-
         original = os.path.join(settings.ORIGINALS_DIR, "0000001.pdf")
         archive = os.path.join(settings.ARCHIVE_DIR, "0000001.pdf")
         Path(original).touch()
@@ -868,7 +866,6 @@ class TestFileHandlingWithArchive(DirectoriesMixin, FileSystemAssertsMixin, Test
 class TestFilenameGeneration(DirectoriesMixin, TestCase):
     @override_settings(FILENAME_FORMAT="{title}")
     def test_invalid_characters(self):
-
         doc = Document.objects.create(
             title="This. is the title.",
             mime_type="application/pdf",

@@ -31,7 +31,6 @@ class RasterisedDocumentParser(DocumentParser):
     logging_name = "paperless.parsing.tesseract"
 
     def extract_metadata(self, document_path, mime_type):
-
         result = []
         if mime_type == "application/pdf":
             import pikepdf
@@ -265,7 +264,6 @@ class RasterisedDocumentParser(DocumentParser):
             # Convert pixels to mega-pixels and provide to ocrmypdf
             max_pixels_mpixels = settings.OCR_MAX_IMAGE_PIXELS / 1_000_000.0
             if max_pixels_mpixels > 0:
-
                 self.log(
                     "debug",
                     f"Calculated {max_pixels_mpixels} megapixels for OCR",

@@ -146,10 +146,8 @@ class TagMailAction(BaseMailAction):
     """
 
     def __init__(self, parameter):
-
         # The custom tag should look like "apple:<color>"
         if "apple:" in parameter.lower():
-
             _, self.color = parameter.split(":")
             self.color = self.color.strip()
 
@@ -163,7 +161,6 @@ class TagMailAction(BaseMailAction):
             self.color = None
 
     def get_criteria(self):
-
         # AppleMail: We only need to check if mails are \Flagged
         if self.color:
             return {"flagged": False}
@@ -178,7 +175,6 @@ class TagMailAction(BaseMailAction):
 
         # AppleMail
         elif self.color:
-
             # Remove all existing $MailFlagBits
             M.flag(
                 message_uid,
@@ -205,7 +201,6 @@ def mailbox_login(mailbox: MailBox, account: MailAccount):
     logger = logging.getLogger("paperless_mail")
 
     try:
-
         if account.is_token:
             mailbox.xoauth2(account.username, account.password)
         else:
@@ -253,7 +248,6 @@ def apply_mail_action(
         message_date = make_aware(message_date)
 
     try:
-
         action = get_rule_action(rule)
 
         with get_mailbox(
@@ -477,7 +471,6 @@ class MailAccountHandler(LoggingMixin):
                 account.imap_port,
                 account.imap_security,
             ) as M:
-
                 supports_gmail_labels = "X-GM-EXT-1" in M.client.capabilities
                 supports_auth_plain = "AUTH=PLAIN" in M.client.capabilities
 
@@ -520,13 +513,11 @@ class MailAccountHandler(LoggingMixin):
         M: MailBox,
         rule: MailRule,
     ):
-
         self.log("debug", f"Rule {rule}: Selecting folder {rule.folder}")
 
         try:
             M.folder.set(rule.folder)
         except MailboxFolderSelectError as err:
-
             self.log(
                 "error",
                 f"Unable to access folder {rule.folder}, attempting folder listing",
@@ -653,7 +644,6 @@ class MailAccountHandler(LoggingMixin):
         consume_tasks = list()
 
         for att in message.attachments:
-
             if (
                 att.content_disposition != "attachment"
                 and rule.attachment_type
@@ -682,7 +672,6 @@ class MailAccountHandler(LoggingMixin):
             mime_type = magic.from_buffer(att.payload, mime=True)
 
             if is_mime_type_supported(mime_type):
-
                 os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
                 _, temp_filename = tempfile.mkstemp(
                     prefix="paperless-mail-",

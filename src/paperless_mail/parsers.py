@@ -250,14 +250,12 @@ class MailDocumentParser(DocumentParser):
         return html
 
     def generate_pdf_from_mail(self, mail):
-
         url = self.gotenberg_server + "/forms/chromium/convert/html"
         self.log("info", "Converting mail to PDF")
 
         css_file = os.path.join(os.path.dirname(__file__), "templates/output.css")
 
         with open(css_file, "rb") as css_handle:
-
             files = {
                 "html": ("index.html", self.mail_to_html(mail)),
                 "css": ("output.css", css_handle),

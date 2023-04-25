@@ -30,7 +30,6 @@ class TestArchiver(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         )
 
     def test_archiver(self):
-
         doc = self.make_models()
         shutil.copy(
             sample_file,
@@ -40,7 +39,6 @@ class TestArchiver(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         call_command("document_archiver")
 
     def test_handle_document(self):
-
         doc = self.make_models()
         shutil.copy(
             sample_file,
@@ -114,7 +112,6 @@ class TestDecryptDocuments(FileSystemAssertsMixin, TestCase):
     )
     @mock.patch("documents.management.commands.decrypt_documents.input")
     def test_decrypt(self, m):
-
         media_dir = tempfile.mkdtemp()
         originals_dir = os.path.join(media_dir, "documents", "originals")
         thumb_dir = os.path.join(media_dir, "documents", "thumbnails")

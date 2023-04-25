@@ -34,7 +34,7 @@ class TestViews(TestCase):
 
     def test_index(self):
         self.client.force_login(self.user)
-        for (language_given, language_actual) in [
+        for language_given, language_actual in [
             ("", "en-US"),
             ("en-US", "en-US"),
             ("de", "de-DE"),

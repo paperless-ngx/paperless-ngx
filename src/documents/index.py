@@ -331,7 +331,7 @@ class DelayedMoreLikeThisQuery(DelayedQuery):
 def autocomplete(ix, term, limit=10):
     with ix.reader() as reader:
         terms = []
-        for (score, t) in reader.most_distinctive_terms(
+        for score, t in reader.most_distinctive_terms(
             "content",
             number=limit,
             prefix=term.lower(),

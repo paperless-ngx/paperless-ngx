@@ -13,7 +13,6 @@ from documents.parsers import parse_date_generator
 
 
 class TestDate(TestCase):
-
     SAMPLE_FILES = os.path.join(
         os.path.dirname(__file__),
         "../../paperless_tesseract/tests/samples",
