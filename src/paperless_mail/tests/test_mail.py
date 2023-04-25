@@ -612,6 +612,29 @@ class TestMail(
 
         self.assertEqual(len(self.bogus_mailbox.messages), 1)
 
+    def test_handle_mail_account_delete_no_filters(self):
+
+        account = MailAccount.objects.create(
+            name="test",
+            imap_server="",
+            username="admin",
+            password="secret",
+        )
+
+        _ = MailRule.objects.create(
+            name="testrule",
+            account=account,
+            action=MailRule.MailAction.DELETE,
+            maximum_age=0,
+        )
+
+        self.assertEqual(len(self.bogus_mailbox.messages), 3)
+
+        self.mail_account_handler.handle_mail_account(account)
+        self.apply_mail_actions()
+
+        self.assertEqual(len(self.bogus_mailbox.messages), 0)
+
     def test_handle_mail_account_flag(self):
         account = MailAccount.objects.create(
             name="test",
