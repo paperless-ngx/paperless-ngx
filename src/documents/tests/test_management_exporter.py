@@ -212,7 +212,7 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             Tag.objects.all().delete()
             self.assertEqual(Document.objects.count(), 0)
 
-            call_command("document_importer", self.target)
+            call_command("document_importer", "--no-progress-bar", self.target)
             self.assertEqual(Document.objects.count(), 4)
             self.assertEqual(Tag.objects.count(), 1)
             self.assertEqual(Correspondent.objects.count(), 1)
@@ -541,7 +541,7 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             self.assertEqual(Document.objects.count(), 4)
             Document.objects.all().delete()
             self.assertEqual(Document.objects.count(), 0)
-            call_command("document_importer", self.target)
+            call_command("document_importer", "--no-progress-bar", self.target)
             self.assertEqual(Document.objects.count(), 4)
 
     def test_no_thumbnail(self):
@@ -584,7 +584,7 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             self.assertEqual(Document.objects.count(), 4)
             Document.objects.all().delete()
             self.assertEqual(Document.objects.count(), 0)
-            call_command("document_importer", self.target)
+            call_command("document_importer", "--no-progress-bar", self.target)
             self.assertEqual(Document.objects.count(), 4)
 
     def test_split_manifest(self):
@@ -613,7 +613,7 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             self.assertEqual(Document.objects.count(), 4)
             Document.objects.all().delete()
             self.assertEqual(Document.objects.count(), 0)
-            call_command("document_importer", self.target)
+            call_command("document_importer", "--no-progress-bar", self.target)
             self.assertEqual(Document.objects.count(), 4)
 
     def test_folder_prefix(self):
@@ -637,5 +637,5 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             self.assertEqual(Document.objects.count(), 4)
             Document.objects.all().delete()
             self.assertEqual(Document.objects.count(), 0)
-            call_command("document_importer", self.target)
+            call_command("document_importer", "--no-progress-bar", self.target)
             self.assertEqual(Document.objects.count(), 4)
