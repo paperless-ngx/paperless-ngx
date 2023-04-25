@@ -381,7 +381,8 @@ def make_criterias(rule):
 
     rule_query = get_rule_action(rule).get_criteria()
     if isinstance(rule_query, dict):
-        return AND(**rule_query, **criterias)
+        if len(rule_query) != 0 or len(criterias) != 0:
+            return AND(**rule_query, **criterias)
     else:
         return AND(rule_query, **criterias)
 
