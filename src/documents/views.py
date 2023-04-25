@@ -597,7 +597,6 @@ class UnifiedSearchViewSet(DocumentViewSet):
 
 
 class LogViewSet(ViewSet):
-
     permission_classes = (IsAuthenticated, PaperlessAdminPermissions)
 
     log_files = ["paperless", "mail"]
@@ -643,7 +642,6 @@ class SavedViewViewSet(ModelViewSet, PassUserMixin):
 
 
 class BulkEditView(GenericAPIView):
-
     permission_classes = (IsAuthenticated,)
     serializer_class = BulkEditSerializer
     parser_classes = (parsers.JSONParser,)
@@ -665,13 +663,11 @@ class BulkEditView(GenericAPIView):
 
 
 class PostDocumentView(GenericAPIView):
-
     permission_classes = (IsAuthenticated,)
     serializer_class = PostDocumentSerializer
     parser_classes = (parsers.MultiPartParser,)
 
     def post(self, request, *args, **kwargs):
-
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -719,7 +715,6 @@ class PostDocumentView(GenericAPIView):
 
 
 class SelectionDataView(GenericAPIView):
-
     permission_classes = (IsAuthenticated,)
     serializer_class = DocumentListSerializer
     parser_classes = (parsers.MultiPartParser, parsers.JSONParser)
@@ -777,7 +772,6 @@ class SelectionDataView(GenericAPIView):
 
 
 class SearchAutoCompleteView(APIView):
-
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
@@ -801,7 +795,6 @@ class SearchAutoCompleteView(APIView):
 
 
 class StatisticsView(APIView):
-
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
@@ -843,7 +836,6 @@ class StatisticsView(APIView):
 
 
 class BulkDownloadView(GenericAPIView):
-
     permission_classes = (IsAuthenticated,)
     serializer_class = BulkDownloadSerializer
     parser_classes = (parsers.JSONParser,)
@@ -938,13 +930,16 @@ class StoragePathViewSet(ModelViewSet, PassUserMixin):
     serializer_class = StoragePathSerializer
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
-    filter_backends = (DjangoFilterBackend, OrderingFilter)
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+        ObjectOwnedOrGrantedPermissionsFilter,
+    )
     filterset_class = StoragePathFilterSet
     ordering_fields = ("name", "path", "matching_algorithm", "match", "document_count")
 
 
 class UiSettingsView(GenericAPIView):
-
     permission_classes = (IsAuthenticated,)
     serializer_class = UiSettingsViewSerializer
 
@@ -993,7 +988,6 @@ class UiSettingsView(GenericAPIView):
 
 
 class TasksViewSet(ReadOnlyModelViewSet):
-
     permission_classes = (IsAuthenticated,)
     serializer_class = TasksViewSerializer
 
@@ -1012,7 +1006,6 @@ class TasksViewSet(ReadOnlyModelViewSet):
 
 
 class AcknowledgeTasksView(GenericAPIView):
-
     permission_classes = (IsAuthenticated,)
     serializer_class = AcknowledgeTasksViewSerializer
 
