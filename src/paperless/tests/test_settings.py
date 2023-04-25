@@ -24,7 +24,6 @@ class TestIgnoreDateParsing(TestCase):
             test_cases (_type_): _description_
         """
         for env_str, date_format, expected_date_set in test_cases:
-
             self.assertSetEqual(
                 _parse_ignore_dates(env_str, date_format),
                 expected_date_set,

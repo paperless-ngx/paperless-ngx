@@ -14,7 +14,6 @@ from documents.tests.utils import DirectoriesMixin
 
 class TestSanityCheck(DirectoriesMixin, TestCase):
     def make_test_data(self):
-
         with filelock.FileLock(settings.MEDIA_LOCK):
             # just make sure that the lockfile is present.
             shutil.copy(

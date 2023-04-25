@@ -82,7 +82,6 @@ class TitleContentFilter(Filter):
 
 
 class DocumentFilterSet(FilterSet):
-
     is_tagged = BooleanFilter(
         label="Is tagged",
         field_name="tags",

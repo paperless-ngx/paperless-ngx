@@ -17,7 +17,6 @@ logger = logging.getLogger("paperless.migrations")
 def _do_convert(work_package):
     existing_thumbnail, converted_thumbnail = work_package
     try:
-
         logger.info(f"Converting thumbnail: {existing_thumbnail}")
 
         # Run actual conversion
@@ -51,7 +50,6 @@ def _convert_thumbnails_to_webp(apps, schema_editor):
     start = time.time()
 
     with tempfile.TemporaryDirectory() as tempdir:
-
         work_packages = []
 
         for file in Path(settings.THUMBNAIL_DIR).glob("*.png"):
@@ -73,7 +71,6 @@ def _convert_thumbnails_to_webp(apps, schema_editor):
             )
 
         if len(work_packages):
-
             logger.info(
                 "\n\n"
                 "  This is a one-time only migration to convert thumbnails for all of your\n"
@@ -95,7 +92,6 @@ def _convert_thumbnails_to_webp(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("documents", "1020_merge_20220518_1839"),
     ]

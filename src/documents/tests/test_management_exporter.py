@@ -364,7 +364,6 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         )
 
     def test_export_missing_files(self):
-
         target = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, target)
         Document.objects.create(
@@ -458,7 +457,6 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         args = ["document_exporter", "/tmp/foo/bar"]
 
         with self.assertRaises(CommandError) as e:
-
             call_command(*args)
 
             self.assertEqual("That path isn't a directory", str(e))
@@ -474,11 +472,9 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         """
 
         with tempfile.NamedTemporaryFile() as tmp_file:
-
             args = ["document_exporter", tmp_file.name]
 
             with self.assertRaises(CommandError) as e:
-
                 call_command(*args)
 
                 self.assertEqual("That path isn't a directory", str(e))
@@ -493,13 +489,11 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             - Error is raised
         """
         with tempfile.TemporaryDirectory() as tmp_dir:
-
             os.chmod(tmp_dir, 0o000)
 
             args = ["document_exporter", tmp_dir]
 
             with self.assertRaises(CommandError) as e:
-
                 call_command(*args)
 
                 self.assertEqual("That path doesn't appear to be writable", str(e))

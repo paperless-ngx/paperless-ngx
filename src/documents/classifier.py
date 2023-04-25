@@ -60,7 +60,6 @@ def load_classifier() -> Optional["DocumentClassifier"]:
 
 
 class DocumentClassifier:
-
     # v7 - Updated scikit-learn package version
     # v8 - Added storage path classifier
     # v9 - Changed from hashing to time/ids for re-train check
@@ -141,7 +140,6 @@ class DocumentClassifier:
         target_file_temp.rename(target_file)
 
     def train(self):
-
         # Get non-inbox documents
         docs_queryset = Document.objects.exclude(
             tags__is_inbox_tag=True,
@@ -160,7 +158,6 @@ class DocumentClassifier:
         logger.debug("Gathering data from database...")
         hasher = sha256()
         for doc in docs_queryset:
-
             y = -1
             dt = doc.document_type
             if dt and dt.matching_algorithm == MatchingModel.MATCH_AUTO:
@@ -335,7 +332,6 @@ class DocumentClassifier:
 
         # If the NLTK language is supported, do further processing
         if settings.NLTK_LANGUAGE is not None and settings.NLTK_ENABLED:
-
             import nltk
             from nltk.corpus import stopwords
             from nltk.stem import SnowballStemmer

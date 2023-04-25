@@ -6,7 +6,6 @@ from documents.tasks import index_reindex
 
 
 class Command(BaseCommand):
-
     help = "Manages the document index."
 
     def add_arguments(self, parser):

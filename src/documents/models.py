@@ -38,7 +38,6 @@ class ModelWithOwner(models.Model):
 
 
 class MatchingModel(ModelWithOwner):
-
     MATCH_NONE = 0
     MATCH_ANY = 1
     MATCH_ALL = 2
@@ -95,7 +94,6 @@ class Correspondent(MatchingModel):
 
 
 class Tag(MatchingModel):
-
     color = models.CharField(_("color"), max_length=7, default="#a6cee3")
 
     is_inbox_tag = models.BooleanField(
@@ -130,7 +128,6 @@ class StoragePath(MatchingModel):
 
 
 class Document(ModelWithOwner):
-
     STORAGE_TYPE_UNENCRYPTED = "unencrypted"
     STORAGE_TYPE_GPG = "gpg"
     STORAGE_TYPES = (
@@ -280,7 +277,6 @@ class Document(ModelWithOwner):
         verbose_name_plural = _("documents")
 
     def __str__(self) -> str:
-
         # Convert UTC database time to local time
         created = datetime.date.isoformat(timezone.localdate(self.created))
 
@@ -365,7 +361,6 @@ class Document(ModelWithOwner):
 
 
 class Log(models.Model):
-
     LEVELS = (
         (logging.DEBUG, _("debug")),
         (logging.INFO, _("information")),
@@ -397,7 +392,6 @@ class Log(models.Model):
 
 class SavedView(ModelWithOwner):
     class Meta:
-
         ordering = ("name",)
         verbose_name = _("saved view")
         verbose_name_plural = _("saved views")
@@ -481,7 +475,6 @@ class SavedViewFilterRule(models.Model):
 # the filename, if possible, as a higher priority than either document filename or
 # content parsing
 class FileInfo:
-
     REGEXES = OrderedDict(
         [
             (
@@ -503,7 +496,6 @@ class FileInfo:
         tags=(),
         extension=None,
     ):
-
         self.created = created
         self.title = title
         self.extension = extension
@@ -530,7 +522,7 @@ class FileInfo:
     def from_filename(cls, filename) -> "FileInfo":
         # Mutate filename in-place before parsing its components
         # by applying at most one of the configured transformations.
-        for (pattern, repl) in settings.FILENAME_PARSE_TRANSFORMS:
+        for pattern, repl in settings.FILENAME_PARSE_TRANSFORMS:
             (filename, count) = pattern.subn(repl, filename)
             if count:
                 break
@@ -564,7 +556,6 @@ class FileInfo:
 
 # Extending User Model Using a One-To-One Link
 class UiSettings(models.Model):
-
     user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,

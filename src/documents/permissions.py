@@ -2,6 +2,7 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from guardian.core import ObjectPermissionChecker
 from guardian.models import GroupObjectPermission
 from guardian.shortcuts import assign_perm
 from guardian.shortcuts import get_objects_for_user
@@ -9,7 +10,6 @@ from guardian.shortcuts import get_users_with_perms
 from guardian.shortcuts import remove_perm
 from rest_framework.permissions import BasePermission
 from rest_framework.permissions import DjangoObjectPermissions
-from guardian.core import ObjectPermissionChecker
 
 
 class PaperlessObjectPermissions(DjangoObjectPermissions):

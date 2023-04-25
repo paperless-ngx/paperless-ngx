@@ -9,7 +9,6 @@ DOCUMENT_SENDER_MAP = {}
 
 
 def move_sender_strings_to_sender_model(apps, schema_editor):
-
     sender_model = apps.get_model("documents", "Sender")
     document_model = apps.get_model("documents", "Document")
 

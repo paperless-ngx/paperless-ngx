@@ -5,7 +5,6 @@ from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("documents", "1032_alter_correspondent_matching_algorithm_and_more"),
     ]
