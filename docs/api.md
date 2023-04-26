@@ -257,7 +257,6 @@ The endpoint supports the following optional form fields:
 - `document_type`: Similar to correspondent.
 - `tags`: Similar to correspondent. Specify this multiple times to
   have multiple tags added to the document.
-- `owner`: An optional user ID to set as the owner.
 - `archive_serial_number`: An optional archive serial number to set.
 
 The endpoint will immediately return HTTP 200 if the document consumption
