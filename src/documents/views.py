@@ -57,6 +57,7 @@ from rest_framework.viewsets import ViewSet
 from documents.filters import ObjectOwnedOrGrantedPermissionsFilter
 from documents.permissions import PaperlessAdminPermissions
 from documents.permissions import PaperlessObjectPermissions
+from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_perms_owner_aware
 from documents.tasks import consume_file
 from paperless import version
@@ -831,18 +832,35 @@ class StatisticsView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
-        documents_total = Document.objects.all().count()
+        user = request.user if request.user is not None else None
 
-        inbox_tag = Tag.objects.filter(is_inbox_tag=True)
+        documents = (
+            Document.objects.all()
+            if user is None
+            else get_objects_for_user_owner_aware(
+                user,
+                "documents.view_document",
+                Document,
+            )
+        )
+        tags = (
+            Tag.objects.all()
+            if user is None
+            else get_objects_for_user_owner_aware(user, "documents.view_tag", Tag)
+        )
+
+        documents_total = documents.count()
+
+        inbox_tag = tags.filter(is_inbox_tag=True)
 
         documents_inbox = (
-            Document.objects.filter(tags__is_inbox_tag=True).distinct().count()
+            documents.filter(tags__is_inbox_tag=True).distinct().count()
             if inbox_tag.exists()
             else None
         )
 
         document_file_type_counts = (
-            Document.objects.values("mime_type")
+            documents.values("mime_type")
             .annotate(mime_type_count=Count("mime_type"))
             .order_by("-mime_type_count")
             if documents_total > 0
@@ -850,7 +868,7 @@ class StatisticsView(APIView):
         )
 
         character_count = (
-            Document.objects.annotate(
+            documents.annotate(
                 characters=Length("content"),
             )
             .aggregate(Sum("characters"))
