@@ -5,11 +5,15 @@ describe('document-detail', () => {
     this.modifiedDocuments = []
 
     cy.fixture('documents/documents.json').then((documentsJson) => {
-      cy.intercept('GET', 'http://localhost:8000/api/documents/1/', (req) => {
-        let response = { ...documentsJson }
-        response = response.results.find((d) => d.id == 1)
-        req.reply(response)
-      })
+      cy.intercept(
+        'GET',
+        'http://localhost:8000/api/documents/1/?full_perms=true',
+        (req) => {
+          let response = { ...documentsJson }
+          response = response.results.find((d) => d.id == 1)
+          req.reply(response)
+        }
+      )
     })
 
     cy.intercept('PUT', 'http://localhost:8000/api/documents/1/', (req) => {
