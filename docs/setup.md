@@ -33,6 +33,11 @@ steps described in [Docker setup](#docker_hub) automatically.
     $ bash -c "$(curl -L https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/install-paperless-ngx.sh)"
     ```
 
+    !!! note
+
+        macOS users will need to install e.g. [gnu-sed](https://formulae.brew.sh/formula/gnu-sed) with support
+        for running as `sed`.
+
 ### From GHCR / Docker Hub {#docker_hub}
 
 1.  Login with your user and create a folder in your home-directory to have a place for your
