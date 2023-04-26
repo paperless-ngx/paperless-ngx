@@ -3076,7 +3076,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">595,597</context>
         </context-group>
-        <target state="needs-translation">Error deleting document: <x id="PH" equiv-text="error.error?.detail ?? error.message ?? JSON.stringify(error)"/></target>
+        <target state="translated">Greška prilikom brisanja dokumenta: <x id="PH" equiv-text="error.error?.detail ?? error.message ?? JSON.stringify(error)"/></target>
       </trans-unit>
       <trans-unit id="7362691899087997122" datatype="html">
         <source>Redo OCR confirm</source>
@@ -4578,7 +4578,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">140,142</context>
         </context-group>
-        <target state="needs-translation"> Update checking works by pinging the public <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;"/>Github API<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> for the latest release to determine whether a new version is available.<x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br/&gt;"/> Actual updating of the app must still be performed manually. </target>
+        <target state="translated"> Provera ažuriranja funkcioniše pingovanjem javnog <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;"/>Github API<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> za najnovije izdanje da bi se utvrdilo da li je nova verzija dostupna.<x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br/&gt;"/> Stvarno ažuriranje aplikacije i dalje mora da se obavlja ručno. </target>
       </trans-unit>
       <trans-unit id="5489945693955857309" datatype="html">
         <source><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="No track"/>No tracking data is collected by the app in any way.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></source>
@@ -5671,7 +5671,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">177</context>
         </context-group>
-        <target state="needs-translation">Catalan</target>
+        <target state="translated">Katalonski</target>
       </trans-unit>
       <trans-unit id="2719780722934172508" datatype="html">
         <source>Czech</source>
