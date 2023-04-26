@@ -298,7 +298,7 @@ REST_FRAMEWORK = {
     "DEFAULT_VERSION": "1",
     # Make sure these are ordered and that the most recent version appears
     # last
-    "ALLOWED_VERSIONS": ["1", "2"],
+    "ALLOWED_VERSIONS": ["1", "2", "3"],
 }
 
 if DEBUG:
