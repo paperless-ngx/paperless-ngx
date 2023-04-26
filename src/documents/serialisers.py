@@ -14,6 +14,7 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
+from guardian.core import ObjectPermissionChecker
 from guardian.shortcuts import get_users_with_perms
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
@@ -149,11 +150,21 @@ class SetPermissionsMixin:
 class OwnedObjectSerializer(serializers.ModelSerializer, SetPermissionsMixin):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user", None)
+        full_perms = kwargs.pop("full_perms", False)
         super().__init__(*args, **kwargs)
+
+        try:
+            if full_perms:
+                self.fields.pop("user_can_change")
+            else:
+                self.fields.pop("permissions")
+        except KeyError:
+            pass
 
     def get_permissions(self, obj):
         view_codename = f"view_{obj.__class__.__name__.lower()}"
         change_codename = f"change_{obj.__class__.__name__.lower()}"
+
         return {
             "view": {
                 "users": get_users_with_perms(
@@ -179,7 +190,19 @@ class OwnedObjectSerializer(serializers.ModelSerializer, SetPermissionsMixin):
             },
         }
 
+    def get_user_can_change(self, obj):
+        checker = ObjectPermissionChecker(self.user) if self.user is not None else None
+        return (
+            obj.owner is None
+            or obj.owner == self.user
+            or (
+                self.user is not None
+                and checker.has_perm(f"change_{obj.__class__.__name__.lower()}", obj)
+            )
+        )
+
     permissions = SerializerMethodField(read_only=True)
+    user_can_change = SerializerMethodField(read_only=True)
 
     set_permissions = serializers.DictField(
         label="Set permissions",
@@ -235,6 +258,7 @@ class CorrespondentSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             "last_correspondence",
             "owner",
             "permissions",
+            "user_can_change",
             "set_permissions",
         )
 
@@ -252,6 +276,7 @@ class DocumentTypeSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             "document_count",
             "owner",
             "permissions",
+            "user_can_change",
             "set_permissions",
         )
 
@@ -303,6 +328,7 @@ class TagSerializerVersion1(MatchingModelSerializer, OwnedObjectSerializer):
             "document_count",
             "owner",
             "permissions",
+            "user_can_change",
             "set_permissions",
         )
 
@@ -338,6 +364,7 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             "document_count",
             "owner",
             "permissions",
+            "user_can_change",
             "set_permissions",
         )
 
@@ -437,6 +464,7 @@ class DocumentSerializer(OwnedObjectSerializer, DynamicFieldsModelSerializer):
             "archived_file_name",
             "owner",
             "permissions",
+            "user_can_change",
             "set_permissions",
             "notes",
         )
@@ -464,6 +492,7 @@ class SavedViewSerializer(OwnedObjectSerializer):
             "filter_rules",
             "owner",
             "permissions",
+            "user_can_change",
             "set_permissions",
         ]
 
@@ -783,6 +812,7 @@ class StoragePathSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             "document_count",
             "owner",
             "permissions",
+            "user_can_change",
             "set_permissions",
         )
 
