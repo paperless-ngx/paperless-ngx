@@ -3396,6 +3396,36 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
             status.HTTP_404_NOT_FOUND,
         )
 
+    def test_dynamic_permissions_fields(self):
+        Document.objects.create(title="Test", content="content 1", checksum="1")
+
+        user1 = User.objects.create_superuser(username="test1")
+        self.client.force_authenticate(user1)
+
+        response = self.client.get(
+            "/api/documents/",
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        resp_data = response.json()
+
+        self.assertNotIn("permissions", resp_data["results"][0])
+        self.assertIn("user_can_change", resp_data["results"][0])
+
+        response = self.client.get(
+            "/api/documents/?full_perms=true",
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        resp_data = response.json()
+
+        self.assertIn("permissions", resp_data["results"][0])
+        self.assertNotIn("user_can_change", resp_data["results"][0])
+
 
 class TestApiRemoteVersion(DirectoriesMixin, APITestCase):
     ENDPOINT = "/api/remote_version/"
