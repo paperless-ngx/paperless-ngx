@@ -206,6 +206,67 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.content, content_thumbnail)
 
+    def test_document_actions_with_perms(self):
+        """
+        GIVEN:
+            - Document with owner and without granted permissions
+            - User is then granted permissions
+        WHEN:
+            - User tries to load preview, thumbnail
+        THEN:
+            - Initially, HTTP 403 Forbidden
+            - With permissions, HTTP 200 OK
+        """
+        _, filename = tempfile.mkstemp(dir=self.dirs.originals_dir)
+
+        content = b"This is a test"
+        content_thumbnail = b"thumbnail content"
+
+        with open(filename, "wb") as f:
+            f.write(content)
+
+        user1 = User.objects.create_user(username="test1")
+        user2 = User.objects.create_user(username="test2")
+        user1.user_permissions.add(*Permission.objects.filter(codename="view_document"))
+        user2.user_permissions.add(*Permission.objects.filter(codename="view_document"))
+
+        self.client.force_authenticate(user2)
+
+        doc = Document.objects.create(
+            title="none",
+            filename=os.path.basename(filename),
+            mime_type="application/pdf",
+            owner=user1,
+        )
+
+        with open(
+            os.path.join(self.dirs.thumbnail_dir, f"{doc.pk:07d}.webp"),
+            "wb",
+        ) as f:
+            f.write(content_thumbnail)
+
+        response = self.client.get(f"/api/documents/{doc.pk}/download/")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        response = self.client.get(f"/api/documents/{doc.pk}/preview/")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        response = self.client.get(f"/api/documents/{doc.pk}/thumb/")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        from guardian.shortcuts import assign_perm
+
+        assign_perm("view_document", user2, doc)
+
+        response = self.client.get(f"/api/documents/{doc.pk}/download/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        response = self.client.get(f"/api/documents/{doc.pk}/preview/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        response = self.client.get(f"/api/documents/{doc.pk}/thumb/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
     @override_settings(FILENAME_FORMAT="")
     def test_download_with_archive(self):
 

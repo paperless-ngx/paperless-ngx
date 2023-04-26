@@ -9,6 +9,7 @@ from guardian.shortcuts import get_users_with_perms
 from guardian.shortcuts import remove_perm
 from rest_framework.permissions import BasePermission
 from rest_framework.permissions import DjangoObjectPermissions
+from guardian.core import ObjectPermissionChecker
 
 
 class PaperlessObjectPermissions(DjangoObjectPermissions):
@@ -114,3 +115,8 @@ def get_objects_for_user_owner_aware(user, perms, Model):
         accept_global_perms=False,
     )
     return objects_owned | objects_unowned | objects_with_perms
+
+
+def has_perms_owner_aware(user, perms, obj):
+    checker = ObjectPermissionChecker(user)
+    return obj.owner is None or obj.owner == user or checker.has_perm(perms, obj)
