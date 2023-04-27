@@ -296,7 +296,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">100</context>
         </context-group>
-        <target state="final">أُضيف المستند</target>
+        <target state="final">تم إضافة المستند</target>
       </trans-unit>
       <trans-unit id="9204248378636247318" datatype="html" approved="yes">
         <source>Document <x id="PH" equiv-text="status.filename"/> was added to paperless.</source>
@@ -308,7 +308,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">102</context>
         </context-group>
-        <target state="final">أضيف المستند <x id="PH" equiv-text="status.filename"/> إلى paperless.</target>
+        <target state="final">تم إضافة المستند <x id="PH" equiv-text="status.filename"/> إلى paperless.</target>
       </trans-unit>
       <trans-unit id="1931214133925051574" datatype="html" approved="yes">
         <source>Open document</source>
@@ -4578,7 +4578,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">140,142</context>
         </context-group>
-        <target state="needs-translation"> Update checking works by pinging the public <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;"/>Github API<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> for the latest release to determine whether a new version is available.<x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br/&gt;"/> Actual updating of the app must still be performed manually. </target>
+        <target state="translated"> التحقق من التحديثات يعمل عن طريق اختبار التواصل مع الجمهور <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;"/>Github API<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> حول أحدث إصدار لتحديد ما إذا كان الإصدار الجديد متاحًا أم لا.<x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br/&gt;"/> يتطلب إجراء التحديث الفعلي للتطبيق يدويا. </target>
       </trans-unit>
       <trans-unit id="5489945693955857309" datatype="html">
         <source><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="No track"/>No tracking data is collected by the app in any way.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></source>
