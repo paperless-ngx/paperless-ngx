@@ -604,6 +604,9 @@ class UnifiedSearchViewSet(DocumentViewSet):
                 # pass user to query for perms
                 self.request.query_params._mutable = True
                 self.request.query_params["user"] = self.request.user.id
+                self.request.query_params[
+                    "is_superuser"
+                ] = self.request.user.is_superuser
                 self.request.query_params._mutable = False
 
             if "query" in self.request.query_params:
