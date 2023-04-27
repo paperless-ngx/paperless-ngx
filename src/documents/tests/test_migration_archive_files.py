@@ -6,11 +6,11 @@ from unittest import mock
 
 from django.conf import settings
 from django.test import override_settings
+
 from documents.parsers import ParseError
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import TestMigrations
-
 
 STORAGE_TYPE_GPG = "gpg"
 
@@ -114,7 +114,6 @@ simple_png2 = os.path.join(os.path.dirname(__file__), "examples", "no-text.png")
 
 @override_settings(FILENAME_FORMAT="")
 class TestMigrateArchiveFiles(DirectoriesMixin, FileSystemAssertsMixin, TestMigrations):
-
     migrate_from = "1011_auto_20210101_2340"
     migrate_to = "1012_fix_archive_files"
 
@@ -282,13 +281,11 @@ def fake_parse_wrapper(parser, path, mime_type, file_name):
 
 @override_settings(FILENAME_FORMAT="")
 class TestMigrateArchiveFilesErrors(DirectoriesMixin, TestMigrations):
-
     migrate_from = "1011_auto_20210101_2340"
     migrate_to = "1012_fix_archive_files"
     auto_migrate = False
 
     def test_archive_missing(self):
-
         Document = self.apps.get_model("documents", "Document")
 
         doc = make_test_document(
@@ -454,12 +451,10 @@ class TestMigrateArchiveFilesBackwards(
     FileSystemAssertsMixin,
     TestMigrations,
 ):
-
     migrate_from = "1012_fix_archive_files"
     migrate_to = "1011_auto_20210101_2340"
 
     def setUpBeforeMigration(self, apps):
-
         Document = apps.get_model("documents", "Document")
 
         make_test_document(
@@ -519,13 +514,11 @@ class TestMigrateArchiveFilesBackwardsWithFilenameFormat(
 
 @override_settings(FILENAME_FORMAT="")
 class TestMigrateArchiveFilesBackwardsErrors(DirectoriesMixin, TestMigrations):
-
     migrate_from = "1012_fix_archive_files"
     migrate_to = "1011_auto_20210101_2340"
     auto_migrate = False
 
     def test_filename_clash(self):
-
         Document = self.apps.get_model("documents", "Document")
 
         self.clashA = make_test_document(
@@ -554,7 +547,6 @@ class TestMigrateArchiveFilesBackwardsErrors(DirectoriesMixin, TestMigrations):
         )
 
     def test_filename_exists(self):
-
         Document = self.apps.get_model("documents", "Document")
 
         self.clashA = make_test_document(

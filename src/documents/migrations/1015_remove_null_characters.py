@@ -3,7 +3,6 @@ import logging
 
 from django.db import migrations
 
-
 logger = logging.getLogger("paperless.migrations")
 
 
@@ -19,7 +18,6 @@ def remove_null_characters(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("documents", "1014_auto_20210228_1614"),
     ]

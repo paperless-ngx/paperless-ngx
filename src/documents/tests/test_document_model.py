@@ -8,8 +8,8 @@ try:
 except ImportError:
     from backports import zoneinfo
 
-from django.test import override_settings
 from django.test import TestCase
+from django.test import override_settings
 from django.utils import timezone
 
 from documents.models import Correspondent
@@ -52,7 +52,6 @@ class TestDocument(TestCase):
             self.assertEqual(mock_unlink.call_count, 2)
 
     def test_file_name(self):
-
         doc = Document(
             mime_type="application/pdf",
             title="test",
@@ -64,7 +63,6 @@ class TestDocument(TestCase):
         TIME_ZONE="Europe/Berlin",
     )
     def test_file_name_with_timezone(self):
-
         # See https://docs.djangoproject.com/en/4.0/ref/utils/#django.utils.timezone.now
         # The default for created is an aware datetime in UTC
         # This does that, just manually, with a fixed date
@@ -107,7 +105,6 @@ class TestDocument(TestCase):
         self.assertEqual(doc.get_public_filename(), "2020-01-01 test.pdf")
 
     def test_file_name_jpg(self):
-
         doc = Document(
             mime_type="image/jpeg",
             title="test",
@@ -116,7 +113,6 @@ class TestDocument(TestCase):
         self.assertEqual(doc.get_public_filename(), "2020-12-25 test.jpg")
 
     def test_file_name_unknown(self):
-
         doc = Document(
             mime_type="application/zip",
             title="test",
@@ -125,7 +121,6 @@ class TestDocument(TestCase):
         self.assertEqual(doc.get_public_filename(), "2020-12-25 test.zip")
 
     def test_file_name_invalid_type(self):
-
         doc = Document(
             mime_type="image/jpegasd",
             title="test",

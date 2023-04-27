@@ -5,14 +5,14 @@ from uuid import uuid4
 
 from dateutil import tz
 from django.conf import settings
-from django.test import override_settings
 from django.test import TestCase
+from django.test import override_settings
+
 from documents.parsers import parse_date
 from documents.parsers import parse_date_generator
 
 
 class TestDate(TestCase):
-
     SAMPLE_FILES = os.path.join(
         os.path.dirname(__file__),
         "../../paperless_tesseract/tests/samples",

@@ -1,7 +1,8 @@
 import os
 
-from django.test import override_settings
 from django.test import TestCase
+from django.test import override_settings
+
 from documents.tests.utils import DirectoriesMixin
 from paperless.checks import binaries_check
 from paperless.checks import debug_mode_check

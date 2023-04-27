@@ -1,6 +1,7 @@
 import os
 
 from django.test import TestCase
+
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
 from paperless_text.parsers import TextDocumentParser
@@ -8,7 +9,6 @@ from paperless_text.parsers import TextDocumentParser
 
 class TestTextParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     def test_thumbnail(self):
-
         parser = TextDocumentParser(None)
 
         # just make sure that it does not crash
@@ -19,7 +19,6 @@ class TestTextParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertIsFile(f)
 
     def test_parse(self):
-
         parser = TextDocumentParser(None)
 
         parser.parse(

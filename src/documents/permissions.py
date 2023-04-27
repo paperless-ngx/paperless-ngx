@@ -2,6 +2,7 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from guardian.core import ObjectPermissionChecker
 from guardian.models import GroupObjectPermission
 from guardian.shortcuts import assign_perm
 from guardian.shortcuts import get_objects_for_user
@@ -114,3 +115,8 @@ def get_objects_for_user_owner_aware(user, perms, Model):
         accept_global_perms=False,
     )
     return objects_owned | objects_unowned | objects_with_perms
+
+
+def has_perms_owner_aware(user, perms, obj):
+    checker = ObjectPermissionChecker(user)
+    return obj.owner is None or obj.owner == user or checker.has_perm(perms, obj)

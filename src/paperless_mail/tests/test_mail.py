@@ -12,21 +12,22 @@ from unittest import mock
 from django.core.management import call_command
 from django.db import DatabaseError
 from django.test import TestCase
-from documents.models import Correspondent
-from documents.tests.utils import DirectoriesMixin
-from documents.tests.utils import FileSystemAssertsMixin
+from imap_tools import NOT
 from imap_tools import EmailAddress
 from imap_tools import FolderInfo
 from imap_tools import MailboxFolderSelectError
 from imap_tools import MailboxLoginError
 from imap_tools import MailMessage
 from imap_tools import MailMessageFlags
-from imap_tools import NOT
+
+from documents.models import Correspondent
+from documents.tests.utils import DirectoriesMixin
+from documents.tests.utils import FileSystemAssertsMixin
 from paperless_mail import tasks
-from paperless_mail.mail import apply_mail_action
 from paperless_mail.mail import MailAccountHandler
 from paperless_mail.mail import MailError
 from paperless_mail.mail import TagMailAction
+from paperless_mail.mail import apply_mail_action
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 
@@ -77,7 +78,6 @@ class BogusClient:
 
 
 class BogusMailBox(ContextManager):
-
     # Common values so tests don't need to remember an accepted login
     USERNAME: str = "admin"
     ASCII_PASSWORD: str = "secret"
@@ -229,7 +229,6 @@ class TestMail(
         flagged: bool = False,
         processed: bool = False,
     ) -> MailMessage:
-
         if to is None:
             to = ["tosomeone@somewhere.com"]
 
@@ -545,7 +544,7 @@ class TestMail(
             ("*.png", ["f2.png"]),
         ]
 
-        for (pattern, matches) in tests:
+        for pattern, matches in tests:
             with self.subTest(msg=pattern):
                 self._queue_consumption_tasks_mock.reset_mock()
                 account = MailAccount(name=str(uuid.uuid4()))
@@ -566,7 +565,6 @@ class TestMail(
                 )
 
     def test_handle_mail_account_mark_read(self):
-
         account = MailAccount.objects.create(
             name="test",
             imap_server="",
@@ -590,7 +588,6 @@ class TestMail(
         self.assertEqual(len(self.bogus_mailbox.messages), 3)
 
     def test_handle_mail_account_delete(self):
-
         account = MailAccount.objects.create(
             name="test",
             imap_server="",
@@ -611,6 +608,28 @@ class TestMail(
         self.apply_mail_actions()
 
         self.assertEqual(len(self.bogus_mailbox.messages), 1)
+
+    def test_handle_mail_account_delete_no_filters(self):
+        account = MailAccount.objects.create(
+            name="test",
+            imap_server="",
+            username="admin",
+            password="secret",
+        )
+
+        _ = MailRule.objects.create(
+            name="testrule",
+            account=account,
+            action=MailRule.MailAction.DELETE,
+            maximum_age=0,
+        )
+
+        self.assertEqual(len(self.bogus_mailbox.messages), 3)
+
+        self.mail_account_handler.handle_mail_account(account)
+        self.apply_mail_actions()
+
+        self.assertEqual(len(self.bogus_mailbox.messages), 0)
 
     def test_handle_mail_account_flag(self):
         account = MailAccount.objects.create(
@@ -714,7 +733,6 @@ class TestMail(
         self.assertEqual(len(self.bogus_mailbox.messages), 3)
 
     def test_tag_mail_action_applemail_wrong_input(self):
-
         self.assertRaises(
             MailError,
             TagMailAction,
@@ -798,7 +816,6 @@ class TestMail(
         self.assertEqual(len(self.bogus_mailbox.messages_spam), 1)
 
     def test_error_skip_rule(self):
-
         account = MailAccount.objects.create(
             name="test2",
             imap_server="",
@@ -929,7 +946,6 @@ class TestMail(
         self.assertEqual(self.bogus_mailbox.messages[0].from_, "amazon@amazon.de")
 
     def test_error_create_correspondent(self):
-
         account = MailAccount.objects.create(
             name="test2",
             imap_server="",
@@ -975,7 +991,6 @@ class TestMail(
         )
 
     def test_filters(self):
-
         account = MailAccount.objects.create(
             name="test3",
             imap_server="",
@@ -983,7 +998,7 @@ class TestMail(
             password="secret",
         )
 
-        for (f_body, f_from, f_to, f_subject, expected_mail_count) in [
+        for f_body, f_from, f_to, f_subject, expected_mail_count in [
             (None, None, None, "Claim", 1),
             ("electronic", None, None, None, 1),
             (None, "amazon", None, None, 2),

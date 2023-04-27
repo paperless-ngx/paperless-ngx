@@ -2,6 +2,7 @@ from django.test import TestCase
 
 from documents.models import Correspondent
 from documents.models import Document
+
 from .factories import CorrespondentFactory
 from .factories import DocumentFactory
 
@@ -15,7 +16,6 @@ class CorrespondentTestCase(TestCase):
 
 class DocumentTestCase(TestCase):
     def test_correspondent_deletion_does_not_cascade(self):
-
         self.assertEqual(Correspondent.objects.all().count(), 0)
         correspondent = CorrespondentFactory.create()
         self.assertEqual(Correspondent.objects.all().count(), 1)

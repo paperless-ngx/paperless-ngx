@@ -122,7 +122,8 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
         null,
         this.sortField,
         this.sortReverse,
-        this._nameFilter
+        this._nameFilter,
+        true
       )
       .subscribe((c) => {
         this.data = c.results

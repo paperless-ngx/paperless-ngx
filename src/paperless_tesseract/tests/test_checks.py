@@ -1,8 +1,9 @@
 from unittest import mock
 
 from django.core.checks import ERROR
-from django.test import override_settings
 from django.test import TestCase
+from django.test import override_settings
+
 from paperless_tesseract import check_default_language_available
 
 

@@ -1,9 +1,10 @@
 import datetime
 import os
-from unittest import mock
 from unittest import TestCase
+from unittest import mock
 
 from celery.schedules import crontab
+
 from paperless.settings import _parse_beat_schedule
 from paperless.settings import _parse_ignore_dates
 from paperless.settings import _parse_redis_url
@@ -23,7 +24,6 @@ class TestIgnoreDateParsing(TestCase):
             test_cases (_type_): _description_
         """
         for env_str, date_format, expected_date_set in test_cases:
-
             self.assertSetEqual(
                 _parse_ignore_dates(env_str, date_format),
                 expected_date_set,

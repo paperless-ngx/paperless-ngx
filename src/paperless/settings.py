@@ -298,7 +298,7 @@ REST_FRAMEWORK = {
     "DEFAULT_VERSION": "1",
     # Make sure these are ordered and that the most recent version appears
     # last
-    "ALLOWED_VERSIONS": ["1", "2"],
+    "ALLOWED_VERSIONS": ["1", "2", "3"],
 }
 
 if DEBUG:
@@ -719,7 +719,7 @@ CONSUMER_IGNORE_PATTERNS = list(
     json.loads(
         os.getenv(
             "PAPERLESS_CONSUMER_IGNORE_PATTERNS",
-            '[".DS_STORE/*", "._*", ".stfolder/*", ".stversions/*", ".localized/*", "desktop.ini", "@eaDir/*"]',  # noqa: E501
+            '[".DS_Store", ".DS_STORE", "._*", ".stfolder/*", ".stversions/*", ".localized/*", "desktop.ini", "@eaDir/*"]',  # noqa: E501
         ),
     ),
 )

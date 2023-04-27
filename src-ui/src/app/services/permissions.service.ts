@@ -58,17 +58,24 @@ export class PermissionsService {
     action: string,
     object: ObjectWithPermissions
   ): boolean {
-    let actionObject = null
-    if (action === PermissionAction.View) actionObject = object.permissions.view
-    else if (action === PermissionAction.Change)
-      actionObject = object.permissions.change
-    if (!actionObject) return false
-    return (
-      this.currentUserOwnsObject(object) ||
-      actionObject.users.includes(this.currentUser.id) ||
-      actionObject.groups.filter((g) => this.currentUser.groups.includes(g))
-        .length > 0
-    )
+    if (action === PermissionAction.View) {
+      return (
+        this.currentUserOwnsObject(object) ||
+        object.permissions?.view.users.includes(this.currentUser.id) ||
+        object.permissions?.view.groups.filter((g) =>
+          this.currentUser.groups.includes(g)
+        ).length > 0
+      )
+    } else if (action === PermissionAction.Change) {
+      return (
+        this.currentUserOwnsObject(object) ||
+        object.user_can_change ||
+        object.permissions?.change.users.includes(this.currentUser.id) ||
+        object.permissions?.change.groups.filter((g) =>
+          this.currentUser.groups.includes(g)
+        ).length > 0
+      )
+    }
   }
 
   public getPermissionCode(
