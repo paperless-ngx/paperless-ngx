@@ -1,5 +1,28 @@
 # Changelog
 
+## paperless-ngx 1.14.2
+
+### Features
+
+- Feature: Finnish translation [@shamoon](https://github.com/shamoon) ([#3215](https://github.com/paperless-ngx/paperless-ngx/pull/3215))
+
+### Bug Fixes
+
+- Fix: Load saved views from app frame, not dashboard [@shamoon](https://github.com/shamoon) ([#3211](https://github.com/paperless-ngx/paperless-ngx/pull/3211))
+- Fix: advanced search or date searching + doc type/correspondent/storage path broken [@shamoon](https://github.com/shamoon) ([#3209](https://github.com/paperless-ngx/paperless-ngx/pull/3209))
+- Fix MixedContentTypeError in add_inbox_tags handler [@e1mo](https://github.com/e1mo) ([#3212](https://github.com/paperless-ngx/paperless-ngx/pull/3212))
+
+### All App Changes
+
+<details>
+<summary>4 changes</summary>
+
+- Feature: Finnish translation [@shamoon](https://github.com/shamoon) ([#3215](https://github.com/paperless-ngx/paperless-ngx/pull/3215))
+- Fix: Load saved views from app frame, not dashboard [@shamoon](https://github.com/shamoon) ([#3211](https://github.com/paperless-ngx/paperless-ngx/pull/3211))
+- Fix: advanced search or date searching + doc type/correspondent/storage path broken [@shamoon](https://github.com/shamoon) ([#3209](https://github.com/paperless-ngx/paperless-ngx/pull/3209))
+- Fix MixedContentTypeError in add_inbox_tags handler [@e1mo](https://github.com/e1mo) ([#3212](https://github.com/paperless-ngx/paperless-ngx/pull/3212))
+</details>
+
 ## paperless-ngx 1.14.1
 
 ### Bug Fixes
