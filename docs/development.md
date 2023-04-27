@@ -374,13 +374,10 @@ If you want to build the documentation locally, this is how you do it:
 The docker image is primarily built by the GitHub actions workflow, but
 it can be faster when developing to build and tag an image locally.
 
-To provide the build arguments automatically, build the image using the
-helper script `build-docker-image.sh`.
+Building the image works as with any image:
 
-Building the docker image from source:
-
-```bash
-./build-docker-image.sh Dockerfile -t <your-tag>
+```
+docker build --file Dockerfile --tag paperless:local --progress simple .
 ```
 
 ## Extending Paperless-ngx
