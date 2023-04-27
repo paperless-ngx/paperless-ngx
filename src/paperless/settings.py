@@ -425,7 +425,7 @@ if _paperless_url:
 
 if ["*"] != ALLOWED_HOSTS:
     # always allow localhost. Necessary e.g. for healthcheck in docker.
-    ALLOWED_HOSTS.append(["localhost"])
+    ALLOWED_HOSTS.append("localhost")
     if _paperless_url:
         ALLOWED_HOSTS.append(_paperless_uri.hostname)
 
