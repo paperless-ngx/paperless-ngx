@@ -194,7 +194,6 @@ class TagViewSet(ModelViewSet, PassUserMixin):
     )
 
     def get_serializer_class(self, *args, **kwargs):
-        print(self.request.version)
         if int(self.request.version) == 1:
             return TagSerializerVersion1
         else:

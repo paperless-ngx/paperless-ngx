@@ -28,12 +28,21 @@ from documents.models import Document
 from documents.models import MatchingModel
 from documents.models import PaperlessTask
 from documents.models import Tag
+from documents.permissions import get_objects_for_user_owner_aware
 
 logger = logging.getLogger("paperless.handlers")
 
 
 def add_inbox_tags(sender, document=None, logging_group=None, **kwargs):
-    inbox_tags = Tag.objects.filter(is_inbox_tag=True)
+    if document.owner is not None:
+        tags = get_objects_for_user_owner_aware(
+            document.owner,
+            "documents.view_documenttype",
+            Tag,
+        )
+    else:
+        tags = Tag.objects.all()
+    inbox_tags = tags.filter(is_inbox_tag=True)
     document.tags.add(*inbox_tags)
 
 
