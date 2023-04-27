@@ -1,5 +1,50 @@
 # Changelog
 
+## paperless-ngx 1.14.1
+
+### Bug Fixes
+
+- Fix: reduce frequency of permissions queries to speed up v1.14.0 [@shamoon](https://github.com/shamoon) ([#3201](https://github.com/paperless-ngx/paperless-ngx/pull/3201))
+- Fix: permissions-aware statistics [@shamoon](https://github.com/shamoon) ([#3199](https://github.com/paperless-ngx/paperless-ngx/pull/3199))
+- Fix: Use document owner for matching if set [@shamoon](https://github.com/shamoon) ([#3198](https://github.com/paperless-ngx/paperless-ngx/pull/3198))
+- Fix: respect permissions on document view actions [@shamoon](https://github.com/shamoon) ([#3174](https://github.com/paperless-ngx/paperless-ngx/pull/3174))
+- Increment API version for 1.14.1+ [@shamoon](https://github.com/shamoon) ([#3191](https://github.com/paperless-ngx/paperless-ngx/pull/3191))
+- Fix: dropdown Private items with empty set [@shamoon](https://github.com/shamoon) ([#3189](https://github.com/paperless-ngx/paperless-ngx/pull/3189))
+- Documentation: add note for macOS [@shamoon](https://github.com/shamoon) ([#3190](https://github.com/paperless-ngx/paperless-ngx/pull/3190))
+- Fix: make the importer a little more robust against some errors [@stumpylog](https://github.com/stumpylog) ([#3188](https://github.com/paperless-ngx/paperless-ngx/pull/3188))
+- Fix: Specify backend for auto-login [@shamoon](https://github.com/shamoon) ([#3163](https://github.com/paperless-ngx/paperless-ngx/pull/3163))
+- Fix: StoragePath missing the owned or granted filter [@stumpylog](https://github.com/stumpylog) ([#3180](https://github.com/paperless-ngx/paperless-ngx/pull/3180))
+- Fix: Redis socket connections fail due to redis-py [@stumpylog](https://github.com/stumpylog) ([#3176](https://github.com/paperless-ngx/paperless-ngx/pull/3176))
+- Fix: Handle delete mail action with no filters [@shamoon](https://github.com/shamoon) ([#3161](https://github.com/paperless-ngx/paperless-ngx/pull/3161))
+- Fix typos and wrong version number in doc [@FizzyMUC](https://github.com/FizzyMUC) ([#3171](https://github.com/paperless-ngx/paperless-ngx/pull/3171))
+
+### Documentation
+
+- Documentation: add note for macOS [@shamoon](https://github.com/shamoon) ([#3190](https://github.com/paperless-ngx/paperless-ngx/pull/3190))
+- Fix typos and wrong version number in doc [@FizzyMUC](https://github.com/FizzyMUC) ([#3171](https://github.com/paperless-ngx/paperless-ngx/pull/3171))
+
+### Maintenance
+
+- Chore: Fix isort not running, upgrade to the latest black [@stumpylog](https://github.com/stumpylog) ([#3177](https://github.com/paperless-ngx/paperless-ngx/pull/3177))
+
+### All App Changes
+
+<details>
+<summary>11 changes</summary>
+
+- Fix: reduce frequency of permissions queries to speed up v1.14.0 [@shamoon](https://github.com/shamoon) ([#3201](https://github.com/paperless-ngx/paperless-ngx/pull/3201))
+- Fix: permissions-aware statistics [@shamoon](https://github.com/shamoon) ([#3199](https://github.com/paperless-ngx/paperless-ngx/pull/3199))
+- Fix: Use document owner for matching if set [@shamoon](https://github.com/shamoon) ([#3198](https://github.com/paperless-ngx/paperless-ngx/pull/3198))
+- Chore: Fix isort not running, upgrade to the latest black [@stumpylog](https://github.com/stumpylog) ([#3177](https://github.com/paperless-ngx/paperless-ngx/pull/3177))
+- Fix: respect permissions on document view actions [@shamoon](https://github.com/shamoon) ([#3174](https://github.com/paperless-ngx/paperless-ngx/pull/3174))
+- Increment API version for 1.14.1+ [@shamoon](https://github.com/shamoon) ([#3191](https://github.com/paperless-ngx/paperless-ngx/pull/3191))
+- Fix: dropdown Private items with empty set [@shamoon](https://github.com/shamoon) ([#3189](https://github.com/paperless-ngx/paperless-ngx/pull/3189))
+- Fix: make the importer a little more robust against some errors [@stumpylog](https://github.com/stumpylog) ([#3188](https://github.com/paperless-ngx/paperless-ngx/pull/3188))
+- Fix: Specify backend for auto-login [@shamoon](https://github.com/shamoon) ([#3163](https://github.com/paperless-ngx/paperless-ngx/pull/3163))
+- Fix: StoragePath missing the owned or granted filter [@stumpylog](https://github.com/stumpylog) ([#3180](https://github.com/paperless-ngx/paperless-ngx/pull/3180))
+- Fix: Handle delete mail action with no filters [@shamoon](https://github.com/shamoon) ([#3161](https://github.com/paperless-ngx/paperless-ngx/pull/3161))
+</details>
+
 ## paperless-ngx 1.14.0
 
 ### Notable Changes
