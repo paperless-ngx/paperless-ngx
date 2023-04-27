@@ -21,7 +21,7 @@ RUN set -eux \
 # Comments:
 #  - pipenv dependencies are not left in the final image
 #  - pipenv can't touch the final image somehow
-FROM --platform=$BUILDPLATFORM python:3.9-slim-bullseye as pipenv-base
+FROM --platform=$BUILDPLATFORM python:3.9-alpine as pipenv-base
 
 WORKDIR /usr/src/pipenv
 
@@ -29,7 +29,7 @@ COPY Pipfile* ./
 
 RUN set -eux \
   && echo "Installing pipenv" \
-    && python3 -m pip install --no-cache-dir --upgrade pipenv==2023.3.20 \
+    && python3 -m pip install --no-cache-dir --upgrade pipenv==2023.4.20 \
   && echo "Generating requirement.txt" \
     && pipenv requirements > requirements.txt
 
@@ -170,7 +170,7 @@ RUN set -eux \
 ARG TARGETARCH
 ARG TARGETVARIANT
 
-# Workflow provided, defaults set for manual building
+# Can be workflow provided, defaults set for manual building
 ARG JBIG2ENC_VERSION=0.29
 ARG QPDF_VERSION=11.3.0
 ARG PIKEPDF_VERSION=7.1.1
@@ -181,7 +181,7 @@ ARG PSYCOPG2_VERSION=2.9.5
 RUN set -eux \
   && echo "Getting binaries" \
     && mkdir paperless-ngx \
-    && curl --fail --silent --show-error --output paperless-ngx.tar.gz --location https://github.com/paperless-ngx/paperless-ngx/archive/ba28a1e16c27d121b644b4f6bdb78855a2850561.tar.gz \
+    && curl --fail --silent --show-error --output paperless-ngx.tar.gz --location https://github.com/paperless-ngx/builder/archive/e04666c257ef648716381a99113856f599e66911.tar.gz \
     && tar -xf paperless-ngx.tar.gz --directory paperless-ngx --strip-components=1 \
     && cd paperless-ngx \
     # Setting a specific revision ensures we know what this installed
