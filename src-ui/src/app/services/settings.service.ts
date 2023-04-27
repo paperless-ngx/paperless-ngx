@@ -209,6 +209,12 @@ export class SettingsService {
         dateInputFormat: 'dd/mm/yyyy',
       },
       {
+        code: 'fi-fi',
+        name: $localize`Finnish`,
+        englishName: 'Finnish',
+        dateInputFormat: 'dd.mm.yyyy',
+      },
+      {
         code: 'fr-fr',
         name: $localize`French`,
         englishName: 'French',
