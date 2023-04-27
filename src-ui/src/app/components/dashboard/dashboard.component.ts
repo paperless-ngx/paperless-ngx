@@ -1,9 +1,4 @@
 import { Component } from '@angular/core'
-import {
-  PermissionAction,
-  PermissionsService,
-  PermissionType,
-} from 'src/app/services/permissions.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
@@ -16,19 +11,9 @@ import { ComponentWithPermissions } from '../with-permissions/with-permissions.c
 export class DashboardComponent extends ComponentWithPermissions {
   constructor(
     public settingsService: SettingsService,
-    private permissionsService: PermissionsService,
     public savedViewService: SavedViewService
   ) {
     super()
-
-    if (
-      permissionsService.currentUserCan(
-        PermissionAction.View,
-        PermissionType.SavedView
-      )
-    ) {
-      savedViewService.initialize()
-    }
   }
 
   get subtitle() {
