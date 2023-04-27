@@ -24,6 +24,7 @@
           "de-DE": "src/locale/messages.de_DE.xlf",
           "en-GB": "src/locale/messages.en_GB.xlf",
           "es-ES": "src/locale/messages.es_ES.xlf",
+          "fi-FI": "src/locale/messages.fi_FI.xlf",
           "fr-FR": "src/locale/messages.fr_FR.xlf",
           "it-IT": "src/locale/messages.it_IT.xlf",
           "lb-LU": "src/locale/messages.lb_LU.xlf",

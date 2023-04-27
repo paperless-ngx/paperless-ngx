@@ -27,6 +27,11 @@ import { ComponentCanDeactivate } from 'src/app/guards/dirty-doc.guard'
 import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 import { ToastService } from 'src/app/services/toast.service'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
+import {
+  PermissionAction,
+  PermissionsService,
+  PermissionType,
+} from 'src/app/services/permissions.service'
 
 @Component({
   selector: 'app-app-frame',
@@ -47,9 +52,19 @@ export class AppFrameComponent
     private list: DocumentListViewService,
     public settingsService: SettingsService,
     public tasksService: TasksService,
-    private readonly toastService: ToastService
+    private readonly toastService: ToastService,
+    private permissionsService: PermissionsService
   ) {
     super()
+
+    if (
+      permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.SavedView
+      )
+    ) {
+      savedViewService.initialize()
+    }
   }
 
   ngOnInit(): void {

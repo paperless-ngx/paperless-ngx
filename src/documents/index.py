@@ -172,6 +172,14 @@ class DelayedQuery:
         for k, v in self.query_params.items():
             if k == "correspondent__id":
                 criterias.append(query.Term("correspondent_id", v))
+            elif k == "correspondent__id__in":
+                for correspondent_id in v.split(","):
+                    criterias.append(query.Term("correspondent_id", correspondent_id))
+            elif k == "correspondent__id__none":
+                for correspondent_id in v.split(","):
+                    criterias.append(
+                        query.Not(query.Term("correspondent_id", correspondent_id)),
+                    )
             elif k == "tags__id__all":
                 for tag_id in v.split(","):
                     criterias.append(query.Term("tag_id", tag_id))
@@ -180,6 +188,12 @@ class DelayedQuery:
                     criterias.append(query.Not(query.Term("tag_id", tag_id)))
             elif k == "document_type__id":
                 criterias.append(query.Term("type_id", v))
+            elif k == "document_type__id__in":
+                for document_type_id in v.split(","):
+                    criterias.append(query.Term("type_id", document_type_id))
+            elif k == "document_type__id__none":
+                for document_type_id in v.split(","):
+                    criterias.append(query.Not(query.Term("type_id", document_type_id)))
             elif k == "correspondent__isnull":
                 criterias.append(query.Term("has_correspondent", v == "false"))
             elif k == "is_tagged":
@@ -200,6 +214,12 @@ class DelayedQuery:
                 criterias.append(query.DateRange("added", start=None, end=isoparse(v)))
             elif k == "storage_path__id":
                 criterias.append(query.Term("path_id", v))
+            elif k == "storage_path__id__in":
+                for storage_path_id in v.split(","):
+                    criterias.append(query.Term("path_id", storage_path_id))
+            elif k == "storage_path__id__none":
+                for storage_path_id in v.split(","):
+                    criterias.append(query.Not(query.Term("path_id", storage_path_id)))
             elif k == "storage_path__isnull":
                 criterias.append(query.Term("has_path", v == "false"))
 
