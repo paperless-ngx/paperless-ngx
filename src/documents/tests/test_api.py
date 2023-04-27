@@ -20,30 +20,31 @@ except ImportError:
     from backports import zoneinfo
 
 import pytest
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.test import override_settings
 from django.utils import timezone
-from dateutil.relativedelta import relativedelta
 from rest_framework import status
+from rest_framework.test import APITestCase
+from whoosh.writing import AsyncWriter
+
 from documents import bulk_edit
 from documents import index
 from documents.models import Correspondent
 from documents.models import Document
-from documents.tests.utils import DocumentConsumeDelayMixin
 from documents.models import DocumentType
 from documents.models import MatchingModel
+from documents.models import Note
 from documents.models import PaperlessTask
 from documents.models import SavedView
 from documents.models import StoragePath
 from documents.models import Tag
-from documents.models import Note
 from documents.tests.utils import DirectoriesMixin
+from documents.tests.utils import DocumentConsumeDelayMixin
 from paperless import version
-from rest_framework.test import APITestCase
-from whoosh.writing import AsyncWriter
 
 
 class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
@@ -54,7 +55,6 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.client.force_authenticate(user=self.user)
 
     def testDocuments(self):
-
         response = self.client.get("/api/documents/").data
 
         self.assertEqual(response["count"], 0)
@@ -170,7 +170,6 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(len(results[0]), 0)
 
     def test_document_actions(self):
-
         _, filename = tempfile.mkstemp(dir=self.dirs.originals_dir)
 
         content = b"This is a test"
@@ -206,9 +205,69 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.content, content_thumbnail)
 
+    def test_document_actions_with_perms(self):
+        """
+        GIVEN:
+            - Document with owner and without granted permissions
+            - User is then granted permissions
+        WHEN:
+            - User tries to load preview, thumbnail
+        THEN:
+            - Initially, HTTP 403 Forbidden
+            - With permissions, HTTP 200 OK
+        """
+        _, filename = tempfile.mkstemp(dir=self.dirs.originals_dir)
+
+        content = b"This is a test"
+        content_thumbnail = b"thumbnail content"
+
+        with open(filename, "wb") as f:
+            f.write(content)
+
+        user1 = User.objects.create_user(username="test1")
+        user2 = User.objects.create_user(username="test2")
+        user1.user_permissions.add(*Permission.objects.filter(codename="view_document"))
+        user2.user_permissions.add(*Permission.objects.filter(codename="view_document"))
+
+        self.client.force_authenticate(user2)
+
+        doc = Document.objects.create(
+            title="none",
+            filename=os.path.basename(filename),
+            mime_type="application/pdf",
+            owner=user1,
+        )
+
+        with open(
+            os.path.join(self.dirs.thumbnail_dir, f"{doc.pk:07d}.webp"),
+            "wb",
+        ) as f:
+            f.write(content_thumbnail)
+
+        response = self.client.get(f"/api/documents/{doc.pk}/download/")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        response = self.client.get(f"/api/documents/{doc.pk}/preview/")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        response = self.client.get(f"/api/documents/{doc.pk}/thumb/")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        from guardian.shortcuts import assign_perm
+
+        assign_perm("view_document", user2, doc)
+
+        response = self.client.get(f"/api/documents/{doc.pk}/download/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        response = self.client.get(f"/api/documents/{doc.pk}/preview/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        response = self.client.get(f"/api/documents/{doc.pk}/thumb/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
     @override_settings(FILENAME_FORMAT="")
     def test_download_with_archive(self):
-
         content = b"This is a test"
         content_archive = b"This is the same test but archived"
 
@@ -250,7 +309,6 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(response.content, content)
 
     def test_document_actions_not_existing_file(self):
-
         doc = Document.objects.create(
             title="none",
             filename=os.path.basename("asd"),
@@ -267,7 +325,6 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_document_filters(self):
-
         doc1 = Document.objects.create(
             title="none1",
             checksum="A",
@@ -365,7 +422,6 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(len(results), 0)
 
     def test_documents_title_content_filter(self):
-
         doc1 = Document.objects.create(
             title="title A",
             content="content A",
@@ -1039,7 +1095,6 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         )
 
     def test_statistics(self):
-
         doc1 = Document.objects.create(
             title="none1",
             checksum="A",
@@ -1087,7 +1142,6 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(response.data["inbox_tag"], None)
 
     def test_upload(self):
-
         self.consume_file_mock.return_value = celery.result.AsyncResult(
             id=str(uuid.uuid4()),
         )
@@ -1115,7 +1169,6 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertIsNone(overrides.tag_ids)
 
     def test_upload_empty_metadata(self):
-
         self.consume_file_mock.return_value = celery.result.AsyncResult(
             id=str(uuid.uuid4()),
         )
@@ -1143,7 +1196,6 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertIsNone(overrides.tag_ids)
 
     def test_upload_invalid_form(self):
-
         self.consume_file_mock.return_value = celery.result.AsyncResult(
             id=str(uuid.uuid4()),
         )
@@ -1160,7 +1212,6 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.consume_file_mock.assert_not_called()
 
     def test_upload_invalid_file(self):
-
         self.consume_file_mock.return_value = celery.result.AsyncResult(
             id=str(uuid.uuid4()),
         )
@@ -1177,7 +1228,6 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.consume_file_mock.assert_not_called()
 
     def test_upload_with_title(self):
-
         self.consume_file_mock.return_value = celery.result.AsyncResult(
             id=str(uuid.uuid4()),
         )
@@ -1202,7 +1252,6 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertIsNone(overrides.tag_ids)
 
     def test_upload_with_correspondent(self):
-
         self.consume_file_mock.return_value = celery.result.AsyncResult(
             id=str(uuid.uuid4()),
         )
@@ -1228,7 +1277,6 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertIsNone(overrides.tag_ids)
 
     def test_upload_with_invalid_correspondent(self):
-
         self.consume_file_mock.return_value = celery.result.AsyncResult(
             id=str(uuid.uuid4()),
         )
@@ -1246,7 +1294,6 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.consume_file_mock.assert_not_called()
 
     def test_upload_with_document_type(self):
-
         self.consume_file_mock.return_value = celery.result.AsyncResult(
             id=str(uuid.uuid4()),
         )
@@ -1272,7 +1319,6 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertIsNone(overrides.tag_ids)
 
     def test_upload_with_invalid_document_type(self):
-
         self.consume_file_mock.return_value = celery.result.AsyncResult(
             id=str(uuid.uuid4()),
         )
@@ -1290,7 +1336,6 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.consume_file_mock.assert_not_called()
 
     def test_upload_with_tags(self):
-
         self.consume_file_mock.return_value = celery.result.AsyncResult(
             id=str(uuid.uuid4()),
         )
@@ -1317,7 +1362,6 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertIsNone(overrides.title)
 
     def test_upload_with_invalid_tags(self):
-
         self.consume_file_mock.return_value = celery.result.AsyncResult(
             id=str(uuid.uuid4()),
         )
@@ -1337,7 +1381,6 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.consume_file_mock.assert_not_called()
 
     def test_upload_with_created(self):
-
         self.consume_file_mock.return_value = celery.result.AsyncResult(
             id=str(uuid.uuid4()),
         )
@@ -1369,7 +1412,6 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(overrides.created, created)
 
     def test_upload_with_asn(self):
-
         self.consume_file_mock.return_value = celery.result.AsyncResult(
             id=str(uuid.uuid4()),
         )
@@ -1593,7 +1635,6 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         )
 
     def test_create_update_patch(self):
-
         User.objects.create_user("user1")
 
         view = {
@@ -2072,7 +2113,6 @@ class TestDocumentApiV2(DirectoriesMixin, APITestCase):
 
 
 class TestApiUiSettings(DirectoriesMixin, APITestCase):
-
     ENDPOINT = "/api/ui_settings/"
 
     def setUp(self):
@@ -2868,7 +2908,6 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
 
 
 class TestBulkDownload(DirectoriesMixin, APITestCase):
-
     ENDPOINT = "/api/documents/bulk_download/"
 
     def setUp(self):
@@ -3190,7 +3229,6 @@ class TestBulkDownload(DirectoriesMixin, APITestCase):
 
 class TestApiAuth(DirectoriesMixin, APITestCase):
     def test_auth_required(self):
-
         d = Document.objects.create(title="Test")
 
         self.assertEqual(
@@ -3255,7 +3293,6 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
         )
 
     def test_api_version_no_auth(self):
-
         response = self.client.get("/api/")
         self.assertNotIn("X-Api-Version", response)
         self.assertNotIn("X-Version", response)
@@ -3359,6 +3396,36 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
             status.HTTP_404_NOT_FOUND,
         )
 
+    def test_dynamic_permissions_fields(self):
+        Document.objects.create(title="Test", content="content 1", checksum="1")
+
+        user1 = User.objects.create_superuser(username="test1")
+        self.client.force_authenticate(user1)
+
+        response = self.client.get(
+            "/api/documents/",
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        resp_data = response.json()
+
+        self.assertNotIn("permissions", resp_data["results"][0])
+        self.assertIn("user_can_change", resp_data["results"][0])
+
+        response = self.client.get(
+            "/api/documents/?full_perms=true",
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        resp_data = response.json()
+
+        self.assertIn("permissions", resp_data["results"][0])
+        self.assertNotIn("user_can_change", resp_data["results"][0])
+
 
 class TestApiRemoteVersion(DirectoriesMixin, APITestCase):
     ENDPOINT = "/api/remote_version/"
@@ -3368,7 +3435,6 @@ class TestApiRemoteVersion(DirectoriesMixin, APITestCase):
 
     @mock.patch("urllib.request.urlopen")
     def test_remote_version_enabled_no_update_prefix(self, urlopen_mock):
-
         cm = MagicMock()
         cm.getcode.return_value = status.HTTP_200_OK
         cm.read.return_value = json.dumps({"tag_name": "ngx-1.6.0"}).encode()
@@ -3388,7 +3454,6 @@ class TestApiRemoteVersion(DirectoriesMixin, APITestCase):
 
     @mock.patch("urllib.request.urlopen")
     def test_remote_version_enabled_no_update_no_prefix(self, urlopen_mock):
-
         cm = MagicMock()
         cm.getcode.return_value = status.HTTP_200_OK
         cm.read.return_value = json.dumps(
@@ -3410,7 +3475,6 @@ class TestApiRemoteVersion(DirectoriesMixin, APITestCase):
 
     @mock.patch("urllib.request.urlopen")
     def test_remote_version_enabled_update(self, urlopen_mock):
-
         new_version = (
             version.__version__[0],
             version.__version__[1],
@@ -3439,7 +3503,6 @@ class TestApiRemoteVersion(DirectoriesMixin, APITestCase):
 
     @mock.patch("urllib.request.urlopen")
     def test_remote_version_bad_json(self, urlopen_mock):
-
         cm = MagicMock()
         cm.getcode.return_value = status.HTTP_200_OK
         cm.read.return_value = b'{ "blah":'
@@ -3459,7 +3522,6 @@ class TestApiRemoteVersion(DirectoriesMixin, APITestCase):
 
     @mock.patch("urllib.request.urlopen")
     def test_remote_version_exception(self, urlopen_mock):
-
         cm = MagicMock()
         cm.getcode.return_value = status.HTTP_200_OK
         cm.read.side_effect = urllib.error.URLError("an error")

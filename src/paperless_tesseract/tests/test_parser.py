@@ -5,14 +5,15 @@ import uuid
 from typing import ContextManager
 from unittest import mock
 
-from django.test import override_settings
 from django.test import TestCase
+from django.test import override_settings
+
 from documents.parsers import ParseError
 from documents.parsers import run_convert
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
-from paperless_tesseract.parsers import post_process_text
 from paperless_tesseract.parsers import RasterisedDocumentParser
+from paperless_tesseract.parsers import post_process_text
 
 image_to_string_calls = []
 
@@ -38,7 +39,6 @@ class FakeImageFile(ContextManager):
 
 
 class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
-
     SAMPLE_FILES = os.path.join(os.path.dirname(__file__), "samples")
 
     def assertContainsStrings(self, content, strings):
@@ -52,7 +52,6 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertListEqual(indices, sorted(indices))
 
     def test_post_process_text(self):
-
         text_cases = [
             ("simple     string", "simple string"),
             ("simple    newline\n   testing string", "simple newline\ntesting string"),
@@ -829,7 +828,6 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
 
 class TestParserFileTypes(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
-
     SAMPLE_FILES = os.path.join(os.path.dirname(__file__), "samples")
 
     def test_bmp(self):

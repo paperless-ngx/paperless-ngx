@@ -8,11 +8,12 @@ from time import sleep
 
 import pathvalidate
 from django.conf import settings
-from django.db import migrations, models
+from django.db import migrations
+from django.db import models
 from django.template.defaultfilters import slugify
 
-from documents.file_handling import defaultdictNoStr, many_to_dictionary
-
+from documents.file_handling import defaultdictNoStr
+from documents.file_handling import many_to_dictionary
 
 logger = logging.getLogger("paperless.migrations")
 
@@ -160,11 +161,9 @@ def parse_wrapper(parser, path, mime_type, file_name):
 
 
 def create_archive_version(doc, retry_count=3):
-    from documents.parsers import (
-        get_parser_class_for_mime_type,
-        DocumentParser,
-        ParseError,
-    )
+    from documents.parsers import DocumentParser
+    from documents.parsers import ParseError
+    from documents.parsers import get_parser_class_for_mime_type
 
     logger.info(f"Regenerating archive document for document ID:{doc.id}")
     parser_class = get_parser_class_for_mime_type(doc.mime_type)
@@ -255,7 +254,6 @@ def move_old_to_new_locations(apps, schema_editor):
             )
 
     for doc in Document.objects.filter(archive_checksum__isnull=False):
-
         if doc.id in affected_document_ids:
             old_path = archive_path_old(doc)
             # remove affected archive versions
@@ -305,7 +303,6 @@ def move_new_to_old_locations(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("documents", "1011_auto_20210101_2340"),
     ]

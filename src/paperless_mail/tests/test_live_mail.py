@@ -2,10 +2,12 @@ import os
 
 import pytest
 from django.test import TestCase
+
 from paperless_mail.mail import MailAccountHandler
 from paperless_mail.mail import MailError
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
+
 
 # Only run if the environment is setup
 # And the environment is not empty (forks, I think)
@@ -16,7 +18,6 @@ from paperless_mail.models import MailRule
 )
 class TestMailLiveServer(TestCase):
     def setUp(self) -> None:
-
         self.mail_account_handler = MailAccountHandler()
         self.account = MailAccount.objects.create(
             name="test",
@@ -33,7 +34,6 @@ class TestMailLiveServer(TestCase):
         return super().tearDown()
 
     def test_process_non_gmail_server_flag(self):
-
         try:
             rule1 = MailRule.objects.create(
                 name="testrule",
@@ -51,9 +51,7 @@ class TestMailLiveServer(TestCase):
             pass
 
     def test_process_non_gmail_server_tag(self):
-
         try:
-
             rule2 = MailRule.objects.create(
                 name="testrule",
                 account=self.account,

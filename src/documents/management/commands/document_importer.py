@@ -14,16 +14,16 @@ from django.core.management.base import CommandError
 from django.core.serializers.base import DeserializationError
 from django.db.models.signals import m2m_changed
 from django.db.models.signals import post_save
+from filelock import FileLock
+
+from documents.file_handling import create_source_path_directory
 from documents.models import Document
 from documents.parsers import run_convert
 from documents.settings import EXPORTER_ARCHIVE_NAME
 from documents.settings import EXPORTER_FILE_NAME
 from documents.settings import EXPORTER_THUMBNAIL_NAME
-from filelock import FileLock
-from paperless import version
-
-from documents.file_handling import create_source_path_directory
 from documents.signals.handlers import update_filename_and_move_files
+from paperless import version
 
 
 @contextmanager
@@ -36,7 +36,6 @@ def disable_signal(sig, receiver, sender):
 
 
 class Command(BaseCommand):
-
     help = """
         Using a manifest.json file, load the data from there, and import the
         documents it refers to.
@@ -61,12 +60,11 @@ class Command(BaseCommand):
         self.version = None
 
     def handle(self, *args, **options):
-
         logging.getLogger().handlers[0].level = logging.ERROR
 
-        self.source = options["source"]
+        self.source = Path(options["source"]).resolve()
 
-        if not os.path.exists(self.source):
+        if not self.source.exists():
             raise CommandError("That path doesn't exist")
 
         if not os.access(self.source, os.R_OK):
@@ -74,39 +72,39 @@ class Command(BaseCommand):
 
         manifest_paths = []
 
-        main_manifest_path = os.path.normpath(
-            os.path.join(self.source, "manifest.json"),
-        )
+        main_manifest_path = self.source / "manifest.json"
+
         self._check_manifest_exists(main_manifest_path)
 
-        with open(main_manifest_path) as f:
-            self.manifest = json.load(f)
+        with main_manifest_path.open() as infile:
+            self.manifest = json.load(infile)
         manifest_paths.append(main_manifest_path)
 
         for file in Path(self.source).glob("**/*-manifest.json"):
-            with open(file) as f:
-                self.manifest += json.load(f)
+            with file.open() as infile:
+                self.manifest += json.load(infile)
             manifest_paths.append(file)
 
-        version_path = os.path.normpath(os.path.join(self.source, "version.json"))
-        if os.path.exists(version_path):
-            with open(version_path) as f:
-                self.version = json.load(f)["version"]
-                # Provide an initial warning if needed to the user
-                if self.version != version.__full_version_str__:
-                    self.stdout.write(
-                        self.style.WARNING(
-                            "Version mismatch: "
-                            f"Currently {version.__full_version_str__},"
-                            f" importing {self.version}."
-                            " Continuing, but import may fail.",
-                        ),
-                    )
+        version_path = self.source / "version.json"
+        if version_path.exists():
+            with version_path.open() as infile:
+                self.version = json.load(infile)["version"]
+            # Provide an initial warning if needed to the user
+            if self.version != version.__full_version_str__:
+                self.stdout.write(
+                    self.style.WARNING(
+                        "Version mismatch: "
+                        f"Currently {version.__full_version_str__},"
+                        f" importing {self.version}."
+                        " Continuing, but import may fail.",
+                    ),
+                )
 
         else:
             self.stdout.write(self.style.NOTICE("No version.json file located"))
 
-        self._check_manifest()
+        self._check_manifest_valid()
+
         with disable_signal(
             post_save,
             receiver=update_filename_and_move_files,
@@ -150,16 +148,19 @@ class Command(BaseCommand):
         )
 
     @staticmethod
-    def _check_manifest_exists(path):
-        if not os.path.exists(path):
+    def _check_manifest_exists(path: Path):
+        if not path.exists():
             raise CommandError(
                 "That directory doesn't appear to contain a manifest.json file.",
             )
 
-    def _check_manifest(self):
-
+    def _check_manifest_valid(self):
+        """
+        Attempts to verify the manifest is valid.  Namely checking the files
+        referred to exist and the files can be read from
+        """
+        self.stdout.write("Checking the manifest")
         for record in self.manifest:
-
             if record["model"] != "documents.document":
                 continue
 
@@ -170,22 +171,37 @@ class Command(BaseCommand):
                 )
 
             doc_file = record[EXPORTER_FILE_NAME]
-            if not os.path.exists(os.path.join(self.source, doc_file)):
+            doc_path = self.source / doc_file
+            if not doc_path.exists():
                 raise CommandError(
                     'The manifest file refers to "{}" which does not '
                     "appear to be in the source directory.".format(doc_file),
                 )
+            try:
+                with doc_path.open(mode="rb") as infile:
+                    infile.read(1)
+            except Exception as e:
+                raise CommandError(
+                    f"Failed to read from original file {doc_path}",
+                ) from e
 
             if EXPORTER_ARCHIVE_NAME in record:
                 archive_file = record[EXPORTER_ARCHIVE_NAME]
-                if not os.path.exists(os.path.join(self.source, archive_file)):
+                doc_archive_path = self.source / archive_file
+                if not doc_archive_path.exists():
                     raise CommandError(
                         f"The manifest file refers to {archive_file} which "
                         f"does not appear to be in the source directory.",
                     )
+                try:
+                    with doc_archive_path.open(mode="rb") as infile:
+                        infile.read(1)
+                except Exception as e:
+                    raise CommandError(
+                        f"Failed to read from archive file {doc_archive_path}",
+                    ) from e
 
     def _import_files_from_manifest(self, progress_bar_disable):
-
         os.makedirs(settings.ORIGINALS_DIR, exist_ok=True)
         os.makedirs(settings.THUMBNAIL_DIR, exist_ok=True)
         os.makedirs(settings.ARCHIVE_DIR, exist_ok=True)
@@ -197,7 +213,6 @@ class Command(BaseCommand):
         )
 
         for record in tqdm.tqdm(manifest_documents, disable=progress_bar_disable):
-
             document = Document.objects.get(pk=record["pk"])
 
             doc_file = record[EXPORTER_FILE_NAME]

@@ -6,8 +6,6 @@ from contextlib import contextmanager
 from dateutil.parser import isoparse
 from django.conf import settings
 from django.utils import timezone
-from documents.models import Document
-from documents.models import Note
 from guardian.shortcuts import get_users_with_perms
 from whoosh import classify
 from whoosh import highlight
@@ -16,8 +14,8 @@ from whoosh.fields import BOOLEAN
 from whoosh.fields import DATETIME
 from whoosh.fields import KEYWORD
 from whoosh.fields import NUMERIC
-from whoosh.fields import Schema
 from whoosh.fields import TEXT
+from whoosh.fields import Schema
 from whoosh.highlight import HtmlFormatter
 from whoosh.index import create_in
 from whoosh.index import exists_in
@@ -27,6 +25,9 @@ from whoosh.qparser.dateparse import DateParserPlugin
 from whoosh.searching import ResultsPage
 from whoosh.searching import Searcher
 from whoosh.writing import AsyncWriter
+
+from documents.models import Document
+from documents.models import Note
 
 logger = logging.getLogger("paperless.index")
 
@@ -330,7 +331,7 @@ class DelayedMoreLikeThisQuery(DelayedQuery):
 def autocomplete(ix, term, limit=10):
     with ix.reader() as reader:
         terms = []
-        for (score, t) in reader.most_distinctive_terms(
+        for score, t in reader.most_distinctive_terms(
             "content",
             number=limit,
             prefix=term.lower(),

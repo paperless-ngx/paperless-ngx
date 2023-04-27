@@ -5,8 +5,9 @@ from pathlib import Path
 from typing import Final
 
 from django.conf import settings
-from documents.models import Document
 from tqdm import tqdm
+
+from documents.models import Document
 
 
 class SanityCheckMessages:
@@ -32,7 +33,6 @@ class SanityCheckMessages:
         if len(self._messages) == 0:
             logger.info("Sanity checker detected no issues.")
         else:
-
             # Query once
             all_docs = Document.objects.all()
 

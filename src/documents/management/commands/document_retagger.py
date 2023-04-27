@@ -2,20 +2,18 @@ import logging
 
 import tqdm
 from django.core.management.base import BaseCommand
+
 from documents.classifier import load_classifier
 from documents.models import Document
-
 from documents.signals.handlers import set_correspondent
 from documents.signals.handlers import set_document_type
 from documents.signals.handlers import set_storage_path
 from documents.signals.handlers import set_tags
 
-
 logger = logging.getLogger("paperless.management.retagger")
 
 
 class Command(BaseCommand):
-
     help = """
         Using the current classification model, assigns correspondents, tags
         and document types to all documents, effectively allowing you to
@@ -79,7 +77,6 @@ class Command(BaseCommand):
         classifier = load_classifier()
 
         for document in tqdm.tqdm(documents, disable=options["no_progress_bar"]):
-
             if options["correspondent"]:
                 set_correspondent(
                     sender=None,

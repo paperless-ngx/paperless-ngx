@@ -31,9 +31,9 @@ from .models import DocumentType
 from .models import FileInfo
 from .models import Tag
 from .parsers import DocumentParser
+from .parsers import ParseError
 from .parsers import get_parser_class_for_mime_type
 from .parsers import parse_date
-from .parsers import ParseError
 from .signals import document_consumption_finished
 from .signals import document_consumption_started
 
@@ -60,7 +60,6 @@ MESSAGE_FINISHED = "finished"
 
 
 class Consumer(LoggingMixin):
-
     logging_name = "paperless.consumer"
 
     def _send_progress(
@@ -426,7 +425,6 @@ class Consumer(LoggingMixin):
         # in the system. This will be a transaction and reasonably fast.
         try:
             with transaction.atomic():
-
                 # store the document.
                 document = self._store(text=text, date=date, mime_type=mime_type)
 
@@ -520,7 +518,6 @@ class Consumer(LoggingMixin):
         date: Optional[datetime.datetime],
         mime_type: str,
     ) -> Document:
-
         # If someone gave us the original filename, use it instead of doc.
 
         file_info = FileInfo.from_filename(self.filename)

@@ -15,9 +15,9 @@ except ImportError:
     from backports import zoneinfo
 
 from django.conf import settings
-from django.utils import timezone
-from django.test import override_settings
 from django.test import TestCase
+from django.test import override_settings
+from django.utils import timezone
 
 from documents.consumer import Consumer
 from documents.consumer import ConsumerError
@@ -29,12 +29,12 @@ from documents.models import Tag
 from documents.parsers import DocumentParser
 from documents.parsers import ParseError
 from documents.tasks import sanity_check
-from .utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
+
+from .utils import DirectoriesMixin
 
 
 class TestAttributes(TestCase):
-
     TAGS = ("tag1", "tag2", "tag3")
 
     def _test_guess_attributes_from_name(self, filename, sender, title, tags):
@@ -67,7 +67,6 @@ class TestAttributes(TestCase):
 
 
 class TestFieldPermutations(TestCase):
-
     valid_dates = (
         "20150102030405Z",
         "20150102Z",
@@ -84,7 +83,6 @@ class TestFieldPermutations(TestCase):
         title=None,
         tags=None,
     ):
-
         info = FileInfo.from_filename(filename)
 
         # Created
@@ -131,7 +129,6 @@ class TestFieldPermutations(TestCase):
         self.assertIsNone(info.created)
 
     def test_filename_parse_transforms(self):
-
         filename = "tag1,tag2_20190908_180610_0001.pdf"
         all_patt = re.compile("^.*$")
         none_patt = re.compile("$a")
@@ -214,7 +211,6 @@ class FaultyParser(DocumentParser):
 
 
 def fake_magic_from_file(file, mime=False):
-
     if mime:
         if os.path.splitext(file)[1] == ".pdf":
             return "application/pdf"
@@ -239,7 +235,6 @@ class TestConsumer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         last_progress=100,
         last_progress_max=100,
     ):
-
         self._send_progress.assert_called()
 
         args, kwargs = self._send_progress.call_args_list[0]
@@ -314,7 +309,6 @@ class TestConsumer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
     @override_settings(FILENAME_FORMAT=None, TIME_ZONE="America/Chicago")
     def testNormalOperation(self):
-
         filename = self.get_test_file()
 
         # Get the local time, as an aware datetime
@@ -436,7 +430,6 @@ class TestConsumer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self._assert_first_last_send_progress()
 
     def testNotAFile(self):
-
         self.assertRaisesMessage(
             ConsumerError,
             "File not found",
@@ -544,7 +537,6 @@ class TestConsumer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     @override_settings(FILENAME_FORMAT="{correspondent}/{title}")
     @mock.patch("documents.signals.handlers.generate_unique_filename")
     def testFilenameHandlingUnstableFormat(self, m):
-
         filenames = ["this", "that", "now this", "i cant decide"]
 
         def get_filename():
@@ -791,7 +783,6 @@ class TestConsumerCreatedDate(DirectoriesMixin, TestCase):
 
 class PreConsumeTestCase(TestCase):
     def setUp(self) -> None:
-
         # this prevents websocket message reports during testing.
         patcher = mock.patch("documents.consumer.Consumer._send_progress")
         self._send_progress = patcher.start()
@@ -899,7 +890,6 @@ class PreConsumeTestCase(TestCase):
 
 class PostConsumeTestCase(TestCase):
     def setUp(self) -> None:
-
         # this prevents websocket message reports during testing.
         patcher = mock.patch("documents.consumer.Consumer._send_progress")
         self._send_progress = patcher.start()

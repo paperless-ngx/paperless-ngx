@@ -3,6 +3,7 @@ import os
 from unittest import mock
 
 from django.test import TestCase
+
 from documents.parsers import ParseError
 from documents.tests.utils import FileSystemAssertsMixin
 from paperless_mail.parsers import MailDocumentParser

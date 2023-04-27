@@ -3,7 +3,8 @@ import os
 
 import magic
 from django.conf import settings
-from django.db import migrations, models
+from django.db import migrations
+from django.db import models
 
 from paperless.db import GnuPG
 
@@ -29,7 +30,6 @@ def add_mime_types(apps, schema_editor):
     for d in documents:
         f = open(source_path(d), "rb")
         if d.storage_type == STORAGE_TYPE_GPG:
-
             data = GnuPG.decrypted(f)
         else:
             data = f.read(1024)
@@ -50,7 +50,6 @@ def add_file_extensions(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("documents", "1002_auto_20201111_1105"),
     ]

@@ -1,5 +1,6 @@
-from django.db import migrations, models
 import django.utils.timezone
+from django.db import migrations
+from django.db import models
 
 
 def set_added_time_to_created_time(apps, schema_editor):

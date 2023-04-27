@@ -17,6 +17,10 @@ from django.core.management.base import BaseCommand
 from django.core.management.base import CommandError
 from django.db import transaction
 from django.utils import timezone
+from filelock import FileLock
+
+from documents.file_handling import delete_empty_directories
+from documents.file_handling import generate_filename
 from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
@@ -29,18 +33,13 @@ from documents.models import UiSettings
 from documents.settings import EXPORTER_ARCHIVE_NAME
 from documents.settings import EXPORTER_FILE_NAME
 from documents.settings import EXPORTER_THUMBNAIL_NAME
-from filelock import FileLock
 from paperless import version
 from paperless.db import GnuPG
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 
-from documents.file_handling import delete_empty_directories
-from documents.file_handling import generate_filename
-
 
 class Command(BaseCommand):
-
     help = """
         Decrypt and rename all files in our collection into a given target
         directory.  And include a manifest file containing document data for
@@ -144,7 +143,6 @@ class Command(BaseCommand):
         self.no_thumbnail = False
 
     def handle(self, *args, **options):
-
         self.target = Path(options["target"]).resolve()
         self.split_manifest = options["split_manifest"]
         self.compare_checksums = options["compare_checksums"]

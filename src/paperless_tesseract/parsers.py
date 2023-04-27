@@ -7,10 +7,11 @@ from pathlib import Path
 from typing import Optional
 
 from django.conf import settings
-from documents.parsers import DocumentParser
-from documents.parsers import make_thumbnail_from_pdf
-from documents.parsers import ParseError
 from PIL import Image
+
+from documents.parsers import DocumentParser
+from documents.parsers import ParseError
+from documents.parsers import make_thumbnail_from_pdf
 
 
 class NoTextFoundException(Exception):
@@ -30,7 +31,6 @@ class RasterisedDocumentParser(DocumentParser):
     logging_name = "paperless.parsing.tesseract"
 
     def extract_metadata(self, document_path, mime_type):
-
         result = []
         if mime_type == "application/pdf":
             import pikepdf
@@ -264,7 +264,6 @@ class RasterisedDocumentParser(DocumentParser):
             # Convert pixels to mega-pixels and provide to ocrmypdf
             max_pixels_mpixels = settings.OCR_MAX_IMAGE_PIXELS / 1_000_000.0
             if max_pixels_mpixels > 0:
-
                 self.log(
                     "debug",
                     f"Calculated {max_pixels_mpixels} megapixels for OCR",
@@ -310,7 +309,8 @@ class RasterisedDocumentParser(DocumentParser):
         # text located via OCR
 
         import ocrmypdf
-        from ocrmypdf import InputFileError, EncryptedPdfError
+        from ocrmypdf import EncryptedPdfError
+        from ocrmypdf import InputFileError
 
         archive_path = Path(os.path.join(self.tempdir, "archive.pdf"))
         sidecar_file = Path(os.path.join(self.tempdir, "sidecar.txt"))

@@ -7,6 +7,7 @@ import pathvalidate
 from django.conf import settings
 from django.template.defaultfilters import slugify
 from django.utils import timezone
+
 from documents.models import Document
 
 logger = logging.getLogger("paperless.filehandling")

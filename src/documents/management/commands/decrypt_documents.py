@@ -3,19 +3,18 @@ import os
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.core.management.base import CommandError
+
 from documents.models import Document
 from paperless.db import GnuPG
 
 
 class Command(BaseCommand):
-
     help = (
         "This is how you migrate your stored documents from an encrypted "
         "state to an unencrypted one (or vice-versa)"
     )
 
     def add_arguments(self, parser):
-
         parser.add_argument(
             "--passphrase",
             help="If PAPERLESS_PASSPHRASE isn't set already, you need to "
@@ -23,7 +22,6 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-
         try:
             print(
                 "\n\nWARNING: This script is going to work directly on your "
@@ -48,13 +46,11 @@ class Command(BaseCommand):
 
     @staticmethod
     def __gpg_to_unencrypted(passphrase):
-
         encrypted_files = Document.objects.filter(
             storage_type=Document.STORAGE_TYPE_GPG,
         )
 
         for document in encrypted_files:
-
             print(f"Decrypting {document}".encode())
 
             old_paths = [document.source_path, document.thumbnail_path]

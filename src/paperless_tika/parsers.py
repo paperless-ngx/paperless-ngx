@@ -4,10 +4,11 @@ from pathlib import Path
 import dateutil.parser
 import requests
 from django.conf import settings
-from documents.parsers import DocumentParser
-from documents.parsers import make_thumbnail_from_pdf
-from documents.parsers import ParseError
 from tika import parser
+
+from documents.parsers import DocumentParser
+from documents.parsers import ParseError
+from documents.parsers import make_thumbnail_from_pdf
 
 
 class TikaDocumentParser(DocumentParser):

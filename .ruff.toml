@@ -1,6 +1,6 @@
 # https://beta.ruff.rs/docs/settings/
 # https://beta.ruff.rs/docs/rules/
-select = ["F", "E", "W", "UP", "COM", "DJ", "EXE", "ISC", "ICN", "G201", "INP", "PIE", "RSE", "SIM", "TID", "PLC", "PLE", "RUF"]
+extend-select = ["I", "W", "UP", "COM", "DJ", "EXE", "ISC", "ICN", "G201", "INP", "PIE", "RSE", "SIM", "TID", "PLC", "PLE", "RUF"]
 # TODO PTH
 ignore = ["DJ001", "SIM105"]
 fix = true

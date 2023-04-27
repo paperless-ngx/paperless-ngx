@@ -3,8 +3,8 @@ import tempfile
 
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.test import override_settings
 from django.test import TestCase
+from django.test import override_settings
 from rest_framework import status
 
 
@@ -34,7 +34,7 @@ class TestViews(TestCase):
 
     def test_index(self):
         self.client.force_login(self.user)
-        for (language_given, language_actual) in [
+        for language_given, language_actual in [
             ("", "en-US"),
             ("en-US", "en-US"),
             ("de", "de-DE"),
