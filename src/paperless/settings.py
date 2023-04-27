@@ -548,6 +548,7 @@ LANGUAGES = [
     ("de-de", _("German")),
     ("en-gb", _("English (GB)")),
     ("es-es", _("Spanish")),
+    ("fi-fi", _("Finnish")),
     ("fr-fr", _("French")),
     ("it-it", _("Italian")),
     ("lb-lu", _("Luxembourgish")),
