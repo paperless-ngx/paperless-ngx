@@ -3070,13 +3070,13 @@
         </context-group>
         <target state="final">Supprimer le document</target>
       </trans-unit>
-      <trans-unit id="1844801255494293730" datatype="html">
+      <trans-unit id="1844801255494293730" datatype="html" approved="yes">
         <source>Error deleting document: <x id="PH" equiv-text="error.error?.detail ?? error.message ?? JSON.stringify(error)"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">595,597</context>
         </context-group>
-        <target state="needs-translation">Error deleting document: <x id="PH" equiv-text="error.error?.detail ?? error.message ?? JSON.stringify(error)"/></target>
+        <target state="final">Erreur lors de la suppression du document : <x id="PH" equiv-text="error.error?.detail ?? error.message ?? JSON.stringify(error)"/></target>
       </trans-unit>
       <trans-unit id="7362691899087997122" datatype="html" approved="yes">
         <source>Redo OCR confirm</source>
@@ -4572,13 +4572,13 @@
         </context-group>
         <target state="final">Vérification des mises à jour</target>
       </trans-unit>
-      <trans-unit id="7578076359386888824" datatype="html">
+      <trans-unit id="7578076359386888824" datatype="html" approved="yes">
         <source> Update checking works by pinging the public <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;"/>Github API<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> for the latest release to determine whether a new version is available.<x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br/&gt;"/> Actual updating of the app must still be performed manually. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">140,142</context>
         </context-group>
-        <target state="needs-translation"> Update checking works by pinging the public <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;"/>Github API<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> for the latest release to determine whether a new version is available.<x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br/&gt;"/> Actual updating of the app must still be performed manually. </target>
+        <target state="final"> La vérification des mises à jour fonctionne en faisant un ping sur l'API publique <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;"/>Github<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> pour la dernière version afin de déterminer si une nouvelle version est disponible.<x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br/&gt;"/> La mise à jour réelle de l'application doit toujours être effectuée manuellement. </target>
       </trans-unit>
       <trans-unit id="5489945693955857309" datatype="html">
         <source><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="No track"/>No tracking data is collected by the app in any way.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></source>
@@ -5665,13 +5665,13 @@
         </context-group>
         <target state="final">Biélorusse</target>
       </trans-unit>
-      <trans-unit id="1001043467371963032" datatype="html">
+      <trans-unit id="1001043467371963032" datatype="html" approved="yes">
         <source>Catalan</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">177</context>
         </context-group>
-        <target state="needs-translation">Catalan</target>
+        <target state="final">Catalan</target>
       </trans-unit>
       <trans-unit id="2719780722934172508" datatype="html" approved="yes">
         <source>Czech</source>
