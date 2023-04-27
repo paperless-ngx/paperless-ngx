@@ -37,7 +37,7 @@ def add_inbox_tags(sender, document=None, logging_group=None, **kwargs):
     if document.owner is not None:
         tags = get_objects_for_user_owner_aware(
             document.owner,
-            "documents.view_documenttype",
+            "documents.view_tag",
             Tag,
         )
     else:
