@@ -97,6 +97,7 @@ import localeDa from '@angular/common/locales/da'
 import localeDe from '@angular/common/locales/de'
 import localeEnGb from '@angular/common/locales/en-GB'
 import localeEs from '@angular/common/locales/es'
+import localeFi from '@angular/common/locales/fi'
 import localeFr from '@angular/common/locales/fr'
 import localeIt from '@angular/common/locales/it'
 import localeLb from '@angular/common/locales/lb'
@@ -121,6 +122,7 @@ registerLocaleData(localeDa)
 registerLocaleData(localeDe)
 registerLocaleData(localeEnGb)
 registerLocaleData(localeEs)
+registerLocaleData(localeFi)
 registerLocaleData(localeFr)
 registerLocaleData(localeIt)
 registerLocaleData(localeLb)
