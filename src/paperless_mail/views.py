@@ -2,19 +2,20 @@ import datetime
 import logging
 
 from django.http import HttpResponseBadRequest
-from documents.views import PassUserMixin
-from paperless.views import StandardPagination
-from paperless_mail.mail import get_mailbox
-from paperless_mail.mail import mailbox_login
-from paperless_mail.mail import MailError
-from paperless_mail.models import MailAccount
-from paperless_mail.models import MailRule
-from paperless_mail.serialisers import MailAccountSerializer
-from paperless_mail.serialisers import MailRuleSerializer
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
+
+from documents.views import PassUserMixin
+from paperless.views import StandardPagination
+from paperless_mail.mail import MailError
+from paperless_mail.mail import get_mailbox
+from paperless_mail.mail import mailbox_login
+from paperless_mail.models import MailAccount
+from paperless_mail.models import MailRule
+from paperless_mail.serialisers import MailAccountSerializer
+from paperless_mail.serialisers import MailRuleSerializer
 
 
 class MailAccountViewSet(ModelViewSet, PassUserMixin):
@@ -36,7 +37,6 @@ class MailRuleViewSet(ModelViewSet, PassUserMixin):
 
 
 class MailAccountTestView(GenericAPIView):
-
     permission_classes = (IsAuthenticated,)
     serializer_class = MailAccountSerializer
 

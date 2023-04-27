@@ -8,7 +8,6 @@ from documents.models import StoragePath
 from documents.models import Tag
 from documents.permissions import get_objects_for_user_owner_aware
 
-
 logger = logging.getLogger("paperless.matching")
 
 
@@ -22,6 +21,9 @@ def log_reason(matching_model, document, reason):
 
 def match_correspondents(document, classifier, user=None):
     pred_id = classifier.predict_correspondent(document.content) if classifier else None
+
+    if user is None and document.owner is not None:
+        user = document.owner
 
     if user is not None:
         correspondents = get_objects_for_user_owner_aware(
@@ -40,6 +42,9 @@ def match_correspondents(document, classifier, user=None):
 def match_document_types(document, classifier, user=None):
     pred_id = classifier.predict_document_type(document.content) if classifier else None
 
+    if user is None and document.owner is not None:
+        user = document.owner
+
     if user is not None:
         document_types = get_objects_for_user_owner_aware(
             user,
@@ -57,6 +62,9 @@ def match_document_types(document, classifier, user=None):
 def match_tags(document, classifier, user=None):
     predicted_tag_ids = classifier.predict_tags(document.content) if classifier else []
 
+    if user is None and document.owner is not None:
+        user = document.owner
+
     if user is not None:
         tags = get_objects_for_user_owner_aware(user, "documents.view_tag", Tag)
     else:
@@ -69,6 +77,9 @@ def match_tags(document, classifier, user=None):
 
 def match_storage_paths(document, classifier, user=None):
     pred_id = classifier.predict_storage_path(document.content) if classifier else None
+
+    if user is None and document.owner is not None:
+        user = document.owner
 
     if user is not None:
         storage_paths = get_objects_for_user_owner_aware(

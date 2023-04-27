@@ -43,8 +43,8 @@ export class SelectComponent extends AbstractInputComponent<number> {
   }
 
   checkForPrivateItems(value: any) {
-    if (Array.isArray(value) && value.length > 0) {
-      value.forEach((id) => this.checkForPrivateItem(id))
+    if (Array.isArray(value)) {
+      if (value.length > 0) value.forEach((id) => this.checkForPrivateItem(id))
     } else {
       this.checkForPrivateItem(value)
     }

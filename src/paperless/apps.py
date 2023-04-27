@@ -1,5 +1,6 @@
 from django.apps import AppConfig
 from django.utils.translation import gettext_lazy as _
+
 from paperless.signals import handle_failed_login
 
 

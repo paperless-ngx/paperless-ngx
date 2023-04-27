@@ -6,6 +6,7 @@ from pathlib import Path
 import filelock
 from django.conf import settings
 from django.test import TestCase
+
 from documents.models import Document
 from documents.sanity_checker import check_sanity
 from documents.tests.utils import DirectoriesMixin
@@ -13,7 +14,6 @@ from documents.tests.utils import DirectoriesMixin
 
 class TestSanityCheck(DirectoriesMixin, TestCase):
     def make_test_data(self):
-
         with filelock.FileLock(settings.MEDIA_LOCK):
             # just make sure that the lockfile is present.
             shutil.copy(

@@ -113,6 +113,14 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
     }).pipe(map((response) => response.results.map((doc) => doc.id)))
   }
 
+  get(id: number): Observable<PaperlessDocument> {
+    return this.http.get<PaperlessDocument>(this.getResourceUrl(id), {
+      params: {
+        full_perms: true,
+      },
+    })
+  }
+
   getPreviewUrl(id: number, original: boolean = false): string {
     let url = this.getResourceUrl(id, 'preview')
     if (this._searchQuery) url += `#search="${this._searchQuery}"`

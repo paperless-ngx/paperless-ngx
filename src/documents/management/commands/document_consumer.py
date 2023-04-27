@@ -13,17 +13,19 @@ from typing import Set
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.core.management.base import CommandError
+from watchdog.events import FileSystemEventHandler
+from watchdog.observers.polling import PollingObserver
+
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
 from documents.models import Tag
 from documents.parsers import is_file_ext_supported
 from documents.tasks import consume_file
-from watchdog.events import FileSystemEventHandler
-from watchdog.observers.polling import PollingObserver
 
 try:
-    from inotifyrecursive import INotify, flags
+    from inotifyrecursive import INotify
+    from inotifyrecursive import flags
 except ImportError:  # pragma: nocover
     INotify = flags = None
 

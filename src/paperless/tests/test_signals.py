@@ -1,5 +1,6 @@
 from django.http import HttpRequest
 from django.test import TestCase
+
 from paperless.signals import handle_failed_login
 
 

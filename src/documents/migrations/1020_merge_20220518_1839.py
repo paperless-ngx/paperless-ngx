@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("documents", "1019_storagepath_document_storage_path"),
         ("documents", "1019_uisettings"),

@@ -200,7 +200,6 @@ class RegistryTagsCleaner:
                         tag,
                     )
                     for manifest in image_index.image_pointers:
-
                         if manifest.digest in untagged_versions:
                             logger.info(
                                 f"Skipping deletion of {manifest.digest},"
@@ -287,7 +286,6 @@ class RegistryTagsCleaner:
         logger.info("Beginning confirmation step")
         a_tag_failed = False
         for tag in sorted(self.tags_to_keep):
-
             try:
                 image_index = ImageIndex(
                     f"ghcr.io/{self.repo_owner}/{self.package_name}",
@@ -301,7 +299,6 @@ class RegistryTagsCleaner:
                     digest_name = f"ghcr.io/{self.repo_owner}/{self.package_name}@{manifest.digest}"
 
                     try:
-
                         subprocess.run(
                             [
                                 shutil.which("docker"),

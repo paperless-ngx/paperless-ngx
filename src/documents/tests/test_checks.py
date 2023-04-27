@@ -2,8 +2,9 @@ import textwrap
 from unittest import mock
 
 from django.core.checks import Error
-from django.test import override_settings
 from django.test import TestCase
+from django.test import override_settings
+
 from documents.checks import changed_password_check
 from documents.checks import parser_check
 from documents.models import Document
@@ -35,7 +36,6 @@ class TestDocumentChecks(TestCase):
     @mock.patch("paperless.db.GnuPG.decrypted")
     @mock.patch("documents.models.Document.source_file")
     def test_encrypted_decrypt_fails(self, mock_decrypted, mock_source_file):
-
         mock_decrypted.return_value = None
         mock_source_file.return_value = b""
 
@@ -60,7 +60,6 @@ class TestDocumentChecks(TestCase):
         )
 
     def test_parser_check(self):
-
         self.assertEqual(parser_check(None), [])
 
         with mock.patch("documents.checks.document_consumer_declaration.send") as m:

@@ -26,21 +26,15 @@ from django.db.models.functions import Lower
 from django.http import Http404
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
+from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.utils.translation import get_language
 from django.views.decorators.cache import cache_control
 from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
-from documents.filters import ObjectOwnedOrGrantedPermissionsFilter
-from documents.permissions import PaperlessAdminPermissions
-from documents.permissions import PaperlessObjectPermissions
-from documents.tasks import consume_file
 from langdetect import detect
 from packaging import version as packaging_version
-from paperless import version
-from paperless.db import GnuPG
-from paperless.views import StandardPagination
 from rest_framework import parsers
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
@@ -59,6 +53,16 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.viewsets import ViewSet
+
+from documents.filters import ObjectOwnedOrGrantedPermissionsFilter
+from documents.permissions import PaperlessAdminPermissions
+from documents.permissions import PaperlessObjectPermissions
+from documents.permissions import get_objects_for_user_owner_aware
+from documents.permissions import has_perms_owner_aware
+from documents.tasks import consume_file
+from paperless import version
+from paperless.db import GnuPG
+from paperless.views import StandardPagination
 
 from .bulk_download import ArchiveOnlyStrategy
 from .bulk_download import OriginalAndArchiveStrategy
@@ -153,6 +157,10 @@ class PassUserMixin(CreateModelMixin):
 
     def get_serializer(self, *args, **kwargs):
         kwargs.setdefault("user", self.request.user)
+        kwargs.setdefault(
+            "full_perms",
+            self.request.query_params.get("full_perms", False),
+        )
         return super().get_serializer(*args, **kwargs)
 
 
@@ -190,7 +198,6 @@ class TagViewSet(ModelViewSet, PassUserMixin):
     )
 
     def get_serializer_class(self, *args, **kwargs):
-        print(self.request.version)
         if int(self.request.version) == 1:
             return TagSerializerVersion1
         else:
@@ -271,6 +278,10 @@ class DocumentViewSet(
         kwargs.setdefault("context", self.get_serializer_context())
         kwargs.setdefault("fields", fields)
         kwargs.setdefault("truncate_content", truncate_content.lower() in ["true", "1"])
+        kwargs.setdefault(
+            "full_perms",
+            self.request.query_params.get("full_perms", False),
+        )
         return serializer_class(*args, **kwargs)
 
     def update(self, request, *args, **kwargs):
@@ -295,6 +306,12 @@ class DocumentViewSet(
 
     def file_response(self, pk, request, disposition):
         doc = Document.objects.get(id=pk)
+        if request.user is not None and not has_perms_owner_aware(
+            request.user,
+            "view_document",
+            doc,
+        ):
+            return HttpResponseForbidden("Insufficient permissions")
         if not self.original_requested(request) and doc.has_archive_version:
             file_handle = doc.archive_file
             filename = doc.get_public_filename(archive=True)
@@ -354,6 +371,12 @@ class DocumentViewSet(
     def metadata(self, request, pk=None):
         try:
             doc = Document.objects.get(pk=pk)
+            if request.user is not None and not has_perms_owner_aware(
+                request.user,
+                "view_document",
+                doc,
+            ):
+                return HttpResponseForbidden("Insufficient permissions")
         except Document.DoesNotExist:
             raise Http404
 
@@ -391,6 +414,12 @@ class DocumentViewSet(
     @action(methods=["get"], detail=True)
     def suggestions(self, request, pk=None):
         doc = get_object_or_404(Document, pk=pk)
+        if request.user is not None and not has_perms_owner_aware(
+            request.user,
+            "view_document",
+            doc,
+        ):
+            return HttpResponseForbidden("Insufficient permissions")
 
         classifier = load_classifier()
 
@@ -430,6 +459,12 @@ class DocumentViewSet(
     def thumb(self, request, pk=None):
         try:
             doc = Document.objects.get(id=pk)
+            if request.user is not None and not has_perms_owner_aware(
+                request.user,
+                "view_document",
+                doc,
+            ):
+                return HttpResponseForbidden("Insufficient permissions")
             if doc.storage_type == Document.STORAGE_TYPE_GPG:
                 handle = GnuPG.decrypted(doc.thumbnail_file)
             else:
@@ -468,6 +503,12 @@ class DocumentViewSet(
     def notes(self, request, pk=None):
         try:
             doc = Document.objects.get(pk=pk)
+            if request.user is not None and not has_perms_owner_aware(
+                request.user,
+                "view_document",
+                doc,
+            ):
+                return HttpResponseForbidden("Insufficient permissions")
         except Document.DoesNotExist:
             raise Http404
 
@@ -597,7 +638,6 @@ class UnifiedSearchViewSet(DocumentViewSet):
 
 
 class LogViewSet(ViewSet):
-
     permission_classes = (IsAuthenticated, PaperlessAdminPermissions)
 
     log_files = ["paperless", "mail"]
@@ -643,7 +683,6 @@ class SavedViewViewSet(ModelViewSet, PassUserMixin):
 
 
 class BulkEditView(GenericAPIView):
-
     permission_classes = (IsAuthenticated,)
     serializer_class = BulkEditSerializer
     parser_classes = (parsers.JSONParser,)
@@ -665,13 +704,11 @@ class BulkEditView(GenericAPIView):
 
 
 class PostDocumentView(GenericAPIView):
-
     permission_classes = (IsAuthenticated,)
     serializer_class = PostDocumentSerializer
     parser_classes = (parsers.MultiPartParser,)
 
     def post(self, request, *args, **kwargs):
-
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -719,7 +756,6 @@ class PostDocumentView(GenericAPIView):
 
 
 class SelectionDataView(GenericAPIView):
-
     permission_classes = (IsAuthenticated,)
     serializer_class = DocumentListSerializer
     parser_classes = (parsers.MultiPartParser, parsers.JSONParser)
@@ -777,7 +813,6 @@ class SelectionDataView(GenericAPIView):
 
 
 class SearchAutoCompleteView(APIView):
-
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
@@ -801,22 +836,38 @@ class SearchAutoCompleteView(APIView):
 
 
 class StatisticsView(APIView):
-
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
-        documents_total = Document.objects.all().count()
+        user = request.user if request.user is not None else None
 
-        inbox_tag = Tag.objects.filter(is_inbox_tag=True)
+        documents = (
+            Document.objects.all()
+            if user is None
+            else get_objects_for_user_owner_aware(
+                user,
+                "documents.view_document",
+                Document,
+            )
+        )
+        tags = (
+            Tag.objects.all()
+            if user is None
+            else get_objects_for_user_owner_aware(user, "documents.view_tag", Tag)
+        )
+
+        documents_total = documents.count()
+
+        inbox_tag = tags.filter(is_inbox_tag=True)
 
         documents_inbox = (
-            Document.objects.filter(tags__is_inbox_tag=True).distinct().count()
+            documents.filter(tags__is_inbox_tag=True).distinct().count()
             if inbox_tag.exists()
             else None
         )
 
         document_file_type_counts = (
-            Document.objects.values("mime_type")
+            documents.values("mime_type")
             .annotate(mime_type_count=Count("mime_type"))
             .order_by("-mime_type_count")
             if documents_total > 0
@@ -824,7 +875,7 @@ class StatisticsView(APIView):
         )
 
         character_count = (
-            Document.objects.annotate(
+            documents.annotate(
                 characters=Length("content"),
             )
             .aggregate(Sum("characters"))
@@ -843,7 +894,6 @@ class StatisticsView(APIView):
 
 
 class BulkDownloadView(GenericAPIView):
-
     permission_classes = (IsAuthenticated,)
     serializer_class = BulkDownloadSerializer
     parser_classes = (parsers.JSONParser,)
@@ -938,13 +988,16 @@ class StoragePathViewSet(ModelViewSet, PassUserMixin):
     serializer_class = StoragePathSerializer
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
-    filter_backends = (DjangoFilterBackend, OrderingFilter)
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+        ObjectOwnedOrGrantedPermissionsFilter,
+    )
     filterset_class = StoragePathFilterSet
     ordering_fields = ("name", "path", "matching_algorithm", "match", "document_count")
 
 
 class UiSettingsView(GenericAPIView):
-
     permission_classes = (IsAuthenticated,)
     serializer_class = UiSettingsViewSerializer
 
@@ -993,7 +1046,6 @@ class UiSettingsView(GenericAPIView):
 
 
 class TasksViewSet(ReadOnlyModelViewSet):
-
     permission_classes = (IsAuthenticated,)
     serializer_class = TasksViewSerializer
 
@@ -1012,7 +1064,6 @@ class TasksViewSet(ReadOnlyModelViewSet):
 
 
 class AcknowledgeTasksView(GenericAPIView):
-
     permission_classes = (IsAuthenticated,)
     serializer_class = AcknowledgeTasksViewSerializer
 

@@ -9,9 +9,10 @@ from zipfile import ZipFile
 
 from django.core.management import call_command
 from django.core.management.base import CommandError
-from django.test import override_settings
 from django.test import TestCase
+from django.test import override_settings
 from django.utils import timezone
+
 from documents.management.commands import document_exporter
 from documents.models import Correspondent
 from documents.models import Document
@@ -212,7 +213,7 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             Tag.objects.all().delete()
             self.assertEqual(Document.objects.count(), 0)
 
-            call_command("document_importer", self.target)
+            call_command("document_importer", "--no-progress-bar", self.target)
             self.assertEqual(Document.objects.count(), 4)
             self.assertEqual(Tag.objects.count(), 1)
             self.assertEqual(Correspondent.objects.count(), 1)
@@ -363,7 +364,6 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         )
 
     def test_export_missing_files(self):
-
         target = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, target)
         Document.objects.create(
@@ -457,7 +457,6 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         args = ["document_exporter", "/tmp/foo/bar"]
 
         with self.assertRaises(CommandError) as e:
-
             call_command(*args)
 
             self.assertEqual("That path isn't a directory", str(e))
@@ -473,11 +472,9 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         """
 
         with tempfile.NamedTemporaryFile() as tmp_file:
-
             args = ["document_exporter", tmp_file.name]
 
             with self.assertRaises(CommandError) as e:
-
                 call_command(*args)
 
                 self.assertEqual("That path isn't a directory", str(e))
@@ -492,13 +489,11 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             - Error is raised
         """
         with tempfile.TemporaryDirectory() as tmp_dir:
-
             os.chmod(tmp_dir, 0o000)
 
             args = ["document_exporter", tmp_dir]
 
             with self.assertRaises(CommandError) as e:
-
                 call_command(*args)
 
                 self.assertEqual("That path doesn't appear to be writable", str(e))
@@ -541,7 +536,7 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             self.assertEqual(Document.objects.count(), 4)
             Document.objects.all().delete()
             self.assertEqual(Document.objects.count(), 0)
-            call_command("document_importer", self.target)
+            call_command("document_importer", "--no-progress-bar", self.target)
             self.assertEqual(Document.objects.count(), 4)
 
     def test_no_thumbnail(self):
@@ -584,7 +579,7 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             self.assertEqual(Document.objects.count(), 4)
             Document.objects.all().delete()
             self.assertEqual(Document.objects.count(), 0)
-            call_command("document_importer", self.target)
+            call_command("document_importer", "--no-progress-bar", self.target)
             self.assertEqual(Document.objects.count(), 4)
 
     def test_split_manifest(self):
@@ -613,7 +608,7 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             self.assertEqual(Document.objects.count(), 4)
             Document.objects.all().delete()
             self.assertEqual(Document.objects.count(), 0)
-            call_command("document_importer", self.target)
+            call_command("document_importer", "--no-progress-bar", self.target)
             self.assertEqual(Document.objects.count(), 4)
 
     def test_folder_prefix(self):
@@ -637,5 +632,5 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             self.assertEqual(Document.objects.count(), 4)
             Document.objects.all().delete()
             self.assertEqual(Document.objects.count(), 0)
-            call_command("document_importer", self.target)
+            call_command("document_importer", "--no-progress-bar", self.target)
             self.assertEqual(Document.objects.count(), 4)

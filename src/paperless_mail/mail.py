@@ -21,6 +21,16 @@ from django.conf import settings
 from django.db import DatabaseError
 from django.utils.timezone import is_naive
 from django.utils.timezone import make_aware
+from imap_tools import AND
+from imap_tools import NOT
+from imap_tools import MailBox
+from imap_tools import MailboxFolderSelectError
+from imap_tools import MailBoxUnencrypted
+from imap_tools import MailMessage
+from imap_tools import MailMessageFlags
+from imap_tools.mailbox import MailBoxTls
+from imap_tools.query import LogicOperator
+
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
@@ -28,15 +38,6 @@ from documents.loggers import LoggingMixin
 from documents.models import Correspondent
 from documents.parsers import is_mime_type_supported
 from documents.tasks import consume_file
-from imap_tools import AND
-from imap_tools import MailBox
-from imap_tools import MailboxFolderSelectError
-from imap_tools import MailBoxUnencrypted
-from imap_tools import MailMessage
-from imap_tools import MailMessageFlags
-from imap_tools import NOT
-from imap_tools.mailbox import MailBoxTls
-from imap_tools.query import LogicOperator
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 from paperless_mail.models import ProcessedMail
@@ -145,10 +146,8 @@ class TagMailAction(BaseMailAction):
     """
 
     def __init__(self, parameter):
-
         # The custom tag should look like "apple:<color>"
         if "apple:" in parameter.lower():
-
             _, self.color = parameter.split(":")
             self.color = self.color.strip()
 
@@ -162,7 +161,6 @@ class TagMailAction(BaseMailAction):
             self.color = None
 
     def get_criteria(self):
-
         # AppleMail: We only need to check if mails are \Flagged
         if self.color:
             return {"flagged": False}
@@ -177,7 +175,6 @@ class TagMailAction(BaseMailAction):
 
         # AppleMail
         elif self.color:
-
             # Remove all existing $MailFlagBits
             M.flag(
                 message_uid,
@@ -204,7 +201,6 @@ def mailbox_login(mailbox: MailBox, account: MailAccount):
     logger = logging.getLogger("paperless_mail")
 
     try:
-
         if account.is_token:
             mailbox.xoauth2(account.username, account.password)
         else:
@@ -252,7 +248,6 @@ def apply_mail_action(
         message_date = make_aware(message_date)
 
     try:
-
         action = get_rule_action(rule)
 
         with get_mailbox(
@@ -381,7 +376,8 @@ def make_criterias(rule):
 
     rule_query = get_rule_action(rule).get_criteria()
     if isinstance(rule_query, dict):
-        return AND(**rule_query, **criterias)
+        if len(rule_query) or len(criterias):
+            return AND(**rule_query, **criterias)
     else:
         return AND(rule_query, **criterias)
 
@@ -475,7 +471,6 @@ class MailAccountHandler(LoggingMixin):
                 account.imap_port,
                 account.imap_security,
             ) as M:
-
                 supports_gmail_labels = "X-GM-EXT-1" in M.client.capabilities
                 supports_auth_plain = "AUTH=PLAIN" in M.client.capabilities
 
@@ -518,13 +513,11 @@ class MailAccountHandler(LoggingMixin):
         M: MailBox,
         rule: MailRule,
     ):
-
         self.log("debug", f"Rule {rule}: Selecting folder {rule.folder}")
 
         try:
             M.folder.set(rule.folder)
         except MailboxFolderSelectError as err:
-
             self.log(
                 "error",
                 f"Unable to access folder {rule.folder}, attempting folder listing",
@@ -651,7 +644,6 @@ class MailAccountHandler(LoggingMixin):
         consume_tasks = list()
 
         for att in message.attachments:
-
             if (
                 att.content_disposition != "attachment"
                 and rule.attachment_type
@@ -680,7 +672,6 @@ class MailAccountHandler(LoggingMixin):
             mime_type = magic.from_buffer(att.payload, mime=True)
 
             if is_mime_type_supported(mime_type):
-
                 os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
                 _, temp_filename = tempfile.mkstemp(
                     prefix="paperless-mail-",

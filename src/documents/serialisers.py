@@ -10,31 +10,30 @@ except ImportError:
     from backports import zoneinfo
 import magic
 from django.conf import settings
+from django.contrib.auth.models import Group
+from django.contrib.auth.models import User
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
+from guardian.core import ObjectPermissionChecker
+from guardian.shortcuts import get_users_with_perms
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
+
+from documents.permissions import get_groups_with_only_permission
+from documents.permissions import set_permissions_for_object
 
 from . import bulk_edit
 from .models import Correspondent
 from .models import Document
 from .models import DocumentType
 from .models import MatchingModel
+from .models import PaperlessTask
 from .models import SavedView
 from .models import SavedViewFilterRule
 from .models import StoragePath
 from .models import Tag
 from .models import UiSettings
-from .models import PaperlessTask
 from .parsers import is_mime_type_supported
-
-from guardian.shortcuts import get_users_with_perms
-
-from django.contrib.auth.models import User
-from django.contrib.auth.models import Group
-
-from documents.permissions import get_groups_with_only_permission
-from documents.permissions import set_permissions_for_object
 
 
 # https://www.django-rest-framework.org/api-guide/serializers/#example
@@ -60,7 +59,6 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
 
 
 class MatchingModelSerializer(serializers.ModelSerializer):
-
     document_count = serializers.IntegerField(read_only=True)
 
     def get_slug(self, obj):
@@ -152,11 +150,21 @@ class SetPermissionsMixin:
 class OwnedObjectSerializer(serializers.ModelSerializer, SetPermissionsMixin):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user", None)
+        full_perms = kwargs.pop("full_perms", False)
         super().__init__(*args, **kwargs)
+
+        try:
+            if full_perms:
+                self.fields.pop("user_can_change")
+            else:
+                self.fields.pop("permissions")
+        except KeyError:
+            pass
 
     def get_permissions(self, obj):
         view_codename = f"view_{obj.__class__.__name__.lower()}"
         change_codename = f"change_{obj.__class__.__name__.lower()}"
+
         return {
             "view": {
                 "users": get_users_with_perms(
@@ -182,7 +190,19 @@ class OwnedObjectSerializer(serializers.ModelSerializer, SetPermissionsMixin):
             },
         }
 
+    def get_user_can_change(self, obj):
+        checker = ObjectPermissionChecker(self.user) if self.user is not None else None
+        return (
+            obj.owner is None
+            or obj.owner == self.user
+            or (
+                self.user is not None
+                and checker.has_perm(f"change_{obj.__class__.__name__.lower()}", obj)
+            )
+        )
+
     permissions = SerializerMethodField(read_only=True)
+    user_can_change = SerializerMethodField(read_only=True)
 
     set_permissions = serializers.DictField(
         label="Set permissions",
@@ -223,7 +243,6 @@ class OwnedObjectSerializer(serializers.ModelSerializer, SetPermissionsMixin):
 
 
 class CorrespondentSerializer(MatchingModelSerializer, OwnedObjectSerializer):
-
     last_correspondence = serializers.DateTimeField(read_only=True)
 
     class Meta:
@@ -239,6 +258,7 @@ class CorrespondentSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             "last_correspondence",
             "owner",
             "permissions",
+            "user_can_change",
             "set_permissions",
         )
 
@@ -256,12 +276,12 @@ class DocumentTypeSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             "document_count",
             "owner",
             "permissions",
+            "user_can_change",
             "set_permissions",
         )
 
 
 class ColorField(serializers.Field):
-
     COLOURS = (
         (1, "#a6cee3"),
         (2, "#1f78b4"),
@@ -292,7 +312,6 @@ class ColorField(serializers.Field):
 
 
 class TagSerializerVersion1(MatchingModelSerializer, OwnedObjectSerializer):
-
     colour = ColorField(source="color", default="#a6cee3")
 
     class Meta:
@@ -309,6 +328,7 @@ class TagSerializerVersion1(MatchingModelSerializer, OwnedObjectSerializer):
             "document_count",
             "owner",
             "permissions",
+            "user_can_change",
             "set_permissions",
         )
 
@@ -344,6 +364,7 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             "document_count",
             "owner",
             "permissions",
+            "user_can_change",
             "set_permissions",
         )
 
@@ -375,7 +396,6 @@ class StoragePathField(serializers.PrimaryKeyRelatedField):
 
 
 class DocumentSerializer(OwnedObjectSerializer, DynamicFieldsModelSerializer):
-
     correspondent = CorrespondentField(allow_null=True)
     tags = TagsField(many=True)
     document_type = DocumentTypeField(allow_null=True)
@@ -444,6 +464,7 @@ class DocumentSerializer(OwnedObjectSerializer, DynamicFieldsModelSerializer):
             "archived_file_name",
             "owner",
             "permissions",
+            "user_can_change",
             "set_permissions",
             "notes",
         )
@@ -456,7 +477,6 @@ class SavedViewFilterRuleSerializer(serializers.ModelSerializer):
 
 
 class SavedViewSerializer(OwnedObjectSerializer):
-
     filter_rules = SavedViewFilterRuleSerializer(many=True)
 
     class Meta:
@@ -472,6 +492,7 @@ class SavedViewSerializer(OwnedObjectSerializer):
             "filter_rules",
             "owner",
             "permissions",
+            "user_can_change",
             "set_permissions",
         ]
 
@@ -502,7 +523,6 @@ class SavedViewSerializer(OwnedObjectSerializer):
 
 
 class DocumentListSerializer(serializers.Serializer):
-
     documents = serializers.ListField(
         required=True,
         label="Documents",
@@ -527,7 +547,6 @@ class DocumentListSerializer(serializers.Serializer):
 
 
 class BulkEditSerializer(DocumentListSerializer, SetPermissionsMixin):
-
     method = serializers.ChoiceField(
         choices=[
             "set_correspondent",
@@ -653,7 +672,6 @@ class BulkEditSerializer(DocumentListSerializer, SetPermissionsMixin):
             self._validate_owner(parameters["owner"])
 
     def validate(self, attrs):
-
         method = attrs["method"]
         parameters = attrs["parameters"]
 
@@ -674,7 +692,6 @@ class BulkEditSerializer(DocumentListSerializer, SetPermissionsMixin):
 
 
 class PostDocumentSerializer(serializers.Serializer):
-
     created = serializers.DateTimeField(
         label="Created",
         allow_null=True,
@@ -756,7 +773,6 @@ class PostDocumentSerializer(serializers.Serializer):
 
 
 class BulkDownloadSerializer(DocumentListSerializer):
-
     content = serializers.ChoiceField(
         choices=["archive", "originals", "both"],
         default="archive",
@@ -796,6 +812,7 @@ class StoragePathSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             "document_count",
             "owner",
             "permissions",
+            "user_can_change",
             "set_permissions",
         )
 
@@ -907,7 +924,6 @@ class TasksViewSerializer(serializers.ModelSerializer):
 
 
 class AcknowledgeTasksViewSerializer(serializers.Serializer):
-
     tasks = serializers.ListField(
         required=True,
         label="Tasks",

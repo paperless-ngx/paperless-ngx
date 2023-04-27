@@ -10,12 +10,13 @@ from bleach import linkify
 from django.conf import settings
 from django.utils.timezone import is_naive
 from django.utils.timezone import make_aware
-from documents.parsers import DocumentParser
-from documents.parsers import make_thumbnail_from_pdf
-from documents.parsers import ParseError
 from humanfriendly import format_size
 from imap_tools import MailMessage
 from tika import parser
+
+from documents.parsers import DocumentParser
+from documents.parsers import ParseError
+from documents.parsers import make_thumbnail_from_pdf
 
 
 class MailDocumentParser(DocumentParser):
@@ -249,14 +250,12 @@ class MailDocumentParser(DocumentParser):
         return html
 
     def generate_pdf_from_mail(self, mail):
-
         url = self.gotenberg_server + "/forms/chromium/convert/html"
         self.log("info", "Converting mail to PDF")
 
         css_file = os.path.join(os.path.dirname(__file__), "templates/output.css")
 
         with open(css_file, "rb") as css_handle:
-
             files = {
                 "html": ("index.html", self.mail_to_html(mail)),
                 "css": ("output.css", css_handle),

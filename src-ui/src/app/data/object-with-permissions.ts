@@ -16,4 +16,6 @@ export interface ObjectWithPermissions extends ObjectWithId {
   owner?: number
 
   permissions?: PermissionsObject
+
+  user_can_change?: boolean
 }

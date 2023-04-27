@@ -12,14 +12,14 @@ from unittest import mock
 from django.apps import apps
 from django.db import connection
 from django.db.migrations.executor import MigrationExecutor
-from django.test import override_settings
 from django.test import TransactionTestCase
+from django.test import override_settings
+
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 
 
 def setup_directories():
-
     dirs = namedtuple("Dirs", ())
 
     dirs.data_dir = Path(tempfile.mkdtemp())

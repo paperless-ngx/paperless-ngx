@@ -11,7 +11,6 @@ class GnuPG:
 
     @classmethod
     def decrypted(cls, file_handle, passphrase=None):
-
         if not passphrase:
             passphrase = settings.PASSPHRASE
 

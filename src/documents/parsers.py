@@ -14,6 +14,7 @@ from typing import Set
 
 from django.conf import settings
 from django.utils import timezone
+
 from documents.loggers import LoggingMixin
 from documents.signals import document_consumer_declaration
 
@@ -139,7 +140,6 @@ def run_convert(
     extra=None,
     logging_group=None,
 ) -> None:
-
     environment = os.environ.copy()
     if settings.CONVERT_MEMORY_LIMIT:
         environment["MAGICK_MEMORY_LIMIT"] = settings.CONVERT_MEMORY_LIMIT

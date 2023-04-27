@@ -6,12 +6,13 @@ from urllib.request import urlopen
 
 import pytest
 from django.test import TestCase
-from documents.parsers import run_convert
-from documents.tests.utils import FileSystemAssertsMixin
 from imagehash import average_hash
-from paperless_mail.parsers import MailDocumentParser
 from pdfminer.high_level import extract_text
 from PIL import Image
+
+from documents.parsers import run_convert
+from documents.tests.utils import FileSystemAssertsMixin
+from paperless_mail.parsers import MailDocumentParser
 
 
 class TestParserLive(FileSystemAssertsMixin, TestCase):

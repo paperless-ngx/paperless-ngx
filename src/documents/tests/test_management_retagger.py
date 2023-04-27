@@ -1,5 +1,6 @@
 from django.core.management import call_command
 from django.test import TestCase
+
 from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
@@ -10,7 +11,6 @@ from documents.tests.utils import DirectoriesMixin
 
 class TestRetagger(DirectoriesMixin, TestCase):
     def make_models(self):
-
         self.sp1 = StoragePath.objects.create(
             name="dummy a",
             path="{created_data}/{title}",
