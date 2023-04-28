@@ -44,7 +44,7 @@
             <use xlink:href="assets/bootstrap-icons.svg#gear"/>
           </svg><ng-container i18n>Settings</ng-container>
         </a>
-        <a ngbDropdownItem class="nav-link" href="accounts/logout/">
+        <a ngbDropdownItem class="nav-link" href="accounts/logout/" (click)="onLogout()">
           <svg class="sidebaricon me-2" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#door-open"/>
           </svg><ng-container i18n>Logout</ng-container>
