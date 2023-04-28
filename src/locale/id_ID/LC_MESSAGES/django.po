@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-04-28 07:47\n"
+"PO-Revision-Date: 2023-04-28 09:40\n"
 "Last-Translator: \n"
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
@@ -642,7 +642,7 @@ msgstr "Turki"
 
 #: paperless/settings.py:542
 msgid "Chinese Simplified"
-msgstr ""
+msgstr "Mandarin Sederhana"
 
 #: paperless/urls.py:169
 msgid "Paperless-ngx administration"
@@ -682,7 +682,7 @@ msgstr ""
 
 #: paperless_mail/apps.py:10
 msgid "Paperless mail"
-msgstr ""
+msgstr "Surat Paperless"
 
 #: paperless_mail/models.py:9
 msgid "mail account"
@@ -806,11 +806,11 @@ msgstr ""
 
 #: paperless_mail/models.py:91
 msgid "order"
-msgstr ""
+msgstr "urut"
 
 #: paperless_mail/models.py:97
 msgid "account"
-msgstr ""
+msgstr "akun"
 
 #: paperless_mail/models.py:101 paperless_mail/models.py:231
 msgid "folder"
@@ -834,7 +834,7 @@ msgstr "saring badan"
 
 #: paperless_mail/models.py:130
 msgid "filter attachment filename"
-msgstr ""
+msgstr "saring nama file lampiran"
 
 #: paperless_mail/models.py:135
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
