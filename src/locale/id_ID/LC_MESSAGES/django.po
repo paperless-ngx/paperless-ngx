@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-04-28 06:43\n"
+"PO-Revision-Date: 2023-04-28 07:47\n"
 "Last-Translator: \n"
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
@@ -232,7 +232,7 @@ msgstr "kesalahan"
 
 #: documents/models.py:363
 msgid "critical"
-msgstr ""
+msgstr "kritis"
 
 #: documents/models.py:366
 msgid "group"
@@ -276,15 +276,15 @@ msgstr ""
 
 #: documents/models.py:409
 msgid "sort reverse"
-msgstr ""
+msgstr "urutkan terbalik"
 
 #: documents/models.py:414
 msgid "title contains"
-msgstr ""
+msgstr "judul memiliki"
 
 #: documents/models.py:415
 msgid "content contains"
-msgstr ""
+msgstr "konten memiliki"
 
 #: documents/models.py:416
 msgid "ASN is"
@@ -300,7 +300,7 @@ msgstr ""
 
 #: documents/models.py:419
 msgid "is in inbox"
-msgstr ""
+msgstr "di dalam kotak masuk"
 
 #: documents/models.py:420
 msgid "has tag"
@@ -464,27 +464,27 @@ msgstr ""
 
 #: documents/models.py:615
 msgid "Result Data"
-msgstr ""
+msgstr "Data Hasil"
 
 #: documents/models.py:617
 msgid "The data returned by the task"
-msgstr ""
+msgstr "Data yang dikembalikan dari tugas"
 
 #: documents/models.py:626
 msgid "Comment for the document"
-msgstr ""
+msgstr "Komentar pada dokumen"
 
 #: documents/models.py:650
 msgid "user"
-msgstr ""
+msgstr "pengguna"
 
 #: documents/models.py:655
 msgid "comment"
-msgstr ""
+msgstr "komentar"
 
 #: documents/models.py:656
 msgid "comments"
-msgstr ""
+msgstr "komentar"
 
 #: documents/serialisers.py:80
 #, python-format
@@ -526,7 +526,7 @@ msgstr ""
 
 #: documents/templates/registration/logged_out.html:60
 msgid "Sign in again"
-msgstr ""
+msgstr "Masuk lagi"
 
 #: documents/templates/registration/login.html:15
 msgid "Paperless-ngx sign in"
@@ -534,23 +534,23 @@ msgstr ""
 
 #: documents/templates/registration/login.html:61
 msgid "Please sign in."
-msgstr ""
+msgstr "Mohon masuk."
 
 #: documents/templates/registration/login.html:64
 msgid "Your username and password didn't match. Please try again."
-msgstr ""
+msgstr "Nama pengguna dan sandi tidak cocok. Silahkan coba kembali."
 
 #: documents/templates/registration/login.html:67
 msgid "Username"
-msgstr ""
+msgstr "Nama pengguna"
 
 #: documents/templates/registration/login.html:68
 msgid "Password"
-msgstr ""
+msgstr "Kata sandi"
 
 #: documents/templates/registration/login.html:73
 msgid "Sign in"
-msgstr ""
+msgstr "Masuk"
 
 #: paperless/apps.py:9
 msgid "Paperless"
@@ -558,15 +558,15 @@ msgstr ""
 
 #: paperless/settings.py:521
 msgid "English (US)"
-msgstr ""
+msgstr "Inggris (AS)"
 
 #: paperless/settings.py:522
 msgid "Arabic"
-msgstr ""
+msgstr "Arab"
 
 #: paperless/settings.py:523
 msgid "Belarusian"
-msgstr ""
+msgstr "Belarusia"
 
 #: paperless/settings.py:524
 msgid "Czech"
@@ -582,11 +582,11 @@ msgstr ""
 
 #: paperless/settings.py:527
 msgid "English (GB)"
-msgstr ""
+msgstr "Inggris (GB)"
 
 #: paperless/settings.py:528
 msgid "Spanish"
-msgstr ""
+msgstr "Spanyol"
 
 #: paperless/settings.py:529
 msgid "French"
@@ -602,43 +602,43 @@ msgstr ""
 
 #: paperless/settings.py:532
 msgid "Dutch"
-msgstr ""
+msgstr "Belanda"
 
 #: paperless/settings.py:533
 msgid "Polish"
-msgstr ""
+msgstr "Polandia"
 
 #: paperless/settings.py:534
 msgid "Portuguese (Brazil)"
-msgstr ""
+msgstr "Portugis (Brasil)"
 
 #: paperless/settings.py:535
 msgid "Portuguese"
-msgstr ""
+msgstr "Portugis"
 
 #: paperless/settings.py:536
 msgid "Romanian"
-msgstr ""
+msgstr "Rumania"
 
 #: paperless/settings.py:537
 msgid "Russian"
-msgstr ""
+msgstr "Rusia"
 
 #: paperless/settings.py:538
 msgid "Slovenian"
-msgstr ""
+msgstr "Slovenia"
 
 #: paperless/settings.py:539
 msgid "Serbian"
-msgstr ""
+msgstr "Serbia"
 
 #: paperless/settings.py:540
 msgid "Swedish"
-msgstr ""
+msgstr "Swedia"
 
 #: paperless/settings.py:541
 msgid "Turkish"
-msgstr ""
+msgstr "Turki"
 
 #: paperless/settings.py:542
 msgid "Chinese Simplified"
@@ -646,27 +646,27 @@ msgstr ""
 
 #: paperless/urls.py:169
 msgid "Paperless-ngx administration"
-msgstr ""
+msgstr "Administrasi Paperless-ngx"
 
 #: paperless_mail/admin.py:30
 msgid "Authentication"
-msgstr ""
+msgstr "Autentikasi"
 
 #: paperless_mail/admin.py:31
 msgid "Advanced settings"
-msgstr ""
+msgstr "Pengaturan lanjutan"
 
 #: paperless_mail/admin.py:48
 msgid "Filter"
-msgstr ""
+msgstr "Saring"
 
 #: paperless_mail/admin.py:51
 msgid "Paperless will only process mails that match ALL of the filters given below."
-msgstr ""
+msgstr "Paperless hanya akan memproses SEMUA surat yang cocok dengan filter yang diberikan."
 
 #: paperless_mail/admin.py:66
 msgid "Actions"
-msgstr ""
+msgstr "Aksi"
 
 #: paperless_mail/admin.py:69
 msgid "The action applied to the mail. This action is only performed when the mail body or attachments were consumed from the mail."
@@ -686,31 +686,31 @@ msgstr ""
 
 #: paperless_mail/models.py:9
 msgid "mail account"
-msgstr ""
+msgstr "akun surat"
 
 #: paperless_mail/models.py:10
 msgid "mail accounts"
-msgstr ""
+msgstr "akun surat"
 
 #: paperless_mail/models.py:13
 msgid "No encryption"
-msgstr ""
+msgstr "Tanpa enkripsi"
 
 #: paperless_mail/models.py:14
 msgid "Use SSL"
-msgstr ""
+msgstr "Gunakan SSL"
 
 #: paperless_mail/models.py:15
 msgid "Use STARTTLS"
-msgstr ""
+msgstr "Gunakan STARTTLS"
 
 #: paperless_mail/models.py:19
 msgid "IMAP server"
-msgstr ""
+msgstr "Server IMAP"
 
 #: paperless_mail/models.py:22
 msgid "IMAP port"
-msgstr ""
+msgstr "Port IMAP"
 
 #: paperless_mail/models.py:26
 msgid "This is usually 143 for unencrypted and STARTTLS connections, and 993 for SSL connections."
@@ -722,11 +722,11 @@ msgstr ""
 
 #: paperless_mail/models.py:37
 msgid "username"
-msgstr ""
+msgstr "nama pengguna"
 
 #: paperless_mail/models.py:39
 msgid "password"
-msgstr ""
+msgstr "kata sandi"
 
 #: paperless_mail/models.py:42
 msgid "character set"
@@ -738,11 +738,11 @@ msgstr ""
 
 #: paperless_mail/models.py:57
 msgid "mail rule"
-msgstr ""
+msgstr "peraturan surat"
 
 #: paperless_mail/models.py:58
 msgid "mail rules"
-msgstr ""
+msgstr "peraturan surat"
 
 #: paperless_mail/models.py:61 paperless_mail/models.py:69
 msgid "Only process attachments."
@@ -762,7 +762,7 @@ msgstr ""
 
 #: paperless_mail/models.py:73
 msgid "Delete"
-msgstr ""
+msgstr "Hapus"
 
 #: paperless_mail/models.py:74
 msgid "Move to specified folder"
@@ -794,11 +794,11 @@ msgstr ""
 
 #: paperless_mail/models.py:85
 msgid "Use mail address"
-msgstr ""
+msgstr "Gunakan alamat surat"
 
 #: paperless_mail/models.py:86
 msgid "Use name (or mail address if not available)"
-msgstr ""
+msgstr "Gunakan nama (atau alamat surat jika tidak tersedia)"
 
 #: paperless_mail/models.py:87
 msgid "Use correspondent selected below"
@@ -814,7 +814,7 @@ msgstr ""
 
 #: paperless_mail/models.py:101 paperless_mail/models.py:231
 msgid "folder"
-msgstr ""
+msgstr "direktori"
 
 #: paperless_mail/models.py:105
 msgid "Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server."
@@ -822,15 +822,15 @@ msgstr ""
 
 #: paperless_mail/models.py:111
 msgid "filter from"
-msgstr ""
+msgstr "saring dari"
 
 #: paperless_mail/models.py:117
 msgid "filter subject"
-msgstr ""
+msgstr "saring subjek"
 
 #: paperless_mail/models.py:123
 msgid "filter body"
-msgstr ""
+msgstr "saring badan"
 
 #: paperless_mail/models.py:130
 msgid "filter attachment filename"
@@ -842,7 +842,7 @@ msgstr ""
 
 #: paperless_mail/models.py:142
 msgid "maximum age"
-msgstr ""
+msgstr "umur maksimal"
 
 #: paperless_mail/models.py:144
 msgid "Specified in days."
@@ -850,7 +850,7 @@ msgstr ""
 
 #: paperless_mail/models.py:148
 msgid "attachment type"
-msgstr ""
+msgstr "jenis lampiran"
 
 #: paperless_mail/models.py:152
 msgid "Inline attachments include embedded images, so it's best to combine this option with a filename filter."
@@ -862,11 +862,11 @@ msgstr ""
 
 #: paperless_mail/models.py:164
 msgid "action"
-msgstr ""
+msgstr "aksi"
 
 #: paperless_mail/models.py:170
 msgid "action parameter"
-msgstr ""
+msgstr "parameter aksi"
 
 #: paperless_mail/models.py:175
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
@@ -898,17 +898,17 @@ msgstr ""
 
 #: paperless_mail/models.py:247
 msgid "subject"
-msgstr ""
+msgstr "subjek"
 
 #: paperless_mail/models.py:255
 msgid "received"
-msgstr ""
+msgstr "diterima"
 
 #: paperless_mail/models.py:262
 msgid "processed"
-msgstr ""
+msgstr "diproses"
 
 #: paperless_mail/models.py:268
 msgid "status"
-msgstr ""
+msgstr "status"
 
