@@ -100,7 +100,7 @@
                     <a ngbNavLink i18n>Metadata</a>
                     <ng-template ngbNavContent>
 
-                        <table class="table table-borderless">
+                        <table class="table table-borderless" *ngIf="document">
                             <tbody>
                                 <tr>
                                     <td i18n>Date modified</td>

@@ -317,6 +317,10 @@ export class DocumentDetailComponent
         if (navIDKey) {
           this.activeNavID = DocumentDetailNavIDs[navIDKey]
         }
+      } else if (paramMap.get('id')) {
+        this.router.navigate(['documents', +paramMap.get('id'), 'details'], {
+          replaceUrl: true,
+        })
       }
     })
   }
