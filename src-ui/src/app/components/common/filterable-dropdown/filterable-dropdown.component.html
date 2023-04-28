@@ -1,4 +1,4 @@
-<div class="btn-group w-100" ngbDropdown role="group" (openChange)="dropdownOpenChange($event)" #dropdown="ngbDropdown">
+<div class="btn-group w-100" ngbDropdown role="group" (openChange)="dropdownOpenChange($event)" #dropdown="ngbDropdown" (keydown)="listKeyDown($event)">
   <button class="btn btn-sm" id="dropdown_{{name}}" ngbDropdownToggle [ngClass]="!editing && selectionModel.selectionSize() > 0 ? 'btn-primary' : 'btn-outline-primary'" [disabled]="disabled">
     <svg class="toolbaricon" fill="currentColor">
       <use attr.xlink:href="assets/bootstrap-icons.svg#{{icon}}" />
@@ -31,9 +31,11 @@
           <input class="form-control" type="text" [(ngModel)]="filterText" [placeholder]="filterPlaceholder" (keyup.enter)="listFilterEnter()" #listFilterTextInput>
         </div>
       </div>
-      <div *ngIf="selectionModel.items" class="items">
-        <ng-container *ngFor="let item of selectionModel.itemsSorted | filter: filterText">
-          <app-toggleable-dropdown-button *ngIf="allowSelectNone || item.id" [item]="item" [state]="selectionModel.get(item.id)" [count]="getUpdatedDocumentCount(item.id)" (toggle)="selectionModel.toggle(item.id)" (exclude)="excludeClicked(item.id)" [disabled]="disabled"></app-toggleable-dropdown-button>
+      <div *ngIf="selectionModel.items" class="items" #buttonItems>
+        <ng-container *ngFor="let item of selectionModel.itemsSorted | filter: filterText; let i = index">
+          <app-toggleable-dropdown-button
+            *ngIf="allowSelectNone || item.id" [item]="item" [state]="selectionModel.get(item.id)" [count]="getUpdatedDocumentCount(item.id)" (toggle)="selectionModel.toggle(item.id)" (exclude)="excludeClicked(item.id)" (click)="setButtonItemIndex(i)" [disabled]="disabled">
+          </app-toggleable-dropdown-button>
         </ng-container>
       </div>
       <button *ngIf="editing" class="list-group-item list-group-item-action bg-light" (click)="applyClicked()" [disabled]="!modelIsDirty || disabled">

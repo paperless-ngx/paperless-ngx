@@ -324,6 +324,7 @@ export class FilterableDropdownSelectionModel {
 export class FilterableDropdownComponent {
   @ViewChild('listFilterTextInput') listFilterTextInput: ElementRef
   @ViewChild('dropdown') dropdown: NgbDropdown
+  @ViewChild('buttonItems') buttonItems: ElementRef
 
   filterText: string
 
@@ -416,13 +417,9 @@ export class FilterableDropdownComponent {
     return this.title ? this.title.replace(/\s/g, '_').toLowerCase() : null
   }
 
-  getUpdatedDocumentCount(id: number) {
-    if (this.documentCounts) {
-      return this.documentCounts.find((c) => c.id === id)?.document_count
-    }
-  }
-
   modelIsDirty: boolean = false
+
+  private keyboardIndex: number
 
   constructor(private filterPipe: FilterPipe) {
     this.selectionModelChange.subscribe((updatedModel) => {
@@ -461,11 +458,13 @@ export class FilterableDropdownComponent {
     let filtered = this.filterPipe.transform(this.items, this.filterText)
     if (filtered.length == 1) {
       this.selectionModel.toggle(filtered[0].id)
-      if (this.editing) {
-        this.applyClicked()
-      } else {
-        this.dropdown.close()
-      }
+      setTimeout(() => {
+        if (this.editing) {
+          this.applyClicked()
+        } else {
+          this.dropdown.close()
+        }
+      }, 200)
     }
   }
 
@@ -480,5 +479,77 @@ export class FilterableDropdownComponent {
   reset() {
     this.selectionModel.reset(true)
     this.selectionModelChange.emit(this.selectionModel)
+  }
+
+  getUpdatedDocumentCount(id: number) {
+    if (this.documentCounts) {
+      return this.documentCounts.find((c) => c.id === id)?.document_count
+    }
+  }
+
+  listKeyDown(event: KeyboardEvent) {
+    switch (event.key) {
+      case 'ArrowDown':
+        if (event.target instanceof HTMLInputElement) {
+          if (
+            !this.filterText ||
+            event.target.selectionStart === this.filterText.length
+          ) {
+            this.keyboardIndex = -1
+            this.focusNextButtonItem()
+            event.preventDefault()
+          }
+        } else if (event.target instanceof HTMLButtonElement) {
+          this.focusNextButtonItem()
+          event.preventDefault()
+        }
+        break
+      case 'ArrowUp':
+        if (event.target instanceof HTMLButtonElement) {
+          if (this.keyboardIndex === 0) {
+            this.listFilterTextInput.nativeElement.focus()
+          } else {
+            this.focusPreviousButtonItem()
+          }
+          event.preventDefault()
+        }
+        break
+      case 'Tab':
+        // just track the index in case user uses arrows
+        if (event.target instanceof HTMLInputElement) {
+          this.keyboardIndex = 0
+        } else if (event.target instanceof HTMLButtonElement) {
+          if (event.shiftKey) {
+            if (this.keyboardIndex > 0) {
+              this.focusPreviousButtonItem(false)
+            }
+          } else {
+            this.focusNextButtonItem(false)
+          }
+        }
+      default:
+        break
+    }
+  }
+
+  focusNextButtonItem(setFocus: boolean = true) {
+    this.keyboardIndex = Math.min(this.items.length - 1, this.keyboardIndex + 1)
+    if (setFocus) this.setButtonItemFocus()
+  }
+
+  focusPreviousButtonItem(setFocus: boolean = true) {
+    this.keyboardIndex = Math.max(0, this.keyboardIndex - 1)
+    if (setFocus) this.setButtonItemFocus()
+  }
+
+  setButtonItemFocus() {
+    this.buttonItems.nativeElement.children[
+      this.keyboardIndex
+    ]?.children[0].focus()
+  }
+
+  setButtonItemIndex(index: number) {
+    // just track the index in case user uses arrows
+    this.keyboardIndex = index
   }
 }
