@@ -2,7 +2,6 @@ import datetime
 import itertools
 import logging
 import os
-import re
 import tempfile
 import traceback
 from datetime import date
@@ -145,7 +144,7 @@ class TagMailAction(BaseMailAction):
     A mail action that tags mails after processing.
     """
 
-    def __init__(self, parameter):
+    def __init__(self, parameter: str, supports_gmail_labels: bool):
         # The custom tag should look like "apple:<color>"
         if "apple:" in parameter.lower():
             _, self.color = parameter.split(":")
@@ -159,18 +158,22 @@ class TagMailAction(BaseMailAction):
         else:
             self.keyword = parameter
             self.color = None
+        self.supports_gmail_labels = supports_gmail_labels
 
     def get_criteria(self):
         # AppleMail: We only need to check if mails are \Flagged
         if self.color:
             return {"flagged": False}
         elif self.keyword:
-            return AND(NOT(gmail_label=self.keyword), no_keyword=self.keyword)
+            if self.supports_gmail_labels:
+                return AND(NOT(gmail_label=self.keyword), no_keyword=self.keyword)
+            else:
+                return NOT(no_keyword=self.keyword)
         else:  # pragma: nocover
             raise ValueError("This should never happen.")
 
     def post_consume(self, M: MailBox, message_uid: str, parameter: str):
-        if re.search(r"gmail\.com$|googlemail\.com$", M._host):
+        if self.supports_gmail_labels:
             M.client.uid("STORE", message_uid, "+X-GM-LABELS", self.keyword)
 
         # AppleMail
@@ -248,15 +251,18 @@ def apply_mail_action(
         message_date = make_aware(message_date)
 
     try:
-        action = get_rule_action(rule)
-
         with get_mailbox(
             server=account.imap_server,
             port=account.imap_port,
             security=account.imap_security,
         ) as M:
+            # Need to know the support for the possible tagging
+            supports_gmail_labels = "X-GM-EXT-1" in M.client.capabilities
+
             mailbox_login(M, account)
             M.folder.set(rule.folder)
+
+            action = get_rule_action(rule, supports_gmail_labels)
             action.post_consume(M, message_uid, rule.action_parameter)
 
         ProcessedMail.objects.create(
@@ -337,7 +343,7 @@ def queue_consumption_tasks(
     ).delay()
 
 
-def get_rule_action(rule) -> BaseMailAction:
+def get_rule_action(rule: MailRule, supports_gmail_labels: bool) -> BaseMailAction:
     """
     Returns a BaseMailAction instance for the given rule.
     """
@@ -351,12 +357,12 @@ def get_rule_action(rule) -> BaseMailAction:
     elif rule.action == MailRule.MailAction.MARK_READ:
         return MarkReadMailAction()
     elif rule.action == MailRule.MailAction.TAG:
-        return TagMailAction(rule.action_parameter)
+        return TagMailAction(rule.action_parameter, supports_gmail_labels)
     else:
         raise NotImplementedError("Unknown action.")  # pragma: nocover
 
 
-def make_criterias(rule):
+def make_criterias(rule: MailRule, supports_gmail_labels: bool):
     """
     Returns criteria to be applied to MailBox.fetch for the given rule.
     """
@@ -374,7 +380,7 @@ def make_criterias(rule):
     if rule.filter_body:
         criterias["body"] = rule.filter_body
 
-    rule_query = get_rule_action(rule).get_criteria()
+    rule_query = get_rule_action(rule, supports_gmail_labels).get_criteria()
     if isinstance(rule_query, dict):
         if len(rule_query) or len(criterias):
             return AND(**rule_query, **criterias)
@@ -490,6 +496,7 @@ class MailAccountHandler(LoggingMixin):
                         total_processed_files += self._handle_mail_rule(
                             M,
                             rule,
+                            supports_gmail_labels,
                         )
                     except Exception as e:
                         self.log(
@@ -512,6 +519,7 @@ class MailAccountHandler(LoggingMixin):
         self,
         M: MailBox,
         rule: MailRule,
+        supports_gmail_labels: bool,
     ):
         self.log("debug", f"Rule {rule}: Selecting folder {rule.folder}")
 
@@ -537,7 +545,7 @@ class MailAccountHandler(LoggingMixin):
                 f"does not exist in account {rule.account}",
             ) from err
 
-        criterias = make_criterias(rule)
+        criterias = make_criterias(rule, supports_gmail_labels)
 
         self.log(
             "debug",

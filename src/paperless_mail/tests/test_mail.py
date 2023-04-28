@@ -737,6 +737,7 @@ class TestMail(
             MailError,
             TagMailAction,
             "apple:black",
+            False,
         )
 
     def test_handle_mail_account_tag_applemail(self):
