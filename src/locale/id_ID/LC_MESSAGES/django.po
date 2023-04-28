@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-04-20 13:20\n"
+"PO-Revision-Date: 2023-04-28 06:43\n"
 "Last-Translator: \n"
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
@@ -212,7 +212,7 @@ msgstr "dokumen"
 
 #: documents/models.py:269
 msgid "documents"
-msgstr ""
+msgstr "dokumen"
 
 #: documents/models.py:359
 msgid "debug"
@@ -224,7 +224,7 @@ msgstr "informasi"
 
 #: documents/models.py:361
 msgid "warning"
-msgstr ""
+msgstr "peringatan"
 
 #: documents/models.py:362 paperless_mail/models.py:276
 msgid "error"
@@ -244,7 +244,7 @@ msgstr "pesan"
 
 #: documents/models.py:371
 msgid "level"
-msgstr ""
+msgstr "tingkat"
 
 #: documents/models.py:380
 msgid "log"
@@ -380,11 +380,11 @@ msgstr ""
 
 #: documents/models.py:439
 msgid "storage path is"
-msgstr ""
+msgstr "lokasi penyimpanan"
 
 #: documents/models.py:449
 msgid "rule type"
-msgstr ""
+msgstr "jenis peraturan"
 
 #: documents/models.py:451
 msgid "value"
@@ -392,15 +392,15 @@ msgstr "nilai"
 
 #: documents/models.py:454
 msgid "filter rule"
-msgstr ""
+msgstr "saring aturan"
 
 #: documents/models.py:455
 msgid "filter rules"
-msgstr ""
+msgstr "saring aturan"
 
 #: documents/models.py:563
 msgid "Task ID"
-msgstr ""
+msgstr "ID Tugas"
 
 #: documents/models.py:564
 msgid "Celery ID for the Task that was run"
@@ -432,11 +432,11 @@ msgstr ""
 
 #: documents/models.py:591
 msgid "Task State"
-msgstr ""
+msgstr "Status Tugas"
 
 #: documents/models.py:592
 msgid "Current state of the task being run"
-msgstr ""
+msgstr "Status tugas sekarang yang sedang dijalankan"
 
 #: documents/models.py:597
 msgid "Created DateTime"
@@ -489,28 +489,28 @@ msgstr ""
 #: documents/serialisers.py:80
 #, python-format
 msgid "Invalid regular expression: %(error)s"
-msgstr ""
+msgstr "Ekspresi reguler tidak valid: %(error)s"
 
 #: documents/serialisers.py:320
 msgid "Invalid color."
-msgstr ""
+msgstr "Warna tidak valid."
 
 #: documents/serialisers.py:700
 #, python-format
 msgid "File type %(type)s not supported"
-msgstr ""
+msgstr "Jenis file %(type)s tidak didukung"
 
 #: documents/serialisers.py:794
 msgid "Invalid variable detected."
-msgstr ""
+msgstr "Variabel ilegal terdeteksi."
 
 #: documents/templates/index.html:78
 msgid "Paperless-ngx is loading..."
-msgstr ""
+msgstr "Paperless-ngx sedang memuat..."
 
 #: documents/templates/index.html:79
 msgid "Still here?! Hmm, something might be wrong."
-msgstr ""
+msgstr "Masih disini?! Hmm, sepertinya ada yang salah."
 
 #: documents/templates/index.html:79
 msgid "Here's a link to the docs."
