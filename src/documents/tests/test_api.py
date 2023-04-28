@@ -27,6 +27,7 @@ from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.test import override_settings
 from django.utils import timezone
+from guardian.shortcuts import assign_perm
 from rest_framework import status
 from rest_framework.test import APITestCase
 from whoosh.writing import AsyncWriter
@@ -252,8 +253,6 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         response = self.client.get(f"/api/documents/{doc.pk}/thumb/")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
-        from guardian.shortcuts import assign_perm
 
         assign_perm("view_document", user2, doc)
 
@@ -1063,6 +1062,92 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
                 + datetime.datetime(2020, 1, 2).strftime("%Y-%m-%d"),
             ),
         )
+
+    def test_search_filtering_respect_owner(self):
+        """
+        GIVEN:
+            - Documents with owners set & without
+        WHEN:
+            - API reuqest for advanced query (search) is made by non-superuser
+            - API reuqest for advanced query (search) is made by superuser
+        THEN:
+            - Only owned docs are returned for regular users
+            - All docs are returned for superuser
+        """
+        superuser = User.objects.create_superuser("superuser")
+        u1 = User.objects.create_user("user1")
+        u2 = User.objects.create_user("user2")
+        u1.user_permissions.add(*Permission.objects.filter(codename="view_document"))
+        u2.user_permissions.add(*Permission.objects.filter(codename="view_document"))
+
+        Document.objects.create(checksum="1", content="test 1", owner=u1)
+        Document.objects.create(checksum="2", content="test 2", owner=u2)
+        Document.objects.create(checksum="3", content="test 3", owner=u2)
+        Document.objects.create(checksum="4", content="test 4")
+
+        with AsyncWriter(index.open_index()) as writer:
+            for doc in Document.objects.all():
+                index.update_document(writer, doc)
+
+        self.client.force_authenticate(user=u1)
+        r = self.client.get("/api/documents/?query=test")
+        self.assertEqual(r.data["count"], 2)
+        r = self.client.get("/api/documents/?query=test&document_type__id__none=1")
+        self.assertEqual(r.data["count"], 2)
+
+        self.client.force_authenticate(user=u2)
+        r = self.client.get("/api/documents/?query=test")
+        self.assertEqual(r.data["count"], 3)
+        r = self.client.get("/api/documents/?query=test&document_type__id__none=1")
+        self.assertEqual(r.data["count"], 3)
+
+        self.client.force_authenticate(user=superuser)
+        r = self.client.get("/api/documents/?query=test")
+        self.assertEqual(r.data["count"], 4)
+        r = self.client.get("/api/documents/?query=test&document_type__id__none=1")
+        self.assertEqual(r.data["count"], 4)
+
+    def test_search_filtering_with_object_perms(self):
+        """
+        GIVEN:
+            - Documents with granted view permissions to others
+        WHEN:
+            - API reuqest for advanced query (search) is made by user
+        THEN:
+            - Only docs with granted view permissions are returned
+        """
+        u1 = User.objects.create_user("user1")
+        u2 = User.objects.create_user("user2")
+        u1.user_permissions.add(*Permission.objects.filter(codename="view_document"))
+        u2.user_permissions.add(*Permission.objects.filter(codename="view_document"))
+
+        Document.objects.create(checksum="1", content="test 1", owner=u1)
+        d2 = Document.objects.create(checksum="2", content="test 2", owner=u2)
+        d3 = Document.objects.create(checksum="3", content="test 3", owner=u2)
+        Document.objects.create(checksum="4", content="test 4")
+
+        with AsyncWriter(index.open_index()) as writer:
+            for doc in Document.objects.all():
+                index.update_document(writer, doc)
+
+        self.client.force_authenticate(user=u1)
+        r = self.client.get("/api/documents/?query=test")
+        self.assertEqual(r.data["count"], 2)
+        r = self.client.get("/api/documents/?query=test&document_type__id__none=1")
+        self.assertEqual(r.data["count"], 2)
+
+        assign_perm("view_document", u1, d2)
+        assign_perm("view_document", u1, d3)
+
+        with AsyncWriter(index.open_index()) as writer:
+            for doc in [d2, d3]:
+                index.update_document(writer, doc)
+
+        self.client.force_authenticate(user=u1)
+        r = self.client.get("/api/documents/?query=test")
+        self.assertEqual(r.data["count"], 4)
+        r = self.client.get("/api/documents/?query=test&document_type__id__none=1")
+        self.assertEqual(r.data["count"], 4)
 
     def test_search_sorting(self):
         c1 = Correspondent.objects.create(name="corres Ax")
