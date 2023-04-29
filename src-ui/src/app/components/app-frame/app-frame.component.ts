@@ -243,4 +243,8 @@ export class AppFrameComponent
       this.checkForUpdates()
     }
   }
+
+  onLogout() {
+    this.openDocumentsService.closeAll()
+  }
 }
