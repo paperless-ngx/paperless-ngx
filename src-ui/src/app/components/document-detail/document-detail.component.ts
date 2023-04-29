@@ -236,10 +236,21 @@ export class DocumentDetailComponent
             true
           )
           this.suggestions = null
-          if (this.openDocumentService.getOpenDocument(this.documentId)) {
-            this.updateComponent(
-              this.openDocumentService.getOpenDocument(this.documentId)
-            )
+          const openDocument = this.openDocumentService.getOpenDocument(
+            this.documentId
+          )
+          if (openDocument) {
+            if (this.documentForm.dirty) {
+              Object.assign(openDocument, this.documentForm.value)
+              openDocument['owner'] =
+                this.documentForm.get('permissions_form').value['owner']
+              openDocument['permissions'] =
+                this.documentForm.get('permissions_form').value[
+                  'set_permissions'
+                ]
+              delete openDocument['permissions_form']
+            }
+            this.updateComponent(openDocument)
           } else {
             this.openDocumentService.openDocument(doc)
             this.updateComponent(doc)
