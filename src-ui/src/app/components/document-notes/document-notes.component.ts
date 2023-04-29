@@ -86,7 +86,7 @@ export class DocumentNotesComponent extends ComponentWithPermissions {
 
   displayName(note: PaperlessDocumentNote): string {
     if (!note.user) return ''
-    const user = this.users.find((u) => u.id === note.user)
+    const user = this.users?.find((u) => u.id === note.user)
     if (!user) return ''
     const nameComponents = []
     if (user.first_name) nameComponents.unshift(user.first_name)
