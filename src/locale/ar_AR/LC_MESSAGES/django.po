@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-03-07 19:40\n"
+"PO-Revision-Date: 2023-05-01 08:36\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -420,7 +420,7 @@ msgstr "اسم ملف المهمة"
 
 #: documents/models.py:577
 msgid "Name of the file which the Task was run for"
-msgstr "اسم الملف الذي وكل بالمهمة"
+msgstr "اسم المِلَفّ الذي وكل بالمهمة"
 
 #: documents/models.py:583
 msgid "Task Name"
@@ -670,7 +670,7 @@ msgstr "إجراءات"
 
 #: paperless_mail/admin.py:69
 msgid "The action applied to the mail. This action is only performed when the mail body or attachments were consumed from the mail."
-msgstr "الإجراء المطبق على البريد. يتم تنفيذ هذا الإجراء فقط عندما يتم إستهلاك البريد أو المرفقات من البريد."
+msgstr "الإجراء المطبق على البريد. يتم تنفيذ هذا الإجراء فقط عندما يتم أستهلاك البريد أو المرفقات من البريد."
 
 #: paperless_mail/admin.py:77
 msgid "Metadata"
