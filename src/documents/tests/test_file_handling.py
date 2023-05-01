@@ -697,7 +697,7 @@ class TestFileHandlingWithArchive(DirectoriesMixin, FileSystemAssertsMixin, Test
         self.assertIsFile(doc.archive_path)
 
     @override_settings(FILENAME_FORMAT="{correspondent}/{title}")
-    @mock.patch("documents.signals.handlers.os.rename")
+    @mock.patch("documents.signals.handlers.shutil.move")
     def test_move_archive_error(self, m):
         def fake_rename(src, dst):
             if "archive" in str(src):
@@ -748,7 +748,7 @@ class TestFileHandlingWithArchive(DirectoriesMixin, FileSystemAssertsMixin, Test
         self.assertIsFile(doc.archive_path)
 
     @override_settings(FILENAME_FORMAT="{correspondent}/{title}")
-    @mock.patch("documents.signals.handlers.os.rename")
+    @mock.patch("documents.signals.handlers.shutil.move")
     def test_move_file_error(self, m):
         def fake_rename(src, dst):
             if "original" in str(src):
