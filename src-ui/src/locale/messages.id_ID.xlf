@@ -284,7 +284,7 @@
           <context context-type="sourcefile">src/app/app.component.html</context>
           <context context-type="linenumber">7</context>
         </context-group>
-        <target state="translated">Letakan file untuk mulai mengunggah</target>
+        <target state="translated">Jatuhkan file untuk mulai mengunggah</target>
       </trans-unit>
       <trans-unit id="9103526311244275943" datatype="html">
         <source>Document added</source>
@@ -673,7 +673,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">155</context>
         </context-group>
-        <target state="needs-translation">Storage paths</target>
+        <target state="translated">Lokasi penyimpanan</target>
       </trans-unit>
       <trans-unit id="2991443309752293110" datatype="html">
         <source>File Tasks</source>
@@ -709,7 +709,7 @@
           <context context-type="sourcefile">src/app/components/manage/logs/logs.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="needs-translation">Logs</target>
+        <target state="translated">Log</target>
       </trans-unit>
       <trans-unit id="314315645942131479" datatype="html">
         <source>Info</source>
@@ -781,7 +781,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">217</context>
         </context-group>
-        <target state="needs-translation">Paperless-ngx can automatically check for updates</target>
+        <target state="translated">Paperless-ngx dapat secara otomatis memeriksa pembaruan</target>
       </trans-unit>
       <trans-unit id="894819944961861800" datatype="html">
         <source> How does this work? </source>
@@ -809,7 +809,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">593</context>
         </context-group>
-        <target state="needs-translation">An error occurred while saving settings.</target>
+        <target state="translated">Terjadi kesalahan saat menyimpan setelan.</target>
       </trans-unit>
       <trans-unit id="2526035785704676448" datatype="html">
         <source>An error occurred while saving update checking settings.</source>
@@ -817,7 +817,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
           <context context-type="linenumber">222</context>
         </context-group>
-        <target state="needs-translation">An error occurred while saving update checking settings.</target>
+        <target state="translated">Terjadi kesalahan saat menyimpan setelan pemeriksaan pembaruan.</target>
       </trans-unit>
       <trans-unit id="8700121026680200191" datatype="html">
         <source>Clear</source>
@@ -1217,7 +1217,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/edit-dialog.component.ts</context>
           <context context-type="linenumber">71</context>
         </context-group>
-        <target state="needs-translation">Create new item</target>
+        <target state="translated">Buat barang baru</target>
       </trans-unit>
       <trans-unit id="5324147361912094446" datatype="html">
         <source>Edit item</source>
@@ -1225,7 +1225,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/edit-dialog.component.ts</context>
           <context context-type="linenumber">75</context>
         </context-group>
-        <target state="needs-translation">Edit item</target>
+        <target state="translated">Sunting barang</target>
       </trans-unit>
       <trans-unit id="1699589597032579396" datatype="html">
         <source>Could not save element: <x id="PH" equiv-text="error"/></source>
@@ -1565,7 +1565,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="needs-translation">Filter body</target>
+        <target state="translated">Saring badan</target>
       </trans-unit>
       <trans-unit id="5031687746498952417" datatype="html">
         <source>Filter attachment filename</source>
@@ -1573,7 +1573,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="needs-translation">Filter attachment filename</target>
+        <target state="translated">Saring nama file lampiran</target>
       </trans-unit>
       <trans-unit id="4245210767172267486" datatype="html">
         <source>Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive.</source>
@@ -2069,7 +2069,7 @@
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="needs-translation">Include</target>
+        <target state="translated">Sertakan</target>
       </trans-unit>
       <trans-unit id="5668077948386857930" datatype="html">
         <source>Exclude</source>
@@ -2077,7 +2077,7 @@
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="needs-translation">Exclude</target>
+        <target state="translated">Kecuali</target>
       </trans-unit>
       <trans-unit id="4391289919356861627" datatype="html">
         <source>Apply</source>
@@ -2093,7 +2093,7 @@
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
           <context context-type="linenumber">46</context>
         </context-group>
-        <target state="needs-translation">Click again to exclude items.</target>
+        <target state="translated">Klik lagi untuk mengecualikan barang.</target>
       </trans-unit>
       <trans-unit id="7593728289020204896" datatype="html">
         <source>Not assigned</source>
@@ -2271,7 +2271,7 @@
           <context context-type="linenumber">12</context>
         </context-group>
         <note priority="1" from="description">Used for both types, correspondents, storage paths</note>
-        <target state="needs-translation">Add item</target>
+        <target state="translated">Tambah barang</target>
       </trans-unit>
       <trans-unit id="3686284950598311784" datatype="html">
         <source>Private</source>
@@ -2389,7 +2389,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="needs-translation">Hello <x id="PH" equiv-text="this.settingsService.displayName"/>, welcome to Paperless-ngx</target>
+        <target state="translated">Halo <x id="PH" equiv-text="this.settingsService.displayName"/>, selamat datang ke Paperless-ngx</target>
       </trans-unit>
       <trans-unit id="5334686081082652461" datatype="html">
         <source>Welcome to Paperless-ngx</source>
@@ -2397,7 +2397,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
           <context context-type="linenumber">38</context>
         </context-group>
-        <target state="needs-translation">Welcome to Paperless-ngx</target>
+        <target state="translated">Selamat datang ke Paperless-ngx</target>
       </trans-unit>
       <trans-unit id="2946624699882754313" datatype="html">
         <source>Show all</source>
@@ -2481,7 +2481,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">5</context>
         </context-group>
-        <target state="needs-translation">Documents in inbox</target>
+        <target state="translated">Dokumen dalam kotak masuk</target>
       </trans-unit>
       <trans-unit id="8809281703097241399" datatype="html">
         <source>Go to documents</source>
@@ -2538,7 +2538,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">Drop documents here or</target>
+        <target state="translated">Jatuhkan dokumen di sini atau</target>
       </trans-unit>
       <trans-unit id="8133800334834354642" datatype="html">
         <source>Browse files</source>
@@ -2592,7 +2592,7 @@
           <context context-type="linenumber">269</context>
         </context-group>
         <note priority="1" from="description">this string is used to separate processing, failed and added on the file upload widget</note>
-        <target state="needs-translation">, </target>
+        <target state="translated">, </target>
       </trans-unit>
       <trans-unit id="7915903586014997661" datatype="html">
         <source>Paperless-ngx is running!</source>
@@ -2608,7 +2608,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="needs-translation">You're ready to start uploading documents! Explore the various features of this web app on your own, or start a quick tour using the button below.</target>
+        <target state="translated">Anda siap untuk mulai mengunggah dokumen! Jelajahi berbagai fitur aplikasi web ini, atau mulai tur singkat menggunakan tombol di bawah ini.</target>
       </trans-unit>
       <trans-unit id="4474647174688421179" datatype="html">
         <source>More detail on how to use and configure Paperless-ngx is always available in the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://docs.paperless-ngx.com&quot; target=&quot;_blank&quot;&gt;"/>documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</source>
@@ -2616,7 +2616,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">5</context>
         </context-group>
-        <target state="needs-translation">More detail on how to use and configure Paperless-ngx is always available in the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://docs.paperless-ngx.com&quot; target=&quot;_blank&quot;&gt;"/>documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</target>
+        <target state="translated">Detail lebih lanjut tentang cara menggunakan dan mengonfigurasi Paperless-ngx selalu tersedia di <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://docs.paperless-ngx.com&quot; target=&quot;_blank&quot;&gt;"/>dokumentasi<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</target>
       </trans-unit>
       <trans-unit id="4294899532887357745" datatype="html">
         <source>Thanks for being a part of the Paperless-ngx community!</source>
@@ -2624,7 +2624,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">8</context>
         </context-group>
-        <target state="needs-translation">Thanks for being a part of the Paperless-ngx community!</target>
+        <target state="translated">Terima kasih telah menjadi bagian dalam komunitas Paperless-ngx!</target>
       </trans-unit>
       <trans-unit id="1415832194529539652" datatype="html">
         <source>Start the tour</source>
@@ -2640,7 +2640,7 @@
           <context context-type="sourcefile">src/app/components/document-asn/document-asn.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="needs-translation">Searching document with asn <x id="INTERPOLATION" equiv-text="{{asn}}"/></target>
+        <target state="translated">Mencari dokumen dengan asn <x id="INTERPOLATION" equiv-text="{{asn}}"/></target>
       </trans-unit>
       <trans-unit id="1407560924967345762" datatype="html">
         <source>Page</source>
@@ -2660,7 +2660,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">5,6</context>
         </context-group>
-        <target state="needs-translation">of <x id="INTERPOLATION" equiv-text="{{previewNumPages}}"/></target>
+        <target state="translated">dari <x id="INTERPOLATION" equiv-text="{{previewNumPages}}"/></target>
       </trans-unit>
       <trans-unit id="3099741642167775297" datatype="html">
         <source>Download</source>
@@ -2700,7 +2700,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">92</context>
         </context-group>
-        <target state="needs-translation">Redo OCR</target>
+        <target state="translated">Lakukan ulang pengenalan karakter</target>
       </trans-unit>
       <trans-unit id="1418444397960583910" datatype="html">
         <source>More like this</source>
@@ -2712,7 +2712,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
           <context context-type="linenumber">44</context>
         </context-group>
-        <target state="needs-translation">More like this</target>
+        <target state="translated">Lebih seperti ini</target>
       </trans-unit>
       <trans-unit id="7819314041543176992" datatype="html">
         <source>Close</source>
@@ -2748,7 +2748,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">76</context>
         </context-group>
-        <target state="needs-translation">Archive serial number</target>
+        <target state="translated">Nomor serial arsip</target>
       </trans-unit>
       <trans-unit id="5114742157723900905" datatype="html">
         <source>Date created</source>
@@ -2780,7 +2780,7 @@
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">19</context>
         </context-group>
-        <target state="needs-translation">Correspondent</target>
+        <target state="translated">Koresponden</target>
       </trans-unit>
       <trans-unit id="5066119607229701477" datatype="html">
         <source>Document type</source>
@@ -2804,7 +2804,7 @@
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="needs-translation">Document type</target>
+        <target state="translated">Jenis dokumen</target>
       </trans-unit>
       <trans-unit id="2091353339965748767" datatype="html">
         <source>Storage path</source>
@@ -2824,7 +2824,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">52</context>
         </context-group>
-        <target state="needs-translation">Storage path</target>
+        <target state="translated">Lokasi penyimpanan</target>
       </trans-unit>
       <trans-unit id="5607669932062416162" datatype="html">
         <source>Default</source>
@@ -2852,7 +2852,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/metadata-collapse/metadata-collapse.component.ts</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="needs-translation">Metadata</target>
+        <target state="translated">Metadata</target>
       </trans-unit>
       <trans-unit id="1826652001816486190" datatype="html">
         <source>Date modified</source>
@@ -2984,7 +2984,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">195</context>
         </context-group>
-        <target state="needs-translation">Save &amp; next</target>
+        <target state="translated">Simpan &amp; lanjut</target>
       </trans-unit>
       <trans-unit id="2218903673684131427" datatype="html">
         <source>An error occurred loading content: <x id="PH" equiv-text="err.message ?? err.toString()"/></source>
@@ -2992,7 +2992,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">226,228</context>
         </context-group>
-        <target state="needs-translation">An error occurred loading content: <x id="PH" equiv-text="err.message ?? err.toString()"/></target>
+        <target state="translated">Terjadi masalah saat memuat konten: <x id="PH" equiv-text="err.message ?? err.toString()"/></target>
       </trans-unit>
       <trans-unit id="5758784066858623886" datatype="html">
         <source>Error retrieving metadata</source>
@@ -3000,7 +3000,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">354</context>
         </context-group>
-        <target state="needs-translation">Error retrieving metadata</target>
+        <target state="translated">Kesalahan saat mendapatkan metadata</target>
       </trans-unit>
       <trans-unit id="2374084708811774419" datatype="html">
         <source>Error retrieving suggestions</source>
@@ -3032,7 +3032,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">542</context>
         </context-group>
-        <target state="needs-translation">Error saving document</target>
+        <target state="translated">Kesalahan saat menyimpan dokumen</target>
       </trans-unit>
       <trans-unit id="9021887951960049161" datatype="html">
         <source>Confirm delete</source>
@@ -3076,7 +3076,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">595,597</context>
         </context-group>
-        <target state="needs-translation">Error deleting document: <x id="PH" equiv-text="error.error?.detail ?? error.message ?? JSON.stringify(error)"/></target>
+        <target state="translated">Kesalahan saat menghapus dokumen: <x id="PH" equiv-text="error.error?.detail ?? error.message ?? JSON.stringify(error)"/></target>
       </trans-unit>
       <trans-unit id="7362691899087997122" datatype="html">
         <source>Redo OCR confirm</source>
@@ -4474,7 +4474,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">72</context>
         </context-group>
-        <target state="needs-translation">Items per page</target>
+        <target state="translated">Barang per halaman</target>
       </trans-unit>
       <trans-unit id="8028535997917730106" datatype="html">
         <source>Document editor</source>
