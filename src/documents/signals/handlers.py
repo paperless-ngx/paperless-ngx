@@ -429,12 +429,12 @@ def update_filename_and_move_files(sender, instance: Document, **kwargs):
             if move_original:
                 validate_move(instance, old_source_path, instance.source_path)
                 create_source_path_directory(instance.source_path)
-                os.rename(old_source_path, instance.source_path)
+                shutil.move(old_source_path, instance.source_path)
 
             if move_archive:
                 validate_move(instance, old_archive_path, instance.archive_path)
                 create_source_path_directory(instance.archive_path)
-                os.rename(old_archive_path, instance.archive_path)
+                shutil.move(old_archive_path, instance.archive_path)
 
             # Don't save() here to prevent infinite recursion.
             Document.objects.filter(pk=instance.pk).update(
@@ -453,11 +453,11 @@ def update_filename_and_move_files(sender, instance: Document, **kwargs):
             try:
                 if move_original and os.path.isfile(instance.source_path):
                     logger.info("Restoring previous original path")
-                    os.rename(instance.source_path, old_source_path)
+                    shutil.move(instance.source_path, old_source_path)
 
                 if move_archive and os.path.isfile(instance.archive_path):
                     logger.info("Restoring previous archive path")
-                    os.rename(instance.archive_path, old_archive_path)
+                    shutil.move(instance.archive_path, old_archive_path)
 
             except Exception:
                 # This is fine, since:

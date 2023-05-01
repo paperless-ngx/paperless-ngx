@@ -47,12 +47,16 @@ class TestMakeThumbnails(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertIsFile(self.d1.thumbnail_path)
 
     @mock.patch("documents.management.commands.document_thumbnails.shutil.move")
-    def test_process_document_invalid_mime_type(self, m):
+    def test_process_document_invalid_mime_type(self, m: mock.Mock):
         self.d1.mime_type = "asdasdasd"
         self.d1.save()
 
+        # .save() triggers filename handling
+        m.reset_mock()
+
         _process_document(self.d1.id)
 
+        # Not called during processing of document
         m.assert_not_called()
 
     def test_command(self):
