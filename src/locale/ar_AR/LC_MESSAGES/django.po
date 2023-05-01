@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-05-01 08:36\n"
+"PO-Revision-Date: 2023-05-01 13:00\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -834,11 +834,11 @@ msgstr "تصفية الجسم"
 
 #: paperless_mail/models.py:130
 msgid "filter attachment filename"
-msgstr "تصفية اسم الملف المرفق"
+msgstr "تصفية اسم المِلَفّ المرفق"
 
 #: paperless_mail/models.py:135
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr "فقط المستندات التي تتطابق تماما مع اسم هذا الملف إذا تم تحديدها. المحارف البديلة مثل *.pdf أو *الفواتير* مسموح بها. لأنها غير حساسة."
+msgstr "فقط المستندات التي تتطابق تماما مع اسم هذا المِلَفّ إذا تم تحديدها. المحارف البديلة مثل *.pdf أو *الفواتير* مسموح بها. لأنها غير حساسة."
 
 #: paperless_mail/models.py:142
 msgid "maximum age"
