@@ -208,11 +208,13 @@ class DelayedQuery:
                 for document_type_id in v.split(","):
                     criterias.append(query.Not(query.Term("type_id", document_type_id)))
             elif k == "correspondent__isnull":
-                criterias.append(query.Term("has_correspondent", v == "false"))
+                criterias.append(
+                    query.Term("has_correspondent", self.evalBoolean(v)),
+                )
             elif k == "is_tagged":
-                criterias.append(query.Term("has_tag", v == "true"))
+                criterias.append(query.Term("has_tag", self.evalBoolean(v)))
             elif k == "document_type__isnull":
-                criterias.append(query.Term("has_type", v == "false"))
+                criterias.append(query.Term("has_type", self.evalBoolean(v) is False))
             elif k == "created__date__lt":
                 criterias.append(
                     query.DateRange("created", start=None, end=isoparse(v)),
@@ -236,7 +238,19 @@ class DelayedQuery:
                 for storage_path_id in v.split(","):
                     criterias.append(query.Not(query.Term("path_id", storage_path_id)))
             elif k == "storage_path__isnull":
-                criterias.append(query.Term("has_path", v == "false"))
+                criterias.append(query.Term("has_path", self.evalBoolean(v) is False))
+            elif k == "owner__isnull":
+                criterias.append(query.Term("has_owner", self.evalBoolean(v) is False))
+            elif k == "owner__id":
+                criterias.append(query.Term("owner_id", v))
+            elif k == "owner__id__in":
+                owners_in = []
+                for owner_id in v.split(","):
+                    owners_in.append(query.Term("owner_id", owner_id))
+                criterias.append(query.Or(owners_in))
+            elif k == "owner__id__none":
+                for owner_id in v.split(","):
+                    criterias.append(query.Not(query.Term("owner_id", owner_id)))
 
         user_criterias = [query.Term("has_owner", False)]
         if "user" in self.query_params:
@@ -254,6 +268,12 @@ class DelayedQuery:
         else:
             return query.Or(user_criterias) if len(user_criterias) > 0 else None
 
+    def evalBoolean(self, val):
+        if val == "false" or val == "0":
+            return False
+        if val == "true" or val == "1":
+            return True
+
     def _get_query_sortedby(self):
         if "ordering" not in self.query_params:
             return None, False
@@ -269,6 +289,7 @@ class DelayedQuery:
             "document_type__name": "type",
             "archive_serial_number": "asn",
             "num_notes": "num_notes",
+            "owner": "owner",
         }
 
         if field.startswith("-"):
