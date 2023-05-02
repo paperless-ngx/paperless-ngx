@@ -448,6 +448,10 @@ class SavedViewFilterRule(models.Model):
         (29, _("does not have document type in")),
         (30, _("has storage path in")),
         (31, _("does not have storage path in")),
+        (32, _("owner is")),
+        (33, _("has owner in")),
+        (34, _("does not have owner")),
+        (35, _("does not have owner in")),
     ]
 
     saved_view = models.ForeignKey(
