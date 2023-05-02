@@ -6,6 +6,10 @@ tr {
   user-select: none;
 }
 
+th {
+  cursor: pointer;
+}
+
 .table-row-selected {
   background-color: var(--pngx-primary-faded);
 }

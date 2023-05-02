@@ -12,16 +12,20 @@ name = "piwheels"
 dateparser = "~=1.1"
 django = "~=4.1"
 django-cors-headers = "*"
+django-celery-results = "*"
 django-compression-middleware = "*"
+django-guardian = "*"
 django-extensions = "*"
 django-filter = "~=22.1"
 djangorestframework = "~=3.14"
+djangorestframework-guardian = "*"
+django-ipware = "*"
 filelock = "*"
 gunicorn = "*"
 imap-tools = "*"
 langdetect = "*"
 pathvalidate = "*"
-pillow = "~=9.3"
+pillow = "~=9.4"
 pikepdf = "*"
 python-gnupg = "*"
 python-dotenv = "*"
@@ -30,10 +34,10 @@ python-magic = "*"
 psycopg2 = "*"
 rapidfuzz = "*"
 redis = {extras = ["hiredis"], version = "*"}
-scikit-learn = "~=1.1"
+scikit-learn = "~=1.2"
 numpy = "*"
-whitenoise = "~=6.2"
-watchdog = "~=2.1"
+whitenoise = "~=6.3"
+watchdog = "~=2.2"
 whoosh="~=2.7"
 inotifyrecursive = "~=0.3"
 ocrmypdf = "~=14.0"
@@ -42,29 +46,24 @@ tika = "*"
 # TODO: This will sadly also install daphne+dependencies,
 #  which an ASGI server we don't need. Adds about 15MB image size.
 channels = "~=3.0"
+channels-redis = "*"
 uvicorn = {extras = ["standard"], version = "*"}
 concurrent-log-handler = "*"
 "pdfminer.six" = "*"
 pyzbar = "*"
 mysqlclient = "*"
 celery = {extras = ["redis"], version = "*"}
-django-celery-results = "*"
 setproctitle = "*"
 nltk = "*"
 pdf2image = "*"
 flower = "*"
 bleach = "*"
+zxing-cpp = {version = "*", platform_machine = "== 'x86_64'"}
 #
 # Packages locked due to issues (try to check if these are fixed in a release every so often)
 #
 # Pin this until piwheels is building 1.9 (see https://www.piwheels.org/project/scipy/)
 scipy = "==1.8.1"
-# Newer versions aren't builting yet (see https://www.piwheels.org/project/cryptography/)
-cryptography = "==38.0.1"
-# Locked version until https://github.com/django/channels_redis/issues/332
-# is resolved
-channels-redis = "==3.4.1"
-
 
 [dev-packages]
 coveralls = "*"
@@ -79,3 +78,24 @@ black = "*"
 pre-commit = "*"
 imagehash = "*"
 mkdocs-material = "*"
+ruff = "*"
+
+[typing-dev]
+mypy = "*"
+types-Pillow = "*"
+django-filter-stubs = "*"
+types-python-dateutil = "*"
+djangorestframework-stubs = {extras= ["compatible-mypy"], version="*"}
+celery-types = "*"
+django-stubs = {extras= ["compatible-mypy"], version="*"}
+types-dateparser = "*"
+types-bleach = "*"
+types-humanfriendly = "*"
+types-redis = "*"
+types-tqdm = "*"
+types-Markdown = "*"
+types-Pygments = "*"
+types-backports = "*"
+types-colorama = "*"
+types-psycopg2 = "*"
+types-setuptools = "*"

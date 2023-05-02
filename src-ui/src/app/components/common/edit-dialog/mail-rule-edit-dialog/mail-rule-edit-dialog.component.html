@@ -18,6 +18,7 @@
       <div class="col">
         <p class="small" i18n>Paperless will only process mails that match <em>all</em> of the filters specified below.</p>
         <app-input-text i18n-title title="Filter from" formControlName="filter_from" [error]="error?.filter_from"></app-input-text>
+        <app-input-text i18n-title title="Filter to" formControlName="filter_to" [error]="error?.filter_to"></app-input-text>
         <app-input-text i18n-title title="Filter subject" formControlName="filter_subject" [error]="error?.filter_subject"></app-input-text>
         <app-input-text i18n-title title="Filter body" formControlName="filter_body" [error]="error?.filter_body"></app-input-text>
         <app-input-text i18n-title title="Filter attachment filename" formControlName="filter_attachment_filename" i18n-hint hint="Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive." [error]="error?.filter_attachment_filename"></app-input-text>

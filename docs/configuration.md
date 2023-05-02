@@ -90,6 +90,36 @@ changed here.
 
     Default is `prefer`.
 
+`PAPERLESS_DBSSLROOTCERT=<ca-path>`
+
+: SSL root certificate path
+
+    See [the official documentation about
+    sslmode](https://www.postgresql.org/docs/current/libpq-ssl.html).
+    Changes path of `root.crt`.
+
+    Defaults to unset, using the documented path in the home directory.
+
+`PAPERLESS_DBSSLCERT=<client-cert-path>`
+
+: SSL client certificate path
+
+    See [the official documentation about
+    sslmode](https://www.postgresql.org/docs/current/libpq-ssl.html).
+    Changes path of `postgresql.crt`.
+
+    Defaults to unset, using the documented path in the home directory.
+
+`PAPERLESS_DBSSLKEY=<client-cert-key>`
+
+: SSL client key path
+
+    See [the official documentation about
+    sslmode](https://www.postgresql.org/docs/current/libpq-ssl.html).
+    Changes path of `postgresql.key`.
+
+    Defaults to unset, using the documented path in the home directory.
+
 `PAPERLESS_DB_TIMEOUT=<float>`
 
 : Amount of time for a database connection to wait for the database to
@@ -306,6 +336,14 @@ do CORS calls. Set this to your public domain name.
 
     Defaults to "<http://localhost:8000>".
 
+`PAPERLESS_TRUSTED_PROXIES=<comma-separated-list>`
+
+: This may be needed to prevent IP address spoofing if you are using e.g.
+fail2ban with log entries for failed authorization attempts. Value should be
+IP address(es).
+
+    Defaults to empty string.
+
 `PAPERLESS_FORCE_SCRIPT_NAME=<path>`
 
 : To host paperless under a subpath url like example.com/paperless you
@@ -415,6 +453,33 @@ redirect the user back to the SSO application's logout page.
 
     Defaults to None, which disables this feature.
 
+`PAPERLESS_USE_X_FORWARD_HOST=<bool>`
+
+: Configures the Django setting [USE_X_FORWARDED_HOST](https://docs.djangoproject.com/en/4.2/ref/settings/#use-x-forwarded-host)
+which may be needed for hosting behind a proxy.
+
+    Defaults to False
+
+`PAPERLESS_USE_X_FORWARD_PORT=<bool>`
+
+: Configures the Django setting [USE_X_FORWARDED_PORT](https://docs.djangoproject.com/en/4.2/ref/settings/#use-x-forwarded-port)
+which may be needed for hosting behind a proxy.
+
+    Defaults to False
+
+`PAPERLESS_PROXY_SSL_HEADER=<json-list>`
+
+: Configures the Django setting [SECURE_PROXY_SSL_HEADER](https://docs.djangoproject.com/en/4.2/ref/settings/#secure-proxy-ssl-header)
+which may be needed for hosting behind a proxy. The two values in the list will form the tuple of
+HTTP header/value expected by Django, eg `'["HTTP_X_FORWARDED_PROTO", "https"]'`.
+
+    Defaults to None
+
+!!! warning
+
+    Settings this value has security implications.  Read the Django documentation
+    and be sure you understand its usage before setting it.
+
 ## OCR settings {#ocr}
 
 Paperless uses [OCRmyPDF](https://ocrmypdf.readthedocs.io/en/latest/)
@@ -450,12 +515,6 @@ modes are available:
     -   `skip`: Paperless skips all pages and will perform ocr only on
         pages where no text is present. This is the safest option.
 
-    -   `skip_noarchive`: In addition to skip, paperless won't create
-        an archived version of your documents when it finds any text in
-        them. This is useful if you don't want to have two
-        almost-identical versions of your digital documents in the media
-        folder. This is the fastest option.
-
     -   `redo`: Paperless will OCR all pages of your documents and
         attempt to replace any existing text layers with new text. This
         will be useful for documents from scanners that already
@@ -477,6 +536,19 @@ modes are available:
 
     Read more about this in the [OCRmyPDF
     documentation](https://ocrmypdf.readthedocs.io/en/latest/advanced.html#when-ocr-is-skipped).
+
+`PAPERLESS_OCR_SKIP_ARCHIVE_FILE=<mode>`
+
+: Specify when you would like paperless to skip creating an archived
+version of your documents. This is useful if you don't want to have two
+almost-identical versions of your documents in the media folder.
+
+    -   `never`: Never skip creating an archived version.
+    -   `with_text`: Skip creating an archived version for documents
+    that already have embedded text.
+    -   `always`: Always skip creating an archived version.
+
+    The default is `never`.
 
 `PAPERLESS_OCR_CLEAN=<mode>`
 
@@ -810,6 +882,16 @@ or hidden folders some tools use to store data.
 
     Defaults to
     `[".DS_STORE/*", "._*", ".stfolder/*", ".stversions/*", ".localized/*", "desktop.ini", "@eaDir/*"]`.
+
+`PAPERLESS_CONSUMER_BARCODE_SCANNER=<string>`
+
+: Sets the barcode scanner used for barcode functionality.
+
+    Currently, "PYZBAR" (the default) or "ZXING" might be selected.
+    If you have problems that your Barcodes/QR-Codes are not detected
+    (especially with bad scan quality and/or small codes), try the other one.
+
+    zxing is not available on all platforms.
 
 `PAPERLESS_PRE_CONSUME_SCRIPT=<filename>`
 

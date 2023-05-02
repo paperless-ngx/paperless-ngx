@@ -52,7 +52,7 @@ class BulkArchiveStrategy:
         return in_archive_path
 
     def add_document(self, doc: Document):
-        raise NotImplementedError()  # pragma: no cover
+        raise NotImplementedError  # pragma: no cover
 
 
 class OriginalsOnlyStrategy(BulkArchiveStrategy):

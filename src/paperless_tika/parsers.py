@@ -4,10 +4,11 @@ from pathlib import Path
 import dateutil.parser
 import requests
 from django.conf import settings
-from documents.parsers import DocumentParser
-from documents.parsers import make_thumbnail_from_pdf
-from documents.parsers import ParseError
 from tika import parser
+
+from documents.parsers import DocumentParser
+from documents.parsers import ParseError
+from documents.parsers import make_thumbnail_from_pdf
 
 
 class TikaDocumentParser(DocumentParser):
@@ -39,7 +40,7 @@ class TikaDocumentParser(DocumentParser):
         except Exception as e:
             self.log(
                 "warning",
-                f"Error while fetching document metadata for " f"{document_path}: {e}",
+                f"Error while fetching document metadata for {document_path}: {e}",
             )
             return []
 
@@ -76,7 +77,7 @@ class TikaDocumentParser(DocumentParser):
         except Exception as e:
             self.log(
                 "warning",
-                f"Unable to extract date for document " f"{document_path}: {e}",
+                f"Unable to extract date for document {document_path}: {e}",
             )
 
         self.archive_path = self.convert_to_pdf(document_path, file_name)

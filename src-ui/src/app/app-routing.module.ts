@@ -14,8 +14,13 @@ import { DocumentAsnComponent } from './components/document-asn/document-asn.com
 import { DirtyFormGuard } from './guards/dirty-form.guard'
 import { StoragePathListComponent } from './components/manage/storage-path-list/storage-path-list.component'
 import { TasksComponent } from './components/manage/tasks/tasks.component'
+import { PermissionsGuard } from './guards/permissions.guard'
 import { DirtyDocGuard } from './guards/dirty-doc.guard'
 import { DirtySavedViewGuard } from './guards/dirty-saved-view.guard'
+import {
+  PermissionAction,
+  PermissionType,
+} from './services/permissions.service'
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -29,28 +34,153 @@ const routes: Routes = [
         path: 'documents',
         component: DocumentListComponent,
         canDeactivate: [DirtySavedViewGuard],
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.Document,
+          },
+        },
       },
       {
         path: 'view/:id',
         component: DocumentListComponent,
         canDeactivate: [DirtySavedViewGuard],
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.SavedView,
+          },
+        },
       },
-      { path: 'documents/:id', component: DocumentDetailComponent },
-      { path: 'asn/:id', component: DocumentAsnComponent },
-      { path: 'tags', component: TagListComponent },
-      { path: 'documenttypes', component: DocumentTypeListComponent },
-      { path: 'correspondents', component: CorrespondentListComponent },
-      { path: 'storagepaths', component: StoragePathListComponent },
-      { path: 'logs', component: LogsComponent },
+      {
+        path: 'documents/:id',
+        component: DocumentDetailComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.Document,
+          },
+        },
+      },
+      {
+        path: 'documents/:id/:section',
+        component: DocumentDetailComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.Document,
+          },
+        },
+      },
+      {
+        path: 'asn/:id',
+        component: DocumentAsnComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.Document,
+          },
+        },
+      },
+      {
+        path: 'tags',
+        component: TagListComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.Tag,
+          },
+        },
+      },
+      {
+        path: 'documenttypes',
+        component: DocumentTypeListComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.DocumentType,
+          },
+        },
+      },
+      {
+        path: 'correspondents',
+        component: CorrespondentListComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.Correspondent,
+          },
+        },
+      },
+      {
+        path: 'storagepaths',
+        component: StoragePathListComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.StoragePath,
+          },
+        },
+      },
+      {
+        path: 'logs',
+        component: LogsComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.Admin,
+          },
+        },
+      },
       {
         path: 'settings',
         component: SettingsComponent,
         canDeactivate: [DirtyFormGuard],
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.UISettings,
+          },
+        },
       },
       {
         path: 'settings/:section',
         component: SettingsComponent,
         canDeactivate: [DirtyFormGuard],
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.UISettings,
+          },
+        },
+      },
+      {
+        path: 'settings/:section',
+        component: SettingsComponent,
+        canDeactivate: [DirtyFormGuard],
+      },
+      {
+        path: 'tasks',
+        component: TasksComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.PaperlessTask,
+          },
+        },
       },
       { path: 'tasks', component: TasksComponent },
     ],

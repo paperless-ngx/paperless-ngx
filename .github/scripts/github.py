@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 This module contains some useful classes for interacting with the Github API.
 The full documentation for the API can be found here: https://docs.github.com/en/rest
@@ -162,10 +161,7 @@ class ContainerPackage(_EndpointResponse):
         Returns True if the image has at least one tag which matches the given regex,
         False otherwise
         """
-        for tag in self.tags:
-            if re.match(pattern, tag) is not None:
-                return True
-        return False
+        return any(re.match(pattern, tag) is not None for tag in self.tags)
 
     def __repr__(self):
         return f"Package {self.name}"

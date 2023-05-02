@@ -1,6 +1,7 @@
-from django.db import migrations, models
 import django.utils.timezone
 from django.conf import settings
+from django.db import migrations
+from django.db import models
 
 
 class Migration(migrations.Migration):

@@ -35,15 +35,16 @@ export class OpenDocumentsService {
   refreshDocument(id: number) {
     let index = this.openDocuments.findIndex((doc) => doc.id == id)
     if (index > -1) {
-      this.documentService.get(id).subscribe(
-        (doc) => {
+      this.documentService.get(id).subscribe({
+        next: (doc) => {
           this.openDocuments[index] = doc
+          this.save()
         },
-        (error) => {
+        error: () => {
           this.openDocuments.splice(index, 1)
           this.save()
-        }
-      )
+        },
+      })
     }
   }
 

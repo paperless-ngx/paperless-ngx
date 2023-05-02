@@ -2,10 +2,10 @@ from unittest import mock
 
 from channels.layers import get_channel_layer
 from channels.testing import WebsocketCommunicator
-from django.test import override_settings
 from django.test import TestCase
-from paperless.asgi import application
+from django.test import override_settings
 
+from paperless.asgi import application
 
 TEST_CHANNEL_LAYERS = {
     "default": {

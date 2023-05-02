@@ -20,4 +20,6 @@ export interface PaperlessMailAccount extends ObjectWithId {
   password: string
 
   character_set?: string
+
+  is_token: boolean
 }

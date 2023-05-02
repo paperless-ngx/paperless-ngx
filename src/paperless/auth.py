@@ -10,7 +10,11 @@ class AutoLoginMiddleware(MiddlewareMixin):
     def process_request(self, request):
         try:
             request.user = User.objects.get(username=settings.AUTO_LOGIN_USERNAME)
-            auth.login(request, request.user)
+            auth.login(
+                request=request,
+                user=request.user,
+                backend="django.contrib.auth.backends.ModelBackend",
+            )
         except User.DoesNotExist:
             pass
 

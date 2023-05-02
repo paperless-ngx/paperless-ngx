@@ -74,6 +74,8 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
   }
 
   removeTag(event: PointerEvent, id: number) {
+    if (this.disabled) return
+
     // prevent opening dropdown
     event.stopImmediatePropagation()
 

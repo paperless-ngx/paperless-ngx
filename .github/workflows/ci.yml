@@ -16,7 +16,7 @@ on:
 env:
   # This is the version of pipenv all the steps will use
   # If changing this, change Dockerfile
-  DEFAULT_PIP_ENV_VERSION: "2022.11.30"
+  DEFAULT_PIP_ENV_VERSION: "2023.3.20"
   # This is the default version of Python to use in most steps
   # If changing this, change Dockerfile
   DEFAULT_PYTHON_VERSION: "3.9"
@@ -190,6 +190,8 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: 'src-ui/package-lock.json'
       - run: cd src-ui && npm ci
       - run: cd src-ui && npm run lint
       - run: cd src-ui && npm run test
@@ -301,6 +303,7 @@ jobs:
           images: |
             ghcr.io/${{ needs.prepare-docker-build.outputs.ghcr-repository }}
             name=paperlessngx/paperless-ngx,enable=${{ steps.docker-hub.outputs.enable }}
+            name=quay.io/paperlessngx/paperless-ngx,enable=${{ steps.docker-hub.outputs.enable }}
           tags: |
             # Tag branches with branch name
             type=ref,event=branch
@@ -332,6 +335,15 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      -
+        name: Login to Quay.io
+        uses: docker/login-action@v2
+        # Don't attempt to login is not pushing to Docker Hub
+        if: steps.docker-hub.outputs.enable == 'true'
+        with:
+          registry: quay.io
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_ROBOT_TOKEN }}
       -
         name: Build and push
         uses: docker/build-push-action@v4
@@ -451,7 +463,7 @@ jobs:
           do
             cp --verbose ${file_name} dist/paperless-ngx/
           done
-          mv --verbose dist/paperless-ngx/paperless.conf.example paperless.conf
+          mv --verbose dist/paperless-ngx/paperless.conf.example dist/paperless-ngx/paperless.conf
 
           echo "Copying Docker related files"
           cp --recursive docker/ dist/paperless-ngx/docker
@@ -586,5 +598,5 @@ jobs:
               owner,
               repo,
               issue_number: result.data.number,
-              labels: ['documentation']
+              labels: ['documentation', 'skip-changelog']
             });

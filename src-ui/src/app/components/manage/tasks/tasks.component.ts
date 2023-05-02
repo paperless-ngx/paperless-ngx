@@ -5,13 +5,17 @@ import { Subject, first } from 'rxjs'
 import { PaperlessTask } from 'src/app/data/paperless-task'
 import { TasksService } from 'src/app/services/tasks.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
+import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 
 @Component({
   selector: 'app-tasks',
   templateUrl: './tasks.component.html',
   styleUrls: ['./tasks.component.scss'],
 })
-export class TasksComponent implements OnInit, OnDestroy {
+export class TasksComponent
+  extends ComponentWithPermissions
+  implements OnInit, OnDestroy
+{
   public activeTab: string
   public selectedTasks: Set<number> = new Set()
   private unsubscribeNotifer = new Subject()
@@ -27,7 +31,9 @@ export class TasksComponent implements OnInit, OnDestroy {
     public tasksService: TasksService,
     private modalService: NgbModal,
     private readonly router: Router
-  ) {}
+  ) {
+    super()
+  }
 
   ngOnInit() {
     this.tasksService.reload()

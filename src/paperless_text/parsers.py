@@ -1,10 +1,11 @@
 import os
 
 from django.conf import settings
-from documents.parsers import DocumentParser
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
+
+from documents.parsers import DocumentParser
 
 
 class TextDocumentParser(DocumentParser):

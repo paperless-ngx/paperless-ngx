@@ -6,15 +6,14 @@ import tqdm
 from django import db
 from django.conf import settings
 from django.core.management.base import BaseCommand
+
 from documents.models import Document
 from documents.tasks import update_document_archive_file
-
 
 logger = logging.getLogger("paperless.management.archiver")
 
 
 class Command(BaseCommand):
-
     help = """
         Using the current classification model, assigns correspondents, tags
         and document types to all documents, effectively allowing you to
@@ -51,7 +50,6 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-
         os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
 
         overwrite = options["overwrite"]
@@ -74,7 +72,6 @@ class Command(BaseCommand):
         db.connections.close_all()
 
         try:
-
             logging.getLogger().handlers[0].level = logging.ERROR
             with multiprocessing.Pool(processes=settings.TASK_WORKERS) as pool:
                 list(

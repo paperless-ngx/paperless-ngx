@@ -3,6 +3,10 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { FILTER_HAS_TAGS_ALL } from 'src/app/data/filter-rule-type'
 import { PaperlessTag } from 'src/app/data/paperless-tag'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
+import {
+  PermissionsService,
+  PermissionType,
+} from 'src/app/services/permissions.service'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { TagEditDialogComponent } from '../../common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
@@ -18,7 +22,8 @@ export class TagListComponent extends ManagementListComponent<PaperlessTag> {
     tagService: TagService,
     modalService: NgbModal,
     toastService: ToastService,
-    documentListViewService: DocumentListViewService
+    documentListViewService: DocumentListViewService,
+    permissionsService: PermissionsService
   ) {
     super(
       tagService,
@@ -26,9 +31,11 @@ export class TagListComponent extends ManagementListComponent<PaperlessTag> {
       TagEditDialogComponent,
       toastService,
       documentListViewService,
+      permissionsService,
       FILTER_HAS_TAGS_ALL,
       $localize`tag`,
       $localize`tags`,
+      PermissionType.Tag,
       [
         {
           key: 'color',

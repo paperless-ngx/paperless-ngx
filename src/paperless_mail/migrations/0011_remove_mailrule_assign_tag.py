@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("paperless_mail", "0010_auto_20220311_1602"),
     ]

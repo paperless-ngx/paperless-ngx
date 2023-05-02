@@ -30,7 +30,9 @@ def worker_int(worker):
     worker.log.info("worker received INT or QUIT signal")
 
     ## get traceback info
-    import threading, sys, traceback
+    import sys
+    import threading
+    import traceback
 
     id2name = {th.ident: th.name for th in threading.enumerate()}
     code = []

@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("documents", "1027_remove_paperlesstask_attempted_task_and_more"),
     ]

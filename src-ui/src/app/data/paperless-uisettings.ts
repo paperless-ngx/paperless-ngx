@@ -1,11 +1,9 @@
+import { PaperlessUser } from './paperless-user'
+
 export interface PaperlessUiSettings {
-  user_id: number
-
-  username: string
-
-  display_name: string
-
+  user: PaperlessUser
   settings: Object
+  permissions: string[]
 }
 
 export interface PaperlessUiSetting {
@@ -36,7 +34,7 @@ export const SETTINGS_KEYS = {
     'general-settings:notifications:consumer-failed',
   NOTIFICATIONS_CONSUMER_SUPPRESS_ON_DASHBOARD:
     'general-settings:notifications:consumer-suppress-on-dashboard',
-  COMMENTS_ENABLED: 'general-settings:comments-enabled',
+  NOTES_ENABLED: 'general-settings:notes-enabled',
   SLIM_SIDEBAR: 'general-settings:slim-sidebar',
   UPDATE_CHECKING_ENABLED: 'general-settings:update-checking:enabled',
   UPDATE_CHECKING_BACKEND_SETTING:
@@ -127,7 +125,7 @@ export const SETTINGS: PaperlessUiSetting[] = [
     default: true,
   },
   {
-    key: SETTINGS_KEYS.COMMENTS_ENABLED,
+    key: SETTINGS_KEYS.NOTES_ENABLED,
     type: 'boolean',
     default: true,
   },

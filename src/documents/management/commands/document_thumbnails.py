@@ -5,9 +5,9 @@ import shutil
 import tqdm
 from django import db
 from django.core.management.base import BaseCommand
-from documents.models import Document
 
-from ...parsers import get_parser_class_for_mime_type
+from documents.models import Document
+from documents.parsers import get_parser_class_for_mime_type
 
 
 def _process_document(doc_in):
@@ -21,7 +21,6 @@ def _process_document(doc_in):
         return
 
     try:
-
         thumb = parser.get_thumbnail(
             document.source_path,
             document.mime_type,
@@ -34,7 +33,6 @@ def _process_document(doc_in):
 
 
 class Command(BaseCommand):
-
     help = """
         This will regenerate the thumbnails for all documents.
     """.replace(

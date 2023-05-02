@@ -9,6 +9,7 @@
             "account": 2,
             "folder": "INBOX",
             "filter_from": null,
+            "filter_to": null,
             "filter_subject": "[paperless]",
             "filter_body": null,
             "filter_attachment_filename": null,

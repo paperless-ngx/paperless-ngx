@@ -56,8 +56,6 @@ describe('settings', () => {
             'GET',
             'http://localhost:8000/api/mail_accounts/*',
             (req) => {
-              console.log(req, this.newMailAccounts)
-
               let response = { ...mailAccountsJson }
               if (this.newMailAccounts.length) {
                 response.results = response.results.concat(this.newMailAccounts)
@@ -115,7 +113,7 @@ describe('settings', () => {
     cy.contains('a', 'Dashboard').click()
     cy.contains('You have unsaved changes')
     cy.contains('button', 'Cancel').click()
-    cy.contains('button', 'Save').click().wait('@savedViews').wait(2000)
+    cy.contains('button', 'Save').click().wait(2000)
     cy.contains('a', 'Dashboard').click()
     cy.contains('You have unsaved changes').should('not.exist')
   })
@@ -142,7 +140,7 @@ describe('settings', () => {
     cy.get('app-saved-view-widget').contains('Inbox').should('not.exist')
   })
 
-  it('should show a list of mail accounts & rules & support creation', () => {
+  it('should show a list of mail accounts & support creation', () => {
     cy.contains('a', 'Mail').click()
     cy.get('app-settings .tab-content ul li').its('length').should('eq', 5) // 2 headers, 2 accounts, 1 rule
     cy.contains('button', 'Add Account').click()
@@ -162,6 +160,13 @@ describe('settings', () => {
       .wait('@getAccounts')
     cy.contains('Saved account')
 
+    cy.get('app-settings .tab-content ul li').its('length').should('eq', 6)
+  })
+
+  it('should show a list of mail rules & support creation', () => {
+    cy.contains('a', 'Mail').click()
+    cy.get('app-settings .tab-content ul li').its('length').should('eq', 5) // 2 headers, 2 accounts, 1 rule
+
     cy.wait(1000)
     cy.contains('button', 'Add Rule').click()
     cy.contains('Create new mail rule')
@@ -177,6 +182,6 @@ describe('settings', () => {
       .wait('@getRules')
     cy.contains('Saved rule').wait(1000)
 
-    cy.get('app-settings .tab-content ul li').its('length').should('eq', 7)
+    cy.get('app-settings .tab-content ul li').its('length').should('eq', 6)
   })
 })

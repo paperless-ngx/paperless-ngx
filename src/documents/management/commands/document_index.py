@@ -1,11 +1,11 @@
 from django.core.management import BaseCommand
 from django.db import transaction
+
 from documents.tasks import index_optimize
 from documents.tasks import index_reindex
 
 
 class Command(BaseCommand):
-
     help = "Manages the document index."
 
     def add_arguments(self, parser):

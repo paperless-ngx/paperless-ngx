@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 This is a helper script for the mutli-stage Docker image builder.
 It provides a single point of configuration for package version control.

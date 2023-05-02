@@ -1,8 +1,10 @@
 from django import forms
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
+
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
+from paperless_mail.models import ProcessedMail
 
 
 class MailAccountAdminForm(forms.ModelForm):
@@ -17,23 +19,33 @@ class MailAccountAdminForm(forms.ModelForm):
         widgets = {
             "password": forms.PasswordInput(),
         }
-        fields = "__all__"
+        fields = [
+            "name",
+            "imap_server",
+            "username",
+            "imap_security",
+            "username",
+            "password",
+            "is_token",
+            "character_set",
+        ]
 
 
 class MailAccountAdmin(admin.ModelAdmin):
-
     list_display = ("name", "imap_server", "username")
 
     fieldsets = [
         (None, {"fields": ["name", "imap_server", "imap_port"]}),
-        (_("Authentication"), {"fields": ["imap_security", "username", "password"]}),
+        (
+            _("Authentication"),
+            {"fields": ["imap_security", "username", "password", "is_token"]},
+        ),
         (_("Advanced settings"), {"fields": ["character_set"]}),
     ]
     form = MailAccountAdminForm
 
 
 class MailRuleAdmin(admin.ModelAdmin):
-
     radio_fields = {
         "attachment_type": admin.VERTICAL,
         "action": admin.VERTICAL,
@@ -52,6 +64,7 @@ class MailRuleAdmin(admin.ModelAdmin):
                 ),
                 "fields": (
                     "filter_from",
+                    "filter_to",
                     "filter_subject",
                     "filter_body",
                     "filter_attachment_filename",
@@ -105,5 +118,32 @@ class MailRuleAdmin(admin.ModelAdmin):
     ordering = ["order"]
 
 
+class ProcessedMailAdmin(admin.ModelAdmin):
+    class Meta:
+        model = ProcessedMail
+        fields = "__all__"
+
+    list_display = ("subject", "status", "processed", "received", "rule")
+
+    ordering = ["-processed"]
+
+    readonly_fields = [
+        "owner",
+        "rule",
+        "folder",
+        "uid",
+        "subject",
+        "received",
+        "processed",
+        "status",
+        "error",
+    ]
+
+    list_display_links = ["subject"]
+
+    list_filter = ("status", "rule")
+
+
 admin.site.register(MailAccount, MailAccountAdmin)
 admin.site.register(MailRule, MailRuleAdmin)
+admin.site.register(ProcessedMail, ProcessedMailAdmin)

@@ -14,6 +14,7 @@ import magic
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
@@ -30,9 +31,9 @@ from .models import DocumentType
 from .models import FileInfo
 from .models import Tag
 from .parsers import DocumentParser
+from .parsers import ParseError
 from .parsers import get_parser_class_for_mime_type
 from .parsers import parse_date
-from .parsers import ParseError
 from .signals import document_consumption_finished
 from .signals import document_consumption_started
 
@@ -59,7 +60,6 @@ MESSAGE_FINISHED = "finished"
 
 
 class Consumer(LoggingMixin):
-
     logging_name = "paperless.consumer"
 
     def _send_progress(
@@ -106,6 +106,7 @@ class Consumer(LoggingMixin):
         self.override_document_type_id = None
         self.override_asn = None
         self.task_id = None
+        self.owner_id = None
 
         self.channel_layer = get_channel_layer()
 
@@ -282,7 +283,7 @@ class Consumer(LoggingMixin):
 
     def try_consume_file(
         self,
-        path,
+        path: Path,
         override_filename=None,
         override_title=None,
         override_correspondent_id=None,
@@ -291,6 +292,7 @@ class Consumer(LoggingMixin):
         task_id=None,
         override_created=None,
         override_asn=None,
+        override_owner_id=None,
     ) -> Document:
         """
         Return the document object if it was successfully created.
@@ -305,6 +307,7 @@ class Consumer(LoggingMixin):
         self.task_id = task_id or str(uuid.uuid4())
         self.override_created = override_created
         self.override_asn = override_asn
+        self.override_owner_id = override_owner_id
 
         self._send_progress(0, 100, "STARTING", MESSAGE_NEW_FILE)
 
@@ -422,7 +425,6 @@ class Consumer(LoggingMixin):
         # in the system. This will be a transaction and reasonably fast.
         try:
             with transaction.atomic():
-
                 # store the document.
                 document = self._store(text=text, date=date, mime_type=mime_type)
 
@@ -516,7 +518,6 @@ class Consumer(LoggingMixin):
         date: Optional[datetime.datetime],
         mime_type: str,
     ) -> Document:
-
         # If someone gave us the original filename, use it instead of doc.
 
         file_info = FileInfo.from_filename(self.filename)
@@ -580,10 +581,14 @@ class Consumer(LoggingMixin):
         if self.override_asn:
             document.archive_serial_number = self.override_asn
 
+        if self.override_owner_id:
+            document.owner = User.objects.get(
+                pk=self.override_owner_id,
+            )
+
     def _write(self, storage_type, source, target):
-        with open(source, "rb") as read_file:
-            with open(target, "wb") as write_file:
-                write_file.write(read_file.read())
+        with open(source, "rb") as read_file, open(target, "wb") as write_file:
+            write_file.write(read_file.read())
 
     def _log_script_outputs(self, completed_process: CompletedProcess):
         """

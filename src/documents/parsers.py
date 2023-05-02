@@ -14,6 +14,7 @@ from typing import Set
 
 from django.conf import settings
 from django.utils import timezone
+
 from documents.loggers import LoggingMixin
 from documents.signals import document_consumer_declaration
 
@@ -139,7 +140,6 @@ def run_convert(
     extra=None,
     logging_group=None,
 ) -> None:
-
     environment = os.environ.copy()
     if settings.CONVERT_MEMORY_LIMIT:
         environment["MAGICK_MEMORY_LIMIT"] = settings.CONVERT_MEMORY_LIMIT
@@ -323,7 +323,7 @@ class DocumentParser(LoggingMixin):
         return []
 
     def parse(self, document_path, mime_type, file_name=None):
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def get_archive_path(self):
         return self.archive_path
@@ -332,7 +332,7 @@ class DocumentParser(LoggingMixin):
         """
         Returns the path to a file we can use as a thumbnail for this document.
         """
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def get_text(self):
         return self.text

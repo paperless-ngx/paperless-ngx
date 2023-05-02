@@ -6,8 +6,7 @@ from contextlib import contextmanager
 from dateutil.parser import isoparse
 from django.conf import settings
 from django.utils import timezone
-from documents.models import Comment
-from documents.models import Document
+from guardian.shortcuts import get_users_with_perms
 from whoosh import classify
 from whoosh import highlight
 from whoosh import query
@@ -15,8 +14,8 @@ from whoosh.fields import BOOLEAN
 from whoosh.fields import DATETIME
 from whoosh.fields import KEYWORD
 from whoosh.fields import NUMERIC
-from whoosh.fields import Schema
 from whoosh.fields import TEXT
+from whoosh.fields import Schema
 from whoosh.highlight import HtmlFormatter
 from whoosh.index import create_in
 from whoosh.index import exists_in
@@ -26,6 +25,9 @@ from whoosh.qparser.dateparse import DateParserPlugin
 from whoosh.searching import ResultsPage
 from whoosh.searching import Searcher
 from whoosh.writing import AsyncWriter
+
+from documents.models import Document
+from documents.models import Note
 
 logger = logging.getLogger("paperless.index")
 
@@ -51,7 +53,11 @@ def get_schema():
         path=TEXT(sortable=True),
         path_id=NUMERIC(),
         has_path=BOOLEAN(),
-        comments=TEXT(),
+        notes=TEXT(),
+        owner=TEXT(),
+        owner_id=NUMERIC(),
+        has_owner=BOOLEAN(),
+        viewer_id=KEYWORD(commas=True),
     )
 
 
@@ -93,7 +99,7 @@ def open_index_searcher():
 def update_document(writer: AsyncWriter, doc: Document):
     tags = ",".join([t.name for t in doc.tags.all()])
     tags_ids = ",".join([str(t.id) for t in doc.tags.all()])
-    comments = ",".join([str(c.comment) for c in Comment.objects.filter(document=doc)])
+    notes = ",".join([str(c.note) for c in Note.objects.filter(document=doc)])
     asn = doc.archive_serial_number
     if asn is not None and (
         asn < Document.ARCHIVE_SERIAL_NUMBER_MIN
@@ -106,6 +112,11 @@ def update_document(writer: AsyncWriter, doc: Document):
             f"{Document.ARCHIVE_SERIAL_NUMBER_MAX:,}.",
         )
         asn = 0
+    users_with_perms = get_users_with_perms(
+        doc,
+        only_with_perms_in=["view_document"],
+    )
+    viewer_ids = ",".join([str(u.id) for u in users_with_perms])
     writer.update_document(
         id=doc.pk,
         title=doc.title,
@@ -126,7 +137,11 @@ def update_document(writer: AsyncWriter, doc: Document):
         path=doc.storage_path.name if doc.storage_path else None,
         path_id=doc.storage_path.id if doc.storage_path else None,
         has_path=doc.storage_path is not None,
-        comments=comments,
+        notes=notes,
+        owner=doc.owner.username if doc.owner else None,
+        owner_id=doc.owner.id if doc.owner else None,
+        has_owner=doc.owner is not None,
+        viewer_id=viewer_ids if viewer_ids else None,
     )
 
 
@@ -150,13 +165,21 @@ def remove_document_from_index(document):
 
 class DelayedQuery:
     def _get_query(self):
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def _get_query_filter(self):
         criterias = []
         for k, v in self.query_params.items():
             if k == "correspondent__id":
                 criterias.append(query.Term("correspondent_id", v))
+            elif k == "correspondent__id__in":
+                for correspondent_id in v.split(","):
+                    criterias.append(query.Term("correspondent_id", correspondent_id))
+            elif k == "correspondent__id__none":
+                for correspondent_id in v.split(","):
+                    criterias.append(
+                        query.Not(query.Term("correspondent_id", correspondent_id)),
+                    )
             elif k == "tags__id__all":
                 for tag_id in v.split(","):
                     criterias.append(query.Term("tag_id", tag_id))
@@ -165,6 +188,12 @@ class DelayedQuery:
                     criterias.append(query.Not(query.Term("tag_id", tag_id)))
             elif k == "document_type__id":
                 criterias.append(query.Term("type_id", v))
+            elif k == "document_type__id__in":
+                for document_type_id in v.split(","):
+                    criterias.append(query.Term("type_id", document_type_id))
+            elif k == "document_type__id__none":
+                for document_type_id in v.split(","):
+                    criterias.append(query.Not(query.Term("type_id", document_type_id)))
             elif k == "correspondent__isnull":
                 criterias.append(query.Term("has_correspondent", v == "false"))
             elif k == "is_tagged":
@@ -185,13 +214,26 @@ class DelayedQuery:
                 criterias.append(query.DateRange("added", start=None, end=isoparse(v)))
             elif k == "storage_path__id":
                 criterias.append(query.Term("path_id", v))
+            elif k == "storage_path__id__in":
+                for storage_path_id in v.split(","):
+                    criterias.append(query.Term("path_id", storage_path_id))
+            elif k == "storage_path__id__none":
+                for storage_path_id in v.split(","):
+                    criterias.append(query.Not(query.Term("path_id", storage_path_id)))
             elif k == "storage_path__isnull":
                 criterias.append(query.Term("has_path", v == "false"))
 
+        user_criterias = [query.Term("has_owner", False)]
+        if "user" in self.query_params:
+            user_criterias.append(query.Term("owner_id", self.query_params["user"]))
+            user_criterias.append(
+                query.Term("viewer_id", str(self.query_params["user"])),
+            )
         if len(criterias) > 0:
+            criterias.append(query.Or(user_criterias))
             return query.And(criterias)
         else:
-            return None
+            return query.Or(user_criterias)
 
     def _get_query_sortedby(self):
         if "ordering" not in self.query_params:
@@ -272,7 +314,7 @@ class DelayedFullTextQuery(DelayedQuery):
     def _get_query(self):
         q_str = self.query_params["query"]
         qp = MultifieldParser(
-            ["content", "title", "correspondent", "tag", "type", "comments"],
+            ["content", "title", "correspondent", "tag", "type", "notes"],
             self.searcher.ixreader.schema,
         )
         qp.add_plugin(DateParserPlugin(basedate=timezone.now()))
@@ -309,7 +351,7 @@ class DelayedMoreLikeThisQuery(DelayedQuery):
 def autocomplete(ix, term, limit=10):
     with ix.reader() as reader:
         terms = []
-        for (score, t) in reader.most_distinctive_terms(
+        for score, t in reader.most_distinctive_terms(
             "content",
             number=limit,
             prefix=term.lower(),

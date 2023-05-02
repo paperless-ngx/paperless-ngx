@@ -1,8 +1,10 @@
 from django.contrib import admin
+from guardian.admin import GuardedModelAdmin
 
 from .models import Correspondent
 from .models import Document
 from .models import DocumentType
+from .models import Note
 from .models import PaperlessTask
 from .models import SavedView
 from .models import SavedViewFilterRule
@@ -10,29 +12,25 @@ from .models import StoragePath
 from .models import Tag
 
 
-class CorrespondentAdmin(admin.ModelAdmin):
-
+class CorrespondentAdmin(GuardedModelAdmin):
     list_display = ("name", "match", "matching_algorithm")
     list_filter = ("matching_algorithm",)
     list_editable = ("match", "matching_algorithm")
 
 
-class TagAdmin(admin.ModelAdmin):
-
+class TagAdmin(GuardedModelAdmin):
     list_display = ("name", "color", "match", "matching_algorithm")
     list_filter = ("color", "matching_algorithm")
     list_editable = ("color", "match", "matching_algorithm")
 
 
-class DocumentTypeAdmin(admin.ModelAdmin):
-
+class DocumentTypeAdmin(GuardedModelAdmin):
     list_display = ("name", "match", "matching_algorithm")
     list_filter = ("matching_algorithm",)
     list_editable = ("match", "matching_algorithm")
 
 
-class DocumentAdmin(admin.ModelAdmin):
-
+class DocumentAdmin(GuardedModelAdmin):
     search_fields = ("correspondent__name", "title", "content", "tags__name")
     readonly_fields = (
         "added",
@@ -96,9 +94,8 @@ class RuleInline(admin.TabularInline):
     model = SavedViewFilterRule
 
 
-class SavedViewAdmin(admin.ModelAdmin):
-
-    list_display = ("name", "user")
+class SavedViewAdmin(GuardedModelAdmin):
+    list_display = ("name", "owner")
 
     inlines = [RuleInline]
 
@@ -107,14 +104,13 @@ class StoragePathInline(admin.TabularInline):
     model = StoragePath
 
 
-class StoragePathAdmin(admin.ModelAdmin):
+class StoragePathAdmin(GuardedModelAdmin):
     list_display = ("name", "path", "match", "matching_algorithm")
     list_filter = ("path", "matching_algorithm")
     list_editable = ("path", "match", "matching_algorithm")
 
 
 class TaskAdmin(admin.ModelAdmin):
-
     list_display = ("task_id", "task_file_name", "task_name", "date_done", "status")
     list_filter = ("status", "date_done", "task_file_name", "task_name")
     search_fields = ("task_name", "task_id", "status")
@@ -130,6 +126,12 @@ class TaskAdmin(admin.ModelAdmin):
     )
 
 
+class NotesAdmin(GuardedModelAdmin):
+    list_display = ("user", "created", "note", "document")
+    list_filter = ("created", "user")
+    list_display_links = ("created",)
+
+
 admin.site.register(Correspondent, CorrespondentAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(DocumentType, DocumentTypeAdmin)
@@ -137,3 +139,4 @@ admin.site.register(Document, DocumentAdmin)
 admin.site.register(SavedView, SavedViewAdmin)
 admin.site.register(StoragePath, StoragePathAdmin)
 admin.site.register(PaperlessTask, TaskAdmin)
+admin.site.register(Note, NotesAdmin)

@@ -3,7 +3,6 @@ import uuid
 
 
 class LoggingMixin:
-
     logging_group = None
 
     logging_name = None

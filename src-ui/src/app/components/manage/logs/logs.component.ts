@@ -38,14 +38,14 @@ export class LogsComponent implements OnInit, AfterViewChecked {
   }
 
   reloadLogs() {
-    this.logService.get(this.activeLog).subscribe(
-      (result) => {
+    this.logService.get(this.activeLog).subscribe({
+      next: (result) => {
         this.logs = result
       },
-      (error) => {
+      error: () => {
         this.logs = []
-      }
-    )
+      },
+    })
   }
 
   getLogLevel(log: string) {

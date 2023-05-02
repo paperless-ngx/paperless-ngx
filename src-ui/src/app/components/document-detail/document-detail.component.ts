@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core'
 import { FormControl, FormGroup } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
-import { NgbModal, NgbNav } from '@ng-bootstrap/ng-bootstrap'
+import { NgbModal, NgbNav, NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap'
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent'
 import { PaperlessDocument } from 'src/app/data/paperless-document'
 import { PaperlessDocumentMetadata } from 'src/app/data/paperless-document-metadata'
@@ -35,6 +35,24 @@ import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
 import { StoragePathEditDialogComponent } from '../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
 import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
+import {
+  PermissionAction,
+  PermissionsService,
+  PermissionType,
+} from 'src/app/services/permissions.service'
+import { PaperlessUser } from 'src/app/data/paperless-user'
+import { UserService } from 'src/app/services/rest/user.service'
+import { PaperlessDocumentNote } from 'src/app/data/paperless-document-note'
+import { HttpClient } from '@angular/common/http'
+
+enum DocumentDetailNavIDs {
+  Details = 1,
+  Content = 2,
+  Metadata = 3,
+  Preview = 4,
+  Notes = 5,
+  Permissions = 6,
+}
 
 @Component({
   selector: 'app-document-detail',
@@ -58,10 +76,12 @@ export class DocumentDetailComponent
   document: PaperlessDocument
   metadata: PaperlessDocumentMetadata
   suggestions: PaperlessDocumentSuggestions
+  users: PaperlessUser[]
 
   title: string
   titleSubject: Subject<string> = new Subject()
   previewUrl: string
+  _previewHtml: string
   downloadUrl: string
   downloadOriginalUrl: string
 
@@ -78,6 +98,7 @@ export class DocumentDetailComponent
     storage_path: new FormControl(),
     archive_serial_number: new FormControl(),
     tags: new FormControl([]),
+    permissions_form: new FormControl(null),
   })
 
   previewCurrentPage: number = 1
@@ -106,6 +127,11 @@ export class DocumentDetailComponent
     }
   }
 
+  PermissionAction = PermissionAction
+  PermissionType = PermissionType
+  DocumentDetailNavIDs = DocumentDetailNavIDs
+  activeNavID: number
+
   constructor(
     private documentsService: DocumentService,
     private route: ActivatedRoute,
@@ -118,7 +144,10 @@ export class DocumentDetailComponent
     private documentTitlePipe: DocumentTitlePipe,
     private toastService: ToastService,
     private settings: SettingsService,
-    private storagePathService: StoragePathService
+    private storagePathService: StoragePathService,
+    private permissionsService: PermissionsService,
+    private userService: UserService,
+    private http: HttpClient
   ) {}
 
   titleKeyUp(event) {
@@ -147,7 +176,13 @@ export class DocumentDetailComponent
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
         this.error = null
-        Object.assign(this.document, this.documentForm.value)
+        const docValues = Object.assign({}, this.documentForm.value)
+        docValues['owner'] =
+          this.documentForm.get('permissions_form').value['owner']
+        docValues['set_permissions'] =
+          this.documentForm.get('permissions_form').value['set_permissions']
+        delete docValues['permissions_form']
+        Object.assign(this.document, docValues)
       })
 
     this.correspondentService
@@ -165,6 +200,11 @@ export class DocumentDetailComponent
       .pipe(first())
       .subscribe((result) => (this.storagePaths = result.results))
 
+    this.userService
+      .listAll()
+      .pipe(first())
+      .subscribe((result) => (this.users = result.results))
+
     this.route.paramMap
       .pipe(
         takeUntil(this.unsubscribeNotifier),
@@ -178,6 +218,16 @@ export class DocumentDetailComponent
         switchMap((doc) => {
           this.documentId = doc.id
           this.previewUrl = this.documentsService.getPreviewUrl(this.documentId)
+          this.http.get(this.previewUrl, { responseType: 'text' }).subscribe({
+            next: (res) => {
+              this._previewHtml = res.toString()
+            },
+            error: (err) => {
+              this._previewHtml = $localize`An error occurred loading content: ${
+                err.message ?? err.toString()
+              }`
+            },
+          })
           this.downloadUrl = this.documentsService.getDownloadUrl(
             this.documentId
           )
@@ -232,6 +282,10 @@ export class DocumentDetailComponent
             storage_path: doc.storage_path,
             archive_serial_number: doc.archive_serial_number,
             tags: [...doc.tags],
+            permissions_form: {
+              owner: doc.owner,
+              set_permissions: doc.permissions,
+            },
           })
 
           this.isDirty$ = dirtyCheck(
@@ -253,11 +307,35 @@ export class DocumentDetailComponent
           this.router.navigate(['404'])
         },
       })
+
+    this.route.paramMap.subscribe((paramMap) => {
+      const section = paramMap.get('section')
+      if (section) {
+        const navIDKey: string = Object.keys(DocumentDetailNavIDs).find(
+          (navID) => navID.toLowerCase() == section
+        )
+        if (navIDKey) {
+          this.activeNavID = DocumentDetailNavIDs[navIDKey]
+        }
+      }
+    })
   }
 
   ngOnDestroy(): void {
     this.unsubscribeNotifier.next(this)
     this.unsubscribeNotifier.complete()
+  }
+
+  onNavChange(navChangeEvent: NgbNavChangeEvent) {
+    const [foundNavIDkey] = Object.entries(DocumentDetailNavIDs).find(
+      ([, navIDValue]) => navIDValue == navChangeEvent.nextId
+    )
+    if (foundNavIDkey)
+      this.router.navigate([
+        'documents',
+        this.documentId,
+        foundNavIDkey.toLowerCase(),
+      ])
   }
 
   updateComponent(doc: PaperlessDocument) {
@@ -272,21 +350,41 @@ export class DocumentDetailComponent
         },
         error: (error) => {
           this.metadata = null
+          this.toastService.showError(
+            $localize`Error retrieving metadata` + ': ' + error.toString()
+          )
         },
       })
-    this.documentsService
-      .getSuggestions(doc.id)
-      .pipe(first())
-      .subscribe({
-        next: (result) => {
-          this.suggestions = result
-        },
-        error: (error) => {
-          this.suggestions = null
-        },
-      })
+    if (
+      this.permissionsService.currentUserHasObjectPermissions(
+        PermissionAction.Change,
+        doc
+      )
+    ) {
+      this.documentsService
+        .getSuggestions(doc.id)
+        .pipe(first())
+        .subscribe({
+          next: (result) => {
+            this.suggestions = result
+          },
+          error: (error) => {
+            this.suggestions = null
+            this.toastService.showError(
+              $localize`Error retrieving suggestions` + ': ' + error.toString()
+            )
+          },
+        })
+    }
     this.title = this.documentTitlePipe.transform(doc.title)
-    this.documentForm.patchValue(doc)
+    const docFormValues = Object.assign({}, doc)
+    docFormValues['permissions_form'] = {
+      owner: doc.owner,
+      set_permissions: doc.permissions,
+    }
+
+    this.documentForm.patchValue(docFormValues, { emitEvent: false })
+    if (!this.userCanEdit) this.documentForm.disable()
   }
 
   createDocumentType(newName: string) {
@@ -361,6 +459,10 @@ export class DocumentDetailComponent
       .subscribe({
         next: (doc) => {
           Object.assign(this.document, doc)
+          doc['permissions_form'] = {
+            owner: doc.owner,
+            set_permissions: doc.permissions,
+          }
           this.title = doc.title
           this.documentForm.patchValue(doc)
           this.openDocumentService.setDirty(doc, false)
@@ -373,19 +475,30 @@ export class DocumentDetailComponent
 
   save() {
     this.networkActive = true
-    this.store.next(this.documentForm.value)
     this.documentsService
       .update(this.document)
       .pipe(first())
       .subscribe({
-        next: (result) => {
+        next: () => {
+          this.store.next(this.documentForm.value)
+          this.toastService.showInfo($localize`Document saved successfully.`)
           this.close()
           this.networkActive = false
           this.error = null
         },
         error: (error) => {
           this.networkActive = false
-          this.error = error.error
+          if (!this.userCanEdit) {
+            this.toastService.showInfo($localize`Document saved successfully.`)
+            this.close()
+          } else {
+            this.error = error.error
+            this.toastService.showError(
+              $localize`Error saving document` +
+                ': ' +
+                (error.error?.detail ?? error.message ?? JSON.stringify(error))
+            )
+          }
         },
       })
   }
@@ -425,6 +538,11 @@ export class DocumentDetailComponent
         error: (error) => {
           this.networkActive = false
           this.error = error.error
+          this.toastService.showError(
+            $localize`Error saving document` +
+              ': ' +
+              (error.error?.detail ?? error.message ?? JSON.stringify(error))
+          )
         },
       })
   }
@@ -455,6 +573,10 @@ export class DocumentDetailComponent
     modal.componentInstance.message = $localize`The files for this document will be deleted permanently. This operation cannot be undone.`
     modal.componentInstance.btnClass = 'btn-danger'
     modal.componentInstance.btnCaption = $localize`Delete document`
+    this.subscribeModalDelete(modal) // so can be re-subscribed if error
+  }
+
+  subscribeModalDelete(modal) {
     modal.componentInstance.confirmClicked
       .pipe(
         switchMap(() => {
@@ -463,18 +585,21 @@ export class DocumentDetailComponent
         })
       )
       .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe(
-        () => {
+      .subscribe({
+        next: () => {
           modal.close()
           this.close()
         },
-        (error) => {
+        error: (error) => {
           this.toastService.showError(
-            $localize`Error deleting document: ${JSON.stringify(error)}`
+            $localize`Error deleting document: ${
+              error.error?.detail ?? error.message ?? JSON.stringify(error)
+            }`
           )
           modal.componentInstance.buttonsEnabled = true
-        }
-      )
+          this.subscribeModalDelete(modal)
+        },
+      })
   }
 
   moreLike() {
@@ -563,7 +688,55 @@ export class DocumentDetailComponent
     }
   }
 
-  get commentsEnabled(): boolean {
-    return this.settings.get(SETTINGS_KEYS.COMMENTS_ENABLED)
+  get showPermissions(): boolean {
+    return (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.User
+      ) && this.userIsOwner
+    )
+  }
+
+  get notesEnabled(): boolean {
+    return (
+      this.settings.get(SETTINGS_KEYS.NOTES_ENABLED) &&
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.Note
+      )
+    )
+  }
+
+  notesUpdated(notes: PaperlessDocumentNote[]) {
+    this.document.notes = notes
+    this.openDocumentService.refreshDocument(this.documentId)
+  }
+
+  get userIsOwner(): boolean {
+    let doc: PaperlessDocument = Object.assign({}, this.document)
+    // dont disable while editing
+    if (this.document && this.store?.value.permissions_form?.owner) {
+      doc.owner = this.store?.value.permissions_form?.owner
+    }
+    return !this.document || this.permissionsService.currentUserOwnsObject(doc)
+  }
+
+  get userCanEdit(): boolean {
+    let doc: PaperlessDocument = Object.assign({}, this.document)
+    // dont disable while editing
+    if (this.document && this.store?.value.permissions_form?.owner) {
+      doc.owner = this.store?.value.permissions_form?.owner
+    }
+    return (
+      !this.document ||
+      this.permissionsService.currentUserHasObjectPermissions(
+        PermissionAction.Change,
+        doc
+      )
+    )
+  }
+
+  get previewHtml(): string {
+    return this._previewHtml
   }
 }

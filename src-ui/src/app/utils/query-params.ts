@@ -86,12 +86,12 @@ export function queryParamsFromFilterRules(filterRules: FilterRule[]): Params {
     let params = {}
     for (let rule of filterRules) {
       let ruleType = FILTER_RULE_TYPES.find((t) => t.id == rule.rule_type)
-      if (ruleType.multi) {
+      if (ruleType.isnull_filtervar && rule.value == null) {
+        params[ruleType.isnull_filtervar] = 1
+      } else if (ruleType.multi) {
         params[ruleType.filtervar] = params[ruleType.filtervar]
           ? params[ruleType.filtervar] + ',' + rule.value
           : rule.value
-      } else if (ruleType.isnull_filtervar && rule.value == null) {
-        params[ruleType.isnull_filtervar] = 1
       } else {
         params[ruleType.filtervar] = rule.value
         if (ruleType.datatype == 'boolean')

@@ -3,6 +3,7 @@ import shutil
 
 from django.conf import settings
 from django.test import override_settings
+
 from documents.parsers import get_default_file_extension
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import TestMigrations
@@ -39,7 +40,6 @@ def source_path_after(doc):
 
 @override_settings(PASSPHRASE="test")
 class TestMigrateMimeType(DirectoriesMixin, TestMigrations):
-
     migrate_from = "1002_auto_20201111_1105"
     migrate_to = "1003_mime_types"
 
@@ -85,7 +85,6 @@ class TestMigrateMimeType(DirectoriesMixin, TestMigrations):
 
 @override_settings(PASSPHRASE="test")
 class TestMigrateMimeTypeBackwards(DirectoriesMixin, TestMigrations):
-
     migrate_from = "1003_mime_types"
     migrate_to = "1002_auto_20201111_1105"
 

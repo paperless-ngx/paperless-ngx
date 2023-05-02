@@ -9,11 +9,15 @@ export abstract class AbstractNameFilterService<
     pageSize?: number,
     sortField?: string,
     sortReverse?: boolean,
-    nameFilter?: string
+    nameFilter?: string,
+    fullPerms?: boolean
   ) {
     let params = {}
     if (nameFilter) {
-      params = { name__icontains: nameFilter }
+      params['name__icontains'] = nameFilter
+    }
+    if (fullPerms) {
+      params['full_perms'] = true
     }
     return this.list(page, pageSize, sortField, sortReverse, params)
   }

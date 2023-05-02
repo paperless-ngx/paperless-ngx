@@ -12,28 +12,29 @@ from dateutil import tz
 try:
     import zoneinfo
 except ImportError:
-    import backports.zoneinfo as zoneinfo
+    from backports import zoneinfo
 
 from django.conf import settings
-from django.utils import timezone
-from django.test import override_settings
 from django.test import TestCase
+from django.test import override_settings
+from django.utils import timezone
 
-from ..consumer import Consumer
-from ..consumer import ConsumerError
-from ..models import Correspondent
-from ..models import Document
-from ..models import DocumentType
-from ..models import FileInfo
-from ..models import Tag
-from ..parsers import DocumentParser
-from ..parsers import ParseError
-from ..tasks import sanity_check
+from documents.consumer import Consumer
+from documents.consumer import ConsumerError
+from documents.models import Correspondent
+from documents.models import Document
+from documents.models import DocumentType
+from documents.models import FileInfo
+from documents.models import Tag
+from documents.parsers import DocumentParser
+from documents.parsers import ParseError
+from documents.tasks import sanity_check
+from documents.tests.utils import FileSystemAssertsMixin
+
 from .utils import DirectoriesMixin
 
 
 class TestAttributes(TestCase):
-
     TAGS = ("tag1", "tag2", "tag3")
 
     def _test_guess_attributes_from_name(self, filename, sender, title, tags):
@@ -66,13 +67,12 @@ class TestAttributes(TestCase):
 
 
 class TestFieldPermutations(TestCase):
-
     valid_dates = (
         "20150102030405Z",
         "20150102Z",
     )
-    valid_correspondents = ["timmy", "Dr. McWheelie", "Dash Gor-don", "ο Θερμαστής", ""]
-    valid_titles = ["title", "Title w Spaces", "Title a-dash", "Τίτλος", ""]
+    valid_correspondents = ["timmy", "Dr. McWheelie", "Dash Gor-don", "o Θεpμaoτής", ""]
+    valid_titles = ["title", "Title w Spaces", "Title a-dash", "Tίτλoς", ""]
     valid_tags = ["tag", "tig,tag", "tag1,tag2,tag-3"]
 
     def _test_guessed_attributes(
@@ -83,7 +83,6 @@ class TestFieldPermutations(TestCase):
         title=None,
         tags=None,
     ):
-
         info = FileInfo.from_filename(filename)
 
         # Created
@@ -130,13 +129,10 @@ class TestFieldPermutations(TestCase):
         self.assertIsNone(info.created)
 
     def test_filename_parse_transforms(self):
-
         filename = "tag1,tag2_20190908_180610_0001.pdf"
         all_patt = re.compile("^.*$")
         none_patt = re.compile("$a")
-        exact_patt = re.compile("^([a-z0-9,]+)_(\\d{8})_(\\d{6})_([0-9]+)\\.")
-        repl1 = " - \\4 - \\1."  # (empty) corrspondent, title and tags
-        repl2 = "\\2Z - " + repl1  # creation date + repl1
+        re.compile("^([a-z0-9,]+)_(\\d{8})_(\\d{6})_([0-9]+)\\.")
 
         # No transformations configured (= default)
         info = FileInfo.from_filename(filename)
@@ -176,10 +172,6 @@ class TestFieldPermutations(TestCase):
 
 
 class DummyParser(DocumentParser):
-    def get_thumbnail(self, document_path, mime_type, file_name=None):
-        # not important during tests
-        raise NotImplementedError()
-
     def __init__(self, logging_group, scratch_dir, archive_path):
         super().__init__(logging_group, None)
         _, self.fake_thumb = tempfile.mkstemp(suffix=".webp", dir=scratch_dir)
@@ -196,9 +188,6 @@ class CopyParser(DocumentParser):
     def get_thumbnail(self, document_path, mime_type, file_name=None):
         return self.fake_thumb
 
-    def get_thumbnail(self, document_path, mime_type, file_name=None):
-        return self.fake_thumb
-
     def __init__(self, logging_group, progress_callback=None):
         super().__init__(logging_group, progress_callback)
         _, self.fake_thumb = tempfile.mkstemp(suffix=".webp", dir=self.tempdir)
@@ -210,10 +199,6 @@ class CopyParser(DocumentParser):
 
 
 class FaultyParser(DocumentParser):
-    def get_thumbnail(self, document_path, mime_type, file_name=None):
-        # not important during tests
-        raise NotImplementedError()
-
     def __init__(self, logging_group, scratch_dir):
         super().__init__(logging_group)
         _, self.fake_thumb = tempfile.mkstemp(suffix=".webp", dir=scratch_dir)
@@ -226,7 +211,6 @@ class FaultyParser(DocumentParser):
 
 
 def fake_magic_from_file(file, mime=False):
-
     if mime:
         if os.path.splitext(file)[1] == ".pdf":
             return "application/pdf"
@@ -241,7 +225,7 @@ def fake_magic_from_file(file, mime=False):
 
 
 @mock.patch("documents.consumer.magic.from_file", fake_magic_from_file)
-class TestConsumer(DirectoriesMixin, TestCase):
+class TestConsumer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     def _assert_first_last_send_progress(
         self,
         first_status="STARTING",
@@ -251,7 +235,6 @@ class TestConsumer(DirectoriesMixin, TestCase):
         last_progress=100,
         last_progress_max=100,
     ):
-
         self._send_progress.assert_called()
 
         args, kwargs = self._send_progress.call_args_list[0]
@@ -326,7 +309,6 @@ class TestConsumer(DirectoriesMixin, TestCase):
 
     @override_settings(FILENAME_FORMAT=None, TIME_ZONE="America/Chicago")
     def testNormalOperation(self):
-
         filename = self.get_test_file()
 
         # Get the local time, as an aware datetime
@@ -346,16 +328,16 @@ class TestConsumer(DirectoriesMixin, TestCase):
         self.assertEqual(document.filename, "0000001.pdf")
         self.assertEqual(document.archive_filename, "0000001.pdf")
 
-        self.assertTrue(os.path.isfile(document.source_path))
+        self.assertIsFile(document.source_path)
 
-        self.assertTrue(os.path.isfile(document.thumbnail_path))
+        self.assertIsFile(document.thumbnail_path)
 
-        self.assertTrue(os.path.isfile(document.archive_path))
+        self.assertIsFile(document.archive_path)
 
         self.assertEqual(document.checksum, "42995833e01aea9b3edee44bbfdd7ce1")
         self.assertEqual(document.archive_checksum, "62acb0bcbfbcaa62ca6ad3668e4e404b")
 
-        self.assertFalse(os.path.isfile(filename))
+        self.assertIsNotFile(filename)
 
         self._assert_first_last_send_progress()
 
@@ -383,14 +365,14 @@ class TestConsumer(DirectoriesMixin, TestCase):
 
         shutil.copy(filename, shadow_file)
 
-        self.assertTrue(os.path.isfile(shadow_file))
+        self.assertIsFile(shadow_file)
 
         document = self.consumer.try_consume_file(filename)
 
-        self.assertTrue(os.path.isfile(document.source_path))
+        self.assertIsFile(document.source_path)
 
-        self.assertFalse(os.path.isfile(shadow_file))
-        self.assertFalse(os.path.isfile(filename))
+        self.assertIsNotFile(shadow_file)
+        self.assertIsNotFile(filename)
 
     def testOverrideFilename(self):
         filename = self.get_test_file()
@@ -448,7 +430,6 @@ class TestConsumer(DirectoriesMixin, TestCase):
         self._assert_first_last_send_progress()
 
     def testNotAFile(self):
-
         self.assertRaisesMessage(
             ConsumerError,
             "File not found",
@@ -536,7 +517,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
         self._assert_first_last_send_progress(last_status="FAILED")
 
         # file not deleted
-        self.assertTrue(os.path.isfile(filename))
+        self.assertIsFile(filename)
 
         # Database empty
         self.assertEqual(len(Document.objects.all()), 0)
@@ -556,7 +537,6 @@ class TestConsumer(DirectoriesMixin, TestCase):
     @override_settings(FILENAME_FORMAT="{correspondent}/{title}")
     @mock.patch("documents.signals.handlers.generate_unique_filename")
     def testFilenameHandlingUnstableFormat(self, m):
-
         filenames = ["this", "that", "now this", "i cant decide"]
 
         def get_filename():
@@ -573,9 +553,9 @@ class TestConsumer(DirectoriesMixin, TestCase):
         document = self.consumer.try_consume_file(filename, override_title="new docs")
 
         self.assertEqual(document.title, "new docs")
-        self.assertIsNotNone(os.path.isfile(document.title))
-        self.assertTrue(os.path.isfile(document.source_path))
-        self.assertTrue(os.path.isfile(document.archive_path))
+        self.assertIsNotNone(document.title)
+        self.assertIsFile(document.source_path)
+        self.assertIsFile(document.archive_path)
 
         self._assert_first_last_send_progress()
 
@@ -603,35 +583,35 @@ class TestConsumer(DirectoriesMixin, TestCase):
     @override_settings(CONSUMER_DELETE_DUPLICATES=True)
     def test_delete_duplicate(self):
         dst = self.get_test_file()
-        self.assertTrue(os.path.isfile(dst))
+        self.assertIsFile(dst)
         doc = self.consumer.try_consume_file(dst)
 
         self._assert_first_last_send_progress()
 
-        self.assertFalse(os.path.isfile(dst))
+        self.assertIsNotFile(dst)
         self.assertIsNotNone(doc)
 
         self._send_progress.reset_mock()
 
         dst = self.get_test_file()
-        self.assertTrue(os.path.isfile(dst))
+        self.assertIsFile(dst)
         self.assertRaises(ConsumerError, self.consumer.try_consume_file, dst)
-        self.assertFalse(os.path.isfile(dst))
+        self.assertIsNotFile(dst)
         self._assert_first_last_send_progress(last_status="FAILED")
 
     @override_settings(CONSUMER_DELETE_DUPLICATES=False)
     def test_no_delete_duplicate(self):
         dst = self.get_test_file()
-        self.assertTrue(os.path.isfile(dst))
+        self.assertIsFile(dst)
         doc = self.consumer.try_consume_file(dst)
 
-        self.assertFalse(os.path.isfile(dst))
+        self.assertIsNotFile(dst)
         self.assertIsNotNone(doc)
 
         dst = self.get_test_file()
-        self.assertTrue(os.path.isfile(dst))
+        self.assertIsFile(dst)
         self.assertRaises(ConsumerError, self.consumer.try_consume_file, dst)
-        self.assertTrue(os.path.isfile(dst))
+        self.assertIsFile(dst)
 
         self._assert_first_last_send_progress(last_status="FAILED")
 
@@ -803,7 +783,6 @@ class TestConsumerCreatedDate(DirectoriesMixin, TestCase):
 
 class PreConsumeTestCase(TestCase):
     def setUp(self) -> None:
-
         # this prevents websocket message reports during testing.
         patcher = mock.patch("documents.consumer.Consumer._send_progress")
         self._send_progress = patcher.start()
@@ -911,7 +890,6 @@ class PreConsumeTestCase(TestCase):
 
 class PostConsumeTestCase(TestCase):
     def setUp(self) -> None:
-
         # this prevents websocket message reports during testing.
         patcher = mock.patch("documents.consumer.Consumer._send_progress")
         self._send_progress = patcher.start()

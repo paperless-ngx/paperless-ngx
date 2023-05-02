@@ -2,8 +2,9 @@ from tempfile import TemporaryDirectory
 from unittest import mock
 
 from django.apps import apps
-from django.test import override_settings
 from django.test import TestCase
+from django.test import override_settings
+
 from documents.parsers import get_default_file_extension
 from documents.parsers import get_parser_class_for_mime_type
 from documents.parsers import get_supported_file_extensions
@@ -94,7 +95,7 @@ class TestParserDiscovery(TestCase):
             - No parser class is returned
         """
         m.return_value = []
-        with TemporaryDirectory() as tmpdir:
+        with TemporaryDirectory():
             self.assertIsNone(get_parser_class_for_mime_type("application/pdf"))
 
     @mock.patch("documents.parsers.document_consumer_declaration.send")

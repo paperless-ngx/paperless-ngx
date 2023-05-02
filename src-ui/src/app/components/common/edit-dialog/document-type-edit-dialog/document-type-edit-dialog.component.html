@@ -6,10 +6,16 @@
     </div>
     <div class="modal-body">
 
-      <app-input-text i18n-title title="Name" formControlName="name" [error]="error?.name"></app-input-text>
-      <app-input-select i18n-title title="Matching algorithm" [items]="getMatchingAlgorithms()" formControlName="matching_algorithm"></app-input-select>
-      <app-input-text *ngIf="patternRequired" i18n-title title="Matching pattern" formControlName="match" [error]="error?.match"></app-input-text>
-      <app-input-check *ngIf="patternRequired" i18n-title title="Case insensitive" formControlName="is_insensitive"></app-input-check>
+      <div class="col">
+        <app-input-text i18n-title title="Name" formControlName="name" [error]="error?.name"></app-input-text>
+        <app-input-select i18n-title title="Matching algorithm" [items]="getMatchingAlgorithms()" formControlName="matching_algorithm"></app-input-select>
+        <app-input-text *ngIf="patternRequired" i18n-title title="Matching pattern" formControlName="match" [error]="error?.match"></app-input-text>
+        <app-input-check *ngIf="patternRequired" i18n-title title="Case insensitive" formControlName="is_insensitive"></app-input-check>
+      </div>
+
+      <div *appIfOwner="object">
+        <app-permissions-form [users]="users" accordion="true" formControlName="permissions_form"></app-permissions-form>
+      </div>
 
     </div>
     <div class="modal-footer">
