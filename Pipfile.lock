@@ -569,11 +569,11 @@
         },
         "filelock": {
             "hashes": [
-                "sha256:75997740323c5f12e18f10b494bc11c03e42843129f980f17c04352cc7b09d40",
-                "sha256:eb8f0f2d37ed68223ea63e3bddf2fac99667e4362c88b3f762e434d160190d18"
+                "sha256:ad98852315c2ab702aeb628412cbf7e95b7ce8c3bf9565670b4eaecf1db370a9",
+                "sha256:fc03ae43288c013d2ea83c8597001b1129db351aad9c57fe2409327916b8e718"
             ],
             "index": "pypi",
-            "version": "==3.10.2"
+            "version": "==3.12.0"
         },
         "flower": {
             "hashes": [
