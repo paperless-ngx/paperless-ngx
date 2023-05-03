@@ -322,8 +322,7 @@ You can read more about this in [the Django project's documentation](https://doc
 
     Can also be set using PAPERLESS_URL (see above).
 
-    If manually set, please remember to include "localhost". Otherwise
-    docker healthcheck will fail.
+    "localhost" is always allowed for docker healthcheck
 
     Defaults to "\*", which is all hosts.
 

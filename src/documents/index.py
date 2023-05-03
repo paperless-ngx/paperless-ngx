@@ -225,15 +225,19 @@ class DelayedQuery:
 
         user_criterias = [query.Term("has_owner", False)]
         if "user" in self.query_params:
-            user_criterias.append(query.Term("owner_id", self.query_params["user"]))
-            user_criterias.append(
-                query.Term("viewer_id", str(self.query_params["user"])),
-            )
+            if self.query_params["is_superuser"]:  # superusers see all docs
+                user_criterias = []
+            else:
+                user_criterias.append(query.Term("owner_id", self.query_params["user"]))
+                user_criterias.append(
+                    query.Term("viewer_id", str(self.query_params["user"])),
+                )
         if len(criterias) > 0:
-            criterias.append(query.Or(user_criterias))
+            if len(user_criterias) > 0:
+                criterias.append(query.Or(user_criterias))
             return query.And(criterias)
         else:
-            return query.Or(user_criterias)
+            return query.Or(user_criterias) if len(user_criterias) > 0 else None
 
     def _get_query_sortedby(self):
         if "ordering" not in self.query_params:

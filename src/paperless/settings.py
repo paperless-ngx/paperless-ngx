@@ -422,11 +422,12 @@ if _paperless_url:
     _paperless_uri = urlparse(_paperless_url)
     CSRF_TRUSTED_ORIGINS.append(_paperless_url)
     CORS_ALLOWED_ORIGINS.append(_paperless_url)
-    if ["*"] != ALLOWED_HOSTS:
+
+if ["*"] != ALLOWED_HOSTS:
+    # always allow localhost. Necessary e.g. for healthcheck in docker.
+    ALLOWED_HOSTS.append("localhost")
+    if _paperless_url:
         ALLOWED_HOSTS.append(_paperless_uri.hostname)
-    else:
-        # always allow localhost. Necessary e.g. for healthcheck in docker.
-        ALLOWED_HOSTS = [_paperless_uri.hostname] + ["localhost"]
 
 # For use with trusted proxies
 TRUSTED_PROXIES = __get_list("PAPERLESS_TRUSTED_PROXIES")
