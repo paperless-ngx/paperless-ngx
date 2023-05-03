@@ -1,5 +1,57 @@
 # Changelog
 
+## paperless-ngx 1.14.3
+
+### Features
+
+- Enhancement: better keyboard nav for filter/edit dropdowns [@shamoon](https://github.com/shamoon) ([#3227](https://github.com/paperless-ngx/paperless-ngx/pull/3227))
+
+### Bug Fixes
+
+- Bump filelock from 3.10.2 to 3.12.0 to fix permissions bug [@rbrownwsws](https://github.com/rbrownwsws) ([#3282](https://github.com/paperless-ngx/paperless-ngx/pull/3282))
+- Fix: Handle cases where media files aren't all in the same filesystem [@stumpylog](https://github.com/stumpylog) ([#3261](https://github.com/paperless-ngx/paperless-ngx/pull/3261))
+- Fix: Prevent erroneous warning when starting container [@stumpylog](https://github.com/stumpylog) ([#3262](https://github.com/paperless-ngx/paperless-ngx/pull/3262))
+- Retain doc changes on tab switch after refresh doc [@shamoon](https://github.com/shamoon) ([#3243](https://github.com/paperless-ngx/paperless-ngx/pull/3243))
+- Fix: Don't send Gmail related setting if the server doesn't support it [@stumpylog](https://github.com/stumpylog) ([#3240](https://github.com/paperless-ngx/paperless-ngx/pull/3240))
+- Fix: close all docs on logout [@shamoon](https://github.com/shamoon) ([#3232](https://github.com/paperless-ngx/paperless-ngx/pull/3232))
+- Fix: Respect superuser for advanced queries, test coverage for object perms [@shamoon](https://github.com/shamoon) ([#3222](https://github.com/paperless-ngx/paperless-ngx/pull/3222))
+- Fix: ALLOWED_HOSTS logic being overwritten when \* is set [@ikaruswill](https://github.com/ikaruswill) ([#3218](https://github.com/paperless-ngx/paperless-ngx/pull/3218))
+
+### Dependencies
+
+<details>
+<summary>7 changes</summary>
+
+- Bump eslint from 8.38.0 to 8.39.0 in /src-ui [@dependabot](https://github.com/dependabot) ([#3276](https://github.com/paperless-ngx/paperless-ngx/pull/3276))
+- Bump [@<!---->typescript-eslint/parser from 5.58.0 to 5.59.2 in /src-ui @dependabot](https://github.com/<!---->typescript-eslint/parser from 5.58.0 to 5.59.2 in /src-ui @dependabot) ([#3278](https://github.com/paperless-ngx/paperless-ngx/pull/3278))
+- Bump [@<!---->types/node from 18.15.11 to 18.16.3 in /src-ui @dependabot](https://github.com/<!---->types/node from 18.15.11 to 18.16.3 in /src-ui @dependabot) ([#3275](https://github.com/paperless-ngx/paperless-ngx/pull/3275))
+- Bump rxjs from 7.8.0 to 7.8.1 in /src-ui [@dependabot](https://github.com/dependabot) ([#3277](https://github.com/paperless-ngx/paperless-ngx/pull/3277))
+- Bump [@<!---->typescript-eslint/eslint-plugin from 5.58.0 to 5.59.2 in /src-ui @dependabot](https://github.com/<!---->typescript-eslint/eslint-plugin from 5.58.0 to 5.59.2 in /src-ui @dependabot) ([#3274](https://github.com/paperless-ngx/paperless-ngx/pull/3274))
+- Bump cypress from 12.9.0 to 12.11.0 in /src-ui [@dependabot](https://github.com/dependabot) ([#3268](https://github.com/paperless-ngx/paperless-ngx/pull/3268))
+- Bulk bump angular packages to 15.2.8 in /src-ui [@dependabot](https://github.com/dependabot) ([#3270](https://github.com/paperless-ngx/paperless-ngx/pull/3270))
+</details>
+
+### All App Changes
+
+<details>
+<summary>14 changes</summary>
+
+- Bump eslint from 8.38.0 to 8.39.0 in /src-ui [@dependabot](https://github.com/dependabot) ([#3276](https://github.com/paperless-ngx/paperless-ngx/pull/3276))
+- Bump [@<!---->typescript-eslint/parser from 5.58.0 to 5.59.2 in /src-ui @dependabot](https://github.com/<!---->typescript-eslint/parser from 5.58.0 to 5.59.2 in /src-ui @dependabot) ([#3278](https://github.com/paperless-ngx/paperless-ngx/pull/3278))
+- Bump [@<!---->types/node from 18.15.11 to 18.16.3 in /src-ui @dependabot](https://github.com/<!---->types/node from 18.15.11 to 18.16.3 in /src-ui @dependabot) ([#3275](https://github.com/paperless-ngx/paperless-ngx/pull/3275))
+- Bump rxjs from 7.8.0 to 7.8.1 in /src-ui [@dependabot](https://github.com/dependabot) ([#3277](https://github.com/paperless-ngx/paperless-ngx/pull/3277))
+- Bump [@<!---->typescript-eslint/eslint-plugin from 5.58.0 to 5.59.2 in /src-ui @dependabot](https://github.com/<!---->typescript-eslint/eslint-plugin from 5.58.0 to 5.59.2 in /src-ui @dependabot) ([#3274](https://github.com/paperless-ngx/paperless-ngx/pull/3274))
+- Bump cypress from 12.9.0 to 12.11.0 in /src-ui [@dependabot](https://github.com/dependabot) ([#3268](https://github.com/paperless-ngx/paperless-ngx/pull/3268))
+- Bulk bump angular packages to 15.2.8 in /src-ui [@dependabot](https://github.com/dependabot) ([#3270](https://github.com/paperless-ngx/paperless-ngx/pull/3270))
+- Fix: Handle cases where media files aren't all in the same filesystem [@stumpylog](https://github.com/stumpylog) ([#3261](https://github.com/paperless-ngx/paperless-ngx/pull/3261))
+- Retain doc changes on tab switch after refresh doc [@shamoon](https://github.com/shamoon) ([#3243](https://github.com/paperless-ngx/paperless-ngx/pull/3243))
+- Fix: Don't send Gmail related setting if the server doesn't support it [@stumpylog](https://github.com/stumpylog) ([#3240](https://github.com/paperless-ngx/paperless-ngx/pull/3240))
+- Fix: close all docs on logout [@shamoon](https://github.com/shamoon) ([#3232](https://github.com/paperless-ngx/paperless-ngx/pull/3232))
+- Enhancement: better keyboard nav for filter/edit dropdowns [@shamoon](https://github.com/shamoon) ([#3227](https://github.com/paperless-ngx/paperless-ngx/pull/3227))
+- Fix: Respect superuser for advanced queries, test coverage for object perms [@shamoon](https://github.com/shamoon) ([#3222](https://github.com/paperless-ngx/paperless-ngx/pull/3222))
+- Fix: ALLOWED_HOSTS logic being overwritten when \* is set [@ikaruswill](https://github.com/ikaruswill) ([#3218](https://github.com/paperless-ngx/paperless-ngx/pull/3218))
+</details>
+
 ## paperless-ngx 1.14.2
 
 ### Features
