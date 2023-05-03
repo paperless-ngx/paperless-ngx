@@ -43,6 +43,10 @@ import {
   FILTER_DOCUMENT_TYPE,
   FILTER_CORRESPONDENT,
   FILTER_STORAGE_PATH,
+  FILTER_OWNER,
+  FILTER_OWNER_DOES_NOT_INCLUDE,
+  FILTER_OWNER_ISNULL,
+  FILTER_OWNER_ANY,
 } from 'src/app/data/filter-rule-type'
 import {
   FilterableDropdownSelectionModel,
@@ -59,6 +63,11 @@ import { PaperlessDocument } from 'src/app/data/paperless-document'
 import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { RelativeDate } from '../../common/date-dropdown/date-dropdown.component'
+import {
+  OwnerFilterType,
+  PermissionsSelectionModel,
+} from '../../common/permissions-filter-dropdown/permissions-filter-dropdown.component'
+import { SettingsService } from 'src/app/services/settings.service'
 
 const TEXT_FILTER_TARGET_TITLE = 'title'
 const TEXT_FILTER_TARGET_TITLE_CONTENT = 'title-content'
@@ -136,6 +145,15 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
 
         case FILTER_ASN:
           return $localize`ASN: ${rule.value}`
+
+        case FILTER_OWNER:
+          return $localize`Owner: ${rule.value}`
+
+        case FILTER_OWNER_DOES_NOT_INCLUDE:
+          return $localize`Owner not in: ${rule.value}`
+
+        case FILTER_OWNER_ISNULL:
+          return $localize`Without an owner`
       }
     }
 
@@ -147,7 +165,8 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     private tagService: TagService,
     private correspondentService: CorrespondentService,
     private documentService: DocumentService,
-    private storagePathService: StoragePathService
+    private storagePathService: StoragePathService,
+    private settingsService: SettingsService
   ) {}
 
   @ViewChild('textFilterInput')
@@ -241,6 +260,8 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   dateCreatedRelativeDate: RelativeDate
   dateAddedRelativeDate: RelativeDate
 
+  permissionsSelectionModel = new PermissionsSelectionModel()
+
   _unmodifiedFilterRules: FilterRule[] = []
   _filterRules: FilterRule[] = []
 
@@ -274,6 +295,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     this.dateCreatedRelativeDate = null
     this.dateAddedRelativeDate = null
     this.textFilterModifier = TEXT_FILTER_MODIFIER_EQUALS
+    this.permissionsSelectionModel.clear()
 
     value.forEach((rule) => {
       switch (rule.rule_type) {
@@ -441,6 +463,35 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
           this.textFilterModifier = TEXT_FILTER_MODIFIER_LT
           this._textFilter = rule.value
           break
+        case FILTER_OWNER:
+          this.permissionsSelectionModel.ownerFilter = OwnerFilterType.SELF
+          this.permissionsSelectionModel.hideUnowned = false
+          if (rule.value)
+            this.permissionsSelectionModel.userID = parseInt(rule.value, 10)
+          break
+        case FILTER_OWNER_ANY:
+          this.permissionsSelectionModel.ownerFilter = OwnerFilterType.OTHERS
+          if (rule.value)
+            this.permissionsSelectionModel.includeUsers.push(
+              parseInt(rule.value, 10)
+            )
+          break
+        case FILTER_OWNER_DOES_NOT_INCLUDE:
+          this.permissionsSelectionModel.ownerFilter = OwnerFilterType.NOT_SELF
+          if (rule.value)
+            this.permissionsSelectionModel.excludeUsers.push(
+              parseInt(rule.value, 10)
+            )
+          break
+        case FILTER_OWNER_ISNULL:
+          if (rule.value === 'true' || rule.value === '1') {
+            this.permissionsSelectionModel.hideUnowned = false
+            this.permissionsSelectionModel.ownerFilter = OwnerFilterType.UNOWNED
+          } else {
+            this.permissionsSelectionModel.hideUnowned =
+              rule.value === 'false' || rule.value === '0'
+            break
+          }
       }
     })
     this.rulesModified = filterRulesDiffer(
@@ -701,6 +752,40 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
           filterRules.splice(filterRules.indexOf(existingRule), 1)
         }
       }
+    }
+    if (this.permissionsSelectionModel.ownerFilter == OwnerFilterType.SELF) {
+      filterRules.push({
+        rule_type: FILTER_OWNER,
+        value: this.permissionsSelectionModel.userID.toString(),
+      })
+    } else if (
+      this.permissionsSelectionModel.ownerFilter == OwnerFilterType.NOT_SELF
+    ) {
+      filterRules.push({
+        rule_type: FILTER_OWNER_DOES_NOT_INCLUDE,
+        value: this.permissionsSelectionModel.excludeUsers?.join(','),
+      })
+    } else if (
+      this.permissionsSelectionModel.ownerFilter == OwnerFilterType.OTHERS
+    ) {
+      filterRules.push({
+        rule_type: FILTER_OWNER_ANY,
+        value: this.permissionsSelectionModel.includeUsers?.join(','),
+      })
+    } else if (
+      this.permissionsSelectionModel.ownerFilter == OwnerFilterType.UNOWNED
+    ) {
+      filterRules.push({
+        rule_type: FILTER_OWNER_ISNULL,
+        value: 'true',
+      })
+    }
+
+    if (this.permissionsSelectionModel.hideUnowned) {
+      filterRules.push({
+        rule_type: FILTER_OWNER_ISNULL,
+        value: 'false',
+      })
     }
     return filterRules
   }

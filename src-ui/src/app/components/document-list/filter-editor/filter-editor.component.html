@@ -58,19 +58,25 @@
             [documentCounts]="storagePathDocumentCounts"
             [allowSelectNone]="true"></app-filterable-dropdown>
         </div>
-        <div class="d-flex flex-wrap">
+        <div class="d-flex flex-wrap mb-2 mb-xxl-0">
           <app-date-dropdown class="mb-2 mb-xl-0"
             title="Created" i18n-title
             (datesSet)="updateRules()"
             [(dateBefore)]="dateCreatedBefore"
             [(dateAfter)]="dateCreatedAfter"
             [(relativeDate)]="dateCreatedRelativeDate"></app-date-dropdown>
-          <app-date-dropdown class="mb-2 mb-xl-0"
+          <app-date-dropdown class="mb-2 mb-xl-0 me-2"
             title="Added" i18n-title
             (datesSet)="updateRules()"
             [(dateBefore)]="dateAddedBefore"
             [(dateAfter)]="dateAddedAfter"
             [(relativeDate)]="dateAddedRelativeDate"></app-date-dropdown>
+        </div>
+        <div class="d-flex flex-wrap">
+          <app-permissions-filter-dropdown class="mb-2 mb-xl-0"
+            title="Permissions" i18n-title
+            (ownerFilterSet)="updateRules()"
+            [(selectionModel)]="permissionsSelectionModel"></app-permissions-filter-dropdown>
         </div>
      </div>
    </div>

@@ -142,6 +142,13 @@
         [currentSortReverse]="list.sortReverse"
         (sort)="onSort($event)"
         i18n>Title</th>
+      <th class="d-none d-xl-table-cell"
+        appSortable="owner"
+        title="Sort by owner" i18n-title
+        [currentSortField]="list.sortField"
+        [currentSortReverse]="list.sortReverse"
+        (sort)="onSort($event)"
+        i18n>Owner</th>
       <th *ngIf="notesEnabled" class="d-none d-xl-table-cell"
         appSortable="num_notes"
         title="Sort by notes" i18n-title
@@ -197,6 +204,9 @@
         <td>
           <a routerLink="/documents/{{d.id}}" title="Edit document" i18n-title style="overflow-wrap: anywhere;">{{d.title | documentTitle}}</a>
           <app-tag [tag]="t" *ngFor="let t of d.tags$ | async" class="ms-1" clickable="true" linkTitle="Filter by tag" i18n-linkTitle (click)="clickTag(t.id);$event.stopPropagation()"></app-tag>
+        </td>
+        <td>
+          {{d.owner | username}}
         </td>
         <td *ngIf="notesEnabled" class="d-none d-xl-table-cell">
           <a *ngIf="d.notes.length" routerLink="/documents/{{d.id}}/notes" class="btn btn-sm p-0">
