@@ -150,7 +150,7 @@ describe('documents-list', () => {
         cy.contains('button', 'Corresp 11').click()
         cy.contains('label', 'Exclude').click()
       })
-    cy.contains('One document')
+    cy.contains('3 documents')
   })
 
   it('should apply tags', () => {
