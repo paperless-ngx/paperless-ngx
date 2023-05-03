@@ -5671,7 +5671,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">177</context>
         </context-group>
-        <target state="needs-translation">Catalan</target>
+        <target state="translated">اللغة الكتالونية</target>
       </trans-unit>
       <trans-unit id="2719780722934172508" datatype="html">
         <source>Czech</source>
@@ -5719,7 +5719,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">213</context>
         </context-group>
-        <target state="needs-translation">Finnish</target>
+        <target state="translated">الفنلندية</target>
       </trans-unit>
       <trans-unit id="7633754075223722162" datatype="html">
         <source>French</source>
