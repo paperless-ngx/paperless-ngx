@@ -168,7 +168,7 @@ class TagMailAction(BaseMailAction):
             if self.supports_gmail_labels:
                 return AND(NOT(gmail_label=self.keyword), no_keyword=self.keyword)
             else:
-                return NOT(no_keyword=self.keyword)
+                return {"no_keyword": self.keyword}
         else:  # pragma: nocover
             raise ValueError("This should never happen.")
 
