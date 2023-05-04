@@ -54,6 +54,7 @@ def get_schema():
         path_id=NUMERIC(),
         has_path=BOOLEAN(),
         notes=TEXT(),
+        num_notes=NUMERIC(sortable=True, signed=False),
         owner=TEXT(),
         owner_id=NUMERIC(),
         has_owner=BOOLEAN(),
@@ -138,6 +139,7 @@ def update_document(writer: AsyncWriter, doc: Document):
         path_id=doc.storage_path.id if doc.storage_path else None,
         has_path=doc.storage_path is not None,
         notes=notes,
+        num_notes=len(notes),
         owner=doc.owner.username if doc.owner else None,
         owner_id=doc.owner.id if doc.owner else None,
         has_owner=doc.owner is not None,
@@ -266,6 +268,7 @@ class DelayedQuery:
             "correspondent__name": "correspondent",
             "document_type__name": "type",
             "archive_serial_number": "asn",
+            "num_notes": "num_notes",
         }
 
         if field.startswith("-"):
