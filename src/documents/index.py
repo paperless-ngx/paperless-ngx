@@ -209,7 +209,7 @@ class DelayedQuery:
                     criterias.append(query.Not(query.Term("type_id", document_type_id)))
             elif k == "correspondent__isnull":
                 criterias.append(
-                    query.Term("has_correspondent", self.evalBoolean(v)),
+                    query.Term("has_correspondent", self.evalBoolean(v) is False),
                 )
             elif k == "is_tagged":
                 criterias.append(query.Term("has_tag", self.evalBoolean(v)))

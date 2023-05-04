@@ -1084,15 +1084,15 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         )
 
         self.assertCountEqual(
-            search_query("&storage_path__isnull"),
+            search_query("&storage_path__isnull=true"),
             [d1.id, d2.id, d3.id, d4.id, d5.id],
         )
         self.assertCountEqual(
-            search_query("&correspondent__isnull"),
+            search_query("&correspondent__isnull=true"),
             [d2.id, d3.id, d4.id, d5.id, d7.id],
         )
         self.assertCountEqual(
-            search_query("&document_type__isnull"),
+            search_query("&document_type__isnull=true"),
             [d1.id, d3.id, d4.id, d5.id, d7.id],
         )
         self.assertCountEqual(
