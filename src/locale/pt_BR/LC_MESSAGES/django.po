@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-05-02 19:20\n"
+"PO-Revision-Date: 2023-05-03 20:18\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
@@ -35,7 +35,7 @@ msgstr "Todas as palavras"
 
 #: documents/models.py:39
 msgid "Exact match"
-msgstr "Detecção exata"
+msgstr "Correspondência exata"
 
 #: documents/models.py:40
 msgid "Regular expression"
@@ -56,11 +56,11 @@ msgstr "nome"
 
 #: documents/models.py:47
 msgid "match"
-msgstr "detecção"
+msgstr "correspondência"
 
 #: documents/models.py:50
 msgid "matching algorithm"
-msgstr "algoritmo de detecção"
+msgstr "algoritmo de correspondência"
 
 #: documents/models.py:55
 msgid "is insensitive"
@@ -144,7 +144,7 @@ msgstr "tipo mime"
 
 #: documents/models.py:178
 msgid "checksum"
-msgstr "some de verificação"
+msgstr "soma de verificação"
 
 #: documents/models.py:182
 msgid "The checksum of the original document."
@@ -662,7 +662,7 @@ msgstr "Filtro"
 
 #: paperless_mail/admin.py:51
 msgid "Paperless will only process mails that match ALL of the filters given below."
-msgstr "Paperless processará somente e-mails que se encaixam em TODOS os filtros abaixo."
+msgstr "Paperless processará somente e-mails que se encaixem em TODOS os filtros abaixo."
 
 #: paperless_mail/admin.py:66
 msgid "Actions"
@@ -678,7 +678,7 @@ msgstr "Metadados"
 
 #: paperless_mail/admin.py:80
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
-msgstr "Atribua metadados aos documentos consumidos por esta regra automaticamente. Se você não atribuir etiquetas, tipos ou correspondentes aqui, paperless ainda sim processará todas as regras de detecção que você definiu."
+msgstr "Atribua metadados aos documentos consumidos por esta regra automaticamente. Se você não atribuir etiquetas, tipos ou correspondentes aqui, Paperless ainda sim processará todas as regras de correspondência que você definiu."
 
 #: paperless_mail/apps.py:10
 msgid "Paperless mail"

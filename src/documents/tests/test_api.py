@@ -1150,6 +1150,8 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(r.data["count"], 4)
 
     def test_search_sorting(self):
+        u1 = User.objects.create_user("user1")
+        u2 = User.objects.create_user("user2")
         c1 = Correspondent.objects.create(name="corres Ax")
         c2 = Correspondent.objects.create(name="corres Cx")
         c3 = Correspondent.objects.create(name="corres Bx")
@@ -1159,6 +1161,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             content="test",
             archive_serial_number=2,
             title="3",
+            owner=u1,
         )
         d2 = Document.objects.create(
             checksum="2",
@@ -1166,6 +1169,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             content="test",
             archive_serial_number=3,
             title="2",
+            owner=u2,
         )
         d3 = Document.objects.create(
             checksum="3",
@@ -1173,6 +1177,21 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             content="test",
             archive_serial_number=1,
             title="1",
+        )
+        Note.objects.create(
+            note="This is a note.",
+            document=d1,
+            user=u1,
+        )
+        Note.objects.create(
+            note="This is a note.",
+            document=d1,
+            user=u1,
+        )
+        Note.objects.create(
+            note="This is a note.",
+            document=d3,
+            user=u1,
         )
 
         with AsyncWriter(index.open_index()) as writer:
@@ -1201,6 +1220,14 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertListEqual(
             search_query("&ordering=-correspondent__name"),
             [d2.id, d3.id, d1.id],
+        )
+        self.assertListEqual(
+            search_query("&ordering=num_notes"),
+            [d2.id, d3.id, d1.id],
+        )
+        self.assertListEqual(
+            search_query("&ordering=-num_notes"),
+            [d1.id, d3.id, d2.id],
         )
 
     def test_statistics(self):
