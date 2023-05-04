@@ -173,8 +173,12 @@ class DelayedQuery:
             if k == "correspondent__id":
                 criterias.append(query.Term("correspondent_id", v))
             elif k == "correspondent__id__in":
+                correspondents_in = []
                 for correspondent_id in v.split(","):
-                    criterias.append(query.Term("correspondent_id", correspondent_id))
+                    correspondents_in.append(
+                        query.Term("correspondent_id", correspondent_id),
+                    )
+                criterias.append(query.Or(correspondents_in))
             elif k == "correspondent__id__none":
                 for correspondent_id in v.split(","):
                     criterias.append(
@@ -186,11 +190,18 @@ class DelayedQuery:
             elif k == "tags__id__none":
                 for tag_id in v.split(","):
                     criterias.append(query.Not(query.Term("tag_id", tag_id)))
+            elif k == "tags__id__in":
+                tags_in = []
+                for tag_id in v.split(","):
+                    tags_in.append(query.Term("tag_id", tag_id))
+                criterias.append(query.Or(tags_in))
             elif k == "document_type__id":
                 criterias.append(query.Term("type_id", v))
             elif k == "document_type__id__in":
+                document_types_in = []
                 for document_type_id in v.split(","):
-                    criterias.append(query.Term("type_id", document_type_id))
+                    document_types_in.append(query.Term("type_id", document_type_id))
+                criterias.append(query.Or(document_types_in))
             elif k == "document_type__id__none":
                 for document_type_id in v.split(","):
                     criterias.append(query.Not(query.Term("type_id", document_type_id)))
@@ -215,8 +226,10 @@ class DelayedQuery:
             elif k == "storage_path__id":
                 criterias.append(query.Term("path_id", v))
             elif k == "storage_path__id__in":
+                storage_paths_in = []
                 for storage_path_id in v.split(","):
-                    criterias.append(query.Term("path_id", storage_path_id))
+                    storage_paths_in.append(query.Term("path_id", storage_path_id))
+                criterias.append(query.Or(storage_paths_in))
             elif k == "storage_path__id__none":
                 for storage_path_id in v.split(","):
                     criterias.append(query.Not(query.Term("path_id", storage_path_id)))
