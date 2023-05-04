@@ -3402,7 +3402,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">316,320</context>
         </context-group>
-        <target state="translated">Diese Aktion wird die Tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> hinzufügen und die Tags <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> ertfernen von <x id="PH_2" equiv-text="this.list.selected.size"/> ausgewählten Dokument(en).</target>
+        <target state="translated">Diese Aktion wird die Tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> hinzufügen und die Tags <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> entfernen von <x id="PH_2" equiv-text="this.list.selected.size"/> ausgewählten Dokument(en).</target>
       </trans-unit>
       <trans-unit id="2996713129519325161" datatype="html" approved="yes">
         <source>Confirm correspondent assignment</source>
