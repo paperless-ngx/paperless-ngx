@@ -304,6 +304,10 @@ textarea,
   cursor: not-allowed;
 }
 
+ul.pagination {
+  margin-bottom: 0;
+}
+
 .page-link {
   color: var(--bs-secondary);
   background-color: var(--bs-body-bg);
@@ -317,7 +321,6 @@ textarea,
 
 .page-item.active .page-link {
   background-color: var(--bs-primary);
-  border-color: var(--bs-primary) !important;
   color: var(--bs-light);
 }
 
@@ -423,6 +426,11 @@ textarea,
 .buttonicon {
   width: 1.2em;
   height: 1.2em;
+}
+
+.buttonicon-sm {
+  width: 1em;
+  height: 1em;
 }
 
 .sidebaricon {
