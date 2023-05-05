@@ -21,22 +21,20 @@
 
 <div class="row">
   <div class="col-lg-8">
-    <ng-container *ngIf="savedViewService.loading">
-      <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-      <ng-container i18n>Loading...</ng-container>
-    </ng-container>
-
-    <app-welcome-widget *ngIf="settingsService.offerTour()" tourAnchor="tour.dashboard"></app-welcome-widget>
-
-    <div *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }">
-      <ng-container *ngFor="let v of savedViewService.dashboardViews; first as isFirst">
-        <app-saved-view-widget *ngIf="isFirst; else noTour" [savedView]="v" tourAnchor="tour.dashboard"></app-saved-view-widget>
-        <ng-template #noTour>
-          <app-saved-view-widget [savedView]="v"></app-saved-view-widget>
-        </ng-template>
+    <div tourAnchor="tour.dashboard">
+      <ng-container *ngIf="savedViewService.loading">
+        <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+        <ng-container i18n>Loading...</ng-container>
       </ng-container>
-    </div>
 
+      <app-welcome-widget *ngIf="settingsService.offerTour()" (dismiss)="completeTour()"></app-welcome-widget>
+
+      <div *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }">
+        <ng-container *ngFor="let v of savedViewService.dashboardViews; first as isFirst">
+          <app-saved-view-widget [savedView]="v"></app-saved-view-widget>
+        </ng-container>
+      </div>
+    </div>
   </div>
   <div class="col-lg-4">
 
