@@ -2,7 +2,7 @@ import { SettingsService } from './services/settings.service'
 import { SETTINGS_KEYS } from './data/paperless-uisettings'
 import { Component, OnDestroy, OnInit, Renderer2 } from '@angular/core'
 import { Router } from '@angular/router'
-import { Subscription } from 'rxjs'
+import { Subscription, first } from 'rxjs'
 import { ConsumerStatusService } from './services/consumer-status.service'
 import { ToastService } from './services/toast.service'
 import { NgxFileDropEntry } from 'ngx-file-drop'
@@ -240,13 +240,14 @@ export class AppComponent implements OnInit, OnDestroy {
 
     this.tourService.start$.subscribe(() => {
       this.renderer.addClass(document.body, 'tour-active')
-    })
 
-    this.tourService.end$.subscribe(() => {
-      // animation time
-      setTimeout(() => {
-        this.renderer.removeClass(document.body, 'tour-active')
-      }, 500)
+      this.tourService.end$.pipe(first()).subscribe(() => {
+        this.settings.completeTour()
+        // animation time
+        setTimeout(() => {
+          this.renderer.removeClass(document.body, 'tour-active')
+        }, 500)
+      })
     })
   }
 
