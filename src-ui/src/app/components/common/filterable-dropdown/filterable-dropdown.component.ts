@@ -12,6 +12,7 @@ import { ToggleableItemState } from './toggleable-dropdown-button/toggleable-dro
 import { MatchingModel } from 'src/app/data/matching-model'
 import { Subject } from 'rxjs'
 import { SelectionDataItem } from 'src/app/services/rest/document.service'
+import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
 
 export interface ChangedItems {
   itemsToAdd: MatchingModel[]
@@ -551,5 +552,14 @@ export class FilterableDropdownComponent {
   setButtonItemIndex(index: number) {
     // just track the index in case user uses arrows
     this.keyboardIndex = index
+  }
+
+  hideCount(item: ObjectWithPermissions) {
+    // counts are pointless when clicking item would add to the set of docs
+    return (
+      this.selectionModel.logicalOperator === LogicalOperator.Or &&
+      this.manyToOne &&
+      this.selectionModel.get(item.id) !== ToggleableItemState.Selected
+    )
   }
 }
