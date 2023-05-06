@@ -230,21 +230,14 @@ export class DocumentListViewService {
           activeListViewState.documents = result.results
 
           this.documentService
-            .listAllFilteredIds(activeListViewState.filterRules)
+            .getSelectionData(result.all)
             .pipe(first())
             .subscribe({
-              next: (ids: number[]) => {
-                this.documentService
-                  .getSelectionData(ids)
-                  .pipe(first())
-                  .subscribe({
-                    next: (selectionData) => {
-                      this.selectionData = selectionData
-                    },
-                    error: () => {
-                      this.selectionData = null
-                    },
-                  })
+              next: (selectionData) => {
+                this.selectionData = selectionData
+              },
+              error: () => {
+                this.selectionData = null
               },
             })
 
