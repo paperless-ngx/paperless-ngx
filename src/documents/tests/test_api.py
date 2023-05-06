@@ -499,21 +499,25 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         results = response.data["results"]
         self.assertEqual(response.data["count"], 3)
         self.assertEqual(len(results), 3)
+        self.assertCountEqual(response.data["all"], [d1.id, d2.id, d3.id])
 
         response = self.client.get("/api/documents/?query=september")
         results = response.data["results"]
         self.assertEqual(response.data["count"], 1)
         self.assertEqual(len(results), 1)
+        self.assertCountEqual(response.data["all"], [d3.id])
 
         response = self.client.get("/api/documents/?query=statement")
         results = response.data["results"]
         self.assertEqual(response.data["count"], 2)
         self.assertEqual(len(results), 2)
+        self.assertCountEqual(response.data["all"], [d2.id, d3.id])
 
         response = self.client.get("/api/documents/?query=sfegdfg")
         results = response.data["results"]
         self.assertEqual(response.data["count"], 0)
         self.assertEqual(len(results), 0)
+        self.assertCountEqual(response.data["all"], [])
 
     def test_search_multi_page(self):
         with AsyncWriter(index.open_index()) as writer:
@@ -1229,6 +1233,31 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             search_query("&ordering=-num_notes"),
             [d1.id, d3.id, d2.id],
         )
+
+    def test_pagination_all(self):
+        """
+        GIVEN:
+            - A set of 50 documents
+        WHEN:
+            - API reuqest for document filtering
+        THEN:
+            - Results are paginated (25 items) and response["all"] returns all ids (50 items)
+        """
+        t = Tag.objects.create(name="tag")
+        docs = []
+        for i in range(50):
+            d = Document.objects.create(checksum=i, content=f"test{i}")
+            d.tags.add(t)
+            docs.append(d)
+
+        response = self.client.get(
+            f"/api/documents/?tags__id__in={t.id}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 25)
+        self.assertEqual(len(response.data["all"]), 50)
+        self.assertCountEqual(response.data["all"], [d.id for d in docs])
 
     def test_statistics(self):
         doc1 = Document.objects.create(
