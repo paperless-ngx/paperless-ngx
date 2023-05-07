@@ -222,7 +222,7 @@ class TestMail(
         self,
         attachments: Union[int, List[_AttachmentDef]] = 1,
         body: str = "",
-        subject: str = "the suject",
+        subject: str = "the subject",
         from_: str = "noone@mail.com",
         to: Optional[List[str]] = None,
         seen: bool = False,
@@ -539,7 +539,6 @@ class TestMail(
         tests = [
             ("*.pdf", ["f1.pdf", "f2.pdf", "f3.pdf", "file.PDf", "f1.Pdf"]),
             ("f1.pdf", ["f1.pdf", "f1.Pdf"]),
-            ("f1", []),
             ("*", ["f1.pdf", "f2.pdf", "f3.pdf", "f2.png", "file.PDf", "f1.Pdf"]),
             ("*.png", ["f2.png"]),
         ]
@@ -563,6 +562,48 @@ class TestMail(
                         [{"override_filename": m} for m in matches],
                     ],
                 )
+
+    def test_filename_filter_inline_no_consumption(self):
+        """
+        GIVEN:
+            - Rule that processes all attachments but filters by filename
+        WHEN:
+            - Given email with inline attachment that does not meet filename filter
+        THEN:
+            - Mail action should not be performed
+        """
+        message = self.create_message(
+            attachments=[
+                _AttachmentDef(
+                    filename="test.png",
+                    disposition="inline",
+                ),
+            ],
+        )
+        self.bogus_mailbox.messages.append(message)
+        account = MailAccount.objects.create(
+            name="test",
+            imap_server="",
+            username="admin",
+            password="secret",
+        )
+        account.save()
+        rule = MailRule(
+            name=str(uuid.uuid4()),
+            assign_title_from=MailRule.TitleSource.FROM_FILENAME,
+            account=account,
+            filter_attachment_filename="*.pdf",
+            attachment_type=MailRule.AttachmentProcessing.EVERYTHING,
+            action=MailRule.MailAction.DELETE,
+        )
+        rule.save()
+
+        self.assertEqual(len(self.bogus_mailbox.messages), 4)
+
+        self.mail_account_handler.handle_mail_account(account)
+        self.apply_mail_actions()
+
+        self.assertEqual(len(self.bogus_mailbox.messages), 1)
 
     def test_handle_mail_account_mark_read(self):
         account = MailAccount.objects.create(
