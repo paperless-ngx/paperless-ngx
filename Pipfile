@@ -10,7 +10,9 @@ name = "piwheels"
 
 [packages]
 dateparser = "~=1.1"
-django = "~=4.1"
+# WARNING: django does not use semver.
+#          Only patch versions are guaranteed to not introduce breaking changes.
+django = "~=4.1.9"
 django-cors-headers = "*"
 django-celery-results = "*"
 django-compression-middleware = "*"
