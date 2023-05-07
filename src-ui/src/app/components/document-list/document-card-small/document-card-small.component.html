@@ -11,7 +11,7 @@
       </div>
 
       <div class="tags d-flex flex-column text-end position-absolute me-1 fs-6">
-        <app-tag *ngFor="let t of getTagsLimited$() | async" [tag]="t" (click)="clickTag.emit(t.id);$event.stopPropagation()" [clickable]="true" linkTitle="Toggle tag filter" i18n-linkTitle></app-tag>
+        <app-tag *ngFor="let t of getTagsLimited$() | async" [tag]="t" (click)="clickTag.emit(t);$event.stopPropagation()" [clickable]="true" linkTitle="Toggle tag filter" i18n-linkTitle></app-tag>
         <div *ngIf="moreTags">
           <span class="badge text-dark">+ {{moreTags}}</span>
         </div>

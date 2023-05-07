@@ -1,0 +1,14 @@
+<div>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title" i18n>{{model.name}}</h4>
+    <button type="button" [disabled]="!closeEnabled" class="btn-close" aria-label="Close" (click)="cancel()">
+    </button>
+  </div>
+  <div class="modal-body">
+      {{model.description}}
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-dark" (click)="cancel()" i18n [disabled]="!buttonsEnabled">Cancel</button>
+    <button type="button" class="btn btn-primary" (click)="filter()" i18n [disabled]="!buttonsEnabled">Apply as Filter</button>
+  </div>
+</div>

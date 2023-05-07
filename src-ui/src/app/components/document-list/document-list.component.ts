@@ -6,21 +6,23 @@ import {
   ViewChild,
   ViewChildren,
 } from '@angular/core'
-import { ActivatedRoute, convertToParamMap, Router } from '@angular/router'
+import { ActivatedRoute, Router, convertToParamMap } from '@angular/router'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
-import { filter, first, map, Subject, switchMap, takeUntil } from 'rxjs'
+import { Subject, filter, first, map, switchMap, takeUntil } from 'rxjs'
 import {
   FilterRule,
   filterRulesDiffer,
   isFullTextFilterRule,
 } from 'src/app/data/filter-rule'
 import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type'
+import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent'
 import { PaperlessDocument } from 'src/app/data/paperless-document'
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
+import { PaperlessTag } from 'src/app/data/paperless-tag'
 import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 import {
-  SortableDirective,
   SortEvent,
+  SortableDirective,
 } from 'src/app/directives/sortable.directive'
 import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
@@ -32,9 +34,11 @@ import {
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
+
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { FilterEditorComponent } from './filter-editor/filter-editor.component'
 import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-view-config-dialog.component'
+import { ShowDescriptionDialogComponent } from './show-description-dialog/show-description-dialog.component'
 
 @Component({
   selector: 'app-document-list',
@@ -267,14 +271,28 @@ export class DocumentListComponent
     else this.list.selectRangeTo(document)
   }
 
-  clickTag(tagID: number) {
-    this.list.selectNone()
-    this.filterEditor.toggleTag(tagID)
+  clickTag(tag: PaperlessTag) 
+  {
+    let modal = this.modalService.open(ShowDescriptionDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.model = tag
+    modal.filterClicked.pipe(first()).subscribe(() => {
+      this.list.selectNone()
+      this.filterEditor.toggleTag(tag.id)
+    })
   }
 
-  clickCorrespondent(correspondentID: number) {
-    this.list.selectNone()
-    this.filterEditor.toggleCorrespondent(correspondentID)
+  clickCorrespondent(correspondent: PaperlessCorrespondent)
+  {
+    let modal = this.modalService.open(ShowDescriptionDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.model = correspondent
+    modal.filterClicked.pipe(first()).subscribe(() => {
+      this.list.selectNone()
+      this.filterEditor.toggleCorrespondent(correspondent.id)
+    })
   }
 
   clickDocumentType(documentTypeID: number) {

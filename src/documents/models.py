@@ -88,6 +88,12 @@ class MatchingModel(ModelWithOwner):
 
 
 class Correspondent(MatchingModel):
+    description = models.TextField(
+        _("content"),
+        blank=True,
+        default=""
+    )
+
     class Meta(MatchingModel.Meta):
         verbose_name = _("correspondent")
         verbose_name_plural = _("correspondents")
@@ -103,6 +109,12 @@ class Tag(MatchingModel):
             "Marks this tag as an inbox tag: All newly consumed "
             "documents will be tagged with inbox tags.",
         ),
+    )
+
+    description = models.TextField(
+        _("content"),
+        blank=True,
+        default=""
     )
 
     class Meta(MatchingModel.Meta):

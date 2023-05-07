@@ -5,11 +5,12 @@ import {
   Output,
   ViewChild,
 } from '@angular/core'
+import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
 import { PaperlessDocument } from 'src/app/data/paperless-document'
+import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SettingsService } from 'src/app/services/settings.service'
-import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
-import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
+
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 
 @Component({
@@ -45,10 +46,10 @@ export class DocumentCardLargeComponent extends ComponentWithPermissions {
   dblClickDocument = new EventEmitter()
 
   @Output()
-  clickTag = new EventEmitter<number>()
+  clickTag = new EventEmitter()
 
   @Output()
-  clickCorrespondent = new EventEmitter<number>()
+  clickCorrespondent = new EventEmitter()
 
   @Output()
   clickDocumentType = new EventEmitter<number>()

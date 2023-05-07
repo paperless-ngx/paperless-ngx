@@ -6,4 +6,6 @@ export interface PaperlessTag extends MatchingModel {
   text_color?: string
 
   is_inbox_tag?: boolean
+
+  description?: string
 }
