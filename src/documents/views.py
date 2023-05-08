@@ -270,11 +270,9 @@ class DocumentViewSet(
         return Document.objects.distinct().annotate(num_notes=Count("notes"))
 
     def get_serializer(self, *args, **kwargs):
-        super().get_serializer(*args, **kwargs)
         fields_param = self.request.query_params.get("fields", None)
         fields = fields_param.split(",") if fields_param else None
         truncate_content = self.request.query_params.get("truncate_content", "False")
-        serializer_class = self.get_serializer_class()
         kwargs.setdefault("context", self.get_serializer_context())
         kwargs.setdefault("fields", fields)
         kwargs.setdefault("truncate_content", truncate_content.lower() in ["true", "1"])
@@ -282,7 +280,7 @@ class DocumentViewSet(
             "full_perms",
             self.request.query_params.get("full_perms", False),
         )
-        return serializer_class(*args, **kwargs)
+        return super().get_serializer(*args, **kwargs)
 
     def update(self, request, *args, **kwargs):
         response = super().update(request, *args, **kwargs)
