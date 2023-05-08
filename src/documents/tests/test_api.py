@@ -3532,6 +3532,77 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
             status.HTTP_404_NOT_FOUND,
         )
 
+    def test_api_set_permissions(self):
+        """
+        GIVEN:
+            - API request to create an object (Tag) that supplies set_permissions object
+        WHEN:
+            - owner is passed as null or as a user id
+            - view > users is set
+        THEN:
+            - Object permissions are set appropriately
+        """
+        user1 = User.objects.create_superuser(username="user1")
+        user2 = User.objects.create(username="user2")
+
+        self.client.force_authenticate(user1)
+
+        response = self.client.post(
+            "/api/tags/",
+            json.dumps(
+                {
+                    "name": "test1",
+                    "matching_algorithm": MatchingModel.MATCH_AUTO,
+                    "set_permissions": {
+                        "owner": None,
+                        "view": {
+                            "users": None,
+                            "groups": None,
+                        },
+                        "change": {
+                            "users": None,
+                            "groups": None,
+                        },
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        tag1 = Tag.objects.filter(name="test1").first()
+        self.assertEqual(tag1.owner, None)
+
+        response = self.client.post(
+            "/api/tags/",
+            json.dumps(
+                {
+                    "name": "test2",
+                    "matching_algorithm": MatchingModel.MATCH_AUTO,
+                    "set_permissions": {
+                        "owner": user1.id,
+                        "view": {
+                            "users": [user2.id],
+                            "groups": None,
+                        },
+                        "change": {
+                            "users": None,
+                            "groups": None,
+                        },
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+
+        tag2 = Tag.objects.filter(name="test2").first()
+
+        from guardian.core import ObjectPermissionChecker
+
+        checker = ObjectPermissionChecker(user2)
+        self.assertEqual(checker.has_perm("view_tag", tag2), True)
+
     def test_dynamic_permissions_fields(self):
         Document.objects.create(title="Test", content="content 1", checksum="1")
 
