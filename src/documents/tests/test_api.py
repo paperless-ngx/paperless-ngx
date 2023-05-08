@@ -912,8 +912,11 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         t = Tag.objects.create(name="tag")
         t2 = Tag.objects.create(name="tag2")
         c = Correspondent.objects.create(name="correspondent")
+        c2 = Correspondent.objects.create(name="correspondent2")
         dt = DocumentType.objects.create(name="type")
+        dt2 = DocumentType.objects.create(name="type2")
         sp = StoragePath.objects.create(name="path")
+        sp2 = StoragePath.objects.create(name="path2")
 
         d1 = Document.objects.create(checksum="1", correspondent=c, content="test")
         d2 = Document.objects.create(checksum="2", document_type=dt, content="test")
@@ -934,6 +937,13 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         )
         Document.objects.create(checksum="6", content="test2")
         d7 = Document.objects.create(checksum="7", storage_path=sp, content="test")
+        d8 = Document.objects.create(
+            checksum="8",
+            correspondent=c2,
+            document_type=dt2,
+            storage_path=sp2,
+            content="test",
+        )
 
         with AsyncWriter(index.open_index()) as writer:
             for doc in Document.objects.all():
@@ -946,39 +956,39 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         self.assertCountEqual(
             search_query(""),
-            [d1.id, d2.id, d3.id, d4.id, d5.id, d7.id],
+            [d1.id, d2.id, d3.id, d4.id, d5.id, d7.id, d8.id],
         )
         self.assertCountEqual(search_query("&is_tagged=true"), [d3.id, d4.id])
         self.assertCountEqual(
             search_query("&is_tagged=false"),
-            [d1.id, d2.id, d5.id, d7.id],
+            [d1.id, d2.id, d5.id, d7.id, d8.id],
         )
         self.assertCountEqual(search_query("&correspondent__id=" + str(c.id)), [d1.id])
         self.assertCountEqual(
-            search_query("&correspondent__id__in=" + str(c.id)),
-            [d1.id],
+            search_query(f"&correspondent__id__in={c.id},{c2.id}"),
+            [d1.id, d8.id],
         )
         self.assertCountEqual(
             search_query("&correspondent__id__none=" + str(c.id)),
-            [d2.id, d3.id, d4.id, d5.id, d7.id],
+            [d2.id, d3.id, d4.id, d5.id, d7.id, d8.id],
         )
         self.assertCountEqual(search_query("&document_type__id=" + str(dt.id)), [d2.id])
         self.assertCountEqual(
-            search_query("&document_type__id__in=" + str(dt.id)),
-            [d2.id],
+            search_query(f"&document_type__id__in={dt.id},{dt2.id}"),
+            [d2.id, d8.id],
         )
         self.assertCountEqual(
             search_query("&document_type__id__none=" + str(dt.id)),
-            [d1.id, d3.id, d4.id, d5.id, d7.id],
+            [d1.id, d3.id, d4.id, d5.id, d7.id, d8.id],
         )
         self.assertCountEqual(search_query("&storage_path__id=" + str(sp.id)), [d7.id])
         self.assertCountEqual(
-            search_query("&storage_path__id__in=" + str(sp.id)),
-            [d7.id],
+            search_query(f"&storage_path__id__in={sp.id},{sp2.id}"),
+            [d7.id, d8.id],
         )
         self.assertCountEqual(
             search_query("&storage_path__id__none=" + str(sp.id)),
-            [d1.id, d2.id, d3.id, d4.id, d5.id],
+            [d1.id, d2.id, d3.id, d4.id, d5.id, d8.id],
         )
 
         self.assertCountEqual(
@@ -1001,6 +1011,14 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertCountEqual(
             search_query("&tags__id__all=" + str(t2.id)),
             [d3.id, d4.id],
+        )
+        self.assertCountEqual(
+            search_query(f"&tags__id__in={t.id},{t2.id}"),
+            [d3.id, d4.id],
+        )
+        self.assertCountEqual(
+            search_query(f"&tags__id__none={t.id},{t2.id}"),
+            [d1.id, d2.id, d5.id, d7.id, d8.id],
         )
 
         self.assertIn(
