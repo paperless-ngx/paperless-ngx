@@ -269,10 +269,7 @@ class DelayedQuery:
             return query.Or(user_criterias) if len(user_criterias) > 0 else None
 
     def evalBoolean(self, val):
-        if val == "false" or val == "0":
-            return False
-        if val == "true" or val == "1":
-            return True
+        return val.lower() in {"true", "1"}
 
     def _get_query_sortedby(self):
         if "ordering" not in self.query_params:
