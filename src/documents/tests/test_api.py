@@ -3551,9 +3551,28 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
         )
 
     def test_dynamic_permissions_fields(self):
-        Document.objects.create(title="Test", content="content 1", checksum="1")
+        user1 = User.objects.create_user(username="user1")
+        user1.user_permissions.add(*Permission.objects.filter(codename="view_document"))
+        user2 = User.objects.create_user(username="user2")
 
-        user1 = User.objects.create_superuser(username="test1")
+        Document.objects.create(title="Test", content="content 1", checksum="1")
+        doc2 = Document.objects.create(
+            title="Test2",
+            content="content 2",
+            checksum="2",
+            owner=user2,
+        )
+        doc3 = Document.objects.create(
+            title="Test3",
+            content="content 3",
+            checksum="3",
+            owner=user2,
+        )
+
+        assign_perm("view_document", user1, doc2)
+        assign_perm("view_document", user1, doc3)
+        assign_perm("change_document", user1, doc3)
+
         self.client.force_authenticate(user1)
 
         response = self.client.get(
@@ -3567,6 +3586,9 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
 
         self.assertNotIn("permissions", resp_data["results"][0])
         self.assertIn("user_can_change", resp_data["results"][0])
+        self.assertEqual(resp_data["results"][0]["user_can_change"], True)  # doc1
+        self.assertEqual(resp_data["results"][1]["user_can_change"], False)  # doc2
+        self.assertEqual(resp_data["results"][2]["user_can_change"], True)  # doc3
 
         response = self.client.get(
             "/api/documents/?full_perms=true",
