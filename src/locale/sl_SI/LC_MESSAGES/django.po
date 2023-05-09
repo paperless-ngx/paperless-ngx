@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-03-03 20:41\n"
+"PO-Revision-Date: 2023-05-09 10:37\n"
 "Last-Translator: \n"
 "Language-Team: Slovenian\n"
 "Language: sl_SI\n"
@@ -23,7 +23,7 @@ msgstr "Dokumenti"
 
 #: documents/models.py:36
 msgid "None"
-msgstr ""
+msgstr "Brez"
 
 #: documents/models.py:37
 msgid "Any word"
@@ -68,7 +68,7 @@ msgstr "brez razlikovanje velikosti črk"
 
 #: documents/models.py:71
 msgid "owner"
-msgstr ""
+msgstr "lastnik"
 
 #: documents/models.py:81 documents/models.py:136
 msgid "correspondent"
@@ -192,7 +192,7 @@ msgstr "Trenutno ime arhivske datoteke v shrambi"
 
 #: documents/models.py:239
 msgid "original filename"
-msgstr ""
+msgstr "izvirno ime datoteke"
 
 #: documents/models.py:245
 msgid "The original name of the file when it was uploaded"
