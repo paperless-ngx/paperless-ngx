@@ -5713,13 +5713,13 @@
         </context-group>
         <target state="final">Espagnol</target>
       </trans-unit>
-      <trans-unit id="861663369293303028" datatype="html">
+      <trans-unit id="861663369293303028" datatype="html" approved="yes">
         <source>Finnish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">213</context>
         </context-group>
-        <target state="needs-translation">Finnish</target>
+        <target state="final">Finnois</target>
       </trans-unit>
       <trans-unit id="7633754075223722162" datatype="html" approved="yes">
         <source>French</source>
@@ -5857,13 +5857,13 @@
         </context-group>
         <target state="final">Impossible de migrer les paramètres vers la base de données, veuillez essayer d’enregistrer manuellement.</target>
       </trans-unit>
-      <trans-unit id="1168781785897678748" datatype="html">
+      <trans-unit id="1168781785897678748" datatype="html" approved="yes">
         <source>You can restart the tour from the settings page.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">500</context>
         </context-group>
-        <target state="needs-translation">You can restart the tour from the settings page.</target>
+        <target state="final">Vous pouvez recommencer la visite depuis les paramètres.</target>
       </trans-unit>
       <trans-unit id="5037437391296624618" datatype="html" approved="yes">
         <source>Information</source>
