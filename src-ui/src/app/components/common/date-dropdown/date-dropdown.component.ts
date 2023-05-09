@@ -39,20 +39,24 @@ export class DateDropdownComponent implements OnInit, OnDestroy {
 
   relativeDates = [
     {
-      date: RelativeDate.LAST_7_DAYS,
+      id: RelativeDate.LAST_7_DAYS,
       name: $localize`Last 7 days`,
+      date: new Date().setDate(new Date().getDate() - 7),
     },
     {
-      date: RelativeDate.LAST_MONTH,
+      id: RelativeDate.LAST_MONTH,
       name: $localize`Last month`,
+      date: new Date().setMonth(new Date().getMonth() - 1),
     },
     {
-      date: RelativeDate.LAST_3_MONTHS,
+      id: RelativeDate.LAST_3_MONTHS,
       name: $localize`Last 3 months`,
+      date: new Date().setMonth(new Date().getMonth() - 3),
     },
     {
-      date: RelativeDate.LAST_YEAR,
+      id: RelativeDate.LAST_YEAR,
       name: $localize`Last year`,
+      date: new Date().setFullYear(new Date().getFullYear() - 1),
     },
   ]
 
