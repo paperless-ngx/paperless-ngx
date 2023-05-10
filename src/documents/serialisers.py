@@ -220,6 +220,8 @@ class OwnedObjectSerializer(serializers.ModelSerializer, SetPermissionsMixin):
         permissions = None
         if "set_permissions" in validated_data:
             permissions = validated_data.pop("set_permissions")
+            if "user" not in permissions or permissions["user"] is None:
+                validated_data["owner"] = None
         instance = super().create(validated_data)
         if permissions is not None:
             self._set_permissions(permissions, instance)
