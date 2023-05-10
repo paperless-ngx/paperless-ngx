@@ -13,6 +13,7 @@ import { PaperlessUser } from 'src/app/data/paperless-user'
 import { AbstractPaperlessService } from 'src/app/services/rest/abstract-paperless-service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { PermissionsFormObject } from '../input/permissions/permissions-form/permissions-form.component'
+import { SettingsService } from 'src/app/services/settings.service'
 
 @Directive()
 export abstract class EditDialogComponent<
@@ -22,7 +23,8 @@ export abstract class EditDialogComponent<
   constructor(
     protected service: AbstractPaperlessService<T>,
     private activeModal: NgbActiveModal,
-    private userService: UserService
+    private userService: UserService,
+    private settingsService: SettingsService
   ) {}
 
   users: PaperlessUser[]
@@ -64,7 +66,14 @@ export abstract class EditDialogComponent<
       this.closeEnabled = true
     })
 
-    this.userService.listAll().subscribe((r) => (this.users = r.results))
+    this.userService.listAll().subscribe((r) => {
+      this.users = r.results
+      if (this.dialogMode === 'create') {
+        this.objectForm.get('permissions_form').setValue({
+          owner: this.settingsService.currentUser.id,
+        })
+      }
+    })
   }
 
   getCreateTitle() {

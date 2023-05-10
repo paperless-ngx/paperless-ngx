@@ -5,6 +5,7 @@ import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-
 import { PaperlessGroup } from 'src/app/data/paperless-group'
 import { GroupService } from 'src/app/services/rest/group.service'
 import { UserService } from 'src/app/services/rest/user.service'
+import { SettingsService } from 'src/app/services/settings.service'
 
 @Component({
   selector: 'app-group-edit-dialog',
@@ -15,9 +16,10 @@ export class GroupEditDialogComponent extends EditDialogComponent<PaperlessGroup
   constructor(
     service: GroupService,
     activeModal: NgbActiveModal,
-    userService: UserService
+    userService: UserService,
+    settingsService: SettingsService
   ) {
-    super(service, activeModal, userService)
+    super(service, activeModal, userService, settingsService)
   }
 
   getCreateTitle() {
