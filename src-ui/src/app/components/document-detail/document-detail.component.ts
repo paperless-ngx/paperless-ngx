@@ -81,7 +81,7 @@ export class DocumentDetailComponent
   title: string
   titleSubject: Subject<string> = new Subject()
   previewUrl: string
-  _previewHtml: string
+  previewText: string
   downloadUrl: string
   downloadOriginalUrl: string
 
@@ -164,6 +164,12 @@ export class DocumentDetailComponent
       : this.metadata?.original_mime_type
   }
 
+  get renderAsPlainText(): boolean {
+    return ['text/plain', 'application/csv', 'text/csv'].includes(
+      this.getContentType()
+    )
+  }
+
   get isRTL() {
     if (!this.metadata || !this.metadata.lang) return false
     else {
@@ -220,10 +226,10 @@ export class DocumentDetailComponent
           this.previewUrl = this.documentsService.getPreviewUrl(this.documentId)
           this.http.get(this.previewUrl, { responseType: 'text' }).subscribe({
             next: (res) => {
-              this._previewHtml = res.toString()
+              this.previewText = res.toString()
             },
             error: (err) => {
-              this._previewHtml = $localize`An error occurred loading content: ${
+              this.previewText = $localize`An error occurred loading content: ${
                 err.message ?? err.toString()
               }`
             },
@@ -751,9 +757,5 @@ export class DocumentDetailComponent
         doc
       )
     )
-  }
-
-  get previewHtml(): string {
-    return this._previewHtml
   }
 }
