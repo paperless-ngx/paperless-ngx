@@ -424,7 +424,7 @@ class DocumentSerializer(OwnedObjectSerializer, DynamicFieldsModelSerializer):
 
     def to_representation(self, instance):
         doc = super().to_representation(instance)
-        if self.truncate_content:
+        if self.truncate_content and "content" in self.fields:
             doc["content"] = doc.get("content")[0:550]
         return doc
 
