@@ -207,8 +207,8 @@
                 <object [data]="previewUrl | safeUrl" class="preview-sticky" width="100%"></object>
             </ng-template>
         </ng-container>
-        <ng-container *ngIf="getContentType() === 'text/plain'">
-            <div [innerHTML]="previewHtml | safeHtml" class="preview-sticky bg-light p-3" width="100%"></div>
+        <ng-container *ngIf="renderAsPlainText">
+            <div [innerText]="previewText" class="preview-sticky bg-light p-3" width="100%"></div>
         </ng-container>
         <div *ngIf="requiresPassword" class="password-prompt">
             <form>
