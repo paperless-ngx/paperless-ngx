@@ -45,9 +45,7 @@ inotifyrecursive = "~=0.3"
 ocrmypdf = "~=14.0"
 tqdm = "*"
 tika = "*"
-# TODO: This will sadly also install daphne+dependencies,
-#  which an ASGI server we don't need. Adds about 15MB image size.
-channels = "~=3.0"
+channels = "~=4.0"
 channels-redis = "*"
 uvicorn = {extras = ["standard"], version = "*"}
 concurrent-log-handler = "*"
@@ -69,6 +67,11 @@ scipy = "==1.8.1"
 reportlab = "==3.6.12"
 
 [dev-packages]
+# Linting
+black = "*"
+pre-commit = "*"
+ruff = "*"
+# Testing
 factory-boy = "*"
 pytest = "*"
 pytest-cov = "*"
@@ -77,11 +80,10 @@ pytest-env = "*"
 pytest-sugar = "*"
 pytest-xdist = "*"
 "pdfminer.six" = "*"
-black = "*"
-pre-commit = "*"
 imagehash = "*"
+daphne = "*"
+# Documentation
 mkdocs-material = "*"
-ruff = "*"
 
 [typing-dev]
 mypy = "*"
