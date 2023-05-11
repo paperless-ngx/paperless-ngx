@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "8fecf74dce093fa66c1027ae9230da1afb1c61d80eab7264823884e005e7284b"
+            "sha256": "6aeae592dcf1d7737a6cb6886db1ff7387a9daf3796f782531d25f2e22d608d9"
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -542,14 +542,6 @@
             ],
             "index": "pypi",
             "version": "==2.4.0"
-        },
-        "django-ipware": {
-            "hashes": [
-                "sha256:4fa5607ee85e12ee5e158bc7569ff1e134fb1579681aa1ff3f0ed04be21be153",
-                "sha256:80b52a3f571a371519cc552798f1015b934dd5dd7738bfad87e101e861bd21b8"
-            ],
-            "index": "pypi",
-            "version": "==5.0.0"
         },
         "djangorestframework": {
             "hashes": [
@@ -1300,6 +1292,14 @@
             ],
             "index": "pypi",
             "version": "==0.5.0"
+        },
+        "python-ipware": {
+            "hashes": [
+                "sha256:01b9fa589521c29d7573f69fc4855c6b95687f0029601b78fffef1eb17f1de27",
+                "sha256:ee84cd16c2cf862faae197ad5f8fae6c75e4b1f40bb13357944a5d63ddc2a373"
+            ],
+            "index": "pypi",
+            "version": "==0.9.0"
         },
         "python-magic": {
             "hashes": [
