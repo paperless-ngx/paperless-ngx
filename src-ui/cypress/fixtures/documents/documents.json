@@ -143,6 +143,64 @@
                 }
             },
             "notes": []
+        },
+        {
+            "id": 5,
+            "correspondent": null,
+            "document_type": null,
+            "storage_path": null,
+            "title": "Doc 5",
+            "content": "Test document 5",
+            "tags": [],
+            "created": "2023-05-01T07:24:18Z",
+            "created_date": "2023-05-02",
+            "modified": "2023-05-02T07:24:23.264859Z",
+            "added": "2023-05-02T07:24:22.922631Z",
+            "archive_serial_number": null,
+            "original_file_name": "doc5.pdf",
+            "archived_file_name": "doc5.pdf",
+            "owner": 15,
+            "user_can_change": true,
+            "permissions": {
+                "view": {
+                    "users": [1],
+                    "groups": []
+                },
+                "change": {
+                    "users": [],
+                    "groups": []
+                }
+            },
+            "notes": []
+        },
+        {
+            "id": 6,
+            "correspondent": null,
+            "document_type": null,
+            "storage_path": null,
+            "title": "Doc 6",
+            "content": "Test document 6",
+            "tags": [],
+            "created": "2023-05-01T10:24:18Z",
+            "created_date": "2023-05-02",
+            "modified": "2023-05-02T10:24:23.264859Z",
+            "added": "2023-05-02T10:24:22.922631Z",
+            "archive_serial_number": null,
+            "original_file_name": "doc6.pdf",
+            "archived_file_name": "doc6.pdf",
+            "owner": 6,
+            "user_can_change": true,
+            "permissions": {
+                "view": {
+                    "users": [1],
+                    "groups": []
+                },
+                "change": {
+                    "users": [],
+                    "groups": []
+                }
+            },
+            "notes": []
         }
     ]
 }

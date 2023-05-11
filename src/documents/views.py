@@ -264,6 +264,7 @@ class DocumentViewSet(
         "added",
         "archive_serial_number",
         "num_notes",
+        "owner",
     )
 
     def get_queryset(self):
