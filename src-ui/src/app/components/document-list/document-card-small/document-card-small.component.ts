@@ -24,7 +24,7 @@ import { ComponentWithPermissions } from '../../with-permissions/with-permission
 export class DocumentCardSmallComponent extends ComponentWithPermissions {
   constructor(
     private documentService: DocumentService,
-    private settingsService: SettingsService
+    public settingsService: SettingsService
   ) {
     super()
   }

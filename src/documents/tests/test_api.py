@@ -469,6 +469,98 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         results = response.data["results"]
         self.assertEqual(len(results), 0)
 
+    def test_document_owner_filters(self):
+        """
+        GIVEN:
+            - Documents with owners, with and without granted permissions
+        WHEN:
+            - User filters by owner
+        THEN:
+            - Owner filters work correctly but still respect permissions
+        """
+        u1 = User.objects.create_user("user1")
+        u2 = User.objects.create_user("user2")
+        u1.user_permissions.add(*Permission.objects.filter(codename="view_document"))
+        u2.user_permissions.add(*Permission.objects.filter(codename="view_document"))
+
+        u1_doc1 = Document.objects.create(
+            title="none1",
+            checksum="A",
+            mime_type="application/pdf",
+            owner=u1,
+        )
+        Document.objects.create(
+            title="none2",
+            checksum="B",
+            mime_type="application/pdf",
+            owner=u2,
+        )
+        u0_doc1 = Document.objects.create(
+            title="none3",
+            checksum="C",
+            mime_type="application/pdf",
+        )
+        u1_doc2 = Document.objects.create(
+            title="none4",
+            checksum="D",
+            mime_type="application/pdf",
+            owner=u1,
+        )
+        u2_doc2 = Document.objects.create(
+            title="none5",
+            checksum="E",
+            mime_type="application/pdf",
+            owner=u2,
+        )
+
+        self.client.force_authenticate(user=u1)
+        assign_perm("view_document", u1, u2_doc2)
+
+        # Will not show any u1 docs or u2_doc1 which isn't shared
+        response = self.client.get(f"/api/documents/?owner__id__none={u1.id}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 2)
+        self.assertCountEqual(
+            [results[0]["id"], results[1]["id"]],
+            [u0_doc1.id, u2_doc2.id],
+        )
+
+        # Will not show any u1 docs, u0_doc1 which has no owner or u2_doc1 which isn't shared
+        response = self.client.get(
+            f"/api/documents/?owner__id__none={u1.id}&owner__isnull=false",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+        self.assertCountEqual([results[0]["id"]], [u2_doc2.id])
+
+        # Will not show any u1 docs, u2_doc2 which is shared but has owner
+        response = self.client.get(
+            f"/api/documents/?owner__id__none={u1.id}&owner__isnull=true",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+        self.assertCountEqual([results[0]["id"]], [u0_doc1.id])
+
+        # Will not show any u1 docs or u2_doc1 which is not shared
+        response = self.client.get(f"/api/documents/?owner__id={u2.id}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+        self.assertCountEqual([results[0]["id"]], [u2_doc2.id])
+
+        # Will not show u2_doc1 which is not shared
+        response = self.client.get(f"/api/documents/?owner__id__in={u1.id},{u2.id}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 3)
+        self.assertCountEqual(
+            [results[0]["id"], results[1]["id"], results[2]["id"]],
+            [u1_doc1.id, u1_doc2.id, u2_doc2.id],
+        )
+
     def test_search(self):
         d1 = Document.objects.create(
             title="invoice",
@@ -996,15 +1088,15 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         )
 
         self.assertCountEqual(
-            search_query("&storage_path__isnull"),
+            search_query("&storage_path__isnull=true"),
             [d1.id, d2.id, d3.id, d4.id, d5.id],
         )
         self.assertCountEqual(
-            search_query("&correspondent__isnull"),
+            search_query("&correspondent__isnull=true"),
             [d2.id, d3.id, d4.id, d5.id, d7.id],
         )
         self.assertCountEqual(
-            search_query("&document_type__isnull"),
+            search_query("&document_type__isnull=true"),
             [d1.id, d3.id, d4.id, d5.id, d7.id],
         )
         self.assertCountEqual(
@@ -1116,18 +1208,30 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(r.data["count"], 2)
         r = self.client.get("/api/documents/?query=test&document_type__id__none=1")
         self.assertEqual(r.data["count"], 2)
+        r = self.client.get(f"/api/documents/?query=test&owner__id__none={u1.id}")
+        self.assertEqual(r.data["count"], 1)
+        r = self.client.get(f"/api/documents/?query=test&owner__id__in={u1.id}")
+        self.assertEqual(r.data["count"], 1)
+        r = self.client.get(
+            f"/api/documents/?query=test&owner__id__none={u1.id}&owner__isnull=true",
+        )
+        self.assertEqual(r.data["count"], 1)
 
         self.client.force_authenticate(user=u2)
         r = self.client.get("/api/documents/?query=test")
         self.assertEqual(r.data["count"], 3)
         r = self.client.get("/api/documents/?query=test&document_type__id__none=1")
         self.assertEqual(r.data["count"], 3)
+        r = self.client.get(f"/api/documents/?query=test&owner__id__none={u2.id}")
+        self.assertEqual(r.data["count"], 1)
 
         self.client.force_authenticate(user=superuser)
         r = self.client.get("/api/documents/?query=test")
         self.assertEqual(r.data["count"], 4)
         r = self.client.get("/api/documents/?query=test&document_type__id__none=1")
         self.assertEqual(r.data["count"], 4)
+        r = self.client.get(f"/api/documents/?query=test&owner__id__none={u1.id}")
+        self.assertEqual(r.data["count"], 3)
 
     def test_search_filtering_with_object_perms(self):
         """
@@ -1157,6 +1261,14 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(r.data["count"], 2)
         r = self.client.get("/api/documents/?query=test&document_type__id__none=1")
         self.assertEqual(r.data["count"], 2)
+        r = self.client.get(f"/api/documents/?query=test&owner__id__none={u1.id}")
+        self.assertEqual(r.data["count"], 1)
+        r = self.client.get(f"/api/documents/?query=test&owner__id={u1.id}")
+        self.assertEqual(r.data["count"], 1)
+        r = self.client.get(f"/api/documents/?query=test&owner__id__in={u1.id}")
+        self.assertEqual(r.data["count"], 1)
+        r = self.client.get("/api/documents/?query=test&owner__isnull=true")
+        self.assertEqual(r.data["count"], 1)
 
         assign_perm("view_document", u1, d2)
         assign_perm("view_document", u1, d3)
@@ -1170,6 +1282,14 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(r.data["count"], 4)
         r = self.client.get("/api/documents/?query=test&document_type__id__none=1")
         self.assertEqual(r.data["count"], 4)
+        r = self.client.get(f"/api/documents/?query=test&owner__id__none={u1.id}")
+        self.assertEqual(r.data["count"], 3)
+        r = self.client.get(f"/api/documents/?query=test&owner__id={u1.id}")
+        self.assertEqual(r.data["count"], 1)
+        r = self.client.get(f"/api/documents/?query=test&owner__id__in={u1.id}")
+        self.assertEqual(r.data["count"], 1)
+        r = self.client.get("/api/documents/?query=test&owner__isnull=true")
+        self.assertEqual(r.data["count"], 1)
 
     def test_search_sorting(self):
         u1 = User.objects.create_user("user1")
@@ -1250,6 +1370,14 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertListEqual(
             search_query("&ordering=-num_notes"),
             [d1.id, d3.id, d2.id],
+        )
+        self.assertListEqual(
+            search_query("&ordering=owner"),
+            [d1.id, d2.id, d3.id],
+        )
+        self.assertListEqual(
+            search_query("&ordering=-owner"),
+            [d3.id, d2.id, d1.id],
         )
 
     def test_pagination_all(self):
