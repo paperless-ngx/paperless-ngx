@@ -21,7 +21,6 @@ django-extensions = "*"
 django-filter = "~=22.1"
 djangorestframework = "~=3.14"
 djangorestframework-guardian = "*"
-django-ipware = "*"
 filelock = "*"
 gunicorn = "*"
 imap-tools = "*"
@@ -33,6 +32,7 @@ python-gnupg = "*"
 python-dotenv = "*"
 python-dateutil = "*"
 python-magic = "*"
+python-ipware = "*"
 psycopg2 = "*"
 rapidfuzz = "*"
 redis = {extras = ["hiredis"], version = "*"}
@@ -51,7 +51,6 @@ channels = "~=3.0"
 channels-redis = "*"
 uvicorn = {extras = ["standard"], version = "*"}
 concurrent-log-handler = "*"
-
 pyzbar = "*"
 mysqlclient = "*"
 celery = {extras = ["redis"], version = "*"}
