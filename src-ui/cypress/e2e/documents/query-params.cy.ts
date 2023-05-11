@@ -190,6 +190,36 @@ describe('documents query params', () => {
           response.count = response.results.length
         }
 
+        if (req.query.hasOwnProperty('owner__id')) {
+          response.results = (
+            documentsJson.results as Array<PaperlessDocument>
+          ).filter((d) => d.owner == req.query['owner__id'])
+          response.count = response.results.length
+        } else if (req.query.hasOwnProperty('owner__id__in')) {
+          const owners = req.query['owner__id__in']
+            .toString()
+            .split(',')
+            .map((o) => parseInt(o))
+          response.results = (
+            documentsJson.results as Array<PaperlessDocument>
+          ).filter((d) => owners.includes(d.owner))
+          response.count = response.results.length
+        } else if (req.query.hasOwnProperty('owner__id__none')) {
+          const owners = req.query['owner__id__none']
+            .toString()
+            .split(',')
+            .map((o) => parseInt(o))
+          response.results = (
+            documentsJson.results as Array<PaperlessDocument>
+          ).filter((d) => !owners.includes(d.owner))
+          response.count = response.results.length
+        } else if (req.query.hasOwnProperty('owner__isnull')) {
+          response.results = (
+            documentsJson.results as Array<PaperlessDocument>
+          ).filter((d) => d.owner === null)
+          response.count = response.results.length
+        }
+
         req.reply(response)
       })
     })
@@ -202,7 +232,7 @@ describe('documents query params', () => {
 
   it('should show a list of documents reverse sorted by created', () => {
     cy.visit('/documents?sort=created&reverse=true')
-    cy.get('app-document-card-small').first().contains('sit amet')
+    cy.get('app-document-card-small').first().contains('Doc 6')
   })
 
   it('should show a list of documents sorted by added', () => {
@@ -212,7 +242,7 @@ describe('documents query params', () => {
 
   it('should show a list of documents reverse sorted by added', () => {
     cy.visit('/documents?sort=added&reverse=true')
-    cy.get('app-document-card-small').first().contains('sit amet')
+    cy.get('app-document-card-small').first().contains('Doc 6')
   })
 
   it('should show a list of documents filtered by any tags', () => {
@@ -222,12 +252,12 @@ describe('documents query params', () => {
 
   it('should show a list of documents filtered by excluded tags', () => {
     cy.visit('/documents?sort=created&reverse=true&tags__id__none=2,4')
-    cy.contains('One document')
+    cy.contains('3 documents')
   })
 
   it('should show a list of documents filtered by no tags', () => {
     cy.visit('/documents?sort=created&reverse=true&is_tagged=0')
-    cy.contains('One document')
+    cy.contains('3 documents')
   })
 
   it('should show a list of documents filtered by document type', () => {
@@ -242,7 +272,7 @@ describe('documents query params', () => {
 
   it('should show a list of documents filtered by no document type', () => {
     cy.visit('/documents?sort=created&reverse=true&document_type__isnull=1')
-    cy.contains('One document')
+    cy.contains('3 documents')
   })
 
   it('should show a list of documents filtered by correspondent', () => {
@@ -257,7 +287,7 @@ describe('documents query params', () => {
 
   it('should show a list of documents filtered by no correspondent', () => {
     cy.visit('/documents?sort=created&reverse=true&correspondent__isnull=1')
-    cy.contains('One document')
+    cy.contains('3 documents')
   })
 
   it('should show a list of documents filtered by storage path', () => {
@@ -267,7 +297,7 @@ describe('documents query params', () => {
 
   it('should show a list of documents filtered by no storage path', () => {
     cy.visit('/documents?sort=created&reverse=true&storage_path__isnull=1')
-    cy.contains('3 documents')
+    cy.contains('5 documents')
   })
 
   it('should show a list of documents filtered by title or content', () => {
@@ -312,7 +342,7 @@ describe('documents query params', () => {
     cy.visit(
       '/documents?sort=created&reverse=true&created__date__gt=2022-03-23'
     )
-    cy.contains('3 documents')
+    cy.contains('5 documents')
   })
 
   it('should show a list of documents filtered by created date less than', () => {
@@ -324,7 +354,7 @@ describe('documents query params', () => {
 
   it('should show a list of documents filtered by added date greater than', () => {
     cy.visit('/documents?sort=created&reverse=true&added__date__gt=2022-03-24')
-    cy.contains('2 documents')
+    cy.contains('4 documents')
   })
 
   it('should show a list of documents filtered by added date less than', () => {
@@ -337,5 +367,25 @@ describe('documents query params', () => {
       '/documents?sort=created&reverse=true&document_type__id=1&correspondent__id=9&tags__id__in=4,5'
     )
     cy.contains('2 documents')
+  })
+
+  it('should show a list of documents filtered by owner', () => {
+    cy.visit('/documents?owner__id=15')
+    cy.contains('One document')
+  })
+
+  it('should show a list of documents filtered by multiple owners', () => {
+    cy.visit('/documents?owner__id__in=6,15')
+    cy.contains('2 documents')
+  })
+
+  it('should show a list of documents filtered by excluded owners', () => {
+    cy.visit('/documents?owner__id__none=6')
+    cy.contains('5 documents')
+  })
+
+  it('should show a list of documents filtered by null owner', () => {
+    cy.visit('/documents?owner__isnull=true')
+    cy.contains('4 documents')
   })
 })
