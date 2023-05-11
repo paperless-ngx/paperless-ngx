@@ -8,6 +8,7 @@ import {
 } from 'src/app/services/permissions.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 
 export class PermissionsSelectionModel {
   ownerFilter: OwnerFilterType
@@ -38,9 +39,7 @@ export enum OwnerFilterType {
   templateUrl: './permissions-filter-dropdown.component.html',
   styleUrls: ['./permissions-filter-dropdown.component.scss'],
 })
-export class PermissionsFilterDropdownComponent {
-  public PermissionAction = PermissionAction
-  public PermissionType = PermissionType
+export class PermissionsFilterDropdownComponent extends ComponentWithPermissions {
   public OwnerFilterType = OwnerFilterType
 
   @Input()
@@ -71,6 +70,7 @@ export class PermissionsFilterDropdownComponent {
     userService: UserService,
     private settingsService: SettingsService
   ) {
+    super()
     if (
       permissionsService.currentUserCan(
         PermissionAction.View,
