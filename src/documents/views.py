@@ -634,7 +634,10 @@ class UnifiedSearchViewSet(DocumentViewSet):
             except NotFound:
                 raise
             except Exception as e:
-                return HttpResponseBadRequest(str(e))
+                logger.warning(f"An error occurred listing search results: {str(e)}")
+                return HttpResponseBadRequest(
+                    "Error listing search results, check logs for more detail.",
+                )
         else:
             return super().list(request)
 
@@ -702,7 +705,10 @@ class BulkEditView(GenericAPIView):
             result = method(documents, **parameters)
             return Response({"result": result})
         except Exception as e:
-            return HttpResponseBadRequest(str(e))
+            logger.warning(f"An error occurred performing bulk edit: {str(e)}")
+            return HttpResponseBadRequest(
+                "Error performing bulk edit, check logs for more detail.",
+            )
 
 
 class PostDocumentView(GenericAPIView):
