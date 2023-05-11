@@ -44,6 +44,7 @@ import { PaperlessUser } from 'src/app/data/paperless-user'
 import { UserService } from 'src/app/services/rest/user.service'
 import { PaperlessDocumentNote } from 'src/app/data/paperless-document-note'
 import { HttpClient } from '@angular/common/http'
+import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 
 enum DocumentDetailNavIDs {
   Details = 1,
@@ -60,6 +61,7 @@ enum DocumentDetailNavIDs {
   styleUrls: ['./document-detail.component.scss'],
 })
 export class DocumentDetailComponent
+  extends ComponentWithPermissions
   implements OnInit, OnDestroy, DirtyComponent
 {
   @ViewChild('inputTitle')
@@ -127,8 +129,6 @@ export class DocumentDetailComponent
     }
   }
 
-  PermissionAction = PermissionAction
-  PermissionType = PermissionType
   DocumentDetailNavIDs = DocumentDetailNavIDs
   activeNavID: number
 
@@ -148,7 +148,9 @@ export class DocumentDetailComponent
     private permissionsService: PermissionsService,
     private userService: UserService,
     private http: HttpClient
-  ) {}
+  ) {
+    super()
+  }
 
   titleKeyUp(event) {
     this.titleSubject.next(event.target?.value)
