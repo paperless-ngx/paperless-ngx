@@ -599,15 +599,6 @@ class UnifiedSearchViewSet(DocumentViewSet):
         if self._is_search_request():
             from documents import index
 
-            if hasattr(self.request, "user"):
-                # pass user to query for perms
-                self.request.query_params._mutable = True
-                self.request.query_params["user"] = self.request.user.id
-                self.request.query_params[
-                    "is_superuser"
-                ] = self.request.user.is_superuser
-                self.request.query_params._mutable = False
-
             if "query" in self.request.query_params:
                 query_class = index.DelayedFullTextQuery
             elif "more_like_id" in self.request.query_params:
@@ -619,6 +610,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
                 self.searcher,
                 self.request.query_params,
                 self.paginator.get_page_size(self.request),
+                self.request.user,
             )
         else:
             return super().filter_queryset(queryset)
@@ -824,6 +816,8 @@ class SearchAutoCompleteView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
+        user = self.request.user if hasattr(self.request, "user") else None
+
         if "term" in request.query_params:
             term = request.query_params["term"]
         else:
@@ -840,7 +834,14 @@ class SearchAutoCompleteView(APIView):
 
         ix = index.open_index()
 
-        return Response(index.autocomplete(ix, term, limit))
+        return Response(
+            index.autocomplete(
+                ix,
+                term,
+                limit,
+                user,
+            ),
+        )
 
 
 class StatisticsView(APIView):
