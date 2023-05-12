@@ -928,7 +928,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
     @mock.patch("documents.index.autocomplete")
     def test_search_autocomplete(self, m):
-        m.side_effect = lambda ix, term, limit: [term for _ in range(limit)]
+        m.side_effect = lambda ix, term, limit, user: [term for _ in range(limit)]
 
         response = self.client.get("/api/search/autocomplete/?term=test")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -947,6 +947,66 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         response = self.client.get("/api/search/autocomplete/?term=")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 10)
+
+    def test_search_autocomplete_respect_permissions(self):
+        """
+        GIVEN:
+            - Multiple users and documents with & without permissions
+        WHEN:
+            - API reuqest for autocomplete is made by user with or without permissions
+        THEN:
+            - Terms only within docs user has access to are returned
+        """
+        u1 = User.objects.create_user("user1")
+        u2 = User.objects.create_user("user2")
+
+        self.client.force_authenticate(user=u1)
+
+        d1 = Document.objects.create(
+            title="doc1",
+            content="apples",
+            checksum="1",
+            owner=u1,
+        )
+        d2 = Document.objects.create(
+            title="doc2",
+            content="applebaum",
+            checksum="2",
+            owner=u1,
+        )
+        d3 = Document.objects.create(
+            title="doc3",
+            content="appletini",
+            checksum="3",
+            owner=u1,
+        )
+
+        with AsyncWriter(index.open_index()) as writer:
+            index.update_document(writer, d1)
+            index.update_document(writer, d2)
+            index.update_document(writer, d3)
+
+        response = self.client.get("/api/search/autocomplete/?term=app")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, [b"apples", b"applebaum", b"appletini"])
+
+        d3.owner = u2
+
+        with AsyncWriter(index.open_index()) as writer:
+            index.update_document(writer, d3)
+
+        response = self.client.get("/api/search/autocomplete/?term=app")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, [b"apples", b"applebaum"])
+
+        assign_perm("view_document", u1, d3)
+
+        with AsyncWriter(index.open_index()) as writer:
+            index.update_document(writer, d3)
+
+        response = self.client.get("/api/search/autocomplete/?term=app")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, [b"apples", b"applebaum", b"appletini"])
 
     @pytest.mark.skip(reason="Not implemented yet")
     def test_search_spelling_correction(self):
