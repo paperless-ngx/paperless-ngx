@@ -2,6 +2,7 @@ import os
 import shutil
 import tempfile
 import uuid
+from pathlib import Path
 from typing import ContextManager
 from unittest import mock
 
@@ -39,7 +40,7 @@ class FakeImageFile(ContextManager):
 
 
 class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
-    SAMPLE_FILES = os.path.join(os.path.dirname(__file__), "samples")
+    SAMPLE_FILES = Path(__file__).resolve().parent / "samples"
 
     def assertContainsStrings(self, content, strings):
         # Asserts that all strings appear in content, in the given order.
@@ -77,7 +78,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         parser = RasterisedDocumentParser(uuid.uuid4())
         text = parser.extract_text(
             None,
-            os.path.join(self.SAMPLE_FILES, "simple-digital.pdf"),
+            self.SAMPLE_FILES / "simple-digital.pdf",
         )
 
         self.assertContainsStrings(text.strip(), ["This is a test document."])
