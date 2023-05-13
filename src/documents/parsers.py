@@ -329,7 +329,7 @@ class DocumentParser(LoggingMixin):
             text = filepath.read_text(encoding="utf-8")
         except UnicodeDecodeError as e:
             self.log("warning", f"Unicode error during text reading, continuing: {e}")
-            text = filepath.read_bytes().decode("utf-8", errors="ignore")
+            text = filepath.read_bytes().decode("utf-8", errors="replace")
         return text
 
     def extract_metadata(self, document_path, mime_type):
