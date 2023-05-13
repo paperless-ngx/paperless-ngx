@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-05-13 10:37\n"
+"PO-Revision-Date: 2023-05-13 11:51\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -754,7 +754,7 @@ msgstr "Przetwarzaj pełną wiadomości mailową (z załącznikami osadzonymi w 
 
 #: paperless_mail/models.py:64
 msgid "Process full Mail (with embedded attachments in file) as .eml + process attachments as separate documents"
-msgstr ""
+msgstr "Przetwarzaj pełną wiadomości mailową (z załącznikami osadzonymi w pliku) jako .eml + przetwórz załączniki jako osobne dokumenty"
 
 #: paperless_mail/models.py:70
 msgid "Process all files, including 'inline' attachments."
@@ -858,7 +858,7 @@ msgstr "Załączniki typu \"inline\" zawierają osadzone obrazy, więc najlepiej
 
 #: paperless_mail/models.py:158
 msgid "consumption scope"
-msgstr ""
+msgstr "zakres konsumpcji"
 
 #: paperless_mail/models.py:164
 msgid "action"
