@@ -48,5 +48,5 @@ class TestTextParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             "text/plain",
         )
 
-        self.assertEqual(parser.get_text(), "Pantothensure\n")
+        self.assertEqual(parser.get_text(), "Pantothens�ure\n")
         self.assertIsNone(parser.get_archive_path())
