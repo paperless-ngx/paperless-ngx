@@ -1,0 +1,42 @@
+.badge-corner {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+}
+
+.dropdown-menu {
+  min-width: 250px;
+
+  .items {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  button:disabled {
+    opacity: 0.2;
+  }
+}
+
+.btn-group > label.disabled {
+  filter: brightness(0.5);
+
+  &.active {
+    background-color: var(--pngx-primary-lighten-30);
+  }
+}
+
+small > svg {
+  margin-top: -2px;
+}
+
+.list-group-item-note {
+  line-height: 1;
+
+  small {
+    font-size: 65%;
+  }
+}
+
+.show .btn-outline-primary {
+  color: #fff;
+}

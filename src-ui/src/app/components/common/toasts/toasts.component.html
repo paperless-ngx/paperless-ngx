@@ -1,0 +1,8 @@
+<ngb-toast
+  *ngFor="let toast of toasts"
+  [header]="toast.title" [autohide]="true" [delay]="toast.delay"
+  [class]="toast.classname"
+  (hidden)="toastService.closeToast(toast)">
+  <p>{{toast.content}}</p>
+  <p class="mb-0" *ngIf="toast.action"><button class="btn btn-sm btn-outline-secondary" (click)="toastService.closeToast(toast); toast.action()">{{toast.actionName}}</button></p>
+</ngb-toast>

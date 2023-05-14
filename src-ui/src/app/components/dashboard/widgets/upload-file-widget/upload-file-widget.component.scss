@@ -1,0 +1,37 @@
+form {
+  position: relative;
+}
+
+.alert-heading {
+  font-size: 80%;
+  font-weight: bold;
+}
+
+.alerts-hidden {
+  .btn {
+    line-height: 1;
+  }
+}
+
+.btn-open {
+  line-height: 1;
+
+  svg {
+    margin-top: -1px;
+  }
+}
+
+.progress {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: auto;
+  mix-blend-mode: soft-light;
+  pointer-events: none;
+}
+
+::ng-deep .ngx-file-drop__drop-zone--over {
+  background-color: var(--pngx-primary-faded) !important;
+}

@@ -1,0 +1,26 @@
+.selected-icon {
+  min-width: 1em;
+  min-height: 1em;
+}
+
+.tag-wrap {
+  font-size: 1rem;
+}
+
+.tag-wrap-delete {
+  cursor: pointer;
+}
+
+.paperless-input-select.disabled {
+  .input-group {
+      cursor: not-allowed;
+  }
+
+  ::ng-deep ng-select {
+      pointer-events: none;
+
+      .ng-select-container {
+          background-color: var(--pngx-bg-alt) !important;
+      }
+  }
+}

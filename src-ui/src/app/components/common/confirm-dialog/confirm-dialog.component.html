@@ -1,0 +1,22 @@
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">{{title}}</h4>
+      <button type="button" class="btn-close" aria-label="Close" (click)="cancel()">
+      </button>
+    </div>
+    <div class="modal-body">
+      <p *ngIf="messageBold"><b>{{messageBold}}</b></p>
+      <p class="mb-0" *ngIf="message" [innerHTML]="message | safeHtml"></p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-secondary" (click)="cancel()" [disabled]="!buttonsEnabled" i18n>
+        <span class="d-inline-block" style="padding-bottom: 1px;" >Cancel</span>
+      </button>
+      <button type="button" class="btn" [class]="btnClass" (click)="confirm()" [disabled]="!confirmButtonEnabled || !buttonsEnabled">
+        {{btnCaption}}
+        <ngb-progressbar *ngIf="!confirmButtonEnabled" style="height: 1px;" type="dark" [max]="secondsTotal" [value]="seconds"></ngb-progressbar>
+        <span class="visually-hidden">{{ seconds | number: '1.0-0' }} seconds</span>
+      </button>
+      <button *ngIf="alternativeBtnCaption" type="button" class="btn" [class]="alternativeBtnClass" (click)="alternative()" [disabled]="!alternativeButtonEnabled || !buttonsEnabled">
+        {{alternativeBtnCaption}}
+      </button>
+    </div>

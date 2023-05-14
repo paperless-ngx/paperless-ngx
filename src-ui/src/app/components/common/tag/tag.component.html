@@ -1,0 +1,9 @@
+<ng-container *ngIf="tag !== undefined; else privateTag" >
+    <span *ngIf="!clickable" class="badge" [style.background]="tag.color" [style.color]="tag.text_color">{{tag.name}}</span>
+    <a [title]="linkTitle" *ngIf="clickable" class="badge" [style.background]="tag.color" [style.color]="tag.text_color">{{tag.name}}</a>
+</ng-container>
+
+<ng-template #privateTag>
+    <span *ngIf="!clickable" class="badge private" i18n>Private</span>
+    <a [title]="linkTitle" *ngIf="clickable" class="badge private" i18n>Private</a>
+</ng-template>

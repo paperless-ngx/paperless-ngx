@@ -1,0 +1,23 @@
+<h6>
+  <button type="button" class="btn btn-outline-secondary btn-sm me-2"
+      (click)="expand = !expand">
+      <svg class="buttonicon" fill="currentColor" *ngIf="!expand">
+          <use xlink:href="assets/bootstrap-icons.svg#caret-down" />
+      </svg>
+      <svg class="buttonicon" fill="currentColor" *ngIf="expand">
+          <use xlink:href="assets/bootstrap-icons.svg#caret-up" />
+      </svg>
+  </button>
+  {{title}}
+</h6>
+
+<div #collapse="ngbCollapse" [(ngbCollapse)]="!expand">
+  <table class="table table-borderless">
+      <tbody>
+          <tr *ngFor="let m of metadata">
+              <td>{{m.prefix}}:{{m.key}}</td>
+              <td class="metadata-column">{{m.value}}</td>
+          </tr>
+      </tbody>
+  </table>
+</div>

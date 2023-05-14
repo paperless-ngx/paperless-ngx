@@ -1,0 +1,26 @@
+.log-entry-10 {
+  color: lightslategray !important;
+}
+
+.log-entry-30 {
+  color: yellow !important;
+}
+
+.log-entry-40 {
+  color: red !important;
+}
+
+.log-entry-50 {
+  color: lightcoral !important;
+  font-weight: bold;
+}
+
+.log-container {
+  overflow-y: scroll;
+  height: calc(100vh - 200px);
+  top: 70px;
+
+  p {
+    white-space: pre-wrap;
+  }
+}

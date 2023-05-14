@@ -1,0 +1,88 @@
+.result-content {
+  overflow-wrap: anywhere;
+}
+
+.doc-img-background {
+  position: relative;
+}
+
+.doc-img {
+  object-fit: cover;
+  object-position: top left;
+  height: 100%;
+  position: absolute;
+  mix-blend-mode: multiply;
+}
+
+.card-title {
+  word-break: break-word;
+}
+
+.search-score-bar {
+  width: 100px;
+  height: 5px;
+  margin-top: 1px;
+}
+
+.document-card-check {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 0.5rem;
+  border-top-left-radius: 0.25rem;
+  border-bottom-right-radius: 0.25rem;
+  pointer-events: none;
+
+  .form-check {
+    padding: 0;
+    min-height: 0;
+    margin-bottom: 0;
+
+    .form-check-input {
+      margin-left: 0;
+    }
+  }
+}
+
+.document-card:hover .document-card-check {
+  display: block;
+}
+
+.card-selected {
+  border-color: var(--bs-primary);
+
+  .document-card-check {
+    display: block;
+  }
+}
+
+.doc-img-background-selected {
+  background-color: var(--pngx-primary-faded);
+}
+
+.card-info {
+  line-height: 1;
+
+  button {
+    line-height: 1;
+
+    &:hover,
+    &:focus {
+      background-color: transparent !important;
+    }
+  }
+
+  .search-score {
+    padding-top: 0.35rem !important;
+  }
+}
+
+span ::ng-deep .match {
+  color: black;
+  background-color: rgb(255, 211, 66);
+}
+
+a {
+  cursor: pointer;
+}

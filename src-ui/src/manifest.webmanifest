@@ -1,0 +1,18 @@
+{
+  "background_color": "white",
+  "description": "A supercharged version of paperless: scan, index and archive all your physical documents",
+  "display": "fullscreen",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "256x256"
+    },
+    {
+      "src": "assets/logo-notext.svg",
+      "sizes": "any"
+    }
+  ],
+  "name": "Paperless-ngx",
+  "short_name": "Paperless-ngx",
+  "start_url": "/"
+}

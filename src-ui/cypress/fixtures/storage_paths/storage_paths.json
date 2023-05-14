@@ -1,0 +1,17 @@
+{
+    "count": 1,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": 2,
+            "slug": "year-title",
+            "name": "Year - Title",
+            "path": "{created_year}/{title}",
+            "match": "",
+            "matching_algorithm": 6,
+            "is_insensitive": true,
+            "document_count": 1
+        }
+    ]
+}

@@ -1,0 +1,88 @@
+.card-text {
+  font-size: 90%;
+}
+
+.doc-img {
+  object-fit: cover;
+  object-position: top left;
+  height: 180px;
+  mix-blend-mode: multiply;
+}
+
+.document-card-check {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 0.5rem;
+  border-top-left-radius: 0.25rem;
+  border-bottom-right-radius: 0.25rem;
+  pointer-events: none;
+
+  .form-check {
+    padding: 0;
+    min-height: 0;
+    margin-bottom: 0;
+
+    .form-check-input {
+      margin-left: 0;
+    }
+  }
+}
+
+.document-card:hover .document-card-check {
+  display: block;
+}
+
+.document-card-notes {
+  position: absolute;
+  right: 0;
+  top: 142px;
+}
+
+.card-selected {
+  border-color:var(--bs-primary);
+
+  .document-card-check {
+    display: block;
+  }
+}
+
+.doc-img-background-selected {
+  background-color: var(--pngx-primary-faded);
+}
+
+.card-info {
+  line-height: 1;
+
+  button {
+    line-height: 1;
+
+    &:hover,
+    &:focus {
+      background-color: transparent !important;
+      color: var(--bs-primary);
+    }
+  }
+}
+
+.card-footer .btn {
+  padding-top: .10rem;
+}
+
+::ng-deep .tooltip-inner {
+  text-align: left !important;
+  font-size: 90%;
+}
+
+a {
+  cursor: pointer;
+}
+
+.tags {
+  top: .2rem;
+  right: 0;
+  max-width: 80%;
+  row-gap: .2rem;
+  line-height: 1;
+}
