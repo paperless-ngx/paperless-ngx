@@ -323,3 +323,18 @@ Initial API version.
   color to use for a specific tag, which is either black or white
   depending on the brightness of `Tag.color`.
 - Removed field `Tag.colour`.
+
+### Third-party clients
+
+!!! note
+
+    The Paperless project provides no support for the third-party client
+    implementations.
+
+*   Dart:
+    [astubenbord/paperless-mobile](https://github.com/astubenbord/paperless-mobile/)
+    uses its own API client.
+*   Go: [hansmi/paperhooks](https://github.com/hansmi/paperhooks/) is a toolkit
+    for writing consumption hooks and includes a REST API client.
+*   Python: [tb1337/paperless-api](https://github.com/tb1337/paperless-api) is
+    an asynchronous wrapper for the REST API.
