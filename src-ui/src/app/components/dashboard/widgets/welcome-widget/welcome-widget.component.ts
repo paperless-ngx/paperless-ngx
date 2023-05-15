@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, EventEmitter, Output } from '@angular/core'
 import { TourService } from 'ngx-ui-tour-ng-bootstrap'
 
 @Component({
@@ -8,4 +8,7 @@ import { TourService } from 'ngx-ui-tour-ng-bootstrap'
 })
 export class WelcomeWidgetComponent {
   constructor(public readonly tourService: TourService) {}
+
+  @Output()
+  dismiss: EventEmitter<boolean> = new EventEmitter()
 }

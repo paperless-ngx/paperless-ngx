@@ -7,6 +7,7 @@ import shutil
 import subprocess
 import tempfile
 from functools import lru_cache
+from pathlib import Path
 from typing import Iterator
 from typing import Match
 from typing import Optional
@@ -318,6 +319,18 @@ class DocumentParser(LoggingMixin):
     def progress(self, current_progress, max_progress):
         if self.progress_callback:
             self.progress_callback(current_progress, max_progress)
+
+    def read_file_handle_unicode_errors(self, filepath: Path) -> str:
+        """
+        Helper utility for reading from a file, and handling a problem with its
+        unicode, falling back to ignoring the error to remove the invalid bytes
+        """
+        try:
+            text = filepath.read_text(encoding="utf-8")
+        except UnicodeDecodeError as e:
+            self.log("warning", f"Unicode error during text reading, continuing: {e}")
+            text = filepath.read_bytes().decode("utf-8", errors="replace")
+        return text
 
     def extract_metadata(self, document_path, mime_type):
         return []

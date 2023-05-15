@@ -11,6 +11,7 @@ import {
   PermissionsService,
   PermissionType,
 } from 'src/app/services/permissions.service'
+import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 
 @Component({
   providers: [
@@ -25,11 +26,9 @@ import {
   styleUrls: ['./permissions-select.component.scss'],
 })
 export class PermissionsSelectComponent
+  extends ComponentWithPermissions
   implements OnInit, ControlValueAccessor
 {
-  PermissionType = PermissionType
-  PermissionAction = PermissionAction
-
   @Input()
   title: string = 'Permissions'
 
@@ -62,6 +61,7 @@ export class PermissionsSelectComponent
   inheritedWarning: string = $localize`Inherited from group`
 
   constructor(private readonly permissionsService: PermissionsService) {
+    super()
     for (const type in PermissionType) {
       const control = new FormGroup({})
       for (const action in PermissionAction) {

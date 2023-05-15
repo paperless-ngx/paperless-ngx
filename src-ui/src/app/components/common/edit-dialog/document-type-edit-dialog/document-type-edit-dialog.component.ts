@@ -6,6 +6,7 @@ import { DEFAULT_MATCHING_ALGORITHM } from 'src/app/data/matching-model'
 import { PaperlessDocumentType } from 'src/app/data/paperless-document-type'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { UserService } from 'src/app/services/rest/user.service'
+import { SettingsService } from 'src/app/services/settings.service'
 
 @Component({
   selector: 'app-document-type-edit-dialog',
@@ -16,9 +17,10 @@ export class DocumentTypeEditDialogComponent extends EditDialogComponent<Paperle
   constructor(
     service: DocumentTypeService,
     activeModal: NgbActiveModal,
-    userService: UserService
+    userService: UserService,
+    settingsService: SettingsService
   ) {
-    super(service, activeModal, userService)
+    super(service, activeModal, userService, settingsService)
   }
 
   getCreateTitle() {

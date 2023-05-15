@@ -44,6 +44,7 @@ import { PaperlessUser } from 'src/app/data/paperless-user'
 import { UserService } from 'src/app/services/rest/user.service'
 import { PaperlessDocumentNote } from 'src/app/data/paperless-document-note'
 import { HttpClient } from '@angular/common/http'
+import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 
 enum DocumentDetailNavIDs {
   Details = 1,
@@ -60,6 +61,7 @@ enum DocumentDetailNavIDs {
   styleUrls: ['./document-detail.component.scss'],
 })
 export class DocumentDetailComponent
+  extends ComponentWithPermissions
   implements OnInit, OnDestroy, DirtyComponent
 {
   @ViewChild('inputTitle')
@@ -81,7 +83,7 @@ export class DocumentDetailComponent
   title: string
   titleSubject: Subject<string> = new Subject()
   previewUrl: string
-  _previewHtml: string
+  previewText: string
   downloadUrl: string
   downloadOriginalUrl: string
 
@@ -127,8 +129,6 @@ export class DocumentDetailComponent
     }
   }
 
-  PermissionAction = PermissionAction
-  PermissionType = PermissionType
   DocumentDetailNavIDs = DocumentDetailNavIDs
   activeNavID: number
 
@@ -148,7 +148,9 @@ export class DocumentDetailComponent
     private permissionsService: PermissionsService,
     private userService: UserService,
     private http: HttpClient
-  ) {}
+  ) {
+    super()
+  }
 
   titleKeyUp(event) {
     this.titleSubject.next(event.target?.value)
@@ -162,6 +164,12 @@ export class DocumentDetailComponent
     return this.metadata?.has_archive_version
       ? 'application/pdf'
       : this.metadata?.original_mime_type
+  }
+
+  get renderAsPlainText(): boolean {
+    return ['text/plain', 'application/csv', 'text/csv'].includes(
+      this.getContentType()
+    )
   }
 
   get isRTL() {
@@ -220,10 +228,10 @@ export class DocumentDetailComponent
           this.previewUrl = this.documentsService.getPreviewUrl(this.documentId)
           this.http.get(this.previewUrl, { responseType: 'text' }).subscribe({
             next: (res) => {
-              this._previewHtml = res.toString()
+              this.previewText = res.toString()
             },
             error: (err) => {
-              this._previewHtml = $localize`An error occurred loading content: ${
+              this.previewText = $localize`An error occurred loading content: ${
                 err.message ?? err.toString()
               }`
             },
@@ -386,7 +394,9 @@ export class DocumentDetailComponent
           error: (error) => {
             this.suggestions = null
             this.toastService.showError(
-              $localize`Error retrieving suggestions` + ': ' + error.toString()
+              $localize`Error retrieving suggestions: ${JSON.stringify(
+                error
+              ).slice(0, 500)}`
             )
           },
         })
@@ -749,9 +759,5 @@ export class DocumentDetailComponent
         doc
       )
     )
-  }
-
-  get previewHtml(): string {
-    return this._previewHtml
   }
 }

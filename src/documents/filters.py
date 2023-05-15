@@ -105,6 +105,8 @@ class DocumentFilterSet(FilterSet):
 
     title_content = TitleContentFilter()
 
+    owner__id__none = ObjectFilter(field_name="owner", exclude=True)
+
     class Meta:
         model = Document
         fields = {
@@ -125,6 +127,8 @@ class DocumentFilterSet(FilterSet):
             "storage_path": ["isnull"],
             "storage_path__id": ID_KWARGS,
             "storage_path__name": CHAR_KWARGS,
+            "owner": ["isnull"],
+            "owner__id": ID_KWARGS,
         }
 
 

@@ -1,24 +1,25 @@
 import logging
 
 from django.conf import settings
-from ipware import get_client_ip
+from ipware import IpWare
 
 logger = logging.getLogger("paperless.auth")
 
 
 # https://docs.djangoproject.com/en/4.1/ref/contrib/auth/#django.contrib.auth.signals.user_login_failed
 def handle_failed_login(sender, credentials, request, **kwargs):
-    client_ip, is_routable = get_client_ip(
-        request,
-        proxy_trusted_ips=settings.TRUSTED_PROXIES,
+    ipware = IpWare(proxy_trusted_list=settings.TRUSTED_PROXIES)
+    client_ip, _ = ipware.get_client_ip(
+        meta=request.META,
     )
+
     if client_ip is None:
         logger.info(
             f"Login failed for user `{credentials['username']}`."
             " Unable to determine IP address.",
         )
     else:
-        if is_routable:
+        if client_ip.is_global:
             # We got the client's IP address
             logger.info(
                 f"Login failed for user `{credentials['username']}`"
