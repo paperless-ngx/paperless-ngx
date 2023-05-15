@@ -1,5 +1,52 @@
 # Changelog
 
+## paperless-ngx 1.14.5
+
+### Features
+
+- Feature: owner filtering [@shamoon](https://github.com/shamoon) ([#3309](https://github.com/paperless-ngx/paperless-ngx/pull/3309))
+- Enhancement: dynamic counts include all pages, hide for Any [@shamoon](https://github.com/shamoon) ([#3329](https://github.com/paperless-ngx/paperless-ngx/pull/3329))
+- Enhancement: save tour completion, hide welcome widget [@shamoon](https://github.com/shamoon) ([#3321](https://github.com/paperless-ngx/paperless-ngx/pull/3321))
+
+### Bug Fixes
+
+- Fix: Adds better handling for files with invalid utf8 content [@stumpylog](https://github.com/stumpylog) ([#3387](https://github.com/paperless-ngx/paperless-ngx/pull/3387))
+- Fix: respect permissions for autocomplete suggestions [@shamoon](https://github.com/shamoon) ([#3359](https://github.com/paperless-ngx/paperless-ngx/pull/3359))
+- Fix: Transition to new library for finding IPs for failed logins [@stumpylog](https://github.com/stumpylog) ([#3382](https://github.com/paperless-ngx/paperless-ngx/pull/3382))
+- [Security] Render frontend text as plain text [@shamoon](https://github.com/shamoon) ([#3366](https://github.com/paperless-ngx/paperless-ngx/pull/3366))
+- Fix: default frontend to current owner, allow setting no owner on create [@shamoon](https://github.com/shamoon) ([#3347](https://github.com/paperless-ngx/paperless-ngx/pull/3347))
+- Fix: dont perform mail actions when rule filename filter not met [@shamoon](https://github.com/shamoon) ([#3336](https://github.com/paperless-ngx/paperless-ngx/pull/3336))
+- Fix: permission-aware bulk editing in 1.14.1+ [@shamoon](https://github.com/shamoon) ([#3345](https://github.com/paperless-ngx/paperless-ngx/pull/3345))
+
+### Maintenance
+
+- Chore: Rework workflows [@stumpylog](https://github.com/stumpylog) ([#3242](https://github.com/paperless-ngx/paperless-ngx/pull/3242))
+
+### Dependencies
+
+- Chore: Upgrade channels to v4 [@stumpylog](https://github.com/stumpylog) ([#3383](https://github.com/paperless-ngx/paperless-ngx/pull/3383))
+- Chore: Upgrades Python dependencies to their latest allowed versions [@stumpylog](https://github.com/stumpylog) ([#3365](https://github.com/paperless-ngx/paperless-ngx/pull/3365))
+
+### All App Changes
+
+<details>
+<summary>13 changes</summary>
+
+- Fix: Adds better handling for files with invalid utf8 content [@stumpylog](https://github.com/stumpylog) ([#3387](https://github.com/paperless-ngx/paperless-ngx/pull/3387))
+- Fix: respect permissions for autocomplete suggestions [@shamoon](https://github.com/shamoon) ([#3359](https://github.com/paperless-ngx/paperless-ngx/pull/3359))
+- Chore: Upgrade channels to v4 [@stumpylog](https://github.com/stumpylog) ([#3383](https://github.com/paperless-ngx/paperless-ngx/pull/3383))
+- Fix: Transition to new library for finding IPs for failed logins [@stumpylog](https://github.com/stumpylog) ([#3382](https://github.com/paperless-ngx/paperless-ngx/pull/3382))
+- Feature: owner filtering [@shamoon](https://github.com/shamoon) ([#3309](https://github.com/paperless-ngx/paperless-ngx/pull/3309))
+- [Security] Render frontend text as plain text [@shamoon](https://github.com/shamoon) ([#3366](https://github.com/paperless-ngx/paperless-ngx/pull/3366))
+- Enhancement: dynamic counts include all pages, hide for Any [@shamoon](https://github.com/shamoon) ([#3329](https://github.com/paperless-ngx/paperless-ngx/pull/3329))
+- Fix: default frontend to current owner, allow setting no owner on create [@shamoon](https://github.com/shamoon) ([#3347](https://github.com/paperless-ngx/paperless-ngx/pull/3347))
+- [Fix] Position:fixed for .global-dropzone-overlay [@denilsonsa](https://github.com/denilsonsa) ([#3367](https://github.com/paperless-ngx/paperless-ngx/pull/3367))
+- Fix: dont perform mail actions when rule filename filter not met [@shamoon](https://github.com/shamoon) ([#3336](https://github.com/paperless-ngx/paperless-ngx/pull/3336))
+- Enhancement: save tour completion, hide welcome widget [@shamoon](https://github.com/shamoon) ([#3321](https://github.com/paperless-ngx/paperless-ngx/pull/3321))
+- Fix: permission-aware bulk editing in 1.14.1+ [@shamoon](https://github.com/shamoon) ([#3345](https://github.com/paperless-ngx/paperless-ngx/pull/3345))
+- Fix: Add proper testing for \*\_\_id\_\_in testing [@shamoon](https://github.com/shamoon) ([#3315](https://github.com/paperless-ngx/paperless-ngx/pull/3315))
+</details>
+
 ## paperless-ngx 1.14.4
 
 ### Bug Fixes
