@@ -88,6 +88,10 @@ import { PermissionsUserComponent } from './components/common/input/permissions/
 import { PermissionsGroupComponent } from './components/common/input/permissions/permissions-group/permissions-group.component'
 import { IfOwnerDirective } from './directives/if-owner.directive'
 import { IfObjectPermissionsDirective } from './directives/if-object-permissions.directive'
+import { PermissionsDialogComponent } from './components/common/permissions-dialog/permissions-dialog.component'
+import { PermissionsFormComponent } from './components/common/input/permissions/permissions-form/permissions-form.component'
+import { PermissionsFilterDropdownComponent } from './components/common/permissions-filter-dropdown/permissions-filter-dropdown.component'
+import { UsernamePipe } from './pipes/username.pipe'
 
 import localeAr from '@angular/common/locales/ar'
 import localeBe from '@angular/common/locales/be'
@@ -111,8 +115,6 @@ import localeSr from '@angular/common/locales/sr'
 import localeSv from '@angular/common/locales/sv'
 import localeTr from '@angular/common/locales/tr'
 import localeZh from '@angular/common/locales/zh'
-import { PermissionsDialogComponent } from './components/common/permissions-dialog/permissions-dialog.component'
-import { PermissionsFormComponent } from './components/common/input/permissions/permissions-form/permissions-form.component'
 
 registerLocaleData(localeAr)
 registerLocaleData(localeBe)
@@ -213,6 +215,8 @@ function initializeApp(settings: SettingsService) {
     IfObjectPermissionsDirective,
     PermissionsDialogComponent,
     PermissionsFormComponent,
+    PermissionsFilterDropdownComponent,
+    UsernamePipe,
   ],
   imports: [
     BrowserModule,
@@ -253,6 +257,7 @@ function initializeApp(settings: SettingsService) {
     PermissionsGuard,
     DirtyDocGuard,
     DirtySavedViewGuard,
+    UsernamePipe,
   ],
   bootstrap: [AppComponent],
 })

@@ -19,6 +19,7 @@ import { DocumentTypeService } from 'src/app/services/rest/document-type.service
 import { MailAccountService } from 'src/app/services/rest/mail-account.service'
 import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
 import { UserService } from 'src/app/services/rest/user.service'
+import { SettingsService } from 'src/app/services/settings.service'
 
 const ATTACHMENT_TYPE_OPTIONS = [
   {
@@ -115,9 +116,10 @@ export class MailRuleEditDialogComponent extends EditDialogComponent<PaperlessMa
     accountService: MailAccountService,
     correspondentService: CorrespondentService,
     documentTypeService: DocumentTypeService,
-    userService: UserService
+    userService: UserService,
+    settingsService: SettingsService
   ) {
-    super(service, activeModal, userService)
+    super(service, activeModal, userService, settingsService)
 
     accountService
       .listAll()

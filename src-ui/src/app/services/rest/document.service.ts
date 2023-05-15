@@ -23,6 +23,7 @@ export const DOCUMENT_SORT_FIELDS = [
   { field: 'added', name: $localize`Added` },
   { field: 'modified', name: $localize`Modified` },
   { field: 'num_notes', name: $localize`Notes` },
+  { field: 'owner', name: $localize`Owner` },
 ]
 
 export const DOCUMENT_SORT_FIELDS_FULLTEXT = [

@@ -41,6 +41,11 @@ export const FILTER_TITLE_CONTENT = 19
 export const FILTER_FULLTEXT_QUERY = 20
 export const FILTER_FULLTEXT_MORELIKE = 21
 
+export const FILTER_OWNER = 32
+export const FILTER_OWNER_ANY = 33
+export const FILTER_OWNER_ISNULL = 34
+export const FILTER_OWNER_DOES_NOT_INCLUDE = 35
+
 export const FILTER_RULE_TYPES: FilterRuleType[] = [
   {
     id: FILTER_TITLE,
@@ -241,6 +246,30 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
     filtervar: 'more_like_id',
     datatype: 'number',
     multi: false,
+  },
+  {
+    id: FILTER_OWNER,
+    filtervar: 'owner__id',
+    datatype: 'number',
+    multi: false,
+  },
+  {
+    id: FILTER_OWNER_ANY,
+    filtervar: 'owner__id__in',
+    datatype: 'number',
+    multi: true,
+  },
+  {
+    id: FILTER_OWNER_ISNULL,
+    filtervar: 'owner__isnull',
+    datatype: 'boolean',
+    multi: false,
+  },
+  {
+    id: FILTER_OWNER_DOES_NOT_INCLUDE,
+    filtervar: 'owner__id__none',
+    datatype: 'number',
+    multi: true,
   },
 ]
 

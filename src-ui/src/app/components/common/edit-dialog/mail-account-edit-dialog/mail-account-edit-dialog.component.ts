@@ -8,6 +8,7 @@ import {
 } from 'src/app/data/paperless-mail-account'
 import { MailAccountService } from 'src/app/services/rest/mail-account.service'
 import { UserService } from 'src/app/services/rest/user.service'
+import { SettingsService } from 'src/app/services/settings.service'
 
 const IMAP_SECURITY_OPTIONS = [
   { id: IMAPSecurity.None, name: $localize`No encryption` },
@@ -30,9 +31,10 @@ export class MailAccountEditDialogComponent extends EditDialogComponent<Paperles
   constructor(
     service: MailAccountService,
     activeModal: NgbActiveModal,
-    userService: UserService
+    userService: UserService,
+    settingsService: SettingsService
   ) {
-    super(service, activeModal, userService)
+    super(service, activeModal, userService, settingsService)
   }
 
   getCreateTitle() {
