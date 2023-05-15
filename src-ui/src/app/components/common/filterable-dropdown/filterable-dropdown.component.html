@@ -34,7 +34,7 @@
       <div *ngIf="selectionModel.items" class="items" #buttonItems>
         <ng-container *ngFor="let item of selectionModel.itemsSorted | filter: filterText; let i = index">
           <app-toggleable-dropdown-button
-            *ngIf="allowSelectNone || item.id" [item]="item" [state]="selectionModel.get(item.id)" [count]="getUpdatedDocumentCount(item.id)" (toggle)="selectionModel.toggle(item.id)" (exclude)="excludeClicked(item.id)" (click)="setButtonItemIndex(i)" [disabled]="disabled">
+            *ngIf="allowSelectNone || item.id" [item]="item" [hideCount]="hideCount(item)" [state]="selectionModel.get(item.id)" [count]="getUpdatedDocumentCount(item.id)" (toggle)="selectionModel.toggle(item.id)" (exclude)="excludeClicked(item.id)" (click)="setButtonItemIndex(i)" [disabled]="disabled">
           </app-toggleable-dropdown-button>
         </ng-container>
       </div>

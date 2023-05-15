@@ -10,7 +10,9 @@ name = "piwheels"
 
 [packages]
 dateparser = "~=1.1"
-django = "~=4.1"
+# WARNING: django does not use semver.
+#          Only patch versions are guaranteed to not introduce breaking changes.
+django = "~=4.1.9"
 django-cors-headers = "*"
 django-celery-results = "*"
 django-compression-middleware = "*"
@@ -19,18 +21,18 @@ django-extensions = "*"
 django-filter = "~=22.1"
 djangorestframework = "~=3.14"
 djangorestframework-guardian = "*"
-django-ipware = "*"
 filelock = "*"
 gunicorn = "*"
 imap-tools = "*"
 langdetect = "*"
 pathvalidate = "*"
-pillow = "~=9.4"
+pillow = "*"
 pikepdf = "*"
 python-gnupg = "*"
 python-dotenv = "*"
 python-dateutil = "*"
 python-magic = "*"
+python-ipware = "*"
 psycopg2 = "*"
 rapidfuzz = "*"
 redis = {extras = ["hiredis"], version = "*"}
@@ -43,13 +45,10 @@ inotifyrecursive = "~=0.3"
 ocrmypdf = "~=14.0"
 tqdm = "*"
 tika = "*"
-# TODO: This will sadly also install daphne+dependencies,
-#  which an ASGI server we don't need. Adds about 15MB image size.
-channels = "~=3.0"
+channels = "~=4.0"
 channels-redis = "*"
 uvicorn = {extras = ["standard"], version = "*"}
 concurrent-log-handler = "*"
-"pdfminer.six" = "*"
 pyzbar = "*"
 mysqlclient = "*"
 celery = {extras = ["redis"], version = "*"}
@@ -64,9 +63,15 @@ zxing-cpp = {version = "*", platform_machine = "== 'x86_64'"}
 #
 # Pin this until piwheels is building 1.9 (see https://www.piwheels.org/project/scipy/)
 scipy = "==1.8.1"
+# v4 brings in extra dependencies for features not used here
+reportlab = "==3.6.12"
 
 [dev-packages]
-coveralls = "*"
+# Linting
+black = "*"
+pre-commit = "*"
+ruff = "*"
+# Testing
 factory-boy = "*"
 pytest = "*"
 pytest-cov = "*"
@@ -74,11 +79,11 @@ pytest-django = "*"
 pytest-env = "*"
 pytest-sugar = "*"
 pytest-xdist = "*"
-black = "*"
-pre-commit = "*"
+"pdfminer.six" = "*"
 imagehash = "*"
+daphne = "*"
+# Documentation
 mkdocs-material = "*"
-ruff = "*"
 
 [typing-dev]
 mypy = "*"

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { ParamMap, Router } from '@angular/router'
-import { Observable } from 'rxjs'
+import { Observable, first } from 'rxjs'
 import {
   filterRulesDiffer,
   cloneFilterRules,
@@ -230,7 +230,8 @@ export class DocumentListViewService {
           activeListViewState.documents = result.results
 
           this.documentService
-            .getSelectionData(result.results.map((d) => d.id))
+            .getSelectionData(result.all)
+            .pipe(first())
             .subscribe({
               next: (selectionData) => {
                 this.selectionData = selectionData

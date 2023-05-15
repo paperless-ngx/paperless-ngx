@@ -7,6 +7,7 @@ import { TagService } from 'src/app/services/rest/tag.service'
 import { randomColor } from 'src/app/utils/color'
 import { DEFAULT_MATCHING_ALGORITHM } from 'src/app/data/matching-model'
 import { UserService } from 'src/app/services/rest/user.service'
+import { SettingsService } from 'src/app/services/settings.service'
 
 @Component({
   selector: 'app-tag-edit-dialog',
@@ -17,9 +18,10 @@ export class TagEditDialogComponent extends EditDialogComponent<PaperlessTag> {
   constructor(
     service: TagService,
     activeModal: NgbActiveModal,
-    userService: UserService
+    userService: UserService,
+    settingsService: SettingsService
   ) {
-    super(service, activeModal, userService)
+    super(service, activeModal, userService, settingsService)
   }
 
   getCreateTitle() {

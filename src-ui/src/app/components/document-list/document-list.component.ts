@@ -300,4 +300,8 @@ export class DocumentListComponent
   get notesEnabled(): boolean {
     return this.settingsService.get(SETTINGS_KEYS.NOTES_ENABLED)
   }
+
+  resetFilters() {
+    this.filterEditor.resetSelected()
+  }
 }

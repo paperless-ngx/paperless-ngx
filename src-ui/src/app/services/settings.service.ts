@@ -484,7 +484,22 @@ export class SettingsService {
   offerTour(): boolean {
     return (
       !this.savedViewService.loading &&
-      this.savedViewService.dashboardViews.length == 0
+      this.savedViewService.dashboardViews.length == 0 &&
+      !this.get(SETTINGS_KEYS.TOUR_COMPLETE)
     )
+  }
+
+  completeTour() {
+    const tourCompleted = this.get(SETTINGS_KEYS.TOUR_COMPLETE)
+    if (!tourCompleted) {
+      this.set(SETTINGS_KEYS.TOUR_COMPLETE, true)
+      this.storeSettings()
+        .pipe(first())
+        .subscribe(() => {
+          this.toastService.showInfo(
+            $localize`You can restart the tour from the settings page.`
+          )
+        })
+    }
   }
 }

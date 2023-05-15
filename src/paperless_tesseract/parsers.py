@@ -122,8 +122,7 @@ class RasterisedDocumentParser(DocumentParser):
             and os.path.isfile(sidecar_file)
             and settings.OCR_MODE != "redo"
         ):
-            with open(sidecar_file) as f:
-                text = f.read()
+            text = self.read_file_handle_unicode_errors(sidecar_file)
 
             if "[OCR skipped on page" not in text:
                 # This happens when there's already text in the input file.
@@ -155,7 +154,7 @@ class RasterisedDocumentParser(DocumentParser):
                         tmp.name,
                     ],
                 )
-                text = tmp.read()
+                text = self.read_file_handle_unicode_errors(Path(tmp.name))
 
             return post_process_text(text)
 

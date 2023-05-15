@@ -6,6 +6,7 @@ import { DEFAULT_MATCHING_ALGORITHM } from 'src/app/data/matching-model'
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { UserService } from 'src/app/services/rest/user.service'
+import { SettingsService } from 'src/app/services/settings.service'
 
 @Component({
   selector: 'app-correspondent-edit-dialog',
@@ -16,9 +17,10 @@ export class CorrespondentEditDialogComponent extends EditDialogComponent<Paperl
   constructor(
     service: CorrespondentService,
     activeModal: NgbActiveModal,
-    userService: UserService
+    userService: UserService,
+    settingsService: SettingsService
   ) {
-    super(service, activeModal, userService)
+    super(service, activeModal, userService, settingsService)
   }
 
   getCreateTitle() {

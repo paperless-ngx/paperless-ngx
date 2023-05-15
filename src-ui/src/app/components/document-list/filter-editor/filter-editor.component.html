@@ -1,5 +1,5 @@
 <div class="row flex-wrap" tourAnchor="tour.documents-filter-editor">
-   <div class="col mb-2 mb-xxl-0">
+   <div class="col mb-3 mb-xxl-0">
      <div class="form-inline d-flex align-items-center">
          <div class="input-group input-group-sm flex-fill w-auto flex-nowrap">
            <div ngbDropdown>
@@ -12,8 +12,8 @@
             <option *ngFor="let m of textFilterModifiers" ngbDropdownItem [value]="m.id">{{m.label}}</option>
           </select>
           <button *ngIf="_textFilter" class="btn btn-link btn-sm px-0 position-absolute top-0 end-0 z-10" (click)="resetTextField()">
-            <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x me-1" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-              <path fill-rule="evenodd" d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+            <svg fill="currentColor" class="buttonicon-sm me-1">
+              <use xlink:href="assets/bootstrap-icons.svg#x"/>
             </svg>
           </button>
           <input #textFilterInput class="form-control form-control-sm" type="text" [disabled]="textFilterModifierIsNull" [(ngModel)]="textFilter" (keyup)="textFilterKeyup($event)" [readonly]="textFilterTarget === 'fulltext-morelike'">
@@ -22,8 +22,8 @@
   </div>
   <div class="w-100 d-xxl-none"></div>
     <div class="col col-xl-auto">
-      <div class="d-flex flex-wrap">
-        <div class="d-flex flex-wrap mb-2 mb-xxl-0">
+      <div class="d-flex flex-wrap gap-3">
+        <div class="d-flex flex-wrap gap-2">
           <app-filterable-dropdown class="flex-fill" title="Tags" icon="tag-fill" i18n-title
             filterPlaceholder="Filter tags" i18n-filterPlaceholder
             [items]="tags"
@@ -49,7 +49,7 @@
             (opened)="onDocumentTypeDropdownOpen()"
             [documentCounts]="documentTypeDocumentCounts"
             [allowSelectNone]="true"></app-filterable-dropdown>
-          <app-filterable-dropdown class="me-2 flex-fill" title="Storage path" icon="folder-fill" i18n-title
+          <app-filterable-dropdown class="flex-fill" title="Storage path" icon="folder-fill" i18n-title
             filterPlaceholder="Filter storage paths" i18n-filterPlaceholder
             [items]="storagePaths"
             [(selectionModel)]="storagePathSelectionModel"
@@ -58,28 +58,33 @@
             [documentCounts]="storagePathDocumentCounts"
             [allowSelectNone]="true"></app-filterable-dropdown>
         </div>
-        <div class="d-flex flex-wrap">
-          <app-date-dropdown class="mb-2 mb-xl-0"
+        <div class="d-flex flex-wrap gap-2">
+          <app-date-dropdown
             title="Created" i18n-title
             (datesSet)="updateRules()"
             [(dateBefore)]="dateCreatedBefore"
             [(dateAfter)]="dateCreatedAfter"
             [(relativeDate)]="dateCreatedRelativeDate"></app-date-dropdown>
-          <app-date-dropdown class="mb-2 mb-xl-0"
+          <app-date-dropdown
             title="Added" i18n-title
             (datesSet)="updateRules()"
             [(dateBefore)]="dateAddedBefore"
             [(dateAfter)]="dateAddedAfter"
             [(relativeDate)]="dateAddedRelativeDate"></app-date-dropdown>
         </div>
+        <div class="d-flex flex-wrap">
+          <app-permissions-filter-dropdown
+            title="Permissions" i18n-title
+            (ownerFilterSet)="updateRules()"
+            [(selectionModel)]="permissionsSelectionModel"></app-permissions-filter-dropdown>
+        </div>
+        <div class="d-flex flex-wrap d-none d-sm-inline-block">
+          <button class="btn btn-outline-secondary btn-sm" [disabled]="!rulesModified" (click)="resetSelected()">
+            <svg class="toolbaricon ms-n1" fill="currentColor">
+              <use xlink:href="assets/bootstrap-icons.svg#x"></use>
+            </svg><ng-container i18n>Reset filters</ng-container>
+          </button>
+        </div>
      </div>
-   </div>
-   <div class="w-100 d-xxl-none"></div>
-   <div class="col col-xl-auto ps-xxl-0">
-     <button class="btn btn-link btn-sm px-0" [disabled]="!rulesModified" (click)="resetSelected()">
-       <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x me-1 ms-n1" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-         <path fill-rule="evenodd" d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
-       </svg><ng-container i18n>Reset filters</ng-container>
-     </button>
    </div>
 </div>

@@ -264,17 +264,16 @@ class DocumentViewSet(
         "added",
         "archive_serial_number",
         "num_notes",
+        "owner",
     )
 
     def get_queryset(self):
         return Document.objects.distinct().annotate(num_notes=Count("notes"))
 
     def get_serializer(self, *args, **kwargs):
-        super().get_serializer(*args, **kwargs)
         fields_param = self.request.query_params.get("fields", None)
         fields = fields_param.split(",") if fields_param else None
         truncate_content = self.request.query_params.get("truncate_content", "False")
-        serializer_class = self.get_serializer_class()
         kwargs.setdefault("context", self.get_serializer_context())
         kwargs.setdefault("fields", fields)
         kwargs.setdefault("truncate_content", truncate_content.lower() in ["true", "1"])
@@ -282,7 +281,7 @@ class DocumentViewSet(
             "full_perms",
             self.request.query_params.get("full_perms", False),
         )
-        return serializer_class(*args, **kwargs)
+        return super().get_serializer(*args, **kwargs)
 
     def update(self, request, *args, **kwargs):
         response = super().update(request, *args, **kwargs)
@@ -600,15 +599,6 @@ class UnifiedSearchViewSet(DocumentViewSet):
         if self._is_search_request():
             from documents import index
 
-            if hasattr(self.request, "user"):
-                # pass user to query for perms
-                self.request.query_params._mutable = True
-                self.request.query_params["user"] = self.request.user.id
-                self.request.query_params[
-                    "is_superuser"
-                ] = self.request.user.is_superuser
-                self.request.query_params._mutable = False
-
             if "query" in self.request.query_params:
                 query_class = index.DelayedFullTextQuery
             elif "more_like_id" in self.request.query_params:
@@ -620,6 +610,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
                 self.searcher,
                 self.request.query_params,
                 self.paginator.get_page_size(self.request),
+                self.request.user,
             )
         else:
             return super().filter_queryset(queryset)
@@ -635,7 +626,10 @@ class UnifiedSearchViewSet(DocumentViewSet):
             except NotFound:
                 raise
             except Exception as e:
-                return HttpResponseBadRequest(str(e))
+                logger.warning(f"An error occurred listing search results: {str(e)}")
+                return HttpResponseBadRequest(
+                    "Error listing search results, check logs for more detail.",
+                )
         else:
             return super().list(request)
 
@@ -703,7 +697,10 @@ class BulkEditView(GenericAPIView):
             result = method(documents, **parameters)
             return Response({"result": result})
         except Exception as e:
-            return HttpResponseBadRequest(str(e))
+            logger.warning(f"An error occurred performing bulk edit: {str(e)}")
+            return HttpResponseBadRequest(
+                "Error performing bulk edit, check logs for more detail.",
+            )
 
 
 class PostDocumentView(GenericAPIView):
@@ -819,6 +816,8 @@ class SearchAutoCompleteView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
+        user = self.request.user if hasattr(self.request, "user") else None
+
         if "term" in request.query_params:
             term = request.query_params["term"]
         else:
@@ -835,7 +834,14 @@ class SearchAutoCompleteView(APIView):
 
         ix = index.open_index()
 
-        return Response(index.autocomplete(ix, term, limit))
+        return Response(
+            index.autocomplete(
+                ix,
+                term,
+                limit,
+                user,
+            ),
+        )
 
 
 class StatisticsView(APIView):

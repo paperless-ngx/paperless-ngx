@@ -469,6 +469,98 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         results = response.data["results"]
         self.assertEqual(len(results), 0)
 
+    def test_document_owner_filters(self):
+        """
+        GIVEN:
+            - Documents with owners, with and without granted permissions
+        WHEN:
+            - User filters by owner
+        THEN:
+            - Owner filters work correctly but still respect permissions
+        """
+        u1 = User.objects.create_user("user1")
+        u2 = User.objects.create_user("user2")
+        u1.user_permissions.add(*Permission.objects.filter(codename="view_document"))
+        u2.user_permissions.add(*Permission.objects.filter(codename="view_document"))
+
+        u1_doc1 = Document.objects.create(
+            title="none1",
+            checksum="A",
+            mime_type="application/pdf",
+            owner=u1,
+        )
+        Document.objects.create(
+            title="none2",
+            checksum="B",
+            mime_type="application/pdf",
+            owner=u2,
+        )
+        u0_doc1 = Document.objects.create(
+            title="none3",
+            checksum="C",
+            mime_type="application/pdf",
+        )
+        u1_doc2 = Document.objects.create(
+            title="none4",
+            checksum="D",
+            mime_type="application/pdf",
+            owner=u1,
+        )
+        u2_doc2 = Document.objects.create(
+            title="none5",
+            checksum="E",
+            mime_type="application/pdf",
+            owner=u2,
+        )
+
+        self.client.force_authenticate(user=u1)
+        assign_perm("view_document", u1, u2_doc2)
+
+        # Will not show any u1 docs or u2_doc1 which isn't shared
+        response = self.client.get(f"/api/documents/?owner__id__none={u1.id}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 2)
+        self.assertCountEqual(
+            [results[0]["id"], results[1]["id"]],
+            [u0_doc1.id, u2_doc2.id],
+        )
+
+        # Will not show any u1 docs, u0_doc1 which has no owner or u2_doc1 which isn't shared
+        response = self.client.get(
+            f"/api/documents/?owner__id__none={u1.id}&owner__isnull=false",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+        self.assertCountEqual([results[0]["id"]], [u2_doc2.id])
+
+        # Will not show any u1 docs, u2_doc2 which is shared but has owner
+        response = self.client.get(
+            f"/api/documents/?owner__id__none={u1.id}&owner__isnull=true",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+        self.assertCountEqual([results[0]["id"]], [u0_doc1.id])
+
+        # Will not show any u1 docs or u2_doc1 which is not shared
+        response = self.client.get(f"/api/documents/?owner__id={u2.id}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+        self.assertCountEqual([results[0]["id"]], [u2_doc2.id])
+
+        # Will not show u2_doc1 which is not shared
+        response = self.client.get(f"/api/documents/?owner__id__in={u1.id},{u2.id}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 3)
+        self.assertCountEqual(
+            [results[0]["id"], results[1]["id"], results[2]["id"]],
+            [u1_doc1.id, u1_doc2.id, u2_doc2.id],
+        )
+
     def test_search(self):
         d1 = Document.objects.create(
             title="invoice",
@@ -499,21 +591,25 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         results = response.data["results"]
         self.assertEqual(response.data["count"], 3)
         self.assertEqual(len(results), 3)
+        self.assertCountEqual(response.data["all"], [d1.id, d2.id, d3.id])
 
         response = self.client.get("/api/documents/?query=september")
         results = response.data["results"]
         self.assertEqual(response.data["count"], 1)
         self.assertEqual(len(results), 1)
+        self.assertCountEqual(response.data["all"], [d3.id])
 
         response = self.client.get("/api/documents/?query=statement")
         results = response.data["results"]
         self.assertEqual(response.data["count"], 2)
         self.assertEqual(len(results), 2)
+        self.assertCountEqual(response.data["all"], [d2.id, d3.id])
 
         response = self.client.get("/api/documents/?query=sfegdfg")
         results = response.data["results"]
         self.assertEqual(response.data["count"], 0)
         self.assertEqual(len(results), 0)
+        self.assertCountEqual(response.data["all"], [])
 
     def test_search_multi_page(self):
         with AsyncWriter(index.open_index()) as writer:
@@ -832,7 +928,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
     @mock.patch("documents.index.autocomplete")
     def test_search_autocomplete(self, m):
-        m.side_effect = lambda ix, term, limit: [term for _ in range(limit)]
+        m.side_effect = lambda ix, term, limit, user: [term for _ in range(limit)]
 
         response = self.client.get("/api/search/autocomplete/?term=test")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -851,6 +947,66 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         response = self.client.get("/api/search/autocomplete/?term=")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 10)
+
+    def test_search_autocomplete_respect_permissions(self):
+        """
+        GIVEN:
+            - Multiple users and documents with & without permissions
+        WHEN:
+            - API reuqest for autocomplete is made by user with or without permissions
+        THEN:
+            - Terms only within docs user has access to are returned
+        """
+        u1 = User.objects.create_user("user1")
+        u2 = User.objects.create_user("user2")
+
+        self.client.force_authenticate(user=u1)
+
+        d1 = Document.objects.create(
+            title="doc1",
+            content="apples",
+            checksum="1",
+            owner=u1,
+        )
+        d2 = Document.objects.create(
+            title="doc2",
+            content="applebaum",
+            checksum="2",
+            owner=u1,
+        )
+        d3 = Document.objects.create(
+            title="doc3",
+            content="appletini",
+            checksum="3",
+            owner=u1,
+        )
+
+        with AsyncWriter(index.open_index()) as writer:
+            index.update_document(writer, d1)
+            index.update_document(writer, d2)
+            index.update_document(writer, d3)
+
+        response = self.client.get("/api/search/autocomplete/?term=app")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, [b"apples", b"applebaum", b"appletini"])
+
+        d3.owner = u2
+
+        with AsyncWriter(index.open_index()) as writer:
+            index.update_document(writer, d3)
+
+        response = self.client.get("/api/search/autocomplete/?term=app")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, [b"apples", b"applebaum"])
+
+        assign_perm("view_document", u1, d3)
+
+        with AsyncWriter(index.open_index()) as writer:
+            index.update_document(writer, d3)
+
+        response = self.client.get("/api/search/autocomplete/?term=app")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, [b"apples", b"applebaum", b"appletini"])
 
     @pytest.mark.skip(reason="Not implemented yet")
     def test_search_spelling_correction(self):
@@ -912,8 +1068,11 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         t = Tag.objects.create(name="tag")
         t2 = Tag.objects.create(name="tag2")
         c = Correspondent.objects.create(name="correspondent")
+        c2 = Correspondent.objects.create(name="correspondent2")
         dt = DocumentType.objects.create(name="type")
+        dt2 = DocumentType.objects.create(name="type2")
         sp = StoragePath.objects.create(name="path")
+        sp2 = StoragePath.objects.create(name="path2")
 
         d1 = Document.objects.create(checksum="1", correspondent=c, content="test")
         d2 = Document.objects.create(checksum="2", document_type=dt, content="test")
@@ -934,6 +1093,13 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         )
         Document.objects.create(checksum="6", content="test2")
         d7 = Document.objects.create(checksum="7", storage_path=sp, content="test")
+        d8 = Document.objects.create(
+            checksum="8",
+            correspondent=c2,
+            document_type=dt2,
+            storage_path=sp2,
+            content="test",
+        )
 
         with AsyncWriter(index.open_index()) as writer:
             for doc in Document.objects.all():
@@ -946,51 +1112,51 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         self.assertCountEqual(
             search_query(""),
-            [d1.id, d2.id, d3.id, d4.id, d5.id, d7.id],
+            [d1.id, d2.id, d3.id, d4.id, d5.id, d7.id, d8.id],
         )
         self.assertCountEqual(search_query("&is_tagged=true"), [d3.id, d4.id])
         self.assertCountEqual(
             search_query("&is_tagged=false"),
-            [d1.id, d2.id, d5.id, d7.id],
+            [d1.id, d2.id, d5.id, d7.id, d8.id],
         )
         self.assertCountEqual(search_query("&correspondent__id=" + str(c.id)), [d1.id])
         self.assertCountEqual(
-            search_query("&correspondent__id__in=" + str(c.id)),
-            [d1.id],
+            search_query(f"&correspondent__id__in={c.id},{c2.id}"),
+            [d1.id, d8.id],
         )
         self.assertCountEqual(
             search_query("&correspondent__id__none=" + str(c.id)),
-            [d2.id, d3.id, d4.id, d5.id, d7.id],
+            [d2.id, d3.id, d4.id, d5.id, d7.id, d8.id],
         )
         self.assertCountEqual(search_query("&document_type__id=" + str(dt.id)), [d2.id])
         self.assertCountEqual(
-            search_query("&document_type__id__in=" + str(dt.id)),
-            [d2.id],
+            search_query(f"&document_type__id__in={dt.id},{dt2.id}"),
+            [d2.id, d8.id],
         )
         self.assertCountEqual(
             search_query("&document_type__id__none=" + str(dt.id)),
-            [d1.id, d3.id, d4.id, d5.id, d7.id],
+            [d1.id, d3.id, d4.id, d5.id, d7.id, d8.id],
         )
         self.assertCountEqual(search_query("&storage_path__id=" + str(sp.id)), [d7.id])
         self.assertCountEqual(
-            search_query("&storage_path__id__in=" + str(sp.id)),
-            [d7.id],
+            search_query(f"&storage_path__id__in={sp.id},{sp2.id}"),
+            [d7.id, d8.id],
         )
         self.assertCountEqual(
             search_query("&storage_path__id__none=" + str(sp.id)),
-            [d1.id, d2.id, d3.id, d4.id, d5.id],
+            [d1.id, d2.id, d3.id, d4.id, d5.id, d8.id],
         )
 
         self.assertCountEqual(
-            search_query("&storage_path__isnull"),
+            search_query("&storage_path__isnull=true"),
             [d1.id, d2.id, d3.id, d4.id, d5.id],
         )
         self.assertCountEqual(
-            search_query("&correspondent__isnull"),
+            search_query("&correspondent__isnull=true"),
             [d2.id, d3.id, d4.id, d5.id, d7.id],
         )
         self.assertCountEqual(
-            search_query("&document_type__isnull"),
+            search_query("&document_type__isnull=true"),
             [d1.id, d3.id, d4.id, d5.id, d7.id],
         )
         self.assertCountEqual(
@@ -1001,6 +1167,14 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertCountEqual(
             search_query("&tags__id__all=" + str(t2.id)),
             [d3.id, d4.id],
+        )
+        self.assertCountEqual(
+            search_query(f"&tags__id__in={t.id},{t2.id}"),
+            [d3.id, d4.id],
+        )
+        self.assertCountEqual(
+            search_query(f"&tags__id__none={t.id},{t2.id}"),
+            [d1.id, d2.id, d5.id, d7.id, d8.id],
         )
 
         self.assertIn(
@@ -1094,18 +1268,30 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(r.data["count"], 2)
         r = self.client.get("/api/documents/?query=test&document_type__id__none=1")
         self.assertEqual(r.data["count"], 2)
+        r = self.client.get(f"/api/documents/?query=test&owner__id__none={u1.id}")
+        self.assertEqual(r.data["count"], 1)
+        r = self.client.get(f"/api/documents/?query=test&owner__id__in={u1.id}")
+        self.assertEqual(r.data["count"], 1)
+        r = self.client.get(
+            f"/api/documents/?query=test&owner__id__none={u1.id}&owner__isnull=true",
+        )
+        self.assertEqual(r.data["count"], 1)
 
         self.client.force_authenticate(user=u2)
         r = self.client.get("/api/documents/?query=test")
         self.assertEqual(r.data["count"], 3)
         r = self.client.get("/api/documents/?query=test&document_type__id__none=1")
         self.assertEqual(r.data["count"], 3)
+        r = self.client.get(f"/api/documents/?query=test&owner__id__none={u2.id}")
+        self.assertEqual(r.data["count"], 1)
 
         self.client.force_authenticate(user=superuser)
         r = self.client.get("/api/documents/?query=test")
         self.assertEqual(r.data["count"], 4)
         r = self.client.get("/api/documents/?query=test&document_type__id__none=1")
         self.assertEqual(r.data["count"], 4)
+        r = self.client.get(f"/api/documents/?query=test&owner__id__none={u1.id}")
+        self.assertEqual(r.data["count"], 3)
 
     def test_search_filtering_with_object_perms(self):
         """
@@ -1135,6 +1321,14 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(r.data["count"], 2)
         r = self.client.get("/api/documents/?query=test&document_type__id__none=1")
         self.assertEqual(r.data["count"], 2)
+        r = self.client.get(f"/api/documents/?query=test&owner__id__none={u1.id}")
+        self.assertEqual(r.data["count"], 1)
+        r = self.client.get(f"/api/documents/?query=test&owner__id={u1.id}")
+        self.assertEqual(r.data["count"], 1)
+        r = self.client.get(f"/api/documents/?query=test&owner__id__in={u1.id}")
+        self.assertEqual(r.data["count"], 1)
+        r = self.client.get("/api/documents/?query=test&owner__isnull=true")
+        self.assertEqual(r.data["count"], 1)
 
         assign_perm("view_document", u1, d2)
         assign_perm("view_document", u1, d3)
@@ -1148,6 +1342,14 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(r.data["count"], 4)
         r = self.client.get("/api/documents/?query=test&document_type__id__none=1")
         self.assertEqual(r.data["count"], 4)
+        r = self.client.get(f"/api/documents/?query=test&owner__id__none={u1.id}")
+        self.assertEqual(r.data["count"], 3)
+        r = self.client.get(f"/api/documents/?query=test&owner__id={u1.id}")
+        self.assertEqual(r.data["count"], 1)
+        r = self.client.get(f"/api/documents/?query=test&owner__id__in={u1.id}")
+        self.assertEqual(r.data["count"], 1)
+        r = self.client.get("/api/documents/?query=test&owner__isnull=true")
+        self.assertEqual(r.data["count"], 1)
 
     def test_search_sorting(self):
         u1 = User.objects.create_user("user1")
@@ -1229,6 +1431,39 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             search_query("&ordering=-num_notes"),
             [d1.id, d3.id, d2.id],
         )
+        self.assertListEqual(
+            search_query("&ordering=owner"),
+            [d1.id, d2.id, d3.id],
+        )
+        self.assertListEqual(
+            search_query("&ordering=-owner"),
+            [d3.id, d2.id, d1.id],
+        )
+
+    def test_pagination_all(self):
+        """
+        GIVEN:
+            - A set of 50 documents
+        WHEN:
+            - API reuqest for document filtering
+        THEN:
+            - Results are paginated (25 items) and response["all"] returns all ids (50 items)
+        """
+        t = Tag.objects.create(name="tag")
+        docs = []
+        for i in range(50):
+            d = Document.objects.create(checksum=i, content=f"test{i}")
+            d.tags.add(t)
+            docs.append(d)
+
+        response = self.client.get(
+            f"/api/documents/?tags__id__in={t.id}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 25)
+        self.assertEqual(len(response.data["all"]), 50)
+        self.assertCountEqual(response.data["all"], [d.id for d in docs])
 
     def test_statistics(self):
         doc1 = Document.objects.create(
@@ -3532,10 +3767,100 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
             status.HTTP_404_NOT_FOUND,
         )
 
-    def test_dynamic_permissions_fields(self):
-        Document.objects.create(title="Test", content="content 1", checksum="1")
+    def test_api_set_permissions(self):
+        """
+        GIVEN:
+            - API request to create an object (Tag) that supplies set_permissions object
+        WHEN:
+            - owner is passed as null or as a user id
+            - view > users is set
+        THEN:
+            - Object permissions are set appropriately
+        """
+        user1 = User.objects.create_superuser(username="user1")
+        user2 = User.objects.create(username="user2")
 
-        user1 = User.objects.create_superuser(username="test1")
+        self.client.force_authenticate(user1)
+
+        response = self.client.post(
+            "/api/tags/",
+            json.dumps(
+                {
+                    "name": "test1",
+                    "matching_algorithm": MatchingModel.MATCH_AUTO,
+                    "set_permissions": {
+                        "owner": None,
+                        "view": {
+                            "users": None,
+                            "groups": None,
+                        },
+                        "change": {
+                            "users": None,
+                            "groups": None,
+                        },
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        tag1 = Tag.objects.filter(name="test1").first()
+        self.assertEqual(tag1.owner, None)
+
+        response = self.client.post(
+            "/api/tags/",
+            json.dumps(
+                {
+                    "name": "test2",
+                    "matching_algorithm": MatchingModel.MATCH_AUTO,
+                    "set_permissions": {
+                        "owner": user1.id,
+                        "view": {
+                            "users": [user2.id],
+                            "groups": None,
+                        },
+                        "change": {
+                            "users": None,
+                            "groups": None,
+                        },
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+
+        tag2 = Tag.objects.filter(name="test2").first()
+
+        from guardian.core import ObjectPermissionChecker
+
+        checker = ObjectPermissionChecker(user2)
+        self.assertEqual(checker.has_perm("view_tag", tag2), True)
+
+    def test_dynamic_permissions_fields(self):
+        user1 = User.objects.create_user(username="user1")
+        user1.user_permissions.add(*Permission.objects.filter(codename="view_document"))
+        user2 = User.objects.create_user(username="user2")
+
+        Document.objects.create(title="Test", content="content 1", checksum="1")
+        doc2 = Document.objects.create(
+            title="Test2",
+            content="content 2",
+            checksum="2",
+            owner=user2,
+        )
+        doc3 = Document.objects.create(
+            title="Test3",
+            content="content 3",
+            checksum="3",
+            owner=user2,
+        )
+
+        assign_perm("view_document", user1, doc2)
+        assign_perm("view_document", user1, doc3)
+        assign_perm("change_document", user1, doc3)
+
         self.client.force_authenticate(user1)
 
         response = self.client.get(
@@ -3549,6 +3874,9 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
 
         self.assertNotIn("permissions", resp_data["results"][0])
         self.assertIn("user_can_change", resp_data["results"][0])
+        self.assertEqual(resp_data["results"][0]["user_can_change"], True)  # doc1
+        self.assertEqual(resp_data["results"][1]["user_can_change"], False)  # doc2
+        self.assertEqual(resp_data["results"][2]["user_can_change"], True)  # doc3
 
         response = self.client.get(
             "/api/documents/?full_perms=true",

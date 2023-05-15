@@ -725,11 +725,27 @@ class MailAccountHandler(LoggingMixin):
                     f"by paperless",
                 )
 
-        queue_consumption_tasks(
-            consume_tasks=consume_tasks,
-            rule=rule,
-            message=message,
-        )
+        if len(consume_tasks) > 0:
+            queue_consumption_tasks(
+                consume_tasks=consume_tasks,
+                rule=rule,
+                message=message,
+            )
+        else:
+            # No files to consume, just mark as processed if it wasnt by .eml processing
+            if not ProcessedMail.objects.filter(
+                rule=rule,
+                uid=message.uid,
+                folder=rule.folder,
+            ).exists():
+                ProcessedMail.objects.create(
+                    rule=rule,
+                    folder=rule.folder,
+                    uid=message.uid,
+                    subject=message.subject,
+                    received=message.date,
+                    status="PROCESSED_WO_CONSUMPTION",
+                )
 
         return processed_attachments
 
