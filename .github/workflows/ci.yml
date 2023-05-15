@@ -161,7 +161,7 @@ jobs:
           pipenv --python ${{ steps.setup-python.outputs.python-version }} run pytest -ra
       -
         name: Upload coverage to Codecov
-        if: ${{ matrix.python-version == env.DEFAULT_PYTHON_VERSION && github.event_name == 'pull_request'}}
+        if: ${{ matrix.python-version == env.DEFAULT_PYTHON_VERSION && github.event_name == 'push'}}
         uses: codecov/codecov-action@v3
         with:
           # not required for public repos, but intermittently fails otherwise
