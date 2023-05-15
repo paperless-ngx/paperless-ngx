@@ -182,67 +182,11 @@
         </h6>
         <ul class="nav flex-column mb-2">
           <li class="nav-item" tourAnchor="tour.outro">
-            <a class="nav-link" target="_blank" rel="noopener noreferrer" href="https://docs.paperless-ngx.com" ngbPopover="Documentation" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
+            <a class="nav-link" target="_blank" rel="noopener noreferrer" href="#" ngbPopover="Documentation" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#question-circle"/>
-              </svg><span>&nbsp;<ng-container i18n>Documentation</ng-container></span>
+              </svg><span>&nbsp;<ng-container i18n>User Guide (WIP)</ng-container></span>
             </a>
-          </li>
-          <li class="nav-item">
-            <div class="d-flex w-100 flex-wrap">
-              <a class="nav-link pe-2 pb-1" target="_blank" rel="noopener noreferrer" href="https://github.com/paperless-ngx/paperless-ngx" ngbPopover="GitHub" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="sidebaricon" viewBox="0 0 16 16">
-                  <use xlink:href="assets/bootstrap-icons.svg#github" />
-                </svg><span>&nbsp;<ng-container i18n>GitHub</ng-container></span>
-              </a>
-              <a class="nav-link-additional small text-muted ms-3" [class.visually-hidden]="slimSidebarEnabled" target="_blank" rel="noopener noreferrer" href="https://github.com/paperless-ngx/paperless-ngx/discussions/categories/feature-requests" title="Suggest an idea" i18n-title>
-                <svg xmlns="http://www.w3.org/2000/svg" width="1.1em" height="1.1em" fill="currentColor" class="me-1" viewBox="0 0 16 16">
-                  <use xlink:href="assets/bootstrap-icons.svg#lightbulb" />
-                </svg>
-                <ng-container i18n>Suggest an idea</ng-container>
-              </a>
-            </div>
-          </li>
-          <li class="nav-item mt-2" [class.visually-hidden]="slimSidebarEnabled">
-            <div class="px-3 py-2 text-muted small d-flex align-items-center flex-wrap">
-              <div class="me-3">{{ versionString }}</div>
-              <div *ngIf="!settingsService.updateCheckingIsSet || appRemoteVersion" class="version-check">
-                <ng-template #updateAvailablePopContent>
-                  <span class="small">Paperless-ngx {{ appRemoteVersion.version }} <ng-container i18n>is available.</ng-container><br/><ng-container i18n>Click to view.</ng-container></span>
-                </ng-template>
-                <ng-template #updateCheckingNotEnabledPopContent>
-                  <p class="small mb-2">
-                    <ng-container i18n>Paperless-ngx can automatically check for updates</ng-container>
-                  </p>
-                  <div class="btn-group btn-group-xs flex-fill w-100">
-                    <button class="btn btn-outline-primary" (click)="setUpdateChecking(true)">Enable</button>
-                    <button class="btn btn-outline-secondary" (click)="setUpdateChecking(false)">Disable</button>
-                  </div>
-                  <p class="small mb-0 mt-2">
-                    <a class="small text-decoration-none fst-italic" routerLink="/settings" fragment="update-checking" i18n>
-                      How does this work?
-                    </a>
-                  </p>
-                </ng-template>
-                <ng-container *ngIf="settingsService.updateCheckingIsSet; else updateCheckNotSet">
-                  <a *ngIf="appRemoteVersion.update_available" class="small text-decoration-none" target="_blank" rel="noopener noreferrer" href="https://github.com/paperless-ngx/paperless-ngx/releases"
-                  [ngbPopover]="updateAvailablePopContent" popoverClass="shadow" triggers="mouseenter:mouseleave" container="body">
-                    <svg fill="currentColor" class="me-1" width="1.2em" height="1.2em" style="vertical-align: text-top;" viewBox="0 0 16 16">
-                      <use xlink:href="assets/bootstrap-icons.svg#info-circle" />
-                    </svg>
-                    <ng-container *ngIf="appRemoteVersion?.update_available" i18n>Update available</ng-container>
-                  </a>
-                </ng-container>
-                <ng-template #updateCheckNotSet>
-                  <a class="small text-decoration-none" routerLink="/settings" fragment="update-checking"
-                  [ngbPopover]="updateCheckingNotEnabledPopContent" popoverClass="shadow" triggers="mouseenter" container="body">
-                    <svg fill="currentColor" class="me-1" width="1.2em" height="1.2em" style="vertical-align: text-top;" viewBox="0 0 16 16">
-                      <use xlink:href="assets/bootstrap-icons.svg#info-circle" />
-                    </svg>
-                  </a>
-                </ng-template>
-              </div>
-            </div>
           </li>
         </ul>
       </div>
