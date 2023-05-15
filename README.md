@@ -101,14 +101,7 @@ For bugs please [open an issue](https://github.com/paperless-ngx/paperless-ngx/i
 
 # Affiliated Projects
 
-Paperless has been around for a while now, and people have built tools that interact with it. If you're one of them, please reach out and we can add your project to the list. Current projects include:
-
-- **Mobile**
-  - [Paperless App](https://github.com/bauerj/paperless_app): An Android/iOS application for Paperless-ngx.
-  - [Paperless Mobile](https://github.com/astubenbord/paperless-mobile): A modern, feature rich Android app for Paperless-ngx.
-  - [Paperless Share](https://github.com/qcasey/paperless_share): Share any files from your Android application with Paperless-ngx. Very simple, but works with all mobile scanning apps that allow you to share scanned documents.
-- **Desktop**
-  - [Scan to Paperless](https://github.com/sbrunner/scan-to-paperless): Scan and prepare (crop, deskew, OCR, ...) your documents for use in Paperless-ngx.
+Please see [the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Affiliated-Projects) for a user-maintained list of affiliated projects and software that is compatible with Paperless-ngx.
 
 # Important Note
 
