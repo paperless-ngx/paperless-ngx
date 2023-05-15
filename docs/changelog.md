@@ -4,10 +4,8 @@
 
 ### Features
 
-- Fix: respect permissions for autocomplete suggestions [@shamoon](https://github.com/shamoon) ([#3359](https://github.com/paperless-ngx/paperless-ngx/pull/3359))
 - Feature: owner filtering [@shamoon](https://github.com/shamoon) ([#3309](https://github.com/paperless-ngx/paperless-ngx/pull/3309))
 - Enhancement: dynamic counts include all pages, hide for Any [@shamoon](https://github.com/shamoon) ([#3329](https://github.com/paperless-ngx/paperless-ngx/pull/3329))
-- Chore: Upgrades Python dependencies to their latest allowed versions [@stumpylog](https://github.com/stumpylog) ([#3365](https://github.com/paperless-ngx/paperless-ngx/pull/3365))
 - Enhancement: save tour completion, hide welcome widget [@shamoon](https://github.com/shamoon) ([#3321](https://github.com/paperless-ngx/paperless-ngx/pull/3321))
 
 ### Bug Fixes
@@ -27,6 +25,7 @@
 ### Dependencies
 
 - Chore: Upgrade channels to v4 [@stumpylog](https://github.com/stumpylog) ([#3383](https://github.com/paperless-ngx/paperless-ngx/pull/3383))
+- Chore: Upgrades Python dependencies to their latest allowed versions [@stumpylog](https://github.com/stumpylog) ([#3365](https://github.com/paperless-ngx/paperless-ngx/pull/3365))
 
 ### All App Changes
 
