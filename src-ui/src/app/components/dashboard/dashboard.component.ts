@@ -33,9 +33,9 @@ export class DashboardComponent extends ComponentWithPermissions {
 
   get subtitle() {
     if (this.settingsService.displayName) {
-      return $localize`Hello ${this.settingsService.displayName}, welcome to Paperless-ngx`
+      return $localize`Hello ${this.settingsService.displayName}, welcome to LBC Finance`
     } else {
-      return $localize`Welcome to Paperless-ngx`
+      return $localize`Welcome to LBC Finance`
     }
   }
 }

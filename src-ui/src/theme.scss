@@ -4,8 +4,13 @@
   --pngx-primary-lightness: 21%;
 }
 
+@mixin paperless-lbc {
+  --pngx-primary: 0, 63%;
+  --pngx-primary-lightness: 31%;
+}
+
 body {
-  @include paperless-green;
+  @include paperless-lbc;
   --pngx-primary-text-contrast: var(--bs-light);
 
   --bs-primary: hsl(var(--pngx-primary), var(--pngx-primary-lightness));
@@ -255,7 +260,7 @@ body.color-scheme-dark {
 
     .navbar.bg-primary {
       // navbar is og green in dark mode
-      @include paperless-green;
+      @include paperless-lbc;
     }
   }
 
@@ -270,7 +275,7 @@ body.color-scheme-dark {
 
       .navbar.bg-primary {
         // navbar is og green in dark mode
-        @include paperless-green;
+        @include paperless-lbc;
       }
     }
 
