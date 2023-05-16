@@ -205,8 +205,10 @@ for details.
 ## Permissions
 
 As of version 1.14.0 Paperless-ngx added core support for user / group permissions. Permissions is
-based around an object 'owner' and 'view' and 'edit' permissions can be granted to other users
-or groups.
+based around 'global' permissions as well as 'object-level' permissions. Global permissions designate
+which parts of the application a user can access (e.g. Documents, Tags, Settings) and object-level
+determine which objects are visible or editable. All objects have an 'owner' and 'view' and 'edit'
+permissions which can be granted to other users or groups.
 
 Permissions uses the built-in user model of the backend framework, Django.
 
