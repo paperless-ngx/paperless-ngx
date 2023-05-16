@@ -1,4 +1,8 @@
 commit_message: '[ci skip]'
+pull_request_labels: [
+  "skip-changelog",
+  "translation"
+]
 files:
   - source: /src/locale/en_US/LC_MESSAGES/django.po
     translation: /src/locale/%locale_with_underscore%/LC_MESSAGES/django.po
