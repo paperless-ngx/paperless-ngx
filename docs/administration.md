@@ -148,6 +148,13 @@ following:
     $ pip install -r requirements.txt
     ```
 
+    !!! note
+
+        At times, some dependencies will be removed from requirements.txt.
+        Comparing the versions and removing no longer needed dependencies
+        will keep your system or virtual environment clean and prevent
+        possible conflicts.
+
 3.  Migrate the database.
 
     ```shell-session
