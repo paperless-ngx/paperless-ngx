@@ -213,7 +213,7 @@ Add the following contents to the file:
 enabled  = true
 maxretry = 5
 filter   = paperless
-logpath  = /var/lib/docker/volumes/paperless_data/_data/log/paperless.log
+logpath  = /var/lib/docker/volumes/paperless_data/_data/log/paperless.log 
 chain    = DOCKER-USER
 port     = 8000
 
@@ -224,6 +224,7 @@ filter   = paperless
 logpath  = /var/lib/docker/volumes/paperless_data/_data/log/paperless.log
 port     = http,https
 ```
+If the Paperless Docker volumes are located to a different location (`/var/lib/docker/volumes/`), modify the `logpath` accordingly.
 
 If you are not using a reverse proxy to access Paperless you can remove the `[paperless_proxy]` section.
 
