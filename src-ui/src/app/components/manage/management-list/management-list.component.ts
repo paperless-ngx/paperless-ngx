@@ -136,26 +136,18 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
       backdrop: 'static',
     })
     activeModal.componentInstance.dialogMode = 'create'
-    activeModal.componentInstance.succeeded.subscribe({
-      next: () => {
-        if (activeModal.componentInstance.error) {
-          this.toastService.showInfo(
-            $localize`Error occurred while creating ${this.typeName} : ${activeModal.componentInstance.error}.`
-          )
-        } else {
-          this.reloadData()
-          this.toastService.showInfo(
-            $localize`Successfully created ${this.typeName}.`
-          )
-        }
-      },
-      error: (e) => {
-        this.toastService.showInfo(
-          $localize`Error occurred while creating ${this.typeName} : ${
-            e.error ?? e.message ?? e.toString()
-          }.`
-        )
-      },
+    activeModal.componentInstance.succeeded.subscribe(() => {
+      this.reloadData()
+      this.toastService.showInfo(
+        $localize`Successfully created ${this.typeName}.`
+      )
+    })
+    activeModal.componentInstance.failed.subscribe((e) => {
+      this.toastService.showError(
+        $localize`Error occurred while creating ${this.typeName}.`,
+        10000,
+        JSON.stringify(e)
+      )
     })
   }
 
@@ -165,31 +157,18 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
     })
     activeModal.componentInstance.object = object
     activeModal.componentInstance.dialogMode = 'edit'
-    activeModal.componentInstance.succeeded.subscribe({
-      next: () => {
-        if (activeModal.componentInstance.error) {
-          const errorDetail = activeModal.componentInstance.error.error
-            ? activeModal.componentInstance.error.error[0]
-            : null
-          this.toastService.showInfo(
-            $localize`Error occurred while saving ${this.typeName}${
-              errorDetail ? ': ' + errorDetail : ''
-            }.`
-          )
-        } else {
-          this.reloadData()
-          this.toastService.showInfo(
-            $localize`Successfully updated ${this.typeName}.`
-          )
-        }
-      },
-      error: (e) => {
-        this.toastService.showInfo(
-          $localize`Error occurred while saving ${
-            this.typeName
-          } : ${e.toString()}.`
-        )
-      },
+    activeModal.componentInstance.succeeded.subscribe(() => {
+      this.reloadData()
+      this.toastService.showInfo(
+        $localize`Successfully updated ${this.typeName}.`
+      )
+    })
+    activeModal.componentInstance.failed.subscribe((e) => {
+      this.toastService.showError(
+        $localize`Error occurred while saving ${this.typeName}.`,
+        10000,
+        JSON.stringify(e)
+      )
     })
   }
 
