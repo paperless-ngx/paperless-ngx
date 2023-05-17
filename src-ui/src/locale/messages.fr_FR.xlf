@@ -4032,13 +4032,13 @@
         </context-group>
         <target state="translated">Propriétaire : <x id="PH" equiv-text="rule.value"/></target>
       </trans-unit>
-      <trans-unit id="3550877650686009106" datatype="html">
+      <trans-unit id="3550877650686009106" datatype="html" approved="yes">
         <source>Owner not in: <x id="PH" equiv-text="rule.value"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">153</context>
         </context-group>
-        <target state="needs-translation">Owner not in: <x id="PH" equiv-text="rule.value"/></target>
+        <target state="final">Propriétaire non présent dans : <x id="PH" equiv-text="rule.value"/></target>
       </trans-unit>
       <trans-unit id="1082034558646673343" datatype="html">
         <source>Without an owner</source>
