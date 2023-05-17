@@ -69,7 +69,7 @@ export abstract class EditDialogComponent<
     this.userService.listAll().subscribe((r) => {
       this.users = r.results
       if (this.dialogMode === 'create') {
-        this.objectForm.get('permissions_form').setValue({
+        this.objectForm.get('permissions_form')?.setValue({
           owner: this.settingsService.currentUser.id,
         })
       }
