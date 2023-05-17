@@ -73,8 +73,15 @@
           <li class="nav-item" *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
             <a class="nav-link" routerLink="documents" routerLinkActive="active" (click)="closeMenu()" ngbPopover="Documents" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
               <svg class="sidebaricon" fill="currentColor">
+                <use xlink:href="assets/bootstrap-icons.svg#search"/>
+              </svg><span>&nbsp;<ng-container i18n>Search</ng-container></span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="explorer" routerLinkActive="active" (click)="closeMenu()" ngbPopover="Explorer" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
+              <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#files"/>
-              </svg><span>&nbsp;<ng-container i18n>Documents</ng-container></span>
+              </svg><span>&nbsp;<ng-container i18n>File Explorer</ng-container></span>
             </a>
           </li>
         </ul>

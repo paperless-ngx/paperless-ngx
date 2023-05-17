@@ -9,6 +9,7 @@ import {
 } from '@ng-bootstrap/ng-bootstrap'
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http'
 import { DocumentListComponent } from './components/document-list/document-list.component'
+import { ExplorerComponent } from './components/explorer/explorer.component'
 import { DocumentDetailComponent } from './components/document-detail/document-detail.component'
 import { DashboardComponent } from './components/dashboard/dashboard.component'
 import { TagListComponent } from './components/manage/tag-list/tag-list.component'
@@ -29,6 +30,7 @@ import { PageHeaderComponent } from './components/common/page-header/page-header
 import { AppFrameComponent } from './components/app-frame/app-frame.component'
 import { ToastsComponent } from './components/common/toasts/toasts.component'
 import { FilterEditorComponent } from './components/document-list/filter-editor/filter-editor.component'
+import { FilterEditorComponent as ExplorerFilterEditorComponent } from './components/explorer/filter-editor/filter-editor.component'
 import { FilterableDropdownComponent } from './components/common/filterable-dropdown/filterable-dropdown.component'
 import { ToggleableDropdownButtonComponent } from './components/common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component'
 import { DateDropdownComponent } from './components/common/date-dropdown/date-dropdown.component'
@@ -144,6 +146,7 @@ function initializeApp(settings: SettingsService) {
   declarations: [
     AppComponent,
     DocumentListComponent,
+    ExplorerComponent,
     DocumentDetailComponent,
     DashboardComponent,
     TagListComponent,
@@ -164,6 +167,7 @@ function initializeApp(settings: SettingsService) {
     AppFrameComponent,
     ToastsComponent,
     FilterEditorComponent,
+    ExplorerFilterEditorComponent,
     FilterableDropdownComponent,
     ToggleableDropdownButtonComponent,
     DateDropdownComponent,

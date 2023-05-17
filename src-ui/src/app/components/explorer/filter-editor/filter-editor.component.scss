@@ -1,0 +1,27 @@
+.quick-filter {
+  min-width: 250px;
+  max-height: 400px;
+  overflow-y: scroll;
+
+  .selected-icon {
+    min-width: 1em;
+    min-height: 1em;
+  }
+}
+
+.input-group .dropdown .btn {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.d-flex.flex-wrap {
+  column-gap: 0.7rem;
+}
+
+input[type="text"] {
+  min-width: 120px;
+}
+
+.z-10 {
+  z-index: 10;
+}

@@ -1,22 +1,23 @@
 import { NgModule } from '@angular/core'
-import { Routes, RouterModule } from '@angular/router'
+import { RouterModule, Routes } from '@angular/router'
 import { AppFrameComponent } from './components/app-frame/app-frame.component'
 import { DashboardComponent } from './components/dashboard/dashboard.component'
+import { DocumentAsnComponent } from './components/document-asn/document-asn.component'
 import { DocumentDetailComponent } from './components/document-detail/document-detail.component'
 import { DocumentListComponent } from './components/document-list/document-list.component'
+import { ExplorerComponent } from './components/explorer/explorer.component'
 import { CorrespondentListComponent } from './components/manage/correspondent-list/correspondent-list.component'
 import { DocumentTypeListComponent } from './components/manage/document-type-list/document-type-list.component'
 import { LogsComponent } from './components/manage/logs/logs.component'
 import { SettingsComponent } from './components/manage/settings/settings.component'
-import { TagListComponent } from './components/manage/tag-list/tag-list.component'
-import { NotFoundComponent } from './components/not-found/not-found.component'
-import { DocumentAsnComponent } from './components/document-asn/document-asn.component'
-import { DirtyFormGuard } from './guards/dirty-form.guard'
 import { StoragePathListComponent } from './components/manage/storage-path-list/storage-path-list.component'
+import { TagListComponent } from './components/manage/tag-list/tag-list.component'
 import { TasksComponent } from './components/manage/tasks/tasks.component'
-import { PermissionsGuard } from './guards/permissions.guard'
+import { NotFoundComponent } from './components/not-found/not-found.component'
 import { DirtyDocGuard } from './guards/dirty-doc.guard'
+import { DirtyFormGuard } from './guards/dirty-form.guard'
 import { DirtySavedViewGuard } from './guards/dirty-saved-view.guard'
+import { PermissionsGuard } from './guards/permissions.guard'
 import {
   PermissionAction,
   PermissionType,
@@ -30,6 +31,18 @@ const routes: Routes = [
     canDeactivate: [DirtyDocGuard],
     children: [
       { path: 'dashboard', component: DashboardComponent },
+      {
+        path: 'explorer',
+        component: ExplorerComponent,
+        canDeactivate: [DirtySavedViewGuard],
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.Document,
+          },
+        },
+      },
       {
         path: 'documents',
         component: DocumentListComponent,

@@ -1,0 +1,82 @@
+::ng-deep app-document-list app-page-header > div.mb-3 {
+  margin-bottom: 0 !important;
+}
+
+tr {
+  user-select: none;
+}
+
+th {
+  cursor: pointer;
+}
+
+.table-row-selected {
+  background-color: var(--pngx-primary-faded);
+}
+
+$paperless-card-breakpoints: (
+  // 0: 2, // xs is manual for slim-sidebar
+  768px: 3, //md
+  992px: 4, //lg
+  1200px: 5, //xl
+  1400px: 6, // xxl
+  1600px: 7,
+  1800px: 8,
+  2000px: 9
+);
+
+.row-cols-paperless-cards {
+  // xs, we dont want in .col-slim block
+  > * {
+    flex: 0 0 auto;
+    width: calc(100% / 2);
+  }
+
+  @each $width, $n_cols in $paperless-card-breakpoints {
+    @media(min-width: $width) {
+      > * {
+        flex: 0 0 auto;
+        width: calc(100% / $n-cols);
+      }
+    }
+  }
+}
+
+::ng-deep .col-slim .row-cols-paperless-cards {
+  @each $width, $n_cols in $paperless-card-breakpoints {
+    @media(min-width: $width) {
+      > * {
+        flex: 0 0 auto;
+        width: calc(100% / ($n-cols + 1)) !important;
+      }
+    }
+  }
+}
+
+.dropdown-menu-right {
+  right: 0 !important;
+  left: auto !important;
+}
+
+.sticky-top {
+  z-index: 990; // below main navbar
+  top: calc(7rem - 2px); // height of navbar (mobile)
+
+  @media (min-width: 580px) {
+    top: 3.5rem; // height of navbar
+  }
+}
+
+.table .form-check {
+  padding: 0.2rem;
+  min-height: 0;
+  margin-bottom: 0;
+
+  .form-check-input {
+    margin-left: 0;
+  }
+}
+
+a {
+  cursor: pointer;
+}
