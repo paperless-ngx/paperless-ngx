@@ -20,3 +20,8 @@
   border-bottom-left-radius: inherit;
   border-bottom-right-radius: inherit;
 }
+
+pre {
+  white-space: pre-line;
+  --bs-bg-opacity: .25;
+}
