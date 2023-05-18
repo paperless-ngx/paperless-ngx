@@ -1,11 +1,14 @@
 # syntax=docker/dockerfile:1.4
 # https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/reference.md
 
+ARG NODE_VERSION=16
+ARG PYTHON_VERSION=3.9
+
 # Stage: compile-frontend
 # Purpose: Compiles the frontend
 # Notes:
 #  - Does NPM stuff with Typescript and such
-FROM --platform=$BUILDPLATFORM node:16-bullseye-slim AS compile-frontend
+FROM --platform=$BUILDPLATFORM node:${NODE_VERSION}-bullseye-slim AS compile-frontend
 
 COPY ./src-ui /src/src-ui
 
@@ -21,7 +24,8 @@ RUN set -eux \
 # Comments:
 #  - pipenv dependencies are not left in the final image
 #  - pipenv can't touch the final image somehow
-FROM --platform=$BUILDPLATFORM python:3.9-alpine as pipenv-base
+
+FROM --platform=$BUILDPLATFORM python:${PYTHON_VERSION}-alpine as pipenv-base
 
 WORKDIR /usr/src/pipenv
 
@@ -37,7 +41,7 @@ RUN set -eux \
 # Purpose: The final image
 # Comments:
 #  - Don't leave anything extra in here
-FROM python:3.9-slim-bullseye as main-app
+FROM python:${PYTHON_VERSION}-slim-bullseye as main-app
 
 LABEL org.opencontainers.image.authors="paperless-ngx team <hello@paperless-ngx.com>"
 LABEL org.opencontainers.image.documentation="https://docs.paperless-ngx.com/"
@@ -162,7 +166,7 @@ RUN set -eux \
     && chmod 755 /usr/local/bin/paperless_cmd.sh \
     && mv flower-conditional.sh /usr/local/bin/flower-conditional.sh \
     && chmod 755 /usr/local/bin/flower-conditional.sh \
-  && echo "Installing managment commands" \
+  && echo "Installing management commands" \
     && chmod +x install_management_commands.sh \
     && ./install_management_commands.sh
 
