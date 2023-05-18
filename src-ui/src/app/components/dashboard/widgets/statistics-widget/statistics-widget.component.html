@@ -1,7 +1,7 @@
 <app-widget-frame title="Statistics" [loading]="loading" i18n-title>
   <ng-container content>
     <div class="list-group border-light">
-      <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" title="Go to inbox" i18n-title href="javascript:void()" *ngIf="statistics?.documents_inbox !== null" (click)="goToInbox()">
+      <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" title="Go to inbox" i18n-title href="javascript:void(0)" *ngIf="statistics?.documents_inbox !== null" (click)="goToInbox()">
         <ng-container i18n>Documents in inbox</ng-container>:
         <span class="badge rounded-pill" [class.bg-primary]="statistics?.documents_inbox > 0" [class.bg-muted]="statistics?.documents_inbox === 0">{{statistics?.documents_inbox}}</span>
       </a>
