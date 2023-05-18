@@ -4,5 +4,10 @@
   [class]="toast.classname"
   (hidden)="toastService.closeToast(toast)">
   <p>{{toast.content}}</p>
+  <details *ngIf="toast.error">
+    <pre class="p-2 m-0 bg-light text-dark">
+      {{toast.error}}
+    </pre>
+  </details>
   <p class="mb-0" *ngIf="toast.action"><button class="btn btn-sm btn-outline-secondary" (click)="toastService.closeToast(toast); toast.action()">{{toast.actionName}}</button></p>
 </ngb-toast>

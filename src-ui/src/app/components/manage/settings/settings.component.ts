@@ -590,9 +590,10 @@ export class SettingsComponent
         },
         error: (error) => {
           this.toastService.showError(
-            $localize`An error occurred while saving settings.`
+            $localize`An error occurred while saving settings.`,
+            10000,
+            JSON.stringify(error)
           )
-          console.log(error)
         },
       })
   }
@@ -625,9 +626,9 @@ export class SettingsComponent
         },
         (error) => {
           this.toastService.showError(
-            $localize`Error while storing settings on server: ${JSON.stringify(
-              error.error
-            )}`
+            $localize`Error while storing settings on server.`,
+            10000,
+            JSON.stringify(error)
           )
         }
       )
@@ -649,33 +650,35 @@ export class SettingsComponent
     modal.componentInstance.object = user
     modal.componentInstance.succeeded
       .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe({
-        next: (newUser: PaperlessUser) => {
-          if (
-            newUser.id === this.settings.currentUser.id &&
-            (modal.componentInstance as UserEditDialogComponent).passwordIsSet
-          ) {
-            this.toastService.showInfo(
-              $localize`Password has been changed, you will be logged out momentarily.`
-            )
-            setTimeout(() => {
-              window.location.href = `${window.location.origin}/accounts/logout/?next=/accounts/login/`
-            }, 2500)
-          } else {
-            this.toastService.showInfo(
-              $localize`Saved user "${newUser.username}".`
-            )
-            this.usersService.listAll().subscribe((r) => {
-              this.users = r.results
-              this.initialize()
-            })
-          }
-        },
-        error: (e) => {
-          this.toastService.showError(
-            $localize`Error saving user: ${e.toString()}.`
+      .subscribe((newUser: PaperlessUser) => {
+        if (
+          newUser.id === this.settings.currentUser.id &&
+          (modal.componentInstance as UserEditDialogComponent).passwordIsSet
+        ) {
+          this.toastService.showInfo(
+            $localize`Password has been changed, you will be logged out momentarily.`
           )
-        },
+          setTimeout(() => {
+            window.location.href = `${window.location.origin}/accounts/logout/?next=/accounts/login/`
+          }, 2500)
+        } else {
+          this.toastService.showInfo(
+            $localize`Saved user "${newUser.username}".`
+          )
+          this.usersService.listAll().subscribe((r) => {
+            this.users = r.results
+            this.initialize()
+          })
+        }
+      })
+    modal.componentInstance.failed
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe((e) => {
+        this.toastService.showError(
+          $localize`Error saving user.`,
+          10000,
+          JSON.stringify(e)
+        )
       })
   }
 
@@ -701,7 +704,9 @@ export class SettingsComponent
         },
         error: (e) => {
           this.toastService.showError(
-            $localize`Error deleting user: ${e.toString()}.`
+            $localize`Error deleting user.`,
+            10000,
+            JSON.stringify(e)
           )
         },
       })
@@ -717,19 +722,21 @@ export class SettingsComponent
     modal.componentInstance.object = group
     modal.componentInstance.succeeded
       .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe({
-        next: (newGroup) => {
-          this.toastService.showInfo($localize`Saved group "${newGroup.name}".`)
-          this.groupsService.listAll().subscribe((r) => {
-            this.groups = r.results
-            this.initialize()
-          })
-        },
-        error: (e) => {
-          this.toastService.showError(
-            $localize`Error saving group: ${e.toString()}.`
-          )
-        },
+      .subscribe((newGroup) => {
+        this.toastService.showInfo($localize`Saved group "${newGroup.name}".`)
+        this.groupsService.listAll().subscribe((r) => {
+          this.groups = r.results
+          this.initialize()
+        })
+      })
+    modal.componentInstance.failed
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe((e) => {
+        this.toastService.showError(
+          $localize`Error saving group.`,
+          10000,
+          JSON.stringify(e)
+        )
       })
   }
 
@@ -755,7 +762,9 @@ export class SettingsComponent
         },
         error: (e) => {
           this.toastService.showError(
-            $localize`Error deleting group: ${e.toString()}.`
+            $localize`Error deleting group.`,
+            10000,
+            JSON.stringify(e)
           )
         },
       })
@@ -775,22 +784,24 @@ export class SettingsComponent
     modal.componentInstance.object = account
     modal.componentInstance.succeeded
       .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe({
-        next: (newMailAccount) => {
-          this.toastService.showInfo(
-            $localize`Saved account "${newMailAccount.name}".`
-          )
-          this.mailAccountService.clearCache()
-          this.mailAccountService.listAll().subscribe((r) => {
-            this.mailAccounts = r.results
-            this.initialize()
-          })
-        },
-        error: (e) => {
-          this.toastService.showError(
-            $localize`Error saving account: ${e.toString()}.`
-          )
-        },
+      .subscribe((newMailAccount) => {
+        this.toastService.showInfo(
+          $localize`Saved account "${newMailAccount.name}".`
+        )
+        this.mailAccountService.clearCache()
+        this.mailAccountService.listAll().subscribe((r) => {
+          this.mailAccounts = r.results
+          this.initialize()
+        })
+      })
+    modal.componentInstance.failed
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe((e) => {
+        this.toastService.showError(
+          $localize`Error saving account.`,
+          10000,
+          JSON.stringify(e)
+        )
       })
   }
 
@@ -817,7 +828,9 @@ export class SettingsComponent
         },
         error: (e) => {
           this.toastService.showError(
-            $localize`Error deleting mail account: ${e.toString()}.`
+            $localize`Error deleting mail account.`,
+            10000,
+            JSON.stringify(e)
           )
         },
       })
@@ -833,23 +846,23 @@ export class SettingsComponent
     modal.componentInstance.object = rule
     modal.componentInstance.succeeded
       .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe({
-        next: (newMailRule) => {
-          this.toastService.showInfo(
-            $localize`Saved rule "${newMailRule.name}".`
-          )
-          this.mailRuleService.clearCache()
-          this.mailRuleService.listAll().subscribe((r) => {
-            this.mailRules = r.results
+      .subscribe((newMailRule) => {
+        this.toastService.showInfo($localize`Saved rule "${newMailRule.name}".`)
+        this.mailRuleService.clearCache()
+        this.mailRuleService.listAll().subscribe((r) => {
+          this.mailRules = r.results
 
-            this.initialize(true)
-          })
-        },
-        error: (e) => {
-          this.toastService.showError(
-            $localize`Error saving rule: ${e.toString()}.`
-          )
-        },
+          this.initialize(true)
+        })
+      })
+    modal.componentInstance.failed
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe((e) => {
+        this.toastService.showError(
+          $localize`Error saving rule.`,
+          10000,
+          JSON.stringify(e)
+        )
       })
   }
 
@@ -876,7 +889,9 @@ export class SettingsComponent
         },
         error: (e) => {
           this.toastService.showError(
-            $localize`Error deleting mail rule: ${e.toString()}.`
+            $localize`Error deleting mail rule.`,
+            10000,
+            JSON.stringify(e)
           )
         },
       })

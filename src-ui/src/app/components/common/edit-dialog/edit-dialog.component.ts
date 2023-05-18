@@ -38,6 +38,9 @@ export abstract class EditDialogComponent<
   @Output()
   succeeded = new EventEmitter()
 
+  @Output()
+  failed = new EventEmitter()
+
   networkActive = false
 
   closeEnabled = false
@@ -141,7 +144,7 @@ export abstract class EditDialogComponent<
       error: (error) => {
         this.error = error.error
         this.networkActive = false
-        this.succeeded.next(error)
+        this.failed.next(error)
       },
     })
   }
