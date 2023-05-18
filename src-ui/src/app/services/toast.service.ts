@@ -13,6 +13,8 @@ export interface Toast {
   actionName?: string
 
   classname?: string
+
+  error?: any
 }
 
 @Injectable({
@@ -30,12 +32,13 @@ export class ToastService {
     this.toastsSubject.next(this.toasts)
   }
 
-  showError(content: string, delay: number = 10000) {
+  showError(content: string, delay: number = 10000, error: any = null) {
     this.show({
       title: $localize`Error`,
       content: content,
       delay: delay,
       classname: 'error',
+      error,
     })
   }
 
