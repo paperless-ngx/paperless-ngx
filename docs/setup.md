@@ -862,4 +862,4 @@ For details, refer to [configuration](/configuration).
 
 # Using nginx as a reverse proxy {#nginx}
 
-Please see (the wiki)[https://github.com/paperless-ngx/paperless-ngx/wiki/Using-a-Reverse-Proxy-with-Paperless-ngx#nginx] for user-maintained documetation of using nginx with Paperless-ngx.
+Please see [the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Using-a-Reverse-Proxy-with-Paperless-ngx#nginx) for user-maintained documetation of using nginx with Paperless-ngx.
