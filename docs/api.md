@@ -47,6 +47,8 @@ fields:
   Read-only.
 - `archived_file_name`: Verbose filename of the archived document.
   Read-only. Null if no archived document is available.
+- `set_permissions`: Allows setting document permissions. Optional,
+  write-only. See [below](#permissions).
 
 ## Downloading documents
 
@@ -266,6 +268,29 @@ itself is available immediately, since that happens in a different process.
 However, querying the tasks endpoint with the returned UUID e.g.
 `/api/tasks/?task_id={uuid}` will provide information on the state of the
 consumption including the ID of a created document if consumption succeeded.
+
+## Permissions
+
+All objects (documents, tags, etc.) allow setting object-level permissions
+with an optional `set_permissions` parameter which is of the form:
+
+```
+{
+  "owner": user_id,
+  "view": {
+      "users": [...],
+      "groups": [...],
+  },
+  "change": {
+      "users": [...],
+      "groups": [...],
+  },
+}
+```
+
+If this paramter is supplied the objects permissions will be overwritten,
+assuming the authenticated user has permission to do so (the user must be
+the object owner or a superuser).
 
 ## API Versioning
 
