@@ -64,8 +64,7 @@ class MailDocumentParser(DocumentParser):
         try:
             mail = self.get_parsed(document_path)
         except ParseError as e:
-            self.log(
-                "warning",
+            self.log.warning(
                 f"Error while fetching document metadata for {document_path}: {e}",
             )
             return result
@@ -146,7 +145,7 @@ class MailDocumentParser(DocumentParser):
         self.archive_path = self.generate_pdf(document_path)
 
     def tika_parse(self, html: str):
-        self.log("info", "Sending content to Tika server")
+        self.log.info("Sending content to Tika server")
 
         try:
             parsed = parser.from_buffer(html, self.tika_server)
@@ -251,7 +250,7 @@ class MailDocumentParser(DocumentParser):
 
     def generate_pdf_from_mail(self, mail):
         url = self.gotenberg_server + "/forms/chromium/convert/html"
-        self.log("info", "Converting mail to PDF")
+        self.log.info("Converting mail to PDF")
 
         css_file = os.path.join(os.path.dirname(__file__), "templates/output.css")
 
@@ -320,7 +319,7 @@ class MailDocumentParser(DocumentParser):
 
     def generate_pdf_from_html(self, orig_html, attachments):
         url = self.gotenberg_server + "/forms/chromium/convert/html"
-        self.log("info", "Converting html to PDF")
+        self.log.info("Converting html to PDF")
 
         files = {}
         for name, file in self.transform_inline_html(orig_html, attachments):

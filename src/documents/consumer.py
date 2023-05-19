@@ -92,7 +92,7 @@ class Consumer(LoggingMixin):
         exception: Optional[Exception] = None,
     ):
         self._send_progress(100, 100, "FAILED", message)
-        self.log("error", log_message or message, exc_info=exc_info)
+        self.log.error(log_message or message, exc_info=exc_info)
         raise ConsumerError(f"{self.filename}: {log_message or message}") from exception
 
     def __init__(self):
@@ -175,7 +175,7 @@ class Consumer(LoggingMixin):
                 f"{settings.PRE_CONSUME_SCRIPT} does not exist.",
             )
 
-        self.log("info", f"Executing pre-consume script {settings.PRE_CONSUME_SCRIPT}")
+        self.log.info(f"Executing pre-consume script {settings.PRE_CONSUME_SCRIPT}")
 
         working_file_path = str(self.path)
         original_file_path = str(self.original_path)
@@ -218,8 +218,7 @@ class Consumer(LoggingMixin):
                 f"{settings.POST_CONSUME_SCRIPT} does not exist.",
             )
 
-        self.log(
-            "info",
+        self.log.info(
             f"Executing post-consume script {settings.POST_CONSUME_SCRIPT}",
         )
 
@@ -311,11 +310,6 @@ class Consumer(LoggingMixin):
 
         self._send_progress(0, 100, "STARTING", MESSAGE_NEW_FILE)
 
-        # this is for grouping logging entries for this particular file
-        # together.
-
-        self.renew_logging_group()
-
         # Make sure that preconditions for consuming the file are met.
 
         self.pre_check_file_exists()
@@ -323,7 +317,7 @@ class Consumer(LoggingMixin):
         self.pre_check_duplicate()
         self.pre_check_asn_value()
 
-        self.log("info", f"Consuming {self.filename}")
+        self.log.info(f"Consuming {self.filename}")
 
         # For the actual work, copy the file into a tempdir
         self.original_path = self.path
@@ -338,7 +332,7 @@ class Consumer(LoggingMixin):
 
         mime_type = magic.from_file(self.path, mime=True)
 
-        self.log("debug", f"Detected mime type: {mime_type}")
+        self.log.debug(f"Detected mime type: {mime_type}")
 
         # Based on the mime type, get the parser for that type
         parser_class: Optional[Type[DocumentParser]] = get_parser_class_for_mime_type(
@@ -370,7 +364,7 @@ class Consumer(LoggingMixin):
             progress_callback,
         )
 
-        self.log("debug", f"Parser: {type(document_parser).__name__}")
+        self.log.debug(f"Parser: {type(document_parser).__name__}")
 
         # However, this already created working directories which we have to
         # clean up.
@@ -384,10 +378,10 @@ class Consumer(LoggingMixin):
 
         try:
             self._send_progress(20, 100, "WORKING", MESSAGE_PARSING_DOCUMENT)
-            self.log("debug", f"Parsing {self.filename}...")
+            self.log.debug(f"Parsing {self.filename}...")
             document_parser.parse(self.path, mime_type, self.filename)
 
-            self.log("debug", f"Generating thumbnail for {self.filename}...")
+            self.log.debug(f"Generating thumbnail for {self.filename}...")
             self._send_progress(70, 100, "WORKING", MESSAGE_GENERATING_THUMBNAIL)
             thumbnail = document_parser.get_thumbnail(
                 self.path,
@@ -475,7 +469,7 @@ class Consumer(LoggingMixin):
                 document.save()
 
                 # Delete the file only if it was successfully consumed
-                self.log("debug", f"Deleting file {self.path}")
+                self.log.debug(f"Deleting file {self.path}")
                 os.unlink(self.path)
                 self.original_path.unlink()
 
@@ -486,7 +480,7 @@ class Consumer(LoggingMixin):
                 )
 
                 if os.path.isfile(shadow_file):
-                    self.log("debug", f"Deleting file {shadow_file}")
+                    self.log.debug(f"Deleting file {shadow_file}")
                     os.unlink(shadow_file)
 
         except Exception as e:
@@ -503,7 +497,7 @@ class Consumer(LoggingMixin):
 
         self.run_post_consume_script(document)
 
-        self.log("info", f"Document {document} consumption finished")
+        self.log.info(f"Document {document} consumption finished")
 
         self._send_progress(100, 100, "SUCCESS", MESSAGE_FINISHED, document.id)
 
@@ -522,26 +516,25 @@ class Consumer(LoggingMixin):
 
         file_info = FileInfo.from_filename(self.filename)
 
-        self.log("debug", "Saving record to database")
+        self.log.debug("Saving record to database")
 
         if self.override_created is not None:
             create_date = self.override_created
-            self.log(
-                "debug",
+            self.log.debug(
                 f"Creation date from post_documents parameter: {create_date}",
             )
         elif file_info.created is not None:
             create_date = file_info.created
-            self.log("debug", f"Creation date from FileInfo: {create_date}")
+            self.log.debug(f"Creation date from FileInfo: {create_date}")
         elif date is not None:
             create_date = date
-            self.log("debug", f"Creation date from parse_date: {create_date}")
+            self.log.debug(f"Creation date from parse_date: {create_date}")
         else:
             stats = os.stat(self.path)
             create_date = timezone.make_aware(
                 datetime.datetime.fromtimestamp(stats.st_mtime),
             )
-            self.log("debug", f"Creation date from st_mtime: {create_date}")
+            self.log.debug(f"Creation date from st_mtime: {create_date}")
 
         storage_type = Document.STORAGE_TYPE_UNENCRYPTED
 
@@ -595,8 +588,7 @@ class Consumer(LoggingMixin):
         Decodes a process stdout and stderr streams and logs them to the main log
         """
         # Log what the script exited as
-        self.log(
-            "info",
+        self.log.info(
             f"{completed_process.args[0]} exited {completed_process.returncode}",
         )
 
@@ -609,9 +601,9 @@ class Consumer(LoggingMixin):
                     "\n",
                 )
             )
-            self.log("info", "Script stdout:")
+            self.log.info("Script stdout:")
             for line in stdout_str:
-                self.log("info", line)
+                self.log.info(line)
 
         if len(completed_process.stderr):
             stderr_str = (
@@ -622,6 +614,6 @@ class Consumer(LoggingMixin):
                 )
             )
 
-            self.log("warning", "Script stderr:")
+            self.log.warning("Script stderr:")
             for line in stderr_str:
-                self.log("warning", line)
+                self.log.warning(line)

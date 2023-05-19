@@ -328,7 +328,7 @@ class DocumentParser(LoggingMixin):
         try:
             text = filepath.read_text(encoding="utf-8")
         except UnicodeDecodeError as e:
-            self.log("warning", f"Unicode error during text reading, continuing: {e}")
+            self.log.warning(f"Unicode error during text reading, continuing: {e}")
             text = filepath.read_bytes().decode("utf-8", errors="replace")
         return text
 
@@ -354,5 +354,5 @@ class DocumentParser(LoggingMixin):
         return self.date
 
     def cleanup(self):
-        self.log("debug", f"Deleting directory {self.tempdir}")
+        self.log.debug(f"Deleting directory {self.tempdir}")
         shutil.rmtree(self.tempdir)
