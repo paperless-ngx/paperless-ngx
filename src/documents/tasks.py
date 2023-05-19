@@ -16,16 +16,15 @@ from filelock import FileLock
 from redis.exceptions import ConnectionError
 from whoosh.writing import AsyncWriter
 
-from documents import barcodes
 from documents import index
 from documents import sanity_checker
+from documents.barcodes import BarcodeReader
 from documents.classifier import DocumentClassifier
 from documents.classifier import load_classifier
 from documents.consumer import Consumer
 from documents.consumer import ConsumerError
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
-from documents.data_models import DocumentSource
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
 from documents.models import Correspondent
@@ -96,95 +95,39 @@ def consume_file(
 
     # read all barcodes in the current document
     if settings.CONSUMER_ENABLE_BARCODES or settings.CONSUMER_ENABLE_ASN_BARCODE:
-        doc_barcode_info = barcodes.scan_file_for_barcodes(
-            input_doc.original_file,
-            input_doc.mime_type,
-        )
+        with BarcodeReader(input_doc.original_file, input_doc.mime_type) as reader:
+            if settings.CONSUMER_ENABLE_BARCODES and reader.separate(
+                input_doc.source,
+                overrides.filename,
+            ):
+                # notify the sender, otherwise the progress bar
+                # in the UI stays stuck
+                payload = {
+                    "filename": overrides.filename or input_doc.original_file.name,
+                    "task_id": None,
+                    "current_progress": 100,
+                    "max_progress": 100,
+                    "status": "SUCCESS",
+                    "message": "finished",
+                }
+                try:
+                    async_to_sync(get_channel_layer().group_send)(
+                        "status_updates",
+                        {"type": "status_update", "data": payload},
+                    )
+                except ConnectionError as e:
+                    logger.warning(f"ConnectionError on status send: {str(e)}")
+                # consuming stops here, since the original document with
+                # the barcodes has been split and will be consumed separately
 
-        # split document by separator pages, if enabled
-        if settings.CONSUMER_ENABLE_BARCODES:
-            separators = barcodes.get_separating_barcodes(doc_barcode_info.barcodes)
+                input_doc.original_file.unlink()
+                return "File successfully split"
 
-            if len(separators) > 0:
-                logger.debug(
-                    f"Pages with separators found in: {input_doc.original_file}",
-                )
-                document_list = barcodes.separate_pages(
-                    doc_barcode_info.pdf_path,
-                    separators,
-                )
-
-                if document_list:
-                    # If the file is an upload, it's in the scratch directory
-                    # Move it to consume directory to be picked up
-                    # Otherwise, use the current parent to keep possible tags
-                    # from subdirectories
-                    if input_doc.source != DocumentSource.ConsumeFolder:
-                        save_to_dir = settings.CONSUMPTION_DIR
-                    else:
-                        # Note this uses the original file, because it's in the
-                        # consume folder already and may include additional path
-                        # components for tagging
-                        # the .path is somewhere in scratch in this case
-                        save_to_dir = input_doc.original_file.parent
-
-                    for n, document in enumerate(document_list):
-                        # save to consumption dir
-                        # rename it to the original filename  with number prefix
-                        if overrides.filename is not None:
-                            newname = f"{str(n)}_{overrides.filename}"
-                        else:
-                            newname = None
-
-                        barcodes.save_to_dir(
-                            document,
-                            newname=newname,
-                            target_dir=save_to_dir,
-                        )
-
-                        # Split file has been copied safely, remove it
-                        document.unlink()
-
-                    # And clean up the directory as well, now it's empty
-                    shutil.rmtree(document_list[0].parent)
-
-                    # This file has been split into multiple files without issue
-                    # remove the original and working copy
-                    input_doc.original_file.unlink()
-
-                    # If the original file was a TIFF, remove the PDF generated from it
-                    if input_doc.mime_type == "image/tiff":
-                        logger.debug(
-                            f"Deleting file {doc_barcode_info.pdf_path}",
-                        )
-                        doc_barcode_info.pdf_path.unlink()
-
-                    # notify the sender, otherwise the progress bar
-                    # in the UI stays stuck
-                    payload = {
-                        "filename": overrides.filename or input_doc.original_file.name,
-                        "task_id": None,
-                        "current_progress": 100,
-                        "max_progress": 100,
-                        "status": "SUCCESS",
-                        "message": "finished",
-                    }
-                    try:
-                        async_to_sync(get_channel_layer().group_send)(
-                            "status_updates",
-                            {"type": "status_update", "data": payload},
-                        )
-                    except ConnectionError as e:
-                        logger.warning(f"ConnectionError on status send: {str(e)}")
-                    # consuming stops here, since the original document with
-                    # the barcodes has been split and will be consumed separately
-                    return "File successfully split"
-
-        # try reading the ASN from barcode
-        if settings.CONSUMER_ENABLE_ASN_BARCODE:
-            overrides.asn = barcodes.get_asn_from_barcodes(doc_barcode_info.barcodes)
-            if overrides.asn:
-                logger.info(f"Found ASN in barcode: {overrides.asn}")
+            # try reading the ASN from barcode
+            if settings.CONSUMER_ENABLE_ASN_BARCODE:
+                overrides.asn = reader.asn
+                if overrides.asn:
+                    logger.info(f"Found ASN in barcode: {overrides.asn}")
 
     # continue with consumption if no barcode was found
     document = Consumer().try_consume_file(
