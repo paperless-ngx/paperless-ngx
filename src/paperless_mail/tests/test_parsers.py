@@ -129,8 +129,7 @@ class TestParser(FileSystemAssertsMixin, TestCase):
         )
         self.assertEqual(mocked_return, thumb)
 
-    @mock.patch("documents.loggers.LoggingMixin.log")
-    def test_extract_metadata_fail(self, m: mock.MagicMock):
+    def test_extract_metadata_fail(self):
         """
         GIVEN:
             - Fresh start
@@ -140,8 +139,12 @@ class TestParser(FileSystemAssertsMixin, TestCase):
             - A log warning should be generated
         """
         # Validate if warning is logged when parsing fails
-        self.assertEqual([], self.parser.extract_metadata("na", "message/rfc822"))
-        self.assertEqual("warning", m.call_args[0][0])
+        with self.assertLogs("paperless.parsing.mail", level="WARNING") as cm:
+            self.assertEqual([], self.parser.extract_metadata("na", "message/rfc822"))
+            self.assertIn(
+                "WARNING:paperless.parsing.mail:Error while fetching document metadata for na",
+                cm.output[0],
+            )
 
     def test_extract_metadata(self):
         """
