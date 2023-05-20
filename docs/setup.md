@@ -483,7 +483,7 @@ supported.
         in front of gunicorn instead.
 
         For instructions on how to use nginx for that,
-        [see the instructions below](/setup#nginx).
+        [see the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Using-a-Reverse-Proxy-with-Paperless-ngx#nginx).
 
     !!! warning
 
@@ -862,45 +862,4 @@ For details, refer to [configuration](/configuration).
 
 # Using nginx as a reverse proxy {#nginx}
 
-If you want to expose paperless to the internet, you should hide it
-behind a reverse proxy with SSL enabled.
-
-In addition to the usual configuration for SSL, the following
-configuration is required for paperless to operate:
-
-```nginx
-http {
-
-    # Adjust as required. This is the maximum size for file uploads.
-    # The default value 1M might be a little too small.
-    client_max_body_size 10M;
-
-    server {
-
-        location / {
-
-            # Adjust host and port as required.
-            proxy_pass http://localhost:8000/;
-
-            # These configuration options are required for WebSockets to work.
-            proxy_http_version 1.1;
-            proxy_set_header Upgrade $http_upgrade;
-            proxy_set_header Connection "upgrade";
-
-            proxy_redirect off;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Host $server_name;
-            add_header P3P 'CP=""'; # may not be required in all setups
-        }
-    }
-}
-```
-
-The `PAPERLESS_URL` configuration variable is also required when using a
-reverse proxy. Please refer to the [hosting and security](/configuration#hosting-and-security) docs.
-
-Also read
-[this](https://channels.readthedocs.io/en/stable/deploying.html#nginx-supervisor-ubuntu),
-towards the end of the section.
+Please see [the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Using-a-Reverse-Proxy-with-Paperless-ngx#nginx) for user-maintained documetation of using nginx with Paperless-ngx.

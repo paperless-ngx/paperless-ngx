@@ -103,7 +103,7 @@ see if it works.
 
 ## _How do I proxy this with NGINX?_
 
-**A:** See [here](/setup#nginx).
+**A:** See [the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Using-a-Reverse-Proxy-with-Paperless-ngx#nginx).
 
 ## _How do I get WebSocket support with Apache mod_wsgi_?
 
