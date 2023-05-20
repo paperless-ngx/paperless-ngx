@@ -394,9 +394,9 @@ export class DocumentDetailComponent
           error: (error) => {
             this.suggestions = null
             this.toastService.showError(
-              $localize`Error retrieving suggestions: ${JSON.stringify(
-                error
-              ).slice(0, 500)}`
+              $localize`Error retrieving suggestions.`,
+              10000,
+              error
             )
           },
         })
