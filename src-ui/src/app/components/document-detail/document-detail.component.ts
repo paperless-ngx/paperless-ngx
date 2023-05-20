@@ -374,7 +374,9 @@ export class DocumentDetailComponent
         error: (error) => {
           this.metadata = null
           this.toastService.showError(
-            $localize`Error retrieving metadata` + ': ' + error.toString()
+            $localize`Error retrieving metadata`,
+            10000,
+            error
           )
         },
       })
