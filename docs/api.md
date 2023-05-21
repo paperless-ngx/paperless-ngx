@@ -288,7 +288,7 @@ with an optional `set_permissions` parameter which is of the form:
 }
 ```
 
-If this paramter is supplied the objects permissions will be overwritten,
+If this parameter is supplied the object's permissions will be overwritten,
 assuming the authenticated user has permission to do so (the user must be
 the object owner or a superuser).
 
