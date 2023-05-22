@@ -83,20 +83,28 @@ changed here.
 
 `PAPERLESS_DBSSLMODE=<mode>`
 
-: SSL mode to use when connecting to PostgreSQL.
+: SSL mode to use when connecting to PostgreSQL or MariaDB.
 
     See [the official documentation about
-    sslmode](https://www.postgresql.org/docs/current/libpq-ssl.html).
-
-    Default is `prefer`.
+    sslmode for PostgreSQL](https://www.postgresql.org/docs/current/libpq-ssl.html).
+    
+    See [the official documentation about
+    sslmode for MySQL and MariaDB](https://dev.mysql.com/doc/refman/8.0/en/connection-options.html#option_general_ssl-mode)
+    
+    *Note*: SSL mode values differ between PostgreSQL and MariaDB.
+    
+    Default is `prefer` for PostgreSQL and `PREFERRED` for MariaDB.
 
 `PAPERLESS_DBSSLROOTCERT=<ca-path>`
 
 : SSL root certificate path
 
     See [the official documentation about
-    sslmode](https://www.postgresql.org/docs/current/libpq-ssl.html).
+    sslmode for PostgreSQL](https://www.postgresql.org/docs/current/libpq-ssl.html).
     Changes path of `root.crt`.
+    
+    See [the official documentation about
+    sslmode for MySQL and MariaDB](https://dev.mysql.com/doc/refman/8.0/en/connection-options.html#option_general_ssl-ca)
 
     Defaults to unset, using the documented path in the home directory.
 
@@ -105,7 +113,11 @@ changed here.
 : SSL client certificate path
 
     See [the official documentation about
-    sslmode](https://www.postgresql.org/docs/current/libpq-ssl.html).
+    sslmode for PostgreSQL](https://www.postgresql.org/docs/current/libpq-ssl.html).
+
+    See [the official documentation about
+    sslmode for MySQL and MariaDB](https://dev.mysql.com/doc/refman/8.0/en/connection-options.html#option_general_ssl-cert)
+
     Changes path of `postgresql.crt`.
 
     Defaults to unset, using the documented path in the home directory.
@@ -115,7 +127,11 @@ changed here.
 : SSL client key path
 
     See [the official documentation about
-    sslmode](https://www.postgresql.org/docs/current/libpq-ssl.html).
+    sslmode for PostgreSQL](https://www.postgresql.org/docs/current/libpq-ssl.html).
+    
+    See [the official documentation about
+    sslmode for MySQL and MariaDB](https://dev.mysql.com/doc/refman/8.0/en/connection-options.html#option_general_ssl-key)
+    
     Changes path of `postgresql.key`.
 
     Defaults to unset, using the documented path in the home directory.
