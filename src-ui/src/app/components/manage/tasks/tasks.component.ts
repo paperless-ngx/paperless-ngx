@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core'
 import { Router } from '@angular/router'
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
+import { NgbModal, NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap'
 import { Subject, first } from 'rxjs'
 import { PaperlessTask } from 'src/app/data/paperless-task'
 import { TasksService } from 'src/app/services/tasks.service'
@@ -20,6 +20,9 @@ export class TasksComponent
   public selectedTasks: Set<number> = new Set()
   private unsubscribeNotifer = new Subject()
   public expandedTask: number
+
+  public pageSize: number = 25
+  public page: number = 1
 
   get dismissButtonText(): string {
     return this.selectedTasks.size > 0
@@ -118,5 +121,9 @@ export class TasksComponent
 
   clearSelection() {
     this.selectedTasks.clear()
+  }
+
+  duringTabChange(navID: number) {
+    this.page = 1
   }
 }
