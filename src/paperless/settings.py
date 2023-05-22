@@ -507,14 +507,14 @@ if os.getenv("PAPERLESS_DBHOST"):
     if os.getenv("PAPERLESS_DBENGINE") == "mariadb":
         engine = "django.db.backends.mysql"
         options = {
-            "read_default_file": "/etc/mysql/my.cnf", 
+            "read_default_file": "/etc/mysql/my.cnf",
             "charset": "utf8mb4",
             "ssl": {
                 "ssl_mode": os.getenv("PAPERLESS_DBSSLMODE", "PREFERRED"),
                 "ca": os.getenv("PAPERLESS_DBSSLROOTCERT", None),
                 "cert": os.getenv("PAPERLESS_DBSSLCERT", None),
                 "key": os.getenv("PAPERLESS_DBSSLKEY", None),
-            }
+            },
         }
 
         # Silence Django error on old MariaDB versions.
