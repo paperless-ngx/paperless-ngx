@@ -45,7 +45,7 @@
       </tr>
     </thead>
     <tbody>
-      <ng-container *ngFor="let task of tasks">
+      <ng-container *ngFor="let task of tasks | slice: (page-1) * pageSize : page * pageSize">
       <tr (click)="toggleSelected(task, $event); $event.stopPropagation();">
         <th>
           <div class="form-check">
@@ -98,9 +98,14 @@
       </ng-container>
     </tbody>
   </table>
+
+  <div class="pb-3 d-sm-flex justify-content-between align-items-center">
+    <div class="pb-2 pb-sm-0" i18n *ngIf="tasks.length > 0">{tasks.length, plural, =1 {One {{this.activeTab}} task} other {{{tasks.length || 0}} total {{this.activeTab}} tasks}}</div>
+    <ngb-pagination *ngIf="tasks.length > pageSize" [(page)]="page" [pageSize]="pageSize" [collectionSize]="tasks.length" maxSize="8" size="sm"></ngb-pagination>
+  </div>
 </ng-template>
 
-<ul ngbNav #nav="ngbNav" [(activeId)]="activeTab" class="nav-tabs">
+<ul ngbNav #nav="ngbNav" [(activeId)]="activeTab" class="nav-tabs" (hidden)="duringTabChange($event)">
   <li ngbNavItem="failed">
     <a ngbNavLink i18n>Failed&nbsp;<span *ngIf="tasksService.failedFileTasks.length > 0" class="badge bg-danger ms-1">{{tasksService.failedFileTasks.length}}</span></a>
     <ng-template ngbNavContent>
