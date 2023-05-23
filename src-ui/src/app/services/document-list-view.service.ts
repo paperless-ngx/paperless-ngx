@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core'
 import { ParamMap, Router } from '@angular/router'
 import { Observable, first } from 'rxjs'
+import { FilterRule } from '../data/filter-rule'
 import {
   filterRulesDiffer,
   cloneFilterRules,
-  FilterRule,
   isFullTextFilterRule,
-} from '../data/filter-rule'
+} from '../utils/filter-rules'
 import { PaperlessDocument } from '../data/paperless-document'
 import { PaperlessSavedView } from '../data/paperless-saved-view'
 import { SETTINGS_KEYS } from '../data/paperless-uisettings'

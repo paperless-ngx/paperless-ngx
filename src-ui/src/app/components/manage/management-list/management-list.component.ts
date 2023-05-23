@@ -28,7 +28,10 @@ import {
 import { AbstractNameFilterService } from 'src/app/services/rest/abstract-name-filter-service'
 import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
-import { EditDialogComponent } from '../../common/edit-dialog/edit-dialog.component'
+import {
+  EditDialogComponent,
+  EditDialogMode,
+} from '../../common/edit-dialog/edit-dialog.component'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 
 export interface ManagementListColumn {
@@ -135,7 +138,7 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
     var activeModal = this.modalService.open(this.editDialogComponent, {
       backdrop: 'static',
     })
-    activeModal.componentInstance.dialogMode = 'create'
+    activeModal.componentInstance.dialogMode = EditDialogMode.CREATE
     activeModal.componentInstance.succeeded.subscribe(() => {
       this.reloadData()
       this.toastService.showInfo(
@@ -156,7 +159,7 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
       backdrop: 'static',
     })
     activeModal.componentInstance.object = object
-    activeModal.componentInstance.dialogMode = 'edit'
+    activeModal.componentInstance.dialogMode = EditDialogMode.EDIT
     activeModal.componentInstance.succeeded.subscribe(() => {
       this.reloadData()
       this.toastService.showInfo(
@@ -172,9 +175,7 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
     })
   }
 
-  getDeleteMessage(object: T) {
-    return $localize`Do you really want to delete the ${this.typeName}?`
-  }
+  abstract getDeleteMessage(object: T)
 
   filterDocuments(object: ObjectWithId) {
     this.documentListViewService.quickFilter([

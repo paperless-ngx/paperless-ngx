@@ -15,7 +15,7 @@ export class ToastsComponent implements OnInit, OnDestroy {
   toasts: Toast[] = []
 
   ngOnDestroy(): void {
-    this.subscription.unsubscribe()
+    this.subscription?.unsubscribe()
   }
 
   ngOnInit(): void {
