@@ -15,6 +15,11 @@ import { UserService } from 'src/app/services/rest/user.service'
 import { PermissionsFormObject } from '../input/permissions/permissions-form/permissions-form.component'
 import { SettingsService } from 'src/app/services/settings.service'
 
+export enum EditDialogMode {
+  CREATE = 0,
+  EDIT = 1,
+}
+
 @Directive()
 export abstract class EditDialogComponent<
   T extends ObjectWithPermissions | ObjectWithId
@@ -30,7 +35,7 @@ export abstract class EditDialogComponent<
   users: PaperlessUser[]
 
   @Input()
-  dialogMode: string = 'create'
+  dialogMode: EditDialogMode = EditDialogMode.CREATE
 
   @Input()
   object: T
@@ -71,7 +76,7 @@ export abstract class EditDialogComponent<
 
     this.userService.listAll().subscribe((r) => {
       this.users = r.results
-      if (this.dialogMode === 'create') {
+      if (this.dialogMode === EditDialogMode.CREATE) {
         this.objectForm.get('permissions_form')?.setValue({
           owner: this.settingsService.currentUser.id,
         })
@@ -87,15 +92,11 @@ export abstract class EditDialogComponent<
     return $localize`Edit item`
   }
 
-  getSaveErrorMessage(error: string) {
-    return $localize`Could not save element: ${error}`
-  }
-
   getTitle() {
     switch (this.dialogMode) {
-      case 'create':
+      case EditDialogMode.CREATE:
         return this.getCreateTitle()
-      case 'edit':
+      case EditDialogMode.EDIT:
         return this.getEditTitle()
       default:
         break
@@ -127,10 +128,10 @@ export abstract class EditDialogComponent<
     var newObject = Object.assign(Object.assign({}, this.object), formValues)
     var serverResponse: Observable<T>
     switch (this.dialogMode) {
-      case 'create':
+      case EditDialogMode.CREATE:
         serverResponse = this.service.create(newObject)
         break
-      case 'edit':
+      case EditDialogMode.EDIT:
         serverResponse = this.service.update(newObject)
       default:
         break
