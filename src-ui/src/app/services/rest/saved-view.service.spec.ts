@@ -1,0 +1,81 @@
+import { HttpTestingController } from '@angular/common/http/testing'
+import { Subscription } from 'rxjs'
+import { TestBed } from '@angular/core/testing'
+import { environment } from 'src/environments/environment'
+import { commonAbstractPaperlessServiceTests } from './abstract-paperless-service.spec'
+import { SavedViewService } from './saved-view.service'
+
+let httpTestingController: HttpTestingController
+let service: SavedViewService
+let subscription: Subscription
+const endpoint = 'saved_views'
+const saved_views = [
+  {
+    name: 'Saved View',
+    id: 1,
+    show_on_dashboard: true,
+    show_in_sidebar: true,
+    sort_field: 'name',
+    sort_reverse: true,
+    filter_rules: [],
+  },
+  {
+    name: 'Saved View 2',
+    id: 2,
+    show_on_dashboard: false,
+    show_in_sidebar: false,
+    sort_field: 'name',
+    sort_reverse: true,
+    filter_rules: [],
+  },
+  {
+    name: 'Saved View 3',
+    id: 3,
+    show_on_dashboard: true,
+    show_in_sidebar: false,
+    sort_field: 'name',
+    sort_reverse: true,
+    filter_rules: [],
+  },
+]
+
+// run common tests
+commonAbstractPaperlessServiceTests(endpoint, SavedViewService)
+
+describe(`Additional service tests for SavedViewService`, () => {
+  it('should retrieve saved views and sort them', () => {
+    service.initialize()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/?page=1&page_size=100000`
+    )
+    req.flush({
+      results: saved_views,
+    })
+    expect(service.allViews).toHaveLength(3)
+    expect(service.dashboardViews).toHaveLength(2)
+    expect(service.sidebarViews).toHaveLength(1)
+  })
+
+  it('should support patchMany', () => {
+    subscription = service.patchMany(saved_views).subscribe()
+    saved_views.forEach((saved_view) => {
+      const reqs = httpTestingController.match(
+        `${environment.apiBaseUrl}${endpoint}/${saved_view.id}/`
+      )
+      expect(reqs).toHaveLength(1)
+      expect(reqs[0].request.method).toEqual('PATCH')
+    })
+  })
+
+  beforeEach(() => {
+    // Dont need to setup again
+
+    httpTestingController = TestBed.inject(HttpTestingController)
+    service = TestBed.inject(SavedViewService)
+  })
+
+  afterEach(() => {
+    subscription?.unsubscribe()
+    httpTestingController.verify()
+  })
+})

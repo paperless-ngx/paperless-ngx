@@ -5,7 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
-    "test": "ng test",
+    "test": "ng test --no-watch --coverage",
     "lint": "ng lint"
   },
   "private": true,
@@ -55,6 +55,7 @@
     "jest": "28.1.3",
     "jest-environment-jsdom": "^29.5.0",
     "jest-preset-angular": "^12.2.6",
+    "jest-websocket-mock": "^2.4.0",
     "ts-node": "~10.9.1",
     "typescript": "~4.9.5",
     "wait-on": "^7.0.1"
