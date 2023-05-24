@@ -921,6 +921,10 @@ def _get_nltk_language_setting(ocr_lang: str) -> Optional[str]:
     languages for all the NLTK data used.
 
     Assumption: The primary language is first
+
+    NLTK Languages:
+      - https://www.nltk.org/api/nltk.stem.snowball.html#nltk.stem.snowball.SnowballStemmer
+
     """
     ocr_lang = ocr_lang.split("+")[0]
     iso_code_to_nltk = {
