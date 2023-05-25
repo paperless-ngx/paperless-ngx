@@ -559,7 +559,7 @@ Users who installed with the bare-metal route should also update their
 Git clone to point to `https://github.com/paperless-ngx/paperless-ngx`,
 e.g. using the command
 `git remote set-url origin https://github.com/paperless-ngx/paperless-ngx`
-and then pull the lastest version.
+and then pull the latest version.
 
 ## Migrating from Paperless
 
