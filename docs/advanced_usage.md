@@ -488,7 +488,7 @@ database to be case sensitive. This would prevent a user from creating a
 tag `Name` and `NAME` as they are considered the same.
 
 Per Django documentation, to enable this requires manual intervention.
-To enable case sensetive tables, you can execute the following command
+To enable case sensitive tables, you can execute the following command
 against each table:
 
 `ALTER TABLE <table_name> CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;`
@@ -508,7 +508,7 @@ existing tables) with:
 
 Paperless is able to utilize barcodes for automatically preforming some tasks.
 
-At this time, the library utilized for detection of bacodes supports the following types:
+At this time, the library utilized for detection of barcodes supports the following types:
 
 - AN-13/UPC-A
 - UPC-E

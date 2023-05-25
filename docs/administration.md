@@ -303,7 +303,7 @@ will be placed in individual json files, instead of a single JSON file. The main
 manifest.json will still contain application wide information (e.g. tags, correspondent,
 documenttype, etc)
 
-If `-z` or `--zip` is provided, the export will be a zipfile
+If `-z` or `--zip` is provided, the export will be a zip file
 in the target directory, named according to the current date.
 
 !!! warning

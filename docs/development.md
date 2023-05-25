@@ -186,7 +186,7 @@ The front end is built using AngularJS. In order to get started, you need Node.j
 
 2. Make sure that it's on your path.
 
-3. Install all neccessary modules:
+3. Install all necessary modules:
 
    ```bash
    $ npm install
@@ -362,7 +362,7 @@ If you want to build the documentation locally, this is how you do it:
 
 3.  Serve the documentation. This will spin up a
     copy of the documentation at http://127.0.0.1:8000
-    that will automatically refresh everytime you change
+    that will automatically refresh every time you change
     something.
 
     ```bash
@@ -395,7 +395,7 @@ responsible for:
 - Retrieving the content from the original
 - Creating a thumbnail
 - _optional:_ Retrieving a created date from the original
-- _optional:_ Creainge an archived document from the original
+- _optional:_ Creating an archived document from the original
 
 Custom parsers can be added to Paperless-ngx to support more file types. In
 order to do that, you need to write the parser itself and announce its
