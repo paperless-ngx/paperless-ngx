@@ -530,7 +530,7 @@ class Consumer(LoggingMixin):
             create_date = date
             self.log.debug(f"Creation date from parse_date: {create_date}")
         else:
-            stats = os.stat(self.path)
+            stats = os.stat(self.original_path)
             create_date = timezone.make_aware(
                 datetime.datetime.fromtimestamp(stats.st_mtime),
             )
