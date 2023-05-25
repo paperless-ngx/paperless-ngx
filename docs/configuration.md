@@ -880,6 +880,13 @@ don't exist yet.
 
     Defaults to false.
 
+`PAPERLESS_CONSUMER_MTIME_AS_DATE_ADDED=<bool>`
+
+: Sets the modification timestamp of the source file as `date added`
+of the resulting document.
+
+    Defaults to false.
+
 `PAPERLESS_CONSUMER_IGNORE_PATTERNS=<json>`
 
 : By default, paperless ignores certain files and folders in the

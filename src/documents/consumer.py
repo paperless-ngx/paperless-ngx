@@ -536,6 +536,16 @@ class Consumer(LoggingMixin):
             )
             self.log.debug(f"Creation date from st_mtime: {create_date}")
 
+        # see: https://github.com/paperless-ngx/paperless-ngx/discussions/3463
+        if settings.CONSUMER_MTIME_AS_DATE_ADDED:
+            stats = os.stat(self.original_path)
+            added_date = timezone.make_aware(
+                datetime.datetime.fromtimestamp(stats.st_mtime),
+            )
+            self.log("debug", f"Added date from st_mtime: {added_date}")
+        else:
+            added_date = timezone.now
+
         storage_type = Document.STORAGE_TYPE_UNENCRYPTED
 
         with open(self.path, "rb") as f:
@@ -546,6 +556,7 @@ class Consumer(LoggingMixin):
                 checksum=hashlib.md5(f.read()).hexdigest(),
                 created=create_date,
                 modified=create_date,
+                added=added_date,
                 storage_type=storage_type,
                 original_filename=self.filename,
             )
