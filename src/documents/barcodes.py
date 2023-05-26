@@ -180,6 +180,9 @@ class BarcodeReader:
         with scratch_image.open("rb") as img_file, self.pdf_file.open("wb") as pdf_file:
             pdf_file.write(img2pdf.convert(img_file))
 
+        # Copy what file stat is possible
+        shutil.copystat(self.file, self.pdf_file)
+
     def detect(self) -> None:
         """
         Scan all pages of the PDF as images, updating barcodes and the pages
@@ -292,6 +295,9 @@ class BarcodeReader:
                 savepath = Path(self.temp_dir.name) / output_filename
                 with open(savepath, "wb") as out:
                     dst.save(out)
+
+                shutil.copystat(self.file, savepath)
+
                 document_paths.append(savepath)
 
             return document_paths
