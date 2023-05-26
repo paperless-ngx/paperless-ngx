@@ -326,7 +326,7 @@ class Consumer(LoggingMixin):
             dir=settings.SCRATCH_DIR,
         )
         self.path = Path(tempdir.name) / Path(self.filename)
-        shutil.copy(self.original_path, self.path)
+        shutil.copy2(self.original_path, self.path)
 
         # Determine the parser class.
 
@@ -582,6 +582,7 @@ class Consumer(LoggingMixin):
     def _write(self, storage_type, source, target):
         with open(source, "rb") as read_file, open(target, "wb") as write_file:
             write_file.write(read_file.read())
+        shutil.copystat(source, target)
 
     def _log_script_outputs(self, completed_process: CompletedProcess):
         """
