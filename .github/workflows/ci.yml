@@ -202,10 +202,20 @@ jobs:
         name: Linting checks
         run: cd src-ui && npm run lint
       -
-        name: Run Playwright tests
+        name: Run Jest unit tests
+        run: cd src-ui && npm run test
+      -
+        name: Upload Jest coverage
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: jest-coverage-report
+          path: src-ui/coverage
+      -
+        name: Run Playwright e2e tests
         run: cd src-ui && npx playwright test
       -
-        name: Upload test results
+        name: Upload Playwright test results
         if: always()
         uses: actions/upload-artifact@v3
         with:
