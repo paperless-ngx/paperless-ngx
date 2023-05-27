@@ -414,7 +414,7 @@ class DocumentSerializer(OwnedObjectSerializer, DynamicFieldsModelSerializer):
     )
 
     def get_original_file_name(self, obj):
-        return obj.get_public_filename()
+        return obj.original_filename
 
     def get_archived_file_name(self, obj):
         if obj.has_archive_version:
