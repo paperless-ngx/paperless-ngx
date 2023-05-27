@@ -579,6 +579,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             content="things i paid for in september",
             pk=3,
             checksum="C",
+            original_filename="someepdf.pdf",
         )
         with AsyncWriter(index.open_index()) as writer:
             # Note to future self: there is a reason we dont use a model signal handler to update the index: some operations edit many documents at once
@@ -598,6 +599,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(response.data["count"], 1)
         self.assertEqual(len(results), 1)
         self.assertCountEqual(response.data["all"], [d3.id])
+        self.assertEqual(results[0]["original_file_name"], "someepdf.pdf")
 
         response = self.client.get("/api/documents/?query=statement")
         results = response.data["results"]
