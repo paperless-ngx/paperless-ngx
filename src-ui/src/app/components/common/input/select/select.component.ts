@@ -85,8 +85,14 @@ export class SelectComponent extends AbstractInputComponent<number> {
   @Input()
   bindLabel: string = 'name'
 
+  @Input()
+  showFilter: boolean = false
+
   @Output()
   createNew = new EventEmitter<string>()
+
+  @Output()
+  filterDocuments = new EventEmitter<any[]>()
 
   public addItemRef: (name) => void
 
@@ -133,5 +139,9 @@ export class SelectComponent extends AbstractInputComponent<number> {
     setTimeout(() => {
       this.clearLastSearchTerm()
     }, 3000)
+  }
+
+  onFilterDocuments() {
+    this.filterDocuments.emit([this.items.find((i) => i.id === this.value)])
   }
 }
