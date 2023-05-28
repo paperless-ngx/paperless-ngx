@@ -108,13 +108,6 @@ export class CustomStoragePathService extends AbstractPaperlessService<Paperless
     })
   }
 
-  getSelectionData(ids: number[]): Observable<SelectionData> {
-    return this.http.post<SelectionData>(
-      this.getResourceUrl(null, 'selection_data'),
-      { documents: ids }
-    )
-  }
-
   getSuggestions(id: number): Observable<PaperlessDocumentSuggestions> {
     return this.http.get<PaperlessDocumentSuggestions>(
       this.getResourceUrl(id, 'suggestions')

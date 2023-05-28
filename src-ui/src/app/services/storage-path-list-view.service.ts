@@ -208,17 +208,6 @@ export class StoragePathListViewService {
           activeListViewState.collectionSize = result.count
           activeListViewState.storagePaths = result.results
 
-          this.storagePathService
-            .getSelectionData(result.results.map((d) => d.id))
-            .subscribe({
-              next: (selectionData) => {
-                this.selectionData = selectionData
-              },
-              error: () => {
-                this.selectionData = null
-              },
-            })
-
           // if (updateQueryParams && !this._activeSavedViewId) {
           //   let base = ['/documents']
           //   this.router.navigate(base, {

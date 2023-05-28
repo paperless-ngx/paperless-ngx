@@ -170,7 +170,6 @@ export class ExplorerComponent
         takeUntil(this.unsubscribeNotifier)
       )
       .subscribe((queryParams) => {
-        console.log('test')
         if (queryParams.has('view')) {
           // loading a saved view on /documents
           this.loadViewConfig(parseInt(queryParams.get('view')))
