@@ -57,6 +57,8 @@ export interface ListViewState {
    * Contains the IDs of all selected documents.
    */
   selected?: Set<number>
+
+  storagePathId?: number | null
 }
 
 /**
@@ -108,6 +110,7 @@ export class StoragePathListViewService {
       sortReverse: true,
       filterRules: [],
       selected: new Set<number>(),
+      storagePathId: null,
     }
   }
 
@@ -121,56 +124,22 @@ export class StoragePathListViewService {
     return this.listViewStates.get(this._activeSavedViewId)
   }
 
-  activateSavedView(view: PaperlessSavedView) {
-    this.rangeSelectionAnchorIndex = this.lastRangeSelectionToIndex = null
-    if (view) {
-      this._activeSavedViewId = view.id
-      this.loadSavedView(view)
-    } else {
-      this._activeSavedViewId = null
-    }
-  }
-
-  activateSavedViewWithQueryParams(
-    view: PaperlessSavedView,
-    queryParams: ParamMap
-  ) {
-    const viewState = paramsToViewState(queryParams)
-    this.activateSavedView(view)
-    this.currentPage = viewState.currentPage
-  }
-
-  loadSavedView(view: PaperlessSavedView, closeCurrentView: boolean = false) {
-    if (closeCurrentView) {
-      this._activeSavedViewId = null
-    }
-
-    this.activeListViewState.filterRules = cloneFilterRules(view.filter_rules)
-    this.activeListViewState.sortField = view.sort_field
-    this.activeListViewState.sortReverse = view.sort_reverse
-    if (this._activeSavedViewId) {
-      this.activeListViewState.title = view.name
-    }
-
-    this.reduceSelectionToFilter()
-
-    if (!this.router.routerState.snapshot.url.includes('/view/')) {
-      this.router.navigate(['view', view.id])
-    }
-  }
-
   loadFromQueryParams(queryParams: ParamMap) {
-    const paramsEmpty: boolean = queryParams.keys.length == 0
-    let newState: ListViewState = this.listViewStates.get(
-      this._activeSavedViewId
-    )
-    if (!paramsEmpty) newState = paramsToViewState(queryParams)
+    const isParamsEmpty: boolean = queryParams.keys.length == 0
+    let newState: ListViewState & { storagePathId?: number } =
+      this.listViewStates.get(this._activeSavedViewId)
+    if (!isParamsEmpty) {
+      newState = paramsToViewState(queryParams)
+      if (queryParams.has('spid')) {
+        newState.storagePathId = parseInt(queryParams.get('spid'))
+      }
+    }
     if (newState == undefined) newState = this.defaultListViewState() // if nothing in local storage
 
     // only reload if things have changed
     if (
       !this.initialized ||
-      paramsEmpty ||
+      isParamsEmpty ||
       this.activeListViewState.sortField !== newState.sortField ||
       this.activeListViewState.sortReverse !== newState.sortReverse ||
       this.activeListViewState.currentPage !== newState.currentPage ||
@@ -183,7 +152,8 @@ export class StoragePathListViewService {
       this.activeListViewState.sortField = newState.sortField
       this.activeListViewState.sortReverse = newState.sortReverse
       this.activeListViewState.currentPage = newState.currentPage
-      this.reload(null, paramsEmpty) // update the params if there arent any
+      this.activeListViewState.storagePathId = newState.storagePathId
+      this.reload(null, isParamsEmpty) // update the params if there arent any
     }
   }
 
@@ -198,11 +168,12 @@ export class StoragePathListViewService {
         activeListViewState.sortField,
         activeListViewState.sortReverse,
         activeListViewState.filterRules,
-        { truncate_content: true }
+        { truncate_content: true },
+        activeListViewState.storagePathId
       )
       .subscribe({
         next: (result) => {
-          console.log('list filtered result:', result)
+          console.log('result:', result)
           this.initialized = true
           this.isReloading = false
           activeListViewState.collectionSize = result.count

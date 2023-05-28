@@ -1,10 +1,7 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { Observable, map } from 'rxjs'
+import { Observable, filter, map, switchMap, tap } from 'rxjs'
 import { FilterRule } from 'src/app/data/filter-rule'
-import { PaperlessDocument } from 'src/app/data/paperless-document'
-import { PaperlessDocumentMetadata } from 'src/app/data/paperless-document-metadata'
-import { PaperlessDocumentSuggestions } from 'src/app/data/paperless-document-suggestions'
 import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
 import { Results } from 'src/app/data/results'
 import { queryParamsFromFilterRules } from 'src/app/utils/query-params'
@@ -26,8 +23,6 @@ interface SelectionData {
   providedIn: 'root',
 })
 export class CustomStoragePathService extends AbstractPaperlessService<PaperlessStoragePath> {
-  private _searchQuery: string
-
   constructor(http: HttpClient) {
     super(http, 'storage_paths')
   }
@@ -38,16 +33,40 @@ export class CustomStoragePathService extends AbstractPaperlessService<Paperless
     sortField?: string,
     sortReverse?: boolean,
     filterRules?: FilterRule[],
-    extraParams = {}
+    extraParams = {},
+    parentStoragePathId?: number
   ): Observable<Results<PaperlessStoragePath>> {
-    return this.list(
-      page,
-      pageSize,
-      sortField,
-      sortReverse,
-      Object.assign(extraParams, queryParamsFromFilterRules(filterRules))
-    ).pipe(
+    const params = Object.assign(
+      extraParams,
+      queryParamsFromFilterRules(filterRules)
+    )
+    if (parentStoragePathId !== null && parentStoragePathId !== undefined) {
+      return this.get(parentStoragePathId).pipe(
+        switchMap((storagePath) => {
+          params.path__istartswith = storagePath.path
+          return this.list(page, pageSize, sortField, sortReverse, params).pipe(
+            map((results) => {
+              results.results = results.results.filter((s) => {
+                const isNotParent = s.id !== parentStoragePathId
+                const isDirectChild =
+                  s.path
+                    .replace(storagePath.path, '')
+                    .split('/')
+                    .filter((s) => !!s).length === 1
+                return isNotParent && isDirectChild
+              })
+              return results
+            })
+          )
+        })
+      )
+    }
+
+    return this.list(page, pageSize, sortField, sortReverse, params).pipe(
       map((results) => {
+        results.results = results.results.filter(
+          (s) => s.path.split('/').length === 1
+        )
         return results
       })
     )
@@ -57,80 +76,5 @@ export class CustomStoragePathService extends AbstractPaperlessService<Paperless
     return this.listFiltered(1, 100000, null, null, filterRules, {
       fields: 'id',
     }).pipe(map((response) => response.results.map((doc) => doc.id)))
-  }
-
-  getPreviewUrl(id: number, original: boolean = false): string {
-    let url = this.getResourceUrl(id, 'preview')
-    if (this._searchQuery) url += `#search="${this._searchQuery}"`
-    if (original) {
-      url += '?original=true'
-    }
-    return url
-  }
-
-  getThumbUrl(id: number): string {
-    return this.getResourceUrl(id, 'thumb')
-  }
-
-  getDownloadUrl(id: number, original: boolean = false): string {
-    let url = this.getResourceUrl(id, 'download')
-    if (original) {
-      url += '?original=true'
-    }
-    return url
-  }
-
-  update(o: PaperlessDocument): Observable<PaperlessDocument> {
-    // we want to only set created_date
-    o.created = undefined
-    return super.update(o)
-  }
-
-  uploadDocument(formData) {
-    return this.http.post(
-      this.getResourceUrl(null, 'post_document'),
-      formData,
-      { reportProgress: true, observe: 'events' }
-    )
-  }
-
-  getMetadata(id: number): Observable<PaperlessDocumentMetadata> {
-    return this.http.get<PaperlessDocumentMetadata>(
-      this.getResourceUrl(id, 'metadata')
-    )
-  }
-
-  bulkEdit(ids: number[], method: string, args: any) {
-    return this.http.post(this.getResourceUrl(null, 'bulk_edit'), {
-      documents: ids,
-      method: method,
-      parameters: args,
-    })
-  }
-
-  getSuggestions(id: number): Observable<PaperlessDocumentSuggestions> {
-    return this.http.get<PaperlessDocumentSuggestions>(
-      this.getResourceUrl(id, 'suggestions')
-    )
-  }
-
-  bulkDownload(
-    ids: number[],
-    content = 'both',
-    useFilenameFormatting: boolean = false
-  ) {
-    return this.http.post(
-      this.getResourceUrl(null, 'bulk_download'),
-      {
-        documents: ids,
-        content: content,
-        follow_formatting: useFilenameFormatting,
-      },
-      { responseType: 'blob' }
-    )
-  }
-
-  public set searchQuery(query: string) {
-    this._searchQuery = query
   }
 }

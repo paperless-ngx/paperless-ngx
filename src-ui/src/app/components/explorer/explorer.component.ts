@@ -8,7 +8,16 @@ import {
 } from '@angular/core'
 import { ActivatedRoute, Router, convertToParamMap } from '@angular/router'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
-import { Subject, filter, first, map, switchMap, takeUntil } from 'rxjs'
+import {
+  Subject,
+  filter,
+  first,
+  map,
+  switchMap,
+  take,
+  takeUntil,
+  tap,
+} from 'rxjs'
 import {
   FilterRule,
   filterRulesDiffer,
@@ -34,6 +43,7 @@ import { StoragePathListViewService } from 'src/app/services/storage-path-list-v
 import { ToastService } from 'src/app/services/toast.service'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { FilterEditorComponent } from './filter-editor/filter-editor.component'
+import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
 
 @Component({
   selector: 'app-explorer',
@@ -140,44 +150,11 @@ export class ExplorerComponent
         this.list.reload()
       })
 
-    this.route.paramMap
-      .pipe(
-        filter((params) => params.has('id')), // only on saved view e.g. /view/id
-        switchMap((params) => {
-          return this.savedViewService
-            .getCached(+params.get('id'))
-            .pipe(map((view) => ({ view })))
-        })
-      )
-      .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe(({ view }) => {
-        if (!view) {
-          this.router.navigate(['404'])
-          return
-        }
-        this.unmodifiedSavedView = view
-        this.list.activateSavedViewWithQueryParams(
-          view,
-          convertToParamMap(this.route.snapshot.queryParams)
-        )
-        // this.list.reload()
-        this.unmodifiedFilterRules = view.filter_rules
-      })
-
     this.route.queryParamMap
-      .pipe(
-        filter(() => !this.route.snapshot.paramMap.has('id')), // only when not on /view/id
-        takeUntil(this.unsubscribeNotifier)
-      )
+      .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((queryParams) => {
-        if (queryParams.has('view')) {
-          // loading a saved view on /documents
-          this.loadViewConfig(parseInt(queryParams.get('view')))
-        } else {
-          this.list.activateSavedView(null)
-          this.list.loadFromQueryParams(queryParams)
-          this.unmodifiedFilterRules = []
-        }
+        this.list.loadFromQueryParams(queryParams)
+        this.unmodifiedFilterRules = []
       })
   }
 
@@ -187,19 +164,10 @@ export class ExplorerComponent
     this.unsubscribeNotifier.complete()
   }
 
-  loadViewConfig(viewID: number) {
-    this.savedViewService
-      .getCached(viewID)
-      .pipe(first())
-      .subscribe((view) => {
-        this.unmodifiedSavedView = view
-        this.list.activateSavedView(view)
-        this.list.reload()
-      })
-  }
-
-  openDocumentDetail(document: PaperlessDocument) {
-    this.router.navigate(['documents', document.id])
+  openDocumentDetail(storagePath: PaperlessStoragePath) {
+    this.router.navigate(['explorer'], {
+      queryParams: { spid: storagePath.id },
+    })
   }
 
   toggleSelected(document: PaperlessDocument, event: MouseEvent): void {

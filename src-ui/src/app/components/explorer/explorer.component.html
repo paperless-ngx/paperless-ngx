@@ -370,7 +370,7 @@
         </td>
         <td>
           <a
-            routerLink="/explorer/{{ d.id }}"
+            routerLink="/explorer?spid={{ d.id }}"
             title="Edit document"
             i18n-title
             style="overflow-wrap: anywhere"
@@ -385,20 +385,6 @@
             i18n-linkTitle
             (click)="clickTag(t.id); $event.stopPropagation()"
           ></app-tag>
-        </td>
-        <td *ngIf="notesEnabled" class="d-none d-xl-table-cell">
-          <a
-            *ngIf="d.notes.length"
-            routerLink="/documents/{{ d.id }}/notes"
-            class="btn btn-sm p-0"
-          >
-            <span class="badge rounded-pill bg-light border text-primary">
-              <svg class="metadata-icon ms-1 me-1" fill="currentColor">
-                <use xlink:href="assets/bootstrap-icons.svg#chat-left-text" />
-              </svg>
-              {{ d.notes.length }}</span
-            >
-          </a>
         </td>
         <td class="d-none d-xl-table-cell">
           <ng-container *ngIf="d.document_type">
