@@ -376,6 +376,7 @@ export class DocumentListViewService {
   quickFilter(filterRules: FilterRule[]) {
     this._activeSavedViewId = null
     this.filterRules = filterRules
+    this.router.navigate(['documents'])
   }
 
   getLastPage(): number {

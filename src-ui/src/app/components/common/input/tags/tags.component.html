@@ -31,10 +31,14 @@
         </div>
       </ng-template>
     </ng-select>
-
     <button *ngIf="allowCreate" class="btn btn-outline-secondary" type="button" (click)="createTag()" [disabled]="disabled">
       <svg class="buttonicon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#plus" />
+      </svg>
+    </button>
+    <button *ngIf="showFilter" class="btn btn-outline-secondary" type="button" (click)="onFilterDocuments()" [disabled]="hasPrivate || this.value === null" i18n-title title="Filter documents with these Tags">
+      <svg class="buttonicon" fill="currentColor">
+        <use xlink:href="assets/bootstrap-icons.svg#filter" />
       </svg>
     </button>
   </div>
