@@ -6,9 +6,9 @@ import {
   ViewChild,
   ViewChildren,
 } from '@angular/core'
-import { ActivatedRoute, convertToParamMap, Router } from '@angular/router'
+import { ActivatedRoute, Router, convertToParamMap } from '@angular/router'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
-import { filter, first, map, Subject, switchMap, takeUntil } from 'rxjs'
+import { Subject, filter, first, map, switchMap, takeUntil } from 'rxjs'
 import {
   FilterRule,
   filterRulesDiffer,
@@ -19,11 +19,10 @@ import { PaperlessDocument } from 'src/app/data/paperless-document'
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
 import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 import {
-  SortableDirective,
   SortEvent,
+  SortableDirective,
 } from 'src/app/directives/sortable.directive'
 import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
-import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import {
   DOCUMENT_SORT_FIELDS,
@@ -31,6 +30,7 @@ import {
 } from 'src/app/services/rest/document.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { StoragePathListViewService } from 'src/app/services/storage-path-list-view.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { FilterEditorComponent } from './filter-editor/filter-editor.component'
@@ -45,7 +45,7 @@ export class ExplorerComponent
   implements OnInit, OnDestroy
 {
   constructor(
-    public list: DocumentListViewService,
+    public list: StoragePathListViewService,
     public savedViewService: SavedViewService,
     public route: ActivatedRoute,
     private router: Router,
@@ -170,13 +170,14 @@ export class ExplorerComponent
         takeUntil(this.unsubscribeNotifier)
       )
       .subscribe((queryParams) => {
+        console.log('test')
         if (queryParams.has('view')) {
           // loading a saved view on /documents
           this.loadViewConfig(parseInt(queryParams.get('view')))
         } else {
-          // this.list.activateSavedView(null)
-          // this.list.loadFromQueryParams(queryParams)
-          // this.unmodifiedFilterRules = []
+          this.list.activateSavedView(null)
+          this.list.loadFromQueryParams(queryParams)
+          this.unmodifiedFilterRules = []
         }
       })
   }

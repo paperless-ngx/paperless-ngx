@@ -1,0 +1,50 @@
+<div class="col p-2 h-100">
+  <div
+    class="card h-100 shadow-sm document-card"
+    [class.card-selected]="selected"
+    [class.popover-hidden]="popoverHidden"
+    (mouseleave)="mouseLeaveCard()"
+  >
+    <div
+      class="border-bottom doc-img-container"
+      [class.doc-img-background-selected]="selected"
+      (click)="this.toggleSelected.emit($event)"
+      (dblclick)="dblClickDocument.emit(this)"
+    >
+      <div class="card-img doc-img rounded-top">
+        <svg
+          width="100%"
+          height="100%"
+          preserveAspectRatio="xMidYMid meet"
+          fill="currentColor"
+        >
+          <use xlink:href="assets/bootstrap-icons.svg#folder" />
+        </svg>
+      </div>
+
+      <div
+        class="border-end border-bottom bg-light py-1 px-2 document-card-check"
+      >
+        <div class="form-check">
+          <input
+            type="checkbox"
+            class="form-check-input"
+            id="smallCardCheck{{ storagePath.id }}"
+            [checked]="selected"
+            (click)="this.toggleSelected.emit($event)"
+          />
+          <label
+            class="form-check-label"
+            for="smallCardCheck{{ storagePath.id }}"
+          ></label>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-body bg-light p-2">
+      <p class="card-text">
+        {{ storagePath.name }}
+      </p>
+    </div>
+  </div>
+</div>
