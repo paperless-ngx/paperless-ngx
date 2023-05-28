@@ -74,15 +74,15 @@
 
                         <app-input-text #inputTitle i18n-title title="Title" formControlName="title" (keyup)="titleKeyUp($event)" [error]="error?.title"></app-input-text>
                         <app-input-number i18n-title title="Archive serial number" [error]="error?.archive_serial_number" formControlName='archive_serial_number'></app-input-number>
-                        <app-input-date i18n-title title="Date created" formControlName="created_date" [suggestions]="suggestions?.dates"
+                        <app-input-date i18n-title title="Date created" formControlName="created_date" [suggestions]="suggestions?.dates" [showFilter]="true" (filterDocuments)="filterDocuments($event)"
                             [error]="error?.created_date"></app-input-date>
-                        <app-input-select [items]="correspondents" i18n-title title="Correspondent" formControlName="correspondent" [allowNull]="true"
+                        <app-input-select [items]="correspondents" i18n-title title="Correspondent" formControlName="correspondent" [allowNull]="true" [showFilter]="true" (filterDocuments)="filterDocuments($event)"
                             (createNew)="createCorrespondent($event)" [suggestions]="suggestions?.correspondents" *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.Correspondent }"></app-input-select>
-                        <app-input-select [items]="documentTypes" i18n-title title="Document type" formControlName="document_type" [allowNull]="true"
+                        <app-input-select [items]="documentTypes" i18n-title title="Document type" formControlName="document_type" [allowNull]="true" [showFilter]="true" (filterDocuments)="filterDocuments($event)"
                             (createNew)="createDocumentType($event)" [suggestions]="suggestions?.document_types" *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.DocumentType }"></app-input-select>
-                        <app-input-select [items]="storagePaths" i18n-title title="Storage path" formControlName="storage_path" [allowNull]="true"
+                        <app-input-select [items]="storagePaths" i18n-title title="Storage path" formControlName="storage_path" [allowNull]="true" [showFilter]="true" (filterDocuments)="filterDocuments($event)"
                             (createNew)="createStoragePath($event)" [suggestions]="suggestions?.storage_paths" i18n-placeholder placeholder="Default" *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.StoragePath }"></app-input-select>
-                        <app-input-tags formControlName="tags" [suggestions]="suggestions?.tags" *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.Tag }"></app-input-tags>
+                        <app-input-tags formControlName="tags" [suggestions]="suggestions?.tags" [showFilter]="true" (filterDocuments)="filterDocuments($event)" *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.Tag }"></app-input-tags>
 
                     </ng-template>
                 </li>

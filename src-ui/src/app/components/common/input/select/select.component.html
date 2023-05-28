@@ -1,6 +1,6 @@
 <div class="mb-3 paperless-input-select" [class.disabled]="disabled">
   <label *ngIf="title" class="form-label" [for]="inputId">{{title}}</label>
-    <div [class.input-group]="allowCreateNew">
+    <div [class.input-group]="allowCreateNew || showFilter">
       <ng-select name="inputId" [(ngModel)]="value"
         [disabled]="disabled"
         [style.color]="textColor"
@@ -24,6 +24,11 @@
       <button *ngIf="allowCreateNew" class="btn btn-outline-secondary" type="button" (click)="addItem()" [disabled]="disabled">
         <svg class="buttonicon" fill="currentColor">
           <use xlink:href="assets/bootstrap-icons.svg#plus" />
+        </svg>
+      </button>
+      <button *ngIf="showFilter" class="btn btn-outline-secondary" type="button" (click)="onFilterDocuments()" [disabled]="isPrivate || this.value === null" i18n-title title="Filter documents with this {{title}}">
+        <svg class="buttonicon" fill="currentColor">
+          <use xlink:href="assets/bootstrap-icons.svg#filter" />
         </svg>
       </button>
     </div>

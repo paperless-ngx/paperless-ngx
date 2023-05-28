@@ -1,8 +1,16 @@
-import { Component, forwardRef, Input, OnInit } from '@angular/core'
+import {
+  Component,
+  EventEmitter,
+  forwardRef,
+  Input,
+  OnInit,
+  Output,
+} from '@angular/core'
 import { NG_VALUE_ACCESSOR } from '@angular/forms'
 import {
   NgbDateAdapter,
   NgbDateParserFormatter,
+  NgbDateStruct,
 } from '@ng-bootstrap/ng-bootstrap'
 import { SettingsService } from 'src/app/services/settings.service'
 import { AbstractInputComponent } from '../abstract-input'
@@ -33,6 +41,12 @@ export class DateComponent
 
   @Input()
   suggestions: string[]
+
+  @Input()
+  showFilter: boolean = false
+
+  @Output()
+  filterDocuments = new EventEmitter<NgbDateStruct[]>()
 
   getSuggestions() {
     return this.suggestions == null
@@ -79,5 +93,9 @@ export class DateComponent
     if ('Enter' !== event.key && !/[0-9,\.\/-]+/.test(event.key)) {
       event.preventDefault()
     }
+  }
+
+  onFilterDocuments() {
+    this.filterDocuments.emit([this.ngbDateParserFormatter.parse(this.value)])
   }
 }

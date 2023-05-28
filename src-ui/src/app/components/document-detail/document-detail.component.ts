@@ -1,11 +1,17 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core'
 import { FormControl, FormGroup } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
-import { NgbModal, NgbNav, NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap'
+import {
+  NgbDateStruct,
+  NgbModal,
+  NgbNav,
+  NgbNavChangeEvent,
+} from '@ng-bootstrap/ng-bootstrap'
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent'
 import { PaperlessDocument } from 'src/app/data/paperless-document'
 import { PaperlessDocumentMetadata } from 'src/app/data/paperless-document-metadata'
 import { PaperlessDocumentType } from 'src/app/data/paperless-document-type'
+import { PaperlessTag } from 'src/app/data/paperless-tag'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
@@ -30,7 +36,18 @@ import {
   distinctUntilChanged,
 } from 'rxjs/operators'
 import { PaperlessDocumentSuggestions } from 'src/app/data/paperless-document-suggestions'
-import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type'
+import {
+  FILTER_CORRESPONDENT,
+  FILTER_CREATED_AFTER,
+  FILTER_CREATED_BEFORE,
+  FILTER_CREATED_DAY,
+  FILTER_CREATED_MONTH,
+  FILTER_CREATED_YEAR,
+  FILTER_DOCUMENT_TYPE,
+  FILTER_FULLTEXT_MORELIKE,
+  FILTER_HAS_TAGS_ALL,
+  FILTER_STORAGE_PATH,
+} from 'src/app/data/filter-rule-type'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
 import { StoragePathEditDialogComponent } from '../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
@@ -45,6 +62,9 @@ import { UserService } from 'src/app/services/rest/user.service'
 import { PaperlessDocumentNote } from 'src/app/data/paperless-document-note'
 import { HttpClient } from '@angular/common/http'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
+import { FilterRule } from 'src/app/data/filter-rule'
+import { ObjectWithId } from 'src/app/data/object-with-id'
+import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
 
 enum DocumentDetailNavIDs {
   Details = 1,
@@ -761,5 +781,54 @@ export class DocumentDetailComponent
         doc
       )
     )
+  }
+
+  filterDocuments(items: ObjectWithId[] | NgbDateStruct[]) {
+    const filterRules: FilterRule[] = items.flatMap((i) => {
+      if (i.hasOwnProperty('year')) {
+        const isoDateAdapter = new ISODateAdapter()
+        const dateAfter: Date = new Date(isoDateAdapter.toModel(i))
+        dateAfter.setDate(dateAfter.getDate() - 1)
+        const dateBefore: Date = new Date(isoDateAdapter.toModel(i))
+        dateBefore.setDate(dateBefore.getDate() + 1)
+        // Created Date
+        return [
+          {
+            rule_type: FILTER_CREATED_AFTER,
+            value: dateAfter.toISOString().substring(0, 10),
+          },
+          {
+            rule_type: FILTER_CREATED_BEFORE,
+            value: dateBefore.toISOString().substring(0, 10),
+          },
+        ]
+      } else if (i.hasOwnProperty('last_correspondence')) {
+        // Correspondent
+        return {
+          rule_type: FILTER_CORRESPONDENT,
+          value: (i as PaperlessCorrespondent).id.toString(),
+        }
+      } else if (i.hasOwnProperty('path')) {
+        // Storage Path
+        return {
+          rule_type: FILTER_STORAGE_PATH,
+          value: (i as PaperlessStoragePath).id.toString(),
+        }
+      } else if (i.hasOwnProperty('is_inbox_tag')) {
+        // Tag
+        return {
+          rule_type: FILTER_HAS_TAGS_ALL,
+          value: (i as PaperlessTag).id.toString(),
+        }
+      } else {
+        // Document Type, has no specific props
+        return {
+          rule_type: FILTER_DOCUMENT_TYPE,
+          value: (i as PaperlessDocumentType).id.toString(),
+        }
+      }
+    })
+
+    this.documentListViewService.quickFilter(filterRules)
   }
 }
