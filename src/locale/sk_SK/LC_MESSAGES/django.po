@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-05-29 07:36\n"
+"PO-Revision-Date: 2023-05-29 20:45\n"
 "Last-Translator: \n"
 "Language-Team: Slovak\n"
 "Language: sk_SK\n"
@@ -39,11 +39,11 @@ msgstr "Presná zhoda"
 
 #: documents/models.py:40
 msgid "Regular expression"
-msgstr "Normálny výraz"
+msgstr "Regulárny výraz"
 
 #: documents/models.py:41
 msgid "Fuzzy word"
-msgstr "Nejasné slovo"
+msgstr "Nejednoznačné slovo"
 
 #: documents/models.py:42
 msgid "Automatic"
