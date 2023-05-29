@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-05-29 20:45\n"
+"PO-Revision-Date: 2023-05-29 21:58\n"
 "Last-Translator: \n"
 "Language-Team: Slovak\n"
 "Language: sk_SK\n"
@@ -60,11 +60,11 @@ msgstr "zhoda"
 
 #: documents/models.py:50
 msgid "matching algorithm"
-msgstr "zhodový algoritmus"
+msgstr "algoritmus zhody"
 
 #: documents/models.py:55
 msgid "is insensitive"
-msgstr "je necitlivý"
+msgstr "nerozlišuje veľké a malé písmená"
 
 #: documents/models.py:71
 msgid "owner"
@@ -72,11 +72,11 @@ msgstr "vlastník"
 
 #: documents/models.py:81 documents/models.py:136
 msgid "correspondent"
-msgstr "korešpondencia"
+msgstr "dopisovateľ"
 
 #: documents/models.py:82
 msgid "correspondents"
-msgstr "zodpovedá"
+msgstr "dopisovatelia"
 
 #: documents/models.py:87
 msgid "color"
