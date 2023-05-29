@@ -175,13 +175,13 @@
       <span *ngIf="i < folderPath.split('/').length - 1"> / </span>
     </span>
   </div>
-  <app-filter-editor
+  <!-- <app-filter-editor
     [hidden]="isBulkEditing"
     [(filterRules)]="list.filterRules"
     [unmodifiedFilterRules]="unmodifiedFilterRules"
     [selectionData]="list.selectionData"
     #filterEditor
-  ></app-filter-editor>
+  ></app-filter-editor> -->
   <app-bulk-editor [hidden]="!isBulkEditing"></app-bulk-editor>
 </div>
 
