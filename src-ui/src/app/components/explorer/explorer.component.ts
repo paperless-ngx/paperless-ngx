@@ -80,6 +80,10 @@ export class ExplorerComponent
 
   private unsubscribeNotifier: Subject<any> = new Subject()
 
+  get folderPath(): string {
+    return this.list.currentFolderPath
+  }
+
   get savedViewIsModified(): boolean {
     if (!this.list.activeSavedViewId || !this.unmodifiedSavedView) return false
     else {
@@ -153,6 +157,7 @@ export class ExplorerComponent
     this.route.queryParamMap
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((queryParams) => {
+        console.log('query params updated:', queryParams)
         this.list.loadFromQueryParams(queryParams)
         this.unmodifiedFilterRules = []
       })
@@ -162,6 +167,18 @@ export class ExplorerComponent
     // unsubscribes all
     this.unsubscribeNotifier.next(this)
     this.unsubscribeNotifier.complete()
+  }
+
+  clickPathPart(index: number) {
+    const pathUntilPart = this.folderPath
+      .split('/')
+      .slice(0, index + 1)
+      .join('/')
+    this.list.getStoragePathByPath(pathUntilPart).subscribe((storagePath) => {
+      this.router.navigate(['explorer'], {
+        queryParams: { spid: storagePath.id },
+      })
+    })
   }
 
   openDocumentDetail(storagePath: PaperlessStoragePath) {

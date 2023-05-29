@@ -59,6 +59,8 @@ export interface ListViewState {
   selected?: Set<number>
 
   storagePathId?: number | null
+
+  parentStoragePath?: PaperlessStoragePath | null
 }
 
 /**
@@ -111,6 +113,7 @@ export class StoragePathListViewService {
       filterRules: [],
       selected: new Set<number>(),
       storagePathId: null,
+      parentStoragePath: null,
     }
   }
 
@@ -143,6 +146,7 @@ export class StoragePathListViewService {
       this.activeListViewState.sortField !== newState.sortField ||
       this.activeListViewState.sortReverse !== newState.sortReverse ||
       this.activeListViewState.currentPage !== newState.currentPage ||
+      this.activeListViewState.storagePathId !== newState.storagePathId ||
       filterRulesDiffer(
         this.activeListViewState.filterRules,
         newState.filterRules
@@ -155,6 +159,10 @@ export class StoragePathListViewService {
       this.activeListViewState.storagePathId = newState.storagePathId
       this.reload(null, isParamsEmpty) // update the params if there arent any
     }
+  }
+
+  getStoragePathByPath(path: string): Observable<PaperlessStoragePath> {
+    return this.storagePathService.getByPath(path)
   }
 
   reload(onFinish?, updateQueryParams: boolean = true) {
@@ -178,6 +186,7 @@ export class StoragePathListViewService {
           this.isReloading = false
           activeListViewState.collectionSize = result.count
           activeListViewState.storagePaths = result.results
+          activeListViewState.parentStoragePath = result.parentStoragePath
 
           // if (updateQueryParams && !this._activeSavedViewId) {
           //   let base = ['/documents']
@@ -286,6 +295,10 @@ export class StoragePathListViewService {
 
   get selected(): Set<number> {
     return this.activeListViewState.selected
+  }
+
+  get currentFolderPath(): string {
+    return this.activeListViewState.parentStoragePath?.path || '/'
   }
 
   setSort(field: string, reverse: boolean) {

@@ -169,6 +169,12 @@
 </app-page-header>
 
 <div class="row sticky-top pt-3 pt-sm-4 pb-2 pb-lg-4 bg-body">
+  <div class="flex pb-2">
+    <span *ngFor="let pathPart of folderPath.split('/'); let i = index">
+      <a (click)="clickPathPart(i)">{{ pathPart }}</a>
+      <span *ngIf="i < folderPath.split('/').length - 1"> / </span>
+    </span>
+  </div>
   <app-filter-editor
     [hidden]="isBulkEditing"
     [(filterRules)]="list.filterRules"

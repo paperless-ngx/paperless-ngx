@@ -27,6 +27,12 @@ export class CustomStoragePathService extends AbstractPaperlessService<Paperless
     super(http, 'storage_paths')
   }
 
+  getByPath(path: string): Observable<PaperlessStoragePath> {
+    return this.list(1, 1, null, null, { path__iexact: path }).pipe(
+      map((results) => results.results.pop())
+    )
+  }
+
   listFiltered(
     page?: number,
     pageSize?: number,
@@ -35,7 +41,9 @@ export class CustomStoragePathService extends AbstractPaperlessService<Paperless
     filterRules?: FilterRule[],
     extraParams = {},
     parentStoragePathId?: number
-  ): Observable<Results<PaperlessStoragePath>> {
+  ): Observable<
+    Results<PaperlessStoragePath> & { parentStoragePath?: PaperlessStoragePath }
+  > {
     const params = Object.assign(
       extraParams,
       queryParamsFromFilterRules(filterRules)
@@ -55,6 +63,8 @@ export class CustomStoragePathService extends AbstractPaperlessService<Paperless
                     .filter((s) => !!s).length === 1
                 return isNotParent && isDirectChild
               })
+              // @ts-ignore
+              results.parentStoragePath = storagePath
               return results
             })
           )
