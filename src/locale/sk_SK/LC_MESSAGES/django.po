@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-05-29 06:37\n"
+"PO-Revision-Date: 2023-05-29 07:36\n"
 "Last-Translator: \n"
 "Language-Team: Slovak\n"
 "Language: sk_SK\n"
@@ -68,7 +68,7 @@ msgstr "je necitlivý"
 
 #: documents/models.py:71
 msgid "owner"
-msgstr ""
+msgstr "vlastník"
 
 #: documents/models.py:81 documents/models.py:136
 msgid "correspondent"
@@ -108,7 +108,7 @@ msgstr "typy dokumentov"
 
 #: documents/models.py:111
 msgid "path"
-msgstr ""
+msgstr "cesta"
 
 #: documents/models.py:117 documents/models.py:145
 msgid "storage path"
@@ -192,7 +192,7 @@ msgstr "Aktuálny archovivaný názov dokumentu v úložisku"
 
 #: documents/models.py:239
 msgid "original filename"
-msgstr ""
+msgstr "pôvodný názov súboru"
 
 #: documents/models.py:245
 msgid "The original name of the file when it was uploaded"
@@ -220,39 +220,39 @@ msgstr ""
 
 #: documents/models.py:360
 msgid "information"
-msgstr ""
+msgstr "informácia"
 
 #: documents/models.py:361
 msgid "warning"
-msgstr ""
+msgstr "upozornenie"
 
 #: documents/models.py:362 paperless_mail/models.py:276
 msgid "error"
-msgstr ""
+msgstr "chyba"
 
 #: documents/models.py:363
 msgid "critical"
-msgstr ""
+msgstr "kritické"
 
 #: documents/models.py:366
 msgid "group"
-msgstr ""
+msgstr "skupina"
 
 #: documents/models.py:368
 msgid "message"
-msgstr ""
+msgstr "správa"
 
 #: documents/models.py:371
 msgid "level"
-msgstr ""
+msgstr "úroveň"
 
 #: documents/models.py:380
 msgid "log"
-msgstr ""
+msgstr "log"
 
 #: documents/models.py:381
 msgid "logs"
-msgstr ""
+msgstr "logy"
 
 #: documents/models.py:391 documents/models.py:446
 msgid "saved view"
