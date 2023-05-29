@@ -8,6 +8,7 @@
       class="border-bottom doc-img-container"
       [class.doc-img-background-selected]="selected"
       (click)="this.toggleSelected.emit($event)"
+      (dblclick)="dblClickDocument.emit(this)"
     >
       <div class="card-img doc-img rounded-top">
         <svg
