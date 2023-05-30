@@ -422,10 +422,12 @@ class DocumentViewSet(
 
         classifier = load_classifier()
 
-        gen = parse_date_generator(doc.filename, doc.content)
-        dates = sorted(
-            {i for i in itertools.islice(gen, settings.NUMBER_OF_SUGGESTED_DATES)},
-        )
+        dates = []
+        if settings.NUMBER_OF_SUGGESTED_DATES > 0:
+            gen = parse_date_generator(doc.filename, doc.content)
+            dates = sorted(
+                {i for i in itertools.islice(gen, settings.NUMBER_OF_SUGGESTED_DATES)},
+            )
 
         return Response(
             {
