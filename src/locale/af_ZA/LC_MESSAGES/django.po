@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-05-30 15:09\n"
+"PO-Revision-Date: 2023-05-30 16:23\n"
 "Last-Translator: \n"
 "Language-Team: Afrikaans\n"
 "Language: af_ZA\n"
@@ -440,39 +440,39 @@ msgstr ""
 
 #: documents/models.py:597
 msgid "Created DateTime"
-msgstr ""
+msgstr "Geskepte datumtyd"
 
 #: documents/models.py:598
 msgid "Datetime field when the task result was created in UTC"
-msgstr ""
+msgstr "Datumtydveld wanneer die resultaat geskep is in UTC"
 
 #: documents/models.py:603
 msgid "Started DateTime"
-msgstr ""
+msgstr "Begonne datumtyd"
 
 #: documents/models.py:604
 msgid "Datetime field when the task was started in UTC"
-msgstr ""
+msgstr "Datumtydveld wanneer die taak begin is in UTC"
 
 #: documents/models.py:609
 msgid "Completed DateTime"
-msgstr ""
+msgstr "Voltooide datumtyd"
 
 #: documents/models.py:610
 msgid "Datetime field when the task was completed in UTC"
-msgstr ""
+msgstr "Datumtydveld wanneer die taak voltooi is in UTC"
 
 #: documents/models.py:615
 msgid "Result Data"
-msgstr ""
+msgstr "Resultaatdata"
 
 #: documents/models.py:617
 msgid "The data returned by the task"
-msgstr ""
+msgstr "Data wat deur die taak teruggegee is"
 
 #: documents/models.py:626
 msgid "Comment for the document"
-msgstr ""
+msgstr "Kommentaar op die dokument"
 
 #: documents/models.py:650
 msgid "user"
@@ -480,16 +480,16 @@ msgstr "gebruiker"
 
 #: documents/models.py:655
 msgid "comment"
-msgstr ""
+msgstr "kommentaar"
 
 #: documents/models.py:656
 msgid "comments"
-msgstr ""
+msgstr "kommentare"
 
 #: documents/serialisers.py:80
 #, python-format
 msgid "Invalid regular expression: %(error)s"
-msgstr ""
+msgstr "Ongeldige reguliere uitdrukking: %(error)s"
 
 #: documents/serialisers.py:320
 msgid "Invalid color."
@@ -510,7 +510,7 @@ msgstr "Paperless-ngx laai tans…"
 
 #: documents/templates/index.html:79
 msgid "Still here?! Hmm, something might be wrong."
-msgstr ""
+msgstr "Nog steeds hier?! H’m, iets is dalk fout."
 
 #: documents/templates/index.html:79
 msgid "Here's a link to the docs."
@@ -554,7 +554,7 @@ msgstr "Teken aan"
 
 #: paperless/apps.py:9
 msgid "Paperless"
-msgstr ""
+msgstr "Paperless"
 
 #: paperless/settings.py:521
 msgid "English (US)"
@@ -646,11 +646,11 @@ msgstr "Vereenvoudigde Sjinees"
 
 #: paperless/urls.py:169
 msgid "Paperless-ngx administration"
-msgstr ""
+msgstr "Paperless-ngx administrasie"
 
 #: paperless_mail/admin.py:30
 msgid "Authentication"
-msgstr ""
+msgstr "Geldigverklaring"
 
 #: paperless_mail/admin.py:31
 msgid "Advanced settings"
@@ -658,11 +658,11 @@ msgstr "Gevorderde instellings"
 
 #: paperless_mail/admin.py:48
 msgid "Filter"
-msgstr ""
+msgstr "Filter"
 
 #: paperless_mail/admin.py:51
 msgid "Paperless will only process mails that match ALL of the filters given below."
-msgstr ""
+msgstr "Paperless verwerk slegs e-posse wat aan ALLE onderstaande filters voldoen."
 
 #: paperless_mail/admin.py:66
 msgid "Actions"
@@ -670,19 +670,19 @@ msgstr "Aksies"
 
 #: paperless_mail/admin.py:69
 msgid "The action applied to the mail. This action is only performed when the mail body or attachments were consumed from the mail."
-msgstr ""
+msgstr "Die aksie wat op die e-pos toegepas is. Hierdie aksie word slegs uitgevoer wanneer die e-posinhoud of -aanhegsels van die e-pos verbruik is."
 
 #: paperless_mail/admin.py:77
 msgid "Metadata"
-msgstr ""
+msgstr "Metadata"
 
 #: paperless_mail/admin.py:80
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
-msgstr ""
+msgstr "Ken outomaties metadata toe aan dokumente vanuit hierdie reël. Indien u geen etikette, tipes of korrespondente toeken nie, sal Paperless steeds alle ooreenstemmende gedefinieerde reëls verwerk."
 
 #: paperless_mail/apps.py:10
 msgid "Paperless mail"
-msgstr ""
+msgstr "Paperless e-pos"
 
 #: paperless_mail/models.py:9
 msgid "mail account"
@@ -714,7 +714,7 @@ msgstr "IMAP-poort"
 
 #: paperless_mail/models.py:26
 msgid "This is usually 143 for unencrypted and STARTTLS connections, and 993 for SSL connections."
-msgstr ""
+msgstr "Dit is gewoonlik 143 vir ongeënkripteerde of STARTTLS-verbindings, en 993 vir SSL verbindings."
 
 #: paperless_mail/models.py:32
 msgid "IMAP security"
@@ -730,23 +730,23 @@ msgstr "wagwoord"
 
 #: paperless_mail/models.py:42
 msgid "character set"
-msgstr ""
+msgstr "karakterstel"
 
 #: paperless_mail/models.py:46
 msgid "The character set to use when communicating with the mail server, such as 'UTF-8' or 'US-ASCII'."
-msgstr ""
+msgstr "Karakterstel wat gebruik moet word by kommunikasie met die e-posbediener, soos ‘UTF-8’ of ‘US-ASCII’."
 
 #: paperless_mail/models.py:57
 msgid "mail rule"
-msgstr ""
+msgstr "e-posreël"
 
 #: paperless_mail/models.py:58
 msgid "mail rules"
-msgstr ""
+msgstr "e-posreëls"
 
 #: paperless_mail/models.py:61 paperless_mail/models.py:69
 msgid "Only process attachments."
-msgstr ""
+msgstr "Verwerk slegs aanhegsels."
 
 #: paperless_mail/models.py:62
 msgid "Process full Mail (with embedded attachments in file) as .eml"
@@ -766,19 +766,19 @@ msgstr "Skrap"
 
 #: paperless_mail/models.py:74
 msgid "Move to specified folder"
-msgstr ""
+msgstr "Skuif na gegewe vouer"
 
 #: paperless_mail/models.py:75
 msgid "Mark as read, don't process read mails"
-msgstr ""
+msgstr "Markeer as gelees, moenie geleeste e-posse verwerk nie"
 
 #: paperless_mail/models.py:76
 msgid "Flag the mail, don't process flagged mails"
-msgstr ""
+msgstr "Markeer die e-pos, moenie gemarkeerde e-osse verwerk nie"
 
 #: paperless_mail/models.py:77
 msgid "Tag the mail with specified tag, don't process tagged mails"
-msgstr ""
+msgstr "Etiketteer die e-pos met die gespesifiseerde etiket, moenie geëtiketteerde e-posse verwerk nie"
 
 #: paperless_mail/models.py:80
 msgid "Use subject as title"
