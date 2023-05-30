@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-05-30 16:23\n"
+"PO-Revision-Date: 2023-05-30 17:29\n"
 "Last-Translator: \n"
 "Language-Team: Afrikaans\n"
 "Language: af_ZA\n"
@@ -39,7 +39,7 @@ msgstr "Presiese ooreenkoms"
 
 #: documents/models.py:40
 msgid "Regular expression"
-msgstr ""
+msgstr "Reguliere uitdrukking"
 
 #: documents/models.py:41
 msgid "Fuzzy word"
@@ -84,7 +84,7 @@ msgstr "kleur"
 
 #: documents/models.py:90
 msgid "is inbox tag"
-msgstr ""
+msgstr "is inmandjie-etiket"
 
 #: documents/models.py:93
 msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
@@ -112,11 +112,11 @@ msgstr "pad"
 
 #: documents/models.py:117 documents/models.py:145
 msgid "storage path"
-msgstr ""
+msgstr "bergpad"
 
 #: documents/models.py:118
 msgid "storage paths"
-msgstr ""
+msgstr "bergpaaie"
 
 #: documents/models.py:126
 msgid "Unencrypted"
@@ -124,7 +124,7 @@ msgstr "Ongeënkripteer"
 
 #: documents/models.py:127
 msgid "Encrypted with GNU Privacy Guard"
-msgstr ""
+msgstr "Geënkripteer met GNU Privacy Guard"
 
 #: documents/models.py:148
 msgid "title"
@@ -136,27 +136,27 @@ msgstr "inhoud"
 
 #: documents/models.py:163
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
-msgstr ""
+msgstr "Die rou data van die dokument. Hierdie veld word hoofsaaklik gebruik om te soek."
 
 #: documents/models.py:168
 msgid "mime type"
-msgstr ""
+msgstr "MIME-tipe"
 
 #: documents/models.py:178
 msgid "checksum"
-msgstr ""
+msgstr "kontrolesom"
 
 #: documents/models.py:182
 msgid "The checksum of the original document."
-msgstr ""
+msgstr "Die kontrolesom van die oorspronklike dokument."
 
 #: documents/models.py:186
 msgid "archive checksum"
-msgstr ""
+msgstr "argiefkontrolesom"
 
 #: documents/models.py:191
 msgid "The checksum of the archived document."
-msgstr ""
+msgstr "Die kontrolesom van die geargiveerde dokument."
 
 #: documents/models.py:194 documents/models.py:376 documents/models.py:630
 msgid "created"
@@ -168,7 +168,7 @@ msgstr "gewysig"
 
 #: documents/models.py:204
 msgid "storage type"
-msgstr ""
+msgstr "tipe bergplek"
 
 #: documents/models.py:212
 msgid "added"
@@ -180,15 +180,15 @@ msgstr "lêernaam"
 
 #: documents/models.py:225
 msgid "Current filename in storage"
-msgstr ""
+msgstr "Huidige lêernaam in argief"
 
 #: documents/models.py:229
 msgid "archive filename"
-msgstr ""
+msgstr "lêernaam in argief"
 
 #: documents/models.py:235
 msgid "Current archive filename in storage"
-msgstr ""
+msgstr "Huidige lêernaam in argief"
 
 #: documents/models.py:239
 msgid "original filename"
@@ -200,11 +200,11 @@ msgstr "Die oorspronklike lêernaam toe dit opgelaai is"
 
 #: documents/models.py:252
 msgid "archive serial number"
-msgstr ""
+msgstr "argiefreeksnommer"
 
 #: documents/models.py:262
 msgid "The position of this document in your physical document archive."
-msgstr ""
+msgstr "Die ligging van hierdie dokument in u fisiese dokumentargief."
 
 #: documents/models.py:268 documents/models.py:641
 msgid "document"
@@ -216,7 +216,7 @@ msgstr "dokumente"
 
 #: documents/models.py:359
 msgid "debug"
-msgstr ""
+msgstr "ontfout"
 
 #: documents/models.py:360
 msgid "information"
@@ -232,7 +232,7 @@ msgstr "fout"
 
 #: documents/models.py:363
 msgid "critical"
-msgstr ""
+msgstr "krities"
 
 #: documents/models.py:366
 msgid "group"
@@ -248,23 +248,23 @@ msgstr "vlak"
 
 #: documents/models.py:380
 msgid "log"
-msgstr ""
+msgstr "logboek"
 
 #: documents/models.py:381
 msgid "logs"
-msgstr ""
+msgstr "logboeke"
 
 #: documents/models.py:391 documents/models.py:446
 msgid "saved view"
-msgstr ""
+msgstr "bewaarde aansig"
 
 #: documents/models.py:392
 msgid "saved views"
-msgstr ""
+msgstr "bewaarde aansigte"
 
 #: documents/models.py:397
 msgid "show on dashboard"
-msgstr ""
+msgstr "toon in paneelbord"
 
 #: documents/models.py:400
 msgid "show in sidebar"
@@ -272,11 +272,11 @@ msgstr "toon in systaaf"
 
 #: documents/models.py:404
 msgid "sort field"
-msgstr ""
+msgstr "sorteerveld"
 
 #: documents/models.py:409
 msgid "sort reverse"
-msgstr ""
+msgstr "sorteer omgekeerd"
 
 #: documents/models.py:414
 msgid "title contains"
@@ -288,7 +288,7 @@ msgstr "inhoud bevat"
 
 #: documents/models.py:416
 msgid "ASN is"
-msgstr ""
+msgstr "ASN is"
 
 #: documents/models.py:417
 msgid "correspondent is"
@@ -300,7 +300,7 @@ msgstr "dokumenttipe is"
 
 #: documents/models.py:419
 msgid "is in inbox"
-msgstr ""
+msgstr "is in inmandjie"
 
 #: documents/models.py:420
 msgid "has tag"
@@ -320,15 +320,15 @@ msgstr "geskep na"
 
 #: documents/models.py:424
 msgid "created year is"
-msgstr ""
+msgstr "jaar geskep is"
 
 #: documents/models.py:425
 msgid "created month is"
-msgstr ""
+msgstr "maand geskep is"
 
 #: documents/models.py:426
 msgid "created day is"
-msgstr ""
+msgstr "dag geskep is"
 
 #: documents/models.py:427
 msgid "added before"
@@ -348,43 +348,43 @@ msgstr "gewysig na"
 
 #: documents/models.py:431
 msgid "does not have tag"
-msgstr ""
+msgstr "het geen etiket nie"
 
 #: documents/models.py:432
 msgid "does not have ASN"
-msgstr ""
+msgstr "het geen ASN nie"
 
 #: documents/models.py:433
 msgid "title or content contains"
-msgstr ""
+msgstr "titel of inhoud bevat"
 
 #: documents/models.py:434
 msgid "fulltext query"
-msgstr ""
+msgstr "deursoek inhoud"
 
 #: documents/models.py:435
 msgid "more like this"
-msgstr ""
+msgstr "meer soos dit"
 
 #: documents/models.py:436
 msgid "has tags in"
-msgstr ""
+msgstr "het etikette in"
 
 #: documents/models.py:437
 msgid "ASN greater than"
-msgstr ""
+msgstr "ASN groter as"
 
 #: documents/models.py:438
 msgid "ASN less than"
-msgstr ""
+msgstr "ASN kleiner as"
 
 #: documents/models.py:439
 msgid "storage path is"
-msgstr ""
+msgstr "bewaarpad is"
 
 #: documents/models.py:449
 msgid "rule type"
-msgstr ""
+msgstr "reëltipe"
 
 #: documents/models.py:451
 msgid "value"
@@ -404,15 +404,15 @@ msgstr "Taak-ID"
 
 #: documents/models.py:564
 msgid "Celery ID for the Task that was run"
-msgstr ""
+msgstr "Celery ID vir die taak wat uitgevoer is"
 
 #: documents/models.py:569
 msgid "Acknowledged"
-msgstr ""
+msgstr "Bevestig"
 
 #: documents/models.py:570
 msgid "If the task is acknowledged via the frontend or API"
-msgstr ""
+msgstr "Of die taak bevestig is via die tussenvlak of die API"
 
 #: documents/models.py:576
 msgid "Task Filename"
@@ -420,7 +420,7 @@ msgstr "Taaklêernaam"
 
 #: documents/models.py:577
 msgid "Name of the file which the Task was run for"
-msgstr ""
+msgstr "Naam van die lêer waarvoor die taak uitgevoer is"
 
 #: documents/models.py:583
 msgid "Task Name"
@@ -428,15 +428,15 @@ msgstr "Taaknaam"
 
 #: documents/models.py:584
 msgid "Name of the Task which was run"
-msgstr ""
+msgstr "Naam van die uitgevoerde taak"
 
 #: documents/models.py:591
 msgid "Task State"
-msgstr ""
+msgstr "Taakstatus"
 
 #: documents/models.py:592
 msgid "Current state of the task being run"
-msgstr ""
+msgstr "Huidige status van die taak wat uitgevoer word"
 
 #: documents/models.py:597
 msgid "Created DateTime"
@@ -750,11 +750,11 @@ msgstr "Verwerk slegs aanhegsels."
 
 #: paperless_mail/models.py:62
 msgid "Process full Mail (with embedded attachments in file) as .eml"
-msgstr ""
+msgstr "Verwerk volle e-pos (met ingebedde aanhegsels in lêer) as .eml"
 
 #: paperless_mail/models.py:64
 msgid "Process full Mail (with embedded attachments in file) as .eml + process attachments as separate documents"
-msgstr ""
+msgstr "Verwerk volle e-pos (met ingebedde aanhegsels in lêer) as .eml + verwerk aanhegsels as afsonderlike dokumente"
 
 #: paperless_mail/models.py:70
 msgid "Process all files, including 'inline' attachments."
