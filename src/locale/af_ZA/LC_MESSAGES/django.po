@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-05-28 21:36\n"
+"PO-Revision-Date: 2023-05-30 14:22\n"
 "Last-Translator: \n"
 "Language-Team: Afrikaans\n"
 "Language: af_ZA\n"
@@ -19,19 +19,19 @@ msgstr ""
 
 #: documents/apps.py:9
 msgid "Documents"
-msgstr ""
+msgstr "Dokumente"
 
 #: documents/models.py:36
 msgid "None"
-msgstr ""
+msgstr "Geen"
 
 #: documents/models.py:37
 msgid "Any word"
-msgstr ""
+msgstr "Enige woord"
 
 #: documents/models.py:38
 msgid "All words"
-msgstr ""
+msgstr "Alle woorde"
 
 #: documents/models.py:39
 msgid "Exact match"
@@ -47,12 +47,12 @@ msgstr ""
 
 #: documents/models.py:42
 msgid "Automatic"
-msgstr ""
+msgstr "Outomaties"
 
 #: documents/models.py:45 documents/models.py:394 paperless_mail/models.py:17
 #: paperless_mail/models.py:89
 msgid "name"
-msgstr ""
+msgstr "naam"
 
 #: documents/models.py:47
 msgid "match"
@@ -68,19 +68,19 @@ msgstr ""
 
 #: documents/models.py:71
 msgid "owner"
-msgstr ""
+msgstr "eienaar"
 
 #: documents/models.py:81 documents/models.py:136
 msgid "correspondent"
-msgstr ""
+msgstr "korrespondent"
 
 #: documents/models.py:82
 msgid "correspondents"
-msgstr ""
+msgstr "korrespondente"
 
 #: documents/models.py:87
 msgid "color"
-msgstr ""
+msgstr "kleur"
 
 #: documents/models.py:90
 msgid "is inbox tag"
@@ -100,15 +100,15 @@ msgstr ""
 
 #: documents/models.py:105 documents/models.py:156
 msgid "document type"
-msgstr ""
+msgstr "dokumenttipe"
 
 #: documents/models.py:106
 msgid "document types"
-msgstr ""
+msgstr "dokumenttipes"
 
 #: documents/models.py:111
 msgid "path"
-msgstr ""
+msgstr "pad"
 
 #: documents/models.py:117 documents/models.py:145
 msgid "storage path"
@@ -542,11 +542,11 @@ msgstr ""
 
 #: documents/templates/registration/login.html:67
 msgid "Username"
-msgstr ""
+msgstr "Gebruikersnaam"
 
 #: documents/templates/registration/login.html:68
 msgid "Password"
-msgstr ""
+msgstr "Wagwoord"
 
 #: documents/templates/registration/login.html:73
 msgid "Sign in"
@@ -558,87 +558,87 @@ msgstr ""
 
 #: paperless/settings.py:521
 msgid "English (US)"
-msgstr ""
+msgstr "Engels (VS)"
 
 #: paperless/settings.py:522
 msgid "Arabic"
-msgstr ""
+msgstr "Arabies"
 
 #: paperless/settings.py:523
 msgid "Belarusian"
-msgstr ""
+msgstr "Belorussies"
 
 #: paperless/settings.py:524
 msgid "Czech"
-msgstr ""
+msgstr "Tsjeggies"
 
 #: paperless/settings.py:525
 msgid "Danish"
-msgstr ""
+msgstr "Deens"
 
 #: paperless/settings.py:526
 msgid "German"
-msgstr ""
+msgstr "Duits"
 
 #: paperless/settings.py:527
 msgid "English (GB)"
-msgstr ""
+msgstr "Engels (GB)"
 
 #: paperless/settings.py:528
 msgid "Spanish"
-msgstr ""
+msgstr "Spaans"
 
 #: paperless/settings.py:529
 msgid "French"
-msgstr ""
+msgstr "Frans"
 
 #: paperless/settings.py:530
 msgid "Italian"
-msgstr ""
+msgstr "Italiaans"
 
 #: paperless/settings.py:531
 msgid "Luxembourgish"
-msgstr ""
+msgstr "Luxemburgs"
 
 #: paperless/settings.py:532
 msgid "Dutch"
-msgstr ""
+msgstr "Nederlands"
 
 #: paperless/settings.py:533
 msgid "Polish"
-msgstr ""
+msgstr "Pools"
 
 #: paperless/settings.py:534
 msgid "Portuguese (Brazil)"
-msgstr ""
+msgstr "Portugees (Brasilië)"
 
 #: paperless/settings.py:535
 msgid "Portuguese"
-msgstr ""
+msgstr "Portugees"
 
 #: paperless/settings.py:536
 msgid "Romanian"
-msgstr ""
+msgstr "Roemeens"
 
 #: paperless/settings.py:537
 msgid "Russian"
-msgstr ""
+msgstr "Russies"
 
 #: paperless/settings.py:538
 msgid "Slovenian"
-msgstr ""
+msgstr "Sloweens"
 
 #: paperless/settings.py:539
 msgid "Serbian"
-msgstr ""
+msgstr "Serwies"
 
 #: paperless/settings.py:540
 msgid "Swedish"
-msgstr ""
+msgstr "Sweeds"
 
 #: paperless/settings.py:541
 msgid "Turkish"
-msgstr ""
+msgstr "Turks"
 
 #: paperless/settings.py:542
 msgid "Chinese Simplified"
@@ -654,7 +654,7 @@ msgstr ""
 
 #: paperless_mail/admin.py:31
 msgid "Advanced settings"
-msgstr ""
+msgstr "Gevorderde instellings"
 
 #: paperless_mail/admin.py:48
 msgid "Filter"
@@ -666,7 +666,7 @@ msgstr ""
 
 #: paperless_mail/admin.py:66
 msgid "Actions"
-msgstr ""
+msgstr "Aksies"
 
 #: paperless_mail/admin.py:69
 msgid "The action applied to the mail. This action is only performed when the mail body or attachments were consumed from the mail."
@@ -686,31 +686,31 @@ msgstr ""
 
 #: paperless_mail/models.py:9
 msgid "mail account"
-msgstr ""
+msgstr "e-posrekening"
 
 #: paperless_mail/models.py:10
 msgid "mail accounts"
-msgstr ""
+msgstr "e-posrekeninge"
 
 #: paperless_mail/models.py:13
 msgid "No encryption"
-msgstr ""
+msgstr "Geen enkripsie"
 
 #: paperless_mail/models.py:14
 msgid "Use SSL"
-msgstr ""
+msgstr "Gebruik SSL"
 
 #: paperless_mail/models.py:15
 msgid "Use STARTTLS"
-msgstr ""
+msgstr "Gebruik STARTTLS"
 
 #: paperless_mail/models.py:19
 msgid "IMAP server"
-msgstr ""
+msgstr "IMAP-bediener"
 
 #: paperless_mail/models.py:22
 msgid "IMAP port"
-msgstr ""
+msgstr "IMAP-poort"
 
 #: paperless_mail/models.py:26
 msgid "This is usually 143 for unencrypted and STARTTLS connections, and 993 for SSL connections."
@@ -718,15 +718,15 @@ msgstr ""
 
 #: paperless_mail/models.py:32
 msgid "IMAP security"
-msgstr ""
+msgstr "IMAP-beveiliging"
 
 #: paperless_mail/models.py:37
 msgid "username"
-msgstr ""
+msgstr "gebruikersnaam"
 
 #: paperless_mail/models.py:39
 msgid "password"
-msgstr ""
+msgstr "wagwoord"
 
 #: paperless_mail/models.py:42
 msgid "character set"
@@ -758,11 +758,11 @@ msgstr ""
 
 #: paperless_mail/models.py:70
 msgid "Process all files, including 'inline' attachments."
-msgstr ""
+msgstr "Verwerk alle lêers, insluitend ‘inlyn’-aanhegsels."
 
 #: paperless_mail/models.py:73
 msgid "Delete"
-msgstr ""
+msgstr "Skrap"
 
 #: paperless_mail/models.py:74
 msgid "Move to specified folder"
@@ -782,23 +782,23 @@ msgstr ""
 
 #: paperless_mail/models.py:80
 msgid "Use subject as title"
-msgstr ""
+msgstr "Gebruik onderwerp as titel"
 
 #: paperless_mail/models.py:81
 msgid "Use attachment filename as title"
-msgstr ""
+msgstr "Gebruik aanhegsellêernaam as titel"
 
 #: paperless_mail/models.py:84
 msgid "Do not assign a correspondent"
-msgstr ""
+msgstr "Moenie ’n korrespondent toeken nie"
 
 #: paperless_mail/models.py:85
 msgid "Use mail address"
-msgstr ""
+msgstr "Gebruik e-posadres"
 
 #: paperless_mail/models.py:86
 msgid "Use name (or mail address if not available)"
-msgstr ""
+msgstr "Gebruik naam (of e-posadres indien nie beskikbaar nie)"
 
 #: paperless_mail/models.py:87
 msgid "Use correspondent selected below"
@@ -810,11 +810,11 @@ msgstr ""
 
 #: paperless_mail/models.py:97
 msgid "account"
-msgstr ""
+msgstr "rekening"
 
 #: paperless_mail/models.py:101 paperless_mail/models.py:231
 msgid "folder"
-msgstr ""
+msgstr "vouer"
 
 #: paperless_mail/models.py:105
 msgid "Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server."
@@ -842,7 +842,7 @@ msgstr ""
 
 #: paperless_mail/models.py:142
 msgid "maximum age"
-msgstr ""
+msgstr "maksimum ouderdom"
 
 #: paperless_mail/models.py:144
 msgid "Specified in days."
@@ -850,7 +850,7 @@ msgstr ""
 
 #: paperless_mail/models.py:148
 msgid "attachment type"
-msgstr ""
+msgstr "aanhegseltipe"
 
 #: paperless_mail/models.py:152
 msgid "Inline attachments include embedded images, so it's best to combine this option with a filename filter."
@@ -862,7 +862,7 @@ msgstr ""
 
 #: paperless_mail/models.py:164
 msgid "action"
-msgstr ""
+msgstr "aksie"
 
 #: paperless_mail/models.py:170
 msgid "action parameter"
@@ -890,7 +890,7 @@ msgstr ""
 
 #: paperless_mail/models.py:213
 msgid "assign this correspondent"
-msgstr ""
+msgstr "ken hierdie korrespondent toe"
 
 #: paperless_mail/models.py:239
 msgid "uid"
@@ -898,17 +898,17 @@ msgstr ""
 
 #: paperless_mail/models.py:247
 msgid "subject"
-msgstr ""
+msgstr "onderwerp"
 
 #: paperless_mail/models.py:255
 msgid "received"
-msgstr ""
+msgstr "ontvang"
 
 #: paperless_mail/models.py:262
 msgid "processed"
-msgstr ""
+msgstr "verwerk"
 
 #: paperless_mail/models.py:268
 msgid "status"
-msgstr ""
+msgstr "status"
 
