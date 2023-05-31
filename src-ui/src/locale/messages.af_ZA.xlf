@@ -2954,7 +2954,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">122</context>
         </context-group>
-        <target state="needs-translation">Original MD5 checksum</target>
+        <target state="translated">Oorspronklike MD5 kontrolesom</target>
       </trans-unit>
       <trans-unit id="5888243105821763422" datatype="html">
         <source>Original file size</source>
@@ -2962,7 +2962,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">126</context>
         </context-group>
-        <target state="needs-translation">Original file size</target>
+        <target state="translated">Oorspronklike lêergrootte</target>
       </trans-unit>
       <trans-unit id="2696647325713149563" datatype="html">
         <source>Original mime type</source>
@@ -2970,7 +2970,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">130</context>
         </context-group>
-        <target state="needs-translation">Original mime type</target>
+        <target state="translated">Oorspronklike MIME-tipe</target>
       </trans-unit>
       <trans-unit id="342875990758166588" datatype="html">
         <source>Archive MD5 checksum</source>
@@ -2994,7 +2994,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">144</context>
         </context-group>
-        <target state="needs-translation">Original document metadata</target>
+        <target state="translated">Oorspronklike dokumentmetadata</target>
       </trans-unit>
       <trans-unit id="2846565152091361585" datatype="html">
         <source>Archived document metadata</source>
@@ -3002,7 +3002,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">145</context>
         </context-group>
-        <target state="needs-translation">Archived document metadata</target>
+        <target state="translated">Geargiveerdedokumentmetadata</target>
       </trans-unit>
       <trans-unit id="1295614462098694869" datatype="html">
         <source>Preview</source>
@@ -3010,7 +3010,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">151</context>
         </context-group>
-        <target state="needs-translation">Preview</target>
+        <target state="translated">Voorskou</target>
       </trans-unit>
       <trans-unit id="8191371354890763172" datatype="html">
         <source>Enter Password</source>
@@ -3022,7 +3022,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">215</context>
         </context-group>
-        <target state="needs-translation">Enter Password</target>
+        <target state="translated">Voer wagwoord in</target>
       </trans-unit>
       <trans-unit id="8460995830263484763" datatype="html">
         <source>Notes <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;document?.notes.length&quot; class=&quot;badge text-bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="ngth}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/a&gt;"/></source>
@@ -3030,7 +3030,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">175,176</context>
         </context-group>
-        <target state="needs-translation">Notes <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;document?.notes.length&quot; class=&quot;badge text-bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="ngth}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/a&gt;"/></target>
+        <target state="translated">Notas <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;document?.notes.length&quot; class=&quot;badge text-bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="ngth}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/a&gt;"/></target>
       </trans-unit>
       <trans-unit id="3823219296477075982" datatype="html">
         <source>Discard</source>
@@ -3046,7 +3046,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">195</context>
         </context-group>
-        <target state="needs-translation">Save &amp; next</target>
+        <target state="translated">Bewaar &amp; volgende</target>
       </trans-unit>
       <trans-unit id="2218903673684131427" datatype="html">
         <source>An error occurred loading content: <x id="PH" equiv-text="err.message ?? err.toString()"/></source>
@@ -3062,7 +3062,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">377</context>
         </context-group>
-        <target state="needs-translation">Error retrieving metadata</target>
+        <target state="translated">Fout by ophaal van metadata</target>
       </trans-unit>
       <trans-unit id="3456881259945295697" datatype="html">
         <source>Error retrieving suggestions.</source>
@@ -3070,7 +3070,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">399</context>
         </context-group>
-        <target state="needs-translation">Error retrieving suggestions.</target>
+        <target state="translated">Fout by ophaal van voorstelle.</target>
       </trans-unit>
       <trans-unit id="8348337312757497317" datatype="html">
         <source>Document saved successfully.</source>
@@ -3082,7 +3082,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">519</context>
         </context-group>
-        <target state="needs-translation">Document saved successfully.</target>
+        <target state="translated">Dokument is suksesvol bewaar.</target>
       </trans-unit>
       <trans-unit id="448882439049417053" datatype="html">
         <source>Error saving document</source>
@@ -3094,7 +3094,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">569</context>
         </context-group>
-        <target state="needs-translation">Error saving document</target>
+        <target state="translated">Fout by bewaar van dokument</target>
       </trans-unit>
       <trans-unit id="9021887951960049161" datatype="html">
         <source>Confirm delete</source>
@@ -3106,7 +3106,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">189</context>
         </context-group>
-        <target state="needs-translation">Confirm delete</target>
+        <target state="translated">Bevestig skrap</target>
       </trans-unit>
       <trans-unit id="5382975254277698192" datatype="html">
         <source>Do you really want to delete document &quot;<x id="PH" equiv-text="this.document.title"/>&quot;?</source>
@@ -3114,7 +3114,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">599</context>
         </context-group>
-        <target state="needs-translation">Do you really want to delete document "<x id="PH" equiv-text="this.document.title"/>"?</target>
+        <target state="translated">Wil u regtig dokument <x id="PH" equiv-text="this.document.title"/> skrap"?</target>
       </trans-unit>
       <trans-unit id="6691075929777935948" datatype="html">
         <source>The files for this document will be deleted permanently. This operation cannot be undone.</source>
@@ -3122,7 +3122,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">600</context>
         </context-group>
-        <target state="needs-translation">The files for this document will be deleted permanently. This operation cannot be undone.</target>
+        <target state="translated">Die lêers vir hierdie dokument word permanent geskrap. Dit kan nie ontdaan word nie.</target>
       </trans-unit>
       <trans-unit id="719892092227206532" datatype="html">
         <source>Delete document</source>
@@ -3130,7 +3130,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">602</context>
         </context-group>
-        <target state="needs-translation">Delete document</target>
+        <target state="translated">Skrap dokument</target>
       </trans-unit>
       <trans-unit id="1844801255494293730" datatype="html">
         <source>Error deleting document: <x id="PH" equiv-text="error.error?.detail ?? error.message ?? JSON.stringify(error)"/></source>
@@ -3138,7 +3138,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">622,624</context>
         </context-group>
-        <target state="needs-translation">Error deleting document: <x id="PH" equiv-text="error.error?.detail ?? error.message ?? JSON.stringify(error)"/></target>
+        <target state="translated">Fout by skrap van dokument: <x id="PH" equiv-text="error.error?.detail ?? error.message ?? JSON.stringify(error)"/></target>
       </trans-unit>
       <trans-unit id="7362691899087997122" datatype="html">
         <source>Redo OCR confirm</source>
@@ -3150,7 +3150,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">499</context>
         </context-group>
-        <target state="needs-translation">Redo OCR confirm</target>
+        <target state="translated">Bevestig OCR-heruitvoer</target>
       </trans-unit>
       <trans-unit id="9197453786953646058" datatype="html">
         <source>This operation will permanently redo OCR for this document.</source>
@@ -3190,7 +3190,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">875</context>
         </context-group>
-        <target state="needs-translation">This operation cannot be undone.</target>
+        <target state="translated">Dit kan nie ontdaan word nie.</target>
       </trans-unit>
       <trans-unit id="1181910457994920507" datatype="html">
         <source>Proceed</source>
@@ -3218,7 +3218,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">877</context>
         </context-group>
-        <target state="needs-translation">Proceed</target>
+        <target state="translated">Gaan voort</target>
       </trans-unit>
       <trans-unit id="5729001209753056399" datatype="html">
         <source>Redo OCR operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.</source>
@@ -3242,7 +3242,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">10</context>
         </context-group>
-        <target state="needs-translation">Select:</target>
+        <target state="translated">Kies:</target>
       </trans-unit>
       <trans-unit id="6299008920007331381" datatype="html">
         <source>Edit:</source>
@@ -3250,7 +3250,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">Edit:</target>
+        <target state="translated">Wysig:</target>
       </trans-unit>
       <trans-unit id="7001227209911602786" datatype="html">
         <source>Filter tags</source>
@@ -3262,7 +3262,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">28</context>
         </context-group>
-        <target state="needs-translation">Filter tags</target>
+        <target state="translated">Filtreer etikette</target>
       </trans-unit>
       <trans-unit id="184185893993764098" datatype="html">
         <source>Filter correspondents</source>
@@ -3274,7 +3274,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="needs-translation">Filter correspondents</target>
+        <target state="translated">Filtreer korrespondente</target>
       </trans-unit>
       <trans-unit id="2947613869920454977" datatype="html">
         <source>Filter document types</source>
@@ -3286,7 +3286,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="needs-translation">Filter document types</target>
+        <target state="translated">Filtreer dokumenttipes</target>
       </trans-unit>
       <trans-unit id="8816999377397522522" datatype="html">
         <source>Filter storage paths</source>
@@ -3298,7 +3298,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">53</context>
         </context-group>
-        <target state="needs-translation">Filter storage paths</target>
+        <target state="translated">Filtreer bergpaaie</target>
       </trans-unit>
       <trans-unit id="3193976279273491157" datatype="html">
         <source>Actions</source>
@@ -3346,7 +3346,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">44</context>
         </context-group>
-        <target state="needs-translation">Actions</target>
+        <target state="translated">Aksies</target>
       </trans-unit>
       <trans-unit id="1015374532025907183" datatype="html">
         <source>Include:</source>
@@ -3354,7 +3354,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">108</context>
         </context-group>
-        <target state="needs-translation">Include:</target>
+        <target state="translated">Sluit in:</target>
       </trans-unit>
       <trans-unit id="1208547554603365604" datatype="html">
         <source> Archived files </source>
@@ -3362,7 +3362,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">112,114</context>
         </context-group>
-        <target state="needs-translation"> Archived files </target>
+        <target state="translated"> Geargiveerde lêers </target>
       </trans-unit>
       <trans-unit id="6791570188945688785" datatype="html">
         <source> Original files </source>
@@ -3370,7 +3370,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">118,120</context>
         </context-group>
-        <target state="needs-translation"> Original files </target>
+        <target state="translated">Oorspronklike lêers</target>
       </trans-unit>
       <trans-unit id="3608345051493493574" datatype="html">
         <source> Use formatted filename </source>
@@ -3378,7 +3378,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">125,127</context>
         </context-group>
-        <target state="needs-translation"> Use formatted filename </target>
+        <target state="translated"> Gebruik geformatteerde lêernaam </target>
       </trans-unit>
       <trans-unit id="7985804062689412812" datatype="html">
         <source>Error executing bulk operation: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></source>
@@ -3424,7 +3424,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">288</context>
         </context-group>
-        <target state="needs-translation">Confirm tags assignment</target>
+        <target state="translated">Bevestig etikettoewysing</target>
       </trans-unit>
       <trans-unit id="6619516195038467207" datatype="html">
         <source>This operation will add the tag &quot;<x id="PH" equiv-text="tag.name"/>&quot; to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -3432,7 +3432,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">294</context>
         </context-group>
-        <target state="needs-translation">This operation will add the tag "<x id="PH" equiv-text="tag.name"/>" to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Die etiket "<x id="PH" equiv-text="tag.name"/>" sal aan <x id="PH_1" equiv-text="this.list.selected.size"/> gekose dokument(e) toegevoeg word.</target>
       </trans-unit>
       <trans-unit id="1894412783609570695" datatype="html">
         <source>This operation will add the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -3440,7 +3440,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">299,301</context>
         </context-group>
-        <target state="needs-translation">This operation will add the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Hierdie bewerking sal die etikette <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> toevoeg aan <x id="PH_1" equiv-text="this.list.selected.size"/> gekose dokument(e).</target>
       </trans-unit>
       <trans-unit id="7181166515756808573" datatype="html">
         <source>This operation will remove the tag &quot;<x id="PH" equiv-text="tag.name"/>&quot; from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -3448,7 +3448,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">307</context>
         </context-group>
-        <target state="needs-translation">This operation will remove the tag "<x id="PH" equiv-text="tag.name"/>" from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Die etiket “<x id="PH" equiv-text="tag.name"/>” sal van <x id="PH_1" equiv-text="this.list.selected.size"/> gekose dokument(e) verwyder word.</target>
       </trans-unit>
       <trans-unit id="3819792277998068944" datatype="html">
         <source>This operation will remove the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -3456,7 +3456,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">312,314</context>
         </context-group>
-        <target state="needs-translation">This operation will remove the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Hierdie bewerking sal die etikette <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> van <x id="PH_1" equiv-text="this.list.selected.size"/> gekose dokument(e) verwyder.</target>
       </trans-unit>
       <trans-unit id="2739066218579571288" datatype="html">
         <source>This operation will add the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> and remove the tags <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> on <x id="PH_2" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -3464,7 +3464,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">316,320</context>
         </context-group>
-        <target state="needs-translation">This operation will add the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> and remove the tags <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> on <x id="PH_2" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Hierdie bewerking sal die etikette <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> toevoeg en die etikette <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> verwyder van <x id="PH_2" equiv-text="this.list.selected.size"/> gekose dokument(e).</target>
       </trans-unit>
       <trans-unit id="2996713129519325161" datatype="html">
         <source>Confirm correspondent assignment</source>
@@ -3472,7 +3472,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">357</context>
         </context-group>
-        <target state="needs-translation">Confirm correspondent assignment</target>
+        <target state="translated">Bevestig korrespondenttoewysing</target>
       </trans-unit>
       <trans-unit id="6900893559485781849" datatype="html">
         <source>This operation will assign the correspondent &quot;<x id="PH" equiv-text="correspondent.name"/>&quot; to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -3480,7 +3480,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">359</context>
         </context-group>
-        <target state="needs-translation">This operation will assign the correspondent "<x id="PH" equiv-text="correspondent.name"/>" to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Die korrespondent “<x id="PH" equiv-text="correspondent.name"/>” sal aan <x id="PH_1" equiv-text="this.list.selected.size"/> gekose dokument(e) toegewys word.</target>
       </trans-unit>
       <trans-unit id="1257522660364398440" datatype="html">
         <source>This operation will remove the correspondent from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -3488,7 +3488,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">361</context>
         </context-group>
-        <target state="needs-translation">This operation will remove the correspondent from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Die korrespondent sal verwyder word van <x id="PH" equiv-text="this.list.selected.size"/> gekose dokument(e).</target>
       </trans-unit>
       <trans-unit id="5393409374423140648" datatype="html">
         <source>Confirm document type assignment</source>
