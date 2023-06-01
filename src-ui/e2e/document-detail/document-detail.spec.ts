@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test'
 
 const REQUESTS_HAR = 'e2e/document-detail/requests/api-document-detail.har'
+const REQUESTS_HAR2 = 'e2e/document-detail/requests/api-document-detail2.har'
 
 test('should activate / deactivate save button when changes are saved', async ({
   page,
@@ -8,7 +9,9 @@ test('should activate / deactivate save button when changes are saved', async ({
   await page.routeFromHAR(REQUESTS_HAR, { notFound: 'fallback' })
   await page.goto('/documents/175/')
   await page.waitForSelector('app-document-detail app-input-text:first-child')
-  await expect(page.getByTitle('Storage path')).toHaveText(/\w+/)
+  await expect(page.getByTitle('Storage path', { exact: true })).toHaveText(
+    /\w+/
+  )
   await expect(page.getByRole('button', { name: 'Save' })).toBeDisabled()
   await page.getByTitle('Storage path').getByTitle('Clear all').click()
   await expect(page.getByRole('button', { name: 'Save' })).toBeEnabled()
@@ -17,9 +20,14 @@ test('should activate / deactivate save button when changes are saved', async ({
 test('should warn on unsaved changes', async ({ page }) => {
   await page.routeFromHAR(REQUESTS_HAR, { notFound: 'fallback' })
   await page.goto('/documents/175/')
-  await expect(page.getByTitle('Correspondent')).toHaveText(/\w+/)
+  await expect(page.getByTitle('Correspondent', { exact: true })).toHaveText(
+    /\w+/
+  )
   await expect(page.getByRole('button', { name: 'Save' })).toBeDisabled()
-  await page.getByTitle('Storage path').getByTitle('Clear all').click()
+  await page
+    .getByTitle('Storage path', { exact: true })
+    .getByTitle('Clear all')
+    .click()
   await expect(page.getByRole('button', { name: 'Save' })).toBeEnabled()
   await page.getByRole('button', { name: 'Close' }).click()
   await expect(page.getByRole('dialog')).toHaveText(/unsaved changes/)
@@ -121,4 +129,13 @@ test('should support note insertion', async ({ page }) => {
   })
   await page.getByRole('button', { name: 'Add note' }).click()
   await addPromise
+})
+
+test('should support quick filters', async ({ page }) => {
+  await page.routeFromHAR(REQUESTS_HAR2, { notFound: 'fallback' })
+  await page.goto('/documents/175/details')
+  await page
+    .getByRole('button', { name: 'Filter documents with these Tags' })
+    .click()
+  await expect(page).toHaveURL(/tags__id__all=4&sort=created&reverse=1&page=1/)
 })
