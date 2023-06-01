@@ -1,4 +1,11 @@
-import { Component, forwardRef, Input, OnInit } from '@angular/core'
+import {
+  Component,
+  EventEmitter,
+  forwardRef,
+  Input,
+  OnInit,
+  Output,
+} from '@angular/core'
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { PaperlessTag } from 'src/app/data/paperless-tag'
@@ -56,6 +63,12 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
 
   @Input()
   allowCreate: boolean = true
+
+  @Input()
+  showFilter: boolean = false
+
+  @Output()
+  filterDocuments = new EventEmitter<PaperlessTag[]>()
 
   value: number[]
 
@@ -132,5 +145,17 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
     setTimeout(() => {
       this.clearLastSearchTerm()
     }, 3000)
+  }
+
+  get hasPrivate(): boolean {
+    return this.value.some(
+      (t) => this.tags?.find((t2) => t2.id === t) === undefined
+    )
+  }
+
+  onFilterDocuments() {
+    this.filterDocuments.emit(
+      this.tags.filter((t) => this.value.includes(t.id))
+    )
   }
 }
