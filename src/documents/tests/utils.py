@@ -105,6 +105,20 @@ class FileSystemAssertsMixin:
     def assertIsNotDir(self, path: Union[PathLike, str]):
         self.assertFalse(Path(path).resolve().is_dir(), f"Dir does exist: {path}")
 
+    def assertFilesEqual(
+        self,
+        path1: Union[PathLike, str],
+        path2: Union[PathLike, str],
+    ):
+        path1 = Path(path1)
+        path2 = Path(path2)
+        import hashlib
+
+        hash1 = hashlib.sha256(path1.read_bytes()).hexdigest()
+        hash2 = hashlib.sha256(path2.read_bytes()).hexdigest()
+
+        self.assertEqual(hash1, hash2, "File SHA256 mismatch")
+
 
 class ConsumerProgressMixin:
     def setUp(self) -> None:
