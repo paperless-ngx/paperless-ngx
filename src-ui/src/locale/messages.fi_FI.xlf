@@ -1735,19 +1735,19 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
-          <context context-type="linenumber">65</context>
+          <context context-type="linenumber">64</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
-          <context context-type="linenumber">65</context>
+          <context context-type="linenumber">64</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
-          <context context-type="linenumber">65</context>
+          <context context-type="linenumber">64</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
-          <context context-type="linenumber">65</context>
+          <context context-type="linenumber">64</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
@@ -2120,11 +2120,23 @@
         <note priority="1" from="description">Filter drop down element to filter for documents with no correspondent/type/tag assigned</note>
         <target state="translated">Ei määritetty</target>
       </trans-unit>
+      <trans-unit id="2088622872854972056" datatype="html">
+        <source>Filter documents with this <x id="INTERPOLATION" equiv-text="{{title}}"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/input/date/date.component.html</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/input/select/select.component.html</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
+        <target state="needs-translation">Filter documents with this <x id="INTERPOLATION" equiv-text="{{title}}"/></target>
+      </trans-unit>
       <trans-unit id="445302259125375799" datatype="html">
         <source>Invalid date.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/date/date.component.html</context>
-          <context context-type="linenumber">13</context>
+          <context context-type="linenumber">18</context>
         </context-group>
         <target state="translated">Virheellinen päivämäärä.</target>
       </trans-unit>
@@ -2132,15 +2144,15 @@
         <source>Suggestions:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/date/date.component.html</context>
-          <context context-type="linenumber">16</context>
+          <context context-type="linenumber">21</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/select/select.component.html</context>
-          <context context-type="linenumber">32</context>
+          <context context-type="linenumber">37</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.html</context>
-          <context context-type="linenumber">43</context>
+          <context context-type="linenumber">47</context>
         </context-group>
         <target state="translated">Ehdotukset:</target>
       </trans-unit>
@@ -2312,6 +2324,14 @@
           <context context-type="linenumber">12</context>
         </context-group>
         <target state="translated">Lisää tunniste</target>
+      </trans-unit>
+      <trans-unit id="2561408369057364131" datatype="html">
+        <source>Filter documents with these Tags</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.html</context>
+          <context context-type="linenumber">39</context>
+        </context-group>
+        <target state="needs-translation">Filter documents with these Tags</target>
       </trans-unit>
       <trans-unit id="8105421668262723483" datatype="html">
         <source>Set Permissions</source>
@@ -3050,7 +3070,7 @@
         <source>An error occurred loading content: <x id="PH" equiv-text="err.message ?? err.toString()"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">234,236</context>
+          <context context-type="linenumber">254,256</context>
         </context-group>
         <target state="translated">Sisällön lataamisessa tapahtui virhe: <x id="PH" equiv-text="err.message ?? err.toString()"/></target>
       </trans-unit>
@@ -3058,7 +3078,7 @@
         <source>Error retrieving metadata</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">377</context>
+          <context context-type="linenumber">397</context>
         </context-group>
         <target state="translated">Virhe haettaessa metatietoja</target>
       </trans-unit>
@@ -3066,7 +3086,7 @@
         <source>Error retrieving suggestions.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">399</context>
+          <context context-type="linenumber">419</context>
         </context-group>
         <target state="needs-translation">Error retrieving suggestions.</target>
       </trans-unit>
@@ -3074,11 +3094,11 @@
         <source>Document saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">511</context>
+          <context context-type="linenumber">531</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">519</context>
+          <context context-type="linenumber">539</context>
         </context-group>
         <target state="translated">Asiakirja tallennettu onnistuneesti.</target>
       </trans-unit>
@@ -3086,11 +3106,11 @@
         <source>Error saving document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">524</context>
+          <context context-type="linenumber">544</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">569</context>
+          <context context-type="linenumber">589</context>
         </context-group>
         <target state="translated">Virhe tallennettaessa asiakirjaa</target>
       </trans-unit>
@@ -3098,7 +3118,7 @@
         <source>Confirm delete</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">598</context>
+          <context context-type="linenumber">618</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
@@ -3110,7 +3130,7 @@
         <source>Do you really want to delete document &quot;<x id="PH" equiv-text="this.document.title"/>&quot;?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">599</context>
+          <context context-type="linenumber">619</context>
         </context-group>
         <target state="translated">Haluatko varmasti poistaa asiakirjan "<x id="PH" equiv-text="this.document.title"/>"?</target>
       </trans-unit>
@@ -3118,7 +3138,7 @@
         <source>The files for this document will be deleted permanently. This operation cannot be undone.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">600</context>
+          <context context-type="linenumber">620</context>
         </context-group>
         <target state="translated">Tämän asiakirjan tiedostot poistetaan pysyvästi. Tätä toimintoa ei voi peruuttaa.</target>
       </trans-unit>
@@ -3126,7 +3146,7 @@
         <source>Delete document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">602</context>
+          <context context-type="linenumber">622</context>
         </context-group>
         <target state="translated">Poista asiakirja</target>
       </trans-unit>
@@ -3134,7 +3154,7 @@
         <source>Error deleting document: <x id="PH" equiv-text="error.error?.detail ?? error.message ?? JSON.stringify(error)"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">622,624</context>
+          <context context-type="linenumber">642,644</context>
         </context-group>
         <target state="translated">Virhe poistettaessa asiakirjaa: <x id="PH" equiv-text="error.error?.detail ?? error.message ?? JSON.stringify(error)"/></target>
       </trans-unit>
@@ -3142,7 +3162,7 @@
         <source>Redo OCR confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">645</context>
+          <context context-type="linenumber">665</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -3154,7 +3174,7 @@
         <source>This operation will permanently redo OCR for this document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">646</context>
+          <context context-type="linenumber">666</context>
         </context-group>
         <target state="translated">Tämä toiminto suorittaa OCR:n uudelleen.</target>
       </trans-unit>
@@ -3162,7 +3182,7 @@
         <source>This operation cannot be undone.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">647</context>
+          <context context-type="linenumber">667</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -3194,7 +3214,7 @@
         <source>Proceed</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">649</context>
+          <context context-type="linenumber">669</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -3222,7 +3242,7 @@
         <source>Redo OCR operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">657</context>
+          <context context-type="linenumber">677</context>
         </context-group>
         <target state="translated">OCR-toiminto alkaa taustalla. Sulje ja avaa uudelleen tämä asiakirja tai lataa se uudelleen, kun toiminto on suoritettu nähdäksesi uuden sisällön.</target>
       </trans-unit>
@@ -3230,7 +3250,7 @@
         <source>Error executing operation: <x id="PH" equiv-text="JSON.stringify(                 error.error               )"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">668,670</context>
+          <context context-type="linenumber">688,690</context>
         </context-group>
         <target state="translated">Virhe suoritettaessa toimintoa: <x id="PH" equiv-text="JSON.stringify(                 error.error               )"/></target>
       </trans-unit>
@@ -4380,19 +4400,19 @@
         <source>{VAR_PLURAL, plural, =1 {One <x id="INTERPOLATION"/>} other {<x id="INTERPOLATION_1"/> total <x id="INTERPOLATION_2"/>}}</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
-          <context context-type="linenumber">74</context>
+          <context context-type="linenumber">73</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
-          <context context-type="linenumber">74</context>
+          <context context-type="linenumber">73</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
-          <context context-type="linenumber">74</context>
+          <context context-type="linenumber">73</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
-          <context context-type="linenumber">74</context>
+          <context context-type="linenumber">73</context>
         </context-group>
         <target state="translated">{VAR_PLURAL, plural, one {}=1 {Yksi <x id="INTERPOLATION"/>} other {<x id="INTERPOLATION_1"/> yhteensä <x id="INTERPOLATION_2"/>}}</target>
       </trans-unit>
