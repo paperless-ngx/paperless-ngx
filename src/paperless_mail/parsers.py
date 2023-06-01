@@ -4,7 +4,7 @@ from html import escape
 from io import BytesIO
 from io import StringIO
 
-import requests
+import httpx
 from bleach import clean
 from bleach import linkify
 from django.conf import settings
@@ -185,7 +185,7 @@ class MailDocumentParser(DocumentParser):
             files[name] = (name, BytesIO(content))
         headers = {}
         try:
-            response = requests.post(url_merge, files=files, headers=headers)
+            response = httpx.post(url_merge, files=files, headers=headers)
             response.raise_for_status()  # ensure we notice bad responses
         except Exception as err:
             raise ParseError(f"Error while converting document to PDF: {err}") from err
@@ -280,7 +280,7 @@ class MailDocumentParser(DocumentParser):
                 data["pdfFormat"] = "PDF/A-3b"
 
             try:
-                response = requests.post(
+                response = httpx.post(
                     url,
                     files=files,
                     headers=headers,
@@ -336,7 +336,7 @@ class MailDocumentParser(DocumentParser):
             "scale": "1.0",
         }
         try:
-            response = requests.post(
+            response = httpx.post(
                 url,
                 files=files,
                 headers=headers,

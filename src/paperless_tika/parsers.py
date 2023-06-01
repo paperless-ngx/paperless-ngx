@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 import dateutil.parser
-import requests
+import httpx
 from django.conf import settings
 from tika import parser
 
@@ -106,7 +106,7 @@ class TikaDocumentParser(DocumentParser):
                 data["pdfFormat"] = "PDF/A-3b"
 
             try:
-                response = requests.post(url, files=files, headers=headers, data=data)
+                response = httpx.post(url, files=files, headers=headers, data=data)
                 response.raise_for_status()  # ensure we notice bad responses
             except Exception as err:
                 raise ParseError(
