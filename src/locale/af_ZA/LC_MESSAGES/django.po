@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-05-30 17:29\n"
+"PO-Revision-Date: 2023-06-01 06:34\n"
 "Last-Translator: \n"
 "Language-Team: Afrikaans\n"
 "Language: af_ZA\n"
@@ -774,7 +774,7 @@ msgstr "Markeer as gelees, moenie geleeste e-posse verwerk nie"
 
 #: paperless_mail/models.py:76
 msgid "Flag the mail, don't process flagged mails"
-msgstr "Markeer die e-pos, moenie gemarkeerde e-osse verwerk nie"
+msgstr "Markeer die e-pos, moenie gemarkeerde e-posse verwerk nie"
 
 #: paperless_mail/models.py:77
 msgid "Tag the mail with specified tag, don't process tagged mails"
@@ -838,7 +838,7 @@ msgstr "filter aanhegsellêernaam"
 
 #: paperless_mail/models.py:135
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr "Verwerk slegs dokumente wat volledig met hierdie lêernaam ooreenkom indien gespesifiseer. U kan jokertekens soos *.pdf of *factuur* gebruik. Hoofletterongevoelig."
+msgstr "Verwerk slegs dokumente wat volledig met hierdie lêernaam ooreenkom indien gespesifiseer. U kan jokertekens soos *.pdf of *faktuur* gebruik. Hoofletterongevoelig."
 
 #: paperless_mail/models.py:142
 msgid "maximum age"
