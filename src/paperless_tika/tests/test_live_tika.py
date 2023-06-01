@@ -9,7 +9,10 @@ from django.test import TestCase
 from paperless_tika.parsers import TikaDocumentParser
 
 
-@pytest.mark.skipif("TIKA_LIVE" not in os.environ, reason="No tika server")
+@pytest.mark.skipif(
+    "PAPERLESS_CI_TEST" not in os.environ,
+    reason="No Gotenberg/Tika servers to test with",
+)
 class TestTikaParserAgainstServer(TestCase):
     """
     This test case tests the Tika parsing against a live tika server,
@@ -25,7 +28,7 @@ class TestTikaParserAgainstServer(TestCase):
     def tearDown(self) -> None:
         self.parser.cleanup()
 
-    def try_parse_with_wait(self, test_file, mime_type):
+    def try_parse_with_wait(self, test_file: Path, mime_type: str):
         """
         For whatever reason, the image started during the test pipeline likes to
         segfault sometimes, when run with the exact files that usually pass.

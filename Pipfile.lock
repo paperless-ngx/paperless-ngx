@@ -1745,11 +1745,11 @@
         },
         "tika-client": {
             "hashes": [
-                "sha256:6f2afab12eb46cd7b4ed6c34c9c2a1791a45d2f479c0da0076936dc6dbfe8061",
-                "sha256:f2c23cb76677b7b8be70e2d95ac3418ed046b1514bff920f7460beae1ca3342b"
+                "sha256:43b53816b3783c9c77e16df314cad5ad66ab606391c26ad4bc94a784d473a156",
+                "sha256:e1ef3447b4307059e4a836e3786088498637323733f83a2f807b77f998d77610"
             ],
             "index": "pypi",
-            "version": "==0.0.2"
+            "version": "==0.0.3"
         },
         "tornado": {
             "hashes": [
