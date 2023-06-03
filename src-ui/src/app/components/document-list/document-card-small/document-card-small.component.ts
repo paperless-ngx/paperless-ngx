@@ -76,6 +76,10 @@ export class DocumentCardSmallComponent extends ComponentWithPermissions {
     return this.documentService.getPreviewUrl(this.document.id)
   }
 
+  get privateName() {
+    return $localize`Private`
+  }
+
   getTagsLimited$() {
     const limit = this.document.notes.length > 0 ? 6 : 7
     return this.document.tags$.pipe(
