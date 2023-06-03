@@ -1,5 +1,15 @@
 # Changelog
 
+## paperless-ngx 1.15.1
+
+### Bug Fixes
+
+- Fix incorrect colors in v1.15.0 [@shamoon](https://github.com/shamoon) ([#3523](https://github.com/paperless-ngx/paperless-ngx/pull/3523))
+
+### All App Changes
+
+- Fix incorrect colors in v1.15.0 [@shamoon](https://github.com/shamoon) ([#3523](https://github.com/paperless-ngx/paperless-ngx/pull/3523))
+
 ## paperless-ngx 1.15.0
 
 ### Features
