@@ -243,6 +243,10 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
     --bs-dropdown-color: var(--bs-body-color);
   }
 
+  .list-group {
+    --bs-list-group-action-hover-color: var(--bs-secondary-color);
+  }
+
   .card .list-group-item {
     --bs-border-color: rgb(var(--bs-dark-rgb));
 
