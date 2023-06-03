@@ -161,7 +161,7 @@ jobs:
           pipenv --python ${{ steps.setup-python.outputs.python-version }} run pytest -ra
       -
         name: Upload coverage to Codecov
-        if: ${{ matrix.python-version == env.DEFAULT_PYTHON_VERSION && github.event_name == 'pull_request'}}
+        if: ${{ matrix.python-version == env.DEFAULT_PYTHON_VERSION && github.event_name == 'push'}}
         uses: codecov/codecov-action@v3
         with:
           # not required for public repos, but intermittently fails otherwise
@@ -192,10 +192,25 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
           cache-dependency-path: 'src-ui/package-lock.json'
-      - run: cd src-ui && npm ci
-      - run: cd src-ui && npm run lint
-      - run: cd src-ui && npm run test
-      - run: cd src-ui && npm run e2e:ci
+      -
+        name: Install dependencies
+        run: cd src-ui && npm ci
+      -
+        name: Install Playwright
+        run: npx playwright install --with-deps
+      -
+        name: Linting checks
+        run: cd src-ui && npm run lint
+      -
+        name: Run Playwright tests
+        run: cd src-ui && npx playwright test
+      -
+        name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: playwright-report
+          path: src-ui/playwright-report
 
   build-docker-image:
     name: Build Docker image for ${{ github.ref_name }}

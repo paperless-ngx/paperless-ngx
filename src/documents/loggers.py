@@ -3,18 +3,16 @@ import uuid
 
 
 class LoggingMixin:
-    logging_group = None
-
-    logging_name = None
+    def __init__(self) -> None:
+        self.renew_logging_group()
 
     def renew_logging_group(self):
+        """
+        Creates a new UUID to group subsequent log calls together with
+        the extra data named group
+        """
         self.logging_group = uuid.uuid4()
-
-    def log(self, level, message, **kwargs):
-        if self.logging_name:
-            logger = logging.getLogger(self.logging_name)
-        else:
-            name = ".".join([self.__class__.__module__, self.__class__.__name__])
-            logger = logging.getLogger(name)
-
-        getattr(logger, level)(message, extra={"group": self.logging_group}, **kwargs)
+        self.log = logging.LoggerAdapter(
+            logging.getLogger(self.logging_name),
+            extra={"group": self.logging_group},
+        )

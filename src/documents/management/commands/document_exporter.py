@@ -250,7 +250,12 @@ class Command(BaseCommand):
 
             manifest += json.loads(serializers.serialize("json", Group.objects.all()))
 
-            manifest += json.loads(serializers.serialize("json", User.objects.all()))
+            manifest += json.loads(
+                serializers.serialize(
+                    "json",
+                    User.objects.exclude(username__in=["consumer", "AnonymousUser"]),
+                ),
+            )
 
             manifest += json.loads(
                 serializers.serialize("json", UiSettings.objects.all()),

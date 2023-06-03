@@ -60,7 +60,8 @@ export class SavedViewWidgetComponent
         10,
         this.savedView.sort_field,
         this.savedView.sort_reverse,
-        this.savedView.filter_rules
+        this.savedView.filter_rules,
+        { truncate_content: true }
       )
       .subscribe((result) => {
         this.loading = false

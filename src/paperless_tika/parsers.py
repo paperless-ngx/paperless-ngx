@@ -38,8 +38,7 @@ class TikaDocumentParser(DocumentParser):
         try:
             parsed = parser.from_file(document_path, tika_server)
         except Exception as e:
-            self.log(
-                "warning",
+            self.log.warning(
                 f"Error while fetching document metadata for {document_path}: {e}",
             )
             return []
@@ -55,7 +54,7 @@ class TikaDocumentParser(DocumentParser):
         ]
 
     def parse(self, document_path: Path, mime_type, file_name=None):
-        self.log("info", f"Sending {document_path} to Tika server")
+        self.log.info(f"Sending {document_path} to Tika server")
         tika_server = settings.TIKA_ENDPOINT
 
         # tika does not support a PathLike, only strings
@@ -75,8 +74,7 @@ class TikaDocumentParser(DocumentParser):
         try:
             self.date = dateutil.parser.isoparse(parsed["metadata"]["Creation-Date"])
         except Exception as e:
-            self.log(
-                "warning",
+            self.log.warning(
                 f"Unable to extract date for document {document_path}: {e}",
             )
 
@@ -87,7 +85,7 @@ class TikaDocumentParser(DocumentParser):
         gotenberg_server = settings.TIKA_GOTENBERG_ENDPOINT
         url = gotenberg_server + "/forms/libreoffice/convert"
 
-        self.log("info", f"Converting {document_path} to PDF as {pdf_path}")
+        self.log.info(f"Converting {document_path} to PDF as {pdf_path}")
         with open(document_path, "rb") as document_handle:
             files = {
                 "files": (
