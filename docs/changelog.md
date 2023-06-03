@@ -1,5 +1,82 @@
 # Changelog
 
+## paperless-ngx 1.15.0
+
+### Features
+
+- Feature: quick filters from document detail [@shamoon](https://github.com/shamoon) ([#3476](https://github.com/paperless-ngx/paperless-ngx/pull/3476))
+- Feature: Add explanations to relative dates [@shamoon](https://github.com/shamoon) ([#3471](https://github.com/paperless-ngx/paperless-ngx/pull/3471))
+- Enhancement: paginate frontend tasks [@shamoon](https://github.com/shamoon) ([#3445](https://github.com/paperless-ngx/paperless-ngx/pull/3445))
+- Feature: Better encapsulation of barcode logic [@stumpylog](https://github.com/stumpylog) ([#3425](https://github.com/paperless-ngx/paperless-ngx/pull/3425))
+- Enhancement: Improve frontend error handling [@shamoon](https://github.com/shamoon) ([#3413](https://github.com/paperless-ngx/paperless-ngx/pull/3413))
+
+### Bug Fixes
+
+- Fix: KeyError error on unauthenticated API calls \& persist authentication when enabled [@ajgon](https://github.com/ajgon) ([#3516](https://github.com/paperless-ngx/paperless-ngx/pull/3516))
+- Fix: exclude consumer \& AnonymousUser users from export manifest [@shamoon](https://github.com/shamoon) ([#3487](https://github.com/paperless-ngx/paperless-ngx/pull/3487))
+- Fix: prevent date suggestion search if disabled [@shamoon](https://github.com/shamoon) ([#3472](https://github.com/paperless-ngx/paperless-ngx/pull/3472))
+- Sync Pipfile.lock based on latest Pipfile [@adamantike](https://github.com/adamantike) ([#3475](https://github.com/paperless-ngx/paperless-ngx/pull/3475))
+- Fix: DocumentSerializer should return correct original filename [@jayme-github](https://github.com/jayme-github) ([#3473](https://github.com/paperless-ngx/paperless-ngx/pull/3473))
+- consumer.py: read from original file (instead of temp copy) [@chrisblech](https://github.com/chrisblech) ([#3466](https://github.com/paperless-ngx/paperless-ngx/pull/3466))
+- Bugfix: Catch an nltk AttributeError and handle it [@stumpylog](https://github.com/stumpylog) ([#3453](https://github.com/paperless-ngx/paperless-ngx/pull/3453))
+
+### Documentation
+
+- Adding doc on how to setup Fail2ban [@GuillaumeHullin](https://github.com/GuillaumeHullin) ([#3414](https://github.com/paperless-ngx/paperless-ngx/pull/3414))
+- Docs: Fix typo [@MarcelBochtler](https://github.com/MarcelBochtler) ([#3437](https://github.com/paperless-ngx/paperless-ngx/pull/3437))
+- [Documentation] Move nginx [@shamoon](https://github.com/shamoon) ([#3420](https://github.com/paperless-ngx/paperless-ngx/pull/3420))
+- Documentation: Note possible dependency removal for bare metal [@stumpylog](https://github.com/stumpylog) ([#3408](https://github.com/paperless-ngx/paperless-ngx/pull/3408))
+
+### Development
+
+- Development: migrate frontend tests to playwright [@shamoon](https://github.com/shamoon) ([#3401](https://github.com/paperless-ngx/paperless-ngx/pull/3401))
+
+### Dependencies
+
+<details>
+<summary>10 changes</summary>
+
+- Bump eslint from 8.39.0 to 8.41.0 in /src-ui [@dependabot](https://github.com/dependabot) ([#3513](https://github.com/paperless-ngx/paperless-ngx/pull/3513))
+- Bump concurrently from 8.0.1 to 8.1.0 in /src-ui [@dependabot](https://github.com/dependabot) ([#3510](https://github.com/paperless-ngx/paperless-ngx/pull/3510))
+- Bump [@<!---->ng-bootstrap/ng-bootstrap from 14.1.0 to 14.2.0 in /src-ui @dependabot](https://github.com/<!---->ng-bootstrap/ng-bootstrap from 14.1.0 to 14.2.0 in /src-ui @dependabot) ([#3507](https://github.com/paperless-ngx/paperless-ngx/pull/3507))
+- Bump [@<!---->popperjs/core from 2.11.7 to 2.11.8 in /src-ui @dependabot](https://github.com/<!---->popperjs/core from 2.11.7 to 2.11.8 in /src-ui @dependabot) ([#3508](https://github.com/paperless-ngx/paperless-ngx/pull/3508))
+- Bump [@<!---->typescript-eslint/parser from 5.59.2 to 5.59.8 in /src-ui @dependabot](https://github.com/<!---->typescript-eslint/parser from 5.59.2 to 5.59.8 in /src-ui @dependabot) ([#3505](https://github.com/paperless-ngx/paperless-ngx/pull/3505))
+- Bump bootstrap from 5.2.3 to 5.3.0 in /src-ui [@dependabot](https://github.com/dependabot) ([#3497](https://github.com/paperless-ngx/paperless-ngx/pull/3497))
+- Bump [@<!---->typescript-eslint/eslint-plugin from 5.59.2 to 5.59.8 in /src-ui @dependabot](https://github.com/<!---->typescript-eslint/eslint-plugin from 5.59.2 to 5.59.8 in /src-ui @dependabot) ([#3500](https://github.com/paperless-ngx/paperless-ngx/pull/3500))
+- Bump tslib from 2.5.0 to 2.5.2 in /src-ui [@dependabot](https://github.com/dependabot) ([#3501](https://github.com/paperless-ngx/paperless-ngx/pull/3501))
+- Bump [@<!---->types/node from 18.16.3 to 20.2.5 in /src-ui @dependabot](https://github.com/<!---->types/node from 18.16.3 to 20.2.5 in /src-ui @dependabot) ([#3498](https://github.com/paperless-ngx/paperless-ngx/pull/3498))
+- Bump [@<!---->playwright/test from 1.33.0 to 1.34.3 in /src-ui @dependabot](https://github.com/<!---->playwright/test from 1.33.0 to 1.34.3 in /src-ui @dependabot) ([#3499](https://github.com/paperless-ngx/paperless-ngx/pull/3499))
+</details>
+
+### All App Changes
+
+<details>
+<summary>22 changes</summary>
+
+- Fix: KeyError error on unauthenticated API calls \& persist authentication when enabled [@ajgon](https://github.com/ajgon) ([#3516](https://github.com/paperless-ngx/paperless-ngx/pull/3516))
+- Bump eslint from 8.39.0 to 8.41.0 in /src-ui [@dependabot](https://github.com/dependabot) ([#3513](https://github.com/paperless-ngx/paperless-ngx/pull/3513))
+- Bump concurrently from 8.0.1 to 8.1.0 in /src-ui [@dependabot](https://github.com/dependabot) ([#3510](https://github.com/paperless-ngx/paperless-ngx/pull/3510))
+- Bump [@<!---->ng-bootstrap/ng-bootstrap from 14.1.0 to 14.2.0 in /src-ui @dependabot](https://github.com/<!---->ng-bootstrap/ng-bootstrap from 14.1.0 to 14.2.0 in /src-ui @dependabot) ([#3507](https://github.com/paperless-ngx/paperless-ngx/pull/3507))
+- Bump [@<!---->popperjs/core from 2.11.7 to 2.11.8 in /src-ui @dependabot](https://github.com/<!---->popperjs/core from 2.11.7 to 2.11.8 in /src-ui @dependabot) ([#3508](https://github.com/paperless-ngx/paperless-ngx/pull/3508))
+- Bump [@<!---->typescript-eslint/parser from 5.59.2 to 5.59.8 in /src-ui @dependabot](https://github.com/<!---->typescript-eslint/parser from 5.59.2 to 5.59.8 in /src-ui @dependabot) ([#3505](https://github.com/paperless-ngx/paperless-ngx/pull/3505))
+- Bump bootstrap from 5.2.3 to 5.3.0 in /src-ui [@dependabot](https://github.com/dependabot) ([#3497](https://github.com/paperless-ngx/paperless-ngx/pull/3497))
+- Bump [@<!---->typescript-eslint/eslint-plugin from 5.59.2 to 5.59.8 in /src-ui @dependabot](https://github.com/<!---->typescript-eslint/eslint-plugin from 5.59.2 to 5.59.8 in /src-ui @dependabot) ([#3500](https://github.com/paperless-ngx/paperless-ngx/pull/3500))
+- Bump tslib from 2.5.0 to 2.5.2 in /src-ui [@dependabot](https://github.com/dependabot) ([#3501](https://github.com/paperless-ngx/paperless-ngx/pull/3501))
+- Bump [@<!---->types/node from 18.16.3 to 20.2.5 in /src-ui @dependabot](https://github.com/<!---->types/node from 18.16.3 to 20.2.5 in /src-ui @dependabot) ([#3498](https://github.com/paperless-ngx/paperless-ngx/pull/3498))
+- Bump [@<!---->playwright/test from 1.33.0 to 1.34.3 in /src-ui @dependabot](https://github.com/<!---->playwright/test from 1.33.0 to 1.34.3 in /src-ui @dependabot) ([#3499](https://github.com/paperless-ngx/paperless-ngx/pull/3499))
+- Feature: quick filters from document detail [@shamoon](https://github.com/shamoon) ([#3476](https://github.com/paperless-ngx/paperless-ngx/pull/3476))
+- Fix: exclude consumer \& AnonymousUser users from export manifest [@shamoon](https://github.com/shamoon) ([#3487](https://github.com/paperless-ngx/paperless-ngx/pull/3487))
+- Fix: prevent date suggestion search if disabled [@shamoon](https://github.com/shamoon) ([#3472](https://github.com/paperless-ngx/paperless-ngx/pull/3472))
+- Feature: Add explanations to relative dates [@shamoon](https://github.com/shamoon) ([#3471](https://github.com/paperless-ngx/paperless-ngx/pull/3471))
+- Fix: DocumentSerializer should return correct original filename [@jayme-github](https://github.com/jayme-github) ([#3473](https://github.com/paperless-ngx/paperless-ngx/pull/3473))
+- consumer.py: read from original file (instead of temp copy) [@chrisblech](https://github.com/chrisblech) ([#3466](https://github.com/paperless-ngx/paperless-ngx/pull/3466))
+- Bugfix: Catch an nltk AttributeError and handle it [@stumpylog](https://github.com/stumpylog) ([#3453](https://github.com/paperless-ngx/paperless-ngx/pull/3453))
+- Chore: Improves the logging mixin and allows it to be typed better [@stumpylog](https://github.com/stumpylog) ([#3451](https://github.com/paperless-ngx/paperless-ngx/pull/3451))
+- Enhancement: paginate frontend tasks [@shamoon](https://github.com/shamoon) ([#3445](https://github.com/paperless-ngx/paperless-ngx/pull/3445))
+- Add SSL Support for MariaDB [@kimdre](https://github.com/kimdre) ([#3444](https://github.com/paperless-ngx/paperless-ngx/pull/3444))
+- Enhancement: Improve frontend error handling [@shamoon](https://github.com/shamoon) ([#3413](https://github.com/paperless-ngx/paperless-ngx/pull/3413))
+</details>
+
 ## paperless-ngx 1.14.5
 
 ### Features
