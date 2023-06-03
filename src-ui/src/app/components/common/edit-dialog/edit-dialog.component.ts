@@ -38,6 +38,9 @@ export abstract class EditDialogComponent<
   @Output()
   succeeded = new EventEmitter()
 
+  @Output()
+  failed = new EventEmitter()
+
   networkActive = false
 
   closeEnabled = false
@@ -69,7 +72,7 @@ export abstract class EditDialogComponent<
     this.userService.listAll().subscribe((r) => {
       this.users = r.results
       if (this.dialogMode === 'create') {
-        this.objectForm.get('permissions_form').setValue({
+        this.objectForm.get('permissions_form')?.setValue({
           owner: this.settingsService.currentUser.id,
         })
       }
@@ -141,7 +144,7 @@ export abstract class EditDialogComponent<
       error: (error) => {
         this.error = error.error
         this.networkActive = false
-        this.succeeded.next(error)
+        this.failed.next(error)
       },
     })
   }

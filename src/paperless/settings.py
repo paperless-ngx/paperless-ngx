@@ -506,7 +506,16 @@ if os.getenv("PAPERLESS_DBHOST"):
     # Leave room for future extensibility
     if os.getenv("PAPERLESS_DBENGINE") == "mariadb":
         engine = "django.db.backends.mysql"
-        options = {"read_default_file": "/etc/mysql/my.cnf", "charset": "utf8mb4"}
+        options = {
+            "read_default_file": "/etc/mysql/my.cnf",
+            "charset": "utf8mb4",
+            "ssl": {
+                "ssl_mode": os.getenv("PAPERLESS_DBSSLMODE", "PREFERRED"),
+                "ca": os.getenv("PAPERLESS_DBSSLROOTCERT", None),
+                "cert": os.getenv("PAPERLESS_DBSSLCERT", None),
+                "key": os.getenv("PAPERLESS_DBSSLKEY", None),
+            },
+        }
 
         # Silence Django error on old MariaDB versions.
         # VARCHAR can support > 255 in modern versions
@@ -912,6 +921,10 @@ def _get_nltk_language_setting(ocr_lang: str) -> Optional[str]:
     languages for all the NLTK data used.
 
     Assumption: The primary language is first
+
+    NLTK Languages:
+      - https://www.nltk.org/api/nltk.stem.snowball.html#nltk.stem.snowball.SnowballStemmer
+
     """
     ocr_lang = ocr_lang.split("+")[0]
     iso_code_to_nltk = {

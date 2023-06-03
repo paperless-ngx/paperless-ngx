@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.contrib import auth
-from django.contrib.auth.middleware import RemoteUserMiddleware
+from django.contrib.auth.middleware import PersistentRemoteUserMiddleware
 from django.contrib.auth.models import User
 from django.utils.deprecation import MiddlewareMixin
 from rest_framework import authentication
@@ -37,7 +37,7 @@ class AngularApiAuthenticationOverride(authentication.BaseAuthentication):
             return None
 
 
-class HttpRemoteUserMiddleware(RemoteUserMiddleware):
+class HttpRemoteUserMiddleware(PersistentRemoteUserMiddleware):
     """This class allows authentication via HTTP_REMOTE_USER which is set for
     example by certain SSO applications.
     """

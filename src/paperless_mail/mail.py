@@ -422,7 +422,7 @@ class MailAccountHandler(LoggingMixin):
         try:
             return Correspondent.objects.get_or_create(name=name)[0]
         except DatabaseError as e:
-            self.log("error", f"Error while retrieving correspondent {name}: {e}")
+            self.log.error(f"Error while retrieving correspondent {name}: {e}")
             return None
 
     def _get_title(self, message, att, rule):
@@ -468,7 +468,7 @@ class MailAccountHandler(LoggingMixin):
 
         self.renew_logging_group()
 
-        self.log("debug", f"Processing mail account {account}")
+        self.log.debug(f"Processing mail account {account}")
 
         total_processed_files = 0
         try:
@@ -480,13 +480,12 @@ class MailAccountHandler(LoggingMixin):
                 supports_gmail_labels = "X-GM-EXT-1" in M.client.capabilities
                 supports_auth_plain = "AUTH=PLAIN" in M.client.capabilities
 
-                self.log("debug", f"GMAIL Label Support: {supports_gmail_labels}")
-                self.log("debug", f"AUTH=PLAIN Support: {supports_auth_plain}")
+                self.log.debug(f"GMAIL Label Support: {supports_gmail_labels}")
+                self.log.debug(f"AUTH=PLAIN Support: {supports_auth_plain}")
 
                 mailbox_login(M, account)
 
-                self.log(
-                    "debug",
+                self.log.debug(
                     f"Account {account}: Processing "
                     f"{account.rules.count()} rule(s)",
                 )
@@ -499,16 +498,13 @@ class MailAccountHandler(LoggingMixin):
                             supports_gmail_labels,
                         )
                     except Exception as e:
-                        self.log(
-                            "error",
+                        self.log.exception(
                             f"Rule {rule}: Error while processing rule: {e}",
-                            exc_info=True,
                         )
         except MailError:
             raise
         except Exception as e:
-            self.log(
-                "error",
+            self.log.error(
                 f"Error while retrieving mailbox {account}: {e}",
                 exc_info=False,
             )
@@ -521,21 +517,19 @@ class MailAccountHandler(LoggingMixin):
         rule: MailRule,
         supports_gmail_labels: bool,
     ):
-        self.log("debug", f"Rule {rule}: Selecting folder {rule.folder}")
+        self.log.debug(f"Rule {rule}: Selecting folder {rule.folder}")
 
         try:
             M.folder.set(rule.folder)
         except MailboxFolderSelectError as err:
-            self.log(
-                "error",
+            self.log.error(
                 f"Unable to access folder {rule.folder}, attempting folder listing",
             )
             try:
                 for folder_info in M.folder.list():
-                    self.log("info", f"Located folder: {folder_info.name}")
+                    self.log.info(f"Located folder: {folder_info.name}")
             except Exception as e:
-                self.log(
-                    "error",
+                self.log.error(
                     "Exception during folder listing, unable to provide list folders: "
                     + str(e),
                 )
@@ -547,8 +541,7 @@ class MailAccountHandler(LoggingMixin):
 
         criterias = make_criterias(rule, supports_gmail_labels)
 
-        self.log(
-            "debug",
+        self.log.debug(
             f"Rule {rule}: Searching folder with criteria {str(criterias)}",
         )
 
@@ -572,7 +565,7 @@ class MailAccountHandler(LoggingMixin):
                 uid=message.uid,
                 folder=rule.folder,
             ).exists():
-                self.log("debug", f"Skipping mail {message}, already processed.")
+                self.log.debug(f"Skipping mail {message}, already processed.")
                 continue
 
             try:
@@ -581,13 +574,11 @@ class MailAccountHandler(LoggingMixin):
                 total_processed_files += processed_files
                 mails_processed += 1
             except Exception as e:
-                self.log(
-                    "error",
+                self.log.exception(
                     f"Rule {rule}: Error while processing mail {message.uid}: {e}",
-                    exc_info=True,
                 )
 
-        self.log("debug", f"Rule {rule}: Processed {mails_processed} matching mail(s)")
+        self.log.debug(f"Rule {rule}: Processed {mails_processed} matching mail(s)")
 
         return total_processed_files
 
@@ -602,8 +593,7 @@ class MailAccountHandler(LoggingMixin):
         ):
             return processed_elements
 
-        self.log(
-            "debug",
+        self.log.debug(
             f"Rule {rule}: "
             f"Processing mail {message.subject} from {message.from_} with "
             f"{len(message.attachments)} attachment(s)",
@@ -657,8 +647,7 @@ class MailAccountHandler(LoggingMixin):
                 and rule.attachment_type
                 == MailRule.AttachmentProcessing.ATTACHMENTS_ONLY
             ):
-                self.log(
-                    "debug",
+                self.log.debug(
                     f"Rule {rule}: "
                     f"Skipping attachment {att.filename} "
                     f"with content disposition {att.content_disposition}",
@@ -688,8 +677,7 @@ class MailAccountHandler(LoggingMixin):
                 with open(temp_filename, "wb") as f:
                     f.write(att.payload)
 
-                self.log(
-                    "info",
+                self.log.info(
                     f"Rule {rule}: "
                     f"Consuming attachment {att.filename} from mail "
                     f"{message.subject} from {message.from_}",
@@ -717,8 +705,7 @@ class MailAccountHandler(LoggingMixin):
 
                 processed_attachments += 1
             else:
-                self.log(
-                    "debug",
+                self.log.debug(
                     f"Rule {rule}: "
                     f"Skipping attachment {att.filename} "
                     f"since guessed mime type {mime_type} is not supported "
@@ -784,8 +771,7 @@ class MailAccountHandler(LoggingMixin):
 
             f.write(message.obj.as_bytes())
 
-        self.log(
-            "info",
+        self.log.info(
             f"Rule {rule}: "
             f"Consuming eml from mail "
             f"{message.subject} from {message.from_}",
