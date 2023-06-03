@@ -8,7 +8,6 @@
 - Feature: Add explanations to relative dates [@shamoon](https://github.com/shamoon) ([#3471](https://github.com/paperless-ngx/paperless-ngx/pull/3471))
 - Enhancement: paginate frontend tasks [@shamoon](https://github.com/shamoon) ([#3445](https://github.com/paperless-ngx/paperless-ngx/pull/3445))
 - Feature: Better encapsulation of barcode logic [@stumpylog](https://github.com/stumpylog) ([#3425](https://github.com/paperless-ngx/paperless-ngx/pull/3425))
-- Development: migrate frontend tests to playwright [@shamoon](https://github.com/shamoon) ([#3401](https://github.com/paperless-ngx/paperless-ngx/pull/3401))
 - Enhancement: Improve frontend error handling [@shamoon](https://github.com/shamoon) ([#3413](https://github.com/paperless-ngx/paperless-ngx/pull/3413))
 
 ### Bug Fixes
@@ -16,7 +15,6 @@
 - Fix: KeyError error on unauthenticated API calls \& persist authentication when enabled [@ajgon](https://github.com/ajgon) ([#3516](https://github.com/paperless-ngx/paperless-ngx/pull/3516))
 - Fix: exclude consumer \& AnonymousUser users from export manifest [@shamoon](https://github.com/shamoon) ([#3487](https://github.com/paperless-ngx/paperless-ngx/pull/3487))
 - Fix: prevent date suggestion search if disabled [@shamoon](https://github.com/shamoon) ([#3472](https://github.com/paperless-ngx/paperless-ngx/pull/3472))
-- Feature: Add explanations to relative dates [@shamoon](https://github.com/shamoon) ([#3471](https://github.com/paperless-ngx/paperless-ngx/pull/3471))
 - Sync Pipfile.lock based on latest Pipfile [@adamantike](https://github.com/adamantike) ([#3475](https://github.com/paperless-ngx/paperless-ngx/pull/3475))
 - Fix: DocumentSerializer should return correct original filename [@jayme-github](https://github.com/jayme-github) ([#3473](https://github.com/paperless-ngx/paperless-ngx/pull/3473))
 - consumer.py: read from original file (instead of temp copy) [@chrisblech](https://github.com/chrisblech) ([#3466](https://github.com/paperless-ngx/paperless-ngx/pull/3466))
@@ -28,6 +26,10 @@
 - Docs: Fix typo [@MarcelBochtler](https://github.com/MarcelBochtler) ([#3437](https://github.com/paperless-ngx/paperless-ngx/pull/3437))
 - [Documentation] Move nginx [@shamoon](https://github.com/shamoon) ([#3420](https://github.com/paperless-ngx/paperless-ngx/pull/3420))
 - Documentation: Note possible dependency removal for bare metal [@stumpylog](https://github.com/stumpylog) ([#3408](https://github.com/paperless-ngx/paperless-ngx/pull/3408))
+
+### Development
+
+- Development: migrate frontend tests to playwright [@shamoon](https://github.com/shamoon) ([#3401](https://github.com/paperless-ngx/paperless-ngx/pull/3401))
 
 ### Dependencies
 
