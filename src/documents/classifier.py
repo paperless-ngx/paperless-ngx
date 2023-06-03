@@ -341,20 +341,42 @@ class DocumentClassifier:
             # set the search path for NLTK data to the single location it should be in
             nltk.data.path = [settings.NLTK_DIR]
 
-            # Do some one time setup
-            if self._stemmer is None:
-                self._stemmer = SnowballStemmer(settings.NLTK_LANGUAGE)
-            if self._stop_words is None:
-                self._stop_words = set(stopwords.words(settings.NLTK_LANGUAGE))
+            try:
+                # Preload the corpus early, to force the lazy loader to transform
+                stopwords.ensure_loaded()
 
-            # Tokenize
-            words: List[str] = word_tokenize(content, language=settings.NLTK_LANGUAGE)
-            # Remove stop words
-            meaningful_words = [w for w in words if w not in self._stop_words]
-            # Stem words
-            meaningful_words = [self._stemmer.stem(w) for w in meaningful_words]
+                # Do some one time setup
+                # Sometimes, somehow, there's multiple threads loading the corpus
+                # and it's not thread safe, raising an AttributeError
+                if self._stemmer is None:
+                    self._stemmer = SnowballStemmer(settings.NLTK_LANGUAGE)
+                if self._stop_words is None:
+                    self._stop_words = set(stopwords.words(settings.NLTK_LANGUAGE))
 
-            return " ".join(meaningful_words)
+                # Tokenize
+                # This splits the content into tokens, roughly words
+                words: List[str] = word_tokenize(
+                    content,
+                    language=settings.NLTK_LANGUAGE,
+                )
+
+                meaningful_words = []
+                for word in words:
+                    # Skip stop words
+                    # These are words like "a", "and", "the" which add little meaning
+                    if word in self._stop_words:
+                        continue
+                    # Stem the words
+                    # This reduces the words to their stems.
+                    # "amazement" returns "amaz"
+                    # "amaze" returns "amaz
+                    # "amazed" returns "amaz"
+                    meaningful_words.append(self._stemmer.stem(word))
+
+                return " ".join(meaningful_words)
+
+            except AttributeError:
+                return content
 
         return content
 

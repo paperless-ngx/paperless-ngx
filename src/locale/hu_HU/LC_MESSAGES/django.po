@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-05-09 23:56\n"
+"PO-Revision-Date: 2023-05-16 16:33\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -19,68 +19,68 @@ msgstr ""
 
 #: documents/apps.py:9
 msgid "Documents"
-msgstr ""
+msgstr "Dokumentumok"
 
 #: documents/models.py:36
 msgid "None"
-msgstr ""
+msgstr "Egyik sem"
 
 #: documents/models.py:37
 msgid "Any word"
-msgstr ""
+msgstr "Bármely szó"
 
 #: documents/models.py:38
 msgid "All words"
-msgstr ""
+msgstr "Összes szó"
 
 #: documents/models.py:39
 msgid "Exact match"
-msgstr ""
+msgstr "Pontos egyezés"
 
 #: documents/models.py:40
 msgid "Regular expression"
-msgstr ""
+msgstr "Reguláris kifejezés"
 
 #: documents/models.py:41
 msgid "Fuzzy word"
-msgstr ""
+msgstr "Elmosódott szó"
 
 #: documents/models.py:42
 msgid "Automatic"
-msgstr ""
+msgstr "Automatikus"
 
 #: documents/models.py:45 documents/models.py:394 paperless_mail/models.py:17
 #: paperless_mail/models.py:89
 msgid "name"
-msgstr ""
+msgstr "név"
 
 #: documents/models.py:47
 msgid "match"
-msgstr ""
+msgstr "egyezés"
 
 #: documents/models.py:50
 msgid "matching algorithm"
-msgstr ""
+msgstr "egyeztető algoritmus"
 
 #: documents/models.py:55
 msgid "is insensitive"
-msgstr ""
+msgstr "érzéketlen"
 
 #: documents/models.py:71
 msgid "owner"
-msgstr ""
+msgstr "tulajdonos"
 
 #: documents/models.py:81 documents/models.py:136
 msgid "correspondent"
-msgstr ""
+msgstr "partner"
 
 #: documents/models.py:82
 msgid "correspondents"
-msgstr ""
+msgstr "partnerek"
 
 #: documents/models.py:87
 msgid "color"
-msgstr ""
+msgstr "szín"
 
 #: documents/models.py:90
 msgid "is inbox tag"

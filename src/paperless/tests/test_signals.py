@@ -12,6 +12,26 @@ class TestFailedLoginLogging(TestCase):
             "username": "john lennon",
         }
 
+    def test_unauthenticated(self):
+        """
+        GIVEN:
+            - Request with no authentication provided
+        WHEN:
+            - Request provided to signal handler
+        THEN:
+            - Unable to determine logged for unauthenticated user
+        """
+        request = HttpRequest()
+        request.META = {}
+        with self.assertLogs("paperless.auth") as logs:
+            handle_failed_login(None, {}, request)
+            self.assertEqual(
+                logs.output,
+                [
+                    "INFO:paperless.auth:No authentication provided. Unable to determine IP address.",
+                ],
+            )
+
     def test_none(self):
         """
         GIVEN:

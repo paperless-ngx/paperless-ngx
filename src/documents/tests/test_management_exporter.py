@@ -141,7 +141,14 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         manifest = self._do_export(use_filename_format=use_filename_format)
 
-        self.assertEqual(len(manifest), 12)
+        self.assertEqual(len(manifest), 10)
+
+        # dont include consumer or AnonymousUser users
+        self.assertEqual(
+            len(list(filter(lambda e: e["model"] == "auth.user", manifest))),
+            1,
+        )
+
         self.assertEqual(
             len(list(filter(lambda e: e["model"] == "documents.document", manifest))),
             4,

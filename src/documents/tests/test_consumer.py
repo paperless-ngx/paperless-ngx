@@ -832,8 +832,7 @@ class PreConsumeTestCase(TestCase):
                 }
                 self.assertDictEqual(environment, {**environment, **subset})
 
-    @mock.patch("documents.consumer.Consumer.log")
-    def test_script_with_output(self, mocked_log):
+    def test_script_with_output(self):
         """
         GIVEN:
             - A script which outputs to stdout and stderr
@@ -854,14 +853,19 @@ class PreConsumeTestCase(TestCase):
             os.chmod(script.name, st.st_mode | stat.S_IEXEC)
 
             with override_settings(PRE_CONSUME_SCRIPT=script.name):
-                c = Consumer()
-                c.path = "path-to-file"
-                c.run_pre_consume_script()
+                with self.assertLogs("paperless.consumer", level="INFO") as cm:
+                    c = Consumer()
+                    c.path = "path-to-file"
 
-                mocked_log.assert_called()
-
-                mocked_log.assert_any_call("info", "This message goes to stdout")
-                mocked_log.assert_any_call("warning", "This message goes to stderr")
+                    c.run_pre_consume_script()
+                    self.assertIn(
+                        "INFO:paperless.consumer:This message goes to stdout",
+                        cm.output,
+                    )
+                    self.assertIn(
+                        "WARNING:paperless.consumer:This message goes to stderr",
+                        cm.output,
+                    )
 
     def test_script_exit_non_zero(self):
         """
