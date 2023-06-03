@@ -452,6 +452,7 @@ ul.pagination {
 
 table.table {
   color: var(--bs-body-color);
+  --bs-table-bg: var(--bs-light-rgb);
 
   .des,.asc {
     background-color: var(--bs-body-bg) !important;
