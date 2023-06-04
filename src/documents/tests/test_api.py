@@ -420,6 +420,74 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         results = response.data["results"]
         self.assertEqual(len(results), 0)
 
+    def test_document_checksum_filter(self):
+        Document.objects.create(
+            title="none1",
+            checksum="A",
+            mime_type="application/pdf",
+        )
+        doc2 = Document.objects.create(
+            title="none2",
+            checksum="B",
+            mime_type="application/pdf",
+        )
+        Document.objects.create(
+            title="none3",
+            checksum="C",
+            mime_type="application/pdf",
+        )
+
+        response = self.client.get("/api/documents/?checksum__iexact=B")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["id"], doc2.id)
+
+        response = self.client.get("/api/documents/?checksum__iexact=X")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 0)
+
+    def test_document_original_filename_filter(self):
+        doc1 = Document.objects.create(
+            title="none1",
+            checksum="A",
+            mime_type="application/pdf",
+            original_filename="docA.pdf",
+        )
+        doc2 = Document.objects.create(
+            title="none2",
+            checksum="B",
+            mime_type="application/pdf",
+            original_filename="docB.pdf",
+        )
+        doc3 = Document.objects.create(
+            title="none3",
+            checksum="C",
+            mime_type="application/pdf",
+            original_filename="docC.pdf",
+        )
+
+        response = self.client.get("/api/documents/?original_filename__iexact=DOCa.pdf")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["id"], doc1.id)
+
+        response = self.client.get("/api/documents/?original_filename__iexact=docx.pdf")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 0)
+
+        response = self.client.get("/api/documents/?original_filename__istartswith=dOc")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 3)
+        self.assertCountEqual(
+            [results[0]["id"], results[1]["id"], results[2]["id"]],
+            [doc1.id, doc2.id, doc3.id],
+        )
+
     def test_documents_title_content_filter(self):
         doc1 = Document.objects.create(
             title="title A",
@@ -1086,17 +1154,19 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             checksum="4",
             created=timezone.make_aware(datetime.datetime(2020, 7, 13)),
             content="test",
+            original_filename="doc4.pdf",
         )
         d4.tags.add(t2)
         d5 = Document.objects.create(
             checksum="5",
             added=timezone.make_aware(datetime.datetime(2020, 7, 13)),
             content="test",
+            original_filename="doc5.pdf",
         )
         Document.objects.create(checksum="6", content="test2")
         d7 = Document.objects.create(checksum="7", storage_path=sp, content="test")
         d8 = Document.objects.create(
-            checksum="8",
+            checksum="foo",
             correspondent=c2,
             document_type=dt2,
             storage_path=sp2,
@@ -1237,6 +1307,16 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
                 "&added__date__gt="
                 + datetime.datetime(2020, 1, 2).strftime("%Y-%m-%d"),
             ),
+        )
+
+        self.assertEqual(
+            search_query("&checksum__icontains=foo"),
+            [d8.id],
+        )
+
+        self.assertCountEqual(
+            search_query("&original_filename__istartswith=doc"),
+            [d4.id, d5.id],
         )
 
     def test_search_filtering_respect_owner(self):
