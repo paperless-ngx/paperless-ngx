@@ -116,6 +116,8 @@ class DocumentFilterSet(FilterSet):
             "created": DATE_KWARGS,
             "added": DATE_KWARGS,
             "modified": DATE_KWARGS,
+            "original_filename": CHAR_KWARGS,
+            "checksum": CHAR_KWARGS,
             "correspondent": ["isnull"],
             "correspondent__id": ID_KWARGS,
             "correspondent__name": CHAR_KWARGS,
