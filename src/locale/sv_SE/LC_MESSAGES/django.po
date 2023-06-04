@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-03-24 15:12\n"
+"PO-Revision-Date: 2023-06-04 19:57\n"
 "Last-Translator: \n"
 "Language-Team: Swedish\n"
 "Language: sv_SE\n"
@@ -23,7 +23,7 @@ msgstr "Dokument"
 
 #: documents/models.py:36
 msgid "None"
-msgstr ""
+msgstr "Ingen"
 
 #: documents/models.py:37
 msgid "Any word"
@@ -68,7 +68,7 @@ msgstr "är ej skiftlägeskänsligt"
 
 #: documents/models.py:71
 msgid "owner"
-msgstr ""
+msgstr "ägare"
 
 #: documents/models.py:81 documents/models.py:136
 msgid "correspondent"
@@ -404,7 +404,7 @@ msgstr "Uppgifts-ID"
 
 #: documents/models.py:564
 msgid "Celery ID for the Task that was run"
-msgstr ""
+msgstr "Celery ID för uppgiften som kördes"
 
 #: documents/models.py:569
 msgid "Acknowledged"
@@ -416,7 +416,7 @@ msgstr "Om uppgiften bekräftas via frontend eller API"
 
 #: documents/models.py:576
 msgid "Task Filename"
-msgstr ""
+msgstr "Uppgiftens filnamn"
 
 #: documents/models.py:577
 msgid "Name of the file which the Task was run for"
@@ -468,7 +468,7 @@ msgstr "Resultatdata"
 
 #: documents/models.py:617
 msgid "The data returned by the task"
-msgstr ""
+msgstr "De data som returneras av uppgiften"
 
 #: documents/models.py:626
 msgid "Comment for the document"
@@ -502,19 +502,19 @@ msgstr "Filtypen %(type)s stöds inte"
 
 #: documents/serialisers.py:794
 msgid "Invalid variable detected."
-msgstr ""
+msgstr "Ogiltig variabel upptäckt."
 
 #: documents/templates/index.html:78
 msgid "Paperless-ngx is loading..."
-msgstr ""
+msgstr "Paperless-ngx laddar..."
 
 #: documents/templates/index.html:79
 msgid "Still here?! Hmm, something might be wrong."
-msgstr ""
+msgstr "Fortfarande här?! Hmm, någonting kan vara fel."
 
 #: documents/templates/index.html:79
 msgid "Here's a link to the docs."
-msgstr ""
+msgstr "Här är en länk till dokumentationen."
 
 #: documents/templates/registration/logged_out.html:14
 msgid "Paperless-ngx signed out"
@@ -530,7 +530,7 @@ msgstr "Logga in igen"
 
 #: documents/templates/registration/login.html:15
 msgid "Paperless-ngx sign in"
-msgstr ""
+msgstr "Paperless-ngx inloggning"
 
 #: documents/templates/registration/login.html:61
 msgid "Please sign in."
@@ -554,7 +554,7 @@ msgstr "Logga in"
 
 #: paperless/apps.py:9
 msgid "Paperless"
-msgstr ""
+msgstr "Paperless"
 
 #: paperless/settings.py:521
 msgid "English (US)"
@@ -562,19 +562,19 @@ msgstr "Engelska (USA)"
 
 #: paperless/settings.py:522
 msgid "Arabic"
-msgstr ""
+msgstr "Arabiska"
 
 #: paperless/settings.py:523
 msgid "Belarusian"
-msgstr ""
+msgstr "Belarusiska"
 
 #: paperless/settings.py:524
 msgid "Czech"
-msgstr ""
+msgstr "Tjeckiska"
 
 #: paperless/settings.py:525
 msgid "Danish"
-msgstr ""
+msgstr "Danska"
 
 #: paperless/settings.py:526
 msgid "German"
@@ -626,11 +626,11 @@ msgstr "Ryska"
 
 #: paperless/settings.py:538
 msgid "Slovenian"
-msgstr ""
+msgstr "Slovenska"
 
 #: paperless/settings.py:539
 msgid "Serbian"
-msgstr ""
+msgstr "Serbiska"
 
 #: paperless/settings.py:540
 msgid "Swedish"
@@ -638,7 +638,7 @@ msgstr "Svenska"
 
 #: paperless/settings.py:541
 msgid "Turkish"
-msgstr ""
+msgstr "Turkiska"
 
 #: paperless/settings.py:542
 msgid "Chinese Simplified"
@@ -646,7 +646,7 @@ msgstr ""
 
 #: paperless/urls.py:169
 msgid "Paperless-ngx administration"
-msgstr ""
+msgstr "Paperless-ngx administration"
 
 #: paperless_mail/admin.py:30
 msgid "Authentication"
@@ -658,7 +658,7 @@ msgstr "Avancerade inställningar"
 
 #: paperless_mail/admin.py:48
 msgid "Filter"
-msgstr ""
+msgstr "Filter"
 
 #: paperless_mail/admin.py:51
 msgid "Paperless will only process mails that match ALL of the filters given below."
@@ -894,7 +894,7 @@ msgstr "tilldela denna korrespondent"
 
 #: paperless_mail/models.py:239
 msgid "uid"
-msgstr ""
+msgstr "uid"
 
 #: paperless_mail/models.py:247
 msgid "subject"
