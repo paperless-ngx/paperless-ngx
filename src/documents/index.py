@@ -207,7 +207,7 @@ class DelayedQuery:
             try:
                 field, supported_query_filters = self.param_map[param]
             except KeyError:
-                logger.error("Unable to build a query filter for parameter %s", key)
+                logger.error(f"Unable to build a query filter for parameter {key}")
                 continue
 
             # We only support certain filters per parameter
