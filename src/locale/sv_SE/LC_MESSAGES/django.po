@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-06-04 19:57\n"
+"PO-Revision-Date: 2023-06-04 20:53\n"
 "Last-Translator: \n"
 "Language-Team: Swedish\n"
 "Language: sv_SE\n"
@@ -112,7 +112,7 @@ msgstr "sökväg"
 
 #: documents/models.py:117 documents/models.py:145
 msgid "storage path"
-msgstr "sökväg till lagring"
+msgstr "sökväg för lagring"
 
 #: documents/models.py:118
 msgid "storage paths"
@@ -642,7 +642,7 @@ msgstr "Turkiska"
 
 #: paperless/settings.py:542
 msgid "Chinese Simplified"
-msgstr ""
+msgstr "Kinesiska (förenklad)"
 
 #: paperless/urls.py:169
 msgid "Paperless-ngx administration"
@@ -674,7 +674,7 @@ msgstr ""
 
 #: paperless_mail/admin.py:77
 msgid "Metadata"
-msgstr ""
+msgstr "Metadata"
 
 #: paperless_mail/admin.py:80
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
@@ -750,11 +750,11 @@ msgstr "Behandla endast bilagor."
 
 #: paperless_mail/models.py:62
 msgid "Process full Mail (with embedded attachments in file) as .eml"
-msgstr ""
+msgstr "Behandla helt e-postmeddelande (med inbäddade bilagor i fil) som .eml"
 
 #: paperless_mail/models.py:64
 msgid "Process full Mail (with embedded attachments in file) as .eml + process attachments as separate documents"
-msgstr ""
+msgstr "Behandla helt e-postmeddelande (med inbäddade bilagor i fil) som .eml + processbilagor som separata dokument"
 
 #: paperless_mail/models.py:70
 msgid "Process all files, including 'inline' attachments."
@@ -898,17 +898,17 @@ msgstr "uid"
 
 #: paperless_mail/models.py:247
 msgid "subject"
-msgstr ""
+msgstr "ämne"
 
 #: paperless_mail/models.py:255
 msgid "received"
-msgstr ""
+msgstr "mottaget"
 
 #: paperless_mail/models.py:262
 msgid "processed"
-msgstr ""
+msgstr "bearbetat"
 
 #: paperless_mail/models.py:268
 msgid "status"
-msgstr ""
+msgstr "status"
 
