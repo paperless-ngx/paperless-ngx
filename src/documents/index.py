@@ -192,70 +192,67 @@ class DelayedQuery:
 
     def _get_query_filter(self):
         criterias = []
-        for k, v in self.query_params.items():
+        for key, value in self.query_params.items():
             # is_tagged is a special case
-            if k == "is_tagged":
-                criterias.append(query.Term("has_tag", self.evalBoolean(v)))
+            if key == "is_tagged":
+                criterias.append(query.Term("has_tag", self.evalBoolean(value)))
                 continue
 
             # Don't process query params without a filter
-            if "__" not in k:
+            if "__" not in key:
                 continue
 
             # All other query params consist of a parameter and a query filter
-            param, query_filter = k.split("__", 1)
+            param, query_filter = key.split("__", 1)
             try:
                 field, supported_query_filters = self.param_map[param]
             except KeyError:
-                logger.error("Unable to build a query filter for parameter %s", k)
+                logger.error("Unable to build a query filter for parameter %s", key)
                 continue
 
             # We only support certain filters per parameter
             if query_filter not in supported_query_filters:
                 logger.info(
-                    "Query filter %s not supported for parameter %s",
-                    query_filter,
-                    param,
+                    f"Query filter {query_filter} not supported for parameter {param}",
                 )
                 continue
 
             if query_filter == "id":
-                criterias.append(query.Term(f"{field}_id", v))
+                criterias.append(query.Term(f"{field}_id", value))
             elif query_filter == "id__in":
                 in_filter = []
-                for xid in v.split(","):
+                for object_id in value.split(","):
                     in_filter.append(
-                        query.Term(f"{field}_id", xid),
+                        query.Term(f"{field}_id", object_id),
                     )
                 criterias.append(query.Or(in_filter))
             elif query_filter == "id__none":
-                for xid in v.split(","):
+                for object_id in value.split(","):
                     criterias.append(
-                        query.Not(query.Term(f"{field}_id", xid)),
+                        query.Not(query.Term(f"{field}_id", object_id)),
                     )
             elif query_filter == "isnull":
                 criterias.append(
-                    query.Term(f"has_{field}", self.evalBoolean(v) is False),
+                    query.Term(f"has_{field}", self.evalBoolean(value) is False),
                 )
             elif query_filter == "id__all":
-                for xid in v.split(","):
-                    criterias.append(query.Term(f"{field}_id", xid))
-
+                for object_id in value.split(","):
+                    criterias.append(query.Term(f"{field}_id", object_id))
             elif query_filter == "date__lt":
                 criterias.append(
-                    query.DateRange(field, start=None, end=isoparse(v)),
+                    query.DateRange(field, start=None, end=isoparse(value)),
                 )
             elif query_filter == "date__gt":
                 criterias.append(
-                    query.DateRange(field, start=isoparse(v), end=None),
+                    query.DateRange(field, start=isoparse(value), end=None),
                 )
             elif query_filter == "icontains":
                 criterias.append(
-                    query.Term(field, v),
+                    query.Term(field, value),
                 )
             elif query_filter == "istartswith":
                 criterias.append(
-                    query.Prefix(field, v),
+                    query.Prefix(field, value),
                 )
 
         user_criterias = get_permissions_criterias(
