@@ -2130,7 +2130,7 @@
           <context context-type="sourcefile">src/app/components/common/input/select/select.component.html</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="needs-translation">Filter documents with this <x id="INTERPOLATION" equiv-text="{{title}}"/></target>
+        <target state="translated">Filtra documents amb aquest <x id="INTERPOLATION" equiv-text="{{title}}"/></target>
       </trans-unit>
       <trans-unit id="445302259125375799" datatype="html">
         <source>Invalid date.</source>
@@ -2335,7 +2335,7 @@
           <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.html</context>
           <context context-type="linenumber">39</context>
         </context-group>
-        <target state="needs-translation">Filter documents with these Tags</target>
+        <target state="translated">Filtra documents amb aquestes etiquetes</target>
       </trans-unit>
       <trans-unit id="8105421668262723483" datatype="html">
         <source>Set Permissions</source>
