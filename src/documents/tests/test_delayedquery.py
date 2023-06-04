@@ -115,7 +115,7 @@ class TestDelayedQuery(TestCase):
     def test_tags_query_filters(self):
         # tests contains touples of query_parameter dics and the expected whoosh query
         param = "tags"
-        field = "tag"
+        field, _ = DelayedQuery.param_map[param]
         tests = (
             (
                 {f"{param}__id__all": "42,43"},
@@ -148,12 +148,7 @@ class TestDelayedQuery(TestCase):
 
     def test_generic_query_filters(self):
         def _get_testset(param: str):
-            if param == "document_type":
-                field = "type"
-            elif param == "storage_path":
-                field = "path"
-            else:
-                field = param
+            field, _ = DelayedQuery.param_map[param]
             return (
                 (
                     {f"{param}__id": "42"},
@@ -187,6 +182,36 @@ class TestDelayedQuery(TestCase):
             )
 
         query_params = ["correspondent", "document_type", "storage_path", "owner"]
+        for param in query_params:
+            for params, expected in _get_testset(param):
+                dq = DelayedQuery(None, params, None, None)
+                got = dq._get_query_filter()
+                self.assertCountEqual(got, expected)
+
+    def test_char_query_filter(self):
+        def _get_testset(param: str):
+            return (
+                (
+                    {f"{param}__icontains": "foo"},
+                    query.And(
+                        [
+                            query.Term(f"{param}", "foo"),
+                            self.has_no_owner,
+                        ],
+                    ),
+                ),
+                (
+                    {f"{param}__istartswith": "foo"},
+                    query.And(
+                        [
+                            query.Prefix(f"{param}", "foo"),
+                            self.has_no_owner,
+                        ],
+                    ),
+                ),
+            )
+
+        query_params = ["checksum", "original_filename"]
         for param in query_params:
             for params, expected in _get_testset(param):
                 dq = DelayedQuery(None, params, None, None)

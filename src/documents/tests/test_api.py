@@ -1154,17 +1154,19 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             checksum="4",
             created=timezone.make_aware(datetime.datetime(2020, 7, 13)),
             content="test",
+            original_filename="doc4.pdf",
         )
         d4.tags.add(t2)
         d5 = Document.objects.create(
             checksum="5",
             added=timezone.make_aware(datetime.datetime(2020, 7, 13)),
             content="test",
+            original_filename="doc5.pdf",
         )
         Document.objects.create(checksum="6", content="test2")
         d7 = Document.objects.create(checksum="7", storage_path=sp, content="test")
         d8 = Document.objects.create(
-            checksum="8",
+            checksum="foo",
             correspondent=c2,
             document_type=dt2,
             storage_path=sp2,
@@ -1305,6 +1307,16 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
                 "&added__date__gt="
                 + datetime.datetime(2020, 1, 2).strftime("%Y-%m-%d"),
             ),
+        )
+
+        self.assertEqual(
+            search_query("&checksum__icontains=foo"),
+            [d8.id],
+        )
+
+        self.assertCountEqual(
+            search_query("&original_filename__istartswith=doc"),
+            [d4.id, d5.id],
         )
 
     def test_search_filtering_respect_owner(self):
