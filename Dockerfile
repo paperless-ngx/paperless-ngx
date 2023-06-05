@@ -5,7 +5,7 @@
 # Purpose: Compiles the frontend
 # Notes:
 #  - Does NPM stuff with Typescript and such
-FROM --platform=$BUILDPLATFORM node:16-bullseye-slim AS compile-frontend
+FROM --platform=$BUILDPLATFORM docker.io/node:16-bullseye-slim AS compile-frontend
 
 COPY ./src-ui /src/src-ui
 
@@ -21,7 +21,7 @@ RUN set -eux \
 # Comments:
 #  - pipenv dependencies are not left in the final image
 #  - pipenv can't touch the final image somehow
-FROM --platform=$BUILDPLATFORM python:3.9-alpine as pipenv-base
+FROM --platform=$BUILDPLATFORM docker.io/python:3.9-alpine as pipenv-base
 
 WORKDIR /usr/src/pipenv
 
@@ -37,7 +37,7 @@ RUN set -eux \
 # Purpose: The final image
 # Comments:
 #  - Don't leave anything extra in here
-FROM python:3.9-slim-bullseye as main-app
+FROM docker.io/python:3.9-slim-bookworm as main-app
 
 LABEL org.opencontainers.image.authors="paperless-ngx team <hello@paperless-ngx.com>"
 LABEL org.opencontainers.image.documentation="https://docs.paperless-ngx.com/"
@@ -70,9 +70,9 @@ ARG RUNTIME_PACKAGES="\
   # Image processing
   liblept5 \
   liblcms2-2 \
-  libtiff5 \
+  libtiff6 \
   libfreetype6 \
-  libwebp6 \
+  libwebp7 \
   libopenjp2-7 \
   libimagequant0 \
   libraqm0 \
@@ -98,6 +98,8 @@ ARG RUNTIME_PACKAGES="\
   libxml2 \
   libxslt1.1 \
   libgnutls30 \
+  libqpdf29 \
+  qpdf \
   # Mime type detection
   file \
   libmagic1 \
@@ -189,9 +191,6 @@ RUN set -eux \
   && echo "Installing jbig2enc" \
     && cp ./jbig2enc/${JBIG2ENC_VERSION}/${TARGETARCH}${TARGETVARIANT}/jbig2 /usr/local/bin/ \
     && cp ./jbig2enc/${JBIG2ENC_VERSION}/${TARGETARCH}${TARGETVARIANT}/libjbig2enc* /usr/local/lib/ \
-  && echo "Installing qpdf" \
-    && apt-get install --yes --no-install-recommends ./qpdf/${QPDF_VERSION}/${TARGETARCH}${TARGETVARIANT}/libqpdf29_*.deb \
-    && apt-get install --yes --no-install-recommends ./qpdf/${QPDF_VERSION}/${TARGETARCH}${TARGETVARIANT}/qpdf_*.deb \
   && echo "Installing pikepdf and dependencies" \
     && python3 -m pip install --no-cache-dir ./pikepdf/${PIKEPDF_VERSION}/${TARGETARCH}${TARGETVARIANT}/*.whl \
     && python3 -m pip list \
