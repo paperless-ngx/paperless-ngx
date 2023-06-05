@@ -3,7 +3,8 @@
   <a class="btn-link" header-buttons [routerLink]="[]" (click)="showAll()" *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }" i18n>Show all</a>
 
 
-  <table content class="table table-sm table-hover table-borderless mb-0">
+  <div content class="card-body text-dark bg-light">
+  <table class="table table-sm table-hover table-borderless mb-0">
     <thead>
       <tr>
         <th i18n>Created</th>
@@ -17,5 +18,6 @@
       </tr>
     </tbody>
   </table>
+  </div>
 
 </app-widget-frame>

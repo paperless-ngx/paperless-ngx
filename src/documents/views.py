@@ -12,6 +12,7 @@ from time import mktime
 from unicodedata import normalize
 from urllib.parse import quote
 
+import img2pdf
 import pathvalidate
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -715,6 +716,13 @@ class PostDocumentView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
 
         doc_name, doc_data = serializer.validated_data.get("document")
+
+        if doc_name is None:
+            doc_name = serializer.validated_data.get("filename")
+
+        if doc_name is None:
+            raise ValueError
+
         correspondent_id = serializer.validated_data.get("correspondent")
         document_type_id = serializer.validated_data.get("document_type")
         tag_ids = serializer.validated_data.get("tags")
@@ -730,7 +738,12 @@ class PostDocumentView(GenericAPIView):
             pathvalidate.sanitize_filename(doc_name),
         )
 
-        temp_file_path.write_bytes(doc_data)
+        if len(doc_data) > 1:
+            temp_file_path.write_bytes(
+                img2pdf.convert(doc_data, rotation=img2pdf.Rotation.ifvalid)
+            )
+        else:
+            temp_file_path.write_bytes(doc_data[0])
 
         os.utime(temp_file_path, times=(t, t))
 

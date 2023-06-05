@@ -701,9 +701,17 @@ class PostDocumentSerializer(serializers.Serializer):
         required=False,
     )
 
-    document = serializers.FileField(
-        label="Document",
+    filename = serializers.CharField(
+        label="Filename",
         write_only=True,
+        required=False,
+    )
+
+    document = serializers.ListField(
+        child=serializers.FileField(
+            label="Document",
+            write_only=True,
+        )
     )
 
     title = serializers.CharField(
@@ -744,16 +752,27 @@ class PostDocumentSerializer(serializers.Serializer):
         max_value=Document.ARCHIVE_SERIAL_NUMBER_MAX,
     )
 
-    def validate_document(self, document):
-        document_data = document.file.read()
-        mime_type = magic.from_buffer(document_data, mime=True)
-
-        if not is_mime_type_supported(mime_type):
+    def validate(self, data):
+        if len(data["document"]) != 1 and "filename" not in data:
             raise serializers.ValidationError(
-                _("File type %(type)s not supported") % {"type": mime_type},
+                _("Filename entry is required if multiple documents are provided"),
             )
 
-        return document.name, document_data
+        return data
+
+    def validate_document(self, document):
+        document_data = []
+
+        for f in document:
+            document_data.append(f.file.read())
+            mime_type = magic.from_buffer(document_data[-1], mime=True)
+
+            if not is_mime_type_supported(mime_type):
+                raise serializers.ValidationError(
+                    _("File type %(type)s not supported") % {"type": mime_type},
+                )
+
+        return document[0].name if len(document) == 1 else None, document_data
 
     def validate_correspondent(self, correspondent):
         if correspondent:

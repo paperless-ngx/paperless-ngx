@@ -8,6 +8,11 @@ import {
   NgbModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http'
+import {
+  CdkDragDrop,
+  CdkDropList,
+  CdkDrag,
+} from '@angular/cdk/drag-drop';
 import { DocumentListComponent } from './components/document-list/document-list.component'
 import { DocumentDetailComponent } from './components/document-detail/document-detail.component'
 import { DashboardComponent } from './components/dashboard/dashboard.component'
@@ -230,6 +235,8 @@ function initializeApp(settings: SettingsService) {
     NgSelectModule,
     ColorSliderModule,
     TourNgBootstrapModule,
+    CdkDropList,
+    CdkDrag,
   ],
   providers: [
     {

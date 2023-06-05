@@ -35,3 +35,7 @@ form {
 ::ng-deep .ngx-file-drop__drop-zone--over {
   background-color: var(--pngx-primary-faded) !important;
 }
+
+.staged-file {
+  cursor: move;
+}
