@@ -27,6 +27,12 @@ system. On Linux, chances are high that this location is
     files around manually. This folder is meant to be entirely managed by
     docker and paperless.
 
+!!! note
+
+    Files consumed from the consumption directory are re-created inside
+    this media directory and are removed from the consumption directory
+    itself.
+
 ## Let's say I want to switch tools in a year. Can I easily move to other systems?
 
 **A:** Your documents are stored as plain files inside the media folder.
