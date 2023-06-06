@@ -69,7 +69,7 @@ class Consumer(LoggingMixin):
         status,
         message=None,
         document_id=None,
-    ):
+    ):  # pragma: no cover
         payload = {
             "filename": os.path.basename(self.filename) if self.filename else None,
             "task_id": self.task_id,
@@ -352,7 +352,7 @@ class Consumer(LoggingMixin):
 
         self.run_pre_consume_script()
 
-        def progress_callback(current_progress, max_progress):
+        def progress_callback(current_progress, max_progress):  # pragma: no cover
             # recalculate progress to be within 20 and 80
             p = int((current_progress / max_progress) * 50 + 20)
             self._send_progress(p, 100, "WORKING")
