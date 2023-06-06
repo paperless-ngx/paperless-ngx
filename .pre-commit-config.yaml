@@ -37,7 +37,7 @@ repos:
         exclude: "(^Pipfile\\.lock$)"
   # Python hooks
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: 'v0.0.265'
+    rev: 'v0.0.272'
     hooks:
       - id: ruff
   - repo: https://github.com/psf/black
@@ -57,6 +57,6 @@ repos:
         args:
           - "--tab"
   - repo: https://github.com/shellcheck-py/shellcheck-py
-    rev: "v0.9.0.2"
+    rev: "v0.9.0.5"
     hooks:
       - id: shellcheck
