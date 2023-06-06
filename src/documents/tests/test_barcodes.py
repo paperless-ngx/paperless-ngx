@@ -12,6 +12,7 @@ from documents.barcodes import BarcodeReader
 from documents.consumer import ConsumerError
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentSource
+from documents.models import Document
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
 
@@ -764,7 +765,7 @@ class TestAsnBarcode(DirectoriesMixin, TestCase):
             self.assertEqual(reader.pdf_file, test_file)
             self.assertEqual(asn, 123)
 
-    def test_scan_file_for_asn_not_existing(self):
+    def test_scan_file_for_asn_not_found(self):
         """
         GIVEN:
             - PDF without an ASN barcode
@@ -780,6 +781,49 @@ class TestAsnBarcode(DirectoriesMixin, TestCase):
 
             self.assertEqual(reader.pdf_file, test_file)
             self.assertEqual(asn, None)
+
+    @override_settings(CONSUMER_ENABLE_ASN_BARCODE=True)
+    def test_scan_file_for_asn_already_exists(self):
+        """
+        GIVEN:
+            - PDF with an ASN barcode
+            - ASN value already exists
+        WHEN:
+            - File is scanned for barcodes
+        THEN:
+            - ASN is retrieved from the document
+            - Consumption fails
+        """
+
+        Document.objects.create(
+            title="WOW",
+            content="the content",
+            archive_serial_number=123,
+            checksum="456",
+            mime_type="application/pdf",
+        )
+
+        test_file = self.BARCODE_SAMPLE_DIR / "barcode-39-asn-123.pdf"
+
+        dst = settings.SCRATCH_DIR / "barcode-39-asn-123.pdf"
+        shutil.copy(test_file, dst)
+
+        with mock.patch("documents.consumer.Consumer._send_progress"):
+            with self.assertRaises(ConsumerError) as cm, self.assertLogs(
+                "paperless.consumer",
+                level="ERROR",
+            ) as logs_cm:
+                tasks.consume_file(
+                    ConsumableDocument(
+                        source=DocumentSource.ConsumeFolder,
+                        original_file=dst,
+                    ),
+                    None,
+                )
+            self.assertIn("Not consuming barcode-39-asn-123.pdf", str(cm.exception))
+            error_str = logs_cm.output[0]
+            expected_str = "ERROR:paperless.consumer:Not consuming barcode-39-asn-123.pdf: Given ASN already exists!"
+            self.assertEqual(expected_str, error_str)
 
     def test_scan_file_for_asn_barcode_invalid(self):
         """
