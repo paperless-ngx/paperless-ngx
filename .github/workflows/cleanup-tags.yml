@@ -51,14 +51,6 @@ jobs:
         include:
           - primary-name: "paperless-ngx"
           - primary-name: "paperless-ngx/builder/cache/app"
-          - primary-name: "paperless-ngx/builder/qpdf"
-          - primary-name: "paperless-ngx/builder/cache/qpdf"
-          - primary-name: "paperless-ngx/builder/pikepdf"
-          - primary-name: "paperless-ngx/builder/cache/pikepdf"
-          - primary-name: "paperless-ngx/builder/jbig2enc"
-          - primary-name: "paperless-ngx/builder/cache/jbig2enc"
-          - primary-name: "paperless-ngx/builder/psycopg2"
-          - primary-name: "paperless-ngx/builder/cache/psycopg2"
           # TODO: Remove the above and replace with the below
           # - primary-name: "builder/qpdf"
           # - primary-name: "builder/cache/qpdf"
