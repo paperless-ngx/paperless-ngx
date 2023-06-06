@@ -69,7 +69,9 @@ following operations on your documents:
     No matter which options you choose, Paperless will always store the
     original document that it found in the consumption directory or in the
     mail and will never overwrite that document. Archived versions are
-    stored alongside the original versions.
+    stored alongside the original versions. Any files found in the
+    consumption directory will stored inside the Paperless-ngx file
+    structure and will not be retained in the consumption directory.
 
 ### The consumption directory
 
@@ -77,7 +79,9 @@ The primary method of getting documents into your database is by putting
 them in the consumption directory. The consumer waits patiently, looking
 for new additions to this directory. When it finds them,
 the consumer goes about the process of parsing them with the OCR,
-indexing what it finds, and storing it in the media directory.
+indexing what it finds, and storing it in the media directory. You should
+think of this folder as a temporary location, as files will be re-created
+inside Paperless-ngx and removed from the consumption folder.
 
 Getting stuff into this directory is up to you. If you're running
 Paperless on your local computer, you might just want to drag and drop
@@ -87,6 +91,15 @@ setup some sort of service to accept the files from the scanner.
 Typically, you're looking at an FTP server like
 [Proftpd](http://www.proftpd.org/) or a Windows folder share with
 [Samba](https://www.samba.org/).
+
+!!! warning
+
+    Files found in the consumption directory that are consumed will be
+    removed from the consumption directory and stored inside the
+    Paperless-ngx file structure using any settings / storage paths
+    you have specified. This action is performed as safely as possible
+    but this means it is expected that files in the consumption
+    directory will no longer exist (there) after being consumed.
 
 ### Web UI Upload
 
