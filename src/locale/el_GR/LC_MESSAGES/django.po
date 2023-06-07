@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-06-07 13:19\n"
+"PO-Revision-Date: 2023-06-07 14:21\n"
 "Last-Translator: \n"
 "Language-Team: Greek\n"
 "Language: el_GR\n"
@@ -100,167 +100,167 @@ msgstr "ετικέτες"
 
 #: documents/models.py:105 documents/models.py:156
 msgid "document type"
-msgstr ""
+msgstr "τύπος εγγράφου"
 
 #: documents/models.py:106
 msgid "document types"
-msgstr ""
+msgstr "τύποι εγγράφων"
 
 #: documents/models.py:111
 msgid "path"
-msgstr ""
+msgstr "διαδρομή"
 
 #: documents/models.py:117 documents/models.py:145
 msgid "storage path"
-msgstr ""
+msgstr "διαδρομή αποθήκευσης"
 
 #: documents/models.py:118
 msgid "storage paths"
-msgstr ""
+msgstr "διαδρομές αποθήκευσης"
 
 #: documents/models.py:126
 msgid "Unencrypted"
-msgstr ""
+msgstr "Μη Κρυπτογραφημένο"
 
 #: documents/models.py:127
 msgid "Encrypted with GNU Privacy Guard"
-msgstr ""
+msgstr "Κρυπτογραφημένο με GNU Privacy Guard"
 
 #: documents/models.py:148
 msgid "title"
-msgstr ""
+msgstr "τίτλος"
 
 #: documents/models.py:160 documents/models.py:624
 msgid "content"
-msgstr ""
+msgstr "περιεχόμενο"
 
 #: documents/models.py:163
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
-msgstr ""
+msgstr "Τα ωμά δεδομένα μόνο κειμένου του εγγράφου. Αυτό το πεδίο χρησιμοποιείται κυρίως για αναζήτηση."
 
 #: documents/models.py:168
 msgid "mime type"
-msgstr ""
+msgstr "τύπος Mime"
 
 #: documents/models.py:178
 msgid "checksum"
-msgstr ""
+msgstr "checksum"
 
 #: documents/models.py:182
 msgid "The checksum of the original document."
-msgstr ""
+msgstr "Το checksum του αρχικού εγγράφου."
 
 #: documents/models.py:186
 msgid "archive checksum"
-msgstr ""
+msgstr "checksum αρχειοθέτησης"
 
 #: documents/models.py:191
 msgid "The checksum of the archived document."
-msgstr ""
+msgstr "Το checksum του αρχειοθετημένου εγγράφου."
 
 #: documents/models.py:194 documents/models.py:376 documents/models.py:630
 msgid "created"
-msgstr ""
+msgstr "δημιουργήθηκε"
 
 #: documents/models.py:197
 msgid "modified"
-msgstr ""
+msgstr "τροποποιήθηκε"
 
 #: documents/models.py:204
 msgid "storage type"
-msgstr ""
+msgstr "τύπος αποθήκευσης"
 
 #: documents/models.py:212
 msgid "added"
-msgstr ""
+msgstr "προστέθηκε"
 
 #: documents/models.py:219
 msgid "filename"
-msgstr ""
+msgstr "όνομα αρχείου"
 
 #: documents/models.py:225
 msgid "Current filename in storage"
-msgstr ""
+msgstr "Τρέχον όνομα αρχείου στον αποθηκευτικό χώρο"
 
 #: documents/models.py:229
 msgid "archive filename"
-msgstr ""
+msgstr "όνομα αρχείου αρχειοθήκης"
 
 #: documents/models.py:235
 msgid "Current archive filename in storage"
-msgstr ""
+msgstr "Τρέχον όνομα αρχείου αρχειοθήκης στον αποθηκευτικό χώρο"
 
 #: documents/models.py:239
 msgid "original filename"
-msgstr ""
+msgstr "πρωτότυπο όνομα αρχείου"
 
 #: documents/models.py:245
 msgid "The original name of the file when it was uploaded"
-msgstr ""
+msgstr "Το αρχικό όνομα του αρχείου όταν μεταφορτώθηκε"
 
 #: documents/models.py:252
 msgid "archive serial number"
-msgstr ""
+msgstr "σειριακός αριθμός αρχειοθέτησης"
 
 #: documents/models.py:262
 msgid "The position of this document in your physical document archive."
-msgstr ""
+msgstr "Η θέση αυτού του εγγράφου στο αρχείο φυσικών εγγράφων σας."
 
 #: documents/models.py:268 documents/models.py:641
 msgid "document"
-msgstr ""
+msgstr "αρχείο"
 
 #: documents/models.py:269
 msgid "documents"
-msgstr ""
+msgstr "αρχεία"
 
 #: documents/models.py:359
 msgid "debug"
-msgstr ""
+msgstr "αποσφαλμάτωση"
 
 #: documents/models.py:360
 msgid "information"
-msgstr ""
+msgstr "πληροφορίες"
 
 #: documents/models.py:361
 msgid "warning"
-msgstr ""
+msgstr "προειδοποίηση"
 
 #: documents/models.py:362 paperless_mail/models.py:276
 msgid "error"
-msgstr ""
+msgstr "σφάλμα"
 
 #: documents/models.py:363
 msgid "critical"
-msgstr ""
+msgstr "κρίσιμο"
 
 #: documents/models.py:366
 msgid "group"
-msgstr ""
+msgstr "ομάδα"
 
 #: documents/models.py:368
 msgid "message"
-msgstr ""
+msgstr "μήνυμα"
 
 #: documents/models.py:371
 msgid "level"
-msgstr ""
+msgstr "επίπεδο"
 
 #: documents/models.py:380
 msgid "log"
-msgstr ""
+msgstr "αρχείο καταγραφής"
 
 #: documents/models.py:381
 msgid "logs"
-msgstr ""
+msgstr "αρχεία καταγραφής"
 
 #: documents/models.py:391 documents/models.py:446
 msgid "saved view"
-msgstr ""
+msgstr "αποθηκευμένη προβολή"
 
 #: documents/models.py:392
 msgid "saved views"
-msgstr ""
+msgstr "αποθηκευμένες προβολές"
 
 #: documents/models.py:397
 msgid "show on dashboard"
@@ -460,205 +460,205 @@ msgstr ""
 
 #: documents/models.py:610
 msgid "Datetime field when the task was completed in UTC"
-msgstr ""
+msgstr "Πεδίο ημερομηνίας/ώρας κατά την ολοκλήρωση της εργασίας σε UTC"
 
 #: documents/models.py:615
 msgid "Result Data"
-msgstr ""
+msgstr "Αποτέλεσμα Δεδομένων"
 
 #: documents/models.py:617
 msgid "The data returned by the task"
-msgstr ""
+msgstr "Τα δεδομένα που επιστράφηκαν από την εργασία"
 
 #: documents/models.py:626
 msgid "Comment for the document"
-msgstr ""
+msgstr "Σχόλιο για το έγγραφο"
 
 #: documents/models.py:650
 msgid "user"
-msgstr ""
+msgstr "χρήστης"
 
 #: documents/models.py:655
 msgid "comment"
-msgstr ""
+msgstr "σχόλιο"
 
 #: documents/models.py:656
 msgid "comments"
-msgstr ""
+msgstr "σχόλια"
 
 #: documents/serialisers.py:80
 #, python-format
 msgid "Invalid regular expression: %(error)s"
-msgstr ""
+msgstr "Άκυρη έκφραση: %(error)s"
 
 #: documents/serialisers.py:320
 msgid "Invalid color."
-msgstr ""
+msgstr "Άκυρο χρώμα."
 
 #: documents/serialisers.py:700
 #, python-format
 msgid "File type %(type)s not supported"
-msgstr ""
+msgstr "Ο τύπος αρχείου %(type)s δεν υποστηρίζεται"
 
 #: documents/serialisers.py:794
 msgid "Invalid variable detected."
-msgstr ""
+msgstr "Εντοπίστηκε μη έγκυρη μεταβλητή."
 
 #: documents/templates/index.html:78
 msgid "Paperless-ngx is loading..."
-msgstr ""
+msgstr "Το Paperless-ngx φορτώνει..."
 
 #: documents/templates/index.html:79
 msgid "Still here?! Hmm, something might be wrong."
-msgstr ""
+msgstr "Ακόμα εδώ?! Χμμ, κάτι μπορεί να είναι λάθος."
 
 #: documents/templates/index.html:79
 msgid "Here's a link to the docs."
-msgstr ""
+msgstr "Ορίστε ένας σύνδεσμος για τις οδηγίες."
 
 #: documents/templates/registration/logged_out.html:14
 msgid "Paperless-ngx signed out"
-msgstr ""
+msgstr "Το Paperless-ngx αποσυνδέθηκε"
 
 #: documents/templates/registration/logged_out.html:59
 msgid "You have been successfully logged out. Bye!"
-msgstr ""
+msgstr "Έχετε αποσυνδεθεί με επιτυχία. Αντίο!"
 
 #: documents/templates/registration/logged_out.html:60
 msgid "Sign in again"
-msgstr ""
+msgstr "Συνδεθείτε ξανά"
 
 #: documents/templates/registration/login.html:15
 msgid "Paperless-ngx sign in"
-msgstr ""
+msgstr "Σύνδεση Paperless-ngx"
 
 #: documents/templates/registration/login.html:61
 msgid "Please sign in."
-msgstr ""
+msgstr "Παρακαλώ συνδεθείτε."
 
 #: documents/templates/registration/login.html:64
 msgid "Your username and password didn't match. Please try again."
-msgstr ""
+msgstr "Το όνομα χρήστη και ο κωδικός πρόσβασης δεν ταιριάζουν. Παρακαλώ δοκιμάστε ξανά."
 
 #: documents/templates/registration/login.html:67
 msgid "Username"
-msgstr ""
+msgstr "Όνομα χρήστη"
 
 #: documents/templates/registration/login.html:68
 msgid "Password"
-msgstr ""
+msgstr "Κωδικός"
 
 #: documents/templates/registration/login.html:73
 msgid "Sign in"
-msgstr ""
+msgstr "Είσοδος"
 
 #: paperless/apps.py:9
 msgid "Paperless"
-msgstr ""
+msgstr "Paperless"
 
 #: paperless/settings.py:521
 msgid "English (US)"
-msgstr ""
+msgstr "Αγγλικά (ΗΠΑ)"
 
 #: paperless/settings.py:522
 msgid "Arabic"
-msgstr ""
+msgstr "Αραβικά"
 
 #: paperless/settings.py:523
 msgid "Belarusian"
-msgstr ""
+msgstr "Λευκορωσικά"
 
 #: paperless/settings.py:524
 msgid "Czech"
-msgstr ""
+msgstr "Τσέχικα"
 
 #: paperless/settings.py:525
 msgid "Danish"
-msgstr ""
+msgstr "Δανέζικα"
 
 #: paperless/settings.py:526
 msgid "German"
-msgstr ""
+msgstr "Γερμανικά"
 
 #: paperless/settings.py:527
 msgid "English (GB)"
-msgstr ""
+msgstr "Αγγλικά (Ηνωμένο Βασίλειο)"
 
 #: paperless/settings.py:528
 msgid "Spanish"
-msgstr ""
+msgstr "Ισπανικά"
 
 #: paperless/settings.py:529
 msgid "French"
-msgstr ""
+msgstr "Γαλλικά"
 
 #: paperless/settings.py:530
 msgid "Italian"
-msgstr ""
+msgstr "Ιταλικά"
 
 #: paperless/settings.py:531
 msgid "Luxembourgish"
-msgstr ""
+msgstr "Λουξεμβουργικά"
 
 #: paperless/settings.py:532
 msgid "Dutch"
-msgstr ""
+msgstr "Ολλανδικά"
 
 #: paperless/settings.py:533
 msgid "Polish"
-msgstr ""
+msgstr "Πολωνικά"
 
 #: paperless/settings.py:534
 msgid "Portuguese (Brazil)"
-msgstr ""
+msgstr "Πορτογαλικά (Βραζιλίας)"
 
 #: paperless/settings.py:535
 msgid "Portuguese"
-msgstr ""
+msgstr "Πορτογαλικά"
 
 #: paperless/settings.py:536
 msgid "Romanian"
-msgstr ""
+msgstr "Ρουμάνικα"
 
 #: paperless/settings.py:537
 msgid "Russian"
-msgstr ""
+msgstr "Ρωσικά"
 
 #: paperless/settings.py:538
 msgid "Slovenian"
-msgstr ""
+msgstr "Σλοβενικά"
 
 #: paperless/settings.py:539
 msgid "Serbian"
-msgstr ""
+msgstr "Σερβικά"
 
 #: paperless/settings.py:540
 msgid "Swedish"
-msgstr ""
+msgstr "Σουηδικά"
 
 #: paperless/settings.py:541
 msgid "Turkish"
-msgstr ""
+msgstr "Τούρκικα"
 
 #: paperless/settings.py:542
 msgid "Chinese Simplified"
-msgstr ""
+msgstr "Κινέζικα Απλοποιημένα"
 
 #: paperless/urls.py:169
 msgid "Paperless-ngx administration"
-msgstr ""
+msgstr "Διαχείριση Paperless-ngx"
 
 #: paperless_mail/admin.py:30
 msgid "Authentication"
-msgstr ""
+msgstr "Ταυτοποίηση"
 
 #: paperless_mail/admin.py:31
 msgid "Advanced settings"
-msgstr ""
+msgstr "Ρυθμίσεις για προχωρημένους"
 
 #: paperless_mail/admin.py:48
 msgid "Filter"
-msgstr ""
+msgstr "Φίλτρο"
 
 #: paperless_mail/admin.py:51
 msgid "Paperless will only process mails that match ALL of the filters given below."
@@ -862,53 +862,53 @@ msgstr ""
 
 #: paperless_mail/models.py:164
 msgid "action"
-msgstr ""
+msgstr "ενέργεια"
 
 #: paperless_mail/models.py:170
 msgid "action parameter"
-msgstr ""
+msgstr "παράμετρος ενέργειας"
 
 #: paperless_mail/models.py:175
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
-msgstr ""
+msgstr "Επιπρόσθετη παράμετρος για την ενέργεια που επιλέχθηκε παραπάνω, παράδειγμα: ο φάκελος προορισμού της μετακίνησης σε φάκελο. Οι υποφακέλοι πρέπει να διαχωρίζονται με τελείες."
 
 #: paperless_mail/models.py:183
 msgid "assign title from"
-msgstr ""
+msgstr "ανάθεση τίτλου από"
 
 #: paperless_mail/models.py:191
 msgid "assign this tag"
-msgstr ""
+msgstr "ανάθεση αυτής της ετικέτας"
 
 #: paperless_mail/models.py:199
 msgid "assign this document type"
-msgstr ""
+msgstr "ανάθεση αυτού του τύπου εγγράφου"
 
 #: paperless_mail/models.py:203
 msgid "assign correspondent from"
-msgstr ""
+msgstr "ανάθεση ανταποκριτή από"
 
 #: paperless_mail/models.py:213
 msgid "assign this correspondent"
-msgstr ""
+msgstr "ανάθεση αυτού του ανταποκριτή"
 
 #: paperless_mail/models.py:239
 msgid "uid"
-msgstr ""
+msgstr "uid"
 
 #: paperless_mail/models.py:247
 msgid "subject"
-msgstr ""
+msgstr "θέμα"
 
 #: paperless_mail/models.py:255
 msgid "received"
-msgstr ""
+msgstr "λήφθηκαν"
 
 #: paperless_mail/models.py:262
 msgid "processed"
-msgstr ""
+msgstr "επεξεργασμένα"
 
 #: paperless_mail/models.py:268
 msgid "status"
-msgstr ""
+msgstr "κατάσταση"
 
