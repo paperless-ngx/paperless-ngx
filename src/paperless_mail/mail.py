@@ -384,6 +384,8 @@ def make_criterias(rule: MailRule, supports_gmail_labels: bool):
     if isinstance(rule_query, dict):
         if len(rule_query) or len(criterias):
             return AND(**rule_query, **criterias)
+        else:
+            return "ALL"
     else:
         return AND(rule_query, **criterias)
 
