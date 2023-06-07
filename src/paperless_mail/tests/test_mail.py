@@ -721,6 +721,31 @@ class TestMail(
         self.assertEqual(len(self.bogus_mailbox.messages), 2)
         self.assertEqual(len(self.bogus_mailbox.messages_spam), 1)
 
+    def test_handle_mail_account_move_no_filters(self):
+        account = MailAccount.objects.create(
+            name="test",
+            imap_server="",
+            username="admin",
+            password="secret",
+        )
+
+        _ = MailRule.objects.create(
+            name="testrule",
+            account=account,
+            action=MailRule.MailAction.MOVE,
+            action_parameter="spam",
+            maximum_age=0,
+        )
+
+        self.assertEqual(len(self.bogus_mailbox.messages), 3)
+        self.assertEqual(len(self.bogus_mailbox.messages_spam), 0)
+
+        self.mail_account_handler.handle_mail_account(account)
+        self.apply_mail_actions()
+
+        self.assertEqual(len(self.bogus_mailbox.messages), 0)
+        self.assertEqual(len(self.bogus_mailbox.messages_spam), 3)
+
     def test_handle_mail_account_tag(self):
         account = MailAccount.objects.create(
             name="test",
