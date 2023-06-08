@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-06-08 05:48\n"
+"PO-Revision-Date: 2023-06-08 06:55\n"
 "Last-Translator: \n"
 "Language-Team: Slovak\n"
 "Language: sk_SK\n"
@@ -284,147 +284,147 @@ msgstr "názov obsahuje"
 
 #: documents/models.py:415
 msgid "content contains"
-msgstr ""
+msgstr "dokument obsahuje"
 
 #: documents/models.py:416
 msgid "ASN is"
-msgstr ""
+msgstr "ASN je"
 
 #: documents/models.py:417
 msgid "correspondent is"
-msgstr ""
+msgstr "odosielateľ je"
 
 #: documents/models.py:418
 msgid "document type is"
-msgstr ""
+msgstr "typ dokumentu je"
 
 #: documents/models.py:419
 msgid "is in inbox"
-msgstr ""
+msgstr "je v doručenej pošte"
 
 #: documents/models.py:420
 msgid "has tag"
-msgstr ""
+msgstr "má štítok"
 
 #: documents/models.py:421
 msgid "has any tag"
-msgstr ""
+msgstr "má niektorý zo štítkov"
 
 #: documents/models.py:422
 msgid "created before"
-msgstr ""
+msgstr "vytvorený pred"
 
 #: documents/models.py:423
 msgid "created after"
-msgstr ""
+msgstr "vytvorený po"
 
 #: documents/models.py:424
 msgid "created year is"
-msgstr ""
+msgstr "rok vytvorenia je"
 
 #: documents/models.py:425
 msgid "created month is"
-msgstr ""
+msgstr "mesiac vytvorenia je"
 
 #: documents/models.py:426
 msgid "created day is"
-msgstr ""
+msgstr "deň vytvorenia je"
 
 #: documents/models.py:427
 msgid "added before"
-msgstr ""
+msgstr "pridaný pred"
 
 #: documents/models.py:428
 msgid "added after"
-msgstr ""
+msgstr "pridaný po"
 
 #: documents/models.py:429
 msgid "modified before"
-msgstr ""
+msgstr "zmenený pred"
 
 #: documents/models.py:430
 msgid "modified after"
-msgstr ""
+msgstr "zmenený po"
 
 #: documents/models.py:431
 msgid "does not have tag"
-msgstr ""
+msgstr "nemá štítok"
 
 #: documents/models.py:432
 msgid "does not have ASN"
-msgstr ""
+msgstr "nemá ASN"
 
 #: documents/models.py:433
 msgid "title or content contains"
-msgstr ""
+msgstr "názov alebo dokument obsahuje"
 
 #: documents/models.py:434
 msgid "fulltext query"
-msgstr ""
+msgstr "fulltextový dopyt"
 
 #: documents/models.py:435
 msgid "more like this"
-msgstr ""
+msgstr "viac podobných"
 
 #: documents/models.py:436
 msgid "has tags in"
-msgstr ""
+msgstr "má štítok v"
 
 #: documents/models.py:437
 msgid "ASN greater than"
-msgstr ""
+msgstr "ASN väčšie ako"
 
 #: documents/models.py:438
 msgid "ASN less than"
-msgstr ""
+msgstr "ASN menšie ako"
 
 #: documents/models.py:439
 msgid "storage path is"
-msgstr ""
+msgstr "cesta k úložisku je"
 
 #: documents/models.py:449
 msgid "rule type"
-msgstr ""
+msgstr "typ pravidla"
 
 #: documents/models.py:451
 msgid "value"
-msgstr ""
+msgstr "hodnota"
 
 #: documents/models.py:454
 msgid "filter rule"
-msgstr ""
+msgstr "pravidlo filtra"
 
 #: documents/models.py:455
 msgid "filter rules"
-msgstr ""
+msgstr "pravidlá filtra"
 
 #: documents/models.py:563
 msgid "Task ID"
-msgstr ""
+msgstr "ID úlohy"
 
 #: documents/models.py:564
 msgid "Celery ID for the Task that was run"
-msgstr ""
+msgstr "Celery ID úlohy, ktorá bola vykonaná"
 
 #: documents/models.py:569
 msgid "Acknowledged"
-msgstr ""
+msgstr "Potvrdené"
 
 #: documents/models.py:570
 msgid "If the task is acknowledged via the frontend or API"
-msgstr ""
+msgstr "Ak je úloha potvrdená prostredníctvom rozhrania alebo API"
 
 #: documents/models.py:576
 msgid "Task Filename"
-msgstr ""
+msgstr "Názov súboru úlohy"
 
 #: documents/models.py:577
 msgid "Name of the file which the Task was run for"
-msgstr ""
+msgstr "Názov súboru, na ktorom bola vykonaná úloha"
 
 #: documents/models.py:583
 msgid "Task Name"
-msgstr ""
+msgstr "Názov úlohy"
 
 #: documents/models.py:584
 msgid "Name of the Task which was run"
@@ -630,43 +630,43 @@ msgstr ""
 
 #: paperless/settings.py:539
 msgid "Serbian"
-msgstr ""
+msgstr "Srbčina"
 
 #: paperless/settings.py:540
 msgid "Swedish"
-msgstr ""
+msgstr "Švédčina"
 
 #: paperless/settings.py:541
 msgid "Turkish"
-msgstr ""
+msgstr "Turečtina"
 
 #: paperless/settings.py:542
 msgid "Chinese Simplified"
-msgstr ""
+msgstr "Čínština (zjednodušená)"
 
 #: paperless/urls.py:169
 msgid "Paperless-ngx administration"
-msgstr ""
+msgstr "Správa Paperless-ngx"
 
 #: paperless_mail/admin.py:30
 msgid "Authentication"
-msgstr ""
+msgstr "Autentifikácia"
 
 #: paperless_mail/admin.py:31
 msgid "Advanced settings"
-msgstr ""
+msgstr "Pokročilé nastavenia"
 
 #: paperless_mail/admin.py:48
 msgid "Filter"
-msgstr ""
+msgstr "Filter"
 
 #: paperless_mail/admin.py:51
 msgid "Paperless will only process mails that match ALL of the filters given below."
-msgstr ""
+msgstr "Paperless spracuje iba e-maily, ktoré spĺňajú všetky filtre definované nižšie."
 
 #: paperless_mail/admin.py:66
 msgid "Actions"
-msgstr ""
+msgstr "Akcie"
 
 #: paperless_mail/admin.py:69
 msgid "The action applied to the mail. This action is only performed when the mail body or attachments were consumed from the mail."
