@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-06-08 06:55\n"
+"PO-Revision-Date: 2023-06-08 12:39\n"
 "Last-Translator: \n"
 "Language-Team: Slovak\n"
 "Language: sk_SK\n"
@@ -428,205 +428,205 @@ msgstr "Názov úlohy"
 
 #: documents/models.py:584
 msgid "Name of the Task which was run"
-msgstr ""
+msgstr "Názov vykonanej úlohy"
 
 #: documents/models.py:591
 msgid "Task State"
-msgstr ""
+msgstr "Stav úlohy"
 
 #: documents/models.py:592
 msgid "Current state of the task being run"
-msgstr ""
+msgstr "Aktuálny stav bežiacej úlohy"
 
 #: documents/models.py:597
 msgid "Created DateTime"
-msgstr ""
+msgstr "Dátum a čas vytvorenia"
 
 #: documents/models.py:598
 msgid "Datetime field when the task result was created in UTC"
-msgstr ""
+msgstr "Dátum a čas výsledku úlohy v UTC"
 
 #: documents/models.py:603
 msgid "Started DateTime"
-msgstr ""
+msgstr "Dátum a čas začiatku"
 
 #: documents/models.py:604
 msgid "Datetime field when the task was started in UTC"
-msgstr ""
+msgstr "Dátum a čas začiatku úlohy v UTC"
 
 #: documents/models.py:609
 msgid "Completed DateTime"
-msgstr ""
+msgstr "Dátum a čas skončenia"
 
 #: documents/models.py:610
 msgid "Datetime field when the task was completed in UTC"
-msgstr ""
+msgstr "Dátum a čas skončenia úlohy v UTC"
 
 #: documents/models.py:615
 msgid "Result Data"
-msgstr ""
+msgstr "Výsledné dáta"
 
 #: documents/models.py:617
 msgid "The data returned by the task"
-msgstr ""
+msgstr "Výsledné dáta úlohy"
 
 #: documents/models.py:626
 msgid "Comment for the document"
-msgstr ""
+msgstr "Komentár k dokumentu"
 
 #: documents/models.py:650
 msgid "user"
-msgstr ""
+msgstr "užívateľ"
 
 #: documents/models.py:655
 msgid "comment"
-msgstr ""
+msgstr "komentár"
 
 #: documents/models.py:656
 msgid "comments"
-msgstr ""
+msgstr "komentáre"
 
 #: documents/serialisers.py:80
 #, python-format
 msgid "Invalid regular expression: %(error)s"
-msgstr ""
+msgstr "Neplatný regulárny výraz: %(error)s"
 
 #: documents/serialisers.py:320
 msgid "Invalid color."
-msgstr ""
+msgstr "Neplatná farba."
 
 #: documents/serialisers.py:700
 #, python-format
 msgid "File type %(type)s not supported"
-msgstr ""
+msgstr "Typ súboru %(type)s nie je podporovaný"
 
 #: documents/serialisers.py:794
 msgid "Invalid variable detected."
-msgstr ""
+msgstr "Zistená neplatná premenná."
 
 #: documents/templates/index.html:78
 msgid "Paperless-ngx is loading..."
-msgstr ""
+msgstr "Paperless-ngx sa načítava..."
 
 #: documents/templates/index.html:79
 msgid "Still here?! Hmm, something might be wrong."
-msgstr ""
+msgstr "Ešte stále tu?! Hmm, niečo sa možno prihodilo."
 
 #: documents/templates/index.html:79
 msgid "Here's a link to the docs."
-msgstr ""
+msgstr "Tu je odkaz na dokumentáciu."
 
 #: documents/templates/registration/logged_out.html:14
 msgid "Paperless-ngx signed out"
-msgstr ""
+msgstr "Paperless-ngx bol odhlásený"
 
 #: documents/templates/registration/logged_out.html:59
 msgid "You have been successfully logged out. Bye!"
-msgstr ""
+msgstr "Boli ste úspešne odhlásený. Dovidenia!"
 
 #: documents/templates/registration/logged_out.html:60
 msgid "Sign in again"
-msgstr ""
+msgstr "Prihlásiť sa znova"
 
 #: documents/templates/registration/login.html:15
 msgid "Paperless-ngx sign in"
-msgstr ""
+msgstr "Prihlásiť Paperless-ngx"
 
 #: documents/templates/registration/login.html:61
 msgid "Please sign in."
-msgstr ""
+msgstr "Prihláste sa, prosím."
 
 #: documents/templates/registration/login.html:64
 msgid "Your username and password didn't match. Please try again."
-msgstr ""
+msgstr "Vaše prihlasovacie údaje nie sú správne. Prosím, skúste to znova."
 
 #: documents/templates/registration/login.html:67
 msgid "Username"
-msgstr ""
+msgstr "Užívateľské meno"
 
 #: documents/templates/registration/login.html:68
 msgid "Password"
-msgstr ""
+msgstr "Heslo"
 
 #: documents/templates/registration/login.html:73
 msgid "Sign in"
-msgstr ""
+msgstr "Prihlásiť sa"
 
 #: paperless/apps.py:9
 msgid "Paperless"
-msgstr ""
+msgstr "Paperless"
 
 #: paperless/settings.py:521
 msgid "English (US)"
-msgstr ""
+msgstr "Angličtina (US)"
 
 #: paperless/settings.py:522
 msgid "Arabic"
-msgstr ""
+msgstr "Arabčina"
 
 #: paperless/settings.py:523
 msgid "Belarusian"
-msgstr ""
+msgstr "Bieloruština"
 
 #: paperless/settings.py:524
 msgid "Czech"
-msgstr ""
+msgstr "Čeština"
 
 #: paperless/settings.py:525
 msgid "Danish"
-msgstr ""
+msgstr "Dánčina"
 
 #: paperless/settings.py:526
 msgid "German"
-msgstr ""
+msgstr "Nemčina"
 
 #: paperless/settings.py:527
 msgid "English (GB)"
-msgstr ""
+msgstr "Angličtina (GB)"
 
 #: paperless/settings.py:528
 msgid "Spanish"
-msgstr ""
+msgstr "Španielčina"
 
 #: paperless/settings.py:529
 msgid "French"
-msgstr ""
+msgstr "Francúzština"
 
 #: paperless/settings.py:530
 msgid "Italian"
-msgstr ""
+msgstr "Taliančina"
 
 #: paperless/settings.py:531
 msgid "Luxembourgish"
-msgstr ""
+msgstr "Luxemburčina"
 
 #: paperless/settings.py:532
 msgid "Dutch"
-msgstr ""
+msgstr "Holandčina"
 
 #: paperless/settings.py:533
 msgid "Polish"
-msgstr ""
+msgstr "Polština"
 
 #: paperless/settings.py:534
 msgid "Portuguese (Brazil)"
-msgstr ""
+msgstr "Portugalčina (Brazília)"
 
 #: paperless/settings.py:535
 msgid "Portuguese"
-msgstr ""
+msgstr "Portugalčina"
 
 #: paperless/settings.py:536
 msgid "Romanian"
-msgstr ""
+msgstr "Rumunčina"
 
 #: paperless/settings.py:537
 msgid "Russian"
-msgstr ""
+msgstr "Ruština"
 
 #: paperless/settings.py:538
 msgid "Slovenian"
-msgstr ""
+msgstr "Slovinčina"
 
 #: paperless/settings.py:539
 msgid "Serbian"
