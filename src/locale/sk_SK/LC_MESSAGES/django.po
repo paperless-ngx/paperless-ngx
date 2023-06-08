@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-06-07 11:14\n"
+"PO-Revision-Date: 2023-06-08 05:48\n"
 "Last-Translator: \n"
 "Language-Team: Slovak\n"
 "Language: sk_SK\n"
@@ -112,11 +112,11 @@ msgstr "cesta"
 
 #: documents/models.py:117 documents/models.py:145
 msgid "storage path"
-msgstr ""
+msgstr "cesta k úložisku"
 
 #: documents/models.py:118
 msgid "storage paths"
-msgstr ""
+msgstr "cesty k úložisku"
 
 #: documents/models.py:126
 msgid "Unencrypted"
@@ -140,7 +140,7 @@ msgstr "Nespracované, iba textové údaje dokumentu. Toto pole sa primárne pou
 
 #: documents/models.py:168
 msgid "mime type"
-msgstr ""
+msgstr "MIME typ"
 
 #: documents/models.py:178
 msgid "checksum"
@@ -196,7 +196,7 @@ msgstr "pôvodný názov súboru"
 
 #: documents/models.py:245
 msgid "The original name of the file when it was uploaded"
-msgstr ""
+msgstr "Pôvodný názov súboru pri nahratí"
 
 #: documents/models.py:252
 msgid "archive serial number"
@@ -204,19 +204,19 @@ msgstr "archivovať sériové číslo"
 
 #: documents/models.py:262
 msgid "The position of this document in your physical document archive."
-msgstr ""
+msgstr "Umiestnenie dokumentu vo vašom fyzickom archíve."
 
 #: documents/models.py:268 documents/models.py:641
 msgid "document"
-msgstr ""
+msgstr "dokument"
 
 #: documents/models.py:269
 msgid "documents"
-msgstr ""
+msgstr "dokumenty"
 
 #: documents/models.py:359
 msgid "debug"
-msgstr ""
+msgstr "odstraňovanie chýb"
 
 #: documents/models.py:360
 msgid "information"
@@ -256,31 +256,31 @@ msgstr "logy"
 
 #: documents/models.py:391 documents/models.py:446
 msgid "saved view"
-msgstr ""
+msgstr "uložené zobrazenie"
 
 #: documents/models.py:392
 msgid "saved views"
-msgstr ""
+msgstr "uložené zobrazenia"
 
 #: documents/models.py:397
 msgid "show on dashboard"
-msgstr ""
+msgstr "zobraziť na hlavnom paneli"
 
 #: documents/models.py:400
 msgid "show in sidebar"
-msgstr ""
+msgstr "zobraziť na bočnom paneli"
 
 #: documents/models.py:404
 msgid "sort field"
-msgstr ""
+msgstr "zoraďovacie pole"
 
 #: documents/models.py:409
 msgid "sort reverse"
-msgstr ""
+msgstr "zoradiť opačne"
 
 #: documents/models.py:414
 msgid "title contains"
-msgstr ""
+msgstr "názov obsahuje"
 
 #: documents/models.py:415
 msgid "content contains"
