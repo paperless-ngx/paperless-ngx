@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-06-07 15:24\n"
+"PO-Revision-Date: 2023-06-09 12:46\n"
 "Last-Translator: \n"
 "Language-Team: Greek\n"
 "Language: el_GR\n"
@@ -264,7 +264,7 @@ msgstr "αποθηκευμένες προβολές"
 
 #: documents/models.py:397
 msgid "show on dashboard"
-msgstr "εμφάνιση στον Πίνακα Ελέγχου"
+msgstr "εμφάνιση στο Ταμπλό"
 
 #: documents/models.py:400
 msgid "show in sidebar"
