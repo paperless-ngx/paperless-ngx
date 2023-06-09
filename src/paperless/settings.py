@@ -1,11 +1,3 @@
-'''
-Descripttion: 
-version: 
-Author: Tao Chen
-Date: 2023-06-09 15:48:19
-LastEditors: Tao Chen
-LastEditTime: 2023-06-09 15:51:13
-'''
 import datetime
 import json
 import math
