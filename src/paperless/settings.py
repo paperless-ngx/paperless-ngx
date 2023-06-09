@@ -1,3 +1,11 @@
+'''
+Descripttion: 
+version: 
+Author: Tao Chen
+Date: 2023-06-09 15:48:19
+LastEditors: Tao Chen
+LastEditTime: 2023-06-09 15:51:13
+'''
 import datetime
 import json
 import math
@@ -950,3 +958,6 @@ def _get_nltk_language_setting(ocr_lang: str) -> Optional[str]:
 NLTK_ENABLED: Final[bool] = __get_boolean("PAPERLESS_ENABLE_NLTK", "yes")
 
 NLTK_LANGUAGE: Optional[str] = _get_nltk_language_setting(OCR_LANGUAGE)
+
+# Get DEFAULT_GROUP from environment
+DEFAULT_GROUP = __get_list("DEFAULT_GROUP")
