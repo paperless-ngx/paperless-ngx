@@ -1593,7 +1593,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="translated">Wenn angegeben werden nur Dateien verarbeitet, die exakt diesem Dateinamen entsprechen. Platzhalter wie *.pdf oder *rechnung* sind erlaubt. Groß-/Kleinschreibung wird nicht berücksichtigt.</target>
+        <target state="translated">Wenn angegeben, werden nur Dateien verarbeitet, die exakt diesem Dateinamen entsprechen. Platzhalter wie *.pdf oder *rechnung* sind erlaubt. Groß-/Kleinschreibung wird nicht berücksichtigt.</target>
       </trans-unit>
       <trans-unit id="9216117865911519658" datatype="html">
         <source>Action</source>
@@ -1625,7 +1625,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="translated">Titel zuweisen von</target>
+        <target state="translated">Titel zuweisen</target>
       </trans-unit>
       <trans-unit id="6695990587380209737" datatype="html">
         <source>Assign document type</source>
@@ -1641,7 +1641,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="translated">Korrespondent zuweisen von</target>
+        <target state="translated">Korrespondent zuweisen</target>
       </trans-unit>
       <trans-unit id="4875491778188965469" datatype="html">
         <source>Assign correspondent</source>
@@ -1797,7 +1797,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">65</context>
         </context-group>
-        <target state="translated">Als wichtig markieren, verarbeite als wichtig markierte E-Mails nicht</target>
+        <target state="translated">Als wichtig markieren, verarbeite wichtige E-Mails nicht</target>
       </trans-unit>
       <trans-unit id="6457024618858980302" datatype="html">
         <source>Tag the mail with specified tag, don&apos;t process tagged mails</source>
@@ -1845,7 +1845,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">95</context>
         </context-group>
-        <target state="translated">Namen (oder E-Mail-Adresse falls nicht verfügbar) verwenden</target>
+        <target state="translated">Namen (oder, falls nicht verfügbar, E-Mail-Adresse) verwenden</target>
       </trans-unit>
       <trans-unit id="1258862217749148424" datatype="html">
         <source>Use correspondent selected below</source>
@@ -1853,7 +1853,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">99</context>
         </context-group>
-        <target state="translated">Nachfolgend ausgewählten Korrespondent verwenden</target>
+        <target state="translated">Nachfolgend ausgewählten Korrespondenten verwenden</target>
       </trans-unit>
       <trans-unit id="3147349817770432927" datatype="html">
         <source>Create new mail rule</source>
@@ -1989,7 +1989,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.html</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="translated">Nachname</target>
+        <target state="translated">Name</target>
       </trans-unit>
       <trans-unit id="8204176479746810612" datatype="html">
         <source>Active</source>
