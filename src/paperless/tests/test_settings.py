@@ -6,6 +6,7 @@ from unittest import mock
 from celery.schedules import crontab
 
 from paperless.settings import _parse_beat_schedule
+from paperless.settings import _parse_db_settings
 from paperless.settings import _parse_ignore_dates
 from paperless.settings import _parse_redis_url
 from paperless.settings import default_threads_per_worker
@@ -291,3 +292,60 @@ class TestCeleryScheduleParsing(TestCase):
             {},
             schedule,
         )
+
+
+class TestDBSettings(TestCase):
+    def test_db_timeout_with_sqlite(self):
+        """
+        GIVEN:
+            - PAPERLESS_DB_TIMEOUT is set
+        WHEN:
+            - Settings are parsed
+        THEN:
+            - PAPERLESS_DB_TIMEOUT set for sqlite
+        """
+        with mock.patch.dict(
+            os.environ,
+            {
+                "PAPERLESS_DB_TIMEOUT": "10",
+            },
+        ):
+            databases = _parse_db_settings()
+
+            self.assertDictEqual(
+                {
+                    "timeout": 10.0,
+                },
+                databases["default"]["OPTIONS"],
+            )
+
+    def test_db_timeout_with_not_sqlite(self):
+        """
+        GIVEN:
+            - PAPERLESS_DB_TIMEOUT is set but db is not sqlite
+        WHEN:
+            - Settings are parsed
+        THEN:
+            - PAPERLESS_DB_TIMEOUT set correctly in non-sqlite db & for fallback sqlite db
+        """
+        with mock.patch.dict(
+            os.environ,
+            {
+                "PAPERLESS_DBHOST": "127.0.0.1",
+                "PAPERLESS_DB_TIMEOUT": "10",
+            },
+        ):
+            databases = _parse_db_settings()
+
+            self.assertDictContainsSubset(
+                {
+                    "connect_timeout": 10.0,
+                },
+                databases["default"]["OPTIONS"],
+            )
+            self.assertDictEqual(
+                {
+                    "timeout": 10.0,
+                },
+                databases["sqlite"]["OPTIONS"],
+            )

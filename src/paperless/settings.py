@@ -476,69 +476,82 @@ CSRF_COOKIE_NAME = f"{COOKIE_PREFIX}csrftoken"
 SESSION_COOKIE_NAME = f"{COOKIE_PREFIX}sessionid"
 LANGUAGE_COOKIE_NAME = f"{COOKIE_PREFIX}django_language"
 
+
 ###############################################################################
 # Database                                                                    #
 ###############################################################################
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": os.path.join(DATA_DIR, "db.sqlite3"),
-        "OPTIONS": {},
-    },
-}
-
-if os.getenv("PAPERLESS_DBHOST"):
-    # Have sqlite available as a second option for management commands
-    # This is important when migrating to/from sqlite
-    DATABASES["sqlite"] = DATABASES["default"].copy()
-
-    DATABASES["default"] = {
-        "HOST": os.getenv("PAPERLESS_DBHOST"),
-        "NAME": os.getenv("PAPERLESS_DBNAME", "paperless"),
-        "USER": os.getenv("PAPERLESS_DBUSER", "paperless"),
-        "PASSWORD": os.getenv("PAPERLESS_DBPASS", "paperless"),
-        "OPTIONS": {},
+def _parse_db_settings() -> Dict:
+    databases = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": os.path.join(DATA_DIR, "db.sqlite3"),
+            "OPTIONS": {},
+        },
     }
-    if os.getenv("PAPERLESS_DBPORT"):
-        DATABASES["default"]["PORT"] = os.getenv("PAPERLESS_DBPORT")
+    if os.getenv("PAPERLESS_DBHOST"):
+        # Have sqlite available as a second option for management commands
+        # This is important when migrating to/from sqlite
+        databases["sqlite"] = databases["default"].copy()
 
-    # Leave room for future extensibility
-    if os.getenv("PAPERLESS_DBENGINE") == "mariadb":
-        engine = "django.db.backends.mysql"
-        options = {
-            "read_default_file": "/etc/mysql/my.cnf",
-            "charset": "utf8mb4",
-            "ssl": {
-                "ssl_mode": os.getenv("PAPERLESS_DBSSLMODE", "PREFERRED"),
-                "ca": os.getenv("PAPERLESS_DBSSLROOTCERT", None),
-                "cert": os.getenv("PAPERLESS_DBSSLCERT", None),
-                "key": os.getenv("PAPERLESS_DBSSLKEY", None),
-            },
+        databases["default"] = {
+            "HOST": os.getenv("PAPERLESS_DBHOST"),
+            "NAME": os.getenv("PAPERLESS_DBNAME", "paperless"),
+            "USER": os.getenv("PAPERLESS_DBUSER", "paperless"),
+            "PASSWORD": os.getenv("PAPERLESS_DBPASS", "paperless"),
+            "OPTIONS": {},
         }
+        if os.getenv("PAPERLESS_DBPORT"):
+            databases["default"]["PORT"] = os.getenv("PAPERLESS_DBPORT")
 
-        # Silence Django error on old MariaDB versions.
-        # VARCHAR can support > 255 in modern versions
-        # https://docs.djangoproject.com/en/4.1/ref/checks/#database
-        # https://mariadb.com/kb/en/innodb-system-variables/#innodb_large_prefix
-        SILENCED_SYSTEM_CHECKS = ["mysql.W003"]
+        # Leave room for future extensibility
+        if os.getenv("PAPERLESS_DBENGINE") == "mariadb":
+            engine = "django.db.backends.mysql"
+            options = {
+                "read_default_file": "/etc/mysql/my.cnf",
+                "charset": "utf8mb4",
+                "ssl": {
+                    "ssl_mode": os.getenv("PAPERLESS_DBSSLMODE", "PREFERRED"),
+                    "ca": os.getenv("PAPERLESS_DBSSLROOTCERT", None),
+                    "cert": os.getenv("PAPERLESS_DBSSLCERT", None),
+                    "key": os.getenv("PAPERLESS_DBSSLKEY", None),
+                },
+            }
 
-    else:  # Default to PostgresDB
-        engine = "django.db.backends.postgresql_psycopg2"
-        options = {
-            "sslmode": os.getenv("PAPERLESS_DBSSLMODE", "prefer"),
-            "sslrootcert": os.getenv("PAPERLESS_DBSSLROOTCERT", None),
-            "sslcert": os.getenv("PAPERLESS_DBSSLCERT", None),
-            "sslkey": os.getenv("PAPERLESS_DBSSLKEY", None),
-        }
+        else:  # Default to PostgresDB
+            engine = "django.db.backends.postgresql_psycopg2"
+            options = {
+                "sslmode": os.getenv("PAPERLESS_DBSSLMODE", "prefer"),
+                "sslrootcert": os.getenv("PAPERLESS_DBSSLROOTCERT", None),
+                "sslcert": os.getenv("PAPERLESS_DBSSLCERT", None),
+                "sslkey": os.getenv("PAPERLESS_DBSSLKEY", None),
+            }
 
-    DATABASES["default"]["ENGINE"] = engine
-    DATABASES["default"]["OPTIONS"].update(options)
+        databases["default"]["ENGINE"] = engine
+        databases["default"]["OPTIONS"].update(options)
 
-if os.getenv("PAPERLESS_DB_TIMEOUT") is not None:
-    DATABASES["default"]["OPTIONS"].update(
-        {"timeout": float(os.getenv("PAPERLESS_DB_TIMEOUT"))},
-    )
+    if os.getenv("PAPERLESS_DB_TIMEOUT") is not None:
+        if databases["default"]["ENGINE"] == "django.db.backends.sqlite3":
+            databases["default"]["OPTIONS"].update(
+                {"timeout": float(os.getenv("PAPERLESS_DB_TIMEOUT"))},
+            )
+        else:
+            databases["default"]["OPTIONS"].update(
+                {"connect_timeout": float(os.getenv("PAPERLESS_DB_TIMEOUT"))},
+            )
+            databases["sqlite"]["OPTIONS"].update(
+                {"timeout": float(os.getenv("PAPERLESS_DB_TIMEOUT"))},
+            )
+    return databases
+
+
+DATABASES = _parse_db_settings()
+
+if os.getenv("PAPERLESS_DBENGINE") == "mariadb":
+    # Silence Django error on old MariaDB versions.
+    # VARCHAR can support > 255 in modern versions
+    # https://docs.djangoproject.com/en/4.1/ref/checks/#database
+    # https://mariadb.com/kb/en/innodb-system-variables/#innodb_large_prefix
+    SILENCED_SYSTEM_CHECKS = ["mysql.W003"]
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
