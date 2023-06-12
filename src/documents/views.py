@@ -1028,16 +1028,23 @@ class UiSettingsView(GenericAPIView):
             ui_settings["update_checking"] = {
                 "backend_setting": settings.ENABLE_UPDATE_CHECK,
             }
+        user_resp = {
+            "id": user.id,
+            "username": user.username,
+            "is_superuser": user.is_superuser,
+            "groups": list(user.groups.values_list("id", flat=True)),
+        }
+
+        if len(user.first_name) > 0:
+            user_resp["first_name"] = user.first_name
+        if len(user.last_name) > 0:
+            user_resp["last_name"] = user.last_name
+
         # strip <app_label>.
         roles = map(lambda perm: re.sub(r"^\w+.", "", perm), user.get_all_permissions())
         return Response(
             {
-                "user": {
-                    "id": user.id,
-                    "username": user.username,
-                    "is_superuser": user.is_superuser,
-                    "groups": user.groups.values_list("id", flat=True),
-                },
+                "user": user_resp,
                 "settings": ui_settings,
                 "permissions": roles,
             },
