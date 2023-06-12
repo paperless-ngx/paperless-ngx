@@ -136,7 +136,7 @@ changed here.
 
     Defaults to unset, using the documented path in the home directory.
 
-`PAPERLESS_DB_TIMEOUT=<float>`
+`PAPERLESS_DB_TIMEOUT=<int>`
 
 : Amount of time for a database connection to wait for the database to
 unlock. Mostly applicable for sqlite based installation. Consider changing
