@@ -46,7 +46,7 @@
         (click)="$event.preventDefault(); dblClickDocument.emit(this)"
         class="card-text"
       >
-        {{ storagePath.name }}
+        {{ storagePath.path.split('/').pop() }}
       </a>
     </div>
   </div>
