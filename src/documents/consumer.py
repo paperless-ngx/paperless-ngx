@@ -25,7 +25,7 @@ from .classifier import load_classifier
 from .file_handling import create_source_path_directory
 from .file_handling import generate_unique_filename
 from .loggers import LoggingMixin
-from .models import Correspondent
+from .models import Correspondent, StoragePath
 from .models import Document
 from .models import DocumentType
 from .models import FileInfo
@@ -294,6 +294,7 @@ class Consumer(LoggingMixin):
         override_created=None,
         override_asn=None,
         override_owner_id=None,
+        override_storage_path_id=None,
     ) -> Document:
         """
         Return the document object if it was successfully created.
@@ -309,6 +310,7 @@ class Consumer(LoggingMixin):
         self.override_created = override_created
         self.override_asn = override_asn
         self.override_owner_id = override_owner_id
+        self.override_storage_path_id = override_storage_path_id
 
         self._send_progress(0, 100, "STARTING", MESSAGE_NEW_FILE)
 
@@ -566,7 +568,7 @@ class Consumer(LoggingMixin):
 
         return document
 
-    def apply_overrides(self, document):
+    def apply_overrides(self, document: Document):
         if self.override_correspondent_id:
             document.correspondent = Correspondent.objects.get(
                 pk=self.override_correspondent_id,
@@ -587,6 +589,11 @@ class Consumer(LoggingMixin):
         if self.override_owner_id:
             document.owner = User.objects.get(
                 pk=self.override_owner_id,
+            )
+
+        if self.override_storage_path_id:
+            document.storage_path = StoragePath.objects.get(
+                id=self.override_storage_path_id,
             )
 
     def _write(self, storage_type, source, target):

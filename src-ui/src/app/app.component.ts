@@ -1,7 +1,7 @@
 import { SettingsService } from './services/settings.service'
 import { SETTINGS_KEYS } from './data/paperless-uisettings'
 import { Component, OnDestroy, OnInit, Renderer2 } from '@angular/core'
-import { Router } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
 import { Subscription } from 'rxjs'
 import { ConsumerStatusService } from './services/consumer-status.service'
 import { ToastService } from './services/toast.service'
@@ -34,6 +34,7 @@ export class AppComponent implements OnInit, OnDestroy {
     private consumerStatusService: ConsumerStatusService,
     private toastService: ToastService,
     private router: Router,
+    private route: ActivatedRoute,
     private uploadDocumentsService: UploadDocumentsService,
     private tasksService: TasksService,
     public tourService: TourService,
@@ -265,7 +266,9 @@ export class AppComponent implements OnInit, OnDestroy {
 
   public dropped(files: NgxFileDropEntry[]) {
     this.fileLeave(true)
-    this.uploadDocumentsService.uploadFiles(files)
+    let storagePathId = parseInt(this.route.snapshot.queryParams['spid'])
+    storagePathId = !isNaN(storagePathId) ? storagePathId : undefined
+    this.uploadDocumentsService.uploadFiles(files, storagePathId)
     this.toastService.showInfo($localize`Initiating upload...`, 3000)
   }
 }

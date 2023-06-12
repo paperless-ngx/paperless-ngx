@@ -181,7 +181,6 @@ export class StoragePathListViewService {
       )
       .subscribe({
         next: (result) => {
-          console.log('result:', result)
           this.initialized = true
           this.isReloading = false
           activeListViewState.collectionSize = result.count

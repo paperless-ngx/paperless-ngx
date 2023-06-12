@@ -157,7 +157,6 @@ export class ExplorerComponent
     this.route.queryParamMap
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((queryParams) => {
-        console.log('query params updated:', queryParams)
         this.list.loadFromQueryParams(queryParams)
         this.unmodifiedFilterRules = []
       })

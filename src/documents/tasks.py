@@ -200,6 +200,7 @@ def consume_file(
         override_created=overrides.created,
         override_asn=overrides.asn,
         override_owner_id=overrides.owner_id,
+        override_storage_path_id=overrides.storage_path_id
     )
 
     if document:

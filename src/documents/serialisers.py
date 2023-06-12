@@ -725,6 +725,13 @@ class PostDocumentSerializer(serializers.Serializer):
         max_value=Document.ARCHIVE_SERIAL_NUMBER_MAX,
     )
 
+    storage_path_id = serializers.IntegerField(
+        label="Storage path ID",
+        allow_null=True,
+        write_only=True,
+        required=False,
+    )
+
     def validate_document(self, document):
         document_data = document.file.read()
         mime_type = magic.from_buffer(document_data, mime=True)
