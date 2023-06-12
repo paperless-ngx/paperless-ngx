@@ -518,7 +518,7 @@ export class DocumentDetailComponent
       })
   }
 
-  save() {
+  save(exit: boolean = true) {
     this.networkActive = true
     this.documentsService
       .update(this.document)
@@ -527,7 +527,7 @@ export class DocumentDetailComponent
         next: () => {
           this.store.next(this.documentForm.value)
           this.toastService.showInfo($localize`Document saved successfully.`)
-          this.close()
+          exit && this.close()
           this.networkActive = false
           this.error = null
         },
@@ -535,7 +535,7 @@ export class DocumentDetailComponent
           this.networkActive = false
           if (!this.userCanEdit) {
             this.toastService.showInfo($localize`Document saved successfully.`)
-            this.close()
+            exit && this.close()
           } else {
             this.error = error.error
             this.toastService.showError(
