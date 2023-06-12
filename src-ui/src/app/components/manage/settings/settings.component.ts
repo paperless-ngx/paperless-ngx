@@ -82,6 +82,7 @@ export class SettingsComponent
     darkModeInvertThumbs: new FormControl(null),
     themeColor: new FormControl(null),
     useNativePdfViewer: new FormControl(null),
+    exitOnSave: new FormControl(null),
     displayLanguage: new FormControl(null),
     dateLocale: new FormControl(null),
     dateFormat: new FormControl(null),
@@ -192,6 +193,9 @@ export class SettingsComponent
       themeColor: this.settings.get(SETTINGS_KEYS.THEME_COLOR),
       useNativePdfViewer: this.settings.get(
         SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER
+      ),
+      exitOnSave: this.settings.get(
+        SETTINGS_KEYS.EXIT_ON_SAVE
       ),
       displayLanguage: this.settings.getLanguage(),
       dateLocale: this.settings.get(SETTINGS_KEYS.DATE_LOCALE),
@@ -526,6 +530,10 @@ export class SettingsComponent
     this.settings.set(
       SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER,
       this.settingsForm.value.useNativePdfViewer
+    )
+    this.settings.set(
+      SETTINGS_KEYS.EXIT_ON_SAVE,
+      this.settingsForm.value.exitOnSave
     )
     this.settings.set(
       SETTINGS_KEYS.DATE_LOCALE,

@@ -24,6 +24,7 @@ export const SETTINGS_KEYS = {
   DARK_MODE_THUMB_INVERTED: 'general-settings:dark-mode:thumb-inverted',
   THEME_COLOR: 'general-settings:theme:color',
   USE_NATIVE_PDF_VIEWER: 'general-settings:document-details:native-pdf-viewer',
+  EXIT_ON_SAVE: 'general-settings:document-details:exit-on-save',
   DATE_LOCALE: 'general-settings:date-display:date-locale',
   DATE_FORMAT: 'general-settings:date-display:date-format',
   NOTIFICATIONS_CONSUMER_NEW_DOCUMENT:
@@ -94,6 +95,11 @@ export const SETTINGS: PaperlessUiSetting[] = [
     key: SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER,
     type: 'boolean',
     default: false,
+  },
+  {
+    key: SETTINGS_KEYS.EXIT_ON_SAVE,
+    type: 'boolean',
+    default: true,
   },
   {
     key: SETTINGS_KEYS.DATE_LOCALE,
