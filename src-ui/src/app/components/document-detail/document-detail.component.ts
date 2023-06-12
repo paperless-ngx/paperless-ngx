@@ -180,10 +180,6 @@ export class DocumentDetailComponent
     return this.settings.get(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER)
   }
 
-  get exitOnSave(): boolean {
-    return this.settings.get(SETTINGS_KEYS.EXIT_ON_SAVE)
-  }
-
   getContentType() {
     return this.metadata?.has_archive_version
       ? 'application/pdf'
@@ -533,7 +529,7 @@ export class DocumentDetailComponent
         next: () => {
           this.store.next(this.documentForm.value)
           this.toastService.showInfo($localize`Document saved successfully.`)
-          this.exitOnSave && this.close()
+          this.close()
           this.networkActive = false
           this.error = null
         },
