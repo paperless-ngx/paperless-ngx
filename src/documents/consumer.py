@@ -295,6 +295,7 @@ class Consumer(LoggingMixin):
         override_asn=None,
         override_owner_id=None,
         override_storage_path_id=None,
+        full_path=None,
     ) -> Document:
         """
         Return the document object if it was successfully created.
@@ -311,6 +312,7 @@ class Consumer(LoggingMixin):
         self.override_asn = override_asn
         self.override_owner_id = override_owner_id
         self.override_storage_path_id = override_storage_path_id
+        self.full_path = full_path
 
         self._send_progress(0, 100, "STARTING", MESSAGE_NEW_FILE)
 
@@ -595,6 +597,23 @@ class Consumer(LoggingMixin):
             document.storage_path = StoragePath.objects.get(
                 id=self.override_storage_path_id,
             )
+        
+        if self.full_path:
+            folders = self.full_path.split('/')[:-1]
+            folders = [i for i in folders if i]
+            folder_path = '/'.join(folders)
+            print(f'folder_path: {folder_path}')
+            
+            for i in range(len(folders)):
+                sub_path = '/'.join(folders[:i+1])
+                # Source: https://stackoverflow.com/a/21750566/5575610
+                if StoragePath.objects.filter(path=sub_path).exists(): continue
+                print(f'Creating StoragePath: {sub_path}')
+                StoragePath.objects.create(name=sub_path, path=sub_path)
+            
+            print(f'Assigning StoragePath: "{folder_path}" to file')
+            document.storage_path = StoragePath.objects.get(path=folder_path)
+            
 
     def _write(self, storage_type, source, target):
         with open(source, "rb") as read_file, open(target, "wb") as write_file:

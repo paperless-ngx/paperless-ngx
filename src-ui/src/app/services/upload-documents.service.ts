@@ -21,18 +21,25 @@ export class UploadDocumentsService {
     private settings: SettingsService
   ) {}
 
-  uploadFiles(files: NgxFileDropEntry[], storagePathId?: number) {
+  uploadFiles(
+    files: NgxFileDropEntry[],
+    storagePathId?: number,
+    isUploadWithFolders?: boolean
+  ) {
     for (const droppedFile of files) {
       if (droppedFile.fileEntry.isFile) {
         const fileEntry = droppedFile.fileEntry as FileSystemFileEntry
         fileEntry.file((file: File) => {
           let formData = new FormData()
           formData.append('document', file, file.name)
+          if (isUploadWithFolders && 'fullPath' in fileEntry) {
+            formData.append('full_path', (fileEntry as any).fullPath)
+          }
 
           if (storagePathId) {
             formData.append('storage_path_id', storagePathId.toString())
           }
-          
+
           let status = this.consumerStatusService.newFileUpload(file.name)
 
           status.message = $localize`Connecting...`

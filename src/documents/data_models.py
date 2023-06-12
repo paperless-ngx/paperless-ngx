@@ -25,6 +25,7 @@ class DocumentMetadataOverrides:
     asn: Optional[int] = None
     owner_id: Optional[int] = None
     storage_path_id: Optional[int] = None
+    full_path: Optional[str] = None
 
 
 class DocumentSource(enum.IntEnum):
