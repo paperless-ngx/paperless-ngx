@@ -532,14 +532,14 @@ def _parse_db_settings() -> Dict:
     if os.getenv("PAPERLESS_DB_TIMEOUT") is not None:
         if databases["default"]["ENGINE"] == "django.db.backends.sqlite3":
             databases["default"]["OPTIONS"].update(
-                {"timeout": float(os.getenv("PAPERLESS_DB_TIMEOUT"))},
+                {"timeout": int(os.getenv("PAPERLESS_DB_TIMEOUT"))},
             )
         else:
             databases["default"]["OPTIONS"].update(
-                {"connect_timeout": float(os.getenv("PAPERLESS_DB_TIMEOUT"))},
+                {"connect_timeout": int(os.getenv("PAPERLESS_DB_TIMEOUT"))},
             )
             databases["sqlite"]["OPTIONS"].update(
-                {"timeout": float(os.getenv("PAPERLESS_DB_TIMEOUT"))},
+                {"timeout": int(os.getenv("PAPERLESS_DB_TIMEOUT"))},
             )
     return databases
 
