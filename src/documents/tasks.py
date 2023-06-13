@@ -116,7 +116,7 @@ def consume_file(
                         {"type": "status_update", "data": payload},
                     )
                 except ConnectionError as e:
-                    logger.warning(f"ConnectionError on status send: {str(e)}")
+                    logger.warning(f"ConnectionError on status send: {e!s}")
                 # consuming stops here, since the original document with
                 # the barcodes has been split and will be consumed separately
 

@@ -544,7 +544,7 @@ class MailAccountHandler(LoggingMixin):
         criterias = make_criterias(rule, supports_gmail_labels)
 
         self.log.debug(
-            f"Rule {rule}: Searching folder with criteria {str(criterias)}",
+            f"Rule {rule}: Searching folder with criteria {criterias}",
         )
 
         try:

@@ -346,7 +346,7 @@ def cleanup_document_deletion(sender, instance, using, **kwargs):
                     logger.debug(f"Deleted file {filename}.")
                 except OSError as e:
                     logger.warning(
-                        f"While deleting document {str(instance)}, the file "
+                        f"While deleting document {instance!s}, the file "
                         f"{filename} could not be deleted: {e}",
                     )
 
@@ -369,13 +369,13 @@ class CannotMoveFilesException(Exception):
 def validate_move(instance, old_path, new_path):
     if not os.path.isfile(old_path):
         # Can't do anything if the old file does not exist anymore.
-        logger.fatal(f"Document {str(instance)}: File {old_path} has gone.")
+        logger.fatal(f"Document {instance!s}: File {old_path} has gone.")
         raise CannotMoveFilesException
 
     if os.path.isfile(new_path):
         # Can't do anything if the new file already exists. Skip updating file.
         logger.warning(
-            f"Document {str(instance)}: Cannot rename file "
+            f"Document {instance!s}: Cannot rename file "
             f"since target path {new_path} already exists.",
         )
         raise CannotMoveFilesException

@@ -121,7 +121,7 @@ class BarcodeReader:
             if barcode.text:
                 barcodes.append(barcode.text)
                 logger.debug(
-                    f"Barcode of type {str(barcode.format)} found: {barcode.text}",
+                    f"Barcode of type {barcode.format} found: {barcode.text}",
                 )
 
         return barcodes
@@ -141,7 +141,7 @@ class BarcodeReader:
                 decoded_barcode = barcode.data.decode("utf-8")
                 barcodes.append(decoded_barcode)
                 logger.debug(
-                    f"Barcode of type {str(barcode.type)} found: {decoded_barcode}",
+                    f"Barcode of type {barcode.type} found: {decoded_barcode}",
                 )
 
         return barcodes
@@ -348,7 +348,7 @@ class BarcodeReader:
 
         for idx, document_path in enumerate(doc_paths):
             if override_name is not None:
-                newname = f"{str(idx)}_{override_name}"
+                newname = f"{idx}_{override_name}"
                 dest = save_to_dir / newname
             else:
                 dest = save_to_dir
