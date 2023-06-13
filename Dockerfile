@@ -213,8 +213,7 @@ COPY --from=pipenv-base /usr/src/pipenv/requirements.txt ./
 ARG BUILD_PACKAGES="\
   build-essential \
   git \
-  default-libmysqlclient-dev \
-  python3-dev"
+  default-libmysqlclient-dev"
 
 RUN set -eux \
   && echo "Installing build system packages" \
