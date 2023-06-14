@@ -191,6 +191,7 @@ RUN set -eux \
   && echo "Installing jbig2enc" \
     && cp ./jbig2enc/${JBIG2ENC_VERSION}/${TARGETARCH}${TARGETVARIANT}/jbig2 /usr/local/bin/ \
     && cp ./jbig2enc/${JBIG2ENC_VERSION}/${TARGETARCH}${TARGETVARIANT}/libjbig2enc* /usr/local/lib/ \
+    && chmod a+x /usr/local/bin/jbig2 \
   && echo "Installing pikepdf and dependencies" \
     && python3 -m pip install --no-cache-dir ./pikepdf/${PIKEPDF_VERSION}/${TARGETARCH}${TARGETVARIANT}/*.whl \
     && python3 -m pip list \
