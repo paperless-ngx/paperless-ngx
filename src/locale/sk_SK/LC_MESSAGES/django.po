@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-06-08 12:39\n"
+"PO-Revision-Date: 2023-06-14 13:23\n"
 "Last-Translator: \n"
 "Language-Team: Slovak\n"
 "Language: sk_SK\n"
@@ -670,55 +670,55 @@ msgstr "Akcie"
 
 #: paperless_mail/admin.py:69
 msgid "The action applied to the mail. This action is only performed when the mail body or attachments were consumed from the mail."
-msgstr ""
+msgstr "Akcia aplikovaná na e-mail. Táto akcia sa vykonáva iba v prípade, ak boli z e-mailu spracované jeho obsah alebo prílohy."
 
 #: paperless_mail/admin.py:77
 msgid "Metadata"
-msgstr ""
+msgstr "Metadáta"
 
 #: paperless_mail/admin.py:80
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
-msgstr ""
+msgstr "Automaticky priradiť metadáta dokumentom, ktoré sú spracovávané na základe tohto pravidla. Ak aj v tomto kroku nepriradíte dokumentom štítky, typy alebo odosielateľov, paperless skontroluje a vykoná všetky definované pravidlá."
 
 #: paperless_mail/apps.py:10
 msgid "Paperless mail"
-msgstr ""
+msgstr "Paperless e-mail"
 
 #: paperless_mail/models.py:9
 msgid "mail account"
-msgstr ""
+msgstr "e-mailový účet"
 
 #: paperless_mail/models.py:10
 msgid "mail accounts"
-msgstr ""
+msgstr "e-mailové účty"
 
 #: paperless_mail/models.py:13
 msgid "No encryption"
-msgstr ""
+msgstr "Žiadne šifrovanie"
 
 #: paperless_mail/models.py:14
 msgid "Use SSL"
-msgstr ""
+msgstr "Použiť SSL"
 
 #: paperless_mail/models.py:15
 msgid "Use STARTTLS"
-msgstr ""
+msgstr "Použiť STARTTLS"
 
 #: paperless_mail/models.py:19
 msgid "IMAP server"
-msgstr ""
+msgstr "IMAP server"
 
 #: paperless_mail/models.py:22
 msgid "IMAP port"
-msgstr ""
+msgstr "IMAP port"
 
 #: paperless_mail/models.py:26
 msgid "This is usually 143 for unencrypted and STARTTLS connections, and 993 for SSL connections."
-msgstr ""
+msgstr "Zvyčajne 143 pre nešifrované a STARTTLS pripojenia a 993 pre SSL pripojenia."
 
 #: paperless_mail/models.py:32
 msgid "IMAP security"
-msgstr ""
+msgstr "IMAP zabezpečenie"
 
 #: paperless_mail/models.py:37
 msgid "username"
