@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-06-14 14:23\n"
+"PO-Revision-Date: 2023-06-15 10:39\n"
 "Last-Translator: \n"
 "Language-Team: Slovak\n"
 "Language: sk_SK\n"
@@ -870,45 +870,45 @@ msgstr "parameter akcie"
 
 #: paperless_mail/models.py:175
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
-msgstr ""
+msgstr "Prídavný parameter akcie vybranej vyššie, konkrétne cieľový priečinok akcie presunutia priečinku. Podpriečinky musia byť oddelené bodkami."
 
 #: paperless_mail/models.py:183
 msgid "assign title from"
-msgstr ""
+msgstr "priradiť názov podľa"
 
 #: paperless_mail/models.py:191
 msgid "assign this tag"
-msgstr ""
+msgstr "priradiť tento štítok"
 
 #: paperless_mail/models.py:199
 msgid "assign this document type"
-msgstr ""
+msgstr "priradiť tento typ dokumentu"
 
 #: paperless_mail/models.py:203
 msgid "assign correspondent from"
-msgstr ""
+msgstr "priradiť odosielateľa podľa"
 
 #: paperless_mail/models.py:213
 msgid "assign this correspondent"
-msgstr ""
+msgstr "priradiť tohto odosielateľa"
 
 #: paperless_mail/models.py:239
 msgid "uid"
-msgstr ""
+msgstr "uid"
 
 #: paperless_mail/models.py:247
 msgid "subject"
-msgstr ""
+msgstr "predmet"
 
 #: paperless_mail/models.py:255
 msgid "received"
-msgstr ""
+msgstr "doručené"
 
 #: paperless_mail/models.py:262
 msgid "processed"
-msgstr ""
+msgstr "spracované"
 
 #: paperless_mail/models.py:268
 msgid "status"
-msgstr ""
+msgstr "stav"
 
