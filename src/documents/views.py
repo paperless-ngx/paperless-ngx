@@ -519,7 +519,7 @@ class DocumentViewSet(
             try:
                 return Response(self.getNotes(doc))
             except Exception as e:
-                logger.warning(f"An error occurred retrieving notes: {str(e)}")
+                logger.warning(f"An error occurred retrieving notes: {e!s}")
                 return Response(
                     {"error": "Error retreiving notes, check logs for more detail."},
                 )
@@ -538,7 +538,7 @@ class DocumentViewSet(
 
                 return Response(self.getNotes(doc))
             except Exception as e:
-                logger.warning(f"An error occurred saving note: {str(e)}")
+                logger.warning(f"An error occurred saving note: {e!s}")
                 return Response(
                     {
                         "error": "Error saving note, check logs for more detail.",
@@ -628,7 +628,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
             except NotFound:
                 raise
             except Exception as e:
-                logger.warning(f"An error occurred listing search results: {str(e)}")
+                logger.warning(f"An error occurred listing search results: {e!s}")
                 return HttpResponseBadRequest(
                     "Error listing search results, check logs for more detail.",
                 )
@@ -699,7 +699,7 @@ class BulkEditView(GenericAPIView):
             result = method(documents, **parameters)
             return Response({"result": result})
         except Exception as e:
-            logger.warning(f"An error occurred performing bulk edit: {str(e)}")
+            logger.warning(f"An error occurred performing bulk edit: {e!s}")
             return HttpResponseBadRequest(
                 "Error performing bulk edit, check logs for more detail.",
             )
@@ -1028,16 +1028,23 @@ class UiSettingsView(GenericAPIView):
             ui_settings["update_checking"] = {
                 "backend_setting": settings.ENABLE_UPDATE_CHECK,
             }
+        user_resp = {
+            "id": user.id,
+            "username": user.username,
+            "is_superuser": user.is_superuser,
+            "groups": list(user.groups.values_list("id", flat=True)),
+        }
+
+        if len(user.first_name) > 0:
+            user_resp["first_name"] = user.first_name
+        if len(user.last_name) > 0:
+            user_resp["last_name"] = user.last_name
+
         # strip <app_label>.
         roles = map(lambda perm: re.sub(r"^\w+.", "", perm), user.get_all_permissions())
         return Response(
             {
-                "user": {
-                    "id": user.id,
-                    "username": user.username,
-                    "is_superuser": user.is_superuser,
-                    "groups": user.groups.values_list("id", flat=True),
-                },
+                "user": user_resp,
                 "settings": ui_settings,
                 "permissions": roles,
             },

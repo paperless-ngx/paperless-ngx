@@ -29,7 +29,7 @@
     <div class="card-body bg-light p-2">
       <p class="card-text">
         <ng-container *ngIf="document.correspondent">
-          <a title="Toggle correspondent filter" i18n-title (click)="clickCorrespondent.emit(document.correspondent);$event.stopPropagation()" class="fw-bold btn-link">{{(document.correspondent$ | async)?.name}}</a>:
+          <a title="Toggle correspondent filter" i18n-title (click)="clickCorrespondent.emit(document.correspondent);$event.stopPropagation()" class="fw-bold btn-link">{{(document.correspondent$ | async)?.name ?? privateName}}</a>:
         </ng-container>
         {{document.title | documentTitle}}
       </p>
@@ -41,14 +41,14 @@
           <svg class="metadata-icon me-2 text-muted" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#file-earmark"/>
           </svg>
-          <small>{{(document.document_type$ | async)?.name}}</small>
+          <small>{{(document.document_type$ | async)?.name ?? privateName}}</small>
         </button>
         <button *ngIf="document.storage_path" type="button" class="list-group-item list-group-item-action bg-transparent ps-0 p-1 border-0" title="Toggle storage path filter" i18n-title
          (click)="clickStoragePath.emit(document.storage_path);$event.stopPropagation()">
           <svg class="metadata-icon me-2 text-muted" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#folder"/>
           </svg>
-          <small>{{(document.storage_path$ | async)?.name}}</small>
+          <small>{{(document.storage_path$ | async)?.name ?? privateName}}</small>
         </button>
         <div class="list-group-item bg-transparent p-0 border-0 d-flex flex-wrap-reverse justify-content-between">
           <ng-template #dateTooltip>
