@@ -3678,7 +3678,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">57,58</context>
         </context-group>
-        <target state="needs-translation">Added: <x id="INTERPOLATION" equiv-text="{{ document.added | customDate }}"/></target>
+        <target state="translated">Pridané: <x id="INTERPOLATION" equiv-text="{{ document.added | customDate }}"/></target>
       </trans-unit>
       <trans-unit id="4235671847487610290" datatype="html">
         <source>Modified: <x id="INTERPOLATION" equiv-text="{{ document.modified | customDate }}"/></source>
@@ -3690,7 +3690,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">58,59</context>
         </context-group>
-        <target state="needs-translation">Modified: <x id="INTERPOLATION" equiv-text="{{ document.modified | customDate }}"/></target>
+        <target state="translated">Zmenené: <x id="INTERPOLATION" equiv-text="{{ document.modified | customDate }}"/></target>
       </trans-unit>
       <trans-unit id="2332107018974972998" datatype="html">
         <source>Score:</source>
@@ -3698,7 +3698,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
           <context context-type="linenumber">116</context>
         </context-group>
-        <target state="needs-translation">Score:</target>
+        <target state="translated">Skóre:</target>
       </trans-unit>
       <trans-unit id="3661756380991326939" datatype="html">
         <source>Toggle tag filter</source>
@@ -3706,7 +3706,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="needs-translation">Toggle tag filter</target>
+        <target state="translated">Zapnúť filter štítkov</target>
       </trans-unit>
       <trans-unit id="4648526799630820486" datatype="html">
         <source>Toggle correspondent filter</source>
@@ -3714,7 +3714,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="needs-translation">Toggle correspondent filter</target>
+        <target state="translated">Zapnúť filter odosielateľa</target>
       </trans-unit>
       <trans-unit id="5319701482646590642" datatype="html">
         <source>Toggle document type filter</source>
@@ -3722,7 +3722,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">39</context>
         </context-group>
-        <target state="needs-translation">Toggle document type filter</target>
+        <target state="translated">Zapnúť filter typu dokumentu</target>
       </trans-unit>
       <trans-unit id="8950368321707344185" datatype="html">
         <source>Toggle storage path filter</source>
@@ -3730,7 +3730,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">46</context>
         </context-group>
-        <target state="needs-translation">Toggle storage path filter</target>
+        <target state="translated">Zapnúť filter cesty k úložisku</target>
       </trans-unit>
       <trans-unit id="5145213156408463657" datatype="html">
         <source>Select none</source>
@@ -3738,7 +3738,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="needs-translation">Select none</target>
+        <target state="translated">Nevybrať žiadne</target>
       </trans-unit>
       <trans-unit id="1512866475468373520" datatype="html">
         <source>Select page</source>
@@ -3746,7 +3746,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation">Select page</target>
+        <target state="translated">Vybrať stránku</target>
       </trans-unit>
       <trans-unit id="1494518490116523821" datatype="html">
         <source>Select all</source>
@@ -3754,7 +3754,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">Select all</target>
+        <target state="translated">Vybrať všetko</target>
       </trans-unit>
       <trans-unit id="5146398958364876914" datatype="html">
         <source>Sort</source>
@@ -3762,7 +3762,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">38</context>
         </context-group>
-        <target state="needs-translation">Sort</target>
+        <target state="translated">Zoradiť</target>
       </trans-unit>
       <trans-unit id="2123659921722214537" datatype="html">
         <source>Views</source>
@@ -3774,7 +3774,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">199</context>
         </context-group>
-        <target state="needs-translation">Views</target>
+        <target state="translated">Zobrazenia</target>
       </trans-unit>
       <trans-unit id="1233494216161906927" datatype="html">
         <source>Save &quot;<x id="INTERPOLATION" equiv-text="{{list.activeSavedViewTitle}}"/>&quot;</source>
@@ -3782,7 +3782,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">76</context>
         </context-group>
-        <target state="needs-translation">Save "<x id="INTERPOLATION" equiv-text="{{list.activeSavedViewTitle}}"/>"</target>
+        <target state="translated">Uložiť "<x id="INTERPOLATION" equiv-text="{{list.activeSavedViewTitle}}"/>"</target>
       </trans-unit>
       <trans-unit id="2276119452079372898" datatype="html">
         <source>Save as...</source>
@@ -3790,7 +3790,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">78</context>
         </context-group>
-        <target state="needs-translation">Save as...</target>
+        <target state="translated">Uložiť ako...</target>
       </trans-unit>
       <trans-unit id="8786996283897742947" datatype="html">
         <source>{VAR_PLURAL, plural, =1 {Selected <x id="INTERPOLATION"/> of one document} other {Selected <x id="INTERPOLATION"/> of <x id="INTERPOLATION_1"/> documents}}</source>
@@ -3798,7 +3798,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">97</context>
         </context-group>
-        <target state="needs-translation">{VAR_PLURAL, plural, =1 {Selected <x id="INTERPOLATION"/> of one document} other {Selected <x id="INTERPOLATION"/> of <x id="INTERPOLATION_1"/> documents}}</target>
+        <target state="translated">{VAR_PLURAL, plural, =1 {Vybrané <x id="INTERPOLATION"/> jedného dokumentu} other {Vybrané <x id="INTERPOLATION"/> z <x id="INTERPOLATION_1"/> z dokumentov}}</target>
       </trans-unit>
       <trans-unit id="6600548268163632449" datatype="html">
         <source>{VAR_PLURAL, plural, =1 {One document} other {<x id="INTERPOLATION"/> documents}}</source>
@@ -3806,7 +3806,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">99</context>
         </context-group>
-        <target state="needs-translation">{VAR_PLURAL, plural, =1 {One document} other {<x id="INTERPOLATION"/> documents}}</target>
+        <target state="translated">{VAR_PLURAL, plural, =1 {Jeden dokument} other {<x id="INTERPOLATION"/> dokumenty}}</target>
       </trans-unit>
       <trans-unit id="2243770355958919528" datatype="html">
         <source>(filtered)</source>
@@ -3814,7 +3814,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">99</context>
         </context-group>
-        <target state="needs-translation">(filtered)</target>
+        <target state="translated">(filtrované)</target>
       </trans-unit>
       <trans-unit id="6849725902312323996" datatype="html">
         <source>Reset filters</source>
