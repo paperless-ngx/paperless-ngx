@@ -649,7 +649,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">27</context>
         </context-group>
-        <target state="needs-translation">Tags</target>
+        <target state="translated">Štítky</target>
       </trans-unit>
       <trans-unit id="3079652255369035" datatype="html">
         <source>Document types</source>
@@ -661,7 +661,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">148</context>
         </context-group>
-        <target state="needs-translation">Document types</target>
+        <target state="translated">Typy dokumentov</target>
       </trans-unit>
       <trans-unit id="8835528846812581148" datatype="html">
         <source>Storage paths</source>
@@ -673,7 +673,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">155</context>
         </context-group>
-        <target state="needs-translation">Storage paths</target>
+        <target state="translated">Cesty k úložisku</target>
       </trans-unit>
       <trans-unit id="2991443309752293110" datatype="html">
         <source>File Tasks</source>
@@ -685,7 +685,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="needs-translation">File Tasks</target>
+        <target state="translated">Súborové úlohy</target>
       </trans-unit>
       <trans-unit id="5537285341303594392" datatype="html">
         <source>File Tasks<x id="START_TAG_SPAN_1" ctype="x-span_1" equiv-text="&lt;span *ngIf=&quot;tasksService.failedFileTasks.length &gt; 0&quot;&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-danger ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
@@ -693,7 +693,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">163</context>
         </context-group>
-        <target state="needs-translation">File Tasks<x id="START_TAG_SPAN_1" ctype="x-span_1" equiv-text="&lt;span *ngIf=&quot;tasksService.failedFileTasks.length &gt; 0&quot;&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-danger ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
+        <target state="translated">Súborové úlohy<x id="START_TAG_SPAN_1" ctype="x-span_1" equiv-text="&lt;span *ngIf=&quot;tasksService.failedFileTasks.length &gt; 0&quot;&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-danger ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
       </trans-unit>
       <trans-unit id="4804785061014590286" datatype="html">
         <source>Logs</source>
@@ -709,7 +709,7 @@
           <context context-type="sourcefile">src/app/components/manage/logs/logs.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="needs-translation">Logs</target>
+        <target state="translated">Logy</target>
       </trans-unit>
       <trans-unit id="314315645942131479" datatype="html">
         <source>Info</source>
@@ -721,7 +721,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">43</context>
         </context-group>
-        <target state="needs-translation">Info</target>
+        <target state="translated">Info</target>
       </trans-unit>
       <trans-unit id="4895326106573044490" datatype="html">
         <source>Documentation</source>
@@ -733,7 +733,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">190</context>
         </context-group>
-        <target state="needs-translation">Documentation</target>
+        <target state="translated">Dokumentácia</target>
       </trans-unit>
       <trans-unit id="1534029177398918729" datatype="html">
         <source>GitHub</source>
@@ -745,7 +745,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">198</context>
         </context-group>
-        <target state="needs-translation">GitHub</target>
+        <target state="translated">GitHub</target>
       </trans-unit>
       <trans-unit id="5612903193691847840" datatype="html">
         <source>Suggest an idea</source>
@@ -757,7 +757,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">204</context>
         </context-group>
-        <target state="needs-translation">Suggest an idea</target>
+        <target state="translated">Navrhnúť nápad</target>
       </trans-unit>
       <trans-unit id="4112664765954374539" datatype="html">
         <source>is available.</source>
@@ -765,7 +765,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">213</context>
         </context-group>
-        <target state="needs-translation">is available.</target>
+        <target state="translated">je dostupný.</target>
       </trans-unit>
       <trans-unit id="1175891574282637937" datatype="html">
         <source>Click to view.</source>
@@ -773,7 +773,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">213</context>
         </context-group>
-        <target state="needs-translation">Click to view.</target>
+        <target state="translated">Klikni pre zobrazenie.</target>
       </trans-unit>
       <trans-unit id="9811291095862612" datatype="html">
         <source>Paperless-ngx can automatically check for updates</source>
@@ -781,7 +781,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">217</context>
         </context-group>
-        <target state="needs-translation">Paperless-ngx can automatically check for updates</target>
+        <target state="translated">Paperless-ngx môže automaticky kontrolovať aktualizácie</target>
       </trans-unit>
       <trans-unit id="894819944961861800" datatype="html">
         <source> How does this work? </source>
@@ -789,7 +789,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">224,226</context>
         </context-group>
-        <target state="needs-translation"> How does this work? </target>
+        <target state="translated">Ako to funguje?</target>
       </trans-unit>
       <trans-unit id="509090351011426949" datatype="html">
         <source>Update available</source>
@@ -797,7 +797,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">235</context>
         </context-group>
-        <target state="needs-translation">Update available</target>
+        <target state="translated">Aktualizácia je k dispozícii</target>
       </trans-unit>
       <trans-unit id="3011185103048412841" datatype="html">
         <source>An error occurred while saving settings.</source>
@@ -809,7 +809,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">593</context>
         </context-group>
-        <target state="needs-translation">An error occurred while saving settings.</target>
+        <target state="translated">Pri ukladaní nastavení sa vyskytla chyba.</target>
       </trans-unit>
       <trans-unit id="2526035785704676448" datatype="html">
         <source>An error occurred while saving update checking settings.</source>
@@ -817,7 +817,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
           <context context-type="linenumber">237</context>
         </context-group>
-        <target state="needs-translation">An error occurred while saving update checking settings.</target>
+        <target state="translated">Pri ukladaní nastavení vyhľadávania aktualizácií sa vyskytla chyba.</target>
       </trans-unit>
       <trans-unit id="8700121026680200191" datatype="html">
         <source>Clear</source>
@@ -833,7 +833,7 @@
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.html</context>
           <context context-type="linenumber">56</context>
         </context-group>
-        <target state="needs-translation">Clear</target>
+        <target state="translated">Vymazať</target>
       </trans-unit>
       <trans-unit id="5000042972069710005" datatype="html">
         <source><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;d-inline-block&quot; style=&quot;padding-bottom: 1px;&quot; &gt;"/>Cancel<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
@@ -841,7 +841,7 @@
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/confirm-dialog.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation"><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;d-inline-block&quot; style=&quot;padding-bottom: 1px;&quot; &gt;"/>Cancel<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
+        <target state="translated"><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;d-inline-block&quot; style=&quot;padding-bottom: 1px;&quot; &gt;"/>Zrušiť<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
       </trans-unit>
       <trans-unit id="1234709746630139322" datatype="html">
         <source>Confirmation</source>
@@ -849,7 +849,7 @@
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/confirm-dialog.component.ts</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Confirmation</target>
+        <target state="translated">Potvrdenie</target>
       </trans-unit>
       <trans-unit id="9178182467454450952" datatype="html">
         <source>Confirm</source>
@@ -877,7 +877,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">440</context>
         </context-group>
-        <target state="needs-translation">Confirm</target>
+        <target state="translated">Potvrdiť</target>
       </trans-unit>
       <trans-unit id="6052766076365105714" datatype="html">
         <source>now</source>
@@ -885,7 +885,7 @@
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">now</target>
+        <target state="translated">teraz</target>
       </trans-unit>
       <trans-unit id="6371576811194810854" datatype="html">
         <source>After</source>
@@ -893,7 +893,7 @@
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.html</context>
           <context context-type="linenumber">28</context>
         </context-group>
-        <target state="needs-translation">After</target>
+        <target state="translated">Po</target>
       </trans-unit>
       <trans-unit id="1218334388194408974" datatype="html">
         <source>Before</source>
@@ -901,7 +901,7 @@
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.html</context>
           <context context-type="linenumber">51</context>
         </context-group>
-        <target state="needs-translation">Before</target>
+        <target state="translated">Pred</target>
       </trans-unit>
       <trans-unit id="4873149362496451858" datatype="html">
         <source>Last 7 days</source>
@@ -909,7 +909,7 @@
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.ts</context>
           <context context-type="linenumber">43</context>
         </context-group>
-        <target state="needs-translation">Last 7 days</target>
+        <target state="translated">Posledných 7 dní</target>
       </trans-unit>
       <trans-unit id="4463380307954693363" datatype="html">
         <source>Last month</source>
@@ -917,7 +917,7 @@
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.ts</context>
           <context context-type="linenumber">48</context>
         </context-group>
-        <target state="needs-translation">Last month</target>
+        <target state="translated">Posledný mesiac</target>
       </trans-unit>
       <trans-unit id="8697368973702409683" datatype="html">
         <source>Last 3 months</source>
@@ -925,7 +925,7 @@
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.ts</context>
           <context context-type="linenumber">53</context>
         </context-group>
-        <target state="needs-translation">Last 3 months</target>
+        <target state="translated">Posledné 3 mesiace</target>
       </trans-unit>
       <trans-unit id="3566342898065860218" datatype="html">
         <source>Last year</source>
@@ -933,7 +933,7 @@
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.ts</context>
           <context context-type="linenumber">58</context>
         </context-group>
-        <target state="needs-translation">Last year</target>
+        <target state="translated">Posledný rok</target>
       </trans-unit>
       <trans-unit id="8953033926734869941" datatype="html">
         <source>Name</source>
@@ -1025,7 +1025,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">40</context>
         </context-group>
-        <target state="needs-translation">Name</target>
+        <target state="translated">Meno</target>
       </trans-unit>
       <trans-unit id="8743659855412792665" datatype="html">
         <source>Matching algorithm</source>
@@ -1045,7 +1045,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">Matching algorithm</target>
+        <target state="translated">Algoritmus porovnávania</target>
       </trans-unit>
       <trans-unit id="2656329676292524585" datatype="html">
         <source>Matching pattern</source>
@@ -1065,7 +1065,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component.html</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="needs-translation">Matching pattern</target>
+        <target state="translated">Vzor porovnania</target>
       </trans-unit>
       <trans-unit id="6063936469630366525" datatype="html">
         <source>Case insensitive</source>
@@ -1085,7 +1085,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component.html</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="needs-translation">Case insensitive</target>
+        <target state="translated">Rozlišuje veľké a malé písmená</target>
       </trans-unit>
       <trans-unit id="2159130950882492111" datatype="html">
         <source>Cancel</source>
@@ -1137,7 +1137,7 @@
           <context context-type="sourcefile">src/app/components/document-list/save-view-config-dialog/save-view-config-dialog.component.html</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="needs-translation">Cancel</target>
+        <target state="translated">Zrušiť</target>
       </trans-unit>
       <trans-unit id="3768927257183755959" datatype="html">
         <source>Save</source>
@@ -1185,7 +1185,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">415</context>
         </context-group>
-        <target state="needs-translation">Save</target>
+        <target state="translated">Uložiť</target>
       </trans-unit>
       <trans-unit id="6457471243969293847" datatype="html">
         <source>Create new correspondent</source>
@@ -1193,7 +1193,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component.ts</context>
           <context context-type="linenumber">27</context>
         </context-group>
-        <target state="needs-translation">Create new correspondent</target>
+        <target state="translated">Vytvoriť nového odosielateľa</target>
       </trans-unit>
       <trans-unit id="2059822531169388684" datatype="html">
         <source>Edit correspondent</source>
@@ -1201,7 +1201,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component.ts</context>
           <context context-type="linenumber">31</context>
         </context-group>
-        <target state="needs-translation">Edit correspondent</target>
+        <target state="translated">Upraviť odosielateľa</target>
       </trans-unit>
       <trans-unit id="6672809941092516947" datatype="html">
         <source>Create new document type</source>
