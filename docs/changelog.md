@@ -1,5 +1,41 @@
 # Changelog
 
+## paperless-ngx 1.16.0
+
+### Notable Changes
+
+- Chore: Update base image to Debian bookworm [@stumpylog](https://github.com/stumpylog) ([#3469](https://github.com/paperless-ngx/paperless-ngx/pull/3469))
+
+### Features
+
+- Feature: Update to a simpler Tika library [@stumpylog](https://github.com/stumpylog) ([#3517](https://github.com/paperless-ngx/paperless-ngx/pull/3517))
+- Feature: Allow to filter documents by original filename and checksum [@jayme-github](https://github.com/jayme-github) ([#3485](https://github.com/paperless-ngx/paperless-ngx/pull/3485))
+
+### Bug Fixes
+
+- Fix: return user first / last name from backend [@shamoon](https://github.com/shamoon) ([#3579](https://github.com/paperless-ngx/paperless-ngx/pull/3579))
+- Fix use of `PAPERLESS_DB_TIMEOUT` for all db types [@shamoon](https://github.com/shamoon) ([#3576](https://github.com/paperless-ngx/paperless-ngx/pull/3576))
+- Fix: handle mail rules with no filters on some imap servers [@shamoon](https://github.com/shamoon) ([#3554](https://github.com/paperless-ngx/paperless-ngx/pull/3554))
+
+### Dependencies
+
+- Chore: Python dependency updates (celery 5.3.0 in particular) [@stumpylog](https://github.com/stumpylog) ([#3584](https://github.com/paperless-ngx/paperless-ngx/pull/3584))
+
+### All App Changes
+
+<details>
+<summary>8 changes</summary>
+
+- Chore: Python dependency updates (celery 5.3.0 in particular) [@stumpylog](https://github.com/stumpylog) ([#3584](https://github.com/paperless-ngx/paperless-ngx/pull/3584))
+- Fix: return user first / last name from backend [@shamoon](https://github.com/shamoon) ([#3579](https://github.com/paperless-ngx/paperless-ngx/pull/3579))
+- Fix use of `PAPERLESS_DB_TIMEOUT` for all db types [@shamoon](https://github.com/shamoon) ([#3576](https://github.com/paperless-ngx/paperless-ngx/pull/3576))
+- Fix: handle mail rules with no filters on some imap servers [@shamoon](https://github.com/shamoon) ([#3554](https://github.com/paperless-ngx/paperless-ngx/pull/3554))
+- Chore: Copy file stats from original file [@stumpylog](https://github.com/stumpylog) ([#3551](https://github.com/paperless-ngx/paperless-ngx/pull/3551))
+- Chore: Adds test for barcode ASN when it already exists [@stumpylog](https://github.com/stumpylog) ([#3550](https://github.com/paperless-ngx/paperless-ngx/pull/3550))
+- Feature: Update to a simpler Tika library [@stumpylog](https://github.com/stumpylog) ([#3517](https://github.com/paperless-ngx/paperless-ngx/pull/3517))
+- Feature: Allow to filter documents by original filename and checksum [@jayme-github](https://github.com/jayme-github) ([#3485](https://github.com/paperless-ngx/paperless-ngx/pull/3485))
+</details>
+
 ## paperless-ngx 1.15.1
 
 ### Bug Fixes
