@@ -335,7 +335,7 @@ class RasterisedDocumentParser(DocumentParser):
                 self.text = text_original
         except (NoTextFoundException, InputFileError) as e:
             self.log.warning(
-                f"Encountered an error while running OCR: {str(e)}. "
+                f"Encountered an error while running OCR: {e!s}. "
                 f"Attempting force OCR to get the text.",
             )
 
@@ -370,11 +370,11 @@ class RasterisedDocumentParser(DocumentParser):
 
             except Exception as e:
                 # If this fails, we have a serious issue at hand.
-                raise ParseError(f"{e.__class__.__name__}: {str(e)}") from e
+                raise ParseError(f"{e.__class__.__name__}: {e!s}") from e
 
         except Exception as e:
             # Anything else is probably serious.
-            raise ParseError(f"{e.__class__.__name__}: {str(e)}") from e
+            raise ParseError(f"{e.__class__.__name__}: {e!s}") from e
 
         # As a last resort, if we still don't have any text for any reason,
         # try to extract the text from the original document.

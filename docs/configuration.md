@@ -136,11 +136,11 @@ changed here.
 
     Defaults to unset, using the documented path in the home directory.
 
-`PAPERLESS_DB_TIMEOUT=<float>`
+`PAPERLESS_DB_TIMEOUT=<int>`
 
 : Amount of time for a database connection to wait for the database to
-unlock. Mostly applicable for an sqlite based installation, consider
-changing to postgresql if you need to increase this.
+unlock. Mostly applicable for sqlite based installation. Consider changing
+to postgresql if you are having concurrency problems with sqlite.
 
     Defaults to unset, keeping the Django defaults.
 

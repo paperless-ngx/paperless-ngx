@@ -384,6 +384,8 @@ def make_criterias(rule: MailRule, supports_gmail_labels: bool):
     if isinstance(rule_query, dict):
         if len(rule_query) or len(criterias):
             return AND(**rule_query, **criterias)
+        else:
+            return "ALL"
     else:
         return AND(rule_query, **criterias)
 
@@ -542,7 +544,7 @@ class MailAccountHandler(LoggingMixin):
         criterias = make_criterias(rule, supports_gmail_labels)
 
         self.log.debug(
-            f"Rule {rule}: Searching folder with criteria {str(criterias)}",
+            f"Rule {rule}: Searching folder with criteria {criterias}",
         )
 
         try:

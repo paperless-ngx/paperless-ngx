@@ -1,10 +1,9 @@
 import os
 from pathlib import Path
 
-import dateutil.parser
-import requests
+import httpx
 from django.conf import settings
-from tika import parser
+from tika_client import TikaClient
 
 from documents.parsers import DocumentParser
 from documents.parsers import ParseError
@@ -29,55 +28,38 @@ class TikaDocumentParser(DocumentParser):
         )
 
     def extract_metadata(self, document_path, mime_type):
-        tika_server = settings.TIKA_ENDPOINT
-
-        # tika does not support a PathLike, only strings
-        # ensure this is a string
-        document_path = str(document_path)
-
         try:
-            parsed = parser.from_file(document_path, tika_server)
+            with TikaClient(tika_url=settings.TIKA_ENDPOINT) as client:
+                parsed = client.metadata.from_file(document_path, mime_type)
+                return [
+                    {
+                        "namespace": "",
+                        "prefix": "",
+                        "key": key,
+                        "value": parsed.data[key],
+                    }
+                    for key in parsed.data
+                ]
         except Exception as e:
             self.log.warning(
                 f"Error while fetching document metadata for {document_path}: {e}",
             )
             return []
 
-        return [
-            {
-                "namespace": "",
-                "prefix": "",
-                "key": key,
-                "value": parsed["metadata"][key],
-            }
-            for key in parsed["metadata"]
-        ]
-
-    def parse(self, document_path: Path, mime_type, file_name=None):
+    def parse(self, document_path: Path, mime_type: str, file_name=None):
         self.log.info(f"Sending {document_path} to Tika server")
-        tika_server = settings.TIKA_ENDPOINT
-
-        # tika does not support a PathLike, only strings
-        # ensure this is a string
-        document_path = str(document_path)
 
         try:
-            parsed = parser.from_file(document_path, tika_server)
+            with TikaClient(tika_url=settings.TIKA_ENDPOINT) as client:
+                parsed = client.tika.as_text.from_file(document_path, mime_type)
         except Exception as err:
             raise ParseError(
                 f"Could not parse {document_path} with tika server at "
-                f"{tika_server}: {err}",
+                f"{settings.TIKA_ENDPOINT}: {err}",
             ) from err
 
-        self.text = parsed["content"].strip()
-
-        try:
-            self.date = dateutil.parser.isoparse(parsed["metadata"]["Creation-Date"])
-        except Exception as e:
-            self.log.warning(
-                f"Unable to extract date for document {document_path}: {e}",
-            )
-
+        self.text = parsed.content.strip()
+        self.date = parsed.metadata.created
         self.archive_path = self.convert_to_pdf(document_path, file_name)
 
     def convert_to_pdf(self, document_path, file_name):
@@ -106,7 +88,7 @@ class TikaDocumentParser(DocumentParser):
                 data["pdfFormat"] = "PDF/A-3b"
 
             try:
-                response = requests.post(url, files=files, headers=headers, data=data)
+                response = httpx.post(url, files=files, headers=headers, data=data)
                 response.raise_for_status()  # ensure we notice bad responses
             except Exception as err:
                 raise ParseError(

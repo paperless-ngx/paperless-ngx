@@ -121,7 +121,7 @@ class BarcodeReader:
             if barcode.text:
                 barcodes.append(barcode.text)
                 logger.debug(
-                    f"Barcode of type {str(barcode.format)} found: {barcode.text}",
+                    f"Barcode of type {barcode.format} found: {barcode.text}",
                 )
 
         return barcodes
@@ -141,7 +141,7 @@ class BarcodeReader:
                 decoded_barcode = barcode.data.decode("utf-8")
                 barcodes.append(decoded_barcode)
                 logger.debug(
-                    f"Barcode of type {str(barcode.type)} found: {decoded_barcode}",
+                    f"Barcode of type {barcode.type} found: {decoded_barcode}",
                 )
 
         return barcodes
@@ -179,6 +179,9 @@ class BarcodeReader:
 
         with scratch_image.open("rb") as img_file, self.pdf_file.open("wb") as pdf_file:
             pdf_file.write(img2pdf.convert(img_file))
+
+        # Copy what file stat is possible
+        shutil.copystat(self.file, self.pdf_file)
 
     def detect(self) -> None:
         """
@@ -292,6 +295,9 @@ class BarcodeReader:
                 savepath = Path(self.temp_dir.name) / output_filename
                 with open(savepath, "wb") as out:
                     dst.save(out)
+
+                shutil.copystat(self.file, savepath)
+
                 document_paths.append(savepath)
 
             return document_paths
@@ -342,7 +348,7 @@ class BarcodeReader:
 
         for idx, document_path in enumerate(doc_paths):
             if override_name is not None:
-                newname = f"{str(idx)}_{override_name}"
+                newname = f"{idx}_{override_name}"
                 dest = save_to_dir / newname
             else:
                 dest = save_to_dir
