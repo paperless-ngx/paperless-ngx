@@ -64,6 +64,8 @@ def get_schema():
         owner_id=NUMERIC(),
         has_owner=BOOLEAN(),
         viewer_id=KEYWORD(commas=True),
+        checksum=TEXT(),
+        original_filename=TEXT(sortable=True),
     )
 
 
@@ -149,6 +151,8 @@ def update_document(writer: AsyncWriter, doc: Document):
         owner_id=doc.owner.id if doc.owner else None,
         has_owner=doc.owner is not None,
         viewer_id=viewer_ids if viewer_ids else None,
+        checksum=doc.checksum,
+        original_filename=doc.original_filename,
     )
 
 
@@ -171,91 +175,85 @@ def remove_document_from_index(document):
 
 
 class DelayedQuery:
+    param_map = {
+        "correspondent": ("correspondent", ["id", "id__in", "id__none", "isnull"]),
+        "document_type": ("type", ["id", "id__in", "id__none", "isnull"]),
+        "storage_path": ("path", ["id", "id__in", "id__none", "isnull"]),
+        "owner": ("owner", ["id", "id__in", "id__none", "isnull"]),
+        "tags": ("tag", ["id__all", "id__in", "id__none"]),
+        "added": ("added", ["date__lt", "date__gt"]),
+        "created": ("created", ["date__lt", "date__gt"]),
+        "checksum": ("checksum", ["icontains", "istartswith"]),
+        "original_filename": ("original_filename", ["icontains", "istartswith"]),
+    }
+
     def _get_query(self):
         raise NotImplementedError
 
     def _get_query_filter(self):
         criterias = []
-        for k, v in self.query_params.items():
-            if k == "correspondent__id":
-                criterias.append(query.Term("correspondent_id", v))
-            elif k == "correspondent__id__in":
-                correspondents_in = []
-                for correspondent_id in v.split(","):
-                    correspondents_in.append(
-                        query.Term("correspondent_id", correspondent_id),
+        for key, value in self.query_params.items():
+            # is_tagged is a special case
+            if key == "is_tagged":
+                criterias.append(query.Term("has_tag", self.evalBoolean(value)))
+                continue
+
+            # Don't process query params without a filter
+            if "__" not in key:
+                continue
+
+            # All other query params consist of a parameter and a query filter
+            param, query_filter = key.split("__", 1)
+            try:
+                field, supported_query_filters = self.param_map[param]
+            except KeyError:
+                logger.error(f"Unable to build a query filter for parameter {key}")
+                continue
+
+            # We only support certain filters per parameter
+            if query_filter not in supported_query_filters:
+                logger.info(
+                    f"Query filter {query_filter} not supported for parameter {param}",
+                )
+                continue
+
+            if query_filter == "id":
+                criterias.append(query.Term(f"{field}_id", value))
+            elif query_filter == "id__in":
+                in_filter = []
+                for object_id in value.split(","):
+                    in_filter.append(
+                        query.Term(f"{field}_id", object_id),
                     )
-                criterias.append(query.Or(correspondents_in))
-            elif k == "correspondent__id__none":
-                for correspondent_id in v.split(","):
+                criterias.append(query.Or(in_filter))
+            elif query_filter == "id__none":
+                for object_id in value.split(","):
                     criterias.append(
-                        query.Not(query.Term("correspondent_id", correspondent_id)),
+                        query.Not(query.Term(f"{field}_id", object_id)),
                     )
-            elif k == "tags__id__all":
-                for tag_id in v.split(","):
-                    criterias.append(query.Term("tag_id", tag_id))
-            elif k == "tags__id__none":
-                for tag_id in v.split(","):
-                    criterias.append(query.Not(query.Term("tag_id", tag_id)))
-            elif k == "tags__id__in":
-                tags_in = []
-                for tag_id in v.split(","):
-                    tags_in.append(query.Term("tag_id", tag_id))
-                criterias.append(query.Or(tags_in))
-            elif k == "document_type__id":
-                criterias.append(query.Term("type_id", v))
-            elif k == "document_type__id__in":
-                document_types_in = []
-                for document_type_id in v.split(","):
-                    document_types_in.append(query.Term("type_id", document_type_id))
-                criterias.append(query.Or(document_types_in))
-            elif k == "document_type__id__none":
-                for document_type_id in v.split(","):
-                    criterias.append(query.Not(query.Term("type_id", document_type_id)))
-            elif k == "correspondent__isnull":
+            elif query_filter == "isnull":
                 criterias.append(
-                    query.Term("has_correspondent", self.evalBoolean(v) is False),
+                    query.Term(f"has_{field}", self.evalBoolean(value) is False),
                 )
-            elif k == "is_tagged":
-                criterias.append(query.Term("has_tag", self.evalBoolean(v)))
-            elif k == "document_type__isnull":
-                criterias.append(query.Term("has_type", self.evalBoolean(v) is False))
-            elif k == "created__date__lt":
+            elif query_filter == "id__all":
+                for object_id in value.split(","):
+                    criterias.append(query.Term(f"{field}_id", object_id))
+            elif query_filter == "date__lt":
                 criterias.append(
-                    query.DateRange("created", start=None, end=isoparse(v)),
+                    query.DateRange(field, start=None, end=isoparse(value)),
                 )
-            elif k == "created__date__gt":
+            elif query_filter == "date__gt":
                 criterias.append(
-                    query.DateRange("created", start=isoparse(v), end=None),
+                    query.DateRange(field, start=isoparse(value), end=None),
                 )
-            elif k == "added__date__gt":
-                criterias.append(query.DateRange("added", start=isoparse(v), end=None))
-            elif k == "added__date__lt":
-                criterias.append(query.DateRange("added", start=None, end=isoparse(v)))
-            elif k == "storage_path__id":
-                criterias.append(query.Term("path_id", v))
-            elif k == "storage_path__id__in":
-                storage_paths_in = []
-                for storage_path_id in v.split(","):
-                    storage_paths_in.append(query.Term("path_id", storage_path_id))
-                criterias.append(query.Or(storage_paths_in))
-            elif k == "storage_path__id__none":
-                for storage_path_id in v.split(","):
-                    criterias.append(query.Not(query.Term("path_id", storage_path_id)))
-            elif k == "storage_path__isnull":
-                criterias.append(query.Term("has_path", self.evalBoolean(v) is False))
-            elif k == "owner__isnull":
-                criterias.append(query.Term("has_owner", self.evalBoolean(v) is False))
-            elif k == "owner__id":
-                criterias.append(query.Term("owner_id", v))
-            elif k == "owner__id__in":
-                owners_in = []
-                for owner_id in v.split(","):
-                    owners_in.append(query.Term("owner_id", owner_id))
-                criterias.append(query.Or(owners_in))
-            elif k == "owner__id__none":
-                for owner_id in v.split(","):
-                    criterias.append(query.Not(query.Term("owner_id", owner_id)))
+            elif query_filter == "icontains":
+                criterias.append(
+                    query.Term(field, value),
+                )
+            elif query_filter == "istartswith":
+                criterias.append(
+                    query.Prefix(field, value),
+                )
 
         user_criterias = get_permissions_criterias(
             user=self.user,

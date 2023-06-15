@@ -106,15 +106,6 @@ jobs:
       matrix:
         python-version: ['3.8', '3.9', '3.10']
       fail-fast: false
-    env:
-      # Enable Tika end to end testing
-      TIKA_LIVE: 1
-      # Enable paperless_mail testing against real server
-      PAPERLESS_MAIL_TEST_HOST: ${{ secrets.TEST_MAIL_HOST }}
-      PAPERLESS_MAIL_TEST_USER: ${{ secrets.TEST_MAIL_USER }}
-      PAPERLESS_MAIL_TEST_PASSWD: ${{ secrets.TEST_MAIL_PASSWD }}
-      # Enable Gotenberg end to end testing
-      GOTENBERG_LIVE: 1
     steps:
       -
         name: Checkout
@@ -156,12 +147,18 @@ jobs:
           pipenv --python ${{ steps.setup-python.outputs.python-version }} run pip list
       -
         name: Tests
+        env:
+          PAPERLESS_CI_TEST: 1
+          # Enable paperless_mail testing against real server
+          PAPERLESS_MAIL_TEST_HOST: ${{ secrets.TEST_MAIL_HOST }}
+          PAPERLESS_MAIL_TEST_USER: ${{ secrets.TEST_MAIL_USER }}
+          PAPERLESS_MAIL_TEST_PASSWD: ${{ secrets.TEST_MAIL_PASSWD }}
         run: |
           cd src/
           pipenv --python ${{ steps.setup-python.outputs.python-version }} run pytest -ra
       -
         name: Upload coverage to Codecov
-        if: ${{ matrix.python-version == env.DEFAULT_PYTHON_VERSION && github.event_name == 'push'}}
+        if: ${{ matrix.python-version == env.DEFAULT_PYTHON_VERSION }}
         uses: codecov/codecov-action@v3
         with:
           # not required for public repos, but intermittently fails otherwise
@@ -309,7 +306,7 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.docker-meta.outputs.tags }}
           labels: ${{ steps.docker-meta.outputs.labels }}
-          # Get cache layers from this branch, then dev, then main
+          # Get cache layers from this branch, then dev
           # This allows new branches to get at least some cache benefits, generally from dev
           cache-from: |
             type=registry,ref=ghcr.io/${{ steps.set-ghcr-repository.outputs.ghcr-repository }}/builder/cache/app:${{ github.ref_name }}

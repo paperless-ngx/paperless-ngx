@@ -69,7 +69,7 @@ class Consumer(LoggingMixin):
         status,
         message=None,
         document_id=None,
-    ):
+    ):  # pragma: no cover
         payload = {
             "filename": os.path.basename(self.filename) if self.filename else None,
             "task_id": self.task_id,
@@ -326,7 +326,7 @@ class Consumer(LoggingMixin):
             dir=settings.SCRATCH_DIR,
         )
         self.path = Path(tempdir.name) / Path(self.filename)
-        shutil.copy(self.original_path, self.path)
+        shutil.copy2(self.original_path, self.path)
 
         # Determine the parser class.
 
@@ -352,7 +352,7 @@ class Consumer(LoggingMixin):
 
         self.run_pre_consume_script()
 
-        def progress_callback(current_progress, max_progress):
+        def progress_callback(current_progress, max_progress):  # pragma: no cover
             # recalculate progress to be within 20 and 80
             p = int((current_progress / max_progress) * 50 + 20)
             self._send_progress(p, 100, "WORKING")
@@ -582,6 +582,7 @@ class Consumer(LoggingMixin):
     def _write(self, storage_type, source, target):
         with open(source, "rb") as read_file, open(target, "wb") as write_file:
             write_file.write(read_file.read())
+        shutil.copystat(source, target)
 
     def _log_script_outputs(self, completed_process: CompletedProcess):
         """

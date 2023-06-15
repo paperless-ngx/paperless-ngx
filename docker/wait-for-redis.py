@@ -28,7 +28,7 @@ if __name__ == "__main__":
             except Exception as e:
                 print(
                     f"Redis ping #{attempt} failed.\n"
-                    f"Error: {str(e)}.\n"
+                    f"Error: {e!s}.\n"
                     f"Waiting {RETRY_SLEEP_SECONDS}s",
                     flush=True,
                 )
