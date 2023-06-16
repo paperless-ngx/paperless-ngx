@@ -38,6 +38,7 @@ jobs:
           scheme: "branch"
           repo_name: "paperless-ngx"
           match_regex: "feature-"
+          do_delete: "true"
 
   cleanup-untagged-images:
     name: Cleanup Untagged Images Tags for ${{ matrix.primary-name }}
@@ -73,3 +74,4 @@ jobs:
           owner: "${{ github.repository_owner }}"
           is_org: "true"
           package_name: "${{ matrix.primary-name }}"
+          do_delete: "true"
