@@ -1,5 +1,15 @@
 # Changelog
 
+## paperless-ngx 1.16.1
+
+### Bug Fixes
+
+- Fix: PIL ImportError on ARM devices with Docker [@stumpylog](https://github.com/stumpylog) ([#3605](https://github.com/paperless-ngx/paperless-ngx/pull/3605))
+
+### Maintenance
+
+- Chore: Enable the image cleanup action [@stumpylog](https://github.com/stumpylog) ([#3606](https://github.com/paperless-ngx/paperless-ngx/pull/3606))
+
 ## paperless-ngx 1.16.0
 
 ### Notable Changes
