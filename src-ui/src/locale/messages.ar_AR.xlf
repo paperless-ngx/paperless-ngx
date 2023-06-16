@@ -885,7 +885,7 @@
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">now</target>
+        <target state="translated">الآن</target>
       </trans-unit>
       <trans-unit id="6371576811194810854" datatype="html">
         <source>After</source>
@@ -2130,7 +2130,7 @@
           <context context-type="sourcefile">src/app/components/common/input/select/select.component.html</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="needs-translation">Filter documents with this <x id="INTERPOLATION" equiv-text="{{title}}"/></target>
+        <target state="translated">البحث عن المستند باستخدام asn <x id="INTERPOLATION" equiv-text="{{title}}"/></target>
       </trans-unit>
       <trans-unit id="445302259125375799" datatype="html" approved="yes">
         <source>Invalid date.</source>
@@ -2335,7 +2335,7 @@
           <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.html</context>
           <context context-type="linenumber">39</context>
         </context-group>
-        <target state="needs-translation">Filter documents with these Tags</target>
+        <target state="translated">تصفية الوثائق بهذه العلامات</target>
       </trans-unit>
       <trans-unit id="8105421668262723483" datatype="html">
         <source>Set Permissions</source>
@@ -2359,7 +2359,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-filter-dropdown/permissions-filter-dropdown.component.html</context>
           <context context-type="linenumber">28</context>
         </context-group>
-        <target state="needs-translation">My documents</target>
+        <target state="translated">مستنداتي</target>
       </trans-unit>
       <trans-unit id="231920238966427751" datatype="html">
         <source>Shared with me</source>
@@ -2367,7 +2367,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-filter-dropdown/permissions-filter-dropdown.component.html</context>
           <context context-type="linenumber">38</context>
         </context-group>
-        <target state="needs-translation">Shared with me</target>
+        <target state="translated">مُشارْك معي</target>
       </trans-unit>
       <trans-unit id="5151074932731293042" datatype="html">
         <source>Unowned</source>
@@ -2375,7 +2375,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-filter-dropdown/permissions-filter-dropdown.component.html</context>
           <context context-type="linenumber">48</context>
         </context-group>
-        <target state="needs-translation">Unowned</target>
+        <target state="translated">غير مملوك</target>
       </trans-unit>
       <trans-unit id="4555457172864212828" datatype="html">
         <source>Users</source>
@@ -2395,7 +2395,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-filter-dropdown/permissions-filter-dropdown.component.html</context>
           <context context-type="linenumber">77</context>
         </context-group>
-        <target state="needs-translation">Hide unowned</target>
+        <target state="translated">إخفاء الغير مملوك</target>
       </trans-unit>
       <trans-unit id="8650499415827640724" datatype="html">
         <source>Type</source>
@@ -3092,7 +3092,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">419</context>
         </context-group>
-        <target state="needs-translation">Error retrieving suggestions.</target>
+        <target state="translated">خطأ في استرجاع الاقتراحات.</target>
       </trans-unit>
       <trans-unit id="8348337312757497317" datatype="html">
         <source>Document saved successfully.</source>
@@ -3882,7 +3882,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">152</context>
         </context-group>
-        <target state="needs-translation">Sort by owner</target>
+        <target state="translated">فرز حسب المالك</target>
       </trans-unit>
       <trans-unit id="3715596725146409911" datatype="html">
         <source>Owner</source>
@@ -3894,7 +3894,7 @@
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="needs-translation">Owner</target>
+        <target state="translated">مالك</target>
       </trans-unit>
       <trans-unit id="3557446856808034218" datatype="html">
         <source>Sort by notes</source>
@@ -4062,7 +4062,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">150</context>
         </context-group>
-        <target state="needs-translation">Owner: <x id="PH" equiv-text="rule.value"/></target>
+        <target state="translated">المالك: <x id="PH" equiv-text="rule.value"/></target>
       </trans-unit>
       <trans-unit id="3550877650686009106" datatype="html">
         <source>Owner not in: <x id="PH" equiv-text="rule.value"/></source>
@@ -4070,7 +4070,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">153</context>
         </context-group>
-        <target state="needs-translation">Owner not in: <x id="PH" equiv-text="rule.value"/></target>
+        <target state="translated">المالك ليس في: <x id="PH" equiv-text="rule.value"/></target>
       </trans-unit>
       <trans-unit id="1082034558646673343" datatype="html">
         <source>Without an owner</source>
@@ -4078,7 +4078,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">156</context>
         </context-group>
-        <target state="needs-translation">Without an owner</target>
+        <target state="translated">بدون مالك</target>
       </trans-unit>
       <trans-unit id="3100631071441658964" datatype="html">
         <source>Title &amp; content</source>
@@ -4458,7 +4458,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">147</context>
         </context-group>
-        <target state="needs-translation">Error occurred while creating <x id="PH" equiv-text="this.typeName"/>.</target>
+        <target state="translated">حدث خطأ في أثناء إنشاء <x id="PH" equiv-text="this.typeName"/>.</target>
       </trans-unit>
       <trans-unit id="2541368547549828690" datatype="html">
         <source>Successfully updated <x id="PH" equiv-text="this.typeName"/>.</source>
