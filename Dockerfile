@@ -183,7 +183,7 @@ ARG PSYCOPG2_VERSION=2.9.6
 RUN set -eux \
   && echo "Getting binaries" \
     && mkdir paperless-ngx \
-    && curl --fail --silent --show-error --output paperless-ngx.tar.gz --location https://github.com/paperless-ngx/builder/archive/1f0e6665ba1b144f70fd6dfc8d0e8ba3b7a578ee.tar.gz \
+    && curl --fail --silent --show-error --output paperless-ngx.tar.gz --location https://github.com/paperless-ngx/builder/archive/58bb061b9b3b63009852d6d875f9a305d9ae6ac9.tar.gz \
     && tar -xf paperless-ngx.tar.gz --directory paperless-ngx --strip-components=1 \
     && cd paperless-ngx \
     # Setting a specific revision ensures we know what this installed
