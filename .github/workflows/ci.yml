@@ -212,6 +212,15 @@ jobs:
           name: jest-coverage-report
           path: src-ui/coverage
       -
+        name: Upload frontend coverage to Codecov
+        if: always()
+        uses: codecov/codecov-action@v3
+        with:
+          # not required for public repos, but intermittently fails otherwise
+          token: ${{ secrets.CODECOV_TOKEN }}
+          # future expansion
+          flags: frontend
+      -
         name: Run Playwright e2e tests
         run: cd src-ui && npx playwright test
       -
