@@ -4,8 +4,8 @@ daysUntilStale: 30
 # Number of days of inactivity before a stale issue is closed
 daysUntilClose: 7
 
-# Only issues or pull requests with all of these labels are check if stale. Defaults to `[]` (disabled)
-onlyLabels: [cant-reproduce]
+# Only issues or pull requests with any of these labels are check if stale. Defaults to `[]` (disabled)
+any-of-labels: ['cant-reproduce','not a bug','unconfirmed']
 
 # Label to use when marking an issue as stale
 staleLabel: stale
