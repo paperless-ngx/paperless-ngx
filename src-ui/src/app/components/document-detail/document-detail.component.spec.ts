@@ -372,10 +372,56 @@ describe('DocumentDetailComponent', () => {
     const updateSpy = jest.spyOn(documentService, 'update')
     const toastSpy = jest.spyOn(toastService, 'showInfo')
     updateSpy.mockImplementation((o) => of(doc))
-    component.save()
+    component.save(true)
     expect(updateSpy).toHaveBeenCalled()
     expect(closeSpy).toHaveBeenCalled()
     expect(toastSpy).toHaveBeenCalledWith('Document saved successfully.')
+  })
+
+  it('should support save without close and show success toast', () => {
+    initNormally()
+    component.title = 'Foo Bar'
+    const closeSpy = jest.spyOn(component, 'close')
+    const updateSpy = jest.spyOn(documentService, 'update')
+    const toastSpy = jest.spyOn(toastService, 'showInfo')
+    updateSpy.mockImplementation((o) => of(doc))
+    component.save()
+    expect(updateSpy).toHaveBeenCalled()
+    expect(closeSpy).not.toHaveBeenCalled()
+    expect(toastSpy).toHaveBeenCalledWith('Document saved successfully.')
+  })
+
+  it('should show save button and save & close or save & next', () => {
+    const nextSpy = jest.spyOn(component, 'hasNext')
+    nextSpy.mockReturnValueOnce(false)
+    fixture.detectChanges()
+    expect(
+      fixture.debugElement
+        .queryAll(By.css('button'))
+        .find((b) => b.nativeElement.textContent === 'Save')
+    ).not.toBeUndefined()
+    expect(
+      fixture.debugElement
+        .queryAll(By.css('button'))
+        .find((b) => b.nativeElement.textContent === 'Save & close')
+    ).not.toBeUndefined()
+    expect(
+      fixture.debugElement
+        .queryAll(By.css('button'))
+        .find((b) => b.nativeElement.textContent === 'Save & next')
+    ).toBeUndefined()
+    nextSpy.mockReturnValue(true)
+    fixture.detectChanges()
+    expect(
+      fixture.debugElement
+        .queryAll(By.css('button'))
+        .find((b) => b.nativeElement.textContent === 'Save & close')
+    ).toBeUndefined()
+    expect(
+      fixture.debugElement
+        .queryAll(By.css('button'))
+        .find((b) => b.nativeElement.textContent === 'Save & next')
+    ).not.toBeUndefined()
   })
 
   it('should show toast error on save if error occurs', () => {
@@ -406,7 +452,7 @@ describe('DocumentDetailComponent', () => {
     updateSpy.mockImplementation(() =>
       throwError(() => new Error('failed to save'))
     )
-    component.save()
+    component.save(true)
     expect(updateSpy).toHaveBeenCalled()
     expect(closeSpy).toHaveBeenCalled()
     expect(toastSpy).toHaveBeenCalledWith('Document saved successfully.')
