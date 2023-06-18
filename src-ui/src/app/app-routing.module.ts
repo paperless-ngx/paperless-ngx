@@ -22,7 +22,7 @@ import {
   PermissionType,
 } from './services/permissions.service'
 
-const routes: Routes = [
+export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   {
     path: '',

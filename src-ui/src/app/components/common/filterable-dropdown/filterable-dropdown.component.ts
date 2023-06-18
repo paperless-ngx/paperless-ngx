@@ -96,7 +96,7 @@ export class FilterableDropdownSelectionModel {
   toggle(id: number, fireEvent = true) {
     let state = this.temporarySelectionStates.get(id)
     if (
-      state == null ||
+      state == undefined ||
       (state != ToggleableItemState.Selected &&
         state != ToggleableItemState.Excluded)
     ) {
