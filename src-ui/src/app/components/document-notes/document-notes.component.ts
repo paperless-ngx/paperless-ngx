@@ -2,7 +2,6 @@ import { Component, Input, Output, EventEmitter } from '@angular/core'
 import { DocumentNotesService } from 'src/app/services/rest/document-notes.service'
 import { PaperlessDocumentNote } from 'src/app/data/paperless-document-note'
 import { FormControl, FormGroup } from '@angular/forms'
-import { first } from 'rxjs/operators'
 import { ToastService } from 'src/app/services/toast.service'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { UserService } from 'src/app/services/rest/user.service'
@@ -89,8 +88,8 @@ export class DocumentNotesComponent extends ComponentWithPermissions {
     const user = this.users?.find((u) => u.id === note.user)
     if (!user) return ''
     const nameComponents = []
-    if (user.first_name) nameComponents.unshift(user.first_name)
-    if (user.last_name) nameComponents.unshift(user.last_name)
+    if (user.first_name) nameComponents.push(user.first_name)
+    if (user.last_name) nameComponents.push(user.last_name)
     if (user.username) {
       if (nameComponents.length > 0) nameComponents.push(`(${user.username})`)
       else nameComponents.push(user.username)

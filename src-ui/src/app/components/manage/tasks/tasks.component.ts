@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core'
 import { Router } from '@angular/router'
-import { NgbModal, NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap'
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { Subject, first } from 'rxjs'
 import { PaperlessTask } from 'src/app/data/paperless-task'
 import { TasksService } from 'src/app/services/tasks.service'
@@ -51,8 +51,8 @@ export class TasksComponent
   }
 
   dismissTasks(task: PaperlessTask = undefined) {
-    let tasks = task ? new Set([task.id]) : this.selectedTasks
-    if (!task && this.selectedTasks.size == 0)
+    let tasks = task ? new Set([task.id]) : new Set(this.selectedTasks.values())
+    if (!task && tasks.size == 0)
       tasks = new Set(this.tasksService.allFileTasks.map((t) => t.id))
     if (tasks.size > 1) {
       let modal = this.modalService.open(ConfirmDialogComponent, {
@@ -91,7 +91,7 @@ export class TasksComponent
   }
 
   get currentTasks(): PaperlessTask[] {
-    let tasks: PaperlessTask[]
+    let tasks: PaperlessTask[] = []
     switch (this.activeTab) {
       case 'queued':
         tasks = this.tasksService.queuedFileTasks
@@ -104,8 +104,6 @@ export class TasksComponent
         break
       case 'failed':
         tasks = this.tasksService.failedFileTasks
-        break
-      default:
         break
     }
     return tasks

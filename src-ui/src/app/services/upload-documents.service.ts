@@ -7,7 +7,6 @@ import {
 } from './consumer-status.service'
 import { DocumentService } from './rest/document.service'
 import { Subscription } from 'rxjs'
-import { SettingsService } from './settings.service'
 
 @Injectable({
   providedIn: 'root',
@@ -17,8 +16,7 @@ export class UploadDocumentsService {
 
   constructor(
     private documentService: DocumentService,
-    private consumerStatusService: ConsumerStatusService,
-    private settings: SettingsService
+    private consumerStatusService: ConsumerStatusService
   ) {}
 
   uploadFiles(files: NgxFileDropEntry[]) {
