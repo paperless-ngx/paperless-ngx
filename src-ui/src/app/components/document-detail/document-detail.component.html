@@ -191,9 +191,12 @@
             <div [ngbNavOutlet]="nav" class="mt-2"></div>
 
             <ng-container>
-                <button type="button" class="btn btn-outline-secondary" (click)="discard()" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Discard</button>&nbsp;
-                <button type="button" class="btn btn-outline-primary" (click)="saveEditNext()" *ngIf="hasNext()" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Save & next</button>&nbsp;
-                <button type="submit" class="btn btn-primary" *appIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Save</button>&nbsp;
+                <button type="button" class="btn btn-outline-secondary me-2" (click)="discard()" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Discard</button>
+                <ng-container *appIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
+                    <button *ngIf="hasNext()" type="button" class="btn btn-outline-primary me-2" (click)="saveEditNext()" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Save &amp; next</button>
+                    <button *ngIf="!hasNext()" type="button" class="btn btn-outline-primary me-2" (click)="save(true)" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Save &amp; close</button>
+                    <button type="submit" class="btn btn-primary" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Save</button>
+                </ng-container>
             </ng-container>
         </form>
     </div>
