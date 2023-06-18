@@ -5,7 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
-    "test": "ng test",
+    "test": "ng test --no-watch --coverage",
     "lint": "ng lint"
   },
   "private": true,
@@ -45,7 +45,7 @@
     "@angular-eslint/template-parser": "15.2.1",
     "@angular/cli": "~15.2.7",
     "@angular/compiler-cli": "~15.2.8",
-    "@playwright/test": "^1.34.3",
+    "@playwright/test": "^1.35.1",
     "@types/jest": "^29.5.0",
     "@types/node": "^20.2.5",
     "@typescript-eslint/eslint-plugin": "^5.59.8",
@@ -55,6 +55,7 @@
     "jest": "28.1.3",
     "jest-environment-jsdom": "^29.5.0",
     "jest-preset-angular": "^12.2.6",
+    "jest-websocket-mock": "^2.4.0",
     "ts-node": "~10.9.1",
     "typescript": "~4.9.5",
     "wait-on": "^7.0.1"

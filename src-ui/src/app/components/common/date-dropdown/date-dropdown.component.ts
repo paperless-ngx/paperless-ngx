@@ -1,4 +1,3 @@
-import { formatDate } from '@angular/common'
 import {
   Component,
   EventEmitter,

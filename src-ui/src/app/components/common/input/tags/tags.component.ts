@@ -11,6 +11,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { PaperlessTag } from 'src/app/data/paperless-tag'
 import { TagEditDialogComponent } from '../../edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
 import { TagService } from 'src/app/services/rest/tag.service'
+import { EditDialogMode } from '../../edit-dialog/edit-dialog.component'
 
 @Component({
   providers: [
@@ -105,7 +106,7 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
     var modal = this.modalService.open(TagEditDialogComponent, {
       backdrop: 'static',
     })
-    modal.componentInstance.dialogMode = 'create'
+    modal.componentInstance.dialogMode = EditDialogMode.CREATE
     if (name) modal.componentInstance.object = { name: name }
     else if (this._lastSearchTerm)
       modal.componentInstance.object = { name: this._lastSearchTerm }

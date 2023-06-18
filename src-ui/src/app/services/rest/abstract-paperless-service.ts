@@ -10,9 +10,9 @@ export abstract class AbstractPaperlessService<T extends ObjectWithId> {
 
   constructor(protected http: HttpClient, private resourceName: string) {}
 
-  protected getResourceUrl(id?: number, action?: string): string {
+  protected getResourceUrl(id: number = null, action: string = null): string {
     let url = `${this.baseUrl}${this.resourceName}/`
-    if (id) {
+    if (id !== null) {
       url += `${id}/`
     }
     if (action) {
