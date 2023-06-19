@@ -18,7 +18,7 @@ export function paramsFromViewState(
   params[PAGE_PARAMETER] = isNaN(viewState.currentPage)
     ? 1
     : viewState.currentPage
-  if (pageOnly && viewState.currentPage == 1) params[PAGE_PARAMETER] = null
+  if (pageOnly && viewState.currentPage == 1) params[PAGE_PARAMETER] = undefined
   return params
 }
 

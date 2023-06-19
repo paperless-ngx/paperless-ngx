@@ -16,7 +16,7 @@ on:
 env:
   # This is the version of pipenv all the steps will use
   # If changing this, change Dockerfile
-  DEFAULT_PIP_ENV_VERSION: "2023.4.20"
+  DEFAULT_PIP_ENV_VERSION: "2023.6.12"
   # This is the default version of Python to use in most steps
   # If changing this, change Dockerfile
   DEFAULT_PYTHON_VERSION: "3.9"
@@ -77,6 +77,7 @@ jobs:
         with:
           name: documentation
           path: site/
+          retention-days: 7
 
   documentation-deploy:
     name: "Deploy Documentation"
@@ -199,15 +200,36 @@ jobs:
         name: Linting checks
         run: cd src-ui && npm run lint
       -
-        name: Run Playwright tests
+        name: Run Jest unit tests
+        run: cd src-ui && npm run test
+      -
+        name: Upload Jest coverage
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: jest-coverage-report
+          path: src-ui/coverage
+          retention-days: 7
+      -
+        name: Upload frontend coverage to Codecov
+        if: always()
+        uses: codecov/codecov-action@v3
+        with:
+          # not required for public repos, but intermittently fails otherwise
+          token: ${{ secrets.CODECOV_TOKEN }}
+          # future expansion
+          flags: frontend
+      -
+        name: Run Playwright e2e tests
         run: cd src-ui && npx playwright test
       -
-        name: Upload test results
+        name: Upload Playwright test results
         if: always()
         uses: actions/upload-artifact@v3
         with:
           name: playwright-report
           path: src-ui/playwright-report
+          retention-days: 7
 
   build-docker-image:
     name: Build Docker image for ${{ github.ref_name }}
@@ -328,6 +350,7 @@ jobs:
         with:
           name: frontend-compiled
           path: src/documents/static/frontend/
+          retention-days: 7
 
   build-release:
     needs:
@@ -436,6 +459,7 @@ jobs:
         with:
           name: release
           path: dist/paperless-ngx.tar.xz
+          retention-days: 7
 
   publish-release:
     runs-on: ubuntu-22.04

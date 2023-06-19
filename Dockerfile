@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.4
+# syntax=docker/dockerfile:1
 # https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/reference.md
 
 # Stage: compile-frontend
@@ -29,7 +29,7 @@ COPY Pipfile* ./
 
 RUN set -eux \
   && echo "Installing pipenv" \
-    && python3 -m pip install --no-cache-dir --upgrade pipenv==2023.4.20 \
+    && python3 -m pip install --no-cache-dir --upgrade pipenv==2023.6.12 \
   && echo "Generating requirement.txt" \
     && pipenv requirements > requirements.txt
 
@@ -216,13 +216,15 @@ ARG BUILD_PACKAGES="\
   git \
   default-libmysqlclient-dev"
 
-RUN set -eux \
+# hadolint ignore=DL3042
+RUN --mount=type=cache,target=/root/.cache/pip/,id=pip-cache \
+  set -eux \
   && echo "Installing build system packages" \
     && apt-get update \
     && apt-get install --yes --quiet --no-install-recommends ${BUILD_PACKAGES} \
     && python3 -m pip install --no-cache-dir --upgrade wheel \
   && echo "Installing Python requirements" \
-    && python3 -m pip install --default-timeout=1000 --no-cache-dir --requirement requirements.txt \
+    && python3 -m pip install --default-timeout=1000 --requirement requirements.txt \
   && echo "Installing NLTK data" \
     && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/share/nltk_data" snowball_data \
     && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/share/nltk_data" stopwords \

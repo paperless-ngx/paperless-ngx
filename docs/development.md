@@ -216,19 +216,18 @@ The front end is built using AngularJS. In order to get started, you need Node.j
   $ git ls-files -- '*.ts' | xargs pre-commit run prettier --files
   ```
 
-- Front end testing uses jest and cypress. There is currently a need
-  for significantly more front end tests. Unit tests and e2e tests,
+- Front end testing uses Jest and Playwright. Unit tests and e2e tests,
   respectively, can be run non-interactively with:
 
   ```bash
   $ ng test
-  $ npm run e2e:ci
+  $ npx playwright test
   ```
 
-  - Cypress also includes a UI which can be run with:
+  - Playwright also includes a UI which can be run with:
 
     ```bash
-    $ ./node_modules/.bin/cypress open
+    $ npx playwright test --ui
     ```
 
 - In order to build the front end and serve it as part of Django, execute:

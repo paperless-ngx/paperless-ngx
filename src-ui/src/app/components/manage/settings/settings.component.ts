@@ -44,6 +44,7 @@ import { MailAccountService } from 'src/app/services/rest/mail-account.service'
 import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
 import { MailAccountEditDialogComponent } from '../../common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component'
 import { MailRuleEditDialogComponent } from '../../common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component'
+import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 
 enum SettingsNavIDs {
   General = 1,
@@ -225,9 +226,9 @@ export class SettingsComponent
 
   onNavChange(navChangeEvent: NgbNavChangeEvent) {
     this.maybeInitializeTab(navChangeEvent.nextId)
-    const [foundNavIDkey, foundNavIDValue] = Object.entries(
-      SettingsNavIDs
-    ).find(([navIDkey, navIDValue]) => navIDValue == navChangeEvent.nextId)
+    const [foundNavIDkey] = Object.entries(SettingsNavIDs).find(
+      ([, navIDValue]) => navIDValue == navChangeEvent.nextId
+    )
     if (foundNavIDkey)
       // if its dirty we need to wait for confirmation
       this.router
@@ -579,8 +580,8 @@ export class SettingsComponent
             delay: 5000,
           }
           if (reloadRequired) {
-            ;(savedToast.content = $localize`Settings were saved successfully. Reload is required to apply some changes.`),
-              (savedToast.actionName = $localize`Reload now`)
+            savedToast.content = $localize`Settings were saved successfully. Reload is required to apply some changes.`
+            savedToast.actionName = $localize`Reload now`
             savedToast.action = () => {
               location.reload()
             }
@@ -646,7 +647,9 @@ export class SettingsComponent
       backdrop: 'static',
       size: 'xl',
     })
-    modal.componentInstance.dialogMode = user ? 'edit' : 'create'
+    modal.componentInstance.dialogMode = user
+      ? EditDialogMode.EDIT
+      : EditDialogMode.CREATE
     modal.componentInstance.object = user
     modal.componentInstance.succeeded
       .pipe(takeUntil(this.unsubscribeNotifier))
@@ -718,7 +721,9 @@ export class SettingsComponent
       backdrop: 'static',
       size: 'lg',
     })
-    modal.componentInstance.dialogMode = group ? 'edit' : 'create'
+    modal.componentInstance.dialogMode = group
+      ? EditDialogMode.EDIT
+      : EditDialogMode.CREATE
     modal.componentInstance.object = group
     modal.componentInstance.succeeded
       .pipe(takeUntil(this.unsubscribeNotifier))
@@ -780,7 +785,9 @@ export class SettingsComponent
       backdrop: 'static',
       size: 'xl',
     })
-    modal.componentInstance.dialogMode = account ? 'edit' : 'create'
+    modal.componentInstance.dialogMode = account
+      ? EditDialogMode.EDIT
+      : EditDialogMode.CREATE
     modal.componentInstance.object = account
     modal.componentInstance.succeeded
       .pipe(takeUntil(this.unsubscribeNotifier))
@@ -842,7 +849,9 @@ export class SettingsComponent
       backdrop: 'static',
       size: 'xl',
     })
-    modal.componentInstance.dialogMode = rule ? 'edit' : 'create'
+    modal.componentInstance.dialogMode = rule
+      ? EditDialogMode.EDIT
+      : EditDialogMode.CREATE
     modal.componentInstance.object = rule
     modal.componentInstance.succeeded
       .pipe(takeUntil(this.unsubscribeNotifier))

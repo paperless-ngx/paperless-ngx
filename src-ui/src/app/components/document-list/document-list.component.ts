@@ -9,11 +9,11 @@ import {
 import { ActivatedRoute, convertToParamMap, Router } from '@angular/router'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { filter, first, map, Subject, switchMap, takeUntil } from 'rxjs'
+import { FilterRule } from 'src/app/data/filter-rule'
 import {
-  FilterRule,
   filterRulesDiffer,
   isFullTextFilterRule,
-} from 'src/app/data/filter-rule'
+} from 'src/app/utils/filter-rules'
 import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type'
 import { PaperlessDocument } from 'src/app/data/paperless-document'
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'

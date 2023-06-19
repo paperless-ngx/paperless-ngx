@@ -21,7 +21,7 @@ export class CsrfInterceptor implements HttpInterceptor {
     if (this.meta.getTag('name=cookie_prefix')) {
       prefix = this.meta.getTag('name=cookie_prefix').content
     }
-    let csrfToken = this.cookieService.get(`${prefix ? prefix : ''}csrftoken`)
+    let csrfToken = this.cookieService.get(`${prefix}csrftoken`)
     if (csrfToken) {
       request = request.clone({
         setHeaders: {

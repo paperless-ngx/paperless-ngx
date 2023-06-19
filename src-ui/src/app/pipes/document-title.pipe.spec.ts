@@ -1,8 +1,9 @@
 import { DocumentTitlePipe } from './document-title.pipe'
 
 describe('DocumentTitlePipe', () => {
-  it('create an instance', () => {
+  it('should return a value if not null', () => {
     const pipe = new DocumentTitlePipe()
-    expect(pipe).toBeTruthy()
+    expect(pipe.transform('some string')).toEqual('some string')
+    expect(pipe.transform(null)).toEqual('(no title)')
   })
 })
