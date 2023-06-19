@@ -42,7 +42,10 @@ export class PermissionsService {
     action: PermissionAction,
     type: PermissionType
   ): boolean {
-    return this.permissions.includes(this.getPermissionCode(action, type))
+    return (
+      this.currentUser?.is_superuser ||
+      this.permissions?.includes(this.getPermissionCode(action, type))
+    )
   }
 
   public currentUserOwnsObject(object: ObjectWithPermissions): boolean {

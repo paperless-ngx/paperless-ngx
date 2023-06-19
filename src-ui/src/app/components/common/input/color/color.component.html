@@ -11,7 +11,7 @@
 
       </ng-template>
 
-      <input class="form-control" [class.is-invalid]="error" [id]="inputId" [(ngModel)]="value" (change)="onChange(value)" [autoClose]="'outside'" [ngbPopover]="popContent" placement="bottom" popoverClass="shadow">
+      <input #inputField class="form-control" [class.is-invalid]="error" [id]="inputId" [(ngModel)]="value" (change)="onChange(value)" [autoClose]="'outside'" [ngbPopover]="popContent" placement="bottom" popoverClass="shadow">
 
       <button class="btn btn-outline-secondary" type="button" (click)="randomize()">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-dice-5" viewBox="0 0 16 16">

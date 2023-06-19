@@ -19,7 +19,7 @@ export class TasksService {
   private fileTasks: PaperlessTask[] = []
 
   public get total(): number {
-    return this.fileTasks?.length
+    return this.fileTasks.length
   }
 
   public get allFileTasks(): PaperlessTask[] {

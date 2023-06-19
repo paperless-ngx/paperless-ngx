@@ -1,7 +1,7 @@
 <div class="mb-3">
   <label class="form-label" [for]="inputId">{{title}}</label>
   <div class="input-group" [class.is-invalid]="error">
-    <input class="form-control" [class.is-invalid]="error" [placeholder]="placeholder" [id]="inputId" maxlength="10"
+    <input #inputField class="form-control" [class.is-invalid]="error" [placeholder]="placeholder" [id]="inputId" maxlength="10"
           (dateSelect)="onChange(value)" (change)="onChange(value)" (keypress)="onKeyPress($event)" (paste)="onPaste($event)"
           name="dp" [(ngModel)]="value" ngbDatepicker #datePicker="ngbDatepicker" #datePickerContent="ngModel" [disabled]="disabled">
     <button class="btn btn-outline-secondary calendar" (click)="datePicker.toggle()" type="button" [disabled]="disabled">

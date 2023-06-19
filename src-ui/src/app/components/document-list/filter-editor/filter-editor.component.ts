@@ -16,7 +16,8 @@ import { debounceTime, distinctUntilChanged, filter } from 'rxjs/operators'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
-import { filterRulesDiffer, FilterRule } from 'src/app/data/filter-rule'
+import { FilterRule } from 'src/app/data/filter-rule'
+import { filterRulesDiffer } from 'src/app/utils/filter-rules'
 import {
   FILTER_ADDED_AFTER,
   FILTER_ADDED_BEFORE,
@@ -67,7 +68,6 @@ import {
   OwnerFilterType,
   PermissionsSelectionModel,
 } from '../../common/permissions-filter-dropdown/permissions-filter-dropdown.component'
-import { SettingsService } from 'src/app/services/settings.service'
 
 const TEXT_FILTER_TARGET_TITLE = 'title'
 const TEXT_FILTER_TARGET_TITLE_CONTENT = 'title-content'
@@ -111,7 +111,8 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   generateFilterName() {
     if (this.filterRules.length == 1) {
       let rule = this.filterRules[0]
-      switch (this.filterRules[0].rule_type) {
+      switch (rule.rule_type) {
+        case FILTER_CORRESPONDENT:
         case FILTER_HAS_CORRESPONDENT_ANY:
           if (rule.value) {
             return $localize`Correspondent: ${
@@ -121,13 +122,24 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
             return $localize`Without correspondent`
           }
 
+        case FILTER_DOCUMENT_TYPE:
         case FILTER_HAS_DOCUMENT_TYPE_ANY:
           if (rule.value) {
-            return $localize`Type: ${
+            return $localize`Document type: ${
               this.documentTypes.find((dt) => dt.id == +rule.value)?.name
             }`
           } else {
             return $localize`Without document type`
+          }
+
+        case FILTER_STORAGE_PATH:
+        case FILTER_HAS_STORAGE_PATH_ANY:
+          if (rule.value) {
+            return $localize`Storage path: ${
+              this.storagePaths.find((sp) => sp.id == +rule.value)?.name
+            }`
+          } else {
+            return $localize`Without storage path`
           }
 
         case FILTER_HAS_TAGS_ALL:
@@ -165,8 +177,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     private tagService: TagService,
     private correspondentService: CorrespondentService,
     private documentService: DocumentService,
-    private storagePathService: StoragePathService,
-    private settingsService: SettingsService
+    private storagePathService: StoragePathService
   ) {}
 
   @ViewChild('textFilterInput')
@@ -557,7 +568,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     ) {
       filterRules.push({
         rule_type: FILTER_FULLTEXT_MORELIKE,
-        value: this._moreLikeId?.toString(),
+        value: this._moreLikeId.toString(),
       })
     }
     if (this.tagSelectionModel.isNoneSelected()) {

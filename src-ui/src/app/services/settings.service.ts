@@ -43,13 +43,17 @@ export interface LanguageOption {
   providedIn: 'root',
 })
 export class SettingsService {
-  private renderer: Renderer2
   protected baseUrl: string = environment.apiBaseUrl + 'ui_settings/'
 
   private settings: Object = {}
   currentUser: PaperlessUser
 
   public settingsSaved: EventEmitter<any> = new EventEmitter()
+
+  private _renderer: Renderer2
+  public get renderer(): Renderer2 {
+    return this._renderer
+  }
 
   constructor(
     rendererFactory: RendererFactory2,
@@ -62,7 +66,7 @@ export class SettingsService {
     private savedViewService: SavedViewService,
     private permissionsService: PermissionsService
   ) {
-    this.renderer = rendererFactory.createRenderer(null, null)
+    this._renderer = rendererFactory.createRenderer(null, null)
   }
 
   // this is called by the app initializer in app.module
@@ -102,49 +106,49 @@ export class SettingsService {
     themeColor ??= this.get(SETTINGS_KEYS.THEME_COLOR)
 
     if (darkModeUseSystem) {
-      this.renderer.addClass(this.document.body, 'color-scheme-system')
-      this.renderer.removeClass(this.document.body, 'color-scheme-dark')
+      this._renderer.addClass(this.document.body, 'color-scheme-system')
+      this._renderer.removeClass(this.document.body, 'color-scheme-dark')
     } else {
-      this.renderer.removeClass(this.document.body, 'color-scheme-system')
+      this._renderer.removeClass(this.document.body, 'color-scheme-system')
       darkModeEnabled
-        ? this.renderer.addClass(this.document.body, 'color-scheme-dark')
-        : this.renderer.removeClass(this.document.body, 'color-scheme-dark')
+        ? this._renderer.addClass(this.document.body, 'color-scheme-dark')
+        : this._renderer.removeClass(this.document.body, 'color-scheme-dark')
     }
 
     // remove these in case they were there
-    this.renderer.removeClass(this.document.body, 'primary-dark')
-    this.renderer.removeClass(this.document.body, 'primary-light')
+    this._renderer.removeClass(this.document.body, 'primary-dark')
+    this._renderer.removeClass(this.document.body, 'primary-light')
 
     if (themeColor) {
       const hsl = hexToHsl(themeColor)
       const bgBrightnessEstimate = estimateBrightnessForColor(themeColor)
 
       if (bgBrightnessEstimate == BRIGHTNESS.DARK) {
-        this.renderer.addClass(this.document.body, 'primary-dark')
-        this.renderer.removeClass(this.document.body, 'primary-light')
+        this._renderer.addClass(this.document.body, 'primary-dark')
+        this._renderer.removeClass(this.document.body, 'primary-light')
       } else {
-        this.renderer.addClass(this.document.body, 'primary-light')
-        this.renderer.removeClass(this.document.body, 'primary-dark')
+        this._renderer.addClass(this.document.body, 'primary-light')
+        this._renderer.removeClass(this.document.body, 'primary-dark')
       }
-      this.renderer.setStyle(
+      this._renderer.setStyle(
         document.body,
         '--pngx-primary',
         `${+hsl.h * 360},${hsl.s * 100}%`,
         RendererStyleFlags2.DashCase
       )
-      this.renderer.setStyle(
+      this._renderer.setStyle(
         document.body,
         '--pngx-primary-lightness',
         `${hsl.l * 100}%`,
         RendererStyleFlags2.DashCase
       )
     } else {
-      this.renderer.removeStyle(
+      this._renderer.removeStyle(
         document.body,
         '--pngx-primary',
         RendererStyleFlags2.DashCase
       )
-      this.renderer.removeStyle(
+      this._renderer.removeStyle(
         document.body,
         '--pngx-primary-lightness',
         RendererStyleFlags2.DashCase

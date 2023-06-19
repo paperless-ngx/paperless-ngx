@@ -69,9 +69,6 @@ export class UploadFileWidgetComponent extends ComponentWithPermissions {
     return this.consumerStatusService.getConsumerStatus(FileStatusPhase.SUCCESS)
   }
 
-  getStatusCompleted() {
-    return this.consumerStatusService.getConsumerStatusCompleted()
-  }
   getTotalUploadProgress() {
     let current = 0
     let max = 0

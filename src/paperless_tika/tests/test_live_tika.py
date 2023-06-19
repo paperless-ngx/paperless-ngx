@@ -118,3 +118,28 @@ class TestTikaParserAgainstServer(TestCase):
             self.assertTrue(b"PDF-" in f.read()[:10])
 
         # self.assertEqual(self.parser.date, datetime.datetime(2022, 9, 14))
+
+    def test_basic_parse_doc(self):
+        """
+        GIVEN:
+            - An input DOC format document
+        WHEN:
+            - The document is parsed
+        THEN:
+            - Document content is correct
+            - Document date is correct
+        """
+        test_file = self.SAMPLE_DIR / "sample.doc"
+
+        self.try_parse_with_wait(
+            test_file,
+            "application/msword",
+        )
+
+        self.assertIn(
+            "his is a test document, saved in the older .doc format",
+            self.parser.text,
+        )
+        self.assertIsNotNone(self.parser.archive_path)
+        with open(self.parser.archive_path, "rb") as f:
+            self.assertTrue(b"PDF-" in f.read()[:10])
