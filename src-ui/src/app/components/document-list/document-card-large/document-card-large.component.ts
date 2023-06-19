@@ -133,7 +133,7 @@ export class DocumentCardLargeComponent extends ComponentWithPermissions {
 
   get contentTrimmed() {
     return (
-      this.document.content.substr(0, 500) +
+      this.document.content.substring(0, 500) +
       (this.document.content.length > 500 ? '...' : '')
     )
   }

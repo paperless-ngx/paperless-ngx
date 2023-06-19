@@ -53,7 +53,7 @@ export class AppFrameComponent
     public settingsService: SettingsService,
     public tasksService: TasksService,
     private readonly toastService: ToastService,
-    private permissionsService: PermissionsService
+    permissionsService: PermissionsService
   ) {
     super()
 
@@ -75,7 +75,7 @@ export class AppFrameComponent
   }
 
   versionString = `${environment.appTitle} ${environment.version}`
-  appRemoteVersion
+  appRemoteVersion: AppRemoteVersion
 
   isMenuCollapsed: boolean = true
 
@@ -103,7 +103,7 @@ export class AppFrameComponent
           this.toastService.showError(
             $localize`An error occurred while saving settings.`
           )
-          console.log(error)
+          console.warn(error)
         },
       })
   }
@@ -236,7 +236,7 @@ export class AppFrameComponent
           this.toastService.showError(
             $localize`An error occurred while saving update checking settings.`
           )
-          console.log(error)
+          console.warn(error)
         },
       })
     if (enable) {
