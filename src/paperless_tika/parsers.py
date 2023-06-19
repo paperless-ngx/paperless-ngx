@@ -96,7 +96,13 @@ class TikaDocumentParser(DocumentParser):
                 data["pdfFormat"] = "PDF/A-3b"
 
             try:
-                response = httpx.post(url, files=files, headers=headers, data=data)
+                response = httpx.post(
+                    url,
+                    files=files,
+                    headers=headers,
+                    data=data,
+                    timeout=30.0,
+                )
                 response.raise_for_status()  # ensure we notice bad responses
             except Exception as err:
                 raise ParseError(
