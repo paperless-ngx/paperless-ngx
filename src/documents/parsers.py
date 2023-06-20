@@ -202,7 +202,12 @@ def make_thumbnail_from_pdf_gs_fallback(in_path, temp_dir, logging_group=None) -
         return out_path
 
     except ParseError:
-        return get_default_thumbnail()
+        # The caller might expect a generated thumbnail that can be moved,
+        # so we need to copy it before it gets moved.
+        # https://github.com/paperless-ngx/paperless-ngx/issues/3631
+        default_thumbnail_path = os.path.join(temp_dir, "document.png")
+        shutil.copy2(get_default_thumbnail(), default_thumbnail_path)
+        return default_thumbnail_path
 
 
 def make_thumbnail_from_pdf(in_path, temp_dir, logging_group=None) -> str:
