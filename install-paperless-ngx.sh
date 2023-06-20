@@ -384,6 +384,14 @@ fi
 
 ${DOCKER_COMPOSE_CMD} pull
 
+if [ "$DATABASE_BACKEND" == "postgres" ] || [ "$DATABASE_BACKEND" == "mariadb" ] ; then
+	echo "Starting DB first for initilzation"
+	${DOCKER_COMPOSE_CMD} up --detach db
+	# hopefully enough time for even the slower systems
+	sleep 15
+	${DOCKER_COMPOSE_CMD} stop
+fi
+
 ${DOCKER_COMPOSE_CMD} run --rm -e DJANGO_SUPERUSER_PASSWORD="$PASSWORD" webserver createsuperuser --noinput --username "$USERNAME" --email "$EMAIL"
 
 ${DOCKER_COMPOSE_CMD} up --detach
