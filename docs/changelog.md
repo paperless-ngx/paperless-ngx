@@ -7,7 +7,7 @@
 - Fix: Increase httpx operation timeouts to 30s [@stumpylog](https://github.com/stumpylog) ([#3627](https://github.com/paperless-ngx/paperless-ngx/pull/3627))
 - Fix: Better error handling and checking when parsing documents via Tika [@stumpylog](https://github.com/stumpylog) ([#3617](https://github.com/paperless-ngx/paperless-ngx/pull/3617))
 
-### Documentation
+### Development
 
 - Development: frontend unit testing [@shamoon](https://github.com/shamoon) ([#3597](https://github.com/paperless-ngx/paperless-ngx/pull/3597))
 
@@ -15,7 +15,6 @@
 
 - Chore: Bumps the CI/Docker pipenv version [@stumpylog](https://github.com/stumpylog) ([#3622](https://github.com/paperless-ngx/paperless-ngx/pull/3622))
 - Chore: Set CI artifact retention days [@stumpylog](https://github.com/stumpylog) ([#3621](https://github.com/paperless-ngx/paperless-ngx/pull/3621))
-- Development: frontend unit testing [@shamoon](https://github.com/shamoon) ([#3597](https://github.com/paperless-ngx/paperless-ngx/pull/3597))
 
 ### All App Changes
 
