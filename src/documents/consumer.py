@@ -582,7 +582,12 @@ class Consumer(LoggingMixin):
     def _write(self, storage_type, source, target):
         with open(source, "rb") as read_file, open(target, "wb") as write_file:
             write_file.write(read_file.read())
-        shutil.copystat(source, target)
+
+        # Attempt to copy file's original stats, but it's ok if we can't
+        try:
+            shutil.copystat(source, target)
+        except Exception:  # pragma: no cover
+            pass
 
     def _log_script_outputs(self, completed_process: CompletedProcess):
         """
