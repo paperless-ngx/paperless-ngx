@@ -211,7 +211,9 @@ class BarcodeReader:
                 factor = settings.CONSUMER_ASN_BARCODE_UPSCALE
                 if factor != 1.0:
                     x, y = page.size
-                    page = page.resize((int(round(x*factor)), (int(round(y*factor)))))
+                    page = page.resize(
+                        (int(round(x * factor)), (int(round(y * factor)))),
+                    )
 
                 for barcode_value in reader(page):
                     self.barcodes.append(

@@ -1095,6 +1095,22 @@ barcode.
 
     Defaults to "ASN"
 
+`PAPERLESS_CONSUMER_ASN_BARCODE_UPSCALE=<float>`
+
+: Defines the upscale factor used in ASN barcode detection.
+Improves the detection of small barcodes, with i.e. 1.5
+
+    Defaults to "1.0"
+
+`PAPERLESS_CONSUMER_ASN_BARCODE_DPI=<int>`
+
+: During ASN barcode detection every page from a PDF document needs
+to be converted to an image. A dpi value can be specified in the
+conversion process. Default is 300. If the detection of barcodes fails
+a bigger dpi value i.e. 600 can fix the issue.
+
+    Defaults to "300"
+
 ## Binaries
 
 There are a few external software packages that Paperless expects to
