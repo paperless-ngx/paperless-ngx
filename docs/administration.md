@@ -167,6 +167,16 @@ following:
     This might not actually do anything. Not every new paperless version
     comes with new database migrations.
 
+### Database Upgrades
+
+In general, paperless does not require a specific version of PostgreSQL or MariaDB and it is
+safe to update them to newer versions. However, you should always take a backup and follow
+the instructions from your database's documentation for how to upgrade between major versions.
+
+For PostgreSQL, refer to [Upgrading a PostgreSQL Cluster](https://www.postgresql.org/docs/current/upgrading.html).
+
+For MariaDB, refer to [Upgrading MariaDB](https://mariadb.com/kb/en/upgrading/)
+
 ## Downgrading Paperless {#downgrade-paperless}
 
 Downgrades are possible. However, some updates also contain database
