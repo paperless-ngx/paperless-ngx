@@ -26,7 +26,7 @@
           <use xlink:href="assets/bootstrap-icons.svg#plus" />
         </svg>
       </button>
-      <button *ngIf="showFilter" class="btn btn-outline-secondary" type="button" (click)="onFilterDocuments()" [disabled]="isPrivate || this.value === null" title="{{ filterTitle }}">
+      <button *ngIf="showFilter" class="btn btn-outline-secondary" type="button" (click)="onFilterDocuments()" [disabled]="isPrivate || this.value === null" title="{{ filterButtonTitle }}">
         <svg class="buttonicon" fill="currentColor">
           <use xlink:href="assets/bootstrap-icons.svg#filter" />
         </svg>
