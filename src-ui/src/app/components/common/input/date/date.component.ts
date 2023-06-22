@@ -98,4 +98,8 @@ export class DateComponent
   onFilterDocuments() {
     this.filterDocuments.emit([this.ngbDateParserFormatter.parse(this.value)])
   }
+
+  get filterButtonTitle() {
+    return $localize`Filter documents with this ${this.title}`
+  }
 }
