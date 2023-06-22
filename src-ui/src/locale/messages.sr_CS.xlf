@@ -2112,18 +2112,6 @@
         <note priority="1" from="description">Filter drop down element to filter for documents with no correspondent/type/tag assigned</note>
         <target state="translated">Nije dodeljen</target>
       </trans-unit>
-      <trans-unit id="2088622872854972056" datatype="html">
-        <source>Filter documents with this <x id="INTERPOLATION" equiv-text="{{title}}"/></source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/common/input/date/date.component.html</context>
-          <context context-type="linenumber">12</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/common/input/select/select.component.html</context>
-          <context context-type="linenumber">29</context>
-        </context-group>
-        <target state="needs-translation">Filter documents with this <x id="INTERPOLATION" equiv-text="{{title}}"/></target>
-      </trans-unit>
       <trans-unit id="445302259125375799" datatype="html">
         <source>Invalid date.</source>
         <context-group purpose="location">
@@ -2147,6 +2135,18 @@
           <context context-type="linenumber">47</context>
         </context-group>
         <target state="translated">Sugestije:</target>
+      </trans-unit>
+      <trans-unit id="6344437738844463465" datatype="html">
+        <source>Filter documents with this <x id="PH" equiv-text="this.title"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/input/date/date.component.ts</context>
+          <context context-type="linenumber">103</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/input/select/select.component.ts</context>
+          <context context-type="linenumber">149</context>
+        </context-group>
+        <target state="needs-translation">Filter documents with this <x id="PH" equiv-text="this.title"/></target>
       </trans-unit>
       <trans-unit id="594042705136125260" datatype="html">
         <source>Edit Permissions</source>
