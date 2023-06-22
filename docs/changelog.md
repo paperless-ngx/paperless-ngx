@@ -2,18 +2,15 @@
 
 ## paperless-ngx 1.16.3
 
-### Features
-
-- Fix: Set user and home environment through supervisord [@stumpylog](https://github.com/stumpylog) ([#3638](https://github.com/paperless-ngx/paperless-ngx/pull/3638))
-
 ### Bug Fixes
 
+- Fix: Set user and home environment through supervisord [@stumpylog](https://github.com/stumpylog) ([#3638](https://github.com/paperless-ngx/paperless-ngx/pull/3638))
 - Fix: Ignore errors when trying to copy the original file's stats [@stumpylog](https://github.com/stumpylog) ([#3652](https://github.com/paperless-ngx/paperless-ngx/pull/3652))
-- Copy default thumbnail if thumbnail generation fails [@plu](https://github.com/plu) ([#3632](https://github.com/paperless-ngx/paperless-ngx/pull/3632))
+- Fix: Copy default thumbnail if thumbnail generation fails [@plu](https://github.com/plu) ([#3632](https://github.com/paperless-ngx/paperless-ngx/pull/3632))
 - Fix: Set user and home environment through supervisord [@stumpylog](https://github.com/stumpylog) ([#3638](https://github.com/paperless-ngx/paperless-ngx/pull/3638))
 - Fix: Fix quick install with external database not being fully ready [@stumpylog](https://github.com/stumpylog) ([#3637](https://github.com/paperless-ngx/paperless-ngx/pull/3637))
 
-### Documentation
+### Maintenance
 
 - Chore: Update default Postgres version for new installs [@stumpylog](https://github.com/stumpylog) ([#3640](https://github.com/paperless-ngx/paperless-ngx/pull/3640))
 
@@ -23,7 +20,7 @@
 <summary>2 changes</summary>
 
 - Fix: Ignore errors when trying to copy the original file's stats [@stumpylog](https://github.com/stumpylog) ([#3652](https://github.com/paperless-ngx/paperless-ngx/pull/3652))
-- Copy default thumbnail if thumbnail generation fails [@plu](https://github.com/plu) ([#3632](https://github.com/paperless-ngx/paperless-ngx/pull/3632))
+- Fix: Copy default thumbnail if thumbnail generation fails [@plu](https://github.com/plu) ([#3632](https://github.com/paperless-ngx/paperless-ngx/pull/3632))
 </details>
 
 ## paperless-ngx 1.16.2
