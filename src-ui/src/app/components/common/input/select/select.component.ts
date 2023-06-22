@@ -144,4 +144,8 @@ export class SelectComponent extends AbstractInputComponent<number> {
   onFilterDocuments() {
     this.filterDocuments.emit([this.items.find((i) => i.id === this.value)])
   }
+
+  get filterTitle() {
+    return $localize`Filter documents with this ${this.title}`
+  }
 }
