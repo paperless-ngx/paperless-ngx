@@ -7,11 +7,15 @@ from pathlib import Path
 
 import tqdm
 from django.conf import settings
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldDoesNotExist
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.core.management.base import CommandError
 from django.core.serializers.base import DeserializationError
+from django.db import IntegrityError
+from django.db import transaction
 from django.db.models.signals import m2m_changed
 from django.db.models.signals import post_save
 from filelock import FileLock
@@ -116,9 +120,13 @@ class Command(BaseCommand):
         ):
             # Fill up the database with whatever is in the manifest
             try:
-                for manifest_path in manifest_paths:
-                    call_command("loaddata", manifest_path)
-            except (FieldDoesNotExist, DeserializationError) as e:
+                with transaction.atomic():
+                    for manifest_path in manifest_paths:
+                        # delete these since pk can change, re-created from import
+                        ContentType.objects.all().delete()
+                        Permission.objects.all().delete()
+                        call_command("loaddata", manifest_path)
+            except (FieldDoesNotExist, DeserializationError, IntegrityError) as e:
                 self.stdout.write(self.style.ERROR("Database import failed"))
                 if (
                     self.version is not None
