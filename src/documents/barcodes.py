@@ -203,13 +203,16 @@ class BarcodeReader:
         try:
             pages_from_path = convert_from_path(
                 self.pdf_file,
-                dpi=settings.CONSUMER_ASN_BARCODE_DPI,
+                dpi=settings.CONSUMER_BARCODE_DPI,
                 output_folder=self.temp_dir.name,
             )
 
             for current_page_number, page in enumerate(pages_from_path):
-                factor = settings.CONSUMER_ASN_BARCODE_UPSCALE
-                if factor != 1.0:
+                factor = settings.CONSUMER_BARCODE_UPSCALE
+                if factor > 1.0:
+                    logger.debug(
+                        f"Upscaling image by {factor} for better barcode detection",
+                    )
                     x, y = page.size
                     page = page.resize(
                         (int(round(x * factor)), (int(round(y * factor)))),

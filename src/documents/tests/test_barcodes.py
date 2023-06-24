@@ -906,6 +906,29 @@ class TestAsnBarcode(DirectoriesMixin, TestCase):
                 input_doc,
             )
 
+    @override_settings(CONSUMER_BARCODE_UPSCALE=1.5)
+    @override_settings(CONSUMER_BARCODE_DPI=600)
+    def test_scan_file_for_qrcode_with_upscale(self):
+        """
+        ?????
+        GIVEN:
+            - A printed and scanned PDF document with a rather small QR code
+            - ASN Barcode isn't detected with default settings of 300dpi and without upscaling
+        WHEN:
+            - ASN Barcode detection is run with 600dpi and an upscale factor of 1.5
+        THEN:
+            - ASN 123 is detected
+
+        """
+
+        test_file = self.BARCODE_SAMPLE_DIR / "barcode-qr-asn-000123-upscale-dpi.pdf"
+
+        with BarcodeReader(test_file, "application/pdf") as reader:
+            reader.detect()
+
+            self.assertEqual(len(reader.barcodes), 1)
+            self.assertEqual(reader.asn, 123)
+
 
 @pytest.mark.skipif(
     not HAS_ZXING_LIB,
