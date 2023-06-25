@@ -137,6 +137,7 @@ main {
 
 .sidebar .nav-link {
   font-weight: 500;
+  white-space: nowrap;
 
   &:hover, &.active, &:focus {
     color: var(--bs-primary);
