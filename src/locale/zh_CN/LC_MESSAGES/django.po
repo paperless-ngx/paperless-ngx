@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-03-03 20:41\n"
+"PO-Revision-Date: 2023-06-22 01:26\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -23,7 +23,7 @@ msgstr "文档"
 
 #: documents/models.py:36
 msgid "None"
-msgstr ""
+msgstr "无"
 
 #: documents/models.py:37
 msgid "Any word"
@@ -68,7 +68,7 @@ msgstr "忽略大小写"
 
 #: documents/models.py:71
 msgid "owner"
-msgstr ""
+msgstr "所有者"
 
 #: documents/models.py:81 documents/models.py:136
 msgid "correspondent"
@@ -192,11 +192,11 @@ msgstr "当前存储中的归档文件名"
 
 #: documents/models.py:239
 msgid "original filename"
-msgstr ""
+msgstr "原文件名"
 
 #: documents/models.py:245
 msgid "The original name of the file when it was uploaded"
-msgstr ""
+msgstr "文件上传时的原始名称"
 
 #: documents/models.py:252
 msgid "archive serial number"
@@ -372,15 +372,15 @@ msgstr "有标签包含于"
 
 #: documents/models.py:437
 msgid "ASN greater than"
-msgstr ""
+msgstr "ASN 大于"
 
 #: documents/models.py:438
 msgid "ASN less than"
-msgstr ""
+msgstr "ASN 小于"
 
 #: documents/models.py:439
 msgid "storage path is"
-msgstr ""
+msgstr "保存路径"
 
 #: documents/models.py:449
 msgid "rule type"
@@ -400,79 +400,79 @@ msgstr "过滤规则"
 
 #: documents/models.py:563
 msgid "Task ID"
-msgstr ""
+msgstr "任务ID"
 
 #: documents/models.py:564
 msgid "Celery ID for the Task that was run"
-msgstr ""
+msgstr "正在运行的任务的 Celery ID"
 
 #: documents/models.py:569
 msgid "Acknowledged"
-msgstr ""
+msgstr "已确认"
 
 #: documents/models.py:570
 msgid "If the task is acknowledged via the frontend or API"
-msgstr ""
+msgstr "如果任务通过前端或 API 确认"
 
 #: documents/models.py:576
 msgid "Task Filename"
-msgstr ""
+msgstr "任务文件名"
 
 #: documents/models.py:577
 msgid "Name of the file which the Task was run for"
-msgstr ""
+msgstr "正在运行的任务文件名称"
 
 #: documents/models.py:583
 msgid "Task Name"
-msgstr ""
+msgstr "任务名称"
 
 #: documents/models.py:584
 msgid "Name of the Task which was run"
-msgstr ""
+msgstr "运行中的任务名称"
 
 #: documents/models.py:591
 msgid "Task State"
-msgstr ""
+msgstr "任务状态"
 
 #: documents/models.py:592
 msgid "Current state of the task being run"
-msgstr ""
+msgstr "当前任务运行状态"
 
 #: documents/models.py:597
 msgid "Created DateTime"
-msgstr ""
+msgstr "创建日期"
 
 #: documents/models.py:598
 msgid "Datetime field when the task result was created in UTC"
-msgstr ""
+msgstr "任务结果创建时间（UTC）"
 
 #: documents/models.py:603
 msgid "Started DateTime"
-msgstr ""
+msgstr "开始时间"
 
 #: documents/models.py:604
 msgid "Datetime field when the task was started in UTC"
-msgstr ""
+msgstr "任务开始时间（UTC）"
 
 #: documents/models.py:609
 msgid "Completed DateTime"
-msgstr ""
+msgstr "完成时间"
 
 #: documents/models.py:610
 msgid "Datetime field when the task was completed in UTC"
-msgstr ""
+msgstr "任务完成时间（UTC）"
 
 #: documents/models.py:615
 msgid "Result Data"
-msgstr ""
+msgstr "结果数据"
 
 #: documents/models.py:617
 msgid "The data returned by the task"
-msgstr ""
+msgstr "任务返回的数据"
 
 #: documents/models.py:626
 msgid "Comment for the document"
-msgstr ""
+msgstr "文档评论"
 
 #: documents/models.py:650
 msgid "user"
@@ -480,11 +480,11 @@ msgstr "用户"
 
 #: documents/models.py:655
 msgid "comment"
-msgstr ""
+msgstr "备注"
 
 #: documents/models.py:656
 msgid "comments"
-msgstr ""
+msgstr "备注"
 
 #: documents/serialisers.py:80
 #, python-format
@@ -554,7 +554,7 @@ msgstr "登录"
 
 #: paperless/apps.py:9
 msgid "Paperless"
-msgstr ""
+msgstr "无纸版"
 
 #: paperless/settings.py:521
 msgid "English (US)"
@@ -562,7 +562,7 @@ msgstr "英语(美国)"
 
 #: paperless/settings.py:522
 msgid "Arabic"
-msgstr ""
+msgstr "阿拉伯语"
 
 #: paperless/settings.py:523
 msgid "Belarusian"
@@ -670,7 +670,7 @@ msgstr "操作"
 
 #: paperless_mail/admin.py:69
 msgid "The action applied to the mail. This action is only performed when the mail body or attachments were consumed from the mail."
-msgstr ""
+msgstr "邮件中的操作。仅当邮件正文或附件已被读取时执行此操作。"
 
 #: paperless_mail/admin.py:77
 msgid "Metadata"
@@ -750,11 +750,11 @@ msgstr "只处理附件。"
 
 #: paperless_mail/models.py:62
 msgid "Process full Mail (with embedded attachments in file) as .eml"
-msgstr ""
+msgstr "处理.eml邮件文件(包含文件中的嵌入附件) "
 
 #: paperless_mail/models.py:64
 msgid "Process full Mail (with embedded attachments in file) as .eml + process attachments as separate documents"
-msgstr ""
+msgstr "处理.eml邮件文件(包含文件中的嵌入附件) + 将附件作为单独的文档处理"
 
 #: paperless_mail/models.py:70
 msgid "Process all files, including 'inline' attachments."
@@ -858,7 +858,7 @@ msgstr "内嵌附件包含嵌入图像，所以最好将此选项与文件名过
 
 #: paperless_mail/models.py:158
 msgid "consumption scope"
-msgstr ""
+msgstr "消费范围"
 
 #: paperless_mail/models.py:164
 msgid "action"
@@ -894,21 +894,21 @@ msgstr "分配此联系人"
 
 #: paperless_mail/models.py:239
 msgid "uid"
-msgstr ""
+msgstr "UID"
 
 #: paperless_mail/models.py:247
 msgid "subject"
-msgstr ""
+msgstr "标题"
 
 #: paperless_mail/models.py:255
 msgid "received"
-msgstr ""
+msgstr "已接收"
 
 #: paperless_mail/models.py:262
 msgid "processed"
-msgstr ""
+msgstr "已处理"
 
 #: paperless_mail/models.py:268
 msgid "status"
-msgstr ""
+msgstr "状态"
 
