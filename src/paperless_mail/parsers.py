@@ -33,7 +33,9 @@ class MailDocumentParser(DocumentParser):
 
     def get_thumbnail(self, document_path: Path, mime_type: str, file_name=None):
         if not self.archive_path:
-            self.archive_path = self.generate_pdf(document_path)
+            self.archive_path = self.generate_pdf(
+                self.parse_file_to_message(document_path),
+            )
 
         return make_thumbnail_from_pdf(
             self.archive_path,
@@ -299,9 +301,6 @@ class MailDocumentParser(DocumentParser):
 
         css_file = Path(__file__).parent / "templates" / "output.css"
         email_html_file = self.mail_to_html(mail)
-
-        print(css_file)
-        print(email_html_file)
 
         with css_file.open("rb") as css_handle, email_html_file.open(
             "rb",
