@@ -300,9 +300,10 @@ the object owner or a superuser).
 
 By default, the API will return a truncated version of object-level
 permissions, returning `user_can_change` indicating whether the current user
-has edit permissions. You can pass the parameter `full_perms=true` to API
-calls to view the full permissions of objects in a format that mirrors the
-`set_permissions` parameter above.
+can edit the object (either because they are the object owner or have permissions
+granted). You can pass the parameter `full_perms=true` to API calls to view the
+full permissions of objects in a format that mirrors the `set_permissions`
+parameter above.
 
 ## API Versioning
 
