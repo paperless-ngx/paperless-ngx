@@ -66,6 +66,7 @@ scipy = "==1.8.1"
 reportlab = "==3.6.12"
 # Pin this until piwheels is building a newer version (see https://www.piwheels.org/project/cryptography/)
 cryptography = "==40.0.1"
+httpx = "*"
 
 [dev-packages]
 # Linting

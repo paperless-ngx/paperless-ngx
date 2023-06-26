@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "db3fc8c37931534327f89c6211581495328b6f6bf2c533df848fa23faa5d0cd3"
+            "sha256": "e63cdbb928210fc4dcf0554bde381abd0ff956923ae03ab9f6984025cd5a454d"
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -712,7 +712,7 @@
                 "sha256:06781eb9ac53cde990577af654bd990a4949de37a28bdb4a230d434f3a30b9bd",
                 "sha256:5853a43053df830c20f8110c5e69fe44d035d850b2dfe795e196f00fdb774bdd"
             ],
-            "markers": "python_version >= '3.7'",
+            "index": "pypi",
             "version": "==0.24.1"
         },
         "humanfriendly": {
@@ -1746,11 +1746,11 @@
         },
         "tika-client": {
             "hashes": [
-                "sha256:29b702d64bbbaa324a75f99062efb3253239762cbf0a3419a47549c2de9379d0",
-                "sha256:63a93593068dc0da07108dc47c12cd3ff00f07403cff72c86bea6a89abafbf6d"
+                "sha256:6110bd73eaa133f9c8eb1ef2566e6c0c8123a0e4efbcfb85b86f8c1b26cb4de2",
+                "sha256:e8eaa52771c72426f5531c53dcc8dfc5e3bb6e1f91f89fc93674a81bfca59d6d"
             ],
             "index": "pypi",
-            "version": "==0.1.1"
+            "version": "==0.2.0"
         },
         "tornado": {
             "hashes": [
