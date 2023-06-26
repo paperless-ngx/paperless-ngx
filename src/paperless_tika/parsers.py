@@ -4,7 +4,6 @@ from pathlib import Path
 import httpx
 from django.conf import settings
 from tika_client import TikaClient
-from tika_client.data_models import TikaKey
 
 from documents.parsers import DocumentParser
 from documents.parsers import ParseError
@@ -59,13 +58,9 @@ class TikaDocumentParser(DocumentParser):
                 f"{settings.TIKA_ENDPOINT}: {err}",
             ) from err
 
-        self.text = None
-        if hasattr(parsed, "content") and parsed.content is not None:
-            self.text = parsed.content.strip()
-        elif TikaKey.Content in parsed.data:
-            # May not be a completely handled type, but
-            # the Tika response may still include content
-            self.text = parsed.data[TikaKey.Content].strip()
+        self.text = parsed.content
+        if self.text is not None:
+            self.text = self.text.strip()
 
         self.date = parsed.created
         self.archive_path = self.convert_to_pdf(document_path, file_name)
