@@ -288,9 +288,22 @@ with an optional `set_permissions` parameter which is of the form:
 }
 ```
 
+!!! note
+
+    Arrays should contain user or group ID numbers.
+
 If this parameter is supplied the object's permissions will be overwritten,
 assuming the authenticated user has permission to do so (the user must be
 the object owner or a superuser).
+
+### Retrieving full permissions
+
+By default, the API will return a truncated version of object-level
+permissions, returning `user_can_change` indicating whether the current user
+can edit the object (either because they are the object owner or have permissions
+granted). You can pass the parameter `full_perms=true` to API calls to view the
+full permissions of objects in a format that mirrors the `set_permissions`
+parameter above.
 
 ## API Versioning
 
