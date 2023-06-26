@@ -1,5 +1,33 @@
 # Changelog
 
+## paperless-ngx 1.16.4
+
+### Bug Fixes
+
+- Fix: prevent button wrapping when sidebar narrows in MS Edge [@shamoon](https://github.com/shamoon) ([#3682](https://github.com/paperless-ngx/paperless-ngx/pull/3682))
+- Fix: Handling for filenames with non-ascii and no content attribute [@stumpylog](https://github.com/stumpylog) ([#3695](https://github.com/paperless-ngx/paperless-ngx/pull/3695))
+- Fix: Generation of thumbnails for existing stored emails [@stumpylog](https://github.com/stumpylog) ([#3696](https://github.com/paperless-ngx/paperless-ngx/pull/3696))
+- Fix: Use row gap for filter editor [@kleinweby](https://github.com/kleinweby) ([#3662](https://github.com/paperless-ngx/paperless-ngx/pull/3662))
+
+### Documentation
+
+- Documentation: update API docs re permissions [@shamoon](https://github.com/shamoon) ([#3697](https://github.com/paperless-ngx/paperless-ngx/pull/3697))
+
+### Maintenance
+
+- Chore: Updates codecov configuration for the flag settings and notification delay [@stumpylog](https://github.com/stumpylog) ([#3656](https://github.com/paperless-ngx/paperless-ngx/pull/3656))
+
+### All App Changes
+
+<details>
+<summary>4 changes</summary>
+
+- Fix: prevent button wrapping when sidebar narrows in MS Edge [@shamoon](https://github.com/shamoon) ([#3682](https://github.com/paperless-ngx/paperless-ngx/pull/3682))
+- Fix: Handling for filenames with non-ascii and no content attribute [@stumpylog](https://github.com/stumpylog) ([#3695](https://github.com/paperless-ngx/paperless-ngx/pull/3695))
+- Fix: Generation of thumbnails for existing stored emails [@stumpylog](https://github.com/stumpylog) ([#3696](https://github.com/paperless-ngx/paperless-ngx/pull/3696))
+- Fix: Use row gap for filter editor [@kleinweby](https://github.com/kleinweby) ([#3662](https://github.com/paperless-ngx/paperless-ngx/pull/3662))
+</details>
+
 ## paperless-ngx 1.16.3
 
 ### Bug Fixes
