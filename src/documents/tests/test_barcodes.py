@@ -912,10 +912,10 @@ class TestAsnBarcode(DirectoriesMixin, TestCase):
         GIVEN:
             - A printed and scanned PDF document with a rather small QR code
         WHEN:
-            - ASN barcode detection is run with default settings and pyzbar
+            - ASN barcode detection is run with default settings
+            - pyzbar is used for detection, as zxing would behave differently, and detect the QR code
         THEN:
             - ASN is not detected
-
         """
 
         test_file = self.BARCODE_SAMPLE_DIR / "barcode-qr-asn-000123-upscale-dpi.pdf"
@@ -933,9 +933,11 @@ class TestAsnBarcode(DirectoriesMixin, TestCase):
             - A printed and scanned PDF document with a rather small QR code
         WHEN:
             - ASN barcode detection is run with 600dpi and an upscale factor of 1.5 and pyzbar
+            - pyzbar is used for detection, as zxing would behave differently.
+              Upscaling is a workaround for detection problems with pyzbar,
+              when you cannot switch to zxing (aarch64 build problems of zxing)
         THEN:
             - ASN 123 is detected
-
         """
 
         test_file = self.BARCODE_SAMPLE_DIR / "barcode-qr-asn-000123-upscale-dpi.pdf"
