@@ -13,7 +13,6 @@ from humanfriendly import format_size
 from imap_tools import MailAttachment
 from imap_tools import MailMessage
 from tika_client import TikaClient
-from tika_client.data_models import TikaKey
 
 from documents.parsers import DocumentParser
 from documents.parsers import ParseError
@@ -173,12 +172,8 @@ class MailDocumentParser(DocumentParser):
             with TikaClient(tika_url=self.tika_server) as client:
                 parsed = client.tika.as_text.from_buffer(html, "text/html")
 
-                if hasattr(parsed, "content") and parsed.content is not None:
+                if parsed.content is not None:
                     return parsed.content.strip()
-                elif TikaKey.Content in parsed.data:
-                    # May not be a completely handled type, but
-                    # the Tika response may still include content
-                    return parsed.data[TikaKey.Content].strip()
                 return ""
         except Exception as err:
             raise ParseError(
