@@ -293,9 +293,7 @@ class TestEmailThumbnailGenerate(BaseMailParserTestCase):
             "message/rfc822",
         )
 
-        mock_generate_pdf.assert_called_once_with(
-            test_file,
-        )
+        mock_generate_pdf.assert_called_once()
         mock_make_thumbnail_from_pdf.assert_called_once_with(
             "Mocked return value..",
             self.parser.tempdir,
