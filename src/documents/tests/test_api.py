@@ -3994,6 +3994,57 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
         self.assertEqual(checker.has_perm("view_tag", tag1), True)
         self.assertIn("view_tag", get_perms(group1, tag1))
 
+    def test_api_set_doc_permissions(self):
+        """
+        GIVEN:
+            - API request to update doc permissions and owner
+        WHEN:
+            - owner is set
+            - view > users is set & view > groups is set
+        THEN:
+            - Object permissions are set appropriately
+        """
+        doc = Document.objects.create(
+            title="test",
+            mime_type="application/pdf",
+            content="this is a document",
+        )
+        user1 = User.objects.create_superuser(username="user1")
+        user2 = User.objects.create(username="user2")
+        group1 = Group.objects.create(name="group1")
+
+        self.client.force_authenticate(user1)
+
+        response = self.client.patch(
+            f"/api/documents/{doc.id}/",
+            json.dumps(
+                {
+                    "owner": user1.id,
+                    "set_permissions": {
+                        "view": {
+                            "users": [user2.id],
+                            "groups": [group1.id],
+                        },
+                        "change": {
+                            "users": None,
+                            "groups": None,
+                        },
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        doc = Document.objects.get(pk=doc.id)
+
+        self.assertEqual(doc.owner, user1)
+        from guardian.core import ObjectPermissionChecker
+
+        checker = ObjectPermissionChecker(user2)
+        self.assertTrue(checker.has_perm("view_document", doc))
+        self.assertIn("view_document", get_perms(group1, doc))
+
     def test_dynamic_permissions_fields(self):
         user1 = User.objects.create_user(username="user1")
         user1.user_permissions.add(*Permission.objects.filter(codename="view_document"))
