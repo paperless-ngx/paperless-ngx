@@ -781,6 +781,16 @@ CONSUMER_ASN_BARCODE_PREFIX: Final[str] = os.getenv(
 )
 
 
+CONSUMER_BARCODE_UPSCALE: Final[float] = float(
+    os.getenv("PAPERLESS_CONSUMER_BARCODE_UPSCALE", 0.0),
+)
+
+
+CONSUMER_BARCODE_DPI: Final[str] = int(
+    os.getenv("PAPERLESS_CONSUMER_BARCODE_DPI", 300),
+)
+
+
 OCR_PAGES = int(os.getenv("PAPERLESS_OCR_PAGES", 0))
 
 # The default language that tesseract will attempt to use when parsing
