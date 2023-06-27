@@ -1,5 +1,24 @@
 # Changelog
 
+## paperless-ngx 1.16.5
+
+### Features
+
+- Feature: support barcode upscaling for better detection of small barcodes [@bmachek](https://github.com/bmachek) ([#3655](https://github.com/paperless-ngx/paperless-ngx/pull/3655))
+
+### Bug Fixes
+
+- Fix: owner removed when set_permissions passed on object create [@shamoon](https://github.com/shamoon) ([#3702](https://github.com/paperless-ngx/paperless-ngx/pull/3702))
+
+### All App Changes
+
+<details>
+<summary>2 changes</summary>
+
+- Feature: support barcode upscaling for better detection of small barcodes [@bmachek](https://github.com/bmachek) ([#3655](https://github.com/paperless-ngx/paperless-ngx/pull/3655))
+- Fix: owner removed when set_permissions passed on object create [@shamoon](https://github.com/shamoon) ([#3702](https://github.com/paperless-ngx/paperless-ngx/pull/3702))
+</details>
+
 ## paperless-ngx 1.16.4
 
 ### Bug Fixes
