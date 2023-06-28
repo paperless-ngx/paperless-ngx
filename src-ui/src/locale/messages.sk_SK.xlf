@@ -308,7 +308,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">102</context>
         </context-group>
-        <target state="translated">Dokument <x id="PH" equiv-text="status.filename"/> bol pridaný do paperless-ngx.</target>
+        <target state="translated">Dokument <x id="PH" equiv-text="status.filename"/> bol pridaný do paperless.</target>
       </trans-unit>
       <trans-unit id="1931214133925051574" datatype="html">
         <source>Open document</source>
@@ -344,7 +344,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">133</context>
         </context-group>
-        <target state="translated">Dokument <x id="PH" equiv-text="status.filename"/> je spracovávaný paperless-ngx.</target>
+        <target state="translated">Dokument <x id="PH" equiv-text="status.filename"/> je spracovávaný v paperless.</target>
       </trans-unit>
       <trans-unit id="2501522447884928778" datatype="html">
         <source>Prev</source>
@@ -3384,7 +3384,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">112,114</context>
         </context-group>
-        <target state="translated">Archivované súbory</target>
+        <target state="translated"> Archivované súbory </target>
       </trans-unit>
       <trans-unit id="6791570188945688785" datatype="html">
         <source> Original files </source>
@@ -3392,7 +3392,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">118,120</context>
         </context-group>
-        <target state="translated">Pôvodné súbory</target>
+        <target state="translated"> Pôvodné súbory </target>
       </trans-unit>
       <trans-unit id="3608345051493493574" datatype="html">
         <source> Use formatted filename </source>
@@ -3400,7 +3400,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">125,127</context>
         </context-group>
-        <target state="translated"> Použiť formátovaný názov súboru</target>
+        <target state="translated"> Použiť formátovaný názov súboru </target>
       </trans-unit>
       <trans-unit id="7985804062689412812" datatype="html">
         <source>Error executing bulk operation: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></source>
@@ -3454,7 +3454,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">294</context>
         </context-group>
-        <target state="translated">Táto akcia priradí štítok "<x id="PH" equiv-text="tag.name"/>" <x id="PH_1" equiv-text="this.list.selected.size"/> vybranému dokumentu(-om).</target>
+        <target state="translated">Táto akcia pridá štítok "<x id="PH" equiv-text="tag.name"/>" <x id="PH_1" equiv-text="this.list.selected.size"/> vybraným dokumentom.</target>
       </trans-unit>
       <trans-unit id="1894412783609570695" datatype="html">
         <source>This operation will add the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -3462,7 +3462,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">299,301</context>
         </context-group>
-        <target state="translated">Táto akcia pridá štítky <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> <x id="PH_1" equiv-text="this.list.selected.size"/> dokumentu/-om.</target>
+        <target state="translated">Táto akcia pridá štítky <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> <x id="PH_1" equiv-text="this.list.selected.size"/> vybraným dokumentom.</target>
       </trans-unit>
       <trans-unit id="7181166515756808573" datatype="html">
         <source>This operation will remove the tag &quot;<x id="PH" equiv-text="tag.name"/>&quot; from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -3470,7 +3470,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">307</context>
         </context-group>
-        <target state="translated">Táto akcia odstráni štítok <x id="PH" equiv-text="tag.name"/> z <x id="PH_1" equiv-text="this.list.selected.size"/> dokumentu/-ov.</target>
+        <target state="translated">Táto akcia odstráni štítok <x id="PH" equiv-text="tag.name"/> z <x id="PH_1" equiv-text="this.list.selected.size"/> vybraným dokumentom.</target>
       </trans-unit>
       <trans-unit id="3819792277998068944" datatype="html">
         <source>This operation will remove the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -3478,7 +3478,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">312,314</context>
         </context-group>
-        <target state="translated">Táto akcia odstráni štítky <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> z <x id="PH_1" equiv-text="this.list.selected.size"/> dokumentu/-ov.</target>
+        <target state="translated">Táto akcia odstráni štítky <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> z <x id="PH_1" equiv-text="this.list.selected.size"/> vybraných dokumentov.</target>
       </trans-unit>
       <trans-unit id="2739066218579571288" datatype="html">
         <source>This operation will add the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> and remove the tags <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> on <x id="PH_2" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -3486,7 +3486,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">316,320</context>
         </context-group>
-        <target state="translated">Táto akcia pridá štítky <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> a odstráni štítky <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> z <x id="PH_2" equiv-text="this.list.selected.size"/> dokumentu/-ov.</target>
+        <target state="translated">Táto akcia pridá štítky <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> a odstráni štítky <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> z <x id="PH_2" equiv-text="this.list.selected.size"/> vybraných dokumentov.</target>
       </trans-unit>
       <trans-unit id="2996713129519325161" datatype="html">
         <source>Confirm correspondent assignment</source>
@@ -3502,7 +3502,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">359</context>
         </context-group>
-        <target state="translated">Táto akcia priradí odosielateľa "<x id="PH" equiv-text="correspondent.name"/>" <x id="PH_1" equiv-text="this.list.selected.size"/> dokumentu/-om.</target>
+        <target state="translated">Táto akcia priradí odosielateľa "<x id="PH" equiv-text="correspondent.name"/>" <x id="PH_1" equiv-text="this.list.selected.size"/> vybraných dokumentov.</target>
       </trans-unit>
       <trans-unit id="1257522660364398440" datatype="html">
         <source>This operation will remove the correspondent from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -3510,7 +3510,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">361</context>
         </context-group>
-        <target state="translated">Táto akcia odstráni odosielateľa z <x id="PH" equiv-text="this.list.selected.size"/> dokumentu/-ov.</target>
+        <target state="translated">Táto akcia odstráni odosielateľa z <x id="PH" equiv-text="this.list.selected.size"/> vybraných dokumentov.</target>
       </trans-unit>
       <trans-unit id="5393409374423140648" datatype="html">
         <source>Confirm document type assignment</source>
@@ -3534,7 +3534,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">399</context>
         </context-group>
-        <target state="translated">Táto akcia odstráni typ dokumentu z <x id="PH" equiv-text="this.list.selected.size"/> vybraného dokumentu(-ov).</target>
+        <target state="translated">Táto akcia odstráni typ dokumentu z <x id="PH" equiv-text="this.list.selected.size"/> vybraných dokumentov.</target>
       </trans-unit>
       <trans-unit id="6386555513013840736" datatype="html">
         <source>Confirm storage path assignment</source>
@@ -3550,7 +3550,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">435</context>
         </context-group>
-        <target state="translated">Táto akcia priradí cestu k úložisku "<x id="PH" equiv-text="storagePath.name"/>" <x id="PH_1" equiv-text="this.list.selected.size"/> vybranému dokumentu(-om).</target>
+        <target state="translated">Táto akcia priradí cestu k úložisku "<x id="PH" equiv-text="storagePath.name"/>" <x id="PH_1" equiv-text="this.list.selected.size"/> vybraným dokumentom.</target>
       </trans-unit>
       <trans-unit id="60728365335056946" datatype="html">
         <source>This operation will remove the storage path from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -3558,7 +3558,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">437</context>
         </context-group>
-        <target state="translated">Táto akcia odstráni cestu k úložisku z <x id="PH" equiv-text="this.list.selected.size"/> vybraného dokumentu(-ov).</target>
+        <target state="translated">Táto akcia odstráni cestu k úložisku z <x id="PH" equiv-text="this.list.selected.size"/> vybraných dokumentov.</target>
       </trans-unit>
       <trans-unit id="749430623564850405" datatype="html">
         <source>Delete confirm</source>
@@ -3574,7 +3574,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">461</context>
         </context-group>
-        <target state="translated">Táto akcia trvale odstráni <x id="PH" equiv-text="this.list.selected.size"/> vybraný dokument(-y).</target>
+        <target state="translated">Táto akcia trvale odstráni <x id="PH" equiv-text="this.list.selected.size"/> vybrané dokumenty.</target>
       </trans-unit>
       <trans-unit id="6734339521247847366" datatype="html">
         <source>Delete document(s)</source>
@@ -3582,7 +3582,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">464</context>
         </context-group>
-        <target state="translated">Odstrániť dokument(-y)</target>
+        <target state="translated">Odstrániť dokumenty</target>
       </trans-unit>
       <trans-unit id="8968869182645922415" datatype="html">
         <source>This operation will permanently redo OCR for <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -3590,7 +3590,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">500</context>
         </context-group>
-        <target state="translated">Táto akcia vykoná opakované OCR pre <x id="PH" equiv-text="this.list.selected.size"/> vybraný dokument(-y).</target>
+        <target state="translated">Táto akcia vykoná opakované OCR pre <x id="PH" equiv-text="this.list.selected.size"/> vybrané dokumenty.</target>
       </trans-unit>
       <trans-unit id="8076495233090006322" datatype="html">
         <source>Filter by correspondent</source>
@@ -4290,7 +4290,7 @@
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.ts</context>
           <context context-type="linenumber">55</context>
         </context-group>
-        <target state="translated">Naozaj chcete vymazať odosielateľa "<x id="PH" equiv-text="object.name"/>"?</target>
+        <target state="translated">Naozaj chcete vymazať korešpondenta"<x id="PH" equiv-text="object.name"/>"?</target>
       </trans-unit>
       <trans-unit id="8084492669582894778" datatype="html">
         <source>document type</source>
