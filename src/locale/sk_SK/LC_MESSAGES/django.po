@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-06-15 10:39\n"
+"PO-Revision-Date: 2023-06-29 06:41\n"
 "Last-Translator: \n"
 "Language-Team: Slovak\n"
 "Language: sk_SK\n"
@@ -72,11 +72,11 @@ msgstr "vlastník"
 
 #: documents/models.py:81 documents/models.py:136
 msgid "correspondent"
-msgstr "dopisovateľ"
+msgstr "korešpondent"
 
 #: documents/models.py:82
 msgid "correspondents"
-msgstr "dopisovatelia"
+msgstr "korešpondenti"
 
 #: documents/models.py:87
 msgid "color"
@@ -84,7 +84,7 @@ msgstr "farba"
 
 #: documents/models.py:90
 msgid "is inbox tag"
-msgstr "je štítok pošty"
+msgstr "je štítok schránky"
 
 #: documents/models.py:93
 msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
