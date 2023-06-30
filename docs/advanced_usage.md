@@ -528,7 +528,7 @@ For how to enable barcode usage, see [the configuration](/configuration#barcodes
 The two settings may be enabled independently, but do have interactions as explained
 below.
 
-### Document Splitting
+### Document Splitting {#document-splitting}
 
 When enabled, Paperless will look for a barcode with the configured value and create a new document
 starting from the next page. The page with the barcode on it will _not_ be retained. It
@@ -543,3 +543,74 @@ If document splitting via barcode is also enabled, documents will be split when 
 barcode is located. However, differing from the splitting, the page with the
 barcode _will_ be retained. This allows application of a barcode to any page, including
 one which holds data to keep in the document.
+
+## Automatic collation of double-sided documents {#collate}
+
+!!! note
+
+    If your scanner supports double-sided scanning natively, you do not need this feature.
+
+### Summary
+
+If you have scanner with an automatic document feeder (ADF) that only scans a single side,
+this feature makes scanning double-sided documents much more convenient by automatically
+collating two separate scans into one document, reordering the pages as necessary.
+
+### Usage example
+
+Suppose you have a double-sided document with 6 pages (3 sheets of paper). First, you
+put the stack into your ADF as normal, ensuring that page 1 is scanned first. Your ADF
+will now scan pages 1, 3, and 5. You (or your the scanner, if it supports it) then upload
+the scan into the correct sub-directory of the consume folder (`double-sided` by default;
+keep in mind that Paperless will _not_ automatically create the directory for you.)
+Paperless will then process the scan and move it into an internal staging area.
+
+The next step is to turn your stack upside down (without reordering the sheets of paper),
+and scan it once again, your ADF will now scan pages 6, 4, and 2, in that order. Once this
+scan is copied into the sub-directory, Paperless will collate the previous scan with the
+new one, reversing the order of the pages on the second, "even numbered" scan. The
+resulting document will have the pages 1-6 in the correct order, and this new file will
+then be processed as normal.
+
+!!! tip
+
+    When scanning the even numbered pages, you can omit the last empty pages, if there are
+    any. For example, if page 6 is empty, you only need to scan pages 4 and 2; if 4 and 6
+    are empty, only scan page 2. Keep in mind that you _cannot_ omit empty pages in the
+    middle; if 2 and 6 have content, but 4 is empty, you still have to scan page 4.
+
+### Things that could go wrong
+
+Paperless will notice when the first, "odd numbered" scan has less pages than the second
+scan (this can happen when e.g. the ADF skipped a few pages in the first pass). In that
+case, Paperless will remove the staging copy as well as the scan, and give you an error
+message asking you to restart the process from scratch, by scanning the odd pages again,
+followed by the even pages.
+
+Another thing that might happen is that you start a double sided scan, but then forget
+to upload the second file. To avoid collating the wrong documents if you then come back
+a day later to scan a new double-sided document, Paperless will only keep an "odd numbered
+pages" file for up to 30 minutes. If more time passes, it will consider the next incoming
+scan a completely new "odd numbered pages" one. The old staging file will get discarded.
+
+If you accidentally put a normal single-sided scan into the double-sided directory, you can
+just upload the scan into the normal consume folder. However, the staging file will be kept for 30
+minutes. If you plan to start a double-sided scan within that timeframe, the easiest fix is
+to just put another dummy scan in the double-sided directory and delete the resulting (garbage)
+document in the UI.
+
+### Interaction with "subdirs as tags"
+
+The collation feature can be used together with the "subdirs as tags" feature (but this is not
+a requirement). Just create a correctly named double-sided subdir in the hierachy and upload
+your scans there. For example, both `double-sided/foo/bar` as well as `foo/bar/double-sided` will
+cause the collated document to be treated as if it were uploaded into `foo/bar` and receive both
+`foo` and `bar` tags, but not `double-sided`.
+
+### Interaction with document splitting
+
+You can use the [document splitting](#document-splitting) feature, but if you use a normal
+single-sided split marker page, the split document(s) will have an empty page at the front (or
+whatever else was on the backside of the split marker page.) You can work around that by having
+a split marker page that has the split barcode on _both_ sides. This way, the extra page will
+get automatically removed.

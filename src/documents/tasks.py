@@ -25,6 +25,7 @@ from documents.consumer import Consumer
 from documents.consumer import ConsumerError
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
+from documents.double_sided import collate
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
 from documents.models import Correspondent
@@ -89,9 +90,39 @@ def consume_file(
     input_doc: ConsumableDocument,
     overrides: Optional[DocumentMetadataOverrides] = None,
 ):
+    def send_progress(status="SUCCESS", message="finished"):
+        payload = {
+            "filename": overrides.filename or input_doc.original_file.name,
+            "task_id": None,
+            "current_progress": 100,
+            "max_progress": 100,
+            "status": status,
+            "message": message,
+        }
+        try:
+            async_to_sync(get_channel_layer().group_send)(
+                "status_updates",
+                {"type": "status_update", "data": payload},
+            )
+        except ConnectionError as e:
+            logger.warning(f"ConnectionError on status send: {e!s}")
+
     # Default no overrides
     if overrides is None:
         overrides = DocumentMetadataOverrides()
+
+    # Handle collation of double-sided documents scanned in two parts
+    if settings.CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED and (
+        settings.CONSUMER_COLLATE_DOUBLE_SIDED_SUBDIR_NAME
+        in input_doc.original_file.parts
+    ):
+        try:
+            msg = collate(input_doc)
+            send_progress(message=msg)
+            return msg
+        except ConsumerError as e:
+            send_progress(status="FAILURE", message=e.args[0])
+            raise e
 
     # read all barcodes in the current document
     if settings.CONSUMER_ENABLE_BARCODES or settings.CONSUMER_ENABLE_ASN_BARCODE:
@@ -102,24 +133,9 @@ def consume_file(
             ):
                 # notify the sender, otherwise the progress bar
                 # in the UI stays stuck
-                payload = {
-                    "filename": overrides.filename or input_doc.original_file.name,
-                    "task_id": None,
-                    "current_progress": 100,
-                    "max_progress": 100,
-                    "status": "SUCCESS",
-                    "message": "finished",
-                }
-                try:
-                    async_to_sync(get_channel_layer().group_send)(
-                        "status_updates",
-                        {"type": "status_update", "data": payload},
-                    )
-                except ConnectionError as e:
-                    logger.warning(f"ConnectionError on status send: {e!s}")
+                send_progress()
                 # consuming stops here, since the original document with
                 # the barcodes has been split and will be consumed separately
-
                 input_doc.original_file.unlink()
                 return "File successfully split"
 
