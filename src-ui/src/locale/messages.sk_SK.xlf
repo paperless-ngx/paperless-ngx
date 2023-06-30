@@ -4250,7 +4250,7 @@
           <context context-type="sourcefile">src/app/components/document-notes/document-notes.component.ts</context>
           <context context-type="linenumber">64</context>
         </context-group>
-        <target state="needs-translation">Error saving note: <x id="PH" equiv-text="e.toString()"/></target>
+        <target state="translated">Chyba pri ukladaní poznámky: <x id="PH" equiv-text="e.toString()"/></target>
       </trans-unit>
       <trans-unit id="5682285129543775369" datatype="html">
         <source>Error deleting note: <x id="PH" equiv-text="e.toString()"/></source>
@@ -4258,7 +4258,7 @@
           <context context-type="sourcefile">src/app/components/document-notes/document-notes.component.ts</context>
           <context context-type="linenumber">80</context>
         </context-group>
-        <target state="needs-translation">Error deleting note: <x id="PH" equiv-text="e.toString()"/></target>
+        <target state="translated">Chyba pri mazaní poznámky: <x id="PH" equiv-text="e.toString()"/></target>
       </trans-unit>
       <trans-unit id="6316128875819022658" datatype="html">
         <source>correspondent</source>
@@ -4266,7 +4266,7 @@
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.ts</context>
           <context context-type="linenumber">39</context>
         </context-group>
-        <target state="needs-translation">correspondent</target>
+        <target state="translated">korešpondent</target>
       </trans-unit>
       <trans-unit id="1612355304340685070" datatype="html">
         <source>correspondents</source>
@@ -4274,7 +4274,7 @@
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.ts</context>
           <context context-type="linenumber">40</context>
         </context-group>
-        <target state="needs-translation">correspondents</target>
+        <target state="translated">korešpondenti</target>
       </trans-unit>
       <trans-unit id="6360600151505327572" datatype="html">
         <source>Last used</source>
@@ -4618,7 +4618,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">92</context>
         </context-group>
-        <target state="needs-translation">Use PDF viewer provided by the browser</target>
+        <target state="translated">Použiť prehliadač PDF webového prehliadača</target>
       </trans-unit>
       <trans-unit id="9003921625412907981" datatype="html">
         <source>This is usually faster for displaying large PDF documents, but it might not work on some browsers.</source>
@@ -4626,7 +4626,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">92</context>
         </context-group>
-        <target state="needs-translation">This is usually faster for displaying large PDF documents, but it might not work on some browsers.</target>
+        <target state="translated">Je to zvyčajne rýchlejšie pri zobrazovaní veľkých PDF dokumentov, ale nemusí fungovať vo všetkých prehliadačoch.</target>
       </trans-unit>
       <trans-unit id="3982403428275430291" datatype="html">
         <source>Sidebar</source>
