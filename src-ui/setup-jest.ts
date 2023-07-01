@@ -74,15 +74,6 @@ Object.defineProperty(window, 'getComputedStyle', {
 
 Object.defineProperty(window, 'ResizeObserver', { value: mock() })
 
-Object.defineProperty(document.body.style, 'transform', {
-  value: () => {
-    return {
-      enumerable: true,
-      configurable: true,
-    }
-  },
-})
-
 HTMLCanvasElement.prototype.getContext = <
   typeof HTMLCanvasElement.prototype.getContext
 >jest.fn()
