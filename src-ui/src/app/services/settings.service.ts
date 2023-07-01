@@ -273,6 +273,12 @@ export class SettingsService {
         dateInputFormat: 'dd.mm.yyyy',
       },
       {
+        code: 'sk-sk',
+        name: $localize`Slovak`,
+        englishName: 'Slovak',
+        dateInputFormat: 'dd.mm.yyyy',
+      },
+      {
         code: 'sl-si',
         name: $localize`Slovenian`,
         englishName: 'Slovenian',

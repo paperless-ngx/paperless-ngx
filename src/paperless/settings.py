@@ -581,6 +581,7 @@ LANGUAGES = [
     ("pt-pt", _("Portuguese")),
     ("ro-ro", _("Romanian")),
     ("ru-ru", _("Russian")),
+    ("sk-sk", _("Slovak")),
     ("sl-si", _("Slovenian")),
     ("sr-cs", _("Serbian")),
     ("sv-se", _("Swedish")),
