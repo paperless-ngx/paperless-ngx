@@ -159,7 +159,6 @@
       }
     }
   },
-  "defaultProject": "paperless-ui",
   "cli": {
     "schematicCollections": [
       "@angular-eslint/schematics"
