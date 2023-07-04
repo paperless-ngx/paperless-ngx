@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-07-04 22:26\n"
+"PO-Revision-Date: 2023-07-04 23:43\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -23,7 +23,7 @@ msgstr "Documentos"
 
 #: documents/models.py:36
 msgid "None"
-msgstr ""
+msgstr "Nenhum"
 
 #: documents/models.py:37
 msgid "Any word"
@@ -68,7 +68,7 @@ msgstr "é insensível"
 
 #: documents/models.py:71
 msgid "owner"
-msgstr ""
+msgstr "dono"
 
 #: documents/models.py:81 documents/models.py:136
 msgid "correspondent"
@@ -112,11 +112,11 @@ msgstr "caminho"
 
 #: documents/models.py:117 documents/models.py:145
 msgid "storage path"
-msgstr ""
+msgstr "local de armazenamento"
 
 #: documents/models.py:118
 msgid "storage paths"
-msgstr ""
+msgstr "locais de armazenamento"
 
 #: documents/models.py:126
 msgid "Unencrypted"
@@ -196,7 +196,7 @@ msgstr "nome do ficheiro original"
 
 #: documents/models.py:245
 msgid "The original name of the file when it was uploaded"
-msgstr ""
+msgstr "O nome original do arquivo quando foi carregado"
 
 #: documents/models.py:252
 msgid "archive serial number"
@@ -372,15 +372,15 @@ msgstr "tem etiquetas em"
 
 #: documents/models.py:437
 msgid "ASN greater than"
-msgstr ""
+msgstr "ASN maior que"
 
 #: documents/models.py:438
 msgid "ASN less than"
-msgstr ""
+msgstr "ASN menor que"
 
 #: documents/models.py:439
 msgid "storage path is"
-msgstr ""
+msgstr "local de armazenamento é"
 
 #: documents/models.py:449
 msgid "rule type"
@@ -404,23 +404,23 @@ msgstr "ID da tarefa"
 
 #: documents/models.py:564
 msgid "Celery ID for the Task that was run"
-msgstr ""
+msgstr "Celery ID para a tarefa que foi executada"
 
 #: documents/models.py:569
 msgid "Acknowledged"
-msgstr ""
+msgstr "Confirmado"
 
 #: documents/models.py:570
 msgid "If the task is acknowledged via the frontend or API"
-msgstr ""
+msgstr "Se a tarefa é reconhecida através do frontend ou API"
 
 #: documents/models.py:576
 msgid "Task Filename"
-msgstr ""
+msgstr "Ficheiro da tarefa"
 
 #: documents/models.py:577
 msgid "Name of the file which the Task was run for"
-msgstr ""
+msgstr "Nome do ficheiro pelo qual a tarefa foi executada"
 
 #: documents/models.py:583
 msgid "Task Name"
@@ -428,7 +428,7 @@ msgstr "Nome da Tarefa"
 
 #: documents/models.py:584
 msgid "Name of the Task which was run"
-msgstr ""
+msgstr "Nome da Tarefa que foi executada"
 
 #: documents/models.py:591
 msgid "Task State"
@@ -436,7 +436,7 @@ msgstr "Estado da Tarefa"
 
 #: documents/models.py:592
 msgid "Current state of the task being run"
-msgstr ""
+msgstr "Estado atual da tarefa em execução"
 
 #: documents/models.py:597
 msgid "Created DateTime"
@@ -444,7 +444,7 @@ msgstr "Data de Criação"
 
 #: documents/models.py:598
 msgid "Datetime field when the task result was created in UTC"
-msgstr ""
+msgstr "Campo data/hora quando o resultado da tarefa foi criado, em UTC"
 
 #: documents/models.py:603
 msgid "Started DateTime"
@@ -452,7 +452,7 @@ msgstr "Data de Início"
 
 #: documents/models.py:604
 msgid "Datetime field when the task was started in UTC"
-msgstr ""
+msgstr "Campo Data/Hora quando a tarefa foi iniciada, em UTC"
 
 #: documents/models.py:609
 msgid "Completed DateTime"
@@ -460,19 +460,19 @@ msgstr "Data de conclusão"
 
 #: documents/models.py:610
 msgid "Datetime field when the task was completed in UTC"
-msgstr ""
+msgstr "Campo data/hora quando a tarefa foi concluída, em UTC"
 
 #: documents/models.py:615
 msgid "Result Data"
-msgstr ""
+msgstr "Resultados"
 
 #: documents/models.py:617
 msgid "The data returned by the task"
-msgstr ""
+msgstr "Os dados devolvidos pela tarefa"
 
 #: documents/models.py:626
 msgid "Comment for the document"
-msgstr ""
+msgstr "Comentário para o documento"
 
 #: documents/models.py:650
 msgid "user"
@@ -480,7 +480,7 @@ msgstr "utilizador"
 
 #: documents/models.py:655
 msgid "comment"
-msgstr ""
+msgstr "comentário"
 
 #: documents/models.py:656
 msgid "comments"
@@ -510,11 +510,11 @@ msgstr "O Paperless-ngx está a carregar..."
 
 #: documents/templates/index.html:79
 msgid "Still here?! Hmm, something might be wrong."
-msgstr ""
+msgstr "Ainda aqui?! Hmm, algo pode estar errado."
 
 #: documents/templates/index.html:79
 msgid "Here's a link to the docs."
-msgstr ""
+msgstr "Aqui está um link p/ os docs."
 
 #: documents/templates/registration/logged_out.html:14
 msgid "Paperless-ngx signed out"
@@ -554,7 +554,7 @@ msgstr "Iniciar sessão"
 
 #: paperless/apps.py:9
 msgid "Paperless"
-msgstr ""
+msgstr "Paperless"
 
 #: paperless/settings.py:521
 msgid "English (US)"
@@ -562,11 +562,11 @@ msgstr "Inglês (EUA)"
 
 #: paperless/settings.py:522
 msgid "Arabic"
-msgstr ""
+msgstr "Árabe"
 
 #: paperless/settings.py:523
 msgid "Belarusian"
-msgstr ""
+msgstr "Bielorrusso"
 
 #: paperless/settings.py:524
 msgid "Czech"
@@ -626,7 +626,7 @@ msgstr "Russo"
 
 #: paperless/settings.py:538
 msgid "Slovenian"
-msgstr ""
+msgstr "Esloveno"
 
 #: paperless/settings.py:539
 msgid "Serbian"
@@ -670,7 +670,7 @@ msgstr "Ações"
 
 #: paperless_mail/admin.py:69
 msgid "The action applied to the mail. This action is only performed when the mail body or attachments were consumed from the mail."
-msgstr ""
+msgstr "A ação aplicada à mensagem. Esta ação só é executada quando o corpo do email ou anexos foram consumidos do email."
 
 #: paperless_mail/admin.py:77
 msgid "Metadata"
@@ -750,11 +750,11 @@ msgstr "Processar anexos apenas."
 
 #: paperless_mail/models.py:62
 msgid "Process full Mail (with embedded attachments in file) as .eml"
-msgstr ""
+msgstr "Processar email completo (com anexos incorporados no arquivo) como .eml"
 
 #: paperless_mail/models.py:64
 msgid "Process full Mail (with embedded attachments in file) as .eml + process attachments as separate documents"
-msgstr ""
+msgstr "Processar email completo (com anexos incorporados no ficheiro) como .eml + processar anexos como docs separados"
 
 #: paperless_mail/models.py:70
 msgid "Process all files, including 'inline' attachments."
@@ -778,7 +778,7 @@ msgstr "Marcar o email, não processar emails marcados"
 
 #: paperless_mail/models.py:77
 msgid "Tag the mail with specified tag, don't process tagged mails"
-msgstr ""
+msgstr "Aplicar tag especificada ao email, não processar emails com tags"
 
 #: paperless_mail/models.py:80
 msgid "Use subject as title"
@@ -818,7 +818,7 @@ msgstr "directoria"
 
 #: paperless_mail/models.py:105
 msgid "Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server."
-msgstr ""
+msgstr "Subpastas devem ser separadas por delimitador, como um ponto ('.') ou barra ('/'), varia de acordo com servidor de correio."
 
 #: paperless_mail/models.py:111
 msgid "filter from"
@@ -858,7 +858,7 @@ msgstr "Anexos embutidos incluem imagens incorporadas, por isso é melhor combin
 
 #: paperless_mail/models.py:158
 msgid "consumption scope"
-msgstr ""
+msgstr "âmbito de consumo"
 
 #: paperless_mail/models.py:164
 msgid "action"
