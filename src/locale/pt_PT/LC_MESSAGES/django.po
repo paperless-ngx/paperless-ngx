@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-03-03 20:41\n"
+"PO-Revision-Date: 2023-07-04 22:26\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -192,7 +192,7 @@ msgstr "Nome do arquivo atual em no armazenamento"
 
 #: documents/models.py:239
 msgid "original filename"
-msgstr ""
+msgstr "nome do ficheiro original"
 
 #: documents/models.py:245
 msgid "The original name of the file when it was uploaded"
@@ -432,7 +432,7 @@ msgstr ""
 
 #: documents/models.py:591
 msgid "Task State"
-msgstr ""
+msgstr "Estado da Tarefa"
 
 #: documents/models.py:592
 msgid "Current state of the task being run"
@@ -440,7 +440,7 @@ msgstr ""
 
 #: documents/models.py:597
 msgid "Created DateTime"
-msgstr ""
+msgstr "Data de Criação"
 
 #: documents/models.py:598
 msgid "Datetime field when the task result was created in UTC"
@@ -448,7 +448,7 @@ msgstr ""
 
 #: documents/models.py:603
 msgid "Started DateTime"
-msgstr ""
+msgstr "Data de Início"
 
 #: documents/models.py:604
 msgid "Datetime field when the task was started in UTC"
@@ -456,7 +456,7 @@ msgstr ""
 
 #: documents/models.py:609
 msgid "Completed DateTime"
-msgstr ""
+msgstr "Data de conclusão"
 
 #: documents/models.py:610
 msgid "Datetime field when the task was completed in UTC"
@@ -484,7 +484,7 @@ msgstr ""
 
 #: documents/models.py:656
 msgid "comments"
-msgstr ""
+msgstr "comentários"
 
 #: documents/serialisers.py:80
 #, python-format
@@ -502,7 +502,7 @@ msgstr "Tipo de arquivo %(type)s não suportado"
 
 #: documents/serialisers.py:794
 msgid "Invalid variable detected."
-msgstr ""
+msgstr "Variável inválida detectada."
 
 #: documents/templates/index.html:78
 msgid "Paperless-ngx is loading..."
@@ -894,21 +894,21 @@ msgstr "atribuir este correspondente"
 
 #: paperless_mail/models.py:239
 msgid "uid"
-msgstr ""
+msgstr "uid"
 
 #: paperless_mail/models.py:247
 msgid "subject"
-msgstr ""
+msgstr "assunto"
 
 #: paperless_mail/models.py:255
 msgid "received"
-msgstr ""
+msgstr "recebido"
 
 #: paperless_mail/models.py:262
 msgid "processed"
-msgstr ""
+msgstr "processado"
 
 #: paperless_mail/models.py:268
 msgid "status"
-msgstr ""
+msgstr "estado"
 
