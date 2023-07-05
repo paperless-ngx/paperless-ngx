@@ -4853,6 +4853,34 @@
           <context context-type="linenumber">63</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="9011556615675272238" datatype="html">
+        <source>queued</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.ts</context>
+          <context context-type="linenumber">131</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6415892379431855826" datatype="html">
+        <source>started</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.ts</context>
+          <context context-type="linenumber">133</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7510279840486540181" datatype="html">
+        <source>completed</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.ts</context>
+          <context context-type="linenumber">135</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4083337005045748464" datatype="html">
+        <source>failed</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.ts</context>
+          <context context-type="linenumber">137</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="181464970911903082" datatype="html">
         <source>404 Not Found</source>
         <context-group purpose="location">
