@@ -34,6 +34,7 @@
           "pt-PT": "src/locale/messages.pt_PT.xlf",
           "ro-RO": "src/locale/messages.ro_RO.xlf",
           "ru-RU": "src/locale/messages.ru_RU.xlf",
+          "sk-SK": "src/locale/messages.sk_SK.xlf",
           "sl-SI": "src/locale/messages.sl_SI.xlf",
           "sr-CS": "src/locale/messages.sr_CS.xlf",
           "sv-SE": "src/locale/messages.sv_SE.xlf",

@@ -25,6 +25,7 @@ import localePl from '@angular/common/locales/pl'
 import localePt from '@angular/common/locales/pt'
 import localeRo from '@angular/common/locales/ro'
 import localeRu from '@angular/common/locales/ru'
+import localeSk from '@angular/common/locales/sk'
 import localeSl from '@angular/common/locales/sl'
 import localeSr from '@angular/common/locales/sr'
 import localeSv from '@angular/common/locales/sv'
@@ -49,6 +50,7 @@ registerLocaleData(localePt, 'pt-BR')
 registerLocaleData(localePt, 'pt-PT')
 registerLocaleData(localeRo)
 registerLocaleData(localeRu)
+registerLocaleData(localeSk)
 registerLocaleData(localeSl)
 registerLocaleData(localeSr)
 registerLocaleData(localeSv)
