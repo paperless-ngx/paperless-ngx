@@ -5310,7 +5310,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">103</context>
         </context-group>
-        <target state="translated">{VAR_PLURAL, plural, =1 {Eine <x id="INTERPOLATION"/> Task} other {Insgesamt <x id="INTERPOLATION_1"/> <x id="INTERPOLATION"/> Tasks}}</target>
+        <target state="translated">{VAR_PLURAL, plural, =1 {Eine <x id="INTERPOLATION"/> Aufgabe} other {Insgesamt <x id="INTERPOLATION_1"/> <x id="INTERPOLATION"/> Aufgaben}}</target>
       </trans-unit>
       <trans-unit id="1830925490604698731" datatype="html">
         <source>Failed<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.failedFileTasks.length &gt; 0&quot; class=&quot;badge bg-danger ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
