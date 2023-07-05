@@ -2800,7 +2800,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
-          <context context-type="linenumber">40</context>
+          <context context-type="linenumber">37</context>
         </context-group>
         <target state="translated">Sluit</target>
       </trans-unit>
@@ -3627,12 +3627,12 @@
         <target state="translated">Bekyk notas</target>
       </trans-unit>
       <trans-unit id="8778002102373462277" datatype="html">
-        <source><x id="INTERPOLATION" equiv-text="otes.length}}"/> Notes</source>
+        <source><x id="INTERPOLATION" equiv-text="ocument.notes.length}}"/> Notes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
           <context context-type="linenumber">74</context>
         </context-group>
-        <target state="translated"><x id="INTERPOLATION" equiv-text="otes.length}}"/> notas</target>
+        <target state="needs-translation"><x id="INTERPOLATION" equiv-text="ocument.notes.length}}"/> Notes</target>
       </trans-unit>
       <trans-unit id="78870852467682010" datatype="html">
         <source>Filter by document type</source>
@@ -3850,7 +3850,7 @@
         <source>ASN</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">136,135</context>
+          <context context-type="linenumber">135</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
@@ -4706,17 +4706,17 @@
         <source> Update checking works by pinging the public <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;"/>Github API<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> for the latest release to determine whether a new version is available.<x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br/&gt;"/> Actual updating of the app must still be performed manually. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">140,142</context>
+          <context context-type="linenumber">139,142</context>
         </context-group>
         <target state="translated"> Bywerkkontrole werk deur die openbare <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;"/>Github API<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> te pieng vir die nuutste vrystelling om te bepaal of ’n nuwe weergawe beskikbaar is.<x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br/&gt;"/> Werklike bywerk van die toep moet nog handmatig gedoen word. </target>
       </trans-unit>
       <trans-unit id="5489945693955857309" datatype="html">
-        <source><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="No track"/>No tracking data is collected by the app in any way.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></source>
+        <source><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&gt;"/>No tracking data is collected by the app in any way.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">144,146</context>
         </context-group>
-        <target state="translated"><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="No track"/>Geen naspoordata word op enige wyse deur die toep versamel nie.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></target>
+        <target state="needs-translation"><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&gt;"/>No tracking data is collected by the app in any way.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></target>
       </trans-unit>
       <trans-unit id="5070799004079086984" datatype="html">
         <source>Enable update checking</source>
@@ -4858,7 +4858,7 @@
         <source>Mail</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">240,239</context>
+          <context context-type="linenumber">239</context>
         </context-group>
         <target state="translated">E-pos</target>
       </trans-unit>
@@ -5490,7 +5490,7 @@
         <source>Warning: You have unsaved changes to your document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/guards/dirty-doc.guard.ts</context>
-          <context context-type="linenumber">17</context>
+          <context context-type="linenumber">16</context>
         </context-group>
         <target state="translated">Waarskuwing: U het onbewaarde veranderinge aan u dokument(e).</target>
       </trans-unit>
@@ -5502,7 +5502,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
-          <context context-type="linenumber">32</context>
+          <context context-type="linenumber">29</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
@@ -5546,7 +5546,7 @@
         <source>You have unsaved changes to the saved view</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
-          <context context-type="linenumber">34</context>
+          <context context-type="linenumber">31</context>
         </context-group>
         <target state="translated">U het onbewaarde veranderinge aan die bewaarde aansig</target>
       </trans-unit>
@@ -5554,7 +5554,7 @@
         <source>Are you sure you want to close this saved view?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
-          <context context-type="linenumber">38</context>
+          <context context-type="linenumber">35</context>
         </context-group>
         <target state="translated">Is u seker u wil hierdie bewarde aansig sluit?</target>
       </trans-unit>
@@ -5562,7 +5562,7 @@
         <source>Save and close</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
-          <context context-type="linenumber">42</context>
+          <context context-type="linenumber">39</context>
         </context-group>
         <target state="translated">Bewaar en sluit</target>
       </trans-unit>
@@ -5570,7 +5570,7 @@
         <source>You don&apos;t have permissions to do that</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/guards/permissions.guard.ts</context>
-          <context context-type="linenumber">35</context>
+          <context context-type="linenumber">34</context>
         </context-group>
         <target state="translated">U het nie toestemmings om dit te doen nie</target>
       </trans-unit>
