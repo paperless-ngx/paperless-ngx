@@ -124,4 +124,17 @@ export class TasksComponent
   duringTabChange(navID: number) {
     this.page = 1
   }
+
+  get activeTabLocalized(): string {
+    switch (this.activeTab) {
+      case 'queued':
+        return $localize`queued`
+      case 'started':
+        return $localize`started`
+      case 'completed':
+        return $localize`completed`
+      case 'failed':
+        return $localize`failed`
+    }
+  }
 }
