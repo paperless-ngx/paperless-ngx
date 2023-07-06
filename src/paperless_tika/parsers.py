@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 
+import dateutil.parser
 import httpx
 from django.conf import settings
 
@@ -10,7 +11,6 @@ from documents.parsers import DocumentParser
 from documents.parsers import ParseError
 from documents.parsers import make_thumbnail_from_pdf
 
-import dateutil.parser
 class TikaDocumentParser(DocumentParser):
     """
     This parser sends documents to a local tika server
