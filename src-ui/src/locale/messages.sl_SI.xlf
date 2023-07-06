@@ -885,7 +885,7 @@
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">now</target>
+        <target state="translated">zdaj</target>
       </trans-unit>
       <trans-unit id="6371576811194810854" datatype="html">
         <source>After</source>
@@ -1301,7 +1301,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">IMAP Security</target>
+        <target state="translated">Varnost IMAP</target>
       </trans-unit>
       <trans-unit id="5248717555542428023" datatype="html">
         <source>Username</source>
@@ -1353,7 +1353,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.html</context>
           <context context-type="linenumber">19</context>
         </context-group>
-        <target state="needs-translation">Character Set</target>
+        <target state="translated">Nabor znakov</target>
       </trans-unit>
       <trans-unit id="3894950702316166331" datatype="html">
         <source>Loading...</source>
@@ -1405,7 +1405,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.html</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="needs-translation">Test</target>
+        <target state="translated">Preizkusi</target>
       </trans-unit>
       <trans-unit id="451418349275958054" datatype="html">
         <source>No encryption</source>
@@ -1413,7 +1413,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.ts</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="needs-translation">No encryption</target>
+        <target state="translated">Brez šifriranja</target>
       </trans-unit>
       <trans-unit id="3719080555538542367" datatype="html">
         <source>SSL</source>
@@ -1437,7 +1437,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.ts</context>
           <context context-type="linenumber">41</context>
         </context-group>
-        <target state="needs-translation">Create new mail account</target>
+        <target state="translated">Ustvari nov poštni račun</target>
       </trans-unit>
       <trans-unit id="5559445021532852612" datatype="html">
         <source>Edit mail account</source>
@@ -1445,7 +1445,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.ts</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="needs-translation">Edit mail account</target>
+        <target state="translated">Uredi poštni račun</target>
       </trans-unit>
       <trans-unit id="7726734777863565313" datatype="html">
         <source>Successfully connected to the mail server</source>
@@ -5318,7 +5318,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">110</context>
         </context-group>
-        <target state="needs-translation">Failed<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.failedFileTasks.length &gt; 0&quot; class=&quot;badge bg-danger ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
+        <target state="translated">Neuspešno <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.failedFileTasks.length &gt; 0&quot; class=&quot;badge bg-danger ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
       </trans-unit>
       <trans-unit id="6149567896789735123" datatype="html">
         <source>Complete<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.completedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.completedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
@@ -5334,7 +5334,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">122</context>
         </context-group>
-        <target state="needs-translation">Started<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.startedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.startedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
+        <target state="translated">Začeto <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.startedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.startedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
       </trans-unit>
       <trans-unit id="7252570681759700719" datatype="html">
         <source>Queued<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.queuedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.queuedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
@@ -5342,7 +5342,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">128</context>
         </context-group>
-        <target state="needs-translation">Queued<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.queuedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.queuedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
+        <target state="translated">Čaka <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.queuedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.queuedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
       </trans-unit>
       <trans-unit id="5404910960991552159" datatype="html">
         <source>Dismiss selected</source>
@@ -5386,7 +5386,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.ts</context>
           <context context-type="linenumber">131</context>
         </context-group>
-        <target state="needs-translation">queued</target>
+        <target state="translated">čaka</target>
       </trans-unit>
       <trans-unit id="6415892379431855826" datatype="html">
         <source>started</source>
@@ -5394,7 +5394,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.ts</context>
           <context context-type="linenumber">133</context>
         </context-group>
-        <target state="needs-translation">started</target>
+        <target state="translated">začeto</target>
       </trans-unit>
       <trans-unit id="7510279840486540181" datatype="html">
         <source>completed</source>
@@ -5402,7 +5402,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.ts</context>
           <context context-type="linenumber">135</context>
         </context-group>
-        <target state="needs-translation">completed</target>
+        <target state="translated">končano</target>
       </trans-unit>
       <trans-unit id="4083337005045748464" datatype="html">
         <source>failed</source>
@@ -5410,7 +5410,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.ts</context>
           <context context-type="linenumber">137</context>
         </context-group>
-        <target state="needs-translation">failed</target>
+        <target state="translated">neuspešno</target>
       </trans-unit>
       <trans-unit id="181464970911903082" datatype="html">
         <source>404 Not Found</source>
