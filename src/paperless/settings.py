@@ -287,6 +287,7 @@ INSTALLED_APPS = [
     "django_filters",
     "django_celery_results",
     "guardian",
+    "social_django",
     *env_apps,
 ]
 
@@ -357,6 +358,8 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "paperless.context_processors.settings",
+                "social_django.context_processors.backends",
             ],
         },
     },
@@ -383,7 +386,36 @@ AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
 ]
 
+SOCIAL_AUTH_DISABLE_NORMAL_AUTH = __get_boolean("PAPERLESS_SSO_DISABLE_NORMAL_AUTH")
+
+# Only support OIDC, but it should be easy to enable more backends
+if __get_boolean("PAPERLESS_SSO_OIDC_ENABLE"):
+    SOCIAL_AUTH_OIDC_ENABLE = True
+    AUTHENTICATION_BACKENDS.append(
+        "social_core.backends.open_id_connect.OpenIdConnectAuth",
+    )
+    SOCIAL_AUTH_OIDC_KEY = os.environ.get("PAPERLESS_SSO_OIDC_KEY")
+    SOCIAL_AUTH_OIDC_OIDC_ENDPOINT = os.environ.get("PAPERLESS_SSO_OIDC_ENDPOINT")
+    SOCIAL_AUTH_OIDC_SECRET = os.environ.get("PAPERLESS_SSO_OIDC_SECRET")
+    SOCIAL_AUTH_OIDC_NAME = os.environ.get("PAPERLESS_SSO_OIDC_NAME", "OpenID Connect")
+
+LOGIN_REDIRECT_URL = BASE_URL
+
 AUTO_LOGIN_USERNAME = os.getenv("PAPERLESS_AUTO_LOGIN_USERNAME")
+
+SOCIAL_AUTH_PIPELINE = (
+    "social_core.pipeline.social_auth.social_details",
+    "social_core.pipeline.social_auth.social_uid",
+    "social_core.pipeline.social_auth.auth_allowed",
+    "social_core.pipeline.social_auth.social_user",
+    "social_core.pipeline.user.get_username",
+    "social_core.pipeline.user.create_user",
+    "social_core.pipeline.social_auth.associate_user",
+    "social_core.pipeline.social_auth.load_extra_data",
+    "social_core.pipeline.user.user_details",
+    "social_core.pipeline.social_auth.load_extra_data",
+    "paperless.social_auth.update_groups",
+)
 
 if AUTO_LOGIN_USERNAME:
     _index = MIDDLEWARE.index("django.contrib.auth.middleware.AuthenticationMiddleware")

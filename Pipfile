@@ -51,6 +51,8 @@ flower = "*"
 bleach = "*"
 zxing-cpp = {version = "*", platform_machine = "== 'x86_64'"}
 django-multiselectfield = "*"
+social-auth-core = {version = "*", extras = ["openidconnect"]}
+social-auth-app-django = "*"
 
 [dev-packages]
 # Linting

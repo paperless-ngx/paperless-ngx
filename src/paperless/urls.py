@@ -35,6 +35,7 @@ from documents.views import UnifiedSearchViewSet
 from paperless.consumers import StatusConsumer
 from paperless.views import FaviconView
 from paperless.views import GroupViewSet
+from paperless.views import SSOGroupViewSet
 from paperless.views import UserViewSet
 from paperless_mail.views import MailAccountTestView
 from paperless_mail.views import MailAccountViewSet
@@ -55,6 +56,7 @@ api_router.register(r"mail_accounts", MailAccountViewSet)
 api_router.register(r"mail_rules", MailRuleViewSet)
 api_router.register(r"share_links", ShareLinkViewSet)
 api_router.register(r"consumption_templates", ConsumptionTemplateViewSet)
+api_router.register(r"sso_groups", SSOGroupViewSet)
 
 
 urlpatterns = [
@@ -167,6 +169,7 @@ urlpatterns = [
     # TODO: with localization, this is even worse! :/
     # login, logout
     path("accounts/", include("django.contrib.auth.urls")),
+    path("", include("social_django.urls", namespace="social")),
     # Root of the Frontend
     re_path(r".*", login_required(IndexView.as_view()), name="base"),
 ]
