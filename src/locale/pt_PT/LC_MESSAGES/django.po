@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-07-04 23:43\n"
+"PO-Revision-Date: 2023-07-09 18:33\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -404,7 +404,7 @@ msgstr "ID da tarefa"
 
 #: documents/models.py:564
 msgid "Celery ID for the Task that was run"
-msgstr "Celery ID para a tarefa que foi executada"
+msgstr "ID do Celery para a tarefa que foi executada"
 
 #: documents/models.py:569
 msgid "Acknowledged"
@@ -416,7 +416,7 @@ msgstr "Se a tarefa é reconhecida através do frontend ou API"
 
 #: documents/models.py:576
 msgid "Task Filename"
-msgstr "Ficheiro da tarefa"
+msgstr "Nome do Ficheiro da Tarefa"
 
 #: documents/models.py:577
 msgid "Name of the file which the Task was run for"
@@ -502,7 +502,7 @@ msgstr "Tipo de arquivo %(type)s não suportado"
 
 #: documents/serialisers.py:794
 msgid "Invalid variable detected."
-msgstr "Variável inválida detectada."
+msgstr "Variável inválida detetada."
 
 #: documents/templates/index.html:78
 msgid "Paperless-ngx is loading..."
@@ -514,7 +514,7 @@ msgstr "Ainda aqui?! Hmm, algo pode estar errado."
 
 #: documents/templates/index.html:79
 msgid "Here's a link to the docs."
-msgstr "Aqui está um link p/ os docs."
+msgstr "Aqui está uma hiperligação para os documentos."
 
 #: documents/templates/registration/logged_out.html:14
 msgid "Paperless-ngx signed out"
