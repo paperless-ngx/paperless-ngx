@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-03-09 17:42\n"
+"PO-Revision-Date: 2023-07-10 18:15\n"
 "Last-Translator: \n"
 "Language-Team: Norwegian\n"
 "Language: no_NO\n"
@@ -23,7 +23,7 @@ msgstr "Dokumenter"
 
 #: documents/models.py:36
 msgid "None"
-msgstr ""
+msgstr "Ingen"
 
 #: documents/models.py:37
 msgid "Any word"
@@ -416,7 +416,7 @@ msgstr "Hvis oppgaven bekreftes via frontend eller API"
 
 #: documents/models.py:576
 msgid "Task Filename"
-msgstr ""
+msgstr "Filnavn for oppgave"
 
 #: documents/models.py:577
 msgid "Name of the file which the Task was run for"
@@ -432,11 +432,11 @@ msgstr "Navn på Oppgaven som ble kjørt"
 
 #: documents/models.py:591
 msgid "Task State"
-msgstr ""
+msgstr "Oppgave tilstand"
 
 #: documents/models.py:592
 msgid "Current state of the task being run"
-msgstr ""
+msgstr "Status for oppgaven som kjører"
 
 #: documents/models.py:597
 msgid "Created DateTime"
@@ -444,7 +444,7 @@ msgstr "Opprettet DatoTid"
 
 #: documents/models.py:598
 msgid "Datetime field when the task result was created in UTC"
-msgstr ""
+msgstr "Tidsstempel for når oppgaven ble opprettet i UTC"
 
 #: documents/models.py:603
 msgid "Started DateTime"
@@ -452,27 +452,27 @@ msgstr "Startet DatoTid"
 
 #: documents/models.py:604
 msgid "Datetime field when the task was started in UTC"
-msgstr ""
+msgstr "Tidsstempel for når oppgaven ble startet i UTC"
 
 #: documents/models.py:609
 msgid "Completed DateTime"
-msgstr ""
+msgstr "Fullført tidsstempel"
 
 #: documents/models.py:610
 msgid "Datetime field when the task was completed in UTC"
-msgstr ""
+msgstr "Tidsstempel for når oppgaven ble fullført i UTC"
 
 #: documents/models.py:615
 msgid "Result Data"
-msgstr ""
+msgstr "Resultat data"
 
 #: documents/models.py:617
 msgid "The data returned by the task"
-msgstr ""
+msgstr "Dataene returnert av oppgaven"
 
 #: documents/models.py:626
 msgid "Comment for the document"
-msgstr ""
+msgstr "Kommentar til dokumentet"
 
 #: documents/models.py:650
 msgid "user"
@@ -670,7 +670,7 @@ msgstr "Handlinger"
 
 #: paperless_mail/admin.py:69
 msgid "The action applied to the mail. This action is only performed when the mail body or attachments were consumed from the mail."
-msgstr ""
+msgstr "Handlingen som gjelder for posten. Denne handlingen utføres bare når innholdet i posten eller vedlegget ble hentet fra posten."
 
 #: paperless_mail/admin.py:77
 msgid "Metadata"
@@ -750,11 +750,11 @@ msgstr "Bare behandle vedlegg."
 
 #: paperless_mail/models.py:62
 msgid "Process full Mail (with embedded attachments in file) as .eml"
-msgstr ""
+msgstr "Behandle full e-post (med innebygde vedlegg i fil) som .eml"
 
 #: paperless_mail/models.py:64
 msgid "Process full Mail (with embedded attachments in file) as .eml + process attachments as separate documents"
-msgstr ""
+msgstr "Behandle full e-post (med innebygde vedlegg i fil) som .eml + behandle vedlegg som separate dokumenter"
 
 #: paperless_mail/models.py:70
 msgid "Process all files, including 'inline' attachments."
