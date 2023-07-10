@@ -256,6 +256,10 @@ describe('PermissionsService', () => {
         'view_consumptiontemplate',
         'change_consumptiontemplate',
         'delete_consumptiontemplate',
+        'add_ssogroup',
+        'change_ssogroup',
+        'delete_ssogroup',
+        'view_ssogroup',
       ],
       {
         username: 'testuser',

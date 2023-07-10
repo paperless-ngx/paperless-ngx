@@ -91,11 +91,6 @@ class GroupSerializer(serializers.ModelSerializer):
         queryset=Permission.objects.all(),
         slug_field="codename",
     )
-    sso_groups = serializers.PrimaryKeyRelatedField(
-        many=True,
-        queryset=SSOGroup.objects.all(),
-        required=False,
-    )
 
     class Meta:
         model = Group
@@ -103,7 +98,6 @@ class GroupSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "permissions",
-            "sso_groups",
         )
 
 
@@ -111,6 +105,7 @@ class SSOGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = SSOGroup
         fields = (
+            "id",
             "name",
             "group",
         )

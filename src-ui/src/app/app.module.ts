@@ -81,6 +81,7 @@ import { TasksComponent } from './components/admin/tasks/tasks.component'
 import { TourNgBootstrapModule } from 'ngx-ui-tour-ng-bootstrap'
 import { UserEditDialogComponent } from './components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component'
 import { GroupEditDialogComponent } from './components/common/edit-dialog/group-edit-dialog/group-edit-dialog.component'
+import { SsoGroupEditDialogComponent } from './components/common/edit-dialog/sso-group-edit-dialog/sso-group-edit-dialog.component'
 import { PermissionsSelectComponent } from './components/common/permissions-select/permissions-select.component'
 import { MailAccountEditDialogComponent } from './components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component'
 import { MailRuleEditDialogComponent } from './components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component'
@@ -225,6 +226,7 @@ function initializeApp(settings: SettingsService) {
     TasksComponent,
     UserEditDialogComponent,
     GroupEditDialogComponent,
+    SsoGroupEditDialogComponent,
     PermissionsSelectComponent,
     MailAccountEditDialogComponent,
     MailRuleEditDialogComponent,

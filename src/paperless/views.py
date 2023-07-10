@@ -15,6 +15,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from documents.permissions import PaperlessObjectPermissions
 from paperless.filters import GroupFilterSet
+from paperless.filters import SSOGroupFilterSet
 from paperless.filters import UserFilterSet
 from paperless.models import SSOGroup
 from paperless.serialisers import GroupSerializer
@@ -112,5 +113,12 @@ class GroupViewSet(ModelViewSet):
 
 class SSOGroupViewSet(ModelViewSet):
     model = SSOGroup
+
     queryset = SSOGroup.objects
+
     serializer_class = SSOGroupSerializer
+    pagination_class = StandardPagination
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    filter_backends = (DjangoFilterBackend, OrderingFilter)
+    filterset_class = SSOGroupFilterSet
+    ordering_fields = ("name",)
