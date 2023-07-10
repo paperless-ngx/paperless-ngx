@@ -1301,3 +1301,31 @@ started by the container.
     v1.9.2. A one-time migration is performed for users who have this
     setting set. This setting is always ignored if the corresponding
     frontend setting has been set.
+
+## SSO with OpenIDConnect
+
+To configure OpenIDConnect you need a provider. The redirect url is `${PAPERLESS_URL}/accounts/complete/oidc/`.
+
+`PAPERLESS_SSO_OIDC_ENABLE=<bool>`
+
+: If this environment variable is set to true the button to login with SSO is enabled
+
+`PAPERLESS_SSO_DISABLE_NORMAL_AUTH=<bool>`
+
+: If this environment variable, the normal form to login is disabled
+
+`PAPERLESS_SSO_OIDC_KEY=<str>`
+
+: Client ID of this application
+
+`PAPERLESS_SSO_OIDC_ENDPOINT=<url>`
+
+: This variable must contain the OpenID configuration issuer, without `.well-known/openid-configuration`
+
+`PAPERLESS_SSO_OIDC_SECRET=<str>`
+
+: Client secret of this application
+
+`PAPERLESS_SSO_OIDC_NAME=<str>`
+
+: Value to display inside the button to login with openidconnect
