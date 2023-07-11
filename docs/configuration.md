@@ -1116,7 +1116,7 @@ combination with PAPERLESS_CONSUMER_BARCODE_UPSCALE bigger than 1.0.
 
     Defaults to "300"
 
-## Collate Double-Sided Documents
+## Collate Double-Sided Documents {#collate}
 
 `PAPERLESS_CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED=<bool>`
 

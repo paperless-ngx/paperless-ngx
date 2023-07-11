@@ -550,6 +550,8 @@ one which holds data to keep in the document.
 
     If your scanner supports double-sided scanning natively, you do not need this feature.
 
+This feature is turned off by default, see [configuration](/configuration#collate) on how to turn it on.
+
 ### Summary
 
 If you have scanner with an automatic document feeder (ADF) that only scans a single side,
