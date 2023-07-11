@@ -861,8 +861,9 @@ class TestParserFileTypes(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         parser = RasterisedDocumentParser(None)
         parser.parse(os.path.join(self.SAMPLE_FILES, "document.webp"), "image/webp")
         self.assertIsFile(parser.archive_path)
-        # OCR consistent mangles this space, oh well
-        self.assertIn(
-            "this is awebp document, created 11/14/2022.",
+        # Older tesseracts consistently mangle the space between "a webp",
+        # tesseract 5.3.0 seems to do a better job, so we're accepting both
+        self.assertRegex(
             parser.get_text().lower(),
+            r"this is a ?webp document, created 11/14/2022.",
         )
