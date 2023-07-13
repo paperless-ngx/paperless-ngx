@@ -560,6 +560,17 @@ body.tour-active .sidebar {
   z-index: inherit !important;
 }
 
+.tour-step {
+  .popover-header {
+    --bs-popover-header-padding-y: .75rem;
+  }
+
+  .popover-body {
+    // reset ngx-ui-tour overrides
+    padding: var(--bs-popover-body-padding-y) var(--bs-popover-body-padding-x) !important;
+  }
+}
+
 .nav-item.touranchor--is-active a {
   font-weight: bold !important;
   color: var(--bs-primary);
