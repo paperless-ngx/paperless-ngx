@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-07-13 10:43\n"
+"PO-Revision-Date: 2023-07-13 12:00\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -344,87 +344,87 @@ msgstr "előtt módosítva"
 
 #: documents/models.py:430
 msgid "modified after"
-msgstr ""
+msgstr "után módosítva"
 
 #: documents/models.py:431
 msgid "does not have tag"
-msgstr ""
+msgstr "nincs címkézve"
 
 #: documents/models.py:432
 msgid "does not have ASN"
-msgstr ""
+msgstr "nincs ASN"
 
 #: documents/models.py:433
 msgid "title or content contains"
-msgstr ""
+msgstr "cím, vagy tartalom tartalmazza"
 
 #: documents/models.py:434
 msgid "fulltext query"
-msgstr ""
+msgstr "teljes szöveges lekérdezés"
 
 #: documents/models.py:435
 msgid "more like this"
-msgstr ""
+msgstr "ehhez hasonlók"
 
 #: documents/models.py:436
 msgid "has tags in"
-msgstr ""
+msgstr "címkékkel rendelkezik"
 
 #: documents/models.py:437
 msgid "ASN greater than"
-msgstr ""
+msgstr "ASN nagyobb, mint"
 
 #: documents/models.py:438
 msgid "ASN less than"
-msgstr ""
+msgstr "ASN kisebb, mint"
 
 #: documents/models.py:439
 msgid "storage path is"
-msgstr ""
+msgstr "tárhely elérési útja"
 
 #: documents/models.py:449
 msgid "rule type"
-msgstr ""
+msgstr "szabály típus"
 
 #: documents/models.py:451
 msgid "value"
-msgstr ""
+msgstr "érték"
 
 #: documents/models.py:454
 msgid "filter rule"
-msgstr ""
+msgstr "szűrési szabály"
 
 #: documents/models.py:455
 msgid "filter rules"
-msgstr ""
+msgstr "szûrési szabályok"
 
 #: documents/models.py:563
 msgid "Task ID"
-msgstr ""
+msgstr "Feladatazonosító"
 
 #: documents/models.py:564
 msgid "Celery ID for the Task that was run"
-msgstr ""
+msgstr "A futtatott feladat Celery azonosítója"
 
 #: documents/models.py:569
 msgid "Acknowledged"
-msgstr ""
+msgstr "Visszaigazolva"
 
 #: documents/models.py:570
 msgid "If the task is acknowledged via the frontend or API"
-msgstr ""
+msgstr "Ha a feladatot a frontenden vagy az API-n keresztül visszaigazolták"
 
 #: documents/models.py:576
 msgid "Task Filename"
-msgstr ""
+msgstr "Feladat fájlnév"
 
 #: documents/models.py:577
 msgid "Name of the file which the Task was run for"
-msgstr ""
+msgstr "A fájl neve, amiért a feladatot futtatták"
 
 #: documents/models.py:583
 msgid "Task Name"
-msgstr ""
+msgstr "Feladat neve"
 
 #: documents/models.py:584
 msgid "Name of the Task which was run"
