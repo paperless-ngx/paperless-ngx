@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-07-12 07:08\n"
+"PO-Revision-Date: 2023-07-13 10:43\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -284,63 +284,63 @@ msgstr "cím tartalmazza"
 
 #: documents/models.py:415
 msgid "content contains"
-msgstr ""
+msgstr "tartalom tartalmazza"
 
 #: documents/models.py:416
 msgid "ASN is"
-msgstr ""
+msgstr "Az ASN"
 
 #: documents/models.py:417
 msgid "correspondent is"
-msgstr ""
+msgstr "partnerek"
 
 #: documents/models.py:418
 msgid "document type is"
-msgstr ""
+msgstr "dokumentum típusa"
 
 #: documents/models.py:419
 msgid "is in inbox"
-msgstr ""
+msgstr "beérkezők között"
 
 #: documents/models.py:420
 msgid "has tag"
-msgstr ""
+msgstr "címkézve van"
 
 #: documents/models.py:421
 msgid "has any tag"
-msgstr ""
+msgstr "bármilyen címkéje van"
 
 #: documents/models.py:422
 msgid "created before"
-msgstr ""
+msgstr "előtt létrehozva"
 
 #: documents/models.py:423
 msgid "created after"
-msgstr ""
+msgstr "után létrehozva"
 
 #: documents/models.py:424
 msgid "created year is"
-msgstr ""
+msgstr "létrehozás éve"
 
 #: documents/models.py:425
 msgid "created month is"
-msgstr ""
+msgstr "létrehozás hónapja"
 
 #: documents/models.py:426
 msgid "created day is"
-msgstr ""
+msgstr "létrehozás napja"
 
 #: documents/models.py:427
 msgid "added before"
-msgstr ""
+msgstr "előtt hozzáadva"
 
 #: documents/models.py:428
 msgid "added after"
-msgstr ""
+msgstr "után hozzáadva"
 
 #: documents/models.py:429
 msgid "modified before"
-msgstr ""
+msgstr "előtt módosítva"
 
 #: documents/models.py:430
 msgid "modified after"
