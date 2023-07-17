@@ -2684,7 +2684,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">3</context>
         </context-group>
-        <target state="needs-translation">You're ready to start uploading documents! Explore the various features of this web app on your own, or start a quick tour using the button below.</target>
+        <target state="translated">Encontra-se pronto(a) para começar a carregar documentos! Explore as variadas funcionalidades desta aplicação por si mesmo(a), ou inicie o tutorial no botão abaixo.</target>
       </trans-unit>
       <trans-unit id="4474647174688421179" datatype="html">
         <source>More detail on how to use and configure Paperless-ngx is always available in the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://docs.paperless-ngx.com&quot; target=&quot;_blank&quot;&gt;"/>documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</source>
