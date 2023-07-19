@@ -29,11 +29,11 @@
         },
         "anyio": {
             "hashes": [
-                "sha256:275d9973793619a5374e1c89a4f4ad3f4b0a5510a2b5b939444bee8f4c4d37ce",
-                "sha256:eddca883c4175f14df8aedce21054bfca3adb70ffe76a9f607aef9d7fa2ea7f0"
+                "sha256:44a3c9aba0f5defa43261a8b3efb97891f2bd7d804e0e1f56419befa1adfc780",
+                "sha256:91dee416e570e92c64041bd18b900d1d6fa78dff7048769ce5ac5ddad004fbb5"
             ],
             "markers": "python_version >= '3.7'",
-            "version": "==3.7.0"
+            "version": "==3.7.1"
         },
         "asgiref": {
             "hashes": [
@@ -521,11 +521,11 @@
         },
         "exceptiongroup": {
             "hashes": [
-                "sha256:232c37c63e4f682982c8b6459f33a8981039e5fb8756b2074364e5055c498c9e",
-                "sha256:d484c3090ba2889ae2928419117447a14daf3c1231d5e30d0aae34f354f01785"
+                "sha256:12c3e887d6485d16943a309616de20ae5582633e0a2eda17f4e10fd61c1e8af5",
+                "sha256:e346e69d186172ca7cf029c8c1d16235aa0e04035e5750b4b95039e65204328f"
             ],
             "markers": "python_version < '3.11'",
-            "version": "==1.1.1"
+            "version": "==1.1.2"
         },
         "filelock": {
             "hashes": [
@@ -655,11 +655,11 @@
         },
         "httpcore": {
             "hashes": [
-                "sha256:125f8375ab60036db632f34f4b627a9ad085048eef7cb7d2616fea0f739f98af",
-                "sha256:5581b9c12379c4288fe70f43c710d16060c10080617001e6b22a3b6dbcbefd36"
+                "sha256:a6f30213335e34c1ade7be6ec7c47f19f50c56db36abef1a9dfa3815b1cb3888",
+                "sha256:c2789b767ddddfa2a5782e3199b2b7f6894540b17b16ec26b2c4d8e103510b87"
             ],
             "markers": "python_version >= '3.7'",
-            "version": "==0.17.2"
+            "version": "==0.17.3"
         },
         "httptools": {
             "hashes": [
@@ -1746,11 +1746,11 @@
         },
         "tika-client": {
             "hashes": [
-                "sha256:6110bd73eaa133f9c8eb1ef2566e6c0c8123a0e4efbcfb85b86f8c1b26cb4de2",
-                "sha256:e8eaa52771c72426f5531c53dcc8dfc5e3bb6e1f91f89fc93674a81bfca59d6d"
+                "sha256:5eb8392f688e3dc9eee6ef5ff82324b07f5aa749e858fbba2e1eceaa199efc1e",
+                "sha256:8464a0b9d1b36ddbc853c45aa3fbc5a4ff61516e0ab0a24dd99ae6c5448c13bc"
             ],
             "index": "pypi",
-            "version": "==0.2.0"
+            "version": "==0.3.0"
         },
         "tornado": {
             "hashes": [
