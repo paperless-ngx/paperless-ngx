@@ -124,10 +124,11 @@ def consume_file(
                 return "File successfully split"
 
             # try reading the ASN from barcode
-            if settings.CONSUMER_ENABLE_ASN_BARCODE:
+            if settings.CONSUMER_ENABLE_ASN_BARCODE and reader.asn is not None:
+                # Note this will take precedence over an API provided ASN
+                # But it's from a physical barcode, so that's good
                 overrides.asn = reader.asn
-                if overrides.asn:
-                    logger.info(f"Found ASN in barcode: {overrides.asn}")
+                logger.info(f"Found ASN in barcode: {overrides.asn}")
 
     # continue with consumption if no barcode was found
     document = Consumer().try_consume_file(
