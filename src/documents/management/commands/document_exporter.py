@@ -11,13 +11,17 @@ from typing import Set
 import tqdm
 from django.conf import settings
 from django.contrib.auth.models import Group
+from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
 from django.core import serializers
 from django.core.management.base import BaseCommand
 from django.core.management.base import CommandError
 from django.db import transaction
 from django.utils import timezone
 from filelock import FileLock
+from guardian.models import GroupObjectPermission
+from guardian.models import UserObjectPermission
 
 from documents.file_handling import delete_empty_directories
 from documents.file_handling import generate_filename
@@ -259,6 +263,22 @@ class Command(BaseCommand):
 
             manifest += json.loads(
                 serializers.serialize("json", UiSettings.objects.all()),
+            )
+
+            manifest += json.loads(
+                serializers.serialize("json", ContentType.objects.all()),
+            )
+
+            manifest += json.loads(
+                serializers.serialize("json", Permission.objects.all()),
+            )
+
+            manifest += json.loads(
+                serializers.serialize("json", UserObjectPermission.objects.all()),
+            )
+
+            manifest += json.loads(
+                serializers.serialize("json", GroupObjectPermission.objects.all()),
             )
 
         # 3. Export files from each document
