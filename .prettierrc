@@ -2,3 +2,5 @@
 semi: false
 # https://prettier.io/docs/en/options.html#quotes
 singleQuote: true
+# https://prettier.io/docs/en/options.html#trailing-commas
+trailingComma: "es5"

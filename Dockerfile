@@ -214,7 +214,8 @@ COPY --from=pipenv-base /usr/src/pipenv/requirements.txt ./
 ARG BUILD_PACKAGES="\
   build-essential \
   git \
-  default-libmysqlclient-dev"
+  default-libmysqlclient-dev \
+  pkg-config"
 
 # hadolint ignore=DL3042
 RUN --mount=type=cache,target=/root/.cache/pip/,id=pip-cache \

@@ -26,7 +26,10 @@ import { EditDialogMode } from '../../edit-dialog/edit-dialog.component'
   styleUrls: ['./tags.component.scss'],
 })
 export class TagsComponent implements OnInit, ControlValueAccessor {
-  constructor(private tagService: TagService, private modalService: NgbModal) {
+  constructor(
+    private tagService: TagService,
+    private modalService: NgbModal
+  ) {
     this.createTagRef = this.createTag.bind(this)
   }
 
