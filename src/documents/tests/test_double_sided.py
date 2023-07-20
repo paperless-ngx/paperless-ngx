@@ -130,7 +130,7 @@ class TestDoubleSided(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertIsFile(self.staging_file)
         self.assertIn("Received odd numbered pages", msg)
 
-    def test_less_odd_pages_than_even_fails(self):
+    def test_less_odd_pages_then_even_fails(self):
         """
         GIVEN:
             - A valid staging file

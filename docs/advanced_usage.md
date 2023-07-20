@@ -577,9 +577,8 @@ then be processed as normal.
 !!! tip
 
     When scanning the even numbered pages, you can omit the last empty pages, if there are
-    any. For example, if page 6 is empty, you only need to scan pages 4 and 2; if 4 and 6
-    are empty, only scan page 2. Keep in mind that you _cannot_ omit empty pages in the
-    middle; if 2 and 6 have content, but 4 is empty, you still have to scan page 4.
+    any. For example, if page 6 is empty, you only need to scan pages 2 and 4. _Do not_ omit
+    empty pages in the middle of the document.
 
 ### Things that could go wrong
 
@@ -594,12 +593,6 @@ to upload the second file. To avoid collating the wrong documents if you then co
 a day later to scan a new double-sided document, Paperless will only keep an "odd numbered
 pages" file for up to 30 minutes. If more time passes, it will consider the next incoming
 scan a completely new "odd numbered pages" one. The old staging file will get discarded.
-
-If you accidentally put a normal single-sided scan into the double-sided directory, you can
-just upload the scan into the normal consume folder. However, the staging file will be kept for 30
-minutes. If you plan to start a double-sided scan within that timeframe, the easiest fix is
-to just put another dummy scan in the double-sided directory and delete the resulting (garbage)
-document in the UI.
 
 ### Interaction with "subdirs as tags"
 

@@ -25,7 +25,7 @@ def collate(input_doc: ConsumableDocument) -> str:
     Tries to collate pages from 2 single sided scans of a double sided
     document.
 
-    When called with a file, is it checked whether or not a staging file
+    When called with a file, it checks whether or not a staging file
     exists, if not, the current file is turned into that staging file
     containing the odd numbered pages.
 
