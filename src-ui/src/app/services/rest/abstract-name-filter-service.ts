@@ -2,7 +2,7 @@ import { ObjectWithId } from 'src/app/data/object-with-id'
 import { AbstractPaperlessService } from './abstract-paperless-service'
 
 export abstract class AbstractNameFilterService<
-  T extends ObjectWithId
+  T extends ObjectWithId,
 > extends AbstractPaperlessService<T> {
   listFiltered(
     page?: number,
