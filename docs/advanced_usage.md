@@ -1,6 +1,6 @@
 # Advanced Topics
 
-Paperless offers a couple features that automate certain tasks and make
+Paperless offers a couple of features that automate certain tasks and make
 your life easier.
 
 ## Matching tags, correspondents, document types, and storage paths {#matching}
@@ -35,9 +35,9 @@ The following algorithms are available:
   (i.e. preserve ordering) in the PDF.
 - **Regular expression:** Parses the match as a regular expression and
   tries to find a match within the document.
-- **Fuzzy match:** I don't know. Look at the source.
+- **Fuzzy match:** I don't know. Look at [the source](https://github.com/paperless-ngx/paperless-ngx/blob/main/src/documents/matching.py).
 - **Auto:** Tries to automatically match new documents. This does not
-  require you to set a match. See the notes below.
+  require you to set a match. See the [notes below](#automatic-matching).
 
 When using the _any_ or _all_ matching algorithms, you can search for
 terms that consist of multiple words by enclosing them in double quotes.
@@ -92,7 +92,7 @@ when using this feature:
   decide when not to assign a certain tag, correspondent, document
   type, or storage path. This will usually be the case as you start
   filling up paperless with documents. Example: If all your documents
-  are either from "Webshop" and "Bank", paperless will assign one
+  are either from "Webshop" or "Bank", paperless will assign one
   of these correspondents to ANY new document, if both are set to
   automatic matching.
 
@@ -101,7 +101,7 @@ when using this feature:
 Sometimes you may want to do something arbitrary whenever a document is
 consumed. Rather than try to predict what you may want to do, Paperless
 lets you execute scripts of your own choosing just before or after a
-document is consumed using a couple simple hooks.
+document is consumed using a couple of simple hooks.
 
 Just write a script, put it somewhere that Paperless can read & execute,
 and then put the path to that script in `paperless.conf` or
@@ -197,7 +197,7 @@ The script can be in any language, A simple shell script example:
 !!! warning
 
     The post consumption script should not modify the document files
-    directly
+    directly.
 
 The script's stdout and stderr will be logged line by line to the
 webserver log, along with the exit code of the script.

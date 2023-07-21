@@ -524,7 +524,7 @@ parsing documents.
 
 `PAPERLESS_OCR_MODE=<mode>`
 
-: Tell paperless when and how to perform ocr on your documents. Four
+: Tell paperless when and how to perform ocr on your documents. Three
 modes are available:
 
     -   `skip`: Paperless skips all pages and will perform ocr only on
@@ -1159,7 +1159,7 @@ find on your system when it starts up. Unless you've done something
 creative with their installation, you probably won't need to edit any
 of these. However, if you've installed these programs somewhere where
 simply typing the name of the program doesn't automatically execute it
-(ie. the program isn't in your \$PATH), then you'll need to specify
+(ie. the program isn't in your $PATH), then you'll need to specify
 the literal path for that program.
 
 `PAPERLESS_CONVERT_BINARY=<path>`
@@ -1243,7 +1243,7 @@ actual group ID on the host system, which you can get by executing
 with English, German, Italian, Spanish and French. If your language
 is not in this list, install additional languages with this
 configuration option. You will need to [find the right LangCodes](https://tesseract-ocr.github.io/tessdoc/Data-Files-in-different-versions.html)
-but note that (tesseract-ocr-\* package names)[https://packages.debian.org/bullseye/graphics/]
+but note that [tesseract-ocr-\* package names](https://packages.debian.org/bullseye/graphics/)
 do not always correspond with the language codes e.g. "chi_tra" should be
 specified as "chi-tra".
 

@@ -3,10 +3,11 @@
 ## _What's the general plan for Paperless-ngx?_
 
 **A:** While Paperless-ngx is already considered largely
-"feature-complete" it is a community-driven project and development
-will be guided in this way. New features can be submitted via GitHub
-discussions and "up-voted" by the community but this is not a
-guarantee the feature will be implemented. This project will always be
+"feature-complete", it is a community-driven project and development
+will be guided in this way. New features can be submitted via
+[GitHub discussions](https://github.com/paperless-ngx/paperless-ngx/discussions)
+and "up-voted" by the community, but this is not a
+guarantee that the feature will be implemented. This project will always be
 open to collaboration in the form of PRs, ideas etc.
 
 ## _I'm using docker. Where are my documents?_
@@ -58,7 +59,7 @@ elsewhere. Here are a couple notes about that.
   WebP images are processed with OCR and converted into PDF documents.
 - Plain text documents are supported as well and are added verbatim to
   paperless.
-- With the optional Tika integration enabled (see [Tika configuration](/configuration#tika),
+- With the optional Tika integration enabled (see [Tika configuration](https://docs.paperless-ngx.com/configuration#tika)),
   Paperless also supports various Office documents (.docx, .doc, odt,
   .ppt, .pptx, .odp, .xls, .xlsx, .ods).
 
@@ -82,7 +83,7 @@ has to do much less work to serve the data.
 ## _How do I install paperless-ngx on Raspberry Pi?_
 
 **A:** Docker images are available for armv7 and arm64 hardware, so just
-follow the docker-compose instructions. Apart from more required disk
+follow the [docker-compose instructions](https://docs.paperless-ngx.com/setup/#installation). Apart from more required disk
 space compared to a bare metal installation, docker comes with close to
 zero overhead, even on Raspberry Pi.
 

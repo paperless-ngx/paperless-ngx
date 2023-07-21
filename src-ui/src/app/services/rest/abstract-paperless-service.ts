@@ -8,7 +8,10 @@ import { environment } from 'src/environments/environment'
 export abstract class AbstractPaperlessService<T extends ObjectWithId> {
   protected baseUrl: string = environment.apiBaseUrl
 
-  constructor(protected http: HttpClient, private resourceName: string) {}
+  constructor(
+    protected http: HttpClient,
+    private resourceName: string
+  ) {}
 
   protected getResourceUrl(id: number = null, action: string = null): string {
     let url = `${this.baseUrl}${this.resourceName}/`
