@@ -1,5 +1,4 @@
 import logging
-import shutil
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
@@ -18,6 +17,8 @@ from pikepdf import Pdf
 from PIL import Image
 
 from documents.data_models import DocumentSource
+from documents.utils import copy_basic_file_stats
+from documents.utils import copy_file_with_basic_stats
 
 logger = logging.getLogger("paperless.barcodes")
 
@@ -181,7 +182,7 @@ class BarcodeReader:
             pdf_file.write(img2pdf.convert(img_file))
 
         # Copy what file stat is possible
-        shutil.copystat(self.file, self.pdf_file)
+        copy_basic_file_stats(self.file, self.pdf_file)
 
     def detect(self) -> None:
         """
@@ -306,7 +307,7 @@ class BarcodeReader:
                 with open(savepath, "wb") as out:
                     dst.save(out)
 
-                shutil.copystat(self.file, savepath)
+                copy_basic_file_stats(self.file, savepath)
 
                 document_paths.append(savepath)
 
@@ -363,5 +364,5 @@ class BarcodeReader:
             else:
                 dest = save_to_dir
             logger.info(f"Saving {document_path} to {dest}")
-            shutil.copy2(document_path, dest)
+            copy_file_with_basic_stats(document_path, dest)
         return True

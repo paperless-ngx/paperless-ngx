@@ -277,7 +277,7 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         st_mtime_1 = os.stat(os.path.join(self.target, "manifest.json")).st_mtime
 
         with mock.patch(
-            "documents.management.commands.document_exporter.shutil.copy2",
+            "documents.management.commands.document_exporter.copy_file_with_basic_stats",
         ) as m:
             self._do_export()
             m.assert_not_called()
@@ -288,7 +288,7 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         Path(self.d1.source_path).touch()
 
         with mock.patch(
-            "documents.management.commands.document_exporter.shutil.copy2",
+            "documents.management.commands.document_exporter.copy_file_with_basic_stats",
         ) as m:
             self._do_export()
             self.assertEqual(m.call_count, 1)
@@ -311,7 +311,7 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertIsFile(os.path.join(self.target, "manifest.json"))
 
         with mock.patch(
-            "documents.management.commands.document_exporter.shutil.copy2",
+            "documents.management.commands.document_exporter.copy_file_with_basic_stats",
         ) as m:
             self._do_export()
             m.assert_not_called()
@@ -322,7 +322,7 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.d2.save()
 
         with mock.patch(
-            "documents.management.commands.document_exporter.shutil.copy2",
+            "documents.management.commands.document_exporter.copy_file_with_basic_stats",
         ) as m:
             self._do_export(compare_checksums=True)
             self.assertEqual(m.call_count, 1)
