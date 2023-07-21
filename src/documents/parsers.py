@@ -18,6 +18,7 @@ from django.utils import timezone
 
 from documents.loggers import LoggingMixin
 from documents.signals import document_consumer_declaration
+from documents.utils import copy_file_with_basic_stats
 
 # This regular expression will try to find dates in the document at
 # hand and will match the following formats:
@@ -206,7 +207,7 @@ def make_thumbnail_from_pdf_gs_fallback(in_path, temp_dir, logging_group=None) -
         # so we need to copy it before it gets moved.
         # https://github.com/paperless-ngx/paperless-ngx/issues/3631
         default_thumbnail_path = os.path.join(temp_dir, "document.png")
-        shutil.copy2(get_default_thumbnail(), default_thumbnail_path)
+        copy_file_with_basic_stats(get_default_thumbnail(), default_thumbnail_path)
         return default_thumbnail_path
 
 
