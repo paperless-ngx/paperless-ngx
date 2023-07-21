@@ -2692,7 +2692,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="translated">Mehr Details zur Verwendung und Konfiguration von Paperless-ngx sind immer in der <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://docs.paperless-ngx.com&quot; target=&quot;_blank&quot;&gt;"/>-Dokumentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> verfügbar.</target>
+        <target state="translated">Mehr Details zur Verwendung und Konfiguration von Paperless-ngx sind immer in der <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://docs.paperless-ngx.com&quot; target=&quot;_blank&quot;&gt;"/>Dokumentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> verfügbar.</target>
       </trans-unit>
       <trans-unit id="4294899532887357745" datatype="html">
         <source>Thanks for being a part of the Paperless-ngx community!</source>
