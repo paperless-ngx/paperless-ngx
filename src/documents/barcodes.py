@@ -153,7 +153,6 @@ class BarcodeReader:
         if self.mime != "image/tiff":
             return
 
-        assert self.temp_dir is not None
         self.pdf_file = convert_from_tiff_to_pdf(self.file, Path(self.temp_dir.name))
 
     def detect(self) -> None:

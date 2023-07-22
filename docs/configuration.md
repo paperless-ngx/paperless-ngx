@@ -1137,10 +1137,11 @@ document.
 `PAPERLESS_CONSUMER_COLLATE_DOUBLE_SIDED_SUBDIR_NAME=<str>`
 
 : The name of the subdirectory that the collate feature expects documents to
-arrive. This only has an effect if `PAPERLESS_CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED`
-has been enabled.
+arrive.
 
-    Note that Paperless will not automatically create the directory.
+    This only has an effect if `PAPERLESS_CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED`
+    has been enabled. Note that Paperless will not automatically create the
+    directory.
 
     Defaults to "double-sided".
 
