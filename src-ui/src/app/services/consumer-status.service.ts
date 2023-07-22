@@ -164,7 +164,7 @@ export class ConsumerStatusService {
       }
       status.documentId = statusMessage.document_id
 
-      if (created && statusMessage.status == 'STARTING') {
+      if (created && statusMessage.status == 'STARTED') {
         this.documentDetectedSubject.next(status)
       }
       if (statusMessage.status == 'SUCCESS') {
