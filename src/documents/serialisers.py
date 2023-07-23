@@ -257,6 +257,7 @@ class DocumentTypeSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             "owner",
             "permissions",
             "set_permissions",
+            "default_metadata",
         )
 
 

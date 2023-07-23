@@ -1,25 +1,122 @@
 <form [formGroup]="objectForm" (ngSubmit)="save()">
-    <div class="modal-header">
-      <h4 class="modal-title" id="modal-basic-title">{{getTitle()}}</h4>
-      <button type="button" [disabled]="!closeEnabled" class="btn-close" aria-label="Close" (click)="cancel()">
-      </button>
-    </div>
-    <div class="modal-body">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">{{ getTitle() }}</h4>
+    <button
+      type="button"
+      [disabled]="!closeEnabled"
+      class="btn-close"
+      aria-label="Close"
+      (click)="cancel()"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <div class="col">
+      <app-input-text
+        i18n-title
+        title="Name"
+        formControlName="name"
+        [error]="error?.name"
+      ></app-input-text>
+      <app-input-select
+        i18n-title
+        title="Matching algorithm"
+        [items]="getMatchingAlgorithms()"
+        formControlName="matching_algorithm"
+      ></app-input-select>
 
-      <div class="col">
-        <app-input-text i18n-title title="Name" formControlName="name" [error]="error?.name"></app-input-text>
-        <app-input-select i18n-title title="Matching algorithm" [items]="getMatchingAlgorithms()" formControlName="matching_algorithm"></app-input-select>
-        <app-input-text *ngIf="patternRequired" i18n-title title="Matching pattern" formControlName="match" [error]="error?.match"></app-input-text>
-        <app-input-check *ngIf="patternRequired" i18n-title title="Case insensitive" formControlName="is_insensitive"></app-input-check>
+      <div class="mb-3">
+        <label class="form-labe">Default Metadata</label>
+        <button
+          type="button"
+          class="btn btn-primary btn-sm mx-2"
+          (click)="addIndexField()"
+        >
+          + Index Field
+        </button>
+
+        <div formArrayName="default_metadata">
+          <div
+            *ngFor="
+              let indexField of indexFields;
+              let i = index;
+              trackBy: trackIndexField
+            "
+            [formGroupName]="i"
+          >
+            <div class="row flex-nowrap">
+              <div class="col">
+                <label>Name</label>
+                <input
+                  class="form-control flex-grow-0 w-full"
+                  type="text"
+                  formControlName="name"
+                />
+              </div>
+              <div class="col">
+                <label for="displayName">User Friendly Name</label>
+                <input
+                  class="form-control flex-grow-0 w-full"
+                  type="text"
+                  formControlName="displayName"
+                />
+              </div>
+              <div class="col">
+                <div><label>Actions</label></div>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-danger me-2 ms-auto align-self-end"
+                  (click)="deleteIndexField(i)"
+                >
+                  <svg class="buttonicon" fill="currentColor">
+                    <use xlink:href="assets/bootstrap-icons.svg#trash" /></svg
+                  ><span class="d-none d-lg-inline ps-1" i18n>Delete</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div *appIfOwner="object">
-        <app-permissions-form [users]="users" accordion="true" formControlName="permissions_form"></app-permissions-form>
-      </div>
+      <app-input-text
+        *ngIf="patternRequired"
+        i18n-title
+        title="Matching pattern"
+        formControlName="match"
+        [error]="error?.match"
+      ></app-input-text>
+      <app-input-check
+        *ngIf="patternRequired"
+        i18n-title
+        title="Case insensitive"
+        formControlName="is_insensitive"
+      ></app-input-check>
+    </div>
 
+    <div *appIfOwner="object">
+      <app-permissions-form
+        [users]="users"
+        accordion="true"
+        formControlName="permissions_form"
+      ></app-permissions-form>
     </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-outline-secondary" (click)="cancel()" i18n [disabled]="networkActive">Cancel</button>
-      <button type="submit" class="btn btn-primary" i18n [disabled]="networkActive">Save</button>
-    </div>
-  </form>
+  </div>
+  <div class="modal-footer">
+    <button
+      type="button"
+      class="btn btn-outline-secondary"
+      (click)="cancel()"
+      i18n
+      [disabled]="networkActive"
+    >
+      Cancel
+    </button>
+    <button
+      type="submit"
+      class="btn btn-primary"
+      i18n
+      [disabled]="networkActive"
+    >
+      Save
+    </button>
+  </div>
+</form>
