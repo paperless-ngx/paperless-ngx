@@ -679,3 +679,42 @@ class Note(models.Model):
 
     def __str__(self):
         return self.note
+
+class Metadata(models.Model):
+    data = models.JSONField(
+        _("data"),
+        blank=True,
+        help_text=_("JSON metadata"),
+    )
+
+    created = models.DateTimeField(
+        _("created"),
+        default=timezone.now,
+        db_index=True,
+    )
+
+    document = models.ForeignKey(
+        Document,
+        blank=True,
+        null=True,
+        related_name="document",
+        on_delete=models.CASCADE,
+        verbose_name=_("document"),
+    )
+
+    user = models.ForeignKey(
+        User,
+        blank=True,
+        null=True,
+        related_name="metadatas",
+        on_delete=models.SET_NULL,
+        verbose_name=_("user"),
+    )
+
+    class Meta:
+        ordering = ("created",)
+        verbose_name = _("metadata")
+        verbose_name_plural = _("metadatas")
+
+    def __str__(self):
+        return self.data
