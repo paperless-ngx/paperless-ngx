@@ -146,7 +146,7 @@
           <context context-type="sourcefile">node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="translated">Nächste</target>
+        <target state="translated">Weiter</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.minutes" datatype="html">
         <source>Minutes</source>
@@ -420,7 +420,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">176</context>
         </context-group>
-        <target state="translated">Schlagwörter, Korrespondenten, Dokumententypen und Speicherpfade können über diese Seiten verwaltet werden. Sie können auch aus der Dokumentbearbeitung erstellt werden.</target>
+        <target state="translated">Tags, Korrespondenten, Dokumententypen und Speicherpfade können über diese Seiten verwaltet werden. Sie können auch aus der Dokumentbearbeitung erstellt werden.</target>
       </trans-unit>
       <trans-unit id="4680387114119209483" datatype="html">
         <source>File Tasks shows you documents that have been consumed, are waiting to be, or may have failed during the process.</source>
@@ -468,7 +468,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">273</context>
         </context-group>
-        <target state="translated">Beginne Upload...</target>
+        <target state="translated">Starte Upload...</target>
       </trans-unit>
       <trans-unit id="2173456130768795374" datatype="html">
         <source>Paperless-ngx</source>
@@ -493,7 +493,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">39</context>
         </context-group>
-        <target state="translated">Eingeloggt als <x id="INTERPOLATION" equiv-text="{{this.settingsService.displayName}}"/></target>
+        <target state="translated">Angemeldet als <x id="INTERPOLATION" equiv-text="{{this.settingsService.displayName}}"/></target>
       </trans-unit>
       <trans-unit id="4930506384627295710" datatype="html" approved="yes">
         <source>Settings</source>
