@@ -1,6 +1,7 @@
 import logging
 import os
 import shutil
+from typing import Optional
 
 from celery import states
 from celery.signals import before_task_publish
@@ -21,6 +22,7 @@ from django.utils import timezone
 from filelock import FileLock
 
 from documents import matching
+from documents.classifier import DocumentClassifier
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import delete_empty_directories
 from documents.file_handling import generate_unique_filename
@@ -33,7 +35,7 @@ from documents.permissions import get_objects_for_user_owner_aware
 logger = logging.getLogger("paperless.handlers")
 
 
-def add_inbox_tags(sender, document=None, logging_group=None, **kwargs):
+def add_inbox_tags(sender, document: Document, logging_group=None, **kwargs):
     if document.owner is not None:
         tags = get_objects_for_user_owner_aware(
             document.owner,
@@ -48,9 +50,9 @@ def add_inbox_tags(sender, document=None, logging_group=None, **kwargs):
 
 def set_correspondent(
     sender,
-    document=None,
+    document: Document,
     logging_group=None,
-    classifier=None,
+    classifier: Optional[DocumentClassifier] = None,
     replace=False,
     use_first=True,
     suggest=False,
@@ -111,9 +113,9 @@ def set_correspondent(
 
 def set_document_type(
     sender,
-    document=None,
+    document: Document,
     logging_group=None,
-    classifier=None,
+    classifier: Optional[DocumentClassifier] = None,
     replace=False,
     use_first=True,
     suggest=False,
@@ -175,9 +177,9 @@ def set_document_type(
 
 def set_tags(
     sender,
-    document=None,
+    document: Document,
     logging_group=None,
-    classifier=None,
+    classifier: Optional[DocumentClassifier] = None,
     replace=False,
     suggest=False,
     base_url=None,
@@ -239,9 +241,9 @@ def set_tags(
 
 def set_storage_path(
     sender,
-    document=None,
+    document: Document,
     logging_group=None,
-    classifier=None,
+    classifier: Optional[DocumentClassifier] = None,
     replace=False,
     use_first=True,
     suggest=False,
@@ -491,7 +493,7 @@ def update_filename_and_move_files(sender, instance: Document, **kwargs):
             )
 
 
-def set_log_entry(sender, document=None, logging_group=None, **kwargs):
+def set_log_entry(sender, document: Document, logging_group=None, **kwargs):
     ct = ContentType.objects.get(model="document")
     user = User.objects.get(username="consumer")
 
