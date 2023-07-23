@@ -554,15 +554,15 @@ This feature is turned off by default, see [configuration](/configuration#collat
 
 ### Summary
 
-If you have scanner with an automatic document feeder (ADF) that only scans a single side,
+If you have a scanner with an automatic document feeder (ADF) that only scans a single side,
 this feature makes scanning double-sided documents much more convenient by automatically
 collating two separate scans into one document, reordering the pages as necessary.
 
 ### Usage example
 
-Suppose you have a double-sided document with 6 pages (3 sheets of paper). First, you
+Suppose you have a double-sided document with 6 pages (3 sheets of paper). First,
 put the stack into your ADF as normal, ensuring that page 1 is scanned first. Your ADF
-will now scan pages 1, 3, and 5. You (or your the scanner, if it supports it) then upload
+will now scan pages 1, 3, and 5. Then you (or your the scanner, if it supports it) upload
 the scan into the correct sub-directory of the consume folder (`double-sided` by default;
 keep in mind that Paperless will _not_ automatically create the directory for you.)
 Paperless will then process the scan and move it into an internal staging area.
