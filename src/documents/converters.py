@@ -1,10 +1,11 @@
-import shutil
 from pathlib import Path
 from subprocess import run
 
 import img2pdf
 from django.conf import settings
 from PIL import Image
+
+from documents.utils import copy_basic_file_stats
 
 
 def convert_from_tiff_to_pdf(tiff_path: Path, target_directory: Path) -> Path:
@@ -41,5 +42,5 @@ def convert_from_tiff_to_pdf(tiff_path: Path, target_directory: Path) -> Path:
         pdf_file.write(img2pdf.convert(img_file))
 
     # Copy what file stat is possible
-    shutil.copystat(str(tiff_path), str(pdf_path))
+    copy_basic_file_stats(tiff_path, pdf_path)
     return pdf_path

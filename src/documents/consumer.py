@@ -1,7 +1,6 @@
 import datetime
 import hashlib
 import os
-import shutil
 import tempfile
 import uuid
 from pathlib import Path
@@ -20,6 +19,9 @@ from django.db.models import Q
 from django.utils import timezone
 from filelock import FileLock
 from rest_framework.reverse import reverse
+
+from documents.utils import copy_basic_file_stats
+from documents.utils import copy_file_with_basic_stats
 
 from .classifier import load_classifier
 from .file_handling import create_source_path_directory
@@ -326,7 +328,7 @@ class Consumer(LoggingMixin):
             dir=settings.SCRATCH_DIR,
         )
         self.path = Path(tempdir.name) / Path(self.filename)
-        shutil.copy2(self.original_path, self.path)
+        copy_file_with_basic_stats(self.original_path, self.path)
 
         # Determine the parser class.
 
@@ -585,7 +587,7 @@ class Consumer(LoggingMixin):
 
         # Attempt to copy file's original stats, but it's ok if we can't
         try:
-            shutil.copystat(source, target)
+            copy_basic_file_stats(source, target)
         except Exception:  # pragma: no cover
             pass
 

@@ -37,6 +37,7 @@ from documents.models import UiSettings
 from documents.settings import EXPORTER_ARCHIVE_NAME
 from documents.settings import EXPORTER_FILE_NAME
 from documents.settings import EXPORTER_THUMBNAIL_NAME
+from documents.utils import copy_file_with_basic_stats
 from paperless import version
 from paperless.db import GnuPG
 from paperless_mail.models import MailAccount
@@ -437,4 +438,4 @@ class Command(BaseCommand):
 
         if perform_copy:
             target.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(source, target)
+            copy_file_with_basic_stats(source, target)

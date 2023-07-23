@@ -1,7 +1,6 @@
 import json
 import logging
 import os
-import shutil
 from contextlib import contextmanager
 from pathlib import Path
 
@@ -27,6 +26,7 @@ from documents.settings import EXPORTER_ARCHIVE_NAME
 from documents.settings import EXPORTER_FILE_NAME
 from documents.settings import EXPORTER_THUMBNAIL_NAME
 from documents.signals.handlers import update_filename_and_move_files
+from documents.utils import copy_file_with_basic_stats
 from paperless import version
 
 
@@ -246,7 +246,7 @@ class Command(BaseCommand):
 
                 create_source_path_directory(document.source_path)
 
-                shutil.copy2(document_path, document.source_path)
+                copy_file_with_basic_stats(document_path, document.source_path)
 
                 if thumbnail_path:
                     if thumbnail_path.suffix in {".png", ".PNG"}:
@@ -261,13 +261,16 @@ class Command(BaseCommand):
                             output_file=str(document.thumbnail_path),
                         )
                     else:
-                        shutil.copy2(thumbnail_path, document.thumbnail_path)
+                        copy_file_with_basic_stats(
+                            thumbnail_path,
+                            document.thumbnail_path,
+                        )
 
                 if archive_path:
                     create_source_path_directory(document.archive_path)
                     # TODO: this assumes that the export is valid and
                     #  archive_filename is present on all documents with
                     #  archived files
-                    shutil.copy2(archive_path, document.archive_path)
+                    copy_file_with_basic_stats(archive_path, document.archive_path)
 
             document.save()
