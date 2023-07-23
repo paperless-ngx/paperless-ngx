@@ -112,6 +112,14 @@ class Tag(MatchingModel):
 
 
 class DocumentType(MatchingModel):
+    default_metadata = models.JSONField(
+        _("default_metadata"),
+        # Source: https://stackoverflow.com/a/47590145/5575610
+        null=True,
+        blank=True,
+        help_text=_("Default JSON metadata"),
+    )
+
     class Meta(MatchingModel.Meta):
         verbose_name = _("document type")
         verbose_name_plural = _("document types")
