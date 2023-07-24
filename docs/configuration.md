@@ -1116,6 +1116,43 @@ combination with PAPERLESS_CONSUMER_BARCODE_UPSCALE bigger than 1.0.
 
     Defaults to "300"
 
+## Collate Double-Sided Documents {#collate}
+
+`PAPERLESS_CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED=<bool>`
+
+: Enables automatic collation of two single-sided scans into a double-sided
+document.
+
+    This is useful if you have an automatic document feeder that only supports
+    single-sided scans, but you need to scan a double-sided document. If your
+    ADF supports double-sided scans natively, you do not need this feature.
+
+    `PAPERLESS_CONSUMER_RECURSIVE` must be enabled for this to work.
+
+    For more information, read the [corresponding section in the advanced
+    documentation](/advanced_usage#collate).
+
+    Defaults to false.
+
+`PAPERLESS_CONSUMER_COLLATE_DOUBLE_SIDED_SUBDIR_NAME=<str>`
+
+: The name of the subdirectory that the collate feature expects documents to
+arrive.
+
+    This only has an effect if `PAPERLESS_CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED`
+    has been enabled. Note that Paperless will not automatically create the
+    directory.
+
+    Defaults to "double-sided".
+
+`PAPERLESS_CONSUMER_COLLATE_DOUBLE_SIDED_TIFF_SUPPORT=<bool>`
+: Whether TIFF image files should be supported when collating documents.
+This will automatically convert any TIFF image(s) to pdfs for later
+processing. This only has an effect if
+`PAPERLESS_CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED` has been enabled.
+
+    Defaults to false.
+
 ## Binaries
 
 There are a few external software packages that Paperless expects to
