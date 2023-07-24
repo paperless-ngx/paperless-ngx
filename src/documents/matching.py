@@ -35,7 +35,11 @@ def match_correspondents(document, classifier, user=None):
         correspondents = Correspondent.objects.all()
 
     return list(
-        filter(lambda o: matches(o, document) or o.pk == pred_id, correspondents),
+        filter(
+            lambda o: matches(o, document)
+            or (o.pk == pred_id and o.matching_algorithm == MatchingModel.MATCH_AUTO),
+            correspondents,
+        ),
     )
 
 
@@ -55,7 +59,11 @@ def match_document_types(document, classifier, user=None):
         document_types = DocumentType.objects.all()
 
     return list(
-        filter(lambda o: matches(o, document) or o.pk == pred_id, document_types),
+        filter(
+            lambda o: matches(o, document)
+            or (o.pk == pred_id and o.matching_algorithm == MatchingModel.MATCH_AUTO),
+            document_types,
+        ),
     )
 
 
@@ -71,7 +79,14 @@ def match_tags(document, classifier, user=None):
         tags = Tag.objects.all()
 
     return list(
-        filter(lambda o: matches(o, document) or o.pk in predicted_tag_ids, tags),
+        filter(
+            lambda o: matches(o, document)
+            or (
+                o.matching_algorithm == MatchingModel.MATCH_AUTO
+                and o.pk in predicted_tag_ids
+            ),
+            tags,
+        ),
     )
 
 
@@ -92,7 +107,8 @@ def match_storage_paths(document, classifier, user=None):
 
     return list(
         filter(
-            lambda o: matches(o, document) or o.pk == pred_id,
+            lambda o: matches(o, document)
+            or (o.pk == pred_id and o.matching_algorithm == MatchingModel.MATCH_AUTO),
             storage_paths,
         ),
     )
