@@ -3,10 +3,11 @@ import { Subject } from 'rxjs'
 import { environment } from 'src/environments/environment'
 import { WebsocketConsumerStatusMessage } from '../data/websocket-consumer-status-message'
 
+// see ConsumerFilePhase in src/documents/consumer.py
 export enum FileStatusPhase {
   STARTED = 0,
   UPLOADING = 1,
-  PROCESSING = 2,
+  WORKING = 2,
   SUCCESS = 3,
   FAILED = 4,
 }
@@ -49,7 +50,7 @@ export class FileStatus {
         return 0.0
       case FileStatusPhase.UPLOADING:
         return (this.currentPhaseProgress / this.currentPhaseMaxProgress) * 0.2
-      case FileStatusPhase.PROCESSING:
+      case FileStatusPhase.WORKING:
         return (
           (this.currentPhaseProgress / this.currentPhaseMaxProgress) * 0.8 + 0.2
         )
@@ -150,7 +151,7 @@ export class ConsumerStatusService {
       let created = statusMessageGet.created
 
       status.updateProgress(
-        FileStatusPhase.PROCESSING,
+        FileStatusPhase.WORKING,
         statusMessage.current_progress,
         statusMessage.max_progress
       )
@@ -164,16 +165,25 @@ export class ConsumerStatusService {
       }
       status.documentId = statusMessage.document_id
 
-      if (created && statusMessage.status == 'STARTED') {
-        this.documentDetectedSubject.next(status)
+      if (statusMessage.status in FileStatusPhase) {
+        status.phase = FileStatusPhase[statusMessage.status]
       }
-      if (statusMessage.status == 'SUCCESS') {
-        status.phase = FileStatusPhase.SUCCESS
-        this.documentConsumptionFinishedSubject.next(status)
-      }
-      if (statusMessage.status == 'FAILED') {
-        status.phase = FileStatusPhase.FAILED
-        this.documentConsumptionFailedSubject.next(status)
+
+      switch (status.phase) {
+        case FileStatusPhase.STARTED:
+          if (created) this.documentDetectedSubject.next(status)
+          break
+
+        case FileStatusPhase.SUCCESS:
+          this.documentConsumptionFinishedSubject.next(status)
+          break
+
+        case FileStatusPhase.FAILED:
+          this.documentConsumptionFailedSubject.next(status)
+          break
+
+        default:
+          break
       }
     }
   }
