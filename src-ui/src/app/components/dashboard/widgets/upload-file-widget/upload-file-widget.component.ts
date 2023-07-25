@@ -90,8 +90,9 @@ export class UploadFileWidgetComponent extends ComponentWithPermissions {
 
   getStatusColor(status: FileStatus) {
     switch (status.phase) {
-      case FileStatusPhase.PROCESSING:
       case FileStatusPhase.UPLOADING:
+      case FileStatusPhase.STARTED:
+      case FileStatusPhase.WORKING:
         return 'primary'
       case FileStatusPhase.FAILED:
         return 'danger'
