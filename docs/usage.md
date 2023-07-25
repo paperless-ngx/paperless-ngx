@@ -221,9 +221,18 @@ As of version 1.14.0 Paperless-ngx added core support for user / group permissio
 based around 'global' permissions as well as 'object-level' permissions. Global permissions designate
 which parts of the application a user can access (e.g. Documents, Tags, Settings) and object-level
 determine which objects are visible or editable. All objects have an 'owner' and 'view' and 'edit'
-permissions which can be granted to other users or groups.
+permissions which can be granted to other users or groups. The paperless-ngx permissions system uses
+the built-in user model of the backend framework, Django.
 
-Permissions uses the built-in user model of the backend framework, Django.
+!!! tip
+
+    Object-level permissions only apply to the object itself. In other words, setting permissions
+    for a Tag will _not_ affect the permissions of documents that have the Tag.
+
+Permissions can be set using the new "Permissions" tab when editing documents, or bulk-applied
+in the UI by selecting documents and choosing the "Permissions" button. Owner can also optionally
+be set for documents uploaded via the API. Documents consumed via the consumption dir currently
+do not have an owner set.
 
 !!! note
 
@@ -237,11 +246,6 @@ Permissions uses the built-in user model of the backend framework, Django.
     would usually have been setup during installation) to ensure you have full permissions.
 
     Note that superusers have access to all objects.
-
-Permissions can be set using the new "Permissions" tab when editing documents, or bulk-applied
-in the UI by selecting documents and choosing the "Permissions" button. Owner can also optionally
-be set for documents uploaded via the API. Documents consumed via the consumption dir currently
-do not have an owner set.
 
 ### Users and Groups
 
