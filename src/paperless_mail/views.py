@@ -7,6 +7,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
+from documents.filters import ObjectOwnedOrGrantedPermissionsFilter
+from documents.permissions import PaperlessObjectPermissions
 from documents.views import PassUserMixin
 from paperless.views import StandardPagination
 from paperless_mail.mail import MailError
@@ -24,7 +26,8 @@ class MailAccountViewSet(ModelViewSet, PassUserMixin):
     queryset = MailAccount.objects.all().order_by("pk")
     serializer_class = MailAccountSerializer
     pagination_class = StandardPagination
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    filter_backends = (ObjectOwnedOrGrantedPermissionsFilter,)
 
 
 class MailRuleViewSet(ModelViewSet, PassUserMixin):
@@ -33,7 +36,8 @@ class MailRuleViewSet(ModelViewSet, PassUserMixin):
     queryset = MailRule.objects.all().order_by("order")
     serializer_class = MailRuleSerializer
     pagination_class = StandardPagination
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    filter_backends = (ObjectOwnedOrGrantedPermissionsFilter,)
 
 
 class MailAccountTestView(GenericAPIView):
