@@ -705,7 +705,7 @@ class Metadata(models.Model):
         Document,
         blank=True,
         null=True,
-        related_name="document",
+        related_name="metadatas",
         on_delete=models.CASCADE,
         verbose_name=_("document"),
     )
