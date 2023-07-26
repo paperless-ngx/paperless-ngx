@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
+from guardian.admin import GuardedModelAdmin
 
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
@@ -31,7 +32,7 @@ class MailAccountAdminForm(forms.ModelForm):
         ]
 
 
-class MailAccountAdmin(admin.ModelAdmin):
+class MailAccountAdmin(GuardedModelAdmin):
     list_display = ("name", "imap_server", "username")
 
     fieldsets = [
@@ -45,7 +46,7 @@ class MailAccountAdmin(admin.ModelAdmin):
     form = MailAccountAdminForm
 
 
-class MailRuleAdmin(admin.ModelAdmin):
+class MailRuleAdmin(GuardedModelAdmin):
     radio_fields = {
         "attachment_type": admin.VERTICAL,
         "action": admin.VERTICAL,
