@@ -1,220 +1,489 @@
 <app-page-header [(title)]="title">
-    <div class="input-group input-group-sm me-5 d-none d-md-flex" *ngIf="getContentType() === 'application/pdf' && !useNativePdfViewer">
-      <div class="input-group-text" i18n>Page</div>
-      <input class="form-control flex-grow-0 w-auto" type="number" min="1" [max]="previewNumPages" [(ngModel)]="previewCurrentPage" />
-      <div class="input-group-text" i18n>of {{previewNumPages}}</div>
+  <div
+    class="input-group input-group-sm me-5 d-none d-md-flex"
+    *ngIf="getContentType() === 'application/pdf' && !useNativePdfViewer"
+  >
+    <div class="input-group-text" i18n>Page</div>
+    <input
+      class="form-control flex-grow-0 w-auto"
+      type="number"
+      min="1"
+      [max]="previewNumPages"
+      [(ngModel)]="previewCurrentPage"
+    />
+    <div class="input-group-text" i18n>of {{ previewNumPages }}</div>
+  </div>
+
+  <button
+    type="button"
+    class="btn btn-sm btn-outline-danger me-2 ms-auto"
+    (click)="delete()"
+    [disabled]="!userIsOwner"
+  >
+    <svg class="buttonicon" fill="currentColor">
+      <use xlink:href="assets/bootstrap-icons.svg#trash" /></svg
+    ><span class="d-none d-lg-inline ps-1" i18n>Delete</span>
+  </button>
+
+  <div class="btn-group me-2">
+    <a [href]="downloadUrl" class="btn btn-sm btn-outline-primary">
+      <svg class="buttonicon" fill="currentColor">
+        <use xlink:href="assets/bootstrap-icons.svg#download" /></svg
+      ><span class="d-none d-lg-inline ps-1" i18n>Download</span>
+    </a>
+
+    <div
+      class="btn-group"
+      ngbDropdown
+      role="group"
+      *ngIf="metadata?.has_archive_version"
+    >
+      <button
+        class="btn btn-sm btn-outline-primary dropdown-toggle"
+        ngbDropdownToggle
+      ></button>
+      <div class="dropdown-menu shadow" ngbDropdownMenu>
+        <a ngbDropdownItem [href]="downloadOriginalUrl" i18n
+          >Download original</a
+        >
+      </div>
     </div>
+  </div>
 
-    <button type="button" class="btn btn-sm btn-outline-danger me-2 ms-auto" (click)="delete()" [disabled]="!userIsOwner">
-        <svg class="buttonicon" fill="currentColor">
-            <use xlink:href="assets/bootstrap-icons.svg#trash" />
-        </svg><span class="d-none d-lg-inline ps-1" i18n>Delete</span>
+  <button
+    type="button"
+    class="btn btn-sm btn-outline-primary me-2"
+    (click)="redoOcr()"
+    [disabled]="!userCanEdit"
+  >
+    <svg class="buttonicon" fill="currentColor">
+      <use
+        xlink:href="assets/bootstrap-icons.svg#arrow-counterclockwise"
+      /></svg
+    ><span class="d-none d-lg-inline ps-1" i18n>Redo OCR</span>
+  </button>
+
+  <button
+    type="button"
+    class="btn btn-sm btn-outline-primary me-2"
+    (click)="moreLike()"
+  >
+    <svg class="buttonicon" fill="currentColor">
+      <use xlink:href="assets/bootstrap-icons.svg#diagram-3" /></svg
+    ><span class="d-none d-lg-inline ps-1" i18n>More like this</span>
+  </button>
+
+  <button
+    type="button"
+    class="btn btn-sm btn-outline-primary me-2"
+    i18n-title
+    title="Close"
+    (click)="close()"
+  >
+    <svg class="buttonicon" fill="currentColor">
+      <use xlink:href="assets/bootstrap-icons.svg#x" />
+    </svg>
+  </button>
+
+  <div class="button-group">
+    <button
+      type="button"
+      class="btn btn-sm btn-outline-primary me-2"
+      i18n-title
+      title="Previous"
+      (click)="previousDoc()"
+      [disabled]="!hasPrevious()"
+    >
+      <svg class="buttonicon" fill="currentColor">
+        <use xlink:href="assets/bootstrap-icons.svg#arrow-left" />
+      </svg>
     </button>
-
-    <div class="btn-group me-2">
-
-        <a [href]="downloadUrl" class="btn btn-sm btn-outline-primary">
-            <svg class="buttonicon" fill="currentColor">
-                <use xlink:href="assets/bootstrap-icons.svg#download" />
-            </svg><span class="d-none d-lg-inline ps-1" i18n>Download</span>
-        </a>
-
-        <div class="btn-group" ngbDropdown role="group" *ngIf="metadata?.has_archive_version">
-            <button class="btn btn-sm btn-outline-primary dropdown-toggle" ngbDropdownToggle></button>
-            <div class="dropdown-menu shadow" ngbDropdownMenu>
-                <a ngbDropdownItem [href]="downloadOriginalUrl" i18n>Download original</a>
-            </div>
-        </div>
-
-    </div>
-
-    <button type="button" class="btn btn-sm btn-outline-primary me-2" (click)="redoOcr()" [disabled]="!userCanEdit">
-        <svg class="buttonicon" fill="currentColor">
-            <use xlink:href="assets/bootstrap-icons.svg#arrow-counterclockwise" />
-        </svg><span class="d-none d-lg-inline ps-1" i18n>Redo OCR</span>
+    <button
+      type="button"
+      class="btn btn-sm btn-outline-primary"
+      i18n-title
+      title="Next"
+      (click)="nextDoc()"
+      [disabled]="!hasNext()"
+    >
+      <svg class="buttonicon" fill="currentColor">
+        <use xlink:href="assets/bootstrap-icons.svg#arrow-right" />
+      </svg>
     </button>
-
-    <button type="button" class="btn btn-sm btn-outline-primary me-2" (click)="moreLike()">
-        <svg class="buttonicon" fill="currentColor">
-            <use xlink:href="assets/bootstrap-icons.svg#diagram-3" />
-        </svg><span class="d-none d-lg-inline ps-1" i18n>More like this</span>
-    </button>
-
-    <button type="button" class="btn btn-sm btn-outline-primary me-2" i18n-title title="Close" (click)="close()">
-        <svg class="buttonicon" fill="currentColor">
-            <use xlink:href="assets/bootstrap-icons.svg#x" />
-        </svg>
-    </button>
-
-    <div class="button-group">
-        <button type="button" class="btn btn-sm btn-outline-primary me-2" i18n-title title="Previous" (click)="previousDoc()" [disabled]="!hasPrevious()">
-            <svg class="buttonicon" fill="currentColor">
-                <use xlink:href="assets/bootstrap-icons.svg#arrow-left" />
-            </svg>
-        </button>
-        <button type="button" class="btn btn-sm btn-outline-primary"  i18n-title title="Next" (click)="nextDoc()" [disabled]="!hasNext()">
-            <svg class="buttonicon" fill="currentColor">
-                <use xlink:href="assets/bootstrap-icons.svg#arrow-right" />
-            </svg>
-        </button>
-    </div>
-
+  </div>
 </app-page-header>
 
-
 <div class="row">
-    <div class="col-md-6 col-xl-4 mb-4">
+  <div class="col-md-6 col-xl-4 mb-4">
+    <form [formGroup]="documentForm" (ngSubmit)="save()">
+      <ul
+        ngbNav
+        #nav="ngbNav"
+        class="nav-tabs"
+        (navChange)="onNavChange($event)"
+        [(activeId)]="activeNavID"
+      >
+        <li [ngbNavItem]="DocumentDetailNavIDs.Details">
+          <a ngbNavLink i18n>Details</a>
+          <ng-template ngbNavContent>
+            <app-input-text
+              #inputTitle
+              i18n-title
+              title="Title"
+              formControlName="title"
+              (keyup)="titleKeyUp($event)"
+              [error]="error?.title"
+            ></app-input-text>
+            <app-input-number
+              i18n-title
+              title="Archive serial number"
+              [error]="error?.archive_serial_number"
+              formControlName="archive_serial_number"
+            ></app-input-number>
+            <app-input-date
+              i18n-title
+              title="Date created"
+              formControlName="created_date"
+              [suggestions]="suggestions?.dates"
+              [error]="error?.created_date"
+            ></app-input-date>
+            <app-input-select
+              [items]="correspondents"
+              i18n-title
+              title="Correspondent"
+              formControlName="correspondent"
+              [allowNull]="true"
+              (createNew)="createCorrespondent($event)"
+              [suggestions]="suggestions?.correspondents"
+              *appIfPermissions="{
+                action: PermissionAction.View,
+                type: PermissionType.Correspondent
+              }"
+            ></app-input-select>
 
-        <form [formGroup]='documentForm' (ngSubmit)="save()">
+            <app-input-select
+              [items]="documentTypes"
+              i18n-title
+              title="Document type"
+              formControlName="document_type"
+              [allowNull]="true"
+              (createNew)="createDocumentType($event)"
+              [suggestions]="suggestions?.document_types"
+              *appIfPermissions="{
+                action: PermissionAction.View,
+                type: PermissionType.DocumentType
+              }"
+            ></app-input-select>
 
-            <ul ngbNav #nav="ngbNav" class="nav-tabs" (navChange)="onNavChange($event)" [(activeId)]="activeNavID">
-                <li [ngbNavItem]="DocumentDetailNavIDs.Details">
-                    <a ngbNavLink i18n>Details</a>
-                    <ng-template ngbNavContent>
-
-                        <app-input-text #inputTitle i18n-title title="Title" formControlName="title" (keyup)="titleKeyUp($event)" [error]="error?.title"></app-input-text>
-                        <app-input-number i18n-title title="Archive serial number" [error]="error?.archive_serial_number" formControlName='archive_serial_number'></app-input-number>
-                        <app-input-date i18n-title title="Date created" formControlName="created_date" [suggestions]="suggestions?.dates"
-                            [error]="error?.created_date"></app-input-date>
-                        <app-input-select [items]="correspondents" i18n-title title="Correspondent" formControlName="correspondent" [allowNull]="true"
-                            (createNew)="createCorrespondent($event)" [suggestions]="suggestions?.correspondents" *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.Correspondent }"></app-input-select>
-                        <app-input-select [items]="documentTypes" i18n-title title="Document type" formControlName="document_type" [allowNull]="true"
-                            (createNew)="createDocumentType($event)" [suggestions]="suggestions?.document_types" *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.DocumentType }"></app-input-select>
-                        <app-input-select [items]="storagePaths" i18n-title title="Storage path" formControlName="storage_path" [allowNull]="true"
-                            (createNew)="createStoragePath($event)" [suggestions]="suggestions?.storage_paths" i18n-placeholder placeholder="Default" *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.StoragePath }"></app-input-select>
-                        <app-input-tags formControlName="tags" [suggestions]="suggestions?.tags" *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.Tag }"></app-input-tags>
-
-                    </ng-template>
-                </li>
-
-                <li [ngbNavItem]="DocumentDetailNavIDs.Content">
-                    <a ngbNavLink i18n>Content</a>
-                    <ng-template ngbNavContent>
-                        <div class="mb-3">
-                            <textarea class="form-control" id="content" rows="20" formControlName='content' [class.rtl]="isRTL"></textarea>
-                        </div>
-                    </ng-template>
-                </li>
-
-                <li [ngbNavItem]="DocumentDetailNavIDs.Metadata">
-                    <a ngbNavLink i18n>Metadata</a>
-                    <ng-template ngbNavContent>
-
-                        <table class="table table-borderless">
-                            <tbody>
-                                <tr>
-                                    <td i18n>Date modified</td>
-                                    <td>{{document.modified | customDate}}</td>
-                                </tr>
-                                <tr>
-                                    <td i18n>Date added</td>
-                                    <td>{{document.added | customDate}}</td>
-                                </tr>
-                                <tr>
-                                    <td i18n>Media filename</td>
-                                    <td>{{metadata?.media_filename}}</td>
-                                </tr>
-                                <tr>
-                                    <td i18n>Original filename</td>
-                                    <td>{{metadata?.original_filename}}</td>
-                                </tr>
-                                <tr>
-                                    <td i18n>Original MD5 checksum</td>
-                                    <td>{{metadata?.original_checksum}}</td>
-                                </tr>
-                                <tr>
-                                    <td i18n>Original file size</td>
-                                    <td>{{metadata?.original_size | fileSize}}</td>
-                                </tr>
-                                <tr>
-                                    <td i18n>Original mime type</td>
-                                    <td>{{metadata?.original_mime_type}}</td>
-                                </tr>
-                                <tr *ngIf="metadata?.has_archive_version">
-                                    <td i18n>Archive MD5 checksum</td>
-                                    <td>{{metadata?.archive_checksum}}</td>
-                                </tr>
-                                <tr *ngIf="metadata?.has_archive_version">
-                                    <td i18n>Archive file size</td>
-                                    <td>{{metadata?.archive_size | fileSize}}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-
-                        <app-metadata-collapse i18n-title title="Original document metadata" [metadata]="metadata.original_metadata" *ngIf="metadata?.original_metadata?.length > 0"></app-metadata-collapse>
-                        <app-metadata-collapse i18n-title title="Archived document metadata" [metadata]="metadata.archive_metadata" *ngIf="metadata?.archive_metadata?.length > 0"></app-metadata-collapse>
-
-                    </ng-template>
-                </li>
-
-                <li [ngbNavItem]="DocumentDetailNavIDs.Preview" class="d-md-none">
-                    <a ngbNavLink i18n>Preview</a>
-                    <ng-template ngbNavContent *ngIf="!pdfPreview.offsetParent">
-                        <div class="position-relative">
-                            <ng-container *ngIf="getContentType() === 'application/pdf'">
-                                <div class="preview-sticky pdf-viewer-container" *ngIf="!useNativePdfViewer ; else nativePdfViewer">
-                                    <pdf-viewer [src]="{ url: previewUrl, password: password }" [original-size]="false" [show-borders]="true" [show-all]="true" [(page)]="previewCurrentPage" [render-text-mode]="2" (error)="onError($event)" (after-load-complete)="pdfPreviewLoaded($event)"></pdf-viewer>
-                                </div>
-                                <ng-template #nativePdfViewer>
-                                    <object [data]="previewUrl | safeUrl" class="preview-sticky" width="100%"></object>
-                                </ng-template>
-                            </ng-container>
-                            <ng-container *ngIf="getContentType() === 'text/plain'">
-                                <object [data]="previewUrl | safeUrl" type="text/plain" class="preview-sticky bg-white" width="100%"></object>
-                            </ng-container>
-                            <div *ngIf="requiresPassword" class="password-prompt">
-                                <form>
-                                    <input autocomplete="" class="form-control" i18n-placeholder placeholder="Enter Password" type="password" (keyup)="onPasswordKeyUp($event)" />
-                                </form>
-                            </div>
-                        </div>
-                    </ng-template>
-                </li>
-
-                <li [ngbNavItem]="DocumentDetailNavIDs.Notes" *ngIf="notesEnabled">
-                    <a ngbNavLink i18n>Notes <span *ngIf="document?.notes.length" class="badge text-bg-secondary ms-1">{{document.notes.length}}</span></a>
-                    <ng-template ngbNavContent>
-                        <app-document-notes [documentId]="documentId" [notes]="document?.notes" (updated)="notesUpdated($event)"></app-document-notes>
-                    </ng-template>
-                </li>
-
-                <li [ngbNavItem]="DocumentDetailNavIDs.Permissions" *appIfOwner="document">
-                    <a ngbNavLink i18n>Permissions</a>
-                    <ng-template ngbNavContent>
-                        <div class="mb-3">
-                            <app-permissions-form [users]="users" formControlName="permissions_form"></app-permissions-form>
-                        </div>
-                    </ng-template>
-                </li>
-            </ul>
-
-            <div [ngbNavOutlet]="nav" class="mt-2"></div>
-
-            <ng-container>
-                <button type="button" class="btn btn-outline-secondary" (click)="discard()" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Discard</button>&nbsp;
-                <button type="button" class="btn btn-outline-primary" (click)="saveEditNext()" *ngIf="hasNext()" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Save & next</button>&nbsp;
-                <button type="submit" class="btn btn-primary" *appIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Save</button>&nbsp;
-            </ng-container>
-        </form>
-    </div>
-
-    <div class="col-md-6 col-xl-8 mb-3 d-none d-md-block position-relative" #pdfPreview>
-        <ng-container *ngIf="getContentType() === 'application/pdf'">
-            <div class="preview-sticky pdf-viewer-container" *ngIf="!useNativePdfViewer ; else nativePdfViewer">
-                <pdf-viewer [src]="{ url: previewUrl, password: password }" [original-size]="false" [show-borders]="true" [show-all]="true" [(page)]="previewCurrentPage" [render-text-mode]="2" (error)="onError($event)" (after-load-complete)="pdfPreviewLoaded($event)"></pdf-viewer>
+            <div class="mb-4">
+              <div formArrayName="metadata">
+                <div
+                  *ngFor="
+                    let indexField of indexFields;
+                    let i = index;
+                    trackBy: trackIndexField
+                  "
+                  [formGroupName]="i"
+                >
+                  <div style="display: flex">
+                    <div
+                      class="mx-4"
+                      style="
+                        display: flex;
+                        justify-content: flex-end;
+                        align-items: center;
+                      "
+                    >
+                      <label>{{ indexField.name }}</label>
+                    </div>
+                    <div style="flex-grow: 1">
+                      <input
+                        class="form-control flex-grow-0 w-full"
+                        type="text"
+                        formControlName="value"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <ng-template #nativePdfViewer>
-                <object [data]="previewUrl | safeUrl" class="preview-sticky" width="100%"></object>
-            </ng-template>
-        </ng-container>
-        <ng-container *ngIf="getContentType() === 'text/plain'">
-            <div [innerHTML]="previewHtml | safeHtml" class="preview-sticky bg-light p-3" width="100%"></div>
-        </ng-container>
-        <div *ngIf="requiresPassword" class="password-prompt">
-            <form>
-                <input autocomplete="" class="form-control" i18n-placeholder placeholder="Enter Password" type="password" (keyup)="onPasswordKeyUp($event)" />
-            </form>
-        </div>
-    </div>
 
+            <app-input-select
+              [items]="storagePaths"
+              i18n-title
+              title="Storage path"
+              formControlName="storage_path"
+              [allowNull]="true"
+              (createNew)="createStoragePath($event)"
+              [suggestions]="suggestions?.storage_paths"
+              i18n-placeholder
+              placeholder="Default"
+              *appIfPermissions="{
+                action: PermissionAction.View,
+                type: PermissionType.StoragePath
+              }"
+            ></app-input-select>
+            <app-input-tags
+              formControlName="tags"
+              [suggestions]="suggestions?.tags"
+              *appIfPermissions="{
+                action: PermissionAction.View,
+                type: PermissionType.Tag
+              }"
+            ></app-input-tags>
+          </ng-template>
+        </li>
+
+        <li [ngbNavItem]="DocumentDetailNavIDs.Content">
+          <a ngbNavLink i18n>Content</a>
+          <ng-template ngbNavContent>
+            <div class="mb-3">
+              <textarea
+                class="form-control"
+                id="content"
+                rows="20"
+                formControlName="content"
+                [class.rtl]="isRTL"
+              ></textarea>
+            </div>
+          </ng-template>
+        </li>
+
+        <li [ngbNavItem]="DocumentDetailNavIDs.Metadata">
+          <a ngbNavLink i18n>Metadata</a>
+          <ng-template ngbNavContent>
+            <table class="table table-borderless">
+              <tbody>
+                <tr>
+                  <td i18n>Date modified</td>
+                  <td>{{ document.modified | customDate }}</td>
+                </tr>
+                <tr>
+                  <td i18n>Date added</td>
+                  <td>{{ document.added | customDate }}</td>
+                </tr>
+                <tr>
+                  <td i18n>Media filename</td>
+                  <td>{{ metadata?.media_filename }}</td>
+                </tr>
+                <tr>
+                  <td i18n>Original filename</td>
+                  <td>{{ metadata?.original_filename }}</td>
+                </tr>
+                <tr>
+                  <td i18n>Original MD5 checksum</td>
+                  <td>{{ metadata?.original_checksum }}</td>
+                </tr>
+                <tr>
+                  <td i18n>Original file size</td>
+                  <td>{{ metadata?.original_size | fileSize }}</td>
+                </tr>
+                <tr>
+                  <td i18n>Original mime type</td>
+                  <td>{{ metadata?.original_mime_type }}</td>
+                </tr>
+                <tr *ngIf="metadata?.has_archive_version">
+                  <td i18n>Archive MD5 checksum</td>
+                  <td>{{ metadata?.archive_checksum }}</td>
+                </tr>
+                <tr *ngIf="metadata?.has_archive_version">
+                  <td i18n>Archive file size</td>
+                  <td>{{ metadata?.archive_size | fileSize }}</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <app-metadata-collapse
+              i18n-title
+              title="Original document metadata"
+              [metadata]="metadata.original_metadata"
+              *ngIf="metadata?.original_metadata?.length > 0"
+            ></app-metadata-collapse>
+            <app-metadata-collapse
+              i18n-title
+              title="Archived document metadata"
+              [metadata]="metadata.archive_metadata"
+              *ngIf="metadata?.archive_metadata?.length > 0"
+            ></app-metadata-collapse>
+          </ng-template>
+        </li>
+
+        <li [ngbNavItem]="DocumentDetailNavIDs.Preview" class="d-md-none">
+          <a ngbNavLink i18n>Preview</a>
+          <ng-template ngbNavContent *ngIf="!pdfPreview.offsetParent">
+            <div class="position-relative">
+              <ng-container *ngIf="getContentType() === 'application/pdf'">
+                <div
+                  class="preview-sticky pdf-viewer-container"
+                  *ngIf="!useNativePdfViewer; else nativePdfViewer"
+                >
+                  <pdf-viewer
+                    [src]="{ url: previewUrl, password: password }"
+                    [original-size]="false"
+                    [show-borders]="true"
+                    [show-all]="true"
+                    [(page)]="previewCurrentPage"
+                    [render-text-mode]="2"
+                    (error)="onError($event)"
+                    (after-load-complete)="pdfPreviewLoaded($event)"
+                  ></pdf-viewer>
+                </div>
+                <ng-template #nativePdfViewer>
+                  <object
+                    [data]="previewUrl | safeUrl"
+                    class="preview-sticky"
+                    width="100%"
+                  ></object>
+                </ng-template>
+              </ng-container>
+              <ng-container *ngIf="getContentType() === 'text/plain'">
+                <object
+                  [data]="previewUrl | safeUrl"
+                  type="text/plain"
+                  class="preview-sticky bg-white"
+                  width="100%"
+                ></object>
+              </ng-container>
+              <div *ngIf="requiresPassword" class="password-prompt">
+                <form>
+                  <input
+                    autocomplete=""
+                    class="form-control"
+                    i18n-placeholder
+                    placeholder="Enter Password"
+                    type="password"
+                    (keyup)="onPasswordKeyUp($event)"
+                  />
+                </form>
+              </div>
+            </div>
+          </ng-template>
+        </li>
+
+        <li [ngbNavItem]="DocumentDetailNavIDs.Notes" *ngIf="notesEnabled">
+          <a ngbNavLink i18n
+            >Notes
+            <span
+              *ngIf="document?.notes.length"
+              class="badge text-bg-secondary ms-1"
+              >{{ document.notes.length }}</span
+            ></a
+          >
+          <ng-template ngbNavContent>
+            <app-document-notes
+              [documentId]="documentId"
+              [notes]="document?.notes"
+              (updated)="notesUpdated($event)"
+            ></app-document-notes>
+          </ng-template>
+        </li>
+
+        <li
+          [ngbNavItem]="DocumentDetailNavIDs.Permissions"
+          *appIfOwner="document"
+        >
+          <a ngbNavLink i18n>Permissions</a>
+          <ng-template ngbNavContent>
+            <div class="mb-3">
+              <app-permissions-form
+                [users]="users"
+                formControlName="permissions_form"
+              ></app-permissions-form>
+            </div>
+          </ng-template>
+        </li>
+      </ul>
+
+      <div [ngbNavOutlet]="nav" class="mt-2"></div>
+
+      <ng-container>
+        <button
+          type="button"
+          class="btn btn-outline-secondary"
+          (click)="discard()"
+          i18n
+          [disabled]="
+            !userCanEdit || networkActive || (isDirty$ | async) !== true
+          "
+        >
+          Discard</button
+        >&nbsp;
+        <button
+          type="button"
+          class="btn btn-outline-primary"
+          (click)="saveEditNext()"
+          *ngIf="hasNext()"
+          i18n
+          [disabled]="
+            !userCanEdit || networkActive || (isDirty$ | async) !== true
+          "
+        >
+          Save & next</button
+        >&nbsp;
+        <button
+          type="submit"
+          class="btn btn-primary"
+          *appIfPermissions="{
+            action: PermissionAction.Change,
+            type: PermissionType.Document
+          }"
+          i18n
+          [disabled]="
+            !userCanEdit || networkActive || (isDirty$ | async) !== true
+          "
+        >
+          Save</button
+        >&nbsp;
+      </ng-container>
+    </form>
+  </div>
+
+  <div
+    class="col-md-6 col-xl-8 mb-3 d-none d-md-block position-relative"
+    #pdfPreview
+  >
+    <ng-container *ngIf="getContentType() === 'application/pdf'">
+      <div
+        class="preview-sticky pdf-viewer-container"
+        *ngIf="!useNativePdfViewer; else nativePdfViewer"
+      >
+        <pdf-viewer
+          [src]="{ url: previewUrl, password: password }"
+          [original-size]="false"
+          [show-borders]="true"
+          [show-all]="true"
+          [(page)]="previewCurrentPage"
+          [render-text-mode]="2"
+          (error)="onError($event)"
+          (after-load-complete)="pdfPreviewLoaded($event)"
+        ></pdf-viewer>
+      </div>
+      <ng-template #nativePdfViewer>
+        <object
+          [data]="previewUrl | safeUrl"
+          class="preview-sticky"
+          width="100%"
+        ></object>
+      </ng-template>
+    </ng-container>
+    <ng-container *ngIf="getContentType() === 'text/plain'">
+      <div
+        [innerHTML]="previewHtml | safeHtml"
+        class="preview-sticky bg-light p-3"
+        width="100%"
+      ></div>
+    </ng-container>
+    <div *ngIf="requiresPassword" class="password-prompt">
+      <form>
+        <input
+          autocomplete=""
+          class="form-control"
+          i18n-placeholder
+          placeholder="Enter Password"
+          type="password"
+          (keyup)="onPasswordKeyUp($event)"
+        />
+      </form>
+    </div>
+  </div>
 </div>

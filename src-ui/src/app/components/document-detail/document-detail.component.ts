@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core'
-import { FormControl, FormGroup } from '@angular/forms'
+import { FormArray, FormControl, FormGroup } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { NgbModal, NgbNav, NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap'
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent'
@@ -20,7 +20,13 @@ import { ToastService } from 'src/app/services/toast.service'
 import { TextComponent } from '../common/input/text/text.component'
 import { SettingsService } from 'src/app/services/settings.service'
 import { dirtyCheck, DirtyComponent } from '@ngneat/dirty-check-forms'
-import { Observable, Subject, BehaviorSubject } from 'rxjs'
+import {
+  Observable,
+  Subject,
+  BehaviorSubject,
+  Subscription,
+  combineLatest,
+} from 'rxjs'
 import {
   first,
   takeUntil,
@@ -28,6 +34,8 @@ import {
   map,
   debounceTime,
   distinctUntilChanged,
+  startWith,
+  filter,
 } from 'rxjs/operators'
 import { PaperlessDocumentSuggestions } from 'src/app/data/paperless-document-suggestions'
 import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type'
@@ -99,6 +107,7 @@ export class DocumentDetailComponent
     archive_serial_number: new FormControl(),
     tags: new FormControl([]),
     permissions_form: new FormControl(null),
+    metadata: new FormArray([]),
   })
 
   previewCurrentPage: number = 1
@@ -131,6 +140,9 @@ export class DocumentDetailComponent
   PermissionType = PermissionType
   DocumentDetailNavIDs = DocumentDetailNavIDs
   activeNavID: number
+
+  documentTypesSub$ = new Subject<PaperlessDocumentType[]>()
+  documentTypeFieldSub$: Subscription
 
   constructor(
     private documentsService: DocumentService,
@@ -171,6 +183,14 @@ export class DocumentDetailComponent
     }
   }
 
+  get indexFields() {
+    return this.documentForm.value?.metadata ?? []
+  }
+
+  trackIndexField(_: number, indexField: any) {
+    return indexField.id
+  }
+
   ngOnInit(): void {
     this.documentForm.valueChanges
       .pipe(takeUntil(this.unsubscribeNotifier))
@@ -193,7 +213,10 @@ export class DocumentDetailComponent
     this.documentTypeService
       .listAll()
       .pipe(first())
-      .subscribe((result) => (this.documentTypes = result.results))
+      .subscribe((result) => {
+        this.documentTypes = result.results
+        this.documentTypesSub$.next(result.results)
+      })
 
     this.storagePathService
       .listAll()
@@ -288,6 +311,30 @@ export class DocumentDetailComponent
             },
           })
 
+          this.documentTypeFieldSub$ = combineLatest([
+            this.store.pipe(
+              startWith(null),
+              map((s) => s?.document_type)
+            ),
+            this.documentTypesSub$.asObservable().pipe(
+              startWith(this.documentTypes ?? []),
+              filter((dts) => dts.length > 0)
+            ),
+          ]).subscribe(([documentTypeId, documentTypes]) => {
+            const metadata = this.documentForm.get('metadata') as FormArray
+            const documentType = documentTypes.find(
+              (dt) => dt.id === documentTypeId
+            )
+            metadata.push(
+              new FormGroup({
+                id: new FormControl(documentType.id),
+                name: new FormControl(documentType.name ?? ''),
+                displayName: new FormControl(''),
+                value: new FormControl(''),
+              })
+            )
+          })
+
           this.isDirty$ = dirtyCheck(
             this.documentForm,
             this.store.asObservable()
@@ -324,6 +371,8 @@ export class DocumentDetailComponent
   ngOnDestroy(): void {
     this.unsubscribeNotifier.next(this)
     this.unsubscribeNotifier.complete()
+    this.documentTypesSub$.unsubscribe()
+    this.documentTypeFieldSub$.unsubscribe()
   }
 
   onNavChange(navChangeEvent: NgbNavChangeEvent) {

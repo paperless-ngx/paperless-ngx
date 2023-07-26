@@ -42,7 +42,7 @@ export class DocumentTypeEditDialogComponent
   }
 
   get indexFields() {
-    return this.objectForm.value.default_metadata ?? []
+    return this.objectForm.value?.default_metadata ?? []
   }
 
   trackIndexField(_: number, indexField: any) {
