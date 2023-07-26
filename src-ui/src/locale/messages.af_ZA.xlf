@@ -807,7 +807,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">594</context>
+          <context context-type="linenumber">597</context>
         </context-group>
         <target state="translated">Fout by die bewaar van instellings.</target>
       </trans-unit>
@@ -3200,19 +3200,19 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">694</context>
+          <context context-type="linenumber">708</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">754</context>
+          <context context-type="linenumber">768</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">821</context>
+          <context context-type="linenumber">835</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">884</context>
+          <context context-type="linenumber">898</context>
         </context-group>
         <target state="translated">Dit kan nie ontdaan word nie.</target>
       </trans-unit>
@@ -3228,19 +3228,19 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">696</context>
+          <context context-type="linenumber">710</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">756</context>
+          <context context-type="linenumber">770</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">823</context>
+          <context context-type="linenumber">837</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">886</context>
+          <context context-type="linenumber">900</context>
         </context-group>
         <target state="translated">Gaan voort</target>
       </trans-unit>
@@ -4946,7 +4946,7 @@
         <source>Saved view &quot;<x id="PH" equiv-text="savedView.name"/>&quot; deleted.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">476</context>
+          <context context-type="linenumber">479</context>
         </context-group>
         <target state="translated">Bewaarde aansig "<x id="PH" equiv-text="savedView.name"/>" is geskrap.</target>
       </trans-unit>
@@ -4954,7 +4954,7 @@
         <source>Settings saved</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">578</context>
+          <context context-type="linenumber">581</context>
         </context-group>
         <target state="translated">Instellings bewaar</target>
       </trans-unit>
@@ -4962,7 +4962,7 @@
         <source>Settings were saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">579</context>
+          <context context-type="linenumber">582</context>
         </context-group>
         <target state="translated">Instellings is suksesvol bewaar.</target>
       </trans-unit>
@@ -4970,7 +4970,7 @@
         <source>Settings were saved successfully. Reload is required to apply some changes.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">583</context>
+          <context context-type="linenumber">586</context>
         </context-group>
         <target state="translated">Instellings is suksesvol bewaar. Moet herlaai word om sommige veranderinge toe te pas.</target>
       </trans-unit>
@@ -4978,7 +4978,7 @@
         <source>Reload now</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">584</context>
+          <context context-type="linenumber">587</context>
         </context-group>
         <target state="translated">Herlaai nou</target>
       </trans-unit>
@@ -4986,7 +4986,7 @@
         <source>Use system language</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">603</context>
+          <context context-type="linenumber">606</context>
         </context-group>
         <target state="translated">Gebruik stelseltaal</target>
       </trans-unit>
@@ -4994,7 +4994,7 @@
         <source>Use date format of display language</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">610</context>
+          <context context-type="linenumber">613</context>
         </context-group>
         <target state="translated">Gebruik datumformaat van aansigtaal</target>
       </trans-unit>
@@ -5002,7 +5002,7 @@
         <source>Error while storing settings on server.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">630</context>
+          <context context-type="linenumber">633</context>
         </context-group>
         <target state="translated">Fout toe instellings op bediener bewaar is.</target>
       </trans-unit>
@@ -5010,7 +5010,7 @@
         <source>Password has been changed, you will be logged out momentarily.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">662</context>
+          <context context-type="linenumber">676</context>
         </context-group>
         <target state="translated">Wagwoord is verander, u sal vir nn oomblik afgeteken word.</target>
       </trans-unit>
@@ -5018,7 +5018,7 @@
         <source>Saved user &quot;<x id="PH" equiv-text="newUser.username"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">669</context>
+          <context context-type="linenumber">683</context>
         </context-group>
         <target state="translated">Gebruiker “<x id="PH" equiv-text="newUser.username"/>” is bewaar.</target>
       </trans-unit>
@@ -5026,7 +5026,7 @@
         <source>Error saving user.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">681</context>
+          <context context-type="linenumber">695</context>
         </context-group>
         <target state="translated">Fout by bewaar van gebruiker.</target>
       </trans-unit>
@@ -5034,7 +5034,7 @@
         <source>Confirm delete user account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">692</context>
+          <context context-type="linenumber">706</context>
         </context-group>
         <target state="translated">Bevestig skrap van gebruikersrekening</target>
       </trans-unit>
@@ -5042,7 +5042,7 @@
         <source>This operation will permanently delete this user account.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">693</context>
+          <context context-type="linenumber">707</context>
         </context-group>
         <target state="translated">Hierdie bewerking sal hierdie gebruikersrekening permanent skrap.</target>
       </trans-unit>
@@ -5050,7 +5050,7 @@
         <source>Deleted user</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">702</context>
+          <context context-type="linenumber">716</context>
         </context-group>
         <target state="translated">Skrap gebruiker</target>
       </trans-unit>
@@ -5058,7 +5058,7 @@
         <source>Error deleting user.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">710</context>
+          <context context-type="linenumber">724</context>
         </context-group>
         <target state="translated">Fout by skrap van gebruiker.</target>
       </trans-unit>
@@ -5066,7 +5066,7 @@
         <source>Saved group &quot;<x id="PH" equiv-text="newGroup.name"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">731</context>
+          <context context-type="linenumber">745</context>
         </context-group>
         <target state="translated">Groep “<x id="PH" equiv-text="newGroup.name"/>” is bewaar.</target>
       </trans-unit>
@@ -5074,7 +5074,7 @@
         <source>Error saving group.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">741</context>
+          <context context-type="linenumber">755</context>
         </context-group>
         <target state="translated">Fout by bewaar van groep.</target>
       </trans-unit>
@@ -5082,7 +5082,7 @@
         <source>Confirm delete user group</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">752</context>
+          <context context-type="linenumber">766</context>
         </context-group>
         <target state="translated">Bevestig skrap van gebruikersgroep</target>
       </trans-unit>
@@ -5090,7 +5090,7 @@
         <source>This operation will permanently delete this user group.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">753</context>
+          <context context-type="linenumber">767</context>
         </context-group>
         <target state="translated">Hierdie bewerking sal hierdie gebruikersgroep permanent skrap.</target>
       </trans-unit>
@@ -5098,7 +5098,7 @@
         <source>Deleted group</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">762</context>
+          <context context-type="linenumber">776</context>
         </context-group>
         <target state="translated">Geskrapte groep</target>
       </trans-unit>
@@ -5106,7 +5106,7 @@
         <source>Error deleting group.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">770</context>
+          <context context-type="linenumber">784</context>
         </context-group>
         <target state="translated">Fout by skrap van groep.</target>
       </trans-unit>
@@ -5114,7 +5114,7 @@
         <source>Saved account &quot;<x id="PH" equiv-text="newMailAccount.name"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">796</context>
+          <context context-type="linenumber">810</context>
         </context-group>
         <target state="translated">Rekening “<x id="PH" equiv-text="newMailAccount.name"/>” is bewaar.</target>
       </trans-unit>
@@ -5122,7 +5122,7 @@
         <source>Error saving account.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">808</context>
+          <context context-type="linenumber">822</context>
         </context-group>
         <target state="translated">Fout by bewaar van rekening.</target>
       </trans-unit>
@@ -5130,7 +5130,7 @@
         <source>Confirm delete mail account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">819</context>
+          <context context-type="linenumber">833</context>
         </context-group>
         <target state="translated">Bevestig skrap van e-posrekening</target>
       </trans-unit>
@@ -5138,7 +5138,7 @@
         <source>This operation will permanently delete this mail account.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">820</context>
+          <context context-type="linenumber">834</context>
         </context-group>
         <target state="translated">Hierdie bewerking sal hierdie e-posrekening permanent skrap.</target>
       </trans-unit>
@@ -5146,7 +5146,7 @@
         <source>Deleted mail account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">829</context>
+          <context context-type="linenumber">843</context>
         </context-group>
         <target state="translated">Skrap e-posrekening</target>
       </trans-unit>
@@ -5154,7 +5154,7 @@
         <source>Error deleting mail account.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">838</context>
+          <context context-type="linenumber">852</context>
         </context-group>
         <target state="translated">Fout by skrap van e-posrekening.</target>
       </trans-unit>
@@ -5162,7 +5162,7 @@
         <source>Saved rule &quot;<x id="PH" equiv-text="newMailRule.name"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">859</context>
+          <context context-type="linenumber">873</context>
         </context-group>
         <target state="translated">Reël “<x id="PH" equiv-text="newMailRule.name"/>” is bewaar.</target>
       </trans-unit>
@@ -5170,7 +5170,7 @@
         <source>Error saving rule.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">871</context>
+          <context context-type="linenumber">885</context>
         </context-group>
         <target state="translated">Fout by bewaar van reël.</target>
       </trans-unit>
@@ -5178,7 +5178,7 @@
         <source>Confirm delete mail rule</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">882</context>
+          <context context-type="linenumber">896</context>
         </context-group>
         <target state="translated">Bevestig skrap van e-posreël</target>
       </trans-unit>
@@ -5186,7 +5186,7 @@
         <source>This operation will permanently delete this mail rule.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">883</context>
+          <context context-type="linenumber">897</context>
         </context-group>
         <target state="translated">Hierdie bewerking sal hierdie e-posreël permanent skrap.</target>
       </trans-unit>
@@ -5194,7 +5194,7 @@
         <source>Deleted mail rule</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">892</context>
+          <context context-type="linenumber">906</context>
         </context-group>
         <target state="translated">Skrap e-posreël</target>
       </trans-unit>
@@ -5202,7 +5202,7 @@
         <source>Error deleting mail rule.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">901</context>
+          <context context-type="linenumber">915</context>
         </context-group>
         <target state="translated">Fout by skrap van e-posreël.</target>
       </trans-unit>
