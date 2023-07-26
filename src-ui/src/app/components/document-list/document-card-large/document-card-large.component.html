@@ -50,7 +50,7 @@
             </a>
             <a class="btn btn-sm btn-outline-secondary" target="_blank" [href]="previewUrl"
             [ngbPopover]="previewContent" [popoverTitle]="document.title | documentTitle"
-            autoClose="true" popoverClass="shadow" (mouseenter)="mouseEnterPreview()" (mouseleave)="mouseLeavePreview()" #popover="ngbPopover">
+            autoClose="true" popoverClass="shadow popover-preview" (mouseenter)="mouseEnterPreview()" (mouseleave)="mouseLeavePreview()" #popover="ngbPopover">
               <svg class="sidebaricon" fill="currentColor" class="sidebaricon">
                 <use xlink:href="assets/bootstrap-icons.svg#eye"/>
               </svg>&nbsp;<span class="d-none d-md-inline" i18n>View</span>
