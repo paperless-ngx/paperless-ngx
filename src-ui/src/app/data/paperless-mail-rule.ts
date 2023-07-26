@@ -1,4 +1,4 @@
-import { ObjectWithId } from './object-with-id'
+import { ObjectWithPermissions } from './object-with-permissions'
 
 export enum MailFilterAttachmentType {
   Attachments = 1,
@@ -31,7 +31,7 @@ export enum MailMetadataCorrespondentOption {
   FromCustom = 4,
 }
 
-export interface PaperlessMailRule extends ObjectWithId {
+export interface PaperlessMailRule extends ObjectWithPermissions {
   name: string
 
   account: number // PaperlessMailAccount.id

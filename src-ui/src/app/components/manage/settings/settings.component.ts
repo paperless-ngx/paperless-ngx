@@ -45,6 +45,11 @@ import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
 import { MailAccountEditDialogComponent } from '../../common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component'
 import { MailRuleEditDialogComponent } from '../../common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component'
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
+import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
+import {
+  PermissionAction,
+  PermissionsService,
+} from 'src/app/services/permissions.service'
 
 enum SettingsNavIDs {
   General = 1,
@@ -140,7 +145,8 @@ export class SettingsComponent
     private usersService: UserService,
     private groupsService: GroupService,
     private router: Router,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private permissionsService: PermissionsService
   ) {
     super()
     this.settings.settingsSaved.subscribe(() => {
@@ -640,6 +646,17 @@ export class SettingsComponent
 
   clearThemeColor() {
     this.settingsForm.get('themeColor').patchValue('')
+  }
+
+  userCanEdit(obj: ObjectWithPermissions): boolean {
+    return this.permissionsService.currentUserHasObjectPermissions(
+      PermissionAction.Change,
+      obj
+    )
+  }
+
+  userIsOwner(obj: ObjectWithPermissions): boolean {
+    return this.permissionsService.currentUserOwnsObject(obj)
   }
 
   editUser(user: PaperlessUser) {

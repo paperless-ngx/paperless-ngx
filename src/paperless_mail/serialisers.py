@@ -25,7 +25,6 @@ class MailAccountSerializer(OwnedObjectSerializer):
 
     class Meta:
         model = MailAccount
-        depth = 1
         fields = [
             "id",
             "name",
@@ -36,6 +35,10 @@ class MailAccountSerializer(OwnedObjectSerializer):
             "password",
             "character_set",
             "is_token",
+            "owner",
+            "user_can_change",
+            "permissions",
+            "set_permissions",
         ]
 
     def update(self, instance, validated_data):
@@ -67,7 +70,6 @@ class MailRuleSerializer(OwnedObjectSerializer):
 
     class Meta:
         model = MailRule
-        depth = 1
         fields = [
             "id",
             "name",
@@ -89,6 +91,10 @@ class MailRuleSerializer(OwnedObjectSerializer):
             "order",
             "attachment_type",
             "consumption_scope",
+            "owner",
+            "user_can_change",
+            "permissions",
+            "set_permissions",
         ]
 
     def update(self, instance, validated_data):
