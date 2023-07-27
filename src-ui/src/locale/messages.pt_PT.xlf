@@ -807,7 +807,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">597</context>
+          <context context-type="linenumber">600</context>
         </context-group>
         <target state="translated">Ocorreu um erro ao gravar as configurações.</target>
       </trans-unit>
@@ -2219,6 +2219,10 @@
           <context context-type="linenumber">46</context>
         </context-group>
         <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/saved-view-widget/saved-view-widget.component.html</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+        <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
           <context context-type="linenumber">49</context>
         </context-group>
@@ -2535,6 +2539,38 @@
         </context-group>
         <target state="final">Título</target>
       </trans-unit>
+      <trans-unit id="8911158217491828773" datatype="html">
+        <source>View Preview</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/saved-view-widget/saved-view-widget.component.html</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+        <target state="needs-translation">View Preview</target>
+      </trans-unit>
+      <trans-unit id="3099741642167775297" datatype="html" approved="yes">
+        <source>Download</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/saved-view-widget/saved-view-widget.component.html</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
+          <context context-type="linenumber">102</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
+          <context context-type="linenumber">64</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
+          <context context-type="linenumber">99</context>
+        </context-group>
+        <target state="final">Descarregar</target>
+      </trans-unit>
       <trans-unit id="1069523139277190436" datatype="html" approved="yes">
         <source>Statistics</source>
         <context-group purpose="location">
@@ -2737,26 +2773,6 @@
           <context context-type="linenumber">5,6</context>
         </context-group>
         <target state="final">de <x id="INTERPOLATION" equiv-text="{{previewNumPages}}"/></target>
-      </trans-unit>
-      <trans-unit id="3099741642167775297" datatype="html" approved="yes">
-        <source>Download</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">19</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-          <context context-type="linenumber">102</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">64</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">99</context>
-        </context-group>
-        <target state="final">Descarregar</target>
       </trans-unit>
       <trans-unit id="8659635229098859487" datatype="html" approved="yes">
         <source>Download original</source>
@@ -3198,19 +3214,19 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">708</context>
+          <context context-type="linenumber">711</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">768</context>
+          <context context-type="linenumber">771</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">835</context>
+          <context context-type="linenumber">838</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">898</context>
+          <context context-type="linenumber">901</context>
         </context-group>
         <target state="final">Esta operação não pode ser revertida.</target>
       </trans-unit>
@@ -3226,19 +3242,19 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">710</context>
+          <context context-type="linenumber">713</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">770</context>
+          <context context-type="linenumber">773</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">837</context>
+          <context context-type="linenumber">840</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">900</context>
+          <context context-type="linenumber">903</context>
         </context-group>
         <target state="translated">Continuar</target>
       </trans-unit>
@@ -4944,7 +4960,7 @@
         <source>Saved view &quot;<x id="PH" equiv-text="savedView.name"/>&quot; deleted.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">479</context>
+          <context context-type="linenumber">482</context>
         </context-group>
         <target state="final">Visualização "<x id="PH" equiv-text="savedView.name"/>" apagada.</target>
       </trans-unit>
@@ -4952,7 +4968,7 @@
         <source>Settings saved</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">581</context>
+          <context context-type="linenumber">584</context>
         </context-group>
         <target state="translated">Configurações guardadas</target>
       </trans-unit>
@@ -4960,7 +4976,7 @@
         <source>Settings were saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">582</context>
+          <context context-type="linenumber">585</context>
         </context-group>
         <target state="translated">As configurações foram guardadas com sucesso.</target>
       </trans-unit>
@@ -4968,7 +4984,7 @@
         <source>Settings were saved successfully. Reload is required to apply some changes.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">586</context>
+          <context context-type="linenumber">589</context>
         </context-group>
         <target state="translated">Configurações atualizadas com sucesso. O recarregamento da página é necessário para aplicar algumas alterações.</target>
       </trans-unit>
@@ -4976,7 +4992,7 @@
         <source>Reload now</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">587</context>
+          <context context-type="linenumber">590</context>
         </context-group>
         <target state="translated">Recarregar agora</target>
       </trans-unit>
@@ -4984,7 +5000,7 @@
         <source>Use system language</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">606</context>
+          <context context-type="linenumber">609</context>
         </context-group>
         <target state="final">Usar linguagem do sistema</target>
       </trans-unit>
@@ -4992,7 +5008,7 @@
         <source>Use date format of display language</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">613</context>
+          <context context-type="linenumber">616</context>
         </context-group>
         <target state="final">Usar formato de data da linguagem de exibição</target>
       </trans-unit>
@@ -5000,7 +5016,7 @@
         <source>Error while storing settings on server.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">633</context>
+          <context context-type="linenumber">636</context>
         </context-group>
         <target state="translated">Erro ao gravar as configurações no servidor.</target>
       </trans-unit>
@@ -5008,7 +5024,7 @@
         <source>Password has been changed, you will be logged out momentarily.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">676</context>
+          <context context-type="linenumber">679</context>
         </context-group>
         <target state="translated">A palavra passe foi alterada, terá a sessão atual terminada daqui a nada.</target>
       </trans-unit>
@@ -5016,7 +5032,7 @@
         <source>Saved user &quot;<x id="PH" equiv-text="newUser.username"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">683</context>
+          <context context-type="linenumber">686</context>
         </context-group>
         <target state="translated">Utilizador "<x id="PH" equiv-text="newUser.username"/>" gravado.</target>
       </trans-unit>
@@ -5024,7 +5040,7 @@
         <source>Error saving user.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">695</context>
+          <context context-type="linenumber">698</context>
         </context-group>
         <target state="translated">Erro ao gravar utilizador.</target>
       </trans-unit>
@@ -5032,7 +5048,7 @@
         <source>Confirm delete user account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">706</context>
+          <context context-type="linenumber">709</context>
         </context-group>
         <target state="needs-translation">Confirm delete user account</target>
       </trans-unit>
@@ -5040,7 +5056,7 @@
         <source>This operation will permanently delete this user account.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">707</context>
+          <context context-type="linenumber">710</context>
         </context-group>
         <target state="needs-translation">This operation will permanently delete this user account.</target>
       </trans-unit>
@@ -5048,7 +5064,7 @@
         <source>Deleted user</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">716</context>
+          <context context-type="linenumber">719</context>
         </context-group>
         <target state="translated">Utilizador apagado</target>
       </trans-unit>
@@ -5056,7 +5072,7 @@
         <source>Error deleting user.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">724</context>
+          <context context-type="linenumber">727</context>
         </context-group>
         <target state="translated">Erro ao apagar utilizador.</target>
       </trans-unit>
@@ -5064,7 +5080,7 @@
         <source>Saved group &quot;<x id="PH" equiv-text="newGroup.name"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">745</context>
+          <context context-type="linenumber">748</context>
         </context-group>
         <target state="translated">Grupo "<x id="PH" equiv-text="newGroup.name"/>" guardado.</target>
       </trans-unit>
@@ -5072,7 +5088,7 @@
         <source>Error saving group.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">755</context>
+          <context context-type="linenumber">758</context>
         </context-group>
         <target state="translated">Erro ao gravar grupo.</target>
       </trans-unit>
@@ -5080,7 +5096,7 @@
         <source>Confirm delete user group</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">766</context>
+          <context context-type="linenumber">769</context>
         </context-group>
         <target state="needs-translation">Confirm delete user group</target>
       </trans-unit>
@@ -5088,7 +5104,7 @@
         <source>This operation will permanently delete this user group.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">767</context>
+          <context context-type="linenumber">770</context>
         </context-group>
         <target state="translated">Esta operação irá apagar este grupo de utilizadores permanentemente.</target>
       </trans-unit>
@@ -5096,7 +5112,7 @@
         <source>Deleted group</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">776</context>
+          <context context-type="linenumber">779</context>
         </context-group>
         <target state="translated">Grupo eliminado</target>
       </trans-unit>
@@ -5104,7 +5120,7 @@
         <source>Error deleting group.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">784</context>
+          <context context-type="linenumber">787</context>
         </context-group>
         <target state="translated">Erro ao eliminar grupo.</target>
       </trans-unit>
@@ -5112,7 +5128,7 @@
         <source>Saved account &quot;<x id="PH" equiv-text="newMailAccount.name"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">810</context>
+          <context context-type="linenumber">813</context>
         </context-group>
         <target state="translated">Conta "<x id="PH" equiv-text="newMailAccount.name"/>" gravada.</target>
       </trans-unit>
@@ -5120,7 +5136,7 @@
         <source>Error saving account.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">822</context>
+          <context context-type="linenumber">825</context>
         </context-group>
         <target state="translated">Erro ao gravar conta.</target>
       </trans-unit>
@@ -5128,7 +5144,7 @@
         <source>Confirm delete mail account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">833</context>
+          <context context-type="linenumber">836</context>
         </context-group>
         <target state="translated">Confirme a eliminação da conta de correio eletrónico</target>
       </trans-unit>
@@ -5136,7 +5152,7 @@
         <source>This operation will permanently delete this mail account.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">834</context>
+          <context context-type="linenumber">837</context>
         </context-group>
         <target state="translated">Esta operação irá apagar permanentemente esta conta de correio eletrónico.</target>
       </trans-unit>
@@ -5144,7 +5160,7 @@
         <source>Deleted mail account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">843</context>
+          <context context-type="linenumber">846</context>
         </context-group>
         <target state="translated">Conta de correio eletrónico eliminada</target>
       </trans-unit>
@@ -5152,7 +5168,7 @@
         <source>Error deleting mail account.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">852</context>
+          <context context-type="linenumber">855</context>
         </context-group>
         <target state="translated">Erro ao eliminar conta de correio eletrónico.</target>
       </trans-unit>
@@ -5160,7 +5176,7 @@
         <source>Saved rule &quot;<x id="PH" equiv-text="newMailRule.name"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">873</context>
+          <context context-type="linenumber">876</context>
         </context-group>
         <target state="translated">Regra "<x id="PH" equiv-text="newMailRule.name"/>" gravada.</target>
       </trans-unit>
@@ -5168,7 +5184,7 @@
         <source>Error saving rule.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">885</context>
+          <context context-type="linenumber">888</context>
         </context-group>
         <target state="translated">Erro ao gravar regra.</target>
       </trans-unit>
@@ -5176,7 +5192,7 @@
         <source>Confirm delete mail rule</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">896</context>
+          <context context-type="linenumber">899</context>
         </context-group>
         <target state="translated">Confirmar eliminação da regra de correio eletrónico</target>
       </trans-unit>
@@ -5184,7 +5200,7 @@
         <source>This operation will permanently delete this mail rule.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">897</context>
+          <context context-type="linenumber">900</context>
         </context-group>
         <target state="translated">Esta operação irá eliminar permanentemente esta regra de correio eletrónico.</target>
       </trans-unit>
@@ -5192,7 +5208,7 @@
         <source>Deleted mail rule</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">906</context>
+          <context context-type="linenumber">909</context>
         </context-group>
         <target state="translated">Regra de correio eletrónico eliminada</target>
       </trans-unit>
@@ -5200,7 +5216,7 @@
         <source>Error deleting mail rule.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">915</context>
+          <context context-type="linenumber">918</context>
         </context-group>
         <target state="translated">Erro ao eliminar regra de correio eletrónico.</target>
       </trans-unit>
@@ -5640,7 +5656,7 @@
         <source>Document already exists.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
-          <context context-type="linenumber">15</context>
+          <context context-type="linenumber">16</context>
         </context-group>
         <target state="final">Documento já existe.</target>
       </trans-unit>
@@ -5648,7 +5664,7 @@
         <source>Document with ASN already exists.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
-          <context context-type="linenumber">16</context>
+          <context context-type="linenumber">17</context>
         </context-group>
         <target state="translated">Documento com ASN já existe.</target>
       </trans-unit>
@@ -5656,7 +5672,7 @@
         <source>File not found.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
-          <context context-type="linenumber">17</context>
+          <context context-type="linenumber">18</context>
         </context-group>
         <target state="final">Ficheiro não encontrado.</target>
       </trans-unit>
@@ -5664,7 +5680,7 @@
         <source>Pre-consume script does not exist.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
-          <context context-type="linenumber">18</context>
+          <context context-type="linenumber">19</context>
         </context-group>
         <note priority="1" from="description">Pre-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
         <target state="final">Script de pré-consumo não existe.</target>
@@ -5673,7 +5689,7 @@
         <source>Error while executing pre-consume script.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
-          <context context-type="linenumber">19</context>
+          <context context-type="linenumber">20</context>
         </context-group>
         <note priority="1" from="description">Pre-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
         <target state="final">Erro ao executar script de pré-consumo.</target>
@@ -5682,7 +5698,7 @@
         <source>Post-consume script does not exist.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
-          <context context-type="linenumber">20</context>
+          <context context-type="linenumber">21</context>
         </context-group>
         <note priority="1" from="description">Post-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
         <target state="final">Script de pós-consumo não existe.</target>
@@ -5691,7 +5707,7 @@
         <source>Error while executing post-consume script.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
-          <context context-type="linenumber">21</context>
+          <context context-type="linenumber">22</context>
         </context-group>
         <note priority="1" from="description">Post-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
         <target state="final">Erro ao executar script de pós-consumo.</target>
@@ -5700,7 +5716,7 @@
         <source>Received new file.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
-          <context context-type="linenumber">22</context>
+          <context context-type="linenumber">23</context>
         </context-group>
         <target state="final">Recebido novo ficheiro.</target>
       </trans-unit>
@@ -5708,7 +5724,7 @@
         <source>File type not supported.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
-          <context context-type="linenumber">23</context>
+          <context context-type="linenumber">24</context>
         </context-group>
         <target state="final">Tipo de ficheiro não suportado.</target>
       </trans-unit>
@@ -5716,7 +5732,7 @@
         <source>Processing document...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
-          <context context-type="linenumber">24</context>
+          <context context-type="linenumber">25</context>
         </context-group>
         <target state="final">A processar documento...</target>
       </trans-unit>
@@ -5724,7 +5740,7 @@
         <source>Generating thumbnail...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
-          <context context-type="linenumber">25</context>
+          <context context-type="linenumber">26</context>
         </context-group>
         <target state="final">A gerar miniatura...</target>
       </trans-unit>
@@ -5732,7 +5748,7 @@
         <source>Retrieving date from document...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
-          <context context-type="linenumber">26</context>
+          <context context-type="linenumber">27</context>
         </context-group>
         <target state="final">A obter data do documento...</target>
       </trans-unit>
@@ -5740,7 +5756,7 @@
         <source>Saving document...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
-          <context context-type="linenumber">27</context>
+          <context context-type="linenumber">28</context>
         </context-group>
         <target state="final">A guardar documento...</target>
       </trans-unit>
@@ -5748,7 +5764,7 @@
         <source>Finished.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
-          <context context-type="linenumber">28</context>
+          <context context-type="linenumber">29</context>
         </context-group>
         <target state="final">Concluído.</target>
       </trans-unit>
