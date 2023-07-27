@@ -2,6 +2,7 @@ import datetime
 import itertools
 import logging
 import os
+import ssl
 import tempfile
 import traceback
 from datetime import date
@@ -394,13 +395,12 @@ def get_mailbox(server, port, security) -> MailBox:
     """
     Returns the correct MailBox instance for the given configuration.
     """
-
     if security == MailAccount.ImapSecurity.NONE:
         mailbox = MailBoxUnencrypted(server, port)
     elif security == MailAccount.ImapSecurity.STARTTLS:
-        mailbox = MailBoxTls(server, port)
+        mailbox = MailBoxTls(server, port, ssl_context=ssl.create_default_context())
     elif security == MailAccount.ImapSecurity.SSL:
-        mailbox = MailBox(server, port)
+        mailbox = MailBox(server, port, ssl_context=ssl.create_default_context())
     else:
         raise NotImplementedError("Unknown IMAP security")  # pragma: nocover
     return mailbox
