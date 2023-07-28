@@ -2545,7 +2545,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/saved-view-widget/saved-view-widget.component.html</context>
           <context context-type="linenumber">19</context>
         </context-group>
-        <target state="needs-translation">View Preview</target>
+        <target state="translated">Προβολή Προεπισκόπησης</target>
       </trans-unit>
       <trans-unit id="3099741642167775297" datatype="html">
         <source>Download</source>
