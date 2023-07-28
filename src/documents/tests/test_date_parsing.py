@@ -160,7 +160,7 @@ class TestDate(TestCase):
         )
 
     def test_date_format_20(self):
-        text = "Customer Number Currency 22nd MAR 2022 Credit Card 1934829304"
+        text = "Customer Number Currency 22nd March 2022 Credit Card 1934829304"
         self.assertEqual(
             parse_date("", text),
             datetime.datetime(2022, 3, 22, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
