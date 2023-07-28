@@ -290,7 +290,6 @@ def parse_date_generator(filename, text) -> Iterator[datetime.datetime]:
     def __process_content(content: str, date_order: str) -> Iterator[datetime.datetime]:
         for m in re.finditer(DATE_REGEX, content):
             date = __process_match(m, date_order)
-            print(date)
             if date is not None:
                 yield date
 
