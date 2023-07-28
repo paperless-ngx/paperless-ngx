@@ -32,16 +32,18 @@ from documents.utils import copy_file_with_basic_stats
 # - MONTH ZZZZ, with ZZZZ being 4 digits
 # - MONTH XX, ZZZZ with XX being 1 or 2 and ZZZZ being 4 digits
 # - XX MON ZZZZ with XX being 1 or 2 and ZZZZ being 4 digits. MONTH is 3 letters
+# - XXPP MONTH ZZZZ with XX being 1 or 2 and PP being 2 letters and ZZZZ being 4 digits
 
 # TODO: isnt there a date parsing library for this?
 
 DATE_REGEX = re.compile(
     r"(\b|(?!=([_-])))([0-9]{1,2})[\.\/-]([0-9]{1,2})[\.\/-]([0-9]{4}|[0-9]{2})(\b|(?=([_-])))|"  # noqa: E501
     r"(\b|(?!=([_-])))([0-9]{4}|[0-9]{2})[\.\/-]([0-9]{1,2})[\.\/-]([0-9]{1,2})(\b|(?=([_-])))|"  # noqa: E501
-    r"(\b|(?!=([_-])))([0-9]{1,2}[\. ]+[^ ]{3,9} ([0-9]{4}|[0-9]{2}))(\b|(?=([_-])))|"  # noqa: E501
+    r"(\b|(?!=([_-])))([0-9]{1,2}[\. ]+[a-zA-Z]{3,9} ([0-9]{4}|[0-9]{2}))(\b|(?=([_-])))|"  # noqa: E501
     r"(\b|(?!=([_-])))([^\W\d_]{3,9} [0-9]{1,2}, ([0-9]{4}))(\b|(?=([_-])))|"
     r"(\b|(?!=([_-])))([^\W\d_]{3,9} [0-9]{4})(\b|(?=([_-])))|"
-    r"(\b|(?!=([_-])))(\b[0-9]{1,2}[ \.\/-][A-Z]{3}[ \.\/-][0-9]{4})(\b|(?=([_-])))",  # noqa: E501
+    r"(\b|(?!=([_-])))([0-9]{1,2}[^ ]{2}[\. ]+[^ ]{3,9}[ \.\/-][0-9]{4})(\b|(?=([_-])))|"  # noqa: E501
+    r"(\b|(?!=([_-])))(\b[0-9]{1,2}[ \.\/-][a-zA-Z]{3}[ \.\/-][0-9]{4})(\b|(?=([_-])))",  # noqa: E501
 )
 
 
@@ -288,6 +290,7 @@ def parse_date_generator(filename, text) -> Iterator[datetime.datetime]:
     def __process_content(content: str, date_order: str) -> Iterator[datetime.datetime]:
         for m in re.finditer(DATE_REGEX, content):
             date = __process_match(m, date_order)
+            print(date)
             if date is not None:
                 yield date
 
