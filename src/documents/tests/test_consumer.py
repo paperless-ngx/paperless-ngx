@@ -21,6 +21,7 @@ from django.utils import timezone
 
 from documents.consumer import Consumer
 from documents.consumer import ConsumerError
+from documents.consumer import ConsumerFilePhase
 from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
@@ -228,8 +229,8 @@ def fake_magic_from_file(file, mime=False):
 class TestConsumer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     def _assert_first_last_send_progress(
         self,
-        first_status="STARTING",
-        last_status="SUCCESS",
+        first_status=ConsumerFilePhase.STARTED,
+        last_status=ConsumerFilePhase.SUCCESS,
         first_progress=0,
         first_progress_max=100,
         last_progress=100,
