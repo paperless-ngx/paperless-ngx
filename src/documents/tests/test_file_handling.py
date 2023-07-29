@@ -446,6 +446,19 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertIsNotDir(os.path.join(settings.ORIGINALS_DIR, "none"))
         self.assertIsDir(settings.ORIGINALS_DIR)
 
+    @override_settings(FILENAME_FORMAT="{doc_pk}")
+    def test_format_doc_pk(self):
+        document = Document()
+        document.pk = 1
+        document.mime_type = "application/pdf"
+        document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
+
+        self.assertEqual(generate_filename(document), "0000001.pdf")
+
+        document.pk = 13579
+
+        self.assertEqual(generate_filename(document), "0013579.pdf")
+
     @override_settings(FILENAME_FORMAT=None)
     def test_format_none(self):
         document = Document()
