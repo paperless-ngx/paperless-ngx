@@ -52,6 +52,7 @@ import { PaperlessUser } from 'src/app/data/paperless-user'
 import { UserService } from 'src/app/services/rest/user.service'
 import { PaperlessDocumentNote } from 'src/app/data/paperless-document-note'
 import { HttpClient } from '@angular/common/http'
+import { DocumentMetadataService } from 'src/app/services/rest/document-metadata.service'
 
 enum DocumentDetailNavIDs {
   Details = 1,
@@ -107,7 +108,7 @@ export class DocumentDetailComponent
     archive_serial_number: new FormControl(),
     tags: new FormControl([]),
     permissions_form: new FormControl(null),
-    metadata: new FormArray([]),
+    metadatas: new FormArray([]),
   })
 
   previewCurrentPage: number = 1
@@ -146,6 +147,7 @@ export class DocumentDetailComponent
 
   constructor(
     private documentsService: DocumentService,
+    private documentMetadataService: DocumentMetadataService,
     private route: ActivatedRoute,
     private correspondentService: CorrespondentService,
     private documentTypeService: DocumentTypeService,
@@ -184,7 +186,7 @@ export class DocumentDetailComponent
   }
 
   get indexFields() {
-    return this.documentForm.value?.metadata ?? []
+    return this.documentForm.value?.metadatas ?? []
   }
 
   trackIndexField(_: number, indexField: any) {
@@ -321,18 +323,28 @@ export class DocumentDetailComponent
               filter((dts) => dts.length > 0)
             ),
           ]).subscribe(([documentTypeId, documentTypes]) => {
-            const metadata = this.documentForm.get('metadata') as FormArray
+            const metadata = this.documentForm.get('metadatas') as FormArray
             const documentType = documentTypes.find(
               (dt) => dt.id === documentTypeId
             )
-            metadata.push(
-              new FormGroup({
-                id: new FormControl(documentType.id),
-                name: new FormControl(documentType.name ?? ''),
-                displayName: new FormControl(''),
-                value: new FormControl(''),
-              })
-            )
+            const latestMetadata = doc.metadatas
+              ?.sort((a, b) => (a.created < b.created ? 1 : -1))
+              .shift()?.data
+
+            metadata.clear()
+            documentType.default_metadata?.forEach((m) => {
+              const latestValue = latestMetadata.find(
+                (lm) => lm.name.toLowerCase() === m.name.toLowerCase()
+              )?.value
+              metadata.push(
+                new FormGroup({
+                  id: new FormControl(m.id),
+                  name: new FormControl(m.name ?? ''),
+                  displayName: new FormControl(''),
+                  value: new FormControl(latestValue),
+                })
+              )
+            })
           })
 
           this.isDirty$ = dirtyCheck(
@@ -548,6 +560,26 @@ export class DocumentDetailComponent
                 (error.message ?? error.toString())
             )
           }
+        },
+      })
+    const metadata = this.documentForm.get('metadatas') as FormArray
+    this.documentMetadataService
+      .updateMetadata(this.document.id, metadata.value)
+      .pipe(first())
+      .subscribe({
+        next: () => {
+          console.log('saved document metadata')
+          this.networkActive = false
+          this.error = null
+        },
+        error: (error) => {
+          this.networkActive = false
+          this.error = error.error
+          this.toastService.showError(
+            $localize`Error saving document` +
+              ': ' +
+              (error.message ?? error.toString())
+          )
         },
       })
   }

@@ -1,10 +1,11 @@
-import { PaperlessCorrespondent } from './paperless-correspondent'
-import { PaperlessTag } from './paperless-tag'
-import { PaperlessDocumentType } from './paperless-document-type'
 import { Observable } from 'rxjs'
-import { PaperlessStoragePath } from './paperless-storage-path'
 import { ObjectWithPermissions } from './object-with-permissions'
+import { PaperlessCorrespondent } from './paperless-correspondent'
+import { PaperlessIndexFieldMetadata } from './paperless-document-index-field-metadata'
 import { PaperlessDocumentNote } from './paperless-document-note'
+import { PaperlessDocumentType } from './paperless-document-type'
+import { PaperlessStoragePath } from './paperless-storage-path'
+import { PaperlessTag } from './paperless-tag'
 
 export interface SearchHit {
   score?: number
@@ -56,6 +57,8 @@ export interface PaperlessDocument extends ObjectWithPermissions {
   archive_serial_number?: number
 
   notes?: PaperlessDocumentNote[]
+
+  metadatas?: PaperlessIndexFieldMetadata[]
 
   __search_hit__?: SearchHit
 }

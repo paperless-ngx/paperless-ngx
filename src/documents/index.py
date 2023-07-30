@@ -6,7 +6,7 @@ from contextlib import contextmanager
 from dateutil.parser import isoparse
 from django.conf import settings
 from django.utils import timezone
-from documents.models import Document
+from documents.models import Document, Metadata
 from documents.models import Note
 from guardian.shortcuts import get_users_with_perms
 from whoosh import classify
@@ -53,6 +53,7 @@ def get_schema():
         path_id=NUMERIC(),
         has_path=BOOLEAN(),
         notes=TEXT(),
+        metadatas=TEXT(),
         owner=TEXT(),
         owner_id=NUMERIC(),
         has_owner=BOOLEAN(),
@@ -99,6 +100,8 @@ def update_document(writer: AsyncWriter, doc: Document):
     tags = ",".join([t.name for t in doc.tags.all()])
     tags_ids = ",".join([str(t.id) for t in doc.tags.all()])
     notes = ",".join([str(c.note) for c in Note.objects.filter(document=doc)])
+    latest_metadata = Metadata.objects.filter(document=doc).order_by('-created').first()
+    metadatas = str(latest_metadata) if latest_metadata else ''
     asn = doc.archive_serial_number
     if asn is not None and (
         asn < Document.ARCHIVE_SERIAL_NUMBER_MIN
@@ -137,6 +140,7 @@ def update_document(writer: AsyncWriter, doc: Document):
         path_id=doc.storage_path.id if doc.storage_path else None,
         has_path=doc.storage_path is not None,
         notes=notes,
+        # metadatas=metadatas,
         owner=doc.owner.username if doc.owner else None,
         owner_id=doc.owner.id if doc.owner else None,
         has_owner=doc.owner is not None,
@@ -293,7 +297,7 @@ class DelayedFullTextQuery(DelayedQuery):
     def _get_query(self):
         q_str = self.query_params["query"]
         qp = MultifieldParser(
-            ["content", "title", "correspondent", "tag", "type", "notes"],
+            ["content", "title", "correspondent", "tag", "type", "notes", "metadatas"],
             self.searcher.ixreader.schema,
         )
         qp.add_plugin(DateParserPlugin(basedate=timezone.now()))

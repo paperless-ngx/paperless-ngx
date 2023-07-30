@@ -725,4 +725,4 @@ class Metadata(models.Model):
         verbose_name_plural = _("metadatas")
 
     def __str__(self):
-        return self.data
+        return str(self.data)

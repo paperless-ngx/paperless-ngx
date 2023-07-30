@@ -76,7 +76,7 @@ from .matching import match_correspondents
 from .matching import match_document_types
 from .matching import match_storage_paths
 from .matching import match_tags
-from .models import Correspondent
+from .models import Correspondent, Metadata
 from .models import Document
 from .models import DocumentType
 from .models import Note
@@ -513,6 +513,45 @@ class DocumentViewSet(
                 "error": "error",
             },
         )
+    
+    @action(methods=["get", "post"], detail=True)
+    def index_field_metadata(self, request, pk=None):
+        try:
+            doc = Document.objects.get(pk=pk)
+        except Document.DoesNotExist:
+            raise Http404
+        
+        currentUser = request.user
+
+        if request.method == "GET":
+            try:
+                return Response(Metadata.objects.filter(document=doc).order_by("-created"))
+            except Exception as e:
+                logger.warning(f"An error occurred retrieving metadatas: {str(e)}")
+                return Response(
+                    {"error": "Error retreiving metadatas, check logs for more detail."},
+                )
+        elif request.method == "POST":
+            try:
+                c = Metadata.objects.create(
+                    document=doc,
+                    data=request.data["metadata"],
+                    user=currentUser,
+                )
+                c.save()
+
+                from documents import index
+
+                index.add_or_update_document(self.get_object())
+
+                return Response(str(c.data))
+            except Exception as e:
+                logger.warning(f"An error occurred saving metadata: {str(e)}")
+                return Response(
+                    {
+                        "error": "Error saving metadata, check logs for more detail.",
+                    },
+                )
 
 
 class SearchResultSerializer(DocumentSerializer, PassUserMixin):
