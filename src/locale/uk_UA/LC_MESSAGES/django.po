@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-07-30 19:55\n"
+"PO-Revision-Date: 2023-07-30 20:52\n"
 "Last-Translator: \n"
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
@@ -52,7 +52,7 @@ msgstr "Автоматично"
 #: documents/models.py:45 documents/models.py:394 paperless_mail/models.py:17
 #: paperless_mail/models.py:89
 msgid "name"
-msgstr ""
+msgstr "назва"
 
 #: documents/models.py:47
 msgid "match"
@@ -60,7 +60,7 @@ msgstr ""
 
 #: documents/models.py:50
 msgid "matching algorithm"
-msgstr ""
+msgstr "алгоритм відповідності"
 
 #: documents/models.py:55
 msgid "is insensitive"
@@ -68,15 +68,15 @@ msgstr ""
 
 #: documents/models.py:71
 msgid "owner"
-msgstr ""
+msgstr "власник"
 
 #: documents/models.py:81 documents/models.py:136
 msgid "correspondent"
-msgstr ""
+msgstr "кореспондент"
 
 #: documents/models.py:82
 msgid "correspondents"
-msgstr ""
+msgstr "кореспонденти"
 
 #: documents/models.py:87
 msgid "color"
@@ -128,11 +128,11 @@ msgstr "Зашифровано з допомогою GNU Privacy Guard"
 
 #: documents/models.py:148
 msgid "title"
-msgstr ""
+msgstr "заголовок"
 
 #: documents/models.py:160 documents/models.py:624
 msgid "content"
-msgstr ""
+msgstr "вміст"
 
 #: documents/models.py:163
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
@@ -140,7 +140,7 @@ msgstr ""
 
 #: documents/models.py:168
 msgid "mime type"
-msgstr ""
+msgstr "тип MIME"
 
 #: documents/models.py:178
 msgid "checksum"
@@ -148,7 +148,7 @@ msgstr "контрольна сума"
 
 #: documents/models.py:182
 msgid "The checksum of the original document."
-msgstr ""
+msgstr "Контрольна сума оригінального документа."
 
 #: documents/models.py:186
 msgid "archive checksum"
@@ -176,11 +176,11 @@ msgstr ""
 
 #: documents/models.py:219
 msgid "filename"
-msgstr ""
+msgstr "назва файлу"
 
 #: documents/models.py:225
 msgid "Current filename in storage"
-msgstr ""
+msgstr "Поточна назва файлу в сховищі"
 
 #: documents/models.py:229
 msgid "archive filename"
@@ -280,11 +280,11 @@ msgstr ""
 
 #: documents/models.py:414
 msgid "title contains"
-msgstr ""
+msgstr "заголовок містить"
 
 #: documents/models.py:415
 msgid "content contains"
-msgstr ""
+msgstr "вміст містить"
 
 #: documents/models.py:416
 msgid "ASN is"
@@ -304,11 +304,11 @@ msgstr ""
 
 #: documents/models.py:420
 msgid "has tag"
-msgstr ""
+msgstr "має тег"
 
 #: documents/models.py:421
 msgid "has any tag"
-msgstr ""
+msgstr "має будь-який тег"
 
 #: documents/models.py:422
 msgid "created before"
@@ -348,7 +348,7 @@ msgstr ""
 
 #: documents/models.py:431
 msgid "does not have tag"
-msgstr ""
+msgstr "не має тегу"
 
 #: documents/models.py:432
 msgid "does not have ASN"
@@ -356,7 +356,7 @@ msgstr ""
 
 #: documents/models.py:433
 msgid "title or content contains"
-msgstr ""
+msgstr "заголовок або вміст містить"
 
 #: documents/models.py:434
 msgid "fulltext query"
@@ -368,7 +368,7 @@ msgstr ""
 
 #: documents/models.py:436
 msgid "has tags in"
-msgstr ""
+msgstr "має теги в"
 
 #: documents/models.py:437
 msgid "ASN greater than"
@@ -388,7 +388,7 @@ msgstr ""
 
 #: documents/models.py:451
 msgid "value"
-msgstr ""
+msgstr "значення"
 
 #: documents/models.py:454
 msgid "filter rule"
@@ -424,7 +424,7 @@ msgstr ""
 
 #: documents/models.py:583
 msgid "Task Name"
-msgstr ""
+msgstr "Назва завдання"
 
 #: documents/models.py:584
 msgid "Name of the Task which was run"
@@ -489,11 +489,11 @@ msgstr "коментарі"
 #: documents/serialisers.py:80
 #, python-format
 msgid "Invalid regular expression: %(error)s"
-msgstr ""
+msgstr "Неправильний регулярний вираз: %(error)s"
 
 #: documents/serialisers.py:320
 msgid "Invalid color."
-msgstr ""
+msgstr "Неправильний колір."
 
 #: documents/serialisers.py:700
 #, python-format
@@ -502,7 +502,7 @@ msgstr ""
 
 #: documents/serialisers.py:794
 msgid "Invalid variable detected."
-msgstr ""
+msgstr "Виявлено неправильну змінну."
 
 #: documents/templates/index.html:78
 msgid "Paperless-ngx is loading..."
@@ -526,7 +526,7 @@ msgstr ""
 
 #: documents/templates/registration/logged_out.html:60
 msgid "Sign in again"
-msgstr ""
+msgstr "Увійдіть ще раз"
 
 #: documents/templates/registration/login.html:15
 msgid "Paperless-ngx sign in"
@@ -550,7 +550,7 @@ msgstr "Пароль"
 
 #: documents/templates/registration/login.html:73
 msgid "Sign in"
-msgstr ""
+msgstr "Увійти"
 
 #: paperless/apps.py:9
 msgid "Paperless"
@@ -650,7 +650,7 @@ msgstr "Адміністрування Paperless-ngx"
 
 #: paperless_mail/admin.py:30
 msgid "Authentication"
-msgstr ""
+msgstr "Автентифікація"
 
 #: paperless_mail/admin.py:31
 msgid "Advanced settings"
@@ -666,7 +666,7 @@ msgstr ""
 
 #: paperless_mail/admin.py:66
 msgid "Actions"
-msgstr ""
+msgstr "Дії"
 
 #: paperless_mail/admin.py:69
 msgid "The action applied to the mail. This action is only performed when the mail body or attachments were consumed from the mail."
@@ -674,7 +674,7 @@ msgstr ""
 
 #: paperless_mail/admin.py:77
 msgid "Metadata"
-msgstr ""
+msgstr "Метадані"
 
 #: paperless_mail/admin.py:80
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
@@ -694,23 +694,23 @@ msgstr ""
 
 #: paperless_mail/models.py:13
 msgid "No encryption"
-msgstr ""
+msgstr "Без шифрування"
 
 #: paperless_mail/models.py:14
 msgid "Use SSL"
-msgstr ""
+msgstr "Використовувати SSL"
 
 #: paperless_mail/models.py:15
 msgid "Use STARTTLS"
-msgstr ""
+msgstr "Використовувати STARTTLS"
 
 #: paperless_mail/models.py:19
 msgid "IMAP server"
-msgstr ""
+msgstr "Сервер IMAP"
 
 #: paperless_mail/models.py:22
 msgid "IMAP port"
-msgstr ""
+msgstr "Порт IMAP"
 
 #: paperless_mail/models.py:26
 msgid "This is usually 143 for unencrypted and STARTTLS connections, and 993 for SSL connections."
@@ -726,7 +726,7 @@ msgstr "ім'я користувача"
 
 #: paperless_mail/models.py:39
 msgid "password"
-msgstr ""
+msgstr "пароль"
 
 #: paperless_mail/models.py:42
 msgid "character set"
@@ -746,7 +746,7 @@ msgstr ""
 
 #: paperless_mail/models.py:61 paperless_mail/models.py:69
 msgid "Only process attachments."
-msgstr ""
+msgstr "Опрацьовувати лише вкладення."
 
 #: paperless_mail/models.py:62
 msgid "Process full Mail (with embedded attachments in file) as .eml"
@@ -782,11 +782,11 @@ msgstr ""
 
 #: paperless_mail/models.py:80
 msgid "Use subject as title"
-msgstr ""
+msgstr "Використовувати тему як заголовок"
 
 #: paperless_mail/models.py:81
 msgid "Use attachment filename as title"
-msgstr ""
+msgstr "Використовувати назву файлу як заголовок"
 
 #: paperless_mail/models.py:84
 msgid "Do not assign a correspondent"
@@ -806,19 +806,19 @@ msgstr ""
 
 #: paperless_mail/models.py:91
 msgid "order"
-msgstr ""
+msgstr "порядок"
 
 #: paperless_mail/models.py:97
 msgid "account"
-msgstr ""
+msgstr "обліковий запис"
 
 #: paperless_mail/models.py:101 paperless_mail/models.py:231
 msgid "folder"
-msgstr ""
+msgstr "тека"
 
 #: paperless_mail/models.py:105
 msgid "Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server."
-msgstr ""
+msgstr "Підтеки мають розділятися розділювальними символами, часто крапкою ('.') або скісною рискою ('/'), але це залежить від поштового сервера."
 
 #: paperless_mail/models.py:111
 msgid "filter from"
@@ -826,7 +826,7 @@ msgstr ""
 
 #: paperless_mail/models.py:117
 msgid "filter subject"
-msgstr ""
+msgstr "фільтрувати за темою"
 
 #: paperless_mail/models.py:123
 msgid "filter body"
@@ -842,15 +842,15 @@ msgstr ""
 
 #: paperless_mail/models.py:142
 msgid "maximum age"
-msgstr ""
+msgstr "максимальний вік"
 
 #: paperless_mail/models.py:144
 msgid "Specified in days."
-msgstr ""
+msgstr "Вказано в днях."
 
 #: paperless_mail/models.py:148
 msgid "attachment type"
-msgstr ""
+msgstr "тип вкладення"
 
 #: paperless_mail/models.py:152
 msgid "Inline attachments include embedded images, so it's best to combine this option with a filename filter."
@@ -862,11 +862,11 @@ msgstr ""
 
 #: paperless_mail/models.py:164
 msgid "action"
-msgstr ""
+msgstr "дія"
 
 #: paperless_mail/models.py:170
 msgid "action parameter"
-msgstr ""
+msgstr "параметр дії"
 
 #: paperless_mail/models.py:175
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
@@ -874,11 +874,11 @@ msgstr ""
 
 #: paperless_mail/models.py:183
 msgid "assign title from"
-msgstr ""
+msgstr "призначити заголовок з"
 
 #: paperless_mail/models.py:191
 msgid "assign this tag"
-msgstr ""
+msgstr "призначити цей тег"
 
 #: paperless_mail/models.py:199
 msgid "assign this document type"
@@ -894,21 +894,21 @@ msgstr ""
 
 #: paperless_mail/models.py:239
 msgid "uid"
-msgstr ""
+msgstr "uid"
 
 #: paperless_mail/models.py:247
 msgid "subject"
-msgstr ""
+msgstr "тема"
 
 #: paperless_mail/models.py:255
 msgid "received"
-msgstr ""
+msgstr "отримано"
 
 #: paperless_mail/models.py:262
 msgid "processed"
-msgstr ""
+msgstr "оброблено"
 
 #: paperless_mail/models.py:268
 msgid "status"
-msgstr ""
+msgstr "статус"
 
