@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-07-30 14:19\n"
+"PO-Revision-Date: 2023-07-30 19:55\n"
 "Last-Translator: \n"
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
@@ -19,7 +19,7 @@ msgstr ""
 
 #: documents/apps.py:9
 msgid "Documents"
-msgstr ""
+msgstr "Документи"
 
 #: documents/models.py:36
 msgid "None"
@@ -27,19 +27,19 @@ msgstr ""
 
 #: documents/models.py:37
 msgid "Any word"
-msgstr ""
+msgstr "Будь-яке слово"
 
 #: documents/models.py:38
 msgid "All words"
-msgstr ""
+msgstr "Усі слова"
 
 #: documents/models.py:39
 msgid "Exact match"
-msgstr ""
+msgstr "Точна відповідність"
 
 #: documents/models.py:40
 msgid "Regular expression"
-msgstr ""
+msgstr "Регулярний вираз"
 
 #: documents/models.py:41
 msgid "Fuzzy word"
@@ -47,7 +47,7 @@ msgstr ""
 
 #: documents/models.py:42
 msgid "Automatic"
-msgstr ""
+msgstr "Автоматично"
 
 #: documents/models.py:45 documents/models.py:394 paperless_mail/models.py:17
 #: paperless_mail/models.py:89
@@ -80,7 +80,7 @@ msgstr ""
 
 #: documents/models.py:87
 msgid "color"
-msgstr ""
+msgstr "колір"
 
 #: documents/models.py:90
 msgid "is inbox tag"
@@ -92,23 +92,23 @@ msgstr ""
 
 #: documents/models.py:99
 msgid "tag"
-msgstr ""
+msgstr "тег"
 
 #: documents/models.py:100 documents/models.py:174
 msgid "tags"
-msgstr ""
+msgstr "теги"
 
 #: documents/models.py:105 documents/models.py:156
 msgid "document type"
-msgstr ""
+msgstr "тип документа"
 
 #: documents/models.py:106
 msgid "document types"
-msgstr ""
+msgstr "типи документів"
 
 #: documents/models.py:111
 msgid "path"
-msgstr ""
+msgstr "шлях"
 
 #: documents/models.py:117 documents/models.py:145
 msgid "storage path"
@@ -124,7 +124,7 @@ msgstr ""
 
 #: documents/models.py:127
 msgid "Encrypted with GNU Privacy Guard"
-msgstr ""
+msgstr "Зашифровано з допомогою GNU Privacy Guard"
 
 #: documents/models.py:148
 msgid "title"
@@ -144,7 +144,7 @@ msgstr ""
 
 #: documents/models.py:178
 msgid "checksum"
-msgstr ""
+msgstr "контрольна сума"
 
 #: documents/models.py:182
 msgid "The checksum of the original document."
@@ -192,7 +192,7 @@ msgstr ""
 
 #: documents/models.py:239
 msgid "original filename"
-msgstr ""
+msgstr "оригінальна назва файлу"
 
 #: documents/models.py:245
 msgid "The original name of the file when it was uploaded"
@@ -208,27 +208,27 @@ msgstr ""
 
 #: documents/models.py:268 documents/models.py:641
 msgid "document"
-msgstr ""
+msgstr "документ"
 
 #: documents/models.py:269
 msgid "documents"
-msgstr ""
+msgstr "документи"
 
 #: documents/models.py:359
 msgid "debug"
-msgstr ""
+msgstr "зневадження"
 
 #: documents/models.py:360
 msgid "information"
-msgstr ""
+msgstr "інформація"
 
 #: documents/models.py:361
 msgid "warning"
-msgstr ""
+msgstr "попередження"
 
 #: documents/models.py:362 paperless_mail/models.py:276
 msgid "error"
-msgstr ""
+msgstr "помилка"
 
 #: documents/models.py:363
 msgid "critical"
@@ -236,15 +236,15 @@ msgstr ""
 
 #: documents/models.py:366
 msgid "group"
-msgstr ""
+msgstr "група"
 
 #: documents/models.py:368
 msgid "message"
-msgstr ""
+msgstr "повідомлення"
 
 #: documents/models.py:371
 msgid "level"
-msgstr ""
+msgstr "рівень"
 
 #: documents/models.py:380
 msgid "log"
@@ -476,15 +476,15 @@ msgstr ""
 
 #: documents/models.py:650
 msgid "user"
-msgstr ""
+msgstr "користувач"
 
 #: documents/models.py:655
 msgid "comment"
-msgstr ""
+msgstr "коментар"
 
 #: documents/models.py:656
 msgid "comments"
-msgstr ""
+msgstr "коментарі"
 
 #: documents/serialisers.py:80
 #, python-format
@@ -538,15 +538,15 @@ msgstr ""
 
 #: documents/templates/registration/login.html:64
 msgid "Your username and password didn't match. Please try again."
-msgstr ""
+msgstr "Ім'я користувача та пароль не збігаються. Будь ласка, спробуйте ще раз."
 
 #: documents/templates/registration/login.html:67
 msgid "Username"
-msgstr ""
+msgstr "Ім'я користувача"
 
 #: documents/templates/registration/login.html:68
 msgid "Password"
-msgstr ""
+msgstr "Пароль"
 
 #: documents/templates/registration/login.html:73
 msgid "Sign in"
@@ -558,95 +558,95 @@ msgstr ""
 
 #: paperless/settings.py:521
 msgid "English (US)"
-msgstr ""
+msgstr "Англійська (США)"
 
 #: paperless/settings.py:522
 msgid "Arabic"
-msgstr ""
+msgstr "Арабська"
 
 #: paperless/settings.py:523
 msgid "Belarusian"
-msgstr ""
+msgstr "Білоруська"
 
 #: paperless/settings.py:524
 msgid "Czech"
-msgstr ""
+msgstr "Чеська"
 
 #: paperless/settings.py:525
 msgid "Danish"
-msgstr ""
+msgstr "Данська"
 
 #: paperless/settings.py:526
 msgid "German"
-msgstr ""
+msgstr "Німецька"
 
 #: paperless/settings.py:527
 msgid "English (GB)"
-msgstr ""
+msgstr "Англійська (Велика Британія)"
 
 #: paperless/settings.py:528
 msgid "Spanish"
-msgstr ""
+msgstr "Іспанська"
 
 #: paperless/settings.py:529
 msgid "French"
-msgstr ""
+msgstr "Французька"
 
 #: paperless/settings.py:530
 msgid "Italian"
-msgstr ""
+msgstr "Італійська"
 
 #: paperless/settings.py:531
 msgid "Luxembourgish"
-msgstr ""
+msgstr "Люксембурзька"
 
 #: paperless/settings.py:532
 msgid "Dutch"
-msgstr ""
+msgstr "Нідерландська"
 
 #: paperless/settings.py:533
 msgid "Polish"
-msgstr ""
+msgstr "Польська"
 
 #: paperless/settings.py:534
 msgid "Portuguese (Brazil)"
-msgstr ""
+msgstr "Португальська (Бразилія)"
 
 #: paperless/settings.py:535
 msgid "Portuguese"
-msgstr ""
+msgstr "Португальська"
 
 #: paperless/settings.py:536
 msgid "Romanian"
-msgstr ""
+msgstr "Румунська"
 
 #: paperless/settings.py:537
 msgid "Russian"
-msgstr ""
+msgstr "Російська"
 
 #: paperless/settings.py:538
 msgid "Slovenian"
-msgstr ""
+msgstr "Словенська"
 
 #: paperless/settings.py:539
 msgid "Serbian"
-msgstr ""
+msgstr "Сербська"
 
 #: paperless/settings.py:540
 msgid "Swedish"
-msgstr ""
+msgstr "Шведська"
 
 #: paperless/settings.py:541
 msgid "Turkish"
-msgstr ""
+msgstr "Турецька"
 
 #: paperless/settings.py:542
 msgid "Chinese Simplified"
-msgstr ""
+msgstr "Китайська спрощена"
 
 #: paperless/urls.py:169
 msgid "Paperless-ngx administration"
-msgstr ""
+msgstr "Адміністрування Paperless-ngx"
 
 #: paperless_mail/admin.py:30
 msgid "Authentication"
@@ -658,7 +658,7 @@ msgstr ""
 
 #: paperless_mail/admin.py:48
 msgid "Filter"
-msgstr ""
+msgstr "Фільтр"
 
 #: paperless_mail/admin.py:51
 msgid "Paperless will only process mails that match ALL of the filters given below."
@@ -722,7 +722,7 @@ msgstr ""
 
 #: paperless_mail/models.py:37
 msgid "username"
-msgstr ""
+msgstr "ім'я користувача"
 
 #: paperless_mail/models.py:39
 msgid "password"
@@ -762,11 +762,11 @@ msgstr ""
 
 #: paperless_mail/models.py:73
 msgid "Delete"
-msgstr ""
+msgstr "Видалити"
 
 #: paperless_mail/models.py:74
 msgid "Move to specified folder"
-msgstr ""
+msgstr "Перемістити до вказаної теки"
 
 #: paperless_mail/models.py:75
 msgid "Mark as read, don't process read mails"
