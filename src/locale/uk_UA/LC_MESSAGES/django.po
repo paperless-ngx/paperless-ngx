@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-07-30 20:52\n"
+"PO-Revision-Date: 2023-07-30 21:55\n"
 "Last-Translator: \n"
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
@@ -23,7 +23,7 @@ msgstr "Документи"
 
 #: documents/models.py:36
 msgid "None"
-msgstr ""
+msgstr "Немає"
 
 #: documents/models.py:37
 msgid "Any word"
@@ -43,7 +43,7 @@ msgstr "Регулярний вираз"
 
 #: documents/models.py:41
 msgid "Fuzzy word"
-msgstr ""
+msgstr "Нечіткий пошук"
 
 #: documents/models.py:42
 msgid "Automatic"
@@ -56,15 +56,15 @@ msgstr "назва"
 
 #: documents/models.py:47
 msgid "match"
-msgstr ""
+msgstr "відповідність"
 
 #: documents/models.py:50
 msgid "matching algorithm"
-msgstr "алгоритм відповідності"
+msgstr "алгоритм зіставляння"
 
 #: documents/models.py:55
 msgid "is insensitive"
-msgstr ""
+msgstr "нечутливий до регістру"
 
 #: documents/models.py:71
 msgid "owner"
@@ -112,7 +112,7 @@ msgstr "шлях"
 
 #: documents/models.py:117 documents/models.py:145
 msgid "storage path"
-msgstr ""
+msgstr "шлях до сховища"
 
 #: documents/models.py:118
 msgid "storage paths"
@@ -120,7 +120,7 @@ msgstr ""
 
 #: documents/models.py:126
 msgid "Unencrypted"
-msgstr ""
+msgstr "Без шифрування"
 
 #: documents/models.py:127
 msgid "Encrypted with GNU Privacy Guard"
@@ -136,7 +136,7 @@ msgstr "вміст"
 
 #: documents/models.py:163
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
-msgstr ""
+msgstr "Необроблений текст документа. Це поле використовується в переважно для пошуку."
 
 #: documents/models.py:168
 msgid "mime type"
@@ -152,27 +152,27 @@ msgstr "Контрольна сума оригінального докумен�
 
 #: documents/models.py:186
 msgid "archive checksum"
-msgstr ""
+msgstr "контрольна сума архіву"
 
 #: documents/models.py:191
 msgid "The checksum of the archived document."
-msgstr ""
+msgstr "Контрольна сума архівованого документа."
 
 #: documents/models.py:194 documents/models.py:376 documents/models.py:630
 msgid "created"
-msgstr ""
+msgstr "створено"
 
 #: documents/models.py:197
 msgid "modified"
-msgstr ""
+msgstr "змінено"
 
 #: documents/models.py:204
 msgid "storage type"
-msgstr ""
+msgstr "тип сховища"
 
 #: documents/models.py:212
 msgid "added"
-msgstr ""
+msgstr "додано"
 
 #: documents/models.py:219
 msgid "filename"
@@ -200,11 +200,11 @@ msgstr ""
 
 #: documents/models.py:252
 msgid "archive serial number"
-msgstr ""
+msgstr "архівний серійний номер (АСН)"
 
 #: documents/models.py:262
 msgid "The position of this document in your physical document archive."
-msgstr ""
+msgstr "Позиція цього документа у вашому фізичному архіві документів."
 
 #: documents/models.py:268 documents/models.py:641
 msgid "document"
@@ -272,11 +272,11 @@ msgstr ""
 
 #: documents/models.py:404
 msgid "sort field"
-msgstr ""
+msgstr "поле сортування"
 
 #: documents/models.py:409
 msgid "sort reverse"
-msgstr ""
+msgstr "зворотнє сортування"
 
 #: documents/models.py:414
 msgid "title contains"
@@ -288,7 +288,7 @@ msgstr "вміст містить"
 
 #: documents/models.py:416
 msgid "ASN is"
-msgstr ""
+msgstr "АСН"
 
 #: documents/models.py:417
 msgid "correspondent is"
@@ -312,11 +312,11 @@ msgstr "має будь-який тег"
 
 #: documents/models.py:422
 msgid "created before"
-msgstr ""
+msgstr "створено до"
 
 #: documents/models.py:423
 msgid "created after"
-msgstr ""
+msgstr "створено після"
 
 #: documents/models.py:424
 msgid "created year is"
@@ -332,19 +332,19 @@ msgstr ""
 
 #: documents/models.py:427
 msgid "added before"
-msgstr ""
+msgstr "додано до"
 
 #: documents/models.py:428
 msgid "added after"
-msgstr ""
+msgstr "додано після"
 
 #: documents/models.py:429
 msgid "modified before"
-msgstr ""
+msgstr "змінено до"
 
 #: documents/models.py:430
 msgid "modified after"
-msgstr ""
+msgstr "змінено після"
 
 #: documents/models.py:431
 msgid "does not have tag"
@@ -352,7 +352,7 @@ msgstr "не має тегу"
 
 #: documents/models.py:432
 msgid "does not have ASN"
-msgstr ""
+msgstr "не має АСН"
 
 #: documents/models.py:433
 msgid "title or content contains"
@@ -360,11 +360,11 @@ msgstr "заголовок або вміст містить"
 
 #: documents/models.py:434
 msgid "fulltext query"
-msgstr ""
+msgstr "повнотекстовий запит"
 
 #: documents/models.py:435
 msgid "more like this"
-msgstr ""
+msgstr "більше схожих"
 
 #: documents/models.py:436
 msgid "has tags in"
@@ -372,11 +372,11 @@ msgstr "має теги в"
 
 #: documents/models.py:437
 msgid "ASN greater than"
-msgstr ""
+msgstr "АСН більший ніж"
 
 #: documents/models.py:438
 msgid "ASN less than"
-msgstr ""
+msgstr "АСН менший ніж"
 
 #: documents/models.py:439
 msgid "storage path is"
@@ -400,7 +400,7 @@ msgstr ""
 
 #: documents/models.py:563
 msgid "Task ID"
-msgstr ""
+msgstr "ID завдання"
 
 #: documents/models.py:564
 msgid "Celery ID for the Task that was run"
@@ -432,7 +432,7 @@ msgstr ""
 
 #: documents/models.py:591
 msgid "Task State"
-msgstr ""
+msgstr "Стан завдання"
 
 #: documents/models.py:592
 msgid "Current state of the task being run"
@@ -518,11 +518,11 @@ msgstr ""
 
 #: documents/templates/registration/logged_out.html:14
 msgid "Paperless-ngx signed out"
-msgstr ""
+msgstr "Здійснено вихід з Paperless-ngx"
 
 #: documents/templates/registration/logged_out.html:59
 msgid "You have been successfully logged out. Bye!"
-msgstr ""
+msgstr "Ви успішно вийшли з системи. Бувайте!"
 
 #: documents/templates/registration/logged_out.html:60
 msgid "Sign in again"
@@ -530,11 +530,11 @@ msgstr "Увійдіть ще раз"
 
 #: documents/templates/registration/login.html:15
 msgid "Paperless-ngx sign in"
-msgstr ""
+msgstr "Увійти в Paperless-ngx"
 
 #: documents/templates/registration/login.html:61
 msgid "Please sign in."
-msgstr ""
+msgstr "Будь ласка, увійдіть."
 
 #: documents/templates/registration/login.html:64
 msgid "Your username and password didn't match. Please try again."
@@ -554,7 +554,7 @@ msgstr "Увійти"
 
 #: paperless/apps.py:9
 msgid "Paperless"
-msgstr ""
+msgstr "Paperless"
 
 #: paperless/settings.py:521
 msgid "English (US)"
@@ -654,7 +654,7 @@ msgstr "Автентифікація"
 
 #: paperless_mail/admin.py:31
 msgid "Advanced settings"
-msgstr ""
+msgstr "Додаткові налаштування"
 
 #: paperless_mail/admin.py:48
 msgid "Filter"
@@ -718,7 +718,7 @@ msgstr ""
 
 #: paperless_mail/models.py:32
 msgid "IMAP security"
-msgstr ""
+msgstr "Безпека IMAP"
 
 #: paperless_mail/models.py:37
 msgid "username"
@@ -790,7 +790,7 @@ msgstr "Використовувати назву файлу як заголов
 
 #: paperless_mail/models.py:84
 msgid "Do not assign a correspondent"
-msgstr ""
+msgstr "Не призначити кореспондента"
 
 #: paperless_mail/models.py:85
 msgid "Use mail address"
@@ -882,15 +882,15 @@ msgstr "призначити цей тег"
 
 #: paperless_mail/models.py:199
 msgid "assign this document type"
-msgstr ""
+msgstr "призначити цей тип документа"
 
 #: paperless_mail/models.py:203
 msgid "assign correspondent from"
-msgstr ""
+msgstr "призначити кореспондента з"
 
 #: paperless_mail/models.py:213
 msgid "assign this correspondent"
-msgstr ""
+msgstr "призначити цього кореспондента"
 
 #: paperless_mail/models.py:239
 msgid "uid"
