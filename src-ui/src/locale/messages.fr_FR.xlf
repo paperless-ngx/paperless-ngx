@@ -2539,13 +2539,13 @@
         </context-group>
         <target state="final">Titre</target>
       </trans-unit>
-      <trans-unit id="8911158217491828773" datatype="html">
+      <trans-unit id="8911158217491828773" datatype="html" approved="yes">
         <source>View Preview</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/saved-view-widget/saved-view-widget.component.html</context>
           <context context-type="linenumber">19</context>
         </context-group>
-        <target state="needs-translation">View Preview</target>
+        <target state="final">Afficher l'aperçu</target>
       </trans-unit>
       <trans-unit id="3099741642167775297" datatype="html" approved="yes">
         <source>Download</source>
