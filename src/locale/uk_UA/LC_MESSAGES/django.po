@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-07-31 17:42\n"
+"PO-Revision-Date: 2023-07-31 18:48\n"
 "Last-Translator: \n"
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
@@ -444,7 +444,7 @@ msgstr "Дата і час створення"
 
 #: documents/models.py:598
 msgid "Datetime field when the task result was created in UTC"
-msgstr ""
+msgstr "Дата і час створення результату виконання завдання в UTC"
 
 #: documents/models.py:603
 msgid "Started DateTime"
@@ -452,7 +452,7 @@ msgstr "Дата і час початку"
 
 #: documents/models.py:604
 msgid "Datetime field when the task was started in UTC"
-msgstr ""
+msgstr "Дата і час початку виконання завдання в UTC"
 
 #: documents/models.py:609
 msgid "Completed DateTime"
@@ -460,19 +460,19 @@ msgstr "Дата і час завершення"
 
 #: documents/models.py:610
 msgid "Datetime field when the task was completed in UTC"
-msgstr ""
+msgstr "Дата і час завершення виконання завдання в UTC"
 
 #: documents/models.py:615
 msgid "Result Data"
-msgstr ""
+msgstr "Дані результату"
 
 #: documents/models.py:617
 msgid "The data returned by the task"
-msgstr ""
+msgstr "Дані, які повернені завданням"
 
 #: documents/models.py:626
 msgid "Comment for the document"
-msgstr ""
+msgstr "Коментар до документа"
 
 #: documents/models.py:650
 msgid "user"
@@ -498,7 +498,7 @@ msgstr "Неправильний колір."
 #: documents/serialisers.py:700
 #, python-format
 msgid "File type %(type)s not supported"
-msgstr ""
+msgstr "Тип файлу %(type)s не підтримується"
 
 #: documents/serialisers.py:794
 msgid "Invalid variable detected."
@@ -662,7 +662,7 @@ msgstr "Фільтр"
 
 #: paperless_mail/admin.py:51
 msgid "Paperless will only process mails that match ALL of the filters given below."
-msgstr "Paperless опрацьовуватиме лише ті листи, які відповідають УСІМ фільтрам нижче."
+msgstr "Paperless-ngx оброблятиме лише ті листи, які відповідають УСІМ фільтрам нижче."
 
 #: paperless_mail/admin.py:66
 msgid "Actions"
@@ -670,7 +670,7 @@ msgstr "Дії"
 
 #: paperless_mail/admin.py:69
 msgid "The action applied to the mail. This action is only performed when the mail body or attachments were consumed from the mail."
-msgstr ""
+msgstr "Дія застосовується до листа. Ця дія виконується лише коли тіло листа або вкладення були використані із листа."
 
 #: paperless_mail/admin.py:77
 msgid "Metadata"
@@ -682,15 +682,15 @@ msgstr ""
 
 #: paperless_mail/apps.py:10
 msgid "Paperless mail"
-msgstr ""
+msgstr "Пошта Paperless-ngx"
 
 #: paperless_mail/models.py:9
 msgid "mail account"
-msgstr ""
+msgstr "поштова скринька"
 
 #: paperless_mail/models.py:10
 msgid "mail accounts"
-msgstr ""
+msgstr "поштові скриньки"
 
 #: paperless_mail/models.py:13
 msgid "No encryption"
@@ -714,7 +714,7 @@ msgstr "Порт IMAP"
 
 #: paperless_mail/models.py:26
 msgid "This is usually 143 for unencrypted and STARTTLS connections, and 993 for SSL connections."
-msgstr ""
+msgstr "Зазвичай це 143 для незашифрованих і STARTTLS з'єднань, і 993 для SSL-з'єднань."
 
 #: paperless_mail/models.py:32
 msgid "IMAP security"
@@ -738,15 +738,15 @@ msgstr "Кодування, що використовується при ком�
 
 #: paperless_mail/models.py:57
 msgid "mail rule"
-msgstr ""
+msgstr "правило пошти"
 
 #: paperless_mail/models.py:58
 msgid "mail rules"
-msgstr ""
+msgstr "правила пошти"
 
 #: paperless_mail/models.py:61 paperless_mail/models.py:69
 msgid "Only process attachments."
-msgstr "Опрацьовувати лише вкладення."
+msgstr "Обробляти лише вкладення."
 
 #: paperless_mail/models.py:62
 msgid "Process full Mail (with embedded attachments in file) as .eml"
@@ -758,7 +758,7 @@ msgstr ""
 
 #: paperless_mail/models.py:70
 msgid "Process all files, including 'inline' attachments."
-msgstr ""
+msgstr "Обробляти всі файли, включаючи вбудовані вкладення."
 
 #: paperless_mail/models.py:73
 msgid "Delete"
@@ -770,15 +770,15 @@ msgstr "Перемістити до вказаної теки"
 
 #: paperless_mail/models.py:75
 msgid "Mark as read, don't process read mails"
-msgstr ""
+msgstr "Відмітити як прочитане, не обробляти прочитані повідомлення"
 
 #: paperless_mail/models.py:76
 msgid "Flag the mail, don't process flagged mails"
-msgstr ""
+msgstr "Позначити пошту, не обробляти позначені листи"
 
 #: paperless_mail/models.py:77
 msgid "Tag the mail with specified tag, don't process tagged mails"
-msgstr ""
+msgstr "Позначити пошту зі вказаним тегом, не обробляти позначені листи"
 
 #: paperless_mail/models.py:80
 msgid "Use subject as title"
