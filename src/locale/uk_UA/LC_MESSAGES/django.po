@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-07-31 18:48\n"
+"PO-Revision-Date: 2023-07-31 20:40\n"
 "Last-Translator: \n"
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
@@ -678,7 +678,7 @@ msgstr "Метадані"
 
 #: paperless_mail/admin.py:80
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
-msgstr ""
+msgstr "Автоматично призначати метадані до документів, отриманих з цього правила. Якщо ви тут не призначите теги, типи чи кореспондентів, Paperless-ngx все одно оброблятиме всі відповідні правила, які ви визначили."
 
 #: paperless_mail/apps.py:10
 msgid "Paperless mail"
@@ -750,11 +750,11 @@ msgstr "Обробляти лише вкладення."
 
 #: paperless_mail/models.py:62
 msgid "Process full Mail (with embedded attachments in file) as .eml"
-msgstr ""
+msgstr "Обробка всієї пошти (з вбудованими вкладеннями) як .eml"
 
 #: paperless_mail/models.py:64
 msgid "Process full Mail (with embedded attachments in file) as .eml + process attachments as separate documents"
-msgstr ""
+msgstr "Обробка всієї пошти (з вбудованими вкладеннями) як .eml + обробляти вкладення як окремі документи"
 
 #: paperless_mail/models.py:70
 msgid "Process all files, including 'inline' attachments."
@@ -838,7 +838,7 @@ msgstr "фільтр по назві вкладення"
 
 #: paperless_mail/models.py:135
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr ""
+msgstr "Обробляти лише ті документи, які повністю відповідають назві файлу, якщо вказано. Шаблони, такі як *.pdf чи *invoice* дозволені. Без врахування регістру."
 
 #: paperless_mail/models.py:142
 msgid "maximum age"
