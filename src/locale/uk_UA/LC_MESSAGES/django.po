@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-07-31 06:52\n"
+"PO-Revision-Date: 2023-07-31 17:42\n"
 "Last-Translator: \n"
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
@@ -112,11 +112,11 @@ msgstr "шлях"
 
 #: documents/models.py:117 documents/models.py:145
 msgid "storage path"
-msgstr "шлях до сховища"
+msgstr "шлях зберігання"
 
 #: documents/models.py:118
 msgid "storage paths"
-msgstr ""
+msgstr "шляхи зберігання"
 
 #: documents/models.py:126
 msgid "Unencrypted"
@@ -184,11 +184,11 @@ msgstr "Поточна назва файлу в сховищі"
 
 #: documents/models.py:229
 msgid "archive filename"
-msgstr ""
+msgstr "назва файлу архіву"
 
 #: documents/models.py:235
 msgid "Current archive filename in storage"
-msgstr ""
+msgstr "Поточна назва файлу архіву в сховищі"
 
 #: documents/models.py:239
 msgid "original filename"
@@ -196,7 +196,7 @@ msgstr "оригінальна назва файлу"
 
 #: documents/models.py:245
 msgid "The original name of the file when it was uploaded"
-msgstr ""
+msgstr "Оригінальна назва файлу, коли його було завантажено"
 
 #: documents/models.py:252
 msgid "archive serial number"
@@ -232,7 +232,7 @@ msgstr "помилка"
 
 #: documents/models.py:363
 msgid "critical"
-msgstr ""
+msgstr "критично"
 
 #: documents/models.py:366
 msgid "group"
@@ -248,27 +248,27 @@ msgstr "рівень"
 
 #: documents/models.py:380
 msgid "log"
-msgstr ""
+msgstr "лог"
 
 #: documents/models.py:381
 msgid "logs"
-msgstr ""
+msgstr "логи"
 
 #: documents/models.py:391 documents/models.py:446
 msgid "saved view"
-msgstr ""
+msgstr "збережене представлення"
 
 #: documents/models.py:392
 msgid "saved views"
-msgstr ""
+msgstr "збережені представлення"
 
 #: documents/models.py:397
 msgid "show on dashboard"
-msgstr ""
+msgstr "показати на панелі"
 
 #: documents/models.py:400
 msgid "show in sidebar"
-msgstr ""
+msgstr "показати в бічній панелі"
 
 #: documents/models.py:404
 msgid "sort field"
@@ -292,11 +292,11 @@ msgstr "АСН"
 
 #: documents/models.py:417
 msgid "correspondent is"
-msgstr ""
+msgstr "кореспондент"
 
 #: documents/models.py:418
 msgid "document type is"
-msgstr ""
+msgstr "тип документа"
 
 #: documents/models.py:419
 msgid "is in inbox"
@@ -320,15 +320,15 @@ msgstr "створено після"
 
 #: documents/models.py:424
 msgid "created year is"
-msgstr ""
+msgstr "рік створення"
 
 #: documents/models.py:425
 msgid "created month is"
-msgstr ""
+msgstr "місяць створення"
 
 #: documents/models.py:426
 msgid "created day is"
-msgstr ""
+msgstr "день створення"
 
 #: documents/models.py:427
 msgid "added before"
@@ -380,11 +380,11 @@ msgstr "АСН менший ніж"
 
 #: documents/models.py:439
 msgid "storage path is"
-msgstr ""
+msgstr "шлях зберігання"
 
 #: documents/models.py:449
 msgid "rule type"
-msgstr ""
+msgstr "тип правила"
 
 #: documents/models.py:451
 msgid "value"
@@ -408,19 +408,19 @@ msgstr "Celery ID завдання, яке було запущено"
 
 #: documents/models.py:569
 msgid "Acknowledged"
-msgstr ""
+msgstr "Підтверджено"
 
 #: documents/models.py:570
 msgid "If the task is acknowledged via the frontend or API"
-msgstr ""
+msgstr "Якщо завдання підтверджено через вебінтерфейс або API"
 
 #: documents/models.py:576
 msgid "Task Filename"
-msgstr ""
+msgstr "Назва файлу завдання"
 
 #: documents/models.py:577
 msgid "Name of the file which the Task was run for"
-msgstr ""
+msgstr "Назва файлу, для якого було запущено завдання"
 
 #: documents/models.py:583
 msgid "Task Name"
@@ -440,7 +440,7 @@ msgstr "Поточний стан завдання в обробці"
 
 #: documents/models.py:597
 msgid "Created DateTime"
-msgstr ""
+msgstr "Дата і час створення"
 
 #: documents/models.py:598
 msgid "Datetime field when the task result was created in UTC"
@@ -448,7 +448,7 @@ msgstr ""
 
 #: documents/models.py:603
 msgid "Started DateTime"
-msgstr ""
+msgstr "Дата і час початку"
 
 #: documents/models.py:604
 msgid "Datetime field when the task was started in UTC"
@@ -456,7 +456,7 @@ msgstr ""
 
 #: documents/models.py:609
 msgid "Completed DateTime"
-msgstr ""
+msgstr "Дата і час завершення"
 
 #: documents/models.py:610
 msgid "Datetime field when the task was completed in UTC"
