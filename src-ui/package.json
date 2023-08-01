@@ -22,7 +22,7 @@
     "@ng-select/ng-select": "^11.0.0",
     "@ngneat/dirty-check-forms": "^3.0.3",
     "@popperjs/core": "^2.11.8",
-    "bootstrap": "^5.3.0",
+    "bootstrap": "^5.3.1",
     "file-saver": "^2.0.5",
     "mime-names": "^1.0.0",
     "ng2-pdf-viewer": "^9.1.5",
