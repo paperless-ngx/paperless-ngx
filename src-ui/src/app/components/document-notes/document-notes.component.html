@@ -8,7 +8,7 @@
         </div>
         <div class="form-group mt-2 d-flex justify-content-end align-items-center">
             <div *ngIf="networkActive" class="spinner-border spinner-border-sm fw-normal me-auto" role="status"></div>
-            <button type="button" class="btn btn-primary btn-sm" [disabled]="networkActive" (click)="addNote()" i18n>Add note</button>
+            <button type="button" class="btn btn-primary btn-sm" [disabled]="networkActive || addDisabled" (click)="addNote()" i18n>Add note</button>
         </div>
     </form>
     <hr>
