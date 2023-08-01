@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-07-31 20:40\n"
+"PO-Revision-Date: 2023-08-01 17:22\n"
 "Last-Translator: \n"
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
@@ -858,7 +858,7 @@ msgstr "Вбудовані вкладення містять зображенн�
 
 #: paperless_mail/models.py:158
 msgid "consumption scope"
-msgstr "сфера використання"
+msgstr "сфера застосування"
 
 #: paperless_mail/models.py:164
 msgid "action"
