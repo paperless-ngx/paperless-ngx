@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-05-11 02:17\n"
+"PO-Revision-Date: 2023-08-02 11:39\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
@@ -456,19 +456,19 @@ msgstr "Campo Data/Hora quando a tarefa começou, em UTC"
 
 #: documents/models.py:609
 msgid "Completed DateTime"
-msgstr ""
+msgstr "Data/Hora de conclusão"
 
 #: documents/models.py:610
 msgid "Datetime field when the task was completed in UTC"
-msgstr ""
+msgstr "Campo Data/Hora quando a tarefa foi concluída, em UTC"
 
 #: documents/models.py:615
 msgid "Result Data"
-msgstr ""
+msgstr "Dados de Resultado"
 
 #: documents/models.py:617
 msgid "The data returned by the task"
-msgstr ""
+msgstr "Os dados retornados pela tarefa"
 
 #: documents/models.py:626
 msgid "Comment for the document"
@@ -682,7 +682,7 @@ msgstr "Atribua metadados aos documentos consumidos por esta regra automaticamen
 
 #: paperless_mail/apps.py:10
 msgid "Paperless mail"
-msgstr ""
+msgstr "Paperless email"
 
 #: paperless_mail/models.py:9
 msgid "mail account"
