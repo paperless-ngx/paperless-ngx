@@ -611,8 +611,9 @@ class Consumer(LoggingMixin):
                 print(f'Creating StoragePath: {sub_path}')
                 StoragePath.objects.create(name=sub_path, path=sub_path)
             
-            print(f'Assigning StoragePath: "{folder_path}" to file')
-            document.storage_path = StoragePath.objects.get(path=folder_path)
+            if folder_path:
+                print(f'Assigning StoragePath: "{folder_path}" to file')
+                document.storage_path = StoragePath.objects.get(path=folder_path)
             
 
     def _write(self, storage_type, source, target):
