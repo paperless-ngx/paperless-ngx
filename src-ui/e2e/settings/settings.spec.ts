@@ -1,8 +1,6 @@
 import { test, expect } from '@playwright/test'
 
 const REQUESTS_HAR = 'e2e/settings/requests/api-settings.har'
-const REQUESTS_HAR2 = 'e2e/settings/requests/api-settings2.har'
-const REQUESTS_HAR3 = 'e2e/settings/requests/api-settings3.har'
 
 test('should post settings on save', async ({ page }) => {
   await page.routeFromHAR(REQUESTS_HAR, { notFound: 'fallback' })
