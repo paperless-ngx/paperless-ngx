@@ -4,7 +4,6 @@ from pathlib import Path
 import httpx
 from django.conf import settings
 from django.utils import timezone
-
 from tika_client import TikaClient
 
 from documents.parsers import DocumentParser
@@ -53,9 +52,7 @@ class TikaDocumentParser(DocumentParser):
 
         try:
             with TikaClient(tika_url=settings.TIKA_ENDPOINT) as client:
-                with open(document_path, "rb") as f:
-                    content = f.read()
-                    parsed = client.tika.as_text.from_buffer(content, mime_type)
+                parsed = client.tika.as_text.from_file(document_path, mime_type)
         except Exception as err:
             raise ParseError(
                 f"Could not parse {document_path} with tika server at "
@@ -66,9 +63,10 @@ class TikaDocumentParser(DocumentParser):
         if self.text is not None:
             self.text = self.text.strip()
 
-        tz = timezone.get_current_timezone()
+        self.date = parsed.created
+        if self.date is not None and timezone.is_naive(self.date):
+            self.date = timezone.make_aware(self.date)
 
-        self.date = timezone.make_aware(parsed.created, tz)
         self.archive_path = self.convert_to_pdf(document_path, file_name)
 
     def convert_to_pdf(self, document_path, file_name):
