@@ -84,7 +84,7 @@ describe('UploadFileWidgetComponent', () => {
 
   it('should change color by status phase', () => {
     const processingStatus = new FileStatus()
-    processingStatus.phase = FileStatusPhase.PROCESSING
+    processingStatus.phase = FileStatusPhase.WORKING
     expect(component.getStatusColor(processingStatus)).toEqual('primary')
     const failedStatus = new FileStatus()
     failedStatus.phase = FileStatusPhase.FAILED
@@ -134,7 +134,7 @@ function mockConsumerStatuses(consumerStatusService) {
       switch (phase) {
         case FileStatusPhase.FAILED:
           return [new FileStatus()]
-        case FileStatusPhase.PROCESSING:
+        case FileStatusPhase.WORKING:
           return [new FileStatus(), new FileStatus()]
         case FileStatusPhase.STARTED:
           return [new FileStatus(), new FileStatus(), new FileStatus()]

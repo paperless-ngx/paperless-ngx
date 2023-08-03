@@ -45,7 +45,7 @@ Examples of `non-trivial` PRs might include:
 
 - Additional features
 - Large changes to many distinct files
-- Breaking or depreciation of existing features
+- Breaking or deprecation of existing features
 
 Our community review process for `non-trivial` PRs is the following:
 

@@ -502,18 +502,17 @@ class DocumentViewSet(
 
     @action(methods=["get", "post", "delete"], detail=True)
     def notes(self, request, pk=None):
+        currentUser = request.user
         try:
             doc = Document.objects.get(pk=pk)
-            if request.user is not None and not has_perms_owner_aware(
-                request.user,
+            if currentUser is not None and not has_perms_owner_aware(
+                currentUser,
                 "view_document",
                 doc,
             ):
-                return HttpResponseForbidden("Insufficient permissions")
+                return HttpResponseForbidden("Insufficient permissions to view")
         except Document.DoesNotExist:
             raise Http404
-
-        currentUser = request.user
 
         if request.method == "GET":
             try:
@@ -525,6 +524,13 @@ class DocumentViewSet(
                 )
         elif request.method == "POST":
             try:
+                if currentUser is not None and not has_perms_owner_aware(
+                    currentUser,
+                    "change_document",
+                    doc,
+                ):
+                    return HttpResponseForbidden("Insufficient permissions to create")
+
                 c = Note.objects.create(
                     document=doc,
                     note=request.data["note"],
@@ -545,6 +551,13 @@ class DocumentViewSet(
                     },
                 )
         elif request.method == "DELETE":
+            if currentUser is not None and not has_perms_owner_aware(
+                currentUser,
+                "change_document",
+                doc,
+            ):
+                return HttpResponseForbidden("Insufficient permissions to delete")
+
             note = Note.objects.get(id=int(request.GET.get("id")))
             note.delete()
 

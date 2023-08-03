@@ -1,4 +1,4 @@
-::ng-deep app-document-list .popover {
+::ng-deep .popover.popover-preview {
   max-width: 40rem;
 
   .preview {
@@ -16,7 +16,7 @@
   }
 }
 
- ::ng-deep .popover-hidden .popover {
+::ng-deep .popover-hidden .popover {
   opacity: 0;
   pointer-events: none;
 }

@@ -115,9 +115,9 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
         case FILTER_CORRESPONDENT:
         case FILTER_HAS_CORRESPONDENT_ANY:
           if (rule.value) {
-            return $localize`Correspondent: ${
-              this.correspondents.find((c) => c.id == +rule.value)?.name
-            }`
+            return $localize`Correspondent: ${this.correspondents.find(
+              (c) => c.id == +rule.value
+            )?.name}`
           } else {
             return $localize`Without correspondent`
           }
@@ -125,9 +125,9 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
         case FILTER_DOCUMENT_TYPE:
         case FILTER_HAS_DOCUMENT_TYPE_ANY:
           if (rule.value) {
-            return $localize`Document type: ${
-              this.documentTypes.find((dt) => dt.id == +rule.value)?.name
-            }`
+            return $localize`Document type: ${this.documentTypes.find(
+              (dt) => dt.id == +rule.value
+            )?.name}`
           } else {
             return $localize`Without document type`
           }
@@ -135,17 +135,16 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
         case FILTER_STORAGE_PATH:
         case FILTER_HAS_STORAGE_PATH_ANY:
           if (rule.value) {
-            return $localize`Storage path: ${
-              this.storagePaths.find((sp) => sp.id == +rule.value)?.name
-            }`
+            return $localize`Storage path: ${this.storagePaths.find(
+              (sp) => sp.id == +rule.value
+            )?.name}`
           } else {
             return $localize`Without storage path`
           }
 
         case FILTER_HAS_TAGS_ALL:
-          return $localize`Tag: ${
-            this.tags.find((t) => t.id == +rule.value)?.name
-          }`
+          return $localize`Tag: ${this.tags.find((t) => t.id == +rule.value)
+            ?.name}`
 
         case FILTER_HAS_ANY_TAG:
           if (rule.value == 'false') {

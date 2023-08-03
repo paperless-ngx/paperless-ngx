@@ -21,6 +21,7 @@ from django.utils import timezone
 
 from documents.consumer import Consumer
 from documents.consumer import ConsumerError
+from documents.consumer import ConsumerFilePhase
 from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
@@ -228,8 +229,8 @@ def fake_magic_from_file(file, mime=False):
 class TestConsumer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     def _assert_first_last_send_progress(
         self,
-        first_status="STARTING",
-        last_status="SUCCESS",
+        first_status=ConsumerFilePhase.STARTED,
+        last_status=ConsumerFilePhase.SUCCESS,
         first_progress=0,
         first_progress_max=100,
         last_progress=100,
@@ -561,10 +562,16 @@ class TestConsumer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
     @mock.patch("documents.consumer.load_classifier")
     def testClassifyDocument(self, m):
-        correspondent = Correspondent.objects.create(name="test")
-        dtype = DocumentType.objects.create(name="test")
-        t1 = Tag.objects.create(name="t1")
-        t2 = Tag.objects.create(name="t2")
+        correspondent = Correspondent.objects.create(
+            name="test",
+            matching_algorithm=Correspondent.MATCH_AUTO,
+        )
+        dtype = DocumentType.objects.create(
+            name="test",
+            matching_algorithm=DocumentType.MATCH_AUTO,
+        )
+        t1 = Tag.objects.create(name="t1", matching_algorithm=Tag.MATCH_AUTO)
+        t2 = Tag.objects.create(name="t2", matching_algorithm=Tag.MATCH_AUTO)
 
         m.return_value = MagicMock()
         m.return_value.predict_correspondent.return_value = correspondent.pk
