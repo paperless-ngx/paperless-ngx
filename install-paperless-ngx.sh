@@ -72,7 +72,7 @@ fi
 if ! docker stats --no-stream &> /dev/null ; then
 	echo ""
 	echo "WARN: It look like the current user does not have Docker permissions."
-	echo "WARN: Use 'sudo usermod -aG docker $USER' to assign Docker permissions to the user."
+	echo "WARN: Use 'sudo usermod -aG docker $USER' to assign Docker permissions to the user (may require restarting shell)."
 	echo ""
 	sleep 3
 fi

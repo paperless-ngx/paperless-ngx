@@ -524,7 +524,7 @@ parsing documents.
 
 `PAPERLESS_OCR_MODE=<mode>`
 
-: Tell paperless when and how to perform ocr on your documents. Four
+: Tell paperless when and how to perform ocr on your documents. Three
 modes are available:
 
     -   `skip`: Paperless skips all pages and will perform ocr only on
@@ -1116,6 +1116,43 @@ combination with PAPERLESS_CONSUMER_BARCODE_UPSCALE bigger than 1.0.
 
     Defaults to "300"
 
+## Collate Double-Sided Documents {#collate}
+
+`PAPERLESS_CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED=<bool>`
+
+: Enables automatic collation of two single-sided scans into a double-sided
+document.
+
+    This is useful if you have an automatic document feeder that only supports
+    single-sided scans, but you need to scan a double-sided document. If your
+    ADF supports double-sided scans natively, you do not need this feature.
+
+    `PAPERLESS_CONSUMER_RECURSIVE` must be enabled for this to work.
+
+    For more information, read the [corresponding section in the advanced
+    documentation](/advanced_usage#collate).
+
+    Defaults to false.
+
+`PAPERLESS_CONSUMER_COLLATE_DOUBLE_SIDED_SUBDIR_NAME=<str>`
+
+: The name of the subdirectory that the collate feature expects documents to
+arrive.
+
+    This only has an effect if `PAPERLESS_CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED`
+    has been enabled. Note that Paperless will not automatically create the
+    directory.
+
+    Defaults to "double-sided".
+
+`PAPERLESS_CONSUMER_COLLATE_DOUBLE_SIDED_TIFF_SUPPORT=<bool>`
+: Whether TIFF image files should be supported when collating documents.
+This will automatically convert any TIFF image(s) to pdfs for later
+processing. This only has an effect if
+`PAPERLESS_CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED` has been enabled.
+
+    Defaults to false.
+
 ## Binaries
 
 There are a few external software packages that Paperless expects to
@@ -1123,7 +1160,7 @@ find on your system when it starts up. Unless you've done something
 creative with their installation, you probably won't need to edit any
 of these. However, if you've installed these programs somewhere where
 simply typing the name of the program doesn't automatically execute it
-(ie. the program isn't in your \$PATH), then you'll need to specify
+(ie. the program isn't in your $PATH), then you'll need to specify
 the literal path for that program.
 
 `PAPERLESS_CONVERT_BINARY=<path>`
@@ -1207,7 +1244,7 @@ actual group ID on the host system, which you can get by executing
 with English, German, Italian, Spanish and French. If your language
 is not in this list, install additional languages with this
 configuration option. You will need to [find the right LangCodes](https://tesseract-ocr.github.io/tessdoc/Data-Files-in-different-versions.html)
-but note that (tesseract-ocr-\* package names)[https://packages.debian.org/bullseye/graphics/]
+but note that [tesseract-ocr-\* package names](https://packages.debian.org/bullseye/graphics/)
 do not always correspond with the language codes e.g. "chi_tra" should be
 specified as "chi-tra".
 

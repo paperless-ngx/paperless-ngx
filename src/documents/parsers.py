@@ -18,6 +18,7 @@ from django.utils import timezone
 
 from documents.loggers import LoggingMixin
 from documents.signals import document_consumer_declaration
+from documents.utils import copy_file_with_basic_stats
 
 # This regular expression will try to find dates in the document at
 # hand and will match the following formats:
@@ -31,16 +32,18 @@ from documents.signals import document_consumer_declaration
 # - MONTH ZZZZ, with ZZZZ being 4 digits
 # - MONTH XX, ZZZZ with XX being 1 or 2 and ZZZZ being 4 digits
 # - XX MON ZZZZ with XX being 1 or 2 and ZZZZ being 4 digits. MONTH is 3 letters
+# - XXPP MONTH ZZZZ with XX being 1 or 2 and PP being 2 letters and ZZZZ being 4 digits
 
 # TODO: isnt there a date parsing library for this?
 
 DATE_REGEX = re.compile(
     r"(\b|(?!=([_-])))([0-9]{1,2})[\.\/-]([0-9]{1,2})[\.\/-]([0-9]{4}|[0-9]{2})(\b|(?=([_-])))|"  # noqa: E501
     r"(\b|(?!=([_-])))([0-9]{4}|[0-9]{2})[\.\/-]([0-9]{1,2})[\.\/-]([0-9]{1,2})(\b|(?=([_-])))|"  # noqa: E501
-    r"(\b|(?!=([_-])))([0-9]{1,2}[\. ]+[^ ]{3,9} ([0-9]{4}|[0-9]{2}))(\b|(?=([_-])))|"  # noqa: E501
+    r"(\b|(?!=([_-])))([0-9]{1,2}[\. ]+[a-zA-Z]{3,9} ([0-9]{4}|[0-9]{2}))(\b|(?=([_-])))|"  # noqa: E501
     r"(\b|(?!=([_-])))([^\W\d_]{3,9} [0-9]{1,2}, ([0-9]{4}))(\b|(?=([_-])))|"
     r"(\b|(?!=([_-])))([^\W\d_]{3,9} [0-9]{4})(\b|(?=([_-])))|"
-    r"(\b|(?!=([_-])))(\b[0-9]{1,2}[ \.\/-][A-Z]{3}[ \.\/-][0-9]{4})(\b|(?=([_-])))",  # noqa: E501
+    r"(\b|(?!=([_-])))([0-9]{1,2}[^ ]{2}[\. ]+[^ ]{3,9}[ \.\/-][0-9]{4})(\b|(?=([_-])))|"  # noqa: E501
+    r"(\b|(?!=([_-])))(\b[0-9]{1,2}[ \.\/-][a-zA-Z]{3}[ \.\/-][0-9]{4})(\b|(?=([_-])))",  # noqa: E501
 )
 
 
@@ -206,7 +209,7 @@ def make_thumbnail_from_pdf_gs_fallback(in_path, temp_dir, logging_group=None) -
         # so we need to copy it before it gets moved.
         # https://github.com/paperless-ngx/paperless-ngx/issues/3631
         default_thumbnail_path = os.path.join(temp_dir, "document.png")
-        shutil.copy2(get_default_thumbnail(), default_thumbnail_path)
+        copy_file_with_basic_stats(get_default_thumbnail(), default_thumbnail_path)
         return default_thumbnail_path
 
 

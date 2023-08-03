@@ -11,13 +11,17 @@ from typing import Set
 import tqdm
 from django.conf import settings
 from django.contrib.auth.models import Group
+from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
 from django.core import serializers
 from django.core.management.base import BaseCommand
 from django.core.management.base import CommandError
 from django.db import transaction
 from django.utils import timezone
 from filelock import FileLock
+from guardian.models import GroupObjectPermission
+from guardian.models import UserObjectPermission
 
 from documents.file_handling import delete_empty_directories
 from documents.file_handling import generate_filename
@@ -33,6 +37,7 @@ from documents.models import UiSettings
 from documents.settings import EXPORTER_ARCHIVE_NAME
 from documents.settings import EXPORTER_FILE_NAME
 from documents.settings import EXPORTER_THUMBNAIL_NAME
+from documents.utils import copy_file_with_basic_stats
 from paperless import version
 from paperless.db import GnuPG
 from paperless_mail.models import MailAccount
@@ -261,6 +266,22 @@ class Command(BaseCommand):
                 serializers.serialize("json", UiSettings.objects.all()),
             )
 
+            manifest += json.loads(
+                serializers.serialize("json", ContentType.objects.all()),
+            )
+
+            manifest += json.loads(
+                serializers.serialize("json", Permission.objects.all()),
+            )
+
+            manifest += json.loads(
+                serializers.serialize("json", UserObjectPermission.objects.all()),
+            )
+
+            manifest += json.loads(
+                serializers.serialize("json", GroupObjectPermission.objects.all()),
+            )
+
         # 3. Export files from each document
         for index, document_dict in tqdm.tqdm(
             enumerate(document_manifest),
@@ -417,4 +438,4 @@ class Command(BaseCommand):
 
         if perform_copy:
             target.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(source, target)
+            copy_file_with_basic_stats(source, target)
