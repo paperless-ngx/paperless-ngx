@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-08-01 17:22\n"
+"PO-Revision-Date: 2023-08-03 20:07\n"
 "Last-Translator: \n"
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
@@ -822,7 +822,7 @@ msgstr "Підтеки мають розділятися розділюваль�
 
 #: paperless_mail/models.py:111
 msgid "filter from"
-msgstr "фільтр по відправнику"
+msgstr "фільтрувати по відправнику"
 
 #: paperless_mail/models.py:117
 msgid "filter subject"
@@ -830,11 +830,11 @@ msgstr "фільтрувати за темою"
 
 #: paperless_mail/models.py:123
 msgid "filter body"
-msgstr "фільтр по тексту повідомлення"
+msgstr "фільтрувати по тексту повідомлення"
 
 #: paperless_mail/models.py:130
 msgid "filter attachment filename"
-msgstr "фільтр по назві вкладення"
+msgstr "фільтрувати по назві вкладення"
 
 #: paperless_mail/models.py:135
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
