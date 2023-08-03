@@ -1261,7 +1261,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">76</context>
         </context-group>
-        <target state="needs-translation">Permissions</target>
+        <target state="translated">Права доступу</target>
       </trans-unit>
       <trans-unit id="7878445132438733225" datatype="html">
         <source>Create new user group</source>
@@ -2840,7 +2840,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">76</context>
         </context-group>
-        <target state="needs-translation">Archive serial number</target>
+        <target state="translated">Архівний серійний номер</target>
       </trans-unit>
       <trans-unit id="5114742157723900905" datatype="html">
         <source>Date created</source>
@@ -3176,7 +3176,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">640,642</context>
         </context-group>
-        <target state="needs-translation">Error deleting document: <x id="PH" equiv-text="error.error?.detail ?? error.message ?? JSON.stringify(error)"/></target>
+        <target state="translated">Помилка при видаленні документу: <x id="PH" equiv-text="error.error?.detail ?? error.message ?? JSON.stringify(error)"/></target>
       </trans-unit>
       <trans-unit id="7362691899087997122" datatype="html">
         <source>Redo OCR confirm</source>
@@ -3256,7 +3256,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">903</context>
         </context-group>
-        <target state="needs-translation">Proceed</target>
+        <target state="translated">Продовжити</target>
       </trans-unit>
       <trans-unit id="5729001209753056399" datatype="html">
         <source>Redo OCR operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.</source>
@@ -3392,7 +3392,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">108</context>
         </context-group>
-        <target state="needs-translation">Include:</target>
+        <target state="translated">Включити:</target>
       </trans-unit>
       <trans-unit id="1208547554603365604" datatype="html">
         <source> Archived files </source>
