@@ -3,6 +3,11 @@ import os
 from pathlib import Path
 from unittest import mock
 
+try:
+    import zoneinfo
+except ImportError:
+    from backports import zoneinfo
+
 from django.test import TestCase
 from django.test import override_settings
 from httpx import Request
@@ -21,6 +26,7 @@ class TestTikaParser(HttpxMockMixin, TestCase):
     def tearDown(self) -> None:
         self.parser.cleanup()
 
+    @override_settings(TIME_ZONE="America/Chicago")
     def test_parse(self):
         # Pretend parse response
         self.httpx_mock.add_response(
@@ -46,7 +52,12 @@ class TestTikaParser(HttpxMockMixin, TestCase):
 
         self.assertEqual(
             self.parser.date,
-            datetime.datetime(2020, 11, 21),
+            datetime.datetime(
+                2020,
+                11,
+                21,
+                tzinfo=zoneinfo.ZoneInfo("America/Chicago"),
+            ),
         )
 
     def test_metadata(self):
