@@ -152,6 +152,55 @@ class TestDate(TestCase):
         text = "Customer Number Currency 22 MAR,2022 Credit Card 1934829304"
         self.assertIsNone(parse_date("", text), None)
 
+    def test_date_format_19(self):
+        text = "Customer Number Currency 21st MAR 2022 Credit Card 1934829304"
+        self.assertEqual(
+            parse_date("", text),
+            datetime.datetime(2022, 3, 21, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
+        )
+
+    def test_date_format_20(self):
+        text = "Customer Number Currency 22nd March 2022 Credit Card 1934829304"
+        self.assertEqual(
+            parse_date("", text),
+            datetime.datetime(2022, 3, 22, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
+        )
+
+    def test_date_format_21(self):
+        text = "Customer Number Currency 2nd MAR 2022 Credit Card 1934829304"
+        self.assertEqual(
+            parse_date("", text),
+            datetime.datetime(2022, 3, 2, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
+        )
+
+    def test_date_format_22(self):
+        text = "Customer Number Currency 23rd MAR 2022 Credit Card 1934829304"
+        self.assertEqual(
+            parse_date("", text),
+            datetime.datetime(2022, 3, 23, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
+        )
+
+    def test_date_format_23(self):
+        text = "Customer Number Currency 24th MAR 2022 Credit Card 1934829304"
+        self.assertEqual(
+            parse_date("", text),
+            datetime.datetime(2022, 3, 24, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
+        )
+
+    def test_date_format_24(self):
+        text = "Customer Number Currency 21-MAR-2022 Credit Card 1934829304"
+        self.assertEqual(
+            parse_date("", text),
+            datetime.datetime(2022, 3, 21, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
+        )
+
+    def test_date_format_25(self):
+        text = "Customer Number Currency 25TH MAR 2022 Credit Card 1934829304"
+        self.assertEqual(
+            parse_date("", text),
+            datetime.datetime(2022, 3, 25, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
+        )
+
     def test_crazy_date_past(self, *args):
         self.assertIsNone(parse_date("", "01-07-0590 00:00:00"))
 

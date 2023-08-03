@@ -58,7 +58,7 @@ first-time setup.
 
 !!! note
 
-    Every command is executed directly from the root folder of the project unless specified otherwise.
+      Every command is executed directly from the root folder of the project unless specified otherwise.
 
 1.  Install prerequisites + pipenv as mentioned in
     [Bare metal route](/setup#bare_metal).
@@ -177,68 +177,69 @@ The front end is built using AngularJS. In order to get started, you need Node.j
 
     The following commands are all performed in the `src-ui`-directory. You will need a running back end (including an active session) to connect to the back end API. To spin it up refer to the commands under the section [above](#back-end-development).
 
-1. Install the Angular CLI. You might need sudo privileges
-   to perform this command:
+1.  Install the Angular CLI. You might need sudo privileges to perform this command:
 
-   ```bash
-   $ npm install -g @angular/cli
-   ```
+    ```bash
+    $ npm install -g @angular/cli
+    ```
 
-2. Make sure that it's on your path.
+2.  Make sure that it's on your path.
 
-3. Install all necessary modules:
+3.  Install all necessary modules:
 
-   ```bash
-   $ npm install
-   ```
+    ```bash
+    $ npm install
+    ```
 
-4. You can launch a development server by running:
+4.  You can launch a development server by running:
 
-   ```bash
-   $ ng serve
-   ```
+    ```bash
+    $ ng serve
+    ```
 
-   This will automatically update whenever you save. However, in-place
-   compilation might fail on syntax errors, in which case you need to
-   restart it.
+    This will automatically update whenever you save. However, in-place
+    compilation might fail on syntax errors, in which case you need to
+    restart it.
 
-   By default, the development server is available on `http://localhost:4200/` and is configured to access the API at
-   `http://localhost:8000/api/`, which is the default of the backend. If you enabled `DEBUG` on the back end, several security overrides for allowed hosts, CORS and X-Frame-Options are in place so that the front end behaves exactly as in production.
+    By default, the development server is available on `http://localhost:4200/` and is configured to access the API at
+    `http://localhost:8000/api/`, which is the default of the backend. If you enabled `DEBUG` on the back end, several security overrides for allowed hosts, CORS and X-Frame-Options are in place so that the front end behaves exactly as in production.
 
 ### Testing and code style
 
-- The front end code (.ts, .html, .scss) use `prettier` for code
-  formatting via the Git `pre-commit` hooks which run automatically on
-  commit. See [above](#code-formatting-with-pre-commit-hooks) for installation instructions. You can also run this via the CLI with a
-  command such as
+The front end code (.ts, .html, .scss) use `prettier` for code
+formatting via the Git `pre-commit` hooks which run automatically on
+commit. See [above](#code-formatting-with-pre-commit-hooks) for installation instructions. You can also run this via the CLI with a
+command such as
 
-  ```bash
-  $ git ls-files -- '*.ts' | xargs pre-commit run prettier --files
-  ```
+```bash
+$ git ls-files -- '*.ts' | xargs pre-commit run prettier --files
+```
 
-- Front end testing uses Jest and Playwright. Unit tests and e2e tests,
-  respectively, can be run non-interactively with:
+Front end testing uses Jest and Playwright. Unit tests and e2e tests,
+respectively, can be run non-interactively with:
 
-  ```bash
-  $ ng test
-  $ npx playwright test
-  ```
+```bash
+$ ng test
+$ npx playwright test
+```
 
-  - Playwright also includes a UI which can be run with:
+Playwright also includes a UI which can be run with:
 
-    ```bash
-    $ npx playwright test --ui
-    ```
+```bash
+$ npx playwright test --ui
+```
 
-- In order to build the front end and serve it as part of Django, execute:
+### Building the frontend
 
-  ```bash
-  $ ng build --configuration production
-  ```
+In order to build the front end and serve it as part of Django, execute:
 
-  This will build the front end and put it in a location from which the
-  Django server will serve it as static content. This way, you can verify
-  that authentication is working.
+```bash
+$ ng build --configuration production
+```
+
+This will build the front end and put it in a location from which the
+Django server will serve it as static content. This way, you can verify
+that authentication is working.
 
 ## Localization
 

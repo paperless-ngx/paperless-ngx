@@ -50,7 +50,7 @@
             </a>
             <a class="btn btn-sm btn-outline-secondary" target="_blank" [href]="previewUrl"
             [ngbPopover]="previewContent" [popoverTitle]="document.title | documentTitle"
-            autoClose="true" popoverClass="shadow" (mouseenter)="mouseEnterPreview()" (mouseleave)="mouseLeavePreview()" #popover="ngbPopover">
+            autoClose="true" popoverClass="shadow popover-preview" (mouseenter)="mouseEnterPreview()" (mouseleave)="mouseLeavePreview()" #popover="ngbPopover">
               <svg class="sidebaricon" fill="currentColor" class="sidebaricon">
                 <use xlink:href="assets/bootstrap-icons.svg#eye"/>
               </svg>&nbsp;<span class="d-none d-md-inline" i18n>View</span>
@@ -94,7 +94,7 @@
               <small>#{{document.archive_serial_number}}</small>
             </div>
             <ng-template #dateTooltip>
-              <div class="d-flex flex-column">
+              <div class="d-flex flex-column text-light">
                 <span i18n>Created: {{ document.created | customDate }}</span>
                 <span i18n>Added: {{ document.added | customDate }}</span>
                 <span i18n>Modified: {{ document.modified | customDate }}</span>

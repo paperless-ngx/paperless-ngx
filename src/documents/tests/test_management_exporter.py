@@ -7,11 +7,18 @@ from pathlib import Path
 from unittest import mock
 from zipfile import ZipFile
 
+from django.contrib.auth.models import Group
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 from django.core.management import call_command
 from django.core.management.base import CommandError
+from django.db import IntegrityError
 from django.test import TestCase
 from django.test import override_settings
 from django.utils import timezone
+from guardian.models import GroupObjectPermission
+from guardian.models import UserObjectPermission
+from guardian.shortcuts import assign_perm
 
 from documents.management.commands import document_exporter
 from documents.models import Correspondent
@@ -34,6 +41,8 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.addCleanup(shutil.rmtree, self.target)
 
         self.user = User.objects.create(username="temp_admin")
+        self.user2 = User.objects.create(username="user2")
+        self.group1 = Group.objects.create(name="group1")
 
         self.d1 = Document.objects.create(
             content="Content",
@@ -72,6 +81,9 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             document=self.d1,
             user=self.user,
         )
+
+        assign_perm("view_document", self.user2, self.d2)
+        assign_perm("view_document", self.group1, self.d3)
 
         self.t1 = Tag.objects.create(name="t")
         self.dt1 = DocumentType.objects.create(name="dt")
@@ -141,12 +153,12 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         manifest = self._do_export(use_filename_format=use_filename_format)
 
-        self.assertEqual(len(manifest), 10)
+        self.assertEqual(len(manifest), 149)
 
         # dont include consumer or AnonymousUser users
         self.assertEqual(
             len(list(filter(lambda e: e["model"] == "auth.user", manifest))),
-            1,
+            2,
         )
 
         self.assertEqual(
@@ -218,6 +230,9 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             Correspondent.objects.all().delete()
             DocumentType.objects.all().delete()
             Tag.objects.all().delete()
+            Permission.objects.all().delete()
+            UserObjectPermission.objects.all().delete()
+            GroupObjectPermission.objects.all().delete()
             self.assertEqual(Document.objects.count(), 0)
 
             call_command("document_importer", "--no-progress-bar", self.target)
@@ -230,6 +245,9 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             self.assertEqual(Document.objects.get(id=self.d2.id).title, "wow2")
             self.assertEqual(Document.objects.get(id=self.d3.id).title, "wow2")
             self.assertEqual(Document.objects.get(id=self.d4.id).title, "wow_dec")
+            self.assertEqual(GroupObjectPermission.objects.count(), 1)
+            self.assertEqual(UserObjectPermission.objects.count(), 1)
+            self.assertEqual(Permission.objects.count(), 108)
             messages = check_sanity()
             # everything is alright after the test
             self.assertEqual(len(messages), 0)
@@ -259,7 +277,7 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         st_mtime_1 = os.stat(os.path.join(self.target, "manifest.json")).st_mtime
 
         with mock.patch(
-            "documents.management.commands.document_exporter.shutil.copy2",
+            "documents.management.commands.document_exporter.copy_file_with_basic_stats",
         ) as m:
             self._do_export()
             m.assert_not_called()
@@ -270,7 +288,7 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         Path(self.d1.source_path).touch()
 
         with mock.patch(
-            "documents.management.commands.document_exporter.shutil.copy2",
+            "documents.management.commands.document_exporter.copy_file_with_basic_stats",
         ) as m:
             self._do_export()
             self.assertEqual(m.call_count, 1)
@@ -293,7 +311,7 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertIsFile(os.path.join(self.target, "manifest.json"))
 
         with mock.patch(
-            "documents.management.commands.document_exporter.shutil.copy2",
+            "documents.management.commands.document_exporter.copy_file_with_basic_stats",
         ) as m:
             self._do_export()
             m.assert_not_called()
@@ -304,7 +322,7 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.d2.save()
 
         with mock.patch(
-            "documents.management.commands.document_exporter.shutil.copy2",
+            "documents.management.commands.document_exporter.copy_file_with_basic_stats",
         ) as m:
             self._do_export(compare_checksums=True)
             self.assertEqual(m.call_count, 1)
@@ -641,3 +659,47 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             self.assertEqual(Document.objects.count(), 0)
             call_command("document_importer", "--no-progress-bar", self.target)
             self.assertEqual(Document.objects.count(), 4)
+
+    def test_import_db_transaction_failed(self):
+        """
+        GIVEN:
+            - Import from manifest started
+        WHEN:
+            - Import of database fails
+        THEN:
+            - ContentType & Permission objects are not deleted, db transaction rolled back
+        """
+
+        shutil.rmtree(os.path.join(self.dirs.media_dir, "documents"))
+        shutil.copytree(
+            os.path.join(os.path.dirname(__file__), "samples", "documents"),
+            os.path.join(self.dirs.media_dir, "documents"),
+        )
+
+        self.assertEqual(ContentType.objects.count(), 27)
+        self.assertEqual(Permission.objects.count(), 108)
+
+        manifest = self._do_export()
+
+        with paperless_environment():
+            self.assertEqual(
+                len(list(filter(lambda e: e["model"] == "auth.permission", manifest))),
+                108,
+            )
+            # add 1 more to db to show objects are not re-created by import
+            Permission.objects.create(
+                name="test",
+                codename="test_perm",
+                content_type_id=1,
+            )
+            self.assertEqual(Permission.objects.count(), 109)
+
+            # will cause an import error
+            self.user.delete()
+            self.user = User.objects.create(username="temp_admin")
+
+            with self.assertRaises(IntegrityError):
+                call_command("document_importer", "--no-progress-bar", self.target)
+
+            self.assertEqual(ContentType.objects.count(), 27)
+            self.assertEqual(Permission.objects.count(), 109)

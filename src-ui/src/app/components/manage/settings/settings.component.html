@@ -266,8 +266,8 @@
                     <div class="col d-flex align-items-center">{{account.imap_server}}</div>
                     <div class="col">
                       <div class="btn-group">
-                        <button *appIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailAccount }" class="btn btn-sm btn-primary" type="button" (click)="editMailAccount(account)" i18n>Edit</button>
-                        <button *appIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailAccount }" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteMailAccount(account)" i18n>Delete</button>
+                        <button *appIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailAccount }" [disabled]="!userCanEdit(account)" class="btn btn-sm btn-primary" type="button" (click)="editMailAccount(account)" i18n>Edit</button>
+                        <button *appIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.MailAccount }" [disabled]="!userIsOwner(account)" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteMailAccount(account)" i18n>Delete</button>
                       </div>
                     </div>
                   </div>
@@ -303,8 +303,8 @@
                     <div class="col d-flex align-items-center">{{(mailAccountService.getCached(rule.account) | async)?.name}}</div>
                     <div class="col">
                       <div class="btn-group">
-                        <button *appIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailRule }" class="btn btn-sm btn-primary" type="button" (click)="editMailRule(rule)" i18n>Edit</button>
-                        <button *appIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailRule }" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteMailRule(rule)" i18n>Delete</button>
+                        <button *appIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailRule }" [disabled]="!userCanEdit(rule)" class="btn btn-sm btn-primary" type="button" (click)="editMailRule(rule)" i18n>Edit</button>
+                        <button *appIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.MailRule }" [disabled]="!userIsOwner(rule)" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteMailRule(rule)" i18n>Delete</button>
                       </div>
                     </div>
                   </div>

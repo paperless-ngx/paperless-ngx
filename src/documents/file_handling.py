@@ -218,6 +218,7 @@ def generate_filename(
                 tag_list=tag_list,
                 owner_username=owner_username_str,
                 original_name=original_name,
+                doc_pk=f"{doc.pk:07}",
             ).strip()
 
             if settings.FILENAME_FORMAT_REMOVE_NONE:

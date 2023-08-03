@@ -48,8 +48,8 @@ const savedViews = [
   { id: 2, name: 'view2' },
 ]
 const users = [
-  { id: 1, username: 'user1' },
-  { id: 2, username: 'user2' },
+  { id: 1, username: 'user1', is_superuser: false },
+  { id: 2, username: 'user2', is_superuser: false },
 ]
 const groups = [
   { id: 1, name: 'group1' },
@@ -60,8 +60,8 @@ const mailAccounts = [
   { id: 2, name: 'account2' },
 ]
 const mailRules = [
-  { id: 1, name: 'rule1' },
-  { id: 2, name: 'rule2' },
+  { id: 1, name: 'rule1', owner: 1 },
+  { id: 2, name: 'rule2', owner: 2 },
 ]
 
 describe('SettingsComponent', () => {
@@ -75,6 +75,7 @@ describe('SettingsComponent', () => {
   let viewportScroller: ViewportScroller
   let toastService: ToastService
   let userService: UserService
+  let permissionsService: PermissionsService
   let groupService: GroupService
   let mailAccountService: MailAccountService
   let mailRuleService: MailRuleService
@@ -90,17 +91,7 @@ describe('SettingsComponent', () => {
         CheckComponent,
         ColorComponent,
       ],
-      providers: [
-        {
-          provide: PermissionsService,
-          useValue: {
-            currentUserCan: () => true,
-          },
-        },
-        CustomDatePipe,
-        DatePipe,
-        PermissionsGuard,
-      ],
+      providers: [CustomDatePipe, DatePipe, PermissionsGuard],
       imports: [
         NgbModule,
         HttpClientTestingModule,
@@ -117,6 +108,14 @@ describe('SettingsComponent', () => {
     toastService = TestBed.inject(ToastService)
     settingsService = TestBed.inject(SettingsService)
     userService = TestBed.inject(UserService)
+    permissionsService = TestBed.inject(PermissionsService)
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    jest
+      .spyOn(permissionsService, 'currentUserHasObjectPermissions')
+      .mockReturnValue(true)
+    jest
+      .spyOn(permissionsService, 'currentUserOwnsObject')
+      .mockReturnValue(true)
     jest.spyOn(userService, 'listAll').mockReturnValue(
       of({
         all: users.map((u) => u.id),

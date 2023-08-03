@@ -17,6 +17,21 @@ updates:
     # Add reviewers
     reviewers:
       - "paperless-ngx/frontend"
+    groups:
+      frontend-angular-dependencies:
+        patterns:
+          - "@angular*"
+          - "@ng-*"
+          - "ngx-*"
+          - "ng2-pdf-viewer"
+      frontend-jest-dependencies:
+        patterns:
+          - "@types/jest"
+          - "jest"
+      frontend-eslint-dependencies:
+        patterns:
+          - "@typescript-eslint*"
+          - "eslint"
 
   # Enable version updates for Python
   - package-ecosystem: "pip"

@@ -2369,6 +2369,62 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         self.assertEqual(resp_data["note"], "this is a posted note")
 
+    def test_notes_permissions_aware(self):
+        """
+        GIVEN:
+            - Existing document owned by user2 but with granted view perms for user1
+        WHEN:
+            - API request is made by user1 to add a note or delete
+        THEN:
+            - Notes are neither created nor deleted
+        """
+        user1 = User.objects.create_user(username="test1")
+        user1.user_permissions.add(*Permission.objects.all())
+        user1.save()
+
+        user2 = User.objects.create_user(username="test2")
+        user2.save()
+
+        doc = Document.objects.create(
+            title="test",
+            mime_type="application/pdf",
+            content="this is a document which will have notes added",
+        )
+        doc.owner = user2
+        doc.save()
+
+        self.client.force_authenticate(user1)
+
+        resp = self.client.get(
+            f"/api/documents/{doc.pk}/notes/",
+            format="json",
+        )
+        self.assertEqual(resp.content, b"Insufficient permissions to view")
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+
+        assign_perm("view_document", user1, doc)
+
+        resp = self.client.post(
+            f"/api/documents/{doc.pk}/notes/",
+            data={"note": "this is a posted note"},
+        )
+        self.assertEqual(resp.content, b"Insufficient permissions to create")
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+
+        note = Note.objects.create(
+            note="This is a note.",
+            document=doc,
+            user=user2,
+        )
+
+        response = self.client.delete(
+            f"/api/documents/{doc.pk}/notes/?id={note.pk}",
+            format="json",
+        )
+
+        self.assertEqual(response.content, b"Insufficient permissions to delete")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
     def test_delete_note(self):
         """
         GIVEN:
