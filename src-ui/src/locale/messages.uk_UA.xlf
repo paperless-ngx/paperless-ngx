@@ -428,7 +428,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">184</context>
         </context-group>
-        <target state="needs-translation">File Tasks shows you documents that have been consumed, are waiting to be, or may have failed during the process.</target>
+        <target state="translated">Обробка файлів показує документи, які було оброблено, які в очікуванні, або які зазнали невдачі в процесі обробки.</target>
       </trans-unit>
       <trans-unit id="8116994662047019809" datatype="html">
         <source>Check out the settings for various tweaks to the web app, toggle settings for saved views or setup e-mail checking.</source>
@@ -685,7 +685,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="needs-translation">File Tasks</target>
+        <target state="translated">Обробка файлів</target>
       </trans-unit>
       <trans-unit id="5537285341303594392" datatype="html">
         <source>File Tasks<x id="START_TAG_SPAN_1" ctype="x-span_1" equiv-text="&lt;span *ngIf=&quot;tasksService.failedFileTasks.length &gt; 0&quot;&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-danger ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
@@ -693,7 +693,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">163</context>
         </context-group>
-        <target state="needs-translation">File Tasks<x id="START_TAG_SPAN_1" ctype="x-span_1" equiv-text="&lt;span *ngIf=&quot;tasksService.failedFileTasks.length &gt; 0&quot;&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-danger ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
+        <target state="translated">Обробка файлів<x id="START_TAG_SPAN_1" ctype="x-span_1" equiv-text="&lt;span *ngIf=&quot;tasksService.failedFileTasks.length &gt; 0&quot;&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-danger ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
       </trans-unit>
       <trans-unit id="4804785061014590286" datatype="html">
         <source>Logs</source>
@@ -1577,7 +1577,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="needs-translation">Filter attachment filename</target>
+        <target state="translated">Фільтр по назві вкладення</target>
       </trans-unit>
       <trans-unit id="4245210767172267486" datatype="html">
         <source>Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive.</source>
@@ -1897,7 +1897,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.ts</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="needs-translation">See &lt;a target="_blank" href="https://docs.paperless-ngx.com/advanced_usage/#file-name-handling"&gt;documentation&lt;/a&gt; for full list.</target>
+        <target state="translated">Дивіться &lt;a target="_blank" href="https://docs.paperless-ngx.com/advanced_usage/#file-name-handling"&gt;документацію&lt;/a&gt; для повного списку.</target>
       </trans-unit>
       <trans-unit id="6898961890896270754" datatype="html">
         <source>Create new storage path</source>
@@ -2363,7 +2363,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-filter-dropdown/permissions-filter-dropdown.component.html</context>
           <context context-type="linenumber">38</context>
         </context-group>
-        <target state="needs-translation">Shared with me</target>
+        <target state="translated">Поширені зі мною</target>
       </trans-unit>
       <trans-unit id="5151074932731293042" datatype="html">
         <source>Unowned</source>
@@ -3016,7 +3016,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">138</context>
         </context-group>
-        <target state="needs-translation">Archive file size</target>
+        <target state="translated">Розмір архіву</target>
       </trans-unit>
       <trans-unit id="6992781481378431874" datatype="html">
         <source>Original document metadata</source>
@@ -3300,7 +3300,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">27</context>
         </context-group>
-        <target state="needs-translation">Filter tags</target>
+        <target state="translated">Фільтрувати теги</target>
       </trans-unit>
       <trans-unit id="184185893993764098" datatype="html">
         <source>Filter correspondents</source>
@@ -3312,7 +3312,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="needs-translation">Filter correspondents</target>
+        <target state="translated">Фільтрувати кореспондентів</target>
       </trans-unit>
       <trans-unit id="2947613869920454977" datatype="html">
         <source>Filter document types</source>
@@ -3324,7 +3324,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">44</context>
         </context-group>
-        <target state="needs-translation">Filter document types</target>
+        <target state="translated">Фільтрувати типи документів</target>
       </trans-unit>
       <trans-unit id="8816999377397522522" datatype="html">
         <source>Filter storage paths</source>
@@ -3336,7 +3336,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">52</context>
         </context-group>
-        <target state="needs-translation">Filter storage paths</target>
+        <target state="translated">Фільтрувати шляхи зберігання</target>
       </trans-unit>
       <trans-unit id="3193976279273491157" datatype="html">
         <source>Actions</source>
@@ -5334,7 +5334,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">110</context>
         </context-group>
-        <target state="needs-translation">Failed<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.failedFileTasks.length &gt; 0&quot; class=&quot;badge bg-danger ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
+        <target state="translated">Невдачі<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.failedFileTasks.length &gt; 0&quot; class=&quot;badge bg-danger ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
       </trans-unit>
       <trans-unit id="6149567896789735123" datatype="html">
         <source>Complete<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.completedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.completedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
@@ -5342,7 +5342,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">116</context>
         </context-group>
-        <target state="needs-translation">Complete<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.completedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.completedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
+        <target state="translated">Завершено<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.completedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.completedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
       </trans-unit>
       <trans-unit id="7531670556122409927" datatype="html">
         <source>Started<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.startedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.startedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
@@ -5350,7 +5350,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">122</context>
         </context-group>
-        <target state="needs-translation">Started<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.startedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.startedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
+        <target state="translated">Розпочато<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.startedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.startedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
       </trans-unit>
       <trans-unit id="7252570681759700719" datatype="html">
         <source>Queued<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.queuedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.queuedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
@@ -5358,7 +5358,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">128</context>
         </context-group>
-        <target state="needs-translation">Queued<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.queuedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.queuedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
+        <target state="translated">У черзі<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.queuedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.queuedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
       </trans-unit>
       <trans-unit id="5404910960991552159" datatype="html">
         <source>Dismiss selected</source>
@@ -5750,7 +5750,7 @@
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">27</context>
         </context-group>
-        <target state="needs-translation">Retrieving date from document...</target>
+        <target state="translated">Отримання дати з документа...</target>
       </trans-unit>
       <trans-unit id="7162102384876037296" datatype="html">
         <source>Saving document...</source>
