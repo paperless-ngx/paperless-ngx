@@ -1965,7 +1965,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="needs-translation">Email</target>
+        <target state="translated">Ел. пошта</target>
       </trans-unit>
       <trans-unit id="5342432350421167093" datatype="html">
         <source>First name</source>
@@ -2593,7 +2593,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">5</context>
         </context-group>
-        <target state="needs-translation">Documents in inbox</target>
+        <target state="translated">Документи у вхідних</target>
       </trans-unit>
       <trans-unit id="8809281703097241399" datatype="html">
         <source>Go to documents</source>
@@ -2752,7 +2752,7 @@
           <context context-type="sourcefile">src/app/components/document-asn/document-asn.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="needs-translation">Searching document with asn <x id="INTERPOLATION" equiv-text="{{asn}}"/></target>
+        <target state="translated">Пошук документа з АСН <x id="INTERPOLATION" equiv-text="{{asn}}"/></target>
       </trans-unit>
       <trans-unit id="1407560924967345762" datatype="html">
         <source>Page</source>
@@ -3160,7 +3160,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">618</context>
         </context-group>
-        <target state="needs-translation">The files for this document will be deleted permanently. This operation cannot be undone.</target>
+        <target state="translated">Файли для цього документа будуть видалені назавжди. Цю операцію неможливо скасувати.</target>
       </trans-unit>
       <trans-unit id="719892092227206532" datatype="html">
         <source>Delete document</source>
@@ -3228,7 +3228,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">901</context>
         </context-group>
-        <target state="needs-translation">This operation cannot be undone.</target>
+        <target state="translated">Цю операцію неможливо скасувати.</target>
       </trans-unit>
       <trans-unit id="1181910457994920507" datatype="html">
         <source>Proceed</source>
@@ -3272,7 +3272,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">686,688</context>
         </context-group>
-        <target state="needs-translation">Error executing operation: <x id="PH" equiv-text="JSON.stringify(                 error.error               )"/></target>
+        <target state="translated">Помилка при виконанні операції: <x id="PH" equiv-text="JSON.stringify(                 error.error               )"/></target>
       </trans-unit>
       <trans-unit id="6857598786757174736" datatype="html">
         <source>Select:</source>
@@ -3494,7 +3494,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">312,314</context>
         </context-group>
-        <target state="needs-translation">This operation will remove the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Ця операція видалить теги "<x id="PH" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/>" з <x id="PH_1" equiv-text="this.list.selected.size"/> вибраних документів.</target>
       </trans-unit>
       <trans-unit id="2739066218579571288" datatype="html">
         <source>This operation will add the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> and remove the tags <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> on <x id="PH_2" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -3502,7 +3502,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">316,320</context>
         </context-group>
-        <target state="needs-translation">This operation will add the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> and remove the tags <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> on <x id="PH_2" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Ця операція додасть теги "<x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/>" і видалить теги <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> з <x id="PH_2" equiv-text="this.list.selected.size"/> вибраних документів.</target>
       </trans-unit>
       <trans-unit id="2996713129519325161" datatype="html">
         <source>Confirm correspondent assignment</source>
@@ -3518,7 +3518,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">359</context>
         </context-group>
-        <target state="needs-translation">This operation will assign the correspondent "<x id="PH" equiv-text="correspondent.name"/>" to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Ця операція призначить кореспондента "<x id="PH" equiv-text="correspondent.name"/>" до <x id="PH_1" equiv-text="this.list.selected.size"/> вибраних документів.</target>
       </trans-unit>
       <trans-unit id="1257522660364398440" datatype="html">
         <source>This operation will remove the correspondent from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -3542,7 +3542,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">397</context>
         </context-group>
-        <target state="needs-translation">This operation will assign the document type "<x id="PH" equiv-text="documentType.name"/>" to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Ця операція призначить тип документа "<x id="PH" equiv-text="documentType.name"/>" до <x id="PH_1" equiv-text="this.list.selected.size"/> вибраних документів.</target>
       </trans-unit>
       <trans-unit id="2236642492594872779" datatype="html">
         <source>This operation will remove the document type from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -3550,7 +3550,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">399</context>
         </context-group>
-        <target state="needs-translation">This operation will remove the document type from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Ця операція видалить тип документа з <x id="PH" equiv-text="this.list.selected.size"/> вибраних документів.</target>
       </trans-unit>
       <trans-unit id="6386555513013840736" datatype="html">
         <source>Confirm storage path assignment</source>
@@ -3590,7 +3590,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">461</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently delete <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Ця операція остаточно видалить <x id="PH" equiv-text="this.list.selected.size"/> вибрані документи.</target>
       </trans-unit>
       <trans-unit id="6734339521247847366" datatype="html">
         <source>Delete document(s)</source>
@@ -3618,7 +3618,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">206</context>
         </context-group>
-        <target state="needs-translation">Filter by correspondent</target>
+        <target state="translated">Фільтр по кореспонденту</target>
       </trans-unit>
       <trans-unit id="2784168796433474565" datatype="html">
         <source>Filter by tag</source>
@@ -3646,7 +3646,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
           <context context-type="linenumber">74</context>
         </context-group>
-        <target state="needs-translation"><x id="INTERPOLATION" equiv-text="ocument.notes.length}}"/> Notes</target>
+        <target state="translated"><x id="INTERPOLATION" equiv-text="ocument.notes.length}}"/> Примітки</target>
       </trans-unit>
       <trans-unit id="78870852467682010" datatype="html">
         <source>Filter by document type</source>
@@ -3858,7 +3858,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">131</context>
         </context-group>
-        <target state="needs-translation">Sort by ASN</target>
+        <target state="translated">Впорядкувати за АСН</target>
       </trans-unit>
       <trans-unit id="7517688192215738656" datatype="html">
         <source>ASN</source>
@@ -3874,7 +3874,7 @@
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="needs-translation">ASN</target>
+        <target state="translated">АСН</target>
       </trans-unit>
       <trans-unit id="6954625430271090777" datatype="html">
         <source>Sort by correspondent</source>
@@ -4086,7 +4086,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">158</context>
         </context-group>
-        <target state="needs-translation">ASN: <x id="PH" equiv-text="rule.value"/></target>
+        <target state="translated">АСН: <x id="PH" equiv-text="rule.value"/></target>
       </trans-unit>
       <trans-unit id="102674688969746976" datatype="html">
         <source>Owner: <x id="PH" equiv-text="rule.value"/></source>
@@ -4266,7 +4266,7 @@
           <context context-type="sourcefile">src/app/components/document-notes/document-notes.component.ts</context>
           <context context-type="linenumber">64</context>
         </context-group>
-        <target state="needs-translation">Error saving note: <x id="PH" equiv-text="e.toString()"/></target>
+        <target state="translated">Помилка при збереженні примітки: <x id="PH" equiv-text="e.toString()"/></target>
       </trans-unit>
       <trans-unit id="5682285129543775369" datatype="html">
         <source>Error deleting note: <x id="PH" equiv-text="e.toString()"/></source>
@@ -4274,7 +4274,7 @@
           <context context-type="sourcefile">src/app/components/document-notes/document-notes.component.ts</context>
           <context context-type="linenumber">80</context>
         </context-group>
-        <target state="needs-translation">Error deleting note: <x id="PH" equiv-text="e.toString()"/></target>
+        <target state="translated">Помилка при видаленні примітки: <x id="PH" equiv-text="e.toString()"/></target>
       </trans-unit>
       <trans-unit id="6316128875819022658" datatype="html">
         <source>correspondent</source>
@@ -4306,7 +4306,7 @@
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.ts</context>
           <context context-type="linenumber">55</context>
         </context-group>
-        <target state="needs-translation">Do you really want to delete the correspondent "<x id="PH" equiv-text="object.name"/>"?</target>
+        <target state="translated">Ви дійсно хочете видалити кореспондента "<x id="PH" equiv-text="object.name"/>"?</target>
       </trans-unit>
       <trans-unit id="8084492669582894778" datatype="html">
         <source>document type</source>
@@ -4330,7 +4330,7 @@
           <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.ts</context>
           <context context-type="linenumber">44</context>
         </context-group>
-        <target state="needs-translation">Do you really want to delete the document type "<x id="PH" equiv-text="object.name"/>"?</target>
+        <target state="translated">Ви дійсно хочете видалити тип документу "<x id="PH" equiv-text="object.name"/>"?</target>
       </trans-unit>
       <trans-unit id="5674286808255988565" datatype="html">
         <source>Create</source>
@@ -4370,7 +4370,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
           <context context-type="linenumber">8</context>
         </context-group>
-        <target state="needs-translation">Filter by:</target>
+        <target state="translated">Фільтрувати за:</target>
       </trans-unit>
       <trans-unit id="1383365546483928780" datatype="html">
         <source>Matching</source>
@@ -4390,7 +4390,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Matching</target>
+        <target state="translated">Відповідність</target>
       </trans-unit>
       <trans-unit id="1488347670280290838" datatype="html">
         <source>Document count</source>
@@ -4498,7 +4498,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">166</context>
         </context-group>
-        <target state="needs-translation">Successfully updated <x id="PH" equiv-text="this.typeName"/>.</target>
+        <target state="translated">Успішно оновлено <x id="PH" equiv-text="this.typeName"/>.</target>
       </trans-unit>
       <trans-unit id="6442673774206210733" datatype="html">
         <source>Error occurred while saving <x id="PH" equiv-text="this.typeName"/>.</source>
@@ -4506,7 +4506,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">171</context>
         </context-group>
-        <target state="needs-translation">Error occurred while saving <x id="PH" equiv-text="this.typeName"/>.</target>
+        <target state="translated">Виникла помилка під час збереження <x id="PH" equiv-text="this.typeName"/>.</target>
       </trans-unit>
       <trans-unit id="8371896857609524947" datatype="html">
         <source>Associated documents will not be deleted.</source>
@@ -5186,7 +5186,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">888</context>
         </context-group>
-        <target state="needs-translation">Error saving rule.</target>
+        <target state="translated">Помилка при збереженні правила.</target>
       </trans-unit>
       <trans-unit id="3896080636020672118" datatype="html">
         <source>Confirm delete mail rule</source>
@@ -5298,7 +5298,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">66</context>
         </context-group>
-        <target state="needs-translation">click for full output</target>
+        <target state="translated">натисніть для повного виведення</target>
       </trans-unit>
       <trans-unit id="1536087519743707362" datatype="html">
         <source>Dismiss</source>
@@ -5366,7 +5366,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.ts</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="needs-translation">Dismiss selected</target>
+        <target state="translated">Відхилити вибрані</target>
       </trans-unit>
       <trans-unit id="8829078752502782653" datatype="html">
         <source>Dismiss all</source>
@@ -5378,7 +5378,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.ts</context>
           <context context-type="linenumber">63</context>
         </context-group>
-        <target state="needs-translation">Dismiss all</target>
+        <target state="translated">Відхилити все</target>
       </trans-unit>
       <trans-unit id="1323591410517879795" datatype="html">
         <source>Confirm Dismiss All</source>
@@ -5386,7 +5386,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.ts</context>
           <context context-type="linenumber">61</context>
         </context-group>
-        <target state="needs-translation">Confirm Dismiss All</target>
+        <target state="translated">Підтвердити відхилення всіх</target>
       </trans-unit>
       <trans-unit id="6566358716882976903" datatype="html">
         <source>tasks?</source>
@@ -5402,7 +5402,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.ts</context>
           <context context-type="linenumber">131</context>
         </context-group>
-        <target state="needs-translation">queued</target>
+        <target state="translated">в черзі</target>
       </trans-unit>
       <trans-unit id="6415892379431855826" datatype="html">
         <source>started</source>
@@ -5450,7 +5450,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Any word</target>
+        <target state="translated">Будь-яке слово</target>
       </trans-unit>
       <trans-unit id="7517655726614958140" datatype="html">
         <source>Any: Document contains any of these words (space separated)</source>
@@ -5458,7 +5458,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="needs-translation">Any: Document contains any of these words (space separated)</target>
+        <target state="translated">Будь-яке: Документ містить будь-яке з цих слів (відокремлені пробілом)</target>
       </trans-unit>
       <trans-unit id="700315718208181326" datatype="html">
         <source>All words</source>
@@ -5466,7 +5466,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">All words</target>
+        <target state="translated">Усі слова</target>
       </trans-unit>
       <trans-unit id="111914402588955480" datatype="html">
         <source>All: Document contains all of these words (space separated)</source>
@@ -5474,7 +5474,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="needs-translation">All: Document contains all of these words (space separated)</target>
+        <target state="translated">Всі: Документ містить усі з цих слів (відокремлені пробілом)</target>
       </trans-unit>
       <trans-unit id="9180173992399180575" datatype="html">
         <source>Exact match</source>
@@ -5482,7 +5482,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="needs-translation">Exact match</target>
+        <target state="translated">Точна відповідність</target>
       </trans-unit>
       <trans-unit id="7109184332944610787" datatype="html">
         <source>Exact: Document contains this string</source>
@@ -5490,7 +5490,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">31</context>
         </context-group>
-        <target state="needs-translation">Exact: Document contains this string</target>
+        <target state="translated">Точно: Документ містить цей рядок</target>
       </trans-unit>
       <trans-unit id="1338733395833138319" datatype="html">
         <source>Regular expression</source>
@@ -5538,7 +5538,7 @@
           <context context-type="sourcefile">src/app/guards/dirty-doc.guard.ts</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="needs-translation">Warning: You have unsaved changes to your document(s).</target>
+        <target state="translated">Увага: у Вас є незбережені зміни у документах.</target>
       </trans-unit>
       <trans-unit id="159901853873315050" datatype="html">
         <source>Unsaved Changes</source>
@@ -5626,7 +5626,7 @@
           <context context-type="sourcefile">src/app/pipes/document-title.pipe.ts</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="needs-translation">(no title)</target>
+        <target state="translated">(без назви)</target>
       </trans-unit>
       <trans-unit id="5739581984228459958" datatype="html">
         <source>Shared</source>
@@ -5634,7 +5634,7 @@
           <context context-type="sourcefile">src/app/pipes/username.pipe.ts</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="needs-translation">Shared</target>
+        <target state="translated">Спільні</target>
       </trans-unit>
       <trans-unit id="2807800733729323332" datatype="html">
         <source>Yes</source>
@@ -5666,7 +5666,7 @@
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="needs-translation">Document with ASN already exists.</target>
+        <target state="translated">Документ з АСН вже існує.</target>
       </trans-unit>
       <trans-unit id="148389968432135849" datatype="html">
         <source>File not found.</source>
@@ -5774,7 +5774,7 @@
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
           <context context-type="linenumber">106</context>
         </context-group>
-        <target state="needs-translation">You have unsaved changes to the document</target>
+        <target state="translated">У вас є незбережені зміни в документі</target>
       </trans-unit>
       <trans-unit id="2089045849587358256" datatype="html">
         <source>Are you sure you want to close this document?</source>
