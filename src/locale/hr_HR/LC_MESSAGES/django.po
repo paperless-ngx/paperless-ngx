@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-07-04 11:20\n"
+"PO-Revision-Date: 2023-08-03 12:02\n"
 "Last-Translator: \n"
 "Language-Team: Croatian\n"
 "Language: hr_HR\n"
@@ -456,15 +456,15 @@ msgstr "Polje datuma i vremena kada je zadatak započeo u UTC"
 
 #: documents/models.py:609
 msgid "Completed DateTime"
-msgstr ""
+msgstr "Završeno datum i vrijeme"
 
 #: documents/models.py:610
 msgid "Datetime field when the task was completed in UTC"
-msgstr ""
+msgstr "Polje datuma i vremena kada je zadatak završio u UTC"
 
 #: documents/models.py:615
 msgid "Result Data"
-msgstr ""
+msgstr "Podaci o rezultatima"
 
 #: documents/models.py:617
 msgid "The data returned by the task"
@@ -472,7 +472,7 @@ msgstr ""
 
 #: documents/models.py:626
 msgid "Comment for the document"
-msgstr ""
+msgstr "Komentar dokumenta"
 
 #: documents/models.py:650
 msgid "user"
@@ -562,7 +562,7 @@ msgstr "Engleski (US)"
 
 #: paperless/settings.py:522
 msgid "Arabic"
-msgstr ""
+msgstr "Arapski"
 
 #: paperless/settings.py:523
 msgid "Belarusian"
