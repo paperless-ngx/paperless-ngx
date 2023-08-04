@@ -24,9 +24,9 @@ def handle_failed_login(sender, credentials, request, **kwargs):
     else:
         if client_ip.is_global:
             # We got the client's IP address
-            log_output += f" from IP `{client_ip}.`"
+            log_output += f" from IP `{client_ip}`."
         else:
             # The client's IP address is private
-            log_output += f" from private IP `{client_ip}.`"
+            log_output += f" from private IP `{client_ip}`."
 
     logger.info(log_output)

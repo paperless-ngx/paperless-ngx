@@ -1,6 +1,6 @@
 # Advanced Topics
 
-Paperless offers a couple features that automate certain tasks and make
+Paperless offers a couple of features that automate certain tasks and make
 your life easier.
 
 ## Matching tags, correspondents, document types, and storage paths {#matching}
@@ -35,9 +35,9 @@ The following algorithms are available:
   (i.e. preserve ordering) in the PDF.
 - **Regular expression:** Parses the match as a regular expression and
   tries to find a match within the document.
-- **Fuzzy match:** I don't know. Look at the source.
+- **Fuzzy match:** I don't know. Look at [the source](https://github.com/paperless-ngx/paperless-ngx/blob/main/src/documents/matching.py).
 - **Auto:** Tries to automatically match new documents. This does not
-  require you to set a match. See the notes below.
+  require you to set a match. See the [notes below](#automatic-matching).
 
 When using the _any_ or _all_ matching algorithms, you can search for
 terms that consist of multiple words by enclosing them in double quotes.
@@ -92,7 +92,7 @@ when using this feature:
   decide when not to assign a certain tag, correspondent, document
   type, or storage path. This will usually be the case as you start
   filling up paperless with documents. Example: If all your documents
-  are either from "Webshop" and "Bank", paperless will assign one
+  are either from "Webshop" or "Bank", paperless will assign one
   of these correspondents to ANY new document, if both are set to
   automatic matching.
 
@@ -101,7 +101,7 @@ when using this feature:
 Sometimes you may want to do something arbitrary whenever a document is
 consumed. Rather than try to predict what you may want to do, Paperless
 lets you execute scripts of your own choosing just before or after a
-document is consumed using a couple simple hooks.
+document is consumed using a couple of simple hooks.
 
 Just write a script, put it somewhere that Paperless can read & execute,
 and then put the path to that script in `paperless.conf` or
@@ -197,7 +197,7 @@ The script can be in any language, A simple shell script example:
 !!! warning
 
     The post consumption script should not modify the document files
-    directly
+    directly.
 
 The script's stdout and stderr will be logged line by line to the
 webserver log, along with the exit code of the script.
@@ -311,6 +311,7 @@ Paperless provides the following placeholders within filenames:
 - `{added_day}`: Day added only (number 01-31).
 - `{owner_username}`: Username of document owner, if any, or "none"
 - `{original_name}`: Document original filename, minus the extension, if any, or "none"
+- `{doc_pk}`: The paperless identifier (primary key) for the document.
 
 Paperless will try to conserve the information from your database as
 much as possible. However, some characters that you can use in document
@@ -528,7 +529,7 @@ For how to enable barcode usage, see [the configuration](/configuration#barcodes
 The two settings may be enabled independently, but do have interactions as explained
 below.
 
-### Document Splitting
+### Document Splitting {#document-splitting}
 
 When enabled, Paperless will look for a barcode with the configured value and create a new document
 starting from the next page. The page with the barcode on it will _not_ be retained. It
@@ -543,3 +544,69 @@ If document splitting via barcode is also enabled, documents will be split when 
 barcode is located. However, differing from the splitting, the page with the
 barcode _will_ be retained. This allows application of a barcode to any page, including
 one which holds data to keep in the document.
+
+## Automatic collation of double-sided documents {#collate}
+
+!!! note
+
+    If your scanner supports double-sided scanning natively, you do not need this feature.
+
+This feature is turned off by default, see [configuration](/configuration#collate) on how to turn it on.
+
+### Summary
+
+If you have a scanner with an automatic document feeder (ADF) that only scans a single side,
+this feature makes scanning double-sided documents much more convenient by automatically
+collating two separate scans into one document, reordering the pages as necessary.
+
+### Usage example
+
+Suppose you have a double-sided document with 6 pages (3 sheets of paper). First,
+put the stack into your ADF as normal, ensuring that page 1 is scanned first. Your ADF
+will now scan pages 1, 3, and 5. Then you (or your the scanner, if it supports it) upload
+the scan into the correct sub-directory of the consume folder (`double-sided` by default;
+keep in mind that Paperless will _not_ automatically create the directory for you.)
+Paperless will then process the scan and move it into an internal staging area.
+
+The next step is to turn your stack upside down (without reordering the sheets of paper),
+and scan it once again, your ADF will now scan pages 6, 4, and 2, in that order. Once this
+scan is copied into the sub-directory, Paperless will collate the previous scan with the
+new one, reversing the order of the pages on the second, "even numbered" scan. The
+resulting document will have the pages 1-6 in the correct order, and this new file will
+then be processed as normal.
+
+!!! tip
+
+    When scanning the even numbered pages, you can omit the last empty pages, if there are
+    any. For example, if page 6 is empty, you only need to scan pages 2 and 4. _Do not_ omit
+    empty pages in the middle of the document.
+
+### Things that could go wrong
+
+Paperless will notice when the first, "odd numbered" scan has less pages than the second
+scan (this can happen when e.g. the ADF skipped a few pages in the first pass). In that
+case, Paperless will remove the staging copy as well as the scan, and give you an error
+message asking you to restart the process from scratch, by scanning the odd pages again,
+followed by the even pages.
+
+Another thing that might happen is that you start a double sided scan, but then forget
+to upload the second file. To avoid collating the wrong documents if you then come back
+a day later to scan a new double-sided document, Paperless will only keep an "odd numbered
+pages" file for up to 30 minutes. If more time passes, it will consider the next incoming
+scan a completely new "odd numbered pages" one. The old staging file will get discarded.
+
+### Interaction with "subdirs as tags"
+
+The collation feature can be used together with the "subdirs as tags" feature (but this is not
+a requirement). Just create a correctly named double-sided subdir in the hierachy and upload
+your scans there. For example, both `double-sided/foo/bar` as well as `foo/bar/double-sided` will
+cause the collated document to be treated as if it were uploaded into `foo/bar` and receive both
+`foo` and `bar` tags, but not `double-sided`.
+
+### Interaction with document splitting
+
+You can use the [document splitting](#document-splitting) feature, but if you use a normal
+single-sided split marker page, the split document(s) will have an empty page at the front (or
+whatever else was on the backside of the split marker page.) You can work around that by having
+a split marker page that has the split barcode on _both_ sides. This way, the extra page will
+get automatically removed.

@@ -9,7 +9,10 @@ import { AbstractNameFilterService } from './abstract-name-filter-service'
   providedIn: 'root',
 })
 export class UserService extends AbstractNameFilterService<PaperlessUser> {
-  constructor(http: HttpClient, private permissionService: PermissionsService) {
+  constructor(
+    http: HttpClient,
+    private permissionService: PermissionsService
+  ) {
     super(http, 'users')
   }
 

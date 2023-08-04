@@ -1,5 +1,4 @@
 import {
-  CanActivate,
   ActivatedRouteSnapshot,
   RouterStateSnapshot,
   UrlTree,
@@ -11,7 +10,7 @@ import { ToastService } from '../services/toast.service'
 import { TourService } from 'ngx-ui-tour-ng-bootstrap'
 
 @Injectable()
-export class PermissionsGuard implements CanActivate {
+export class PermissionsGuard {
   constructor(
     private permissionsService: PermissionsService,
     private router: Router,

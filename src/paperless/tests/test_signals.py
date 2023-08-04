@@ -72,7 +72,7 @@ class TestFailedLoginLogging(TestCase):
             self.assertEqual(
                 logs.output,
                 [
-                    "INFO:paperless.auth:Login failed for user `john lennon` from IP `177.139.233.139.`",
+                    "INFO:paperless.auth:Login failed for user `john lennon` from IP `177.139.233.139`.",
                 ],
             )
 
@@ -96,6 +96,6 @@ class TestFailedLoginLogging(TestCase):
             self.assertEqual(
                 logs.output,
                 [
-                    "INFO:paperless.auth:Login failed for user `john lennon` from private IP `10.0.0.1.`",
+                    "INFO:paperless.auth:Login failed for user `john lennon` from private IP `10.0.0.1`.",
                 ],
             )

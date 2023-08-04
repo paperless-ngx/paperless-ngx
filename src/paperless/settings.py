@@ -581,6 +581,7 @@ LANGUAGES = [
     ("pt-pt", _("Portuguese")),
     ("ro-ro", _("Romanian")),
     ("ru-ru", _("Russian")),
+    ("sk-sk", _("Slovak")),
     ("sl-si", _("Slovenian")),
     ("sr-cs", _("Serbian")),
     ("sv-se", _("Swedish")),
@@ -790,6 +791,18 @@ CONSUMER_BARCODE_DPI: Final[str] = int(
     os.getenv("PAPERLESS_CONSUMER_BARCODE_DPI", 300),
 )
 
+CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED: Final[bool] = __get_boolean(
+    "PAPERLESS_CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED",
+)
+
+CONSUMER_COLLATE_DOUBLE_SIDED_SUBDIR_NAME: Final[str] = os.getenv(
+    "PAPERLESS_CONSUMER_COLLATE_DOUBLE_SIDED_SUBDIR_NAME",
+    "double-sided",
+)
+
+CONSUMER_COLLATE_DOUBLE_SIDED_TIFF_SUPPORT: Final[bool] = __get_boolean(
+    "PAPERLESS_CONSUMER_COLLATE_DOUBLE_SIDED_TIFF_SUPPORT",
+)
 
 OCR_PAGES = int(os.getenv("PAPERLESS_OCR_PAGES", 0))
 

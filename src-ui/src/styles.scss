@@ -433,6 +433,11 @@ ul.pagination {
   height: 1em;
 }
 
+.buttonicon-xs {
+  width: 0.8em;
+  height: 0.8em;
+}
+
 .sidebaricon {
   width: 16px;
   height: 16px;
@@ -558,6 +563,17 @@ table.table {
 body.tour-active .row.sticky-top,
 body.tour-active .sidebar {
   z-index: inherit !important;
+}
+
+.tour-step {
+  .popover-header {
+    --bs-popover-header-padding-y: .75rem;
+  }
+
+  .popover-body {
+    // reset ngx-ui-tour overrides
+    padding: var(--bs-popover-body-padding-y) var(--bs-popover-body-padding-x) !important;
+  }
 }
 
 .nav-item.touranchor--is-active a {
