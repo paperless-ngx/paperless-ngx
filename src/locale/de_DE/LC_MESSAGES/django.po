@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-04-20 06:59\n"
+"PO-Revision-Date: 2023-07-23 10:36\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -448,7 +448,7 @@ msgstr "Zeitpunkt, an dem das Ergebnis der Aufgabe erstellt wurde (in UTC)"
 
 #: documents/models.py:603
 msgid "Started DateTime"
-msgstr "Startzeitpunk"
+msgstr "Startdatum/-zeit"
 
 #: documents/models.py:604
 msgid "Datetime field when the task was started in UTC"
@@ -456,7 +456,7 @@ msgstr "Zeitpunkt, als die Aufgabe erstellt wurde (in UTC)"
 
 #: documents/models.py:609
 msgid "Completed DateTime"
-msgstr "Abschlusszeitpunkt"
+msgstr "Abgeschlossen Datum/Zeit"
 
 #: documents/models.py:610
 msgid "Datetime field when the task was completed in UTC"
@@ -510,7 +510,7 @@ msgstr "Paperless-ngx wird geladen..."
 
 #: documents/templates/index.html:79
 msgid "Still here?! Hmm, something might be wrong."
-msgstr "Du bist noch hier? Hmm, da muss wohl etwas schiefgelaufen sein."
+msgstr "Immer noch hier?! Hm, vielleicht stimmt was nicht."
 
 #: documents/templates/index.html:79
 msgid "Here's a link to the docs."
@@ -818,7 +818,7 @@ msgstr "Ordner"
 
 #: paperless_mail/models.py:105
 msgid "Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server."
-msgstr "Unterordner müssen durch ein Trennzeichen getrennt sein. Oft ist dies ein Punkt (\".\") oder ein Schrägstrich (\"/\"); dies variiert bei unterschiedlichen Mail-Servern."
+msgstr "Unterordner müssen durch ein Trennzeichen getrennt werden, oft durch einen Punkt (‚.‘) oder einen Schrägstrich (‚/‘), dies variiert jedoch je nach Mailserver."
 
 #: paperless_mail/models.py:111
 msgid "filter from"
