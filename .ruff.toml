@@ -2,7 +2,7 @@
 # https://beta.ruff.rs/docs/rules/
 extend-select = ["I", "W", "UP", "COM", "DJ", "EXE", "ISC", "ICN", "G201", "INP", "PIE", "RSE", "SIM", "TID", "PLC", "PLE", "RUF"]
 # TODO PTH
-ignore = ["DJ001", "SIM105"]
+ignore = ["DJ001", "SIM105", "RUF012"]
 fix = true
 line-length = 88
 respect-gitignore = true

@@ -10,3 +10,15 @@ th:first-child {
 tbody app-tag {
   cursor: pointer;
 }
+
+tr .btn-group {
+  margin-right: 2px;
+  box-shadow: -6px 0px 4px -1px rgba(var(--bs-body-bg-rgb), .5);
+  opacity: 0;
+  pointer-events: none;
+}
+
+tr:hover .btn-group {
+  opacity: 1;
+  pointer-events: all;
+}

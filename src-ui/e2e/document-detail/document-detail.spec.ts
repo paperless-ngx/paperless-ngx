@@ -94,51 +94,6 @@ test('should show a list of notes', async ({ page }) => {
   ).toHaveCount(4)
 })
 
-test('should support note deletion', async ({ page }) => {
-  await page.routeFromHAR(REQUESTS_HAR, { notFound: 'fallback' })
-  await page.goto('/documents/175/notes')
-  await expect(page.locator('app-document-notes')).toBeVisible()
-  const deletePromise = page.waitForRequest(
-    (request) =>
-      request.method() === 'DELETE' &&
-      request.url().includes('/api/documents/175/notes/')
-  )
-  await page
-    .getByRole('button', { name: /delete note/i, includeHidden: true })
-    .first()
-    .click()
-  await deletePromise
-})
-
-test('should support note insertion', async ({ page }) => {
-  await page.routeFromHAR(REQUESTS_HAR, { notFound: 'fallback' })
-  await page.goto('/documents/175/notes')
-  await expect(page.locator('app-document-notes')).toBeVisible()
-  await expect(
-    await page.getByRole('button', {
-      name: /delete note/i,
-      includeHidden: true,
-    })
-  ).toHaveCount(4)
-  await page.getByPlaceholder('Enter note').fill('This is a new note')
-  const addPromise = page.waitForRequest((request) => {
-    if (!request.url().includes('/notes/')) {
-      // ignore other requests
-      return true
-    } else {
-      const data = request.postDataJSON()
-      const isValid = data['note'] === 'This is a new note'
-      return (
-        isValid &&
-        request.method() === 'POST' &&
-        request.url().includes('/notes/')
-      )
-    }
-  })
-  await page.getByRole('button', { name: 'Add note' }).click()
-  await addPromise
-})
-
 test('should support quick filters', async ({ page }) => {
   await page.routeFromHAR(REQUESTS_HAR2, { notFound: 'fallback' })
   await page.goto('/documents/175/details')

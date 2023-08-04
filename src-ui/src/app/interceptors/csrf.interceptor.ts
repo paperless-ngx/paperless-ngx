@@ -11,7 +11,10 @@ import { Meta } from '@angular/platform-browser'
 
 @Injectable()
 export class CsrfInterceptor implements HttpInterceptor {
-  constructor(private cookieService: CookieService, private meta: Meta) {}
+  constructor(
+    private cookieService: CookieService,
+    private meta: Meta
+  ) {}
 
   intercept(
     request: HttpRequest<unknown>,

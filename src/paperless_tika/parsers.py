@@ -3,6 +3,7 @@ from pathlib import Path
 
 import httpx
 from django.conf import settings
+from django.utils import timezone
 from tika_client import TikaClient
 
 from documents.parsers import DocumentParser
@@ -63,6 +64,9 @@ class TikaDocumentParser(DocumentParser):
             self.text = self.text.strip()
 
         self.date = parsed.created
+        if self.date is not None and timezone.is_naive(self.date):
+            self.date = timezone.make_aware(self.date)
+
         self.archive_path = self.convert_to_pdf(document_path, file_name)
 
     def convert_to_pdf(self, document_path, file_name):

@@ -100,7 +100,7 @@
   </table>
 
   <div class="pb-3 d-sm-flex justify-content-between align-items-center">
-    <div class="pb-2 pb-sm-0" i18n *ngIf="tasks.length > 0">{tasks.length, plural, =1 {One {{this.activeTab}} task} other {{{tasks.length || 0}} total {{this.activeTab}} tasks}}</div>
+    <div class="pb-2 pb-sm-0" i18n *ngIf="tasks.length > 0">{tasks.length, plural, =1 {One {{this.activeTabLocalized}} task} other {{{tasks.length || 0}} total {{this.activeTabLocalized}} tasks}}</div>
     <ngb-pagination *ngIf="tasks.length > pageSize" [(page)]="page" [pageSize]="pageSize" [collectionSize]="tasks.length" maxSize="8" size="sm"></ngb-pagination>
   </div>
 </ng-template>

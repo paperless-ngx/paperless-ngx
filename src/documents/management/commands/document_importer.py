@@ -1,17 +1,20 @@
 import json
 import logging
 import os
-import shutil
 from contextlib import contextmanager
 from pathlib import Path
 
 import tqdm
 from django.conf import settings
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldDoesNotExist
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.core.management.base import CommandError
 from django.core.serializers.base import DeserializationError
+from django.db import IntegrityError
+from django.db import transaction
 from django.db.models.signals import m2m_changed
 from django.db.models.signals import post_save
 from filelock import FileLock
@@ -23,6 +26,7 @@ from documents.settings import EXPORTER_ARCHIVE_NAME
 from documents.settings import EXPORTER_FILE_NAME
 from documents.settings import EXPORTER_THUMBNAIL_NAME
 from documents.signals.handlers import update_filename_and_move_files
+from documents.utils import copy_file_with_basic_stats
 from paperless import version
 
 
@@ -116,9 +120,13 @@ class Command(BaseCommand):
         ):
             # Fill up the database with whatever is in the manifest
             try:
-                for manifest_path in manifest_paths:
-                    call_command("loaddata", manifest_path)
-            except (FieldDoesNotExist, DeserializationError) as e:
+                with transaction.atomic():
+                    for manifest_path in manifest_paths:
+                        # delete these since pk can change, re-created from import
+                        ContentType.objects.all().delete()
+                        Permission.objects.all().delete()
+                        call_command("loaddata", manifest_path)
+            except (FieldDoesNotExist, DeserializationError, IntegrityError) as e:
                 self.stdout.write(self.style.ERROR("Database import failed"))
                 if (
                     self.version is not None
@@ -238,7 +246,7 @@ class Command(BaseCommand):
 
                 create_source_path_directory(document.source_path)
 
-                shutil.copy2(document_path, document.source_path)
+                copy_file_with_basic_stats(document_path, document.source_path)
 
                 if thumbnail_path:
                     if thumbnail_path.suffix in {".png", ".PNG"}:
@@ -253,13 +261,16 @@ class Command(BaseCommand):
                             output_file=str(document.thumbnail_path),
                         )
                     else:
-                        shutil.copy2(thumbnail_path, document.thumbnail_path)
+                        copy_file_with_basic_stats(
+                            thumbnail_path,
+                            document.thumbnail_path,
+                        )
 
                 if archive_path:
                     create_source_path_directory(document.archive_path)
                     # TODO: this assumes that the export is valid and
                     #  archive_filename is present on all documents with
                     #  archived files
-                    shutil.copy2(archive_path, document.archive_path)
+                    copy_file_with_basic_stats(archive_path, document.archive_path)
 
             document.save()

@@ -276,9 +276,9 @@ export class DocumentListViewService {
               errorMessage = Object.keys(error.error)
                 .map((fieldName) => {
                   const fieldError: Array<string> = error.error[fieldName]
-                  return `${
-                    DOCUMENT_SORT_FIELDS.find((f) => f.field == fieldName)?.name
-                  }: ${fieldError[0]}`
+                  return `${DOCUMENT_SORT_FIELDS.find(
+                    (f) => f.field == fieldName
+                  )?.name}: ${fieldError[0]}`
                 })
                 .join(', ')
             } else {

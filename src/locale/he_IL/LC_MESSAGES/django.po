@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-05-20 17:18\n"
+"PO-Revision-Date: 2023-07-11 18:24\n"
 "Last-Translator: \n"
 "Language-Team: Hebrew\n"
 "Language: he_IL\n"
@@ -858,7 +858,7 @@ msgstr "קבצים מצורפים 'מוטבעים' עלולים לכלול תמ�
 
 #: paperless_mail/models.py:158
 msgid "consumption scope"
-msgstr ""
+msgstr "היקף הצריכה"
 
 #: paperless_mail/models.py:164
 msgid "action"

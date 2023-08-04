@@ -174,7 +174,7 @@
                 <li [ngbNavItem]="DocumentDetailNavIDs.Notes" *ngIf="notesEnabled">
                     <a ngbNavLink i18n>Notes <span *ngIf="document?.notes.length" class="badge text-bg-secondary ms-1">{{document.notes.length}}</span></a>
                     <ng-template ngbNavContent>
-                        <app-document-notes [documentId]="documentId" [notes]="document?.notes" (updated)="notesUpdated($event)"></app-document-notes>
+                        <app-document-notes [documentId]="documentId" [notes]="document?.notes" [addDisabled]="!userCanEdit" (updated)="notesUpdated($event)"></app-document-notes>
                     </ng-template>
                 </li>
 
