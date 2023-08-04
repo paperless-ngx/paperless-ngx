@@ -23,7 +23,7 @@
 }
 
 ::ng-deep .ng-select-taggable {
-  max-width: calc(100% - 46px); // fudge factor for ng-select button width
+  max-width: calc(100% - 90px); // fudge factor for (2x) ng-select button width
 }
 
 .btn-group .dropdown-toggle-split {

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-06-15 10:39\n"
+"PO-Revision-Date: 2023-06-29 07:52\n"
 "Last-Translator: \n"
 "Language-Team: Slovak\n"
 "Language: sk_SK\n"
@@ -72,11 +72,11 @@ msgstr "vlastník"
 
 #: documents/models.py:81 documents/models.py:136
 msgid "correspondent"
-msgstr "dopisovateľ"
+msgstr "korešpondent"
 
 #: documents/models.py:82
 msgid "correspondents"
-msgstr "dopisovatelia"
+msgstr "korešpondenti"
 
 #: documents/models.py:87
 msgid "color"
@@ -84,11 +84,11 @@ msgstr "farba"
 
 #: documents/models.py:90
 msgid "is inbox tag"
-msgstr "je štítok pošty"
+msgstr "je štítok schránky"
 
 #: documents/models.py:93
 msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
-msgstr "Označí tento štítok ako štítok doručenej pošty: Všetky novo spotrebované dokumenty budú označené štítkami doručenej pošty."
+msgstr "Označí tento štítok ako štítok doručenej pošty: Všetky novo rozpoznané dokumenty budú označené štítkami doručenej pošty."
 
 #: documents/models.py:99
 msgid "tag"
@@ -152,7 +152,7 @@ msgstr "Kontrolný súčet originálneho dokumentu."
 
 #: documents/models.py:186
 msgid "archive checksum"
-msgstr "archivovať kontrolný súčet"
+msgstr "kontrolný súčet archívu"
 
 #: documents/models.py:191
 msgid "The checksum of the archived document."
@@ -160,7 +160,7 @@ msgstr "Kontrolný súčet archivovaného dokumentu."
 
 #: documents/models.py:194 documents/models.py:376 documents/models.py:630
 msgid "created"
-msgstr "vytovrené"
+msgstr "vytvorené"
 
 #: documents/models.py:197
 msgid "modified"
@@ -184,11 +184,11 @@ msgstr "Aktuálny názov dokumentu v úložisku"
 
 #: documents/models.py:229
 msgid "archive filename"
-msgstr "archovovať názov súboru"
+msgstr "názov archivovaného súboru"
 
 #: documents/models.py:235
 msgid "Current archive filename in storage"
-msgstr "Aktuálny archovivaný názov dokumentu v úložisku"
+msgstr "Aktuálny názov archívneho súboru v úložisku"
 
 #: documents/models.py:239
 msgid "original filename"
@@ -200,7 +200,7 @@ msgstr "Pôvodný názov súboru pri nahratí"
 
 #: documents/models.py:252
 msgid "archive serial number"
-msgstr "archivovať sériové číslo"
+msgstr "sériové číslo archívu"
 
 #: documents/models.py:262
 msgid "The position of this document in your physical document archive."
@@ -216,7 +216,7 @@ msgstr "dokumenty"
 
 #: documents/models.py:359
 msgid "debug"
-msgstr "odstraňovanie chýb"
+msgstr "ladenie"
 
 #: documents/models.py:360
 msgid "information"

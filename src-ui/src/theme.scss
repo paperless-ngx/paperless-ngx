@@ -71,6 +71,7 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
   --pngx-focus-alpha: 0.6;
   --pngx-primary-faded: var(--pngx-primary-darken-15);
   --pngx-primary-text-contrast: var(--bs-body-color);
+  --bs-dark-border-subtle: var(--pngx-bg-darker);
 
   .text-dark, .text-light {
     color: var(--bs-body-color) !important;

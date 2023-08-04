@@ -1,7 +1,9 @@
 import logging
 import re
 
+from documents.classifier import DocumentClassifier
 from documents.models import Correspondent
+from documents.models import Document
 from documents.models import DocumentType
 from documents.models import MatchingModel
 from documents.models import StoragePath
@@ -11,7 +13,7 @@ from documents.permissions import get_objects_for_user_owner_aware
 logger = logging.getLogger("paperless.matching")
 
 
-def log_reason(matching_model, document, reason):
+def log_reason(matching_model: MatchingModel, document: Document, reason: str):
     class_name = type(matching_model).__name__
     logger.debug(
         f"{class_name} {matching_model.name} matched on document "
@@ -19,7 +21,7 @@ def log_reason(matching_model, document, reason):
     )
 
 
-def match_correspondents(document, classifier, user=None):
+def match_correspondents(document: Document, classifier: DocumentClassifier, user=None):
     pred_id = classifier.predict_correspondent(document.content) if classifier else None
 
     if user is None and document.owner is not None:
@@ -35,11 +37,15 @@ def match_correspondents(document, classifier, user=None):
         correspondents = Correspondent.objects.all()
 
     return list(
-        filter(lambda o: matches(o, document) or o.pk == pred_id, correspondents),
+        filter(
+            lambda o: matches(o, document)
+            or (o.pk == pred_id and o.matching_algorithm == MatchingModel.MATCH_AUTO),
+            correspondents,
+        ),
     )
 
 
-def match_document_types(document, classifier, user=None):
+def match_document_types(document: Document, classifier: DocumentClassifier, user=None):
     pred_id = classifier.predict_document_type(document.content) if classifier else None
 
     if user is None and document.owner is not None:
@@ -55,11 +61,15 @@ def match_document_types(document, classifier, user=None):
         document_types = DocumentType.objects.all()
 
     return list(
-        filter(lambda o: matches(o, document) or o.pk == pred_id, document_types),
+        filter(
+            lambda o: matches(o, document)
+            or (o.pk == pred_id and o.matching_algorithm == MatchingModel.MATCH_AUTO),
+            document_types,
+        ),
     )
 
 
-def match_tags(document, classifier, user=None):
+def match_tags(document: Document, classifier: DocumentClassifier, user=None):
     predicted_tag_ids = classifier.predict_tags(document.content) if classifier else []
 
     if user is None and document.owner is not None:
@@ -71,11 +81,18 @@ def match_tags(document, classifier, user=None):
         tags = Tag.objects.all()
 
     return list(
-        filter(lambda o: matches(o, document) or o.pk in predicted_tag_ids, tags),
+        filter(
+            lambda o: matches(o, document)
+            or (
+                o.matching_algorithm == MatchingModel.MATCH_AUTO
+                and o.pk in predicted_tag_ids
+            ),
+            tags,
+        ),
     )
 
 
-def match_storage_paths(document, classifier, user=None):
+def match_storage_paths(document: Document, classifier: DocumentClassifier, user=None):
     pred_id = classifier.predict_storage_path(document.content) if classifier else None
 
     if user is None and document.owner is not None:
@@ -92,13 +109,14 @@ def match_storage_paths(document, classifier, user=None):
 
     return list(
         filter(
-            lambda o: matches(o, document) or o.pk == pred_id,
+            lambda o: matches(o, document)
+            or (o.pk == pred_id and o.matching_algorithm == MatchingModel.MATCH_AUTO),
             storage_paths,
         ),
     )
 
 
-def matches(matching_model, document):
+def matches(matching_model: MatchingModel, document: Document):
     search_kwargs = {}
 
     document_content = document.content

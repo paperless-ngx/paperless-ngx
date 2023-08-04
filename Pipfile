@@ -26,8 +26,6 @@ gunicorn = "*"
 imap-tools = "*"
 langdetect = "*"
 pathvalidate = "*"
-pillow = "*"
-pikepdf = "*"
 python-gnupg = "*"
 python-dotenv = "*"
 python-dateutil = "*"
@@ -36,7 +34,7 @@ python-ipware = "*"
 psycopg2 = "*"
 rapidfuzz = "*"
 redis = {extras = ["hiredis"], version = "*"}
-scikit-learn = "~=1.2"
+scikit-learn = "~=1.3"
 whitenoise = "~=6.3"
 watchdog = "~=2.2"
 whoosh="~=2.7"
@@ -64,9 +62,10 @@ zxing-cpp = {version = "*", platform_machine = "== 'x86_64'"}
 scipy = "==1.8.1"
 # v4 brings in extra dependencies for features not used here
 reportlab = "==3.6.12"
-# Pin this until piwheels is building a newer version (see https://www.piwheels.org/project/cryptography/)
+# Pin these until piwheels is building a newer version (see https://www.piwheels.org/project/{package}/)
 cryptography = "==40.0.1"
-httpx = "*"
+pikepdf = "==7.2.0"
+pillow = "==9.5.0"
 
 [dev-packages]
 # Linting

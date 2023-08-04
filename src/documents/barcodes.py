@@ -1,15 +1,12 @@
 import logging
-import shutil
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
-from subprocess import run
 from typing import Dict
 from typing import Final
 from typing import List
 from typing import Optional
 
-import img2pdf
 from django.conf import settings
 from pdf2image import convert_from_path
 from pdf2image.exceptions import PDFPageCountError
@@ -17,7 +14,10 @@ from pikepdf import Page
 from pikepdf import Pdf
 from PIL import Image
 
+from documents.converters import convert_from_tiff_to_pdf
 from documents.data_models import DocumentSource
+from documents.utils import copy_basic_file_stats
+from documents.utils import copy_file_with_basic_stats
 
 logger = logging.getLogger("paperless.barcodes")
 
@@ -54,7 +54,7 @@ class BarcodeReader:
         self.mime: Final[str] = mime_type
         self.pdf_file: Path = self.file
         self.barcodes: List[Barcode] = []
-        self.temp_dir: Optional[Path] = None
+        self.temp_dir: Optional[tempfile.TemporaryDirectory] = None
 
         if settings.CONSUMER_BARCODE_TIFF_SUPPORT:
             self.SUPPORTED_FILE_MIMES = {"application/pdf", "image/tiff"}
@@ -154,34 +154,7 @@ class BarcodeReader:
         if self.mime != "image/tiff":
             return
 
-        with Image.open(self.file) as im:
-            has_alpha_layer = im.mode in ("RGBA", "LA")
-        if has_alpha_layer:
-            # Note the save into the temp folder, so as not to trigger a new
-            # consume
-            scratch_image = Path(self.temp_dir.name) / Path(self.file.name)
-            run(
-                [
-                    settings.CONVERT_BINARY,
-                    "-alpha",
-                    "off",
-                    self.file,
-                    scratch_image,
-                ],
-            )
-        else:
-            # Not modifying the original, safe to use in place
-            scratch_image = self.file
-
-        self.pdf_file = Path(self.temp_dir.name) / Path(self.file.name).with_suffix(
-            ".pdf",
-        )
-
-        with scratch_image.open("rb") as img_file, self.pdf_file.open("wb") as pdf_file:
-            pdf_file.write(img2pdf.convert(img_file))
-
-        # Copy what file stat is possible
-        shutil.copystat(self.file, self.pdf_file)
+        self.pdf_file = convert_from_tiff_to_pdf(self.file, Path(self.temp_dir.name))
 
     def detect(self) -> None:
         """
@@ -306,7 +279,7 @@ class BarcodeReader:
                 with open(savepath, "wb") as out:
                     dst.save(out)
 
-                shutil.copystat(self.file, savepath)
+                copy_basic_file_stats(self.file, savepath)
 
                 document_paths.append(savepath)
 
@@ -363,5 +336,5 @@ class BarcodeReader:
             else:
                 dest = save_to_dir
             logger.info(f"Saving {document_path} to {dest}")
-            shutil.copy2(document_path, dest)
+            copy_file_with_basic_stats(document_path, dest)
         return True

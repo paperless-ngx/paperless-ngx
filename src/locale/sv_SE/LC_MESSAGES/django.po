@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-06-04 20:53\n"
+"PO-Revision-Date: 2023-07-12 22:34\n"
 "Last-Translator: \n"
 "Language-Team: Swedish\n"
 "Language: sv_SE\n"
@@ -598,7 +598,7 @@ msgstr "Italienska"
 
 #: paperless/settings.py:531
 msgid "Luxembourgish"
-msgstr ""
+msgstr "Luxemburgiska"
 
 #: paperless/settings.py:532
 msgid "Dutch"
@@ -670,7 +670,7 @@ msgstr "Åtgärder"
 
 #: paperless_mail/admin.py:69
 msgid "The action applied to the mail. This action is only performed when the mail body or attachments were consumed from the mail."
-msgstr ""
+msgstr "Åtgärden som tillämpas på e-postmeddelandet. Denna åtgärd utförs endast när meddelandetexten eller bilagorna konsumerades från e-postmeddelandet."
 
 #: paperless_mail/admin.py:77
 msgid "Metadata"
@@ -778,7 +778,7 @@ msgstr "Flagga meddelandet, bearbeta inte flaggade meddelanden"
 
 #: paperless_mail/models.py:77
 msgid "Tag the mail with specified tag, don't process tagged mails"
-msgstr ""
+msgstr "Tagga meddelandet med en specifik tagg, bearbeta inte taggade meddelanden"
 
 #: paperless_mail/models.py:80
 msgid "Use subject as title"
@@ -818,7 +818,7 @@ msgstr "mapp"
 
 #: paperless_mail/models.py:105
 msgid "Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server."
-msgstr ""
+msgstr "Undermappar måste separeras med en avgränsare, ofta en punkt ('.') eller snedstreck ('/'), men det varierar beroende på e-postserver."
 
 #: paperless_mail/models.py:111
 msgid "filter from"
