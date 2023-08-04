@@ -51,7 +51,7 @@ export class CustomStoragePathService extends AbstractPaperlessService<Paperless
     if (parentStoragePathId !== null && parentStoragePathId !== undefined) {
       return this.get(parentStoragePathId).pipe(
         switchMap((storagePath) => {
-          params.path__istartswith = storagePath.path
+          params.path__istartswith = storagePath.path + '/'
           return this.list(page, pageSize, sortField, sortReverse, params).pipe(
             map((results) => {
               results.results = results.results.filter((s) => {

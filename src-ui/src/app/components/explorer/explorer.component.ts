@@ -6,18 +6,9 @@ import {
   ViewChild,
   ViewChildren,
 } from '@angular/core'
-import { ActivatedRoute, Router, convertToParamMap } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
-import {
-  Subject,
-  filter,
-  first,
-  map,
-  switchMap,
-  take,
-  takeUntil,
-  tap,
-} from 'rxjs'
+import { Subject, takeUntil } from 'rxjs'
 import {
   FilterRule,
   filterRulesDiffer,
@@ -26,6 +17,7 @@ import {
 import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type'
 import { PaperlessDocument } from 'src/app/data/paperless-document'
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
+import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
 import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 import {
   SortEvent,
@@ -41,9 +33,9 @@ import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { StoragePathListViewService } from 'src/app/services/storage-path-list-view.service'
 import { ToastService } from 'src/app/services/toast.service'
+import { FolderCreateDialogComponent } from '../common/create-dialog/folder-create-dialog/folder-create-dialog.component'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { FilterEditorComponent } from './filter-editor/filter-editor.component'
-import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
 
 @Component({
   selector: 'app-explorer',
@@ -169,15 +161,30 @@ export class ExplorerComponent
   }
 
   clickPathPart(index: number) {
+    if (index === 0) return this.router.navigate(['explorer'])
     const pathUntilPart = this.folderPath
+      .replace('DMS/', '')
       .split('/')
-      .slice(0, index + 1)
+      .slice(0, index)
       .join('/')
     this.list.getStoragePathByPath(pathUntilPart).subscribe((storagePath) => {
       this.router.navigate(['explorer'], {
         queryParams: { spid: storagePath.id },
       })
     })
+  }
+
+  createFolder() {
+    var modal = this.modalService.open(FolderCreateDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.dialogMode = 'create'
+    modal.componentInstance.object = {
+      path: this.folderPath.replace('DMS/', ''),
+    }
+    modal.componentInstance.succeeded
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => this.list.reload())
   }
 
   openDocumentDetail(storagePath: PaperlessStoragePath) {

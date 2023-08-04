@@ -169,7 +169,7 @@
 </app-page-header>
 
 <div class="row sticky-top pt-3 pt-sm-4 pb-2 pb-lg-4 bg-body">
-  <div class="flex pb-2">
+  <div class="flex pb-2 mb-4">
     <span *ngFor="let pathPart of folderPath.split('/'); let i = index">
       <a (click)="clickPathPart(i)">{{ pathPart }}</a>
       <span *ngIf="i < folderPath.split('/').length - 1"> / </span>
@@ -182,6 +182,17 @@
     [selectionData]="list.selectionData"
     #filterEditor
   ></app-filter-editor> -->
+
+  <div class="row w-auto">
+    <button
+      type="button"
+      class="btn btn-primary btn-sm mx-2"
+      (click)="createFolder()"
+    >
+      + New Folder
+    </button>
+  </div>
+
   <app-bulk-editor [hidden]="!isBulkEditing"></app-bulk-editor>
 </div>
 

@@ -113,7 +113,8 @@ import localeSl from '@angular/common/locales/sl'
 import localeSr from '@angular/common/locales/sr'
 import localeSv from '@angular/common/locales/sv'
 import localeTr from '@angular/common/locales/tr'
-import localeZh from '@angular/common/locales/zh'
+import localeZh from '@angular/common/locales/zh';
+import { FolderCreateDialogComponent } from './components/common/create-dialog/folder-create-dialog/folder-create-dialog.component'
 
 registerLocaleData(localeAr)
 registerLocaleData(localeBe)
@@ -215,6 +216,7 @@ function initializeApp(settings: SettingsService) {
     IfObjectPermissionsDirective,
     PermissionsDialogComponent,
     PermissionsFormComponent,
+    FolderCreateDialogComponent,
   ],
   imports: [
     BrowserModule,

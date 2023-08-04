@@ -1,18 +1,12 @@
 import { Injectable } from '@angular/core'
 import { ParamMap, Router } from '@angular/router'
 import { Observable } from 'rxjs'
-import {
-  FilterRule,
-  cloneFilterRules,
-  filterRulesDiffer,
-  isFullTextFilterRule,
-} from '../data/filter-rule'
+import { FilterRule, isFullTextFilterRule } from '../data/filter-rule'
 import { PaperlessDocument } from '../data/paperless-document'
-import { PaperlessSavedView } from '../data/paperless-saved-view'
 import { PaperlessStoragePath } from '../data/paperless-storage-path'
 import { SETTINGS_KEYS } from '../data/paperless-uisettings'
 import { DOCUMENT_LIST_SERVICE } from '../data/storage-keys'
-import { paramsFromViewState, paramsToViewState } from '../utils/query-params'
+import { paramsToViewState } from '../utils/query-params'
 import { CustomStoragePathService } from './rest/custom-storage-path.service'
 import { DOCUMENT_SORT_FIELDS, SelectionData } from './rest/document.service'
 import { SettingsService } from './settings.service'
@@ -136,29 +130,38 @@ export class StoragePathListViewService {
       if (queryParams.has('spid')) {
         newState.storagePathId = parseInt(queryParams.get('spid'))
       }
+    } else {
+      newState = this.defaultListViewState()
     }
     if (newState == undefined) newState = this.defaultListViewState() // if nothing in local storage
 
+    this.activeListViewState.filterRules = newState.filterRules
+    this.activeListViewState.sortField = newState.sortField
+    this.activeListViewState.sortReverse = newState.sortReverse
+    this.activeListViewState.currentPage = newState.currentPage
+    this.activeListViewState.storagePathId = newState.storagePathId
+    this.activeListViewState.parentStoragePath = newState.parentStoragePath
+    this.reload(null, isParamsEmpty)
     // only reload if things have changed
-    if (
-      !this.initialized ||
-      isParamsEmpty ||
-      this.activeListViewState.sortField !== newState.sortField ||
-      this.activeListViewState.sortReverse !== newState.sortReverse ||
-      this.activeListViewState.currentPage !== newState.currentPage ||
-      this.activeListViewState.storagePathId !== newState.storagePathId ||
-      filterRulesDiffer(
-        this.activeListViewState.filterRules,
-        newState.filterRules
-      )
-    ) {
-      this.activeListViewState.filterRules = newState.filterRules
-      this.activeListViewState.sortField = newState.sortField
-      this.activeListViewState.sortReverse = newState.sortReverse
-      this.activeListViewState.currentPage = newState.currentPage
-      this.activeListViewState.storagePathId = newState.storagePathId
-      this.reload(null, isParamsEmpty) // update the params if there arent any
-    }
+    // if (
+    //   !this.initialized ||
+    //   isParamsEmpty ||
+    //   this.activeListViewState.sortField !== newState.sortField ||
+    //   this.activeListViewState.sortReverse !== newState.sortReverse ||
+    //   this.activeListViewState.currentPage !== newState.currentPage ||
+    //   this.activeListViewState.storagePathId !== newState.storagePathId ||
+    //   filterRulesDiffer(
+    //     this.activeListViewState.filterRules,
+    //     newState.filterRules
+    //   )
+    // ) {
+    //   this.activeListViewState.filterRules = newState.filterRules
+    //   this.activeListViewState.sortField = newState.sortField
+    //   this.activeListViewState.sortReverse = newState.sortReverse
+    //   this.activeListViewState.currentPage = newState.currentPage
+    //   this.activeListViewState.storagePathId = newState.storagePathId
+    //   this.reload(null, isParamsEmpty) // update the params if there arent any
+    // }
   }
 
   getStoragePathByPath(path: string): Observable<PaperlessStoragePath> {
@@ -297,7 +300,8 @@ export class StoragePathListViewService {
   }
 
   get currentFolderPath(): string {
-    return this.activeListViewState.parentStoragePath?.path || '/'
+    const path = this.activeListViewState.parentStoragePath?.path
+    return path ? 'DMS/' + path : 'DMS/'
   }
 
   setSort(field: string, reverse: boolean) {
