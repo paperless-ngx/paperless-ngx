@@ -60,10 +60,10 @@ describe('ConsumerStatusService', () => {
       current_progress: 50,
       max_progress: 100,
       document_id: 12,
-      status: 'STARTING',
+      status: 'WORKING',
     })
 
-    expect(status.getProgress()).toBeCloseTo(0.6) // 0.8 * 50/100
+    expect(status.getProgress()).toBeCloseTo(0.6) // (0.8 * 50/100) + .2
     expect(consumerStatusService.getConsumerStatusNotCompleted()).toEqual([
       status,
     ])
@@ -194,6 +194,7 @@ describe('ConsumerStatusService', () => {
     expect(consumerStatusService.getConsumerStatusCompleted()).toHaveLength(1)
     consumerStatusService.dismissCompleted()
     expect(consumerStatusService.getConsumerStatusCompleted()).toHaveLength(0)
+    consumerStatusService.disconnect()
   })
 
   it('should support dismiss', () => {
@@ -238,17 +239,40 @@ describe('ConsumerStatusService', () => {
   })
 
   it('should notify of document created on status message without upload', () => {
+    let detected = false
     consumerStatusService.onDocumentDetected().subscribe((filestatus) => {
       expect(filestatus.phase).toEqual(FileStatusPhase.STARTED)
+      detected = true
     })
 
+    consumerStatusService.connect()
+    server.send({
+      task_id: '1234',
+      filename: 'file.pdf',
+      current_progress: 0,
+      max_progress: 100,
+      message: 'new_file',
+      status: 'STARTED',
+    })
+
+    consumerStatusService.disconnect()
+    expect(detected).toBeTruthy()
+  })
+
+  it('should notify of document in progress without upload', () => {
+    consumerStatusService.connect()
     server.send({
       task_id: '1234',
       filename: 'file.pdf',
       current_progress: 50,
       max_progress: 100,
-      document_id: 12,
-      status: 'STARTING',
+      docuement_id: 12,
+      status: 'WORKING',
     })
+
+    consumerStatusService.disconnect()
+    expect(consumerStatusService.getConsumerStatusNotCompleted()).toHaveLength(
+      1
+    )
   })
 })

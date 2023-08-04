@@ -65,6 +65,12 @@ def train_classifier():
         and not Correspondent.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
         and not StoragePath.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
     ):
+        logger.info("No automatic matching items, not training")
+        # Special case, items were once auto and trained, so remove the model
+        # and prevent its use again
+        if settings.MODEL_FILE.exists():
+            logger.info(f"Removing {settings.MODEL_FILE} so it won't be used")
+            settings.MODEL_FILE.unlink()
         return
 
     classifier = load_classifier()

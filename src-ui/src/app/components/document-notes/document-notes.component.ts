@@ -26,6 +26,9 @@ export class DocumentNotesComponent extends ComponentWithPermissions {
   @Input()
   notes: PaperlessDocumentNote[] = []
 
+  @Input()
+  addDisabled: boolean = false
+
   @Output()
   updated: EventEmitter<PaperlessDocumentNote[]> = new EventEmitter()
   users: PaperlessUser[]
@@ -61,7 +64,9 @@ export class DocumentNotesComponent extends ComponentWithPermissions {
       error: (e) => {
         this.networkActive = false
         this.toastService.showError(
-          $localize`Error saving note: ${e.toString()}`
+          $localize`Error saving note`,
+          10000,
+          JSON.stringify(e)
         )
       },
     })
