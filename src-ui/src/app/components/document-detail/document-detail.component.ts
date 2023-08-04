@@ -213,22 +213,22 @@ export class DocumentDetailComponent
 
     this.correspondentService
       .listAll()
-      .pipe(first())
+      .pipe(first(), takeUntil(this.unsubscribeNotifier))
       .subscribe((result) => (this.correspondents = result.results))
 
     this.documentTypeService
       .listAll()
-      .pipe(first())
+      .pipe(first(), takeUntil(this.unsubscribeNotifier))
       .subscribe((result) => (this.documentTypes = result.results))
 
     this.storagePathService
       .listAll()
-      .pipe(first())
+      .pipe(first(), takeUntil(this.unsubscribeNotifier))
       .subscribe((result) => (this.storagePaths = result.results))
 
     this.userService
       .listAll()
-      .pipe(first())
+      .pipe(first(), takeUntil(this.unsubscribeNotifier))
       .subscribe((result) => (this.users = result.results))
 
     this.route.paramMap
@@ -406,7 +406,7 @@ export class DocumentDetailComponent
     ) {
       this.documentsService
         .getSuggestions(doc.id)
-        .pipe(first())
+        .pipe(first(), takeUntil(this.unsubscribeNotifier))
         .subscribe({
           next: (result) => {
             this.suggestions = result
