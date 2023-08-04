@@ -3868,18 +3868,18 @@
           <context context-type="linenumber">25</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="207390237682956115" datatype="html">
-        <source>Error saving note: <x id="PH" equiv-text="e.toString()"/></source>
+      <trans-unit id="2054854290951060833" datatype="html">
+        <source>Error saving note</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-notes/document-notes.component.ts</context>
-          <context context-type="linenumber">64</context>
+          <context context-type="linenumber">67</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5682285129543775369" datatype="html">
         <source>Error deleting note: <x id="PH" equiv-text="e.toString()"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-notes/document-notes.component.ts</context>
-          <context context-type="linenumber">80</context>
+          <context context-type="linenumber">85</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6316128875819022658" datatype="html">
