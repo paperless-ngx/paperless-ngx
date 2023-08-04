@@ -1405,7 +1405,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.html</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="needs-translation">Test</target>
+        <target state="translated">Тест</target>
       </trans-unit>
       <trans-unit id="451418349275958054" datatype="html">
         <source>No encryption</source>
@@ -1437,7 +1437,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.ts</context>
           <context context-type="linenumber">41</context>
         </context-group>
-        <target state="translated">Створити новий обліковий запис пошти</target>
+        <target state="translated">Під'єднати поштову скриньку</target>
       </trans-unit>
       <trans-unit id="5559445021532852612" datatype="html">
         <source>Edit mail account</source>
@@ -4260,19 +4260,19 @@
         </context-group>
         <target state="translated">Видалити нотатку</target>
       </trans-unit>
-      <trans-unit id="207390237682956115" datatype="html">
-        <source>Error saving note: <x id="PH" equiv-text="e.toString()"/></source>
+      <trans-unit id="2054854290951060833" datatype="html">
+        <source>Error saving note</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-notes/document-notes.component.ts</context>
-          <context context-type="linenumber">64</context>
+          <context context-type="linenumber">67</context>
         </context-group>
-        <target state="translated">Помилка при збереженні примітки: <x id="PH" equiv-text="e.toString()"/></target>
+        <target state="needs-translation">Error saving note</target>
       </trans-unit>
       <trans-unit id="5682285129543775369" datatype="html">
         <source>Error deleting note: <x id="PH" equiv-text="e.toString()"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-notes/document-notes.component.ts</context>
-          <context context-type="linenumber">80</context>
+          <context context-type="linenumber">85</context>
         </context-group>
         <target state="translated">Помилка при видаленні примітки: <x id="PH" equiv-text="e.toString()"/></target>
       </trans-unit>
