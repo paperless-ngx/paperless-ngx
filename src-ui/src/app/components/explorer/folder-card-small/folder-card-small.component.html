@@ -7,10 +7,9 @@
     <div
       class="border-bottom doc-img-container"
       [class.doc-img-background-selected]="selected"
-      (click)="this.toggleSelected.emit($event)"
       (dblclick)="dblClickDocument.emit(this)"
     >
-      <div class="card-img doc-img rounded-top">
+      <div class="card-img doc-img rounded-top pe-none">
         <svg
           width="100%"
           height="100%"
@@ -30,7 +29,7 @@
             class="form-check-input"
             id="smallCardCheck{{ storagePath.id }}"
             [checked]="selected"
-            (click)="this.toggleSelected.emit($event)"
+            (click)="toggleSelected.emit($event)"
           />
           <label
             class="form-check-label"

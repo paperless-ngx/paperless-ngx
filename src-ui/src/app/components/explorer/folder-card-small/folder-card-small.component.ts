@@ -1,12 +1,4 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  Output,
-  ViewChild,
-} from '@angular/core'
-import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
-import { map } from 'rxjs/operators'
+import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
 import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
