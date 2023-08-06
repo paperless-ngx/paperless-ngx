@@ -1617,7 +1617,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="translated">Призначити заголовок з</target>
+        <target state="translated">Призначити назву з</target>
       </trans-unit>
       <trans-unit id="6695990587380209737" datatype="html">
         <source>Assign document type</source>
@@ -1805,7 +1805,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">76</context>
         </context-group>
-        <target state="translated">Використовувати тему як заголовок</target>
+        <target state="translated">Використовувати тему як назву</target>
       </trans-unit>
       <trans-unit id="8645471396972938185" datatype="html">
         <source>Use attachment filename as title</source>
@@ -1813,7 +1813,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">80</context>
         </context-group>
-        <target state="translated">Використовувати назву файлу як заголовок</target>
+        <target state="translated">Використовувати назву файлу як назву документа</target>
       </trans-unit>
       <trans-unit id="1568902914205618549" datatype="html">
         <source>Do not assign a correspondent</source>
@@ -2537,7 +2537,7 @@
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="translated">Заголовок</target>
+        <target state="translated">Назва</target>
       </trans-unit>
       <trans-unit id="8911158217491828773" datatype="html">
         <source>View Preview</source>
@@ -3714,7 +3714,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
           <context context-type="linenumber">116</context>
         </context-group>
-        <target state="needs-translation">Score:</target>
+        <target state="translated">Релевантність:</target>
       </trans-unit>
       <trans-unit id="3661756380991326939" datatype="html">
         <source>Toggle tag filter</source>
@@ -3882,7 +3882,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">138</context>
         </context-group>
-        <target state="needs-translation">Sort by correspondent</target>
+        <target state="translated">Впорядкувати за кореспондентом</target>
       </trans-unit>
       <trans-unit id="2066713941761361709" datatype="html">
         <source>Sort by title</source>
@@ -3890,7 +3890,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">145</context>
         </context-group>
-        <target state="needs-translation">Sort by title</target>
+        <target state="translated">Впорядкувати за назвою</target>
       </trans-unit>
       <trans-unit id="6232673011753681091" datatype="html">
         <source>Sort by owner</source>
@@ -3898,7 +3898,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">152</context>
         </context-group>
-        <target state="needs-translation">Sort by owner</target>
+        <target state="translated">Впорядкувати за власником</target>
       </trans-unit>
       <trans-unit id="3715596725146409911" datatype="html">
         <source>Owner</source>
@@ -3918,7 +3918,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">159</context>
         </context-group>
-        <target state="needs-translation">Sort by notes</target>
+        <target state="translated">Впорядкувати за нотатками</target>
       </trans-unit>
       <trans-unit id="8104421162933956065" datatype="html">
         <source>Notes</source>
@@ -3942,7 +3942,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">166</context>
         </context-group>
-        <target state="translated">Сортувати за типом документа</target>
+        <target state="translated">Впорядкувати за типом документа</target>
       </trans-unit>
       <trans-unit id="6213829731736042759" datatype="html">
         <source>Sort by storage path</source>
@@ -3950,7 +3950,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">173</context>
         </context-group>
-        <target state="translated">Сортувати за шляхом зберігання</target>
+        <target state="translated">Впорядкувати за шляхом зберігання</target>
       </trans-unit>
       <trans-unit id="3406167410329973166" datatype="html">
         <source>Sort by created date</source>
@@ -3958,7 +3958,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">180</context>
         </context-group>
-        <target state="translated">Сортувати за датою створення</target>
+        <target state="translated">Впорядкувати за датою створення</target>
       </trans-unit>
       <trans-unit id="3769035778779263084" datatype="html">
         <source>Sort by added date</source>
@@ -3966,7 +3966,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">187</context>
         </context-group>
-        <target state="translated">Сортувати за датою додавання</target>
+        <target state="translated">Впорядкувати за датою додавання</target>
       </trans-unit>
       <trans-unit id="231679111972850796" datatype="html">
         <source>Added</source>
@@ -4078,7 +4078,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">155</context>
         </context-group>
-        <target state="needs-translation">Title: <x id="PH" equiv-text="rule.value"/></target>
+        <target state="translated">Назва: <x id="PH" equiv-text="rule.value"/></target>
       </trans-unit>
       <trans-unit id="1872523635812236432" datatype="html">
         <source>ASN: <x id="PH" equiv-text="rule.value"/></source>
@@ -4118,7 +4118,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">204</context>
         </context-group>
-        <target state="needs-translation">Title &amp; content</target>
+        <target state="translated">Назва та вміст</target>
       </trans-unit>
       <trans-unit id="1010505078885609376" datatype="html">
         <source>Advanced search</source>
@@ -4134,7 +4134,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">215</context>
         </context-group>
-        <target state="needs-translation">More like</target>
+        <target state="translated">Більше схожих</target>
       </trans-unit>
       <trans-unit id="3697582909018473071" datatype="html">
         <source>equals</source>
@@ -4142,7 +4142,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">234</context>
         </context-group>
-        <target state="needs-translation">equals</target>
+        <target state="translated">дорівнює</target>
       </trans-unit>
       <trans-unit id="5325481293405718739" datatype="html">
         <source>is empty</source>
@@ -4150,7 +4150,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">238</context>
         </context-group>
-        <target state="needs-translation">is empty</target>
+        <target state="translated">не заповнено</target>
       </trans-unit>
       <trans-unit id="6166785695326182482" datatype="html">
         <source>is not empty</source>
@@ -4158,7 +4158,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">242</context>
         </context-group>
-        <target state="needs-translation">is not empty</target>
+        <target state="translated">заповнено</target>
       </trans-unit>
       <trans-unit id="4686622206659266699" datatype="html">
         <source>greater than</source>
@@ -4166,7 +4166,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">246</context>
         </context-group>
-        <target state="needs-translation">greater than</target>
+        <target state="translated">більше ніж</target>
       </trans-unit>
       <trans-unit id="8014012170270529279" datatype="html">
         <source>less than</source>
@@ -4174,7 +4174,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">250</context>
         </context-group>
-        <target state="needs-translation">less than</target>
+        <target state="translated">менше ніж</target>
       </trans-unit>
       <trans-unit id="7210076240260527720" datatype="html">
         <source>Save current view</source>
@@ -4182,7 +4182,7 @@
           <context context-type="sourcefile">src/app/components/document-list/save-view-config-dialog/save-view-config-dialog.component.html</context>
           <context context-type="linenumber">3</context>
         </context-group>
-        <target state="needs-translation">Save current view</target>
+        <target state="translated">Зберегти поточне представлення</target>
       </trans-unit>
       <trans-unit id="8689274715612276035" datatype="html">
         <source>Show in sidebar</source>
@@ -4730,7 +4730,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">144,146</context>
         </context-group>
-        <target state="needs-translation"><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&gt;"/>No tracking data is collected by the app in any way.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></target>
+        <target state="translated"><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&gt;"/>Програма жодним чином не відстежує дані. <x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></target>
       </trans-unit>
       <trans-unit id="5070799004079086984" datatype="html">
         <source>Enable update checking</source>
@@ -4858,7 +4858,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">209,210</context>
         </context-group>
-        <target state="needs-translation"> <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;visually-hidden&quot;&gt;"/>Appears on<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
+        <target state="translated"> <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;visually-hidden&quot;&gt;"/>Показувати на<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
       </trans-unit>
       <trans-unit id="7877440816920439876" datatype="html">
         <source>No saved views defined.</source>
@@ -5082,7 +5082,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">748</context>
         </context-group>
-        <target state="needs-translation">Saved group "<x id="PH" equiv-text="newGroup.name"/>".</target>
+        <target state="translated">Групу "<x id="PH" equiv-text="newGroup.name"/>" збережено.</target>
       </trans-unit>
       <trans-unit id="8382042988405122578" datatype="html">
         <source>Error saving group.</source>
@@ -5326,7 +5326,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">103</context>
         </context-group>
-        <target state="needs-translation">{VAR_PLURAL, plural, =1 {One <x id="INTERPOLATION"/> task} other {<x id="INTERPOLATION_1"/> total <x id="INTERPOLATION"/> tasks}}</target>
+        <target state="translated">{VAR_PLURAL, plural, =1 {Одне <x id="INTERPOLATION"/> завдання} other {<x id="INTERPOLATION_1"/> всього <x id="INTERPOLATION"/> завдань}}</target>
       </trans-unit>
       <trans-unit id="1830925490604698731" datatype="html">
         <source>Failed<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.failedFileTasks.length &gt; 0&quot; class=&quot;badge bg-danger ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
@@ -5594,7 +5594,7 @@
           <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
           <context context-type="linenumber">31</context>
         </context-group>
-        <target state="needs-translation">You have unsaved changes to the saved view</target>
+        <target state="translated">У вас є незбережені зміни у цьому представленні</target>
       </trans-unit>
       <trans-unit id="7282050913165342352" datatype="html">
         <source>Are you sure you want to close this saved view?</source>
@@ -5602,7 +5602,7 @@
           <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
           <context context-type="linenumber">35</context>
         </context-group>
-        <target state="needs-translation">Are you sure you want to close this saved view?</target>
+        <target state="translated">Ви впевнені, що хочете закрити це представлення?</target>
       </trans-unit>
       <trans-unit id="856284624775342512" datatype="html">
         <source>Save and close</source>
