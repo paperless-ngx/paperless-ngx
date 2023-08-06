@@ -303,6 +303,12 @@ export class SettingsService {
         dateInputFormat: 'yyyy-mm-dd',
       },
       {
+        code: 'uk-ua',
+        name: $localize`Ukranian`,
+        englishName: 'Ukranian',
+        dateInputFormat: 'dd.mm.yyyy',
+      },
+      {
         code: 'zh-cn',
         name: $localize`Chinese Simplified`,
         englishName: 'Chinese Simplified',
