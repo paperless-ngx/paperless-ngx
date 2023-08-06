@@ -6017,11 +6017,19 @@
         </context-group>
         <target state="translated">Turco</target>
       </trans-unit>
+      <trans-unit id="830844828423138653" datatype="html">
+        <source>Ukranian</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">307</context>
+        </context-group>
+        <target state="needs-translation">Ukranian</target>
+      </trans-unit>
       <trans-unit id="4689443708886954687" datatype="html">
         <source>Chinese Simplified</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">307</context>
+          <context context-type="linenumber">313</context>
         </context-group>
         <target state="translated">Chinês Simplificado</target>
       </trans-unit>
@@ -6029,7 +6037,7 @@
         <source>ISO 8601</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">324</context>
+          <context context-type="linenumber">330</context>
         </context-group>
         <target state="translated">ISO 8601</target>
       </trans-unit>
@@ -6037,7 +6045,7 @@
         <source>Successfully completed one-time migratration of settings to the database!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">435</context>
+          <context context-type="linenumber">441</context>
         </context-group>
         <target state="translated">Terminado com sucesso a migração única das definições na base de dados!</target>
       </trans-unit>
@@ -6045,7 +6053,7 @@
         <source>Unable to migrate settings to the database, please try saving manually.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">436</context>
+          <context context-type="linenumber">442</context>
         </context-group>
         <target state="translated">Incapaz de migrar as definições na base de dados, por favor, tente gravar manualmente.</target>
       </trans-unit>
@@ -6053,7 +6061,7 @@
         <source>You can restart the tour from the settings page.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">510</context>
+          <context context-type="linenumber">516</context>
         </context-group>
         <target state="translated">Pode reiniciar o tutorial através da página das Configurações.</target>
       </trans-unit>
