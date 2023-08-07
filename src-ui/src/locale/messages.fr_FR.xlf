@@ -6017,13 +6017,13 @@
         </context-group>
         <target state="final">Turc</target>
       </trans-unit>
-      <trans-unit id="830844828423138653" datatype="html">
+      <trans-unit id="830844828423138653" datatype="html" approved="yes">
         <source>Ukranian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">307</context>
         </context-group>
-        <target state="needs-translation">Ukranian</target>
+        <target state="final">Ukrainien</target>
       </trans-unit>
       <trans-unit id="4689443708886954687" datatype="html" approved="yes">
         <source>Chinese Simplified</source>
