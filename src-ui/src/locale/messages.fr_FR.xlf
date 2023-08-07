@@ -4260,13 +4260,13 @@
         </context-group>
         <target state="final">Supprimer une note</target>
       </trans-unit>
-      <trans-unit id="2054854290951060833" datatype="html">
+      <trans-unit id="2054854290951060833" datatype="html" approved="yes">
         <source>Error saving note</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-notes/document-notes.component.ts</context>
           <context context-type="linenumber">67</context>
         </context-group>
-        <target state="needs-translation">Error saving note</target>
+        <target state="final">Erreur lors de la sauvegarde de la note</target>
       </trans-unit>
       <trans-unit id="5682285129543775369" datatype="html" approved="yes">
         <source>Error deleting note: <x id="PH" equiv-text="e.toString()"/></source>
