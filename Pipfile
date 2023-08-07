@@ -81,11 +81,13 @@ pytest-httpx = "*"
 pytest-env = "*"
 pytest-sugar = "*"
 pytest-xdist = "*"
+pytest-rerunfailures = "*"
 "pdfminer.six" = "*"
 imagehash = "*"
 daphne = "*"
 # Documentation
 mkdocs-material = "*"
+
 
 [typing-dev]
 mypy = "*"
