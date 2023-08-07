@@ -44,7 +44,19 @@ export class CorrespondentListComponent extends ManagementListComponent<Paperles
           key: 'last_correspondence',
           name: $localize`Last used`,
           valueFn: (c: PaperlessCorrespondent) => {
-            return this.datePipe.transform(c.last_correspondence)
+            if (c.last_correspondence) {
+              let date = new Date(c.last_correspondence)
+              if (date.toString() == 'Invalid Date') {
+                // very old date strings are unable to be parsed
+                date = new Date(
+                  c.last_correspondence
+                    ?.toString()
+                    .replace(/-(\d\d):\d\d:\d\d/gm, `-$1:00`)
+                )
+              }
+              return this.datePipe.transform(date)
+            }
+            return ''
           },
         },
       ]

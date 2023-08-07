@@ -668,7 +668,7 @@ describe('DocumentDetailComponent', () => {
     const object = {
       id: 22,
       name: 'Correspondent22',
-      last_correspondence: new Date(),
+      last_correspondence: new Date().toISOString(),
     } as PaperlessCorrespondent
     const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
     component.filterDocuments([object])
