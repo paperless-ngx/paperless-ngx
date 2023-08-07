@@ -31,8 +31,12 @@ describe('CorrespondentListComponent', () => {
         ReactiveFormsModule,
       ],
     }).compileComponents()
-
     correspondentsService = TestBed.inject(CorrespondentService)
+  })
+
+  // Tests are included in management-list.compontent.spec.ts
+
+  it('should use correct delete message', () => {
     jest.spyOn(correspondentsService, 'listFiltered').mockReturnValue(
       of({
         count: 3,
@@ -56,15 +60,30 @@ describe('CorrespondentListComponent', () => {
     fixture = TestBed.createComponent(CorrespondentListComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
-  })
 
-  // Tests are included in management-list.compontent.spec.ts
-
-  it('should use correct delete message', () => {
     expect(
       component.getDeleteMessage({ id: 1, name: 'Correspondent1' })
     ).toEqual(
       'Do you really want to delete the correspondent "Correspondent1"?'
     )
+  })
+
+  it('should support very old date strings', () => {
+    jest.spyOn(correspondentsService, 'listFiltered').mockReturnValue(
+      of({
+        count: 1,
+        all: [1],
+        results: [
+          {
+            id: 1,
+            name: 'Correspondent1',
+            last_correspondence: '1832-12-31T15:32:54-07:52:58',
+          },
+        ],
+      })
+    )
+    fixture = TestBed.createComponent(CorrespondentListComponent)
+    component = fixture.componentInstance
+    fixture.detectChanges()
   })
 })
