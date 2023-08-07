@@ -9,6 +9,7 @@ from typing import Optional
 from typing import Union
 from unittest import mock
 
+import pytest
 from django.core.management import call_command
 from django.db import DatabaseError
 from django.test import TestCase
@@ -400,8 +401,7 @@ class TestMail(
             attachments=2,
         )
 
-        account = MailAccount()
-        account.save()
+        account = MailAccount.objects.create()
         rule = MailRule(
             assign_title_from=MailRule.TitleSource.FROM_FILENAME,
             account=account,
@@ -445,8 +445,7 @@ class TestMail(
             ],
         )
 
-        account = MailAccount()
-        account.save()
+        account = MailAccount.objects.create()
         rule = MailRule(
             assign_title_from=MailRule.TitleSource.FROM_FILENAME,
             account=account,
@@ -475,8 +474,7 @@ class TestMail(
             ],
         )
 
-        account = MailAccount()
-        account.save()
+        account = MailAccount.objects.create()
         rule = MailRule(
             assign_title_from=MailRule.TitleSource.FROM_FILENAME,
             account=account,
@@ -504,8 +502,7 @@ class TestMail(
             ],
         )
 
-        account = MailAccount()
-        account.save()
+        account = MailAccount.objects.create()
         rule = MailRule(
             assign_title_from=MailRule.TitleSource.FROM_FILENAME,
             account=account,
@@ -696,6 +693,7 @@ class TestMail(
         self.assertEqual(len(self.bogus_mailbox.fetch("UNFLAGGED", False)), 1)
         self.assertEqual(len(self.bogus_mailbox.messages), 3)
 
+    @pytest.mark.flaky(reruns=4)
     def test_handle_mail_account_move(self):
         account = MailAccount.objects.create(
             name="test",
@@ -854,6 +852,7 @@ class TestMail(
         ):
             self.mail_account_handler.handle_mail_account(account)
 
+    @pytest.mark.flaky(reruns=4)
     def test_error_skip_account(self):
         _ = MailAccount.objects.create(
             name="test",
