@@ -12,6 +12,7 @@ import { environment } from 'src/environments/environment'
 import { DocumentService } from './rest/document.service'
 import { HttpEventType, HttpResponse } from '@angular/common/http'
 import WS from 'jest-websocket-mock'
+import { SettingsService } from './settings.service'
 
 describe('ConsumerStatusService', () => {
   let httpTestingController: HttpTestingController
@@ -24,7 +25,21 @@ describe('ConsumerStatusService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [ConsumerStatusService, DocumentService],
+      providers: [
+        ConsumerStatusService,
+        DocumentService,
+        SettingsService,
+        {
+          provide: SettingsService,
+          useValue: {
+            currentUser: {
+              id: 1,
+              username: 'testuser',
+              is_superuser: false,
+            },
+          },
+        },
+      ],
       imports: [HttpClientTestingModule],
     })
 
@@ -267,6 +282,34 @@ describe('ConsumerStatusService', () => {
       current_progress: 50,
       max_progress: 100,
       docuement_id: 12,
+      status: 'WORKING',
+    })
+
+    consumerStatusService.disconnect()
+    expect(consumerStatusService.getConsumerStatusNotCompleted()).toHaveLength(
+      1
+    )
+  })
+
+  it('should not notify current user if document has different expected owner', () => {
+    consumerStatusService.connect()
+    server.send({
+      task_id: '1234',
+      filename: 'file1.pdf',
+      current_progress: 50,
+      max_progress: 100,
+      docuement_id: 12,
+      owner_id: 1,
+      status: 'WORKING',
+    })
+
+    server.send({
+      task_id: '5678',
+      filename: 'file2.pdf',
+      current_progress: 50,
+      max_progress: 100,
+      docuement_id: 13,
+      owner_id: 2,
       status: 'WORKING',
     })
 
