@@ -10,6 +10,16 @@ class StatusConsumer(WebsocketConsumer):
     def _authenticated(self):
         return "user" in self.scope and self.scope["user"].is_authenticated
 
+    def _is_owner_or_unowned(self, data):
+        return (
+            (
+                self.scope["user"].is_superuser
+                or self.scope["user"].id == data["owner_id"]
+            )
+            if "owner_id" in data and "user" in self.scope
+            else True
+        )
+
     def connect(self):
         if not self._authenticated():
             raise DenyConnection
@@ -30,4 +40,5 @@ class StatusConsumer(WebsocketConsumer):
         if not self._authenticated():
             self.close()
         else:
-            self.send(json.dumps(event["data"]))
+            if self._is_owner_or_unowned(event["data"]):
+                self.send(json.dumps(event["data"]))
