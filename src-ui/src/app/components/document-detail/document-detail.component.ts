@@ -341,7 +341,9 @@ export class DocumentDetailComponent
           this.openDocumentService.setDirty(doc, dirty)
         },
         error: (error) => {
-          this.router.navigate(['404'])
+          this.router.navigate(['404'], {
+            replaceUrl: true,
+          })
         },
       })
 
@@ -513,7 +515,9 @@ export class DocumentDetailComponent
           this.openDocumentService.setDirty(doc, false)
         },
         error: () => {
-          this.router.navigate(['404'])
+          this.router.navigate(['404'], {
+            replaceUrl: true,
+          })
         },
       })
   }
