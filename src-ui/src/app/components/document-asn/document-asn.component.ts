@@ -25,7 +25,9 @@ export class DocumentAsnComponent implements OnInit {
           if (documentId.length == 1) {
             this.router.navigate(['documents', documentId[0]])
           } else {
-            this.router.navigate(['404'])
+            this.router.navigate(['404'], {
+              replaceUrl: true,
+            })
           }
         })
     })
