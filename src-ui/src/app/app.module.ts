@@ -92,6 +92,7 @@ import { PermissionsDialogComponent } from './components/common/permissions-dial
 import { PermissionsFormComponent } from './components/common/input/permissions/permissions-form/permissions-form.component'
 import { PermissionsFilterDropdownComponent } from './components/common/permissions-filter-dropdown/permissions-filter-dropdown.component'
 import { UsernamePipe } from './pipes/username.pipe'
+import { LogoComponent } from './components/common/logo/logo.component'
 
 import localeAr from '@angular/common/locales/ar'
 import localeBe from '@angular/common/locales/be'
@@ -221,6 +222,7 @@ function initializeApp(settings: SettingsService) {
     PermissionsFormComponent,
     PermissionsFilterDropdownComponent,
     UsernamePipe,
+    LogoComponent,
   ],
   imports: [
     BrowserModule,
