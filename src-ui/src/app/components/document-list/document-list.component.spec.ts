@@ -259,7 +259,7 @@ describe('DocumentListComponent', () => {
       .mockReturnValue(of(convertToParamMap({ id: '10' })))
     const navigateSpy = jest.spyOn(router, 'navigate')
     fixture.detectChanges()
-    expect(navigateSpy).toHaveBeenCalledWith(['404'])
+    expect(navigateSpy).toHaveBeenCalledWith(['404'], { replaceUrl: true })
   })
 
   it('should load saved view from query params', () => {

@@ -1,5 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { NotFoundComponent } from './not-found.component'
+import { By } from '@angular/platform-browser'
+import { LogoComponent } from '../common/logo/logo.component'
 
 describe('NotFoundComponent', () => {
   let component: NotFoundComponent
@@ -7,7 +9,7 @@ describe('NotFoundComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [NotFoundComponent],
+      declarations: [NotFoundComponent, LogoComponent],
     }).compileComponents()
 
     fixture = TestBed.createComponent(NotFoundComponent)
@@ -18,6 +20,7 @@ describe('NotFoundComponent', () => {
 
   it('should create component', () => {
     expect(component).toBeTruthy()
-    expect(fixture.nativeElement.textContent).toContain('404 Not Found')
+    expect(fixture.nativeElement.textContent).toContain('Not Found')
+    expect(fixture.debugElement.queryAll(By.css('a'))).toHaveLength(1)
   })
 })

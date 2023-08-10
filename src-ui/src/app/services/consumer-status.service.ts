@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core'
 import { Subject } from 'rxjs'
 import { environment } from 'src/environments/environment'
 import { WebsocketConsumerStatusMessage } from '../data/websocket-consumer-status-message'
+import { SettingsService } from './settings.service'
 
 // see ConsumerFilePhase in src/documents/consumer.py
 export enum FileStatusPhase {
@@ -44,6 +45,8 @@ export class FileStatus {
 
   documentId: number
 
+  ownerId: number
+
   getProgress(): number {
     switch (this.phase) {
       case FileStatusPhase.STARTED:
@@ -81,7 +84,7 @@ export class FileStatus {
   providedIn: 'root',
 })
 export class ConsumerStatusService {
-  constructor() {}
+  constructor(private settingsService: SettingsService) {}
 
   private statusWebSocket: WebSocket
 
@@ -142,6 +145,15 @@ export class ConsumerStatusService {
     )
     this.statusWebSocket.onmessage = (ev) => {
       let statusMessage: WebsocketConsumerStatusMessage = JSON.parse(ev['data'])
+
+      // fallback if backend didnt restrict message
+      if (
+        statusMessage.owner_id &&
+        statusMessage.owner_id !== this.settingsService.currentUser?.id &&
+        !this.settingsService.currentUser?.is_superuser
+      ) {
+        return
+      }
 
       let statusMessageGet = this.get(
         statusMessage.task_id,

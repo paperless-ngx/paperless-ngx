@@ -53,6 +53,6 @@ describe('DocumentAsnComponent', () => {
       .mockReturnValue(of(convertToParamMap({ id: '5578' })))
     const navigateSpy = jest.spyOn(router, 'navigate')
     component.ngOnInit()
-    expect(navigateSpy).toHaveBeenCalledWith(['404'])
+    expect(navigateSpy).toHaveBeenCalledWith(['404'], { replaceUrl: true })
   })
 })

@@ -16,6 +16,7 @@ import { IfPermissionsDirective } from 'src/app/directives/if-permissions.direct
 import { NgxFileDropModule } from 'ngx-file-drop'
 import { RouterTestingModule } from '@angular/router/testing'
 import { TourNgBootstrapModule, TourService } from 'ngx-ui-tour-ng-bootstrap'
+import { LogoComponent } from '../common/logo/logo.component'
 
 describe('DashboardComponent', () => {
   let component: DashboardComponent
@@ -33,6 +34,7 @@ describe('DashboardComponent', () => {
         UploadFileWidgetComponent,
         IfPermissionsDirective,
         SavedViewWidgetComponent,
+        LogoComponent,
       ],
       providers: [
         PermissionsGuard,
