@@ -586,7 +586,7 @@ LANGUAGES = [
     ("sr-cs", _("Serbian")),
     ("sv-se", _("Swedish")),
     ("tr-tr", _("Turkish")),
-    ("uk-ua", _("Ukranian")),
+    ("uk-ua", _("Ukrainian")),
     ("zh-cn", _("Chinese Simplified")),
 ]
 
