@@ -304,8 +304,8 @@ export class SettingsService {
       },
       {
         code: 'uk-ua',
-        name: $localize`Ukranian`,
-        englishName: 'Ukranian',
+        name: $localize`Ukrainian`,
+        englishName: 'Ukrainian',
         dateInputFormat: 'dd.mm.yyyy',
       },
       {
