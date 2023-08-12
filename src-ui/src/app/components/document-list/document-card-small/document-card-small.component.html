@@ -65,7 +65,7 @@
             <small>{{document.created_date | customDate:'mediumDate'}}</small>
           </div>
         </div>
-        <div *ngIf="document.archive_serial_number" class="ps-0 p-1">
+        <div *ngIf="document.archive_serial_number | isNumber" class="ps-0 p-1">
           <svg class="metadata-icon me-2 text-muted" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#upc-scan"/>
           </svg>

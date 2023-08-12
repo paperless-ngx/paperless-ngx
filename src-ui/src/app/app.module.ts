@@ -93,6 +93,7 @@ import { PermissionsFormComponent } from './components/common/input/permissions/
 import { PermissionsFilterDropdownComponent } from './components/common/permissions-filter-dropdown/permissions-filter-dropdown.component'
 import { UsernamePipe } from './pipes/username.pipe'
 import { LogoComponent } from './components/common/logo/logo.component'
+import { IsNumberPipe } from './pipes/is-number.pipe'
 
 import localeAr from '@angular/common/locales/ar'
 import localeBe from '@angular/common/locales/be'
@@ -223,6 +224,7 @@ function initializeApp(settings: SettingsService) {
     PermissionsFilterDropdownComponent,
     UsernamePipe,
     LogoComponent,
+    IsNumberPipe,
   ],
   imports: [
     BrowserModule,
