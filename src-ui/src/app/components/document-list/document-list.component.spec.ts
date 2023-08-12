@@ -17,7 +17,6 @@ import {
   NgbDropdownModule,
   NgbModal,
   NgbModalRef,
-  NgbPagination,
   NgbPopoverModule,
   NgbTooltipModule,
 } from '@ng-bootstrap/ng-bootstrap'
@@ -63,6 +62,7 @@ import { HttpErrorResponse } from '@angular/common/http'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { SettingsService } from 'src/app/services/settings.service'
 import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
+import { IsNumberPipe } from 'src/app/pipes/is-number.pipe'
 
 const docs: PaperlessDocument[] = [
   {
@@ -126,6 +126,7 @@ describe('DocumentListComponent', () => {
         DocumentTitlePipe,
         UsernamePipe,
         SafeHtmlPipe,
+        IsNumberPipe,
       ],
       providers: [
         FilterPipe,
