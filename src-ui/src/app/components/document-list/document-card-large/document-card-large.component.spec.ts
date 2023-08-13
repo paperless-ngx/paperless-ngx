@@ -18,6 +18,7 @@ import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
 import { SafeUrlPipe } from 'src/app/pipes/safeurl.pipe'
 import { DocumentCardLargeComponent } from './document-card-large.component'
+import { IsNumberPipe } from 'src/app/pipes/is-number.pipe'
 
 const doc = {
   id: 10,
@@ -48,6 +49,7 @@ describe('DocumentCardLargeComponent', () => {
         CustomDatePipe,
         IfPermissionsDirective,
         SafeUrlPipe,
+        IsNumberPipe,
       ],
       providers: [DatePipe],
       imports: [
