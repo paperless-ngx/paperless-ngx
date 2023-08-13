@@ -87,7 +87,7 @@
               </svg>
               <small>{{(document.storage_path$ | async)?.name}}</small>
             </button>
-            <div *ngIf="document.archive_serial_number" class="list-group-item me-2 bg-light text-dark p-1 border-0">
+            <div *ngIf="document.archive_serial_number | isNumber" class="list-group-item me-2 bg-light text-dark p-1 border-0">
               <svg class="metadata-icon me-2 text-muted" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#upc-scan"/>
               </svg>
