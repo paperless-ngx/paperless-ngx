@@ -86,6 +86,7 @@ Object.defineProperty(navigator, 'clipboard', {
     writeText: async () => {},
   },
 })
+Object.defineProperty(navigator, 'canShare', { value: () => true })
 Object.defineProperty(window, 'ResizeObserver', { value: mock() })
 
 HTMLCanvasElement.prototype.getContext = <

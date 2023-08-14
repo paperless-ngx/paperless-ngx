@@ -15,6 +15,7 @@ from unittest.mock import MagicMock
 
 import celery
 import pytest
+from dateutil import parser
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.auth.models import Group
@@ -37,6 +38,7 @@ from documents.models import MatchingModel
 from documents.models import Note
 from documents.models import PaperlessTask
 from documents.models import SavedView
+from documents.models import ShareLink
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.tests.utils import DirectoriesMixin
@@ -2557,6 +2559,119 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_share_links(self):
+        """
+        GIVEN:
+            - Existing document
+        WHEN:
+            - API request is made to generate a share_link
+            - API request is made to view share_links on incorrect doc pk
+            - Invalid method request is made to view share_links doc
+        THEN:
+            - Link is created with a slug and associated with document
+            - 404
+            - Error
+        """
+        doc = Document.objects.create(
+            title="test",
+            mime_type="application/pdf",
+            content="this is a document which will have notes added",
+        )
+        resp = self.client.post(
+            "/api/share_links/",
+            data={
+                "expiration": "",
+                "document": doc.pk,
+            },
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        resp = self.client.post(
+            "/api/share_links/",
+            data={
+                "expiration": (timezone.now() + timedelta(days=7)).isoformat(),
+                "document": doc.pk,
+                "document_version": "original",
+            },
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        response = self.client.get(
+            f"/api/documents/{doc.pk}/share_links/",
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        resp_data = response.json()
+
+        self.assertEqual(len(resp_data), 2)
+
+        self.assertGreater(len(resp_data[1]["slug"]), 0)
+        self.assertIsNone(resp_data[1]["expiration"])
+        self.assertEqual(
+            (parser.isoparse(resp_data[0]["expiration"]) - timezone.now()).days,
+            6,
+        )
+
+        sl1 = ShareLink.objects.get(slug=resp_data[1]["slug"])
+        self.assertEqual(str(sl1), f"Share Link for {doc.title}")
+
+        response = self.client.post(
+            f"/api/documents/{doc.pk}/share_links/",
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+        response = self.client.get(
+            "/api/documents/99/share_links/",
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_share_links_permissions_aware(self):
+        """
+        GIVEN:
+            - Existing document owned by user2 but with granted view perms for user1
+        WHEN:
+            - API request is made by user1 to view share links
+        THEN:
+            - Links only shown if user has permissions
+        """
+        user1 = User.objects.create_user(username="test1")
+        user1.user_permissions.add(*Permission.objects.all())
+        user1.save()
+
+        user2 = User.objects.create_user(username="test2")
+        user2.save()
+
+        doc = Document.objects.create(
+            title="test",
+            mime_type="application/pdf",
+            content="this is a document which will have share links added",
+        )
+        doc.owner = user2
+        doc.save()
+
+        self.client.force_authenticate(user1)
+
+        resp = self.client.get(
+            f"/api/documents/{doc.pk}/share_links/",
+            format="json",
+        )
+        self.assertEqual(resp.content, b"Insufficient permissions")
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+
+        assign_perm("change_document", user1, doc)
+
+        resp = self.client.get(
+            f"/api/documents/{doc.pk}/share_links/",
+            format="json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
 
 class TestDocumentApiV2(DirectoriesMixin, APITestCase):

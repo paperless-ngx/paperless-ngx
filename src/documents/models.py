@@ -675,3 +675,64 @@ class Note(models.Model):
 
     def __str__(self):
         return self.note
+
+
+class ShareLink(models.Model):
+    VERSION_CHOICES = [
+        ("archive", _("Archive")),
+        ("original", _("Original")),
+    ]
+
+    created = models.DateTimeField(
+        _("created"),
+        default=timezone.now,
+        db_index=True,
+        blank=True,
+        editable=False,
+    )
+
+    expiration = models.DateTimeField(
+        _("expiration"),
+        blank=True,
+        null=True,
+        db_index=True,
+    )
+
+    slug = models.SlugField(
+        _("slug"),
+        db_index=True,
+        unique=True,
+        blank=True,
+        editable=False,
+    )
+
+    document = models.ForeignKey(
+        Document,
+        blank=True,
+        related_name="share_links",
+        on_delete=models.CASCADE,
+        verbose_name=_("document"),
+    )
+
+    document_version = models.CharField(
+        max_length=50,
+        choices=VERSION_CHOICES,
+        default="archive",
+    )
+
+    owner = models.ForeignKey(
+        User,
+        blank=True,
+        null=True,
+        related_name="share_links",
+        on_delete=models.SET_NULL,
+        verbose_name=_("owner"),
+    )
+
+    class Meta:
+        ordering = ("created",)
+        verbose_name = _("share link")
+        verbose_name_plural = _("share links")
+
+    def __str__(self):
+        return f"Share Link for {self.document.title}"

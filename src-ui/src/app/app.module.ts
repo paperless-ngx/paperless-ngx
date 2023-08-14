@@ -94,6 +94,7 @@ import { PermissionsFilterDropdownComponent } from './components/common/permissi
 import { UsernamePipe } from './pipes/username.pipe'
 import { LogoComponent } from './components/common/logo/logo.component'
 import { IsNumberPipe } from './pipes/is-number.pipe'
+import { ShareLinksDropdownComponent } from './components/common/share-links-dropdown/share-links-dropdown.component'
 
 import localeAf from '@angular/common/locales/af'
 import localeAr from '@angular/common/locales/ar'
@@ -231,6 +232,7 @@ function initializeApp(settings: SettingsService) {
     UsernamePipe,
     LogoComponent,
     IsNumberPipe,
+    ShareLinksDropdownComponent,
   ],
   imports: [
     BrowserModule,

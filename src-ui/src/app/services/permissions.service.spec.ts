@@ -248,6 +248,10 @@ describe('PermissionsService', () => {
         'view_log',
         'view_comment',
         'change_frontendsettings',
+        'add_sharelink',
+        'view_sharelink',
+        'change_sharelink',
+        'delete_sharelink',
       ],
       {
         username: 'testuser',

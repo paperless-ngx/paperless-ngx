@@ -8,6 +8,7 @@ from .models import Note
 from .models import PaperlessTask
 from .models import SavedView
 from .models import SavedViewFilterRule
+from .models import ShareLink
 from .models import StoragePath
 from .models import Tag
 
@@ -132,6 +133,12 @@ class NotesAdmin(GuardedModelAdmin):
     list_display_links = ("created",)
 
 
+class ShareLinksAdmin(GuardedModelAdmin):
+    list_display = ("created", "expiration", "document")
+    list_filter = ("created", "expiration", "owner")
+    list_display_links = ("created",)
+
+
 admin.site.register(Correspondent, CorrespondentAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(DocumentType, DocumentTypeAdmin)
@@ -140,3 +147,4 @@ admin.site.register(SavedView, SavedViewAdmin)
 admin.site.register(StoragePath, StoragePathAdmin)
 admin.site.register(PaperlessTask, TaskAdmin)
 admin.site.register(Note, NotesAdmin)
+admin.site.register(ShareLink, ShareLinksAdmin)
