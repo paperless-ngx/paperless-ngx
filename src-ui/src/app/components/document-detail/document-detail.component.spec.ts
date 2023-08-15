@@ -355,14 +355,14 @@ describe('DocumentDetailComponent', () => {
       .mockReturnValueOnce(throwError(() => new Error('unable to discard')))
     component.discard()
     fixture.detectChanges()
-    expect(navigateSpy).toHaveBeenCalledWith(['404'])
+    expect(navigateSpy).toHaveBeenCalledWith(['404'], { replaceUrl: true })
   })
 
   it('should 404 on invalid id', () => {
     jest.spyOn(documentService, 'get').mockReturnValueOnce(of(null))
     const navigateSpy = jest.spyOn(router, 'navigate')
     fixture.detectChanges()
-    expect(navigateSpy).toHaveBeenCalledWith(['404'])
+    expect(navigateSpy).toHaveBeenCalledWith(['404'], { replaceUrl: true })
   })
 
   it('should support save, close and show success toast', () => {
@@ -668,7 +668,7 @@ describe('DocumentDetailComponent', () => {
     const object = {
       id: 22,
       name: 'Correspondent22',
-      last_correspondence: new Date(),
+      last_correspondence: new Date().toISOString(),
     } as PaperlessCorrespondent
     const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
     component.filterDocuments([object])

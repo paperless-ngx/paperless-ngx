@@ -92,6 +92,8 @@ import { PermissionsDialogComponent } from './components/common/permissions-dial
 import { PermissionsFormComponent } from './components/common/input/permissions/permissions-form/permissions-form.component'
 import { PermissionsFilterDropdownComponent } from './components/common/permissions-filter-dropdown/permissions-filter-dropdown.component'
 import { UsernamePipe } from './pipes/username.pipe'
+import { LogoComponent } from './components/common/logo/logo.component'
+import { IsNumberPipe } from './pipes/is-number.pipe'
 
 import localeAr from '@angular/common/locales/ar'
 import localeBe from '@angular/common/locales/be'
@@ -115,6 +117,7 @@ import localeSl from '@angular/common/locales/sl'
 import localeSr from '@angular/common/locales/sr'
 import localeSv from '@angular/common/locales/sv'
 import localeTr from '@angular/common/locales/tr'
+import localeUk from '@angular/common/locales/uk'
 import localeZh from '@angular/common/locales/zh'
 
 registerLocaleData(localeAr)
@@ -140,6 +143,7 @@ registerLocaleData(localeSl)
 registerLocaleData(localeSr)
 registerLocaleData(localeSv)
 registerLocaleData(localeTr)
+registerLocaleData(localeUk)
 registerLocaleData(localeZh)
 
 function initializeApp(settings: SettingsService) {
@@ -219,6 +223,8 @@ function initializeApp(settings: SettingsService) {
     PermissionsFormComponent,
     PermissionsFilterDropdownComponent,
     UsernamePipe,
+    LogoComponent,
+    IsNumberPipe,
   ],
   imports: [
     BrowserModule,
