@@ -21,6 +21,7 @@ import { of } from 'rxjs'
 import { By } from '@angular/platform-browser'
 import { TagComponent } from '../../common/tag/tag.component'
 import { PaperlessTag } from 'src/app/data/paperless-tag'
+import { IsNumberPipe } from 'src/app/pipes/is-number.pipe'
 
 const doc = {
   id: 10,
@@ -62,6 +63,7 @@ describe('DocumentCardSmallComponent', () => {
         IfPermissionsDirective,
         SafeUrlPipe,
         TagComponent,
+        IsNumberPipe,
       ],
       providers: [DatePipe],
       imports: [

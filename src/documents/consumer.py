@@ -90,6 +90,7 @@ class Consumer(LoggingMixin):
             "status": status,
             "message": message,
             "document_id": document_id,
+            "owner_id": self.override_owner_id if self.override_owner_id else None,
         }
         async_to_sync(self.channel_layer.group_send)(
             "status_updates",
@@ -118,7 +119,7 @@ class Consumer(LoggingMixin):
         self.override_document_type_id = None
         self.override_asn = None
         self.task_id = None
-        self.owner_id = None
+        self.override_owner_id = None
 
         self.channel_layer = get_channel_layer()
 
