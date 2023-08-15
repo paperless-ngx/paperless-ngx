@@ -259,6 +259,7 @@ supported.
     - `python3-pip`
     - `python3-dev`
     - `default-libmysqlclient-dev` for MariaDB
+    - `pkg-config` for mysqlclient (python dependency)
     - `fonts-liberation` for generating thumbnails for plain text
       files
     - `imagemagick` >= 6 for PDF conversion
@@ -273,7 +274,7 @@ supported.
     Use this list for your preferred package management:
 
     ```
-    python3 python3-pip python3-dev imagemagick fonts-liberation gnupg libpq-dev default-libmysqlclient-dev libmagic-dev mime-support libzbar0 poppler-utils
+    python3 python3-pip python3-dev imagemagick fonts-liberation gnupg libpq-dev default-libmysqlclient-dev pkg-config libmagic-dev mime-support libzbar0 poppler-utils
     ```
 
     These dependencies are required for OCRmyPDF, which is used for text
