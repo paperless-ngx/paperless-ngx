@@ -1,5 +1,40 @@
 # Changelog
 
+## paperless-ngx 1.17.1
+
+### Features
+
+- Fix / Enhancement: restrict status messages by owner if set \& improve 404 page [@shamoon](https://github.com/shamoon) ([#3959](https://github.com/paperless-ngx/paperless-ngx/pull/3959))
+- Feature: Add Ukrainian translation [@shamoon](https://github.com/shamoon) ([#3941](https://github.com/paperless-ngx/paperless-ngx/pull/3941))
+
+### Bug Fixes
+
+- Fix: handle ASN = 0 on frontend cards [@shamoon](https://github.com/shamoon) ([#3988](https://github.com/paperless-ngx/paperless-ngx/pull/3988))
+- Fix: improve light color filled primary button text legibility [@shamoon](https://github.com/shamoon) ([#3980](https://github.com/paperless-ngx/paperless-ngx/pull/3980))
+- Fix / Enhancement: restrict status messages by owner if set \& improve 404 page [@shamoon](https://github.com/shamoon) ([#3959](https://github.com/paperless-ngx/paperless-ngx/pull/3959))
+- Fix: handle very old date strings in correspondent list [@shamoon](https://github.com/shamoon) ([#3953](https://github.com/paperless-ngx/paperless-ngx/pull/3953))
+
+### Documentation
+
+- docs(bare-metal): add new dependency [@bin101](https://github.com/bin101) ([#3931](https://github.com/paperless-ngx/paperless-ngx/pull/3931))
+
+### Dependencies
+
+- Chore: Loosen Pipfile restriction on some packages and update them [@stumpylog](https://github.com/stumpylog) ([#3972](https://github.com/paperless-ngx/paperless-ngx/pull/3972))
+
+### All App Changes
+
+<details>
+<summary>6 changes</summary>
+
+- Fix: handle ASN = 0 on frontend cards [@shamoon](https://github.com/shamoon) ([#3988](https://github.com/paperless-ngx/paperless-ngx/pull/3988))
+- Fix: improve light color filled primary button text legibility [@shamoon](https://github.com/shamoon) ([#3980](https://github.com/paperless-ngx/paperless-ngx/pull/3980))
+- Fix / Enhancement: restrict status messages by owner if set \& improve 404 page [@shamoon](https://github.com/shamoon) ([#3959](https://github.com/paperless-ngx/paperless-ngx/pull/3959))
+- Fix: handle very old date strings in correspondent list [@shamoon](https://github.com/shamoon) ([#3953](https://github.com/paperless-ngx/paperless-ngx/pull/3953))
+- Chore: Reduces the 2 mail tests flakiness [@stumpylog](https://github.com/stumpylog) ([#3949](https://github.com/paperless-ngx/paperless-ngx/pull/3949))
+- Feature: Add Ukrainian translation [@shamoon](https://github.com/shamoon) ([#3941](https://github.com/paperless-ngx/paperless-ngx/pull/3941))
+</details>
+
 ## paperless-ngx 1.17.0
 
 ### Features
