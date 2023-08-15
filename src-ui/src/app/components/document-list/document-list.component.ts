@@ -153,7 +153,9 @@ export class DocumentListComponent
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(({ view }) => {
         if (!view) {
-          this.router.navigate(['404'])
+          this.router.navigate(['404'], {
+            replaceUrl: true,
+          })
           return
         }
         this.unmodifiedSavedView = view
