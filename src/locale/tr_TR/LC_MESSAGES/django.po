@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-03-03 20:41\n"
+"PO-Revision-Date: 2023-08-07 01:43\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -23,7 +23,7 @@ msgstr "Belgeler"
 
 #: documents/models.py:36
 msgid "None"
-msgstr ""
+msgstr "Hiçbiri"
 
 #: documents/models.py:37
 msgid "Any word"
@@ -68,7 +68,7 @@ msgstr "duyarsızdır"
 
 #: documents/models.py:71
 msgid "owner"
-msgstr ""
+msgstr "sahibi"
 
 #: documents/models.py:81 documents/models.py:136
 msgid "correspondent"
@@ -116,7 +116,7 @@ msgstr "depolama dizini"
 
 #: documents/models.py:118
 msgid "storage paths"
-msgstr ""
+msgstr "depolama dizinleri"
 
 #: documents/models.py:126
 msgid "Unencrypted"
@@ -192,7 +192,7 @@ msgstr "Depolamadaki geçerli arşiv dosya adı"
 
 #: documents/models.py:239
 msgid "original filename"
-msgstr ""
+msgstr "orjinal dosya adı"
 
 #: documents/models.py:245
 msgid "The original name of the file when it was uploaded"
