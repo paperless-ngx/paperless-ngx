@@ -318,38 +318,12 @@ class DocumentViewSet(
             doc,
         ):
             return HttpResponseForbidden("Insufficient permissions")
-        if not self.original_requested(request) and doc.has_archive_version:
-            file_handle = doc.archive_file
-            filename = doc.get_public_filename(archive=True)
-            mime_type = "application/pdf"
-        else:
-            file_handle = doc.source_file
-            filename = doc.get_public_filename()
-            mime_type = doc.mime_type
-            # Support browser previewing csv files by using text mime type
-            if mime_type in {"application/csv", "text/csv"} and disposition == "inline":
-                mime_type = "text/plain"
-
-        if doc.storage_type == Document.STORAGE_TYPE_GPG:
-            file_handle = GnuPG.decrypted(file_handle)
-
-        response = HttpResponse(file_handle, content_type=mime_type)
-        # Firefox is not able to handle unicode characters in filename field
-        # RFC 5987 addresses this issue
-        # see https://datatracker.ietf.org/doc/html/rfc5987#section-4.2
-        # Chromium cannot handle commas in the filename
-        filename_normalized = normalize("NFKD", filename.replace(",", "_")).encode(
-            "ascii",
-            "ignore",
+        return serve_file(
+            doc=doc,
+            use_archive=not self.original_requested(request)
+            and doc.has_archive_version,
+            disposition=disposition,
         )
-        filename_encoded = quote(filename)
-        content_disposition = (
-            f"{disposition}; "
-            f'filename="{filename_normalized}"; '
-            f"filename*=utf-8''{filename_encoded}"
-        )
-        response["Content-Disposition"] = content_disposition
-        return response
 
     def get_metadata(self, file, mime_type):
         if not os.path.isfile(file):
@@ -595,33 +569,19 @@ class DocumentViewSet(
             raise Http404
 
         if request.method == "GET":
-            try:
-                now = datetime.now()
-                links = [
-                    {
-                        "id": c.id,
-                        "created": c.created,
-                        "expiration": c.expiration,
-                        "slug": c.slug,
-                    }
-                    for c in ShareLink.objects.filter(document=doc)
-                    .exclude(expiration__lt=now)
-                    .order_by("-created")
-                ]
-                return Response(links)
-            except Exception as e:
-                logger.warning(f"An error occurred retrieving share links: {e!s}")
-                return Response(
-                    {
-                        "error": "Error retreiving share links, see logs for details.",
-                    },
-                )
-
-        return Response(
-            {
-                "error": "error",
-            },
-        )
+            now = datetime.now()
+            links = [
+                {
+                    "id": c.id,
+                    "created": c.created,
+                    "expiration": c.expiration,
+                    "slug": c.slug,
+                }
+                for c in ShareLink.objects.filter(document=doc)
+                .exclude(expiration__lt=now)
+                .order_by("-created")
+            ]
+            return Response(links)
 
 
 class SearchResultSerializer(DocumentSerializer, PassUserMixin):
@@ -1205,39 +1165,43 @@ class SharedLinkView(View):
             return HttpResponseRedirect("/accounts/login/?sharelink_notfound=1")
         if share_link.expiration is not None and share_link.expiration < timezone.now():
             return HttpResponseRedirect("/accounts/login/?sharelink_expired=1")
-        try:
-            doc = share_link.document
-            if share_link.document_version == "archive":
-                file_handle = doc.archive_file
-                filename = doc.get_public_filename(archive=True)
-                mime_type = "application/pdf"
-            else:
-                file_handle = doc.source_file
-                filename = doc.get_public_filename()
-                mime_type = doc.mime_type
-                # Support browser previewing csv files by using text mime type
-                if mime_type in {"application/csv", "text/csv"}:
-                    mime_type = "text/plain"
+        return serve_file(
+            doc=share_link.document,
+            use_archive=share_link.document_version == "archive",
+            disposition="inline",
+        )
 
-            if doc.storage_type == Document.STORAGE_TYPE_GPG:
-                file_handle = GnuPG.decrypted(file_handle)
 
-            response = HttpResponse(file_handle, content_type=mime_type)
-            # Firefox is not able to handle unicode characters in filename field
-            # RFC 5987 addresses this issue
-            # see https://datatracker.ietf.org/doc/html/rfc5987#section-4.2
-            # Chromium cannot handle commas in the filename
-            filename_normalized = normalize("NFKD", filename.replace(",", "_")).encode(
-                "ascii",
-                "ignore",
-            )
-            filename_encoded = quote(filename)
-            content_disposition = (
-                "inline; "
-                f'filename="{filename_normalized}"; '
-                f"filename*=utf-8''{filename_encoded}"
-            )
-            response["Content-Disposition"] = content_disposition
-            return response
-        except (FileNotFoundError, Document.DoesNotExist):
-            raise Http404
+def serve_file(doc: Document, use_archive: bool, disposition: str):
+    if use_archive:
+        file_handle = doc.archive_file
+        filename = doc.get_public_filename(archive=True)
+        mime_type = "application/pdf"
+    else:
+        file_handle = doc.source_file
+        filename = doc.get_public_filename()
+        mime_type = doc.mime_type
+        # Support browser previewing csv files by using text mime type
+        if mime_type in {"application/csv", "text/csv"} and disposition == "inline":
+            mime_type = "text/plain"
+
+    if doc.storage_type == Document.STORAGE_TYPE_GPG:
+        file_handle = GnuPG.decrypted(file_handle)
+
+    response = HttpResponse(file_handle, content_type=mime_type)
+    # Firefox is not able to handle unicode characters in filename field
+    # RFC 5987 addresses this issue
+    # see https://datatracker.ietf.org/doc/html/rfc5987#section-4.2
+    # Chromium cannot handle commas in the filename
+    filename_normalized = normalize("NFKD", filename.replace(",", "_")).encode(
+        "ascii",
+        "ignore",
+    )
+    filename_encoded = quote(filename)
+    content_disposition = (
+        f"{disposition}; "
+        f'filename="{filename_normalized}"; '
+        f"filename*=utf-8''{filename_encoded}"
+    )
+    response["Content-Disposition"] = content_disposition
+    return response
