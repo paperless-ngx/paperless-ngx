@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core'
 import { first } from 'rxjs'
 import {
   PaperlessShareLink,
-  PaperlessShareLinkDocumentVersion,
+  PaperlessFileVersion,
 } from 'src/app/data/paperless-share-link'
 import { ShareLinkService } from 'src/app/services/rest/share-link.service'
 import { ToastService } from 'src/app/services/toast.service'
@@ -125,8 +125,8 @@ export class ShareLinksDropdownComponent implements OnInit {
       .createLinkForDocument(
         this._documentId,
         this.archiveVersion
-          ? PaperlessShareLinkDocumentVersion.Archive
-          : PaperlessShareLinkDocumentVersion.Original,
+          ? PaperlessFileVersion.Archive
+          : PaperlessFileVersion.Original,
         expiration
       )
       .subscribe({

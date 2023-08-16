@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import {
   PaperlessShareLink,
-  PaperlessShareLinkDocumentVersion,
+  PaperlessFileVersion,
 } from 'src/app/data/paperless-share-link'
 import { AbstractNameFilterService } from './abstract-name-filter-service'
 import { HttpClient } from '@angular/common/http'
@@ -23,13 +23,13 @@ export class ShareLinkService extends AbstractNameFilterService<PaperlessShareLi
 
   createLinkForDocument(
     documentId: number,
-    document_version: PaperlessShareLinkDocumentVersion = PaperlessShareLinkDocumentVersion.Archive,
+    file_version: PaperlessFileVersion = PaperlessFileVersion.Archive,
     expiration: Date = null
   ) {
     this.clearCache()
     return this.http.post<PaperlessShareLink>(this.getResourceUrl(), {
       document: documentId,
-      document_version,
+      file_version,
       expiration: expiration?.toISOString(),
     })
   }

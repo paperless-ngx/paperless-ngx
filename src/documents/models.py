@@ -678,10 +678,9 @@ class Note(models.Model):
 
 
 class ShareLink(models.Model):
-    VERSION_CHOICES = [
-        ("archive", _("Archive")),
-        ("original", _("Original")),
-    ]
+    class FileVersion(models.TextChoices):
+        ARCHIVE = ("archive", _("Archive"))
+        ORIGINAL = ("original", _("Original"))
 
     created = models.DateTimeField(
         _("created"),
@@ -714,10 +713,10 @@ class ShareLink(models.Model):
         verbose_name=_("document"),
     )
 
-    document_version = models.CharField(
+    file_version = models.CharField(
         max_length=50,
-        choices=VERSION_CHOICES,
-        default="archive",
+        choices=FileVersion.choices,
+        default=FileVersion.ARCHIVE,
     )
 
     owner = models.ForeignKey(

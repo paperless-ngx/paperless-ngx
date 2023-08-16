@@ -954,7 +954,7 @@ class ShareLinkSerializer(OwnedObjectSerializer):
             "expiration",
             "slug",
             "document",
-            "document_version",
+            "file_version",
         )
 
     def create(self, validated_data):

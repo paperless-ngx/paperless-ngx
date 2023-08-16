@@ -123,7 +123,7 @@ class TestViews(TestCase):
             "/api/share_links/",
             {
                 "document": doc.pk,
-                "document_version": "original",
+                "file_version": "original",
             },
         )
         sl1 = ShareLink.objects.get(document=doc)

@@ -11,7 +11,7 @@ import {
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { of, throwError } from 'rxjs'
 import {
-  PaperlessShareLinkDocumentVersion,
+  PaperlessFileVersion,
   PaperlessShareLink,
 } from 'src/app/data/paperless-share-link'
 import { ShareLinkService } from 'src/app/services/rest/share-link.service'
@@ -56,7 +56,7 @@ describe('ShareLinksDropdownComponent', () => {
           slug: '1234slug',
           created: now.toISOString(),
           document: 99,
-          document_version: PaperlessShareLinkDocumentVersion.Archive,
+          file_version: PaperlessFileVersion.Archive,
           expiration: expiration7days.toISOString(),
         },
         {
@@ -64,7 +64,7 @@ describe('ShareLinksDropdownComponent', () => {
           slug: '1234slug',
           created: now.toISOString(),
           document: 99,
-          document_version: PaperlessShareLinkDocumentVersion.Original,
+          file_version: PaperlessFileVersion.Original,
           expiration: null,
         },
       ])

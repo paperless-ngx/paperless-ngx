@@ -87,7 +87,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
-                    "document_version",
+                    "file_version",
                     models.CharField(
                         choices=[("archive", "Archive"), ("original", "Original")],
                         default="archive",

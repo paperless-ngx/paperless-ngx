@@ -2592,7 +2592,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             data={
                 "expiration": (timezone.now() + timedelta(days=7)).isoformat(),
                 "document": doc.pk,
-                "document_version": "original",
+                "file_version": "original",
             },
         )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
