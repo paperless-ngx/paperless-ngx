@@ -35,6 +35,12 @@ matcher.
 
     Defaults to `redis://localhost:6379`.
 
+`PAPERLESS_REDIS_PREFIX=<prefix>`
+
+: Prefix to be used in Redis for keys and channels. Useful for sharing one Redis server among multiple Paperless instances.
+
+    Defaults to no prefix.
+
 ### Database
 
 `PAPERLESS_DBENGINE=<engine_name>`
