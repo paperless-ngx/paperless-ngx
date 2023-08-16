@@ -22,9 +22,9 @@
                 <use *ngIf="copied === link.id" xlink:href="assets/bootstrap-icons.svg#clipboard-check-fill" />
               </svg><span class="visually-hidden" i18n>Copy</span>
             </button>
-            <button *ngIf="canShare()" type="button" class="btn btn-sm btn-outline-primary" (click)="share(link)">
+            <button *ngIf="canShare(link)" type="button" class="btn btn-sm btn-outline-primary" (click)="share(link)">
               <svg class="buttonicon" fill="currentColor">
-                <use xlink:href="assets/bootstrap-icons.svg#share" />
+                <use xlink:href="assets/bootstrap-icons.svg#box-arrow-up" />
               </svg><span class="visually-hidden" i18n>Share</span>
             </button>
             <button type="button" class="btn btn-sm btn-outline-danger" (click)="delete(link)">

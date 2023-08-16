@@ -93,8 +93,10 @@ export class ShareLinksDropdownComponent implements OnInit {
     }, 3000)
   }
 
-  canShare(): boolean {
-    return navigator && 'canShare' in navigator && navigator.canShare()
+  canShare(link: PaperlessShareLink): boolean {
+    return (
+      navigator?.canShare && navigator.canShare({ url: this.getShareUrl(link) })
+    )
   }
 
   share(link: PaperlessShareLink) {
