@@ -80,6 +80,9 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
   .btn {
     --bs-btn-disabled-opacity: 0.35;
   }
+  .btn.btn-link {
+    --bs-btn-disabled-opacity: 0.85;
+  }
 
   .btn-primary {
     &:hover, &:focus, &.active, &:active {
