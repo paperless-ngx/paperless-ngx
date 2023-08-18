@@ -116,52 +116,66 @@ describe('SettingsComponent', () => {
     jest
       .spyOn(permissionsService, 'currentUserOwnsObject')
       .mockReturnValue(true)
-    jest.spyOn(userService, 'listAll').mockReturnValue(
-      of({
-        all: users.map((u) => u.id),
-        count: users.length,
-        results: users.concat([]),
-      })
-    )
     groupService = TestBed.inject(GroupService)
-    jest.spyOn(groupService, 'listAll').mockReturnValue(
-      of({
-        all: groups.map((g) => g.id),
-        count: groups.length,
-        results: groups.concat([]),
-      })
-    )
     savedViewService = TestBed.inject(SavedViewService)
-    jest.spyOn(savedViewService, 'listAll').mockReturnValue(
-      of({
-        all: savedViews.map((v) => v.id),
-        count: savedViews.length,
-        results: (savedViews as PaperlessSavedView[]).concat([]),
-      })
-    )
     mailAccountService = TestBed.inject(MailAccountService)
-    jest.spyOn(mailAccountService, 'listAll').mockReturnValue(
-      of({
-        all: mailAccounts.map((a) => a.id),
-        count: mailAccounts.length,
-        results: (mailAccounts as PaperlessMailAccount[]).concat([]),
-      })
-    )
     mailRuleService = TestBed.inject(MailRuleService)
-    jest.spyOn(mailRuleService, 'listAll').mockReturnValue(
-      of({
-        all: mailRules.map((r) => r.id),
-        count: mailRules.length,
-        results: (mailRules as PaperlessMailRule[]).concat([]),
-      })
-    )
+  })
+
+  function completeSetup(excludeService = null) {
+    if (excludeService !== userService) {
+      jest.spyOn(userService, 'listAll').mockReturnValue(
+        of({
+          all: users.map((u) => u.id),
+          count: users.length,
+          results: users.concat([]),
+        })
+      )
+    }
+    if (excludeService !== groupService) {
+      jest.spyOn(groupService, 'listAll').mockReturnValue(
+        of({
+          all: groups.map((g) => g.id),
+          count: groups.length,
+          results: groups.concat([]),
+        })
+      )
+    }
+    if (excludeService !== savedViewService) {
+      jest.spyOn(savedViewService, 'listAll').mockReturnValue(
+        of({
+          all: savedViews.map((v) => v.id),
+          count: savedViews.length,
+          results: (savedViews as PaperlessSavedView[]).concat([]),
+        })
+      )
+    }
+    if (excludeService !== mailAccountService) {
+      jest.spyOn(mailAccountService, 'listAll').mockReturnValue(
+        of({
+          all: mailAccounts.map((a) => a.id),
+          count: mailAccounts.length,
+          results: (mailAccounts as PaperlessMailAccount[]).concat([]),
+        })
+      )
+    }
+    if (excludeService !== mailRuleService) {
+      jest.spyOn(mailRuleService, 'listAll').mockReturnValue(
+        of({
+          all: mailRules.map((r) => r.id),
+          count: mailRules.length,
+          results: (mailRules as PaperlessMailRule[]).concat([]),
+        })
+      )
+    }
 
     fixture = TestBed.createComponent(SettingsComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
-  })
+  }
 
   it('should support tabbed settings & change URL, prevent navigation if dirty confirmation rejected', () => {
+    completeSetup()
     const navigateSpy = jest.spyOn(router, 'navigate')
     const tabButtons = fixture.debugElement.queryAll(By.directive(NgbNavLink))
     tabButtons[1].nativeElement.dispatchEvent(new MouseEvent('click'))
@@ -187,6 +201,7 @@ describe('SettingsComponent', () => {
   })
 
   it('should support direct link to tab by URL, scroll if needed', () => {
+    completeSetup()
     jest
       .spyOn(activatedRoute, 'paramMap', 'get')
       .mockReturnValue(of(convertToParamMap({ section: 'mail' })))
@@ -199,6 +214,7 @@ describe('SettingsComponent', () => {
   })
 
   it('should lazy load tab data', () => {
+    completeSetup()
     const tabButtons = fixture.debugElement.queryAll(By.directive(NgbNavLink))
 
     expect(component.savedViews).toBeUndefined()
@@ -221,6 +237,7 @@ describe('SettingsComponent', () => {
   })
 
   it('should support save saved views, show error', () => {
+    completeSetup()
     component.maybeInitializeTab(3) // SavedViews
 
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
@@ -248,6 +265,7 @@ describe('SettingsComponent', () => {
   })
 
   it('should support save local settings updating appearance settings and calling API, show error', () => {
+    completeSetup()
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
     const toastSpy = jest.spyOn(toastService, 'show')
     const storeSpy = jest.spyOn(settingsService, 'storeSettings')
@@ -275,6 +293,7 @@ describe('SettingsComponent', () => {
   })
 
   it('should offer reload if settings changes require', () => {
+    completeSetup()
     let toast: Toast
     toastService.getToasts().subscribe((t) => (toast = t[0]))
     component.initialize(true) // reset
@@ -288,6 +307,7 @@ describe('SettingsComponent', () => {
   })
 
   it('should allow setting theme color, visually apply change immediately but not save', () => {
+    completeSetup()
     const appearanceSpy = jest.spyOn(
       settingsService,
       'updateAppearanceSettings'
@@ -304,6 +324,7 @@ describe('SettingsComponent', () => {
   })
 
   it('should support delete saved view', () => {
+    completeSetup()
     component.maybeInitializeTab(3) // SavedViews
     const toastSpy = jest.spyOn(toastService, 'showInfo')
     const deleteSpy = jest.spyOn(savedViewService, 'delete')
@@ -316,6 +337,7 @@ describe('SettingsComponent', () => {
   })
 
   it('should support edit / create user, show error if needed', () => {
+    completeSetup()
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
     component.editUser(users[0])
@@ -332,6 +354,7 @@ describe('SettingsComponent', () => {
   })
 
   it('should support delete user, show error if needed', () => {
+    completeSetup()
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
     component.deleteUser(users[0])
@@ -352,6 +375,7 @@ describe('SettingsComponent', () => {
   })
 
   it('should logout current user if password changed, after delay', fakeAsync(() => {
+    completeSetup()
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
     component.editUser(users[0])
@@ -371,6 +395,7 @@ describe('SettingsComponent', () => {
   }))
 
   it('should support edit / create group, show error if needed', () => {
+    completeSetup()
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
     component.editGroup(groups[0])
@@ -386,6 +411,7 @@ describe('SettingsComponent', () => {
   })
 
   it('should support delete group, show error if needed', () => {
+    completeSetup()
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
     component.deleteGroup(users[0])
@@ -406,12 +432,71 @@ describe('SettingsComponent', () => {
   })
 
   it('should get group name', () => {
+    completeSetup()
     component.maybeInitializeTab(5) // UsersGroups
     expect(component.getGroupName(1)).toEqual(groups[0].name)
     expect(component.getGroupName(11)).toEqual('')
   })
 
+  it('should show errors on load if load mailAccounts failure', () => {
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    jest
+      .spyOn(mailAccountService, 'listAll')
+      .mockImplementation(() =>
+        throwError(() => new Error('failed to load mail accounts'))
+      )
+    completeSetup(mailAccountService)
+    const tabButtons = fixture.debugElement.queryAll(By.directive(NgbNavLink))
+    tabButtons[3].nativeElement.dispatchEvent(new MouseEvent('click')) // mail tab
+    fixture.detectChanges()
+    expect(toastErrorSpy).toBeCalled()
+  })
+
+  it('should show errors on load if load mailRules failure', () => {
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    jest
+      .spyOn(mailRuleService, 'listAll')
+      .mockImplementation(() =>
+        throwError(() => new Error('failed to load mail rules'))
+      )
+    completeSetup(mailRuleService)
+    const tabButtons = fixture.debugElement.queryAll(By.directive(NgbNavLink))
+    tabButtons[3].nativeElement.dispatchEvent(new MouseEvent('click')) // mail tab
+    fixture.detectChanges()
+    // tabButtons[4].nativeElement.dispatchEvent(new MouseEvent('click'))
+    expect(toastErrorSpy).toBeCalled()
+  })
+
+  it('should show errors on load if load users failure', () => {
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    jest
+      .spyOn(userService, 'listAll')
+      .mockImplementation(() =>
+        throwError(() => new Error('failed to load users'))
+      )
+    completeSetup(userService)
+    const tabButtons = fixture.debugElement.queryAll(By.directive(NgbNavLink))
+    tabButtons[4].nativeElement.dispatchEvent(new MouseEvent('click')) // users tab
+    fixture.detectChanges()
+    expect(toastErrorSpy).toBeCalled()
+  })
+
+  it('should show errors on load if load groups failure', () => {
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    jest
+      .spyOn(groupService, 'listAll')
+      .mockImplementation(() =>
+        throwError(() => new Error('failed to load groups'))
+      )
+    completeSetup(groupService)
+    const tabButtons = fixture.debugElement.queryAll(By.directive(NgbNavLink))
+    tabButtons[4].nativeElement.dispatchEvent(new MouseEvent('click')) // users tab
+    fixture.detectChanges()
+    expect(toastErrorSpy).toBeCalled()
+  })
+
   it('should support edit / create mail account, show error if needed', () => {
+    completeSetup()
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
     component.editMailAccount(mailAccounts[0] as PaperlessMailAccount)
@@ -427,6 +512,7 @@ describe('SettingsComponent', () => {
   })
 
   it('should support delete mail account, show error if needed', () => {
+    completeSetup()
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
     component.deleteMailAccount(mailAccounts[0] as PaperlessMailAccount)
@@ -447,6 +533,7 @@ describe('SettingsComponent', () => {
   })
 
   it('should support edit / create mail rule, show error if needed', () => {
+    completeSetup()
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
     component.editMailRule(mailRules[0] as PaperlessMailRule)
@@ -462,6 +549,7 @@ describe('SettingsComponent', () => {
   })
 
   it('should support delete mail rule, show error if needed', () => {
+    completeSetup()
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
     component.deleteMailRule(mailRules[0] as PaperlessMailRule)

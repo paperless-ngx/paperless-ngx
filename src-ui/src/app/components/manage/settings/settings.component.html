@@ -243,7 +243,7 @@
           <ng-container *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.MailAccount }">
             <h4>
               <ng-container i18n>Mail accounts</ng-container>
-              <button type="button" class="btn btn-sm btn-primary ms-4" (click)="editMailAccount()">
+              <button type="button" class="btn btn-sm btn-primary ms-4" (click)="editMailAccount()" *appIfPermissions="{ action: PermissionAction.Add, type: PermissionType.MailAccount }">
                 <svg class="sidebaricon me-1" fill="currentColor">
                   <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
                 </svg>
@@ -262,7 +262,7 @@
 
                 <li *ngFor="let account of mailAccounts" class="list-group-item" [formGroupName]="account.id">
                   <div class="row">
-                    <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editMailAccount(account)">{{account.name}}</button></div>
+                    <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editMailAccount(account)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.MailAccount)">{{account.name}}</button></div>
                     <div class="col d-flex align-items-center">{{account.imap_server}}</div>
                     <div class="col">
                       <div class="btn-group">
@@ -280,7 +280,7 @@
           <ng-container *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.MailRule }">
             <h4 class="mt-4">
               <ng-container i18n>Mail rules</ng-container>
-              <button type="button" class="btn btn-sm btn-primary ms-4" (click)="editMailRule()">
+              <button type="button" class="btn btn-sm btn-primary ms-4" (click)="editMailRule()" *appIfPermissions="{ action: PermissionAction.Add, type: PermissionType.MailRule }">
                 <svg class="sidebaricon me-1" fill="currentColor">
                   <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
                 </svg>
@@ -299,7 +299,7 @@
 
                 <li *ngFor="let rule of mailRules" class="list-group-item" [formGroupName]="rule.id">
                   <div class="row">
-                    <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editMailRule(rule)">{{rule.name}}</button></div>
+                    <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editMailRule(rule)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.MailRule)">{{rule.name}}</button></div>
                     <div class="col d-flex align-items-center">{{(mailAccountService.getCached(rule.account) | async)?.name}}</div>
                     <div class="col">
                       <div class="btn-group">
@@ -323,7 +323,7 @@
       </ng-template>
     </li>
 
-    <li [ngbNavItem]="SettingsNavIDs.UsersGroups" *appIfPermissions="{ action: PermissionAction.Add, type: PermissionType.User }" (mouseover)="maybeInitializeTab(SettingsNavIDs.UsersGroups)" (focusin)="maybeInitializeTab(SettingsNavIDs.UsersGroups)">
+    <li [ngbNavItem]="SettingsNavIDs.UsersGroups" *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.User }" (mouseover)="maybeInitializeTab(SettingsNavIDs.UsersGroups)" (focusin)="maybeInitializeTab(SettingsNavIDs.UsersGroups)">
       <a ngbNavLink i18n>Users & Groups</a>
       <ng-template ngbNavContent>
 
@@ -334,7 +334,7 @@
             <svg class="sidebaricon me-1" fill="currentColor">
               <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
             </svg>
-            <ng-container i18n>Add User</ng-container>
+            <ng-container *appIfPermissions="{ action: PermissionAction.Add, type: PermissionType.User }" i18n>Add User</ng-container>
           </button>
         </h4>
         <ul class="list-group" formGroupName="usersGroup">
@@ -350,13 +350,13 @@
 
           <li *ngFor="let user of users" class="list-group-item" [formGroupName]="user.id">
             <div class="row">
-              <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editUser(user)">{{user.username}}</button></div>
+              <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editUser(user)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.User)">{{user.username}}</button></div>
               <div class="col d-flex align-items-center">{{user.first_name}} {{user.last_name}}</div>
               <div class="col d-flex align-items-center">{{user.groups?.map(getGroupName, this).join(', ')}}</div>
               <div class="col">
                 <div class="btn-group">
-                  <button class="btn btn-sm btn-primary" type="button" (click)="editUser(user)" i18n>Edit</button>
-                  <button class="btn btn-sm btn-outline-danger" type="button" (click)="deleteUser(user)" i18n>Delete</button>
+                  <button class="btn btn-sm btn-primary" type="button" (click)="editUser(user)" *appIfPermissions="{ action: PermissionAction.Change, type: PermissionType.User }" i18n>Edit</button>
+                  <button class="btn btn-sm btn-outline-danger" type="button" (click)="deleteUser(user)" *appIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.User }" i18n>Delete</button>
                 </div>
               </div>
             </div>
@@ -369,7 +369,7 @@
             <svg class="sidebaricon me-1" fill="currentColor">
               <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
             </svg>
-            <ng-container i18n>Add Group</ng-container>
+            <ng-container *appIfPermissions="{ action: PermissionAction.Add, type: PermissionType.Group }" i18n>Add Group</ng-container>
           </button>
         </h4>
         <ul *ngIf="groups.length > 0" class="list-group" formGroupName="groupsGroup">
@@ -385,13 +385,13 @@
 
           <li *ngFor="let group of groups" class="list-group-item" [formGroupName]="group.id">
             <div class="row">
-              <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editGroup(group)">{{group.name}}</button></div>
+              <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editGroup(group)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.Group)">{{group.name}}</button></div>
               <div class="col"></div>
               <div class="col"></div>
               <div class="col">
                 <div class="btn-group">
-                  <button class="btn btn-sm btn-primary" type="button" (click)="editGroup(group)" i18n>Edit</button>
-                  <button class="btn btn-sm btn-outline-danger" type="button" (click)="deleteGroup(group)" i18n>Delete</button>
+                  <button class="btn btn-sm btn-primary" type="button" (click)="editGroup(group)" *appIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Group }" i18n>Edit</button>
+                  <button class="btn btn-sm btn-outline-danger" type="button" (click)="deleteGroup(group)" *appIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Group }" i18n>Delete</button>
                 </div>
               </div>
             </div>
