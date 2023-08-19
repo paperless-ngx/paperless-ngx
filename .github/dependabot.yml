@@ -48,7 +48,7 @@ updates:
     reviewers:
       - "paperless-ngx/backend"
 
-  # Enable updates for Github Actions
+  # Enable updates for GitHub Actions
   - package-ecosystem: "github-actions"
     target-branch: "dev"
     directory: "/"
