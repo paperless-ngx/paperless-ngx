@@ -91,8 +91,9 @@ def train_classifier():
         logger.warning("Classifier error: " + str(e))
 
 
-@shared_task
+@shared_task(bind=True)
 def consume_file(
+    self,
     input_doc: ConsumableDocument,
     overrides: Optional[DocumentMetadataOverrides] = None,
 ):
@@ -163,6 +164,7 @@ def consume_file(
         override_created=overrides.created,
         override_asn=overrides.asn,
         override_owner_id=overrides.owner_id,
+        task_id=self.request.id,
     )
 
     if document:
