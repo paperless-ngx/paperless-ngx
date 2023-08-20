@@ -984,6 +984,43 @@ class StoragePathViewSet(ModelViewSet, PassUserMixin):
     ordering_fields = ("name", "path", "matching_algorithm", "match", "document_count")
 
 
+class FilesAndFoldersViewSet(ReadOnlyModelViewSet):
+    permission_classes = (IsAuthenticated,)
+
+    def list(self, request):
+        page = int(request.query_params.get('page', 1))
+        page_size = int(request.query_params.get('page_size', 100))
+        ordering = request.query_params.get('ordering', '-created')
+        parent_storage_path_id = request.query_params.get('parent_storage_path_id', None)
+
+        # parent_folder = request.query_params.get('path__istartswith', '')
+        if parent_storage_path_id:
+            parent_storage_path = StoragePath.objects.get(id=parent_storage_path_id)
+            folders = list(StoragePath.objects.filter(path__istartswith=parent_storage_path.path))
+            files = list(Document.objects.all().filter(storage_path=parent_storage_path).order_by(ordering))
+        else:
+            folders = list(StoragePath.objects.exclude(path__contains='/'))
+            files = list(Document.objects.all().filter(storage_path=None).order_by(ordering))
+
+        combined = folders + files
+        
+        start = (page - 1) * page_size
+        end = page * page_size
+        sliced_combined = combined[start:end]
+
+        data = []
+        for item in sliced_combined:
+            if isinstance(item, StoragePath):
+                serialized_item = StoragePathSerializer(item).data
+                serialized_item['type'] = 'folder'
+                data.append(serialized_item)
+            elif isinstance(item, Document):
+                serialized_item = DocumentSerializer(item).data
+                serialized_item['type'] = 'file'
+                data.append(serialized_item)
+
+        return Response(data)
+
 class UiSettingsView(GenericAPIView):
 
     permission_classes = (IsAuthenticated,)

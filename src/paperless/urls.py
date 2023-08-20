@@ -21,6 +21,7 @@ from documents.views import SearchAutoCompleteView
 from documents.views import SelectionDataView
 from documents.views import StatisticsView
 from documents.views import StoragePathViewSet
+from documents.views import FilesAndFoldersViewSet
 from documents.views import TagViewSet
 from documents.views import TasksViewSet
 from documents.views import UiSettingsView
@@ -43,6 +44,7 @@ api_router.register(r"logs", LogViewSet, basename="logs")
 api_router.register(r"tags", TagViewSet)
 api_router.register(r"saved_views", SavedViewViewSet)
 api_router.register(r"storage_paths", StoragePathViewSet)
+api_router.register(r"files_and_folders", FilesAndFoldersViewSet, basename="files_and_folders")
 api_router.register(r"tasks", TasksViewSet, basename="tasks")
 api_router.register(r"users", UserViewSet, basename="users")
 api_router.register(r"groups", GroupViewSet, basename="groups")

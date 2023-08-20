@@ -31,7 +31,7 @@ import {
 } from 'src/app/services/rest/document.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
-import { StoragePathListViewService } from 'src/app/services/storage-path-list-view.service'
+import { ExplorerListViewService } from 'src/app/services/explorer-list-view.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { FolderCreateDialogComponent } from '../common/create-dialog/folder-create-dialog/folder-create-dialog.component'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
@@ -47,7 +47,7 @@ export class ExplorerComponent
   implements OnInit, OnDestroy
 {
   constructor(
-    public list: StoragePathListViewService,
+    public list: ExplorerListViewService,
     public savedViewService: SavedViewService,
     public route: ActivatedRoute,
     private router: Router,

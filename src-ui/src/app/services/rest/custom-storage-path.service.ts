@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http'
+import { HttpClient, HttpParams } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { Observable, filter, map, switchMap, tap } from 'rxjs'
 import { FilterRule } from 'src/app/data/filter-rule'
@@ -31,6 +31,54 @@ export class CustomStoragePathService extends AbstractPaperlessService<Paperless
     return this.list(1, 1, null, null, { path__iexact: path }).pipe(
       map((results) => results.results.pop())
     )
+  }
+
+  listTest(
+    page?: number,
+    pageSize?: number,
+    sortField?: string,
+    sortReverse?: boolean,
+    filterRules?: FilterRule[],
+    extraParams = {},
+    parentStoragePathId?: number
+  ): Observable<any> {
+    const params = Object.assign(
+      extraParams,
+      queryParamsFromFilterRules(filterRules)
+    )
+    
+    let httpParams = new HttpParams()
+    if (page) {
+      httpParams = httpParams.set('page', page.toString())
+    }
+
+    if (pageSize) {
+      httpParams = httpParams.set('page_size', pageSize.toString())
+    }
+
+    let ordering = ((sortField: string, sortReverse: boolean) => {
+      if (sortField) {
+        return (sortReverse ? '-' : '') + sortField
+      } else {
+        return null
+      }
+    })(sortField, sortReverse)
+
+    if (ordering) {
+      httpParams = httpParams.set('ordering', ordering)
+    }
+
+    for (let extraParamKey in extraParams) {
+      if (extraParams[extraParamKey] != null) {
+        httpParams = httpParams.set(extraParamKey, extraParams[extraParamKey])
+      }
+    }
+
+    if (parentStoragePathId) {
+      httpParams = httpParams.set('parent_storage_path_id', parentStoragePathId)
+    }
+
+    return this.http.get<Results<any>>(`${this.baseUrl}files_and_folders/`, { params: httpParams })
   }
 
   listFiltered(

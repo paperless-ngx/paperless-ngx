@@ -66,7 +66,7 @@ export interface ListViewState {
 @Injectable({
   providedIn: 'root',
 })
-export class StoragePathListViewService {
+export class ExplorerListViewService {
   isReloading: boolean = false
   initialized: boolean = false
   error: string = null
@@ -94,7 +94,7 @@ export class StoragePathListViewService {
     private storagePathService: CustomStoragePathService,
     private settings: SettingsService,
     private router: Router
-  ) {}
+  ) { }
 
   private defaultListViewState(): ListViewState {
     return {
@@ -172,6 +172,26 @@ export class StoragePathListViewService {
     this.isReloading = true
     this.error = null
     let activeListViewState = this.activeListViewState
+
+    this.storagePathService
+      .listTest(
+        activeListViewState.currentPage,
+        this.currentPageSize,
+        activeListViewState.sortField,
+        activeListViewState.sortReverse,
+        activeListViewState.filterRules,
+        { truncate_content: true },
+        activeListViewState.storagePathId
+      )
+      .subscribe({
+        next: (result) => {
+          console.log('list test:', result);
+        },
+        error: (err) => {
+          console.error(err);
+        }
+      });
+    
     this.storagePathService
       .listFiltered(
         activeListViewState.currentPage,
@@ -225,9 +245,8 @@ export class StoragePathListViewService {
               errorMessage = Object.keys(error.error)
                 .map((fieldName) => {
                   const fieldError: Array<string> = error.error[fieldName]
-                  return `${
-                    DOCUMENT_SORT_FIELDS.find((f) => f.field == fieldName)?.name
-                  }: ${fieldError[0]}`
+                  return `${DOCUMENT_SORT_FIELDS.find((f) => f.field == fieldName)?.name
+                    }: ${fieldError[0]}`
                 })
                 .join(', ')
             } else {
