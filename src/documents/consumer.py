@@ -186,7 +186,7 @@ class Consumer(LoggingMixin):
                 f"Not consuming {self.filename}: Given ASN already exists!",
             )
 
-    def run_pre_consume_script(self):
+    def run_pre_consume_script(self, task_id):
         """
         If one is configured and exists, run the pre-consume script and
         handle its output and/or errors
@@ -209,6 +209,7 @@ class Consumer(LoggingMixin):
         script_env = os.environ.copy()
         script_env["DOCUMENT_SOURCE_PATH"] = original_file_path
         script_env["DOCUMENT_WORKING_PATH"] = working_file_path
+        script_env["TASK_ID"] = task_id
 
         try:
             completed_proc = run(
@@ -233,7 +234,7 @@ class Consumer(LoggingMixin):
                 exception=e,
             )
 
-    def run_post_consume_script(self, document: Document):
+    def run_post_consume_script(self, document: Document, task_id):
         """
         If one is configured and exists, run the pre-consume script and
         handle its output and/or errors
@@ -279,6 +280,7 @@ class Consumer(LoggingMixin):
             ",".join(document.tags.all().values_list("name", flat=True)),
         )
         script_env["DOCUMENT_ORIGINAL_FILENAME"] = str(document.original_filename)
+        script_env["TASK_ID"] = task_id
 
         try:
             completed_proc = run(
@@ -388,7 +390,7 @@ class Consumer(LoggingMixin):
             logging_group=self.logging_group,
         )
 
-        self.run_pre_consume_script()
+        self.run_pre_consume_script(task_id=self.task_id)
 
         def progress_callback(current_progress, max_progress):  # pragma: no cover
             # recalculate progress to be within 20 and 80
@@ -560,7 +562,7 @@ class Consumer(LoggingMixin):
             document_parser.cleanup()
             tempdir.cleanup()
 
-        self.run_post_consume_script(document)
+        self.run_post_consume_script(document, task_id=self.task_id)
 
         self.log.info(f"Document {document} consumption finished")
 
