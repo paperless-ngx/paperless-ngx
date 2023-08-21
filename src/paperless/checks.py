@@ -177,6 +177,23 @@ def settings_values_check(app_configs, **kwargs):
             )
         return msgs
 
+    def _email_certificate_validate():
+        msgs = []
+        # Existence checks
+        if (
+            settings.EMAIL_CERTIFICATE_FILE is not None
+            and not settings.EMAIL_CERTIFICATE_FILE.is_file()
+        ):
+            msgs.append(
+                Error(
+                    f"Email cert {settings.EMAIL_CERTIFICATE_FILE} is not a file",
+                ),
+            )
+        return msgs
+
     return (
-        _ocrmypdf_settings_check() + _timezone_validate() + _barcode_scanner_validate()
+        _ocrmypdf_settings_check()
+        + _timezone_validate()
+        + _barcode_scanner_validate()
+        + _email_certificate_validate()
     )
