@@ -443,12 +443,24 @@
   >
     <app-folder-card-small
       class="p-0"
-      [selected]="list.isSelected(d)"
-      (toggleSelected)="toggleSelected(d, $event)"
-      (dblClickDocument)="openDocumentDetail(d)"
-      [storagePath]="d"
-      *ngFor="let d of list.documents; trackBy: trackByDocumentId"
+      [selected]="list.isSelected(f)"
+      (toggleSelected)="toggleSelected(f, $event)"
+      (dblClickDocument)="openDocumentDetail(f)"
+      [storagePath]="f"
+      *ngFor="let f of list.folders; trackBy: trackByDocumentId"
     ></app-folder-card-small>
+
+    <app-document-card-small
+      class="p-0"
+      [selected]="list.isSelected(f)"
+      (toggleSelected)="toggleSelected(f, $event)"
+      [document]="f"
+      *ngFor="let f of list.files; trackBy: trackByDocumentId"
+      (clickTag)="clickTag($event)"
+      (clickCorrespondent)="clickCorrespondent($event)"
+      (clickStoragePath)="clickStoragePath($event)"
+      (clickDocumentType)="clickDocumentType($event)"
+    ></app-document-card-small>
   </div>
   <div *ngIf="list.documents?.length > 15" class="mt-3">
     <ng-container *ngTemplateOutlet="pagination"></ng-container>

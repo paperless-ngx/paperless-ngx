@@ -5,14 +5,14 @@
     (mouseleave)="mouseLeaveCard()"
   >
     <div
-      class="border-bottom doc-img-container"
+      class="border-bottom doc-img-container flex-grow-1"
       [class.doc-img-background-selected]="selected"
       (dblclick)="dblClickDocument.emit(this)"
     >
-      <div class="card-img doc-img rounded-top pe-none">
+      <div class="card-img doc-img rounded-top pe-none h-100">
         <svg
-          width="100%"
-          height="100%"
+          width="25%"
+          height="25%"
           preserveAspectRatio="xMidYMid meet"
           fill="currentColor"
         >
@@ -39,7 +39,7 @@
       </div>
     </div>
 
-    <div class="card-body bg-light p-2">
+    <div class="card-body bg-light p-2 flex-grow-0">
       <a
         href="#"
         (click)="$event.preventDefault(); dblClickDocument.emit(this)"

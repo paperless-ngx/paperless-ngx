@@ -6,6 +6,7 @@ import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
 import { Results } from 'src/app/data/results'
 import { queryParamsFromFilterRules } from 'src/app/utils/query-params'
 import { AbstractPaperlessService } from './abstract-paperless-service'
+import { PaperlessDocument } from 'src/app/data/paperless-document'
 
 interface SelectionDataItem {
   id: number
@@ -18,6 +19,8 @@ interface SelectionData {
   selected_tags: SelectionDataItem[]
   selected_document_types: SelectionDataItem[]
 }
+
+export type FileOrFolderItem = { type: 'file' } & PaperlessDocument | { type: 'folder' } & PaperlessStoragePath;
 
 @Injectable({
   providedIn: 'root',
@@ -41,12 +44,12 @@ export class CustomStoragePathService extends AbstractPaperlessService<Paperless
     filterRules?: FilterRule[],
     extraParams = {},
     parentStoragePathId?: number
-  ): Observable<any> {
+  ): Observable<Results<FileOrFolderItem> & { parentStoragePath?: PaperlessStoragePath }> {
     const params = Object.assign(
       extraParams,
       queryParamsFromFilterRules(filterRules)
     )
-    
+
     let httpParams = new HttpParams()
     if (page) {
       httpParams = httpParams.set('page', page.toString())
@@ -78,7 +81,7 @@ export class CustomStoragePathService extends AbstractPaperlessService<Paperless
       httpParams = httpParams.set('parent_storage_path_id', parentStoragePathId)
     }
 
-    return this.http.get<Results<any>>(`${this.baseUrl}files_and_folders/`, { params: httpParams })
+    return this.http.get<Results<FileOrFolderItem>>(`${this.baseUrl}files_and_folders/`, { params: httpParams })
   }
 
   listFiltered(

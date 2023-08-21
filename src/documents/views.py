@@ -992,11 +992,14 @@ class FilesAndFoldersViewSet(ReadOnlyModelViewSet):
         page_size = int(request.query_params.get('page_size', 100))
         ordering = request.query_params.get('ordering', '-created')
         parent_storage_path_id = request.query_params.get('parent_storage_path_id', None)
-
+        parent_storage_path = None
+        
         # parent_folder = request.query_params.get('path__istartswith', '')
         if parent_storage_path_id:
             parent_storage_path = StoragePath.objects.get(id=parent_storage_path_id)
-            folders = list(StoragePath.objects.filter(path__istartswith=parent_storage_path.path))
+            folders = list(StoragePath.objects
+                           .filter(path__istartswith=parent_storage_path.path)
+                           .exclude(id=parent_storage_path.id))
             files = list(Document.objects.all().filter(storage_path=parent_storage_path).order_by(ordering))
         else:
             folders = list(StoragePath.objects.exclude(path__contains='/'))
@@ -1019,7 +1022,13 @@ class FilesAndFoldersViewSet(ReadOnlyModelViewSet):
                 serialized_item['type'] = 'file'
                 data.append(serialized_item)
 
-        return Response(data)
+        return Response({
+            'count': len(combined),
+            'next': None,
+            'previous': None,
+            'results': data,
+            'parentStoragePath': StoragePathSerializer(parent_storage_path).data if parent_storage_path else None
+        })
 
 class UiSettingsView(GenericAPIView):
 

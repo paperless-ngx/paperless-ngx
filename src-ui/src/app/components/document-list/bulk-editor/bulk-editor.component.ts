@@ -1,39 +1,39 @@
 import { Component, OnDestroy, OnInit } from '@angular/core'
-import { PaperlessTag } from 'src/app/data/paperless-tag'
+import { FormControl, FormGroup } from '@angular/forms'
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
+import { saveAs } from 'file-saver'
+import { Subject, first, takeUntil } from 'rxjs'
+import { ConfirmDialogComponent } from 'src/app/components/common/confirm-dialog/confirm-dialog.component'
+import { MatchingModel } from 'src/app/data/matching-model'
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent'
 import { PaperlessDocumentType } from 'src/app/data/paperless-document-type'
-import { TagService } from 'src/app/services/rest/tag.service'
+import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
+import { PaperlessTag } from 'src/app/data/paperless-tag'
+import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
+import { DocumentListViewService } from 'src/app/services/document-list-view.service'
+import { OpenDocumentsService } from 'src/app/services/open-documents.service'
+import {
+  PermissionAction,
+  PermissionType,
+  PermissionsService,
+} from 'src/app/services/permissions.service'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
-import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import {
   DocumentService,
   SelectionDataItem,
 } from 'src/app/services/rest/document.service'
-import { OpenDocumentsService } from 'src/app/services/open-documents.service'
-import { ConfirmDialogComponent } from 'src/app/components/common/confirm-dialog/confirm-dialog.component'
+import { StoragePathService } from 'src/app/services/rest/storage-path.service'
+import { TagService } from 'src/app/services/rest/tag.service'
+import { SettingsService } from 'src/app/services/settings.service'
+import { ToastService } from 'src/app/services/toast.service'
 import {
   ChangedItems,
   FilterableDropdownSelectionModel,
 } from '../../common/filterable-dropdown/filterable-dropdown.component'
 import { ToggleableItemState } from '../../common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component'
-import { MatchingModel } from 'src/app/data/matching-model'
-import { SettingsService } from 'src/app/services/settings.service'
-import { ToastService } from 'src/app/services/toast.service'
-import { saveAs } from 'file-saver'
-import { StoragePathService } from 'src/app/services/rest/storage-path.service'
-import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
-import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
-import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
-import {
-  PermissionAction,
-  PermissionsService,
-  PermissionType,
-} from 'src/app/services/permissions.service'
-import { FormControl, FormGroup } from '@angular/forms'
-import { first, Subject, takeUntil } from 'rxjs'
+import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 
 @Component({
   selector: 'app-bulk-editor',
@@ -42,8 +42,7 @@ import { first, Subject, takeUntil } from 'rxjs'
 })
 export class BulkEditorComponent
   extends ComponentWithPermissions
-  implements OnInit, OnDestroy
-{
+  implements OnInit, OnDestroy {
   tags: PaperlessTag[]
   correspondents: PaperlessCorrespondent[]
   documentTypes: PaperlessDocumentType[]
@@ -268,9 +267,8 @@ export class BulkEditorComponent
         .join(
           $localize`:this is used to separate enumerations and should probably be a comma and a whitespace in most languages:, `
         )
-      return $localize`:this is for messages like 'modify "tag1", "tag2" and "tag3"':${list} and "${
-        items[items.length - 1].name
-      }"`
+      return $localize`:this is for messages like 'modify "tag1", "tag2" and "tag3"':${list} and "${items[items.length - 1].name
+        }"`
     }
   }
 
@@ -474,11 +472,11 @@ export class BulkEditorComponent
     this.awaitingDownload = true
     let downloadFileType: string =
       this.downloadForm.get('downloadFileTypeArchive').value &&
-      this.downloadForm.get('downloadFileTypeOriginals').value
+        this.downloadForm.get('downloadFileTypeOriginals').value
         ? 'both'
         : this.downloadForm.get('downloadFileTypeArchive').value
-        ? 'archive'
-        : 'originals'
+          ? 'archive'
+          : 'originals'
     this.documentService
       .bulkDownload(
         Array.from(this.list.selected),

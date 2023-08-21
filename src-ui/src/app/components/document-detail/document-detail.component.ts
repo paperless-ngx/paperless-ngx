@@ -333,7 +333,7 @@ export class DocumentDetailComponent
 
             metadata.clear()
             documentType.default_metadata?.forEach((m) => {
-              const latestValue = latestMetadata.find(
+              const latestValue = latestMetadata?.find(
                 (lm) => lm.name.toLowerCase() === m.name.toLowerCase()
               )?.value
               metadata.push(

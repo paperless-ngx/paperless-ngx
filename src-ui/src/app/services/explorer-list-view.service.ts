@@ -7,8 +7,8 @@ import { PaperlessStoragePath } from '../data/paperless-storage-path'
 import { SETTINGS_KEYS } from '../data/paperless-uisettings'
 import { DOCUMENT_LIST_SERVICE } from '../data/storage-keys'
 import { paramsToViewState } from '../utils/query-params'
-import { CustomStoragePathService } from './rest/custom-storage-path.service'
-import { DOCUMENT_SORT_FIELDS, SelectionData } from './rest/document.service'
+import { CustomStoragePathService, FileOrFolderItem } from './rest/custom-storage-path.service'
+import { DOCUMENT_SORT_FIELDS, DocumentService, SelectionData } from './rest/document.service'
 import { SettingsService } from './settings.service'
 
 /**
@@ -23,7 +23,7 @@ export interface ListViewState {
   /**
    * Current paginated list of storage paths displayed.
    */
-  storagePaths?: PaperlessStoragePath[]
+  filesAndFolders?: FileOrFolderItem[]
 
   currentPage: number
 
@@ -92,6 +92,7 @@ export class ExplorerListViewService {
 
   constructor(
     private storagePathService: CustomStoragePathService,
+    private documentService: DocumentService,
     private settings: SettingsService,
     private router: Router
   ) { }
@@ -99,7 +100,7 @@ export class ExplorerListViewService {
   private defaultListViewState(): ListViewState {
     return {
       title: null,
-      storagePaths: [],
+      filesAndFolders: [],
       currentPage: 1,
       collectionSize: null,
       sortField: 'created',
@@ -185,29 +186,13 @@ export class ExplorerListViewService {
       )
       .subscribe({
         next: (result) => {
-          console.log('list test:', result);
-        },
-        error: (err) => {
-          console.error(err);
-        }
-      });
-    
-    this.storagePathService
-      .listFiltered(
-        activeListViewState.currentPage,
-        this.currentPageSize,
-        activeListViewState.sortField,
-        activeListViewState.sortReverse,
-        activeListViewState.filterRules,
-        { truncate_content: true },
-        activeListViewState.storagePathId
-      )
-      .subscribe({
-        next: (result) => {
           this.initialized = true
           this.isReloading = false
           activeListViewState.collectionSize = result.count
-          activeListViewState.storagePaths = result.results
+          result.results.forEach(f => {
+            if (f.type === 'file') this.documentService.addObservablesToDocument(f)
+          })
+          activeListViewState.filesAndFolders = result.results
           activeListViewState.parentStoragePath = result.parentStoragePath
 
           // if (updateQueryParams && !this._activeSavedViewId) {
@@ -310,8 +295,12 @@ export class ExplorerListViewService {
     this.saveDocumentListView()
   }
 
-  get documents(): PaperlessDocument[] {
-    return this.activeListViewState.storagePaths
+  get folders(): FileOrFolderItem[] {
+    return this.activeListViewState.filesAndFolders?.filter(f => f.type === 'folder')
+  }
+
+  get files(): FileOrFolderItem[] {
+    return this.activeListViewState.filesAndFolders?.filter(f => f.type === 'file')
   }
 
   get selected(): Set<number> {
@@ -356,35 +345,35 @@ export class ExplorerListViewService {
   }
 
   hasNext(doc: number) {
-    if (this.documents) {
-      let index = this.documents.findIndex((d) => d.id == doc)
+    if (this.folders) {
+      let index = this.folders.findIndex((d) => d.id == doc)
       return (
         index != -1 &&
         (this.currentPage < this.getLastPage() ||
-          index + 1 < this.documents.length)
+          index + 1 < this.folders.length)
       )
     }
   }
 
   hasPrevious(doc: number) {
-    if (this.documents) {
-      let index = this.documents.findIndex((d) => d.id == doc)
+    if (this.folders) {
+      let index = this.folders.findIndex((d) => d.id == doc)
       return index != -1 && !(index == 0 && this.currentPage == 1)
     }
   }
 
   getNext(currentDocId: number): Observable<number> {
     return new Observable((nextDocId) => {
-      if (this.documents != null) {
-        let index = this.documents.findIndex((d) => d.id == currentDocId)
+      if (this.folders != null) {
+        let index = this.folders.findIndex((d) => d.id == currentDocId)
 
-        if (index != -1 && index + 1 < this.documents.length) {
-          nextDocId.next(this.documents[index + 1].id)
+        if (index != -1 && index + 1 < this.folders.length) {
+          nextDocId.next(this.folders[index + 1].id)
           nextDocId.complete()
         } else if (index != -1 && this.currentPage < this.getLastPage()) {
           this.currentPage += 1
           this.reload(() => {
-            nextDocId.next(this.documents[0].id)
+            nextDocId.next(this.folders[0].id)
             nextDocId.complete()
           })
         } else {
@@ -398,16 +387,16 @@ export class ExplorerListViewService {
 
   getPrevious(currentDocId: number): Observable<number> {
     return new Observable((prevDocId) => {
-      if (this.documents != null) {
-        let index = this.documents.findIndex((d) => d.id == currentDocId)
+      if (this.folders != null) {
+        let index = this.folders.findIndex((d) => d.id == currentDocId)
 
         if (index != 0) {
-          prevDocId.next(this.documents[index - 1].id)
+          prevDocId.next(this.folders[index - 1].id)
           prevDocId.complete()
         } else if (this.currentPage > 1) {
           this.currentPage -= 1
           this.reload(() => {
-            prevDocId.next(this.documents[this.documents.length - 1].id)
+            prevDocId.next(this.folders[this.folders.length - 1].id)
             prevDocId.complete()
           })
         } else {
@@ -453,7 +442,7 @@ export class ExplorerListViewService {
 
   selectPage() {
     this.selected.clear()
-    this.documents.forEach((doc) => {
+    this.folders.forEach((doc) => {
       this.selected.add(doc.id)
     })
   }
@@ -480,7 +469,7 @@ export class ExplorerListViewService {
 
       if (this.lastRangeSelectionToIndex !== null) {
         // revert the old selection
-        this.documents
+        this.folders
           .slice(
             Math.min(
               this.rangeSelectionAnchorIndex,
@@ -496,7 +485,7 @@ export class ExplorerListViewService {
           })
       }
 
-      this.documents.slice(fromIndex, toIndex + 1).forEach((d) => {
+      this.folders.slice(fromIndex, toIndex + 1).forEach((d) => {
         this.selected.add(d.id)
       })
       this.lastRangeSelectionToIndex = documentToIndex
@@ -507,6 +496,6 @@ export class ExplorerListViewService {
   }
 
   documentIndexInCurrentView(documentID: number): number {
-    return this.documents.map((d) => d.id).indexOf(documentID)
+    return this.folders.map((d) => d.id).indexOf(documentID)
   }
 }

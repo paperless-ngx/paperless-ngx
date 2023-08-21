@@ -36,6 +36,7 @@ import { ToastService } from 'src/app/services/toast.service'
 import { FolderCreateDialogComponent } from '../common/create-dialog/folder-create-dialog/folder-create-dialog.component'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { FilterEditorComponent } from './filter-editor/filter-editor.component'
+import { FileOrFolderItem } from 'src/app/services/rest/custom-storage-path.service'
 
 @Component({
   selector: 'app-explorer',
@@ -44,8 +45,7 @@ import { FilterEditorComponent } from './filter-editor/filter-editor.component'
 })
 export class ExplorerComponent
   extends ComponentWithPermissions
-  implements OnInit, OnDestroy
-{
+  implements OnInit, OnDestroy {
   constructor(
     public list: ExplorerListViewService,
     public savedViewService: SavedViewService,
@@ -187,10 +187,12 @@ export class ExplorerComponent
       .subscribe(() => this.list.reload())
   }
 
-  openDocumentDetail(storagePath: PaperlessStoragePath) {
-    this.router.navigate(['explorer'], {
-      queryParams: { spid: storagePath.id },
-    })
+  openDocumentDetail(f: FileOrFolderItem) {
+    if (f.type === 'folder') {
+      this.router.navigate(['explorer'], {
+        queryParams: { spid: f.id },
+      })
+    }
   }
 
   toggleSelected(document: PaperlessDocument, event: MouseEvent): void {
