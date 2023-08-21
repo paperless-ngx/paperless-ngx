@@ -803,7 +803,7 @@ class PreConsumeTestCase(TestCase):
     def test_no_pre_consume_script(self, m):
         c = Consumer()
         c.path = "path-to-file"
-        c.run_pre_consume_script(str(uuid.uuid4()))
+        c.run_pre_consume_script()
         m.assert_not_called()
 
     @mock.patch("documents.consumer.run")
@@ -813,7 +813,7 @@ class PreConsumeTestCase(TestCase):
         c = Consumer()
         c.filename = "somefile.pdf"
         c.path = "path-to-file"
-        self.assertRaises(ConsumerError, c.run_pre_consume_script, str(uuid.uuid4()))
+        self.assertRaises(ConsumerError, c.run_pre_consume_script)
 
     @mock.patch("documents.consumer.run")
     def test_pre_consume_script(self, m):
@@ -822,8 +822,8 @@ class PreConsumeTestCase(TestCase):
                 c = Consumer()
                 c.original_path = "path-to-file"
                 c.path = "/tmp/somewhere/path-to-file"
-                task_id = str(uuid.uuid4())
-                c.run_pre_consume_script(task_id)
+                c.task_id = str(uuid.uuid4())
+                c.run_pre_consume_script()
 
                 m.assert_called_once()
 
@@ -838,7 +838,7 @@ class PreConsumeTestCase(TestCase):
                 subset = {
                     "DOCUMENT_SOURCE_PATH": c.original_path,
                     "DOCUMENT_WORKING_PATH": c.path,
-                    "TASK_ID": task_id,
+                    "TASK_ID": c.task_id,
                 }
                 self.assertDictEqual(environment, {**environment, **subset})
 
@@ -867,7 +867,7 @@ class PreConsumeTestCase(TestCase):
                     c = Consumer()
                     c.path = "path-to-file"
 
-                    c.run_pre_consume_script(str(uuid.uuid4()))
+                    c.run_pre_consume_script()
                     self.assertIn(
                         "INFO:paperless.consumer:This message goes to stdout",
                         cm.output,
@@ -902,7 +902,6 @@ class PreConsumeTestCase(TestCase):
                 self.assertRaises(
                     ConsumerError,
                     c.run_pre_consume_script,
-                    str(uuid.uuid4()),
                 )
 
 
@@ -924,7 +923,7 @@ class PostConsumeTestCase(TestCase):
         doc.tags.add(tag1)
         doc.tags.add(tag2)
 
-        Consumer().run_post_consume_script(doc, str(uuid.uuid4()))
+        Consumer().run_post_consume_script(doc)
 
         m.assert_not_called()
 
@@ -938,7 +937,6 @@ class PostConsumeTestCase(TestCase):
             ConsumerError,
             c.run_post_consume_script,
             doc,
-            str(uuid.uuid4()),
         )
 
     @mock.patch("documents.consumer.run")
@@ -947,7 +945,7 @@ class PostConsumeTestCase(TestCase):
             with override_settings(POST_CONSUME_SCRIPT=script.name):
                 doc = Document.objects.create(title="Test", mime_type="application/pdf")
 
-                Consumer().run_post_consume_script(doc, str(uuid.uuid4()))
+                Consumer().run_post_consume_script(doc)
 
                 m.assert_called_once()
 
@@ -965,9 +963,10 @@ class PostConsumeTestCase(TestCase):
                 tag2 = Tag.objects.create(name="b")
                 doc.tags.add(tag1)
                 doc.tags.add(tag2)
-                task_id = str(uuid.uuid4())
 
-                Consumer().run_post_consume_script(doc, task_id)
+                consumer = Consumer()
+                consumer.task_id = str(uuid.uuid4())
+                consumer.run_post_consume_script(doc)
 
                 m.assert_called_once()
 
@@ -989,7 +988,7 @@ class PostConsumeTestCase(TestCase):
                     "DOCUMENT_THUMBNAIL_URL": f"/api/documents/{doc.pk}/thumb/",
                     "DOCUMENT_CORRESPONDENT": "my_bank",
                     "DOCUMENT_TAGS": "a,b",
-                    "TASK_ID": task_id,
+                    "TASK_ID": consumer.task_id,
                 }
 
                 self.assertDictEqual(environment, {**environment, **subset})
@@ -1018,4 +1017,4 @@ class PostConsumeTestCase(TestCase):
                 doc = Document.objects.create(title="Test", mime_type="application/pdf")
                 c.path = "path-to-file"
                 with self.assertRaises(ConsumerError):
-                    c.run_post_consume_script(doc, str(uuid.uuid4()))
+                    c.run_post_consume_script(doc)
