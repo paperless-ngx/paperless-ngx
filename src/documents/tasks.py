@@ -7,6 +7,7 @@ from typing import Type
 
 import tqdm
 from asgiref.sync import async_to_sync
+from celery import Task
 from celery import shared_task
 from channels.layers import get_channel_layer
 from django.conf import settings
@@ -93,7 +94,7 @@ def train_classifier():
 
 @shared_task(bind=True)
 def consume_file(
-    self,
+    self: Task,
     input_doc: ConsumableDocument,
     overrides: Optional[DocumentMetadataOverrides] = None,
 ):
