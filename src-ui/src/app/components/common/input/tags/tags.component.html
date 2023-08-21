@@ -2,7 +2,7 @@
   <label class="form-label" for="tags" i18n>Tags</label>
 
   <div class="input-group flex-nowrap">
-    <ng-select name="tags" [items]="tags" bindLabel="name" bindValue="id" [(ngModel)]="value"
+    <ng-select #tagSelect name="tags" [items]="tags" bindLabel="name" bindValue="id" [(ngModel)]="value"
       [disabled]="disabled"
       [multiple]="true"
       [closeOnSelect]="false"
@@ -11,11 +11,7 @@
       [addTag]="allowCreate ? createTagRef : false"
       addTagText="Add tag"
       i18n-addTagText
-      (change)="onChange(value)"
-      (search)="onSearch($event)"
-      (focus)="clearLastSearchTerm()"
-      (clear)="clearLastSearchTerm()"
-      (blur)="onBlur()">
+      (change)="onChange(value)">
 
       <ng-template ng-label-tmp let-item="item">
         <span class="tag-wrap tag-wrap-delete" (mousedown)="removeTag($event, item.id)">
