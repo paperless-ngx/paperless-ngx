@@ -127,6 +127,7 @@ script can access the following relevant environment variables set:
 | ----------------------- | ------------------------------------------------------------ |
 | `DOCUMENT_SOURCE_PATH`  | Original path of the consumed document                       |
 | `DOCUMENT_WORKING_PATH` | Path to a copy of the original that consumption will work on |
+| `TASK_ID`               | UUID of the task used to process the new document (if any)   |
 
 !!! note
 
@@ -169,21 +170,22 @@ Executed after the consumer has successfully processed a document and
 has moved it into paperless. It receives the following environment
 variables:
 
-| Environment Variable         | Description                                   |
-| ---------------------------- | --------------------------------------------- |
-| `DOCUMENT_ID`                | Database primary key of the document          |
-| `DOCUMENT_FILE_NAME`         | Formatted filename, not including paths       |
-| `DOCUMENT_CREATED`           | Date & time when document created             |
-| `DOCUMENT_MODIFIED`          | Date & time when document was last modified   |
-| `DOCUMENT_ADDED`             | Date & time when document was added           |
-| `DOCUMENT_SOURCE_PATH`       | Path to the original document file            |
-| `DOCUMENT_ARCHIVE_PATH`      | Path to the generate archive file (if any)    |
-| `DOCUMENT_THUMBNAIL_PATH`    | Path to the generated thumbnail               |
-| `DOCUMENT_DOWNLOAD_URL`      | URL for document download                     |
-| `DOCUMENT_THUMBNAIL_URL`     | URL for the document thumbnail                |
-| `DOCUMENT_CORRESPONDENT`     | Assigned correspondent (if any)               |
-| `DOCUMENT_TAGS`              | Comma separated list of tags applied (if any) |
-| `DOCUMENT_ORIGINAL_FILENAME` | Filename of original document                 |
+| Environment Variable         | Description                                    |
+| ---------------------------- | ---------------------------------------------- |
+| `DOCUMENT_ID`                | Database primary key of the document           |
+| `DOCUMENT_FILE_NAME`         | Formatted filename, not including paths        |
+| `DOCUMENT_CREATED`           | Date & time when document created              |
+| `DOCUMENT_MODIFIED`          | Date & time when document was last modified    |
+| `DOCUMENT_ADDED`             | Date & time when document was added            |
+| `DOCUMENT_SOURCE_PATH`       | Path to the original document file             |
+| `DOCUMENT_ARCHIVE_PATH`      | Path to the generate archive file (if any)     |
+| `DOCUMENT_THUMBNAIL_PATH`    | Path to the generated thumbnail                |
+| `DOCUMENT_DOWNLOAD_URL`      | URL for document download                      |
+| `DOCUMENT_THUMBNAIL_URL`     | URL for the document thumbnail                 |
+| `DOCUMENT_CORRESPONDENT`     | Assigned correspondent (if any)                |
+| `DOCUMENT_TAGS`              | Comma separated list of tags applied (if any)  |
+| `DOCUMENT_ORIGINAL_FILENAME` | Filename of original document                  |
+| `TASK_ID`                    | Task UUID used to import the document (if any) |
 
 The script can be in any language, A simple shell script example:
 
