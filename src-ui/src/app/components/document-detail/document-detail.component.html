@@ -126,6 +126,22 @@
         <li [ngbNavItem]="DocumentDetailNavIDs.Details">
           <a ngbNavLink i18n>Details</a>
           <ng-template ngbNavContent>
+            <div class="flex pb-2 mb-2">
+              <span>Location: </span>
+              <span
+                *ngFor="let pathPart of folderPath.split('/'); let i = index"
+              >
+                <a (click)="clickPathPart(i)">{{ pathPart }}</a>
+                <span *ngIf="i < folderPath.split('/').length - 1"> / </span>
+              </span>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-primary mx-2"
+                (click)="copyFolderPath($event)"
+              >
+                Copy
+              </button>
+            </div>
             <app-input-text
               #inputTitle
               i18n-title

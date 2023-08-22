@@ -1,58 +1,58 @@
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core'
+import { HttpClient } from '@angular/common/http'
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core'
 import { FormArray, FormControl, FormGroup } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { NgbModal, NgbNav, NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap'
-import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent'
-import { PaperlessDocument } from 'src/app/data/paperless-document'
-import { PaperlessDocumentMetadata } from 'src/app/data/paperless-document-metadata'
-import { PaperlessDocumentType } from 'src/app/data/paperless-document-type'
-import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
-import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import { OpenDocumentsService } from 'src/app/services/open-documents.service'
-import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
-import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
-import { DocumentService } from 'src/app/services/rest/document.service'
-import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
-import { CorrespondentEditDialogComponent } from '../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
-import { DocumentTypeEditDialogComponent } from '../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
+import { DirtyComponent, dirtyCheck } from '@ngneat/dirty-check-forms'
 import { PDFDocumentProxy } from 'ng2-pdf-viewer'
-import { ToastService } from 'src/app/services/toast.service'
-import { TextComponent } from '../common/input/text/text.component'
-import { SettingsService } from 'src/app/services/settings.service'
-import { dirtyCheck, DirtyComponent } from '@ngneat/dirty-check-forms'
 import {
+  BehaviorSubject,
   Observable,
   Subject,
-  BehaviorSubject,
   Subscription,
   combineLatest,
 } from 'rxjs'
 import {
-  first,
-  takeUntil,
-  switchMap,
-  map,
   debounceTime,
   distinctUntilChanged,
-  startWith,
   filter,
+  first,
+  map,
+  startWith,
+  switchMap,
+  takeUntil,
 } from 'rxjs/operators'
-import { PaperlessDocumentSuggestions } from 'src/app/data/paperless-document-suggestions'
 import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type'
-import { StoragePathService } from 'src/app/services/rest/storage-path.service'
+import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent'
+import { PaperlessDocument } from 'src/app/data/paperless-document'
+import { PaperlessDocumentMetadata } from 'src/app/data/paperless-document-metadata'
+import { PaperlessDocumentNote } from 'src/app/data/paperless-document-note'
+import { PaperlessDocumentSuggestions } from 'src/app/data/paperless-document-suggestions'
+import { PaperlessDocumentType } from 'src/app/data/paperless-document-type'
 import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
-import { StoragePathEditDialogComponent } from '../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
 import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
+import { PaperlessUser } from 'src/app/data/paperless-user'
+import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
+import { DocumentListViewService } from 'src/app/services/document-list-view.service'
+import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import {
   PermissionAction,
-  PermissionsService,
   PermissionType,
+  PermissionsService,
 } from 'src/app/services/permissions.service'
-import { PaperlessUser } from 'src/app/data/paperless-user'
-import { UserService } from 'src/app/services/rest/user.service'
-import { PaperlessDocumentNote } from 'src/app/data/paperless-document-note'
-import { HttpClient } from '@angular/common/http'
+import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { DocumentMetadataService } from 'src/app/services/rest/document-metadata.service'
+import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
+import { DocumentService } from 'src/app/services/rest/document.service'
+import { StoragePathService } from 'src/app/services/rest/storage-path.service'
+import { UserService } from 'src/app/services/rest/user.service'
+import { SettingsService } from 'src/app/services/settings.service'
+import { ToastService } from 'src/app/services/toast.service'
+import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
+import { CorrespondentEditDialogComponent } from '../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
+import { DocumentTypeEditDialogComponent } from '../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
+import { StoragePathEditDialogComponent } from '../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
+import { TextComponent } from '../common/input/text/text.component'
 
 enum DocumentDetailNavIDs {
   Details = 1,
@@ -69,8 +69,7 @@ enum DocumentDetailNavIDs {
   styleUrls: ['./document-detail.component.scss'],
 })
 export class DocumentDetailComponent
-  implements OnInit, OnDestroy, DirtyComponent
-{
+  implements OnInit, OnDestroy, DirtyComponent {
   @ViewChild('inputTitle')
   titleInput: TextComponent
 
@@ -162,7 +161,7 @@ export class DocumentDetailComponent
     private permissionsService: PermissionsService,
     private userService: UserService,
     private http: HttpClient
-  ) {}
+  ) { }
 
   titleKeyUp(event) {
     this.titleSubject.next(event.target?.value)
@@ -170,6 +169,10 @@ export class DocumentDetailComponent
 
   get useNativePdfViewer(): boolean {
     return this.settings.get(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER)
+  }
+
+  get folderPath(): string {
+    return this.storagePaths.find(s => s.id === this.document.storage_path)?.path ?? '';
   }
 
   getContentType() {
@@ -248,9 +251,8 @@ export class DocumentDetailComponent
               this._previewHtml = res.toString()
             },
             error: (err) => {
-              this._previewHtml = $localize`An error occurred loading content: ${
-                err.message ?? err.toString()
-              }`
+              this._previewHtml = $localize`An error occurred loading content: ${err.message ?? err.toString()
+                }`
             },
           })
           this.downloadUrl = this.documentsService.getDownloadUrl(
@@ -513,6 +515,18 @@ export class DocumentDetailComponent
       })
   }
 
+  clickPathPart(index: number) {
+    if (index === 0) return this.router.navigate(['explorer'])
+    this.router.navigate(['explorer'], {
+      queryParams: { spid: this.document.storage_path },
+    })
+  }
+
+  copyFolderPath(e: Event) {
+    e.preventDefault();
+    navigator.clipboard.writeText(this.folderPath)
+  }
+
   discard() {
     this.documentsService
       .get(this.documentId)
@@ -556,8 +570,8 @@ export class DocumentDetailComponent
             this.error = error.error
             this.toastService.showError(
               $localize`Error saving document` +
-                ': ' +
-                (error.message ?? error.toString())
+              ': ' +
+              (error.message ?? error.toString())
             )
           }
         },
@@ -577,8 +591,8 @@ export class DocumentDetailComponent
           this.error = error.error
           this.toastService.showError(
             $localize`Error saving document` +
-              ': ' +
-              (error.message ?? error.toString())
+            ': ' +
+            (error.message ?? error.toString())
           )
         },
       })
@@ -621,8 +635,8 @@ export class DocumentDetailComponent
           this.error = error.error
           this.toastService.showError(
             $localize`Error saving document` +
-              ': ' +
-              (error.message ?? error.toString())
+            ': ' +
+            (error.message ?? error.toString())
           )
         },
       })
