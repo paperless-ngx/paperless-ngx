@@ -543,7 +543,7 @@ export class DocumentDetailComponent
         next: () => {
           this.store.next(this.documentForm.value)
           this.toastService.showInfo($localize`Document saved successfully.`)
-          this.close()
+          // this.close()
           this.networkActive = false
           this.error = null
         },
@@ -551,7 +551,7 @@ export class DocumentDetailComponent
           this.networkActive = false
           if (!this.userCanEdit) {
             this.toastService.showInfo($localize`Document saved successfully.`)
-            this.close()
+            // this.close()
           } else {
             this.error = error.error
             this.toastService.showError(
