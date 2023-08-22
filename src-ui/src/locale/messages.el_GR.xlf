@@ -5434,7 +5434,7 @@
           <context context-type="sourcefile">src/app/components/not-found/not-found.component.html</context>
           <context context-type="linenumber">6</context>
         </context-group>
-        <target state="needs-translation">Not Found</target>
+        <target state="translated">Δε Βρέθηκε</target>
       </trans-unit>
       <trans-unit id="178520337056147266" datatype="html">
         <source>Go to Dashboard</source>
@@ -5442,7 +5442,7 @@
           <context context-type="sourcefile">src/app/components/not-found/not-found.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation">Go to Dashboard</target>
+        <target state="translated">Μετάβαση στον Πίνακα ελέγχου</target>
       </trans-unit>
       <trans-unit id="2167862279705099846" datatype="html">
         <source>Auto: Learn matching automatically</source>
@@ -6031,7 +6031,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">307</context>
         </context-group>
-        <target state="needs-translation">Ukrainian</target>
+        <target state="translated">Ουκρανικά</target>
       </trans-unit>
       <trans-unit id="4689443708886954687" datatype="html">
         <source>Chinese Simplified</source>
