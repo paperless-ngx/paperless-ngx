@@ -147,19 +147,6 @@
               [suggestions]="suggestions?.dates"
               [error]="error?.created_date"
             ></app-input-date>
-            <app-input-select
-              [items]="correspondents"
-              i18n-title
-              title="Correspondent"
-              formControlName="correspondent"
-              [allowNull]="true"
-              (createNew)="createCorrespondent($event)"
-              [suggestions]="suggestions?.correspondents"
-              *appIfPermissions="{
-                action: PermissionAction.View,
-                type: PermissionType.Correspondent
-              }"
-            ></app-input-select>
 
             <app-input-select
               [items]="documentTypes"
@@ -208,6 +195,15 @@
               </div>
             </div>
 
+            <app-input-tags
+              formControlName="tags"
+              [suggestions]="suggestions?.tags"
+              *appIfPermissions="{
+                action: PermissionAction.View,
+                type: PermissionType.Tag
+              }"
+            ></app-input-tags>
+
             <app-input-select
               [items]="storagePaths"
               i18n-title
@@ -223,14 +219,20 @@
                 type: PermissionType.StoragePath
               }"
             ></app-input-select>
-            <app-input-tags
-              formControlName="tags"
-              [suggestions]="suggestions?.tags"
+
+            <app-input-select
+              [items]="correspondents"
+              i18n-title
+              title="Correspondent"
+              formControlName="correspondent"
+              [allowNull]="true"
+              (createNew)="createCorrespondent($event)"
+              [suggestions]="suggestions?.correspondents"
               *appIfPermissions="{
                 action: PermissionAction.View,
-                type: PermissionType.Tag
+                type: PermissionType.Correspondent
               }"
-            ></app-input-tags>
+            ></app-input-select>
           </ng-template>
         </li>
 
