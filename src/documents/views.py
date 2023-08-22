@@ -746,7 +746,8 @@ class PostDocumentView(GenericAPIView):
             tag_ids=tag_ids,
             created=created,
             asn=archive_serial_number,
-            owner_id=request.user.id,
+            # Intentionally removing this because it prevents other users from editing
+            # owner_id=request.user.id,
             storage_path_id=storage_path_id,
             full_path=full_path,
         )
