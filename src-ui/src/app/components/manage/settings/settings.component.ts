@@ -146,7 +146,7 @@ export class SettingsComponent
     private groupsService: GroupService,
     private router: Router,
     private modalService: NgbModal,
-    private permissionsService: PermissionsService
+    public permissionsService: PermissionsService
   ) {
     super()
     this.settings.settingsSaved.subscribe(() => {
@@ -259,25 +259,73 @@ export class SettingsComponent
       navID == SettingsNavIDs.UsersGroups &&
       (!this.users || !this.groups)
     ) {
-      this.usersService.listAll().subscribe((r) => {
-        this.users = r.results
-        this.groupsService.listAll().subscribe((r) => {
-          this.groups = r.results
-          this.initialize(false)
+      this.usersService
+        .listAll()
+        .pipe(first())
+        .subscribe({
+          next: (r) => {
+            this.users = r.results
+            this.groupsService
+              .listAll()
+              .pipe(first())
+              .subscribe({
+                next: (r) => {
+                  this.groups = r.results
+                  this.initialize(false)
+                },
+                error: (e) => {
+                  this.toastService.showError(
+                    $localize`Error retrieving groups`,
+                    10000,
+                    JSON.stringify(e)
+                  )
+                },
+              })
+          },
+          error: (e) => {
+            this.toastService.showError(
+              $localize`Error retrieving users`,
+              10000,
+              JSON.stringify(e)
+            )
+          },
         })
-      })
     } else if (
       navID == SettingsNavIDs.Mail &&
       (!this.mailAccounts || !this.mailRules)
     ) {
-      this.mailAccountService.listAll().subscribe((r) => {
-        this.mailAccounts = r.results
+      this.mailAccountService
+        .listAll()
+        .pipe(first())
+        .subscribe({
+          next: (r) => {
+            this.mailAccounts = r.results
 
-        this.mailRuleService.listAll().subscribe((r) => {
-          this.mailRules = r.results
-          this.initialize(false)
+            this.mailRuleService
+              .listAll()
+              .pipe(first())
+              .subscribe({
+                next: (r) => {
+                  this.mailRules = r.results
+                  this.initialize(false)
+                },
+                error: (e) => {
+                  this.toastService.showError(
+                    $localize`Error retrieving mail rules`,
+                    10000,
+                    JSON.stringify(e)
+                  )
+                },
+              })
+          },
+          error: (e) => {
+            this.toastService.showError(
+              $localize`Error retrieving mail accounts`,
+              10000,
+              JSON.stringify(e)
+            )
+          },
         })
-      })
     }
   }
 

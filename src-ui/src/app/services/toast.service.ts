@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { Subject, zip } from 'rxjs'
+import { Subject } from 'rxjs'
 
 export interface Toast {
   title: string
