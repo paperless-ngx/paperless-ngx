@@ -501,6 +501,19 @@ HTTP header/value expected by Django, eg `'["HTTP_X_FORWARDED_PROTO", "https"]'`
     Settings this value has security implications.  Read the Django documentation
     and be sure you understand its usage before setting it.
 
+`PAPERLESS_EMAIL_CERTIFICATE_FILE=<path>`
+
+: Configures an additional SSL certificate file containing a [certificate](https://docs.python.org/3/library/ssl.html#certificates)
+or certificate chain which should be trusted for validating SSL connections against mail providers.
+This is for use with self-signed certificates against local IMAP servers.
+
+    Defaults to None.
+
+!!! warning
+
+    Settings this value has security implications for the security of your email.
+    Understand what it does and be sure you need to before setting.
+
 ## OCR settings {#ocr}
 
 Paperless uses [OCRmyPDF](https://ocrmypdf.readthedocs.io/en/latest/)

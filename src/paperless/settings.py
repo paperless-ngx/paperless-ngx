@@ -67,11 +67,20 @@ def __get_float(key: str, default: float) -> float:
     return float(os.getenv(key, default))
 
 
-def __get_path(key: str, default: Union[PathLike, str]) -> Path:
+def __get_path(
+    key: str,
+    default: Optional[Union[PathLike, str]] = None,
+) -> Optional[Path]:
     """
-    Return a normalized, absolute path based on the environment variable or a default
+    Return a normalized, absolute path based on the environment variable or a default,
+    if provided.  If not set and no default, returns None
     """
-    return Path(os.environ.get(key, default)).resolve()
+    if key in os.environ:
+        return Path(os.environ[key]).resolve()
+    elif default is not None:
+        return Path(default).resolve()
+    else:
+        return None
 
 
 def __get_list(
@@ -476,6 +485,8 @@ COOKIE_PREFIX = os.getenv("PAPERLESS_COOKIE_PREFIX", "")
 CSRF_COOKIE_NAME = f"{COOKIE_PREFIX}csrftoken"
 SESSION_COOKIE_NAME = f"{COOKIE_PREFIX}sessionid"
 LANGUAGE_COOKIE_NAME = f"{COOKIE_PREFIX}django_language"
+
+EMAIL_CERTIFICATE_FILE = __get_path("PAPERLESS_EMAIL_CERTIFICATE_FILE")
 
 
 ###############################################################################
