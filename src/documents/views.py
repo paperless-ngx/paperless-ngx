@@ -54,6 +54,7 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.viewsets import ViewSet
 
+from documents import bulk_edit
 from documents.filters import ObjectOwnedOrGrantedPermissionsFilter
 from documents.permissions import PaperlessAdminPermissions
 from documents.permissions import PaperlessObjectPermissions
@@ -694,7 +695,7 @@ class SavedViewViewSet(ModelViewSet, PassUserMixin):
         serializer.save(owner=self.request.user)
 
 
-class BulkEditView(GenericAPIView):
+class BulkEditView(GenericAPIView, PassUserMixin):
     permission_classes = (IsAuthenticated,)
     serializer_class = BulkEditSerializer
     parser_classes = (parsers.JSONParser,)
@@ -703,9 +704,24 @@ class BulkEditView(GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
+        user = self.request.user
         method = serializer.validated_data.get("method")
         parameters = serializer.validated_data.get("parameters")
         documents = serializer.validated_data.get("documents")
+
+        if not user.is_superuser:
+            document_objs = Document.objects.filter(pk__in=documents)
+            has_perms = (
+                all((doc.owner == user or doc.owner is None) for doc in document_objs)
+                if method == bulk_edit.set_permissions
+                else all(
+                    has_perms_owner_aware(user, "change_document", doc)
+                    for doc in document_objs
+                )
+            )
+
+            if not has_perms:
+                return HttpResponseForbidden("Insufficient permissions")
 
         try:
             # TODO: parameter validation
