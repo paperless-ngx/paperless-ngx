@@ -4,11 +4,10 @@ import {
   OnDestroy,
   OnInit,
   QueryList,
-  ViewChild,
   ViewChildren,
 } from '@angular/core'
 import { Router } from '@angular/router'
-import { Subscription } from 'rxjs'
+import { Subject, takeUntil } from 'rxjs'
 import { PaperlessDocument } from 'src/app/data/paperless-document'
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
 import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
@@ -49,7 +48,7 @@ export class SavedViewWidgetComponent
 
   documents: PaperlessDocument[] = []
 
-  subscription: Subscription
+  unsubscribeNotifier: Subject<any> = new Subject()
 
   @ViewChildren('popover') popovers: QueryList<NgbPopover>
   popover: NgbPopover
@@ -59,15 +58,17 @@ export class SavedViewWidgetComponent
 
   ngOnInit(): void {
     this.reload()
-    this.subscription = this.consumerStatusService
+    this.consumerStatusService
       .onDocumentConsumptionFinished()
-      .subscribe((status) => {
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
         this.reload()
       })
   }
 
   ngOnDestroy(): void {
-    this.subscription.unsubscribe()
+    this.unsubscribeNotifier.next(true)
+    this.unsubscribeNotifier.complete()
   }
 
   reload() {
@@ -81,6 +82,7 @@ export class SavedViewWidgetComponent
         this.savedView.filter_rules,
         { truncate_content: true }
       )
+      .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((result) => {
         this.loading = false
         this.documents = result.results

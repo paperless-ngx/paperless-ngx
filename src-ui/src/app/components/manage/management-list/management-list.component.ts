@@ -7,7 +7,7 @@ import {
 } from '@angular/core'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { Subject, Subscription } from 'rxjs'
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators'
+import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators'
 import {
   MatchingModel,
   MATCHING_ALGORITHMS,
@@ -76,8 +76,10 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
   public sortField: string
   public sortReverse: boolean
 
+  public isLoading: boolean = false
+
   private nameFilterDebounce: Subject<string>
-  private subscription: Subscription
+  private unsubscribeNotifier: Subject<any> = new Subject()
   private _nameFilter: string
 
   ngOnInit(): void {
@@ -85,8 +87,12 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
 
     this.nameFilterDebounce = new Subject<string>()
 
-    this.subscription = this.nameFilterDebounce
-      .pipe(debounceTime(400), distinctUntilChanged())
+    this.nameFilterDebounce
+      .pipe(
+        takeUntil(this.unsubscribeNotifier),
+        debounceTime(400),
+        distinctUntilChanged()
+      )
       .subscribe((title) => {
         this._nameFilter = title
         this.page = 1
@@ -95,7 +101,8 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
   }
 
   ngOnDestroy() {
-    this.subscription.unsubscribe()
+    this.unsubscribeNotifier.next(true)
+    this.unsubscribeNotifier.complete()
   }
 
   getMatching(o: MatchingModel) {
@@ -119,6 +126,7 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
   }
 
   reloadData() {
+    this.isLoading = true
     this.service
       .listFiltered(
         this.page,
@@ -128,9 +136,11 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
         this._nameFilter,
         true
       )
+      .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((c) => {
         this.data = c.results
         this.collectionSize = c.count
+        this.isLoading = false
       })
   }
 
@@ -192,19 +202,22 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
     activeModal.componentInstance.btnCaption = $localize`Delete`
     activeModal.componentInstance.confirmClicked.subscribe(() => {
       activeModal.componentInstance.buttonsEnabled = false
-      this.service.delete(object).subscribe({
-        next: () => {
-          activeModal.close()
-          this.reloadData()
-        },
-        error: (error) => {
-          activeModal.componentInstance.buttonsEnabled = true
-          this.toastService.showError(
-            $localize`Error while deleting element`,
-            error
-          )
-        },
-      })
+      this.service
+        .delete(object)
+        .pipe(takeUntil(this.unsubscribeNotifier))
+        .subscribe({
+          next: () => {
+            activeModal.close()
+            this.reloadData()
+          },
+          error: (error) => {
+            activeModal.componentInstance.buttonsEnabled = true
+            this.toastService.showError(
+              $localize`Error while deleting element`,
+              error
+            )
+          },
+        })
     })
   }
 

@@ -103,6 +103,7 @@ describe('DocumentListViewService', () => {
   })
 
   afterEach(() => {
+    documentListViewService.cancelPending()
     httpTestingController.verify()
     sessionStorage.clear()
   })
@@ -424,5 +425,14 @@ describe('DocumentListViewService', () => {
       results: documents.slice(0, 3),
     })
     expect(documentListViewService.selected.size).toEqual(3)
+  })
+
+  it('should cancel on reload the list', () => {
+    const cancelSpy = jest.spyOn(documentListViewService, 'cancelPending')
+    documentListViewService.reload()
+    httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&tags__id__all=9`
+    )
+    expect(cancelSpy).toHaveBeenCalled()
   })
 })

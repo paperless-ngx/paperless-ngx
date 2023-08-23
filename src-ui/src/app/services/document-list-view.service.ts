@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { ParamMap, Router } from '@angular/router'
-import { Observable, first } from 'rxjs'
+import { Observable, Subject, first, takeUntil } from 'rxjs'
 import { FilterRule } from '../data/filter-rule'
 import {
   filterRulesDiffer,
@@ -82,6 +82,8 @@ export class DocumentListViewService {
 
   currentPageSize: number = this.settings.get(SETTINGS_KEYS.DOCUMENT_LIST_SIZE)
 
+  private unsubscribeNotifier: Subject<any> = new Subject()
+
   private listViewStates: Map<number, ListViewState> = new Map()
 
   private _activeSavedViewId: number = null
@@ -141,6 +143,10 @@ export class DocumentListViewService {
       )
     }
     return this.listViewStates.get(this._activeSavedViewId)
+  }
+
+  public cancelPending(): void {
+    this.unsubscribeNotifier.next(true)
   }
 
   activateSavedView(view: PaperlessSavedView) {
@@ -210,6 +216,7 @@ export class DocumentListViewService {
   }
 
   reload(onFinish?, updateQueryParams: boolean = true) {
+    this.cancelPending()
     this.isReloading = true
     this.error = null
     let activeListViewState = this.activeListViewState
@@ -222,6 +229,7 @@ export class DocumentListViewService {
         activeListViewState.filterRules,
         { truncate_content: true }
       )
+      .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: (result) => {
           this.initialized = true

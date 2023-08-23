@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core'
 import { Router } from '@angular/router'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
-import { Subject, first } from 'rxjs'
+import { first } from 'rxjs'
 import { PaperlessTask } from 'src/app/data/paperless-task'
 import { TasksService } from 'src/app/services/tasks.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
@@ -18,7 +18,6 @@ export class TasksComponent
 {
   public activeTab: string
   public selectedTasks: Set<number> = new Set()
-  private unsubscribeNotifer = new Subject()
   public expandedTask: number
 
   public pageSize: number = 25
@@ -43,7 +42,7 @@ export class TasksComponent
   }
 
   ngOnDestroy() {
-    this.unsubscribeNotifer.next(true)
+    this.tasksService.cancelPending()
   }
 
   dismissTask(task: PaperlessTask) {
