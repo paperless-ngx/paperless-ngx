@@ -589,6 +589,12 @@ case, Paperless will remove the staging copy as well as the scan, and give you a
 message asking you to restart the process from scratch, by scanning the odd pages again,
 followed by the even pages.
 
+It's important that the scan files get consumed in the correct order, and one at a time.
+You therefore need to make sure that Paperless is running while you upload the files into
+the directory; and if you're using [polling](/configuration#polling), make sure that
+`CONSUMER_POLLING` is set to a value lower than it takes for the second scan to appear,
+like 5-10 or even lower.
+
 Another thing that might happen is that you start a double sided scan, but then forget
 to upload the second file. To avoid collating the wrong documents if you then come back
 a day later to scan a new double-sided document, Paperless will only keep an "odd numbered
@@ -597,11 +603,11 @@ scan a completely new "odd numbered pages" one. The old staging file will get di
 
 ### Interaction with "subdirs as tags"
 
-The collation feature can be used together with the "subdirs as tags" feature (but this is not
-a requirement). Just create a correctly named double-sided subdir in the hierachy and upload
-your scans there. For example, both `double-sided/foo/bar` as well as `foo/bar/double-sided` will
-cause the collated document to be treated as if it were uploaded into `foo/bar` and receive both
-`foo` and `bar` tags, but not `double-sided`.
+The collation feature can be used together with the [subdirs as tags](/configuration#consume_config)
+feature (but this is not a requirement). Just create a correctly named double-sided subdir
+in the hierachy and upload your scans there. For example, both `double-sided/foo/bar` as
+well as `foo/bar/double-sided` will cause the collated document to be treated as if it
+were uploaded into `foo/bar` and receive both `foo` and `bar` tags, but not `double-sided`.
 
 ### Interaction with document splitting
 
