@@ -1,5 +1,5 @@
 <div class="btn-group w-100" ngbDropdown role="group">
-    <button class="btn btn-sm" id="dropdown{{title}}" ngbDropdownToggle [ngClass]="isActive ? 'btn-primary' : 'btn-outline-primary'">
+    <button class="btn btn-sm" id="dropdown{{title}}" ngbDropdownToggle [ngClass]="isActive ? 'btn-primary' : 'btn-outline-primary'" [disabled]="disabled">
         <svg class="toolbaricon" fill="currentColor">
            <use xlink:href="assets/bootstrap-icons.svg#person-fill-lock" />
         </svg>

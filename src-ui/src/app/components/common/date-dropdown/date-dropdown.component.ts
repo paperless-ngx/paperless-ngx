@@ -85,6 +85,9 @@ export class DateDropdownComponent implements OnInit, OnDestroy {
   @Output()
   datesSet = new EventEmitter<DateSelection>()
 
+  @Input()
+  disabled: boolean = false
+
   get isActive(): boolean {
     return (
       this.relativeDate !== null ||

@@ -1,5 +1,5 @@
   <div class="btn-group w-100" ngbDropdown role="group">
-  <button class="btn btn-sm" id="dropdown{{title}}" ngbDropdownToggle [ngClass]="dateBefore || dateAfter ? 'btn-primary' : 'btn-outline-primary'">
+  <button class="btn btn-sm" id="dropdown{{title}}" ngbDropdownToggle [ngClass]="dateBefore || dateAfter ? 'btn-primary' : 'btn-outline-primary'" [disabled]="disabled">
     {{title}}
     <app-clearable-badge [selected]="isActive" (cleared)="reset()"></app-clearable-badge><span class="visually-hidden">selected</span>
   </button>
