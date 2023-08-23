@@ -397,7 +397,7 @@ def get_mailbox(server, port, security) -> MailBox:
     """
     ssl_context = ssl.create_default_context()
     if settings.EMAIL_CERTIFICATE_FILE is not None:  # pragma: nocover
-        ssl_context.load_cert_chain(certfile=settings.EMAIL_CERTIFICATE_FILE)
+        ssl_context.load_verify_locations(cafile=settings.EMAIL_CERTIFICATE_FILE)
 
     if security == MailAccount.ImapSecurity.NONE:
         mailbox = MailBoxUnencrypted(server, port)

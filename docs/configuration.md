@@ -503,9 +503,9 @@ HTTP header/value expected by Django, eg `'["HTTP_X_FORWARDED_PROTO", "https"]'`
 
 `PAPERLESS_EMAIL_CERTIFICATE_FILE=<path>`
 
-: Configures an additional SSL certificate file containing a [combined key and certificate](https://docs.python.org/3/library/ssl.html#combined-key-and-certificate) file
-for validating SSL connections against mail providers. This is for use with self-signed certificates against
-local IMAP servers.
+: Configures an additional SSL certificate file containing a [certificate](https://docs.python.org/3/library/ssl.html#certificates)
+or certificate chain which should be trusted for validating SSL connections against mail providers.
+This is for use with self-signed certificates against local IMAP servers.
 
     Defaults to None.
 
