@@ -395,12 +395,16 @@ def get_mailbox(server, port, security) -> MailBox:
     """
     Returns the correct MailBox instance for the given configuration.
     """
+    ssl_context = ssl.create_default_context()
+    if settings.EMAIL_CERTIFICATE_FILE is not None:  # pragma: nocover
+        ssl_context.load_verify_locations(cafile=settings.EMAIL_CERTIFICATE_FILE)
+
     if security == MailAccount.ImapSecurity.NONE:
         mailbox = MailBoxUnencrypted(server, port)
     elif security == MailAccount.ImapSecurity.STARTTLS:
-        mailbox = MailBoxTls(server, port, ssl_context=ssl.create_default_context())
+        mailbox = MailBoxTls(server, port, ssl_context=ssl_context)
     elif security == MailAccount.ImapSecurity.SSL:
-        mailbox = MailBox(server, port, ssl_context=ssl.create_default_context())
+        mailbox = MailBox(server, port, ssl_context=ssl_context)
     else:
         raise NotImplementedError("Unknown IMAP security")  # pragma: nocover
     return mailbox
