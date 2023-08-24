@@ -1,9 +1,11 @@
 import os
+from pathlib import Path
 
 from django.test import TestCase
 from django.test import override_settings
 
 from documents.tests.utils import DirectoriesMixin
+from documents.tests.utils import FileSystemAssertsMixin
 from paperless.checks import binaries_check
 from paperless.checks import debug_mode_check
 from paperless.checks import paths_check
@@ -57,7 +59,7 @@ class TestChecks(DirectoriesMixin, TestCase):
         self.assertEqual(len(debug_mode_check(None)), 1)
 
 
-class TestSettingsChecks(DirectoriesMixin, TestCase):
+class TestSettingsChecksAgainstDefaults(DirectoriesMixin, TestCase):
     def test_all_valid(self):
         """
         GIVEN:
@@ -70,6 +72,8 @@ class TestSettingsChecks(DirectoriesMixin, TestCase):
         msgs = settings_values_check(None)
         self.assertEqual(len(msgs), 0)
 
+
+class TestOcrSettingsChecks(DirectoriesMixin, TestCase):
     @override_settings(OCR_OUTPUT_TYPE="notapdf")
     def test_invalid_output_type(self):
         """
@@ -160,6 +164,8 @@ class TestSettingsChecks(DirectoriesMixin, TestCase):
 
         self.assertIn('OCR clean mode "cleanme"', msg.msg)
 
+
+class TestTimezoneSettingsChecks(DirectoriesMixin, TestCase):
     @override_settings(TIME_ZONE="TheMoon\\MyCrater")
     def test_invalid_timezone(self):
         """
@@ -178,6 +184,8 @@ class TestSettingsChecks(DirectoriesMixin, TestCase):
 
         self.assertIn('Timezone "TheMoon\\MyCrater"', msg.msg)
 
+
+class TestBarcodeSettingsChecks(DirectoriesMixin, TestCase):
     @override_settings(CONSUMER_BARCODE_SCANNER="Invalid")
     def test_barcode_scanner_invalid(self):
         msgs = settings_values_check(None)
@@ -200,3 +208,26 @@ class TestSettingsChecks(DirectoriesMixin, TestCase):
     def test_barcode_scanner_valid(self):
         msgs = settings_values_check(None)
         self.assertEqual(len(msgs), 0)
+
+
+class TestEmailCertSettingsChecks(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
+    @override_settings(EMAIL_CERTIFICATE_FILE=Path("/tmp/not_actually_here.pem"))
+    def test_not_valid_file(self):
+        """
+        GIVEN:
+            - Default settings
+            - Email certificate is set
+        WHEN:
+            - Email certificate file doesn't exist
+        THEN:
+            - system check error reported for email certificate
+        """
+        self.assertIsNotFile("/tmp/not_actually_here.pem")
+
+        msgs = settings_values_check(None)
+
+        self.assertEqual(len(msgs), 1)
+
+        msg = msgs[0]
+
+        self.assertIn("Email cert /tmp/not_actually_here.pem is not a file", msg.msg)
