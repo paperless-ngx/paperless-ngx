@@ -15,16 +15,28 @@ import {
   DEFAULT_MATCHING_ALGORITHM,
   MATCH_ALL,
 } from 'src/app/data/matching-model'
-import { NgSelectModule } from '@ng-select/ng-select'
+import { NgSelectComponent, NgSelectModule } from '@ng-select/ng-select'
 import { RouterTestingModule } from '@angular/router/testing'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { of } from 'rxjs'
 import { TagService } from 'src/app/services/rest/tag.service'
 import {
+  NgbAccordionModule,
   NgbModal,
   NgbModalModule,
   NgbModalRef,
+  NgbPopoverModule,
 } from '@ng-bootstrap/ng-bootstrap'
+import { TagEditDialogComponent } from '../../edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
+import { CheckComponent } from '../check/check.component'
+import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
+import { TextComponent } from '../text/text.component'
+import { ColorComponent } from '../color/color.component'
+import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
+import { PermissionsFormComponent } from '../permissions/permissions-form/permissions-form.component'
+import { SelectComponent } from '../select/select.component'
+import { ColorSliderModule } from 'ngx-color/slider'
+import { By } from '@angular/platform-browser'
 
 const tags: PaperlessTag[] = [
   {
@@ -56,12 +68,32 @@ describe('TagsComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [TagsComponent],
+      declarations: [
+        TagsComponent,
+        TagEditDialogComponent,
+        TextComponent,
+        ColorComponent,
+        IfOwnerDirective,
+        SelectComponent,
+        TextComponent,
+        PermissionsFormComponent,
+        ColorComponent,
+        CheckComponent,
+      ],
       providers: [
         {
           provide: TagService,
           useValue: {
-            listAll: () => of(tags),
+            listAll: () =>
+              of({
+                results: tags,
+              }),
+            create: () =>
+              of({
+                name: 'bar',
+                id: 99,
+                color: '#fff000',
+              }),
           },
         },
       ],
@@ -72,6 +104,8 @@ describe('TagsComponent', () => {
         RouterTestingModule,
         HttpClientTestingModule,
         NgbModalModule,
+        NgbAccordionModule,
+        NgbPopoverModule,
       ],
     }).compileComponents()
 
@@ -85,7 +119,7 @@ describe('TagsComponent', () => {
   })
 
   it('should support suggestions', () => {
-    expect(component.value).toBeUndefined()
+    expect(component.value).toHaveLength(0)
     component.value = []
     component.tags = tags
     component.suggestions = [1, 2]
@@ -107,18 +141,18 @@ describe('TagsComponent', () => {
   it('should support create new using last search term and open a modal', () => {
     let activeInstances: NgbModalRef[]
     modalService.activeInstances.subscribe((v) => (activeInstances = v))
-    component.onSearch({ term: 'bar' })
+    component.select.searchTerm = 'foobar'
     component.createTag()
     expect(modalService.hasOpenModals()).toBeTruthy()
-    expect(activeInstances[0].componentInstance.object.name).toEqual('bar')
+    expect(activeInstances[0].componentInstance.object.name).toEqual('foobar')
+    const editDialog = activeInstances[0]
+      .componentInstance as TagEditDialogComponent
+    editDialog.save() // create is mocked
+    fixture.detectChanges()
+    fixture.whenStable().then(() => {
+      expect(fixture.debugElement.nativeElement.textContent).toContain('foobar')
+    })
   })
-
-  it('should clear search term on blur after delay', fakeAsync(() => {
-    const clearSpy = jest.spyOn(component, 'clearLastSearchTerm')
-    component.onBlur()
-    tick(3000)
-    expect(clearSpy).toHaveBeenCalled()
-  }))
 
   it('support remove tags', () => {
     component.tags = tags
@@ -132,6 +166,7 @@ describe('TagsComponent', () => {
   })
 
   it('should get tags', () => {
+    component.tags = null
     expect(component.getTag(2)).toBeNull()
     component.tags = tags
     expect(component.getTag(2)).toEqual(tags[1])
