@@ -1,5 +1,31 @@
 # Changelog
 
+## paperless-ngx 1.17.2
+
+### Features
+
+- Enhancement: Allow to set a prefix for keys and channels in redis [@amo13](https://github.com/amo13) ([#3993](https://github.com/paperless-ngx/paperless-ngx/pull/3993))
+
+### Bug Fixes
+
+- Fix: Increase the HTTP timeouts for Tika/Gotenberg to maximum task time [@stumpylog](https://github.com/stumpylog) ([#4061](https://github.com/paperless-ngx/paperless-ngx/pull/4061))
+- Fix: Allow adding an SSL certificate for IMAP SSL context [@stumpylog](https://github.com/stumpylog) ([#4048](https://github.com/paperless-ngx/paperless-ngx/pull/4048))
+- Fix: tag creation sometimes retained search text [@shamoon](https://github.com/shamoon) ([#4038](https://github.com/paperless-ngx/paperless-ngx/pull/4038))
+- Fix: enforce permissions on bulk_edit operations [@shamoon](https://github.com/shamoon) ([#4007](https://github.com/paperless-ngx/paperless-ngx/pull/4007))
+
+### All App Changes
+
+<details>
+<summary>6 changes</summary>
+
+- Fix: Increase the HTTP timeouts for Tika/Gotenberg to maximum task time [@stumpylog](https://github.com/stumpylog) ([#4061](https://github.com/paperless-ngx/paperless-ngx/pull/4061))
+- Enhancement: disable / hide some UI buttons / elements if insufficient permissions, show errors [@shamoon](https://github.com/shamoon) ([#4014](https://github.com/paperless-ngx/paperless-ngx/pull/4014))
+- Fix: Allow adding an SSL certificate for IMAP SSL context [@stumpylog](https://github.com/stumpylog) ([#4048](https://github.com/paperless-ngx/paperless-ngx/pull/4048))
+- Fix: tag creation sometimes retained search text [@shamoon](https://github.com/shamoon) ([#4038](https://github.com/paperless-ngx/paperless-ngx/pull/4038))
+- Fix: enforce permissions on bulk_edit operations [@shamoon](https://github.com/shamoon) ([#4007](https://github.com/paperless-ngx/paperless-ngx/pull/4007))
+- Enhancement: Allow to set a prefix for keys and channels in redis [@amo13](https://github.com/amo13) ([#3993](https://github.com/paperless-ngx/paperless-ngx/pull/3993))
+</details>
+
 ## paperless-ngx 1.17.1
 
 ### Features
