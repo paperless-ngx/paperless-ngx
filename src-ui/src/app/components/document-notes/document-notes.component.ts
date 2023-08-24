@@ -63,11 +63,7 @@ export class DocumentNotesComponent extends ComponentWithPermissions {
       },
       error: (e) => {
         this.networkActive = false
-        this.toastService.showError(
-          $localize`Error saving note`,
-          10000,
-          JSON.stringify(e)
-        )
+        this.toastService.showError($localize`Error saving note`, e)
       },
     })
   }
@@ -81,9 +77,7 @@ export class DocumentNotesComponent extends ComponentWithPermissions {
       },
       error: (e) => {
         this.networkActive = false
-        this.toastService.showError(
-          $localize`Error deleting note: ${e.toString()}`
-        )
+        this.toastService.showError($localize`Error deleting note`, e)
       },
     })
   }

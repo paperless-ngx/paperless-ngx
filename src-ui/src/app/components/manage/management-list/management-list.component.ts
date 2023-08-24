@@ -148,8 +148,7 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
     activeModal.componentInstance.failed.subscribe((e) => {
       this.toastService.showError(
         $localize`Error occurred while creating ${this.typeName}.`,
-        10000,
-        JSON.stringify(e)
+        e
       )
     })
   }
@@ -169,8 +168,7 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
     activeModal.componentInstance.failed.subscribe((e) => {
       this.toastService.showError(
         $localize`Error occurred while saving ${this.typeName}.`,
-        10000,
-        JSON.stringify(e)
+        e
       )
     })
   }
@@ -194,20 +192,19 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
     activeModal.componentInstance.btnCaption = $localize`Delete`
     activeModal.componentInstance.confirmClicked.subscribe(() => {
       activeModal.componentInstance.buttonsEnabled = false
-      this.service.delete(object).subscribe(
-        (_) => {
+      this.service.delete(object).subscribe({
+        next: () => {
           activeModal.close()
           this.reloadData()
         },
-        (error) => {
+        error: (error) => {
           activeModal.componentInstance.buttonsEnabled = true
           this.toastService.showError(
-            $localize`Error while deleting element: ${JSON.stringify(
-              error.error
-            )}`
+            $localize`Error while deleting element`,
+            error
           )
-        }
-      )
+        },
+      })
     })
   }
 
