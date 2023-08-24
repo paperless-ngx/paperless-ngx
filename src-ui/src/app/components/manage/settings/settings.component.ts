@@ -276,18 +276,13 @@ export class SettingsComponent
                 error: (e) => {
                   this.toastService.showError(
                     $localize`Error retrieving groups`,
-                    10000,
-                    JSON.stringify(e)
+                    e
                   )
                 },
               })
           },
           error: (e) => {
-            this.toastService.showError(
-              $localize`Error retrieving users`,
-              10000,
-              JSON.stringify(e)
-            )
+            this.toastService.showError($localize`Error retrieving users`, e)
           },
         })
     } else if (
@@ -312,8 +307,7 @@ export class SettingsComponent
                 error: (e) => {
                   this.toastService.showError(
                     $localize`Error retrieving mail rules`,
-                    10000,
-                    JSON.stringify(e)
+                    e
                   )
                 },
               })
@@ -321,8 +315,7 @@ export class SettingsComponent
           error: (e) => {
             this.toastService.showError(
               $localize`Error retrieving mail accounts`,
-              10000,
-              JSON.stringify(e)
+              e
             )
           },
         })
@@ -646,8 +639,7 @@ export class SettingsComponent
         error: (error) => {
           this.toastService.showError(
             $localize`An error occurred while saving settings.`,
-            10000,
-            JSON.stringify(error)
+            error
           )
         },
       })
@@ -682,8 +674,7 @@ export class SettingsComponent
         (error) => {
           this.toastService.showError(
             $localize`Error while storing settings on server.`,
-            10000,
-            JSON.stringify(error)
+            error
           )
         }
       )
@@ -742,11 +733,7 @@ export class SettingsComponent
     modal.componentInstance.failed
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((e) => {
-        this.toastService.showError(
-          $localize`Error saving user.`,
-          10000,
-          JSON.stringify(e)
-        )
+        this.toastService.showError($localize`Error saving user.`, e)
       })
   }
 
@@ -771,11 +758,7 @@ export class SettingsComponent
           })
         },
         error: (e) => {
-          this.toastService.showError(
-            $localize`Error deleting user.`,
-            10000,
-            JSON.stringify(e)
-          )
+          this.toastService.showError($localize`Error deleting user.`, e)
         },
       })
     })
@@ -802,11 +785,7 @@ export class SettingsComponent
     modal.componentInstance.failed
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((e) => {
-        this.toastService.showError(
-          $localize`Error saving group.`,
-          10000,
-          JSON.stringify(e)
-        )
+        this.toastService.showError($localize`Error saving group.`, e)
       })
   }
 
@@ -831,11 +810,7 @@ export class SettingsComponent
           })
         },
         error: (e) => {
-          this.toastService.showError(
-            $localize`Error deleting group.`,
-            10000,
-            JSON.stringify(e)
-          )
+          this.toastService.showError($localize`Error deleting group.`, e)
         },
       })
     })
@@ -869,11 +844,7 @@ export class SettingsComponent
     modal.componentInstance.failed
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((e) => {
-        this.toastService.showError(
-          $localize`Error saving account.`,
-          10000,
-          JSON.stringify(e)
-        )
+        this.toastService.showError($localize`Error saving account.`, e)
       })
   }
 
@@ -901,8 +872,7 @@ export class SettingsComponent
         error: (e) => {
           this.toastService.showError(
             $localize`Error deleting mail account.`,
-            10000,
-            JSON.stringify(e)
+            e
           )
         },
       })
@@ -932,11 +902,7 @@ export class SettingsComponent
     modal.componentInstance.failed
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((e) => {
-        this.toastService.showError(
-          $localize`Error saving rule.`,
-          10000,
-          JSON.stringify(e)
-        )
+        this.toastService.showError($localize`Error saving rule.`, e)
       })
   }
 
@@ -962,11 +928,7 @@ export class SettingsComponent
           })
         },
         error: (e) => {
-          this.toastService.showError(
-            $localize`Error deleting mail rule.`,
-            10000,
-            JSON.stringify(e)
-          )
+          this.toastService.showError($localize`Error deleting mail rule.`, e)
         },
       })
     })
