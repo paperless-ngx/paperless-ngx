@@ -395,7 +395,6 @@ export class DocumentDetailComponent
           this.metadata = null
           this.toastService.showError(
             $localize`Error retrieving metadata`,
-            10000,
             error
           )
         },
@@ -417,7 +416,6 @@ export class DocumentDetailComponent
             this.suggestions = null
             this.toastService.showError(
               $localize`Error retrieving suggestions.`,
-              10000,
               error
             )
           },
@@ -542,11 +540,7 @@ export class DocumentDetailComponent
             close && this.close()
           } else {
             this.error = error.error
-            this.toastService.showError(
-              $localize`Error saving document` +
-                ': ' +
-                (error.error?.detail ?? error.message ?? JSON.stringify(error))
-            )
+            this.toastService.showError($localize`Error saving document`, error)
           }
         },
       })
@@ -587,11 +581,7 @@ export class DocumentDetailComponent
         error: (error) => {
           this.networkActive = false
           this.error = error.error
-          this.toastService.showError(
-            $localize`Error saving document` +
-              ': ' +
-              (error.error?.detail ?? error.message ?? JSON.stringify(error))
-          )
+          this.toastService.showError($localize`Error saving document`, error)
         },
       })
   }
@@ -640,11 +630,7 @@ export class DocumentDetailComponent
           this.close()
         },
         error: (error) => {
-          this.toastService.showError(
-            $localize`Error deleting document: ${
-              error.error?.detail ?? error.message ?? JSON.stringify(error)
-            }`
-          )
+          this.toastService.showError($localize`Error deleting document`, error)
           modal.componentInstance.buttonsEnabled = true
           this.subscribeModalDelete(modal)
         },
@@ -687,9 +673,8 @@ export class DocumentDetailComponent
               modal.componentInstance.buttonsEnabled = true
             }
             this.toastService.showError(
-              $localize`Error executing operation: ${JSON.stringify(
-                error.error
-              )}`
+              $localize`Error executing operation`,
+              error
             )
           },
         })
