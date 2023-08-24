@@ -1,3 +1,4 @@
+import importlib
 import shutil
 import tempfile
 from pathlib import Path
@@ -10,12 +11,17 @@ from django.test import override_settings
 
 from documents.tests.utils import TestMigrations
 
+# https://github.com/python/cpython/issues/100950
+migration_1037_obj = importlib.import_module(
+    "documents.migrations.1037_webp_encrypted_thumbnail_conversion",
+)
+
 
 @override_settings(PASSPHRASE="test")
 @mock.patch(
-    "documents.migrations.1037_webp_encrypted_thumbnail_conversion.multiprocessing.pool.Pool.map",
+    f"{__name__}.migration_1037_obj.multiprocessing.pool.Pool.map",
 )
-@mock.patch("documents.migrations.1037_webp_encrypted_thumbnail_conversion.run_convert")
+@mock.patch(f"{__name__}.migration_1037_obj.run_convert")
 class TestMigrateToEncrytpedWebPThumbnails(TestMigrations):
     migrate_from = "1036_alter_savedviewfilterrule_rule_type"
     migrate_to = "1037_webp_encrypted_thumbnail_conversion"
