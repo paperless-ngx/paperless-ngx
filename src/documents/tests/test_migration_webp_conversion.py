@@ -1,3 +1,4 @@
+import importlib
 import shutil
 import tempfile
 from pathlib import Path
@@ -10,11 +11,16 @@ from django.test import override_settings
 
 from documents.tests.utils import TestMigrations
 
+# https://github.com/python/cpython/issues/100950
+migration_1021_obj = importlib.import_module(
+    "documents.migrations.1021_webp_thumbnail_conversion",
+)
+
 
 @mock.patch(
-    "documents.migrations.1021_webp_thumbnail_conversion.multiprocessing.pool.Pool.map",
+    f"{__name__}.migration_1021_obj.multiprocessing.pool.Pool.map",
 )
-@mock.patch("documents.migrations.1021_webp_thumbnail_conversion.run_convert")
+@mock.patch(f"{__name__}.migration_1021_obj.run_convert")
 class TestMigrateWebPThumbnails(TestMigrations):
     migrate_from = "1020_merge_20220518_1839"
     migrate_to = "1021_webp_thumbnail_conversion"
