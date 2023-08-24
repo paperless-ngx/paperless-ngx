@@ -100,7 +100,7 @@ class TikaDocumentParser(DocumentParser):
                     files=files,
                     headers=headers,
                     data=data,
-                    timeout=30.0,
+                    timeout=settings.CELERY_TASK_TIME_LIMIT,
                 )
                 response.raise_for_status()  # ensure we notice bad responses
             except Exception as err:
