@@ -15,6 +15,7 @@ import {
   NgbModule,
   NgbNavLink,
   NgbModalRef,
+  NgbAlertModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
@@ -42,6 +43,13 @@ import { CheckComponent } from '../../common/input/check/check.component'
 import { ColorComponent } from '../../common/input/color/color.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { SettingsComponent } from './settings.component'
+import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
+import { SelectComponent } from '../../common/input/select/select.component'
+import { TextComponent } from '../../common/input/text/text.component'
+import { PasswordComponent } from '../../common/input/password/password.component'
+import { NumberComponent } from '../../common/input/number/number.component'
+import { TagsComponent } from '../../common/input/tags/tags.component'
+import { NgSelectModule } from '@ng-select/ng-select'
 
 const savedViews = [
   { id: 1, name: 'view1' },
@@ -90,6 +98,14 @@ describe('SettingsComponent', () => {
         ConfirmDialogComponent,
         CheckComponent,
         ColorComponent,
+        SafeHtmlPipe,
+        SelectComponent,
+        TextComponent,
+        PasswordComponent,
+        NumberComponent,
+        TagsComponent,
+        MailAccountEditDialogComponent,
+        MailRuleEditDialogComponent,
       ],
       providers: [CustomDatePipe, DatePipe, PermissionsGuard],
       imports: [
@@ -98,6 +114,8 @@ describe('SettingsComponent', () => {
         RouterTestingModule.withRoutes(routes),
         FormsModule,
         ReactiveFormsModule,
+        NgbAlertModule,
+        NgSelectModule,
       ],
     }).compileComponents()
 
