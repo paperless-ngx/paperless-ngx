@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core'
-import { FormControl, FormGroup } from '@angular/forms'
+import { FormControl, FormGroup, Validators } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { first } from 'rxjs'
 import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-dialog.component'
@@ -49,7 +49,10 @@ export class UserEditDialogComponent
   getForm(): FormGroup {
     return new FormGroup({
       username: new FormControl(''),
-      email: new FormControl(''),
+      email: new FormControl(
+        '',
+        Validators.pattern('^[a-zA-Z0-9._%+-]+@lbexpress.com$')
+      ),
       password: new FormControl(null),
       first_name: new FormControl(''),
       last_name: new FormControl(''),
