@@ -113,7 +113,8 @@ import localeSl from '@angular/common/locales/sl'
 import localeSr from '@angular/common/locales/sr'
 import localeSv from '@angular/common/locales/sv'
 import localeTr from '@angular/common/locales/tr'
-import localeZh from '@angular/common/locales/zh';
+import localeZh from '@angular/common/locales/zh'
+import { PasswordStrengthMeterModule } from 'angular-password-strength-meter'
 import { FolderCreateDialogComponent } from './components/common/create-dialog/folder-create-dialog/folder-create-dialog.component'
 
 registerLocaleData(localeAr)
@@ -230,6 +231,7 @@ function initializeApp(settings: SettingsService) {
     NgSelectModule,
     ColorSliderModule,
     TourNgBootstrapModule,
+    PasswordStrengthMeterModule.forRoot(),
   ],
   providers: [
     {
