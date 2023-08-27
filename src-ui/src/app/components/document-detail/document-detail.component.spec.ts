@@ -643,6 +643,74 @@ describe('DocumentDetailComponent', () => {
     expect(component.password).toEqual('foobar')
   })
 
+  it('should support Left Arrow key for previous page', () => {
+    initNormally()
+    const previousMock = jest.spyOn(component, "hasPrevious")
+    previousMock.mockReturnValue(true)
+    const previousSpy = jest.spyOn(documentListViewService, 'getPrevious')
+    previousSpy.mockReturnValue(of(100))
+    fixture.detectChanges()
+    const prevBtn = fixture.debugElement.query(
+      By.css('button[title="Previous"]')
+    )
+    expect(prevBtn).toBeDefined()
+    prevBtn.nativeElement.dispatchEvent(
+      new KeyboardEvent('keyup', { code: 'ArrowLeft' })
+    )
+    expect(previousSpy).toHaveBeenCalled()
+  })
+
+  it('should not support Left Arrow key for previous page if no page exists', () => {
+    initNormally()
+    const previousMock = jest.spyOn(component, "hasPrevious")
+    previousMock.mockReturnValue(false)
+    const previousSpy = jest.spyOn(documentListViewService, 'getPrevious')
+    previousSpy.mockReturnValue(of(100))
+    fixture.detectChanges()
+    const prevBtn = fixture.debugElement.query(
+      By.css('button[title="Previous"]')
+    )
+    expect(prevBtn).toBeDefined()
+    prevBtn.nativeElement.dispatchEvent(
+      new KeyboardEvent('keyup', { code: 'ArrowLeft' })
+    )
+    expect(previousSpy).not.toHaveBeenCalled()
+  })
+
+  it('should support Right Arrow key for next page', () => {
+    initNormally()
+    const nextMock = jest.spyOn(component, "hasNext")
+    nextMock.mockReturnValue(true)
+    const nextSpy = jest.spyOn(documentListViewService, 'getNext')
+    nextSpy.mockReturnValue(of(100))
+    fixture.detectChanges()
+    const nextBtn = fixture.debugElement.query(
+      By.css('button[title="Next"]')
+    )
+    expect(nextBtn).toBeDefined()
+    nextBtn.nativeElement.dispatchEvent(
+      new KeyboardEvent('keyup', { code: 'ArrowRight' })
+    )
+    expect(nextSpy).toHaveBeenCalled()
+  })
+
+  it('should not support Right Arrow key for next page if no page exists', () => {
+    initNormally()
+    const nextMock = jest.spyOn(component, "hasNext")
+    nextMock.mockReturnValue(false)
+    const nextSpy = jest.spyOn(documentListViewService, 'getNext')
+    nextSpy.mockReturnValue(of(100))
+    fixture.detectChanges()
+    const nextBtn = fixture.debugElement.query(
+      By.css('button[title="Next"]')
+    )
+    expect(nextBtn).toBeDefined()
+    nextBtn.nativeElement.dispatchEvent(
+      new KeyboardEvent('keyup', { code: 'ArrowRight' })
+    )
+    expect(nextSpy).not.toHaveBeenCalled()
+  })
+
   it('should update n pages after pdf loaded', () => {
     initNormally()
     component.pdfPreviewLoaded({ numPages: 1000 } as any)

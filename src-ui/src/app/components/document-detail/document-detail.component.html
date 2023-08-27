@@ -47,12 +47,12 @@
     </button>
 
     <div class="button-group">
-        <button type="button" class="btn btn-sm btn-outline-primary me-2" i18n-title title="Previous" (click)="previousDoc()" [disabled]="!hasPrevious()">
+        <button type="button" class="btn btn-sm btn-outline-primary me-2" i18n-title title="Previous" (click)="previousDoc()" [disabled]="!hasPrevious()" (keyup)="onLeftArrowKeyUp($event)">
             <svg class="buttonicon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#arrow-left" />
             </svg>
         </button>
-        <button type="button" class="btn btn-sm btn-outline-primary"  i18n-title title="Next" (click)="nextDoc()" [disabled]="!hasNext()">
+        <button type="button" class="btn btn-sm btn-outline-primary"  i18n-title title="Next" (click)="nextDoc()" [disabled]="!hasNext()" (keyup)="onRightArrowKeyUp($event)">
             <svg class="buttonicon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#arrow-right" />
             </svg>

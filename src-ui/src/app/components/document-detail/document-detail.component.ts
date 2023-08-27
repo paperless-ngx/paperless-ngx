@@ -731,6 +731,18 @@ export class DocumentDetailComponent
     }
   }
 
+  onLeftArrowKeyUp(event: KeyboardEvent) {
+    if ('ArrowLeft' == event.code && this.hasPrevious()) {
+      this.previousDoc()
+    }
+  }
+
+  onRightArrowKeyUp(event: KeyboardEvent) {
+    if ('ArrowRight' == event.code && this.hasNext()) {
+      this.nextDoc()
+    }
+  }
+
   onPasswordKeyUp(event: KeyboardEvent) {
     if ('Enter' == event.key) {
       this.password = (event.target as HTMLInputElement).value
