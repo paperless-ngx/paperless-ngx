@@ -63,6 +63,12 @@ class Command(BaseCommand):
             "--base-url",
             help="The base URL to use to build the link to the documents.",
         )
+        parser.add_argument(
+            "--id-range",
+            help="A range of document id's on which the retagging should be applied.",
+            nargs=2,
+            type=int,
+        )
 
     def handle(self, *args, **options):
         # Detect if we support color
@@ -72,6 +78,12 @@ class Command(BaseCommand):
             queryset = Document.objects.filter(tags__is_inbox_tag=True)
         else:
             queryset = Document.objects.all()
+
+        if options["id_range"]:
+            queryset = queryset.filter(
+                id__range=(options["id_range"][0], options["id_range"][1]),
+            )
+
         documents = queryset.distinct()
 
         classifier = load_classifier()

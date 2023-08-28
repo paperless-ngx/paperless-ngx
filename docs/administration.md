@@ -351,7 +351,7 @@ currently-imported docs. This problem is common enough that there are
 tools for it.
 
 ```
-document_retagger [-h] [-c] [-T] [-t] [-i] [--use-first] [-f]
+document_retagger [-h] [-c] [-T] [-t] [-i] [--id-range] [--use-first] [-f]
 
 optional arguments:
 -c, --correspondent
@@ -359,6 +359,7 @@ optional arguments:
 -t, --document_type
 -s, --storage_path
 -i, --inbox-only
+--id-range
 --use-first
 -f, --overwrite
 ```
@@ -374,6 +375,11 @@ specify any of these options, the document retagger won't do anything.
 Specify `-i` to have the document retagger work on documents tagged with
 inbox tags only. This is useful when you don't want to mess with your
 already processed documents.
+
+Specify `--id-range 1 100` to have the document retagger work only on a
+specific range of document id´s. This can be useful if you have a lot of
+documents and want to test the matching rules only on a subset of
+documents.
 
 When multiple document types or correspondents match a single document,
 the retagger won't assign these to the document. Specify `--use-first`
