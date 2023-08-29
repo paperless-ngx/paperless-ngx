@@ -20,3 +20,9 @@ pre {
     width: 0.8rem;
     height: 0.8rem;
 }
+
+@media (max-width: 575.98px) {
+    .name-col {
+        max-width: 150px;
+    }
+}
