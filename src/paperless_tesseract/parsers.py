@@ -304,6 +304,7 @@ class RasterisedDocumentParser(DocumentParser):
         import ocrmypdf
         from ocrmypdf import EncryptedPdfError
         from ocrmypdf import InputFileError
+        from ocrmypdf import SubprocessOutputError
 
         archive_path = Path(os.path.join(self.tempdir, "archive.pdf"))
         sidecar_file = Path(os.path.join(self.tempdir, "sidecar.txt"))
@@ -333,6 +334,13 @@ class RasterisedDocumentParser(DocumentParser):
             )
             if original_has_text:
                 self.text = text_original
+        except SubprocessOutputError as e:
+            if "Ghostscript PDF/A rendering" in str(e):
+                self.log.warning(
+                    "Ghostscript PDF/A rendering failed, consider setting "
+                    "PAPERLESS_OCR_USER_ARGS: '{\"continue_on_soft_render_error\": true}'",  # noqa: E501
+                )
+            raise e
         except (NoTextFoundException, InputFileError) as e:
             self.log.warning(
                 f"Encountered an error while running OCR: {e!s}. "
