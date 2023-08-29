@@ -106,7 +106,6 @@ class TestParserLive(FileSystemAssertsMixin, BaseMailParserTestCase):
 
                 succeeded = True
             except httpx.HTTPError as e:
-                raise
                 # Retry on HTTP errors
                 print(f"{e} during try #{retry_count}", flush=True)
 
