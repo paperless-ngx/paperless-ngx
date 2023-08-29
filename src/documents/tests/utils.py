@@ -1,14 +1,21 @@
 import shutil
 import tempfile
+import time
+import warnings
 from collections import namedtuple
 from contextlib import contextmanager
 from os import PathLike
 from pathlib import Path
+from typing import Any
+from typing import Callable
 from typing import Iterator
+from typing import List
 from typing import Tuple
 from typing import Union
 from unittest import mock
 
+import httpx
+import pytest
 from django.apps import apps
 from django.db import connection
 from django.db.migrations.executor import MigrationExecutor
@@ -76,6 +83,61 @@ def paperless_environment():
     finally:
         if dirs:
             remove_dirs(dirs)
+
+
+def util_call_with_backoff(
+    method_or_callable: Callable,
+    args: Union[List, Tuple],
+    *,
+    skip_on_503=True,
+) -> Tuple[bool, Any]:
+    """
+    For whatever reason, the images started during the test pipeline like to
+    segfault sometimes, crash and otherwise fail randomly, when run with the
+    exact files that usually pass.
+
+    So, this function will retry the given method/function up to 3 times, with larger backoff
+    periods between each attempt, in hopes the issue resolves itself during
+    one attempt to parse.
+
+    This will wait the following:
+        - Attempt 1 - 20s following failure
+        - Attempt 2 - 40s following failure
+        - Attempt 3 - 80s following failure
+
+    """
+    result = None
+    succeeded = False
+    retry_time = 20.0
+    retry_count = 0
+    status_codes = []
+    max_retry_count = 3
+
+    while retry_count < max_retry_count and not succeeded:
+        try:
+            result = method_or_callable(*args)
+
+            succeeded = True
+        except httpx.HTTPError as exc:
+            warnings.warn(f"HTTP Exception for {exc.request.url} - {exc}")
+
+            if isinstance(exc, httpx.HTTPStatusError):
+                status_codes.append(exc.response.status_code)
+
+            retry_count = retry_count + 1
+
+            time.sleep(retry_time)
+            retry_time = retry_time * 2.0
+
+    if (
+        not succeeded
+        and status_codes
+        and skip_on_503
+        and all(element == httpx.codes.SERVICE_UNAVAILABLE for element in status_codes)
+    ):
+        pytest.skip("Repeated HTTP 503 for service")
+
+    return succeeded, result
 
 
 class DirectoriesMixin:

@@ -1,5 +1,4 @@
 import os
-import time
 from unittest import mock
 
 import httpx
@@ -10,6 +9,7 @@ from pdfminer.high_level import extract_text
 from PIL import Image
 
 from documents.tests.utils import FileSystemAssertsMixin
+from documents.tests.utils import util_call_with_backoff
 from paperless_mail.tests.test_parsers import BaseMailParserTestCase
 
 
@@ -79,51 +79,6 @@ class TestParserLive(FileSystemAssertsMixin, BaseMailParserTestCase):
     def imagehash(file, hash_size=18):
         return f"{average_hash(Image.open(file), hash_size)}"
 
-    def util_call_with_backoff(self, method_or_callable, args):
-        """
-        For whatever reason, the image started during the test pipeline likes to
-        segfault sometimes, when run with the exact files that usually pass.
-
-        So, this function will retry the parsing up to 3 times, with larger backoff
-        periods between each attempt, in hopes the issue resolves itself during
-        one attempt to parse.
-
-        This will wait the following:
-            - Attempt 1 - 20s following failure
-            - Attempt 2 - 40s following failure
-            - Attempt 3 - 80s following failure
-
-        """
-        result = None
-        succeeded = False
-        retry_time = 20.0
-        retry_count = 0
-        max_retry_count = 3
-
-        while retry_count < max_retry_count and not succeeded:
-            try:
-                result = method_or_callable(*args)
-
-                succeeded = True
-            except httpx.HTTPError as e:
-                # Retry on HTTP errors
-                print(f"{e} during try #{retry_count}", flush=True)
-
-                retry_count = retry_count + 1
-
-                time.sleep(retry_time)
-                retry_time = retry_time * 2.0
-            except Exception:
-                # Not on other error
-                raise
-
-        self.assertTrue(
-            succeeded,
-            "Continued Tika server errors after multiple retries",
-        )
-
-        return result
-
     @mock.patch("paperless_mail.parsers.MailDocumentParser.generate_pdf")
     def test_get_thumbnail(self, mock_generate_pdf: mock.MagicMock):
         """
@@ -187,7 +142,7 @@ class TestParserLive(FileSystemAssertsMixin, BaseMailParserTestCase):
             self.SAMPLE_DIR / "html.eml",
         )
 
-        pdf_path = self.util_call_with_backoff(
+        _, pdf_path = util_call_with_backoff(
             self.parser.generate_pdf,
             [msg],
         )
@@ -210,7 +165,7 @@ class TestParserLive(FileSystemAssertsMixin, BaseMailParserTestCase):
             - gotenberg is called and the resulting file is returned and look as expected.
         """
 
-        self.util_call_with_backoff(
+        util_call_with_backoff(
             self.parser.parse,
             [self.SAMPLE_DIR / "html.eml", "message/rfc822"],
         )
