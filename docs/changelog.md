@@ -2,13 +2,13 @@
 
 ## paperless-ngx 1.17.3
 
-### Features
-
-- Chore: update frontend PDF viewer (including pdf-js) [@shamoon](https://github.com/shamoon) ([#4065](https://github.com/paperless-ngx/paperless-ngx/pull/4065))
-
 ### Bug Fixes
 
 - Fix: When PDF/A rendering fails, add a consideration for the user to add args to override [@stumpylog](https://github.com/stumpylog) ([#4083](https://github.com/paperless-ngx/paperless-ngx/pull/4083))
+
+### Dependencies
+
+- Chore: update frontend PDF viewer (including pdf-js) [@shamoon](https://github.com/shamoon) ([#4065](https://github.com/paperless-ngx/paperless-ngx/pull/4065))
 
 ### Maintenance
 
