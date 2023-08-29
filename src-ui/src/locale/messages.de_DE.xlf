@@ -807,7 +807,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">600</context>
+          <context context-type="linenumber">648</context>
         </context-group>
         <target state="translated">Es ist ein Fehler beim Speichern der Einstellungen aufgetreten.</target>
       </trans-unit>
@@ -3214,19 +3214,19 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">711</context>
+          <context context-type="linenumber">759</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">771</context>
+          <context context-type="linenumber">819</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">838</context>
+          <context context-type="linenumber">886</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">901</context>
+          <context context-type="linenumber">949</context>
         </context-group>
         <target state="final">Diese Aktion kann nicht rückgängig gemacht werden.</target>
       </trans-unit>
@@ -3242,19 +3242,19 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">713</context>
+          <context context-type="linenumber">761</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">773</context>
+          <context context-type="linenumber">821</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">840</context>
+          <context context-type="linenumber">888</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">903</context>
+          <context context-type="linenumber">951</context>
         </context-group>
         <target state="translated">Fortfahren</target>
       </trans-unit>
@@ -4956,11 +4956,43 @@
         </context-group>
         <target state="translated">Gruppe hinzufügen</target>
       </trans-unit>
+      <trans-unit id="3066660568529853846" datatype="html">
+        <source>Error retrieving groups</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
+          <context context-type="linenumber">278</context>
+        </context-group>
+        <target state="needs-translation">Error retrieving groups</target>
+      </trans-unit>
+      <trans-unit id="1235706724900303689" datatype="html">
+        <source>Error retrieving users</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
+          <context context-type="linenumber">287</context>
+        </context-group>
+        <target state="needs-translation">Error retrieving users</target>
+      </trans-unit>
+      <trans-unit id="5241231471117657636" datatype="html">
+        <source>Error retrieving mail rules</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
+          <context context-type="linenumber">314</context>
+        </context-group>
+        <target state="needs-translation">Error retrieving mail rules</target>
+      </trans-unit>
+      <trans-unit id="3178554336792037159" datatype="html">
+        <source>Error retrieving mail accounts</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
+          <context context-type="linenumber">323</context>
+        </context-group>
+        <target state="needs-translation">Error retrieving mail accounts</target>
+      </trans-unit>
       <trans-unit id="5610279464668232148" datatype="html" approved="yes">
         <source>Saved view &quot;<x id="PH" equiv-text="savedView.name"/>&quot; deleted.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">482</context>
+          <context context-type="linenumber">530</context>
         </context-group>
         <target state="final">Gespeicherte Ansicht "<x id="PH" equiv-text="savedView.name"/>" gelöscht.</target>
       </trans-unit>
@@ -4968,7 +5000,7 @@
         <source>Settings saved</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">584</context>
+          <context context-type="linenumber">632</context>
         </context-group>
         <target state="translated">Einstellungen gespeichert</target>
       </trans-unit>
@@ -4976,7 +5008,7 @@
         <source>Settings were saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">585</context>
+          <context context-type="linenumber">633</context>
         </context-group>
         <target state="translated">Einstellungen wurden erfolgreich gespeichert.</target>
       </trans-unit>
@@ -4984,7 +5016,7 @@
         <source>Settings were saved successfully. Reload is required to apply some changes.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">589</context>
+          <context context-type="linenumber">637</context>
         </context-group>
         <target state="translated">Einstellungen wurden erfolgreich gespeichert. Neuladen ist erforderlich, um einige Änderungen zu übernehmen.</target>
       </trans-unit>
@@ -4992,7 +5024,7 @@
         <source>Reload now</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">590</context>
+          <context context-type="linenumber">638</context>
         </context-group>
         <target state="translated">Jetzt neu laden</target>
       </trans-unit>
@@ -5000,7 +5032,7 @@
         <source>Use system language</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">609</context>
+          <context context-type="linenumber">657</context>
         </context-group>
         <target state="final">Benutze Systemsprache</target>
       </trans-unit>
@@ -5008,7 +5040,7 @@
         <source>Use date format of display language</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">616</context>
+          <context context-type="linenumber">664</context>
         </context-group>
         <target state="final">Benutze Datumsformat der Anzeigesprache</target>
       </trans-unit>
@@ -5016,7 +5048,7 @@
         <source>Error while storing settings on server.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">636</context>
+          <context context-type="linenumber">684</context>
         </context-group>
         <target state="translated">Fehler beim Speichern der Einstellungen auf dem Server.</target>
       </trans-unit>
@@ -5024,7 +5056,7 @@
         <source>Password has been changed, you will be logged out momentarily.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">679</context>
+          <context context-type="linenumber">727</context>
         </context-group>
         <target state="translated">Das Kennwort wurde geändert, Sie werden nun abgemeldet.</target>
       </trans-unit>
@@ -5032,7 +5064,7 @@
         <source>Saved user &quot;<x id="PH" equiv-text="newUser.username"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">686</context>
+          <context context-type="linenumber">734</context>
         </context-group>
         <target state="translated">Benutzerkonto "<x id="PH" equiv-text="newUser.username"/>" wurde gespeichert.</target>
       </trans-unit>
@@ -5040,7 +5072,7 @@
         <source>Error saving user.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">698</context>
+          <context context-type="linenumber">746</context>
         </context-group>
         <target state="translated">Fehler beim Speichern des Benutzers.</target>
       </trans-unit>
@@ -5048,7 +5080,7 @@
         <source>Confirm delete user account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">709</context>
+          <context context-type="linenumber">757</context>
         </context-group>
         <target state="translated">Löschen des Benutzerkontos bestätigen</target>
       </trans-unit>
@@ -5056,7 +5088,7 @@
         <source>This operation will permanently delete this user account.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">710</context>
+          <context context-type="linenumber">758</context>
         </context-group>
         <target state="translated">Dieser Vorgang löscht dieses Benutzerkonto dauerhaft.</target>
       </trans-unit>
@@ -5064,7 +5096,7 @@
         <source>Deleted user</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">719</context>
+          <context context-type="linenumber">767</context>
         </context-group>
         <target state="translated">Gelöschter Benutzer</target>
       </trans-unit>
@@ -5072,7 +5104,7 @@
         <source>Error deleting user.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">727</context>
+          <context context-type="linenumber">775</context>
         </context-group>
         <target state="translated">Fehler beim Löschen des Benutzers.</target>
       </trans-unit>
@@ -5080,7 +5112,7 @@
         <source>Saved group &quot;<x id="PH" equiv-text="newGroup.name"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">748</context>
+          <context context-type="linenumber">796</context>
         </context-group>
         <target state="translated">Gruppe "<x id="PH" equiv-text="newGroup.name"/>" gespeichert.</target>
       </trans-unit>
@@ -5088,7 +5120,7 @@
         <source>Error saving group.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">758</context>
+          <context context-type="linenumber">806</context>
         </context-group>
         <target state="translated">Fehler beim Speichern der Gruppe.</target>
       </trans-unit>
@@ -5096,7 +5128,7 @@
         <source>Confirm delete user group</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">769</context>
+          <context context-type="linenumber">817</context>
         </context-group>
         <target state="translated">Löschen der Benutzergruppe bestätigen</target>
       </trans-unit>
@@ -5104,7 +5136,7 @@
         <source>This operation will permanently delete this user group.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">770</context>
+          <context context-type="linenumber">818</context>
         </context-group>
         <target state="translated">Dieser Vorgang löscht diese Benutzergruppe dauerhaft.</target>
       </trans-unit>
@@ -5112,7 +5144,7 @@
         <source>Deleted group</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">779</context>
+          <context context-type="linenumber">827</context>
         </context-group>
         <target state="translated">Gelöschte Gruppe</target>
       </trans-unit>
@@ -5120,7 +5152,7 @@
         <source>Error deleting group.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">787</context>
+          <context context-type="linenumber">835</context>
         </context-group>
         <target state="translated">Fehler beim Löschen der Gruppe.</target>
       </trans-unit>
@@ -5128,7 +5160,7 @@
         <source>Saved account &quot;<x id="PH" equiv-text="newMailAccount.name"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">813</context>
+          <context context-type="linenumber">861</context>
         </context-group>
         <target state="translated">Benutzerkonto "<x id="PH" equiv-text="newMailAccount.name"/> " wurde gespeichert.</target>
       </trans-unit>
@@ -5136,7 +5168,7 @@
         <source>Error saving account.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">825</context>
+          <context context-type="linenumber">873</context>
         </context-group>
         <target state="translated">Fehler beim Speichern des Kontos.</target>
       </trans-unit>
@@ -5144,7 +5176,7 @@
         <source>Confirm delete mail account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">836</context>
+          <context context-type="linenumber">884</context>
         </context-group>
         <target state="translated">Löschen des E-Mail-Kontos bestätigen</target>
       </trans-unit>
@@ -5152,7 +5184,7 @@
         <source>This operation will permanently delete this mail account.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">837</context>
+          <context context-type="linenumber">885</context>
         </context-group>
         <target state="translated">Dieser Vorgang wird dieses E-Mail-Konto dauerhaft löschen.</target>
       </trans-unit>
@@ -5160,7 +5192,7 @@
         <source>Deleted mail account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">846</context>
+          <context context-type="linenumber">894</context>
         </context-group>
         <target state="translated">E-Mail-Konto gelöscht</target>
       </trans-unit>
@@ -5168,7 +5200,7 @@
         <source>Error deleting mail account.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">855</context>
+          <context context-type="linenumber">903</context>
         </context-group>
         <target state="translated">Fehler beim Löschen des E-Mail-Kontos.</target>
       </trans-unit>
@@ -5176,7 +5208,7 @@
         <source>Saved rule &quot;<x id="PH" equiv-text="newMailRule.name"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">876</context>
+          <context context-type="linenumber">924</context>
         </context-group>
         <target state="translated">Regel „<x id="PH" equiv-text="newMailRule.name"/>“ gespeichert.</target>
       </trans-unit>
@@ -5184,7 +5216,7 @@
         <source>Error saving rule.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">888</context>
+          <context context-type="linenumber">936</context>
         </context-group>
         <target state="translated">Fehler beim Speichern der Regel.</target>
       </trans-unit>
@@ -5192,7 +5224,7 @@
         <source>Confirm delete mail rule</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">899</context>
+          <context context-type="linenumber">947</context>
         </context-group>
         <target state="translated">Löschen der E-Mail-Regel bestätigen</target>
       </trans-unit>
@@ -5200,7 +5232,7 @@
         <source>This operation will permanently delete this mail rule.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">900</context>
+          <context context-type="linenumber">948</context>
         </context-group>
         <target state="translated">Dieser Vorgang wird diese E-Mail-Regel dauerhaft löschen.</target>
       </trans-unit>
@@ -5208,7 +5240,7 @@
         <source>Deleted mail rule</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">909</context>
+          <context context-type="linenumber">957</context>
         </context-group>
         <target state="translated">E-Mail-Regel gelöscht</target>
       </trans-unit>
@@ -5216,7 +5248,7 @@
         <source>Error deleting mail rule.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">918</context>
+          <context context-type="linenumber">966</context>
         </context-group>
         <target state="translated">Fehler beim Löschen der E-Mail-Regel.</target>
       </trans-unit>
@@ -6031,7 +6063,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">307</context>
         </context-group>
-        <target state="needs-translation">Ukrainian</target>
+        <target state="translated">Ukrainisch</target>
       </trans-unit>
       <trans-unit id="4689443708886954687" datatype="html">
         <source>Chinese Simplified</source>
