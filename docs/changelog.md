@@ -1,5 +1,29 @@
 # Changelog
 
+## paperless-ngx 1.17.3
+
+### Features
+
+- Chore: update frontend PDF viewer (including pdf-js) [@shamoon](https://github.com/shamoon) ([#4065](https://github.com/paperless-ngx/paperless-ngx/pull/4065))
+
+### Bug Fixes
+
+- Fix: When PDF/A rendering fails, add a consideration for the user to add args to override [@stumpylog](https://github.com/stumpylog) ([#4083](https://github.com/paperless-ngx/paperless-ngx/pull/4083))
+
+### Maintenance
+
+- Dev: Upload code coverage in the same job [@stumpylog](https://github.com/stumpylog) ([#4084](https://github.com/paperless-ngx/paperless-ngx/pull/4084))
+
+### All App Changes
+
+<details>
+<summary>3 changes</summary>
+
+- Fix: When PDF/A rendering fails, add a consideration for the user to add args to override [@stumpylog](https://github.com/stumpylog) ([#4083](https://github.com/paperless-ngx/paperless-ngx/pull/4083))
+- Chore: update frontend PDF viewer (including pdf-js) [@shamoon](https://github.com/shamoon) ([#4065](https://github.com/paperless-ngx/paperless-ngx/pull/4065))
+- Chore: Prepare for Python 3.11 support [@stumpylog](https://github.com/stumpylog) ([#4066](https://github.com/paperless-ngx/paperless-ngx/pull/4066))
+</details>
+
 ## paperless-ngx 1.17.2
 
 ### Features
