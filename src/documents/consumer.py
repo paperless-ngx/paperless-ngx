@@ -34,6 +34,7 @@ from .models import DocumentType
 from .models import FileInfo
 from .models import Tag
 from .parsers import DocumentParser
+from .parsers import ParseError
 from .parsers import get_parser_class_for_mime_type
 from .parsers import parse_date
 from .signals import document_consumption_finished
@@ -448,12 +449,19 @@ class Consumer(LoggingMixin):
                 date = parse_date(self.filename, text)
             archive_path = document_parser.get_archive_path()
 
+        except ParseError as e:
+            self._fail(
+                str(e),
+                f"Error occurred while consuming document {self.filename}: {e}",
+                exc_info=True,
+                exception=e,
+            )
         except Exception as e:
             document_parser.cleanup()
             tempdir.cleanup()
             self._fail(
                 str(e),
-                f"Error while consuming document {self.filename}: {e}",
+                f"Unexpected error while consuming document {self.filename}: {e}",
                 exc_info=True,
                 exception=e,
             )
@@ -543,8 +551,8 @@ class Consumer(LoggingMixin):
         except Exception as e:
             self._fail(
                 str(e),
-                f"The following error occurred while consuming "
-                f"{self.filename}: {e}",
+                f"The following error occurred while storing document "
+                f"{self.filename} after consuming: {e}",
                 exc_info=True,
                 exception=e,
             )
