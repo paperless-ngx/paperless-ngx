@@ -34,7 +34,6 @@ from .models import DocumentType
 from .models import FileInfo
 from .models import Tag
 from .parsers import DocumentParser
-from .parsers import ParseError
 from .parsers import get_parser_class_for_mime_type
 from .parsers import parse_date
 from .signals import document_consumption_finished
@@ -449,7 +448,7 @@ class Consumer(LoggingMixin):
                 date = parse_date(self.filename, text)
             archive_path = document_parser.get_archive_path()
 
-        except ParseError as e:
+        except Exception as e:
             document_parser.cleanup()
             tempdir.cleanup()
             self._fail(
