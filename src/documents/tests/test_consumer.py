@@ -551,7 +551,7 @@ class TestConsumer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         self.assertRaisesMessage(
             ConsumerError,
-            "sample.pdf: The following error occurred while storing document sample.pdf after consuming: NO.",
+            "sample.pdf: The following error occurred while storing document sample.pdf after parsing: NO.",
             self.consumer.try_consume_file,
             filename,
         )

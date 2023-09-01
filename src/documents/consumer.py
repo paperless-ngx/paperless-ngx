@@ -552,7 +552,7 @@ class Consumer(LoggingMixin):
             self._fail(
                 str(e),
                 f"The following error occurred while storing document "
-                f"{self.filename} after consuming: {e}",
+                f"{self.filename} after parsing: {e}",
                 exc_info=True,
                 exception=e,
             )
