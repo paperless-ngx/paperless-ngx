@@ -52,7 +52,7 @@ describe('ToastsComponent', () => {
   })
 
   it('should call getToasts and return toasts', fakeAsync(() => {
-    const spy = jest.spyOn(toastService, 'getToasts').mockReset()
+    const spy = jest.spyOn(toastService, 'getToasts')
 
     component.ngOnInit()
     fixture.detectChanges()
