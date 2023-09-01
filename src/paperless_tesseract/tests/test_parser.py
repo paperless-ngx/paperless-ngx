@@ -8,6 +8,7 @@ from unittest import mock
 
 from django.test import TestCase
 from django.test import override_settings
+from ocrmypdf import SubprocessOutputError
 
 from documents.parsers import ParseError
 from documents.parsers import run_convert
@@ -826,6 +827,18 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         # Copied from the PDF to here.  Don't even look at it
         self.assertIn("ةﯾﻠﺧﺎدﻻ ةرازو", parser.get_text())
+
+    @mock.patch("ocrmypdf.ocr")
+    def test_gs_rendering_error(self, m):
+        m.side_effect = SubprocessOutputError("Ghostscript PDF/A rendering failed")
+        parser = RasterisedDocumentParser(None)
+
+        self.assertRaises(
+            ParseError,
+            parser.parse,
+            os.path.join(self.SAMPLE_FILES, "simple-digital.pdf"),
+            "application/pdf",
+        )
 
 
 class TestParserFileTypes(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
