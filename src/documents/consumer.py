@@ -450,11 +450,18 @@ class Consumer(LoggingMixin):
             archive_path = document_parser.get_archive_path()
 
         except ParseError as e:
+            self._fail(
+                str(e),
+                f"Error occurred while consuming document {self.filename}: {e}",
+                exc_info=True,
+                exception=e,
+            )
+        except Exception as e:
             document_parser.cleanup()
             tempdir.cleanup()
             self._fail(
                 str(e),
-                f"Error while consuming document {self.filename}: {e}",
+                f"Unexpected error while consuming document {self.filename}: {e}",
                 exc_info=True,
                 exception=e,
             )
@@ -544,8 +551,8 @@ class Consumer(LoggingMixin):
         except Exception as e:
             self._fail(
                 str(e),
-                f"The following error occurred while consuming "
-                f"{self.filename}: {e}",
+                f"The following error occurred while storing document "
+                f"{self.filename} after parsing: {e}",
                 exc_info=True,
                 exception=e,
             )
