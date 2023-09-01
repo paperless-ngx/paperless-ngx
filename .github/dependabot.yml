@@ -27,7 +27,7 @@ updates:
       frontend-jest-dependencies:
         patterns:
           - "@types/jest"
-          - "jest"
+          - "jest*"
       frontend-eslint-dependencies:
         patterns:
           - "@typescript-eslint*"
