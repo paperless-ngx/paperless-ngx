@@ -211,6 +211,18 @@ class FaultyParser(DocumentParser):
         raise ParseError("Does not compute.")
 
 
+class FaultyGenericExceptionParser(DocumentParser):
+    def __init__(self, logging_group, scratch_dir):
+        super().__init__(logging_group)
+        _, self.fake_thumb = tempfile.mkstemp(suffix=".webp", dir=scratch_dir)
+
+    def get_thumbnail(self, document_path, mime_type, file_name=None):
+        return self.fake_thumb
+
+    def parse(self, document_path, mime_type, file_name=None):
+        raise Exception("Generic exception.")
+
+
 def fake_magic_from_file(file, mime=False):
     if mime:
         if os.path.splitext(file)[1] == ".pdf":
@@ -259,6 +271,13 @@ class TestConsumer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
     def make_faulty_parser(self, logging_group, progress_callback=None):
         return FaultyParser(logging_group, self.dirs.scratch_dir)
+
+    def make_faulty_generic_exception_parser(
+        self,
+        logging_group,
+        progress_callback=None,
+    ):
+        return FaultyGenericExceptionParser(logging_group, self.dirs.scratch_dir)
 
     def setUp(self):
         super().setUp()
@@ -496,7 +515,29 @@ class TestConsumer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         self.assertRaisesMessage(
             ConsumerError,
-            "sample.pdf: Error while consuming document sample.pdf: Does not compute.",
+            "sample.pdf: Error occurred while consuming document sample.pdf: Does not compute.",
+            self.consumer.try_consume_file,
+            self.get_test_file(),
+        )
+
+        self._assert_first_last_send_progress(last_status="FAILED")
+
+    @mock.patch("documents.parsers.document_consumer_declaration.send")
+    def testGenericParserException(self, m):
+        m.return_value = [
+            (
+                None,
+                {
+                    "parser": self.make_faulty_generic_exception_parser,
+                    "mime_types": {"application/pdf": ".pdf"},
+                    "weight": 0,
+                },
+            ),
+        ]
+
+        self.assertRaisesMessage(
+            ConsumerError,
+            "sample.pdf: Unexpected error while consuming document sample.pdf: Generic exception.",
             self.consumer.try_consume_file,
             self.get_test_file(),
         )
@@ -510,7 +551,7 @@ class TestConsumer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         self.assertRaisesMessage(
             ConsumerError,
-            "sample.pdf: The following error occurred while consuming sample.pdf: NO.",
+            "sample.pdf: The following error occurred while storing document sample.pdf after parsing: NO.",
             self.consumer.try_consume_file,
             filename,
         )
