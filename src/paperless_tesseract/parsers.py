@@ -340,7 +340,10 @@ class RasterisedDocumentParser(DocumentParser):
                     "Ghostscript PDF/A rendering failed, consider setting "
                     "PAPERLESS_OCR_USER_ARGS: '{\"continue_on_soft_render_error\": true}'",  # noqa: E501
                 )
-            raise e
+
+            raise ParseError(
+                f"SubprocessOutputError: {e!s}. See logs for more information.",
+            ) from e
         except (NoTextFoundException, InputFileError) as e:
             self.log.warning(
                 f"Encountered an error while running OCR: {e!s}. "
