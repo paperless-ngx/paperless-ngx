@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core'
 import { FormControl, FormGroup } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
+import { Subscription } from 'rxjs'
 import { DEFAULT_MATCHING_ALGORITHM } from 'src/app/data/matching-model'
 import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { EditDialogComponent } from '../../edit-dialog/edit-dialog.component'
-import { Subscription } from 'rxjs'
 
 @Component({
   selector: 'app-folder-create-dialog',

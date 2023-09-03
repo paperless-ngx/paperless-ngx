@@ -9,6 +9,7 @@ import {
   NgbModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
+import { PasswordStrengthMeterModule } from 'angular-password-strength-meter'
 import { PdfViewerModule } from 'ng2-pdf-viewer'
 import { ColorSliderModule } from 'ngx-color/slider'
 import { CookieService } from 'ngx-cookie-service'
@@ -19,6 +20,8 @@ import { AppComponent } from './app.component'
 import { AppFrameComponent } from './components/app-frame/app-frame.component'
 import { ClearableBadgeComponent } from './components/common/clearable-badge/clearable-badge.component'
 import { ConfirmDialogComponent } from './components/common/confirm-dialog/confirm-dialog.component'
+import { FolderCreateDialogComponent } from './components/common/create-dialog/folder-create-dialog/folder-create-dialog.component'
+import { UploadLargeFileComponent } from './components/common/create-dialog/upload-large-file/upload-large-file.component'
 import { DateDropdownComponent } from './components/common/date-dropdown/date-dropdown.component'
 import { CorrespondentEditDialogComponent } from './components/common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { DocumentTypeEditDialogComponent } from './components/common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
@@ -114,8 +117,6 @@ import localeSr from '@angular/common/locales/sr'
 import localeSv from '@angular/common/locales/sv'
 import localeTr from '@angular/common/locales/tr'
 import localeZh from '@angular/common/locales/zh'
-import { PasswordStrengthMeterModule } from 'angular-password-strength-meter'
-import { FolderCreateDialogComponent } from './components/common/create-dialog/folder-create-dialog/folder-create-dialog.component'
 
 registerLocaleData(localeAr)
 registerLocaleData(localeBe)
@@ -218,6 +219,7 @@ function initializeApp(settings: SettingsService) {
     PermissionsDialogComponent,
     PermissionsFormComponent,
     FolderCreateDialogComponent,
+    UploadLargeFileComponent,
   ],
   imports: [
     BrowserModule,

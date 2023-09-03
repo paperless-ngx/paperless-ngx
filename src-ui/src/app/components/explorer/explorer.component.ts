@@ -17,26 +17,26 @@ import {
 import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type'
 import { PaperlessDocument } from 'src/app/data/paperless-document'
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
-import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
 import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 import {
   SortEvent,
   SortableDirective,
 } from 'src/app/directives/sortable.directive'
 import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
+import { ExplorerListViewService } from 'src/app/services/explorer-list-view.service'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
+import { FileOrFolderItem } from 'src/app/services/rest/custom-storage-path.service'
 import {
   DOCUMENT_SORT_FIELDS,
   DOCUMENT_SORT_FIELDS_FULLTEXT,
 } from 'src/app/services/rest/document.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
-import { ExplorerListViewService } from 'src/app/services/explorer-list-view.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { FolderCreateDialogComponent } from '../common/create-dialog/folder-create-dialog/folder-create-dialog.component'
+import { UploadLargeFileComponent } from '../common/create-dialog/upload-large-file/upload-large-file.component'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { FilterEditorComponent } from './filter-editor/filter-editor.component'
-import { FileOrFolderItem } from 'src/app/services/rest/custom-storage-path.service'
 
 @Component({
   selector: 'app-explorer',
@@ -45,7 +45,8 @@ import { FileOrFolderItem } from 'src/app/services/rest/custom-storage-path.serv
 })
 export class ExplorerComponent
   extends ComponentWithPermissions
-  implements OnInit, OnDestroy {
+  implements OnInit, OnDestroy
+{
   constructor(
     public list: ExplorerListViewService,
     public savedViewService: SavedViewService,
@@ -182,6 +183,17 @@ export class ExplorerComponent
     modal.componentInstance.object = {
       path: this.folderPath.replace('DMS/', ''),
     }
+    modal.componentInstance.succeeded
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => this.list.reload())
+  }
+
+  uploadLargeFile() {
+    var modal = this.modalService.open(UploadLargeFileComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.dialogMode = 'create'
+    modal.componentInstance.object = {}
     modal.componentInstance.succeeded
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => this.list.reload())

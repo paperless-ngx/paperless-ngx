@@ -7,8 +7,15 @@ import { PaperlessStoragePath } from '../data/paperless-storage-path'
 import { SETTINGS_KEYS } from '../data/paperless-uisettings'
 import { DOCUMENT_LIST_SERVICE } from '../data/storage-keys'
 import { paramsToViewState } from '../utils/query-params'
-import { CustomStoragePathService, FileOrFolderItem } from './rest/custom-storage-path.service'
-import { DOCUMENT_SORT_FIELDS, DocumentService, SelectionData } from './rest/document.service'
+import {
+  CustomStoragePathService,
+  FileOrFolderItem,
+} from './rest/custom-storage-path.service'
+import {
+  DOCUMENT_SORT_FIELDS,
+  DocumentService,
+  SelectionData,
+} from './rest/document.service'
 import { SettingsService } from './settings.service'
 
 /**
@@ -95,7 +102,7 @@ export class ExplorerListViewService {
     private documentService: DocumentService,
     private settings: SettingsService,
     private router: Router
-  ) { }
+  ) {}
 
   private defaultListViewState(): ListViewState {
     return {
@@ -189,8 +196,9 @@ export class ExplorerListViewService {
           this.initialized = true
           this.isReloading = false
           activeListViewState.collectionSize = result.count
-          result.results.forEach(f => {
-            if (f.type === 'file') this.documentService.addObservablesToDocument(f)
+          result.results?.forEach((f) => {
+            if (f.type === 'file')
+              this.documentService.addObservablesToDocument(f)
           })
           activeListViewState.filesAndFolders = result.results
           activeListViewState.parentStoragePath = result.parentStoragePath
@@ -230,8 +238,9 @@ export class ExplorerListViewService {
               errorMessage = Object.keys(error.error)
                 .map((fieldName) => {
                   const fieldError: Array<string> = error.error[fieldName]
-                  return `${DOCUMENT_SORT_FIELDS.find((f) => f.field == fieldName)?.name
-                    }: ${fieldError[0]}`
+                  return `${
+                    DOCUMENT_SORT_FIELDS.find((f) => f.field == fieldName)?.name
+                  }: ${fieldError[0]}`
                 })
                 .join(', ')
             } else {
@@ -296,11 +305,15 @@ export class ExplorerListViewService {
   }
 
   get folders(): FileOrFolderItem[] {
-    return this.activeListViewState.filesAndFolders?.filter(f => f.type === 'folder')
+    return this.activeListViewState.filesAndFolders?.filter(
+      (f) => f.type === 'folder'
+    )
   }
 
   get files(): FileOrFolderItem[] {
-    return this.activeListViewState.filesAndFolders?.filter(f => f.type === 'file')
+    return this.activeListViewState.filesAndFolders?.filter(
+      (f) => f.type === 'file'
+    )
   }
 
   get selected(): Set<number> {
