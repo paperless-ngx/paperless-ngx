@@ -19,14 +19,14 @@ import { EditDialogComponent } from '../../edit-dialog/edit-dialog.component'
 })
 export class UploadLargeFileComponent
   extends EditDialogComponent<PaperlessDocument>
-  implements OnInit
-{
+  implements OnInit {
   nameSub: Subscription
 
   // File upload related variables
   private fileLeaveTimeoutID: any
   fileIsOver: boolean = false
   hideFileDrop: boolean = true
+  private files: NgxFileDropEntry[];
 
   constructor(
     private route: ActivatedRoute,
@@ -50,9 +50,15 @@ export class UploadLargeFileComponent
   }
 
   submit(): void {
-    this.nameSub.unsubscribe()
-    this.objectForm.get('name').patchValue(this.objectForm.get('path').value)
-    this.save()
+    // this.nameSub.unsubscribe()
+    // this.objectForm.get('name').patchValue(this.objectForm.get('path').value)
+    // this.save()
+
+    let storagePathId = parseInt(this.route.snapshot.queryParams['spid'])
+    storagePathId = !isNaN(storagePathId) ? storagePathId : undefined
+    this.toastService.showInfo($localize`Initiating large file upload...`, 3000)
+    this.uploadDocumentsService.uploadFiles(this.files, { storagePathId })
+
   }
 
   getForm(): FormGroup<any> {
@@ -64,6 +70,7 @@ export class UploadLargeFileComponent
       match: new FormControl(''),
       is_insensitive: new FormControl(true),
       permissions_form: new FormControl(null),
+      ocr_pages: new FormControl('')
     })
   }
 
@@ -91,9 +98,6 @@ export class UploadLargeFileComponent
 
   public dropped(files: NgxFileDropEntry[]) {
     this.fileLeave(true)
-    let storagePathId = parseInt(this.route.snapshot.queryParams['spid'])
-    storagePathId = !isNaN(storagePathId) ? storagePathId : undefined
-    this.uploadDocumentsService.uploadFiles(files, storagePathId)
-    this.toastService.showInfo($localize`Initiating upload...`, 3000)
+    this.files = files;
   }
 }

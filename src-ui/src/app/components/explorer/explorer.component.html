@@ -183,17 +183,24 @@
     #filterEditor
   ></app-filter-editor> -->
 
-  <div class="row w-auto">
+  <div class="d-flex">
     <button
       type="button"
-      class="btn btn-primary btn-sm mx-2"
+      class="btn btn-outline-primary btn-sm mx-1"
       (click)="createFolder()"
     >
       + New Folder
     </button>
     <button
       type="button"
-      class="btn btn-primary btn-sm mx-2"
+      class="btn btn-outline-primary btn-sm mx-1"
+      (click)="uploadFile()"
+    >
+      + Upload File
+    </button>
+    <button
+      type="button"
+      class="btn btn-outline-primary btn-sm mx-1"
       (click)="uploadLargeFile()"
     >
       + Upload Large File

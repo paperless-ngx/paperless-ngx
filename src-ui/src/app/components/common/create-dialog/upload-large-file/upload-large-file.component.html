@@ -9,6 +9,7 @@
       (click)="cancel()"
     ></button>
   </div>
+
   <div class="modal-body">
     <ngx-file-drop
       dropZoneClassName="main-dropzone"
@@ -19,17 +20,22 @@
     >
       <ng-template ngx-file-drop-content-tmp>
         <div
-          class="global-dropzone-overlay fade"
-          [class.show]="fileIsOver"
-          [class.hide]="hideFileDrop"
+          class="border w-full d-flex justify-content-center align-items-center mb-2"
+          style="height: 200px"
         >
-          <h2 i18n>Drop files to begin upload</h2>
-        </div>
-        <div [class.inert]="fileIsOver">
-          <router-outlet></router-outlet>
+          <h4 i18n>Drop large file here</h4>
         </div>
       </ng-template>
     </ngx-file-drop>
+
+    <div class="w-full mb-2">
+      <app-input-text
+        i18n-title
+        title='OCR pages separated by comma (e.g. "1,2,3,4")'
+        formControlName="ocr_pages"
+        [error]="error?.ocr_pages"
+      ></app-input-text>
+    </div>
 
     <div *appIfOwner="object">
       <app-permissions-form
@@ -55,7 +61,7 @@
       i18n
       [disabled]="networkActive"
     >
-      Save
+      Upload
     </button>
   </div>
 </form>

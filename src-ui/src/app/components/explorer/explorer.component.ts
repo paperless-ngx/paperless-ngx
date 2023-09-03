@@ -188,6 +188,10 @@ export class ExplorerComponent
       .subscribe(() => this.list.reload())
   }
 
+  uploadFile() {
+    
+  }
+
   uploadLargeFile() {
     var modal = this.modalService.open(UploadLargeFileComponent, {
       backdrop: 'static',

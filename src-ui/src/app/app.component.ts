@@ -268,7 +268,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.fileLeave(true)
     let storagePathId = parseInt(this.route.snapshot.queryParams['spid'])
     storagePathId = !isNaN(storagePathId) ? storagePathId : undefined
-    this.uploadDocumentsService.uploadFiles(files, storagePathId)
+    this.uploadDocumentsService.uploadFiles(files, { storagePathId })
     this.toastService.showInfo($localize`Initiating upload...`, 3000)
   }
 }

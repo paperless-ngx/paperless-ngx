@@ -111,11 +111,11 @@ export class UploadFileWidgetComponent extends ComponentWithPermissions {
     this.consumerStatusService.dismissCompleted()
   }
 
-  public fileOver(event) {}
+  public fileOver(event) { }
 
-  public fileLeave(event) {}
+  public fileLeave(event) { }
 
   public dropped(files: NgxFileDropEntry[]) {
-    this.uploadDocumentsService.uploadFiles(files, undefined, true)
+    this.uploadDocumentsService.uploadFiles(files, { isUploadWithFolders: true })
   }
 }
