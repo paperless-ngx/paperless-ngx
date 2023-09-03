@@ -1010,7 +1010,11 @@ class FilesAndFoldersViewSet(ReadOnlyModelViewSet):
             folders = list(StoragePath.objects.exclude(path__contains='/'))
             files = list(Document.objects.all().filter(storage_path=None).order_by(ordering))
 
-        combined = folders + files
+        # Filter objects by object-level permissions
+        visible_folders = [f for f in folders if request.user.has_perm(f'view_{StoragePath._meta.model_name}', f)]
+        visible_files = [f for f in files if request.user.has_perm(f'view_{Document._meta.model_name}', f)]
+
+        combined = visible_folders + visible_files
         
         start = (page - 1) * page_size
         end = page * page_size
