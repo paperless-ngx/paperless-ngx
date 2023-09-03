@@ -15,8 +15,7 @@ import { EditDialogComponent } from '../../edit-dialog/edit-dialog.component'
 })
 export class FolderCreateDialogComponent
   extends EditDialogComponent<PaperlessStoragePath>
-  implements OnInit
-{
+  implements OnInit {
   nameSub: Subscription
 
   constructor(
@@ -31,7 +30,8 @@ export class FolderCreateDialogComponent
     const nameField = this.objectForm.get('name')
     const parentFolderPath = this.object?.path ?? ''
     this.nameSub = nameField.valueChanges.subscribe(() => {
-      const fullPath = parentFolderPath + '/' + nameField.value
+      let fullPath = parentFolderPath + '/' + nameField.value
+      if (fullPath.charAt(0) === '/') fullPath = fullPath.slice(1)
       this.objectForm.get('path').patchValue(fullPath)
       this.objectForm.get('slug').patchValue(fullPath)
     })
