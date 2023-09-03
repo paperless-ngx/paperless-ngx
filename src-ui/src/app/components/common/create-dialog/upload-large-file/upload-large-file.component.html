@@ -28,6 +28,10 @@
       </ng-template>
     </ngx-file-drop>
 
+    <div class="w-full mb-2" *ngFor="let file of files">
+      <span>{{ file.fileEntry.name }}</span>
+    </div>
+
     <div class="w-full mb-2">
       <app-input-text
         i18n-title

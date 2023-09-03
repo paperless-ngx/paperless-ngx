@@ -296,6 +296,8 @@ class Consumer(LoggingMixin):
         override_owner_id=None,
         override_storage_path_id=None,
         full_path=None,
+        is_large_file=None,
+        ocr_specific_pages=None
     ) -> Document:
         """
         Return the document object if it was successfully created.
@@ -390,7 +392,11 @@ class Consumer(LoggingMixin):
         try:
             self._send_progress(20, 100, "WORKING", MESSAGE_PARSING_DOCUMENT)
             self.log("debug", f"Parsing {self.filename}...")
-            document_parser.parse(self.path, mime_type, self.filename)
+            custom_options = { 
+                'is_large_file': is_large_file,
+                'ocr_specific_pages': ocr_specific_pages 
+            }
+            document_parser.parse(self.path, mime_type, self.filename, custom_options)
 
             self.log("debug", f"Generating thumbnail for {self.filename}...")
             self._send_progress(70, 100, "WORKING", MESSAGE_GENERATING_THUMBNAIL)

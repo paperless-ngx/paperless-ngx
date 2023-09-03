@@ -201,7 +201,9 @@ def consume_file(
         override_asn=overrides.asn,
         override_owner_id=overrides.owner_id,
         override_storage_path_id=overrides.storage_path_id,
-        full_path=overrides.full_path
+        full_path=overrides.full_path,
+        is_large_file=overrides.is_large_file,
+        ocr_specific_pages=overrides.ocr_specific_pages
     )
 
     if document:

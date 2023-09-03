@@ -114,7 +114,7 @@ class RasterisedDocumentParser(DocumentParser):
             self.log("warning", f"Error while calculating DPI for image {image}: {e}")
             return None
 
-    def extract_text(self, sidecar_file: Optional[Path], pdf_file: Path):
+    def extract_text(self, sidecar_file: Optional[Path], pdf_file: Path, custom_options=None):
         # When re-doing OCR, the sidecar contains ONLY the new text, not
         # the whole text, so do not utilize it in that case
         if (
@@ -129,6 +129,9 @@ class RasterisedDocumentParser(DocumentParser):
                 # This happens when there's already text in the input file.
                 # The sidecar file will only contain text for OCR'ed pages.
                 self.log("debug", "Using text from sidecar file")
+                return post_process_text(text)
+            elif custom_options is not None and 'is_large_file' in custom_options:
+                self.log("debug", "File is large so some pages may have been skipped intentionally. Using text from incomplete sidecar file")
                 return post_process_text(text)
             else:
                 self.log("debug", "Incomplete sidecar file: discarding.")
@@ -176,6 +179,9 @@ class RasterisedDocumentParser(DocumentParser):
         output_file,
         sidecar_file,
         safe_fallback=False,
+        # used for large files, to only do OCR on specific pages
+        is_large_file=False,
+        specific_pages=None
     ):
         ocrmypdf_args = {
             "input_file": input_file,
@@ -222,6 +228,25 @@ class RasterisedDocumentParser(DocumentParser):
         else:
             # sidecar is incompatible with pages
             ocrmypdf_args["sidecar"] = sidecar_file
+
+        if is_large_file and specific_pages is not None:
+            specific_pages = specific_pages.strip(',')
+            ocrmypdf_args["pages"] = specific_pages
+        elif is_large_file:
+            self.log("debug", "Large file but did not specify pages, so disabling OCR")
+            ocrmypdf_args["tesseract-timeout"] = 0
+
+        # Regardless of other options, disable postprocessing if large file
+        # Source: https://ocrmypdf.readthedocs.io/en/latest/performance.html?highlight=Postprocessing#speed
+        if is_large_file:
+            self.log("debug", "Since large file, disabling postprocessing")
+            ocrmypdf_args["optimize"] = 0
+            ocrmypdf_args["output-type"] = 'pdf'
+            ocrmypdf_args["fast-web-view"] = 0
+            ocrmypdf_args["skip-big"] = 200
+            ocrmypdf_args["deskew"] = False
+            ocrmypdf_args["rotate_pages"] = False
+            ocrmypdf_args["clean"] = False
 
         if self.is_image(mime_type):
             dpi = self.get_dpi(input_file)
@@ -280,7 +305,7 @@ class RasterisedDocumentParser(DocumentParser):
 
         return ocrmypdf_args
 
-    def parse(self, document_path: Path, mime_type, file_name=None):
+    def parse(self, document_path: Path, mime_type, file_name=None, custom_options=None):
         # This forces tesseract to use one core per page.
         os.environ["OMP_THREAD_LIMIT"] = "1"
         VALID_TEXT_LENGTH = 50
@@ -315,11 +340,21 @@ class RasterisedDocumentParser(DocumentParser):
         archive_path = Path(os.path.join(self.tempdir, "archive.pdf"))
         sidecar_file = Path(os.path.join(self.tempdir, "sidecar.txt"))
 
+        specific_pages = None
+        is_large_file = False
+        if custom_options is not None:
+            if 'ocr_specific_pages' in custom_options:
+                specific_pages = custom_options['ocr_specific_pages']
+            if 'is_large_file' in custom_options:
+                is_large_file = custom_options['is_large_file']
+
         args = self.construct_ocrmypdf_parameters(
             document_path,
             mime_type,
             archive_path,
             sidecar_file,
+            is_large_file=is_large_file,
+            specific_pages=specific_pages
         )
 
         try:
@@ -329,7 +364,7 @@ class RasterisedDocumentParser(DocumentParser):
             if settings.OCR_SKIP_ARCHIVE_FILE != "always":
                 self.archive_path = archive_path
 
-            self.text = self.extract_text(sidecar_file, archive_path)
+            self.text = self.extract_text(sidecar_file, archive_path, custom_options=custom_options)
 
             if not self.text:
                 raise NoTextFoundException("No text was found in the original document")
@@ -363,6 +398,8 @@ class RasterisedDocumentParser(DocumentParser):
                 archive_path_fallback,
                 sidecar_file_fallback,
                 safe_fallback=True,
+                is_large_file=is_large_file,
+                specific_pages=specific_pages
             )
 
             try:

@@ -726,6 +726,8 @@ class PostDocumentSerializer(serializers.Serializer):
         min_value=Document.ARCHIVE_SERIAL_NUMBER_MIN,
         max_value=Document.ARCHIVE_SERIAL_NUMBER_MAX,
     )
+    
+    # Custom fields
 
     storage_path_id = serializers.IntegerField(
         label="Storage path ID",
@@ -735,7 +737,21 @@ class PostDocumentSerializer(serializers.Serializer):
     )
 
     full_path = serializers.CharField(
-        label="Full Path",
+        label="Full path",
+        allow_null=True,
+        write_only=True,
+        required=False,
+    )
+
+    is_large_file = serializers.CharField(
+        label="Is large file",
+        allow_null=True,
+        write_only=True,
+        required=False,
+    )
+
+    ocr_specific_pages = serializers.CharField(
+        label="OCR specific pages",
         allow_null=True,
         write_only=True,
         required=False,

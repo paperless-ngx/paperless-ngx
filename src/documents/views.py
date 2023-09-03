@@ -719,6 +719,8 @@ class PostDocumentView(GenericAPIView):
         archive_serial_number = serializer.validated_data.get("archive_serial_number")
         storage_path_id = serializer.validated_data.get("storage_path_id")
         full_path = serializer.validated_data.get("full_path")
+        is_large_file = serializer.validated_data.get("is_large_file")
+        ocr_specific_pages = serializer.validated_data.get("ocr_specific_pages")
 
         logger.debug(f"storage_path_id: {storage_path_id}")
 
@@ -750,6 +752,8 @@ class PostDocumentView(GenericAPIView):
             # owner_id=request.user.id,
             storage_path_id=storage_path_id,
             full_path=full_path,
+            is_large_file=is_large_file,
+            ocr_specific_pages=ocr_specific_pages
         )
 
         async_task = consume_file.delay(

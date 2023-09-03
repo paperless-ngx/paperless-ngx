@@ -26,7 +26,7 @@ export class UploadLargeFileComponent
   private fileLeaveTimeoutID: any
   fileIsOver: boolean = false
   hideFileDrop: boolean = true
-  private files: NgxFileDropEntry[];
+  files: NgxFileDropEntry[];
 
   constructor(
     private route: ActivatedRoute,
@@ -57,8 +57,11 @@ export class UploadLargeFileComponent
     let storagePathId = parseInt(this.route.snapshot.queryParams['spid'])
     storagePathId = !isNaN(storagePathId) ? storagePathId : undefined
     this.toastService.showInfo($localize`Initiating large file upload...`, 3000)
-    this.uploadDocumentsService.uploadFiles(this.files, { storagePathId })
-
+    this.uploadDocumentsService.uploadFiles(this.files, {
+      storagePathId, 
+      isLargeFile: true, 
+      ocrSpecificPages: this.objectForm.get('ocr_pages').value 
+    })
   }
 
   getForm(): FormGroup<any> {
