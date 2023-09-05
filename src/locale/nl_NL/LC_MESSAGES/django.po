@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-06-24 08:28\n"
+"PO-Revision-Date: 2023-09-05 23:27\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
@@ -858,7 +858,7 @@ msgstr "\"Inline\" bijlagen bevatten vaak ook afbeeldingen. In dit geval valt he
 
 #: paperless_mail/models.py:158
 msgid "consumption scope"
-msgstr "verwerkingsscope"
+msgstr "verwerkingsbereik"
 
 #: paperless_mail/models.py:164
 msgid "action"
