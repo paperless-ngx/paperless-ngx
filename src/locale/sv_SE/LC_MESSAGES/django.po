@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-07-12 22:34\n"
+"PO-Revision-Date: 2023-09-05 18:04\n"
 "Last-Translator: \n"
 "Language-Team: Swedish\n"
 "Language: sv_SE\n"
@@ -518,7 +518,7 @@ msgstr "Här är en länk till dokumentationen."
 
 #: documents/templates/registration/logged_out.html:14
 msgid "Paperless-ngx signed out"
-msgstr ""
+msgstr "Paperless-ngx utloggas"
 
 #: documents/templates/registration/logged_out.html:59
 msgid "You have been successfully logged out. Bye!"
@@ -858,7 +858,7 @@ msgstr "Infogade bilagor inkluderar inbäddade bilder, så det är bäst att kom
 
 #: paperless_mail/models.py:158
 msgid "consumption scope"
-msgstr ""
+msgstr "förbruknings omfattning"
 
 #: paperless_mail/models.py:164
 msgid "action"
