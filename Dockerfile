@@ -192,12 +192,6 @@ RUN set -eux \
     && cp ./jbig2enc/${JBIG2ENC_VERSION}/${TARGETARCH}${TARGETVARIANT}/jbig2 /usr/local/bin/ \
     && cp ./jbig2enc/${JBIG2ENC_VERSION}/${TARGETARCH}${TARGETVARIANT}/libjbig2enc* /usr/local/lib/ \
     && chmod a+x /usr/local/bin/jbig2 \
-  && echo "Installing pikepdf and dependencies" \
-    && python3 -m pip install --no-cache-dir ./pikepdf/${PIKEPDF_VERSION}/${TARGETARCH}${TARGETVARIANT}/*.whl \
-    && python3 -m pip list \
-  && echo "Installing psycopg2" \
-    && python3 -m pip install --no-cache-dir ./psycopg2/${PSYCOPG2_VERSION}/${TARGETARCH}${TARGETVARIANT}/psycopg2*.whl \
-    && python3 -m pip list \
   && echo "Cleaning up image layer" \
     && cd ../ \
     && rm -rf paperless-ngx \
@@ -214,6 +208,9 @@ COPY --from=pipenv-base /usr/src/pipenv/requirements.txt ./
 ARG BUILD_PACKAGES="\
   build-essential \
   git \
+  # https://www.psycopg.org/docs/install.html#prerequisites
+  libpq-dev \
+  # https://github.com/PyMySQL/mysqlclient#linux
   default-libmysqlclient-dev \
   pkg-config"
 
