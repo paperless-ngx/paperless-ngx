@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-09-06 00:31\n"
+"PO-Revision-Date: 2023-09-06 01:37\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
@@ -192,11 +192,11 @@ msgstr "Huidige bestandsnaam in archief"
 
 #: documents/models.py:239
 msgid "original filename"
-msgstr "originele bestandsnaam"
+msgstr "oorspronkelijke bestandsnaam"
 
 #: documents/models.py:245
 msgid "The original name of the file when it was uploaded"
-msgstr "De originele naam van het bestand wanneer het werd geüpload"
+msgstr "De oorspronkelijke naam van het bestand toen het werd geüpload"
 
 #: documents/models.py:252
 msgid "archive serial number"
@@ -232,7 +232,7 @@ msgstr "fout"
 
 #: documents/models.py:363
 msgid "critical"
-msgstr "kritisch"
+msgstr "kritiek"
 
 #: documents/models.py:366
 msgid "group"
@@ -256,11 +256,11 @@ msgstr "berichten"
 
 #: documents/models.py:391 documents/models.py:446
 msgid "saved view"
-msgstr "opgeslagen view"
+msgstr "opgeslagen weergave"
 
 #: documents/models.py:392
 msgid "saved views"
-msgstr "opgeslagen views"
+msgstr "opgeslagen weergaven"
 
 #: documents/models.py:397
 msgid "show on dashboard"
@@ -368,7 +368,7 @@ msgstr "meer zoals dit"
 
 #: documents/models.py:436
 msgid "has tags in"
-msgstr "heeft tags in"
+msgstr "heeft labels in"
 
 #: documents/models.py:437
 msgid "ASN greater than"
@@ -416,7 +416,7 @@ msgstr "Of de taak is bevestigd via de frontend of de API"
 
 #: documents/models.py:576
 msgid "Task Filename"
-msgstr "Bestandsnaam taak "
+msgstr "Bestandsnaam taak"
 
 #: documents/models.py:577
 msgid "Name of the file which the Task was run for"
@@ -472,7 +472,7 @@ msgstr "Gegevens geretourneerd door de taak"
 
 #: documents/models.py:626
 msgid "Comment for the document"
-msgstr "Commentaar op het document"
+msgstr "Opmerking voor het document"
 
 #: documents/models.py:650
 msgid "user"
@@ -522,7 +522,7 @@ msgstr "Paperless-ngx afgemeld"
 
 #: documents/templates/registration/logged_out.html:59
 msgid "You have been successfully logged out. Bye!"
-msgstr "Je bent nu afgemeld. Tot later!"
+msgstr "Je bent nu afgemeld. Tot ziens!"
 
 #: documents/templates/registration/logged_out.html:60
 msgid "Sign in again"
@@ -530,7 +530,7 @@ msgstr "Meld je opnieuw aan"
 
 #: documents/templates/registration/login.html:15
 msgid "Paperless-ngx sign in"
-msgstr "Paperless-ngx afgemeld"
+msgstr "Paperless-ngx inloggen"
 
 #: documents/templates/registration/login.html:61
 msgid "Please sign in."
@@ -878,7 +878,7 @@ msgstr "wijs titel toe van"
 
 #: paperless_mail/models.py:191
 msgid "assign this tag"
-msgstr "wijs dit etiket toe"
+msgstr "wijs dit label toe"
 
 #: paperless_mail/models.py:199
 msgid "assign this document type"
