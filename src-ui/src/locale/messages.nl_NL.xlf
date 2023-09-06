@@ -396,7 +396,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">158</context>
         </context-group>
-        <target state="translated">De documentenlijst toont al uw documenten en maakt zowel filteren als bulkbewerkingen mogelijk. Er zijn drie verschillende weergavestijlen: lijst, kleine kaarten en grote kaarten. In de zijbalk wordt een lijst weergegeven met documenten die momenteel zijn geopend voor bewerking.</target>
+        <target state="translated">De documentenlijst toont al uw documenten en maakt zowel filteren als bulkbewerkingen mogelijk. Er zijn drie verschillende weergavestijlen: lijst, kleine kaarten en grote kaarten. In de navigatiekolom wordt een lijst weergegeven met documenten die momenteel zijn geopend voor bewerking.</target>
       </trans-unit>
       <trans-unit id="1334220418719920556" datatype="html">
         <source>The filtering tools allow you to quickly find documents using various searches, dates, tags, etc.</source>
@@ -412,7 +412,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">171</context>
         </context-group>
-        <target state="translated">Een combinatie van filters kan worden opgeslagen als een 'weergave' die vervolgens op het dashboard en/of de zijbalk kan worden getoond.</target>
+        <target state="translated">Een combinatie van filters kan worden opgeslagen als een 'weergave' die vervolgens op het dashboard en/of de navigatiekolom kan worden getoond.</target>
       </trans-unit>
       <trans-unit id="2804886236408698479" datatype="html">
         <source>Tags, correspondents, document types and storage paths can all be managed using these pages. They can also be created from the document edit view.</source>
@@ -2545,7 +2545,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/saved-view-widget/saved-view-widget.component.html</context>
           <context context-type="linenumber">19</context>
         </context-group>
-        <target state="translated">Voorbeeld bekijken</target>
+        <target state="translated">Bekijk voorbeeld</target>
       </trans-unit>
       <trans-unit id="3099741642167775297" datatype="html" approved="yes">
         <source>Download</source>
@@ -4650,7 +4650,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">99</context>
         </context-group>
-        <target state="translated">Zijbalk</target>
+        <target state="translated">Navigatiekolom</target>
       </trans-unit>
       <trans-unit id="4608457133854405683" datatype="html">
         <source>Use &apos;slim&apos; sidebar (icons only)</source>
@@ -4658,7 +4658,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">103</context>
         </context-group>
-        <target state="translated">Gebruik 'dunne' zijbalk (alleen pictogrammen)</target>
+        <target state="translated">Gebruik 'dunne' navigatiekolom (alleen pictogrammen)</target>
       </trans-unit>
       <trans-unit id="1356890996281769972" datatype="html" approved="yes">
         <source>Dark mode</source>
@@ -5434,7 +5434,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.ts</context>
           <context context-type="linenumber">131</context>
         </context-group>
-        <target state="translated">in de wachtrij geplaatste</target>
+        <target state="translated">in wachtrij</target>
       </trans-unit>
       <trans-unit id="6415892379431855826" datatype="html">
         <source>started</source>
@@ -5442,7 +5442,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.ts</context>
           <context context-type="linenumber">133</context>
         </context-group>
-        <target state="translated">gestarte</target>
+        <target state="translated">gestart</target>
       </trans-unit>
       <trans-unit id="7510279840486540181" datatype="html">
         <source>completed</source>
@@ -5450,7 +5450,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.ts</context>
           <context context-type="linenumber">135</context>
         </context-group>
-        <target state="translated">voltooide</target>
+        <target state="translated">voltooid</target>
       </trans-unit>
       <trans-unit id="4083337005045748464" datatype="html">
         <source>failed</source>
@@ -5458,7 +5458,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.ts</context>
           <context context-type="linenumber">137</context>
         </context-group>
-        <target state="translated">mislukte</target>
+        <target state="translated">mislukt</target>
       </trans-unit>
       <trans-unit id="2649252321173430744" datatype="html">
         <source>Not Found</source>
