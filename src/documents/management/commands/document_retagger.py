@@ -65,7 +65,7 @@ class Command(BaseCommand):
         )
         parser.add_argument(
             "--id-range",
-            help="A range of document id's on which the retagging should be applied.",
+            help="A range of document ids on which the retagging should be applied.",
             nargs=2,
             type=int,
         )
