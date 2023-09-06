@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-09-05 23:27\n"
+"PO-Revision-Date: 2023-09-06 00:31\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
@@ -456,11 +456,11 @@ msgstr "Datetime veld wanneer de taak werd gestart in UTC"
 
 #: documents/models.py:609
 msgid "Completed DateTime"
-msgstr "Voltooid DateTime"
+msgstr "Voltooid datum/tijd"
 
 #: documents/models.py:610
 msgid "Datetime field when the task was completed in UTC"
-msgstr "Datetime veld wanneer de taak werd voltooid in UTC"
+msgstr "Datum/tijd veld wanneer de taak werd voltooid in UTC"
 
 #: documents/models.py:615
 msgid "Result Data"
