@@ -165,6 +165,12 @@ export class SettingsService {
         dateInputFormat: 'mm/dd/yyyy',
       },
       {
+        code: 'af-za',
+        name: $localize`Afrikaans`,
+        englishName: 'Afrikaans',
+        dateInputFormat: 'yyyy-mm-dd',
+      },
+      {
         code: 'ar-ar',
         name: $localize`Arabic`,
         englishName: 'Arabic',
@@ -199,6 +205,12 @@ export class SettingsService {
         name: $localize`German`,
         englishName: 'German',
         dateInputFormat: 'dd.mm.yyyy',
+      },
+      {
+        code: 'el-gr',
+        name: $localize`Greek`,
+        englishName: 'Greek',
+        dateInputFormat: 'dd/mm/yyyy',
       },
       {
         code: 'en-gb',
@@ -241,6 +253,12 @@ export class SettingsService {
         name: $localize`Dutch`,
         englishName: 'Dutch',
         dateInputFormat: 'dd-mm-yyyy',
+      },
+      {
+        code: 'no-no',
+        name: $localize`Norwegian`,
+        englishName: 'Norwegian',
+        dateInputFormat: 'dd.mm.yyyy',
       },
       {
         code: 'pl-pl',
