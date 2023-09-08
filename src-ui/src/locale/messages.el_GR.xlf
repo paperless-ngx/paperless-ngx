@@ -807,7 +807,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">648</context>
+          <context context-type="linenumber">641</context>
         </context-group>
         <target state="translated">Παρουσιάστηκε σφάλμα κατά την αποθήκευση των ρυθμίσεων.</target>
       </trans-unit>
@@ -863,19 +863,19 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">324</context>
+          <context context-type="linenumber">323</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">364</context>
+          <context context-type="linenumber">363</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">402</context>
+          <context context-type="linenumber">401</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">440</context>
+          <context context-type="linenumber">439</context>
         </context-group>
         <target state="translated">Επιβεβαίωση</target>
       </trans-unit>
@@ -1650,6 +1650,10 @@
           <context context-type="linenumber">38</context>
         </context-group>
         <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/toasts/toasts.component.html</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+        <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/toast.service.ts</context>
           <context context-type="linenumber">37</context>
         </context-group>
@@ -1743,7 +1747,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">194</context>
+          <context context-type="linenumber">192</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
@@ -2463,6 +2467,22 @@
         </context-group>
         <target state="translated">Παρακαλώ επιλέξτε ένα αντικείμενο</target>
       </trans-unit>
+      <trans-unit id="5611592591303869712" datatype="html">
+        <source>Status</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/toasts/toasts.component.html</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+        <target state="needs-translation">Status</target>
+      </trans-unit>
+      <trans-unit id="6732151329960766506" datatype="html">
+        <source>Copy Raw Error</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/toasts/toasts.component.html</context>
+          <context context-type="linenumber">23</context>
+        </context-group>
+        <target state="needs-translation">Copy Raw Error</target>
+      </trans-unit>
       <trans-unit id="1865646076514070962" datatype="html">
         <source>Hello <x id="PH" equiv-text="this.settingsService.displayName"/>, welcome to Paperless-ngx</source>
         <context-group purpose="location">
@@ -2701,7 +2721,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">269</context>
+          <context context-type="linenumber">268</context>
         </context-group>
         <note priority="1" from="description">this string is used to separate processing, failed and added on the file upload widget</note>
         <target state="translated">, </target>
@@ -3106,7 +3126,7 @@
         <source>Error retrieving suggestions.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">419</context>
+          <context context-type="linenumber">418</context>
         </context-group>
         <target state="translated">Σφάλμα στην ανάκτηση προτάσεων.</target>
       </trans-unit>
@@ -3114,11 +3134,11 @@
         <source>Document saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">533</context>
+          <context context-type="linenumber">531</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">541</context>
+          <context context-type="linenumber">539</context>
         </context-group>
         <target state="translated">Το έγγραφο αποθηκεύτηκε επιτυχώς.</target>
       </trans-unit>
@@ -3126,11 +3146,11 @@
         <source>Error saving document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">546</context>
+          <context context-type="linenumber">543</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">591</context>
+          <context context-type="linenumber">584</context>
         </context-group>
         <target state="translated">Σφάλμα αποθήκευσης του εγγράφου</target>
       </trans-unit>
@@ -3138,11 +3158,11 @@
         <source>Confirm delete</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">620</context>
+          <context context-type="linenumber">610</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">190</context>
+          <context context-type="linenumber">188</context>
         </context-group>
         <target state="translated">Επιβεβαίωση διαγραφής</target>
       </trans-unit>
@@ -3150,7 +3170,7 @@
         <source>Do you really want to delete document &quot;<x id="PH" equiv-text="this.document.title"/>&quot;?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">621</context>
+          <context context-type="linenumber">611</context>
         </context-group>
         <target state="translated">Θέλετε πραγματικά να διαγράψετε το έγγραφο "<x id="PH" equiv-text="this.document.title"/>";</target>
       </trans-unit>
@@ -3158,7 +3178,7 @@
         <source>The files for this document will be deleted permanently. This operation cannot be undone.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">622</context>
+          <context context-type="linenumber">612</context>
         </context-group>
         <target state="translated">Τα αρχεία αυτού του εγγράφου θα διαγραφούν οριστικά. Αυτή η λειτουργία δεν μπορεί να αναιρεθεί.</target>
       </trans-unit>
@@ -3166,27 +3186,27 @@
         <source>Delete document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">624</context>
+          <context context-type="linenumber">614</context>
         </context-group>
         <target state="translated">Διαγραφή εγγράφου</target>
       </trans-unit>
-      <trans-unit id="1844801255494293730" datatype="html">
-        <source>Error deleting document: <x id="PH" equiv-text="error.error?.detail ?? error.message ?? JSON.stringify(error)"/></source>
+      <trans-unit id="7295637485862454066" datatype="html">
+        <source>Error deleting document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">644,646</context>
+          <context context-type="linenumber">633</context>
         </context-group>
-        <target state="translated">Σφάλμα διαγραφής εγγράφου: <x id="PH" equiv-text="error.error?.detail ?? error.message ?? JSON.stringify(error)"/></target>
+        <target state="needs-translation">Error deleting document</target>
       </trans-unit>
       <trans-unit id="7362691899087997122" datatype="html">
         <source>Redo OCR confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">667</context>
+          <context context-type="linenumber">653</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">499</context>
+          <context context-type="linenumber">498</context>
         </context-group>
         <target state="translated">Επιβεβαίωση επανάληψης OCR</target>
       </trans-unit>
@@ -3194,7 +3214,7 @@
         <source>This operation will permanently redo OCR for this document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">668</context>
+          <context context-type="linenumber">654</context>
         </context-group>
         <target state="translated">Αυτή η λειτουργία θα ξανακάνει οριστικά OCR για αυτό το έγγραφο.</target>
       </trans-unit>
@@ -3202,31 +3222,31 @@
         <source>This operation cannot be undone.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">669</context>
+          <context context-type="linenumber">655</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">462</context>
+          <context context-type="linenumber">461</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">501</context>
+          <context context-type="linenumber">500</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">759</context>
+          <context context-type="linenumber">746</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">819</context>
+          <context context-type="linenumber">798</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">886</context>
+          <context context-type="linenumber">857</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">949</context>
+          <context context-type="linenumber">915</context>
         </context-group>
         <target state="translated">Αυτή η λειτουργία δεν μπορεί να αναιρεθεί.</target>
       </trans-unit>
@@ -3234,27 +3254,27 @@
         <source>Proceed</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">671</context>
+          <context context-type="linenumber">657</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">503</context>
+          <context context-type="linenumber">502</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">761</context>
+          <context context-type="linenumber">748</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">821</context>
+          <context context-type="linenumber">800</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">888</context>
+          <context context-type="linenumber">859</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">951</context>
+          <context context-type="linenumber">917</context>
         </context-group>
         <target state="translated">Συνέχεια</target>
       </trans-unit>
@@ -3262,17 +3282,17 @@
         <source>Redo OCR operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">679</context>
+          <context context-type="linenumber">665</context>
         </context-group>
         <target state="translated">Η λειτουργία επανάληψης OCR θα ξεκινήσει στο παρασκήνιο. Κλείστε και ανοίξτε εκ νέου ή επαναφορτώστε αυτό το έγγραφο μετά την ολοκλήρωση της λειτουργίας για να δείτε νέο περιεχόμενο.</target>
       </trans-unit>
-      <trans-unit id="8008978164775353960" datatype="html">
-        <source>Error executing operation: <x id="PH" equiv-text="JSON.stringify(                 error.error               )"/></source>
+      <trans-unit id="4409560272830824468" datatype="html">
+        <source>Error executing operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">690,692</context>
+          <context context-type="linenumber">676</context>
         </context-group>
-        <target state="translated">Σφάλμα εκτέλεσης λειτουργίας: <x id="PH" equiv-text="JSON.stringify(                 error.error               )"/></target>
+        <target state="needs-translation">Error executing operation</target>
       </trans-unit>
       <trans-unit id="6857598786757174736" datatype="html">
         <source>Select:</source>
@@ -3418,23 +3438,23 @@
         </context-group>
         <target state="translated"> Χρήση μορφοποιημένου ονόματος αρχείου </target>
       </trans-unit>
-      <trans-unit id="7985804062689412812" datatype="html">
-        <source>Error executing bulk operation: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></source>
+      <trans-unit id="1215215387232313677" datatype="html">
+        <source>Error executing bulk operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">185,187</context>
+          <context context-type="linenumber">185</context>
         </context-group>
-        <target state="translated">Σφάλμα κατά την εκτέλεση της μαζικής λειτουργίας: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></target>
+        <target state="needs-translation">Error executing bulk operation</target>
       </trans-unit>
       <trans-unit id="7894972847287473517" datatype="html">
         <source>&quot;<x id="PH" equiv-text="items[0].name"/>&quot;</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">261</context>
+          <context context-type="linenumber">260</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">267</context>
+          <context context-type="linenumber">266</context>
         </context-group>
         <target state="translated">"<x id="PH" equiv-text="items[0].name"/>"</target>
       </trans-unit>
@@ -3442,7 +3462,7 @@
         <source>&quot;<x id="PH" equiv-text="items[0].name"/>&quot; and &quot;<x id="PH_1" equiv-text="items[1].name"/>&quot;</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">263</context>
+          <context context-type="linenumber">262</context>
         </context-group>
         <note priority="1" from="description">This is for messages like 'modify "tag1" and "tag2"'</note>
         <target state="translated">"<x id="PH" equiv-text="items[0].name"/>" και "<x id="PH_1" equiv-text="items[1].name"/>"</target>
@@ -3451,7 +3471,7 @@
         <source><x id="PH" equiv-text="list"/> and &quot;<x id="PH_1" equiv-text="items[items.length - 1].name"/>&quot;</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">271,273</context>
+          <context context-type="linenumber">270,272</context>
         </context-group>
         <note priority="1" from="description">this is for messages like 'modify "tag1", "tag2" and "tag3"'</note>
         <target state="translated"><x id="PH" equiv-text="list"/> και "<x id="PH_1" equiv-text="items[items.length - 1].name"/>"</target>
@@ -3460,7 +3480,7 @@
         <source>Confirm tags assignment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">288</context>
+          <context context-type="linenumber">287</context>
         </context-group>
         <target state="translated">Επιβεβαίωση ανάθεσης ετικετών</target>
       </trans-unit>
@@ -3468,7 +3488,7 @@
         <source>This operation will add the tag &quot;<x id="PH" equiv-text="tag.name"/>&quot; to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">294</context>
+          <context context-type="linenumber">293</context>
         </context-group>
         <target state="translated">Αυτή η λειτουργία θα προσθέσει την ετικέτα "<x id="PH" equiv-text="tag.name"/>" στο(α) <x id="PH_1" equiv-text="this.list.selected.size"/> επιλεγμένο(α) έγγραφο(α).</target>
       </trans-unit>
@@ -3476,7 +3496,7 @@
         <source>This operation will add the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">299,301</context>
+          <context context-type="linenumber">298,300</context>
         </context-group>
         <target state="translated">Αυτή η λειτουργία θα προσθέσει τις ετικέτες <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> στα <x id="PH_1" equiv-text="this.list.selected.size"/> επιλεγμένα έγγραφα.</target>
       </trans-unit>
@@ -3484,7 +3504,7 @@
         <source>This operation will remove the tag &quot;<x id="PH" equiv-text="tag.name"/>&quot; from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">307</context>
+          <context context-type="linenumber">306</context>
         </context-group>
         <target state="translated">Αυτή η λειτουργία θα αφαιρέσει την ετικέτα "<x id="PH" equiv-text="tag.name"/>" από <x id="PH_1" equiv-text="this.list.selected.size"/> το(α) επιλεγμένο(α) έγγραφο(α).</target>
       </trans-unit>
@@ -3492,7 +3512,7 @@
         <source>This operation will remove the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">312,314</context>
+          <context context-type="linenumber">311,313</context>
         </context-group>
         <target state="translated">Αυτή η λειτουργία θα αφαιρέσει τις ετικέτες <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> από το <x id="PH_1" equiv-text="this.list.selected.size"/> επιλεγμένο(α) έγγραφο(α).</target>
       </trans-unit>
@@ -3500,7 +3520,7 @@
         <source>This operation will add the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> and remove the tags <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> on <x id="PH_2" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">316,320</context>
+          <context context-type="linenumber">315,319</context>
         </context-group>
         <target state="translated">Αυτή η λειτουργία θα προσθέσει τις ετικέτες <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> και θα αφαιρέσει τις ετικέτες <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> στα <x id="PH_2" equiv-text="this.list.selected.size"/> επιλεγμένα έγγραφα.</target>
       </trans-unit>
@@ -3508,7 +3528,7 @@
         <source>Confirm correspondent assignment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">357</context>
+          <context context-type="linenumber">356</context>
         </context-group>
         <target state="translated">Επιβεβαίωση ανάθεσης ανταποκριτή</target>
       </trans-unit>
@@ -3516,7 +3536,7 @@
         <source>This operation will assign the correspondent &quot;<x id="PH" equiv-text="correspondent.name"/>&quot; to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">359</context>
+          <context context-type="linenumber">358</context>
         </context-group>
         <target state="translated">Αυτή η ενέργεια θα αναθέσει τον ανταποκριτή "<x id="PH" equiv-text="correspondent.name"/>" στο <x id="PH_1" equiv-text="this.list.selected.size"/> επιλεγμένο(α) έγγραφο(α).</target>
       </trans-unit>
@@ -3524,7 +3544,7 @@
         <source>This operation will remove the correspondent from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">361</context>
+          <context context-type="linenumber">360</context>
         </context-group>
         <target state="translated">Αυτή η λειτουργία θα αφαιρέσει τον ανταποκριτή από το <x id="PH" equiv-text="this.list.selected.size"/> επιλεγμένο(α) έγγραφο(α).</target>
       </trans-unit>
@@ -3532,7 +3552,7 @@
         <source>Confirm document type assignment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">395</context>
+          <context context-type="linenumber">394</context>
         </context-group>
         <target state="translated">Επιβεβαιώστε την ανάθεση τύπου εγγράφου</target>
       </trans-unit>
@@ -3540,7 +3560,7 @@
         <source>This operation will assign the document type &quot;<x id="PH" equiv-text="documentType.name"/>&quot; to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">397</context>
+          <context context-type="linenumber">396</context>
         </context-group>
         <target state="translated">Αυτή η λειτουργία θα αναθέσει τον τύπο εγγράφου "<x id="PH" equiv-text="documentType.name"/>" στο <x id="PH_1" equiv-text="this.list.selected.size"/> επιλεγμένο(α) έγγραφο(α).</target>
       </trans-unit>
@@ -3548,7 +3568,7 @@
         <source>This operation will remove the document type from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">399</context>
+          <context context-type="linenumber">398</context>
         </context-group>
         <target state="translated">Αυτή η λειτουργία θα αφαιρέσει τον τύπο εγγράφου από το <x id="PH" equiv-text="this.list.selected.size"/> επιλεγμένο(α) έγγραφο(α).</target>
       </trans-unit>
@@ -3556,7 +3576,7 @@
         <source>Confirm storage path assignment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">433</context>
+          <context context-type="linenumber">432</context>
         </context-group>
         <target state="translated">Επιβεβαίωση ανάθεσης διαδρομής αποθήκευσης</target>
       </trans-unit>
@@ -3564,7 +3584,7 @@
         <source>This operation will assign the storage path &quot;<x id="PH" equiv-text="storagePath.name"/>&quot; to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">435</context>
+          <context context-type="linenumber">434</context>
         </context-group>
         <target state="translated">Αυτή η λειτουργία θα αναθέσει τη διαδρομή αποθήκευσης "<x id="PH" equiv-text="storagePath.name"/>" στο <x id="PH_1" equiv-text="this.list.selected.size"/> επιλεγμένο(α) έγγραφο(α).</target>
       </trans-unit>
@@ -3572,7 +3592,7 @@
         <source>This operation will remove the storage path from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">437</context>
+          <context context-type="linenumber">436</context>
         </context-group>
         <target state="translated">Αυτή η λειτουργία θα αφαιρέσει τη διαδρομή αποθήκευσης από το <x id="PH" equiv-text="this.list.selected.size"/> επιλεγμένο(α) έγγραφο(α).</target>
       </trans-unit>
@@ -3580,7 +3600,7 @@
         <source>Delete confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">460</context>
+          <context context-type="linenumber">459</context>
         </context-group>
         <target state="translated">Επιβεβαίωση διαγραφής</target>
       </trans-unit>
@@ -3588,7 +3608,7 @@
         <source>This operation will permanently delete <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">461</context>
+          <context context-type="linenumber">460</context>
         </context-group>
         <target state="translated">Αυτή η λειτουργία θα διαγράψει μόνιμα το <x id="PH" equiv-text="this.list.selected.size"/> επιλεγμένο(α) έγγραφο(α).</target>
       </trans-unit>
@@ -3596,7 +3616,7 @@
         <source>Delete document(s)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">464</context>
+          <context context-type="linenumber">463</context>
         </context-group>
         <target state="translated">Διαγραφή εγγράφου(ων)</target>
       </trans-unit>
@@ -3604,7 +3624,7 @@
         <source>This operation will permanently redo OCR for <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">500</context>
+          <context context-type="linenumber">499</context>
         </context-group>
         <target state="translated">Αυτή η λειτουργία θα ξανακάνει οριστικά OCR για τα <x id="PH" equiv-text="this.list.selected.size"/> επιλεγμένο(α) έγγραφο(α).</target>
       </trans-unit>
@@ -4264,17 +4284,17 @@
         <source>Error saving note</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-notes/document-notes.component.ts</context>
-          <context context-type="linenumber">67</context>
+          <context context-type="linenumber">66</context>
         </context-group>
         <target state="translated">Σφάλμα αποθήκευσης σημείωσης</target>
       </trans-unit>
-      <trans-unit id="5682285129543775369" datatype="html">
-        <source>Error deleting note: <x id="PH" equiv-text="e.toString()"/></source>
+      <trans-unit id="4144411010137688084" datatype="html">
+        <source>Error deleting note</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-notes/document-notes.component.ts</context>
-          <context context-type="linenumber">85</context>
+          <context context-type="linenumber">80</context>
         </context-group>
-        <target state="translated">Σφάλμα διαγραφής σημείωσης: <x id="PH" equiv-text="e.toString()"/></target>
+        <target state="needs-translation">Error deleting note</target>
       </trans-unit>
       <trans-unit id="6316128875819022658" datatype="html">
         <source>correspondent</source>
@@ -4496,7 +4516,7 @@
         <source>Successfully updated <x id="PH" equiv-text="this.typeName"/>.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">166</context>
+          <context context-type="linenumber">165</context>
         </context-group>
         <target state="translated">Επιτυχής ενημέρωση του <x id="PH" equiv-text="this.typeName"/>.</target>
       </trans-unit>
@@ -4504,7 +4524,7 @@
         <source>Error occurred while saving <x id="PH" equiv-text="this.typeName"/>.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">171</context>
+          <context context-type="linenumber">170</context>
         </context-group>
         <target state="translated">Παρουσιάστηκε σφάλμα κατά την αποθήκευση του <x id="PH" equiv-text="this.typeName"/>.</target>
       </trans-unit>
@@ -4512,17 +4532,17 @@
         <source>Associated documents will not be deleted.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">192</context>
+          <context context-type="linenumber">190</context>
         </context-group>
         <target state="translated">Τα συσχετιζόμενα έγγραφα δεν θα διαγραφούν.</target>
       </trans-unit>
-      <trans-unit id="5467489005440577210" datatype="html">
-        <source>Error while deleting element: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></source>
+      <trans-unit id="6639207128255974941" datatype="html">
+        <source>Error while deleting element</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">205,207</context>
+          <context context-type="linenumber">203</context>
         </context-group>
-        <target state="translated">Σφάλμα κατά τη διαγραφή στοιχείου: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></target>
+        <target state="needs-translation">Error while deleting element</target>
       </trans-unit>
       <trans-unit id="1685061484835793745" datatype="html">
         <source>Start tour</source>
@@ -4968,7 +4988,7 @@
         <source>Error retrieving users</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">287</context>
+          <context context-type="linenumber">285</context>
         </context-group>
         <target state="translated">Σφάλμα στην ανάκτηση χρηστών</target>
       </trans-unit>
@@ -4976,7 +4996,7 @@
         <source>Error retrieving mail rules</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">314</context>
+          <context context-type="linenumber">309</context>
         </context-group>
         <target state="translated">Σφάλμα κατά την ανάκτηση κανόνων αλληλογραφίας</target>
       </trans-unit>
@@ -4984,7 +5004,7 @@
         <source>Error retrieving mail accounts</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">323</context>
+          <context context-type="linenumber">317</context>
         </context-group>
         <target state="translated">Σφάλμα στην ανάκτηση λογαριασμών αλληλογραφίας</target>
       </trans-unit>
@@ -4992,7 +5012,7 @@
         <source>Saved view &quot;<x id="PH" equiv-text="savedView.name"/>&quot; deleted.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">530</context>
+          <context context-type="linenumber">523</context>
         </context-group>
         <target state="translated">Η αποθηκευμένη προβολή "<x id="PH" equiv-text="savedView.name"/>" διαγράφηκε.</target>
       </trans-unit>
@@ -5000,7 +5020,7 @@
         <source>Settings saved</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">632</context>
+          <context context-type="linenumber">625</context>
         </context-group>
         <target state="translated">Οι ρυθμίσεις αποθηκεύτηκαν</target>
       </trans-unit>
@@ -5008,7 +5028,7 @@
         <source>Settings were saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">633</context>
+          <context context-type="linenumber">626</context>
         </context-group>
         <target state="translated">Οι ρυθμίσεις αποθηκεύτηκαν επιτυχώς.</target>
       </trans-unit>
@@ -5016,7 +5036,7 @@
         <source>Settings were saved successfully. Reload is required to apply some changes.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">637</context>
+          <context context-type="linenumber">630</context>
         </context-group>
         <target state="translated">Οι ρυθμίσεις αποθηκεύτηκαν με επιτυχία. Απαιτείται επαναφόρτωση για να εφαρμοστούν κάποιες αλλαγές.</target>
       </trans-unit>
@@ -5024,7 +5044,7 @@
         <source>Reload now</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">638</context>
+          <context context-type="linenumber">631</context>
         </context-group>
         <target state="translated">Επαναφόρτωση τώρα</target>
       </trans-unit>
@@ -5032,7 +5052,7 @@
         <source>Use system language</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">657</context>
+          <context context-type="linenumber">649</context>
         </context-group>
         <target state="translated">Χρήση γλώσσας συστήματος</target>
       </trans-unit>
@@ -5040,7 +5060,7 @@
         <source>Use date format of display language</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">664</context>
+          <context context-type="linenumber">656</context>
         </context-group>
         <target state="translated">Χρησιμοποιήστε τη μορφή ημερομηνίας της γλώσσας εμφάνισης</target>
       </trans-unit>
@@ -5048,7 +5068,7 @@
         <source>Error while storing settings on server.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">684</context>
+          <context context-type="linenumber">676</context>
         </context-group>
         <target state="translated">Σφάλμα κατά την αποθήκευση των ρυθμίσεων στο διακομιστή.</target>
       </trans-unit>
@@ -5056,7 +5076,7 @@
         <source>Password has been changed, you will be logged out momentarily.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">727</context>
+          <context context-type="linenumber">718</context>
         </context-group>
         <target state="translated">Ο κωδικός πρόσβασης έχει αλλάξει, θα αποσυνδεθείτε αμέσως.</target>
       </trans-unit>
@@ -5064,7 +5084,7 @@
         <source>Saved user &quot;<x id="PH" equiv-text="newUser.username"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">734</context>
+          <context context-type="linenumber">725</context>
         </context-group>
         <target state="translated">Αποθηκεύτηκε ο χρήστης "<x id="PH" equiv-text="newUser.username"/>".</target>
       </trans-unit>
@@ -5072,7 +5092,7 @@
         <source>Error saving user.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">746</context>
+          <context context-type="linenumber">736</context>
         </context-group>
         <target state="translated">Σφάλμα αποθήκευσης χρήστη.</target>
       </trans-unit>
@@ -5080,7 +5100,7 @@
         <source>Confirm delete user account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">757</context>
+          <context context-type="linenumber">744</context>
         </context-group>
         <target state="translated">Επιβεβαίωση διαγραφής λογαριασμού χρήστη</target>
       </trans-unit>
@@ -5088,7 +5108,7 @@
         <source>This operation will permanently delete this user account.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">758</context>
+          <context context-type="linenumber">745</context>
         </context-group>
         <target state="translated">Αυτή η λειτουργία θα διαγράψει μόνιμα αυτόν τον λογαριασμό χρήστη.</target>
       </trans-unit>
@@ -5096,7 +5116,7 @@
         <source>Deleted user</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">767</context>
+          <context context-type="linenumber">754</context>
         </context-group>
         <target state="translated">Διαγράφηκε ο χρήστης</target>
       </trans-unit>
@@ -5104,7 +5124,7 @@
         <source>Error deleting user.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">775</context>
+          <context context-type="linenumber">761</context>
         </context-group>
         <target state="translated">Σφάλμα διαγραφής χρήστη.</target>
       </trans-unit>
@@ -5112,7 +5132,7 @@
         <source>Saved group &quot;<x id="PH" equiv-text="newGroup.name"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">796</context>
+          <context context-type="linenumber">779</context>
         </context-group>
         <target state="translated">Αποθηκεύτηκε η ομάδα "<x id="PH" equiv-text="newGroup.name"/>".</target>
       </trans-unit>
@@ -5120,7 +5140,7 @@
         <source>Error saving group.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">806</context>
+          <context context-type="linenumber">788</context>
         </context-group>
         <target state="translated">Σφάλμα αποθήκευσης ομάδας.</target>
       </trans-unit>
@@ -5128,7 +5148,7 @@
         <source>Confirm delete user group</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">817</context>
+          <context context-type="linenumber">796</context>
         </context-group>
         <target state="translated">Επιβεβαίωση διαγραφής ομάδας χρηστών</target>
       </trans-unit>
@@ -5136,7 +5156,7 @@
         <source>This operation will permanently delete this user group.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">818</context>
+          <context context-type="linenumber">797</context>
         </context-group>
         <target state="translated">Αυτή η λειτουργία θα διαγράψει μόνιμα αυτήν την ομάδα χρηστών.</target>
       </trans-unit>
@@ -5144,7 +5164,7 @@
         <source>Deleted group</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">827</context>
+          <context context-type="linenumber">806</context>
         </context-group>
         <target state="translated">Διαγραμμένη ομάδα</target>
       </trans-unit>
@@ -5152,7 +5172,7 @@
         <source>Error deleting group.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">835</context>
+          <context context-type="linenumber">813</context>
         </context-group>
         <target state="translated">Σφάλμα διαγραφής ομάδας.</target>
       </trans-unit>
@@ -5160,7 +5180,7 @@
         <source>Saved account &quot;<x id="PH" equiv-text="newMailAccount.name"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">861</context>
+          <context context-type="linenumber">836</context>
         </context-group>
         <target state="translated">Αποθηκεύτηκε ο λογαριασμός "<x id="PH" equiv-text="newMailAccount.name"/>".</target>
       </trans-unit>
@@ -5168,7 +5188,7 @@
         <source>Error saving account.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">873</context>
+          <context context-type="linenumber">847</context>
         </context-group>
         <target state="translated">Σφάλμα αποθήκευσης λογαριασμού.</target>
       </trans-unit>
@@ -5176,7 +5196,7 @@
         <source>Confirm delete mail account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">884</context>
+          <context context-type="linenumber">855</context>
         </context-group>
         <target state="translated">Επιβεβαίωση διαγραφής λογαριασμού αλληλογραφίας</target>
       </trans-unit>
@@ -5184,7 +5204,7 @@
         <source>This operation will permanently delete this mail account.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">885</context>
+          <context context-type="linenumber">856</context>
         </context-group>
         <target state="translated">Αυτή η λειτουργία θα διαγράψει μόνιμα αυτόν τον λογαριασμό email.</target>
       </trans-unit>
@@ -5192,7 +5212,7 @@
         <source>Deleted mail account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">894</context>
+          <context context-type="linenumber">865</context>
         </context-group>
         <target state="translated">Διαγραφή λογαριασμού αλληλογραφίας</target>
       </trans-unit>
@@ -5200,7 +5220,7 @@
         <source>Error deleting mail account.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">903</context>
+          <context context-type="linenumber">874</context>
         </context-group>
         <target state="translated">Σφάλμα διαγραφής λογαριασμού αλληλογραφίας.</target>
       </trans-unit>
@@ -5208,7 +5228,7 @@
         <source>Saved rule &quot;<x id="PH" equiv-text="newMailRule.name"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">924</context>
+          <context context-type="linenumber">894</context>
         </context-group>
         <target state="translated">Αποθηκεύτηκε κανόνας "<x id="PH" equiv-text="newMailRule.name"/>".</target>
       </trans-unit>
@@ -5216,7 +5236,7 @@
         <source>Error saving rule.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">936</context>
+          <context context-type="linenumber">905</context>
         </context-group>
         <target state="translated">Σφάλμα αποθήκευσης κανόνα.</target>
       </trans-unit>
@@ -5224,7 +5244,7 @@
         <source>Confirm delete mail rule</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">947</context>
+          <context context-type="linenumber">913</context>
         </context-group>
         <target state="translated">Επιβεβαίωση διαγραφής κανόνα αλληλογραφίας</target>
       </trans-unit>
@@ -5232,7 +5252,7 @@
         <source>This operation will permanently delete this mail rule.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">948</context>
+          <context context-type="linenumber">914</context>
         </context-group>
         <target state="translated">Αυτή η λειτουργία θα διαγράψει μόνιμα αυτόν τον κανόνα αλληλογραφίας.</target>
       </trans-unit>
@@ -5240,7 +5260,7 @@
         <source>Deleted mail rule</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">957</context>
+          <context context-type="linenumber">923</context>
         </context-group>
         <target state="translated">Διαγραμμένος κανόνας mail</target>
       </trans-unit>
@@ -5248,7 +5268,7 @@
         <source>Error deleting mail rule.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">966</context>
+          <context context-type="linenumber">931</context>
         </context-group>
         <target state="translated">Σφάλμα διαγραφής κανόνα αλληλογραφίας.</target>
       </trans-unit>
