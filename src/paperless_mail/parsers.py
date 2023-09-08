@@ -9,7 +9,7 @@ from bleach import linkify
 from django.conf import settings
 from django.utils.timezone import is_naive
 from django.utils.timezone import make_aware
-from humanfriendly import format_size
+from humanize import naturalsize
 from imap_tools import MailAttachment
 from imap_tools import MailMessage
 from tika_client import TikaClient
@@ -72,7 +72,7 @@ class MailDocumentParser(DocumentParser):
                 "key": "attachments",
                 "value": ", ".join(
                     f"{attachment.filename}"
-                    f"({format_size(attachment.size, binary=True)})"
+                    f"({naturalsize(attachment.size, binary=True, format='%.2f')})"
                     for attachment in mail.attachments
                 ),
             },
@@ -124,7 +124,10 @@ class MailDocumentParser(DocumentParser):
             if mail_message.attachments:
                 att = []
                 for a in mail.attachments:
-                    att.append(f"{a.filename} ({format_size(a.size, binary=True)})")
+                    attachment_size = naturalsize(a.size, binary=True, format="%.2f")
+                    att.append(
+                        f"{a.filename} ({attachment_size})",
+                    )
                 fmt_text += f"Attachments: {', '.join(att)}\n\n"
 
             if mail.html:
@@ -247,7 +250,7 @@ class MailDocumentParser(DocumentParser):
             """
             if isinstance(text, list):
                 text = "\n".join([str(e) for e in text])
-            if type(text) != str:
+            if not isinstance(text, str):
                 text = str(text)
             text = escape(text)
             text = clean(text)
@@ -275,7 +278,9 @@ class MailDocumentParser(DocumentParser):
 
         att = []
         for a in mail.attachments:
-            att.append(f"{a.filename} ({format_size(a.size, binary=True)})")
+            att.append(
+                f"{a.filename} ({naturalsize(a.size, binary=True, format='%.2f')})",
+            )
         data["attachments"] = clean_html(", ".join(att))
         if data["attachments"]:
             data["attachments_label"] = "Attachments"
