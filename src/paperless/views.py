@@ -43,7 +43,7 @@ class StandardPagination(PageNumberPagination):
         if hasattr(self.page.paginator.object_list, "saved_results"):
             results_page = self.page.paginator.object_list.saved_results[0]
             if results_page is not None:
-                for i in range(0, len(results_page.results.docs())):
+                for i in range(len(results_page.results.docs())):
                     try:
                         fields = results_page.results.fields(i)
                         if "id" in fields:
