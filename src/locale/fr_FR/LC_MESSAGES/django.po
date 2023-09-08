@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-04-17 05:24\n"
+"PO-Revision-Date: 2023-09-08 17:28\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -464,7 +464,7 @@ msgstr "Champ de date lorsque le résultat de la tâche a été créé en UTC"
 
 #: documents/models.py:615
 msgid "Result Data"
-msgstr "Données du résultat"
+msgstr "Données de résultat"
 
 #: documents/models.py:617
 msgid "The data returned by the task"
@@ -554,7 +554,7 @@ msgstr "S'identifier"
 
 #: paperless/apps.py:9
 msgid "Paperless"
-msgstr "Paperless"
+msgstr "Sans papier"
 
 #: paperless/settings.py:521
 msgid "English (US)"
@@ -858,7 +858,7 @@ msgstr "Les pièces jointes en ligne comprennent les images intégrées, il est 
 
 #: paperless_mail/models.py:158
 msgid "consumption scope"
-msgstr "portée de la consommation"
+msgstr "périmètre de consommation"
 
 #: paperless_mail/models.py:164
 msgid "action"
