@@ -7,6 +7,7 @@ from typing import Type
 
 import tqdm
 from asgiref.sync import async_to_sync
+from celery import Task
 from celery import shared_task
 from channels.layers import get_channel_layer
 from django.conf import settings
@@ -91,8 +92,9 @@ def train_classifier():
         logger.warning("Classifier error: " + str(e))
 
 
-@shared_task
+@shared_task(bind=True)
 def consume_file(
+    self: Task,
     input_doc: ConsumableDocument,
     overrides: Optional[DocumentMetadataOverrides] = None,
 ):
@@ -163,6 +165,7 @@ def consume_file(
         override_created=overrides.created,
         override_asn=overrides.asn,
         override_owner_id=overrides.owner_id,
+        task_id=self.request.id,
     )
 
     if document:

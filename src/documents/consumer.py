@@ -209,6 +209,7 @@ class Consumer(LoggingMixin):
         script_env = os.environ.copy()
         script_env["DOCUMENT_SOURCE_PATH"] = original_file_path
         script_env["DOCUMENT_WORKING_PATH"] = working_file_path
+        script_env["TASK_ID"] = self.task_id or ""
 
         try:
             completed_proc = run(
@@ -279,6 +280,7 @@ class Consumer(LoggingMixin):
             ",".join(document.tags.all().values_list("name", flat=True)),
         )
         script_env["DOCUMENT_ORIGINAL_FILENAME"] = str(document.original_filename)
+        script_env["TASK_ID"] = self.task_id or ""
 
         try:
             completed_proc = run(
