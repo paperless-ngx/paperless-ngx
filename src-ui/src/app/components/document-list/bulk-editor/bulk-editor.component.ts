@@ -182,9 +182,8 @@ export class BulkEditorComponent
             modal.componentInstance.buttonsEnabled = true
           }
           this.toastService.showError(
-            $localize`Error executing bulk operation: ${JSON.stringify(
-              error.error
-            )}`
+            $localize`Error executing bulk operation`,
+            error
           )
         },
       })
