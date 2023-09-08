@@ -398,15 +398,12 @@ describe('DocumentDetailComponent', () => {
     const closeSpy = jest.spyOn(component, 'close')
     const updateSpy = jest.spyOn(documentService, 'update')
     const toastSpy = jest.spyOn(toastService, 'showError')
-    updateSpy.mockImplementation(() =>
-      throwError(() => new Error('failed to save'))
-    )
+    const error = new Error('failed to save')
+    updateSpy.mockImplementation(() => throwError(() => error))
     component.save()
     expect(updateSpy).toHaveBeenCalled()
     expect(closeSpy).not.toHaveBeenCalled()
-    expect(toastSpy).toHaveBeenCalledWith(
-      'Error saving document: failed to save'
-    )
+    expect(toastSpy).toHaveBeenCalledWith('Error saving document', error)
   })
 
   it('should show error toast on save but close if user can no longer edit', () => {
@@ -450,15 +447,12 @@ describe('DocumentDetailComponent', () => {
     const closeSpy = jest.spyOn(component, 'close')
     const updateSpy = jest.spyOn(documentService, 'update')
     const toastSpy = jest.spyOn(toastService, 'showError')
-    updateSpy.mockImplementation(() =>
-      throwError(() => new Error('failed to save'))
-    )
+    const error = new Error('failed to save')
+    updateSpy.mockImplementation(() => throwError(() => error))
     component.saveEditNext()
     expect(updateSpy).toHaveBeenCalled()
     expect(closeSpy).not.toHaveBeenCalled()
-    expect(toastSpy).toHaveBeenCalledWith(
-      'Error saving document: failed to save'
-    )
+    expect(toastSpy).toHaveBeenCalledWith('Error saving document', error)
   })
 
   it('should show save button and save & close or save & next', () => {
@@ -798,11 +792,7 @@ describe('DocumentDetailComponent', () => {
       .mockReturnValue(throwError(() => error))
     const toastSpy = jest.spyOn(toastService, 'showError')
     initNormally()
-    expect(toastSpy).toHaveBeenCalledWith(
-      'Error retrieving metadata',
-      10000,
-      error
-    )
+    expect(toastSpy).toHaveBeenCalledWith('Error retrieving metadata', error)
   })
 
   function initNormally() {

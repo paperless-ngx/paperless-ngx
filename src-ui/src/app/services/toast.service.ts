@@ -32,7 +32,7 @@ export class ToastService {
     this.toastsSubject.next(this.toasts)
   }
 
-  showError(content: string, delay: number = 10000, error: any = null) {
+  showError(content: string, error: any = null, delay: number = 10000) {
     this.show({
       title: $localize`Error`,
       content: content,
