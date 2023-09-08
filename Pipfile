@@ -3,10 +3,6 @@ url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
-[[source]]
-url = "https://www.piwheels.org/simple"
-verify_ssl = true
-name = "piwheels"
 
 [packages]
 dateparser = "~=1.1"
@@ -55,17 +51,6 @@ pdf2image = "*"
 flower = "*"
 bleach = "*"
 zxing-cpp = {version = "*", platform_machine = "== 'x86_64'"}
-#
-# Packages locked due to issues (try to check if these are fixed in a release every so often)
-#
-# Pin this until piwheels is building 1.9 (see https://www.piwheels.org/project/scipy/)
-scipy = "==1.8.1"
-# v4 brings in extra dependencies for features not used here
-reportlab = "==3.6.12"
-# Pin these until piwheels is building a newer version (see https://www.piwheels.org/project/{package}/)
-cryptography = "==40.0.1"
-pikepdf = "==7.2.0"
-pillow = "==9.5.0"
 
 [dev-packages]
 # Linting
@@ -98,7 +83,6 @@ celery-types = "*"
 django-stubs = {extras= ["compatible-mypy"], version="*"}
 types-dateparser = "*"
 types-bleach = "*"
-types-humanfriendly = "*"
 types-redis = "*"
 types-tqdm = "*"
 types-Markdown = "*"

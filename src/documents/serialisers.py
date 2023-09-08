@@ -530,9 +530,9 @@ class DocumentListSerializer(serializers.Serializer):
     )
 
     def _validate_document_id_list(self, documents, name="documents"):
-        if not type(documents) == list:
+        if not isinstance(documents, list):
             raise serializers.ValidationError(f"{name} must be a list")
-        if not all(type(i) == int for i in documents):
+        if not all(isinstance(i, int) for i in documents):
             raise serializers.ValidationError(f"{name} must be a list of integers")
         count = Document.objects.filter(id__in=documents).count()
         if not count == len(documents):
@@ -565,9 +565,9 @@ class BulkEditSerializer(DocumentListSerializer, SetPermissionsMixin):
     parameters = serializers.DictField(allow_empty=True)
 
     def _validate_tag_id_list(self, tags, name="tags"):
-        if not type(tags) == list:
+        if not isinstance(tags, list):
             raise serializers.ValidationError(f"{name} must be a list")
-        if not all(type(i) == int for i in tags):
+        if not all(isinstance(i, int) for i in tags):
             raise serializers.ValidationError(f"{name} must be a list of integers")
         count = Tag.objects.filter(id__in=tags).count()
         if not count == len(tags):
@@ -932,9 +932,9 @@ class AcknowledgeTasksViewSerializer(serializers.Serializer):
 
     def _validate_task_id_list(self, tasks, name="tasks"):
         pass
-        if not type(tasks) == list:
+        if not isinstance(tasks, list):
             raise serializers.ValidationError(f"{name} must be a list")
-        if not all(type(i) == int for i in tasks):
+        if not all(isinstance(i, int) for i in tasks):
             raise serializers.ValidationError(f"{name} must be a list of integers")
         count = PaperlessTask.objects.filter(id__in=tasks).count()
         if not count == len(tasks):
