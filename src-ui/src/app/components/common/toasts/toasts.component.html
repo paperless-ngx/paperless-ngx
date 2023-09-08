@@ -5,9 +5,26 @@
   (hidden)="toastService.closeToast(toast)">
   <p>{{toast.content}}</p>
   <details *ngIf="toast.error">
-    <pre class="p-2 m-0 bg-light text-dark">
-      {{toast.error}}
-    </pre>
+    <div class="p-3">
+      <dl class="row" *ngIf="isDetailedError(toast.error)">
+        <dt class="col-sm-3 fw-normal text-end">URL</dt>
+        <dd class="col-sm-9">{{ toast.error.url }}</dd>
+        <dt class="col-sm-3 fw-normal text-end" i18n>Status</dt>
+        <dd class="col-sm-9">{{ toast.error.status }} <em>{{ toast.error.statusText }}</em></dd>
+        <dt class="col-sm-3 fw-normal text-end" i18n>Error</dt>
+        <dd class="col-sm-9">{{ getErrorText(toast.error) }}</dd>
+      </dl>
+      <div class="row">
+        <div class="col offset-sm-3">
+          <button class="btn btn-sm btn-outline-dark" (click)="copyError(toast.error)">
+            <svg class="sidebaricon" fill="currentColor">
+              <use *ngIf="!copied" xlink:href="assets/bootstrap-icons.svg#clipboard" />
+              <use *ngIf="copied" xlink:href="assets/bootstrap-icons.svg#clipboard-check" />
+            </svg>&nbsp;<ng-container i18n>Copy Raw Error</ng-container>
+          </button>
+        </div>
+      </div>
+    </div>
   </details>
   <p class="mb-0" *ngIf="toast.action"><button class="btn btn-sm btn-outline-secondary" (click)="toastService.closeToast(toast); toast.action()">{{toast.actionName}}</button></p>
 </ngb-toast>
