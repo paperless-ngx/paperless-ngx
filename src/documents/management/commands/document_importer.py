@@ -182,8 +182,8 @@ class Command(BaseCommand):
             doc_path = self.source / doc_file
             if not doc_path.exists():
                 raise CommandError(
-                    'The manifest file refers to "{}" which does not '
-                    "appear to be in the source directory.".format(doc_file),
+                    f'The manifest file refers to "{doc_file}" which does not '
+                    "appear to be in the source directory.",
                 )
             try:
                 with doc_path.open(mode="rb") as infile:
