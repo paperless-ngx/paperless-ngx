@@ -807,7 +807,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">648</context>
+          <context context-type="linenumber">641</context>
         </context-group>
         <target state="translated">Fout by die bewaar van instellings.</target>
       </trans-unit>
@@ -863,19 +863,19 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">324</context>
+          <context context-type="linenumber">323</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">364</context>
+          <context context-type="linenumber">363</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">402</context>
+          <context context-type="linenumber">401</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">440</context>
+          <context context-type="linenumber">439</context>
         </context-group>
         <target state="translated">Bevestig</target>
       </trans-unit>
@@ -1650,6 +1650,10 @@
           <context context-type="linenumber">38</context>
         </context-group>
         <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/toasts/toasts.component.html</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+        <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/toast.service.ts</context>
           <context context-type="linenumber">37</context>
         </context-group>
@@ -1743,7 +1747,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">194</context>
+          <context context-type="linenumber">192</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
@@ -2465,6 +2469,22 @@
         </context-group>
         <target state="translated">Kies asb. ’n voorwerp</target>
       </trans-unit>
+      <trans-unit id="5611592591303869712" datatype="html">
+        <source>Status</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/toasts/toasts.component.html</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+        <target state="needs-translation">Status</target>
+      </trans-unit>
+      <trans-unit id="6732151329960766506" datatype="html">
+        <source>Copy Raw Error</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/toasts/toasts.component.html</context>
+          <context context-type="linenumber">23</context>
+        </context-group>
+        <target state="needs-translation">Copy Raw Error</target>
+      </trans-unit>
       <trans-unit id="1865646076514070962" datatype="html">
         <source>Hello <x id="PH" equiv-text="this.settingsService.displayName"/>, welcome to Paperless-ngx</source>
         <context-group purpose="location">
@@ -2703,7 +2723,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">269</context>
+          <context context-type="linenumber">268</context>
         </context-group>
         <note priority="1" from="description">this string is used to separate processing, failed and added on the file upload widget</note>
         <target state="translated">, </target>
@@ -3108,7 +3128,7 @@
         <source>Error retrieving suggestions.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">419</context>
+          <context context-type="linenumber">418</context>
         </context-group>
         <target state="translated">Fout by ophaal van voorstelle.</target>
       </trans-unit>
@@ -3116,11 +3136,11 @@
         <source>Document saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">533</context>
+          <context context-type="linenumber">531</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">541</context>
+          <context context-type="linenumber">539</context>
         </context-group>
         <target state="translated">Dokument is suksesvol bewaar.</target>
       </trans-unit>
@@ -3128,11 +3148,11 @@
         <source>Error saving document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">546</context>
+          <context context-type="linenumber">543</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">591</context>
+          <context context-type="linenumber">584</context>
         </context-group>
         <target state="translated">Fout by bewaar van dokument</target>
       </trans-unit>
@@ -3140,11 +3160,11 @@
         <source>Confirm delete</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">620</context>
+          <context context-type="linenumber">610</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">190</context>
+          <context context-type="linenumber">188</context>
         </context-group>
         <target state="translated">Bevestig skrap</target>
       </trans-unit>
@@ -3152,7 +3172,7 @@
         <source>Do you really want to delete document &quot;<x id="PH" equiv-text="this.document.title"/>&quot;?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">621</context>
+          <context context-type="linenumber">611</context>
         </context-group>
         <target state="translated">Wil u regtig dokument <x id="PH" equiv-text="this.document.title"/> skrap"?</target>
       </trans-unit>
@@ -3160,7 +3180,7 @@
         <source>The files for this document will be deleted permanently. This operation cannot be undone.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">622</context>
+          <context context-type="linenumber">612</context>
         </context-group>
         <target state="translated">Die lêers vir hierdie dokument word permanent geskrap. Dit kan nie ontdaan word nie.</target>
       </trans-unit>
@@ -3168,27 +3188,27 @@
         <source>Delete document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">624</context>
+          <context context-type="linenumber">614</context>
         </context-group>
         <target state="translated">Skrap dokument</target>
       </trans-unit>
-      <trans-unit id="1844801255494293730" datatype="html">
-        <source>Error deleting document: <x id="PH" equiv-text="error.error?.detail ?? error.message ?? JSON.stringify(error)"/></source>
+      <trans-unit id="7295637485862454066" datatype="html">
+        <source>Error deleting document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">644,646</context>
+          <context context-type="linenumber">633</context>
         </context-group>
-        <target state="translated">Fout by skrap van dokument: <x id="PH" equiv-text="error.error?.detail ?? error.message ?? JSON.stringify(error)"/></target>
+        <target state="needs-translation">Error deleting document</target>
       </trans-unit>
       <trans-unit id="7362691899087997122" datatype="html">
         <source>Redo OCR confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">667</context>
+          <context context-type="linenumber">653</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">499</context>
+          <context context-type="linenumber">498</context>
         </context-group>
         <target state="translated">Bevestig OCR-heruitvoer</target>
       </trans-unit>
@@ -3196,7 +3216,7 @@
         <source>This operation will permanently redo OCR for this document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">668</context>
+          <context context-type="linenumber">654</context>
         </context-group>
         <target state="translated">Hierdie bewerking sal OCR permanent vir hierdie dokument heruitvoer.</target>
       </trans-unit>
@@ -3204,31 +3224,31 @@
         <source>This operation cannot be undone.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">669</context>
+          <context context-type="linenumber">655</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">462</context>
+          <context context-type="linenumber">461</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">501</context>
+          <context context-type="linenumber">500</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">759</context>
+          <context context-type="linenumber">746</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">819</context>
+          <context context-type="linenumber">798</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">886</context>
+          <context context-type="linenumber">857</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">949</context>
+          <context context-type="linenumber">915</context>
         </context-group>
         <target state="translated">Dit kan nie ontdaan word nie.</target>
       </trans-unit>
@@ -3236,27 +3256,27 @@
         <source>Proceed</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">671</context>
+          <context context-type="linenumber">657</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">503</context>
+          <context context-type="linenumber">502</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">761</context>
+          <context context-type="linenumber">748</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">821</context>
+          <context context-type="linenumber">800</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">888</context>
+          <context context-type="linenumber">859</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">951</context>
+          <context context-type="linenumber">917</context>
         </context-group>
         <target state="translated">Gaan voort</target>
       </trans-unit>
@@ -3264,17 +3284,17 @@
         <source>Redo OCR operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">679</context>
+          <context context-type="linenumber">665</context>
         </context-group>
         <target state="translated">Heruitvoer van OCR sal in die agtergrond begin. Sluit en heropen of herlaai die dokument nadat die bewerking voltooi is om nuwe inhoud te sien.</target>
       </trans-unit>
-      <trans-unit id="8008978164775353960" datatype="html">
-        <source>Error executing operation: <x id="PH" equiv-text="JSON.stringify(                 error.error               )"/></source>
+      <trans-unit id="4409560272830824468" datatype="html">
+        <source>Error executing operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">690,692</context>
+          <context context-type="linenumber">676</context>
         </context-group>
-        <target state="translated">Fout by uitvoer van bewerking: <x id="PH" equiv-text="JSON.stringify(                 error.error               )"/></target>
+        <target state="needs-translation">Error executing operation</target>
       </trans-unit>
       <trans-unit id="6857598786757174736" datatype="html">
         <source>Select:</source>
@@ -3420,23 +3440,23 @@
         </context-group>
         <target state="translated"> Gebruik geformatteerde lêernaam </target>
       </trans-unit>
-      <trans-unit id="7985804062689412812" datatype="html">
-        <source>Error executing bulk operation: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></source>
+      <trans-unit id="1215215387232313677" datatype="html">
+        <source>Error executing bulk operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">185,187</context>
+          <context context-type="linenumber">185</context>
         </context-group>
-        <target state="translated">Fout by uitvoer van massabewerking: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></target>
+        <target state="needs-translation">Error executing bulk operation</target>
       </trans-unit>
       <trans-unit id="7894972847287473517" datatype="html">
         <source>&quot;<x id="PH" equiv-text="items[0].name"/>&quot;</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">261</context>
+          <context context-type="linenumber">260</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">267</context>
+          <context context-type="linenumber">266</context>
         </context-group>
         <target state="translated">“<x id="PH" equiv-text="items[0].name"/>”</target>
       </trans-unit>
@@ -3444,7 +3464,7 @@
         <source>&quot;<x id="PH" equiv-text="items[0].name"/>&quot; and &quot;<x id="PH_1" equiv-text="items[1].name"/>&quot;</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">263</context>
+          <context context-type="linenumber">262</context>
         </context-group>
         <note priority="1" from="description">This is for messages like 'modify "tag1" and "tag2"'</note>
         <target state="translated">“<x id="PH" equiv-text="items[0].name"/>” en “<x id="PH_1" equiv-text="items[1].name"/>”</target>
@@ -3453,7 +3473,7 @@
         <source><x id="PH" equiv-text="list"/> and &quot;<x id="PH_1" equiv-text="items[items.length - 1].name"/>&quot;</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">271,273</context>
+          <context context-type="linenumber">270,272</context>
         </context-group>
         <note priority="1" from="description">this is for messages like 'modify "tag1", "tag2" and "tag3"'</note>
         <target state="translated"><x id="PH" equiv-text="list"/> en “<x id="PH_1" equiv-text="items[items.length - 1].name"/>”</target>
@@ -3462,7 +3482,7 @@
         <source>Confirm tags assignment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">288</context>
+          <context context-type="linenumber">287</context>
         </context-group>
         <target state="translated">Bevestig etikettoewysing</target>
       </trans-unit>
@@ -3470,7 +3490,7 @@
         <source>This operation will add the tag &quot;<x id="PH" equiv-text="tag.name"/>&quot; to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">294</context>
+          <context context-type="linenumber">293</context>
         </context-group>
         <target state="translated">Die etiket "<x id="PH" equiv-text="tag.name"/>" sal aan <x id="PH_1" equiv-text="this.list.selected.size"/> gekose dokument(e) toegevoeg word.</target>
       </trans-unit>
@@ -3478,7 +3498,7 @@
         <source>This operation will add the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">299,301</context>
+          <context context-type="linenumber">298,300</context>
         </context-group>
         <target state="translated">Hierdie bewerking sal die etikette <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> toevoeg aan <x id="PH_1" equiv-text="this.list.selected.size"/> gekose dokument(e).</target>
       </trans-unit>
@@ -3486,7 +3506,7 @@
         <source>This operation will remove the tag &quot;<x id="PH" equiv-text="tag.name"/>&quot; from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">307</context>
+          <context context-type="linenumber">306</context>
         </context-group>
         <target state="translated">Die etiket “<x id="PH" equiv-text="tag.name"/>” sal van <x id="PH_1" equiv-text="this.list.selected.size"/> gekose dokument(e) verwyder word.</target>
       </trans-unit>
@@ -3494,7 +3514,7 @@
         <source>This operation will remove the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">312,314</context>
+          <context context-type="linenumber">311,313</context>
         </context-group>
         <target state="translated">Hierdie bewerking sal die etikette <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> van <x id="PH_1" equiv-text="this.list.selected.size"/> gekose dokument(e) verwyder.</target>
       </trans-unit>
@@ -3502,7 +3522,7 @@
         <source>This operation will add the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> and remove the tags <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> on <x id="PH_2" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">316,320</context>
+          <context context-type="linenumber">315,319</context>
         </context-group>
         <target state="translated">Hierdie bewerking sal die etikette <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> toevoeg en die etikette <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> verwyder van <x id="PH_2" equiv-text="this.list.selected.size"/> gekose dokument(e).</target>
       </trans-unit>
@@ -3510,7 +3530,7 @@
         <source>Confirm correspondent assignment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">357</context>
+          <context context-type="linenumber">356</context>
         </context-group>
         <target state="translated">Bevestig korrespondenttoewysing</target>
       </trans-unit>
@@ -3518,7 +3538,7 @@
         <source>This operation will assign the correspondent &quot;<x id="PH" equiv-text="correspondent.name"/>&quot; to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">359</context>
+          <context context-type="linenumber">358</context>
         </context-group>
         <target state="translated">Die korrespondent “<x id="PH" equiv-text="correspondent.name"/>” sal aan <x id="PH_1" equiv-text="this.list.selected.size"/> gekose dokument(e) toegewys word.</target>
       </trans-unit>
@@ -3526,7 +3546,7 @@
         <source>This operation will remove the correspondent from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">361</context>
+          <context context-type="linenumber">360</context>
         </context-group>
         <target state="translated">Die korrespondent sal verwyder word van <x id="PH" equiv-text="this.list.selected.size"/> gekose dokument(e).</target>
       </trans-unit>
@@ -3534,7 +3554,7 @@
         <source>Confirm document type assignment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">395</context>
+          <context context-type="linenumber">394</context>
         </context-group>
         <target state="translated">Bevestig toewys van dokumenttipe</target>
       </trans-unit>
@@ -3542,7 +3562,7 @@
         <source>This operation will assign the document type &quot;<x id="PH" equiv-text="documentType.name"/>&quot; to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">397</context>
+          <context context-type="linenumber">396</context>
         </context-group>
         <target state="translated">Die dokumenttipe “<x id="PH" equiv-text="documentType.name"/>” sal aan <x id="PH_1" equiv-text="this.list.selected.size"/> gekose dokument(e) toegewys word.</target>
       </trans-unit>
@@ -3550,7 +3570,7 @@
         <source>This operation will remove the document type from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">399</context>
+          <context context-type="linenumber">398</context>
         </context-group>
         <target state="translated">Die dokumenttipe sal verwyder word van <x id="PH" equiv-text="this.list.selected.size"/> gekose dokument(e).</target>
       </trans-unit>
@@ -3558,7 +3578,7 @@
         <source>Confirm storage path assignment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">433</context>
+          <context context-type="linenumber">432</context>
         </context-group>
         <target state="translated">Bevestig bergpadtoewysing</target>
       </trans-unit>
@@ -3566,7 +3586,7 @@
         <source>This operation will assign the storage path &quot;<x id="PH" equiv-text="storagePath.name"/>&quot; to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">435</context>
+          <context context-type="linenumber">434</context>
         </context-group>
         <target state="translated">Die bergpad “<x id="PH" equiv-text="storagePath.name"/>” sal aan <x id="PH_1" equiv-text="this.list.selected.size"/> gekose dokument(e) toegewys word.</target>
       </trans-unit>
@@ -3574,7 +3594,7 @@
         <source>This operation will remove the storage path from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">437</context>
+          <context context-type="linenumber">436</context>
         </context-group>
         <target state="translated">Die bergpad sal verwyder word van <x id="PH" equiv-text="this.list.selected.size"/> gekose dokument(e).</target>
       </trans-unit>
@@ -3582,7 +3602,7 @@
         <source>Delete confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">460</context>
+          <context context-type="linenumber">459</context>
         </context-group>
         <target state="translated">Bevestig skrap</target>
       </trans-unit>
@@ -3590,7 +3610,7 @@
         <source>This operation will permanently delete <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">461</context>
+          <context context-type="linenumber">460</context>
         </context-group>
         <target state="translated"><x id="PH" equiv-text="this.list.selected.size"/> gekose dokument(e) sal permanent geskrap word.</target>
       </trans-unit>
@@ -3598,7 +3618,7 @@
         <source>Delete document(s)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">464</context>
+          <context context-type="linenumber">463</context>
         </context-group>
         <target state="translated">Geskrapte dokument(e)</target>
       </trans-unit>
@@ -3606,7 +3626,7 @@
         <source>This operation will permanently redo OCR for <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">500</context>
+          <context context-type="linenumber">499</context>
         </context-group>
         <target state="translated">OCR sal permanent heruitgevoer word vir <x id="PH" equiv-text="this.list.selected.size"/> gekose dokument(e)</target>
       </trans-unit>
@@ -4266,17 +4286,17 @@
         <source>Error saving note</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-notes/document-notes.component.ts</context>
-          <context context-type="linenumber">67</context>
+          <context context-type="linenumber">66</context>
         </context-group>
         <target state="needs-translation">Error saving note</target>
       </trans-unit>
-      <trans-unit id="5682285129543775369" datatype="html">
-        <source>Error deleting note: <x id="PH" equiv-text="e.toString()"/></source>
+      <trans-unit id="4144411010137688084" datatype="html">
+        <source>Error deleting note</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-notes/document-notes.component.ts</context>
-          <context context-type="linenumber">85</context>
+          <context context-type="linenumber">80</context>
         </context-group>
-        <target state="translated">Fout by skrap van nota: <x id="PH" equiv-text="e.toString()"/></target>
+        <target state="needs-translation">Error deleting note</target>
       </trans-unit>
       <trans-unit id="6316128875819022658" datatype="html">
         <source>correspondent</source>
@@ -4498,7 +4518,7 @@
         <source>Successfully updated <x id="PH" equiv-text="this.typeName"/>.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">166</context>
+          <context context-type="linenumber">165</context>
         </context-group>
         <target state="translated"><x id="PH" equiv-text="this.typeName"/> suksesvol bygewerk.</target>
       </trans-unit>
@@ -4506,7 +4526,7 @@
         <source>Error occurred while saving <x id="PH" equiv-text="this.typeName"/>.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">171</context>
+          <context context-type="linenumber">170</context>
         </context-group>
         <target state="translated">Fout by die skrap van <x id="PH" equiv-text="this.typeName"/>.</target>
       </trans-unit>
@@ -4514,17 +4534,17 @@
         <source>Associated documents will not be deleted.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">192</context>
+          <context context-type="linenumber">190</context>
         </context-group>
         <target state="translated">Verwante dokumente sal nie geskrap word nie.</target>
       </trans-unit>
-      <trans-unit id="5467489005440577210" datatype="html">
-        <source>Error while deleting element: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></source>
+      <trans-unit id="6639207128255974941" datatype="html">
+        <source>Error while deleting element</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">205,207</context>
+          <context context-type="linenumber">203</context>
         </context-group>
-        <target state="translated">Fout by skrap van element: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></target>
+        <target state="needs-translation">Error while deleting element</target>
       </trans-unit>
       <trans-unit id="1685061484835793745" datatype="html">
         <source>Start tour</source>
@@ -4970,7 +4990,7 @@
         <source>Error retrieving users</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">287</context>
+          <context context-type="linenumber">285</context>
         </context-group>
         <target state="needs-translation">Error retrieving users</target>
       </trans-unit>
@@ -4978,7 +4998,7 @@
         <source>Error retrieving mail rules</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">314</context>
+          <context context-type="linenumber">309</context>
         </context-group>
         <target state="needs-translation">Error retrieving mail rules</target>
       </trans-unit>
@@ -4986,7 +5006,7 @@
         <source>Error retrieving mail accounts</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">323</context>
+          <context context-type="linenumber">317</context>
         </context-group>
         <target state="needs-translation">Error retrieving mail accounts</target>
       </trans-unit>
@@ -4994,7 +5014,7 @@
         <source>Saved view &quot;<x id="PH" equiv-text="savedView.name"/>&quot; deleted.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">530</context>
+          <context context-type="linenumber">523</context>
         </context-group>
         <target state="translated">Bewaarde aansig "<x id="PH" equiv-text="savedView.name"/>" is geskrap.</target>
       </trans-unit>
@@ -5002,7 +5022,7 @@
         <source>Settings saved</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">632</context>
+          <context context-type="linenumber">625</context>
         </context-group>
         <target state="translated">Instellings bewaar</target>
       </trans-unit>
@@ -5010,7 +5030,7 @@
         <source>Settings were saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">633</context>
+          <context context-type="linenumber">626</context>
         </context-group>
         <target state="translated">Instellings is suksesvol bewaar.</target>
       </trans-unit>
@@ -5018,7 +5038,7 @@
         <source>Settings were saved successfully. Reload is required to apply some changes.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">637</context>
+          <context context-type="linenumber">630</context>
         </context-group>
         <target state="translated">Instellings is suksesvol bewaar. Moet herlaai word om sommige veranderinge toe te pas.</target>
       </trans-unit>
@@ -5026,7 +5046,7 @@
         <source>Reload now</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">638</context>
+          <context context-type="linenumber">631</context>
         </context-group>
         <target state="translated">Herlaai nou</target>
       </trans-unit>
@@ -5034,7 +5054,7 @@
         <source>Use system language</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">657</context>
+          <context context-type="linenumber">649</context>
         </context-group>
         <target state="translated">Gebruik stelseltaal</target>
       </trans-unit>
@@ -5042,7 +5062,7 @@
         <source>Use date format of display language</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">664</context>
+          <context context-type="linenumber">656</context>
         </context-group>
         <target state="translated">Gebruik datumformaat van aansigtaal</target>
       </trans-unit>
@@ -5050,7 +5070,7 @@
         <source>Error while storing settings on server.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">684</context>
+          <context context-type="linenumber">676</context>
         </context-group>
         <target state="translated">Fout toe instellings op bediener bewaar is.</target>
       </trans-unit>
@@ -5058,7 +5078,7 @@
         <source>Password has been changed, you will be logged out momentarily.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">727</context>
+          <context context-type="linenumber">718</context>
         </context-group>
         <target state="translated">Wagwoord is verander, u sal vir nn oomblik afgeteken word.</target>
       </trans-unit>
@@ -5066,7 +5086,7 @@
         <source>Saved user &quot;<x id="PH" equiv-text="newUser.username"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">734</context>
+          <context context-type="linenumber">725</context>
         </context-group>
         <target state="translated">Gebruiker “<x id="PH" equiv-text="newUser.username"/>” is bewaar.</target>
       </trans-unit>
@@ -5074,7 +5094,7 @@
         <source>Error saving user.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">746</context>
+          <context context-type="linenumber">736</context>
         </context-group>
         <target state="translated">Fout by bewaar van gebruiker.</target>
       </trans-unit>
@@ -5082,7 +5102,7 @@
         <source>Confirm delete user account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">757</context>
+          <context context-type="linenumber">744</context>
         </context-group>
         <target state="translated">Bevestig skrap van gebruikersrekening</target>
       </trans-unit>
@@ -5090,7 +5110,7 @@
         <source>This operation will permanently delete this user account.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">758</context>
+          <context context-type="linenumber">745</context>
         </context-group>
         <target state="translated">Hierdie bewerking sal hierdie gebruikersrekening permanent skrap.</target>
       </trans-unit>
@@ -5098,7 +5118,7 @@
         <source>Deleted user</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">767</context>
+          <context context-type="linenumber">754</context>
         </context-group>
         <target state="translated">Skrap gebruiker</target>
       </trans-unit>
@@ -5106,7 +5126,7 @@
         <source>Error deleting user.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">775</context>
+          <context context-type="linenumber">761</context>
         </context-group>
         <target state="translated">Fout by skrap van gebruiker.</target>
       </trans-unit>
@@ -5114,7 +5134,7 @@
         <source>Saved group &quot;<x id="PH" equiv-text="newGroup.name"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">796</context>
+          <context context-type="linenumber">779</context>
         </context-group>
         <target state="translated">Groep “<x id="PH" equiv-text="newGroup.name"/>” is bewaar.</target>
       </trans-unit>
@@ -5122,7 +5142,7 @@
         <source>Error saving group.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">806</context>
+          <context context-type="linenumber">788</context>
         </context-group>
         <target state="translated">Fout by bewaar van groep.</target>
       </trans-unit>
@@ -5130,7 +5150,7 @@
         <source>Confirm delete user group</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">817</context>
+          <context context-type="linenumber">796</context>
         </context-group>
         <target state="translated">Bevestig skrap van gebruikersgroep</target>
       </trans-unit>
@@ -5138,7 +5158,7 @@
         <source>This operation will permanently delete this user group.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">818</context>
+          <context context-type="linenumber">797</context>
         </context-group>
         <target state="translated">Hierdie bewerking sal hierdie gebruikersgroep permanent skrap.</target>
       </trans-unit>
@@ -5146,7 +5166,7 @@
         <source>Deleted group</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">827</context>
+          <context context-type="linenumber">806</context>
         </context-group>
         <target state="translated">Geskrapte groep</target>
       </trans-unit>
@@ -5154,7 +5174,7 @@
         <source>Error deleting group.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">835</context>
+          <context context-type="linenumber">813</context>
         </context-group>
         <target state="translated">Fout by skrap van groep.</target>
       </trans-unit>
@@ -5162,7 +5182,7 @@
         <source>Saved account &quot;<x id="PH" equiv-text="newMailAccount.name"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">861</context>
+          <context context-type="linenumber">836</context>
         </context-group>
         <target state="translated">Rekening “<x id="PH" equiv-text="newMailAccount.name"/>” is bewaar.</target>
       </trans-unit>
@@ -5170,7 +5190,7 @@
         <source>Error saving account.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">873</context>
+          <context context-type="linenumber">847</context>
         </context-group>
         <target state="translated">Fout by bewaar van rekening.</target>
       </trans-unit>
@@ -5178,7 +5198,7 @@
         <source>Confirm delete mail account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">884</context>
+          <context context-type="linenumber">855</context>
         </context-group>
         <target state="translated">Bevestig skrap van e-posrekening</target>
       </trans-unit>
@@ -5186,7 +5206,7 @@
         <source>This operation will permanently delete this mail account.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">885</context>
+          <context context-type="linenumber">856</context>
         </context-group>
         <target state="translated">Hierdie bewerking sal hierdie e-posrekening permanent skrap.</target>
       </trans-unit>
@@ -5194,7 +5214,7 @@
         <source>Deleted mail account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">894</context>
+          <context context-type="linenumber">865</context>
         </context-group>
         <target state="translated">Skrap e-posrekening</target>
       </trans-unit>
@@ -5202,7 +5222,7 @@
         <source>Error deleting mail account.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">903</context>
+          <context context-type="linenumber">874</context>
         </context-group>
         <target state="translated">Fout by skrap van e-posrekening.</target>
       </trans-unit>
@@ -5210,7 +5230,7 @@
         <source>Saved rule &quot;<x id="PH" equiv-text="newMailRule.name"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">924</context>
+          <context context-type="linenumber">894</context>
         </context-group>
         <target state="translated">Reël “<x id="PH" equiv-text="newMailRule.name"/>” is bewaar.</target>
       </trans-unit>
@@ -5218,7 +5238,7 @@
         <source>Error saving rule.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">936</context>
+          <context context-type="linenumber">905</context>
         </context-group>
         <target state="translated">Fout by bewaar van reël.</target>
       </trans-unit>
@@ -5226,7 +5246,7 @@
         <source>Confirm delete mail rule</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">947</context>
+          <context context-type="linenumber">913</context>
         </context-group>
         <target state="translated">Bevestig skrap van e-posreël</target>
       </trans-unit>
@@ -5234,7 +5254,7 @@
         <source>This operation will permanently delete this mail rule.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">948</context>
+          <context context-type="linenumber">914</context>
         </context-group>
         <target state="translated">Hierdie bewerking sal hierdie e-posreël permanent skrap.</target>
       </trans-unit>
@@ -5242,7 +5262,7 @@
         <source>Deleted mail rule</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">957</context>
+          <context context-type="linenumber">923</context>
         </context-group>
         <target state="translated">Skrap e-posreël</target>
       </trans-unit>
@@ -5250,7 +5270,7 @@
         <source>Error deleting mail rule.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">966</context>
+          <context context-type="linenumber">931</context>
         </context-group>
         <target state="translated">Fout by skrap van e-posreël.</target>
       </trans-unit>
