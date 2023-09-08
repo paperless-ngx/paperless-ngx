@@ -151,7 +151,7 @@ class TagMailAction(BaseMailAction):
             _, self.color = parameter.split(":")
             self.color = self.color.strip()
 
-            if self.color.lower() not in APPLE_MAIL_TAG_COLORS.keys():
+            if self.color.lower() not in APPLE_MAIL_TAG_COLORS:
                 raise MailError("Not a valid AppleMail tag color.")
 
             self.keyword = None
