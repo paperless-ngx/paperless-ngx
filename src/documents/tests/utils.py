@@ -24,6 +24,7 @@ from django.test import override_settings
 
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
+from documents.parsers import ParseError
 
 
 def setup_directories():
@@ -89,7 +90,7 @@ def util_call_with_backoff(
     method_or_callable: Callable,
     args: Union[List, Tuple],
     *,
-    skip_on_503=True,
+    skip_on_50x_err=True,
 ) -> Tuple[bool, Any]:
     """
     For whatever reason, the images started during the test pipeline like to
@@ -118,24 +119,30 @@ def util_call_with_backoff(
             result = method_or_callable(*args)
 
             succeeded = True
-        except httpx.HTTPError as exc:
-            warnings.warn(f"HTTP Exception for {exc.request.url} - {exc}")
+        except ParseError as e:
+            cause_exec = e.__cause__
+            if cause_exec is not None and isinstance(cause_exec, httpx.HTTPStatusError):
+                status_codes.append(cause_exec.response.status_code)
+                warnings.warn(
+                    f"HTTP Exception for {cause_exec.request.url} - {cause_exec}",
+                )
+            else:
+                warnings.warn(f"Unexpected error: {e}")
+        except Exception as e:
+            warnings.warn(f"Unexpected error: {e}")
 
-            if isinstance(exc, httpx.HTTPStatusError):
-                status_codes.append(exc.response.status_code)
+        retry_count = retry_count + 1
 
-            retry_count = retry_count + 1
-
-            time.sleep(retry_time)
-            retry_time = retry_time * 2.0
+        time.sleep(retry_time)
+        retry_time = retry_time * 2.0
 
     if (
         not succeeded
         and status_codes
-        and skip_on_503
-        and all(element == httpx.codes.SERVICE_UNAVAILABLE for element in status_codes)
+        and skip_on_50x_err
+        and all(httpx.codes.is_server_error(code) for code in status_codes)
     ):
-        pytest.skip("Repeated HTTP 503 for service")
+        pytest.skip("Repeated HTTP 50x for service")
 
     return succeeded, result
 
