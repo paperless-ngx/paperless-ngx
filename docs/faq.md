@@ -94,7 +94,7 @@ libraries and compilation will take a long time.
 
 !!! note
 
-    For ARMv7 systems, paperless may still function, but it could require
+    For ARMv7 (32-bit) systems, paperless may still function, but it could require
     modifications to the Dockerfile (if using Docker) or additional
     tools for installing bare metal.  It is suggested to upgrade to arm64
     instead.
