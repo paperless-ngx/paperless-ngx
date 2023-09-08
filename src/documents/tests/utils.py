@@ -119,7 +119,7 @@ def util_call_with_backoff(
             result = method_or_callable(*args)
 
             succeeded = True
-        except ParseError as e:
+        except ParseError as e:  # pragma: no cover
             cause_exec = e.__cause__
             if cause_exec is not None and isinstance(cause_exec, httpx.HTTPStatusError):
                 status_codes.append(cause_exec.response.status_code)
@@ -128,7 +128,7 @@ def util_call_with_backoff(
                 )
             else:
                 warnings.warn(f"Unexpected error: {e}")
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             warnings.warn(f"Unexpected error: {e}")
 
         retry_count = retry_count + 1
@@ -142,7 +142,7 @@ def util_call_with_backoff(
         and skip_on_50x_err
         and all(httpx.codes.is_server_error(code) for code in status_codes)
     ):
-        pytest.skip("Repeated HTTP 50x for service")
+        pytest.skip("Repeated HTTP 50x for service")  # pragma: no cover
 
     return succeeded, result
 
