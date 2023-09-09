@@ -185,7 +185,7 @@ export class DocumentListComponent
   }
 
   ngOnDestroy() {
-    // unsubscribes all
+    this.list.cancelPending()
     this.unsubscribeNotifier.next(this)
     this.unsubscribeNotifier.complete()
   }
