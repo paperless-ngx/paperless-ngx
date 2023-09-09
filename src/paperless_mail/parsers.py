@@ -1,7 +1,6 @@
 import re
 from html import escape
 from pathlib import Path
-from typing import List
 
 import httpx
 from bleach import clean
@@ -355,7 +354,7 @@ class MailDocumentParser(DocumentParser):
     def generate_pdf_from_html(
         self,
         orig_html: str,
-        attachments: List[MailAttachment],
+        attachments: list[MailAttachment],
     ) -> Path:
         """
         Generates a PDF file based on the HTML and attachments of the email

@@ -2,7 +2,6 @@ import dataclasses
 import datetime
 import enum
 from pathlib import Path
-from typing import List
 from typing import Optional
 
 import magic
@@ -20,7 +19,7 @@ class DocumentMetadataOverrides:
     title: Optional[str] = None
     correspondent_id: Optional[int] = None
     document_type_id: Optional[int] = None
-    tag_ids: Optional[List[int]] = None
+    tag_ids: Optional[list[int]] = None
     created: Optional[datetime.datetime] = None
     asn: Optional[int] = None
     owner_id: Optional[int] = None

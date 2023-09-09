@@ -5,16 +5,11 @@ import shutil
 import stat
 import tempfile
 import uuid
+import zoneinfo
 from unittest import mock
 from unittest.mock import MagicMock
 
 from dateutil import tz
-
-try:
-    import zoneinfo
-except ImportError:
-    from backports import zoneinfo
-
 from django.conf import settings
 from django.test import TestCase
 from django.test import override_settings

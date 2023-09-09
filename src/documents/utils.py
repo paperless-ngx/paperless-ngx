@@ -1,14 +1,13 @@
 import shutil
 from os import utime
 from pathlib import Path
-from typing import Tuple
 from typing import Union
 
 
 def _coerce_to_path(
     source: Union[Path, str],
     dest: Union[Path, str],
-) -> Tuple[Path, Path]:
+) -> tuple[Path, Path]:
     return Path(source).resolve(), Path(dest).resolve()
 
 

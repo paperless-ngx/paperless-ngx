@@ -6,12 +6,11 @@ import re
 import shutil
 import subprocess
 import tempfile
+from collections.abc import Iterator
 from functools import lru_cache
 from pathlib import Path
-from typing import Iterator
-from typing import Match
+from re import Match
 from typing import Optional
-from typing import Set
 
 from django.conf import settings
 from django.utils import timezone
@@ -90,7 +89,7 @@ def is_file_ext_supported(ext: str) -> bool:
         return False
 
 
-def get_supported_file_extensions() -> Set[str]:
+def get_supported_file_extensions() -> set[str]:
     extensions = set()
     for response in document_consumer_declaration.send(None):
         parser_declaration = response[1]

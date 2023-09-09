@@ -7,12 +7,8 @@ import re
 import tempfile
 from os import PathLike
 from pathlib import Path
-from typing import Dict
 from typing import Final
-from typing import List
 from typing import Optional
-from typing import Set
-from typing import Tuple
 from typing import Union
 from urllib.parse import urlparse
 
@@ -85,9 +81,9 @@ def __get_path(
 
 def __get_list(
     key: str,
-    default: Optional[List[str]] = None,
+    default: Optional[list[str]] = None,
     sep: str = ",",
-) -> List[str]:
+) -> list[str]:
     """
     Return a list of elements from the environment, as separated by the given
     string, or the default if the key does not exist
@@ -100,7 +96,7 @@ def __get_list(
         return []
 
 
-def _parse_redis_url(env_redis: Optional[str]) -> Tuple[str]:
+def _parse_redis_url(env_redis: Optional[str]) -> tuple[str]:
     """
     Gets the Redis information from the environment or a default and handles
     converting from incompatible django_channels and celery formats.
@@ -138,7 +134,7 @@ def _parse_redis_url(env_redis: Optional[str]) -> Tuple[str]:
     return (env_redis, env_redis)
 
 
-def _parse_beat_schedule() -> Dict:
+def _parse_beat_schedule() -> dict:
     """
     Configures the scheduled tasks, according to default or
     environment variables.  Task expiration is configured so the task will
@@ -492,7 +488,7 @@ EMAIL_CERTIFICATE_FILE = __get_path("PAPERLESS_EMAIL_CERTIFICATE_FILE")
 ###############################################################################
 # Database                                                                    #
 ###############################################################################
-def _parse_db_settings() -> Dict:
+def _parse_db_settings() -> dict:
     databases = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
@@ -928,7 +924,7 @@ if TIKA_ENABLED:
 def _parse_ignore_dates(
     env_ignore: str,
     date_order: str = DATE_ORDER,
-) -> Set[datetime.datetime]:
+) -> set[datetime.datetime]:
     """
     If the PAPERLESS_IGNORE_DATES environment variable is set, parse the
     user provided string(s) into dates
@@ -957,7 +953,7 @@ def _parse_ignore_dates(
 
 
 # List dates that should be ignored when trying to parse date from document text
-IGNORE_DATES: Set[datetime.date] = set()
+IGNORE_DATES: set[datetime.date] = set()
 
 if os.getenv("PAPERLESS_IGNORE_DATES") is not None:
     IGNORE_DATES = _parse_ignore_dates(os.getenv("PAPERLESS_IGNORE_DATES"))
