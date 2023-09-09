@@ -24,6 +24,12 @@
     </tr>
   </thead>
   <tbody>
+    <tr *ngIf="isLoading">
+      <td colspan="5">
+        <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+        <ng-container i18n>Loading...</ng-container>
+      </td>
+    </tr>
     <tr *ngFor="let object of data">
       <td scope="row">{{ object.name }}</td>
       <td scope="row" class="d-none d-sm-table-cell">{{ getMatching(object) }}</td>
@@ -69,7 +75,7 @@
   </tbody>
 </table>
 
-<div class="d-flex">
+<div class="d-flex" *ngIf="!isLoading">
   <div i18n *ngIf="collectionSize > 0">{collectionSize, plural, =1 {One {{typeName}}} other {{{collectionSize || 0}} total {{typeNamePlural}}}}</div>
   <ngb-pagination *ngIf="collectionSize > 20" class="ms-auto" [pageSize]="25" [collectionSize]="collectionSize" [(page)]="page" [maxSize]="5" (pageChange)="reloadData()" size="sm" aria-label="Pagination"></ngb-pagination>
 </div>

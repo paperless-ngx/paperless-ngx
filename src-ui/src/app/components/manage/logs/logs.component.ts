@@ -4,7 +4,9 @@ import {
   OnInit,
   AfterViewChecked,
   ViewChild,
+  OnDestroy,
 } from '@angular/core'
+import { Subject, takeUntil } from 'rxjs'
 import { LogService } from 'src/app/services/rest/log.service'
 
 @Component({
@@ -12,40 +14,60 @@ import { LogService } from 'src/app/services/rest/log.service'
   templateUrl: './logs.component.html',
   styleUrls: ['./logs.component.scss'],
 })
-export class LogsComponent implements OnInit, AfterViewChecked {
+export class LogsComponent implements OnInit, AfterViewChecked, OnDestroy {
   constructor(private logService: LogService) {}
 
-  logs: string[] = []
+  public logs: string[] = []
 
-  logFiles: string[] = []
+  public logFiles: string[] = []
 
-  activeLog: string
+  public activeLog: string
+
+  private unsubscribeNotifier: Subject<any> = new Subject()
+
+  public isLoading: boolean = false
 
   @ViewChild('logContainer') logContainer: ElementRef
 
   ngOnInit(): void {
-    this.logService.list().subscribe((result) => {
-      this.logFiles = result
-      if (this.logFiles.length > 0) {
-        this.activeLog = this.logFiles[0]
-        this.reloadLogs()
-      }
-    })
+    this.isLoading = true
+    this.logService
+      .list()
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe((result) => {
+        this.logFiles = result
+        this.isLoading = false
+        if (this.logFiles.length > 0) {
+          this.activeLog = this.logFiles[0]
+          this.reloadLogs()
+        }
+      })
   }
 
   ngAfterViewChecked() {
     this.scrollToBottom()
   }
 
+  ngOnDestroy(): void {
+    this.unsubscribeNotifier.next(true)
+    this.unsubscribeNotifier.complete()
+  }
+
   reloadLogs() {
-    this.logService.get(this.activeLog).subscribe({
-      next: (result) => {
-        this.logs = result
-      },
-      error: () => {
-        this.logs = []
-      },
-    })
+    this.isLoading = true
+    this.logService
+      .get(this.activeLog)
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe({
+        next: (result) => {
+          this.logs = result
+          this.isLoading = false
+        },
+        error: () => {
+          this.logs = []
+          this.isLoading = false
+        },
+      })
   }
 
   getLogLevel(log: string) {
