@@ -8,7 +8,6 @@ from threading import Event
 from time import monotonic
 from time import sleep
 from typing import Final
-from typing import Set
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -32,7 +31,7 @@ except ImportError:  # pragma: nocover
 logger = logging.getLogger("paperless.management.consumer")
 
 
-def _tags_from_path(filepath) -> Set[Tag]:
+def _tags_from_path(filepath) -> set[Tag]:
     """
     Walk up the directory tree from filepath to CONSUMPTION_DIR
     and get or create Tag IDs for every directory.

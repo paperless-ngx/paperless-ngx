@@ -255,7 +255,7 @@ supported.
 
 1.  Install dependencies. Paperless requires the following packages.
 
-    - `python3` - 3.8 - 3.11 are supported
+    - `python3` - 3.9 - 3.11 are supported
     - `python3-pip`
     - `python3-dev`
     - `default-libmysqlclient-dev` for MariaDB

@@ -5,8 +5,6 @@ import shutil
 import tempfile
 import time
 from pathlib import Path
-from typing import List
-from typing import Set
 
 import tqdm
 from django.conf import settings
@@ -138,8 +136,8 @@ class Command(BaseCommand):
         BaseCommand.__init__(self, *args, **kwargs)
         self.target: Path = None
         self.split_manifest = False
-        self.files_in_export_dir: Set[Path] = set()
-        self.exported_files: List[Path] = []
+        self.files_in_export_dir: set[Path] = set()
+        self.exported_files: list[Path] = []
         self.compare_checksums = False
         self.use_filename_format = False
         self.use_folder_prefix = False
