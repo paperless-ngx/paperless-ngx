@@ -7,18 +7,13 @@ import tempfile
 import urllib.request
 import uuid
 import zipfile
+import zoneinfo
 from datetime import timedelta
 from pathlib import Path
 from unittest import mock
 from unittest.mock import MagicMock
 
 import celery
-
-try:
-    import zoneinfo
-except ImportError:
-    from backports import zoneinfo
-
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.conf import settings

@@ -155,10 +155,8 @@ def settings_values_check(app_configs, **kwargs):
         """
         Validates the user provided timezone is a valid timezone
         """
-        try:
-            import zoneinfo
-        except ImportError:  # pragma: nocover
-            from backports import zoneinfo
+        import zoneinfo
+
         msgs = []
         if settings.TIME_ZONE not in zoneinfo.available_timezones():
             msgs.append(

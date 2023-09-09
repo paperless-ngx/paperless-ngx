@@ -8,8 +8,6 @@ import traceback
 from datetime import date
 from datetime import timedelta
 from fnmatch import fnmatch
-from typing import Dict
-from typing import List
 from typing import Union
 
 import magic
@@ -80,7 +78,7 @@ class BaseMailAction:
     read mails when the action is to mark mails as read).
     """
 
-    def get_criteria(self) -> Union[Dict, LogicOperator]:
+    def get_criteria(self) -> Union[dict, LogicOperator]:
         """
         Returns filtering criteria/query for this mail action.
         """
@@ -232,7 +230,7 @@ def mailbox_login(mailbox: MailBox, account: MailAccount):
 
 @shared_task
 def apply_mail_action(
-    result: List[str],
+    result: list[str],
     rule_id: int,
     message_uid: str,
     message_subject: str,
@@ -319,7 +317,7 @@ def error_callback(
 
 def queue_consumption_tasks(
     *,
-    consume_tasks: List[Signature],
+    consume_tasks: list[Signature],
     rule: MailRule,
     message: MailMessage,
 ):

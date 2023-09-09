@@ -17,9 +17,8 @@ env:
   # This is the version of pipenv all the steps will use
   # If changing this, change Dockerfile
   DEFAULT_PIP_ENV_VERSION: "2023.9.8"
-  # This is the default version of Python to use in most steps
-  # If changing this, change Dockerfile
-  DEFAULT_PYTHON_VERSION: "3.9"
+  # This is the default version of Python to use in most steps which aren't specific
+  DEFAULT_PYTHON_VERSION: "3.10"
 
 jobs:
   pre-commit:
@@ -105,7 +104,7 @@ jobs:
       - pre-commit
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11']
+        python-version: ['3.9', '3.10', '3.11']
       fail-fast: false
     steps:
       -
@@ -283,7 +282,7 @@ jobs:
         #  a tag
         # Otherwise forks would require a Docker Hub account and secrets setup
         run: |
-          if [[ ${{ github.repository_owner }} == "paperless-ngx" && ( ${{ github.ref_name }} == "main" || ${{ github.ref_name }} == "dev" || ${{ github.ref_name }} == "beta" || ${{ startsWith(github.ref, 'refs/tags/v') }} == "true" ) ]] ; then
+          if [[ ${{ github.repository_owner }} == "paperless-ngx" && ( ${{ github.ref_name }} == "dev" || ${{ github.ref_name }} == "beta" || ${{ startsWith(github.ref, 'refs/tags/v') }} == "true" ) ]] ; then
             echo "Enabling DockerHub image push"
             echo "enable=true" >> $GITHUB_OUTPUT
           else
