@@ -1,14 +1,10 @@
 import datetime
 import math
 import re
+import zoneinfo
 
-from celery import states
-
-try:
-    import zoneinfo
-except ImportError:
-    from backports import zoneinfo
 import magic
+from celery import states
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User

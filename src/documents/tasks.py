@@ -3,7 +3,6 @@ import logging
 import shutil
 import uuid
 from typing import Optional
-from typing import Type
 
 import tqdm
 from asgiref.sync import async_to_sync
@@ -216,7 +215,7 @@ def update_document_archive_file(document_id):
 
     mime_type = document.mime_type
 
-    parser_class: Type[DocumentParser] = get_parser_class_for_mime_type(mime_type)
+    parser_class: type[DocumentParser] = get_parser_class_for_mime_type(mime_type)
 
     if not parser_class:
         logger.error(
