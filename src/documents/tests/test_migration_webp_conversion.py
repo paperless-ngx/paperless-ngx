@@ -1,9 +1,9 @@
 import importlib
 import shutil
 import tempfile
+from collections.abc import Iterable
 from pathlib import Path
 from typing import Callable
-from typing import Iterable
 from typing import Union
 from unittest import mock
 

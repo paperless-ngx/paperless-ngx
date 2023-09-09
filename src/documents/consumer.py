@@ -8,7 +8,6 @@ from pathlib import Path
 from subprocess import CompletedProcess
 from subprocess import run
 from typing import Optional
-from typing import Type
 
 import magic
 from asgiref.sync import async_to_sync
@@ -372,7 +371,7 @@ class Consumer(LoggingMixin):
         self.log.debug(f"Detected mime type: {mime_type}")
 
         # Based on the mime type, get the parser for that type
-        parser_class: Optional[Type[DocumentParser]] = get_parser_class_for_mime_type(
+        parser_class: Optional[type[DocumentParser]] = get_parser_class_for_mime_type(
             mime_type,
         )
         if not parser_class:

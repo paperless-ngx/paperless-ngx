@@ -3,11 +3,10 @@ import os
 import pickle
 import re
 import warnings
+from collections.abc import Iterator
 from datetime import datetime
 from hashlib import sha256
 from pathlib import Path
-from typing import Iterator
-from typing import List
 from typing import Optional
 
 from django.conf import settings
@@ -357,7 +356,7 @@ class DocumentClassifier:
 
                 # Tokenize
                 # This splits the content into tokens, roughly words
-                words: List[str] = word_tokenize(
+                words: list[str] = word_tokenize(
                     content,
                     language=settings.NLTK_LANGUAGE,
                 )
@@ -404,7 +403,7 @@ class DocumentClassifier:
         else:
             return None
 
-    def predict_tags(self, content: str) -> List[int]:
+    def predict_tags(self, content: str) -> list[int]:
         from sklearn.utils.multiclass import type_of_target
 
         if self.tags_classifier:

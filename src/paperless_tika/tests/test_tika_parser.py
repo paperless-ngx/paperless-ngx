@@ -1,12 +1,8 @@
 import datetime
 import os
+import zoneinfo
 from pathlib import Path
 from unittest import mock
-
-try:
-    import zoneinfo
-except ImportError:
-    from backports import zoneinfo
 
 from django.test import TestCase
 from django.test import override_settings

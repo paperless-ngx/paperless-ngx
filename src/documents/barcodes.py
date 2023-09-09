@@ -2,9 +2,7 @@ import logging
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict
 from typing import Final
-from typing import List
 from typing import Optional
 
 from django.conf import settings
@@ -53,7 +51,7 @@ class BarcodeReader:
         self.file: Final[Path] = filepath
         self.mime: Final[str] = mime_type
         self.pdf_file: Path = self.file
-        self.barcodes: List[Barcode] = []
+        self.barcodes: list[Barcode] = []
         self.temp_dir: Optional[tempfile.TemporaryDirectory] = None
 
         if settings.CONSUMER_BARCODE_TIFF_SUPPORT:
@@ -111,7 +109,7 @@ class BarcodeReader:
         return asn
 
     @staticmethod
-    def read_barcodes_zxing(image: Image) -> List[str]:
+    def read_barcodes_zxing(image: Image) -> list[str]:
         barcodes = []
 
         import zxingcpp
@@ -127,7 +125,7 @@ class BarcodeReader:
         return barcodes
 
     @staticmethod
-    def read_barcodes_pyzbar(image: Image) -> List[str]:
+    def read_barcodes_pyzbar(image: Image) -> list[str]:
         barcodes = []
 
         from pyzbar import pyzbar
@@ -209,7 +207,7 @@ class BarcodeReader:
                 f"Exception during barcode scanning: {e}",
             )
 
-    def get_separation_pages(self) -> Dict[int, bool]:
+    def get_separation_pages(self) -> dict[int, bool]:
         """
         Search the parsed barcodes for separators and returns a dict of page
         numbers, which separate the file into new files, together with the
@@ -228,7 +226,7 @@ class BarcodeReader:
             **{bc.page: True for bc in self.barcodes if bc.is_asn and bc.page != 0},
         }
 
-    def separate_pages(self, pages_to_split_on: Dict[int, bool]) -> List[Path]:
+    def separate_pages(self, pages_to_split_on: dict[int, bool]) -> list[Path]:
         """
         Separate the provided pdf file on the pages_to_split_on.
         The pages which are defined by the keys in page_numbers
@@ -241,9 +239,9 @@ class BarcodeReader:
         fname = self.file.with_suffix("").name
         with Pdf.open(self.pdf_file) as input_pdf:
             # Start with an empty document
-            current_document: List[Page] = []
+            current_document: list[Page] = []
             # A list of documents, ie a list of lists of pages
-            documents: List[List[Page]] = [current_document]
+            documents: list[list[Page]] = [current_document]
 
             for idx, page in enumerate(input_pdf.pages):
                 # Keep building the new PDF as long as it is not a
