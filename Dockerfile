@@ -67,23 +67,11 @@ ARG RUNTIME_PACKAGES="\
   gnupg \
   icc-profiles-free \
   imagemagick \
-  # Image processing
-  liblept5 \
-  liblcms2-2 \
-  libtiff6 \
-  libfreetype6 \
-  libwebp7 \
-  libopenjp2-7 \
-  libimagequant0 \
-  libraqm0 \
-  libjpeg62-turbo \
   # PostgreSQL
   libpq5 \
   postgresql-client \
   # MySQL / MariaDB
   mariadb-client \
-  # For Numpy
-  libatlas3-base \
   # OCRmyPDF dependencies
   tesseract-ocr \
   tesseract-ocr-eng \
@@ -93,12 +81,11 @@ ARG RUNTIME_PACKAGES="\
   tesseract-ocr-spa \
   unpaper \
   pngquant \
-  # pikepdf / qpdf
   jbig2dec \
+  # lxml
   libxml2 \
   libxslt1.1 \
-  libgnutls30 \
-  libqpdf29 \
+  # itself
   qpdf \
   # Mime type detection
   file \
@@ -107,9 +94,7 @@ ARG RUNTIME_PACKAGES="\
   zlib1g \
   # Barcode splitter
   libzbar0 \
-  poppler-utils \
-  # RapidFuzz on armv7
-  libatomic1"
+  poppler-utils"
 
 # Install basic runtime packages.
 # These change very infrequently
