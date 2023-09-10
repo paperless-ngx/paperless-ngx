@@ -122,7 +122,7 @@ class Consumer(LoggingMixin):
         with open(self.path, "rb") as f:
             checksum = hashlib.md5(f.read()).hexdigest()
         existing_doc = Document.objects.filter(
-            Q(checksum=checksum) | Q(archive_checksum=checksum),
+            Q(checksum=checksum) | Q(archive_checksum=checksum) | Q(original_filename=self.filename),
         )
         if existing_doc.exists():
             if settings.CONSUMER_DELETE_DUPLICATES:
