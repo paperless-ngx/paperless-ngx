@@ -53,7 +53,7 @@ class TikaDocumentParser(DocumentParser):
             for key in parsed["metadata"]
         ]
 
-    def parse(self, document_path: Path, mime_type, file_name=None):
+    def parse(self, document_path: Path, mime_type, file_name=None, custom_options=None):
         self.log("info", f"Sending {document_path} to Tika server")
         tika_server = settings.TIKA_ENDPOINT
 

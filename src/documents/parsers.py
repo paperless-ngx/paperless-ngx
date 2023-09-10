@@ -322,7 +322,7 @@ class DocumentParser(LoggingMixin):
     def extract_metadata(self, document_path, mime_type):
         return []
 
-    def parse(self, document_path, mime_type, file_name=None):
+    def parse(self, document_path, mime_type, file_name=None, custom_options=None):
         raise NotImplementedError
 
     def get_archive_path(self):
