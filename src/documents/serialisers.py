@@ -476,7 +476,6 @@ class SavedViewSerializer(OwnedObjectSerializer):
 
     class Meta:
         model = SavedView
-        depth = 1
         fields = [
             "id",
             "name",
