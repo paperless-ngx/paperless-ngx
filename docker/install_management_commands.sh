@@ -13,6 +13,7 @@ for command in decrypt_documents \
 	document_retagger \
 	document_thumbnails \
 	document_sanity_checker \
+	document_fuzzy_match \
 	manage_superuser;
 do
 	echo "installing $command..."
