@@ -572,3 +572,20 @@ it here)
 ```
 decrypt_documents [--passphrase SECR3TP4SSPHRA$E]
 ```
+
+### Detecting duplicates {#fuzzy_duplicate}
+
+Paperless already catches and prevents upload of exactly matching documents,
+however a new scan of an existing document may not produce an exact bit for bit
+duplicate. But the content should be exact or close, allowing detection.
+
+This tool does a fuzzy match over document content, looking for
+those which look close according to a given ratio.
+
+```
+document_fuzzy_match [--ratio]
+```
+
+Optional arguments:
+--ratio - a number between 0 and 100, setting how similar a document must be for it to be reported.
+Higher numbers mean more similarity.
