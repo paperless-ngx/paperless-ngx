@@ -45,7 +45,7 @@ class TestFuzzyMatchCommand(TestCase):
             filename="other_test.pdf",
         )
         stdout, _ = self.call_command()
-        self.assertEqual(stdout, "")
+        self.assertEqual(stdout, "No matches found\n")
 
     def test_with_matches(self):
         # Content similarity is 86.667
