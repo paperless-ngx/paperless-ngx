@@ -13,6 +13,7 @@ class TestFuzzyMatchCommand(TestCase):
         stderr = StringIO()
         call_command(
             "document_fuzzy_match",
+            "--no-progress-bar",
             *args,
             stdout=stdout,
             stderr=stderr,
@@ -63,7 +64,7 @@ class TestFuzzyMatchCommand(TestCase):
             mime_type="application/pdf",
             filename="other_test.pdf",
         )
-        stdout, _ = self.call_command()
+        stdout, _ = self.call_command("--processes", "1")
         self.assertEqual(stdout, "Document 1 fuzzy match to 2 (confidence 86.667)\n")
 
     def test_with_3_matches(self):
