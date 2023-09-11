@@ -586,6 +586,7 @@ those which look close according to a given ratio.
 document_fuzzy_match [--ratio]
 ```
 
-Optional arguments:
---ratio - a number between 0 and 100, setting how similar a document must be for it to be reported.
-Higher numbers mean more similarity.
+| Option      | Required | Default | Description                                                                                                                    |
+| ----------- | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| --ratio     | No       | 85.0    | a number between 0 and 100, setting how similar a document must be for it to be reported. Higher numbers mean more similarity. |
+| --processes | No       | 4       | Number of processes to use for matching. Setting 1 disables multiple processes                                                 |
