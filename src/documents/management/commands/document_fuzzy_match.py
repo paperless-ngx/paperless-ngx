@@ -1,3 +1,5 @@
+import dataclasses
+import multiprocessing
 from typing import Final
 
 import rapidfuzz
@@ -8,8 +10,35 @@ from django.core.management import CommandError
 from documents.models import Document
 
 
+@dataclasses.dataclass(frozen=True)
+class _WorkPackage:
+    first_doc: Document
+    second_doc: Document
+
+
+@dataclasses.dataclass(frozen=True)
+class _WorkResult:
+    doc_one_pk: int
+    doc_two_pk: int
+    ratio: float
+
+    def __lt__(self, other: "_WorkResult") -> bool:
+        return self.doc_one_pk < other.doc_one_pk
+
+
+def _process_and_match(work: _WorkPackage) -> _WorkResult:
+    # Normalize the string some, lower case, whitespace, etc
+    first_string = rapidfuzz.utils.default_process(work.first_doc.content)
+    second_string = rapidfuzz.utils.default_process(work.second_doc.content)
+
+    # Basic matching ratio
+    match = rapidfuzz.fuzz.ratio(first_string, second_string)
+
+    return _WorkResult(work.first_doc.pk, work.second_doc.pk, match)
+
+
 class Command(BaseCommand):
-    help = "Manages the document index."
+    help = "Searches for documents where the content almost matches"
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -17,6 +46,12 @@ class Command(BaseCommand):
             default=85.0,
             type=float,
             help="Ratio to consider documents a match",
+        )
+        parser.add_argument(
+            "--processes",
+            default=4,
+            type=int,
+            help="Number of processes to distribute work amongst",
         )
         parser.add_argument(
             "--no-progress-bar",
@@ -30,8 +65,8 @@ class Command(BaseCommand):
         RATIO_MAX: Final[float] = 100.0
 
         opt_ratio = options["ratio"]
-        progress_bar_disable = options["no_progress_bar"]
-        match_pairs = set()
+        checked_pairs: set[tuple[int, int]] = set()
+        work_pkgs: list[_WorkPackage] = []
 
         # Ratio is a float from 0.0 to 100.0
         if opt_ratio < RATIO_MIN or opt_ratio > RATIO_MAX:
@@ -39,42 +74,54 @@ class Command(BaseCommand):
 
         all_docs = Document.objects.all().order_by("id")
 
-        messages = []
-
-        for first_doc in tqdm.tqdm(all_docs, disable=progress_bar_disable):
+        # Build work packages for processing
+        for first_doc in all_docs:
             for second_doc in all_docs:
+                # doc to doc is obviously not useful
                 if first_doc.pk == second_doc.pk:
                     continue
+                # Skip matching which have already been matched together
+                # doc 1 to doc 2 is the same as doc 2 to doc 1
+                if (first_doc.pk, second_doc.pk) in checked_pairs or (
+                    second_doc.pk,
+                    first_doc.pk,
+                ) in checked_pairs:
+                    continue
+                checked_pairs.update(
+                    [(first_doc.pk, second_doc.pk), (second_doc.pk, first_doc.pk)],
+                )
 
-                # Normalize the string some, lower case, whitespace, etc
-                first_string = rapidfuzz.utils.default_process(first_doc.content)
-                second_string = rapidfuzz.utils.default_process(second_doc.content)
+                work_pkgs.append(_WorkPackage(first_doc, second_doc))
 
-                # Basic matching ratio
-                match = rapidfuzz.fuzz.ratio(first_string, second_string)
+        # Don't spin up a pool of 1 process
+        if options["processes"] == 1:
+            results = []
+            for work in tqdm.tqdm(work_pkgs, disable=options["no_progress_bar"]):
+                results.append(_process_and_match(work))
+        else:
+            with multiprocessing.Pool(processes=options["processes"]) as pool:
+                results = list(
+                    tqdm.tqdm(
+                        pool.imap_unordered(_process_and_match, work_pkgs),
+                        total=len(work_pkgs),
+                        disable=options["no_progress_bar"],
+                    ),
+                )
 
-                if match >= opt_ratio:
-                    # Skip matching which have already been matched together
-                    # doc 1 to doc 2 is the same as doc 2 to doc 1
-                    if (first_doc.pk, second_doc.pk) in match_pairs or (
-                        second_doc.pk,
-                        first_doc.pk,
-                    ) in match_pairs:
-                        continue
-                    else:
-                        match_pairs.add((first_doc.pk, second_doc.pk))
-                        match_pairs.add((second_doc.pk, first_doc.pk))
-
-                    messages.append(
-                        self.style.NOTICE(
-                            f"Document {first_doc.pk} fuzzy match"
-                            f" to {second_doc.pk} (confidence {match:.3f})",
-                        ),
-                    )
+        # Check results
+        messages = []
+        for result in sorted(results):
+            if result.ratio >= opt_ratio:
+                messages.append(
+                    self.style.NOTICE(
+                        f"Document {result.doc_one_pk} fuzzy match"
+                        f" to {result.doc_two_pk} (confidence {result.ratio:.3f})",
+                    ),
+                )
 
         if len(messages) == 0:
             messages.append(
-                self.style.NOTICE("No matches found"),
+                self.style.SUCCESS("No matches found"),
             )
         self.stdout.writelines(
             messages,
