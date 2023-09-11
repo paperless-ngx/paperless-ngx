@@ -1,6 +1,7 @@
 from typing import Final
 
 import rapidfuzz
+import tqdm
 from django.core.management import BaseCommand
 from django.core.management import CommandError
 
@@ -17,12 +18,19 @@ class Command(BaseCommand):
             type=float,
             help="Ratio to consider documents a match",
         )
+        parser.add_argument(
+            "--no-progress-bar",
+            default=False,
+            action="store_true",
+            help="If set, the progress bar will not be shown",
+        )
 
     def handle(self, *args, **options):
         RATIO_MIN: Final[float] = 0.0
         RATIO_MAX: Final[float] = 100.0
 
         opt_ratio = options["ratio"]
+        progress_bar_disable = options["no_progress_bar"]
         match_pairs = set()
 
         # Ratio is a float from 0.0 to 100.0
@@ -31,7 +39,9 @@ class Command(BaseCommand):
 
         all_docs = Document.objects.all().order_by("id")
 
-        for first_doc in all_docs:
+        messages = []
+
+        for first_doc in tqdm.tqdm(all_docs, disable=progress_bar_disable):
             for second_doc in all_docs:
                 if first_doc.pk == second_doc.pk:
                     continue
@@ -55,9 +65,17 @@ class Command(BaseCommand):
                         match_pairs.add((first_doc.pk, second_doc.pk))
                         match_pairs.add((second_doc.pk, first_doc.pk))
 
-                    self.stdout.write(
+                    messages.append(
                         self.style.NOTICE(
                             f"Document {first_doc.pk} fuzzy match"
                             f" to {second_doc.pk} (confidence {match:.3f})",
                         ),
                     )
+
+        if len(messages) == 0:
+            messages.append(
+                self.style.NOTICE("No matches found"),
+            )
+        self.stdout.writelines(
+            messages,
+        )
