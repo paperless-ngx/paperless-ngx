@@ -22,15 +22,54 @@ class TestFuzzyMatchCommand(TestCase):
         return stdout.getvalue(), stderr.getvalue()
 
     def test_invalid_ratio_lower_limit(self):
-        with self.assertRaises(CommandError):
+        """
+        GIVEN:
+            - Invalid ratio below lower limit
+        WHEN:
+            - Command is called
+        THEN:
+            - Error is raised indicating issue
+        """
+        with self.assertRaises(CommandError) as e:
             self.call_command("--ratio", "-1")
+            self.assertIn("The ratio must be between 0 and 100", str(e))
 
     def test_invalid_ratio_upper_limit(self):
-        with self.assertRaises(CommandError):
+        """
+        GIVEN:s
+            - Invalid ratio above upper
+        WHEN:
+            - Command is called
+        THEN:
+            - Error is raised indicating issue
+        """
+        with self.assertRaises(CommandError) as e:
             self.call_command("--ratio", "101")
+            self.assertIn("The ratio must be between 0 and 100", str(e))
+
+    def test_invalid_process_count(self):
+        """
+        GIVEN:
+            - Invalid process count less than 0 above upper
+        WHEN:
+            - Command is called
+        THEN:
+            - Error is raised indicating issue
+        """
+        with self.assertRaises(CommandError) as e:
+            self.call_command("--processes", "0")
+            self.assertIn("There must be at least 1 process", str(e))
 
     def test_no_matches(self):
-        # Content similarity is 82.35
+        """
+        GIVEN:
+            - 2 documents exist
+            - Similarity between content is 82.32
+        WHEN:
+            - Command is called
+        THEN:
+            - No matches are found
+        """
         Document.objects.create(
             checksum="BEEFCAFE",
             title="A",
@@ -49,6 +88,16 @@ class TestFuzzyMatchCommand(TestCase):
         self.assertEqual(stdout, "No matches found\n")
 
     def test_with_matches(self):
+        """
+        GIVEN:
+            - 2 documents exist
+            - Similarity between content is 86.667
+        WHEN:
+            - Command is called
+        THEN:
+            - 1 match is returned from doc 1 to doc 2
+            - No match from doc 2 to doc 1 reported
+        """
         # Content similarity is 86.667
         Document.objects.create(
             checksum="BEEFCAFE",
@@ -68,6 +117,16 @@ class TestFuzzyMatchCommand(TestCase):
         self.assertEqual(stdout, "Document 1 fuzzy match to 2 (confidence 86.667)\n")
 
     def test_with_3_matches(self):
+        """
+        GIVEN:
+            - 3 documents exist
+            - All documents have similarity over 85.0
+        WHEN:
+            - Command is called
+        THEN:
+            - 3 matches is returned from each document to the others
+            - No duplication of matches returned
+        """
         # Content similarity is 86.667
         Document.objects.create(
             checksum="BEEFCAFE",
