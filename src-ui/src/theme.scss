@@ -137,6 +137,7 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
   }
 
   .card {
+    --bs-border-color-translucent: 0, 0, 0, .175;
     background-color: var(--bs-body-bg);
 
     .card-header {
@@ -162,7 +163,7 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
   }
 
   .doc-img {
-    mix-blend-mode: normal;
+    mix-blend-mode: normal !important;
     border-radius: 0;
     border-color: var(--bs-border-color);
     filter: invert(10%);
