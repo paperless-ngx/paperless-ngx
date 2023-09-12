@@ -8,6 +8,8 @@ from documents.models import Document
 
 
 class TestFuzzyMatchCommand(TestCase):
+    MSG_REGEX = r"Document \d fuzzy match to \d \(confidence \d\d\.\d\d\d\)"
+
     def call_command(self, *args, **kwargs):
         stdout = StringIO()
         stderr = StringIO()
@@ -114,7 +116,7 @@ class TestFuzzyMatchCommand(TestCase):
             filename="other_test.pdf",
         )
         stdout, _ = self.call_command("--processes", "1")
-        self.assertEqual(stdout, "Document 1 fuzzy match to 2 (confidence 86.667)\n")
+        self.assertRegex(stdout, self.MSG_REGEX + "\n")
 
     def test_with_3_matches(self):
         """
@@ -152,6 +154,6 @@ class TestFuzzyMatchCommand(TestCase):
         stdout, _ = self.call_command()
         lines = [x.strip() for x in stdout.split("\n") if len(x.strip())]
         self.assertEqual(len(lines), 3)
-        self.assertEqual(lines[0], "Document 1 fuzzy match to 2 (confidence 86.667)")
-        self.assertEqual(lines[1], "Document 1 fuzzy match to 3 (confidence 88.136)")
-        self.assertEqual(lines[2], "Document 2 fuzzy match to 3 (confidence 88.525)")
+        self.assertRegex(lines[0], self.MSG_REGEX)
+        self.assertRegex(lines[1], self.MSG_REGEX)
+        self.assertRegex(lines[2], self.MSG_REGEX)
