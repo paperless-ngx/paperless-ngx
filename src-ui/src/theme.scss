@@ -275,7 +275,7 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
 }
 
 @include color-mode(dark) {
-  &:not(.primary-light):not(.primary-dark) {
+  body:not(.primary-light):not(.primary-dark) {
     @include paperless-green-dark-mode;
 
     .navbar.bg-primary {

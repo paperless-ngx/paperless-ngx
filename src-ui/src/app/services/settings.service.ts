@@ -138,6 +138,16 @@ export class SettingsService {
         '--pngx-primary-lightness',
         `${hsl.l * 100}%`,
         RendererStyleFlags2.DashCase
+      );
+
+      /**
+       * Fix for not reflecting changed variables. (--bs-primary is at :root while here we set them to body)
+        */
+      this._renderer.setStyle(
+        document.body,
+        '--bs-primary',
+        'hsl(var(--pngx-primary), var(--pngx-primary-lightness))',
+        RendererStyleFlags2.DashCase
       )
     } else {
       this._renderer.removeStyle(
@@ -148,6 +158,11 @@ export class SettingsService {
       this._renderer.removeStyle(
         document.body,
         '--pngx-primary-lightness',
+        RendererStyleFlags2.DashCase
+      )
+      this._renderer.removeStyle(
+        document.body,
+        '--bs-primary',
         RendererStyleFlags2.DashCase
       )
     }
