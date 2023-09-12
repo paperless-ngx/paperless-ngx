@@ -1,5 +1,4 @@
 import os
-import shutil
 import tempfile
 from datetime import timedelta
 
@@ -7,31 +6,16 @@ from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.test import TestCase
-from django.test import override_settings
 from django.utils import timezone
 from rest_framework import status
 
 from documents.models import Document
 from documents.models import ShareLink
+from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import setup_directories
 
 
-class TestViews(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        # Provide a dummy static dir to silence whitenoise warnings
-        cls.static_dir = tempfile.mkdtemp()
-
-        cls.override = override_settings(
-            STATIC_ROOT=cls.static_dir,
-        )
-        cls.override.enable()
-
-    @classmethod
-    def tearDownClass(cls):
-        shutil.rmtree(cls.static_dir, ignore_errors=True)
-        cls.override.disable()
-
+class TestViews(TestCase, DirectoriesMixin):
     def setUp(self) -> None:
         self.user = User.objects.create_user("testuser")
 

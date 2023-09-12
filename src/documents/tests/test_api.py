@@ -2578,10 +2578,10 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             mime_type="application/pdf",
             content="this is a document which will have notes added",
         )
+        # never expires
         resp = self.client.post(
             "/api/share_links/",
             data={
-                "expiration": "",
                 "document": doc.pk,
             },
         )
