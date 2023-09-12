@@ -306,19 +306,3 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
   }
 
 }
-
-//@media (prefers-color-scheme: dark) {
-//  :root {
-//    // no custom theme color
-//    &:not(.primary-light):not(.primary-dark) {
-//      @include paperless-green-dark-mode;
-//
-//      .navbar.bg-primary {
-//        // navbar is og green in dark mode
-//        @include paperless-green;
-//      }
-//    }
-//
-//    @include dark-mode;
-//  }
-//}
