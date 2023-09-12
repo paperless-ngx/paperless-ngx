@@ -166,11 +166,11 @@ def run_convert(
         raise ParseError(f"Convert failed at {args}")
 
 
-def get_default_thumbnail() -> str:
+def get_default_thumbnail() -> Path:
     """
     Returns the path to a generic thumbnail
     """
-    return os.path.join(os.path.dirname(__file__), "resources", "document.png")
+    return (Path(__file__).parent / "resources" / "document.webp").resolve()
 
 
 def make_thumbnail_from_pdf_gs_fallback(in_path, temp_dir, logging_group=None) -> str:
@@ -183,12 +183,13 @@ def make_thumbnail_from_pdf_gs_fallback(in_path, temp_dir, logging_group=None) -
         "to ghostscript. Check your /etc/ImageMagick-x/policy.xml!",
         extra={"group": logging_group},
     )
+    # Ghostscript doesn't handle WebP outputs
     gs_out_path = os.path.join(temp_dir, "gs_out.png")
     cmd = [settings.GS_BINARY, "-q", "-sDEVICE=pngalpha", "-o", gs_out_path, in_path]
     try:
         if not subprocess.Popen(cmd).wait() == 0:
             raise ParseError(f"Thumbnail (gs) failed at {cmd}")
-        # then run convert on the output from gs
+        # then run convert on the output from gs to make WebP
         run_convert(
             density=300,
             scale="500x5000>",
@@ -203,11 +204,12 @@ def make_thumbnail_from_pdf_gs_fallback(in_path, temp_dir, logging_group=None) -
 
         return out_path
 
-    except ParseError:
+    except ParseError as e:
+        logger.error(f"Unable to make thumbnail with Ghostscript: {e}")
         # The caller might expect a generated thumbnail that can be moved,
         # so we need to copy it before it gets moved.
         # https://github.com/paperless-ngx/paperless-ngx/issues/3631
-        default_thumbnail_path = os.path.join(temp_dir, "document.png")
+        default_thumbnail_path = os.path.join(temp_dir, "document.webp")
         copy_file_with_basic_stats(get_default_thumbnail(), default_thumbnail_path)
         return default_thumbnail_path
 
@@ -231,7 +233,8 @@ def make_thumbnail_from_pdf(in_path, temp_dir, logging_group=None) -> str:
             output_file=out_path,
             logging_group=logging_group,
         )
-    except ParseError:
+    except ParseError as e:
+        logger.error(f"Unable to make thumbnail with convert: {e}")
         out_path = make_thumbnail_from_pdf_gs_fallback(in_path, temp_dir, logging_group)
 
     return out_path
