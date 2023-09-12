@@ -582,8 +582,11 @@ duplicate. But the content should be exact or close, allowing detection.
 This tool does a fuzzy match over document content, looking for
 those which look close according to a given ratio.
 
+At this time, other metadata (such as correspondent or type) is not
+take into account by the detection.
+
 ```
-document_fuzzy_match [--ratio]
+document_fuzzy_match [--ratio] [--processes N]
 ```
 
 | Option      | Required | Default | Description                                                                                                                    |

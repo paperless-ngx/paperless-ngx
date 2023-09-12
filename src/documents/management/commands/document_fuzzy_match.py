@@ -27,6 +27,10 @@ class _WorkResult:
 
 
 def _process_and_match(work: _WorkPackage) -> _WorkResult:
+    """
+    Does basic processing of document content, gets the basic ratio
+    and returns the result package
+    """
     # Normalize the string some, lower case, whitespace, etc
     first_string = rapidfuzz.utils.default_process(work.first_doc.content)
     second_string = rapidfuzz.utils.default_process(work.second_doc.content)
@@ -71,6 +75,9 @@ class Command(BaseCommand):
         # Ratio is a float from 0.0 to 100.0
         if opt_ratio < RATIO_MIN or opt_ratio > RATIO_MAX:
             raise CommandError("The ratio must be between 0 and 100")
+
+        if options["processes"] < 1:
+            raise CommandError("There must be at least 1 process")
 
         all_docs = Document.objects.all().order_by("id")
 
