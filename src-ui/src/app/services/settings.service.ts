@@ -105,15 +105,24 @@ export class SettingsService {
     darkModeEnabled ??= this.get(SETTINGS_KEYS.DARK_MODE_ENABLED)
     themeColor ??= this.get(SETTINGS_KEYS.THEME_COLOR)
 
-    const isSystemColorSchemeDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const isSystemColorSchemeDark = window.matchMedia(
+      '(prefers-color-scheme: dark)'
+    ).matches
 
     // clearing state.
-    this._renderer.removeAttribute(this.document.documentElement, 'data-bs-theme')
+    this._renderer.removeAttribute(
+      this.document.documentElement,
+      'data-bs-theme'
+    )
     this._renderer.removeClass(this.document.body, 'primary-dark')
     this._renderer.removeClass(this.document.body, 'primary-light')
 
     if ((darkModeUseSystem && isSystemColorSchemeDark) || darkModeEnabled) {
-      this._renderer.setAttribute(this.document.documentElement, 'data-bs-theme', 'dark')
+      this._renderer.setAttribute(
+        this.document.documentElement,
+        'data-bs-theme',
+        'dark'
+      )
     }
 
     if (themeColor) {
@@ -138,11 +147,11 @@ export class SettingsService {
         '--pngx-primary-lightness',
         `${hsl.l * 100}%`,
         RendererStyleFlags2.DashCase
-      );
+      )
 
       /**
        * Fix for not reflecting changed variables. (--bs-primary is at :root while here we set them to body)
-        */
+       */
       this._renderer.setStyle(
         document.body,
         '--bs-primary',

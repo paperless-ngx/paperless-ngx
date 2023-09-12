@@ -149,7 +149,10 @@ describe('SettingsService', () => {
     const addClassSpy = jest.spyOn(settingsService.renderer, 'addClass')
     const removeClassSpy = jest.spyOn(settingsService.renderer, 'removeClass')
     const setAttributeSpy = jest.spyOn(settingsService.renderer, 'setAttribute')
-    const removeAttributeSpy = jest.spyOn(settingsService.renderer, 'removeAttribute')
+    const removeAttributeSpy = jest.spyOn(
+      settingsService.renderer,
+      'removeAttribute'
+    )
 
     settingsService.updateAppearanceSettings(true, true, '#fff000')
     expect(addClassSpy).toHaveBeenCalledWith(document.body, 'primary-light')
