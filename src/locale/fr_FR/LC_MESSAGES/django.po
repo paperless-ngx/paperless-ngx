@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-03 19:15+0000\n"
-"PO-Revision-Date: 2023-09-08 17:28\n"
+"PO-Revision-Date: 2023-09-13 14:32\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -380,7 +380,7 @@ msgstr "ASN inférieur à"
 
 #: documents/models.py:439
 msgid "storage path is"
-msgstr "chemin de stockage est"
+msgstr "Le chemin de stockage est"
 
 #: documents/models.py:449
 msgid "rule type"
