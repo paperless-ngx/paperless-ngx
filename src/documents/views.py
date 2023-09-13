@@ -63,6 +63,7 @@ from documents.permissions import PaperlessAdminPermissions
 from documents.permissions import PaperlessObjectPermissions
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_perms_owner_aware
+from documents.permissions import set_permissions_for_object
 from documents.tasks import consume_file
 from paperless import version
 from paperless.db import GnuPG
@@ -98,6 +99,7 @@ from .parsers import get_parser_class_for_mime_type
 from .parsers import parse_date_generator
 from .serialisers import AcknowledgeTasksViewSerializer
 from .serialisers import BulkDownloadSerializer
+from .serialisers import BulkEditObjectPermissionsSerializer
 from .serialisers import BulkEditSerializer
 from .serialisers import CorrespondentSerializer
 from .serialisers import DocumentListSerializer
@@ -1205,3 +1207,44 @@ def serve_file(doc: Document, use_archive: bool, disposition: str):
     )
     response["Content-Disposition"] = content_disposition
     return response
+
+
+class BulkEditObjectPermissionsView(GenericAPIView, PassUserMixin):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = BulkEditObjectPermissionsSerializer
+    parser_classes = (parsers.JSONParser,)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = self.request.user
+        object_type = serializer.validated_data.get("object_type")
+        object_ids = serializer.validated_data.get("objects")
+        object_class = serializer.get_object_class(object_type)
+        permissions = serializer.validated_data.get("permissions")
+        owner = serializer.validated_data.get("owner")
+
+        if not user.is_superuser:
+            objs = object_class.objects.filter(pk__in=object_ids)
+            has_perms = all((obj.owner == user or obj.owner is None) for obj in objs)
+
+            if not has_perms:
+                return HttpResponseForbidden("Insufficient permissions")
+
+        try:
+            qs = object_class.objects.filter(id__in=object_ids)
+
+            if "owner" in serializer.validated_data:
+                qs.update(owner=owner)
+
+            if "permissions" in serializer.validated_data:
+                for obj in qs:
+                    set_permissions_for_object(permissions, obj)
+
+            return Response({"result": "OK"})
+        except Exception as e:
+            logger.warning(f"An error occurred performing bulk permissions edit: {e!s}")
+            return HttpResponseBadRequest(
+                "Error performing bulk permissions edit, check logs for more detail.",
+            )
