@@ -1001,10 +1001,14 @@ class FilesAndFoldersViewSet(ReadOnlyModelViewSet):
         
         # parent_folder = request.query_params.get('path__istartswith', '')
         if parent_storage_path_id:
+            folders = []
             parent_storage_path = StoragePath.objects.get(id=parent_storage_path_id)
-            folders = list(StoragePath.objects
+            child_folders = list(StoragePath.objects
                            .filter(path__istartswith=parent_storage_path.path)
                            .exclude(id=parent_storage_path.id))
+            for f in child_folders:
+                if len(f.path.replace(parent_storage_path.path, '').split('/')) == 2:
+                    folders.append(f)
             files = list(Document.objects.all().filter(storage_path=parent_storage_path).order_by(ordering))
         else:
             folders = list(StoragePath.objects.exclude(path__contains='/'))
