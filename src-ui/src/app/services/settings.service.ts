@@ -105,24 +105,26 @@ export class SettingsService {
     darkModeEnabled ??= this.get(SETTINGS_KEYS.DARK_MODE_ENABLED)
     themeColor ??= this.get(SETTINGS_KEYS.THEME_COLOR)
 
-    const isSystemColorSchemeDark = window.matchMedia(
-      '(prefers-color-scheme: dark)'
-    ).matches
-
-    // clearing state.
-    this._renderer.removeAttribute(
-      this.document.documentElement,
-      'data-bs-theme'
-    )
-    this._renderer.removeClass(this.document.body, 'primary-dark')
-    this._renderer.removeClass(this.document.body, 'primary-light')
-
-    if ((darkModeUseSystem && isSystemColorSchemeDark) || darkModeEnabled) {
+    if (darkModeUseSystem) {
       this._renderer.setAttribute(
         this.document.documentElement,
         'data-bs-theme',
-        'dark'
+        'auto'
       )
+    } else {
+      if (!darkModeEnabled) {
+        this._renderer.setAttribute(
+          this.document.documentElement,
+          'data-bs-theme',
+          'light'
+        )
+      } else {
+        this._renderer.setAttribute(
+          this.document.documentElement,
+          'data-bs-theme',
+          'dark'
+        )
+      }
     }
 
     if (themeColor) {

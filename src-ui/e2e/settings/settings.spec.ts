@@ -46,10 +46,10 @@ test('should warn on unsaved changes', async ({ page }) => {
 test('should apply appearance changes when set', async ({ page }) => {
   await page.routeFromHAR(REQUESTS_HAR, { notFound: 'fallback' })
   await page.goto('/settings')
-  await expect(page.locator('body')).toHaveClass(/color-scheme-system/)
+  await expect(page.locator('html')).toHaveAttribute('data-bs-theme', /auto/)
   await page.getByLabel('Use system setting').click()
   await page.getByLabel('Enable dark mode').click()
-  await expect(page.locator('body')).toHaveClass(/color-scheme-dark/)
+  await expect(page.locator('html')).toHaveAttribute('data-bs-theme', /dark/)
 })
 
 test('should toggle saved view options when set & saved', async ({ page }) => {
