@@ -1,10 +1,14 @@
+$color-mode-type: data;
+
+@import 'bootstrap/scss/mixins/color-mode';
+
 @mixin paperless-green {
   // base color e.g. #17541f = hsl(128, 57%, 21%)
   --pngx-primary: 128, 57%;
   --pngx-primary-lightness: 21%;
 }
 
-body {
+:root {
   @include paperless-green;
   --pngx-primary-text-contrast: var(--bs-light);
 
@@ -158,7 +162,7 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
   }
 
   .doc-img {
-    mix-blend-mode: normal;
+    mix-blend-mode: normal !important;
     border-radius: 0;
     border-color: var(--bs-border-color);
     filter: invert(10%);
@@ -270,9 +274,8 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
   }
 }
 
-body.color-scheme-dark {
-  // no custom theme color
-  &:not(.primary-light):not(.primary-dark) {
+@include color-mode(dark) {
+  body:not(.primary-light):not(.primary-dark) {
     @include paperless-green-dark-mode;
 
     .navbar.bg-primary {
@@ -284,18 +287,22 @@ body.color-scheme-dark {
   @include dark-mode;
 }
 
-@media (prefers-color-scheme: dark) {
-  body.color-scheme-system {
-    // no custom theme color
-    &:not(.primary-light):not(.primary-dark) {
-      @include paperless-green-dark-mode;
+// Temp to not blink with white before angular loads
+@include color-mode(auto) {
+  @media (prefers-color-scheme: dark) {
+    body {
+      // no custom theme color
+      &:not(.primary-light):not(.primary-dark) {
+        @include paperless-green-dark-mode;
 
-      .navbar.bg-primary {
-        // navbar is og green in dark mode
-        @include paperless-green;
+        .navbar.bg-primary {
+          // navbar is og green in dark mode
+          @include paperless-green;
+        }
       }
-    }
 
-    @include dark-mode;
+      @include dark-mode;
+    }
   }
+
 }

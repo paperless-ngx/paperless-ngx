@@ -147,13 +147,14 @@ describe('SettingsService', () => {
     ).toEqual('')
 
     const addClassSpy = jest.spyOn(settingsService.renderer, 'addClass')
-    const removeClassSpy = jest.spyOn(settingsService.renderer, 'removeClass')
+    const setAttributeSpy = jest.spyOn(settingsService.renderer, 'setAttribute')
 
     settingsService.updateAppearanceSettings(true, true, '#fff000')
     expect(addClassSpy).toHaveBeenCalledWith(document.body, 'primary-light')
-    expect(addClassSpy).toHaveBeenCalledWith(
-      document.body,
-      'color-scheme-system'
+    expect(setAttributeSpy).toHaveBeenCalledWith(
+      document.documentElement,
+      'data-bs-theme',
+      'auto'
     )
     expect(
       document.body.style.getPropertyValue('--pngx-primary-lightness')
@@ -161,21 +162,23 @@ describe('SettingsService', () => {
 
     settingsService.updateAppearanceSettings(false, false, '#000000')
     expect(addClassSpy).toHaveBeenCalledWith(document.body, 'primary-light')
-    expect(removeClassSpy).toHaveBeenCalledWith(
-      document.body,
-      'color-scheme-system'
+    expect(setAttributeSpy).toHaveBeenCalledWith(
+      document.documentElement,
+      'data-bs-theme',
+      'light'
     )
+
     expect(
       document.body.style.getPropertyValue('--pngx-primary-lightness')
     ).toEqual('0%')
 
     settingsService.updateAppearanceSettings(false, true, '#ffffff')
     expect(addClassSpy).toHaveBeenCalledWith(document.body, 'primary-dark')
-    expect(removeClassSpy).toHaveBeenCalledWith(
-      document.body,
-      'color-scheme-system'
+    expect(setAttributeSpy).toHaveBeenCalledWith(
+      document.documentElement,
+      'data-bs-theme',
+      'dark'
     )
-    expect(addClassSpy).toHaveBeenCalledWith(document.body, 'color-scheme-dark')
     expect(
       document.body.style.getPropertyValue('--pngx-primary-lightness')
     ).toEqual('100%')
