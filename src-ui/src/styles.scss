@@ -1,8 +1,8 @@
 // bs options
 $enable-negative-margins: true;
 
-@import "theme";
 @import "node_modules/bootstrap/scss/bootstrap";
+@import "theme";
 @import "~@ng-select/ng-select/themes/default.theme.css";
 @import "print";
 
