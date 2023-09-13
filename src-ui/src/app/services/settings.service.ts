@@ -112,19 +112,11 @@ export class SettingsService {
         'auto'
       )
     } else {
-      if (!darkModeEnabled) {
-        this._renderer.setAttribute(
-          this.document.documentElement,
-          'data-bs-theme',
-          'light'
-        )
-      } else {
-        this._renderer.setAttribute(
-          this.document.documentElement,
-          'data-bs-theme',
-          'dark'
-        )
-      }
+      this._renderer.setAttribute(
+        this.document.documentElement,
+        'data-bs-theme',
+        darkModeEnabled ? 'dark' : 'light'
+      )
     }
 
     if (themeColor) {
