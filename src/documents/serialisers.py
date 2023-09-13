@@ -835,6 +835,7 @@ class StoragePathSerializer(MatchingModelSerializer, OwnedObjectSerializer):
                 tag_list="tag_list",
                 owner_username="someone",
                 original_name="testfile",
+                dock_pk="doc_pk",
             )
 
         except KeyError as err:
