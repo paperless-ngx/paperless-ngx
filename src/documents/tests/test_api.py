@@ -5100,6 +5100,9 @@ class TestBulkEditObjectPermissions(APITestCase):
 
         self.t1 = Tag.objects.create(name="t1")
         self.t2 = Tag.objects.create(name="t2")
+        self.c1 = Correspondent.objects.create(name="c1")
+        self.dt1 = DocumentType.objects.create(name="dt1")
+        self.sp1 = StoragePath.objects.create(name="sp1")
         self.user1 = User.objects.create(username="user1")
         self.user2 = User.objects.create(username="user2")
         self.user3 = User.objects.create(username="user3")
@@ -5129,7 +5132,7 @@ class TestBulkEditObjectPermissions(APITestCase):
             json.dumps(
                 {
                     "objects": [self.t1.id, self.t2.id],
-                    "object_type": "tag",
+                    "object_type": "tags",
                     "permissions": permissions,
                 },
             ),
@@ -5189,7 +5192,7 @@ class TestBulkEditObjectPermissions(APITestCase):
             json.dumps(
                 {
                     "objects": [self.t1.id, self.t2.id],
-                    "object_type": "tag",
+                    "object_type": "tags",
                     "owner": self.user3.id,
                 },
             ),
@@ -5232,7 +5235,7 @@ class TestBulkEditObjectPermissions(APITestCase):
             json.dumps(
                 {
                     "objects": [self.t1.id, self.t2.id],
-                    "object_type": "tag",
+                    "object_type": "tags",
                     "owner": self.user1.id,
                 },
             ),

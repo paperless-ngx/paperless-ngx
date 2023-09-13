@@ -6,7 +6,7 @@ import {
   ViewChildren,
 } from '@angular/core'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
-import { Subject, Subscription } from 'rxjs'
+import { Subject } from 'rxjs'
 import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators'
 import {
   MatchingModel,
@@ -15,7 +15,10 @@ import {
   MATCH_NONE,
 } from 'src/app/data/matching-model'
 import { ObjectWithId } from 'src/app/data/object-with-id'
-import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
+import {
+  ObjectWithPermissions,
+  PermissionsObject,
+} from 'src/app/data/object-with-permissions'
 import {
   SortableDirective,
   SortEvent,
@@ -28,11 +31,9 @@ import {
 import { AbstractNameFilterService } from 'src/app/services/rest/abstract-name-filter-service'
 import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
-import {
-  EditDialogComponent,
-  EditDialogMode,
-} from '../../common/edit-dialog/edit-dialog.component'
+import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
+import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
 
 export interface ManagementListColumn {
   key: string
@@ -81,6 +82,8 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
   private nameFilterDebounce: Subject<string>
   private unsubscribeNotifier: Subject<any> = new Subject()
   private _nameFilter: string
+
+  public selectedObjects: Set<number> = new Set()
 
   ngOnInit(): void {
     this.reloadData()
@@ -241,6 +244,65 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
     return this.permissionsService.currentUserHasObjectPermissions(
       this.PermissionAction.Change,
       object
+    )
+  }
+
+  get userOwnsAll(): boolean {
+    let ownsAll: boolean = true
+    const objects = this.data.filter((o) => this.selectedObjects.has(o.id))
+    ownsAll = objects.every((o) =>
+      this.permissionsService.currentUserOwnsObject(o)
+    )
+    return ownsAll
+  }
+
+  toggleAll(event: PointerEvent) {
+    if ((event.target as HTMLInputElement).checked) {
+      this.selectedObjects = new Set(this.data.map((o) => o.id))
+    } else {
+      this.clearSelection()
+    }
+  }
+
+  clearSelection() {
+    this.selectedObjects.clear()
+  }
+
+  toggleSelected(object) {
+    this.selectedObjects.has(object.id)
+      ? this.selectedObjects.delete(object.id)
+      : this.selectedObjects.add(object.id)
+  }
+
+  setPermissions() {
+    let modal = this.modalService.open(PermissionsDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.confirmClicked.subscribe(
+      (permissions: { owner: number; set_permissions: PermissionsObject }) => {
+        modal.componentInstance.buttonsEnabled = false
+        this.service
+          .bulk_update_permissions(
+            Array.from(this.selectedObjects),
+            permissions
+          )
+          .subscribe({
+            next: () => {
+              modal.close()
+              this.toastService.showInfo(
+                $localize`Permissions updated successfully`
+              )
+              this.reloadData()
+            },
+            error: (error) => {
+              modal.componentInstance.buttonsEnabled = true
+              this.toastService.showError(
+                $localize`Error updating permissions`,
+                error
+              )
+            },
+          })
+      }
     )
   }
 }

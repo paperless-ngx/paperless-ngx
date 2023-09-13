@@ -973,10 +973,10 @@ class BulkEditObjectPermissionsSerializer(serializers.Serializer, SetPermissions
 
     object_type = serializers.ChoiceField(
         choices=[
-            "tag",
-            "correspondent",
-            "document_type",
-            "storage_path",
+            "tags",
+            "correspondents",
+            "document_types",
+            "storage_paths",
         ],
         label="Object Type",
         write_only=True,
@@ -997,13 +997,13 @@ class BulkEditObjectPermissionsSerializer(serializers.Serializer, SetPermissions
 
     def get_object_class(self, object_type):
         object_class = None
-        if object_type == "tag":
+        if object_type == "tags":
             object_class = Tag
-        elif object_type == "correspondent":
+        elif object_type == "correspondents":
             object_class = Correspondent
-        elif object_type == "document_type":
+        elif object_type == "document_types":
             object_class = DocumentType
-        elif object_type == "storage_path":
+        elif object_type == "storage_paths":
             object_class = StoragePath
         return object_class
 
@@ -1013,10 +1013,6 @@ class BulkEditObjectPermissionsSerializer(serializers.Serializer, SetPermissions
         if not all(isinstance(i, int) for i in objects):
             raise serializers.ValidationError("objects must be a list of integers")
         object_class = self.get_object_class(object_type)
-        if object_class is None:
-            raise serializers.ValidationError(
-                "Unknown object type.",
-            )
         count = object_class.objects.filter(id__in=objects).count()
         if not count == len(objects):
             raise serializers.ValidationError(

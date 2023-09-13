@@ -1,5 +1,4 @@
 import { ObjectWithId } from './object-with-id'
-import { PaperlessUser } from './paperless-user'
 
 export interface PermissionsObject {
   view: {
