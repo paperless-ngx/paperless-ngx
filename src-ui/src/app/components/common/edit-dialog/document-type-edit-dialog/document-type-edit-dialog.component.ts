@@ -9,7 +9,7 @@ import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 
 @Component({
-  selector: 'app-document-type-edit-dialog',
+  selector: 'pngx-document-type-edit-dialog',
   templateUrl: './document-type-edit-dialog.component.html',
   styleUrls: ['./document-type-edit-dialog.component.scss'],
 })

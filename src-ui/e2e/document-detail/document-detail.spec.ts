@@ -8,7 +8,7 @@ test('should activate / deactivate save button when changes are saved', async ({
 }) => {
   await page.routeFromHAR(REQUESTS_HAR, { notFound: 'fallback' })
   await page.goto('/documents/175/')
-  await page.waitForSelector('app-document-detail app-input-text:first-child')
+  await page.waitForSelector('pngx-document-detail pngx-input-text:first-child')
   await expect(page.getByTitle('Storage path', { exact: true })).toHaveText(
     /\w+/
   )
@@ -85,7 +85,7 @@ test('should show a mobile preview', async ({ page }) => {
 test('should show a list of notes', async ({ page }) => {
   await page.routeFromHAR(REQUESTS_HAR, { notFound: 'fallback' })
   await page.goto('/documents/175/notes')
-  await expect(page.locator('app-document-notes')).toBeVisible()
+  await expect(page.locator('pngx-document-notes')).toBeVisible()
   await expect(
     await page.getByRole('button', {
       name: /delete note/i,

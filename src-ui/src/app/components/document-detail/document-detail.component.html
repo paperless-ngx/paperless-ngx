@@ -1,11 +1,11 @@
-<app-page-header [(title)]="title">
+<pngx-page-header [(title)]="title">
     <div class="input-group input-group-sm me-5 d-none d-md-flex" *ngIf="getContentType() === 'application/pdf' && !useNativePdfViewer">
       <div class="input-group-text" i18n>Page</div>
       <input class="form-control flex-grow-0 w-auto" type="number" min="1" [max]="previewNumPages" [(ngModel)]="previewCurrentPage" />
       <div class="input-group-text" i18n>of {{previewNumPages}}</div>
     </div>
 
-    <button type="button" class="btn btn-sm btn-outline-danger me-4" (click)="delete()" [disabled]="!userIsOwner" *appIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Document }">
+    <button type="button" class="btn btn-sm btn-outline-danger me-4" (click)="delete()" [disabled]="!userIsOwner" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Document }">
         <svg class="buttonicon" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#trash" />
         </svg><span class="d-none d-lg-inline ps-1" i18n>Delete</span>
@@ -48,7 +48,7 @@
         </div>
     </div>
 
-    <app-share-links-dropdown [documentId]="documentId" [disabled]="!userIsOwner" *appIfPermissions="{ action: PermissionAction.Add, type: PermissionType.ShareLink }"></app-share-links-dropdown>
+    <pngx-share-links-dropdown [documentId]="documentId" [disabled]="!userIsOwner" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.ShareLink }"></pngx-share-links-dropdown>
 
     <button type="button" class="btn btn-sm btn-outline-primary me-2" i18n-title title="Close" (click)="close()">
         <svg class="buttonicon" fill="currentColor">
@@ -69,7 +69,7 @@
         </button>
     </div>
 
-</app-page-header>
+</pngx-page-header>
 
 
 <div class="row">
@@ -82,17 +82,17 @@
                     <a ngbNavLink i18n>Details</a>
                     <ng-template ngbNavContent>
 
-                        <app-input-text #inputTitle i18n-title title="Title" formControlName="title" (keyup)="titleKeyUp($event)" [error]="error?.title"></app-input-text>
-                        <app-input-number i18n-title title="Archive serial number" [error]="error?.archive_serial_number" formControlName='archive_serial_number'></app-input-number>
-                        <app-input-date i18n-title title="Date created" formControlName="created_date" [suggestions]="suggestions?.dates" [showFilter]="true" (filterDocuments)="filterDocuments($event)"
-                            [error]="error?.created_date"></app-input-date>
-                        <app-input-select [items]="correspondents" i18n-title title="Correspondent" formControlName="correspondent" [allowNull]="true" [showFilter]="true" (filterDocuments)="filterDocuments($event)"
-                            (createNew)="createCorrespondent($event)" [suggestions]="suggestions?.correspondents" *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.Correspondent }"></app-input-select>
-                        <app-input-select [items]="documentTypes" i18n-title title="Document type" formControlName="document_type" [allowNull]="true" [showFilter]="true" (filterDocuments)="filterDocuments($event)"
-                            (createNew)="createDocumentType($event)" [suggestions]="suggestions?.document_types" *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.DocumentType }"></app-input-select>
-                        <app-input-select [items]="storagePaths" i18n-title title="Storage path" formControlName="storage_path" [allowNull]="true" [showFilter]="true" (filterDocuments)="filterDocuments($event)"
-                            (createNew)="createStoragePath($event)" [suggestions]="suggestions?.storage_paths" i18n-placeholder placeholder="Default" *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.StoragePath }"></app-input-select>
-                        <app-input-tags formControlName="tags" [suggestions]="suggestions?.tags" [showFilter]="true" (filterDocuments)="filterDocuments($event)" *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.Tag }"></app-input-tags>
+                        <pngx-input-text #inputTitle i18n-title title="Title" formControlName="title" (keyup)="titleKeyUp($event)" [error]="error?.title"></pngx-input-text>
+                        <pngx-input-number i18n-title title="Archive serial number" [error]="error?.archive_serial_number" formControlName='archive_serial_number'></pngx-input-number>
+                        <pngx-input-date i18n-title title="Date created" formControlName="created_date" [suggestions]="suggestions?.dates" [showFilter]="true" (filterDocuments)="filterDocuments($event)"
+                            [error]="error?.created_date"></pngx-input-date>
+                        <pngx-input-select [items]="correspondents" i18n-title title="Correspondent" formControlName="correspondent" [allowNull]="true" [showFilter]="true" (filterDocuments)="filterDocuments($event)"
+                            (createNew)="createCorrespondent($event)" [suggestions]="suggestions?.correspondents" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Correspondent }"></pngx-input-select>
+                        <pngx-input-select [items]="documentTypes" i18n-title title="Document type" formControlName="document_type" [allowNull]="true" [showFilter]="true" (filterDocuments)="filterDocuments($event)"
+                            (createNew)="createDocumentType($event)" [suggestions]="suggestions?.document_types" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.DocumentType }"></pngx-input-select>
+                        <pngx-input-select [items]="storagePaths" i18n-title title="Storage path" formControlName="storage_path" [allowNull]="true" [showFilter]="true" (filterDocuments)="filterDocuments($event)"
+                            (createNew)="createStoragePath($event)" [suggestions]="suggestions?.storage_paths" i18n-placeholder placeholder="Default" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.StoragePath }"></pngx-input-select>
+                        <pngx-input-tags formControlName="tags" [suggestions]="suggestions?.tags" [showFilter]="true" (filterDocuments)="filterDocuments($event)" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Tag }"></pngx-input-tags>
 
                     </ng-template>
                 </li>
@@ -151,8 +151,8 @@
                             </tbody>
                         </table>
 
-                        <app-metadata-collapse i18n-title title="Original document metadata" [metadata]="metadata.original_metadata" *ngIf="metadata?.original_metadata?.length > 0"></app-metadata-collapse>
-                        <app-metadata-collapse i18n-title title="Archived document metadata" [metadata]="metadata.archive_metadata" *ngIf="metadata?.archive_metadata?.length > 0"></app-metadata-collapse>
+                        <pngx-metadata-collapse i18n-title title="Original document metadata" [metadata]="metadata.original_metadata" *ngIf="metadata?.original_metadata?.length > 0"></pngx-metadata-collapse>
+                        <pngx-metadata-collapse i18n-title title="Archived document metadata" [metadata]="metadata.archive_metadata" *ngIf="metadata?.archive_metadata?.length > 0"></pngx-metadata-collapse>
 
                     </ng-template>
                 </li>
@@ -184,7 +184,7 @@
                 <li [ngbNavItem]="DocumentDetailNavIDs.Notes" *ngIf="notesEnabled">
                     <a ngbNavLink i18n>Notes <span *ngIf="document?.notes.length" class="badge text-bg-secondary ms-1">{{document.notes.length}}</span></a>
                     <ng-template ngbNavContent>
-                        <app-document-notes [documentId]="documentId" [notes]="document?.notes" [addDisabled]="!userCanEdit" (updated)="notesUpdated($event)"></app-document-notes>
+                        <pngx-document-notes [documentId]="documentId" [notes]="document?.notes" [addDisabled]="!userCanEdit" (updated)="notesUpdated($event)"></pngx-document-notes>
                     </ng-template>
                 </li>
 
@@ -192,7 +192,7 @@
                     <a ngbNavLink i18n>Permissions</a>
                     <ng-template ngbNavContent>
                         <div class="mb-3">
-                            <app-permissions-form [users]="users" formControlName="permissions_form"></app-permissions-form>
+                            <pngx-permissions-form [users]="users" formControlName="permissions_form"></pngx-permissions-form>
                         </div>
                     </ng-template>
                 </li>
@@ -202,7 +202,7 @@
 
             <ng-container>
                 <button type="button" class="btn btn-outline-secondary me-2" (click)="discard()" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Discard</button>
-                <ng-container *appIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
+                <ng-container *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
                     <button *ngIf="hasNext()" type="button" class="btn btn-outline-primary me-2" (click)="saveEditNext()" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Save &amp; next</button>
                     <button *ngIf="!hasNext()" type="button" class="btn btn-outline-primary me-2" (click)="save(true)" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Save &amp; close</button>
                     <button type="submit" class="btn btn-primary" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Save</button>

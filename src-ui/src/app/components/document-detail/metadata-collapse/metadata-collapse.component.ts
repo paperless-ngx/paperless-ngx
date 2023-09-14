@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core'
 
 @Component({
-  selector: 'app-metadata-collapse',
+  selector: 'pngx-metadata-collapse',
   templateUrl: './metadata-collapse.component.html',
   styleUrls: ['./metadata-collapse.component.scss'],
 })

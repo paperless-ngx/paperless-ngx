@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core'
 
 @Component({
-  selector: 'app-clearable-badge',
+  selector: 'pngx-clearable-badge',
   templateUrl: './clearable-badge.component.html',
   styleUrls: ['./clearable-badge.component.scss'],
 })

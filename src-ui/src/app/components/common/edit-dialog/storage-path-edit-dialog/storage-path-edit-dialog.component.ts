@@ -9,7 +9,7 @@ import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 
 @Component({
-  selector: 'app-storage-path-edit-dialog',
+  selector: 'pngx-storage-path-edit-dialog',
   templateUrl: './storage-path-edit-dialog.component.html',
   styleUrls: ['./storage-path-edit-dialog.component.scss'],
 })

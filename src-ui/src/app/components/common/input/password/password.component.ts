@@ -10,7 +10,7 @@ import { AbstractInputComponent } from '../abstract-input'
       multi: true,
     },
   ],
-  selector: 'app-input-password',
+  selector: 'pngx-input-password',
   templateUrl: './password.component.html',
   styleUrls: ['./password.component.scss'],
 })

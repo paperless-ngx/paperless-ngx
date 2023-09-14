@@ -8,7 +8,7 @@ import { UserService } from 'src/app/services/rest/user.service'
 import { PaperlessUser } from 'src/app/data/paperless-user'
 
 @Component({
-  selector: 'app-document-notes',
+  selector: 'pngx-document-notes',
   templateUrl: './document-notes.component.html',
   styleUrls: ['./document-notes.component.scss'],
 })

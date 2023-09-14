@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router'
 import { FILTER_ASN } from '../../data/filter-rule-type'
 
 @Component({
-  selector: 'app-document-asncomponent',
+  selector: 'pngx-document-asncomponent',
   templateUrl: './document-asn.component.html',
   styleUrls: ['./document-asn.component.scss'],
 })
