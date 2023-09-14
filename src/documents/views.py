@@ -27,9 +27,12 @@ from django.http import Http404
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
 from django.http import HttpResponseForbidden
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.translation import get_language
+from django.views import View
 from django.views.decorators.cache import cache_control
 from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
@@ -75,6 +78,7 @@ from .data_models import DocumentSource
 from .filters import CorrespondentFilterSet
 from .filters import DocumentFilterSet
 from .filters import DocumentTypeFilterSet
+from .filters import ShareLinkFilterSet
 from .filters import StoragePathFilterSet
 from .filters import TagFilterSet
 from .matching import match_correspondents
@@ -87,6 +91,7 @@ from .models import DocumentType
 from .models import Note
 from .models import PaperlessTask
 from .models import SavedView
+from .models import ShareLink
 from .models import StoragePath
 from .models import Tag
 from .parsers import get_parser_class_for_mime_type
@@ -100,6 +105,7 @@ from .serialisers import DocumentSerializer
 from .serialisers import DocumentTypeSerializer
 from .serialisers import PostDocumentSerializer
 from .serialisers import SavedViewSerializer
+from .serialisers import ShareLinkSerializer
 from .serialisers import StoragePathSerializer
 from .serialisers import TagSerializer
 from .serialisers import TagSerializerVersion1
@@ -312,38 +318,12 @@ class DocumentViewSet(
             doc,
         ):
             return HttpResponseForbidden("Insufficient permissions")
-        if not self.original_requested(request) and doc.has_archive_version:
-            file_handle = doc.archive_file
-            filename = doc.get_public_filename(archive=True)
-            mime_type = "application/pdf"
-        else:
-            file_handle = doc.source_file
-            filename = doc.get_public_filename()
-            mime_type = doc.mime_type
-            # Support browser previewing csv files by using text mime type
-            if mime_type in {"application/csv", "text/csv"} and disposition == "inline":
-                mime_type = "text/plain"
-
-        if doc.storage_type == Document.STORAGE_TYPE_GPG:
-            file_handle = GnuPG.decrypted(file_handle)
-
-        response = HttpResponse(file_handle, content_type=mime_type)
-        # Firefox is not able to handle unicode characters in filename field
-        # RFC 5987 addresses this issue
-        # see https://datatracker.ietf.org/doc/html/rfc5987#section-4.2
-        # Chromium cannot handle commas in the filename
-        filename_normalized = normalize("NFKD", filename.replace(",", "_")).encode(
-            "ascii",
-            "ignore",
+        return serve_file(
+            doc=doc,
+            use_archive=not self.original_requested(request)
+            and doc.has_archive_version,
+            disposition=disposition,
         )
-        filename_encoded = quote(filename)
-        content_disposition = (
-            f"{disposition}; "
-            f'filename="{filename_normalized}"; '
-            f"filename*=utf-8''{filename_encoded}"
-        )
-        response["Content-Disposition"] = content_disposition
-        return response
 
     def get_metadata(self, file, mime_type):
         if not os.path.isfile(file):
@@ -573,6 +553,35 @@ class DocumentViewSet(
                 "error": "error",
             },
         )
+
+    @action(methods=["get"], detail=True)
+    def share_links(self, request, pk=None):
+        currentUser = request.user
+        try:
+            doc = Document.objects.get(pk=pk)
+            if currentUser is not None and not has_perms_owner_aware(
+                currentUser,
+                "change_document",
+                doc,
+            ):
+                return HttpResponseForbidden("Insufficient permissions")
+        except Document.DoesNotExist:
+            raise Http404
+
+        if request.method == "GET":
+            now = timezone.now()
+            links = [
+                {
+                    "id": c.id,
+                    "created": c.created,
+                    "expiration": c.expiration,
+                    "slug": c.slug,
+                }
+                for c in ShareLink.objects.filter(document=doc)
+                .exclude(expiration__lt=now)
+                .order_by("-created")
+            ]
+            return Response(links)
 
 
 class SearchResultSerializer(DocumentSerializer, PassUserMixin):
@@ -1127,3 +1136,72 @@ class AcknowledgeTasksView(GenericAPIView):
             return Response({"result": result})
         except Exception:
             return HttpResponseBadRequest()
+
+
+class ShareLinkViewSet(ModelViewSet, PassUserMixin):
+    model = ShareLink
+
+    queryset = ShareLink.objects.all()
+
+    serializer_class = ShareLinkSerializer
+    pagination_class = StandardPagination
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+        ObjectOwnedOrGrantedPermissionsFilter,
+    )
+    filterset_class = ShareLinkFilterSet
+    ordering_fields = ("created", "expiration", "document")
+
+
+class SharedLinkView(View):
+    authentication_classes = []
+    permission_classes = []
+
+    def get(self, request, slug):
+        share_link = ShareLink.objects.filter(slug=slug).first()
+        if share_link is None:
+            return HttpResponseRedirect("/accounts/login/?sharelink_notfound=1")
+        if share_link.expiration is not None and share_link.expiration < timezone.now():
+            return HttpResponseRedirect("/accounts/login/?sharelink_expired=1")
+        return serve_file(
+            doc=share_link.document,
+            use_archive=share_link.file_version == "archive",
+            disposition="inline",
+        )
+
+
+def serve_file(doc: Document, use_archive: bool, disposition: str):
+    if use_archive:
+        file_handle = doc.archive_file
+        filename = doc.get_public_filename(archive=True)
+        mime_type = "application/pdf"
+    else:
+        file_handle = doc.source_file
+        filename = doc.get_public_filename()
+        mime_type = doc.mime_type
+        # Support browser previewing csv files by using text mime type
+        if mime_type in {"application/csv", "text/csv"} and disposition == "inline":
+            mime_type = "text/plain"
+
+    if doc.storage_type == Document.STORAGE_TYPE_GPG:
+        file_handle = GnuPG.decrypted(file_handle)
+
+    response = HttpResponse(file_handle, content_type=mime_type)
+    # Firefox is not able to handle unicode characters in filename field
+    # RFC 5987 addresses this issue
+    # see https://datatracker.ietf.org/doc/html/rfc5987#section-4.2
+    # Chromium cannot handle commas in the filename
+    filename_normalized = normalize("NFKD", filename.replace(",", "_")).encode(
+        "ascii",
+        "ignore",
+    )
+    filename_encoded = quote(filename)
+    content_disposition = (
+        f"{disposition}; "
+        f'filename="{filename_normalized}"; '
+        f"filename*=utf-8''{filename_encoded}"
+    )
+    response["Content-Disposition"] = content_disposition
+    return response

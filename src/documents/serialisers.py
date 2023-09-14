@@ -8,6 +8,7 @@ from celery import states
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
+from django.utils.crypto import get_random_string
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
 from guardian.core import ObjectPermissionChecker
@@ -26,6 +27,7 @@ from .models import MatchingModel
 from .models import PaperlessTask
 from .models import SavedView
 from .models import SavedViewFilterRule
+from .models import ShareLink
 from .models import StoragePath
 from .models import Tag
 from .models import UiSettings
@@ -941,3 +943,20 @@ class AcknowledgeTasksViewSerializer(serializers.Serializer):
     def validate_tasks(self, tasks):
         self._validate_task_id_list(tasks)
         return tasks
+
+
+class ShareLinkSerializer(OwnedObjectSerializer):
+    class Meta:
+        model = ShareLink
+        fields = (
+            "id",
+            "created",
+            "expiration",
+            "slug",
+            "document",
+            "file_version",
+        )
+
+    def create(self, validated_data):
+        validated_data["slug"] = get_random_string(50)
+        return super().create(validated_data)

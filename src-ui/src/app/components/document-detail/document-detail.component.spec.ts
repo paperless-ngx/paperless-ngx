@@ -66,6 +66,7 @@ import { TextComponent } from '../common/input/text/text.component'
 import { PageHeaderComponent } from '../common/page-header/page-header.component'
 import { DocumentNotesComponent } from '../document-notes/document-notes.component'
 import { DocumentDetailComponent } from './document-detail.component'
+import { ShareLinksDropdownComponent } from '../common/share-links-dropdown/share-links-dropdown.component'
 
 const doc: PaperlessDocument = {
   id: 3,
@@ -134,6 +135,7 @@ describe('DocumentDetailComponent', () => {
         ConfirmDialogComponent,
         PdfViewerComponent,
         SafeUrlPipe,
+        ShareLinksDropdownComponent,
       ],
       providers: [
         DocumentTitlePipe,

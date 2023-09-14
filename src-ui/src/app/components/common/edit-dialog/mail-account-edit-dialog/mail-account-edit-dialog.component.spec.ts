@@ -1,7 +1,6 @@
 import {
   ComponentFixture,
   TestBed,
-  discardPeriodicTasks,
   fakeAsync,
   tick,
 } from '@angular/core/testing'
