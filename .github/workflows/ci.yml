@@ -179,7 +179,7 @@ jobs:
       - pre-commit
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: [20.x]
     steps:
       - uses: actions/checkout@v3
       -
