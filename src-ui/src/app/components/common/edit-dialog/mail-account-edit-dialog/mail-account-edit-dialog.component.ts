@@ -17,7 +17,7 @@ const IMAP_SECURITY_OPTIONS = [
 ]
 
 @Component({
-  selector: 'app-mail-account-edit-dialog',
+  selector: 'pngx-mail-account-edit-dialog',
   templateUrl: './mail-account-edit-dialog.component.html',
   styleUrls: ['./mail-account-edit-dialog.component.scss'],
 })

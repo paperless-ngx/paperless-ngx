@@ -1,4 +1,4 @@
-<app-page-header [title]="getTitle()">
+<pngx-page-header [title]="getTitle()">
 
   <div ngbDropdown class="me-2 d-flex">
     <button class="btn btn-sm btn-outline-primary" id="dropdownSelect" ngbDropdownToggle>
@@ -59,7 +59,7 @@
     </div>
   </div>
 
-  <div class="btn-group ms-2 flex-fill" *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }" ngbDropdown role="group">
+  <div class="btn-group ms-2 flex-fill" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }" ngbDropdown role="group">
     <button class="btn btn-sm btn-outline-primary dropdown-toggle flex-fill" tourAnchor="tour.documents-views" ngbDropdownToggle>
       <ng-container i18n>Views</ng-container>
       <div *ngIf="savedViewIsModified" class="position-absolute top-0 start-100 p-2 translate-middle badge bg-secondary border border-light rounded-circle">
@@ -72,18 +72,18 @@
         <div class="dropdown-divider" *ngIf="savedViewService.allViews.length > 0"></div>
       </ng-container>
 
-      <div *appIfPermissions="{ action: PermissionAction.Change, type: PermissionType.SavedView }">
+      <div *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.SavedView }">
         <button ngbDropdownItem (click)="saveViewConfig()" *ngIf="list.activeSavedViewId" [disabled]="!savedViewIsModified" i18n>Save "{{list.activeSavedViewTitle}}"</button>
       </div>
-      <button ngbDropdownItem (click)="saveViewConfigAs()" *appIfPermissions="{ action: PermissionAction.Add, type: PermissionType.SavedView }" i18n>Save as...</button>
+      <button ngbDropdownItem (click)="saveViewConfigAs()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.SavedView }" i18n>Save as...</button>
     </div>
   </div>
 
-</app-page-header>
+</pngx-page-header>
 
 <div class="row sticky-top pt-3 pt-sm-4 pb-3 pb-lg-4 bg-body">
-  <app-filter-editor [hidden]="isBulkEditing" [(filterRules)]="list.filterRules" [unmodifiedFilterRules]="unmodifiedFilterRules" [selectionData]="list.selectionData" #filterEditor></app-filter-editor>
-  <app-bulk-editor [hidden]="!isBulkEditing"></app-bulk-editor>
+  <pngx-filter-editor [hidden]="isBulkEditing" [(filterRules)]="list.filterRules" [unmodifiedFilterRules]="unmodifiedFilterRules" [selectionData]="list.selectionData" #filterEditor></pngx-filter-editor>
+  <pngx-bulk-editor [hidden]="!isBulkEditing"></pngx-bulk-editor>
 </div>
 
 
@@ -119,71 +119,71 @@
 
 <ng-template #documentListNoError>
   <div *ngIf="displayMode === 'largeCards'">
-    <app-document-card-large [selected]="list.isSelected(d)" (toggleSelected)="toggleSelected(d, $event)" (dblClickDocument)="openDocumentDetail(d)" *ngFor="let d of list.documents; trackBy: trackByDocumentId" [document]="d" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)" (clickDocumentType)="clickDocumentType($event)" (clickStoragePath)="clickStoragePath($event)" (clickMoreLike)="clickMoreLike(d.id)">
-    </app-document-card-large>
+    <pngx-document-card-large [selected]="list.isSelected(d)" (toggleSelected)="toggleSelected(d, $event)" (dblClickDocument)="openDocumentDetail(d)" *ngFor="let d of list.documents; trackBy: trackByDocumentId" [document]="d" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)" (clickDocumentType)="clickDocumentType($event)" (clickStoragePath)="clickStoragePath($event)" (clickMoreLike)="clickMoreLike(d.id)">
+    </pngx-document-card-large>
   </div>
 
   <table class="table table-sm align-middle border shadow-sm" *ngIf="displayMode === 'details'">
     <thead>
       <th></th>
       <th class="d-none d-lg-table-cell"
-        appSortable="archive_serial_number"
+        pngxSortable="archive_serial_number"
         title="Sort by ASN" i18n-title
         [currentSortField]="list.sortField"
         [currentSortReverse]="list.sortReverse"
         (sort)="onSort($event)"
         i18n>ASN</th>
       <th class="d-none d-md-table-cell"
-        appSortable="correspondent__name"
+        pngxSortable="correspondent__name"
         title="Sort by correspondent" i18n-title
         [currentSortField]="list.sortField"
         [currentSortReverse]="list.sortReverse"
         (sort)="onSort($event)"
         i18n>Correspondent</th>
       <th
-        appSortable="title"
+        pngxSortable="title"
         title="Sort by title" i18n-title
         [currentSortField]="list.sortField"
         [currentSortReverse]="list.sortReverse"
         (sort)="onSort($event)"
         i18n>Title</th>
       <th class="d-none d-xl-table-cell"
-        appSortable="owner"
+        pngxSortable="owner"
         title="Sort by owner" i18n-title
         [currentSortField]="list.sortField"
         [currentSortReverse]="list.sortReverse"
         (sort)="onSort($event)"
         i18n>Owner</th>
       <th *ngIf="notesEnabled" class="d-none d-xl-table-cell"
-        appSortable="num_notes"
+        pngxSortable="num_notes"
         title="Sort by notes" i18n-title
         [currentSortField]="list.sortField"
         [currentSortReverse]="list.sortReverse"
         (sort)="onSort($event)"
         i18n>Notes</th>
       <th class="d-none d-xl-table-cell"
-        appSortable="document_type__name"
+        pngxSortable="document_type__name"
         title="Sort by document type" i18n-title
         [currentSortField]="list.sortField"
         [currentSortReverse]="list.sortReverse"
         (sort)="onSort($event)"
         i18n>Document type</th>
       <th class="d-none d-xl-table-cell"
-        appSortable="storage_path__name"
+        pngxSortable="storage_path__name"
         title="Sort by storage path" i18n-title
         [currentSortField]="list.sortField"
         [currentSortReverse]="list.sortReverse"
         (sort)="onSort($event)"
         i18n>Storage path</th>
       <th
-        appSortable="created"
+        pngxSortable="created"
         title="Sort by created date" i18n-title
         [currentSortField]="list.sortField"
         [currentSortReverse]="list.sortReverse"
         (sort)="onSort($event)"
         i18n>Created</th>
       <th class="d-none d-xl-table-cell"
-        appSortable="added"
+        pngxSortable="added"
         title="Sort by added date" i18n-title
         [currentSortField]="list.sortField"
         [currentSortReverse]="list.sortReverse"
@@ -208,7 +208,7 @@
         </td>
         <td>
           <a routerLink="/documents/{{d.id}}" title="Edit document" i18n-title style="overflow-wrap: anywhere;">{{d.title | documentTitle}}</a>
-          <app-tag [tag]="t" *ngFor="let t of d.tags$ | async" class="ms-1" clickable="true" linkTitle="Filter by tag" i18n-linkTitle (click)="clickTag(t.id);$event.stopPropagation()"></app-tag>
+          <pngx-tag [tag]="t" *ngFor="let t of d.tags$ | async" class="ms-1" clickable="true" linkTitle="Filter by tag" i18n-linkTitle (click)="clickTag(t.id);$event.stopPropagation()"></pngx-tag>
         </td>
         <td>
           {{d.owner | username}}
@@ -243,7 +243,7 @@
   </table>
 
   <div class="row row-cols-paperless-cards" *ngIf="displayMode === 'smallCards'">
-    <app-document-card-small class="p-0" [selected]="list.isSelected(d)" (toggleSelected)="toggleSelected(d, $event)" (dblClickDocument)="openDocumentDetail(d)" [document]="d" *ngFor="let d of list.documents; trackBy: trackByDocumentId" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)" (clickStoragePath)="clickStoragePath($event)" (clickDocumentType)="clickDocumentType($event)"></app-document-card-small>
+    <pngx-document-card-small class="p-0" [selected]="list.isSelected(d)" (toggleSelected)="toggleSelected(d, $event)" (dblClickDocument)="openDocumentDetail(d)" [document]="d" *ngFor="let d of list.documents; trackBy: trackByDocumentId" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)" (clickStoragePath)="clickStoragePath($event)" (clickDocumentType)="clickDocumentType($event)"></pngx-document-card-small>
   </div>
   <div *ngIf="list.documents?.length > 15" class="mt-3">
     <ng-container *ngTemplateOutlet="pagination"></ng-container>

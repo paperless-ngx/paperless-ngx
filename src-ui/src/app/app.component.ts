@@ -16,7 +16,7 @@ import {
 } from './services/permissions.service'
 
 @Component({
-  selector: 'app-root',
+  selector: 'pngx-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })

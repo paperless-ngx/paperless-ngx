@@ -7,7 +7,7 @@ import { PermissionsService } from '../services/permissions.service'
   template: `
     <div>
       <button
-        *appIfObjectPermissions="{
+        *pngxIfObjectPermissions="{
           object: { id: 2, owner: user1 },
           action: 'view'
         }"

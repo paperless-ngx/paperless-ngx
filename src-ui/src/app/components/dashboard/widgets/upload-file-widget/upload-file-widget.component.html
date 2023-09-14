@@ -1,4 +1,4 @@
-<app-widget-frame title="Upload new documents" i18n-title>
+<pngx-widget-frame title="Upload new documents" i18n-title>
   <div header-buttons>
     <a *ngIf="getStatusSuccess().length > 0" (click)="dismissCompleted()" [routerLink]="[]" >
       <span class="me-1" i18n="This button dismisses all status messages about processed documents on the dashboard (failed and successful)">Dismiss completed</span>
@@ -9,7 +9,7 @@
     </a>
   </div>
   <div content tourAnchor="tour.upload-widget">
-    <form *appIfPermissions="{ action: PermissionAction.Add, type: PermissionType.Document }">
+    <form *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.Document }">
       <ngx-file-drop dropZoneLabel="Drop documents here or" browseBtnLabel="Browse files" (onFileDrop)="dropped($event)"
         (onFileOver)="fileOver($event)" (onFileLeave)="fileLeave($event)" dropZoneClassName="bg-light card"
         multiple="true" contentClassName="justify-content-center d-flex align-items-center py-5 px-2" [showBrowseBtn]=true
@@ -33,14 +33,14 @@
       </div>
     </div>
   </div>
-</app-widget-frame>
+</pngx-widget-frame>
 
 <ng-template #consumerAlert let-status>
   <ngb-alert type="secondary" class="mt-2 mb-0" [dismissible]="isFinished(status)" (closed)="dismiss(status)">
     <h6 class="alert-heading">{{status.filename}}</h6>
     <p class="mb-0 pb-1" *ngIf="!isFinished(status) || (isFinished(status) && !status.documentId)">{{status.message}}</p>
     <ngb-progressbar [value]="status.getProgress()" [max]="1" [type]="getStatusColor(status)"></ngb-progressbar>
-    <div *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
+    <div *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
       <div *ngIf="isFinished(status)">
         <button *ngIf="status.documentId" class="btn btn-sm btn-outline-primary btn-open" routerLink="/documents/{{status.documentId}}" (click)="dismiss(status)">
           <small i18n>Open document</small>

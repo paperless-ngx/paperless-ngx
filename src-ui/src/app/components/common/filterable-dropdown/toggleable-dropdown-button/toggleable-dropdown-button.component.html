@@ -17,7 +17,7 @@
     </ng-container>
   </div>
   <div class="me-1">
-    <app-tag *ngIf="isTag; else displayName" [tag]="item" [clickable]="false"></app-tag>
+    <pngx-tag *ngIf="isTag; else displayName" [tag]="item" [clickable]="false"></pngx-tag>
     <ng-template #displayName><small>{{item.name}}</small></ng-template>
   </div>
   <div *ngIf="!hideCount" class="badge bg-light text-dark rounded-pill ms-auto me-1">{{count ?? item.document_count}}</div>

@@ -13,7 +13,7 @@ import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 
 @Component({
-  selector: 'app-document-card-large',
+  selector: 'pngx-document-card-large',
   templateUrl: './document-card-large.component.html',
   styleUrls: [
     './document-card-large.component.scss',

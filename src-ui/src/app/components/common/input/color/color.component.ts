@@ -11,7 +11,7 @@ import { AbstractInputComponent } from '../abstract-input'
       multi: true,
     },
   ],
-  selector: 'app-input-color',
+  selector: 'pngx-input-color',
   templateUrl: './color.component.html',
   styleUrls: ['./color.component.scss'],
 })

@@ -11,7 +11,7 @@ import { UploadDocumentsService } from 'src/app/services/upload-documents.servic
 const MAX_ALERTS = 5
 
 @Component({
-  selector: 'app-upload-file-widget',
+  selector: 'pngx-upload-file-widget',
   templateUrl: './upload-file-widget.component.html',
   styleUrls: ['./upload-file-widget.component.scss'],
 })

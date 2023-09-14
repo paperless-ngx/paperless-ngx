@@ -8,7 +8,7 @@ import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dial
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 
 @Component({
-  selector: 'app-tasks',
+  selector: 'pngx-tasks',
   templateUrl: './tasks.component.html',
   styleUrls: ['./tasks.component.scss'],
 })

@@ -5,7 +5,7 @@ import { PaperlessUser } from 'src/app/data/paperless-user'
 import { UserService } from 'src/app/services/rest/user.service'
 
 @Component({
-  selector: 'app-permissions-dialog',
+  selector: 'pngx-permissions-dialog',
   templateUrl: './permissions-dialog.component.html',
   styleUrls: ['./permissions-dialog.component.scss'],
 })

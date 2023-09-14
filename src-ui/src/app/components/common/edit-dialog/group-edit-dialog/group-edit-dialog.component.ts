@@ -8,7 +8,7 @@ import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 
 @Component({
-  selector: 'app-group-edit-dialog',
+  selector: 'pngx-group-edit-dialog',
   templateUrl: './group-edit-dialog.component.html',
   styleUrls: ['./group-edit-dialog.component.scss'],
 })

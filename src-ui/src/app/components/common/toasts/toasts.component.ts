@@ -4,7 +4,7 @@ import { Toast, ToastService } from 'src/app/services/toast.service'
 import { ClipboardService } from 'ngx-clipboard'
 
 @Component({
-  selector: 'app-toasts',
+  selector: 'pngx-toasts',
   templateUrl: './toasts.component.html',
   styleUrls: ['./toasts.component.scss'],
 })

@@ -21,7 +21,7 @@ interface DocumentFileType {
 }
 
 @Component({
-  selector: 'app-statistics-widget',
+  selector: 'pngx-statistics-widget',
   templateUrl: './statistics-widget.component.html',
   styleUrls: ['./statistics-widget.component.scss'],
 })

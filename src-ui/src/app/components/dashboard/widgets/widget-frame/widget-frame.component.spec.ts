@@ -9,7 +9,7 @@ import { WidgetFrameComponent } from './widget-frame.component'
   template: `
     <div>
       <button
-        *appIfObjectPermissions="{
+        *pngxIfObjectPermissions="{
           object: { id: 2, owner: user1 },
           action: 'view'
         }"

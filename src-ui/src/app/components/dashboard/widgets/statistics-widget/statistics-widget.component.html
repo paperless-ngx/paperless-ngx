@@ -1,4 +1,4 @@
-<app-widget-frame title="Statistics" [loading]="loading" i18n-title>
+<pngx-widget-frame title="Statistics" [loading]="loading" i18n-title>
   <ng-container content>
     <div class="list-group border-light">
       <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" title="Go to inbox" i18n-title href="javascript:void(0)" *ngIf="statistics?.documents_inbox !== null" (click)="goToInbox()">
@@ -43,4 +43,4 @@
       </div>
     </div>
   </ng-container>
-</app-widget-frame>
+</pngx-widget-frame>

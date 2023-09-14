@@ -1,12 +1,12 @@
-<app-page-header title="Settings" i18n-title>
+<pngx-page-header title="Settings" i18n-title>
   <button class="btn btn-sm btn-outline-primary" (click)="tourService.start()"><ng-container i18n>Start tour</ng-container></button>
-  <a *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.Admin }" class="btn btn-sm btn-primary ms-3" href="admin/" target="_blank">
+  <a *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Admin }" class="btn btn-sm btn-primary ms-3" href="admin/" target="_blank">
       <ng-container i18n>Open Django Admin</ng-container>
       <svg class="sidebaricon ms-1" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#arrow-up-right"/>
       </svg>
   </a>
-</app-page-header>
+</pngx-page-header>
 
 <form [formGroup]="settingsForm" (ngSubmit)="saveSettings()">
 
@@ -89,7 +89,7 @@
           </div>
           <div class="col">
 
-            <app-input-check i18n-title title="Use PDF viewer provided by the browser" i18n-hint hint="This is usually faster for displaying large PDF documents, but it might not work on some browsers." formControlName="useNativePdfViewer"></app-input-check>
+            <pngx-input-check i18n-title title="Use PDF viewer provided by the browser" i18n-hint hint="This is usually faster for displaying large PDF documents, but it might not work on some browsers." formControlName="useNativePdfViewer"></pngx-input-check>
 
           </div>
         </div>
@@ -100,7 +100,7 @@
           </div>
           <div class="col">
 
-            <app-input-check i18n-title title="Use 'slim' sidebar (icons only)" formControlName="slimSidebarEnabled"></app-input-check>
+            <pngx-input-check i18n-title title="Use 'slim' sidebar (icons only)" formControlName="slimSidebarEnabled"></pngx-input-check>
 
           </div>
         </div>
@@ -110,9 +110,9 @@
             <span i18n>Dark mode</span>
           </div>
           <div class="col">
-            <app-input-check i18n-title title="Use system settings" formControlName="darkModeUseSystem"></app-input-check>
-            <app-input-check [hidden]="settingsForm.value.darkModeUseSystem" i18n-title title="Enable dark mode" formControlName="darkModeEnabled"></app-input-check>
-            <app-input-check i18n-title title="Invert thumbnails in dark mode" formControlName="darkModeInvertThumbs"></app-input-check>
+            <pngx-input-check i18n-title title="Use system settings" formControlName="darkModeUseSystem"></pngx-input-check>
+            <pngx-input-check [hidden]="settingsForm.value.darkModeUseSystem" i18n-title title="Enable dark mode" formControlName="darkModeEnabled"></pngx-input-check>
+            <pngx-input-check i18n-title title="Invert thumbnails in dark mode" formControlName="darkModeInvertThumbs"></pngx-input-check>
           </div>
         </div>
 
@@ -121,7 +121,7 @@
             <span i18n>Theme Color</span>
           </div>
           <div class="col col-md-3">
-            <app-input-color i18n-title formControlName="themeColor" [error]="error?.color"></app-input-color>
+            <pngx-input-color i18n-title formControlName="themeColor" [error]="error?.color"></pngx-input-color>
           </div>
           <div class="col-2">
             <button class="btn btn-link btn-sm pt-2 ps-0" [disabled]="!this.settingsForm.get('themeColor').value" (click)="clearThemeColor()">
@@ -143,7 +143,7 @@
             <p i18n>
               <em>No tracking data is collected by the app in any way.</em>
             </p>
-            <app-input-check i18n-title title="Enable update checking" formControlName="updateCheckingEnabled" i18n-hint hint="Note that for users of third-party containers e.g. linuxserver.io this notification may be 'ahead' of the current third-party release."></app-input-check>
+            <pngx-input-check i18n-title title="Enable update checking" formControlName="updateCheckingEnabled" i18n-hint hint="Note that for users of third-party containers e.g. linuxserver.io this notification may be 'ahead' of the current third-party release."></pngx-input-check>
           </div>
         </div>
 
@@ -151,8 +151,8 @@
 
         <div class="row mb-3">
           <div class="offset-md-3 col">
-            <app-input-check i18n-title title="Show confirmation dialogs" formControlName="bulkEditConfirmationDialogs" i18n-hint hint="Deleting documents will always ask for confirmation."></app-input-check>
-            <app-input-check i18n-title title="Apply on close" formControlName="bulkEditApplyOnClose"></app-input-check>
+            <pngx-input-check i18n-title title="Show confirmation dialogs" formControlName="bulkEditConfirmationDialogs" i18n-hint hint="Deleting documents will always ask for confirmation."></pngx-input-check>
+            <pngx-input-check i18n-title title="Apply on close" formControlName="bulkEditApplyOnClose"></pngx-input-check>
           </div>
         </div>
 
@@ -160,7 +160,7 @@
 
         <div class="row mb-3">
           <div class="offset-md-3 col">
-            <app-input-check i18n-title title="Enable notes" formControlName="notesEnabled"></app-input-check>
+            <pngx-input-check i18n-title title="Enable notes" formControlName="notesEnabled"></pngx-input-check>
           </div>
         </div>
 
@@ -175,10 +175,10 @@
 
         <div class="row mb-3">
           <div class="offset-md-3 col">
-            <app-input-check i18n-title title="Show notifications when new documents are detected" formControlName="notificationsConsumerNewDocument"></app-input-check>
-            <app-input-check i18n-title title="Show notifications when document processing completes successfully" formControlName="notificationsConsumerSuccess"></app-input-check>
-            <app-input-check i18n-title title="Show notifications when document processing fails" formControlName="notificationsConsumerFailed"></app-input-check>
-            <app-input-check i18n-title title="Suppress notifications on dashboard" formControlName="notificationsConsumerSuppressOnDashboard" i18n-hint hint="This will suppress all messages about document processing status on the dashboard."></app-input-check>
+            <pngx-input-check i18n-title title="Show notifications when new documents are detected" formControlName="notificationsConsumerNewDocument"></pngx-input-check>
+            <pngx-input-check i18n-title title="Show notifications when document processing completes successfully" formControlName="notificationsConsumerSuccess"></pngx-input-check>
+            <pngx-input-check i18n-title title="Show notifications when document processing fails" formControlName="notificationsConsumerFailed"></pngx-input-check>
+            <pngx-input-check i18n-title title="Suppress notifications on dashboard" formControlName="notificationsConsumerSuppressOnDashboard" i18n-hint hint="This will suppress all messages about document processing status on the dashboard."></pngx-input-check>
           </div>
         </div>
 
@@ -192,7 +192,7 @@
         <h4 i18n>Settings</h4>
         <div class="row mb-3">
           <div class="offset-md-3 col">
-            <app-input-check i18n-title title="Show warning when closing saved views with unsaved changes" formControlName="savedViewsWarnOnUnsavedChange"></app-input-check>
+            <pngx-input-check i18n-title title="Show warning when closing saved views with unsaved changes" formControlName="savedViewsWarnOnUnsavedChange"></pngx-input-check>
           </div>
         </div>
 
@@ -219,7 +219,7 @@
 
               <div class="mb-2 col-auto">
                 <label class="form-label" for="name_{{view.id}}" i18n>Actions</label>
-                <button type="button" class="btn btn-sm btn-outline-danger form-control" (click)="deleteSavedView(view)" *appIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.SavedView }" i18n>Delete</button>
+                <button type="button" class="btn btn-sm btn-outline-danger form-control" (click)="deleteSavedView(view)" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.SavedView }" i18n>Delete</button>
               </div>
             </div>
 
@@ -235,15 +235,15 @@
       </ng-template>
     </li>
 
-    <li *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.MailRule }" [ngbNavItem]="SettingsNavIDs.Mail" (mouseover)="maybeInitializeTab(SettingsNavIDs.Mail)" (focusin)="maybeInitializeTab(SettingsNavIDs.Mail)">
+    <li *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.MailRule }" [ngbNavItem]="SettingsNavIDs.Mail" (mouseover)="maybeInitializeTab(SettingsNavIDs.Mail)" (focusin)="maybeInitializeTab(SettingsNavIDs.Mail)">
       <a ngbNavLink i18n>Mail</a>
       <ng-template ngbNavContent>
 
         <ng-container *ngIf="mailAccounts && mailRules">
-          <ng-container *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.MailAccount }">
+          <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.MailAccount }">
             <h4>
               <ng-container i18n>Mail accounts</ng-container>
-              <button type="button" class="btn btn-sm btn-primary ms-4" (click)="editMailAccount()" *appIfPermissions="{ action: PermissionAction.Add, type: PermissionType.MailAccount }">
+              <button type="button" class="btn btn-sm btn-primary ms-4" (click)="editMailAccount()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.MailAccount }">
                 <svg class="sidebaricon me-1" fill="currentColor">
                   <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
                 </svg>
@@ -266,8 +266,8 @@
                     <div class="col d-flex align-items-center">{{account.imap_server}}</div>
                     <div class="col">
                       <div class="btn-group">
-                        <button *appIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailAccount }" [disabled]="!userCanEdit(account)" class="btn btn-sm btn-primary" type="button" (click)="editMailAccount(account)" i18n>Edit</button>
-                        <button *appIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.MailAccount }" [disabled]="!userIsOwner(account)" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteMailAccount(account)" i18n>Delete</button>
+                        <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailAccount }" [disabled]="!userCanEdit(account)" class="btn btn-sm btn-primary" type="button" (click)="editMailAccount(account)" i18n>Edit</button>
+                        <button *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.MailAccount }" [disabled]="!userIsOwner(account)" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteMailAccount(account)" i18n>Delete</button>
                       </div>
                     </div>
                   </div>
@@ -277,10 +277,10 @@
             </ul>
           </ng-container>
 
-          <ng-container *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.MailRule }">
+          <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.MailRule }">
             <h4 class="mt-4">
               <ng-container i18n>Mail rules</ng-container>
-              <button type="button" class="btn btn-sm btn-primary ms-4" (click)="editMailRule()" *appIfPermissions="{ action: PermissionAction.Add, type: PermissionType.MailRule }">
+              <button type="button" class="btn btn-sm btn-primary ms-4" (click)="editMailRule()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.MailRule }">
                 <svg class="sidebaricon me-1" fill="currentColor">
                   <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
                 </svg>
@@ -303,8 +303,8 @@
                     <div class="col d-flex align-items-center">{{(mailAccountService.getCached(rule.account) | async)?.name}}</div>
                     <div class="col">
                       <div class="btn-group">
-                        <button *appIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailRule }" [disabled]="!userCanEdit(rule)" class="btn btn-sm btn-primary" type="button" (click)="editMailRule(rule)" i18n>Edit</button>
-                        <button *appIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.MailRule }" [disabled]="!userIsOwner(rule)" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteMailRule(rule)" i18n>Delete</button>
+                        <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailRule }" [disabled]="!userCanEdit(rule)" class="btn btn-sm btn-primary" type="button" (click)="editMailRule(rule)" i18n>Edit</button>
+                        <button *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.MailRule }" [disabled]="!userIsOwner(rule)" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteMailRule(rule)" i18n>Delete</button>
                       </div>
                     </div>
                   </div>
@@ -323,14 +323,14 @@
       </ng-template>
     </li>
 
-    <li [ngbNavItem]="SettingsNavIDs.UsersGroups" *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.User }" (mouseover)="maybeInitializeTab(SettingsNavIDs.UsersGroups)" (focusin)="maybeInitializeTab(SettingsNavIDs.UsersGroups)">
+    <li [ngbNavItem]="SettingsNavIDs.UsersGroups" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.User }" (mouseover)="maybeInitializeTab(SettingsNavIDs.UsersGroups)" (focusin)="maybeInitializeTab(SettingsNavIDs.UsersGroups)">
       <a ngbNavLink i18n>Users & Groups</a>
       <ng-template ngbNavContent>
 
       <ng-container *ngIf="users && groups">
         <h4 class="d-flex">
           <ng-container i18n>Users</ng-container>
-          <button type="button" class="btn btn-sm btn-primary ms-4" (click)="editUser()" *appIfPermissions="{ action: PermissionAction.Add, type: PermissionType.User }">
+          <button type="button" class="btn btn-sm btn-primary ms-4" (click)="editUser()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.User }">
             <svg class="sidebaricon me-1" fill="currentColor">
               <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
             </svg>
@@ -355,8 +355,8 @@
               <div class="col d-flex align-items-center">{{user.groups?.map(getGroupName, this).join(', ')}}</div>
               <div class="col">
                 <div class="btn-group">
-                  <button class="btn btn-sm btn-primary" type="button" (click)="editUser(user)" *appIfPermissions="{ action: PermissionAction.Change, type: PermissionType.User }" i18n>Edit</button>
-                  <button class="btn btn-sm btn-outline-danger" type="button" (click)="deleteUser(user)" *appIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.User }" i18n>Delete</button>
+                  <button class="btn btn-sm btn-primary" type="button" (click)="editUser(user)" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.User }" i18n>Edit</button>
+                  <button class="btn btn-sm btn-outline-danger" type="button" (click)="deleteUser(user)" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.User }" i18n>Delete</button>
                 </div>
               </div>
             </div>
@@ -365,7 +365,7 @@
 
         <h4 class="mt-4 d-flex">
           <ng-container i18n>Groups</ng-container>
-          <button type="button" class="btn btn-sm btn-primary ms-4" (click)="editGroup()" *appIfPermissions="{ action: PermissionAction.Add, type: PermissionType.Group }">
+          <button type="button" class="btn btn-sm btn-primary ms-4" (click)="editGroup()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.Group }">
             <svg class="sidebaricon me-1" fill="currentColor">
               <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
             </svg>
@@ -390,8 +390,8 @@
               <div class="col"></div>
               <div class="col">
                 <div class="btn-group">
-                  <button class="btn btn-sm btn-primary" type="button" (click)="editGroup(group)" *appIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Group }" i18n>Edit</button>
-                  <button class="btn btn-sm btn-outline-danger" type="button" (click)="deleteGroup(group)" *appIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Group }" i18n>Delete</button>
+                  <button class="btn btn-sm btn-primary" type="button" (click)="editGroup(group)" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Group }" i18n>Edit</button>
+                  <button class="btn btn-sm btn-outline-danger" type="button" (click)="deleteGroup(group)" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Group }" i18n>Delete</button>
                 </div>
               </div>
             </div>
@@ -412,5 +412,5 @@
 
   <div [ngbNavOutlet]="nav" class="border-start border-end border-bottom p-3 mb-3 shadow-sm"></div>
 
-  <button type="submit" class="btn btn-primary mb-2" *appIfPermissions="{ action: PermissionAction.Change, type: PermissionType.UISettings }" [disabled]="(isDirty$ | async) === false" i18n>Save</button>
+  <button type="submit" class="btn btn-primary mb-2" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.UISettings }" [disabled]="(isDirty$ | async) === false" i18n>Save</button>
 </form>

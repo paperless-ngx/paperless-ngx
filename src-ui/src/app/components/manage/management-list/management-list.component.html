@@ -1,6 +1,6 @@
-<app-page-header title="{{ typeNamePlural | titlecase }}">
-  <button type="button" class="btn btn-sm btn-outline-primary" (click)="openCreateDialog()" *appIfPermissions="{ action: PermissionAction.Add, type: permissionType }" i18n>Create</button>
-</app-page-header>
+<pngx-page-header title="{{ typeNamePlural | titlecase }}">
+  <button type="button" class="btn btn-sm btn-outline-primary" (click)="openCreateDialog()" *pngxIfPermissions="{ action: PermissionAction.Add, type: permissionType }" i18n>Create</button>
+</pngx-page-header>
 
 <div class="row mb-3">
   <div class="col-md mb-2 mb-xl-0">
@@ -16,10 +16,10 @@
 <table class="table table-striped align-middle border shadow-sm">
   <thead>
     <tr>
-      <th scope="col" appSortable="name" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Name</th>
-      <th scope="col" class="d-none d-sm-table-cell" appSortable="matching_algorithm" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Matching</th>
-      <th scope="col" appSortable="document_count" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Document count</th>
-      <th scope="col" *ngFor="let column of extraColumns" appSortable="{{column.key}}" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)">{{column.name}}</th>
+      <th scope="col" pngxSortable="name" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Name</th>
+      <th scope="col" class="d-none d-sm-table-cell" pngxSortable="matching_algorithm" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Matching</th>
+      <th scope="col" pngxSortable="document_count" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Document count</th>
+      <th scope="col" *ngFor="let column of extraColumns" pngxSortable="{{column.key}}" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)">{{column.name}}</th>
       <th scope="col" i18n>Actions</th>
     </tr>
   </thead>
@@ -47,24 +47,24 @@
               </svg>
             </button>
             <div ngbDropdownMenu aria-labelledby="actionsMenuMobile">
-              <button (click)="filterDocuments(object)" *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }" ngbDropdownItem i18n>Filter Documents</button>
-              <button (click)="openEditDialog(object)" *appIfPermissions="{ action: PermissionAction.Change, type: permissionType }" ngbDropdownItem i18n>Edit</button>
-              <button class="text-danger" (click)="openDeleteDialog(object)" *appIfPermissions="{ action: PermissionAction.Delete, type: permissionType }" ngbDropdownItem i18n>Delete</button>
+              <button (click)="filterDocuments(object)" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }" ngbDropdownItem i18n>Filter Documents</button>
+              <button (click)="openEditDialog(object)" *pngxIfPermissions="{ action: PermissionAction.Change, type: permissionType }" ngbDropdownItem i18n>Edit</button>
+              <button class="text-danger" (click)="openDeleteDialog(object)" *pngxIfPermissions="{ action: PermissionAction.Delete, type: permissionType }" ngbDropdownItem i18n>Delete</button>
             </div>
           </div>
         </div>
         <div class="btn-group d-none d-sm-block">
-          <button class="btn btn-sm btn-outline-secondary" (click)="filterDocuments(object)" *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
+          <button class="btn btn-sm btn-outline-secondary" (click)="filterDocuments(object)" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
             <svg class="buttonicon-sm" fill="currentColor">
               <use xlink:href="assets/bootstrap-icons.svg#filter" />
             </svg>&nbsp;<ng-container i18n>Documents</ng-container>
           </button>
-          <button class="btn btn-sm btn-outline-secondary" (click)="openEditDialog(object)" *appIfPermissions="{ action: PermissionAction.Change, type: permissionType }" [disabled]="!userCanEdit(object)">
+          <button class="btn btn-sm btn-outline-secondary" (click)="openEditDialog(object)" *pngxIfPermissions="{ action: PermissionAction.Change, type: permissionType }" [disabled]="!userCanEdit(object)">
             <svg class="buttonicon-sm" fill="currentColor">
               <use xlink:href="assets/bootstrap-icons.svg#pencil" />
             </svg>&nbsp;<ng-container i18n>Edit</ng-container>
           </button>
-          <button class="btn btn-sm btn-outline-danger" (click)="openDeleteDialog(object)" *appIfPermissions="{ action: PermissionAction.Delete, type: permissionType }" [disabled]="!userCanDelete(object)">
+          <button class="btn btn-sm btn-outline-danger" (click)="openDeleteDialog(object)" *pngxIfPermissions="{ action: PermissionAction.Delete, type: permissionType }" [disabled]="!userCanDelete(object)">
             <svg class="buttonicon-sm" fill="currentColor">
               <use xlink:href="assets/bootstrap-icons.svg#trash" />
             </svg>&nbsp;<ng-container i18n>Delete</ng-container>

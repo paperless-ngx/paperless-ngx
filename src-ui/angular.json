@@ -12,7 +12,7 @@
       },
       "root": "",
       "sourceRoot": "src",
-      "prefix": "app",
+      "prefix": "pngx",
       "i18n": {
         "sourceLocale": "en-US",
         "locales": {

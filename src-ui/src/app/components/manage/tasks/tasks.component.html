@@ -1,11 +1,11 @@
-<app-page-header title="File Tasks" i18n-title>
+<pngx-page-header title="File Tasks" i18n-title>
   <div class="btn-toolbar col col-md-auto">
     <button class="btn btn-sm btn-outline-secondary me-2" (click)="clearSelection()" [hidden]="selectedTasks.size === 0">
       <svg class="sidebaricon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#x"/>
       </svg>&nbsp;<ng-container i18n>Clear selection</ng-container>
     </button>
-    <button class="btn btn-sm btn-outline-primary me-4" (click)="dismissTasks()" *appIfPermissions="{ action: PermissionAction.Change, type: PermissionType.PaperlessTask }" [disabled]="tasksService.total === 0">
+    <button class="btn btn-sm btn-outline-primary me-4" (click)="dismissTasks()" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.PaperlessTask }" [disabled]="tasksService.total === 0">
       <svg class="sidebaricon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#check2-all"/>
       </svg>&nbsp;<ng-container i18n>{{dismissButtonText}}</ng-container>
@@ -20,7 +20,7 @@
       </ng-container>&nbsp;<ng-container i18n>Refresh</ng-container>
     </button>
   </div>
-</app-page-header>
+</pngx-page-header>
 
 <ng-container *ngIf="!tasksService.completedFileTasks && tasksService.loading">
   <div class="spinner-border spinner-border-sm fw-normal ms-2 me-auto" role="status"></div>
@@ -75,12 +75,12 @@
         </td>
         <td scope="row">
           <div class="btn-group" role="group">
-            <button class="btn btn-sm btn-outline-secondary" (click)="dismissTask(task); $event.stopPropagation();" *appIfPermissions="{ action: PermissionAction.Change, type: PermissionType.PaperlessTask }">
+            <button class="btn btn-sm btn-outline-secondary" (click)="dismissTask(task); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.PaperlessTask }">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#check"/>
               </svg>&nbsp;<ng-container i18n>Dismiss</ng-container>
             </button>
-            <ng-container *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
+            <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
               <button *ngIf="task.related_document" class="btn btn-sm btn-outline-primary" (click)="dismissAndGo(task); $event.stopPropagation();">
                 <svg class="sidebaricon" fill="currentColor">
                   <use xlink:href="assets/bootstrap-icons.svg#file-text"/>

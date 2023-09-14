@@ -18,12 +18,12 @@
           <svg width="1.2em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
             <use xlink:href="assets/bootstrap-icons.svg#x"/>
           </svg>
-          <app-tag *ngIf="item.id && tags" style="background-color: none;" [tag]="getTag(item.id)"></app-tag>
+          <pngx-tag *ngIf="item.id && tags" style="background-color: none;" [tag]="getTag(item.id)"></pngx-tag>
         </span>
       </ng-template>
       <ng-template ng-option-tmp let-item="item" let-index="index" let-search="searchTerm">
         <div class="tag-wrap">
-          <app-tag *ngIf="item.id && tags" class="me-2" [tag]="getTag(item.id)"></app-tag>
+          <pngx-tag *ngIf="item.id && tags" class="me-2" [tag]="getTag(item.id)"></pngx-tag>
         </div>
       </ng-template>
     </ng-select>
