@@ -37,12 +37,14 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
 .primary-light {
   --pngx-primary-text-contrast: #{$text-color-light-bg} !important;
 
-  .form-check-input:checked[type=checkbox] {
-    background-image: escape-svg($form-check-input-checked-bg-image-dark);
-  }
+  .form-check:not(.form-switch) {
+    .form-check-input:checked[type=checkbox] {
+      background-image: escape-svg($form-check-input-checked-bg-image-dark);
+    }
 
-  .form-check-input:checked[type=radio] {
-    background-image: escape-svg($form-check-radio-checked-bg-image-dark);
+    .form-check-input:checked[type=radio] {
+      background-image: escape-svg($form-check-radio-checked-bg-image-dark);
+    }
   }
 
   .toast .btn-close {
