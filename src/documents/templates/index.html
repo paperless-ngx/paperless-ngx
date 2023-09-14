@@ -3,7 +3,7 @@
 {% load static %}
 {% load i18n %}
 
-<html lang="en">
+<html lang="en" data-bs-theme="auto">
 <head>
 	<meta charset="utf-8">
 	<title>Paperless-ngx</title>
@@ -17,8 +17,8 @@
 	<link rel="stylesheet" href="{% static styles_css %}">
 	<link rel="apple-touch-icon" href="{% static apple_touch_icon %}">
 </head>
-<body class="color-scheme-system">
 	<app-root>
+<body>
 		<script type="text/javascript">
 			setTimeout(() => {
 				let warning = document.getElementsByClassName('warning').item(0)
