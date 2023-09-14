@@ -545,3 +545,16 @@ Paperless-ngx consists of the following components:
 
 - Optional: A database server. Paperless supports PostgreSQL, MariaDB
   and SQLite for storing its data.
+
+## Share Links
+
+Paperless-ngx added the abiltiy to create shareable links to files in version 2.0. You can find the button for this on the document detail screen.
+
+- Share links do not require a user to login and thus link directly to a file.
+- Links are unique and are of the form `{paperless-url}/share/{randomly-generated-slug}`.
+- Links can optionally have an expiration time set.
+- After a link expires or is deleted users will be redirected to the regular paperless-ngx login.
+
+!!! tip
+
+    If your paperless-ngx instance is behind a reverse-proxy you may want to create an exception to bypass any authentication layers that are part of your setup in order to make links truly publicly-accessible. Of course, do so with caution.

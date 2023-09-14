@@ -8,7 +8,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="Paperless-ngx Sign In">
-    <meta name="author" content="The Paperless-ngx Team">
+    <meta name="author" content="Paperless-ngx project and contributors">
     <meta name="robots" content="noindex,nofollow">
 
     <title>{% translate "Paperless-ngx sign in" %}</title>
@@ -40,9 +40,17 @@
       </svg>
 			<p>{% translate "Please sign in." %}</p>
 			{% if form.errors %}
-				<div class="alert alert-danger" role="alert">
-					{% translate "Your username and password didn't match. Please try again." %}
-				</div>
+        <div class="alert alert-danger" role="alert">
+          {% translate "Your username and password didn't match. Please try again." %}
+        </div>
+      {% elif request.GET.sharelink_notfound %}
+        <div class="alert alert-danger" role="alert">
+          {% translate "Share link was not found." %}
+        </div>
+      {% elif request.GET.sharelink_expired %}
+        <div class="alert alert-danger" role="alert">
+          {% translate "Share link has expired." %}
+        </div>
 			{% endif %}
 			{% translate "Username" as i18n_username %}
 			{% translate "Password" as i18n_password %}
