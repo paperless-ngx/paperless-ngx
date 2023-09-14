@@ -19,7 +19,7 @@
       <label class="form-label d-block my-2" i18n>Owner:</label>
     </div>
     <div class="col-lg-9">
-      <app-input-select [items]="users" bindLabel="username" formControlName="owner" [allowNull]="true"></app-input-select>
+      <pngx-input-select [items]="users" bindLabel="username" formControlName="owner" [allowNull]="true"></pngx-input-select>
     </div>
   </div>
   <small class="form-text text-muted text-end d-block mt-n2" i18n>Objects without an owner can be viewed and edited by all users</small>
@@ -31,7 +31,7 @@
           <label class="form-label d-block my-2" i18n>Users:</label>
         </div>
         <div class="col-lg-9">
-          <app-permissions-user type="view" formControlName="users"></app-permissions-user>
+          <pngx-permissions-user type="view" formControlName="users"></pngx-permissions-user>
         </div>
       </div>
       <div class="row">
@@ -39,7 +39,7 @@
           <label class="form-label d-block my-2" i18n>Groups:</label>
         </div>
         <div class="col-lg-9">
-          <app-permissions-group type="view" formControlName="groups"></app-permissions-group>
+          <pngx-permissions-group type="view" formControlName="groups"></pngx-permissions-group>
         </div>
       </div>
     </div>
@@ -50,7 +50,7 @@
           <label class="form-label d-block my-2" i18n>Users:</label>
         </div>
         <div class="col-lg-9">
-          <app-permissions-user type="change" formControlName="users"></app-permissions-user>
+          <pngx-permissions-user type="change" formControlName="users"></pngx-permissions-user>
         </div>
       </div>
       <div class="row">
@@ -58,7 +58,7 @@
           <label class="form-label d-block my-2" i18n>Groups:</label>
         </div>
         <div class="col-lg-9">
-          <app-permissions-group type="change" formControlName="groups"></app-permissions-group>
+          <pngx-permissions-group type="change" formControlName="groups"></pngx-permissions-group>
         </div>
       </div>
       <small class="form-text text-muted text-end d-block" i18n>Edit permissions also grant viewing permissions</small>

@@ -13,7 +13,7 @@ import { StoragePathEditDialogComponent } from '../../common/edit-dialog/storage
 import { ManagementListComponent } from '../management-list/management-list.component'
 
 @Component({
-  selector: 'app-storage-path-list',
+  selector: 'pngx-storage-path-list',
   templateUrl: './../management-list/management-list.component.html',
   styleUrls: ['./../management-list/management-list.component.scss'],
 })

@@ -23,7 +23,7 @@ import { AbstractInputComponent } from '../abstract-input'
       multi: true,
     },
   ],
-  selector: 'app-input-date',
+  selector: 'pngx-input-date',
   templateUrl: './date.component.html',
   styleUrls: ['./date.component.scss'],
 })

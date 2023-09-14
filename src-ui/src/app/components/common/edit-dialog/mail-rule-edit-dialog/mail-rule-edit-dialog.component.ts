@@ -101,7 +101,7 @@ const METADATA_CORRESPONDENT_OPTIONS = [
 ]
 
 @Component({
-  selector: 'app-mail-rule-edit-dialog',
+  selector: 'pngx-mail-rule-edit-dialog',
   templateUrl: './mail-rule-edit-dialog.component.html',
   styleUrls: ['./mail-rule-edit-dialog.component.scss'],
 })

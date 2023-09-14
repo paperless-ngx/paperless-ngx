@@ -10,7 +10,7 @@ import { environment } from 'src/environments/environment'
 import { ClipboardService } from 'ngx-clipboard'
 
 @Component({
-  selector: 'app-share-links-dropdown',
+  selector: 'pngx-share-links-dropdown',
   templateUrl: './share-links-dropdown.component.html',
   styleUrls: ['./share-links-dropdown.component.scss'],
 })

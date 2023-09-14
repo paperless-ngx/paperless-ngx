@@ -5,7 +5,7 @@ import { ComponentWithPermissions } from '../with-permissions/with-permissions.c
 import { TourService } from 'ngx-ui-tour-ng-bootstrap'
 
 @Component({
-  selector: 'app-dashboard',
+  selector: 'pngx-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
 })

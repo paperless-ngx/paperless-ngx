@@ -1,6 +1,6 @@
-<app-page-header title="Dashboard" [subTitle]="subtitle" i18n-title>
-  <app-logo extra_classes="d-none d-md-block"></app-logo>
-</app-page-header>
+<pngx-page-header title="Dashboard" [subTitle]="subtitle" i18n-title>
+  <pngx-logo extra_classes="d-none d-md-block"></pngx-logo>
+</pngx-page-header>
 
 <div class="row">
   <div class="col-lg-8">
@@ -10,20 +10,20 @@
         <ng-container i18n>Loading...</ng-container>
       </ng-container>
 
-      <app-welcome-widget *ngIf="settingsService.offerTour()" (dismiss)="completeTour()"></app-welcome-widget>
+      <pngx-welcome-widget *ngIf="settingsService.offerTour()" (dismiss)="completeTour()"></pngx-welcome-widget>
 
-      <div *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }">
+      <div *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }">
         <ng-container *ngFor="let v of savedViewService.dashboardViews; first as isFirst">
-          <app-saved-view-widget [savedView]="v"></app-saved-view-widget>
+          <pngx-saved-view-widget [savedView]="v"></pngx-saved-view-widget>
         </ng-container>
       </div>
     </div>
   </div>
   <div class="col-lg-4">
 
-    <app-statistics-widget></app-statistics-widget>
+    <pngx-statistics-widget></pngx-statistics-widget>
 
-    <app-upload-file-widget></app-upload-file-widget>
+    <pngx-upload-file-widget></pngx-upload-file-widget>
 
   </div>
 </div>

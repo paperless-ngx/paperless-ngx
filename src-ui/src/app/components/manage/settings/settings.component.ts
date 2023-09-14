@@ -60,7 +60,7 @@ enum SettingsNavIDs {
 }
 
 @Component({
-  selector: 'app-settings',
+  selector: 'pngx-settings',
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss'],
 })

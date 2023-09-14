@@ -12,7 +12,7 @@ import { AbstractInputComponent } from '../abstract-input'
       multi: true,
     },
   ],
-  selector: 'app-input-number',
+  selector: 'pngx-input-number',
   templateUrl: './number.component.html',
   styleUrls: ['./number.component.scss'],
 })

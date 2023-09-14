@@ -75,7 +75,7 @@ enum DocumentDetailNavIDs {
 }
 
 @Component({
-  selector: 'app-document-detail',
+  selector: 'pngx-document-detail',
   templateUrl: './document-detail.component.html',
   styleUrls: ['./document-detail.component.scss'],
 })

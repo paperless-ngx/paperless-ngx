@@ -410,7 +410,7 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
       (fixture.nativeElement as HTMLDivElement).querySelectorAll('button')
     ).filter((b) => b.textContent.includes('Tag'))
     fixture.nativeElement
-      .querySelector('app-toggleable-dropdown-button')
+      .querySelector('pngx-toggleable-dropdown-button')
       .dispatchEvent(new MouseEvent('click'))
     itemButtons[0].focus() // normally handled by browser
     expect(document.activeElement).toEqual(itemButtons[0])

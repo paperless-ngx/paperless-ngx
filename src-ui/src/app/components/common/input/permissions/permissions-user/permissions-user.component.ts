@@ -14,7 +14,7 @@ import { AbstractInputComponent } from '../../abstract-input'
       multi: true,
     },
   ],
-  selector: 'app-permissions-user',
+  selector: 'pngx-permissions-user',
   templateUrl: './permissions-user.component.html',
   styleUrls: ['./permissions-user.component.scss'],
 })

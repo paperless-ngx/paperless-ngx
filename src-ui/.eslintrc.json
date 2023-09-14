@@ -24,7 +24,7 @@
           "error",
           {
             "type": "attribute",
-            "prefix": "app",
+            "prefix": "pngx",
             "style": "camelCase"
           }
         ],
@@ -32,7 +32,7 @@
           "error",
           {
             "type": "element",
-            "prefix": "app",
+            "prefix": "pngx",
             "style": "kebab-case"
           }
         ]

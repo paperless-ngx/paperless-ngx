@@ -34,7 +34,7 @@ import {
 } from 'src/app/services/permissions.service'
 
 @Component({
-  selector: 'app-app-frame',
+  selector: 'pngx-app-frame',
   templateUrl: './app-frame.component.html',
   styleUrls: ['./app-frame.component.scss'],
 })

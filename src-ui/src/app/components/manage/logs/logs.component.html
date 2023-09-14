@@ -1,6 +1,6 @@
-<app-page-header title="Logs" i18n-title>
+<pngx-page-header title="Logs" i18n-title>
 
-</app-page-header>
+</pngx-page-header>
 
 <ul ngbNav #nav="ngbNav" [(activeId)]="activeLog" (activeIdChange)="reloadLogs()" class="nav-tabs">
   <li *ngFor="let logFile of logFiles" [ngbNavItem]="logFile">

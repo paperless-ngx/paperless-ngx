@@ -24,7 +24,7 @@ import { NgSelectComponent } from '@ng-select/ng-select'
       multi: true,
     },
   ],
-  selector: 'app-input-tags',
+  selector: 'pngx-input-tags',
   templateUrl: './tags.component.html',
   styleUrls: ['./tags.component.scss'],
 })
