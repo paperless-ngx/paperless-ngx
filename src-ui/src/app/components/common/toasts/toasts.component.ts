@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core'
 import { Subscription } from 'rxjs'
 import { Toast, ToastService } from 'src/app/services/toast.service'
+import { ClipboardService } from 'ngx-clipboard'
 
 @Component({
   selector: 'app-toasts',
@@ -8,7 +9,10 @@ import { Toast, ToastService } from 'src/app/services/toast.service'
   styleUrls: ['./toasts.component.scss'],
 })
 export class ToastsComponent implements OnInit, OnDestroy {
-  constructor(private toastService: ToastService) {}
+  constructor(
+    private toastService: ToastService,
+    private clipboardService: ClipboardService
+  ) {}
 
   private subscription: Subscription
 
@@ -45,7 +49,7 @@ export class ToastsComponent implements OnInit, OnDestroy {
   }
 
   public copyError(error: any) {
-    navigator.clipboard.writeText(JSON.stringify(error))
+    this.clipboardService.copy(JSON.stringify(error))
     this.copied = true
     setTimeout(() => {
       this.copied = false

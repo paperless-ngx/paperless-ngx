@@ -8,6 +8,7 @@ from .models import Correspondent
 from .models import Document
 from .models import DocumentType
 from .models import Log
+from .models import ShareLink
 from .models import StoragePath
 from .models import Tag
 
@@ -146,6 +147,15 @@ class StoragePathFilterSet(FilterSet):
         fields = {
             "name": CHAR_KWARGS,
             "path": CHAR_KWARGS,
+        }
+
+
+class ShareLinkFilterSet(FilterSet):
+    class Meta:
+        model = ShareLink
+        fields = {
+            "created": DATE_KWARGS,
+            "expiration": DATE_KWARGS,
         }
 
 
