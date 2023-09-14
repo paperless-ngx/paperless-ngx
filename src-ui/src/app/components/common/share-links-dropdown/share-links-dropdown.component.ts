@@ -7,6 +7,7 @@ import {
 import { ShareLinkService } from 'src/app/services/rest/share-link.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
+import { ClipboardService } from 'ngx-clipboard'
 
 @Component({
   selector: 'app-share-links-dropdown',
@@ -28,13 +29,16 @@ export class ShareLinksDropdownComponent implements OnInit {
 
   @Input()
   set documentId(id: number) {
-    this._documentId = id
-    this.refresh()
+    if (id !== undefined) {
+      this._documentId = id
+      this.refresh()
+    }
   }
 
-  shareLinks: PaperlessShareLink[]
+  @Input()
+  disabled: boolean = false
 
-  buttonsEnabled: boolean = true
+  shareLinks: PaperlessShareLink[]
 
   loading: boolean = false
 
@@ -46,15 +50,16 @@ export class ShareLinksDropdownComponent implements OnInit {
 
   constructor(
     private shareLinkService: ShareLinkService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private clipboardService: ClipboardService
   ) {}
 
   ngOnInit(): void {
-    this.refresh()
+    if (this._documentId !== undefined) this.refresh()
   }
 
   refresh() {
-    if (!this._documentId) return
+    if (this._documentId === undefined) return
     this.loading = true
     this.shareLinkService
       .getLinksForDocument(this._documentId)
@@ -86,7 +91,7 @@ export class ShareLinksDropdownComponent implements OnInit {
   }
 
   copy(link: PaperlessShareLink) {
-    navigator.clipboard.writeText(this.getShareUrl(link))
+    this.clipboardService.copy(this.getShareUrl(link))
     this.copied = link.id
     setTimeout(() => {
       this.copied = null

@@ -18,6 +18,7 @@ import { ShareLinkService } from 'src/app/services/rest/share-link.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
 import { ShareLinksDropdownComponent } from './share-links-dropdown.component'
+import { ClipboardService } from 'ngx-clipboard'
 
 describe('ShareLinksDropdownComponent', () => {
   let component: ShareLinksDropdownComponent
@@ -25,6 +26,7 @@ describe('ShareLinksDropdownComponent', () => {
   let shareLinkService: ShareLinkService
   let toastService: ToastService
   let httpController: HttpTestingController
+  let clipboardService: ClipboardService
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -36,6 +38,7 @@ describe('ShareLinksDropdownComponent', () => {
     shareLinkService = TestBed.inject(ShareLinkService)
     toastService = TestBed.inject(ToastService)
     httpController = TestBed.inject(HttpTestingController)
+    clipboardService = TestBed.inject(ClipboardService)
 
     component = fixture.componentInstance
     fixture.detectChanges()
@@ -99,7 +102,7 @@ describe('ShareLinksDropdownComponent', () => {
     const expiration = new Date()
     expiration.setDate(expiration.getDate() + 7)
 
-    const copySpy = jest.spyOn(navigator.clipboard, 'writeText')
+    const copySpy = jest.spyOn(clipboardService, 'copy')
     const refreshSpy = jest.spyOn(component, 'refresh')
 
     component.createLink()

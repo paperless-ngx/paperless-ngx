@@ -48,7 +48,7 @@
         </div>
     </div>
 
-    <app-share-links-dropdown [documentId]="documentId" *appIfPermissions="{ action: PermissionAction.Add, type: PermissionType.ShareLink }"></app-share-links-dropdown>
+    <app-share-links-dropdown [documentId]="documentId" [disabled]="!userIsOwner" *appIfPermissions="{ action: PermissionAction.Add, type: PermissionType.ShareLink }"></app-share-links-dropdown>
 
     <button type="button" class="btn btn-sm btn-outline-primary me-2" i18n-title title="Close" (click)="close()">
         <svg class="buttonicon" fill="currentColor">
