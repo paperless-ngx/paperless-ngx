@@ -569,7 +569,7 @@ class DocumentViewSet(
             raise Http404
 
         if request.method == "GET":
-            now = datetime.now()
+            now = timezone.now()
             links = [
                 {
                     "id": c.id,
