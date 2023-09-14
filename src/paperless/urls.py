@@ -22,6 +22,8 @@ from documents.views import RemoteVersionView
 from documents.views import SavedViewViewSet
 from documents.views import SearchAutoCompleteView
 from documents.views import SelectionDataView
+from documents.views import SharedLinkView
+from documents.views import ShareLinkViewSet
 from documents.views import StatisticsView
 from documents.views import StoragePathViewSet
 from documents.views import TagViewSet
@@ -49,6 +51,7 @@ api_router.register(r"users", UserViewSet, basename="users")
 api_router.register(r"groups", GroupViewSet, basename="groups")
 api_router.register(r"mail_accounts", MailAccountViewSet)
 api_router.register(r"mail_rules", MailRuleViewSet)
+api_router.register(r"share_links", ShareLinkViewSet)
 
 
 urlpatterns = [
@@ -110,6 +113,7 @@ urlpatterns = [
             ],
         ),
     ),
+    re_path(r"share/(?P<slug>\w+)/?$", SharedLinkView.as_view()),
     re_path(r"^favicon.ico$", FaviconView.as_view(), name="favicon"),
     re_path(r"admin/", admin.site.urls),
     re_path(
@@ -155,7 +159,7 @@ urlpatterns = [
     # TODO: with localization, this is even worse! :/
     # login, logout
     path("accounts/", include("django.contrib.auth.urls")),
-    # Root of the Frontent
+    # Root of the Frontend
     re_path(r".*", login_required(IndexView.as_view()), name="base"),
 ]
 

@@ -26,6 +26,7 @@
     "file-saver": "^2.0.5",
     "mime-names": "^1.0.0",
     "ng2-pdf-viewer": "^10.0.0",
+    "ngx-clipboard": "^16.0.0",
     "ngx-color": "^9.0.0",
     "ngx-cookie-service": "^16.0.1",
     "ngx-file-drop": "^16.0.0",
