@@ -20,7 +20,7 @@ import { ComponentWithPermissions } from 'src/app/components/with-permissions/wi
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
 
 @Component({
-  selector: 'app-saved-view-widget',
+  selector: 'pngx-saved-view-widget',
   templateUrl: './saved-view-widget.component.html',
   styleUrls: [
     './saved-view-widget.component.scss',

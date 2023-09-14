@@ -21,7 +21,7 @@ import { ComponentWithPermissions } from '../../with-permissions/with-permission
       multi: true,
     },
   ],
-  selector: 'app-permissions-select',
+  selector: 'pngx-permissions-select',
   templateUrl: './permissions-select.component.html',
   styleUrls: ['./permissions-select.component.scss'],
 })

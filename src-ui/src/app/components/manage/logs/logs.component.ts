@@ -10,7 +10,7 @@ import { Subject, takeUntil } from 'rxjs'
 import { LogService } from 'src/app/services/rest/log.service'
 
 @Component({
-  selector: 'app-logs',
+  selector: 'pngx-logs',
   templateUrl: './logs.component.html',
   styleUrls: ['./logs.component.scss'],
 })

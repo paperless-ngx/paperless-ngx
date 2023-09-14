@@ -4,7 +4,7 @@
            <use xlink:href="assets/bootstrap-icons.svg#person-fill-lock" />
         </svg>
         <div class="d-none d-sm-inline">&nbsp;{{title}}</div>
-      <app-clearable-badge [selected]="isActive" (cleared)="reset()"></app-clearable-badge><span class="visually-hidden">selected</span>
+      <pngx-clearable-badge [selected]="isActive" (cleared)="reset()"></pngx-clearable-badge><span class="visually-hidden">selected</span>
     </button>
     <div class="dropdown-menu permission-filter-dropdown shadow py-0 w-2" ngbDropdownMenu attr.aria-labelledby="dropdown{{title}}">
         <div class="list-group list-group-flush">
@@ -48,7 +48,7 @@
                     <small i18n>Unowned</small>
                 </div>
             </button>
-            <button *appIfPermissions="{ action: PermissionAction.Add, type: PermissionType.User }" class="list-group-item list-group-item-action d-flex align-items-center p-2 border-top-0 border-start-0 border-end-0 border-bottom" role="menuitem" [disabled]="disabled">
+            <button *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.User }" class="list-group-item list-group-item-action d-flex align-items-center p-2 border-top-0 border-start-0 border-end-0 border-bottom" role="menuitem" [disabled]="disabled">
                 <div class="selected-icon me-1">
                     <svg *ngIf="selectionModel.ownerFilter === OwnerFilterType.OTHERS" fill="currentColor" class="buttonicon-sm">
                         <use xlink:href="assets/bootstrap-icons.svg#check"/>

@@ -103,7 +103,7 @@ const RELATIVE_DATE_QUERYSTRINGS = [
 ]
 
 @Component({
-  selector: 'app-filter-editor',
+  selector: 'pngx-filter-editor',
   templateUrl: './filter-editor.component.html',
   styleUrls: ['./filter-editor.component.scss'],
 })

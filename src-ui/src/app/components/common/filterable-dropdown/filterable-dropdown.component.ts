@@ -318,7 +318,7 @@ export class FilterableDropdownSelectionModel {
 }
 
 @Component({
-  selector: 'app-filterable-dropdown',
+  selector: 'pngx-filterable-dropdown',
   templateUrl: './filterable-dropdown.component.html',
   styleUrls: ['./filterable-dropdown.component.scss'],
 })

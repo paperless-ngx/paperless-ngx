@@ -14,7 +14,7 @@ import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 
 @Component({
-  selector: 'app-document-card-small',
+  selector: 'pngx-document-card-small',
   templateUrl: './document-card-small.component.html',
   styleUrls: [
     './document-card-small.component.scss',

@@ -11,12 +11,12 @@ import { ObjectWithPermissions } from '../data/object-with-permissions'
 import { PermissionsService } from '../services/permissions.service'
 
 @Directive({
-  selector: '[appIfOwner]',
+  selector: '[pngxIfOwner]',
 })
 export class IfOwnerDirective implements OnInit, OnChanges {
   // The role the user must have
   @Input()
-  appIfOwner: ObjectWithPermissions
+  pngxIfOwner: ObjectWithPermissions
 
   createdView: EmbeddedViewRef<any>
 
@@ -32,7 +32,7 @@ export class IfOwnerDirective implements OnInit, OnChanges {
   ) {}
 
   public ngOnInit(): void {
-    if (this.permissionsService.currentUserOwnsObject(this.appIfOwner)) {
+    if (this.permissionsService.currentUserOwnsObject(this.pngxIfOwner)) {
       if (!this.createdView)
         this.createdView = this.viewContainerRef.createEmbeddedView(
           this.templateRef

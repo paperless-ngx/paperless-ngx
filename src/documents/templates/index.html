@@ -17,8 +17,8 @@
 	<link rel="stylesheet" href="{% static styles_css %}">
 	<link rel="apple-touch-icon" href="{% static apple_touch_icon %}">
 </head>
-	<app-root>
 <body>
+	<pngx-root>
 		<script type="text/javascript">
 			setTimeout(() => {
 				let warning = document.getElementsByClassName('warning').item(0)
@@ -80,7 +80,7 @@
 				<p class="warning m-auto mt-3 small fade hide">{% translate "Still here?! Hmm, something might be wrong." %} <a href="https://docs.paperless-ngx.com">{% translate "Here's a link to the docs." %}</a></p>
 			</div>
 		</div>
-	</app-root>
+	</pngx-root>
 	<script src="{% static runtime_js %}" defer></script>
 	<script src="{% static polyfills_js %}" defer></script>
 	<script src="{% static main_js %}" defer></script>

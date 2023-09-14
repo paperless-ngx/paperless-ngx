@@ -8,7 +8,7 @@
     <p class="mb-3" *ngIf="message" [innerHTML]="message | safeHtml"></p>
 
     <form [formGroup]="form">
-      <app-permissions-form [users]="users" formControlName="permissions_form"></app-permissions-form>
+      <pngx-permissions-form [users]="users" formControlName="permissions_form"></pngx-permissions-form>
     </form>
 
   </div>
