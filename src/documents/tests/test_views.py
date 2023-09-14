@@ -12,12 +12,12 @@ from rest_framework import status
 from documents.models import Document
 from documents.models import ShareLink
 from documents.tests.utils import DirectoriesMixin
-from documents.tests.utils import setup_directories
 
 
-class TestViews(TestCase, DirectoriesMixin):
+class TestViews(DirectoriesMixin, TestCase):
     def setUp(self) -> None:
         self.user = User.objects.create_user("testuser")
+        super().setUp()
 
     def test_login_redirect(self):
         response = self.client.get("/")
@@ -80,9 +80,8 @@ class TestViews(TestCase, DirectoriesMixin):
             - User is redirected to login with error
             - User is redirected to login with error
         """
-        dirs = setup_directories()
 
-        _, filename = tempfile.mkstemp(dir=dirs.originals_dir)
+        _, filename = tempfile.mkstemp(dir=self.dirs.originals_dir)
 
         content = b"This is a test"
 
