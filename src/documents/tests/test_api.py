@@ -4508,7 +4508,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
                     "/{created_month_name_short}/{created_day}/{added}/{added_year}"
                     "/{added_year_short}/{added_month}/{added_month_name}"
                     "/{added_month_name_short}/{added_day}/{asn}/{tags}"
-                    "/{tag_list}/{owner_username}/{original_name}/{dock_pk}/",
+                    "/{tag_list}/{owner_username}/{original_name}/{doc_pk}/",
                 },
             ),
             content_type="application/json",
