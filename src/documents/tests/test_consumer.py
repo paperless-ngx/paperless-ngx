@@ -11,6 +11,7 @@ from unittest.mock import MagicMock
 
 from dateutil import tz
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test import override_settings
 from django.utils import timezone
@@ -444,6 +445,16 @@ class TestConsumer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertNotIn(t2, document.tags.all())
         self.assertIn(t3, document.tags.all())
         self._assert_first_last_send_progress()
+
+    def testOverrideOwner(self):
+        u1 = User.objects.create(username="u1")
+
+        document1 = self.consumer.try_consume_file(
+            self.get_test_file(),
+            override_owner_id=u1.pk,
+        )
+
+        self.assertEqual(document1.owner.pk, u1.pk)
 
     def testNotAFile(self):
         self.assertRaisesMessage(

@@ -10,6 +10,7 @@ from time import sleep
 from typing import Final
 
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 from django.core.management.base import CommandError
 from watchdog.events import FileSystemEventHandler
@@ -40,12 +41,32 @@ def _tags_from_path(filepath) -> set[Tag]:
     """
     tag_ids = set()
     path_parts = Path(filepath).relative_to(settings.CONSUMPTION_DIR).parent.parts
-    for part in path_parts:
+    for index, part in enumerate(path_parts):
+        # If first subdir should be interpreted as owner
+        # this subdir should not be added as a tag
+        if index == 0 and settings.CONSUMER_SUBDIR_AS_OWNER:
+            owner_id = User.objects.get(username__iexact=part).pk
+            if owner_id:
+                continue
         tag_ids.add(
             Tag.objects.get_or_create(name__iexact=part, defaults={"name": part})[0].pk,
         )
 
     return tag_ids
+
+
+def _owner_from_path(filepath) -> int:
+    """
+    Check first subfolder from filepath below CONSUMPTION_DIR,
+    check if subfolder is equals to an existing user and return user id.
+
+    Returns Owner ID or None
+    """
+    owner_id = None
+    path_parts = Path(filepath).relative_to(settings.CONSUMPTION_DIR).parent.parts
+    owner_id = User.objects.get(username__iexact=path_parts[0]).pk
+
+    return owner_id
 
 
 def _is_ignored(filepath: str) -> bool:
@@ -123,6 +144,13 @@ def _consume(filepath: str) -> None:
     except Exception:
         logger.exception("Error creating tags from path")
 
+    owner_id = None
+    try:
+        if settings.CONSUMER_SUBDIR_AS_OWNER:
+            owner_id = _owner_from_path(filepath)
+    except Exception:
+        logger.exception("Error setting owner from path")
+
     try:
         logger.info(f"Adding {filepath} to the task queue.")
         consume_file.delay(
@@ -130,7 +158,7 @@ def _consume(filepath: str) -> None:
                 source=DocumentSource.ConsumeFolder,
                 original_file=filepath,
             ),
-            DocumentMetadataOverrides(tag_ids=tag_ids),
+            DocumentMetadataOverrides(tag_ids=tag_ids, owner_id=owner_id),
         )
     except Exception:
         # Catch all so that the consumer won't crash.

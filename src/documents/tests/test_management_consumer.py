@@ -7,6 +7,7 @@ from time import sleep
 from unittest import mock
 
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.core.management import CommandError
 from django.core.management import call_command
 from django.test import TransactionTestCase
@@ -411,3 +412,101 @@ class TestConsumerTags(DirectoriesMixin, ConsumerThreadMixin, TransactionTestCas
     )
     def test_consume_file_with_path_tags_polling(self):
         self.test_consume_file_with_path_tags()
+
+
+class TestConsumerOwner(DirectoriesMixin, ConsumerThreadMixin, TransactionTestCase):
+    @override_settings(CONSUMER_RECURSIVE=True, CONSUMER_SUBDIR_AS_OWNER=True)
+    def test_consume_file_with_path_owner(self):
+        owner_name = "User1"
+        # Create a user prior to consuming a file using it in path
+        owner_id = User.objects.create(username=owner_name).pk
+
+        self.t_start()
+
+        path = os.path.join(self.dirs.consumption_dir, owner_name)
+        os.makedirs(path, exist_ok=True)
+        f = Path(os.path.join(path, "my_file.pdf"))
+        # Wait at least inotify read_delay for recursive watchers
+        # to be created for the new directories
+        sleep(1)
+        shutil.copy(self.sample_file, f)
+
+        self.wait_for_task_mock_call()
+
+        self.consume_file_mock.assert_called_once()
+
+        input_doc, overrides = self.get_last_consume_delay_call_args()
+
+        self.assertEqual(input_doc.original_file, f)
+        self.assertEqual(overrides.owner_id, owner_id)
+
+    @override_settings(
+        CONSUMER_POLLING=1,
+        CONSUMER_POLLING_DELAY=3,
+        CONSUMER_POLLING_RETRY_COUNT=20,
+    )
+    def test_consume_file_with_path_owner_polling(self):
+        self.test_consume_file_with_path_owner()
+
+    @override_settings(CONSUMER_RECURSIVE=True, CONSUMER_SUBDIR_AS_OWNER=True)
+    def test_consume_file_with_path_no_owner(self):
+        self.t_start()
+
+        # Create a random sub-folder that is not matching to a user
+        path = os.path.join(self.dirs.consumption_dir, "random_folder")
+        os.makedirs(path, exist_ok=True)
+        f = Path(os.path.join(path, "my_file.pdf"))
+        # Wait at least inotify read_delay for recursive watchers
+        # to be created for the new directories
+        sleep(1)
+        shutil.copy(self.sample_file, f)
+
+        self.wait_for_task_mock_call()
+
+        self.consume_file_mock.assert_called_once()
+
+        input_doc, overrides = self.get_last_consume_delay_call_args()
+
+        self.assertEqual(input_doc.original_file, f)
+        self.assertIsNone(overrides.owner_id)
+
+    @override_settings(
+        CONSUMER_RECURSIVE=True,
+        CONSUMER_SUBDIR_AS_OWNER=True,
+        CONSUMER_SUBDIRS_AS_TAGS=True,
+    )
+    def test_consume_file_with_path_owner_and_tags(self):
+        owner_name = "User1"
+        # Create a user prior to consuming a file using it in path
+        owner_id = User.objects.create(username=owner_name).pk
+
+        tag_names = ("existingTag", "Space Tag")
+        # Create a Tag prior to consuming a file using it in path
+        tag_ids = [
+            Tag.objects.create(name="existingtag").pk,
+        ]
+
+        self.t_start()
+
+        # Create a random sub-folder that is not matching to a user
+        path = os.path.join(self.dirs.consumption_dir, owner_name, *tag_names)
+
+        os.makedirs(path, exist_ok=True)
+        f = Path(os.path.join(path, "my_file.pdf"))
+        # Wait at least inotify read_delay for recursive watchers
+        # to be created for the new directories
+        sleep(1)
+        shutil.copy(self.sample_file, f)
+
+        self.wait_for_task_mock_call()
+
+        self.consume_file_mock.assert_called_once()
+
+        input_doc, overrides = self.get_last_consume_delay_call_args()
+
+        # Add the pk of the Tag created by _consume()
+        tag_ids.append(Tag.objects.get(name=tag_names[1]).pk)
+
+        self.assertEqual(input_doc.original_file, f)
+        self.assertEqual(overrides.owner_id, owner_id)
+        self.assertCountEqual(overrides.tag_ids, tag_ids)

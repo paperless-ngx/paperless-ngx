@@ -819,6 +819,10 @@ CONSUMER_COLLATE_DOUBLE_SIDED_TIFF_SUPPORT: Final[bool] = __get_boolean(
     "PAPERLESS_CONSUMER_COLLATE_DOUBLE_SIDED_TIFF_SUPPORT",
 )
 
+CONSUMER_SUBDIR_AS_OWNER: Final[bool] = __get_boolean(
+    "PAPERLESS_CONSUMER_SUBDIR_AS_OWNER",
+)
+
 OCR_PAGES = int(os.getenv("PAPERLESS_OCR_PAGES", 0))
 
 # The default language that tesseract will attempt to use when parsing

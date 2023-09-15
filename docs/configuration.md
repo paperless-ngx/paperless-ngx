@@ -899,6 +899,19 @@ don't exist yet.
 
     Defaults to false.
 
+`PAPERLESS_CONSUMER_SUBDIR_AS_OWNER=<bool>`
+
+: Set the name of the first subdirectory as owner for consumed files. E.g.
+`<CONSUMPTION_DIR>/user1/file.pdf` will set the owner with username "user1" to the consumed
+file. Paperless will not create a user that don't exist yet and the file will not have an owner.
+
+    This is useful for if you have different users in your system. Each user places
+    their files in the their own folders. These folders won't be deleted.
+
+    PAPERLESS_CONSUMER_RECURSIVE must be enabled for this to work.
+
+    Defaults to false.
+
 `PAPERLESS_CONSUMER_IGNORE_PATTERNS=<json>`
 
 : By default, paperless ignores certain files and folders in the
