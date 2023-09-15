@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-08-15 00:55-0700\n"
-"PO-Revision-Date: 2023-09-14 20:53\n"
+"PO-Revision-Date: 2023-09-15 11:29\n"
 "Last-Translator: \n"
 "Language-Team: Catalan\n"
 "Language: ca_ES\n"
@@ -385,43 +385,43 @@ msgstr "emmagatzematge és"
 
 #: documents/models.py:445
 msgid "has correspondent in"
-msgstr ""
+msgstr "té corresponsal a"
 
 #: documents/models.py:446
 msgid "does not have correspondent in"
-msgstr ""
+msgstr "no té corresponsal a"
 
 #: documents/models.py:447
 msgid "has document type in"
-msgstr ""
+msgstr "té tipus de document a"
 
 #: documents/models.py:448
 msgid "does not have document type in"
-msgstr ""
+msgstr "no té tipus de document a"
 
 #: documents/models.py:449
 msgid "has storage path in"
-msgstr ""
+msgstr "té emmagatzematge a"
 
 #: documents/models.py:450
 msgid "does not have storage path in"
-msgstr ""
+msgstr "no té emmagatzematge a"
 
 #: documents/models.py:451
 msgid "owner is"
-msgstr ""
+msgstr "propietari és"
 
 #: documents/models.py:452
 msgid "has owner in"
-msgstr ""
+msgstr "té propietari a"
 
 #: documents/models.py:453
 msgid "does not have owner"
-msgstr ""
+msgstr "no té propietari"
 
 #: documents/models.py:454
 msgid "does not have owner in"
-msgstr ""
+msgstr "no té propietari a"
 
 #: documents/models.py:464
 msgid "rule type"
@@ -513,7 +513,7 @@ msgstr "Dades retornades per la tasca"
 
 #: documents/models.py:644
 msgid "Note for the document"
-msgstr ""
+msgstr "Nota pel document"
 
 #: documents/models.py:668
 msgid "user"
@@ -521,35 +521,35 @@ msgstr "usuari"
 
 #: documents/models.py:673
 msgid "note"
-msgstr ""
+msgstr "nota"
 
 #: documents/models.py:674
 msgid "notes"
-msgstr ""
+msgstr "notes"
 
 #: documents/models.py:682
 msgid "Archive"
-msgstr ""
+msgstr "Arxiu"
 
 #: documents/models.py:683
 msgid "Original"
-msgstr ""
+msgstr "Original"
 
 #: documents/models.py:695
 msgid "expiration"
-msgstr ""
+msgstr "venciment"
 
 #: documents/models.py:702
 msgid "slug"
-msgstr ""
+msgstr "fitxa"
 
 #: documents/models.py:734
 msgid "share link"
-msgstr ""
+msgstr "comparteix enllaç"
 
 #: documents/models.py:735
 msgid "share links"
-msgstr ""
+msgstr "comparteix enllaços"
 
 #: documents/serialisers.py:100
 #, python-format
@@ -607,11 +607,11 @@ msgstr "Nom usuari / contrasenya no coincideixen. Siusplau torna a provar."
 
 #: documents/templates/registration/login.html:68
 msgid "Share link was not found."
-msgstr ""
+msgstr "No s'ha trobat aquest enllaç."
 
 #: documents/templates/registration/login.html:72
 msgid "Share link has expired."
-msgstr ""
+msgstr "L'enllaç ha caducat."
 
 #: documents/templates/registration/login.html:75
 msgid "Username"
@@ -643,7 +643,7 @@ msgstr "Bielorús"
 
 #: paperless/settings.py:568
 msgid "Catalan"
-msgstr ""
+msgstr "Català"
 
 #: paperless/settings.py:569
 msgid "Czech"
@@ -667,7 +667,7 @@ msgstr "Espanyol"
 
 #: paperless/settings.py:574
 msgid "Finnish"
-msgstr ""
+msgstr "Finès"
 
 #: paperless/settings.py:575
 msgid "French"
@@ -707,7 +707,7 @@ msgstr "Rus"
 
 #: paperless/settings.py:584
 msgid "Slovak"
-msgstr ""
+msgstr "Eslovac"
 
 #: paperless/settings.py:585
 msgid "Slovenian"
@@ -727,7 +727,7 @@ msgstr "Turc"
 
 #: paperless/settings.py:589
 msgid "Ukrainian"
-msgstr ""
+msgstr "Ucranià"
 
 #: paperless/settings.py:590
 msgid "Chinese Simplified"
@@ -819,7 +819,7 @@ msgstr "contrasenya"
 
 #: paperless_mail/models.py:42
 msgid "Is token authentication"
-msgstr ""
+msgstr "És token d'autenticació"
 
 #: paperless_mail/models.py:45
 msgid "character set"
@@ -919,7 +919,7 @@ msgstr "filtra de"
 
 #: paperless_mail/models.py:121
 msgid "filter to"
-msgstr ""
+msgstr "filtra a"
 
 #: paperless_mail/models.py:128
 msgid "filter subject"
