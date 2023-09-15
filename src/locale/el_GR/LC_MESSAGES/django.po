@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-08-15 00:55-0700\n"
-"PO-Revision-Date: 2023-09-14 20:53\n"
+"PO-Revision-Date: 2023-09-15 09:33\n"
 "Last-Translator: \n"
 "Language-Team: Greek\n"
 "Language: el_GR\n"
@@ -385,43 +385,43 @@ msgstr "η διαδρομή αποθήκευσης είναι"
 
 #: documents/models.py:445
 msgid "has correspondent in"
-msgstr ""
+msgstr "έχει ανταποκριτή σε"
 
 #: documents/models.py:446
 msgid "does not have correspondent in"
-msgstr ""
+msgstr "δεν έχει ανταποκριτή σε"
 
 #: documents/models.py:447
 msgid "has document type in"
-msgstr ""
+msgstr "έχει τύπο εγγράφου σε"
 
 #: documents/models.py:448
 msgid "does not have document type in"
-msgstr ""
+msgstr "δεν έχει τύπο εγγράφου σε"
 
 #: documents/models.py:449
 msgid "has storage path in"
-msgstr ""
+msgstr "έχει διαδρομή αποθήκευσης σε"
 
 #: documents/models.py:450
 msgid "does not have storage path in"
-msgstr ""
+msgstr "δεν έχει διαδρομή αποθήκευσης σε"
 
 #: documents/models.py:451
 msgid "owner is"
-msgstr ""
+msgstr "ο ιδιοκτήτης είναι"
 
 #: documents/models.py:452
 msgid "has owner in"
-msgstr ""
+msgstr "έχει ιδιοκτήτη σε"
 
 #: documents/models.py:453
 msgid "does not have owner"
-msgstr ""
+msgstr "δεν έχει ιδιοκτήτη"
 
 #: documents/models.py:454
 msgid "does not have owner in"
-msgstr ""
+msgstr "δεν έχει ιδιοκτήτη σε"
 
 #: documents/models.py:464
 msgid "rule type"
@@ -513,7 +513,7 @@ msgstr "Τα δεδομένα που επιστράφηκαν από την ερ
 
 #: documents/models.py:644
 msgid "Note for the document"
-msgstr ""
+msgstr "Σημείωση για το έγγραφο"
 
 #: documents/models.py:668
 msgid "user"
@@ -521,35 +521,35 @@ msgstr "χρήστης"
 
 #: documents/models.py:673
 msgid "note"
-msgstr ""
+msgstr "σημείωση"
 
 #: documents/models.py:674
 msgid "notes"
-msgstr ""
+msgstr "σημειώσεις"
 
 #: documents/models.py:682
 msgid "Archive"
-msgstr ""
+msgstr "Αρχειοθέτηση"
 
 #: documents/models.py:683
 msgid "Original"
-msgstr ""
+msgstr "Πρωτότυπο"
 
 #: documents/models.py:695
 msgid "expiration"
-msgstr ""
+msgstr "λήξη"
 
 #: documents/models.py:702
 msgid "slug"
-msgstr ""
+msgstr "slug"
 
 #: documents/models.py:734
 msgid "share link"
-msgstr ""
+msgstr "κοινοποίηση συνδέσμου"
 
 #: documents/models.py:735
 msgid "share links"
-msgstr ""
+msgstr "κοινοποίηση συνδέσμων"
 
 #: documents/serialisers.py:100
 #, python-format
@@ -607,11 +607,11 @@ msgstr "Το όνομα χρήστη και ο κωδικός πρόσβασης
 
 #: documents/templates/registration/login.html:68
 msgid "Share link was not found."
-msgstr ""
+msgstr "Δεν βρέθηκε σύνδεσμος κοινοποίησης."
 
 #: documents/templates/registration/login.html:72
 msgid "Share link has expired."
-msgstr ""
+msgstr "Ο σύνδεσμος κοινοποίησης έχει λήξει."
 
 #: documents/templates/registration/login.html:75
 msgid "Username"
@@ -643,7 +643,7 @@ msgstr "Λευκορωσικά"
 
 #: paperless/settings.py:568
 msgid "Catalan"
-msgstr ""
+msgstr "Καταλανικά"
 
 #: paperless/settings.py:569
 msgid "Czech"
@@ -667,7 +667,7 @@ msgstr "Ισπανικά"
 
 #: paperless/settings.py:574
 msgid "Finnish"
-msgstr ""
+msgstr "Φινλανδικά"
 
 #: paperless/settings.py:575
 msgid "French"
@@ -707,7 +707,7 @@ msgstr "Ρωσικά"
 
 #: paperless/settings.py:584
 msgid "Slovak"
-msgstr ""
+msgstr "Σλοβακικά"
 
 #: paperless/settings.py:585
 msgid "Slovenian"
@@ -727,7 +727,7 @@ msgstr "Τούρκικα"
 
 #: paperless/settings.py:589
 msgid "Ukrainian"
-msgstr ""
+msgstr "Ουκρανικά"
 
 #: paperless/settings.py:590
 msgid "Chinese Simplified"
@@ -819,7 +819,7 @@ msgstr "κωδικός"
 
 #: paperless_mail/models.py:42
 msgid "Is token authentication"
-msgstr ""
+msgstr "Είναι token ταυτοποίησης"
 
 #: paperless_mail/models.py:45
 msgid "character set"
@@ -919,7 +919,7 @@ msgstr "φίλτρο από"
 
 #: paperless_mail/models.py:121
 msgid "filter to"
-msgstr ""
+msgstr "φιλτράρισμα σε"
 
 #: paperless_mail/models.py:128
 msgid "filter subject"
