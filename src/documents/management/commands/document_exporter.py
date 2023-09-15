@@ -126,6 +126,13 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
+            "-zn",
+            "--zip-name",
+            default=f"export-{timezone.localdate().isoformat()}",
+            help="Sets the export zip file name",
+        )
+
+        parser.add_argument(
             "--no-progress-bar",
             default=False,
             action="store_true",
@@ -147,13 +154,13 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.target = Path(options["target"]).resolve()
-        self.split_manifest = options["split_manifest"]
-        self.compare_checksums = options["compare_checksums"]
-        self.use_filename_format = options["use_filename_format"]
-        self.use_folder_prefix = options["use_folder_prefix"]
-        self.delete = options["delete"]
-        self.no_archive = options["no_archive"]
-        self.no_thumbnail = options["no_thumbnail"]
+        self.split_manifest: bool = options["split_manifest"]
+        self.compare_checksums: bool = options["compare_checksums"]
+        self.use_filename_format: bool = options["use_filename_format"]
+        self.use_folder_prefix: bool = options["use_folder_prefix"]
+        self.delete: bool = options["delete"]
+        self.no_archive: bool = options["no_archive"]
+        self.no_thumbnail: bool = options["no_thumbnail"]
         zip_export: bool = options["zip"]
 
         # If zipping, save the original target for later and
@@ -189,7 +196,7 @@ class Command(BaseCommand):
                     shutil.make_archive(
                         os.path.join(
                             original_target,
-                            f"export-{timezone.localdate().isoformat()}",
+                            options["zip_name"],
                         ),
                         format="zip",
                         root_dir=temp_dir.name,
