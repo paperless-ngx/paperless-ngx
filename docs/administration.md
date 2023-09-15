@@ -251,14 +251,15 @@ is not a TTY" errors. For example:
 document_exporter target [-c] [-d] [-f] [-na] [-nt] [-p] [-sm] [-z]
 
 optional arguments:
--c, --compare-checksums
--d, --delete
--f, --use-filename-format
+-c,  --compare-checksums
+-d,  --delete
+-f,  --use-filename-format
 -na, --no-archive
 -nt, --no-thumbnail
--p, --use-folder-prefix
+-p,  --use-folder-prefix
 -sm, --split-manifest
--z  --zip
+-z,  --zip
+-zn, --zip-name
 ```
 
 `target` is a folder to which the data gets written. This includes
@@ -314,7 +315,8 @@ manifest.json will still contain application wide information (e.g. tags, corres
 documenttype, etc)
 
 If `-z` or `--zip` is provided, the export will be a zip file
-in the target directory, named according to the current date.
+in the target directory, named according to the current local date or the
+value set in `-zn` or `--zip-name`.
 
 !!! warning
 
