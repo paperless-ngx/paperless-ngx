@@ -252,6 +252,10 @@ describe('PermissionsService', () => {
         'view_sharelink',
         'change_sharelink',
         'delete_sharelink',
+        'add_consumptiontemplate',
+        'view_consumptiontemplate',
+        'change_consumptiontemplate',
+        'delete_consumptiontemplate',
       ],
       {
         username: 'testuser',
