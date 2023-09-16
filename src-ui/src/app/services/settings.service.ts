@@ -7,7 +7,6 @@ import {
   LOCALE_ID,
   Renderer2,
   RendererFactory2,
-  RendererStyleFlags2,
 } from '@angular/core'
 import { Meta } from '@angular/platform-browser'
 import { CookieService } from 'ngx-cookie-service'
@@ -130,44 +129,17 @@ export class SettingsService {
         this._renderer.addClass(this.document.body, 'primary-light')
         this._renderer.removeClass(this.document.body, 'primary-dark')
       }
-      this._renderer.setStyle(
-        document.body,
+      document.documentElement.style.setProperty(
         '--pngx-primary',
-        `${+hsl.h * 360},${hsl.s * 100}%`,
-        RendererStyleFlags2.DashCase
+        `${+hsl.h * 360},${hsl.s * 100}%`
       )
-      this._renderer.setStyle(
-        document.body,
+      document.documentElement.style.setProperty(
         '--pngx-primary-lightness',
-        `${hsl.l * 100}%`,
-        RendererStyleFlags2.DashCase
-      )
-
-      /**
-       * Fix for not reflecting changed variables. (--bs-primary is at :root while here we set them to body)
-       */
-      this._renderer.setStyle(
-        document.body,
-        '--bs-primary',
-        'hsl(var(--pngx-primary), var(--pngx-primary-lightness))',
-        RendererStyleFlags2.DashCase
+        `${hsl.l * 100}%`
       )
     } else {
-      this._renderer.removeStyle(
-        document.body,
-        '--pngx-primary',
-        RendererStyleFlags2.DashCase
-      )
-      this._renderer.removeStyle(
-        document.body,
-        '--pngx-primary-lightness',
-        RendererStyleFlags2.DashCase
-      )
-      this._renderer.removeStyle(
-        document.body,
-        '--bs-primary',
-        RendererStyleFlags2.DashCase
-      )
+      document.documentElement.style.removeProperty('--pngx-primary')
+      document.documentElement.style.removeProperty('--pngx-primary-lightness')
     }
   }
 
