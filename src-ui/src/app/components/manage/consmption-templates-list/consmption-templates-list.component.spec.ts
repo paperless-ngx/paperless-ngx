@@ -9,7 +9,10 @@ import {
   NgbModalModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { of, throwError } from 'rxjs'
-import { PaperlessConsumptionTemplate } from 'src/app/data/paperless-consumption-template'
+import {
+  DocumentSource,
+  PaperlessConsumptionTemplate,
+} from 'src/app/data/paperless-consumption-template'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { ConsumptionTemplateService } from 'src/app/services/rest/consumption-template.service'
 import { ToastService } from 'src/app/services/toast.service'
@@ -24,6 +27,11 @@ const templates: PaperlessConsumptionTemplate[] = [
     id: 0,
     name: 'Template 1',
     order: 0,
+    sources: [
+      DocumentSource.ConsumeFolder,
+      DocumentSource.ApiUpload,
+      DocumentSource.MailFetch,
+    ],
     filter_filename: 'foo',
     filter_path: 'bar',
     assign_tags: [1, 2, 3],
@@ -32,6 +40,7 @@ const templates: PaperlessConsumptionTemplate[] = [
     id: 1,
     name: 'Template 2',
     order: 1,
+    sources: [DocumentSource.MailFetch],
     filter_filename: null,
     filter_path: 'foo/bar',
     assign_owner: 1,

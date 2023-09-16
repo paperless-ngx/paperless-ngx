@@ -155,7 +155,7 @@ def consume_file(
                 logger.info(f"Found ASN in barcode: {overrides.asn}")
 
     template_overrides = Consumer().get_template_overrides(
-        input_doc=input_doc.original_file,
+        input_doc=input_doc,
     )
 
     overrides = merge_overrides(overridesA=overrides, overridesB=template_overrides)

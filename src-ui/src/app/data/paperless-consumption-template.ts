@@ -1,9 +1,17 @@
 import { ObjectWithPermissions } from './object-with-permissions'
 
+export enum DocumentSource {
+  ConsumeFolder = 1,
+  ApiUpload = 2,
+  MailFetch = 3,
+}
+
 export interface PaperlessConsumptionTemplate extends ObjectWithPermissions {
   name: string
 
   order: number
+
+  sources: DocumentSource[]
 
   filter_filename: string
 

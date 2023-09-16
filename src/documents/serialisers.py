@@ -13,13 +13,16 @@ from django.utils.text import slugify
 from django.utils.translation import gettext as _
 from guardian.core import ObjectPermissionChecker
 from guardian.shortcuts import get_users_with_perms
+from rest_framework import fields
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
+from documents.data_models import DocumentSource
 from documents.permissions import get_groups_with_only_permission
 from documents.permissions import set_permissions_for_object
 
 from . import bulk_edit
+from .models import DOCUMENT_SOURCE
 from .models import ConsumptionTemplate
 from .models import Correspondent
 from .models import Document
@@ -1039,17 +1042,28 @@ class BulkEditObjectPermissionsSerializer(serializers.Serializer, SetPermissions
 
 
 class ConsumptionTemplateSerializer(OwnedObjectSerializer):
+    order = serializers.IntegerField(required=False)
+    sources = fields.MultipleChoiceField(
+        choices=DOCUMENT_SOURCE,
+        allow_empty=False,
+        default={
+            DocumentSource.ConsumeFolder,
+            DocumentSource.ApiUpload,
+            DocumentSource.MailFetch,
+        },
+    )
     assign_correspondent = CorrespondentField(allow_null=True, required=False)
     assign_tags = TagsField(many=True, allow_null=True, required=False)
     assign_document_type = DocumentTypeField(allow_null=True, required=False)
     assign_storage_path = StoragePathField(allow_null=True, required=False)
-    order = serializers.IntegerField(required=False)
 
     class Meta:
         model = ConsumptionTemplate
         fields = [
             "id",
             "name",
+            "order",
+            "sources",
             "filter_path",
             "filter_filename",
             "assign_tags",
@@ -1061,7 +1075,6 @@ class ConsumptionTemplateSerializer(OwnedObjectSerializer):
             "assign_view_groups",
             "assign_change_users",
             "assign_change_groups",
-            "order",
             "owner",
             "user_can_change",
             "permissions",
@@ -1081,6 +1094,7 @@ class ConsumptionTemplateSerializer(OwnedObjectSerializer):
     #     return mail_rule
 
     # def validate(self, attrs):
+    # TODO: require path or filename filter
     #     if (
     #         attrs["action"] == ConsumptionTemplate.MailAction.TAG
     #         or attrs["action"] == ConsumptionTemplate.MailAction.MOVE

@@ -21,6 +21,7 @@ from django.utils import timezone
 from filelock import FileLock
 from rest_framework.reverse import reverse
 
+from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.permissions import set_permissions_for_object
 from documents.utils import copy_basic_file_stats
@@ -595,16 +596,25 @@ class Consumer(LoggingMixin):
 
     def get_template_overrides(
         self,
-        input_doc: Path,
+        input_doc: ConsumableDocument,
     ) -> DocumentMetadataOverrides:
         overrides = DocumentMetadataOverrides()
         for template in ConsumptionTemplate.objects.all():
             template_overrides = DocumentMetadataOverrides()
 
-            if fnmatch(
-                input_doc.name.lower(),
-                template.filter_filename.lower(),
-            ) or input_doc.match(template.filter_path):
+            if int(input_doc.source) in list(template.sources) and (
+                (
+                    template.filter_filename is not None
+                    and fnmatch(
+                        input_doc.original_file.name.lower(),
+                        template.filter_filename.lower(),
+                    )
+                )
+                or (
+                    template.filter_path is not None
+                    and input_doc.original_file.match(template.filter_path)
+                )
+            ):
                 self.log.info(f"Document matched consumption template {template.name}")
                 if template.assign_tags is not None:
                     template_overrides.tag_ids = [

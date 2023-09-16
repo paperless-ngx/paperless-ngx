@@ -18,7 +18,9 @@ from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from multiselectfield import MultiSelectField
 
+from documents.data_models import DocumentSource
 from documents.parsers import get_default_file_extension
 
 ALL_STATES = sorted(states.ALL_STATES)
@@ -738,6 +740,13 @@ class ShareLink(models.Model):
         return f"Share Link for {self.document.title}"
 
 
+DOCUMENT_SOURCE = (
+    (int(DocumentSource.ConsumeFolder), _("Consume Folder")),
+    (int(DocumentSource.ApiUpload), _("Api Upload")),
+    (int(DocumentSource.MailFetch), _("Mail Fetch")),
+)
+
+
 class ConsumptionTemplate(ModelWithOwner):
     class Meta:
         verbose_name = _("consumption template")
@@ -746,6 +755,12 @@ class ConsumptionTemplate(ModelWithOwner):
     name = models.CharField(_("name"), max_length=256, unique=True)
 
     order = models.IntegerField(_("order"), default=0)
+
+    sources = MultiSelectField(
+        max_length=3,
+        choices=DOCUMENT_SOURCE,
+        default=f"{DocumentSource.ConsumeFolder},{DocumentSource.ApiUpload},{DocumentSource.MailFetch}",
+    )
 
     filter_path = models.CharField(
         _("filter path"),

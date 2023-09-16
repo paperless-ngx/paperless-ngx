@@ -2,16 +2,12 @@ import { Component } from '@angular/core'
 import { FormGroup, FormControl } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { first } from 'rxjs'
-import { PaperlessConsumptionTemplate } from 'src/app/data/paperless-consumption-template'
+import {
+  DocumentSource,
+  PaperlessConsumptionTemplate,
+} from 'src/app/data/paperless-consumption-template'
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent'
 import { PaperlessDocumentType } from 'src/app/data/paperless-document-type'
-import {
-  MailFilterAttachmentType,
-  MailRuleConsumptionScope,
-  MailAction,
-  MailMetadataTitleOption,
-  MailMetadataCorrespondentOption,
-} from 'src/app/data/paperless-mail-rule'
 import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
 import { ConsumptionTemplateService } from 'src/app/services/rest/consumption-template.service'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
@@ -20,6 +16,21 @@ import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { EditDialogComponent } from '../edit-dialog.component'
+
+const SOURCE_OPTIONS = [
+  {
+    id: DocumentSource.ConsumeFolder,
+    name: $localize`Documents uploaded via consume folder`,
+  },
+  {
+    id: DocumentSource.ApiUpload,
+    name: $localize`Documents uploaded via api upload`,
+  },
+  {
+    id: DocumentSource.MailFetch,
+    name: $localize`Documents uploaded via mail fetch`,
+  },
+]
 
 @Component({
   selector: 'pngx-consumption-template-edit-dialog',
@@ -74,6 +85,7 @@ export class ConsumptionTemplateEditDialogComponent extends EditDialogComponent<
       filter_filename: new FormControl(null),
       filter_path: new FormControl(null),
       order: new FormControl(null),
+      sources: new FormControl([]),
       assign_tags: new FormControl([]),
       assign_owner: new FormControl(null),
       assign_document_type: new FormControl(null),
@@ -84,5 +96,9 @@ export class ConsumptionTemplateEditDialogComponent extends EditDialogComponent<
       assign_change_users: new FormControl(null),
       assign_change_groups: new FormControl(null),
     })
+  }
+
+  get sourceOptions() {
+    return SOURCE_OPTIONS
   }
 }
