@@ -143,7 +143,9 @@ describe('SettingsService', () => {
     req.flush(ui_settings)
 
     expect(
-      document.body.style.getPropertyValue('--pngx-primary-lightness')
+      document.documentElement.style.getPropertyValue(
+        '--pngx-primary-lightness'
+      )
     ).toEqual('')
 
     const addClassSpy = jest.spyOn(settingsService.renderer, 'addClass')
@@ -157,7 +159,9 @@ describe('SettingsService', () => {
       'auto'
     )
     expect(
-      document.body.style.getPropertyValue('--pngx-primary-lightness')
+      document.documentElement.style.getPropertyValue(
+        '--pngx-primary-lightness'
+      )
     ).toEqual('50%')
 
     settingsService.updateAppearanceSettings(false, false, '#000000')
@@ -169,7 +173,9 @@ describe('SettingsService', () => {
     )
 
     expect(
-      document.body.style.getPropertyValue('--pngx-primary-lightness')
+      document.documentElement.style.getPropertyValue(
+        '--pngx-primary-lightness'
+      )
     ).toEqual('0%')
 
     settingsService.updateAppearanceSettings(false, true, '#ffffff')
@@ -180,7 +186,9 @@ describe('SettingsService', () => {
       'dark'
     )
     expect(
-      document.body.style.getPropertyValue('--pngx-primary-lightness')
+      document.documentElement.style.getPropertyValue(
+        '--pngx-primary-lightness'
+      )
     ).toEqual('100%')
   })
 
