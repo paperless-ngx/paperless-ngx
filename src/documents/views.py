@@ -86,6 +86,7 @@ from .matching import match_correspondents
 from .matching import match_document_types
 from .matching import match_storage_paths
 from .matching import match_tags
+from .models import ConsumptionTemplate
 from .models import Correspondent
 from .models import Document
 from .models import DocumentType
@@ -101,6 +102,7 @@ from .serialisers import AcknowledgeTasksViewSerializer
 from .serialisers import BulkDownloadSerializer
 from .serialisers import BulkEditObjectPermissionsSerializer
 from .serialisers import BulkEditSerializer
+from .serialisers import ConsumptionTemplateSerializer
 from .serialisers import CorrespondentSerializer
 from .serialisers import DocumentListSerializer
 from .serialisers import DocumentSerializer
@@ -1248,3 +1250,13 @@ class BulkEditObjectPermissionsView(GenericAPIView, PassUserMixin):
             return HttpResponseBadRequest(
                 "Error performing bulk permissions edit, check logs for more detail.",
             )
+
+
+class ConsumptionTemplateViewSet(ModelViewSet, PassUserMixin):
+    model = ConsumptionTemplate
+
+    queryset = ConsumptionTemplate.objects.all().order_by("order")
+    serializer_class = ConsumptionTemplateSerializer
+    pagination_class = StandardPagination
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    filter_backends = (ObjectOwnedOrGrantedPermissionsFilter,)

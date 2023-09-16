@@ -20,6 +20,7 @@ from documents.permissions import get_groups_with_only_permission
 from documents.permissions import set_permissions_for_object
 
 from . import bulk_edit
+from .models import ConsumptionTemplate
 from .models import Correspondent
 from .models import Document
 from .models import DocumentType
@@ -1035,3 +1036,55 @@ class BulkEditObjectPermissionsSerializer(serializers.Serializer, SetPermissions
             self._validate_permissions(permissions)
 
         return attrs
+
+
+class ConsumptionTemplateSerializer(OwnedObjectSerializer):
+    assign_correspondent = CorrespondentField(allow_null=True, required=False)
+    assign_tags = TagsField(many=True, allow_null=True, required=False)
+    assign_document_type = DocumentTypeField(allow_null=True, required=False)
+    assign_storage_path = StoragePathField(allow_null=True, required=False)
+    order = serializers.IntegerField(required=False)
+
+    class Meta:
+        model = ConsumptionTemplate
+        fields = [
+            "id",
+            "name",
+            "filter_path",
+            "filter_filename",
+            "assign_tags",
+            "assign_correspondent",
+            "assign_document_type",
+            "assign_storage_path",
+            "assign_owner",
+            "assign_view_users",
+            "assign_view_groups",
+            "assign_change_users",
+            "assign_change_groups",
+            "order",
+            "owner",
+            "user_can_change",
+            "permissions",
+            "set_permissions",
+        ]
+
+    def update(self, instance, validated_data):
+        super().update(instance, validated_data)
+        return instance
+
+    # def create(self, validated_data):
+    #     if "assign_tags" in validated_data:
+    #         assign_tags = validated_data.pop("assign_tags")
+    #     mail_rule = super().create(validated_data)
+    #     if assign_tags:
+    #         mail_rule.assign_tags.set(assign_tags)
+    #     return mail_rule
+
+    # def validate(self, attrs):
+    #     if (
+    #         attrs["action"] == ConsumptionTemplate.MailAction.TAG
+    #         or attrs["action"] == ConsumptionTemplate.MailAction.MOVE
+    #     ) and attrs["action_parameter"] is None:
+    #         raise serializers.ValidationError("An action parameter is required.")
+
+    #     return attrs

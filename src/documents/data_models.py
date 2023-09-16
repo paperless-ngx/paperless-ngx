@@ -20,9 +20,14 @@ class DocumentMetadataOverrides:
     correspondent_id: Optional[int] = None
     document_type_id: Optional[int] = None
     tag_ids: Optional[list[int]] = None
+    storage_path_id: Optional[int] = None
     created: Optional[datetime.datetime] = None
     asn: Optional[int] = None
     owner_id: Optional[int] = None
+    view_users: Optional[list[int]] = None
+    view_groups: Optional[list[int]] = None
+    change_users: Optional[list[int]] = None
+    change_groups: Optional[list[int]] = None
 
 
 class DocumentSource(enum.IntEnum):

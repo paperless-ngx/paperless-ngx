@@ -4,6 +4,7 @@ import os
 import tempfile
 import uuid
 from enum import Enum
+from fnmatch import fnmatch
 from pathlib import Path
 from subprocess import CompletedProcess
 from subprocess import run
@@ -20,6 +21,8 @@ from django.utils import timezone
 from filelock import FileLock
 from rest_framework.reverse import reverse
 
+from documents.data_models import DocumentMetadataOverrides
+from documents.permissions import set_permissions_for_object
 from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
 
@@ -27,10 +30,12 @@ from .classifier import load_classifier
 from .file_handling import create_source_path_directory
 from .file_handling import generate_unique_filename
 from .loggers import LoggingMixin
+from .models import ConsumptionTemplate
 from .models import Correspondent
 from .models import Document
 from .models import DocumentType
 from .models import FileInfo
+from .models import StoragePath
 from .models import Tag
 from .parsers import DocumentParser
 from .parsers import ParseError
@@ -319,10 +324,15 @@ class Consumer(LoggingMixin):
         override_correspondent_id=None,
         override_document_type_id=None,
         override_tag_ids=None,
+        override_storage_path_id=None,
         task_id=None,
         override_created=None,
         override_asn=None,
         override_owner_id=None,
+        override_view_users=None,
+        override_view_groups=None,
+        override_change_users=None,
+        override_change_groups=None,
     ) -> Document:
         """
         Return the document object if it was successfully created.
@@ -334,10 +344,15 @@ class Consumer(LoggingMixin):
         self.override_correspondent_id = override_correspondent_id
         self.override_document_type_id = override_document_type_id
         self.override_tag_ids = override_tag_ids
+        self.override_storage_path_id = override_storage_path_id
         self.task_id = task_id or str(uuid.uuid4())
         self.override_created = override_created
         self.override_asn = override_asn
         self.override_owner_id = override_owner_id
+        self.override_view_users = override_view_users
+        self.override_view_groups = override_view_groups
+        self.override_change_users = override_change_users
+        self.override_change_groups = override_change_groups
 
         self._send_progress(
             0,
@@ -578,6 +593,57 @@ class Consumer(LoggingMixin):
 
         return document
 
+    def get_template_overrides(
+        self,
+        input_doc: Path,
+    ) -> DocumentMetadataOverrides:
+        overrides = DocumentMetadataOverrides()
+        for template in ConsumptionTemplate.objects.all():
+            template_overrides = DocumentMetadataOverrides()
+
+            if fnmatch(
+                input_doc.name.lower(),
+                template.filter_filename.lower(),
+            ) or input_doc.match(template.filter_path):
+                self.log.info(f"Document matched consumption template {template.name}")
+                if template.assign_tags is not None:
+                    template_overrides.tag_ids = [
+                        tag.pk for tag in template.assign_tags.all()
+                    ]
+                if template.assign_correspondent is not None:
+                    template_overrides.correspondent_id = (
+                        template.assign_correspondent.pk
+                    )
+                if template.assign_document_type is not None:
+                    template_overrides.document_type_id = (
+                        template.assign_document_type.pk
+                    )
+                if template.assign_storage_path is not None:
+                    template_overrides.storage_path_id = template.assign_storage_path.pk
+                if template.assign_owner is not None:
+                    template_overrides.owner_id = template.assign_owner
+                if template.assign_view_users is not None:
+                    template_overrides.view_users = [
+                        user.pk for user in template.assign_view_users.all()
+                    ]
+                if template.assign_view_groups is not None:
+                    template_overrides.view_groups = [
+                        group.pk for group in template.assign_view_groups.all()
+                    ]
+                if template.assign_change_users is not None:
+                    template_overrides.change_users = [
+                        user.pk for user in template.assign_change_users.all()
+                    ]
+                if template.assign_change_groups is not None:
+                    template_overrides.change_groups = [
+                        group.pk for group in template.assign_change_groups.all()
+                    ]
+                overrides = merge_overrides(
+                    overridesA=overrides,
+                    overridesB=template_overrides,
+                )
+        return overrides
+
     def _store(
         self,
         text: str,
@@ -643,6 +709,11 @@ class Consumer(LoggingMixin):
             for tag_id in self.override_tag_ids:
                 document.tags.add(Tag.objects.get(pk=tag_id))
 
+        if self.override_storage_path_id:
+            document.storage_path = StoragePath.objects.get(
+                pk=self.override_storage_path_id,
+            )
+
         if self.override_asn:
             document.archive_serial_number = self.override_asn
 
@@ -650,6 +721,24 @@ class Consumer(LoggingMixin):
             document.owner = User.objects.get(
                 pk=self.override_owner_id,
             )
+
+        if (
+            self.override_view_users is not None
+            or self.override_view_groups is not None
+            or self.override_change_users is not None
+            or self.override_change_users is not None
+        ):
+            permissions = {
+                "view": {
+                    "users": self.override_view_users,
+                    "groups": self.override_view_groups,
+                },
+                "change": {
+                    "users": self.override_change_users,
+                    "groups": self.override_change_groups,
+                },
+            }
+            set_permissions_for_object(permissions=permissions, object=document)
 
     def _write(self, storage_type, source, target):
         with open(source, "rb") as read_file, open(target, "wb") as write_file:
@@ -695,3 +784,28 @@ class Consumer(LoggingMixin):
             self.log.warning("Script stderr:")
             for line in stderr_str:
                 self.log.warning(line)
+
+
+def merge_overrides(
+    overridesA: DocumentMetadataOverrides,
+    overridesB: DocumentMetadataOverrides,
+) -> DocumentMetadataOverrides:
+    if overridesA.tag_ids is None:
+        overridesA.tag_ids = overridesB.tag_ids
+    if overridesA.correspondent_id is None:
+        overridesA.correspondent_id = overridesB.correspondent_id
+    if overridesA.document_type_id is None:
+        overridesA.document_type_id = overridesB.document_type_id
+    if overridesA.storage_path_id is None:
+        overridesA.storage_path_id = overridesB.storage_path_id
+    if overridesA.owner_id is None:
+        overridesA.owner_id = overridesB.owner_id
+    if overridesA.view_users is None:
+        overridesA.view_users = overridesB.view_users
+    if overridesA.view_groups is None:
+        overridesA.view_groups = overridesB.view_groups
+    if overridesA.change_users is None:
+        overridesA.change_users = overridesB.change_users
+    if overridesA.change_groups is None:
+        overridesA.change_groups = overridesB.change_groups
+    return overridesA

@@ -23,6 +23,7 @@ from documents.classifier import DocumentClassifier
 from documents.classifier import load_classifier
 from documents.consumer import Consumer
 from documents.consumer import ConsumerError
+from documents.consumer import merge_overrides
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.double_sided import collate
@@ -153,6 +154,12 @@ def consume_file(
                 overrides.asn = reader.asn
                 logger.info(f"Found ASN in barcode: {overrides.asn}")
 
+    template_overrides = Consumer().get_template_overrides(
+        input_doc=input_doc.original_file,
+    )
+
+    overrides = merge_overrides(overridesA=overrides, overridesB=template_overrides)
+
     # continue with consumption if no barcode was found
     document = Consumer().try_consume_file(
         input_doc.original_file,
@@ -161,9 +168,14 @@ def consume_file(
         override_correspondent_id=overrides.correspondent_id,
         override_document_type_id=overrides.document_type_id,
         override_tag_ids=overrides.tag_ids,
+        override_storage_path_id=overrides.storage_path_id,
         override_created=overrides.created,
         override_asn=overrides.asn,
         override_owner_id=overrides.owner_id,
+        override_view_users=overrides.view_users,
+        override_view_groups=overrides.view_groups,
+        override_change_users=overrides.change_users,
+        override_change_groups=overrides.change_groups,
         task_id=self.request.id,
     )
 
