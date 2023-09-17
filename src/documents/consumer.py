@@ -598,6 +598,10 @@ class Consumer(LoggingMixin):
         self,
         input_doc: ConsumableDocument,
     ) -> DocumentMetadataOverrides:
+        """
+        Match consumption templates to a document based on source and
+        file name filters or path filters, if specified
+        """
         overrides = DocumentMetadataOverrides()
         for template in ConsumptionTemplate.objects.all().order_by("order"):
             template_overrides = DocumentMetadataOverrides()
@@ -657,6 +661,10 @@ class Consumer(LoggingMixin):
         return overrides
 
     def _parse_title_placeholders(self, title: str) -> str:
+        """
+        Consumption template title placeholders can only include items that are
+        assigned as part of this template (since auto-matching hasnt happened yet)
+        """
         local_added = timezone.now()
 
         correspondent_name = (
@@ -838,6 +846,10 @@ def merge_overrides(
     overridesA: DocumentMetadataOverrides,
     overridesB: DocumentMetadataOverrides,
 ) -> DocumentMetadataOverrides:
+    """
+    Merges two DocumentMetadataOverrides objects such that object B's overrides
+    are only applied if the property is empty in object A
+    """
     if overridesA.title is None:
         overridesA.title = overridesB.title
     if overridesA.tag_ids is None:
