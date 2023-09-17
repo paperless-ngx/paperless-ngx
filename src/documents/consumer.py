@@ -599,7 +599,7 @@ class Consumer(LoggingMixin):
         input_doc: ConsumableDocument,
     ) -> DocumentMetadataOverrides:
         overrides = DocumentMetadataOverrides()
-        for template in ConsumptionTemplate.objects.all():
+        for template in ConsumptionTemplate.objects.all().order_by("order"):
             template_overrides = DocumentMetadataOverrides()
 
             if int(input_doc.source) in list(template.sources) and (

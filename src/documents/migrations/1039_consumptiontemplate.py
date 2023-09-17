@@ -3,10 +3,44 @@
 import django.db.models.deletion
 import multiselectfield.db.fields
 from django.conf import settings
+from django.contrib.auth.management import create_permissions
+from django.contrib.auth.models import Group
+from django.contrib.auth.models import Permission
+from django.contrib.auth.models import User
 from django.db import migrations
 from django.db import models
+from django.db.models import Q
 
-# TODO: migrate permissions, upgrade mail rules?
+
+def add_consumptiontemplate_permissions(apps, schema_editor):
+    # create permissions without waiting for post_migrate signal
+    for app_config in apps.get_app_configs():
+        app_config.models_module = True
+        create_permissions(app_config, apps=apps, verbosity=0)
+        app_config.models_module = None
+
+    add_permission = Permission.objects.get(codename="add_document")
+    consumptiontemplate_permissions = Permission.objects.filter(
+        codename__contains="consumptiontemplate",
+    )
+
+    for user in User.objects.filter(Q(user_permissions=add_permission)).distinct():
+        user.user_permissions.add(*consumptiontemplate_permissions)
+
+    for group in Group.objects.filter(Q(permissions=add_permission)).distinct():
+        group.permissions.add(*consumptiontemplate_permissions)
+
+
+def remove_consumptiontemplate_permissions(apps, schema_editor):
+    consumptiontemplate_permissions = Permission.objects.filter(
+        codename__contains="consumptiontemplate",
+    )
+
+    for user in User.objects.all():
+        user.user_permissions.remove(*consumptiontemplate_permissions)
+
+    for group in Group.objects.all():
+        group.permissions.remove(*consumptiontemplate_permissions)
 
 
 class Migration(migrations.Migration):
@@ -166,5 +200,9 @@ class Migration(migrations.Migration):
                 "verbose_name": "consumption template",
                 "verbose_name_plural": "consumption templates",
             },
+        ),
+        migrations.RunPython(
+            add_consumptiontemplate_permissions,
+            remove_consumptiontemplate_permissions,
         ),
     ]
