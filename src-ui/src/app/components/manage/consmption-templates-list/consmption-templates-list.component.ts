@@ -2,11 +2,17 @@ import { Component, OnInit } from '@angular/core'
 import { ConsumptionTemplateService } from 'src/app/services/rest/consumption-template.service'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 import { Subject, takeUntil } from 'rxjs'
-import { PaperlessConsumptionTemplate } from 'src/app/data/paperless-consumption-template'
+import {
+  DocumentSource,
+  PaperlessConsumptionTemplate,
+} from 'src/app/data/paperless-consumption-template'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { ToastService } from 'src/app/services/toast.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
-import { ConsumptionTemplateEditDialogComponent } from '../../common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component'
+import {
+  ConsumptionTemplateEditDialogComponent,
+  DOCUMENT_SOURCE_OPTIONS,
+} from '../../common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 
@@ -43,6 +49,12 @@ export class ConsmptionTemplatesListComponent
       .subscribe((r) => {
         this.templates = r.results
       })
+  }
+
+  getSourceList(template: PaperlessConsumptionTemplate): string {
+    return template.sources
+      .map((id) => DOCUMENT_SOURCE_OPTIONS.find((s) => s.id === id).name)
+      .join(', ')
   }
 
   editTemplate(rule: PaperlessConsumptionTemplate) {

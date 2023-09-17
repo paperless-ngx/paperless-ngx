@@ -22,6 +22,7 @@ from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import FileInfo
+from documents.models import StoragePath
 from documents.models import Tag
 from documents.parsers import DocumentParser
 from documents.parsers import ParseError
@@ -431,6 +432,16 @@ class TestConsumer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertEqual(document.document_type.id, dt.id)
         self._assert_first_last_send_progress()
 
+    def testOverrideStoragePath(self):
+        sp = StoragePath.objects.create(name="test")
+
+        document = self.consumer.try_consume_file(
+            self.get_test_file(),
+            override_storage_path_id=sp.pk,
+        )
+        self.assertEqual(document.storage_path.id, sp.id)
+        self._assert_first_last_send_progress()
+
     def testOverrideTags(self):
         t1 = Tag.objects.create(name="t1")
         t2 = Tag.objects.create(name="t2")
@@ -443,6 +454,20 @@ class TestConsumer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertIn(t1, document.tags.all())
         self.assertNotIn(t2, document.tags.all())
         self.assertIn(t3, document.tags.all())
+        self._assert_first_last_send_progress()
+
+    def testOverrideTitlePlaceholders(self):
+        c = Correspondent.objects.create(name="Correspondent Name")
+        dt = DocumentType.objects.create(name="DocType Name")
+
+        document = self.consumer.try_consume_file(
+            self.get_test_file(),
+            override_correspondent_id=c.pk,
+            override_document_type_id=dt.pk,
+            override_title="{correspondent}{document_type} {added_month}-{added_year_short}",
+        )
+        now = timezone.now()
+        self.assertEqual(document.title, f"{c.name}{dt.name} {now.strftime('%m-%y')}")
         self._assert_first_last_send_progress()
 
     def testNotAFile(self):

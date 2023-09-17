@@ -17,18 +17,18 @@ import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { EditDialogComponent } from '../edit-dialog.component'
 
-const SOURCE_OPTIONS = [
+export const DOCUMENT_SOURCE_OPTIONS = [
   {
     id: DocumentSource.ConsumeFolder,
-    name: $localize`Documents uploaded via consume folder`,
+    name: $localize`Consume Folder`,
   },
   {
     id: DocumentSource.ApiUpload,
-    name: $localize`Documents uploaded via api upload`,
+    name: $localize`API Upload`,
   },
   {
     id: DocumentSource.MailFetch,
-    name: $localize`Documents uploaded via mail fetch`,
+    name: $localize`Mail Fetch`,
   },
 ]
 
@@ -100,6 +100,6 @@ export class ConsumptionTemplateEditDialogComponent extends EditDialogComponent<
   }
 
   get sourceOptions() {
-    return SOURCE_OPTIONS
+    return DOCUMENT_SOURCE_OPTIONS
   }
 }

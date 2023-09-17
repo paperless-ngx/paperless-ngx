@@ -604,15 +604,15 @@ class Consumer(LoggingMixin):
 
             if int(input_doc.source) in [int(x) for x in list(template.sources)] and (
                 (
-                    template.filter_filename is not None
-                    and fnmatch(
+                    len(template.filter_filename) == 0
+                    or fnmatch(
                         input_doc.original_file.name.lower(),
                         template.filter_filename.lower(),
                     )
                 )
-                or (
-                    template.filter_path is not None
-                    and input_doc.original_file.match(template.filter_path)
+                and (
+                    len(template.filter_path) == 0
+                    or input_doc.original_file.match(template.filter_path)
                 )
             ):
                 self.log.info(f"Document matched consumption template {template.name}")
@@ -719,8 +719,6 @@ class Consumer(LoggingMixin):
             self.log.debug(f"Creation date from st_mtime: {create_date}")
 
         storage_type = Document.STORAGE_TYPE_UNENCRYPTED
-
-        print("override_title", self.override_title)
 
         with open(self.path, "rb") as f:
             document = Document.objects.create(

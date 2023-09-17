@@ -11,6 +11,7 @@
     <thead>
         <tr>
             <th scope="col" i18n>Name</th>
+            <th scope="col" i18n>Document Sources</th>
             <th scope="col" i18n>File name filter</th>
             <th scope="col" i18n>Path filter</th>
             <th scope="col" i18n>Actions</th>
@@ -19,6 +20,7 @@
     <tbody>
         <tr *ngFor="let template of templates">
             <td scope="row"><button class="btn btn-link p-0" type="button" (click)="editTemplate(template)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.ConsumptionTemplate)">{{template.name}}</button></td>
+            <td scope="row">{{getSourceList(template)}}</td>
             <td scope="row"><code>{{template.filter_filename}}</code></td>
             <td scope="row"><code>{{template.filter_path}}</code></td>
             <td scope="row">
