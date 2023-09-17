@@ -1,4 +1,4 @@
-<pngx-widget-frame title="Upload new documents" i18n-title>
+<pngx-widget-frame title="Upload new documents" i18n-title *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.Document }">
   <div header-buttons>
     <a *ngIf="getStatusSuccess().length > 0" (click)="dismissCompleted()" [routerLink]="[]" >
       <span class="me-1" i18n="This button dismisses all status messages about processed documents on the dashboard (failed and successful)">Dismiss completed</span>
@@ -9,7 +9,7 @@
     </a>
   </div>
   <div content tourAnchor="tour.upload-widget">
-    <form *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.Document }">
+    <form>
       <ngx-file-drop dropZoneLabel="Drop documents here or" browseBtnLabel="Browse files" (onFileDrop)="dropped($event)"
         (onFileOver)="fileOver($event)" (onFileLeave)="fileLeave($event)" dropZoneClassName="bg-light card"
         multiple="true" contentClassName="justify-content-center d-flex align-items-center py-5 px-2" [showBrowseBtn]=true
