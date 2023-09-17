@@ -86,15 +86,16 @@ export class ConsumptionTemplateEditDialogComponent extends EditDialogComponent<
       filter_path: new FormControl(null),
       order: new FormControl(null),
       sources: new FormControl([]),
+      assign_title: new FormControl(null),
       assign_tags: new FormControl([]),
       assign_owner: new FormControl(null),
       assign_document_type: new FormControl(null),
       assign_correspondent: new FormControl(null),
       assign_storage_path: new FormControl(null),
-      assign_view_users: new FormControl(null),
-      assign_view_groups: new FormControl(null),
-      assign_change_users: new FormControl(null),
-      assign_change_groups: new FormControl(null),
+      assign_view_users: new FormControl([]),
+      assign_view_groups: new FormControl([]),
+      assign_change_users: new FormControl([]),
+      assign_change_groups: new FormControl([]),
     })
   }
 

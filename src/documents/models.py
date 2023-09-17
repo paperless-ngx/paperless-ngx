@@ -786,6 +786,17 @@ class ConsumptionTemplate(ModelWithOwner):
         ),
     )
 
+    assign_title = models.CharField(
+        _("assign title"),
+        max_length=256,
+        null=True,
+        blank=True,
+        help_text=_(
+            "Assign a document title, can include some placeholders,"
+            "see documentation.",
+        ),
+    )
+
     assign_tags = models.ManyToManyField(
         Tag,
         blank=True,

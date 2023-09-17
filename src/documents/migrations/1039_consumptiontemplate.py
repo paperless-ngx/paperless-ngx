@@ -168,6 +168,16 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
+                    "assign_title",
+                    models.CharField(
+                        blank=True,
+                        help_text="Assign a document title, can include some placeholders, see documentation.",
+                        max_length=256,
+                        null=True,
+                        verbose_name="assign title",
+                    ),
+                ),
+                (
                     "assign_view_groups",
                     models.ManyToManyField(
                         blank=True,

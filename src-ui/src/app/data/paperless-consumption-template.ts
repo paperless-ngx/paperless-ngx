@@ -17,6 +17,8 @@ export interface PaperlessConsumptionTemplate extends ObjectWithPermissions {
 
   filter_path: string
 
+  assign_title?: string
+
   assign_tags?: number[] // PaperlessTag.id
 
   assign_document_type?: number // PaperlessDocumentType.id

@@ -602,7 +602,7 @@ class Consumer(LoggingMixin):
         for template in ConsumptionTemplate.objects.all().order_by("order"):
             template_overrides = DocumentMetadataOverrides()
 
-            if int(input_doc.source) in list(template.sources) and (
+            if int(input_doc.source) in [int(x) for x in list(template.sources)] and (
                 (
                     template.filter_filename is not None
                     and fnmatch(
@@ -616,6 +616,8 @@ class Consumer(LoggingMixin):
                 )
             ):
                 self.log.info(f"Document matched consumption template {template.name}")
+                if template.assign_title is not None:
+                    template_overrides.title = template.assign_title
                 if template.assign_tags is not None:
                     template_overrides.tag_ids = [
                         tag.pk for tag in template.assign_tags.all()
@@ -654,6 +656,38 @@ class Consumer(LoggingMixin):
                 )
         return overrides
 
+    def _parse_title_placeholders(self, title: str) -> str:
+        local_added = timezone.now()
+
+        correspondent_name = (
+            Correspondent.objects.get(pk=self.override_correspondent_id).name
+            if self.override_correspondent_id is not None
+            else None
+        )
+        doc_type_name = (
+            DocumentType.objects.get(pk=self.override_document_type_id).name
+            if self.override_correspondent_id is not None
+            else None
+        )
+        owner_username = (
+            User.objects.get(pk=self.override_owner_id).username
+            if self.override_owner_id is not None
+            else None
+        )
+
+        return title.format(
+            correspondent=correspondent_name or None,
+            document_type=doc_type_name or None,
+            added=local_added.isoformat(),
+            added_year=local_added.strftime("%Y"),
+            added_year_short=local_added.strftime("%y"),
+            added_month=local_added.strftime("%m"),
+            added_month_name=local_added.strftime("%B"),
+            added_month_name_short=local_added.strftime("%b"),
+            added_day=local_added.strftime("%d"),
+            owner_username=owner_username or None,
+        ).strip()
+
     def _store(
         self,
         text: str,
@@ -686,9 +720,15 @@ class Consumer(LoggingMixin):
 
         storage_type = Document.STORAGE_TYPE_UNENCRYPTED
 
+        print("override_title", self.override_title)
+
         with open(self.path, "rb") as f:
             document = Document.objects.create(
-                title=(self.override_title or file_info.title)[:127],
+                title=(
+                    self._parse_title_placeholders(self.override_title)
+                    if self.override_title is not None
+                    else file_info.title
+                )[:127],
                 content=text,
                 mime_type=mime_type,
                 checksum=hashlib.md5(f.read()).hexdigest(),
@@ -800,6 +840,8 @@ def merge_overrides(
     overridesA: DocumentMetadataOverrides,
     overridesB: DocumentMetadataOverrides,
 ) -> DocumentMetadataOverrides:
+    if overridesA.title is None:
+        overridesA.title = overridesB.title
     if overridesA.tag_ids is None:
         overridesA.tag_ids = overridesB.tag_ids
     if overridesA.correspondent_id is None:

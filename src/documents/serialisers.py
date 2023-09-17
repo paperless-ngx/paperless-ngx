@@ -1066,6 +1066,7 @@ class ConsumptionTemplateSerializer(OwnedObjectSerializer):
             "sources",
             "filter_path",
             "filter_filename",
+            "assign_title",
             "assign_tags",
             "assign_correspondent",
             "assign_document_type",
@@ -1085,20 +1086,8 @@ class ConsumptionTemplateSerializer(OwnedObjectSerializer):
         super().update(instance, validated_data)
         return instance
 
-    # def create(self, validated_data):
-    #     if "assign_tags" in validated_data:
-    #         assign_tags = validated_data.pop("assign_tags")
-    #     mail_rule = super().create(validated_data)
-    #     if assign_tags:
-    #         mail_rule.assign_tags.set(assign_tags)
-    #     return mail_rule
+    def validate(self, attrs):
+        if len(attrs["filter_filename"]) == 0 and len(attrs["filter_path"]) == 0:
+            raise serializers.ValidationError("File name or path filter are required")
 
-    # def validate(self, attrs):
-    # TODO: require path or filename filter
-    #     if (
-    #         attrs["action"] == ConsumptionTemplate.MailAction.TAG
-    #         or attrs["action"] == ConsumptionTemplate.MailAction.MOVE
-    #     ) and attrs["action_parameter"] is None:
-    #         raise serializers.ValidationError("An action parameter is required.")
-
-    #     return attrs
+        return attrs
