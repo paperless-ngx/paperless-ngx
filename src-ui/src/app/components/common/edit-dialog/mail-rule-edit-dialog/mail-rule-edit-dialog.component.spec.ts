@@ -26,9 +26,6 @@ import { CheckComponent } from '../../input/check/check.component'
 describe('MailRuleEditDialogComponent', () => {
   let component: MailRuleEditDialogComponent
   let fixture: ComponentFixture<MailRuleEditDialogComponent>
-  let accountService: MailAccountService
-  let correspondentService: CorrespondentService
-  let documentTypeService: DocumentTypeService
 
   beforeEach(async () => {
     TestBed.configureTestingModule({

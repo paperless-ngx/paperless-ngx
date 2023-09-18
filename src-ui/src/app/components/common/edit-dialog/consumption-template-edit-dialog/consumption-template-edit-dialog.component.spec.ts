@@ -18,6 +18,7 @@ import { of } from 'rxjs'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
+import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
 
 describe('ConsumptionTemplateEditDialogComponent', () => {
   let component: ConsumptionTemplateEditDialogComponent
@@ -78,6 +79,15 @@ describe('ConsumptionTemplateEditDialogComponent', () => {
                     username: 'sp1',
                   },
                 ],
+              }),
+          },
+        },
+        {
+          provide: MailRuleService,
+          useValue: {
+            listAll: () =>
+              of({
+                results: [],
               }),
           },
         },
