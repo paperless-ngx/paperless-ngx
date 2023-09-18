@@ -786,13 +786,21 @@ class ConsumptionTemplate(ModelWithOwner):
         ),
     )
 
+    filter_mailrule = models.ForeignKey(
+        "paperless_mail.MailRule",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        verbose_name=_("filter documents from this mail rule"),
+    )
+
     assign_title = models.CharField(
         _("assign title"),
         max_length=256,
         null=True,
         blank=True,
         help_text=_(
-            "Assign a document title, can include some placeholders,"
+            "Assign a document title, can include some placeholders, "
             "see documentation.",
         ),
     )

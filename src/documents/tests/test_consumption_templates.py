@@ -16,6 +16,8 @@ from documents.models import StoragePath
 from documents.models import Tag
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
+from paperless_mail.models import MailAccount
+from paperless_mail.models import MailRule
 
 
 @pytest.mark.django_db
@@ -77,6 +79,90 @@ class TestConsumptionTemplates(DirectoriesMixin, FileSystemAssertsMixin, TestCas
                 ConsumableDocument(
                     source=DocumentSource.ConsumeFolder,
                     original_file=test_file,
+                ),
+                None,
+            )
+            m.assert_called_once()
+            _, overrides = m.call_args
+            self.assertEqual(overrides["override_correspondent_id"], self.c.pk)
+            self.assertEqual(overrides["override_document_type_id"], self.dt.pk)
+            self.assertEqual(
+                overrides["override_tag_ids"],
+                [self.t1.pk, self.t2.pk, self.t3.pk],
+            )
+            self.assertEqual(overrides["override_storage_path_id"], self.sp.pk)
+            self.assertEqual(overrides["override_owner_id"], self.user2.pk)
+            self.assertEqual(overrides["override_view_users"], [self.user3.pk])
+            self.assertEqual(overrides["override_view_groups"], [self.group1.pk])
+            self.assertEqual(overrides["override_change_users"], [self.user3.pk])
+            self.assertEqual(overrides["override_change_groups"], [self.group1.pk])
+            self.assertEqual(overrides["override_title"], "Doc from {correspondent}")
+
+    @mock.patch("documents.consumer.Consumer.try_consume_file")
+    def test_consumption_template_match_mailrule(self, m):
+        """
+        GIVEN:
+            - Existing consumption template
+        WHEN:
+            - File that matches is consumed via mail rule
+        THEN:
+            - Template overrides are applied
+        """
+        account1 = MailAccount.objects.create(
+            name="Email1",
+            username="username1",
+            password="password1",
+            imap_server="server.example.com",
+            imap_port=443,
+            imap_security=MailAccount.ImapSecurity.SSL,
+            character_set="UTF-8",
+        )
+        rule1 = MailRule.objects.create(
+            name="Rule1",
+            account=account1,
+            folder="INBOX",
+            filter_from="from@example.com",
+            filter_to="someone@somewhere.com",
+            filter_subject="subject",
+            filter_body="body",
+            filter_attachment_filename="file.pdf",
+            maximum_age=30,
+            action=MailRule.MailAction.MARK_READ,
+            assign_title_from=MailRule.TitleSource.FROM_SUBJECT,
+            assign_correspondent_from=MailRule.CorrespondentSource.FROM_NOTHING,
+            order=0,
+            attachment_type=MailRule.AttachmentProcessing.ATTACHMENTS_ONLY,
+        )
+        ct = ConsumptionTemplate.objects.create(
+            name="Template 1",
+            order=0,
+            sources=f"{int(DocumentSource.ApiUpload)},{int(DocumentSource.ConsumeFolder)},{int(DocumentSource.MailFetch)}",
+            filter_mailrule=rule1,
+            assign_title="Doc from {correspondent}",
+            assign_correspondent=self.c,
+            assign_document_type=self.dt,
+            assign_storage_path=self.sp,
+            assign_owner=self.user2,
+        )
+        ct.assign_tags.add(self.t1)
+        ct.assign_tags.add(self.t2)
+        ct.assign_tags.add(self.t3)
+        ct.assign_view_users.add(self.user3.pk)
+        ct.assign_view_groups.add(self.group1.pk)
+        ct.assign_change_users.add(self.user3.pk)
+        ct.assign_change_groups.add(self.group1.pk)
+        ct.save()
+
+        self.assertEqual(ct.__str__(), "Template 1")
+
+        test_file = self.SAMPLE_DIR / "simple.pdf"
+
+        with mock.patch("documents.tasks.async_to_sync"):
+            tasks.consume_file(
+                ConsumableDocument(
+                    source=DocumentSource.ConsumeFolder,
+                    original_file=test_file,
+                    mailrule_id=rule1.pk,
                 ),
                 None,
             )

@@ -15,7 +15,9 @@ export interface PaperlessConsumptionTemplate extends ObjectWithPermissions {
 
   filter_filename: string
 
-  filter_path: string
+  filter_path?: string
+
+  filter_mailrule?: number // PaperlessMailRule.id
 
   assign_title?: string
 

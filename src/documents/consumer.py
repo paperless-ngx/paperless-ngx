@@ -600,13 +600,19 @@ class Consumer(LoggingMixin):
     ) -> DocumentMetadataOverrides:
         """
         Match consumption templates to a document based on source and
-        file name filters or path filters, if specified
+        file name filters, path filters or mail rule filter if specified
         """
         overrides = DocumentMetadataOverrides()
         for template in ConsumptionTemplate.objects.all().order_by("order"):
             template_overrides = DocumentMetadataOverrides()
 
-            if int(input_doc.source) in [int(x) for x in list(template.sources)] and (
+            if (
+                int(input_doc.source) in [int(x) for x in list(template.sources)]
+                and (
+                    input_doc.mailrule_id is None
+                    or input_doc.mailrule_id == template.filter_mailrule.pk
+                )
+            ) and (
                 (
                     template.filter_filename is None
                     or len(template.filter_filename) == 0

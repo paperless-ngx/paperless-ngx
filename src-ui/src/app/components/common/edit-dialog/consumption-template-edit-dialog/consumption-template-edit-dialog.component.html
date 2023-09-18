@@ -12,10 +12,11 @@
           <p class="small" i18n>Paperless-ngx will process mails that match <em>all</em> of the filters specified below.</p>
           <pngx-input-select i18n-title title="Filter sources" [items]="sourceOptions" [multiple]="true" formControlName="sources" [error]="error?.filter_filename"></pngx-input-select>
           <pngx-input-text i18n-title title="Filter filename" formControlName="filter_filename" i18n-hint hint="Apply to documents that match this filename. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive." [error]="error?.filter_filename"></pngx-input-text>
-          <pngx-input-text i18n-title title="Filter path" formControlName="filter_path" i18n-hint hint="Apply to documents that match this path. Wildcards specified as * are allowed. Case insensitive. Also see PAPERLESS_CONSUMER_RECURSIVE" [error]="error?.filter_path"></pngx-input-text>
+          <pngx-input-text i18n-title title="Filter path" formControlName="filter_path" i18n-hint hint="Apply to documents that match this path. Wildcards specified as * are allowed. Case insensitive. Also see <a target='_blank' href='https://docs.paperless-ngx.com/configuration/#consume_config'>PAPERLESS_CONSUMER_RECURSIVE</a>" [error]="error?.filter_path"></pngx-input-text>
+          <pngx-input-select i18n-title title="Filter mail rule" [items]="mailRules" [allowNull]="true" formControlName="filter_mailrule" i18n-hint hint="Apply to documents consumed via this mail rule." [error]="error?.filter_mailrule"></pngx-input-select>
         </div>
         <div class="col">
-            <pngx-input-text i18n-title title="Assign title" formControlName="assign_title" i18n-hint hint="Assign a document title, can include some placeholders, see documentation." [error]="error?.assign_title"></pngx-input-text>
+            <pngx-input-text i18n-title title="Assign title" formControlName="assign_title" i18n-hint hint="Assign a document title, can include some placeholders, see <a target='_blank' href='https://docs.paperless-ngx.com/usage/#consumption-templates'>documentation</a>." [error]="error?.assign_title"></pngx-input-text>
             <pngx-input-tags [allowCreate]="false" i18n-title title="Assign tags" formControlName="assign_tags"></pngx-input-tags>
             <pngx-input-select i18n-title title="Assign document type" [items]="documentTypes" [allowNull]="true" formControlName="assign_document_type"></pngx-input-select>
             <pngx-input-select i18n-title title="Assign correspondent" [items]="correspondents" [allowNull]="true" formControlName="assign_correspondent"></pngx-input-select>

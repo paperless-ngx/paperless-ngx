@@ -1066,6 +1066,7 @@ class ConsumptionTemplateSerializer(OwnedObjectSerializer):
             "sources",
             "filter_path",
             "filter_filename",
+            "filter_mailrule",
             "assign_title",
             "assign_tags",
             "assign_correspondent",
@@ -1083,9 +1084,15 @@ class ConsumptionTemplateSerializer(OwnedObjectSerializer):
         ]
 
     def validate(self, attrs):
-        if ("filter_filename" not in attrs or len(attrs["filter_filename"]) == 0) and (
-            "filter_path" not in attrs or len(attrs["filter_path"]) == 0
+        if ("filter_mailrule") in attrs:
+            attrs["sources"] = {int(DocumentSource.MailFetch)}
+        if (
+            ("filter_mailrule" not in attrs)
+            and ("filter_filename" not in attrs or len(attrs["filter_filename"]) == 0)
+            and ("filter_path" not in attrs or len(attrs["filter_path"]) == 0)
         ):
-            raise serializers.ValidationError("File name or path filter are required")
+            raise serializers.ValidationError(
+                "File name, path or mail rule filter are required",
+            )
 
         return attrs

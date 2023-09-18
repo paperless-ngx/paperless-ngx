@@ -48,6 +48,7 @@ class Migration(migrations.Migration):
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ("auth", "0012_alter_user_first_name_max_length"),
         ("documents", "1038_sharelink"),
+        ("paperless_mail", "0021_alter_mailaccount_password"),
     ]
 
     operations = [
@@ -98,6 +99,16 @@ class Migration(migrations.Migration):
                         max_length=256,
                         null=True,
                         verbose_name="filter filename",
+                    ),
+                ),
+                (
+                    "filter_mailrule",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="paperless_mail.mailrule",
+                        verbose_name="filter documents from this mail rule",
                     ),
                 ),
                 (

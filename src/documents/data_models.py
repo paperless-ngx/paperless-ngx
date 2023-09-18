@@ -50,6 +50,7 @@ class ConsumableDocument:
     source: DocumentSource
     original_file: Path
     mime_type: str = dataclasses.field(init=False, default=None)
+    mailrule_id: int = dataclasses.field(default=None)
 
     def __post_init__(self):
         """

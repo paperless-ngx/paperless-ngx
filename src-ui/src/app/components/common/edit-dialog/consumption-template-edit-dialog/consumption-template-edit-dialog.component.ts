@@ -16,6 +16,8 @@ import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { EditDialogComponent } from '../edit-dialog.component'
+import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
+import { PaperlessMailRule } from 'src/app/data/paperless-mail-rule'
 
 export const DOCUMENT_SOURCE_OPTIONS = [
   {
@@ -42,6 +44,7 @@ export class ConsumptionTemplateEditDialogComponent extends EditDialogComponent<
   correspondents: PaperlessCorrespondent[]
   documentTypes: PaperlessDocumentType[]
   storagePaths: PaperlessStoragePath[]
+  mailRules: PaperlessMailRule[]
 
   constructor(
     service: ConsumptionTemplateService,
@@ -49,6 +52,7 @@ export class ConsumptionTemplateEditDialogComponent extends EditDialogComponent<
     correspondentService: CorrespondentService,
     documentTypeService: DocumentTypeService,
     storagePathService: StoragePathService,
+    mailRuleService: MailRuleService,
     userService: UserService,
     settingsService: SettingsService
   ) {
@@ -68,6 +72,11 @@ export class ConsumptionTemplateEditDialogComponent extends EditDialogComponent<
       .listAll()
       .pipe(first())
       .subscribe((result) => (this.storagePaths = result.results))
+
+    mailRuleService
+      .listAll()
+      .pipe(first())
+      .subscribe((result) => (this.mailRules = result.results))
   }
 
   getCreateTitle() {
@@ -84,6 +93,7 @@ export class ConsumptionTemplateEditDialogComponent extends EditDialogComponent<
       account: new FormControl(null),
       filter_filename: new FormControl(null),
       filter_path: new FormControl(null),
+      filter_mailrule: new FormControl(null),
       order: new FormControl(null),
       sources: new FormControl([]),
       assign_title: new FormControl(null),
