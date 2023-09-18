@@ -14,6 +14,10 @@ import { TagsComponent } from '../../input/tags/tags.component'
 import { TextComponent } from '../../input/text/text.component'
 import { ConsumptionTemplateEditDialogComponent } from './consumption-template-edit-dialog.component'
 import { EditDialogMode } from '../edit-dialog.component'
+import { of } from 'rxjs'
+import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
+import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
+import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 
 describe('ConsumptionTemplateEditDialogComponent', () => {
   let component: ConsumptionTemplateEditDialogComponent
@@ -33,7 +37,51 @@ describe('ConsumptionTemplateEditDialogComponent', () => {
         PermissionsGroupComponent,
         SafeHtmlPipe,
       ],
-      providers: [NgbActiveModal],
+      providers: [
+        NgbActiveModal,
+        {
+          provide: CorrespondentService,
+          useValue: {
+            listAll: () =>
+              of({
+                results: [
+                  {
+                    id: 1,
+                    username: 'c1',
+                  },
+                ],
+              }),
+          },
+        },
+        {
+          provide: DocumentTypeService,
+          useValue: {
+            listAll: () =>
+              of({
+                results: [
+                  {
+                    id: 1,
+                    username: 'dt1',
+                  },
+                ],
+              }),
+          },
+        },
+        {
+          provide: StoragePathService,
+          useValue: {
+            listAll: () =>
+              of({
+                results: [
+                  {
+                    id: 1,
+                    username: 'sp1',
+                  },
+                ],
+              }),
+          },
+        },
+      ],
       imports: [
         HttpClientTestingModule,
         FormsModule,

@@ -260,7 +260,8 @@ Introduced in v2.0, consumption templates allow for finer control over what meta
 and permissions (owner, privileges) are assigned to documents during consumption. In general, templates
 are applied sequentially (by sort order) but subsequent templates will never override an assignment from
 a preceding template. The same is true for mail rules, e.g. if you set the correspondent in a mail rule
-any subsequent consumption templates that are applied _will not_ overwrite this.
+any subsequent consumption templates that are applied _will not_ overwrite this. The exception to this
+is assignments that can be multiple e.g. tags and permissions which will be merged.
 
 Consumption templates allow you to filter by:
 

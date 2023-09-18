@@ -14,7 +14,7 @@ export class ConsumptionTemplateService extends AbstractPaperlessService<Paperle
     super(http, 'consumption_templates')
   }
 
-  private reload() {
+  public reload() {
     this.loading = true
     this.listAll().subscribe((r) => {
       this.templates = r.results

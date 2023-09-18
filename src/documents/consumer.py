@@ -608,14 +608,16 @@ class Consumer(LoggingMixin):
 
             if int(input_doc.source) in [int(x) for x in list(template.sources)] and (
                 (
-                    len(template.filter_filename) == 0
+                    template.filter_filename is None
+                    or len(template.filter_filename) == 0
                     or fnmatch(
                         input_doc.original_file.name.lower(),
                         template.filter_filename.lower(),
                     )
                 )
                 and (
-                    len(template.filter_path) == 0
+                    template.filter_path is None
+                    or len(template.filter_path) == 0
                     or input_doc.original_file.match(template.filter_path)
                 )
             ):
@@ -637,7 +639,7 @@ class Consumer(LoggingMixin):
                 if template.assign_storage_path is not None:
                     template_overrides.storage_path_id = template.assign_storage_path.pk
                 if template.assign_owner is not None:
-                    template_overrides.owner_id = template.assign_owner
+                    template_overrides.owner_id = template.assign_owner.pk
                 if template.assign_view_users is not None:
                     template_overrides.view_users = [
                         user.pk for user in template.assign_view_users.all()
@@ -786,12 +788,12 @@ class Consumer(LoggingMixin):
         ):
             permissions = {
                 "view": {
-                    "users": self.override_view_users,
-                    "groups": self.override_view_groups,
+                    "users": self.override_view_users or [],
+                    "groups": self.override_view_groups or [],
                 },
                 "change": {
-                    "users": self.override_change_users,
-                    "groups": self.override_change_groups,
+                    "users": self.override_change_users or [],
+                    "groups": self.override_change_groups or [],
                 },
             }
             set_permissions_for_object(permissions=permissions, object=document)
@@ -848,12 +850,12 @@ def merge_overrides(
 ) -> DocumentMetadataOverrides:
     """
     Merges two DocumentMetadataOverrides objects such that object B's overrides
-    are only applied if the property is empty in object A
+    are only applied if the property is empty in object A or merged if multiple
+    are accepted
     """
+    # only if empty
     if overridesA.title is None:
         overridesA.title = overridesB.title
-    if overridesA.tag_ids is None:
-        overridesA.tag_ids = overridesB.tag_ids
     if overridesA.correspondent_id is None:
         overridesA.correspondent_id = overridesB.correspondent_id
     if overridesA.document_type_id is None:
@@ -862,12 +864,28 @@ def merge_overrides(
         overridesA.storage_path_id = overridesB.storage_path_id
     if overridesA.owner_id is None:
         overridesA.owner_id = overridesB.owner_id
+    # merge
+    if overridesA.tag_ids is None:
+        overridesA.tag_ids = overridesB.tag_ids
+    else:
+        overridesA.tag_ids = [*overridesA.tag_ids, *overridesB.tag_ids]
     if overridesA.view_users is None:
         overridesA.view_users = overridesB.view_users
+    else:
+        overridesA.view_users = [*overridesA.view_users, *overridesB.view_users]
     if overridesA.view_groups is None:
         overridesA.view_groups = overridesB.view_groups
+    else:
+        overridesA.view_groups = [*overridesA.view_groups, *overridesB.view_groups]
     if overridesA.change_users is None:
         overridesA.change_users = overridesB.change_users
+    else:
+        overridesA.change_users = [*overridesA.change_users, *overridesB.change_users]
     if overridesA.change_groups is None:
         overridesA.change_groups = overridesB.change_groups
+    else:
+        overridesA.change_groups = [
+            *overridesA.change_groups,
+            *overridesB.change_groups,
+        ]
     return overridesA

@@ -32,6 +32,8 @@ from whoosh.writing import AsyncWriter
 
 from documents import bulk_edit
 from documents import index
+from documents.data_models import DocumentSource
+from documents.models import ConsumptionTemplate
 from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
@@ -5313,3 +5315,116 @@ class TestBulkEditObjectPermissions(APITestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class TestApiConsumptionTemplates(DirectoriesMixin, APITestCase):
+    ENDPOINT = "/api/consumption_templates/"
+
+    def setUp(self) -> None:
+        super().setUp()
+
+        user = User.objects.create_superuser(username="temp_admin")
+        self.client.force_authenticate(user=user)
+        self.user2 = User.objects.create(username="user2")
+        self.user3 = User.objects.create(username="user3")
+        self.group1 = Group.objects.create(name="group1")
+
+        self.c = Correspondent.objects.create(name="Correspondent Name")
+        self.c2 = Correspondent.objects.create(name="Correspondent Name 2")
+        self.dt = DocumentType.objects.create(name="DocType Name")
+        self.t1 = Tag.objects.create(name="t1")
+        self.t2 = Tag.objects.create(name="t2")
+        self.t3 = Tag.objects.create(name="t3")
+        self.sp = StoragePath.objects.create(path="/test/")
+
+        self.ct = ConsumptionTemplate.objects.create(
+            name="Template 1",
+            order=0,
+            sources=f"{int(DocumentSource.ApiUpload)},{int(DocumentSource.ConsumeFolder)},{int(DocumentSource.MailFetch)}",
+            filter_filename="*simple*",
+            filter_path="*/samples/*",
+            assign_title="Doc from {correspondent}",
+            assign_correspondent=self.c,
+            assign_document_type=self.dt,
+            assign_storage_path=self.sp,
+            assign_owner=self.user2,
+        )
+        self.ct.assign_tags.add(self.t1)
+        self.ct.assign_tags.add(self.t2)
+        self.ct.assign_tags.add(self.t3)
+        self.ct.assign_view_users.add(self.user3.pk)
+        self.ct.assign_view_groups.add(self.group1.pk)
+        self.ct.assign_change_users.add(self.user3.pk)
+        self.ct.assign_change_groups.add(self.group1.pk)
+        self.ct.save()
+
+    def test_api_get_consumption_template(self):
+        """
+        GIVEN:
+            - API request to get all consumption template
+        WHEN:
+            - API is called
+        THEN:
+            - Existing consumption templates are returned
+        """
+        response = self.client.get(self.ENDPOINT, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 1)
+
+        resp_consumption_template = response.data["results"][0]
+        self.assertEqual(resp_consumption_template["id"], self.ct.id)
+        self.assertEqual(
+            resp_consumption_template["assign_correspondent"],
+            self.ct.assign_correspondent.pk,
+        )
+
+    def test_api_create_consumption_template(self):
+        """
+        GIVEN:
+            - API request to create a consumption template
+        WHEN:
+            - API is called
+        THEN:
+            - Correct HTTP response
+            - New template is created
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Template 2",
+                    "order": 1,
+                    "sources": [DocumentSource.ApiUpload],
+                    "filter_filename": "*test*",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(ConsumptionTemplate.objects.count(), 2)
+
+    def test_api_create_invalid_consumption_template(self):
+        """
+        GIVEN:
+            - API request to create a consumption template
+            - Neither file name nor path filter are specified
+        WHEN:
+            - API is called
+        THEN:
+            - Correct HTTP 400 response
+            - No template is created
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Template 2",
+                    "order": 1,
+                    "sources": [DocumentSource.ApiUpload],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(StoragePath.objects.count(), 1)

@@ -1082,12 +1082,10 @@ class ConsumptionTemplateSerializer(OwnedObjectSerializer):
             "set_permissions",
         ]
 
-    def update(self, instance, validated_data):
-        super().update(instance, validated_data)
-        return instance
-
     def validate(self, attrs):
-        if len(attrs["filter_filename"]) == 0 and len(attrs["filter_path"]) == 0:
+        if ("filter_filename" not in attrs or len(attrs["filter_filename"]) == 0) and (
+            "filter_path" not in attrs or len(attrs["filter_path"]) == 0
+        ):
             raise serializers.ValidationError("File name or path filter are required")
 
         return attrs
