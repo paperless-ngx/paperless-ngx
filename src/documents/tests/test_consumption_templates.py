@@ -128,10 +128,11 @@ class TestConsumptionTemplates(DirectoriesMixin, FileSystemAssertsMixin, TestCas
             filter_attachment_filename="file.pdf",
             maximum_age=30,
             action=MailRule.MailAction.MARK_READ,
-            assign_title_from=MailRule.TitleSource.FROM_SUBJECT,
+            assign_title_from=MailRule.TitleSource.NONE,
             assign_correspondent_from=MailRule.CorrespondentSource.FROM_NOTHING,
             order=0,
             attachment_type=MailRule.AttachmentProcessing.ATTACHMENTS_ONLY,
+            assign_owner_from_rule=False,
         )
         ct = ConsumptionTemplate.objects.create(
             name="Template 1",

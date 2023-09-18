@@ -21,6 +21,7 @@ import {
   MailAction,
   MailMetadataCorrespondentOption,
 } from 'src/app/data/paperless-mail-rule'
+import { CheckComponent } from '../../input/check/check.component'
 
 describe('MailRuleEditDialogComponent', () => {
   let component: MailRuleEditDialogComponent
@@ -41,6 +42,7 @@ describe('MailRuleEditDialogComponent', () => {
         NumberComponent,
         TagsComponent,
         SafeHtmlPipe,
+        CheckComponent,
       ],
       providers: [
         NgbActiveModal,

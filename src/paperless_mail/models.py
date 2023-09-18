@@ -82,6 +82,7 @@ class MailRule(document_models.ModelWithOwner):
     class TitleSource(models.IntegerChoices):
         FROM_SUBJECT = 1, _("Use subject as title")
         FROM_FILENAME = 2, _("Use attachment filename as title")
+        NONE = 3, _("Do not assign title from rule")
 
     class CorrespondentSource(models.IntegerChoices):
         FROM_NOTHING = 1, _("Do not assign a correspondent")
@@ -223,6 +224,11 @@ class MailRule(document_models.ModelWithOwner):
         blank=True,
         on_delete=models.SET_NULL,
         verbose_name=_("assign this correspondent"),
+    )
+
+    assign_owner_from_rule = models.BooleanField(
+        _("Assign the rule owner to documents"),
+        default=True,
     )
 
     def __str__(self):
