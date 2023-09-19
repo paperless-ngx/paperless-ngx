@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-08-15 00:55-0700\n"
-"PO-Revision-Date: 2023-09-19 12:03\n"
+"PO-Revision-Date: 2023-09-19 13:05\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -409,7 +409,7 @@ msgstr ""
 
 #: documents/models.py:451
 msgid "owner is"
-msgstr ""
+msgstr "le propriétaire est"
 
 #: documents/models.py:452
 msgid "has owner in"
@@ -529,7 +529,7 @@ msgstr "notes"
 
 #: documents/models.py:682
 msgid "Archive"
-msgstr ""
+msgstr "Archive"
 
 #: documents/models.py:683
 msgid "Original"
@@ -537,11 +537,11 @@ msgstr "Original"
 
 #: documents/models.py:695
 msgid "expiration"
-msgstr ""
+msgstr "expiration"
 
 #: documents/models.py:702
 msgid "slug"
-msgstr ""
+msgstr "identifiant URL"
 
 #: documents/models.py:734
 msgid "share link"
@@ -607,11 +607,11 @@ msgstr "Votre nom d'utilisateur et votre mot de passe ne correspondent pas. Veui
 
 #: documents/templates/registration/login.html:68
 msgid "Share link was not found."
-msgstr ""
+msgstr "Le lien de partage n'a pas été trouvé."
 
 #: documents/templates/registration/login.html:72
 msgid "Share link has expired."
-msgstr ""
+msgstr "Le lien de partage a expiré."
 
 #: documents/templates/registration/login.html:75
 msgid "Username"
