@@ -57,7 +57,8 @@ export class ToastsComponent implements OnInit, OnDestroy {
   }
 
   getErrorText(error: any) {
-    const text: string = error.error?.detail ?? error.error ?? ''
+    let text: string = error.error?.detail ?? error.error ?? ''
+    if (typeof text === 'object') text = JSON.stringify(text)
     return `${text.slice(0, 200)}${text.length > 200 ? '...' : ''}`
   }
 }

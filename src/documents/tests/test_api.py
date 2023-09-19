@@ -25,6 +25,7 @@ from django.test import override_settings
 from django.utils import timezone
 from guardian.shortcuts import assign_perm
 from guardian.shortcuts import get_perms
+from guardian.shortcuts import get_users_with_perms
 from rest_framework import status
 from rest_framework.test import APITestCase
 from whoosh.writing import AsyncWriter
@@ -5088,3 +5089,227 @@ class TestApiGroup(DirectoriesMixin, APITestCase):
 
         returned_group1 = Group.objects.get(pk=group1.pk)
         self.assertEqual(returned_group1.name, "Updated Name 1")
+
+
+class TestBulkEditObjectPermissions(APITestCase):
+    def setUp(self):
+        super().setUp()
+
+        user = User.objects.create_superuser(username="temp_admin")
+        self.client.force_authenticate(user=user)
+
+        self.t1 = Tag.objects.create(name="t1")
+        self.t2 = Tag.objects.create(name="t2")
+        self.c1 = Correspondent.objects.create(name="c1")
+        self.dt1 = DocumentType.objects.create(name="dt1")
+        self.sp1 = StoragePath.objects.create(name="sp1")
+        self.user1 = User.objects.create(username="user1")
+        self.user2 = User.objects.create(username="user2")
+        self.user3 = User.objects.create(username="user3")
+
+    def test_bulk_object_set_permissions(self):
+        """
+        GIVEN:
+            - Existing objects
+        WHEN:
+            - bulk_edit_object_perms API endpoint is called
+        THEN:
+            - Permissions and / or owner are changed
+        """
+        permissions = {
+            "view": {
+                "users": [self.user1.id, self.user2.id],
+                "groups": [],
+            },
+            "change": {
+                "users": [self.user1.id],
+                "groups": [],
+            },
+        }
+
+        response = self.client.post(
+            "/api/bulk_edit_object_perms/",
+            json.dumps(
+                {
+                    "objects": [self.t1.id, self.t2.id],
+                    "object_type": "tags",
+                    "permissions": permissions,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn(self.user1, get_users_with_perms(self.t1))
+
+        response = self.client.post(
+            "/api/bulk_edit_object_perms/",
+            json.dumps(
+                {
+                    "objects": [self.c1.id],
+                    "object_type": "correspondents",
+                    "permissions": permissions,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn(self.user1, get_users_with_perms(self.c1))
+
+        response = self.client.post(
+            "/api/bulk_edit_object_perms/",
+            json.dumps(
+                {
+                    "objects": [self.dt1.id],
+                    "object_type": "document_types",
+                    "permissions": permissions,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn(self.user1, get_users_with_perms(self.dt1))
+
+        response = self.client.post(
+            "/api/bulk_edit_object_perms/",
+            json.dumps(
+                {
+                    "objects": [self.sp1.id],
+                    "object_type": "storage_paths",
+                    "permissions": permissions,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn(self.user1, get_users_with_perms(self.sp1))
+
+        response = self.client.post(
+            "/api/bulk_edit_object_perms/",
+            json.dumps(
+                {
+                    "objects": [self.t1.id, self.t2.id],
+                    "object_type": "tags",
+                    "owner": self.user3.id,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Tag.objects.get(pk=self.t2.id).owner, self.user3)
+
+        response = self.client.post(
+            "/api/bulk_edit_object_perms/",
+            json.dumps(
+                {
+                    "objects": [self.sp1.id],
+                    "object_type": "storage_paths",
+                    "owner": self.user3.id,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(StoragePath.objects.get(pk=self.sp1.id).owner, self.user3)
+
+    def test_bulk_edit_object_permissions_insufficient_perms(self):
+        """
+        GIVEN:
+            - Objects owned by user other than logged in user
+        WHEN:
+            - bulk_edit_object_perms API endpoint is called
+        THEN:
+            - User is not able to change permissions
+        """
+        self.t1.owner = User.objects.get(username="temp_admin")
+        self.t1.save()
+        self.client.force_authenticate(user=self.user1)
+
+        response = self.client.post(
+            "/api/bulk_edit_object_perms/",
+            json.dumps(
+                {
+                    "objects": [self.t1.id, self.t2.id],
+                    "object_type": "tags",
+                    "owner": self.user1.id,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.content, b"Insufficient permissions")
+
+    def test_bulk_edit_object_permissions_validation(self):
+        """
+        GIVEN:
+            - Existing objects
+        WHEN:
+            - bulk_edit_object_perms API endpoint is called with invalid params
+        THEN:
+            - Validation fails
+        """
+        # not a list
+        response = self.client.post(
+            "/api/bulk_edit_object_perms/",
+            json.dumps(
+                {
+                    "objects": self.t1.id,
+                    "object_type": "tags",
+                    "owner": self.user1.id,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # not a list of ints
+        response = self.client.post(
+            "/api/bulk_edit_object_perms/",
+            json.dumps(
+                {
+                    "objects": ["one"],
+                    "object_type": "tags",
+                    "owner": self.user1.id,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # duplicates
+        response = self.client.post(
+            "/api/bulk_edit_object_perms/",
+            json.dumps(
+                {
+                    "objects": [self.t1.id, self.t2.id, self.t1.id],
+                    "object_type": "tags",
+                    "owner": self.user1.id,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # not a valid object type
+        response = self.client.post(
+            "/api/bulk_edit_object_perms/",
+            json.dumps(
+                {
+                    "objects": [1],
+                    "object_type": "madeup",
+                    "owner": self.user1.id,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

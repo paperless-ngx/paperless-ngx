@@ -35,6 +35,7 @@ import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { MATCH_AUTO } from 'src/app/data/matching-model'
 import { MATCH_NONE } from 'src/app/data/matching-model'
 import { MATCH_LITERAL } from 'src/app/data/matching-model'
+import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
 
 const tags: PaperlessTag[] = [
   {
@@ -72,6 +73,7 @@ describe('ManagementListComponent', () => {
         IfPermissionsDirective,
         SafeHtmlPipe,
         ConfirmDialogComponent,
+        PermissionsDialogComponent,
       ],
       providers: [
         {
@@ -145,7 +147,7 @@ describe('ManagementListComponent', () => {
     const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
     const reloadSpy = jest.spyOn(component, 'reloadData')
 
-    const createButton = fixture.debugElement.queryAll(By.css('button'))[0]
+    const createButton = fixture.debugElement.queryAll(By.css('button'))[2]
     createButton.triggerEventHandler('click')
 
     expect(modal).not.toBeUndefined()
@@ -170,7 +172,7 @@ describe('ManagementListComponent', () => {
     const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
     const reloadSpy = jest.spyOn(component, 'reloadData')
 
-    const editButton = fixture.debugElement.queryAll(By.css('button'))[3]
+    const editButton = fixture.debugElement.queryAll(By.css('button'))[5]
     editButton.triggerEventHandler('click')
 
     expect(modal).not.toBeUndefined()
@@ -196,7 +198,7 @@ describe('ManagementListComponent', () => {
     const deleteSpy = jest.spyOn(tagService, 'delete')
     const reloadSpy = jest.spyOn(component, 'reloadData')
 
-    const deleteButton = fixture.debugElement.queryAll(By.css('button'))[4]
+    const deleteButton = fixture.debugElement.queryAll(By.css('button'))[6]
     deleteButton.triggerEventHandler('click')
 
     expect(modal).not.toBeUndefined()
@@ -216,7 +218,7 @@ describe('ManagementListComponent', () => {
 
   it('should support quick filter for objects', () => {
     const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
-    const filterButton = fixture.debugElement.queryAll(By.css('button'))[2]
+    const filterButton = fixture.debugElement.queryAll(By.css('button'))[4]
     filterButton.triggerEventHandler('click')
     expect(qfSpy).toHaveBeenCalledWith([
       { rule_type: FILTER_HAS_TAGS_ALL, value: tags[0].id.toString() },
@@ -228,5 +230,48 @@ describe('ManagementListComponent', () => {
     const sortable = fixture.debugElement.query(By.directive(SortableDirective))
     sortable.triggerEventHandler('click')
     expect(reloadSpy).toHaveBeenCalled()
+  })
+
+  it('should support toggle all items in view', () => {
+    expect(component.selectedObjects.size).toEqual(0)
+    const toggleAllSpy = jest.spyOn(component, 'toggleAll')
+    const checkButton = fixture.debugElement.queryAll(
+      By.css('input.form-check-input')
+    )[0]
+    checkButton.nativeElement.dispatchEvent(new Event('click'))
+    checkButton.nativeElement.checked = true
+    checkButton.nativeElement.dispatchEvent(new Event('click'))
+    expect(toggleAllSpy).toHaveBeenCalled()
+    expect(component.selectedObjects.size).toEqual(tags.length)
+  })
+
+  it('should support bulk edit permissions', () => {
+    const bulkEditPermsSpy = jest.spyOn(tagService, 'bulk_update_permissions')
+    component.toggleSelected(tags[0])
+    component.toggleSelected(tags[1])
+    component.toggleSelected(tags[2])
+    component.toggleSelected(tags[2]) // uncheck, for coverage
+    const selected = new Set([tags[0].id, tags[1].id])
+    expect(component.selectedObjects).toEqual(selected)
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
+    fixture.detectChanges()
+    component.setPermissions()
+    expect(modal).not.toBeUndefined()
+
+    // fail first
+    bulkEditPermsSpy.mockReturnValueOnce(
+      throwError(() => new Error('error setting permissions'))
+    )
+    const errorToastSpy = jest.spyOn(toastService, 'showError')
+    modal.componentInstance.confirmClicked.emit()
+    expect(bulkEditPermsSpy).toHaveBeenCalled()
+    expect(errorToastSpy).toHaveBeenCalled()
+
+    const successToastSpy = jest.spyOn(toastService, 'showInfo')
+    bulkEditPermsSpy.mockReturnValueOnce(of('OK'))
+    modal.componentInstance.confirmClicked.emit()
+    expect(bulkEditPermsSpy).toHaveBeenCalled()
+    expect(successToastSpy).toHaveBeenCalled()
   })
 })
