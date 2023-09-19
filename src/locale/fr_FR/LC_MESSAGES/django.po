@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-08-15 00:55-0700\n"
-"PO-Revision-Date: 2023-09-14 20:52\n"
+"PO-Revision-Date: 2023-09-19 12:03\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -513,7 +513,7 @@ msgstr "Les données retournées par la tâche"
 
 #: documents/models.py:644
 msgid "Note for the document"
-msgstr ""
+msgstr "Note pour le document"
 
 #: documents/models.py:668
 msgid "user"
@@ -521,11 +521,11 @@ msgstr "utilisateur"
 
 #: documents/models.py:673
 msgid "note"
-msgstr ""
+msgstr "note"
 
 #: documents/models.py:674
 msgid "notes"
-msgstr ""
+msgstr "notes"
 
 #: documents/models.py:682
 msgid "Archive"
@@ -533,7 +533,7 @@ msgstr ""
 
 #: documents/models.py:683
 msgid "Original"
-msgstr ""
+msgstr "Original"
 
 #: documents/models.py:695
 msgid "expiration"
@@ -545,11 +545,11 @@ msgstr ""
 
 #: documents/models.py:734
 msgid "share link"
-msgstr ""
+msgstr "partager le lien"
 
 #: documents/models.py:735
 msgid "share links"
-msgstr ""
+msgstr "partager les liens"
 
 #: documents/serialisers.py:100
 #, python-format
@@ -643,7 +643,7 @@ msgstr "Biélorusse"
 
 #: paperless/settings.py:568
 msgid "Catalan"
-msgstr ""
+msgstr "Catalan"
 
 #: paperless/settings.py:569
 msgid "Czech"
@@ -667,7 +667,7 @@ msgstr "Espagnol"
 
 #: paperless/settings.py:574
 msgid "Finnish"
-msgstr ""
+msgstr "Finnois"
 
 #: paperless/settings.py:575
 msgid "French"
@@ -707,7 +707,7 @@ msgstr "Russe"
 
 #: paperless/settings.py:584
 msgid "Slovak"
-msgstr ""
+msgstr "Solvaque"
 
 #: paperless/settings.py:585
 msgid "Slovenian"
@@ -727,7 +727,7 @@ msgstr "Turc"
 
 #: paperless/settings.py:589
 msgid "Ukrainian"
-msgstr ""
+msgstr "Ukrainien"
 
 #: paperless/settings.py:590
 msgid "Chinese Simplified"
