@@ -2481,7 +2481,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.ts</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">Share Links</target>
+        <target state="translated">Поділитись посиланнями</target>
       </trans-unit>
       <trans-unit id="6617773613987957957" datatype="html">
         <source> No existing links </source>
@@ -2489,7 +2489,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.html</context>
           <context context-type="linenumber">10,12</context>
         </context-group>
-        <target state="needs-translation"> No existing links </target>
+        <target state="translated"> Немає існуючих посилань </target>
       </trans-unit>
       <trans-unit id="4323470180912194028" datatype="html">
         <source>Copy</source>
@@ -2497,7 +2497,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.html</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="needs-translation">Copy</target>
+        <target state="translated">Копіювати</target>
       </trans-unit>
       <trans-unit id="7419704019640008953" datatype="html">
         <source>Share</source>
@@ -2505,7 +2505,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.html</context>
           <context context-type="linenumber">28</context>
         </context-group>
-        <target state="needs-translation">Share</target>
+        <target state="translated">Поділитись</target>
       </trans-unit>
       <trans-unit id="5392341774767336507" datatype="html">
         <source>Copied!</source>
@@ -2513,7 +2513,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.html</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="needs-translation">Copied!</target>
+        <target state="translated">Скопійовано!</target>
       </trans-unit>
       <trans-unit id="6811921365829755679" datatype="html">
         <source>Share archive version</source>
@@ -2557,7 +2557,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.ts</context>
           <context context-type="linenumber">85</context>
         </context-group>
-        <target state="needs-translation">1 day</target>
+        <target state="translated">1 день</target>
       </trans-unit>
       <trans-unit id="8542568275115626925" datatype="html">
         <source>7 days</source>
@@ -2565,7 +2565,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.ts</context>
           <context context-type="linenumber">19</context>
         </context-group>
-        <target state="needs-translation">7 days</target>
+        <target state="translated">7 днів</target>
       </trans-unit>
       <trans-unit id="7152095234138763013" datatype="html">
         <source>30 days</source>
@@ -2573,7 +2573,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.ts</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">30 days</target>
+        <target state="translated">30 днів</target>
       </trans-unit>
       <trans-unit id="8372007266188249803" datatype="html">
         <source>Never</source>
@@ -2581,7 +2581,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.ts</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="needs-translation">Never</target>
+        <target state="translated">Ніколи</target>
       </trans-unit>
       <trans-unit id="3429210839568770054" datatype="html">
         <source>Error retrieving links</source>
@@ -2589,7 +2589,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.ts</context>
           <context context-type="linenumber">69</context>
         </context-group>
-        <target state="needs-translation">Error retrieving links</target>
+        <target state="translated">Помилка отримання посилань</target>
       </trans-unit>
       <trans-unit id="3242255798983858463" datatype="html">
         <source><x id="PH" equiv-text="days"/> days</source>
@@ -2597,7 +2597,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.ts</context>
           <context context-type="linenumber">85</context>
         </context-group>
-        <target state="needs-translation"><x id="PH" equiv-text="days"/> days</target>
+        <target state="translated"><x id="PH" equiv-text="days"/> днів</target>
       </trans-unit>
       <trans-unit id="2897042887615940599" datatype="html">
         <source>Error deleting link</source>
@@ -2605,7 +2605,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.ts</context>
           <context context-type="linenumber">112</context>
         </context-group>
-        <target state="needs-translation">Error deleting link</target>
+        <target state="translated">Помилка видалення посилання</target>
       </trans-unit>
       <trans-unit id="8400747326190565173" datatype="html">
         <source>Error creating link</source>
@@ -2613,7 +2613,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.ts</context>
           <context context-type="linenumber">140</context>
         </context-group>
-        <target state="needs-translation">Error creating link</target>
+        <target state="translated">Помилка створення посилання</target>
       </trans-unit>
       <trans-unit id="5611592591303869712" datatype="html">
         <source>Status</source>
