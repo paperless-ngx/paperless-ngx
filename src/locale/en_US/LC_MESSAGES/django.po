@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-17 01:23-0700\n"
+"POT-Creation-Date: 2023-09-19 14:30-0700\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -54,7 +54,7 @@ msgid "Automatic"
 msgstr ""
 
 #: documents/models.py:62 documents/models.py:402 documents/models.py:755
-#: paperless_mail/models.py:18 paperless_mail/models.py:92
+#: paperless_mail/models.py:18 paperless_mail/models.py:93
 msgid "name"
 msgstr ""
 
@@ -231,7 +231,7 @@ msgstr ""
 msgid "warning"
 msgstr ""
 
-#: documents/models.py:371 paperless_mail/models.py:287
+#: documents/models.py:371 paperless_mail/models.py:293
 msgid "error"
 msgstr ""
 
@@ -575,7 +575,7 @@ msgstr ""
 msgid "consumption templates"
 msgstr ""
 
-#: documents/models.py:757 paperless_mail/models.py:94
+#: documents/models.py:757 paperless_mail/models.py:95
 msgid "order"
 msgstr ""
 
@@ -593,54 +593,58 @@ msgstr ""
 msgid "filter filename"
 msgstr ""
 
-#: documents/models.py:783 paperless_mail/models.py:147
+#: documents/models.py:783 paperless_mail/models.py:148
 msgid ""
 "Only consume documents which entirely match this filename if specified. "
 "Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
 msgstr ""
 
-#: documents/models.py:790
+#: documents/models.py:794
+msgid "filter documents from this mail rule"
+msgstr ""
+
+#: documents/models.py:798
 msgid "assign title"
 msgstr ""
 
-#: documents/models.py:795
+#: documents/models.py:803
 msgid ""
-"Assign a document title, can include some placeholders,see documentation."
+"Assign a document title, can include some placeholders, see documentation."
 msgstr ""
 
-#: documents/models.py:803 paperless_mail/models.py:203
+#: documents/models.py:811 paperless_mail/models.py:204
 msgid "assign this tag"
 msgstr ""
 
-#: documents/models.py:811 paperless_mail/models.py:211
+#: documents/models.py:819 paperless_mail/models.py:212
 msgid "assign this document type"
 msgstr ""
 
-#: documents/models.py:819 paperless_mail/models.py:225
+#: documents/models.py:827 paperless_mail/models.py:226
 msgid "assign this correspondent"
 msgstr ""
 
-#: documents/models.py:827
+#: documents/models.py:835
 msgid "assign this storage path"
 msgstr ""
 
-#: documents/models.py:836
+#: documents/models.py:844
 msgid "assign this owner"
 msgstr ""
 
-#: documents/models.py:843
+#: documents/models.py:851
 msgid "grant view permissions to these users"
 msgstr ""
 
-#: documents/models.py:850
+#: documents/models.py:858
 msgid "grant view permissions to these groups"
 msgstr ""
 
-#: documents/models.py:857
+#: documents/models.py:865
 msgid "grant change permissions to these users"
 msgstr ""
 
-#: documents/models.py:864
+#: documents/models.py:872
 msgid "grant change permissions to these groups"
 msgstr ""
 
@@ -838,7 +842,7 @@ msgstr ""
 msgid "Chinese Simplified"
 msgstr ""
 
-#: paperless/urls.py:178
+#: paperless/urls.py:184
 msgid "Paperless-ngx administration"
 msgstr ""
 
@@ -998,116 +1002,124 @@ msgstr ""
 msgid "Use attachment filename as title"
 msgstr ""
 
-#: paperless_mail/models.py:87
-msgid "Do not assign a correspondent"
+#: paperless_mail/models.py:85
+msgid "Do not assign title from rule"
 msgstr ""
 
 #: paperless_mail/models.py:88
-msgid "Use mail address"
+msgid "Do not assign a correspondent"
 msgstr ""
 
 #: paperless_mail/models.py:89
-msgid "Use name (or mail address if not available)"
+msgid "Use mail address"
 msgstr ""
 
 #: paperless_mail/models.py:90
+msgid "Use name (or mail address if not available)"
+msgstr ""
+
+#: paperless_mail/models.py:91
 msgid "Use correspondent selected below"
 msgstr ""
 
-#: paperless_mail/models.py:100
+#: paperless_mail/models.py:101
 msgid "account"
 msgstr ""
 
-#: paperless_mail/models.py:104 paperless_mail/models.py:242
+#: paperless_mail/models.py:105 paperless_mail/models.py:248
 msgid "folder"
 msgstr ""
 
-#: paperless_mail/models.py:108
+#: paperless_mail/models.py:109
 msgid ""
 "Subfolders must be separated by a delimiter, often a dot ('.') or slash "
 "('/'), but it varies by mail server."
 msgstr ""
 
-#: paperless_mail/models.py:114
+#: paperless_mail/models.py:115
 msgid "filter from"
 msgstr ""
 
-#: paperless_mail/models.py:121
+#: paperless_mail/models.py:122
 msgid "filter to"
 msgstr ""
 
-#: paperless_mail/models.py:128
+#: paperless_mail/models.py:129
 msgid "filter subject"
 msgstr ""
 
-#: paperless_mail/models.py:135
+#: paperless_mail/models.py:136
 msgid "filter body"
 msgstr ""
 
-#: paperless_mail/models.py:142
+#: paperless_mail/models.py:143
 msgid "filter attachment filename"
 msgstr ""
 
-#: paperless_mail/models.py:154
+#: paperless_mail/models.py:155
 msgid "maximum age"
 msgstr ""
 
-#: paperless_mail/models.py:156
+#: paperless_mail/models.py:157
 msgid "Specified in days."
 msgstr ""
 
-#: paperless_mail/models.py:160
+#: paperless_mail/models.py:161
 msgid "attachment type"
 msgstr ""
 
-#: paperless_mail/models.py:164
+#: paperless_mail/models.py:165
 msgid ""
 "Inline attachments include embedded images, so it's best to combine this "
 "option with a filename filter."
 msgstr ""
 
-#: paperless_mail/models.py:170
+#: paperless_mail/models.py:171
 msgid "consumption scope"
 msgstr ""
 
-#: paperless_mail/models.py:176
+#: paperless_mail/models.py:177
 msgid "action"
 msgstr ""
 
-#: paperless_mail/models.py:182
+#: paperless_mail/models.py:183
 msgid "action parameter"
 msgstr ""
 
-#: paperless_mail/models.py:187
+#: paperless_mail/models.py:188
 msgid ""
 "Additional parameter for the action selected above, i.e., the target folder "
 "of the move to folder action. Subfolders must be separated by dots."
 msgstr ""
 
-#: paperless_mail/models.py:195
+#: paperless_mail/models.py:196
 msgid "assign title from"
 msgstr ""
 
-#: paperless_mail/models.py:215
+#: paperless_mail/models.py:216
 msgid "assign correspondent from"
 msgstr ""
 
-#: paperless_mail/models.py:250
+#: paperless_mail/models.py:230
+msgid "Assign the rule owner to documents"
+msgstr ""
+
+#: paperless_mail/models.py:256
 msgid "uid"
 msgstr ""
 
-#: paperless_mail/models.py:258
+#: paperless_mail/models.py:264
 msgid "subject"
 msgstr ""
 
-#: paperless_mail/models.py:266
+#: paperless_mail/models.py:272
 msgid "received"
 msgstr ""
 
-#: paperless_mail/models.py:273
+#: paperless_mail/models.py:279
 msgid "processed"
 msgstr ""
 
-#: paperless_mail/models.py:279
+#: paperless_mail/models.py:285
 msgid "status"
 msgstr ""
