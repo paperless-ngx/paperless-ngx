@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-08-15 00:55-0700\n"
-"PO-Revision-Date: 2023-09-14 20:53\n"
+"PO-Revision-Date: 2023-09-19 05:43\n"
 "Last-Translator: \n"
 "Language-Team: Hebrew\n"
 "Language: he_IL\n"
@@ -39,7 +39,7 @@ msgstr "כל המילים"
 
 #: documents/models.py:53
 msgid "Exact match"
-msgstr "התאמה מדוייקת"
+msgstr "התאמה מדויקת"
 
 #: documents/models.py:54
 msgid "Regular expression"
@@ -68,7 +68,7 @@ msgstr "אלגוריתם התאמה"
 
 #: documents/models.py:69
 msgid "is insensitive"
-msgstr "אינו רגיש"
+msgstr "אינו תלוי רישיות"
 
 #: documents/models.py:92 documents/models.py:144
 msgid "correspondent"
