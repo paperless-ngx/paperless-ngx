@@ -2605,7 +2605,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.ts</context>
           <context context-type="linenumber">112</context>
         </context-group>
-        <target state="needs-translation">Error deleting link</target>
+        <target state="translated">Errore nell'eliminazione del collegamento</target>
       </trans-unit>
       <trans-unit id="8400747326190565173" datatype="html">
         <source>Error creating link</source>
@@ -2613,7 +2613,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.ts</context>
           <context context-type="linenumber">140</context>
         </context-group>
-        <target state="needs-translation">Error creating link</target>
+        <target state="translated">Errore nella creazione del collegamento</target>
       </trans-unit>
       <trans-unit id="5611592591303869712" datatype="html">
         <source>Status</source>
@@ -2621,7 +2621,7 @@
           <context context-type="sourcefile">src/app/components/common/toasts/toasts.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation">Status</target>
+        <target state="translated">Stato</target>
       </trans-unit>
       <trans-unit id="6732151329960766506" datatype="html">
         <source>Copy Raw Error</source>
@@ -2629,7 +2629,7 @@
           <context context-type="sourcefile">src/app/components/common/toasts/toasts.component.html</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="needs-translation">Copy Raw Error</target>
+        <target state="translated">Copia Errore Grezzo</target>
       </trans-unit>
       <trans-unit id="1865646076514070962" datatype="html">
         <source>Hello <x id="PH" equiv-text="this.settingsService.displayName"/>, welcome to Paperless-ngx</source>
@@ -3396,7 +3396,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">634</context>
         </context-group>
-        <target state="needs-translation">Error deleting document</target>
+        <target state="translated">Errore durante l'eliminazione del documento</target>
       </trans-unit>
       <trans-unit id="7362691899087997122" datatype="html">
         <source>Redo OCR confirm</source>
@@ -3492,7 +3492,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">677</context>
         </context-group>
-        <target state="needs-translation">Error executing operation</target>
+        <target state="translated">Errore nell'esecuzione dell'operazione</target>
       </trans-unit>
       <trans-unit id="6857598786757174736" datatype="html" approved="yes">
         <source>Select:</source>
@@ -3596,7 +3596,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">185</context>
         </context-group>
-        <target state="needs-translation">Error executing bulk operation</target>
+        <target state="translated">Errore nell'esecuzione dell'operazione in blocco</target>
       </trans-unit>
       <trans-unit id="7894972847287473517" datatype="html">
         <source>&quot;<x id="PH" equiv-text="items[0].name"/>&quot;</source>
@@ -4438,7 +4438,7 @@
           <context context-type="sourcefile">src/app/components/document-notes/document-notes.component.ts</context>
           <context context-type="linenumber">66</context>
         </context-group>
-        <target state="needs-translation">Error saving note</target>
+        <target state="translated">Errore nel salvare la nota</target>
       </trans-unit>
       <trans-unit id="4144411010137688084" datatype="html">
         <source>Error deleting note</source>
@@ -4446,7 +4446,7 @@
           <context context-type="sourcefile">src/app/components/document-notes/document-notes.component.ts</context>
           <context context-type="linenumber">80</context>
         </context-group>
-        <target state="needs-translation">Error deleting note</target>
+        <target state="translated">Errore nell'eliminazione della nota</target>
       </trans-unit>
       <trans-unit id="6316128875819022658" datatype="html">
         <source>correspondent</source>
@@ -4674,7 +4674,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">203</context>
         </context-group>
-        <target state="needs-translation">Error while deleting element</target>
+        <target state="translated">Errore durante l'eliminazione dell'elemento</target>
       </trans-unit>
       <trans-unit id="1685061484835793745" datatype="html">
         <source>Start tour</source>
@@ -5114,7 +5114,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">278</context>
         </context-group>
-        <target state="needs-translation">Error retrieving groups</target>
+        <target state="translated">Errore nel recupero dei gruppi</target>
       </trans-unit>
       <trans-unit id="1235706724900303689" datatype="html">
         <source>Error retrieving users</source>
@@ -5122,7 +5122,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">285</context>
         </context-group>
-        <target state="needs-translation">Error retrieving users</target>
+        <target state="translated">Errore nel recupero degli utenti</target>
       </trans-unit>
       <trans-unit id="5241231471117657636" datatype="html">
         <source>Error retrieving mail rules</source>
@@ -5130,7 +5130,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">309</context>
         </context-group>
-        <target state="needs-translation">Error retrieving mail rules</target>
+        <target state="translated">Errore nel recupero delle regole di posta</target>
       </trans-unit>
       <trans-unit id="3178554336792037159" datatype="html">
         <source>Error retrieving mail accounts</source>
@@ -5138,7 +5138,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">317</context>
         </context-group>
-        <target state="needs-translation">Error retrieving mail accounts</target>
+        <target state="translated">Errore nel recupero degli account di posta</target>
       </trans-unit>
       <trans-unit id="5610279464668232148" datatype="html" approved="yes">
         <source>Saved view &quot;<x id="PH" equiv-text="savedView.name"/>&quot; deleted.</source>
@@ -5618,7 +5618,7 @@
           <context context-type="sourcefile">src/app/components/not-found/not-found.component.html</context>
           <context context-type="linenumber">6</context>
         </context-group>
-        <target state="needs-translation">Not Found</target>
+        <target state="translated">Non trovato</target>
       </trans-unit>
       <trans-unit id="178520337056147266" datatype="html">
         <source>Go to Dashboard</source>
@@ -5626,7 +5626,7 @@
           <context context-type="sourcefile">src/app/components/not-found/not-found.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation">Go to Dashboard</target>
+        <target state="translated">Vai alla dashboard</target>
       </trans-unit>
       <trans-unit id="2167862279705099846" datatype="html" approved="yes">
         <source>Auto: Learn matching automatically</source>
@@ -6031,7 +6031,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">169</context>
         </context-group>
-        <target state="needs-translation">Afrikaans</target>
+        <target state="translated">Afrikaans</target>
       </trans-unit>
       <trans-unit id="6269202464699193298" datatype="html">
         <source>Arabic</source>
@@ -6087,7 +6087,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">211</context>
         </context-group>
-        <target state="needs-translation">Greek</target>
+        <target state="translated">Greco</target>
       </trans-unit>
       <trans-unit id="6987083569809053351" datatype="html" approved="yes">
         <source>English (GB)</source>
@@ -6151,7 +6151,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">259</context>
         </context-group>
-        <target state="needs-translation">Norwegian</target>
+        <target state="translated">Norvegese</target>
       </trans-unit>
       <trans-unit id="792060551707690640" datatype="html" approved="yes">
         <source>Polish</source>
@@ -6239,7 +6239,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">325</context>
         </context-group>
-        <target state="needs-translation">Ukrainian</target>
+        <target state="translated">Ucraino</target>
       </trans-unit>
       <trans-unit id="4689443708886954687" datatype="html">
         <source>Chinese Simplified</source>
