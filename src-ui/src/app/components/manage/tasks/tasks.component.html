@@ -47,12 +47,12 @@
     <tbody>
       <ng-container *ngFor="let task of tasks | slice: (page-1) * pageSize : page * pageSize">
       <tr (click)="toggleSelected(task, $event); $event.stopPropagation();">
-        <th>
+        <td>
           <div class="form-check">
             <input type="checkbox" class="form-check-input" id="task{{task.id}}" [checked]="selectedTasks.has(task.id)" (click)="toggleSelected(task, $event); $event.stopPropagation();">
             <label class="form-check-label" for="task{{task.id}}"></label>
           </div>
-        </th>
+        </td>
         <td class="overflow-auto name-col">{{ task.task_file_name }}</td>
         <td class="d-none d-lg-table-cell">{{ task.date_created | customDate:'short' }}</td>
         <td class="d-none d-lg-table-cell" *ngIf="activeTab !== 'started' && activeTab !== 'queued'">

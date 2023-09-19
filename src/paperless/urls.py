@@ -12,6 +12,7 @@ from rest_framework.routers import DefaultRouter
 
 from documents.views import AcknowledgeTasksView
 from documents.views import BulkDownloadView
+from documents.views import BulkEditObjectPermissionsView
 from documents.views import BulkEditView
 from documents.views import CorrespondentViewSet
 from documents.views import DocumentTypeViewSet
@@ -109,6 +110,11 @@ urlpatterns = [
                     name="mail_accounts_test",
                 ),
                 path("token/", views.obtain_auth_token),
+                re_path(
+                    "^bulk_edit_object_perms/",
+                    BulkEditObjectPermissionsView.as_view(),
+                    name="bulk_edit_object_permissions",
+                ),
                 *api_router.urls,
             ],
         ),
