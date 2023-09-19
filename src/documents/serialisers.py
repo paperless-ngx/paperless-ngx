@@ -960,3 +960,78 @@ class ShareLinkSerializer(OwnedObjectSerializer):
     def create(self, validated_data):
         validated_data["slug"] = get_random_string(50)
         return super().create(validated_data)
+
+
+class BulkEditObjectPermissionsSerializer(serializers.Serializer, SetPermissionsMixin):
+    objects = serializers.ListField(
+        required=True,
+        allow_empty=False,
+        label="Objects",
+        write_only=True,
+        child=serializers.IntegerField(),
+    )
+
+    object_type = serializers.ChoiceField(
+        choices=[
+            "tags",
+            "correspondents",
+            "document_types",
+            "storage_paths",
+        ],
+        label="Object Type",
+        write_only=True,
+    )
+
+    owner = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+        required=False,
+        allow_null=True,
+    )
+
+    permissions = serializers.DictField(
+        label="Set permissions",
+        allow_empty=False,
+        required=False,
+        write_only=True,
+    )
+
+    def get_object_class(self, object_type):
+        object_class = None
+        if object_type == "tags":
+            object_class = Tag
+        elif object_type == "correspondents":
+            object_class = Correspondent
+        elif object_type == "document_types":
+            object_class = DocumentType
+        elif object_type == "storage_paths":
+            object_class = StoragePath
+        return object_class
+
+    def _validate_objects(self, objects, object_type):
+        if not isinstance(objects, list):
+            raise serializers.ValidationError("objects must be a list")
+        if not all(isinstance(i, int) for i in objects):
+            raise serializers.ValidationError("objects must be a list of integers")
+        object_class = self.get_object_class(object_type)
+        count = object_class.objects.filter(id__in=objects).count()
+        if not count == len(objects):
+            raise serializers.ValidationError(
+                "Some ids in objects don't exist or were specified twice.",
+            )
+        return objects
+
+    def _validate_permissions(self, permissions):
+        self.validate_set_permissions(
+            permissions,
+        )
+
+    def validate(self, attrs):
+        object_type = attrs["object_type"]
+        objects = attrs["objects"]
+        permissions = attrs["permissions"] if "permissions" in attrs else None
+
+        self._validate_objects(objects, object_type)
+        if permissions is not None:
+            self._validate_permissions(permissions)
+
+        return attrs

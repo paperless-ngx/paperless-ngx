@@ -1,4 +1,14 @@
 <pngx-page-header title="{{ typeNamePlural | titlecase }}">
+  <button class="btn btn-sm btn-outline-secondary me-2" (click)="clearSelection()" [hidden]="selectedObjects.size === 0">
+    <svg class="sidebaricon" fill="currentColor">
+      <use xlink:href="assets/bootstrap-icons.svg#x"/>
+    </svg>&nbsp;<ng-container i18n>Clear selection</ng-container>
+  </button>
+  <button type="button" class="btn btn-sm btn-outline-primary me-5" (click)="setPermissions()" [disabled]="!userOwnsAll || selectedObjects.size === 0">
+    <svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
+      <use xlink:href="assets/bootstrap-icons.svg#person-fill-lock" />
+    </svg>&nbsp;<ng-container i18n>Permissions</ng-container>
+  </button>
   <button type="button" class="btn btn-sm btn-outline-primary" (click)="openCreateDialog()" *pngxIfPermissions="{ action: PermissionAction.Add, type: permissionType }" i18n>Create</button>
 </pngx-page-header>
 
@@ -16,6 +26,12 @@
 <table class="table table-striped align-middle border shadow-sm">
   <thead>
     <tr>
+      <th scope="col">
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="all-objects" [disabled]="data.length === 0" (click)="toggleAll($event); $event.stopPropagation();">
+          <label class="form-check-label" for="all-objects"></label>
+        </div>
+      </th>
       <th scope="col" pngxSortable="name" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Name</th>
       <th scope="col" class="d-none d-sm-table-cell" pngxSortable="matching_algorithm" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Matching</th>
       <th scope="col" pngxSortable="document_count" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Document count</th>
@@ -30,7 +46,13 @@
         <ng-container i18n>Loading...</ng-container>
       </td>
     </tr>
-    <tr *ngFor="let object of data">
+    <tr *ngFor="let object of data" (click)="toggleSelected(object, $event); $event.stopPropagation();">
+      <td>
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="{{typeName}}{{object.id}}" [checked]="selectedObjects.has(object.id)" (click)="toggleSelected(object); $event.stopPropagation();">
+          <label class="form-check-label" for="{{typeName}}{{object.id}}"></label>
+        </div>
+      </td>
       <td scope="row">{{ object.name }}</td>
       <td scope="row" class="d-none d-sm-table-cell">{{ getMatching(object) }}</td>
       <td scope="row">{{ object.document_count }}</td>
@@ -54,17 +76,17 @@
           </div>
         </div>
         <div class="btn-group d-none d-sm-block">
-          <button class="btn btn-sm btn-outline-secondary" (click)="filterDocuments(object)" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
+          <button class="btn btn-sm btn-outline-secondary" (click)="filterDocuments(object); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
             <svg class="buttonicon-sm" fill="currentColor">
               <use xlink:href="assets/bootstrap-icons.svg#filter" />
             </svg>&nbsp;<ng-container i18n>Documents</ng-container>
           </button>
-          <button class="btn btn-sm btn-outline-secondary" (click)="openEditDialog(object)" *pngxIfPermissions="{ action: PermissionAction.Change, type: permissionType }" [disabled]="!userCanEdit(object)">
+          <button class="btn btn-sm btn-outline-secondary" (click)="openEditDialog(object); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: permissionType }" [disabled]="!userCanEdit(object)">
             <svg class="buttonicon-sm" fill="currentColor">
               <use xlink:href="assets/bootstrap-icons.svg#pencil" />
             </svg>&nbsp;<ng-container i18n>Edit</ng-container>
           </button>
-          <button class="btn btn-sm btn-outline-danger" (click)="openDeleteDialog(object)" *pngxIfPermissions="{ action: PermissionAction.Delete, type: permissionType }" [disabled]="!userCanDelete(object)">
+          <button class="btn btn-sm btn-outline-danger" (click)="openDeleteDialog(object); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Delete, type: permissionType }" [disabled]="!userCanDelete(object)">
             <svg class="buttonicon-sm" fill="currentColor">
               <use xlink:href="assets/bootstrap-icons.svg#trash" />
             </svg>&nbsp;<ng-container i18n>Delete</ng-container>
@@ -75,7 +97,10 @@
   </tbody>
 </table>
 
-<div class="d-flex" *ngIf="!isLoading">
-  <div i18n *ngIf="collectionSize > 0">{collectionSize, plural, =1 {One {{typeName}}} other {{{collectionSize || 0}} total {{typeNamePlural}}}}</div>
+<div class="d-flex mb-2" *ngIf="!isLoading">
+  <div *ngIf="collectionSize > 0">
+    <ng-container i18n>{collectionSize, plural, =1 {One {{typeName}}} other {{{collectionSize || 0}} total {{typeNamePlural}}}}</ng-container>
+    <ng-container *ngIf="selectedObjects.size > 0">&nbsp;({{selectedObjects.size}} selected)</ng-container>
+  </div>
   <ngb-pagination *ngIf="collectionSize > 20" class="ms-auto" [pageSize]="25" [collectionSize]="collectionSize" [(page)]="page" [maxSize]="5" (pageChange)="reloadData()" size="sm" aria-label="Pagination"></ngb-pagination>
 </div>
