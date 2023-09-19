@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-08-15 00:55-0700\n"
-"PO-Revision-Date: 2023-09-19 05:43\n"
+"PO-Revision-Date: 2023-09-19 12:03\n"
 "Last-Translator: \n"
 "Language-Team: Hebrew\n"
 "Language: he_IL\n"
@@ -333,11 +333,11 @@ msgstr "נוצר ביום"
 
 #: documents/models.py:432
 msgid "added before"
-msgstr "הוסף לפני"
+msgstr "נוסף לפני"
 
 #: documents/models.py:433
 msgid "added after"
-msgstr "הוסף אחרי"
+msgstr "נוסף אחרי"
 
 #: documents/models.py:434
 msgid "modified before"
