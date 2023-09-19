@@ -2489,7 +2489,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.html</context>
           <context context-type="linenumber">10,12</context>
         </context-group>
-        <target state="needs-translation"> No existing links </target>
+        <target state="translated"> Aucun lien existant </target>
       </trans-unit>
       <trans-unit id="4323470180912194028" datatype="html">
         <source>Copy</source>
@@ -2597,7 +2597,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.ts</context>
           <context context-type="linenumber">85</context>
         </context-group>
-        <target state="needs-translation"><x id="PH" equiv-text="days"/> days</target>
+        <target state="translated"><x id="PH" equiv-text="days"/> jours</target>
       </trans-unit>
       <trans-unit id="2897042887615940599" datatype="html">
         <source>Error deleting link</source>
