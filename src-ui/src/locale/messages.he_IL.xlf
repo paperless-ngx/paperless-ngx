@@ -24,7 +24,7 @@
           <context context-type="sourcefile">node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="translated">סגור</target>
+        <target state="translated">סגירה</target>
       </trans-unit>
       <trans-unit id="ngb.pagination.first" datatype="html">
         <source>««</source>
@@ -44,7 +44,7 @@
           <context context-type="sourcefile">node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="translated">בחר חודש</target>
+        <target state="translated">בחירת חודש</target>
       </trans-unit>
       <trans-unit id="ngb.datepicker.previous-month" datatype="html">
         <source>Previous month</source>
@@ -6031,7 +6031,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">169</context>
         </context-group>
-        <target state="needs-translation">Afrikaans</target>
+        <target state="translated">אפריקאנס</target>
       </trans-unit>
       <trans-unit id="6269202464699193298" datatype="html">
         <source>Arabic</source>
@@ -6087,7 +6087,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">211</context>
         </context-group>
-        <target state="needs-translation">Greek</target>
+        <target state="translated">יוונית</target>
       </trans-unit>
       <trans-unit id="6987083569809053351" datatype="html">
         <source>English (GB)</source>
@@ -6151,7 +6151,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">259</context>
         </context-group>
-        <target state="needs-translation">Norwegian</target>
+        <target state="translated">נורווגית</target>
       </trans-unit>
       <trans-unit id="792060551707690640" datatype="html">
         <source>Polish</source>
@@ -6199,7 +6199,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">295</context>
         </context-group>
-        <target state="needs-translation">Slovak</target>
+        <target state="translated">סלובקית</target>
       </trans-unit>
       <trans-unit id="4287008301409320881" datatype="html">
         <source>Slovenian</source>
@@ -6239,7 +6239,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">325</context>
         </context-group>
-        <target state="needs-translation">Ukrainian</target>
+        <target state="translated">אוקראינית</target>
       </trans-unit>
       <trans-unit id="4689443708886954687" datatype="html">
         <source>Chinese Simplified</source>
@@ -6311,7 +6311,7 @@
           <context context-type="sourcefile">src/app/services/upload-documents.service.ts</context>
           <context context-type="linenumber">46</context>
         </context-group>
-        <target state="needs-translation">Upload complete, waiting...</target>
+        <target state="translated">ההעלאה הושלמה, נא להמתין…</target>
       </trans-unit>
       <trans-unit id="1405142710727603568" datatype="html">
         <source>HTTP error: <x id="PH" equiv-text="error.status"/> <x id="PH_1" equiv-text="error.statusText"/></source>
@@ -6319,7 +6319,7 @@
           <context context-type="sourcefile">src/app/services/upload-documents.service.ts</context>
           <context context-type="linenumber">62</context>
         </context-group>
-        <target state="needs-translation">HTTP error: <x id="PH" equiv-text="error.status"/> <x id="PH_1" equiv-text="error.statusText"/></target>
+        <target state="translated">שגיאת HTTP‏: <x id="PH" equiv-text="error.status"/> <x id="PH_1" equiv-text="error.statusText"/></target>
       </trans-unit>
     </body>
   </file>
