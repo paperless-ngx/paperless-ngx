@@ -388,7 +388,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">153</context>
         </context-group>
-        <target state="needs-translation">Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Paperless-ngx will start training its machine learning algorithms.</target>
+        <target state="translated">Húzd és dobd ide a dokumentumokat a feltöltés megkezdéséhez, vagy helyezd el őket a "consume" mappában. Dokumentumokat a webalkalmazás minden más oldalán is húzhatsz és dobhatsz. Miután ezt megtetted, a Paperless-ngx elkezdi tanítani gépi tanulási algoritmusait.</target>
       </trans-unit>
       <trans-unit id="7495498057594070122" datatype="html">
         <source>The documents list shows all of your documents and allows for filtering as well as bulk-editing. There are three different view styles: list, small cards and large cards. A list of documents currently opened for editing is shown in the sidebar.</source>
@@ -396,7 +396,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">158</context>
         </context-group>
-        <target state="needs-translation">The documents list shows all of your documents and allows for filtering as well as bulk-editing. There are three different view styles: list, small cards and large cards. A list of documents currently opened for editing is shown in the sidebar.</target>
+        <target state="translated">A dokumentumok listája megjeleníti az összes dokumentumot, és lehetőséget nyújt szűrésre, valamint tömeges szerkesztésre. Három különböző nézetstílus közül választhatsz: lista, kis kártyák és nagy kártyák. Az aktuálisan szerkesztésre megnyitott dokumentumok listája a oldalsávon jelenik meg.</target>
       </trans-unit>
       <trans-unit id="1334220418719920556" datatype="html">
         <source>The filtering tools allow you to quickly find documents using various searches, dates, tags, etc.</source>
