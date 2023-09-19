@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-08-15 00:55-0700\n"
-"PO-Revision-Date: 2023-09-19 16:44\n"
+"PO-Revision-Date: 2023-09-19 18:42\n"
 "Last-Translator: \n"
 "Language-Team: Thai\n"
 "Language: th_TH\n"
@@ -19,241 +19,241 @@ msgstr ""
 
 #: documents/apps.py:8
 msgid "Documents"
-msgstr ""
+msgstr "เอกสาร"
 
 #: documents/models.py:33 documents/models.py:729
 msgid "owner"
-msgstr ""
+msgstr "เจ้าของ"
 
 #: documents/models.py:50
 msgid "None"
-msgstr ""
+msgstr "ไม่ใช้งาน"
 
 #: documents/models.py:51
 msgid "Any word"
-msgstr ""
+msgstr "คำใดคำหนึ่ง"
 
 #: documents/models.py:52
 msgid "All words"
-msgstr ""
+msgstr "ทุกคำ"
 
 #: documents/models.py:53
 msgid "Exact match"
-msgstr ""
+msgstr "ตรงกันทุกประการ"
 
 #: documents/models.py:54
 msgid "Regular expression"
-msgstr ""
+msgstr "Regular expression"
 
 #: documents/models.py:55
 msgid "Fuzzy word"
-msgstr ""
+msgstr "Fuzzy word"
 
 #: documents/models.py:56
 msgid "Automatic"
-msgstr ""
+msgstr "อัตโนมัติ"
 
 #: documents/models.py:59 documents/models.py:399 paperless_mail/models.py:18
 #: paperless_mail/models.py:92
 msgid "name"
-msgstr ""
+msgstr "ชื่อ"
 
 #: documents/models.py:61
 msgid "match"
-msgstr ""
+msgstr "การจำแนก"
 
 #: documents/models.py:64
 msgid "matching algorithm"
-msgstr ""
+msgstr "วิธีการจำแนก"
 
 #: documents/models.py:69
 msgid "is insensitive"
-msgstr ""
+msgstr "ไม่คำนึงถึงตัวพิมพ์เล็ก-ใหญ่"
 
 #: documents/models.py:92 documents/models.py:144
 msgid "correspondent"
-msgstr ""
+msgstr "จาก"
 
 #: documents/models.py:93
 msgid "correspondents"
-msgstr ""
+msgstr "จาก"
 
 #: documents/models.py:97
 msgid "color"
-msgstr ""
+msgstr "สี"
 
 #: documents/models.py:100
 msgid "is inbox tag"
-msgstr ""
+msgstr "แท็กแรกเข้า"
 
 #: documents/models.py:103
 msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
-msgstr ""
+msgstr "แท็กเอกสารใหม่ทั้งหมดด้วยแท็กนี้ (แท็กแรกเข้า)"
 
 #: documents/models.py:109
 msgid "tag"
-msgstr ""
+msgstr "แท็ก"
 
 #: documents/models.py:110 documents/models.py:182
 msgid "tags"
-msgstr ""
+msgstr "แท็ก"
 
 #: documents/models.py:115 documents/models.py:164
 msgid "document type"
-msgstr ""
+msgstr "ประเภทเอกสาร"
 
 #: documents/models.py:116
 msgid "document types"
-msgstr ""
+msgstr "ประเภทเอกสาร"
 
 #: documents/models.py:121
 msgid "path"
-msgstr ""
+msgstr "พาธ"
 
 #: documents/models.py:126 documents/models.py:153
 msgid "storage path"
-msgstr ""
+msgstr "พาธจัดเก็บ"
 
 #: documents/models.py:127
 msgid "storage paths"
-msgstr ""
+msgstr "พาธจัดเก็บ"
 
 #: documents/models.py:134
 msgid "Unencrypted"
-msgstr ""
+msgstr "ไม่เข้ารหัส"
 
 #: documents/models.py:135
 msgid "Encrypted with GNU Privacy Guard"
-msgstr ""
+msgstr "เข้ารหัสด้วย GNU Privacy Guard"
 
 #: documents/models.py:156
 msgid "title"
-msgstr ""
+msgstr "ชื่อ"
 
 #: documents/models.py:168 documents/models.py:642
 msgid "content"
-msgstr ""
+msgstr "เนื้อหา"
 
 #: documents/models.py:171
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
-msgstr ""
+msgstr "เนื้อหาของเอกสารในรูปแบบข้อความล้วน ในการค้นหาข้อมูล เนื้อหาของเอกสาร จะถูกใช้ในการค้นเป็นหลัก"
 
 #: documents/models.py:176
 msgid "mime type"
-msgstr ""
+msgstr "mime type"
 
 #: documents/models.py:186
 msgid "checksum"
-msgstr ""
+msgstr "checksum"
 
 #: documents/models.py:190
 msgid "The checksum of the original document."
-msgstr ""
+msgstr "ค่า checksum ของไฟล์เอกสารต้นฉบับ"
 
 #: documents/models.py:194
 msgid "archive checksum"
-msgstr ""
+msgstr "archive checksum"
 
 #: documents/models.py:199
 msgid "The checksum of the archived document."
-msgstr ""
+msgstr "ค่า checksum ของเอกสารประเภทเก็บถาวร"
 
 #: documents/models.py:202 documents/models.py:382 documents/models.py:648
 #: documents/models.py:687
 msgid "created"
-msgstr ""
+msgstr "สร้างเมื่อ"
 
 #: documents/models.py:205
 msgid "modified"
-msgstr ""
+msgstr "แก้ไขเมื่อ"
 
 #: documents/models.py:212
 msgid "storage type"
-msgstr ""
+msgstr "วิธีการจัดเก็บ"
 
 #: documents/models.py:220
 msgid "added"
-msgstr ""
+msgstr "นำเข้าเมื่อ"
 
 #: documents/models.py:227
 msgid "filename"
-msgstr ""
+msgstr "ชื่อไฟล์"
 
 #: documents/models.py:233
 msgid "Current filename in storage"
-msgstr ""
+msgstr "ชื่อไฟล์ในพื้นที่จัดเก็บ"
 
 #: documents/models.py:237
 msgid "archive filename"
-msgstr ""
+msgstr "ชื่อไฟล์ที่ถูกเก็บถาวร"
 
 #: documents/models.py:243
 msgid "Current archive filename in storage"
-msgstr ""
+msgstr "ชื่อไฟล์ที่ถูกเก็บถาวรในพื้นที่จัดเก็บ"
 
 #: documents/models.py:247
 msgid "original filename"
-msgstr ""
+msgstr "ชื่อไฟล์ต้นฉบับ"
 
 #: documents/models.py:253
 msgid "The original name of the file when it was uploaded"
-msgstr ""
+msgstr "ชื่อไฟล์ต้นฉบับที่อัพโหลดเข้ามา"
 
 #: documents/models.py:260
 msgid "archive serial number"
-msgstr ""
+msgstr "รหัสการจัดเก็บถาวร"
 
 #: documents/models.py:270
 msgid "The position of this document in your physical document archive."
-msgstr ""
+msgstr "ตำแหน่งเอกสารนี้ในสถานที่จัดเก็บจริง ๆ ของคุณ"
 
 #: documents/models.py:276 documents/models.py:659 documents/models.py:714
 msgid "document"
-msgstr ""
+msgstr "เอกสาร"
 
 #: documents/models.py:277
 msgid "documents"
-msgstr ""
+msgstr "เอกสาร"
 
 #: documents/models.py:365
 msgid "debug"
-msgstr ""
+msgstr "debug"
 
 #: documents/models.py:366
 msgid "information"
-msgstr ""
+msgstr "ข้อมูล"
 
 #: documents/models.py:367
 msgid "warning"
-msgstr ""
+msgstr "คำเตือน"
 
 #: documents/models.py:368 paperless_mail/models.py:287
 msgid "error"
-msgstr ""
+msgstr "ข้อผิดพลาด"
 
 #: documents/models.py:369
 msgid "critical"
-msgstr ""
+msgstr "ร้ายแรง"
 
 #: documents/models.py:372
 msgid "group"
-msgstr ""
+msgstr "กลุ่ม"
 
 #: documents/models.py:374
 msgid "message"
-msgstr ""
+msgstr "ข้อความ"
 
 #: documents/models.py:377
 msgid "level"
-msgstr ""
+msgstr "ระดับ"
 
 #: documents/models.py:386
 msgid "log"
-msgstr ""
+msgstr "log"
 
 #: documents/models.py:387
 msgid "logs"
-msgstr ""
+msgstr "logs"
 
 #: documents/models.py:396 documents/models.py:461
 msgid "saved view"
