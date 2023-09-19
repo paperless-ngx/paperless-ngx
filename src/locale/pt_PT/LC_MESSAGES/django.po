@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-15 00:55-0700\n"
-"PO-Revision-Date: 2023-09-14 20:53\n"
+"POT-Creation-Date: 2023-09-19 14:30-0700\n"
+"PO-Revision-Date: 2023-09-19 22:08\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -21,7 +21,7 @@ msgstr ""
 msgid "Documents"
 msgstr "Documentos"
 
-#: documents/models.py:33 documents/models.py:729
+#: documents/models.py:33 documents/models.py:728
 msgid "owner"
 msgstr "dono"
 
@@ -159,7 +159,7 @@ msgid "The checksum of the archived document."
 msgstr "A soma de verificação do documento arquivado."
 
 #: documents/models.py:202 documents/models.py:382 documents/models.py:648
-#: documents/models.py:687
+#: documents/models.py:686
 msgid "created"
 msgstr "criado"
 
@@ -207,7 +207,7 @@ msgstr "numero de série de arquivo"
 msgid "The position of this document in your physical document archive."
 msgstr "A posição do documento no seu arquivo físico de documentos."
 
-#: documents/models.py:276 documents/models.py:659 documents/models.py:714
+#: documents/models.py:276 documents/models.py:659 documents/models.py:713
 msgid "document"
 msgstr "documento"
 
@@ -535,49 +535,49 @@ msgstr ""
 msgid "Original"
 msgstr ""
 
-#: documents/models.py:695
+#: documents/models.py:694
 msgid "expiration"
 msgstr ""
 
-#: documents/models.py:702
+#: documents/models.py:701
 msgid "slug"
 msgstr ""
 
-#: documents/models.py:734
+#: documents/models.py:733
 msgid "share link"
 msgstr ""
 
-#: documents/models.py:735
+#: documents/models.py:734
 msgid "share links"
 msgstr ""
 
-#: documents/serialisers.py:100
+#: documents/serialisers.py:96
 #, python-format
 msgid "Invalid regular expression: %(error)s"
 msgstr "Expressão regular inválida: %(error)s"
 
-#: documents/serialisers.py:375
+#: documents/serialisers.py:371
 msgid "Invalid color."
 msgstr "Cor invalida."
 
-#: documents/serialisers.py:752
+#: documents/serialisers.py:747
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Tipo de arquivo %(type)s não suportado"
 
-#: documents/serialisers.py:848
+#: documents/serialisers.py:844
 msgid "Invalid variable detected."
 msgstr "Variável inválida detetada."
 
-#: documents/templates/index.html:78
+#: documents/templates/index.html:79
 msgid "Paperless-ngx is loading..."
 msgstr "O Paperless-ngx está a carregar..."
 
-#: documents/templates/index.html:79
+#: documents/templates/index.html:80
 msgid "Still here?! Hmm, something might be wrong."
 msgstr "Ainda aqui?! Hmm, algo pode estar errado."
 
-#: documents/templates/index.html:79
+#: documents/templates/index.html:80
 msgid "Here's a link to the docs."
 msgstr "Aqui está uma hiperligação para os documentos."
 
@@ -585,43 +585,43 @@ msgstr "Aqui está uma hiperligação para os documentos."
 msgid "Paperless-ngx signed out"
 msgstr "Paperless-ngx com sessão terminada"
 
-#: documents/templates/registration/logged_out.html:59
+#: documents/templates/registration/logged_out.html:40
 msgid "You have been successfully logged out. Bye!"
 msgstr "Terminou a sessão com sucesso. Adeus!"
 
-#: documents/templates/registration/logged_out.html:60
+#: documents/templates/registration/logged_out.html:41
 msgid "Sign in again"
 msgstr "Iniciar sessão novamente"
 
-#: documents/templates/registration/login.html:15
+#: documents/templates/registration/login.html:14
 msgid "Paperless-ngx sign in"
 msgstr "Início de sessão Paperless-ngx"
 
-#: documents/templates/registration/login.html:61
+#: documents/templates/registration/login.html:41
 msgid "Please sign in."
 msgstr "Por favor inicie sessão."
 
-#: documents/templates/registration/login.html:64
+#: documents/templates/registration/login.html:44
 msgid "Your username and password didn't match. Please try again."
 msgstr "O utilizador e a senha não correspondem. Tente novamente."
 
-#: documents/templates/registration/login.html:68
+#: documents/templates/registration/login.html:48
 msgid "Share link was not found."
 msgstr ""
 
-#: documents/templates/registration/login.html:72
+#: documents/templates/registration/login.html:52
 msgid "Share link has expired."
 msgstr ""
 
-#: documents/templates/registration/login.html:75
+#: documents/templates/registration/login.html:55
 msgid "Username"
 msgstr "Nome de utilizador"
 
-#: documents/templates/registration/login.html:76
+#: documents/templates/registration/login.html:56
 msgid "Password"
 msgstr "Palavra-passe"
 
-#: documents/templates/registration/login.html:81
+#: documents/templates/registration/login.html:66
 msgid "Sign in"
 msgstr "Iniciar sessão"
 
@@ -629,111 +629,123 @@ msgstr "Iniciar sessão"
 msgid "Paperless"
 msgstr "Paperless"
 
-#: paperless/settings.py:565
+#: paperless/settings.py:573
 msgid "English (US)"
 msgstr "Inglês (EUA)"
 
-#: paperless/settings.py:566
+#: paperless/settings.py:574
 msgid "Arabic"
 msgstr "Árabe"
 
-#: paperless/settings.py:567
+#: paperless/settings.py:575
+msgid "Afrikaans"
+msgstr ""
+
+#: paperless/settings.py:576
 msgid "Belarusian"
 msgstr "Bielorrusso"
 
-#: paperless/settings.py:568
+#: paperless/settings.py:577
 msgid "Catalan"
 msgstr ""
 
-#: paperless/settings.py:569
+#: paperless/settings.py:578
 msgid "Czech"
 msgstr "Checo"
 
-#: paperless/settings.py:570
+#: paperless/settings.py:579
 msgid "Danish"
 msgstr "Dinamarquês"
 
-#: paperless/settings.py:571
+#: paperless/settings.py:580
 msgid "German"
 msgstr "Deutsch"
 
-#: paperless/settings.py:572
+#: paperless/settings.py:581
+msgid "Greek"
+msgstr ""
+
+#: paperless/settings.py:582
 msgid "English (GB)"
 msgstr "Inglês (GB)"
 
-#: paperless/settings.py:573
+#: paperless/settings.py:583
 msgid "Spanish"
 msgstr "Espanhol"
 
-#: paperless/settings.py:574
+#: paperless/settings.py:584
 msgid "Finnish"
 msgstr ""
 
-#: paperless/settings.py:575
+#: paperless/settings.py:585
 msgid "French"
 msgstr "Français"
 
-#: paperless/settings.py:576
+#: paperless/settings.py:586
 msgid "Italian"
 msgstr "Italiano"
 
-#: paperless/settings.py:577
+#: paperless/settings.py:587
 msgid "Luxembourgish"
 msgstr "Luxemburguês"
 
-#: paperless/settings.py:578
+#: paperless/settings.py:588
+msgid "Norwegian"
+msgstr ""
+
+#: paperless/settings.py:589
 msgid "Dutch"
 msgstr "Nederlandse"
 
-#: paperless/settings.py:579
+#: paperless/settings.py:590
 msgid "Polish"
 msgstr "Polaco"
 
-#: paperless/settings.py:580
+#: paperless/settings.py:591
 msgid "Portuguese (Brazil)"
 msgstr "Português (Brasil)"
 
-#: paperless/settings.py:581
+#: paperless/settings.py:592
 msgid "Portuguese"
 msgstr "Português"
 
-#: paperless/settings.py:582
+#: paperless/settings.py:593
 msgid "Romanian"
 msgstr "Romeno"
 
-#: paperless/settings.py:583
+#: paperless/settings.py:594
 msgid "Russian"
 msgstr "Russo"
 
-#: paperless/settings.py:584
+#: paperless/settings.py:595
 msgid "Slovak"
 msgstr ""
 
-#: paperless/settings.py:585
+#: paperless/settings.py:596
 msgid "Slovenian"
 msgstr "Esloveno"
 
-#: paperless/settings.py:586
+#: paperless/settings.py:597
 msgid "Serbian"
 msgstr "Sérvio"
 
-#: paperless/settings.py:587
+#: paperless/settings.py:598
 msgid "Swedish"
 msgstr "Sueco"
 
-#: paperless/settings.py:588
+#: paperless/settings.py:599
 msgid "Turkish"
 msgstr "Turco"
 
-#: paperless/settings.py:589
+#: paperless/settings.py:600
 msgid "Ukrainian"
 msgstr ""
 
-#: paperless/settings.py:590
+#: paperless/settings.py:601
 msgid "Chinese Simplified"
 msgstr "Chinês Simplificado"
 
-#: paperless/urls.py:176
+#: paperless/urls.py:182
 msgid "Paperless-ngx administration"
 msgstr "Administração do Paperless-ngx"
 
