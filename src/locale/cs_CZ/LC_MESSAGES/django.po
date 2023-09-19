@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-15 00:55-0700\n"
-"PO-Revision-Date: 2023-09-14 20:53\n"
+"POT-Creation-Date: 2023-09-19 14:30-0700\n"
+"PO-Revision-Date: 2023-09-19 22:07\n"
 "Last-Translator: \n"
 "Language-Team: Czech\n"
 "Language: cs_CZ\n"
@@ -21,7 +21,7 @@ msgstr ""
 msgid "Documents"
 msgstr "Dokumenty"
 
-#: documents/models.py:33 documents/models.py:729
+#: documents/models.py:33 documents/models.py:728
 msgid "owner"
 msgstr "vlastník"
 
@@ -159,7 +159,7 @@ msgid "The checksum of the archived document."
 msgstr "Kontrolní součet archivovaného dokumentu."
 
 #: documents/models.py:202 documents/models.py:382 documents/models.py:648
-#: documents/models.py:687
+#: documents/models.py:686
 msgid "created"
 msgstr "vytvořeno"
 
@@ -207,7 +207,7 @@ msgstr "sériové číslo archivu"
 msgid "The position of this document in your physical document archive."
 msgstr "Pozice dokumentu ve vašem archivu fyzických dokumentů"
 
-#: documents/models.py:276 documents/models.py:659 documents/models.py:714
+#: documents/models.py:276 documents/models.py:659 documents/models.py:713
 msgid "document"
 msgstr "dokument"
 
@@ -535,49 +535,49 @@ msgstr ""
 msgid "Original"
 msgstr ""
 
-#: documents/models.py:695
+#: documents/models.py:694
 msgid "expiration"
 msgstr ""
 
-#: documents/models.py:702
+#: documents/models.py:701
 msgid "slug"
 msgstr ""
 
-#: documents/models.py:734
+#: documents/models.py:733
 msgid "share link"
 msgstr ""
 
-#: documents/models.py:735
+#: documents/models.py:734
 msgid "share links"
 msgstr ""
 
-#: documents/serialisers.py:100
+#: documents/serialisers.py:96
 #, python-format
 msgid "Invalid regular expression: %(error)s"
 msgstr "Neplatný regulární výraz: %(error)s"
 
-#: documents/serialisers.py:375
+#: documents/serialisers.py:371
 msgid "Invalid color."
 msgstr "Neplatná barva."
 
-#: documents/serialisers.py:752
+#: documents/serialisers.py:747
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Typ souboru %(type)s není podporován"
 
-#: documents/serialisers.py:848
+#: documents/serialisers.py:844
 msgid "Invalid variable detected."
 msgstr "Zjištěna neplatná proměnná."
 
-#: documents/templates/index.html:78
+#: documents/templates/index.html:79
 msgid "Paperless-ngx is loading..."
 msgstr "Paperless-ngx se načítá..."
 
-#: documents/templates/index.html:79
+#: documents/templates/index.html:80
 msgid "Still here?! Hmm, something might be wrong."
 msgstr "Stále tady?! Hmm, možná se něco pokazilo."
 
-#: documents/templates/index.html:79
+#: documents/templates/index.html:80
 msgid "Here's a link to the docs."
 msgstr "Zde je odkaz na dokumenty."
 
@@ -585,43 +585,43 @@ msgstr "Zde je odkaz na dokumenty."
 msgid "Paperless-ngx signed out"
 msgstr "Odhlášeno z Paperless-ngx"
 
-#: documents/templates/registration/logged_out.html:59
+#: documents/templates/registration/logged_out.html:40
 msgid "You have been successfully logged out. Bye!"
 msgstr "Byli jste úspěšně odhlášeni. Nashledanou!"
 
-#: documents/templates/registration/logged_out.html:60
+#: documents/templates/registration/logged_out.html:41
 msgid "Sign in again"
 msgstr "Přihlašte se znovu"
 
-#: documents/templates/registration/login.html:15
+#: documents/templates/registration/login.html:14
 msgid "Paperless-ngx sign in"
 msgstr "Paperless-ngx přihlášení"
 
-#: documents/templates/registration/login.html:61
+#: documents/templates/registration/login.html:41
 msgid "Please sign in."
 msgstr "Prosím přihlaste se."
 
-#: documents/templates/registration/login.html:64
+#: documents/templates/registration/login.html:44
 msgid "Your username and password didn't match. Please try again."
 msgstr "Vaše uživatelské jméno a heslo se neshodují. Prosím, zkuste to znovu."
 
-#: documents/templates/registration/login.html:68
+#: documents/templates/registration/login.html:48
 msgid "Share link was not found."
 msgstr ""
 
-#: documents/templates/registration/login.html:72
+#: documents/templates/registration/login.html:52
 msgid "Share link has expired."
 msgstr ""
 
-#: documents/templates/registration/login.html:75
+#: documents/templates/registration/login.html:55
 msgid "Username"
 msgstr "Uživatelské jméno"
 
-#: documents/templates/registration/login.html:76
+#: documents/templates/registration/login.html:56
 msgid "Password"
 msgstr "Heslo"
 
-#: documents/templates/registration/login.html:81
+#: documents/templates/registration/login.html:66
 msgid "Sign in"
 msgstr "Přihlásit se"
 
@@ -629,111 +629,123 @@ msgstr "Přihlásit se"
 msgid "Paperless"
 msgstr "Paperless"
 
-#: paperless/settings.py:565
+#: paperless/settings.py:573
 msgid "English (US)"
 msgstr "Angličtina (US)"
 
-#: paperless/settings.py:566
+#: paperless/settings.py:574
 msgid "Arabic"
 msgstr "Arabština"
 
-#: paperless/settings.py:567
+#: paperless/settings.py:575
+msgid "Afrikaans"
+msgstr ""
+
+#: paperless/settings.py:576
 msgid "Belarusian"
 msgstr "Běloruština"
 
-#: paperless/settings.py:568
+#: paperless/settings.py:577
 msgid "Catalan"
 msgstr ""
 
-#: paperless/settings.py:569
+#: paperless/settings.py:578
 msgid "Czech"
 msgstr "Čeština"
 
-#: paperless/settings.py:570
+#: paperless/settings.py:579
 msgid "Danish"
 msgstr "Dánština"
 
-#: paperless/settings.py:571
+#: paperless/settings.py:580
 msgid "German"
 msgstr "Němčina"
 
-#: paperless/settings.py:572
+#: paperless/settings.py:581
+msgid "Greek"
+msgstr ""
+
+#: paperless/settings.py:582
 msgid "English (GB)"
 msgstr "Angličtina (GB)"
 
-#: paperless/settings.py:573
+#: paperless/settings.py:583
 msgid "Spanish"
 msgstr "Španělština"
 
-#: paperless/settings.py:574
+#: paperless/settings.py:584
 msgid "Finnish"
 msgstr ""
 
-#: paperless/settings.py:575
+#: paperless/settings.py:585
 msgid "French"
 msgstr "Francouzština"
 
-#: paperless/settings.py:576
+#: paperless/settings.py:586
 msgid "Italian"
 msgstr "Italština"
 
-#: paperless/settings.py:577
+#: paperless/settings.py:587
 msgid "Luxembourgish"
 msgstr "Lucemburština"
 
-#: paperless/settings.py:578
+#: paperless/settings.py:588
+msgid "Norwegian"
+msgstr ""
+
+#: paperless/settings.py:589
 msgid "Dutch"
 msgstr "Holandština"
 
-#: paperless/settings.py:579
+#: paperless/settings.py:590
 msgid "Polish"
 msgstr "Polština"
 
-#: paperless/settings.py:580
+#: paperless/settings.py:591
 msgid "Portuguese (Brazil)"
 msgstr "Portugalština (Brazílie)"
 
-#: paperless/settings.py:581
+#: paperless/settings.py:592
 msgid "Portuguese"
 msgstr "Portugalština"
 
-#: paperless/settings.py:582
+#: paperless/settings.py:593
 msgid "Romanian"
 msgstr "Rumunština"
 
-#: paperless/settings.py:583
+#: paperless/settings.py:594
 msgid "Russian"
 msgstr "Ruština"
 
-#: paperless/settings.py:584
+#: paperless/settings.py:595
 msgid "Slovak"
 msgstr ""
 
-#: paperless/settings.py:585
+#: paperless/settings.py:596
 msgid "Slovenian"
 msgstr "Slovinština"
 
-#: paperless/settings.py:586
+#: paperless/settings.py:597
 msgid "Serbian"
 msgstr "Srbština"
 
-#: paperless/settings.py:587
+#: paperless/settings.py:598
 msgid "Swedish"
 msgstr "Švédština"
 
-#: paperless/settings.py:588
+#: paperless/settings.py:599
 msgid "Turkish"
 msgstr "Turečtina"
 
-#: paperless/settings.py:589
+#: paperless/settings.py:600
 msgid "Ukrainian"
 msgstr ""
 
-#: paperless/settings.py:590
+#: paperless/settings.py:601
 msgid "Chinese Simplified"
 msgstr "Čínština (zjednodušená)"
 
-#: paperless/urls.py:176
+#: paperless/urls.py:182
 msgid "Paperless-ngx administration"
 msgstr "Správa Paperless-ngx"
 
