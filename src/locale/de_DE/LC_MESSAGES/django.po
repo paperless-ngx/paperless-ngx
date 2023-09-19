@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-08-15 00:55-0700\n"
-"PO-Revision-Date: 2023-09-17 16:44\n"
+"PO-Revision-Date: 2023-09-19 13:05\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -385,43 +385,43 @@ msgstr "Speicherpfad ist"
 
 #: documents/models.py:445
 msgid "has correspondent in"
-msgstr ""
+msgstr "Korrespondent ist"
 
 #: documents/models.py:446
 msgid "does not have correspondent in"
-msgstr ""
+msgstr "Korrespondent ist nicht"
 
 #: documents/models.py:447
 msgid "has document type in"
-msgstr ""
+msgstr "Dokumenttyp ist"
 
 #: documents/models.py:448
 msgid "does not have document type in"
-msgstr ""
+msgstr "Dokumenttyp ist nicht"
 
 #: documents/models.py:449
 msgid "has storage path in"
-msgstr ""
+msgstr "Speicherpfad ist"
 
 #: documents/models.py:450
 msgid "does not have storage path in"
-msgstr ""
+msgstr "Speicherpfad ist nicht"
 
 #: documents/models.py:451
 msgid "owner is"
-msgstr ""
+msgstr "Eigentümer ist"
 
 #: documents/models.py:452
 msgid "has owner in"
-msgstr ""
+msgstr "Eigentümer ist"
 
 #: documents/models.py:453
 msgid "does not have owner"
-msgstr ""
+msgstr "hat keinen Eigentümer"
 
 #: documents/models.py:454
 msgid "does not have owner in"
-msgstr ""
+msgstr "Eigentümer ist nicht"
 
 #: documents/models.py:464
 msgid "rule type"
@@ -513,7 +513,7 @@ msgstr "Die von der Aufgabe zurückgegebenen Daten"
 
 #: documents/models.py:644
 msgid "Note for the document"
-msgstr ""
+msgstr "Notiz für das Dokument"
 
 #: documents/models.py:668
 msgid "user"
@@ -521,35 +521,35 @@ msgstr "Benutzer"
 
 #: documents/models.py:673
 msgid "note"
-msgstr ""
+msgstr "Notiz"
 
 #: documents/models.py:674
 msgid "notes"
-msgstr ""
+msgstr "Notizen"
 
 #: documents/models.py:682
 msgid "Archive"
-msgstr ""
+msgstr "Archiv"
 
 #: documents/models.py:683
 msgid "Original"
-msgstr ""
+msgstr "Original"
 
 #: documents/models.py:695
 msgid "expiration"
-msgstr ""
+msgstr "Gültigkeit"
 
 #: documents/models.py:702
 msgid "slug"
-msgstr ""
+msgstr "Slug"
 
 #: documents/models.py:734
 msgid "share link"
-msgstr ""
+msgstr "Geteilter Link"
 
 #: documents/models.py:735
 msgid "share links"
-msgstr ""
+msgstr "Geteilte Links"
 
 #: documents/serialisers.py:100
 #, python-format
@@ -607,11 +607,11 @@ msgstr "Ihr Benutzername und Kennwort stimmen nicht überein. Bitte versuchen Si
 
 #: documents/templates/registration/login.html:68
 msgid "Share link was not found."
-msgstr ""
+msgstr "Freigabelink wurde nicht gefunden."
 
 #: documents/templates/registration/login.html:72
 msgid "Share link has expired."
-msgstr ""
+msgstr "Freigabelink ist abgelaufen."
 
 #: documents/templates/registration/login.html:75
 msgid "Username"
@@ -819,7 +819,7 @@ msgstr "Kennwort"
 
 #: paperless_mail/models.py:42
 msgid "Is token authentication"
-msgstr ""
+msgstr "Ist Tokenauthentifizierung"
 
 #: paperless_mail/models.py:45
 msgid "character set"
@@ -919,7 +919,7 @@ msgstr "Absender filtern"
 
 #: paperless_mail/models.py:121
 msgid "filter to"
-msgstr ""
+msgstr "filtern nach"
 
 #: paperless_mail/models.py:128
 msgid "filter subject"
