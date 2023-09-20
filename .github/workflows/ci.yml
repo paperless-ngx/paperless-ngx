@@ -27,7 +27,7 @@ jobs:
     steps:
       -
         name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       -
         name: Install python
         uses: actions/setup-python@v4
@@ -45,7 +45,7 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       -
         name: Set up Python
         id: setup-python
@@ -87,7 +87,7 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       -
         name: Deploy docs
         uses: mhausenblas/mkdocs-deploy-gh-pages@master
@@ -109,7 +109,7 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       -
         name: Start containers
         run: |
@@ -181,7 +181,7 @@ jobs:
       matrix:
         node-version: [20.x]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       -
         name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
@@ -230,7 +230,7 @@ jobs:
       - tests-frontend
     steps:
       -
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       -
         name: Download frontend coverage
         uses: actions/download-artifact@v3
@@ -314,7 +314,7 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
       -
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       # If https://github.com/docker/buildx/issues/1044 is resolved,
       # the append input with a native arm64 arch could be used to
       # significantly speed up building
@@ -391,7 +391,7 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       -
         name: Set up Python
         id: setup-python
@@ -550,7 +550,7 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: main
       -
