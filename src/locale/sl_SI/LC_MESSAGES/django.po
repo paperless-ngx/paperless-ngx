@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-19 14:30-0700\n"
-"PO-Revision-Date: 2023-09-19 22:08\n"
+"PO-Revision-Date: 2023-09-20 08:30\n"
 "Last-Translator: \n"
 "Language-Team: Slovenian\n"
 "Language: sl_SI\n"
@@ -409,7 +409,7 @@ msgstr ""
 
 #: documents/models.py:451
 msgid "owner is"
-msgstr ""
+msgstr "lastnik je"
 
 #: documents/models.py:452
 msgid "has owner in"
@@ -417,7 +417,7 @@ msgstr ""
 
 #: documents/models.py:453
 msgid "does not have owner"
-msgstr ""
+msgstr "brez lastnika"
 
 #: documents/models.py:454
 msgid "does not have owner in"
@@ -529,11 +529,11 @@ msgstr ""
 
 #: documents/models.py:682
 msgid "Archive"
-msgstr ""
+msgstr "Arhiv"
 
 #: documents/models.py:683
 msgid "Original"
-msgstr ""
+msgstr "Izvirnik"
 
 #: documents/models.py:694
 msgid "expiration"
@@ -545,11 +545,11 @@ msgstr ""
 
 #: documents/models.py:733
 msgid "share link"
-msgstr ""
+msgstr "deli povezavo"
 
 #: documents/models.py:734
 msgid "share links"
-msgstr ""
+msgstr "deli povezave"
 
 #: documents/serialisers.py:96
 #, python-format
@@ -607,11 +607,11 @@ msgstr "Vaše uporabniško ime in geslo se ne ujemata. Prosim poskusite ponovno.
 
 #: documents/templates/registration/login.html:48
 msgid "Share link was not found."
-msgstr ""
+msgstr "Deljena povezave ni bila najdena."
 
 #: documents/templates/registration/login.html:52
 msgid "Share link has expired."
-msgstr ""
+msgstr "Deljena povezava je potekla."
 
 #: documents/templates/registration/login.html:55
 msgid "Username"
@@ -639,7 +639,7 @@ msgstr "Arabščina"
 
 #: paperless/settings.py:575
 msgid "Afrikaans"
-msgstr ""
+msgstr "Afrikanščina"
 
 #: paperless/settings.py:576
 msgid "Belarusian"
@@ -647,7 +647,7 @@ msgstr "Beloruščina"
 
 #: paperless/settings.py:577
 msgid "Catalan"
-msgstr ""
+msgstr "Katalonščina"
 
 #: paperless/settings.py:578
 msgid "Czech"
@@ -663,7 +663,7 @@ msgstr "Nemščina"
 
 #: paperless/settings.py:581
 msgid "Greek"
-msgstr ""
+msgstr "Grščina"
 
 #: paperless/settings.py:582
 msgid "English (GB)"
@@ -675,7 +675,7 @@ msgstr "Španščina"
 
 #: paperless/settings.py:584
 msgid "Finnish"
-msgstr ""
+msgstr "Finščina"
 
 #: paperless/settings.py:585
 msgid "French"
@@ -691,7 +691,7 @@ msgstr "Luksemburški"
 
 #: paperless/settings.py:588
 msgid "Norwegian"
-msgstr ""
+msgstr "Norveščina"
 
 #: paperless/settings.py:589
 msgid "Dutch"
@@ -719,7 +719,7 @@ msgstr "Ruščina"
 
 #: paperless/settings.py:595
 msgid "Slovak"
-msgstr ""
+msgstr "Slovaščina"
 
 #: paperless/settings.py:596
 msgid "Slovenian"
@@ -739,7 +739,7 @@ msgstr "Turščina"
 
 #: paperless/settings.py:600
 msgid "Ukrainian"
-msgstr ""
+msgstr "Ukrajinščina"
 
 #: paperless/settings.py:601
 msgid "Chinese Simplified"
