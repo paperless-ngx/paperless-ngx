@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-19 14:30-0700\n"
-"PO-Revision-Date: 2023-09-19 22:08\n"
+"PO-Revision-Date: 2023-09-20 08:30\n"
 "Last-Translator: \n"
 "Language-Team: Hebrew\n"
 "Language: he_IL\n"
@@ -409,19 +409,19 @@ msgstr ""
 
 #: documents/models.py:451
 msgid "owner is"
-msgstr ""
+msgstr "הבעלים הם"
 
 #: documents/models.py:452
 msgid "has owner in"
-msgstr ""
+msgstr "יש בעלים תחת"
 
 #: documents/models.py:453
 msgid "does not have owner"
-msgstr ""
+msgstr "אין בעלים"
 
 #: documents/models.py:454
 msgid "does not have owner in"
-msgstr ""
+msgstr "אין בעלים תחת"
 
 #: documents/models.py:464
 msgid "rule type"
@@ -513,7 +513,7 @@ msgstr "המידע מאוחזר ע\"י המשימה"
 
 #: documents/models.py:644
 msgid "Note for the document"
-msgstr ""
+msgstr "הערה להמסמך"
 
 #: documents/models.py:668
 msgid "user"
@@ -631,7 +631,7 @@ msgstr "ללא נייר"
 
 #: paperless/settings.py:573
 msgid "English (US)"
-msgstr "אנגלית (ארה\"ב)"
+msgstr "אנגלית (ארה״ב)"
 
 #: paperless/settings.py:574
 msgid "Arabic"
@@ -639,7 +639,7 @@ msgstr "ערבית"
 
 #: paperless/settings.py:575
 msgid "Afrikaans"
-msgstr ""
+msgstr "אפריקאנס"
 
 #: paperless/settings.py:576
 msgid "Belarusian"
@@ -647,7 +647,7 @@ msgstr "בלרוסית"
 
 #: paperless/settings.py:577
 msgid "Catalan"
-msgstr ""
+msgstr "קטלאנית"
 
 #: paperless/settings.py:578
 msgid "Czech"
@@ -663,7 +663,7 @@ msgstr "גרמנית"
 
 #: paperless/settings.py:581
 msgid "Greek"
-msgstr ""
+msgstr "יוונית"
 
 #: paperless/settings.py:582
 msgid "English (GB)"
@@ -675,7 +675,7 @@ msgstr "ספרדית"
 
 #: paperless/settings.py:584
 msgid "Finnish"
-msgstr ""
+msgstr "פינית"
 
 #: paperless/settings.py:585
 msgid "French"
@@ -691,7 +691,7 @@ msgstr "לוקסמבורגית"
 
 #: paperless/settings.py:588
 msgid "Norwegian"
-msgstr ""
+msgstr "נורווגית"
 
 #: paperless/settings.py:589
 msgid "Dutch"
@@ -703,11 +703,11 @@ msgstr "פולנית"
 
 #: paperless/settings.py:591
 msgid "Portuguese (Brazil)"
-msgstr "פורטוגזית (ברזיל)"
+msgstr "פורטוגלית ברזילאית"
 
 #: paperless/settings.py:592
 msgid "Portuguese"
-msgstr "פורטוגזית"
+msgstr "פורטוגלית"
 
 #: paperless/settings.py:593
 msgid "Romanian"
@@ -719,7 +719,7 @@ msgstr "רוסית"
 
 #: paperless/settings.py:595
 msgid "Slovak"
-msgstr ""
+msgstr "סלובקית"
 
 #: paperless/settings.py:596
 msgid "Slovenian"
@@ -739,11 +739,11 @@ msgstr "טורקית"
 
 #: paperless/settings.py:600
 msgid "Ukrainian"
-msgstr ""
+msgstr "אוקראינית"
 
 #: paperless/settings.py:601
 msgid "Chinese Simplified"
-msgstr "סינית מופשטת"
+msgstr "סינית מפושטת"
 
 #: paperless/urls.py:182
 msgid "Paperless-ngx administration"
@@ -759,11 +759,11 @@ msgstr "הגדרות מתקדמות"
 
 #: paperless_mail/admin.py:60
 msgid "Filter"
-msgstr "סנן"
+msgstr "סינון"
 
 #: paperless_mail/admin.py:63
 msgid "Paperless will only process mails that match ALL of the filters given below."
-msgstr "Paperless יעבד רק מיילים התואמים את כל המסננים המפורטים להלן."
+msgstr "Paperless יעבד רק הודעות דוא״ל שעוברות את כל המסננים המפורטים להלן."
 
 #: paperless_mail/admin.py:79
 msgid "Actions"
@@ -775,7 +775,7 @@ msgstr "הפעולה חלה על הדואר. פעולה זו מבוצעת רק �
 
 #: paperless_mail/admin.py:90
 msgid "Metadata"
-msgstr "מטא-נתונים"
+msgstr "נתוני על"
 
 #: paperless_mail/admin.py:93
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
@@ -803,7 +803,7 @@ msgstr "השתמש ב-SSL"
 
 #: paperless_mail/models.py:16
 msgid "Use STARTTLS"
-msgstr "השתמש ב-STARTTLS"
+msgstr "להשתמש ב־STARTTLS"
 
 #: paperless_mail/models.py:20
 msgid "IMAP server"
@@ -811,11 +811,11 @@ msgstr "שרת IMAP"
 
 #: paperless_mail/models.py:23
 msgid "IMAP port"
-msgstr "פורט IMAP"
+msgstr "פתחת IMAP"
 
 #: paperless_mail/models.py:27
 msgid "This is usually 143 for unencrypted and STARTTLS connections, and 993 for SSL connections."
-msgstr "זה בדרך כלל 143 עבור חיבורי STARTTLS לא מוצפנים, ו-993 עבור חיבורי SSL."
+msgstr "בדרך כלל 143 לחיבורי STARTTLS וחיבורים לא מוצפנים, ו־993 לחיבורי SSL."
 
 #: paperless_mail/models.py:33
 msgid "IMAP security"
@@ -867,15 +867,15 @@ msgstr "עבד את כל הקבצים, כולל קבצים מצורפים 'מו�
 
 #: paperless_mail/models.py:76
 msgid "Delete"
-msgstr "מחק"
+msgstr "מחיקה"
 
 #: paperless_mail/models.py:77
 msgid "Move to specified folder"
-msgstr "העבר לתיקיה שצוינה"
+msgstr "העברה לתיקייה שצוינה"
 
 #: paperless_mail/models.py:78
 msgid "Mark as read, don't process read mails"
-msgstr "סמן כנקרא, אל תעבד הודעות דואר שנקראו"
+msgstr "סימון כנקרא, לא לעבד הודעות דוא״ל שנקראו"
 
 #: paperless_mail/models.py:79
 msgid "Flag the mail, don't process flagged mails"
