@@ -327,7 +327,7 @@ jobs:
         with:
           platforms: arm64
       -
-        name: Login to Github Container Registry
+        name: Login to GitHub Container Registry
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
