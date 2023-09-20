@@ -228,11 +228,18 @@ COPY --from=compile-frontend /src/src/documents/static/frontend/ ./documents/sta
 # add users, setup scripts
 # Mount the compiled frontend to expected location
 RUN set -eux \
-  && addgroup --gid 1000 paperless \
-  && useradd --uid 1000 --gid paperless --home-dir /usr/src/paperless paperless \
-  && chown -R paperless:paperless /usr/src/paperless \
-  && gosu paperless python3 manage.py collectstatic --clear --no-input --link \
-  && gosu paperless python3 manage.py compilemessages
+  && echo "Setting up user/group" \
+    && addgroup --gid 1000 paperless \
+    && useradd --uid 1000 --gid paperless --home-dir /usr/src/paperless paperless \
+  && echo "Creating volume directories" \
+    && mkdir -p --verbose /usr/src/paperless/media \
+    && mkdir -p --verbose /usr/src/paperless/consume \
+    && mkdir -p --verbose /usr/src/paperless/export \
+  && echo "Adjusting all permissions" \
+    && chown -R paperless:paperless /usr/src/paperless \
+  && echo "Collecting static files" \
+    && gosu paperless python3 manage.py collectstatic --clear --no-input --link \
+    && gosu paperless python3 manage.py compilemessages
 
 VOLUME ["/usr/src/paperless/data", \
         "/usr/src/paperless/media", \
