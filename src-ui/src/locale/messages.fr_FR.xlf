@@ -4746,7 +4746,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">293</context>
         </context-group>
-        <target state="needs-translation">Permissions updated successfully</target>
+        <target state="translated">Les droits d'accès ont bien été mis à jour</target>
       </trans-unit>
       <trans-unit id="4639647950943944112" datatype="html">
         <source>Error updating permissions</source>
@@ -4754,7 +4754,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">300</context>
         </context-group>
-        <target state="needs-translation">Error updating permissions</target>
+        <target state="translated">Erreur lors de la mise à jour des droits d'accès</target>
       </trans-unit>
       <trans-unit id="1685061484835793745" datatype="html" approved="yes">
         <source>Start tour</source>
