@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-19 14:30-0700\n"
-"PO-Revision-Date: 2023-09-19 22:07\n"
+"PO-Revision-Date: 2023-09-20 06:24\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -639,7 +639,7 @@ msgstr "Arabisch"
 
 #: paperless/settings.py:575
 msgid "Afrikaans"
-msgstr ""
+msgstr "Afrikanisch"
 
 #: paperless/settings.py:576
 msgid "Belarusian"
@@ -663,7 +663,7 @@ msgstr "Deutsch"
 
 #: paperless/settings.py:581
 msgid "Greek"
-msgstr ""
+msgstr "Griechisch"
 
 #: paperless/settings.py:582
 msgid "English (GB)"
@@ -691,7 +691,7 @@ msgstr "Luxemburgisch"
 
 #: paperless/settings.py:588
 msgid "Norwegian"
-msgstr ""
+msgstr "Norwegisch"
 
 #: paperless/settings.py:589
 msgid "Dutch"
