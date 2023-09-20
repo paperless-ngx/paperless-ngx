@@ -27,6 +27,7 @@ import { ComponentCanDeactivate } from 'src/app/guards/dirty-doc.guard'
 import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 import { ToastService } from 'src/app/services/toast.service'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
+import { ExplorerListViewService } from 'src/app/services/explorer-list-view.service'
 
 @Component({
   selector: 'app-app-frame',
@@ -44,7 +45,8 @@ export class AppFrameComponent
     private searchService: SearchService,
     public savedViewService: SavedViewService,
     private remoteVersionService: RemoteVersionService,
-    private list: DocumentListViewService,
+    private documentList: DocumentListViewService,
+    private exploreList: ExplorerListViewService,
     public settingsService: SettingsService,
     public tasksService: TasksService,
     private readonly toastService: ToastService
@@ -95,6 +97,8 @@ export class AppFrameComponent
 
   closeMenu() {
     this.isMenuCollapsed = true
+    this.documentList.selectNone()
+    this.exploreList.selectNone()
   }
 
   get openDocuments(): PaperlessDocument[] {
@@ -153,7 +157,7 @@ export class AppFrameComponent
 
   search() {
     this.closeMenu()
-    this.list.quickFilter([
+    this.documentList.quickFilter([
       {
         rule_type: FILTER_FULLTEXT_QUERY,
         value: (this.searchField.value as string).trim(),

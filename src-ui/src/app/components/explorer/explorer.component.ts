@@ -37,6 +37,7 @@ import { FolderCreateDialogComponent } from '../common/create-dialog/folder-crea
 import { UploadLargeFileComponent } from '../common/create-dialog/upload-large-file/upload-large-file.component'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { FilterEditorComponent } from './filter-editor/filter-editor.component'
+import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 
 @Component({
   selector: 'app-explorer',
@@ -49,6 +50,7 @@ export class ExplorerComponent
 {
   constructor(
     public list: ExplorerListViewService,
+    public documentList: DocumentListViewService,
     public savedViewService: SavedViewService,
     public route: ActivatedRoute,
     private router: Router,
@@ -188,9 +190,7 @@ export class ExplorerComponent
       .subscribe(() => this.list.reload())
   }
 
-  uploadFile() {
-    
-  }
+  uploadFile() {}
 
   uploadLargeFile() {
     var modal = this.modalService.open(UploadLargeFileComponent, {
@@ -212,6 +212,8 @@ export class ExplorerComponent
   }
 
   toggleSelected(document: PaperlessDocument, event: MouseEvent): void {
+    if (!event.shiftKey) this.documentList.toggleSelected(document)
+    else this.documentList.selectRangeTo(document)
     if (!event.shiftKey) this.list.toggleSelected(document)
     else this.list.selectRangeTo(document)
   }
