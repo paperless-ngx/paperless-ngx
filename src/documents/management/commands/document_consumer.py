@@ -245,6 +245,8 @@ class Command(BaseCommand):
         if settings.CONSUMER_POLLING == 0 and INotify:
             self.handle_inotify(directory, recursive, options["testing"])
         else:
+            if INotify is None and settings.CONSUMER_POLLING == 0:  # pragma: no cover
+                logger.warn("Using polling as INotify import failed")
             self.handle_polling(directory, recursive, options["testing"])
 
         logger.debug("Consumer exiting.")
@@ -257,8 +259,14 @@ class Command(BaseCommand):
             timeout = self.testing_timeout_s
             logger.debug(f"Configuring timeout to {timeout}s")
 
+        polling_interval = settings.CONSUMER_POLLING
+        if polling_interval == 0:  # pragma: no cover
+            # Only happens if INotify failed to import
+            logger.warn("Using polling of 10s, consider settng this")
+            polling_interval = 10
+
         with ThreadPoolExecutor(max_workers=4) as pool:
-            observer = PollingObserver(timeout=settings.CONSUMER_POLLING)
+            observer = PollingObserver(timeout=polling_interval)
             observer.schedule(Handler(pool), directory, recursive=recursive)
             observer.start()
             try:
