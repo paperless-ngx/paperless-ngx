@@ -14,6 +14,7 @@ import { StoragePathListComponent } from './components/manage/storage-path-list/
 import { TagListComponent } from './components/manage/tag-list/tag-list.component'
 import { TasksComponent } from './components/manage/tasks/tasks.component'
 import { NotFoundComponent } from './components/not-found/not-found.component'
+import { ReportsComponent } from './components/reports/reports.component'
 import { DirtyDocGuard } from './guards/dirty-doc.guard'
 import { DirtyFormGuard } from './guards/dirty-form.guard'
 import { DirtySavedViewGuard } from './guards/dirty-saved-view.guard'
@@ -42,6 +43,10 @@ const routes: Routes = [
             type: PermissionType.Document,
           },
         },
+      },
+      {
+        path: 'reports',
+        component: ReportsComponent,
       },
       {
         path: 'documents',
