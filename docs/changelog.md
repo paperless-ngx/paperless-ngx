@@ -3281,7 +3281,7 @@ this big change.
   wherein Paperless wasn't recognising `.tif` files properly. Thanks
   to [ayounggun](https://github.com/ayounggun) for reporting this one
   and to [Kusti Skytén](https://github.com/kskyten) for posting the
-  correct solution in the Github issue.
+  correct solution in the GitHub issue.
 
 ### 0.6.0
 
