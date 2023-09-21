@@ -252,7 +252,8 @@ def document_matches_template(
     # Document source vs template source
     if document.source not in [int(x) for x in list(template.sources)]:
         log_match_failure(
-            f"Document source {document.source} not in [{template.sources}]",
+            f"Document source {document.source} not in"
+            f" {[int(x) for x in list(template.sources)]}",
         )
         return False
 
@@ -291,7 +292,7 @@ def document_matches_template(
     ):
         log_match_failure(
             f"Document path {document.original_file}"
-            f"does not match {template.filter_path}",
+            f" does not match {template.filter_path}",
         )
         return False
 

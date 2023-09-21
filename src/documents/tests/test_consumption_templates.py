@@ -279,7 +279,7 @@ class TestConsumptionTemplates(DirectoriesMixin, FileSystemAssertsMixin, TestCas
         THEN:
             - Template overrides are not applied
         """
-        ConsumptionTemplate.objects.create(
+        ct = ConsumptionTemplate.objects.create(
             name="Template 1",
             order=0,
             sources=f"{DocumentSource.ApiUpload},{DocumentSource.ConsumeFolder},{DocumentSource.MailFetch}",
@@ -295,25 +295,31 @@ class TestConsumptionTemplates(DirectoriesMixin, FileSystemAssertsMixin, TestCas
         test_file = self.SAMPLE_DIR / "simple.pdf"
 
         with mock.patch("documents.tasks.async_to_sync"):
-            tasks.consume_file(
-                ConsumableDocument(
-                    source=DocumentSource.ConsumeFolder,
-                    original_file=test_file,
-                ),
-                None,
-            )
-            m.assert_called_once()
-            _, overrides = m.call_args
-            self.assertIsNone(overrides["override_correspondent_id"])
-            self.assertIsNone(overrides["override_document_type_id"])
-            self.assertIsNone(overrides["override_tag_ids"])
-            self.assertIsNone(overrides["override_storage_path_id"])
-            self.assertIsNone(overrides["override_owner_id"])
-            self.assertIsNone(overrides["override_view_users"])
-            self.assertIsNone(overrides["override_view_groups"])
-            self.assertIsNone(overrides["override_change_users"])
-            self.assertIsNone(overrides["override_change_groups"])
-            self.assertIsNone(overrides["override_title"])
+            with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+                tasks.consume_file(
+                    ConsumableDocument(
+                        source=DocumentSource.ConsumeFolder,
+                        original_file=test_file,
+                    ),
+                    None,
+                )
+                m.assert_called_once()
+                _, overrides = m.call_args
+                self.assertIsNone(overrides["override_correspondent_id"])
+                self.assertIsNone(overrides["override_document_type_id"])
+                self.assertIsNone(overrides["override_tag_ids"])
+                self.assertIsNone(overrides["override_storage_path_id"])
+                self.assertIsNone(overrides["override_owner_id"])
+                self.assertIsNone(overrides["override_view_users"])
+                self.assertIsNone(overrides["override_view_groups"])
+                self.assertIsNone(overrides["override_change_users"])
+                self.assertIsNone(overrides["override_change_groups"])
+                self.assertIsNone(overrides["override_title"])
+
+        expected_str = f"Document did not match template {ct}"
+        self.assertIn(expected_str, cm.output[0])
+        expected_str = f"Document filename {test_file.name} does not match"
+        self.assertIn(expected_str, cm.output[1])
 
     @mock.patch("documents.consumer.Consumer.try_consume_file")
     def test_consumption_template_no_match_path(self, m):
@@ -325,7 +331,7 @@ class TestConsumptionTemplates(DirectoriesMixin, FileSystemAssertsMixin, TestCas
         THEN:
             - Template overrides are not applied
         """
-        ConsumptionTemplate.objects.create(
+        ct = ConsumptionTemplate.objects.create(
             name="Template 1",
             order=0,
             sources=f"{DocumentSource.ApiUpload},{DocumentSource.ConsumeFolder},{DocumentSource.MailFetch}",
@@ -340,25 +346,31 @@ class TestConsumptionTemplates(DirectoriesMixin, FileSystemAssertsMixin, TestCas
         test_file = self.SAMPLE_DIR / "simple.pdf"
 
         with mock.patch("documents.tasks.async_to_sync"):
-            tasks.consume_file(
-                ConsumableDocument(
-                    source=DocumentSource.ConsumeFolder,
-                    original_file=test_file,
-                ),
-                None,
-            )
-            m.assert_called_once()
-            _, overrides = m.call_args
-            self.assertIsNone(overrides["override_correspondent_id"])
-            self.assertIsNone(overrides["override_document_type_id"])
-            self.assertIsNone(overrides["override_tag_ids"])
-            self.assertIsNone(overrides["override_storage_path_id"])
-            self.assertIsNone(overrides["override_owner_id"])
-            self.assertIsNone(overrides["override_view_users"])
-            self.assertIsNone(overrides["override_view_groups"])
-            self.assertIsNone(overrides["override_change_users"])
-            self.assertIsNone(overrides["override_change_groups"])
-            self.assertIsNone(overrides["override_title"])
+            with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+                tasks.consume_file(
+                    ConsumableDocument(
+                        source=DocumentSource.ConsumeFolder,
+                        original_file=test_file,
+                    ),
+                    None,
+                )
+                m.assert_called_once()
+                _, overrides = m.call_args
+                self.assertIsNone(overrides["override_correspondent_id"])
+                self.assertIsNone(overrides["override_document_type_id"])
+                self.assertIsNone(overrides["override_tag_ids"])
+                self.assertIsNone(overrides["override_storage_path_id"])
+                self.assertIsNone(overrides["override_owner_id"])
+                self.assertIsNone(overrides["override_view_users"])
+                self.assertIsNone(overrides["override_view_groups"])
+                self.assertIsNone(overrides["override_change_users"])
+                self.assertIsNone(overrides["override_change_groups"])
+                self.assertIsNone(overrides["override_title"])
+
+        expected_str = f"Document did not match template {ct}"
+        self.assertIn(expected_str, cm.output[0])
+        expected_str = f"Document path {test_file} does not match"
+        self.assertIn(expected_str, cm.output[1])
 
     @mock.patch("documents.consumer.Consumer.try_consume_file")
     def test_consumption_template_no_match_mail_rule(self, m):
@@ -370,7 +382,7 @@ class TestConsumptionTemplates(DirectoriesMixin, FileSystemAssertsMixin, TestCas
         THEN:
             - Template overrides are not applied
         """
-        ConsumptionTemplate.objects.create(
+        ct = ConsumptionTemplate.objects.create(
             name="Template 1",
             order=0,
             sources=f"{DocumentSource.ApiUpload},{DocumentSource.ConsumeFolder},{DocumentSource.MailFetch}",
@@ -385,26 +397,32 @@ class TestConsumptionTemplates(DirectoriesMixin, FileSystemAssertsMixin, TestCas
         test_file = self.SAMPLE_DIR / "simple.pdf"
 
         with mock.patch("documents.tasks.async_to_sync"):
-            tasks.consume_file(
-                ConsumableDocument(
-                    source=DocumentSource.ConsumeFolder,
-                    original_file=test_file,
-                    mailrule_id=99,
-                ),
-                None,
-            )
-            m.assert_called_once()
-            _, overrides = m.call_args
-            self.assertIsNone(overrides["override_correspondent_id"])
-            self.assertIsNone(overrides["override_document_type_id"])
-            self.assertIsNone(overrides["override_tag_ids"])
-            self.assertIsNone(overrides["override_storage_path_id"])
-            self.assertIsNone(overrides["override_owner_id"])
-            self.assertIsNone(overrides["override_view_users"])
-            self.assertIsNone(overrides["override_view_groups"])
-            self.assertIsNone(overrides["override_change_users"])
-            self.assertIsNone(overrides["override_change_groups"])
-            self.assertIsNone(overrides["override_title"])
+            with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+                tasks.consume_file(
+                    ConsumableDocument(
+                        source=DocumentSource.ConsumeFolder,
+                        original_file=test_file,
+                        mailrule_id=99,
+                    ),
+                    None,
+                )
+                m.assert_called_once()
+                _, overrides = m.call_args
+                self.assertIsNone(overrides["override_correspondent_id"])
+                self.assertIsNone(overrides["override_document_type_id"])
+                self.assertIsNone(overrides["override_tag_ids"])
+                self.assertIsNone(overrides["override_storage_path_id"])
+                self.assertIsNone(overrides["override_owner_id"])
+                self.assertIsNone(overrides["override_view_users"])
+                self.assertIsNone(overrides["override_view_groups"])
+                self.assertIsNone(overrides["override_change_users"])
+                self.assertIsNone(overrides["override_change_groups"])
+                self.assertIsNone(overrides["override_title"])
+
+        expected_str = f"Document did not match template {ct}"
+        self.assertIn(expected_str, cm.output[0])
+        expected_str = "Document mail rule 99 !="
+        self.assertIn(expected_str, cm.output[1])
 
     @mock.patch("documents.consumer.Consumer.try_consume_file")
     def test_consumption_template_no_match_source(self, m):
@@ -416,10 +434,10 @@ class TestConsumptionTemplates(DirectoriesMixin, FileSystemAssertsMixin, TestCas
         THEN:
             - Template overrides are not applied
         """
-        ConsumptionTemplate.objects.create(
+        ct = ConsumptionTemplate.objects.create(
             name="Template 1",
             order=0,
-            sources=f"{int(DocumentSource.ConsumeFolder)},{int(DocumentSource.MailFetch)}",
+            sources=f"{DocumentSource.ConsumeFolder},{DocumentSource.MailFetch}",
             filter_path="*",
             assign_title="Doc from {correspondent}",
             assign_correspondent=self.c,
@@ -431,22 +449,28 @@ class TestConsumptionTemplates(DirectoriesMixin, FileSystemAssertsMixin, TestCas
         test_file = self.SAMPLE_DIR / "simple.pdf"
 
         with mock.patch("documents.tasks.async_to_sync"):
-            tasks.consume_file(
-                ConsumableDocument(
-                    source=DocumentSource.ApiUpload,
-                    original_file=test_file,
-                ),
-                None,
-            )
-            m.assert_called_once()
-            _, overrides = m.call_args
-            self.assertIsNone(overrides["override_correspondent_id"])
-            self.assertIsNone(overrides["override_document_type_id"])
-            self.assertIsNone(overrides["override_tag_ids"])
-            self.assertIsNone(overrides["override_storage_path_id"])
-            self.assertIsNone(overrides["override_owner_id"])
-            self.assertIsNone(overrides["override_view_users"])
-            self.assertIsNone(overrides["override_view_groups"])
-            self.assertIsNone(overrides["override_change_users"])
-            self.assertIsNone(overrides["override_change_groups"])
-            self.assertIsNone(overrides["override_title"])
+            with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+                tasks.consume_file(
+                    ConsumableDocument(
+                        source=DocumentSource.ApiUpload,
+                        original_file=test_file,
+                    ),
+                    None,
+                )
+                m.assert_called_once()
+                _, overrides = m.call_args
+                self.assertIsNone(overrides["override_correspondent_id"])
+                self.assertIsNone(overrides["override_document_type_id"])
+                self.assertIsNone(overrides["override_tag_ids"])
+                self.assertIsNone(overrides["override_storage_path_id"])
+                self.assertIsNone(overrides["override_owner_id"])
+                self.assertIsNone(overrides["override_view_users"])
+                self.assertIsNone(overrides["override_view_groups"])
+                self.assertIsNone(overrides["override_change_users"])
+                self.assertIsNone(overrides["override_change_groups"])
+                self.assertIsNone(overrides["override_title"])
+
+        expected_str = f"Document did not match template {ct}"
+        self.assertIn(expected_str, cm.output[0])
+        expected_str = f"Document source {DocumentSource.ApiUpload} not in [{DocumentSource.ConsumeFolder}, {DocumentSource.MailFetch}]"
+        self.assertIn(expected_str, cm.output[1])
