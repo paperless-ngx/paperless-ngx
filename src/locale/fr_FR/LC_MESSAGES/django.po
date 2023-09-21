@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-19 14:30-0700\n"
-"PO-Revision-Date: 2023-09-20 18:20\n"
+"PO-Revision-Date: 2023-09-21 10:19\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -401,11 +401,11 @@ msgstr ""
 
 #: documents/models.py:449
 msgid "has storage path in"
-msgstr ""
+msgstr "a un chemin de stockage dans"
 
 #: documents/models.py:450
 msgid "does not have storage path in"
-msgstr ""
+msgstr "n'a pas de chemin de stockage dans"
 
 #: documents/models.py:451
 msgid "owner is"
