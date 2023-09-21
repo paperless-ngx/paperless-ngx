@@ -472,5 +472,5 @@ class TestConsumptionTemplates(DirectoriesMixin, FileSystemAssertsMixin, TestCas
 
         expected_str = f"Document did not match template {ct}"
         self.assertIn(expected_str, cm.output[0])
-        expected_str = f"Document source {DocumentSource.ApiUpload} not in [{DocumentSource.ConsumeFolder}, {DocumentSource.MailFetch}]"
+        expected_str = f"Document source {DocumentSource.ApiUpload.name} not in ['{DocumentSource.ConsumeFolder.name}', '{DocumentSource.MailFetch.name}']"
         self.assertIn(expected_str, cm.output[1])

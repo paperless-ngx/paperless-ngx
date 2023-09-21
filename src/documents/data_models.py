@@ -49,22 +49,23 @@ class DocumentMetadataOverrides:
         if self.owner_id is None:
             self.owner_id = other.owner_id
         # merge
+        # TODO: Handle the case where other is also None
         if self.tag_ids is None:
             self.tag_ids = other.tag_ids
         else:
-            self.tag_ids = [*self.tag_ids, *other.tag_ids]
+            self.tag_ids.extend(other.tag_ids)
         if self.view_users is None:
             self.view_users = other.view_users
         else:
-            self.view_users = [*self.view_users, *other.view_users]
+            self.view_users.extend(other.view_users)
         if self.view_groups is None:
             self.view_groups = other.view_groups
         else:
-            self.view_groups = [*self.view_groups, *other.view_groups]
+            self.view_groups.extend(other.view_groups)
         if self.change_users is None:
             self.change_users = other.change_users
         else:
-            self.change_users = [*self.change_users, *other.change_users]
+            self.change_users.extend(other.change_users)
         if self.change_groups is None:
             self.change_groups = other.change_groups
         else:

@@ -4,6 +4,7 @@ from fnmatch import fnmatch
 
 from documents.classifier import DocumentClassifier
 from documents.data_models import ConsumableDocument
+from documents.data_models import DocumentSource
 from documents.models import ConsumptionTemplate
 from documents.models import Correspondent
 from documents.models import Document
@@ -252,8 +253,8 @@ def document_matches_template(
     # Document source vs template source
     if document.source not in [int(x) for x in list(template.sources)]:
         log_match_failure(
-            f"Document source {document.source} not in"
-            f" {[int(x) for x in list(template.sources)]}",
+            f"Document source {document.source.name} not in"
+            f" {[DocumentSource(int(x)).name for x in template.sources]}",
         )
         return False
 
