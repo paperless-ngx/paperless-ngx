@@ -85,9 +85,6 @@ class DocumentSource(IntEnum):
     ApiUpload = 2
     MailFetch = 3
 
-    def __repr__(self) -> str:
-        return str(self)
-
 
 @dataclasses.dataclass
 class ConsumableDocument:
