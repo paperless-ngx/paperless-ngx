@@ -37,6 +37,33 @@ class TestConsumptionTemplates(DirectoriesMixin, FileSystemAssertsMixin, TestCas
         self.user3 = User.objects.create(username="user3")
         self.group1 = Group.objects.create(name="group1")
 
+        account1 = MailAccount.objects.create(
+            name="Email1",
+            username="username1",
+            password="password1",
+            imap_server="server.example.com",
+            imap_port=443,
+            imap_security=MailAccount.ImapSecurity.SSL,
+            character_set="UTF-8",
+        )
+        self.rule1 = MailRule.objects.create(
+            name="Rule1",
+            account=account1,
+            folder="INBOX",
+            filter_from="from@example.com",
+            filter_to="someone@somewhere.com",
+            filter_subject="subject",
+            filter_body="body",
+            filter_attachment_filename="file.pdf",
+            maximum_age=30,
+            action=MailRule.MailAction.MARK_READ,
+            assign_title_from=MailRule.TitleSource.NONE,
+            assign_correspondent_from=MailRule.CorrespondentSource.FROM_NOTHING,
+            order=0,
+            attachment_type=MailRule.AttachmentProcessing.ATTACHMENTS_ONLY,
+            assign_owner_from_rule=False,
+        )
+
         return super().setUp()
 
     @mock.patch("documents.consumer.Consumer.try_consume_file")
@@ -52,7 +79,7 @@ class TestConsumptionTemplates(DirectoriesMixin, FileSystemAssertsMixin, TestCas
         ct = ConsumptionTemplate.objects.create(
             name="Template 1",
             order=0,
-            sources=f"{int(DocumentSource.ApiUpload)},{int(DocumentSource.ConsumeFolder)},{int(DocumentSource.MailFetch)}",
+            sources=f"{DocumentSource.ApiUpload},{DocumentSource.ConsumeFolder},{DocumentSource.MailFetch}",
             filter_filename="*simple*",
             filter_path="*/samples/*",
             assign_title="Doc from {correspondent}",
@@ -108,37 +135,11 @@ class TestConsumptionTemplates(DirectoriesMixin, FileSystemAssertsMixin, TestCas
         THEN:
             - Template overrides are applied
         """
-        account1 = MailAccount.objects.create(
-            name="Email1",
-            username="username1",
-            password="password1",
-            imap_server="server.example.com",
-            imap_port=443,
-            imap_security=MailAccount.ImapSecurity.SSL,
-            character_set="UTF-8",
-        )
-        rule1 = MailRule.objects.create(
-            name="Rule1",
-            account=account1,
-            folder="INBOX",
-            filter_from="from@example.com",
-            filter_to="someone@somewhere.com",
-            filter_subject="subject",
-            filter_body="body",
-            filter_attachment_filename="file.pdf",
-            maximum_age=30,
-            action=MailRule.MailAction.MARK_READ,
-            assign_title_from=MailRule.TitleSource.NONE,
-            assign_correspondent_from=MailRule.CorrespondentSource.FROM_NOTHING,
-            order=0,
-            attachment_type=MailRule.AttachmentProcessing.ATTACHMENTS_ONLY,
-            assign_owner_from_rule=False,
-        )
         ct = ConsumptionTemplate.objects.create(
             name="Template 1",
             order=0,
-            sources=f"{int(DocumentSource.ApiUpload)},{int(DocumentSource.ConsumeFolder)},{int(DocumentSource.MailFetch)}",
-            filter_mailrule=rule1,
+            sources=f"{DocumentSource.ApiUpload},{DocumentSource.ConsumeFolder},{DocumentSource.MailFetch}",
+            filter_mailrule=self.rule1,
             assign_title="Doc from {correspondent}",
             assign_correspondent=self.c,
             assign_document_type=self.dt,
@@ -163,7 +164,7 @@ class TestConsumptionTemplates(DirectoriesMixin, FileSystemAssertsMixin, TestCas
                 ConsumableDocument(
                     source=DocumentSource.ConsumeFolder,
                     original_file=test_file,
-                    mailrule_id=rule1.pk,
+                    mailrule_id=self.rule1.pk,
                 ),
                 None,
             )
@@ -197,7 +198,7 @@ class TestConsumptionTemplates(DirectoriesMixin, FileSystemAssertsMixin, TestCas
         ct1 = ConsumptionTemplate.objects.create(
             name="Template 1",
             order=0,
-            sources=f"{int(DocumentSource.ApiUpload)},{int(DocumentSource.ConsumeFolder)},{int(DocumentSource.MailFetch)}",
+            sources=f"{DocumentSource.ApiUpload},{DocumentSource.ConsumeFolder},{DocumentSource.MailFetch}",
             filter_path="*/samples/*",
             assign_title="Doc from {correspondent}",
             assign_correspondent=self.c,
@@ -210,7 +211,7 @@ class TestConsumptionTemplates(DirectoriesMixin, FileSystemAssertsMixin, TestCas
         ct2 = ConsumptionTemplate.objects.create(
             name="Template 2",
             order=0,
-            sources=f"{int(DocumentSource.ApiUpload)},{int(DocumentSource.ConsumeFolder)},{int(DocumentSource.MailFetch)}",
+            sources=f"{DocumentSource.ApiUpload},{DocumentSource.ConsumeFolder},{DocumentSource.MailFetch}",
             filter_filename="*simple*",
             assign_title="Doc from {correspondent}",
             assign_correspondent=self.c2,
@@ -248,19 +249,19 @@ class TestConsumptionTemplates(DirectoriesMixin, FileSystemAssertsMixin, TestCas
             )
 
     @mock.patch("documents.consumer.Consumer.try_consume_file")
-    def test_consumption_template_no_match(self, m):
+    def test_consumption_template_no_match_filename(self, m):
         """
         GIVEN:
             - Existing consumption template
         WHEN:
-            - File that does not match is consumed
+            - File that does not match on filename is consumed
         THEN:
             - Template overrides are not applied
         """
         ConsumptionTemplate.objects.create(
             name="Template 1",
             order=0,
-            sources=f"{int(DocumentSource.ApiUpload)},{int(DocumentSource.ConsumeFolder)},{int(DocumentSource.MailFetch)}",
+            sources=f"{DocumentSource.ApiUpload},{DocumentSource.ConsumeFolder},{DocumentSource.MailFetch}",
             filter_filename="*foobar*",
             filter_path=None,
             assign_title="Doc from {correspondent}",
@@ -276,6 +277,142 @@ class TestConsumptionTemplates(DirectoriesMixin, FileSystemAssertsMixin, TestCas
             tasks.consume_file(
                 ConsumableDocument(
                     source=DocumentSource.ConsumeFolder,
+                    original_file=test_file,
+                ),
+                None,
+            )
+            m.assert_called_once()
+            _, overrides = m.call_args
+            self.assertIsNone(overrides["override_correspondent_id"])
+            self.assertIsNone(overrides["override_document_type_id"])
+            self.assertIsNone(overrides["override_tag_ids"])
+            self.assertIsNone(overrides["override_storage_path_id"])
+            self.assertIsNone(overrides["override_owner_id"])
+            self.assertIsNone(overrides["override_view_users"])
+            self.assertIsNone(overrides["override_view_groups"])
+            self.assertIsNone(overrides["override_change_users"])
+            self.assertIsNone(overrides["override_change_groups"])
+            self.assertIsNone(overrides["override_title"])
+
+    @mock.patch("documents.consumer.Consumer.try_consume_file")
+    def test_consumption_template_no_match_path(self, m):
+        """
+        GIVEN:
+            - Existing consumption template
+        WHEN:
+            - File that does not match on path is consumed
+        THEN:
+            - Template overrides are not applied
+        """
+        ConsumptionTemplate.objects.create(
+            name="Template 1",
+            order=0,
+            sources=f"{DocumentSource.ApiUpload},{DocumentSource.ConsumeFolder},{DocumentSource.MailFetch}",
+            filter_path="*foo/bar*",
+            assign_title="Doc from {correspondent}",
+            assign_correspondent=self.c,
+            assign_document_type=self.dt,
+            assign_storage_path=self.sp,
+            assign_owner=self.user2,
+        )
+
+        test_file = self.SAMPLE_DIR / "simple.pdf"
+
+        with mock.patch("documents.tasks.async_to_sync"):
+            tasks.consume_file(
+                ConsumableDocument(
+                    source=DocumentSource.ConsumeFolder,
+                    original_file=test_file,
+                ),
+                None,
+            )
+            m.assert_called_once()
+            _, overrides = m.call_args
+            self.assertIsNone(overrides["override_correspondent_id"])
+            self.assertIsNone(overrides["override_document_type_id"])
+            self.assertIsNone(overrides["override_tag_ids"])
+            self.assertIsNone(overrides["override_storage_path_id"])
+            self.assertIsNone(overrides["override_owner_id"])
+            self.assertIsNone(overrides["override_view_users"])
+            self.assertIsNone(overrides["override_view_groups"])
+            self.assertIsNone(overrides["override_change_users"])
+            self.assertIsNone(overrides["override_change_groups"])
+            self.assertIsNone(overrides["override_title"])
+
+    @mock.patch("documents.consumer.Consumer.try_consume_file")
+    def test_consumption_template_no_match_mail_rule(self, m):
+        """
+        GIVEN:
+            - Existing consumption template
+        WHEN:
+            - File that does not match on source is consumed
+        THEN:
+            - Template overrides are not applied
+        """
+        ConsumptionTemplate.objects.create(
+            name="Template 1",
+            order=0,
+            sources=f"{DocumentSource.ApiUpload},{DocumentSource.ConsumeFolder},{DocumentSource.MailFetch}",
+            filter_mailrule=self.rule1,
+            assign_title="Doc from {correspondent}",
+            assign_correspondent=self.c,
+            assign_document_type=self.dt,
+            assign_storage_path=self.sp,
+            assign_owner=self.user2,
+        )
+
+        test_file = self.SAMPLE_DIR / "simple.pdf"
+
+        with mock.patch("documents.tasks.async_to_sync"):
+            tasks.consume_file(
+                ConsumableDocument(
+                    source=DocumentSource.ConsumeFolder,
+                    original_file=test_file,
+                    mailrule_id=99,
+                ),
+                None,
+            )
+            m.assert_called_once()
+            _, overrides = m.call_args
+            self.assertIsNone(overrides["override_correspondent_id"])
+            self.assertIsNone(overrides["override_document_type_id"])
+            self.assertIsNone(overrides["override_tag_ids"])
+            self.assertIsNone(overrides["override_storage_path_id"])
+            self.assertIsNone(overrides["override_owner_id"])
+            self.assertIsNone(overrides["override_view_users"])
+            self.assertIsNone(overrides["override_view_groups"])
+            self.assertIsNone(overrides["override_change_users"])
+            self.assertIsNone(overrides["override_change_groups"])
+            self.assertIsNone(overrides["override_title"])
+
+    @mock.patch("documents.consumer.Consumer.try_consume_file")
+    def test_consumption_template_no_match_source(self, m):
+        """
+        GIVEN:
+            - Existing consumption template
+        WHEN:
+            - File that does not match on source is consumed
+        THEN:
+            - Template overrides are not applied
+        """
+        ConsumptionTemplate.objects.create(
+            name="Template 1",
+            order=0,
+            sources=f"{int(DocumentSource.ConsumeFolder)},{int(DocumentSource.MailFetch)}",
+            filter_path="*",
+            assign_title="Doc from {correspondent}",
+            assign_correspondent=self.c,
+            assign_document_type=self.dt,
+            assign_storage_path=self.sp,
+            assign_owner=self.user2,
+        )
+
+        test_file = self.SAMPLE_DIR / "simple.pdf"
+
+        with mock.patch("documents.tasks.async_to_sync"):
+            tasks.consume_file(
+                ConsumableDocument(
+                    source=DocumentSource.ApiUpload,
                     original_file=test_file,
                 ),
                 None,
