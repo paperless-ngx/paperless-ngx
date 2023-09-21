@@ -14,6 +14,7 @@ import { AbstractPaperlessService } from 'src/app/services/rest/abstract-paperle
 import { UserService } from 'src/app/services/rest/user.service'
 import { PermissionsFormObject } from '../input/permissions/permissions-form/permissions-form.component'
 import { SettingsService } from 'src/app/services/settings.service'
+import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 
 export enum EditDialogMode {
   CREATE = 0,
@@ -67,6 +68,31 @@ export abstract class EditDialogComponent<
         set_permissions: (this.object as ObjectWithPermissions).permissions,
       }
       this.objectForm.patchValue(this.object)
+    } else {
+      // defaults from settings
+      this.objectForm.patchValue({
+        permissions_form: {
+          owner: this.settingsService.get(SETTINGS_KEYS.DEFAULT_PERMS_OWNER),
+          set_permissions: {
+            view: {
+              users: this.settingsService.get(
+                SETTINGS_KEYS.DEFAULT_PERMS_VIEW_USERS
+              ),
+              groups: this.settingsService.get(
+                SETTINGS_KEYS.DEFAULT_PERMS_VIEW_GROUPS
+              ),
+            },
+            change: {
+              users: this.settingsService.get(
+                SETTINGS_KEYS.DEFAULT_PERMS_EDIT_USERS
+              ),
+              groups: this.settingsService.get(
+                SETTINGS_KEYS.DEFAULT_PERMS_EDIT_GROUPS
+              ),
+            },
+          },
+        },
+      })
     }
 
     // wait to enable close button so it doesnt steal focus from input since its the first clickable element in the DOM
@@ -76,11 +102,6 @@ export abstract class EditDialogComponent<
 
     this.userService.listAll().subscribe((r) => {
       this.users = r.results
-      if (this.dialogMode === EditDialogMode.CREATE) {
-        this.objectForm.get('permissions_form')?.setValue({
-          owner: this.settingsService.currentUser.id,
-        })
-      }
     })
   }
 

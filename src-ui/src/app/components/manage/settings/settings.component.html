@@ -11,14 +11,14 @@
 <form [formGroup]="settingsForm" (ngSubmit)="saveSettings()">
 
   <ul ngbNav #nav="ngbNav" (navChange)="onNavChange($event)" [(activeId)]="activeNavID" class="nav-tabs">
-    <li [ngbNavItem]="SettingsNavIDs.General">
+    <li [ngbNavItem]="SettingsNavIDs.General" (mouseover)="maybeInitializeTab(SettingsNavIDs.General)">
       <a ngbNavLink i18n>General</a>
       <ng-template ngbNavContent>
 
         <h4 i18n>Appearance</h4>
 
         <div class="row mb-3">
-          <div class="col-md-3 col-form-label">
+          <div class="col-md-3 col-form-label pt-0">
             <span i18n>Display language</span>
           </div>
           <div class="col">
@@ -33,7 +33,7 @@
         </div>
 
         <div class="row mb-3">
-          <div class="col-md-3 col-form-label">
+          <div class="col-md-3 col-form-label pt-0">
             <span i18n>Date display</span>
           </div>
           <div class="col">
@@ -46,7 +46,7 @@
         </div>
 
         <div class="row mb-3">
-          <div class="col-md-3 col-form-label">
+          <div class="col-md-3 col-form-label pt-0">
             <span i18n>Date format</span>
           </div>
           <div class="col">
@@ -68,7 +68,7 @@
         </div>
 
         <div class="row mb-3">
-          <div class="col-md-3 col-form-label">
+          <div class="col-md-3 col-form-label pt-0">
             <span i18n>Items per page</span>
           </div>
           <div class="col">
@@ -84,7 +84,7 @@
         </div>
 
         <div class="row mb-3">
-          <div class="col-md-3 col-form-label">
+          <div class="col-md-3 col-form-label pt-0">
             <span i18n>Document editor</span>
           </div>
           <div class="col">
@@ -95,7 +95,7 @@
         </div>
 
         <div class="row mb-3">
-          <div class="col-md-3 col-form-label">
+          <div class="col-md-3 col-form-label pt-0">
             <span i18n>Sidebar</span>
           </div>
           <div class="col">
@@ -106,7 +106,7 @@
         </div>
 
         <div class="row mb-3">
-          <div class="col-md-3 col-form-label">
+          <div class="col-md-3 col-form-label pt-0">
             <span i18n>Dark mode</span>
           </div>
           <div class="col">
@@ -117,7 +117,7 @@
         </div>
 
         <div class="row mb-3">
-          <div class="col-md-3 col-form-label">
+          <div class="col-md-3 col-form-label pt-0">
             <span i18n>Theme Color</span>
           </div>
           <div class="col col-md-3">
@@ -129,6 +129,82 @@
                 <use xlink:href="assets/bootstrap-icons.svg#x"/>
               </svg><ng-container i18n>Reset</ng-container>
             </button>
+          </div>
+        </div>
+
+        <h4 i18n>Permissions</h4>
+
+        <div class="row mb-3">
+          <div class="offset-md-3 col">
+            <p i18n>
+              Settings apply to this user account for objects (Tags, Mail Rules, etc.) created via the web UI
+            </p>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-3 col-form-label pt-0">
+            <span i18n>Default Owner</span>
+          </div>
+          <div class="col-md-4">
+            <pngx-input-select [items]="users" bindLabel="username" formControlName="defaultPermsOwner" [allowNull]="true"></pngx-input-select>
+            <small class="form-text text-muted text-end d-block mt-n2" i18n>Objects without an owner can be viewed and edited by all users</small>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-3 col-form-label pt-0">
+            <span i18n>Default View Permissions</span>
+          </div>
+          <div class="col-md-4">
+            <div class="row">
+              <div class="col-2">
+                <span class="d-block pt-1" i18n>Users:</span>
+              </div>
+              <div class="col">
+                <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.User }">
+                  <pngx-permissions-user type="view" formControlName="defaultPermsViewUsers"></pngx-permissions-user>
+                </ng-container>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-2">
+                <span class="d-block pt-1" i18n>Groups:</span>
+              </div>
+              <div class="col">
+                <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Group }">
+                  <pngx-permissions-group type="view" formControlName="defaultPermsViewGroups"></pngx-permissions-group>
+                </ng-container>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-3 col-form-label pt-0">
+            <span i18n>Default Edit Permissions</span>
+          </div>
+          <div class="col-md-4">
+            <div class="row">
+              <div class="col-2">
+                <span class="d-block pt-1" i18n>Users:</span>
+              </div>
+              <div class="col">
+                <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.User }">
+                  <pngx-permissions-user type="view" formControlName="defaultPermsEditUsers"></pngx-permissions-user>
+                </ng-container>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-2">
+                <span class="d-block pt-1" i18n>Groups:</span>
+              </div>
+              <div class="col">
+                <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Group }">
+                  <pngx-permissions-group type="view" formControlName="defaultPermsEditGroups"></pngx-permissions-group>
+                </ng-container>
+              </div>
+            </div>
+            <div class="row">
+              <small class="form-text text-muted text-end d-block" i18n>Edit permissions also grant viewing permissions</small>
+            </div>
           </div>
         </div>
 

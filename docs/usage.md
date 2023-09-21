@@ -247,6 +247,13 @@ do not have an owner set.
 
     Note that superusers have access to all objects.
 
+### Default permissions
+
+Default permissions for documents can be set using consumption templates.
+
+For objects created via the web UI (tags, doc types, etc.) the default is to set the current user
+as owner and no extra permissions, but you explicitly set these under Settings > Permissions.
+
 ### Users and Groups
 
 Paperless-ngx versions after 1.14.0 allow creating and editing users and groups via the 'frontend' UI.

@@ -48,6 +48,7 @@ import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
 import {
   PermissionAction,
+  PermissionType,
   PermissionsService,
 } from 'src/app/services/permissions.service'
 
@@ -93,6 +94,11 @@ export class SettingsComponent
     dateFormat: new FormControl(null),
     notesEnabled: new FormControl(null),
     updateCheckingEnabled: new FormControl(null),
+    defaultPermsOwner: new FormControl(null),
+    defaultPermsViewUsers: new FormControl(null),
+    defaultPermsViewGroups: new FormControl(null),
+    defaultPermsEditUsers: new FormControl(null),
+    defaultPermsEditGroups: new FormControl(null),
 
     notificationsConsumerNewDocument: new FormControl(null),
     notificationsConsumerSuccess: new FormControl(null),
@@ -159,6 +165,16 @@ export class SettingsComponent
 
     this.activatedRoute.paramMap.subscribe((paramMap) => {
       const section = paramMap.get('section')
+      if (section === null) {
+        if (
+          this.permissionsService.currentUserCan(
+            PermissionAction.View,
+            PermissionType.User
+          )
+        ) {
+          this.getUsers()
+        }
+      }
       if (section) {
         const navIDKey: string = Object.keys(SettingsNavIDs).find(
           (navID) => navID.toLowerCase() == section
@@ -222,6 +238,19 @@ export class SettingsComponent
       savedViewsWarnOnUnsavedChange: this.settings.get(
         SETTINGS_KEYS.SAVED_VIEWS_WARN_ON_UNSAVED_CHANGE
       ),
+      defaultPermsOwner: this.settings.get(SETTINGS_KEYS.DEFAULT_PERMS_OWNER),
+      defaultPermsViewUsers: this.settings.get(
+        SETTINGS_KEYS.DEFAULT_PERMS_VIEW_USERS
+      ),
+      defaultPermsViewGroups: this.settings.get(
+        SETTINGS_KEYS.DEFAULT_PERMS_VIEW_GROUPS
+      ),
+      defaultPermsEditUsers: this.settings.get(
+        SETTINGS_KEYS.DEFAULT_PERMS_EDIT_USERS
+      ),
+      defaultPermsEditGroups: this.settings.get(
+        SETTINGS_KEYS.DEFAULT_PERMS_EDIT_GROUPS
+      ),
       usersGroup: {},
       groupsGroup: {},
       savedViews: {},
@@ -256,33 +285,21 @@ export class SettingsComponent
         this.initialize(false)
       })
     } else if (
-      navID == SettingsNavIDs.UsersGroups &&
+      (navID == SettingsNavIDs.UsersGroups ||
+        navID == SettingsNavIDs.General) &&
       (!this.users || !this.groups)
     ) {
-      this.usersService
+      if (!this.users) this.getUsers()
+      this.groupsService
         .listAll()
         .pipe(first())
         .subscribe({
           next: (r) => {
-            this.users = r.results
-            this.groupsService
-              .listAll()
-              .pipe(first())
-              .subscribe({
-                next: (r) => {
-                  this.groups = r.results
-                  this.initialize(false)
-                },
-                error: (e) => {
-                  this.toastService.showError(
-                    $localize`Error retrieving groups`,
-                    e
-                  )
-                },
-              })
+            this.groups = r.results
+            this.initialize(false)
           },
           error: (e) => {
-            this.toastService.showError($localize`Error retrieving users`, e)
+            this.toastService.showError($localize`Error retrieving groups`, e)
           },
         })
     } else if (
@@ -320,6 +337,20 @@ export class SettingsComponent
           },
         })
     }
+  }
+
+  private getUsers() {
+    this.usersService
+      .listAll()
+      .pipe(first())
+      .subscribe({
+        next: (r) => {
+          this.users = r.results
+        },
+        error: (e) => {
+          this.toastService.showError($localize`Error retrieving users`, e)
+        },
+      })
   }
 
   initialize(resetSettings: boolean = true) {
@@ -610,6 +641,26 @@ export class SettingsComponent
     this.settings.set(
       SETTINGS_KEYS.SAVED_VIEWS_WARN_ON_UNSAVED_CHANGE,
       this.settingsForm.value.savedViewsWarnOnUnsavedChange
+    )
+    this.settings.set(
+      SETTINGS_KEYS.DEFAULT_PERMS_OWNER,
+      this.settingsForm.value.defaultPermsOwner
+    )
+    this.settings.set(
+      SETTINGS_KEYS.DEFAULT_PERMS_VIEW_USERS,
+      this.settingsForm.value.defaultPermsViewUsers
+    )
+    this.settings.set(
+      SETTINGS_KEYS.DEFAULT_PERMS_VIEW_GROUPS,
+      this.settingsForm.value.defaultPermsViewGroups
+    )
+    this.settings.set(
+      SETTINGS_KEYS.DEFAULT_PERMS_EDIT_USERS,
+      this.settingsForm.value.defaultPermsEditUsers
+    )
+    this.settings.set(
+      SETTINGS_KEYS.DEFAULT_PERMS_EDIT_GROUPS,
+      this.settingsForm.value.defaultPermsEditGroups
     )
     this.settings.setLanguage(this.settingsForm.value.displayLanguage)
     this.settings
