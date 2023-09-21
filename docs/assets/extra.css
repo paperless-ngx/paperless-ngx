@@ -35,7 +35,12 @@
     margin-right: .5rem;
 }
 
-/* Hide config vars from sidebar toc and move the border on mobile case their hidden */
+/* make code in headers not bold */
+h4 code {
+    font-weight: normal;
+}
+
+/* Hide config vars from sidebar, toc and move the border on mobile case their hidden */
 .md-nav.md-nav--secondary .md-nav__item .md-nav__link[href*="PAPERLESS_"] {
     display: none;
 }
