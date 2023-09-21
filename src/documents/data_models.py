@@ -1,6 +1,6 @@
 import dataclasses
 import datetime
-import enum
+from enum import IntEnum
 from pathlib import Path
 from typing import Optional
 
@@ -30,14 +30,14 @@ class DocumentMetadataOverrides:
     change_groups: Optional[list[int]] = None
 
 
-class DocumentSource(enum.IntEnum):
+class DocumentSource(IntEnum):
     """
     The source of an incoming document.  May have other uses in the future
     """
 
-    ConsumeFolder = enum.auto()
-    ApiUpload = enum.auto()
-    MailFetch = enum.auto()
+    ConsumeFolder = 1
+    ApiUpload = 2
+    MailFetch = 3
 
 
 @dataclasses.dataclass

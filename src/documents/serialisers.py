@@ -18,12 +18,11 @@ from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
 from documents.data_models import DocumentSource
+from documents.models import ConsumptionTemplate
 from documents.permissions import get_groups_with_only_permission
 from documents.permissions import set_permissions_for_object
 
 from . import bulk_edit
-from .models import DOCUMENT_SOURCE
-from .models import ConsumptionTemplate
 from .models import Correspondent
 from .models import Document
 from .models import DocumentType
@@ -1044,7 +1043,7 @@ class BulkEditObjectPermissionsSerializer(serializers.Serializer, SetPermissions
 class ConsumptionTemplateSerializer(OwnedObjectSerializer):
     order = serializers.IntegerField(required=False)
     sources = fields.MultipleChoiceField(
-        choices=DOCUMENT_SOURCE,
+        choices=ConsumptionTemplate.DocumentSourceChoices.choices,
         allow_empty=False,
         default={
             DocumentSource.ConsumeFolder,
@@ -1084,8 +1083,8 @@ class ConsumptionTemplateSerializer(OwnedObjectSerializer):
         ]
 
     def validate(self, attrs):
-        if ("filter_mailrule") in attrs:
-            attrs["sources"] = {int(DocumentSource.MailFetch)}
+        if ("filter_mailrule") in attrs and attrs["filter_mailrule"] is not None:
+            attrs["sources"] = {DocumentSource.MailFetch.value}
         if (
             ("filter_mailrule" not in attrs)
             and ("filter_filename" not in attrs or len(attrs["filter_filename"]) == 0)

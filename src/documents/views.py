@@ -1253,10 +1253,12 @@ class BulkEditObjectPermissionsView(GenericAPIView, PassUserMixin):
 
 
 class ConsumptionTemplateViewSet(ModelViewSet, PassUserMixin):
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+
+    serializer_class = ConsumptionTemplateSerializer
+    pagination_class = StandardPagination
+    filter_backends = (ObjectOwnedOrGrantedPermissionsFilter,)
+
     model = ConsumptionTemplate
 
     queryset = ConsumptionTemplate.objects.all().order_by("order")
-    serializer_class = ConsumptionTemplateSerializer
-    pagination_class = StandardPagination
-    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
-    filter_backends = (ObjectOwnedOrGrantedPermissionsFilter,)

@@ -23,9 +23,6 @@ from multiselectfield import MultiSelectField
 from documents.data_models import DocumentSource
 from documents.parsers import get_default_file_extension
 
-ALL_STATES = sorted(states.ALL_STATES)
-TASK_STATE_CHOICES = sorted(zip(ALL_STATES, ALL_STATES))
-
 
 class ModelWithOwner(models.Model):
     owner = models.ForeignKey(
@@ -575,6 +572,9 @@ class UiSettings(models.Model):
 
 
 class PaperlessTask(models.Model):
+    ALL_STATES = sorted(states.ALL_STATES)
+    TASK_STATE_CHOICES = sorted(zip(ALL_STATES, ALL_STATES))
+
     task_id = models.CharField(
         max_length=255,
         unique=True,
@@ -740,14 +740,12 @@ class ShareLink(models.Model):
         return f"Share Link for {self.document.title}"
 
 
-DOCUMENT_SOURCE = (
-    (int(DocumentSource.ConsumeFolder), _("Consume Folder")),
-    (int(DocumentSource.ApiUpload), _("Api Upload")),
-    (int(DocumentSource.MailFetch), _("Mail Fetch")),
-)
-
-
 class ConsumptionTemplate(ModelWithOwner):
+    class DocumentSourceChoices(models.IntegerChoices):
+        CONSUME_FOLDER = DocumentSource.ConsumeFolder.value, _("Consume Folder")
+        API_UPLOAD = DocumentSource.ApiUpload.value, _("Api Upload")
+        MAIL_FETCH = DocumentSource.MailFetch.value, _("Mail Fetch")
+
     class Meta:
         verbose_name = _("consumption template")
         verbose_name_plural = _("consumption templates")
@@ -758,7 +756,7 @@ class ConsumptionTemplate(ModelWithOwner):
 
     sources = MultiSelectField(
         max_length=3,
-        choices=DOCUMENT_SOURCE,
+        choices=DocumentSourceChoices.choices,
         default=f"{DocumentSource.ConsumeFolder},{DocumentSource.ApiUpload},{DocumentSource.MailFetch}",
     )
 
