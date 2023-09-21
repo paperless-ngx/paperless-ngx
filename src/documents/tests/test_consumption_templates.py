@@ -102,28 +102,36 @@ class TestConsumptionTemplates(DirectoriesMixin, FileSystemAssertsMixin, TestCas
         test_file = self.SAMPLE_DIR / "simple.pdf"
 
         with mock.patch("documents.tasks.async_to_sync"):
-            tasks.consume_file(
-                ConsumableDocument(
-                    source=DocumentSource.ConsumeFolder,
-                    original_file=test_file,
-                ),
-                None,
-            )
-            m.assert_called_once()
-            _, overrides = m.call_args
-            self.assertEqual(overrides["override_correspondent_id"], self.c.pk)
-            self.assertEqual(overrides["override_document_type_id"], self.dt.pk)
-            self.assertEqual(
-                overrides["override_tag_ids"],
-                [self.t1.pk, self.t2.pk, self.t3.pk],
-            )
-            self.assertEqual(overrides["override_storage_path_id"], self.sp.pk)
-            self.assertEqual(overrides["override_owner_id"], self.user2.pk)
-            self.assertEqual(overrides["override_view_users"], [self.user3.pk])
-            self.assertEqual(overrides["override_view_groups"], [self.group1.pk])
-            self.assertEqual(overrides["override_change_users"], [self.user3.pk])
-            self.assertEqual(overrides["override_change_groups"], [self.group1.pk])
-            self.assertEqual(overrides["override_title"], "Doc from {correspondent}")
+            with self.assertLogs("paperless.matching", level="INFO") as cm:
+                tasks.consume_file(
+                    ConsumableDocument(
+                        source=DocumentSource.ConsumeFolder,
+                        original_file=test_file,
+                    ),
+                    None,
+                )
+                m.assert_called_once()
+                _, overrides = m.call_args
+                self.assertEqual(overrides["override_correspondent_id"], self.c.pk)
+                self.assertEqual(overrides["override_document_type_id"], self.dt.pk)
+                self.assertEqual(
+                    overrides["override_tag_ids"],
+                    [self.t1.pk, self.t2.pk, self.t3.pk],
+                )
+                self.assertEqual(overrides["override_storage_path_id"], self.sp.pk)
+                self.assertEqual(overrides["override_owner_id"], self.user2.pk)
+                self.assertEqual(overrides["override_view_users"], [self.user3.pk])
+                self.assertEqual(overrides["override_view_groups"], [self.group1.pk])
+                self.assertEqual(overrides["override_change_users"], [self.user3.pk])
+                self.assertEqual(overrides["override_change_groups"], [self.group1.pk])
+                self.assertEqual(
+                    overrides["override_title"],
+                    "Doc from {correspondent}",
+                )
+
+        info = cm.output[0]
+        expected_str = f"Document matched template {ct}"
+        self.assertIn(expected_str, info)
 
     @mock.patch("documents.consumer.Consumer.try_consume_file")
     def test_consumption_template_match_mailrule(self, m):
@@ -158,31 +166,38 @@ class TestConsumptionTemplates(DirectoriesMixin, FileSystemAssertsMixin, TestCas
         self.assertEqual(ct.__str__(), "Template 1")
 
         test_file = self.SAMPLE_DIR / "simple.pdf"
-
         with mock.patch("documents.tasks.async_to_sync"):
-            tasks.consume_file(
-                ConsumableDocument(
-                    source=DocumentSource.ConsumeFolder,
-                    original_file=test_file,
-                    mailrule_id=self.rule1.pk,
-                ),
-                None,
-            )
-            m.assert_called_once()
-            _, overrides = m.call_args
-            self.assertEqual(overrides["override_correspondent_id"], self.c.pk)
-            self.assertEqual(overrides["override_document_type_id"], self.dt.pk)
-            self.assertEqual(
-                overrides["override_tag_ids"],
-                [self.t1.pk, self.t2.pk, self.t3.pk],
-            )
-            self.assertEqual(overrides["override_storage_path_id"], self.sp.pk)
-            self.assertEqual(overrides["override_owner_id"], self.user2.pk)
-            self.assertEqual(overrides["override_view_users"], [self.user3.pk])
-            self.assertEqual(overrides["override_view_groups"], [self.group1.pk])
-            self.assertEqual(overrides["override_change_users"], [self.user3.pk])
-            self.assertEqual(overrides["override_change_groups"], [self.group1.pk])
-            self.assertEqual(overrides["override_title"], "Doc from {correspondent}")
+            with self.assertLogs("paperless.matching", level="INFO") as cm:
+                tasks.consume_file(
+                    ConsumableDocument(
+                        source=DocumentSource.ConsumeFolder,
+                        original_file=test_file,
+                        mailrule_id=self.rule1.pk,
+                    ),
+                    None,
+                )
+                m.assert_called_once()
+                _, overrides = m.call_args
+                self.assertEqual(overrides["override_correspondent_id"], self.c.pk)
+                self.assertEqual(overrides["override_document_type_id"], self.dt.pk)
+                self.assertEqual(
+                    overrides["override_tag_ids"],
+                    [self.t1.pk, self.t2.pk, self.t3.pk],
+                )
+                self.assertEqual(overrides["override_storage_path_id"], self.sp.pk)
+                self.assertEqual(overrides["override_owner_id"], self.user2.pk)
+                self.assertEqual(overrides["override_view_users"], [self.user3.pk])
+                self.assertEqual(overrides["override_view_groups"], [self.group1.pk])
+                self.assertEqual(overrides["override_change_users"], [self.user3.pk])
+                self.assertEqual(overrides["override_change_groups"], [self.group1.pk])
+                self.assertEqual(
+                    overrides["override_title"],
+                    "Doc from {correspondent}",
+                )
+
+        info = cm.output[0]
+        expected_str = f"Document matched template {ct}"
+        self.assertIn(expected_str, info)
 
     @mock.patch("documents.consumer.Consumer.try_consume_file")
     def test_consumption_template_match_multiple(self, m):
@@ -224,29 +239,35 @@ class TestConsumptionTemplates(DirectoriesMixin, FileSystemAssertsMixin, TestCas
         test_file = self.SAMPLE_DIR / "simple.pdf"
 
         with mock.patch("documents.tasks.async_to_sync"):
-            tasks.consume_file(
-                ConsumableDocument(
-                    source=DocumentSource.ConsumeFolder,
-                    original_file=test_file,
-                ),
-                None,
-            )
-            m.assert_called_once()
-            _, overrides = m.call_args
-            # template 1
-            self.assertEqual(overrides["override_correspondent_id"], self.c.pk)
-            self.assertEqual(overrides["override_document_type_id"], self.dt.pk)
-            # template 2
-            self.assertEqual(overrides["override_storage_path_id"], self.sp.pk)
-            # template 1 & 2
-            self.assertEqual(
-                overrides["override_tag_ids"],
-                [self.t1.pk, self.t2.pk, self.t3.pk],
-            )
-            self.assertEqual(
-                overrides["override_view_users"],
-                [self.user2.pk, self.user3.pk],
-            )
+            with self.assertLogs("paperless.matching", level="INFO") as cm:
+                tasks.consume_file(
+                    ConsumableDocument(
+                        source=DocumentSource.ConsumeFolder,
+                        original_file=test_file,
+                    ),
+                    None,
+                )
+                m.assert_called_once()
+                _, overrides = m.call_args
+                # template 1
+                self.assertEqual(overrides["override_correspondent_id"], self.c.pk)
+                self.assertEqual(overrides["override_document_type_id"], self.dt.pk)
+                # template 2
+                self.assertEqual(overrides["override_storage_path_id"], self.sp.pk)
+                # template 1 & 2
+                self.assertEqual(
+                    overrides["override_tag_ids"],
+                    [self.t1.pk, self.t2.pk, self.t3.pk],
+                )
+                self.assertEqual(
+                    overrides["override_view_users"],
+                    [self.user2.pk, self.user3.pk],
+                )
+
+        expected_str = f"Document matched template {ct1}"
+        self.assertIn(expected_str, cm.output[0])
+        expected_str = f"Document matched template {ct2}"
+        self.assertIn(expected_str, cm.output[1])
 
     @mock.patch("documents.consumer.Consumer.try_consume_file")
     def test_consumption_template_no_match_filename(self, m):

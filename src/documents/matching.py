@@ -295,4 +295,5 @@ def document_matches_template(
         )
         return False
 
+    logger.info(f"Document matched template {template.name}")
     return True
