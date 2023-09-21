@@ -1,26 +1,28 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
-import { EditDialogMode } from '../edit-dialog.component'
-import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
-import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
-import { SelectComponent } from '../../input/select/select.component'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import {
-  AbstractControl,
   FormsModule,
   ReactiveFormsModule,
+  AbstractControl,
 } from '@angular/forms'
-import { TextComponent } from '../../input/text/text.component'
+import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
-import { PermissionsFormComponent } from '../../input/permissions/permissions-form/permissions-form.component'
-import { UserEditDialogComponent } from './user-edit-dialog.component'
-import { PasswordComponent } from '../../input/password/password.component'
-import { PermissionsSelectComponent } from '../../permissions-select/permissions-select.component'
-import { GroupService } from 'src/app/services/rest/group.service'
 import { of } from 'rxjs'
+import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
+import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
+import { GroupService } from 'src/app/services/rest/group.service'
+import { SettingsService } from 'src/app/services/settings.service'
+import { PasswordComponent } from '../../input/password/password.component'
+import { PermissionsFormComponent } from '../../input/permissions/permissions-form/permissions-form.component'
+import { SelectComponent } from '../../input/select/select.component'
+import { TextComponent } from '../../input/text/text.component'
+import { PermissionsSelectComponent } from '../../permissions-select/permissions-select.component'
+import { EditDialogMode } from '../edit-dialog.component'
+import { UserEditDialogComponent } from './user-edit-dialog.component'
 
 describe('UserEditDialogComponent', () => {
   let component: UserEditDialogComponent
+  let settingsService: SettingsService
   let fixture: ComponentFixture<UserEditDialogComponent>
 
   beforeEach(async () => {
@@ -51,6 +53,7 @@ describe('UserEditDialogComponent', () => {
               }),
           },
         },
+        SettingsService,
       ],
       imports: [
         HttpClientTestingModule,
@@ -62,6 +65,8 @@ describe('UserEditDialogComponent', () => {
     }).compileComponents()
 
     fixture = TestBed.createComponent(UserEditDialogComponent)
+    settingsService = TestBed.inject(SettingsService)
+    settingsService.currentUser = { id: 99, username: 'user99' }
     component = fixture.componentInstance
 
     fixture.detectChanges()
