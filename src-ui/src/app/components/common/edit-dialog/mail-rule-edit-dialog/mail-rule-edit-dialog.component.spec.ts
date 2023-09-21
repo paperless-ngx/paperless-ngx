@@ -1,29 +1,31 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
-import { EditDialogMode } from '../edit-dialog.component'
-import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
-import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
-import { SelectComponent } from '../../input/select/select.component'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { TextComponent } from '../../input/text/text.component'
+import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
-import { PermissionsFormComponent } from '../../input/permissions/permissions-form/permissions-form.component'
-import { MailRuleEditDialogComponent } from './mail-rule-edit-dialog.component'
-import { NumberComponent } from '../../input/number/number.component'
-import { TagsComponent } from '../../input/tags/tags.component'
-import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
-import { MailAccountService } from 'src/app/services/rest/mail-account.service'
-import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
-import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { of } from 'rxjs'
 import {
-  MailAction,
   MailMetadataCorrespondentOption,
+  MailAction,
 } from 'src/app/data/paperless-mail-rule'
+import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
+import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
+import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
+import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
+import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
+import { MailAccountService } from 'src/app/services/rest/mail-account.service'
+import { SettingsService } from 'src/app/services/settings.service'
+import { NumberComponent } from '../../input/number/number.component'
+import { PermissionsFormComponent } from '../../input/permissions/permissions-form/permissions-form.component'
+import { SelectComponent } from '../../input/select/select.component'
+import { TagsComponent } from '../../input/tags/tags.component'
+import { TextComponent } from '../../input/text/text.component'
+import { EditDialogMode } from '../edit-dialog.component'
+import { MailRuleEditDialogComponent } from './mail-rule-edit-dialog.component'
 
 describe('MailRuleEditDialogComponent', () => {
   let component: MailRuleEditDialogComponent
+  let settingsService: SettingsService
   let fixture: ComponentFixture<MailRuleEditDialogComponent>
   let accountService: MailAccountService
   let correspondentService: CorrespondentService
@@ -73,6 +75,8 @@ describe('MailRuleEditDialogComponent', () => {
     }).compileComponents()
 
     fixture = TestBed.createComponent(MailRuleEditDialogComponent)
+    settingsService = TestBed.inject(SettingsService)
+    settingsService.currentUser = { id: 99, username: 'user99' }
     component = fixture.componentInstance
 
     fixture.detectChanges()

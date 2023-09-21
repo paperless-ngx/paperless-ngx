@@ -372,7 +372,7 @@ export class SettingsService {
   }
 
   private getSettingRawValue(key: string): any {
-    let value = null
+    let value = undefined
     // parse key:key:key into nested object
     const keys = key.replace('general-settings:', '').split(':')
     let settingObj = this.settings
@@ -389,12 +389,20 @@ export class SettingsService {
     let setting = SETTINGS.find((s) => s.key == key)
 
     if (!setting) {
-      return null
+      return undefined
     }
 
     let value = this.getSettingRawValue(key)
 
-    if (value != null) {
+    // special case to fallback
+    if (key === SETTINGS_KEYS.DEFAULT_PERMS_OWNER && value === undefined) {
+      return this.currentUser.id
+    }
+
+    if (value !== undefined) {
+      if (value === null) {
+        return null
+      }
       switch (setting.type) {
         case 'boolean':
           return JSON.parse(value)
@@ -424,7 +432,7 @@ export class SettingsService {
 
   private settingIsSet(key: string): boolean {
     let value = this.getSettingRawValue(key)
-    return value != null
+    return value != undefined
   }
 
   storeSettings(): Observable<any> {

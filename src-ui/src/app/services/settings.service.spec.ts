@@ -1,21 +1,25 @@
-import { TestBed } from '@angular/core/testing'
-import { SettingsService } from './settings.service'
 import {
-  HttpClientTestingModule,
   HttpTestingController,
+  HttpClientTestingModule,
 } from '@angular/common/http/testing'
-import { RouterTestingModule } from '@angular/router/testing'
-import { environment } from 'src/environments/environment'
-import { Subscription } from 'rxjs'
-import { PaperlessUiSettings } from '../data/paperless-uisettings'
-import { SETTINGS_KEYS } from '../data/paperless-uisettings'
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
+import { TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { RouterTestingModule } from '@angular/router/testing'
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
+import { CookieService } from 'ngx-cookie-service'
+import { Subscription } from 'rxjs'
+import { environment } from 'src/environments/environment'
 import { AppModule } from '../app.module'
+import {
+  PaperlessUiSettings,
+  SETTINGS_KEYS,
+} from '../data/paperless-uisettings'
+import { SettingsService } from './settings.service'
 
 describe('SettingsService', () => {
   let httpTestingController: HttpTestingController
   let settingsService: SettingsService
+  let cookieService: CookieService
   let subscription: Subscription
 
   const ui_settings: PaperlessUiSettings = {
@@ -46,6 +50,13 @@ describe('SettingsService', () => {
       saved_views: { warn_on_unsaved_change: true },
       notes_enabled: true,
       tour_complete: false,
+      permissions: {
+        default_owner: null,
+        default_view_users: [1],
+        default_view_groups: [2],
+        default_edit_users: [3],
+        default_edit_groups: [4],
+      },
     },
     permissions: [],
   }
@@ -53,7 +64,7 @@ describe('SettingsService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [],
-      providers: [SettingsService],
+      providers: [SettingsService, CookieService],
       imports: [
         HttpClientTestingModule,
         RouterTestingModule,
@@ -65,6 +76,7 @@ describe('SettingsService', () => {
     })
 
     httpTestingController = TestBed.inject(HttpTestingController)
+    cookieService = TestBed.inject(CookieService)
     settingsService = TestBed.inject(SettingsService)
   })
 
@@ -136,7 +148,52 @@ describe('SettingsService', () => {
     expect(settingsService.get(SETTINGS_KEYS.THEME_COLOR)).toEqual('#000000')
   })
 
-  it('updates appearnce settings', () => {
+  it('sets django cookie for languages', () => {
+    httpTestingController
+      .expectOne(`${environment.apiBaseUrl}ui_settings/`)
+      .flush(ui_settings)
+    const cookieSetSpy = jest.spyOn(cookieService, 'set')
+    settingsService.initializeSettings().subscribe(() => {})
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}ui_settings/`
+    )
+    ui_settings.settings['language'] = 'foobar'
+    req.flush(ui_settings)
+    expect(cookieSetSpy).toHaveBeenCalledWith('django_language', 'foobar')
+    const cookieDeleteSpy = jest.spyOn(cookieService, 'delete')
+    settingsService.setLanguage('')
+    expect(cookieDeleteSpy).toHaveBeenCalled()
+  })
+
+  it('should support null values for settings if set, undefined if not', () => {
+    httpTestingController
+      .expectOne(`${environment.apiBaseUrl}ui_settings/`)
+      .flush(ui_settings)
+    expect(settingsService.get('foo')).toEqual(undefined)
+    expect(settingsService.get(SETTINGS_KEYS.DEFAULT_PERMS_OWNER)).toEqual(null)
+  })
+
+  it('should support array values', () => {
+    httpTestingController
+      .expectOne(`${environment.apiBaseUrl}ui_settings/`)
+      .flush(ui_settings)
+    expect(settingsService.get(SETTINGS_KEYS.DEFAULT_PERMS_VIEW_USERS)).toEqual(
+      [1]
+    )
+  })
+
+  it('should support default permissions values', () => {
+    delete ui_settings.settings['permissions']
+    httpTestingController
+      .expectOne(`${environment.apiBaseUrl}ui_settings/`)
+      .flush(ui_settings)
+    expect(settingsService.get(SETTINGS_KEYS.DEFAULT_PERMS_OWNER)).toEqual(1)
+    expect(settingsService.get(SETTINGS_KEYS.DEFAULT_PERMS_VIEW_USERS)).toEqual(
+      []
+    )
+  })
+
+  it('updates appearance settings', () => {
     const req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}ui_settings/`
     )
