@@ -4,7 +4,6 @@ import os
 import tempfile
 import uuid
 from enum import Enum
-from fnmatch import fnmatch
 from pathlib import Path
 from subprocess import CompletedProcess
 from subprocess import run
@@ -23,6 +22,7 @@ from rest_framework.reverse import reverse
 
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
+from documents.matching import document_matches_template
 from documents.permissions import set_permissions_for_object
 from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
@@ -606,28 +606,7 @@ class Consumer(LoggingMixin):
         for template in ConsumptionTemplate.objects.all().order_by("order"):
             template_overrides = DocumentMetadataOverrides()
 
-            if (
-                int(input_doc.source) in [int(x) for x in list(template.sources)]
-                and (
-                    input_doc.mailrule_id is None
-                    or input_doc.mailrule_id == template.filter_mailrule.pk
-                )
-            ) and (
-                (
-                    template.filter_filename is None
-                    or len(template.filter_filename) == 0
-                    or fnmatch(
-                        input_doc.original_file.name.lower(),
-                        template.filter_filename.lower(),
-                    )
-                )
-                and (
-                    template.filter_path is None
-                    or len(template.filter_path) == 0
-                    or input_doc.original_file.match(template.filter_path)
-                )
-            ):
-                self.log.info(f"Document matched consumption template {template.name}")
+            if document_matches_template(input_doc, template):
                 if template.assign_title is not None:
                     template_overrides.title = template.assign_title
                 if template.assign_tags is not None:
@@ -662,10 +641,7 @@ class Consumer(LoggingMixin):
                     template_overrides.change_groups = [
                         group.pk for group in template.assign_change_groups.all()
                     ]
-                overrides = merge_overrides(
-                    overridesA=overrides,
-                    overridesB=template_overrides,
-                )
+                overrides.update(template_overrides)
         return overrides
 
     def _parse_title_placeholders(self, title: str) -> str:
@@ -848,50 +824,3 @@ class Consumer(LoggingMixin):
             self.log.warning("Script stderr:")
             for line in stderr_str:
                 self.log.warning(line)
-
-
-def merge_overrides(
-    overridesA: DocumentMetadataOverrides,
-    overridesB: DocumentMetadataOverrides,
-) -> DocumentMetadataOverrides:
-    """
-    Merges two DocumentMetadataOverrides objects such that object B's overrides
-    are only applied if the property is empty in object A or merged if multiple
-    are accepted
-    """
-    # only if empty
-    if overridesA.title is None:
-        overridesA.title = overridesB.title
-    if overridesA.correspondent_id is None:
-        overridesA.correspondent_id = overridesB.correspondent_id
-    if overridesA.document_type_id is None:
-        overridesA.document_type_id = overridesB.document_type_id
-    if overridesA.storage_path_id is None:
-        overridesA.storage_path_id = overridesB.storage_path_id
-    if overridesA.owner_id is None:
-        overridesA.owner_id = overridesB.owner_id
-    # merge
-    if overridesA.tag_ids is None:
-        overridesA.tag_ids = overridesB.tag_ids
-    else:
-        overridesA.tag_ids = [*overridesA.tag_ids, *overridesB.tag_ids]
-    if overridesA.view_users is None:
-        overridesA.view_users = overridesB.view_users
-    else:
-        overridesA.view_users = [*overridesA.view_users, *overridesB.view_users]
-    if overridesA.view_groups is None:
-        overridesA.view_groups = overridesB.view_groups
-    else:
-        overridesA.view_groups = [*overridesA.view_groups, *overridesB.view_groups]
-    if overridesA.change_users is None:
-        overridesA.change_users = overridesB.change_users
-    else:
-        overridesA.change_users = [*overridesA.change_users, *overridesB.change_users]
-    if overridesA.change_groups is None:
-        overridesA.change_groups = overridesB.change_groups
-    else:
-        overridesA.change_groups = [
-            *overridesA.change_groups,
-            *overridesB.change_groups,
-        ]
-    return overridesA

@@ -23,7 +23,6 @@ from documents.classifier import DocumentClassifier
 from documents.classifier import load_classifier
 from documents.consumer import Consumer
 from documents.consumer import ConsumerError
-from documents.consumer import merge_overrides
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.double_sided import collate
@@ -158,7 +157,7 @@ def consume_file(
         input_doc=input_doc,
     )
 
-    overrides = merge_overrides(overridesA=overrides, overridesB=template_overrides)
+    overrides.update(template_overrides)
 
     # continue with consumption if no barcode was found
     document = Consumer().try_consume_file(
