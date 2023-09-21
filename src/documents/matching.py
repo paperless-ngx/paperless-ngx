@@ -244,59 +244,56 @@ def document_matches_template(
     Returns True if the incoming document matches all filters and
     settings from the template, False otherwise
     """
-    reason = None
-    # Document source vs template source
-    match = document.source in [int(x) for x in list(template.sources)]
 
-    # Document mail rule vs template mail rule
-    if match:
-        match = (
-            document.mailrule_id is None
-            or template.filter_mailrule is None
-            or document.mailrule_id == template.filter_mailrule.pk
-        )
-    else:
-        reason = f"Document source {document.source} not in {template.sources}"
-
-    # Document filename vs template filename
-    if match:
-        match = (
-            template.filter_filename is None
-            or len(template.filter_filename) == 0
-            or fnmatch(
-                document.original_file.name.lower(),
-                template.filter_filename.lower(),
-            )
-        )
-    else:
-        reason = (
-            f"Document mail rule {document.mailrule_id} "
-            f"!= {template.filter_mailrule.pk}"
-        )
-
-    # Document path vs template path
-    if match:
-        match = (
-            template.filter_path is None
-            or len(template.filter_path) == 0
-            or document.original_file.match(template.filter_path)
-        )
-    else:
-        reason = (
-            f"Document filename {document.original_file.name} "
-            f"does not match {template.filter_filename.lower()}"
-        )
-
-    if not match:
-        reason = (
-            f"Document path {document.original_file}"
-            f"does not match {template.filter_path}"
-        )
-
-    logger.info(
-        f"Document {'did' if match else 'did not'} match template {template.name}",
-    )
-    if not match:
+    def log_match_failure(reason: str):
+        logger.info(f"Document did not match template {template.name}")
         logger.debug(reason)
 
-    return match
+    # Document source vs template source
+    if document.source not in [int(x) for x in list(template.sources)]:
+        # TODO: This logs an int vs a string, confusing
+        log_match_failure(
+            f"Document source {document.source} not in {template.sources}",
+        )
+        return False
+
+    # Document mail rule vs template mail rule
+    if (
+        document.mailrule_id is not None
+        and template.filter_mailrule is not None
+        and document.mailrule_id != template.filter_mailrule.pk
+    ):
+        log_match_failure(
+            f"Document mail rule {document.mailrule_id}"
+            f" != {template.filter_mailrule.pk}",
+        )
+        return False
+
+    # Document filename vs template filename
+    if (
+        template.filter_filename is not None
+        and len(template.filter_filename) > 0
+        and not fnmatch(
+            document.original_file.name.lower(),
+            template.filter_filename.lower(),
+        )
+    ):
+        log_match_failure(
+            f"Document filename {document.original_file.name} does not match"
+            f" {template.filter_filename.lower()}",
+        )
+        return False
+
+    # Document path vs template path
+    if (
+        template.filter_path is not None
+        and len(template.filter_path) > 0
+        and not document.original_file.match(template.filter_path)
+    ):
+        log_reason(
+            f"Document path {document.original_file}"
+            f"does not match {template.filter_path}",
+        )
+        return False
+
+    return True
