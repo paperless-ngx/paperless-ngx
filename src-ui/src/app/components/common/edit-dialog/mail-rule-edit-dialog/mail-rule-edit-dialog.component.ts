@@ -79,6 +79,10 @@ const METADATA_TITLE_OPTIONS = [
     id: MailMetadataTitleOption.FromFilename,
     name: $localize`Use attachment filename as title`,
   },
+  {
+    id: MailMetadataTitleOption.None,
+    name: $localize`Do not assign title from this rule`,
+  },
 ]
 
 const METADATA_CORRESPONDENT_OPTIONS = [
@@ -168,6 +172,7 @@ export class MailRuleEditDialogComponent extends EditDialogComponent<PaperlessMa
         MailMetadataCorrespondentOption.FromNothing
       ),
       assign_correspondent: new FormControl(null),
+      assign_owner_from_rule: new FormControl(true),
     })
   }
 

@@ -60,6 +60,9 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
   }
 
   @Input()
+  title = $localize`Tags`
+
+  @Input()
   disabled = false
 
   @Input()

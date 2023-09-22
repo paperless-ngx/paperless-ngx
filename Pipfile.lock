@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "ac966c7a02e216e5198e13857f2701fd5e9b1c4dbb39ad151889f8a4d8cd8711"
+            "sha256": "973d5669b7774b4af56a55be874d496dc5d6fb751761bda5749410a4bce57e5c"
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -429,7 +429,6 @@
                 "sha256:cac9df0ba87b4f439e1a311ef22f75c938fc874bebf1fbabaed58d0e6d559a25"
             ],
             "index": "pypi",
-            "markers": "python_version >= '3.8'",
             "version": "==4.1.11"
         },
         "django-celery-results": {
@@ -483,6 +482,14 @@
             "index": "pypi",
             "markers": "python_version >= '3.5'",
             "version": "==2.4.0"
+        },
+        "django-multiselectfield": {
+            "hashes": [
+                "sha256:c270faa7f80588214c55f2d68cbddb2add525c2aa830c216b8a198de914eb470",
+                "sha256:d0a4c71568fb2332c71478ffac9f8708e01314a35cf923dfd7a191343452f9f9"
+            ],
+            "index": "pypi",
+            "version": "==0.1.12"
         },
         "djangorestframework": {
             "hashes": [

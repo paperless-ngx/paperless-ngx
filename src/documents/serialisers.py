@@ -13,9 +13,12 @@ from django.utils.text import slugify
 from django.utils.translation import gettext as _
 from guardian.core import ObjectPermissionChecker
 from guardian.shortcuts import get_users_with_perms
+from rest_framework import fields
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
+from documents.data_models import DocumentSource
+from documents.models import ConsumptionTemplate
 from documents.permissions import get_groups_with_only_permission
 from documents.permissions import set_permissions_for_object
 
@@ -1033,5 +1036,58 @@ class BulkEditObjectPermissionsSerializer(serializers.Serializer, SetPermissions
         self._validate_objects(objects, object_type)
         if permissions is not None:
             self._validate_permissions(permissions)
+
+        return attrs
+
+
+class ConsumptionTemplateSerializer(serializers.ModelSerializer):
+    order = serializers.IntegerField(required=False)
+    sources = fields.MultipleChoiceField(
+        choices=ConsumptionTemplate.DocumentSourceChoices.choices,
+        allow_empty=False,
+        default={
+            DocumentSource.ConsumeFolder,
+            DocumentSource.ApiUpload,
+            DocumentSource.MailFetch,
+        },
+    )
+    assign_correspondent = CorrespondentField(allow_null=True, required=False)
+    assign_tags = TagsField(many=True, allow_null=True, required=False)
+    assign_document_type = DocumentTypeField(allow_null=True, required=False)
+    assign_storage_path = StoragePathField(allow_null=True, required=False)
+
+    class Meta:
+        model = ConsumptionTemplate
+        fields = [
+            "id",
+            "name",
+            "order",
+            "sources",
+            "filter_path",
+            "filter_filename",
+            "filter_mailrule",
+            "assign_title",
+            "assign_tags",
+            "assign_correspondent",
+            "assign_document_type",
+            "assign_storage_path",
+            "assign_owner",
+            "assign_view_users",
+            "assign_view_groups",
+            "assign_change_users",
+            "assign_change_groups",
+        ]
+
+    def validate(self, attrs):
+        if ("filter_mailrule") in attrs and attrs["filter_mailrule"] is not None:
+            attrs["sources"] = {DocumentSource.MailFetch.value}
+        if (
+            ("filter_mailrule" not in attrs)
+            and ("filter_filename" not in attrs or len(attrs["filter_filename"]) == 0)
+            and ("filter_path" not in attrs or len(attrs["filter_path"]) == 0)
+        ):
+            raise serializers.ValidationError(
+                "File name, path or mail rule filter are required",
+            )
 
         return attrs

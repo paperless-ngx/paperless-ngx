@@ -261,6 +261,62 @@ These can be found under Settings > Users & Groups, assuming the user has access
 as a member of a group those permissions will be inherited and this is reflected in the UI. Explicit
 permissions can be granted to limit access to certain parts of the UI (and corresponding API endpoints).
 
+## Consumption templates
+
+Consumption templates were introduced in v2.0 and allow for finer control over what metadata (tags, doc
+types) and permissions (owner, privileges) are assigned to documents during consumption. In general,
+templates are applied sequentially (by sort order) but subsequent templates will never override an
+assignment from a preceding template. The same is true for mail rules, e.g. if you set the correspondent
+in a mail rule any subsequent consumption templates that are applied _will not_ overwrite this. The
+exception to this is assignments that can be multiple e.g. tags and permissions, which will be merged.
+
+Consumption templates allow you to filter by:
+
+- Source, e.g. documents uploaded via consume folder, API (& the web UI) and mail fetch
+- File name, including wildcards e.g. \*.pdf will apply to all pdfs
+- File path, including wildcards. Note that enabling `PAPERLESS_CONSUMER_RECURSIVE` would allow, for
+  example, automatically assigning documents to different owners based on the upload directory.
+- Mail rule. Choosing this option will force 'mail fetch' to be the template source.
+
+!!! note
+
+    You must include a file name filter, a path filter or a mail rule filter. Use * for either to apply
+    to all files.
+
+Consumption templates can assign:
+
+- Title, see [title placeholders](/usage#title_placeholders) below
+- Tags, correspondent, document types
+- Document owner
+- View and / or edit permissions to users or groups
+
+### Consumption template permissions
+
+All users who have application permissions for editing consumption templates can see the same set
+of templates. In other words, templates themselves intentionally do not have an owner or permissions.
+
+Given their potentially far-reaching capabilities, you may want to restrict access to templates.
+
+Upon migration, existing installs will grant access to consumption templates to users who can add
+documents (and superusers who can always access all parts of the app).
+
+### Title placeholders
+
+Consumption template titles can include placeholders, _only for items that are assigned within the template_.
+This is because at the time of consumption (when the title is to be set), no automatic tags etc. have been
+applied. You can use the following placeholders:
+
+- `{correspondent}`: assigned correspondent name
+- `{document_type}`: assigned document type name
+- `{owner_username}`: assigned owner username
+- `{added}`: added datetime
+- `{added_year}`: added year
+- `{added_year_short}`: added year
+- `{added_month}`: added month
+- `{added_month_name}`: added month name
+- `{added_month_name_short}`: added month short name
+- `{added_day}`: added day
+
 ## Best practices {#basic-searching}
 
 Paperless offers a couple tools that help you organize your document
