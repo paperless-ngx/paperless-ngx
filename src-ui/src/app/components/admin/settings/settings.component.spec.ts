@@ -20,8 +20,6 @@ import {
 import { NgSelectModule } from '@ng-select/ng-select'
 import { of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
-import { PaperlessMailAccount } from 'src/app/data/paperless-mail-account'
-import { PaperlessMailRule } from 'src/app/data/paperless-mail-rule'
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
 import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
@@ -30,16 +28,12 @@ import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { GroupService } from 'src/app/services/rest/group.service'
-import { MailAccountService } from 'src/app/services/rest/mail-account.service'
-import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService, Toast } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { GroupEditDialogComponent } from '../../common/edit-dialog/group-edit-dialog/group-edit-dialog.component'
-import { MailAccountEditDialogComponent } from '../../common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component'
-import { MailRuleEditDialogComponent } from '../../common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component'
 import { UserEditDialogComponent } from '../../common/edit-dialog/user-edit-dialog/user-edit-dialog.component'
 import { CheckComponent } from '../../common/input/check/check.component'
 import { ColorComponent } from '../../common/input/color/color.component'
@@ -52,8 +46,6 @@ import { TagsComponent } from '../../common/input/tags/tags.component'
 import { TextComponent } from '../../common/input/text/text.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { SettingsComponent } from './settings.component'
-import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
-import { PermissionsFormComponent } from '../../common/input/permissions/permissions-form/permissions-form.component'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 
 const savedViews = [
@@ -67,14 +59,6 @@ const users = [
 const groups = [
   { id: 1, name: 'group1' },
   { id: 2, name: 'group2' },
-]
-const mailAccounts = [
-  { id: 1, name: 'account1' },
-  { id: 2, name: 'account2' },
-]
-const mailRules = [
-  { id: 1, name: 'rule1', owner: 1, account: 1 },
-  { id: 2, name: 'rule2', owner: 2, account: 2 },
 ]
 
 describe('SettingsComponent', () => {
@@ -90,8 +74,6 @@ describe('SettingsComponent', () => {
   let userService: UserService
   let permissionsService: PermissionsService
   let groupService: GroupService
-  let mailAccountService: MailAccountService
-  let mailRuleService: MailRuleService
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -109,13 +91,9 @@ describe('SettingsComponent', () => {
         PasswordComponent,
         NumberComponent,
         TagsComponent,
-        MailAccountEditDialogComponent,
-        MailRuleEditDialogComponent,
         PermissionsUserComponent,
         PermissionsGroupComponent,
         IfOwnerDirective,
-        PermissionsDialogComponent,
-        PermissionsFormComponent,
       ],
       providers: [CustomDatePipe, DatePipe, PermissionsGuard],
       imports: [
@@ -135,7 +113,7 @@ describe('SettingsComponent', () => {
     viewportScroller = TestBed.inject(ViewportScroller)
     toastService = TestBed.inject(ToastService)
     settingsService = TestBed.inject(SettingsService)
-    settingsService.currentUser = { id: 99, username: 'user99' }
+    settingsService.currentUser = users[0]
     userService = TestBed.inject(UserService)
     permissionsService = TestBed.inject(PermissionsService)
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
@@ -147,8 +125,6 @@ describe('SettingsComponent', () => {
       .mockReturnValue(true)
     groupService = TestBed.inject(GroupService)
     savedViewService = TestBed.inject(SavedViewService)
-    mailAccountService = TestBed.inject(MailAccountService)
-    mailRuleService = TestBed.inject(MailRuleService)
   })
 
   function completeSetup(excludeService = null) {
@@ -179,24 +155,6 @@ describe('SettingsComponent', () => {
         })
       )
     }
-    if (excludeService !== mailAccountService) {
-      jest.spyOn(mailAccountService, 'listAll').mockReturnValue(
-        of({
-          all: mailAccounts.map((a) => a.id),
-          count: mailAccounts.length,
-          results: (mailAccounts as PaperlessMailAccount[]).concat([]),
-        })
-      )
-    }
-    if (excludeService !== mailRuleService) {
-      jest.spyOn(mailRuleService, 'listAll').mockReturnValue(
-        of({
-          all: mailRules.map((r) => r.id),
-          count: mailRules.length,
-          results: (mailRules as PaperlessMailRule[]).concat([]),
-        })
-      )
-    }
 
     fixture = TestBed.createComponent(SettingsComponent)
     component = fixture.componentInstance
@@ -212,8 +170,6 @@ describe('SettingsComponent', () => {
     tabButtons[2].nativeElement.dispatchEvent(new MouseEvent('click'))
     expect(navigateSpy).toHaveBeenCalledWith(['settings', 'savedviews'])
     tabButtons[3].nativeElement.dispatchEvent(new MouseEvent('click'))
-    expect(navigateSpy).toHaveBeenCalledWith(['settings', 'mail'])
-    tabButtons[4].nativeElement.dispatchEvent(new MouseEvent('click'))
     expect(navigateSpy).toHaveBeenCalledWith(['settings', 'usersgroups'])
 
     const initSpy = jest.spyOn(component, 'initialize')
@@ -233,41 +189,17 @@ describe('SettingsComponent', () => {
     completeSetup()
     jest
       .spyOn(activatedRoute, 'paramMap', 'get')
-      .mockReturnValue(of(convertToParamMap({ section: 'mail' })))
-    activatedRoute.snapshot.fragment = '#mail'
+      .mockReturnValue(of(convertToParamMap({ section: 'usersgroups' })))
+    activatedRoute.snapshot.fragment = '#usersgroups'
     const scrollSpy = jest.spyOn(viewportScroller, 'scrollToAnchor')
     component.ngOnInit()
-    expect(component.activeNavID).toEqual(4) // Mail
+    expect(component.activeNavID).toEqual(4) // Users & Groups
     component.ngAfterViewInit()
-    expect(scrollSpy).toHaveBeenCalledWith('#mail')
-  })
-
-  it('should lazy load tab data', () => {
-    completeSetup()
-    const tabButtons = fixture.debugElement.queryAll(By.directive(NgbNavLink))
-
-    expect(component.savedViews).toBeUndefined()
-    tabButtons[2].nativeElement.dispatchEvent(
-      new MouseEvent('mouseover', { bubbles: true })
-    )
-    expect(component.savedViews).not.toBeUndefined()
-
-    expect(component.mailAccounts).toBeUndefined()
-    tabButtons[3].nativeElement.dispatchEvent(
-      new MouseEvent('mouseover', { bubbles: true })
-    )
-    expect(component.mailAccounts).not.toBeUndefined()
-
-    expect(component.groups).toBeUndefined()
-    tabButtons[4].nativeElement.dispatchEvent(
-      new MouseEvent('mouseover', { bubbles: true })
-    )
-    expect(component.groups).not.toBeUndefined()
+    expect(scrollSpy).toHaveBeenCalledWith('#usersgroups')
   })
 
   it('should support save saved views, show error', () => {
     completeSetup()
-    component.maybeInitializeTab(3) // SavedViews
 
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
     const toastSpy = jest.spyOn(toastService, 'show')
@@ -295,6 +227,7 @@ describe('SettingsComponent', () => {
 
   it('should support save local settings updating appearance settings and calling API, show error', () => {
     completeSetup()
+    jest.spyOn(savedViewService, 'patchMany').mockReturnValue(of([]))
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
     const toastSpy = jest.spyOn(toastService, 'show')
     const storeSpy = jest.spyOn(settingsService, 'storeSettings')
@@ -309,6 +242,7 @@ describe('SettingsComponent', () => {
       throwError(() => new Error('unable to save settings'))
     )
     component.saveSettings()
+
     expect(toastErrorSpy).toHaveBeenCalled()
     expect(storeSpy).toHaveBeenCalled()
     expect(appearanceSettingsSpy).not.toHaveBeenCalled()
@@ -323,6 +257,7 @@ describe('SettingsComponent', () => {
 
   it('should offer reload if settings changes require', () => {
     completeSetup()
+    jest.spyOn(savedViewService, 'patchMany').mockReturnValue(of([]))
     let toast: Toast
     toastService.getToasts().subscribe((t) => (toast = t[0]))
     component.initialize(true) // reset
@@ -354,7 +289,6 @@ describe('SettingsComponent', () => {
 
   it('should support delete saved view', () => {
     completeSetup()
-    component.maybeInitializeTab(3) // SavedViews
     const toastSpy = jest.spyOn(toastService, 'showInfo')
     const deleteSpy = jest.spyOn(savedViewService, 'delete')
     deleteSpy.mockReturnValue(of(true))
@@ -462,38 +396,8 @@ describe('SettingsComponent', () => {
 
   it('should get group name', () => {
     completeSetup()
-    component.maybeInitializeTab(5) // UsersGroups
     expect(component.getGroupName(1)).toEqual(groups[0].name)
     expect(component.getGroupName(11)).toEqual('')
-  })
-
-  it('should show errors on load if load mailAccounts failure', () => {
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    jest
-      .spyOn(mailAccountService, 'listAll')
-      .mockImplementation(() =>
-        throwError(() => new Error('failed to load mail accounts'))
-      )
-    completeSetup(mailAccountService)
-    const tabButtons = fixture.debugElement.queryAll(By.directive(NgbNavLink))
-    tabButtons[3].nativeElement.dispatchEvent(new MouseEvent('click')) // mail tab
-    fixture.detectChanges()
-    expect(toastErrorSpy).toBeCalled()
-  })
-
-  it('should show errors on load if load mailRules failure', () => {
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    jest
-      .spyOn(mailRuleService, 'listAll')
-      .mockImplementation(() =>
-        throwError(() => new Error('failed to load mail rules'))
-      )
-    completeSetup(mailRuleService)
-    const tabButtons = fixture.debugElement.queryAll(By.directive(NgbNavLink))
-    tabButtons[3].nativeElement.dispatchEvent(new MouseEvent('click')) // mail tab
-    fixture.detectChanges()
-    // tabButtons[4].nativeElement.dispatchEvent(new MouseEvent('click'))
-    expect(toastErrorSpy).toBeCalled()
   })
 
   it('should show errors on load if load users failure', () => {
@@ -505,7 +409,7 @@ describe('SettingsComponent', () => {
       )
     completeSetup(userService)
     const tabButtons = fixture.debugElement.queryAll(By.directive(NgbNavLink))
-    tabButtons[4].nativeElement.dispatchEvent(new MouseEvent('click')) // users tab
+    tabButtons[3].nativeElement.dispatchEvent(new MouseEvent('click')) // users tab
     fixture.detectChanges()
     expect(toastErrorSpy).toBeCalled()
   })
@@ -519,147 +423,8 @@ describe('SettingsComponent', () => {
       )
     completeSetup(groupService)
     const tabButtons = fixture.debugElement.queryAll(By.directive(NgbNavLink))
-    tabButtons[4].nativeElement.dispatchEvent(new MouseEvent('click')) // users tab
+    tabButtons[3].nativeElement.dispatchEvent(new MouseEvent('click')) // users tab
     fixture.detectChanges()
     expect(toastErrorSpy).toBeCalled()
-  })
-
-  it('should support edit / create mail account, show error if needed', () => {
-    completeSetup()
-    let modal: NgbModalRef
-    modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
-    component.editMailAccount(mailAccounts[0] as PaperlessMailAccount)
-    const editDialog = modal.componentInstance as MailAccountEditDialogComponent
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
-    editDialog.failed.emit()
-    expect(toastErrorSpy).toBeCalled()
-    editDialog.succeeded.emit(mailAccounts[0])
-    expect(toastInfoSpy).toHaveBeenCalledWith(
-      `Saved account "${mailAccounts[0].name}".`
-    )
-  })
-
-  it('should support delete mail account, show error if needed', () => {
-    completeSetup()
-    let modal: NgbModalRef
-    modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
-    component.deleteMailAccount(mailAccounts[0] as PaperlessMailAccount)
-    const deleteDialog = modal.componentInstance as ConfirmDialogComponent
-    const deleteSpy = jest.spyOn(mailAccountService, 'delete')
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
-    const listAllSpy = jest.spyOn(mailAccountService, 'listAll')
-    deleteSpy.mockReturnValueOnce(
-      throwError(() => new Error('error deleting mail account'))
-    )
-    deleteDialog.confirm()
-    expect(toastErrorSpy).toBeCalled()
-    deleteSpy.mockReturnValueOnce(of(true))
-    deleteDialog.confirm()
-    expect(listAllSpy).toHaveBeenCalled()
-    expect(toastInfoSpy).toHaveBeenCalledWith('Deleted mail account')
-  })
-
-  it('should support edit / create mail rule, show error if needed', () => {
-    completeSetup()
-    let modal: NgbModalRef
-    modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
-    component.editMailRule(mailRules[0] as PaperlessMailRule)
-    const editDialog = modal.componentInstance as MailRuleEditDialogComponent
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
-    editDialog.failed.emit()
-    expect(toastErrorSpy).toBeCalled()
-    editDialog.succeeded.emit(mailRules[0])
-    expect(toastInfoSpy).toHaveBeenCalledWith(
-      `Saved rule "${mailRules[0].name}".`
-    )
-  })
-
-  it('should support delete mail rule, show error if needed', () => {
-    completeSetup()
-    let modal: NgbModalRef
-    modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
-    component.deleteMailRule(mailRules[0] as PaperlessMailRule)
-    const deleteDialog = modal.componentInstance as ConfirmDialogComponent
-    const deleteSpy = jest.spyOn(mailRuleService, 'delete')
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
-    const listAllSpy = jest.spyOn(mailRuleService, 'listAll')
-    deleteSpy.mockReturnValueOnce(
-      throwError(() => new Error('error deleting mail rule'))
-    )
-    deleteDialog.confirm()
-    expect(toastErrorSpy).toBeCalled()
-    deleteSpy.mockReturnValueOnce(of(true))
-    deleteDialog.confirm()
-    expect(listAllSpy).toHaveBeenCalled()
-    expect(toastInfoSpy).toHaveBeenCalledWith('Deleted mail rule')
-  })
-
-  it('should support edit permissions on mail rule objects', () => {
-    completeSetup()
-    const perms = {
-      owner: 99,
-      set_permissions: {
-        view: {
-          users: [1],
-          groups: [2],
-        },
-        change: {
-          users: [3],
-          groups: [4],
-        },
-      },
-    }
-    let modal: NgbModalRef
-    modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
-    const rulePatchSpy = jest.spyOn(mailRuleService, 'patch')
-    component.editPermissions(mailRules[0] as PaperlessMailRule)
-    expect(modal).not.toBeUndefined()
-    let dialog = modal.componentInstance as PermissionsDialogComponent
-    expect(dialog.object).toEqual(mailRules[0])
-
-    rulePatchSpy.mockReturnValueOnce(
-      throwError(() => new Error('error saving perms'))
-    )
-    dialog.confirmClicked.emit(perms)
-    expect(rulePatchSpy).toHaveBeenCalled()
-    expect(toastErrorSpy).toHaveBeenCalled()
-    rulePatchSpy.mockReturnValueOnce(of(mailRules[0] as PaperlessMailRule))
-    dialog.confirmClicked.emit(perms)
-    expect(toastInfoSpy).toHaveBeenCalledWith('Permissions updated')
-
-    modalService.dismissAll()
-  })
-
-  it('should support edit permissions on mail account objects', () => {
-    completeSetup()
-    const perms = {
-      owner: 99,
-      set_permissions: {
-        view: {
-          users: [1],
-          groups: [2],
-        },
-        change: {
-          users: [3],
-          groups: [4],
-        },
-      },
-    }
-    let modal: NgbModalRef
-    modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
-    const accountPatchSpy = jest.spyOn(mailAccountService, 'patch')
-    component.editPermissions(mailAccounts[0] as PaperlessMailAccount)
-    expect(modal).not.toBeUndefined()
-    let dialog = modal.componentInstance as PermissionsDialogComponent
-    expect(dialog.object).toEqual(mailAccounts[0])
-    dialog = modal.componentInstance as PermissionsDialogComponent
-    dialog.confirmClicked.emit(perms)
-    expect(accountPatchSpy).toHaveBeenCalled()
   })
 })

@@ -125,6 +125,7 @@ import localeSv from '@angular/common/locales/sv'
 import localeTr from '@angular/common/locales/tr'
 import localeUk from '@angular/common/locales/uk'
 import localeZh from '@angular/common/locales/zh'
+import { MailComponent } from './components/manage/mail/mail.component'
 
 registerLocaleData(localeAf)
 registerLocaleData(localeAr)
@@ -237,6 +238,7 @@ function initializeApp(settings: SettingsService) {
     ShareLinksDropdownComponent,
     ConsumptionTemplatesListComponent,
     ConsumptionTemplateEditDialogComponent,
+    MailComponent,
   ],
   imports: [
     BrowserModule,

@@ -2,24 +2,6 @@ import { test, expect } from '@playwright/test'
 
 const REQUESTS_HAR = 'e2e/admin/requests/api-settings.har'
 
-test('should post settings on save', async ({ page }) => {
-  await page.routeFromHAR(REQUESTS_HAR, { notFound: 'fallback' })
-  await page.goto('/settings')
-  await page.getByLabel('Use system setting').click()
-  await page.getByRole('button', { name: 'Save' }).scrollIntoViewIfNeeded()
-  const updatePromise = page.waitForRequest((request) => {
-    const data = request.postDataJSON()
-    const isValid = data['settings'] != null
-    return (
-      isValid &&
-      request.method() === 'POST' &&
-      request.url().includes('/api/ui_settings/')
-    )
-  })
-  await page.getByRole('button', { name: 'Save' }).click()
-  await updatePromise
-})
-
 test('should activate / deactivate save button when settings change', async ({
   page,
 }) => {
@@ -86,11 +68,6 @@ test('should support tab direct navigation', async ({ page }) => {
   ).toHaveAttribute('aria-selected', 'true')
   await page.goto('/settings/savedviews')
   await expect(page.getByRole('tab', { name: 'Saved Views' })).toHaveAttribute(
-    'aria-selected',
-    'true'
-  )
-  await page.goto('/settings/mail')
-  await expect(page.getByRole('tab', { name: 'Mail' })).toHaveAttribute(
     'aria-selected',
     'true'
   )

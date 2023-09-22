@@ -22,6 +22,7 @@ import {
   PermissionType,
 } from './services/permissions.service'
 import { ConsumptionTemplatesListComponent } from './components/manage/consumption-templates-list/consumption-templates-list.component'
+import { MailComponent } from './components/manage/mail/mail.component'
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -144,6 +145,10 @@ export const routes: Routes = [
         },
       },
       {
+        path: 'settings/mail',
+        redirectTo: '/mail',
+      },
+      {
         path: 'settings',
         component: SettingsComponent,
         canDeactivate: [DirtyFormGuard],
@@ -168,11 +173,6 @@ export const routes: Routes = [
         },
       },
       {
-        path: 'settings/:section',
-        component: SettingsComponent,
-        canDeactivate: [DirtyFormGuard],
-      },
-      {
         path: 'tasks',
         component: TasksComponent,
         canActivate: [PermissionsGuard],
@@ -191,6 +191,17 @@ export const routes: Routes = [
           requiredPermission: {
             action: PermissionAction.View,
             type: PermissionType.ConsumptionTemplate,
+          },
+        },
+      },
+      {
+        path: 'mail',
+        component: MailComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.MailAccount,
           },
         },
       },
