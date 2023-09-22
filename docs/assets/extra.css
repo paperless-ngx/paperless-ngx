@@ -41,7 +41,8 @@ h4 code {
 }
 
 /* Hide config vars from sidebar, toc and move the border on mobile case their hidden */
-.md-nav.md-nav--secondary .md-nav__item .md-nav__link[href*="PAPERLESS_"] {
+.md-nav.md-nav--secondary .md-nav__item .md-nav__link[href*="PAPERLESS_"],
+.md-nav.md-nav--secondary .md-nav__item .md-nav__link[href*="USERMAP_"] {
     display: none;
 }
 
