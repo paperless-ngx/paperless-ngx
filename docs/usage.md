@@ -290,6 +290,16 @@ Consumption templates can assign:
 - Document owner
 - View and / or edit permissions to users or groups
 
+### Consumption template permissions
+
+All users who have application permissions for editing consumption templates can see the same set
+of templates. In other words, templates themselves intentionally do not have an owner or permissions.
+
+Given their potentially far-reaching capabilities, you may want to restrict access to templates.
+
+Upon migration, existing installs will grant access to consumption templates to users who can add
+documents (and superusers who can always access all parts of the app).
+
 ### Title placeholders
 
 Consumption template titles can include placeholders, _only for items that are assigned within the template_.

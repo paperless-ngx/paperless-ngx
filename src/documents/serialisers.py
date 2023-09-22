@@ -1040,7 +1040,7 @@ class BulkEditObjectPermissionsSerializer(serializers.Serializer, SetPermissions
         return attrs
 
 
-class ConsumptionTemplateSerializer(OwnedObjectSerializer):
+class ConsumptionTemplateSerializer(serializers.ModelSerializer):
     order = serializers.IntegerField(required=False)
     sources = fields.MultipleChoiceField(
         choices=ConsumptionTemplate.DocumentSourceChoices.choices,
@@ -1076,10 +1076,6 @@ class ConsumptionTemplateSerializer(OwnedObjectSerializer):
             "assign_view_groups",
             "assign_change_users",
             "assign_change_groups",
-            "owner",
-            "user_can_change",
-            "permissions",
-            "set_permissions",
         ]
 
     def validate(self, attrs):

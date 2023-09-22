@@ -740,15 +740,11 @@ class ShareLink(models.Model):
         return f"Share Link for {self.document.title}"
 
 
-class ConsumptionTemplate(ModelWithOwner):
+class ConsumptionTemplate(models.Model):
     class DocumentSourceChoices(models.IntegerChoices):
         CONSUME_FOLDER = DocumentSource.ConsumeFolder.value, _("Consume Folder")
         API_UPLOAD = DocumentSource.ApiUpload.value, _("Api Upload")
         MAIL_FETCH = DocumentSource.MailFetch.value, _("Mail Fetch")
-
-    class Meta:
-        verbose_name = _("consumption template")
-        verbose_name_plural = _("consumption templates")
 
     name = models.CharField(_("name"), max_length=256, unique=True)
 
@@ -869,6 +865,10 @@ class ConsumptionTemplate(ModelWithOwner):
         related_name="+",
         verbose_name=_("grant change permissions to these groups"),
     )
+
+    class Meta:
+        verbose_name = _("consumption template")
+        verbose_name_plural = _("consumption templates")
 
     def __str__(self):
         return f"{self.name}"

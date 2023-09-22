@@ -1,4 +1,4 @@
-import { ObjectWithPermissions } from './object-with-permissions'
+import { ObjectWithId } from './object-with-id'
 
 export enum DocumentSource {
   ConsumeFolder = 1,
@@ -6,7 +6,7 @@ export enum DocumentSource {
   MailFetch = 3,
 }
 
-export interface PaperlessConsumptionTemplate extends ObjectWithPermissions {
+export interface PaperlessConsumptionTemplate extends ObjectWithId {
   name: string
 
   order: number

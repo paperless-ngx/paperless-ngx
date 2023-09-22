@@ -2,10 +2,7 @@ import { Component, OnInit } from '@angular/core'
 import { ConsumptionTemplateService } from 'src/app/services/rest/consumption-template.service'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 import { Subject, takeUntil } from 'rxjs'
-import {
-  DocumentSource,
-  PaperlessConsumptionTemplate,
-} from 'src/app/data/paperless-consumption-template'
+import { PaperlessConsumptionTemplate } from 'src/app/data/paperless-consumption-template'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { ToastService } from 'src/app/services/toast.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
@@ -108,16 +105,5 @@ export class ConsmptionTemplatesListComponent
         },
       })
     })
-  }
-
-  userCanEdit(template: PaperlessConsumptionTemplate): boolean {
-    return this.permissionsService.currentUserHasObjectPermissions(
-      this.PermissionAction.Change,
-      template
-    )
-  }
-
-  userIsOwner(template: PaperlessConsumptionTemplate): boolean {
-    return this.permissionsService.currentUserOwnsObject(template)
   }
 }

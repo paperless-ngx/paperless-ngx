@@ -206,16 +206,6 @@ class Migration(migrations.Migration):
                         verbose_name="grant view permissions to these users",
                     ),
                 ),
-                (
-                    "owner",
-                    models.ForeignKey(
-                        blank=True,
-                        null=True,
-                        on_delete=django.db.models.deletion.SET_NULL,
-                        to=settings.AUTH_USER_MODEL,
-                        verbose_name="owner",
-                    ),
-                ),
             ],
             options={
                 "verbose_name": "consumption template",
