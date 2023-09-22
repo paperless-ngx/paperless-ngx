@@ -807,7 +807,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">691</context>
+          <context context-type="linenumber">696</context>
         </context-group>
         <target state="translated">Fout by die bewaar van instellings.</target>
       </trans-unit>
@@ -1011,15 +1011,15 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">370</context>
+          <context context-type="linenumber">371</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">421</context>
+          <context context-type="linenumber">423</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">455</context>
+          <context context-type="linenumber">457</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
@@ -1183,7 +1183,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">491</context>
+          <context context-type="linenumber">493</context>
         </context-group>
         <target state="translated">Bewaar</target>
       </trans-unit>
@@ -1223,7 +1223,7 @@
         <source>Create new item</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/edit-dialog.component.ts</context>
-          <context context-type="linenumber">101</context>
+          <context context-type="linenumber">109</context>
         </context-group>
         <target state="translated">Skep nuwe item</target>
       </trans-unit>
@@ -1231,7 +1231,7 @@
         <source>Edit item</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/edit-dialog.component.ts</context>
-          <context context-type="linenumber">105</context>
+          <context context-type="linenumber">113</context>
         </context-group>
         <target state="translated">Wysig item</target>
       </trans-unit>
@@ -1280,6 +1280,14 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">135</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">346</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">384</context>
         </context-group>
         <target state="translated">Toestemmings</target>
       </trans-unit>
@@ -1335,7 +1343,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">420</context>
+          <context context-type="linenumber">422</context>
         </context-group>
         <target state="translated">Gebruikersnaam</target>
       </trans-unit>
@@ -1427,11 +1435,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">396</context>
+          <context context-type="linenumber">398</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">482</context>
+          <context context-type="linenumber">484</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
@@ -1515,7 +1523,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">371</context>
+          <context context-type="linenumber">372</context>
         </context-group>
         <target state="translated">Rekening</target>
       </trans-unit>
@@ -1803,19 +1811,19 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">346</context>
+          <context context-type="linenumber">347</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">383</context>
+          <context context-type="linenumber">385</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">435</context>
+          <context context-type="linenumber">437</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">470</context>
+          <context context-type="linenumber">472</context>
         </context-group>
         <target state="translated">Skrap</target>
       </trans-unit>
@@ -2067,11 +2075,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">422</context>
+          <context context-type="linenumber">424</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">443</context>
+          <context context-type="linenumber">445</context>
         </context-group>
         <target state="translated">Groepe</target>
       </trans-unit>
@@ -2340,15 +2348,15 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">382</context>
+          <context context-type="linenumber">383</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">434</context>
+          <context context-type="linenumber">436</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">469</context>
+          <context context-type="linenumber">471</context>
         </context-group>
         <target state="translated">Wysig</target>
       </trans-unit>
@@ -2409,19 +2417,27 @@
         </context-group>
         <target state="translated">Filter dokumente met hierdie etikette</target>
       </trans-unit>
-      <trans-unit id="8105421668262723483" datatype="html">
-        <source>Set Permissions</source>
+      <trans-unit id="7062872617520618723" datatype="html">
+        <source>Set permissions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-dialog/permissions-dialog.component.ts</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="translated">Stel toestemmings</target>
+        <target state="needs-translation">Set permissions</target>
+      </trans-unit>
+      <trans-unit id="1678966148862835666" datatype="html">
+        <source>Edit permissions for </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/permissions-dialog/permissions-dialog.component.ts</context>
+          <context context-type="linenumber">30</context>
+        </context-group>
+        <target state="needs-translation">Edit permissions for </target>
       </trans-unit>
       <trans-unit id="8283439432608484491" datatype="html">
         <source>Note that permissions set here will override any existing permissions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-dialog/permissions-dialog.component.ts</context>
-          <context context-type="linenumber">43</context>
+          <context context-type="linenumber">55</context>
         </context-group>
         <target state="translated">Let wel dat toestemmings wat hier gestel word enige bestaande toestemmings sal oorheers</target>
       </trans-unit>
@@ -2457,7 +2473,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">408</context>
+          <context context-type="linenumber">410</context>
         </context-group>
         <target state="translated">Gebruikers</target>
       </trans-unit>
@@ -3056,15 +3072,15 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">372</context>
+          <context context-type="linenumber">373</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">423</context>
+          <context context-type="linenumber">425</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">458</context>
+          <context context-type="linenumber">460</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
@@ -3504,19 +3520,19 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">796</context>
+          <context context-type="linenumber">801</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">848</context>
+          <context context-type="linenumber">853</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">907</context>
+          <context context-type="linenumber">912</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">965</context>
+          <context context-type="linenumber">970</context>
         </context-group>
         <target state="translated">Dit kan nie ontdaan word nie.</target>
       </trans-unit>
@@ -3532,19 +3548,19 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">798</context>
+          <context context-type="linenumber">803</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">850</context>
+          <context context-type="linenumber">855</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">909</context>
+          <context context-type="linenumber">914</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">967</context>
+          <context context-type="linenumber">972</context>
         </context-group>
         <target state="translated">Gaan voort</target>
       </trans-unit>
@@ -4784,6 +4800,10 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">300</context>
         </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
+          <context context-type="linenumber">1010</context>
+        </context-group>
         <target state="needs-translation">Error updating permissions</target>
       </trans-unit>
       <trans-unit id="1685061484835793745" datatype="html">
@@ -5198,7 +5218,7 @@
         <source>No mail accounts defined.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">352</context>
+          <context context-type="linenumber">353</context>
         </context-group>
         <target state="translated">Geen e-posrekeninge gedefinieer.</target>
       </trans-unit>
@@ -5206,7 +5226,7 @@
         <source>Mail rules</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">358</context>
+          <context context-type="linenumber">359</context>
         </context-group>
         <target state="translated">E-posreëls</target>
       </trans-unit>
@@ -5214,7 +5234,7 @@
         <source>Add Rule</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">363</context>
+          <context context-type="linenumber">364</context>
         </context-group>
         <target state="translated">Voeg reël toe</target>
       </trans-unit>
@@ -5222,7 +5242,7 @@
         <source>No mail rules defined.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">389</context>
+          <context context-type="linenumber">391</context>
         </context-group>
         <target state="translated">Geen e-posreëls gedefinieer.</target>
       </trans-unit>
@@ -5230,7 +5250,7 @@
         <source>Users &amp; Groups</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">403</context>
+          <context context-type="linenumber">405</context>
         </context-group>
         <target state="translated">Gebruikers &amp; Groepe</target>
       </trans-unit>
@@ -5238,7 +5258,7 @@
         <source>Add User</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">413</context>
+          <context context-type="linenumber">415</context>
         </context-group>
         <target state="translated">Voeg gebruiker toe</target>
       </trans-unit>
@@ -5246,7 +5266,7 @@
         <source>Add Group</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">448</context>
+          <context context-type="linenumber">450</context>
         </context-group>
         <target state="translated">Voeg groep toe</target>
       </trans-unit>
@@ -5254,7 +5274,7 @@
         <source>Error retrieving groups</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">299</context>
+          <context context-type="linenumber">304</context>
         </context-group>
         <target state="needs-translation">Error retrieving groups</target>
       </trans-unit>
@@ -5262,7 +5282,7 @@
         <source>Error retrieving mail rules</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">325</context>
+          <context context-type="linenumber">328</context>
         </context-group>
         <target state="needs-translation">Error retrieving mail rules</target>
       </trans-unit>
@@ -5270,7 +5290,7 @@
         <source>Error retrieving mail accounts</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">333</context>
+          <context context-type="linenumber">336</context>
         </context-group>
         <target state="needs-translation">Error retrieving mail accounts</target>
       </trans-unit>
@@ -5278,7 +5298,7 @@
         <source>Error retrieving users</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">350</context>
+          <context context-type="linenumber">354</context>
         </context-group>
         <target state="needs-translation">Error retrieving users</target>
       </trans-unit>
@@ -5286,7 +5306,7 @@
         <source>Saved view &quot;<x id="PH" equiv-text="savedView.name"/>&quot; deleted.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">553</context>
+          <context context-type="linenumber">558</context>
         </context-group>
         <target state="translated">Bewaarde aansig "<x id="PH" equiv-text="savedView.name"/>" is geskrap.</target>
       </trans-unit>
@@ -5294,7 +5314,7 @@
         <source>Settings saved</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">675</context>
+          <context context-type="linenumber">680</context>
         </context-group>
         <target state="translated">Instellings bewaar</target>
       </trans-unit>
@@ -5302,7 +5322,7 @@
         <source>Settings were saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">676</context>
+          <context context-type="linenumber">681</context>
         </context-group>
         <target state="translated">Instellings is suksesvol bewaar.</target>
       </trans-unit>
@@ -5310,7 +5330,7 @@
         <source>Settings were saved successfully. Reload is required to apply some changes.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">680</context>
+          <context context-type="linenumber">685</context>
         </context-group>
         <target state="translated">Instellings is suksesvol bewaar. Moet herlaai word om sommige veranderinge toe te pas.</target>
       </trans-unit>
@@ -5318,7 +5338,7 @@
         <source>Reload now</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">681</context>
+          <context context-type="linenumber">686</context>
         </context-group>
         <target state="translated">Herlaai nou</target>
       </trans-unit>
@@ -5326,7 +5346,7 @@
         <source>Use system language</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">699</context>
+          <context context-type="linenumber">704</context>
         </context-group>
         <target state="translated">Gebruik stelseltaal</target>
       </trans-unit>
@@ -5334,7 +5354,7 @@
         <source>Use date format of display language</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">706</context>
+          <context context-type="linenumber">711</context>
         </context-group>
         <target state="translated">Gebruik datumformaat van aansigtaal</target>
       </trans-unit>
@@ -5342,7 +5362,7 @@
         <source>Error while storing settings on server.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">726</context>
+          <context context-type="linenumber">731</context>
         </context-group>
         <target state="translated">Fout toe instellings op bediener bewaar is.</target>
       </trans-unit>
@@ -5350,7 +5370,7 @@
         <source>Password has been changed, you will be logged out momentarily.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">768</context>
+          <context context-type="linenumber">773</context>
         </context-group>
         <target state="translated">Wagwoord is verander, u sal vir nn oomblik afgeteken word.</target>
       </trans-unit>
@@ -5358,7 +5378,7 @@
         <source>Saved user &quot;<x id="PH" equiv-text="newUser.username"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">775</context>
+          <context context-type="linenumber">780</context>
         </context-group>
         <target state="translated">Gebruiker “<x id="PH" equiv-text="newUser.username"/>” is bewaar.</target>
       </trans-unit>
@@ -5366,7 +5386,7 @@
         <source>Error saving user.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">786</context>
+          <context context-type="linenumber">791</context>
         </context-group>
         <target state="translated">Fout by bewaar van gebruiker.</target>
       </trans-unit>
@@ -5374,7 +5394,7 @@
         <source>Confirm delete user account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">794</context>
+          <context context-type="linenumber">799</context>
         </context-group>
         <target state="translated">Bevestig skrap van gebruikersrekening</target>
       </trans-unit>
@@ -5382,7 +5402,7 @@
         <source>This operation will permanently delete this user account.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">795</context>
+          <context context-type="linenumber">800</context>
         </context-group>
         <target state="translated">Hierdie bewerking sal hierdie gebruikersrekening permanent skrap.</target>
       </trans-unit>
@@ -5390,7 +5410,7 @@
         <source>Deleted user</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">804</context>
+          <context context-type="linenumber">809</context>
         </context-group>
         <target state="translated">Skrap gebruiker</target>
       </trans-unit>
@@ -5398,7 +5418,7 @@
         <source>Error deleting user.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">811</context>
+          <context context-type="linenumber">816</context>
         </context-group>
         <target state="translated">Fout by skrap van gebruiker.</target>
       </trans-unit>
@@ -5406,7 +5426,7 @@
         <source>Saved group &quot;<x id="PH" equiv-text="newGroup.name"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">829</context>
+          <context context-type="linenumber">834</context>
         </context-group>
         <target state="translated">Groep “<x id="PH" equiv-text="newGroup.name"/>” is bewaar.</target>
       </trans-unit>
@@ -5414,7 +5434,7 @@
         <source>Error saving group.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">838</context>
+          <context context-type="linenumber">843</context>
         </context-group>
         <target state="translated">Fout by bewaar van groep.</target>
       </trans-unit>
@@ -5422,7 +5442,7 @@
         <source>Confirm delete user group</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">846</context>
+          <context context-type="linenumber">851</context>
         </context-group>
         <target state="translated">Bevestig skrap van gebruikersgroep</target>
       </trans-unit>
@@ -5430,7 +5450,7 @@
         <source>This operation will permanently delete this user group.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">847</context>
+          <context context-type="linenumber">852</context>
         </context-group>
         <target state="translated">Hierdie bewerking sal hierdie gebruikersgroep permanent skrap.</target>
       </trans-unit>
@@ -5438,7 +5458,7 @@
         <source>Deleted group</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">856</context>
+          <context context-type="linenumber">861</context>
         </context-group>
         <target state="translated">Geskrapte groep</target>
       </trans-unit>
@@ -5446,7 +5466,7 @@
         <source>Error deleting group.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">863</context>
+          <context context-type="linenumber">868</context>
         </context-group>
         <target state="translated">Fout by skrap van groep.</target>
       </trans-unit>
@@ -5454,7 +5474,7 @@
         <source>Saved account &quot;<x id="PH" equiv-text="newMailAccount.name"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">886</context>
+          <context context-type="linenumber">891</context>
         </context-group>
         <target state="translated">Rekening “<x id="PH" equiv-text="newMailAccount.name"/>” is bewaar.</target>
       </trans-unit>
@@ -5462,7 +5482,7 @@
         <source>Error saving account.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">897</context>
+          <context context-type="linenumber">902</context>
         </context-group>
         <target state="translated">Fout by bewaar van rekening.</target>
       </trans-unit>
@@ -5470,7 +5490,7 @@
         <source>Confirm delete mail account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">905</context>
+          <context context-type="linenumber">910</context>
         </context-group>
         <target state="translated">Bevestig skrap van e-posrekening</target>
       </trans-unit>
@@ -5478,7 +5498,7 @@
         <source>This operation will permanently delete this mail account.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">906</context>
+          <context context-type="linenumber">911</context>
         </context-group>
         <target state="translated">Hierdie bewerking sal hierdie e-posrekening permanent skrap.</target>
       </trans-unit>
@@ -5486,7 +5506,7 @@
         <source>Deleted mail account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">915</context>
+          <context context-type="linenumber">920</context>
         </context-group>
         <target state="translated">Skrap e-posrekening</target>
       </trans-unit>
@@ -5494,7 +5514,7 @@
         <source>Error deleting mail account.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">924</context>
+          <context context-type="linenumber">929</context>
         </context-group>
         <target state="translated">Fout by skrap van e-posrekening.</target>
       </trans-unit>
@@ -5502,7 +5522,7 @@
         <source>Saved rule &quot;<x id="PH" equiv-text="newMailRule.name"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">944</context>
+          <context context-type="linenumber">949</context>
         </context-group>
         <target state="translated">Reël “<x id="PH" equiv-text="newMailRule.name"/>” is bewaar.</target>
       </trans-unit>
@@ -5510,7 +5530,7 @@
         <source>Error saving rule.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">955</context>
+          <context context-type="linenumber">960</context>
         </context-group>
         <target state="translated">Fout by bewaar van reël.</target>
       </trans-unit>
@@ -5518,7 +5538,7 @@
         <source>Confirm delete mail rule</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">963</context>
+          <context context-type="linenumber">968</context>
         </context-group>
         <target state="translated">Bevestig skrap van e-posreël</target>
       </trans-unit>
@@ -5526,7 +5546,7 @@
         <source>This operation will permanently delete this mail rule.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">964</context>
+          <context context-type="linenumber">969</context>
         </context-group>
         <target state="translated">Hierdie bewerking sal hierdie e-posreël permanent skrap.</target>
       </trans-unit>
@@ -5534,7 +5554,7 @@
         <source>Deleted mail rule</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">973</context>
+          <context context-type="linenumber">978</context>
         </context-group>
         <target state="translated">Skrap e-posreël</target>
       </trans-unit>
@@ -5542,9 +5562,17 @@
         <source>Error deleting mail rule.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">981</context>
+          <context context-type="linenumber">986</context>
         </context-group>
         <target state="translated">Fout by skrap van e-posreël.</target>
+      </trans-unit>
+      <trans-unit id="3061362835271417984" datatype="html">
+        <source>Permissions updated</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
+          <context context-type="linenumber">1006</context>
+        </context-group>
+        <target state="needs-translation">Permissions updated</target>
       </trans-unit>
       <trans-unit id="5101757640976222639" datatype="html">
         <source>storage path</source>
