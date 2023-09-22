@@ -50,7 +50,6 @@ enum SettingsNavIDs {
   General = 1,
   Notifications = 2,
   SavedViews = 3,
-  UsersGroups = 4,
 }
 
 @Component({
@@ -66,8 +65,6 @@ export class SettingsComponent
   activeNavID: number
 
   savedViewGroup = new FormGroup({})
-  usersGroup = new FormGroup({})
-  groupsGroup = new FormGroup({})
 
   settingsForm = new FormGroup({
     bulkEditConfirmationDialogs: new FormControl(null),
@@ -94,8 +91,6 @@ export class SettingsComponent
     notificationsConsumerSuccess: new FormControl(null),
     notificationsConsumerFailed: new FormControl(null),
     notificationsConsumerSuppressOnDashboard: new FormControl(null),
-    usersGroup: this.usersGroup,
-    groupsGroup: this.groupsGroup,
 
     savedViewsWarnOnUnsavedChange: new FormControl(null),
     savedViews: this.savedViewGroup,
@@ -133,7 +128,6 @@ export class SettingsComponent
     private usersService: UserService,
     private groupsService: GroupService,
     private router: Router,
-    private modalService: NgbModal,
     public permissionsService: PermissionsService
   ) {
     super()
@@ -274,8 +268,6 @@ export class SettingsComponent
       defaultPermsEditGroups: this.settings.get(
         SETTINGS_KEYS.DEFAULT_PERMS_EDIT_GROUPS
       ),
-      usersGroup: {},
-      groupsGroup: {},
       savedViews: {},
     }
   }
@@ -321,55 +313,6 @@ export class SettingsComponent
             name: new FormControl(null),
             show_on_dashboard: new FormControl(null),
             show_in_sidebar: new FormControl(null),
-          })
-        )
-      }
-    }
-
-    if (this.users) {
-      this.emptyGroup(this.usersGroup)
-
-      for (let user of this.users) {
-        storeData.usersGroup[user.id.toString()] = {
-          id: user.id,
-          username: user.username,
-          first_name: user.first_name,
-          last_name: user.last_name,
-          is_active: user.is_active,
-          is_superuser: user.is_superuser,
-          groups: user.groups,
-          user_permissions: user.user_permissions,
-        }
-        this.usersGroup.addControl(
-          user.id.toString(),
-          new FormGroup({
-            id: new FormControl(null),
-            username: new FormControl(null),
-            first_name: new FormControl(null),
-            last_name: new FormControl(null),
-            is_active: new FormControl(null),
-            is_superuser: new FormControl(null),
-            groups: new FormControl(null),
-            user_permissions: new FormControl(null),
-          })
-        )
-      }
-    }
-
-    if (this.groups) {
-      this.emptyGroup(this.groupsGroup)
-      for (let group of this.groups) {
-        storeData.groupsGroup[group.id.toString()] = {
-          id: group.id,
-          name: group.name,
-          permissions: group.permissions,
-        }
-        this.groupsGroup.addControl(
-          group.id.toString(),
-          new FormGroup({
-            id: new FormControl(null),
-            name: new FormControl(null),
-            permissions: new FormControl(null),
           })
         )
       }
@@ -618,127 +561,5 @@ export class SettingsComponent
 
   userIsOwner(obj: ObjectWithPermissions): boolean {
     return this.permissionsService.currentUserOwnsObject(obj)
-  }
-
-  editUser(user: PaperlessUser) {
-    var modal = this.modalService.open(UserEditDialogComponent, {
-      backdrop: 'static',
-      size: 'xl',
-    })
-    modal.componentInstance.dialogMode = user
-      ? EditDialogMode.EDIT
-      : EditDialogMode.CREATE
-    modal.componentInstance.object = user
-    modal.componentInstance.succeeded
-      .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe((newUser: PaperlessUser) => {
-        if (
-          newUser.id === this.settings.currentUser.id &&
-          (modal.componentInstance as UserEditDialogComponent).passwordIsSet
-        ) {
-          this.toastService.showInfo(
-            $localize`Password has been changed, you will be logged out momentarily.`
-          )
-          setTimeout(() => {
-            window.location.href = `${window.location.origin}/accounts/logout/?next=/accounts/login/`
-          }, 2500)
-        } else {
-          this.toastService.showInfo(
-            $localize`Saved user "${newUser.username}".`
-          )
-          this.usersService.listAll().subscribe((r) => {
-            this.users = r.results
-            this.initialize()
-          })
-        }
-      })
-    modal.componentInstance.failed
-      .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe((e) => {
-        this.toastService.showError($localize`Error saving user.`, e)
-      })
-  }
-
-  deleteUser(user: PaperlessUser) {
-    let modal = this.modalService.open(ConfirmDialogComponent, {
-      backdrop: 'static',
-    })
-    modal.componentInstance.title = $localize`Confirm delete user account`
-    modal.componentInstance.messageBold = $localize`This operation will permanently delete this user account.`
-    modal.componentInstance.message = $localize`This operation cannot be undone.`
-    modal.componentInstance.btnClass = 'btn-danger'
-    modal.componentInstance.btnCaption = $localize`Proceed`
-    modal.componentInstance.confirmClicked.subscribe(() => {
-      modal.componentInstance.buttonsEnabled = false
-      this.usersService.delete(user).subscribe({
-        next: () => {
-          modal.close()
-          this.toastService.showInfo($localize`Deleted user`)
-          this.usersService.listAll().subscribe((r) => {
-            this.users = r.results
-            this.initialize(true)
-          })
-        },
-        error: (e) => {
-          this.toastService.showError($localize`Error deleting user.`, e)
-        },
-      })
-    })
-  }
-
-  editGroup(group: PaperlessGroup) {
-    var modal = this.modalService.open(GroupEditDialogComponent, {
-      backdrop: 'static',
-      size: 'lg',
-    })
-    modal.componentInstance.dialogMode = group
-      ? EditDialogMode.EDIT
-      : EditDialogMode.CREATE
-    modal.componentInstance.object = group
-    modal.componentInstance.succeeded
-      .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe((newGroup) => {
-        this.toastService.showInfo($localize`Saved group "${newGroup.name}".`)
-        this.groupsService.listAll().subscribe((r) => {
-          this.groups = r.results
-          this.initialize()
-        })
-      })
-    modal.componentInstance.failed
-      .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe((e) => {
-        this.toastService.showError($localize`Error saving group.`, e)
-      })
-  }
-
-  deleteGroup(group: PaperlessGroup) {
-    let modal = this.modalService.open(ConfirmDialogComponent, {
-      backdrop: 'static',
-    })
-    modal.componentInstance.title = $localize`Confirm delete user group`
-    modal.componentInstance.messageBold = $localize`This operation will permanently delete this user group.`
-    modal.componentInstance.message = $localize`This operation cannot be undone.`
-    modal.componentInstance.btnClass = 'btn-danger'
-    modal.componentInstance.btnCaption = $localize`Proceed`
-    modal.componentInstance.confirmClicked.subscribe(() => {
-      modal.componentInstance.buttonsEnabled = false
-      this.groupsService.delete(group).subscribe({
-        next: () => {
-          modal.close()
-          this.toastService.showInfo($localize`Deleted group`)
-          this.groupsService.listAll().subscribe((r) => {
-            this.groups = r.results
-            this.initialize(true)
-          })
-        },
-        error: (e) => {
-          this.toastService.showError($localize`Error deleting group.`, e)
-        },
-      })
-    })
-  }
-
-  getGroupName(id: number): string {
-    return this.groups?.find((g) => g.id === id)?.name ?? ''
   }
 }

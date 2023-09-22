@@ -54,25 +54,3 @@ test('should toggle saved view options when set & saved', async ({ page }) => {
   await page.getByRole('button', { name: 'Save' }).click()
   await updatePromise
 })
-
-test('should support tab direct navigation', async ({ page }) => {
-  await page.routeFromHAR(REQUESTS_HAR, { notFound: 'fallback' })
-  await page.goto('/settings/general')
-  await expect(page.getByRole('tab', { name: 'General' })).toHaveAttribute(
-    'aria-selected',
-    'true'
-  )
-  await page.goto('/settings/notifications')
-  await expect(
-    page.getByRole('tab', { name: 'Notifications' })
-  ).toHaveAttribute('aria-selected', 'true')
-  await page.goto('/settings/savedviews')
-  await expect(page.getByRole('tab', { name: 'Saved Views' })).toHaveAttribute(
-    'aria-selected',
-    'true'
-  )
-  await page.goto('/settings/usersgroups')
-  await expect(
-    page.getByRole('tab', { name: 'Users & Groups' })
-  ).toHaveAttribute('aria-selected', 'true')
-})

@@ -23,6 +23,7 @@ import {
 } from './services/permissions.service'
 import { ConsumptionTemplatesListComponent } from './components/manage/consumption-templates-list/consumption-templates-list.component'
 import { MailComponent } from './components/manage/mail/mail.component'
+import { UsersAndGroupsComponent } from './components/admin/users-groups/users-groups.component'
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -144,9 +145,14 @@ export const routes: Routes = [
           },
         },
       },
+      // redirect old paths
       {
         path: 'settings/mail',
         redirectTo: '/mail',
+      },
+      {
+        path: 'settings/usersgroups',
+        redirectTo: '/usersgroups',
       },
       {
         path: 'settings',
@@ -202,6 +208,17 @@ export const routes: Routes = [
           requiredPermission: {
             action: PermissionAction.View,
             type: PermissionType.MailAccount,
+          },
+        },
+      },
+      {
+        path: 'usersgroups',
+        component: UsersAndGroupsComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.User,
           },
         },
       },

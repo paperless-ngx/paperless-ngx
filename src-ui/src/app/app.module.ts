@@ -97,6 +97,8 @@ import { IsNumberPipe } from './pipes/is-number.pipe'
 import { ShareLinksDropdownComponent } from './components/common/share-links-dropdown/share-links-dropdown.component'
 import { ConsumptionTemplatesListComponent } from './components/manage/consumption-templates-list/consumption-templates-list.component'
 import { ConsumptionTemplateEditDialogComponent } from './components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component'
+import { MailComponent } from './components/manage/mail/mail.component'
+import { UsersAndGroupsComponent } from './components/admin/users-groups/users-groups.component'
 
 import localeAf from '@angular/common/locales/af'
 import localeAr from '@angular/common/locales/ar'
@@ -125,7 +127,6 @@ import localeSv from '@angular/common/locales/sv'
 import localeTr from '@angular/common/locales/tr'
 import localeUk from '@angular/common/locales/uk'
 import localeZh from '@angular/common/locales/zh'
-import { MailComponent } from './components/manage/mail/mail.component'
 
 registerLocaleData(localeAf)
 registerLocaleData(localeAr)
@@ -239,6 +240,7 @@ function initializeApp(settings: SettingsService) {
     ConsumptionTemplatesListComponent,
     ConsumptionTemplateEditDialogComponent,
     MailComponent,
+    UsersAndGroupsComponent,
   ],
   imports: [
     BrowserModule,

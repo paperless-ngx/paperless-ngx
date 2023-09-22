@@ -197,7 +197,7 @@ export class AppComponent implements OnInit, OnDestroy {
         },
         {
           anchorId: 'tour.settings',
-          content: $localize`Check out the settings for various tweaks to the web app, toggle settings for saved views or manage users.`,
+          content: $localize`Check out the settings for various tweaks to the web app and toggle settings for saved views.`,
           route: '/settings',
           backdropConfig: {
             offset: 0,

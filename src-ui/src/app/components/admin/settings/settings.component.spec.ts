@@ -1,21 +1,14 @@
 import { ViewportScroller, DatePipe } from '@angular/common'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
-import {
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  tick,
-} from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { By } from '@angular/platform-browser'
 import { Router, ActivatedRoute, convertToParamMap } from '@angular/router'
 import { RouterTestingModule } from '@angular/router/testing'
 import {
-  NgbModal,
   NgbModule,
   NgbAlertModule,
   NgbNavLink,
-  NgbModalRef,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
 import { of, throwError } from 'rxjs'
@@ -33,12 +26,9 @@ import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService, Toast } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
-import { GroupEditDialogComponent } from '../../common/edit-dialog/group-edit-dialog/group-edit-dialog.component'
-import { UserEditDialogComponent } from '../../common/edit-dialog/user-edit-dialog/user-edit-dialog.component'
 import { CheckComponent } from '../../common/input/check/check.component'
 import { ColorComponent } from '../../common/input/color/color.component'
 import { NumberComponent } from '../../common/input/number/number.component'
-import { PasswordComponent } from '../../common/input/password/password.component'
 import { PermissionsGroupComponent } from '../../common/input/permissions/permissions-group/permissions-group.component'
 import { PermissionsUserComponent } from '../../common/input/permissions/permissions-user/permissions-user.component'
 import { SelectComponent } from '../../common/input/select/select.component'
@@ -64,7 +54,6 @@ const groups = [
 describe('SettingsComponent', () => {
   let component: SettingsComponent
   let fixture: ComponentFixture<SettingsComponent>
-  let modalService: NgbModal
   let router: Router
   let settingsService: SettingsService
   let savedViewService: SavedViewService
@@ -88,7 +77,6 @@ describe('SettingsComponent', () => {
         SafeHtmlPipe,
         SelectComponent,
         TextComponent,
-        PasswordComponent,
         NumberComponent,
         TagsComponent,
         PermissionsUserComponent,
@@ -107,7 +95,6 @@ describe('SettingsComponent', () => {
       ],
     }).compileComponents()
 
-    modalService = TestBed.inject(NgbModal)
     router = TestBed.inject(Router)
     activatedRoute = TestBed.inject(ActivatedRoute)
     viewportScroller = TestBed.inject(ViewportScroller)
@@ -169,8 +156,6 @@ describe('SettingsComponent', () => {
     expect(navigateSpy).toHaveBeenCalledWith(['settings', 'notifications'])
     tabButtons[2].nativeElement.dispatchEvent(new MouseEvent('click'))
     expect(navigateSpy).toHaveBeenCalledWith(['settings', 'savedviews'])
-    tabButtons[3].nativeElement.dispatchEvent(new MouseEvent('click'))
-    expect(navigateSpy).toHaveBeenCalledWith(['settings', 'usersgroups'])
 
     const initSpy = jest.spyOn(component, 'initialize')
     component.isDirty = true // mock dirty
@@ -189,13 +174,13 @@ describe('SettingsComponent', () => {
     completeSetup()
     jest
       .spyOn(activatedRoute, 'paramMap', 'get')
-      .mockReturnValue(of(convertToParamMap({ section: 'usersgroups' })))
-    activatedRoute.snapshot.fragment = '#usersgroups'
+      .mockReturnValue(of(convertToParamMap({ section: 'notifications' })))
+    activatedRoute.snapshot.fragment = '#notifications'
     const scrollSpy = jest.spyOn(viewportScroller, 'scrollToAnchor')
     component.ngOnInit()
-    expect(component.activeNavID).toEqual(4) // Users & Groups
+    expect(component.activeNavID).toEqual(2) // Users & Groups
     component.ngAfterViewInit()
-    expect(scrollSpy).toHaveBeenCalledWith('#usersgroups')
+    expect(scrollSpy).toHaveBeenCalledWith('#notifications')
   })
 
   it('should support save saved views, show error', () => {
@@ -299,107 +284,6 @@ describe('SettingsComponent', () => {
     )
   })
 
-  it('should support edit / create user, show error if needed', () => {
-    completeSetup()
-    let modal: NgbModalRef
-    modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
-    component.editUser(users[0])
-    const editDialog = modal.componentInstance as UserEditDialogComponent
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
-    editDialog.failed.emit()
-    expect(toastErrorSpy).toBeCalled()
-    settingsService.currentUser = users[1] // simulate logged in as different user
-    editDialog.succeeded.emit(users[0])
-    expect(toastInfoSpy).toHaveBeenCalledWith(
-      `Saved user "${users[0].username}".`
-    )
-  })
-
-  it('should support delete user, show error if needed', () => {
-    completeSetup()
-    let modal: NgbModalRef
-    modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
-    component.deleteUser(users[0])
-    const deleteDialog = modal.componentInstance as ConfirmDialogComponent
-    const deleteSpy = jest.spyOn(userService, 'delete')
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
-    const listAllSpy = jest.spyOn(userService, 'listAll')
-    deleteSpy.mockReturnValueOnce(
-      throwError(() => new Error('error deleting user'))
-    )
-    deleteDialog.confirm()
-    expect(toastErrorSpy).toBeCalled()
-    deleteSpy.mockReturnValueOnce(of(true))
-    deleteDialog.confirm()
-    expect(listAllSpy).toHaveBeenCalled()
-    expect(toastInfoSpy).toHaveBeenCalledWith('Deleted user')
-  })
-
-  it('should logout current user if password changed, after delay', fakeAsync(() => {
-    completeSetup()
-    let modal: NgbModalRef
-    modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
-    component.editUser(users[0])
-    const editDialog = modal.componentInstance as UserEditDialogComponent
-    editDialog.passwordIsSet = true
-    settingsService.currentUser = users[0] // simulate logged in as same user
-    editDialog.succeeded.emit(users[0])
-    fixture.detectChanges()
-    Object.defineProperty(window, 'location', {
-      value: {
-        href: 'http://localhost/',
-      },
-      writable: true, // possibility to override
-    })
-    tick(2600)
-    expect(window.location.href).toContain('logout')
-  }))
-
-  it('should support edit / create group, show error if needed', () => {
-    completeSetup()
-    let modal: NgbModalRef
-    modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
-    component.editGroup(groups[0])
-    const editDialog = modal.componentInstance as GroupEditDialogComponent
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
-    editDialog.failed.emit()
-    expect(toastErrorSpy).toBeCalled()
-    editDialog.succeeded.emit(groups[0])
-    expect(toastInfoSpy).toHaveBeenCalledWith(
-      `Saved group "${groups[0].name}".`
-    )
-  })
-
-  it('should support delete group, show error if needed', () => {
-    completeSetup()
-    let modal: NgbModalRef
-    modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
-    component.deleteGroup(users[0])
-    const deleteDialog = modal.componentInstance as ConfirmDialogComponent
-    const deleteSpy = jest.spyOn(groupService, 'delete')
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
-    const listAllSpy = jest.spyOn(groupService, 'listAll')
-    deleteSpy.mockReturnValueOnce(
-      throwError(() => new Error('error deleting group'))
-    )
-    deleteDialog.confirm()
-    expect(toastErrorSpy).toBeCalled()
-    deleteSpy.mockReturnValueOnce(of(true))
-    deleteDialog.confirm()
-    expect(listAllSpy).toHaveBeenCalled()
-    expect(toastInfoSpy).toHaveBeenCalledWith('Deleted group')
-  })
-
-  it('should get group name', () => {
-    completeSetup()
-    expect(component.getGroupName(1)).toEqual(groups[0].name)
-    expect(component.getGroupName(11)).toEqual('')
-  })
-
   it('should show errors on load if load users failure', () => {
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
     jest
@@ -408,8 +292,6 @@ describe('SettingsComponent', () => {
         throwError(() => new Error('failed to load users'))
       )
     completeSetup(userService)
-    const tabButtons = fixture.debugElement.queryAll(By.directive(NgbNavLink))
-    tabButtons[3].nativeElement.dispatchEvent(new MouseEvent('click')) // users tab
     fixture.detectChanges()
     expect(toastErrorSpy).toBeCalled()
   })
@@ -422,8 +304,6 @@ describe('SettingsComponent', () => {
         throwError(() => new Error('failed to load groups'))
       )
     completeSetup(groupService)
-    const tabButtons = fixture.debugElement.queryAll(By.directive(NgbNavLink))
-    tabButtons[3].nativeElement.dispatchEvent(new MouseEvent('click')) // users tab
     fixture.detectChanges()
     expect(toastErrorSpy).toBeCalled()
   })

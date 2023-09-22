@@ -182,6 +182,13 @@
               </svg><span>&nbsp;<ng-container i18n>Settings</ng-container></span>
             </a>
           </li>
+          <li class="nav-item" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.User }">
+            <a class="nav-link" routerLink="usersgroups" routerLinkActive="active" (click)="closeMenu()" ngbPopover="Users & Groups" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
+              <svg class="sidebaricon" fill="currentColor">
+                <use xlink:href="assets/bootstrap-icons.svg#people"/>
+              </svg><span>&nbsp;<ng-container i18n>Users & Groups</ng-container></span>
+            </a>
+          </li>
           <li class="nav-item" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.PaperlessTask }" tourAnchor="tour.file-tasks">
             <a class="nav-link" routerLink="tasks" routerLinkActive="active" (click)="closeMenu()" ngbPopover="File Tasks" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
               <span *ngIf="tasksService.failedFileTasks.length > 0 && slimSidebarEnabled" class="badge bg-danger position-absolute top-0 end-0">{{tasksService.failedFileTasks.length}}</span>
