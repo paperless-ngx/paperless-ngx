@@ -19,7 +19,7 @@ const set_permissions = {
       users: [1],
       groups: [],
     },
-    edit: {
+    change: {
       users: [1],
       groups: [],
     },
@@ -78,6 +78,10 @@ describe('PermissionsDialogComponent', () => {
   })
 
   it('should return permissions', () => {
+    expect(component.permissions).toEqual({
+      owner: null,
+      set_permissions: null,
+    })
     component.form.get('permissions_form').setValue(set_permissions)
     expect(component.permissions).toEqual(set_permissions)
   })
@@ -86,5 +90,17 @@ describe('PermissionsDialogComponent', () => {
     const closeSpy = jest.spyOn(modal, 'close')
     component.cancelClicked()
     expect(closeSpy).toHaveBeenCalled()
+  })
+
+  it('should support edit permissions on object', () => {
+    let obj = {
+      id: 1,
+      name: 'account1',
+      owner: set_permissions.owner,
+      permissions: set_permissions.set_permissions,
+    }
+    component.object = obj
+    expect(component.title).toEqual(`Edit permissions for ${obj.name}`)
+    expect(component.permissions).toEqual(set_permissions)
   })
 })

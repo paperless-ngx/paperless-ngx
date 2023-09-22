@@ -52,6 +52,9 @@ import { TagsComponent } from '../../common/input/tags/tags.component'
 import { TextComponent } from '../../common/input/text/text.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { SettingsComponent } from './settings.component'
+import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
+import { PermissionsFormComponent } from '../../common/input/permissions/permissions-form/permissions-form.component'
+import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 
 const savedViews = [
   { id: 1, name: 'view1' },
@@ -70,8 +73,8 @@ const mailAccounts = [
   { id: 2, name: 'account2' },
 ]
 const mailRules = [
-  { id: 1, name: 'rule1', owner: 1 },
-  { id: 2, name: 'rule2', owner: 2 },
+  { id: 1, name: 'rule1', owner: 1, account: 1 },
+  { id: 2, name: 'rule2', owner: 2, account: 2 },
 ]
 
 describe('SettingsComponent', () => {
@@ -110,6 +113,9 @@ describe('SettingsComponent', () => {
         MailRuleEditDialogComponent,
         PermissionsUserComponent,
         PermissionsGroupComponent,
+        IfOwnerDirective,
+        PermissionsDialogComponent,
+        PermissionsFormComponent,
       ],
       providers: [CustomDatePipe, DatePipe, PermissionsGuard],
       imports: [
@@ -590,5 +596,70 @@ describe('SettingsComponent', () => {
     deleteDialog.confirm()
     expect(listAllSpy).toHaveBeenCalled()
     expect(toastInfoSpy).toHaveBeenCalledWith('Deleted mail rule')
+  })
+
+  it('should support edit permissions on mail rule objects', () => {
+    completeSetup()
+    const perms = {
+      owner: 99,
+      set_permissions: {
+        view: {
+          users: [1],
+          groups: [2],
+        },
+        change: {
+          users: [3],
+          groups: [4],
+        },
+      },
+    }
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const rulePatchSpy = jest.spyOn(mailRuleService, 'patch')
+    component.editPermissions(mailRules[0] as PaperlessMailRule)
+    expect(modal).not.toBeUndefined()
+    let dialog = modal.componentInstance as PermissionsDialogComponent
+    expect(dialog.object).toEqual(mailRules[0])
+
+    rulePatchSpy.mockReturnValueOnce(
+      throwError(() => new Error('error saving perms'))
+    )
+    dialog.confirmClicked.emit(perms)
+    expect(rulePatchSpy).toHaveBeenCalled()
+    expect(toastErrorSpy).toHaveBeenCalled()
+    rulePatchSpy.mockReturnValueOnce(of(mailRules[0] as PaperlessMailRule))
+    dialog.confirmClicked.emit(perms)
+    expect(toastInfoSpy).toHaveBeenCalledWith('Permissions updated')
+
+    modalService.dismissAll()
+  })
+
+  it('should support edit permissions on mail account objects', () => {
+    completeSetup()
+    const perms = {
+      owner: 99,
+      set_permissions: {
+        view: {
+          users: [1],
+          groups: [2],
+        },
+        change: {
+          users: [3],
+          groups: [4],
+        },
+      },
+    }
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
+    const accountPatchSpy = jest.spyOn(mailAccountService, 'patch')
+    component.editPermissions(mailAccounts[0] as PaperlessMailAccount)
+    expect(modal).not.toBeUndefined()
+    let dialog = modal.componentInstance as PermissionsDialogComponent
+    expect(dialog.object).toEqual(mailAccounts[0])
+    dialog = modal.componentInstance as PermissionsDialogComponent
+    dialog.confirmClicked.emit(perms)
+    expect(accountPatchSpy).toHaveBeenCalled()
   })
 })
