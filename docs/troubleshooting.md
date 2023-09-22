@@ -46,8 +46,7 @@ run:
 If you notice that the consumer will only pickup files in the
 consumption directory at startup, but won't find any other files added
 later, you will need to enable filesystem polling with the configuration
-option `PAPERLESS_CONSUMER_POLLING`, see
-`[here](/configuration#polling).
+option [`PAPERLESS_CONSUMER_POLLING`](/configuration#PAPERLESS_CONSUMER_POLLING).
 
 This will disable listening to filesystem changes with inotify and
 paperless will manually check the consumption directory for changes
@@ -320,7 +319,7 @@ many workers attempting to access the database simultaneously.
 
 Consider changing to the PostgreSQL database if you will be processing
 many documents at once often. Otherwise, try tweaking the
-`PAPERLESS_DB_TIMEOUT` setting to allow more time for the database to
+[`PAPERLESS_DB_TIMEOUT`](/configuration#PAPERLESS_DB_TIMEOUT) setting to allow more time for the database to
 unlock. This may have minor performance implications.
 
 ## gunicorn fails to start with "is not a valid port number"
@@ -330,7 +329,7 @@ environment variable named `${serviceName}_PORT`. This is
 the same environment variable which is used by Paperless to optionally
 change the port gunicorn listens on.
 
-To fix this, set `PAPERLESS_PORT` again to your desired port, or the
+To fix this, set [`PAPERLESS_PORT`](/configuration#PAPERLESS_PORT) again to your desired port, or the
 default of 8000.
 
 ## Database Warns about unique constraint "documents_tag_name_uniq
