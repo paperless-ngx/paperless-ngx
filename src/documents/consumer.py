@@ -649,7 +649,7 @@ class Consumer(LoggingMixin):
         Consumption template title placeholders can only include items that are
         assigned as part of this template (since auto-matching hasnt happened yet)
         """
-        local_added = timezone.now()
+        local_added = timezone.localtime(timezone.now())
 
         correspondent_name = (
             Correspondent.objects.get(pk=self.override_correspondent_id).name
@@ -668,8 +668,8 @@ class Consumer(LoggingMixin):
         )
 
         return title.format(
-            correspondent=correspondent_name or None,
-            document_type=doc_type_name or None,
+            correspondent=correspondent_name,
+            document_type=doc_type_name,
             added=local_added.isoformat(),
             added_year=local_added.strftime("%Y"),
             added_year_short=local_added.strftime("%y"),
@@ -677,7 +677,7 @@ class Consumer(LoggingMixin):
             added_month_name=local_added.strftime("%B"),
             added_month_name_short=local_added.strftime("%b"),
             added_day=local_added.strftime("%d"),
-            owner_username=owner_username or None,
+            owner_username=owner_username,
         ).strip()
 
     def _store(
