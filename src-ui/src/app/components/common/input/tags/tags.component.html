@@ -7,7 +7,7 @@
       [multiple]="true"
       [closeOnSelect]="false"
       [clearSearchOnAdd]="true"
-      [hideSelected]="true"
+      [hideSelected]="tags.length > 0"
       [addTag]="allowCreate ? createTagRef : false"
       addTagText="Add tag"
       i18n-addTagText
