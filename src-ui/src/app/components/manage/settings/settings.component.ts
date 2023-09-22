@@ -346,6 +346,7 @@ export class SettingsComponent
       .subscribe({
         next: (r) => {
           this.users = r.results
+          this.initialize(false)
         },
         error: (e) => {
           this.toastService.showError($localize`Error retrieving users`, e)
@@ -382,9 +383,8 @@ export class SettingsComponent
       }
     }
 
-    if (this.users && this.groups) {
+    if (this.users) {
       this.emptyGroup(this.usersGroup)
-      this.emptyGroup(this.groupsGroup)
 
       for (let user of this.users) {
         storeData.usersGroup[user.id.toString()] = {
@@ -411,7 +411,9 @@ export class SettingsComponent
           })
         )
       }
-
+    }
+    if (this.groups) {
+      this.emptyGroup(this.groupsGroup)
       for (let group of this.groups) {
         storeData.groupsGroup[group.id.toString()] = {
           id: group.id,
