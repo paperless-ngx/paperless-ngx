@@ -170,7 +170,8 @@ a, a:hover,
 }
 
 .btn-link:hover,
-.btn-link:active {
+.btn-link:active,
+.btn-link:focus-visible {
   color: var(--pngx-primary-darken-15) !important;
 }
 
@@ -456,7 +457,7 @@ ul.pagination {
 }
 
 table.table {
-  color: var(--bs-body-color);
+  --bs-table-color: var(--bs-body-color);
   --bs-table-bg: var(--bs-light-rgb);
 
   .des,.asc {

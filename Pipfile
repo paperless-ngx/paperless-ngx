@@ -3,7 +3,6 @@ url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
-
 [packages]
 dateparser = "~=1.1"
 # WARNING: django does not use semver.
@@ -51,6 +50,7 @@ pdf2image = "*"
 flower = "*"
 bleach = "*"
 zxing-cpp = {version = "*", platform_machine = "== 'x86_64'"}
+django-multiselectfield = "*"
 
 [dev-packages]
 # Linting
