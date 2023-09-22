@@ -13,10 +13,11 @@ import { RouterTestingModule } from '@angular/router/testing'
 import {
   NgbModal,
   NgbModule,
+  NgbAlertModule,
   NgbNavLink,
   NgbModalRef,
-  NgbAlertModule,
 } from '@ng-bootstrap/ng-bootstrap'
+import { NgSelectModule } from '@ng-select/ng-select'
 import { of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
 import { PaperlessMailAccount } from 'src/app/data/paperless-mail-account'
@@ -26,6 +27,7 @@ import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
+import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { GroupService } from 'src/app/services/rest/group.service'
 import { MailAccountService } from 'src/app/services/rest/mail-account.service'
@@ -41,15 +43,15 @@ import { MailRuleEditDialogComponent } from '../../common/edit-dialog/mail-rule-
 import { UserEditDialogComponent } from '../../common/edit-dialog/user-edit-dialog/user-edit-dialog.component'
 import { CheckComponent } from '../../common/input/check/check.component'
 import { ColorComponent } from '../../common/input/color/color.component'
+import { NumberComponent } from '../../common/input/number/number.component'
+import { PasswordComponent } from '../../common/input/password/password.component'
+import { PermissionsGroupComponent } from '../../common/input/permissions/permissions-group/permissions-group.component'
+import { PermissionsUserComponent } from '../../common/input/permissions/permissions-user/permissions-user.component'
+import { SelectComponent } from '../../common/input/select/select.component'
+import { TagsComponent } from '../../common/input/tags/tags.component'
+import { TextComponent } from '../../common/input/text/text.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { SettingsComponent } from './settings.component'
-import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
-import { SelectComponent } from '../../common/input/select/select.component'
-import { TextComponent } from '../../common/input/text/text.component'
-import { PasswordComponent } from '../../common/input/password/password.component'
-import { NumberComponent } from '../../common/input/number/number.component'
-import { TagsComponent } from '../../common/input/tags/tags.component'
-import { NgSelectModule } from '@ng-select/ng-select'
 
 const savedViews = [
   { id: 1, name: 'view1' },
@@ -106,6 +108,8 @@ describe('SettingsComponent', () => {
         TagsComponent,
         MailAccountEditDialogComponent,
         MailRuleEditDialogComponent,
+        PermissionsUserComponent,
+        PermissionsGroupComponent,
       ],
       providers: [CustomDatePipe, DatePipe, PermissionsGuard],
       imports: [
@@ -125,6 +129,7 @@ describe('SettingsComponent', () => {
     viewportScroller = TestBed.inject(ViewportScroller)
     toastService = TestBed.inject(ToastService)
     settingsService = TestBed.inject(SettingsService)
+    settingsService.currentUser = { id: 99, username: 'user99' }
     userService = TestBed.inject(UserService)
     permissionsService = TestBed.inject(PermissionsService)
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
@@ -247,11 +252,11 @@ describe('SettingsComponent', () => {
     )
     expect(component.mailAccounts).not.toBeUndefined()
 
-    expect(component.users).toBeUndefined()
+    expect(component.groups).toBeUndefined()
     tabButtons[4].nativeElement.dispatchEvent(
       new MouseEvent('mouseover', { bubbles: true })
     )
-    expect(component.users).not.toBeUndefined()
+    expect(component.groups).not.toBeUndefined()
   })
 
   it('should support save saved views, show error', () => {
@@ -301,7 +306,7 @@ describe('SettingsComponent', () => {
     expect(toastErrorSpy).toHaveBeenCalled()
     expect(storeSpy).toHaveBeenCalled()
     expect(appearanceSettingsSpy).not.toHaveBeenCalled()
-    expect(setSpy).toHaveBeenCalledTimes(19)
+    expect(setSpy).toHaveBeenCalledTimes(24)
 
     // succeed
     storeSpy.mockReturnValueOnce(of(true))
