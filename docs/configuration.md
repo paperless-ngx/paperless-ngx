@@ -19,7 +19,7 @@ run paperless, these settings have to be defined in different places.
 
 ### Redis Broker
 
-`PAPERLESS_REDIS=<url>`
+#### [`PAPERLESS_REDIS=<url>`](#PAPERLESS_REDIS) {#PAPERLESS_REDIS}
 
 : This is required for processing scheduled tasks such as email
 fetching, index optimization and for training the automatic document
@@ -35,7 +35,7 @@ matcher.
 
     Defaults to `redis://localhost:6379`.
 
-`PAPERLESS_REDIS_PREFIX=<prefix>`
+#### [`PAPERLESS_REDIS_PREFIX=<prefix>`](#PAPERLESS_REDIS_PREFIX) {#PAPERLESS_REDIS_PREFIX}
 
 : Prefix to be used in Redis for keys and channels. Useful for sharing one Redis server among multiple Paperless instances.
 
@@ -43,7 +43,7 @@ matcher.
 
 ### Database
 
-`PAPERLESS_DBENGINE=<engine_name>`
+#### [`PAPERLESS_DBENGINE=<engine_name>`](#PAPERLESS_DBENGINE) {#PAPERLESS_DBENGINE}
 
 : Optional, gives the ability to choose Postgres or MariaDB for
 database engine. Available options are `postgresql` and
@@ -55,7 +55,7 @@ database engine. Available options are `postgresql` and
 
         Using MariaDB comes with some caveats. See [MySQL Caveats](/advanced_usage#mysql-caveats).
 
-`PAPERLESS_DBHOST=<hostname>`
+#### [`PAPERLESS_DBHOST=<hostname>`](#PAPERLESS_DBHOST) {#PAPERLESS_DBHOST}
 
 : By default, sqlite is used as the database backend. This can be
 changed here.
@@ -63,31 +63,31 @@ changed here.
     Set PAPERLESS_DBHOST and another database will be used instead of
     sqlite.
 
-`PAPERLESS_DBPORT=<port>`
+#### [`PAPERLESS_DBPORT=<port>`](#PAPERLESS_DBPORT) {#PAPERLESS_DBPORT}
 
 : Adjust port if necessary.
 
     Default is 5432.
 
-`PAPERLESS_DBNAME=<name>`
+#### [`PAPERLESS_DBNAME=<name>`](#PAPERLESS_DBNAME) {#PAPERLESS_DBNAME}
 
 : Database name in PostgreSQL or MariaDB.
 
     Defaults to "paperless".
 
-`PAPERLESS_DBUSER=<name>`
+#### [`PAPERLESS_DBUSER=<name>`](#PAPERLESS_DBUSER) {#PAPERLESS_DBUSER}
 
 : Database user in PostgreSQL or MariaDB.
 
     Defaults to "paperless".
 
-`PAPERLESS_DBPASS=<password>`
+#### [`PAPERLESS_DBPASS=<password>`](#PAPERLESS_DBPASS) {#PAPERLESS_DBPASS}
 
 : Database password for PostgreSQL or MariaDB.
 
     Defaults to "paperless".
 
-`PAPERLESS_DBSSLMODE=<mode>`
+#### [`PAPERLESS_DBSSLMODE=<mode>`](#PAPERLESS_DBSSLMODE) {#PAPERLESS_DBSSLMODE}
 
 : SSL mode to use when connecting to PostgreSQL or MariaDB.
 
@@ -101,7 +101,7 @@ changed here.
 
     Default is `prefer` for PostgreSQL and `PREFERRED` for MariaDB.
 
-`PAPERLESS_DBSSLROOTCERT=<ca-path>`
+#### [`PAPERLESS_DBSSLROOTCERT=<ca-path>`](#PAPERLESS_DBSSLROOTCERT) {#PAPERLESS_DBSSLROOTCERT}
 
 : SSL root certificate path
 
@@ -114,7 +114,7 @@ changed here.
 
     Defaults to unset, using the documented path in the home directory.
 
-`PAPERLESS_DBSSLCERT=<client-cert-path>`
+#### [`PAPERLESS_DBSSLCERT=<client-cert-path>`](#PAPERLESS_DBSSLCERT) {#PAPERLESS_DBSSLCERT}
 
 : SSL client certificate path
 
@@ -128,7 +128,7 @@ changed here.
 
     Defaults to unset, using the documented path in the home directory.
 
-`PAPERLESS_DBSSLKEY=<client-cert-key>`
+#### [`PAPERLESS_DBSSLKEY=<client-cert-key>`](#PAPERLESS_DBSSLKEY) {#PAPERLESS_DBSSLKEY}
 
 : SSL client key path
 
@@ -142,7 +142,7 @@ changed here.
 
     Defaults to unset, using the documented path in the home directory.
 
-`PAPERLESS_DB_TIMEOUT=<int>`
+#### [`PAPERLESS_DB_TIMEOUT=<int>`](#PAPERLESS_DB_TIMEOUT) {#PAPERLESS_DB_TIMEOUT}
 
 : Amount of time for a database connection to wait for the database to
 unlock. Mostly applicable for sqlite based installation. Consider changing
@@ -162,19 +162,19 @@ Tika and Gotenberg are also needed to allow parsing of E-Mails (.eml).
 If you wish to use this, you must provide a Tika server and a Gotenberg server,
 configure their endpoints, and enable the feature.
 
-`PAPERLESS_TIKA_ENABLED=<bool>`
+#### [`PAPERLESS_TIKA_ENABLED=<bool>`](#PAPERLESS_TIKA_ENABLED) {#PAPERLESS_TIKA_ENABLED}
 
 : Enable (or disable) the Tika parser.
 
     Defaults to false.
 
-`PAPERLESS_TIKA_ENDPOINT=<url>`
+#### [`PAPERLESS_TIKA_ENDPOINT=<url>`](#PAPERLESS_TIKA_ENDPOINT) {#PAPERLESS_TIKA_ENDPOINT}
 
 : Set the endpoint URL were Paperless can reach your Tika server.
 
     Defaults to "<http://localhost:9998>".
 
-`PAPERLESS_TIKA_GOTENBERG_ENDPOINT=<url>`
+#### [`PAPERLESS_TIKA_GOTENBERG_ENDPOINT=<url>`](#PAPERLESS_TIKA_GOTENBERG_ENDPOINT) {#PAPERLESS_TIKA_GOTENBERG_ENDPOINT}
 
 : Set the endpoint URL were Paperless can reach your Gotenberg server.
 
@@ -193,7 +193,7 @@ and watch out for indentation if editing the YAML file.
 
 ## Paths and folders
 
-`PAPERLESS_CONSUMPTION_DIR=<path>`
+#### [`PAPERLESS_CONSUMPTION_DIR=<path>`](#PAPERLESS_CONSUMPTION_DIR) {#PAPERLESS_CONSUMPTION_DIR}
 
 : This where your documents should go to be consumed. Make sure that
 it exists and that the user running the paperless service can
@@ -205,14 +205,14 @@ read/write its contents before you start Paperless.
 
     Defaults to "../consume/", relative to the "src" directory.
 
-`PAPERLESS_DATA_DIR=<path>`
+#### [`PAPERLESS_DATA_DIR=<path>`](#PAPERLESS_DATA_DIR) {#PAPERLESS_DATA_DIR}
 
 : This is where paperless stores all its data (search index, SQLite
 database, classification model, etc).
 
     Defaults to "../data/", relative to the "src" directory.
 
-`PAPERLESS_TRASH_DIR=<path>`
+#### [`PAPERLESS_TRASH_DIR=<path>`](#PAPERLESS_TRASH_DIR) {#PAPERLESS_TRASH_DIR}
 
 : Instead of removing deleted documents, they are moved to this
 directory.
@@ -223,7 +223,7 @@ directory.
 
     Defaults to empty (i.e. really delete documents).
 
-`PAPERLESS_MEDIA_ROOT=<path>`
+#### [`PAPERLESS_MEDIA_ROOT=<path>`](#PAPERLESS_MEDIA_ROOT) {#PAPERLESS_MEDIA_ROOT}
 
 : This is where your documents and thumbnails are stored.
 
@@ -232,7 +232,7 @@ directory.
 
     Defaults to "../media/", relative to the "src" directory.
 
-`PAPERLESS_STATICDIR=<path>`
+#### [`PAPERLESS_STATICDIR=<path>`](#PAPERLESS_STATICDIR) {#PAPERLESS_STATICDIR}
 
 : Override the default STATIC_ROOT here. This is where all static
 files created using "collectstatic" manager command are stored.
@@ -243,14 +243,14 @@ files created using "collectstatic" manager command are stored.
 
     Defaults to "../static/", relative to the "src" directory.
 
-`PAPERLESS_FILENAME_FORMAT=<format>`
+#### [`PAPERLESS_FILENAME_FORMAT=<format>`](#PAPERLESS_FILENAME_FORMAT) {#PAPERLESS_FILENAME_FORMAT}
 
 : Changes the filenames paperless uses to store documents in the media
 directory. See [File name handling](/advanced_usage#file-name-handling) for details.
 
     Default is none, which disables this feature.
 
-`PAPERLESS_FILENAME_FORMAT_REMOVE_NONE=<bool>`
+#### [`PAPERLESS_FILENAME_FORMAT_REMOVE_NONE=<bool>`](#PAPERLESS_FILENAME_FORMAT_REMOVE_NONE) {#PAPERLESS_FILENAME_FORMAT_REMOVE_NONE}
 
 : Tells paperless to replace placeholders in
 `PAPERLESS_FILENAME_FORMAT` that would resolve to
@@ -260,13 +260,13 @@ details.
 
     Defaults to `false` which disables this feature.
 
-`PAPERLESS_LOGGING_DIR=<path>`
+#### [`PAPERLESS_LOGGING_DIR=<path>`](#PAPERLESS_LOGGING_DIR) {#PAPERLESS_LOGGING_DIR}
 
 : This is where paperless will store log files.
 
     Defaults to `PAPERLESS_DATA_DIR/log/`.
 
-`PAPERLESS_NLTK_DIR=<path>`
+#### [`PAPERLESS_NLTK_DIR=<path>`](#PAPERLESS_NLTK_DIR) {#PAPERLESS_NLTK_DIR}
 
 : This is where paperless will search for the data required for NLTK
 processing, if you are using it. If you are using the Docker image,
@@ -281,13 +281,13 @@ Defaults to `/usr/share/nltk_data`
 
 ## Logging
 
-`PAPERLESS_LOGROTATE_MAX_SIZE=<num>`
+#### [`PAPERLESS_LOGROTATE_MAX_SIZE=<num>`](#PAPERLESS_LOGROTATE_MAX_SIZE) {#PAPERLESS_LOGROTATE_MAX_SIZE}
 
 : Maximum file size for log files before they are rotated, in bytes.
 
     Defaults to 1 MiB.
 
-`PAPERLESS_LOGROTATE_MAX_BACKUPS=<num>`
+#### [`PAPERLESS_LOGROTATE_MAX_BACKUPS=<num>`](#PAPERLESS_LOGROTATE_MAX_BACKUPS) {#PAPERLESS_LOGROTATE_MAX_BACKUPS}
 
 : Number of rotated log files to keep.
 
@@ -295,7 +295,7 @@ Defaults to `/usr/share/nltk_data`
 
 ## Hosting & Security {#hosting-and-security}
 
-`PAPERLESS_SECRET_KEY=<key>`
+#### [`PAPERLESS_SECRET_KEY=<key>`](#PAPERLESS_SECRET_KEY) {#PAPERLESS_SECRET_KEY}
 
 : Paperless uses this to make session tokens. If you expose paperless
 on the internet, you need to change this, since the default secret
@@ -306,7 +306,7 @@ is well known.
 
     Default is listed in the file `src/paperless/settings.py`.
 
-`PAPERLESS_URL=<url>`
+#### [`PAPERLESS_URL=<url>`](#PAPERLESS_URL) {#PAPERLESS_URL}
 
 : This setting can be used to set the three options below
 (ALLOWED_HOSTS, CORS_ALLOWED_HOSTS and CSRF_TRUSTED_ORIGINS). If the
@@ -320,7 +320,7 @@ not include a trailing slash. E.g. <https://paperless.domain.com>
         This value cannot contain a path (e.g. domain.com/path), even if
         you are installing paperless-ngx at a subpath.
 
-`PAPERLESS_CSRF_TRUSTED_ORIGINS=<comma-separated-list>`
+#### [`PAPERLESS_CSRF_TRUSTED_ORIGINS=<comma-separated-list>`](#PAPERLESS_CSRF_TRUSTED_ORIGINS) {#PAPERLESS_CSRF_TRUSTED_ORIGINS}
 
 : A list of trusted origins for unsafe requests (e.g. POST). As of
 Django 4.0 this is required to access the Django admin via the web.
@@ -331,7 +331,7 @@ See the [Django project documentation on the settings](https://docs.djangoprojec
     Defaults to empty string, which does not add any origins to the
     trusted list.
 
-`PAPERLESS_ALLOWED_HOSTS=<comma-separated-list>`
+#### [`PAPERLESS_ALLOWED_HOSTS=<comma-separated-list>`](#PAPERLESS_ALLOWED_HOSTS) {#PAPERLESS_ALLOWED_HOSTS}
 
 : If you're planning on putting Paperless on the open internet, then
 you really should set this value to the domain name you're using.
@@ -348,7 +348,7 @@ You can read more about this in [the Django project's documentation](https://doc
 
     Defaults to "\*", which is all hosts.
 
-`PAPERLESS_CORS_ALLOWED_HOSTS=<comma-separated-list>`
+#### [`PAPERLESS_CORS_ALLOWED_HOSTS=<comma-separated-list>`](#PAPERLESS_CORS_ALLOWED_HOSTS) {#PAPERLESS_CORS_ALLOWED_HOSTS}
 
 : You need to add your servers to the list of allowed hosts that can
 do CORS calls. Set this to your public domain name.
@@ -357,7 +357,7 @@ do CORS calls. Set this to your public domain name.
 
     Defaults to "<http://localhost:8000>".
 
-`PAPERLESS_TRUSTED_PROXIES=<comma-separated-list>`
+#### [`PAPERLESS_TRUSTED_PROXIES=<comma-separated-list>`](#PAPERLESS_TRUSTED_PROXIES) {#PAPERLESS_TRUSTED_PROXIES}
 
 : This may be needed to prevent IP address spoofing if you are using e.g.
 fail2ban with log entries for failed authorization attempts. Value should be
@@ -365,14 +365,14 @@ IP address(es).
 
     Defaults to empty string.
 
-`PAPERLESS_FORCE_SCRIPT_NAME=<path>`
+#### [`PAPERLESS_FORCE_SCRIPT_NAME=<path>`](#PAPERLESS_FORCE_SCRIPT_NAME) {#PAPERLESS_FORCE_SCRIPT_NAME}
 
 : To host paperless under a subpath url like example.com/paperless you
 set this value to /paperless. No trailing slash!
 
     Defaults to none, which hosts paperless at "/".
 
-`PAPERLESS_STATIC_URL=<path>`
+#### [`PAPERLESS_STATIC_URL=<path>`](#PAPERLESS_STATIC_URL) {#PAPERLESS_STATIC_URL}
 
 : Override the STATIC_URL here. Unless you're hosting Paperless off a
 subdomain like /paperless/, you probably don't need to change this.
@@ -386,7 +386,7 @@ If you do change it, be sure to include the trailing slash.
         at a subpath e.g. example.com/paperlessngx you will also need to set
         `PAPERLESS_FORCE_SCRIPT_NAME` (see above).
 
-`PAPERLESS_AUTO_LOGIN_USERNAME=<username>`
+#### [`PAPERLESS_AUTO_LOGIN_USERNAME=<username>`](#PAPERLESS_AUTO_LOGIN_USERNAME) {#PAPERLESS_AUTO_LOGIN_USERNAME}
 
 : Specify a username here so that paperless will automatically perform
 login with the selected user.
@@ -398,7 +398,7 @@ login with the selected user.
 
     Defaults to none, which disables this feature.
 
-`PAPERLESS_ADMIN_USER=<username>`
+#### [`PAPERLESS_ADMIN_USER=<username>`](#PAPERLESS_ADMIN_USER) {#PAPERLESS_ADMIN_USER}
 
 : If this environment variable is specified, Paperless automatically
 creates a superuser with the provided username at start. This is
@@ -414,19 +414,19 @@ or AWS ECS.
         it recreate a user that already exists. You can leave this
         throughout the lifecycle of the containers.
 
-`PAPERLESS_ADMIN_MAIL=<email>`
+#### [`PAPERLESS_ADMIN_MAIL=<email>`](#PAPERLESS_ADMIN_MAIL) {#PAPERLESS_ADMIN_MAIL}
 
 : (Optional) Specify superuser email address. Only used when
 PAPERLESS_ADMIN_USER is set.
 
     Defaults to `root@localhost`.
 
-`PAPERLESS_ADMIN_PASSWORD=<password>`
+#### [`PAPERLESS_ADMIN_PASSWORD=<password>`](#PAPERLESS_ADMIN_PASSWORD) {#PAPERLESS_ADMIN_PASSWORD}
 
 : Only used when PAPERLESS_ADMIN_USER is set. This will
 be the password of the automatically created superuser.
 
-`PAPERLESS_COOKIE_PREFIX=<str>`
+#### [`PAPERLESS_COOKIE_PREFIX=<str>`](#PAPERLESS_COOKIE_PREFIX) {#PAPERLESS_COOKIE_PREFIX}
 
 : Specify a prefix that is added to the cookies used by paperless to
 identify the currently logged in user. This is useful for when
@@ -436,7 +436,7 @@ you're running two instances of paperless on the same host.
 
     Defaults to `""`, which does not alter the cookie names.
 
-`PAPERLESS_ENABLE_HTTP_REMOTE_USER=<bool>`
+#### [`PAPERLESS_ENABLE_HTTP_REMOTE_USER=<bool>`](#PAPERLESS_ENABLE_HTTP_REMOTE_USER) {#PAPERLESS_ENABLE_HTTP_REMOTE_USER}
 
 : Allows authentication via HTTP_REMOTE_USER which is used by some SSO
 applications.
@@ -455,7 +455,7 @@ applications.
 
     Defaults to "false" which disables this feature.
 
-`PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME=<str>`
+#### [`PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME=<str>`](#PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME) {#PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME}
 
 : If "PAPERLESS_ENABLE_HTTP_REMOTE_USER" is enabled, this
 property allows to customize the name of the HTTP header from which
@@ -466,7 +466,7 @@ followed by the normalized actual header name.
 
     Defaults to "HTTP_REMOTE_USER".
 
-`PAPERLESS_LOGOUT_REDIRECT_URL=<str>`
+#### [`PAPERLESS_LOGOUT_REDIRECT_URL=<str>`](#PAPERLESS_LOGOUT_REDIRECT_URL) {#PAPERLESS_LOGOUT_REDIRECT_URL}
 
 : URL to redirect the user to after a logout. This can be used
 together with PAPERLESS_ENABLE_HTTP_REMOTE_USER to
@@ -474,21 +474,21 @@ redirect the user back to the SSO application's logout page.
 
     Defaults to None, which disables this feature.
 
-`PAPERLESS_USE_X_FORWARD_HOST=<bool>`
+#### [`PAPERLESS_USE_X_FORWARD_HOST=<bool>`](#PAPERLESS_USE_X_FORWARD_HOST) {#PAPERLESS_USE_X_FORWARD_HOST}
 
 : Configures the Django setting [USE_X_FORWARDED_HOST](https://docs.djangoproject.com/en/4.2/ref/settings/#use-x-forwarded-host)
 which may be needed for hosting behind a proxy.
 
     Defaults to False
 
-`PAPERLESS_USE_X_FORWARD_PORT=<bool>`
+#### [`PAPERLESS_USE_X_FORWARD_PORT=<bool>`](#PAPERLESS_USE_X_FORWARD_PORT) {#PAPERLESS_USE_X_FORWARD_PORT}
 
 : Configures the Django setting [USE_X_FORWARDED_PORT](https://docs.djangoproject.com/en/4.2/ref/settings/#use-x-forwarded-port)
 which may be needed for hosting behind a proxy.
 
     Defaults to False
 
-`PAPERLESS_PROXY_SSL_HEADER=<json-list>`
+#### [`PAPERLESS_PROXY_SSL_HEADER=<json-list>`](#PAPERLESS_PROXY_SSL_HEADER) {#PAPERLESS_PROXY_SSL_HEADER}
 
 : Configures the Django setting [SECURE_PROXY_SSL_HEADER](https://docs.djangoproject.com/en/4.2/ref/settings/#secure-proxy-ssl-header)
 which may be needed for hosting behind a proxy. The two values in the list will form the tuple of
@@ -501,7 +501,7 @@ HTTP header/value expected by Django, eg `'["HTTP_X_FORWARDED_PROTO", "https"]'`
     Settings this value has security implications.  Read the Django documentation
     and be sure you understand its usage before setting it.
 
-`PAPERLESS_EMAIL_CERTIFICATE_FILE=<path>`
+#### [`PAPERLESS_EMAIL_CERTIFICATE_FILE=<path>`](#PAPERLESS_EMAIL_CERTIFICATE_FILE) {#PAPERLESS_EMAIL_CERTIFICATE_FILE}
 
 : Configures an additional SSL certificate file containing a [certificate](https://docs.python.org/3/library/ssl.html#certificates)
 or certificate chain which should be trusted for validating SSL connections against mail providers.
@@ -521,7 +521,7 @@ for performing OCR on documents and images. Paperless uses sensible
 defaults for most settings, but all of them can be configured to your
 needs.
 
-`PAPERLESS_OCR_LANGUAGE=<lang>`
+#### [`PAPERLESS_OCR_LANGUAGE=<lang>`](#PAPERLESS_OCR_LANGUAGE) {#PAPERLESS_OCR_LANGUAGE}
 
 : Customize the language that paperless will attempt to use when
 parsing documents.
@@ -541,7 +541,7 @@ parsing documents.
 
         If your language contains a '-' such as chi-sim, you must use `chi_sim`.
 
-`PAPERLESS_OCR_MODE=<mode>`
+#### [`PAPERLESS_OCR_MODE=<mode>`](#PAPERLESS_OCR_MODE) {#PAPERLESS_OCR_MODE}
 
 : Tell paperless when and how to perform ocr on your documents. Three
 modes are available:
@@ -571,7 +571,7 @@ modes are available:
     Read more about this in the [OCRmyPDF
     documentation](https://ocrmypdf.readthedocs.io/en/latest/advanced.html#when-ocr-is-skipped).
 
-`PAPERLESS_OCR_SKIP_ARCHIVE_FILE=<mode>`
+#### [`PAPERLESS_OCR_SKIP_ARCHIVE_FILE=<mode>`](#PAPERLESS_OCR_SKIP_ARCHIVE_FILE) {#PAPERLESS_OCR_SKIP_ARCHIVE_FILE}
 
 : Specify when you would like paperless to skip creating an archived
 version of your documents. This is useful if you don't want to have two
@@ -584,7 +584,7 @@ almost-identical versions of your documents in the media folder.
 
     The default is `never`.
 
-`PAPERLESS_OCR_CLEAN=<mode>`
+#### [`PAPERLESS_OCR_CLEAN=<mode>`](#PAPERLESS_OCR_CLEAN) {#PAPERLESS_OCR_CLEAN}
 
 : Tells paperless to use `unpaper` to clean any input document before
 sending it to tesseract. This uses more resources, but generally
@@ -603,7 +603,7 @@ results in better OCR results. The following modes are available:
         `clean-final` and the ocr mode `redo` is configured, `clean` is used
         instead.
 
-`PAPERLESS_OCR_DESKEW=<bool>`
+#### [`PAPERLESS_OCR_DESKEW=<bool>`](#PAPERLESS_OCR_DESKEW) {#PAPERLESS_OCR_DESKEW}
 
 : Tells paperless to correct skewing (slight rotation of input images
 mainly due to improper scanning)
@@ -615,7 +615,7 @@ mainly due to improper scanning)
         Deskewing is incompatible with ocr mode `redo`. Deskewing will get
         disabled automatically if `redo` is used as the ocr mode.
 
-`PAPERLESS_OCR_ROTATE_PAGES=<bool>`
+#### [`PAPERLESS_OCR_ROTATE_PAGES=<bool>`](#PAPERLESS_OCR_ROTATE_PAGES) {#PAPERLESS_OCR_ROTATE_PAGES}
 
 : Tells paperless to correct page rotation (90°, 180° and 270°
 rotation).
@@ -626,7 +626,7 @@ rotation).
 
     Defaults to `true`, which enables this feature.
 
-`PAPERLESS_OCR_ROTATE_PAGES_THRESHOLD=<num>`
+#### [`PAPERLESS_OCR_ROTATE_PAGES_THRESHOLD=<num>`](#PAPERLESS_OCR_ROTATE_PAGES_THRESHOLD) {#PAPERLESS_OCR_ROTATE_PAGES_THRESHOLD}
 
 : Adjust the threshold for automatic page rotation by
 `PAPERLESS_OCR_ROTATE_PAGES`. This is an arbitrary value reported by
@@ -636,7 +636,7 @@ pages being rotated as well.
 
     Defaults to "12".
 
-`PAPERLESS_OCR_OUTPUT_TYPE=<type>`
+#### [`PAPERLESS_OCR_OUTPUT_TYPE=<type>`](#PAPERLESS_OCR_OUTPUT_TYPE) {#PAPERLESS_OCR_OUTPUT_TYPE}
 
 : Specify the the type of PDF documents that paperless should produce.
 
@@ -650,7 +650,7 @@ pages being rotated as well.
     If not specified, `pdfa` is used. Remember that paperless also keeps
     the original input file as well as the archived version.
 
-`PAPERLESS_OCR_PAGES=<num>`
+#### [`PAPERLESS_OCR_PAGES=<num>`](#PAPERLESS_OCR_PAGES) {#PAPERLESS_OCR_PAGES}
 
 : Tells paperless to use only the specified amount of pages for OCR.
 Documents with less than the specified amount of pages get OCR'ed
@@ -665,7 +665,7 @@ completely.
     Defaults to 0, which disables this feature and always uses all
     pages.
 
-`PAPERLESS_OCR_IMAGE_DPI=<num>`
+#### [`PAPERLESS_OCR_IMAGE_DPI=<num>`](#PAPERLESS_OCR_IMAGE_DPI) {#PAPERLESS_OCR_IMAGE_DPI}
 
 : Paperless will OCR any images you put into the system and convert
 them into PDF documents. This is useful if your scanner produces
@@ -679,7 +679,7 @@ fails, it uses this value as a fallback.
     Default is none, which will automatically calculate image DPI so
     that the produced PDF documents are A4 sized.
 
-`PAPERLESS_OCR_MAX_IMAGE_PIXELS=<num>`
+#### [`PAPERLESS_OCR_MAX_IMAGE_PIXELS=<num>`](#PAPERLESS_OCR_MAX_IMAGE_PIXELS) {#PAPERLESS_OCR_MAX_IMAGE_PIXELS}
 
 : Paperless will raise a warning when OCRing images which are over
 this limit and will not OCR images which are more than twice this
@@ -702,7 +702,7 @@ but could result in missing text content.
         this value if you are certain your documents are not malicious and
         you need the text which was not OCRed
 
-`PAPERLESS_OCR_USER_ARGS=<json>`
+#### [`PAPERLESS_OCR_USER_ARGS=<json>`](#PAPERLESS_OCR_USER_ARGS) {#PAPERLESS_OCR_USER_ARGS}
 
 : OCRmyPDF offers many more options. Use this parameter to specify any
 additional arguments you wish to pass to OCRmyPDF. Since Paperless
@@ -728,7 +728,7 @@ they use underscores instead of dashes.
 
 ## Software tweaks {#software_tweaks}
 
-`PAPERLESS_TASK_WORKERS=<num>`
+#### [`PAPERLESS_TASK_WORKERS=<num>`](#PAPERLESS_TASK_WORKERS) {#PAPERLESS_TASK_WORKERS}
 
 : Paperless does multiple things in the background: Maintain the
 search index, maintain the automatic matching algorithm, check
@@ -737,7 +737,7 @@ things it will do in parallel.
 
     Defaults to 1
 
-`PAPERLESS_THREADS_PER_WORKER=<num>`
+#### [`PAPERLESS_THREADS_PER_WORKER=<num>`](#PAPERLESS_THREADS_PER_WORKER) {#PAPERLESS_THREADS_PER_WORKER}
 
 : Furthermore, paperless uses multiple threads when consuming
 documents to speed up OCR. This variable specifies how many pages
@@ -771,13 +771,13 @@ paperless will process in parallel on a single document.
     If you only specify PAPERLESS_TASK_WORKERS, paperless will adjust
     PAPERLESS_THREADS_PER_WORKER automatically.
 
-`PAPERLESS_WORKER_TIMEOUT=<num>`
+#### [`PAPERLESS_WORKER_TIMEOUT=<num>`](#PAPERLESS_WORKER_TIMEOUT) {#PAPERLESS_WORKER_TIMEOUT}
 
 : Machines with few cores or weak ones might not be able to finish OCR
 on large documents within the default 1800 seconds. So extending
 this timeout may prove to be useful on weak hardware setups.
 
-`PAPERLESS_TIME_ZONE=<timezone>`
+#### [`PAPERLESS_TIME_ZONE=<timezone>`](#PAPERLESS_TIME_ZONE) {#PAPERLESS_TIME_ZONE}
 
 : Set the time zone here. See more details on
 why and how to set it [in the Django project documentation](https://docs.djangoproject.com/en/4.1/ref/settings/#std:setting-TIME_ZONE)
@@ -785,7 +785,7 @@ for details on how to set it.
 
     Defaults to UTC.
 
-`PAPERLESS_ENABLE_NLTK=<bool>`
+#### [`PAPERLESS_ENABLE_NLTK=<bool>`](#PAPERLESS_ENABLE_NLTK) {#PAPERLESS_ENABLE_NLTK}
 
 : Enables or disables the advanced natural language processing
 used during automatic classification. If disabled, paperless will
@@ -795,7 +795,7 @@ still perform some basic text pre-processing before matching.
 
     Defaults to 1.
 
-`PAPERLESS_EMAIL_TASK_CRON=<cron expression>`
+#### [`PAPERLESS_EMAIL_TASK_CRON=<cron expression>`](#PAPERLESS_EMAIL_TASK_CRON) {#PAPERLESS_EMAIL_TASK_CRON}
 
 : Configures the scheduled email fetching frequency. The value
 should be a valid crontab(5) expression describing when to run.
@@ -804,7 +804,7 @@ should be a valid crontab(5) expression describing when to run.
 
     Defaults to `*/10 * * * *` or every ten minutes.
 
-`PAPERLESS_TRAIN_TASK_CRON=<cron expression>`
+#### [`PAPERLESS_TRAIN_TASK_CRON=<cron expression>`](#PAPERLESS_TRAIN_TASK_CRON) {#PAPERLESS_TRAIN_TASK_CRON}
 
 : Configures the scheduled automatic classifier training frequency. The value
 should be a valid crontab(5) expression describing when to run.
@@ -813,7 +813,7 @@ should be a valid crontab(5) expression describing when to run.
 
     Defaults to `5 */1 * * *` or every hour at 5 minutes past the hour.
 
-`PAPERLESS_INDEX_TASK_CRON=<cron expression>`
+#### [`PAPERLESS_INDEX_TASK_CRON=<cron expression>`](#PAPERLESS_INDEX_TASK_CRON) {#PAPERLESS_INDEX_TASK_CRON}
 
 : Configures the scheduled search index update frequency. The value
 should be a valid crontab(5) expression describing when to run.
@@ -822,7 +822,7 @@ should be a valid crontab(5) expression describing when to run.
 
     Defaults to `0 0 * * *` or daily at midnight.
 
-`PAPERLESS_SANITY_TASK_CRON=<cron expression>`
+#### [`PAPERLESS_SANITY_TASK_CRON=<cron expression>`](#PAPERLESS_SANITY_TASK_CRON) {#PAPERLESS_SANITY_TASK_CRON}
 
 : Configures the scheduled sanity checker frequency.
 
@@ -830,7 +830,7 @@ should be a valid crontab(5) expression describing when to run.
 
     Defaults to `30 0 * * sun` or Sunday at 30 minutes past midnight.
 
-`PAPERLESS_ENABLE_COMPRESSION=<bool>`
+#### [`PAPERLESS_ENABLE_COMPRESSION=<bool>`](#PAPERLESS_ENABLE_COMPRESSION) {#PAPERLESS_ENABLE_COMPRESSION}
 
 : Enables compression of the responses from the webserver.
 
@@ -842,7 +842,7 @@ should be a valid crontab(5) expression describing when to run.
         to enable compression in your proxy configuration rather than
         the webserver
 
-`PAPERLESS_CONVERT_MEMORY_LIMIT=<num>`
+#### [`PAPERLESS_CONVERT_MEMORY_LIMIT=<num>`](#PAPERLESS_CONVERT_MEMORY_LIMIT) {#PAPERLESS_CONVERT_MEMORY_LIMIT}
 
 : On smaller systems, or even in the case of Very Large Documents, the
 consumer may explode, complaining about how it's "unable to extend
@@ -855,7 +855,7 @@ everything without writing to disk, and units are in megabytes.
 
     Defaults to 0, which disables the limit.
 
-`PAPERLESS_CONVERT_TMPDIR=<path>`
+#### [`PAPERLESS_CONVERT_TMPDIR=<path>`](#PAPERLESS_CONVERT_TMPDIR) {#PAPERLESS_CONVERT_TMPDIR}
 
 : Similar to the memory limit, if you've got a small system and your
 OS mounts /tmp as tmpfs, you should set this to a path that's on a
@@ -870,14 +870,14 @@ documents.
 
 ## Document Consumption {#consume_config}
 
-`PAPERLESS_CONSUMER_DELETE_DUPLICATES=<bool>`
+#### [`PAPERLESS_CONSUMER_DELETE_DUPLICATES=<bool>`](#PAPERLESS_CONSUMER_DELETE_DUPLICATES) {#PAPERLESS_CONSUMER_DELETE_DUPLICATES}
 
 : When the consumer detects a duplicate document, it will not touch
 the original document. This default behavior can be changed here.
 
     Defaults to false.
 
-`PAPERLESS_CONSUMER_RECURSIVE=<bool>`
+#### [`PAPERLESS_CONSUMER_RECURSIVE=<bool>`](#PAPERLESS_CONSUMER_RECURSIVE) {#PAPERLESS_CONSUMER_RECURSIVE}
 
 : Enable recursive watching of the consumption directory. Paperless
 will then pickup files from files in subdirectories within your
@@ -885,7 +885,7 @@ consumption directory as well.
 
     Defaults to false.
 
-`PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS=<bool>`
+#### [`PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS=<bool>`](#PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS) {#PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS}
 
 : Set the names of subdirectories as tags for consumed files. E.g.
 `<CONSUMPTION_DIR>/foo/bar/file.pdf` will add the tags "foo" and
@@ -899,7 +899,7 @@ don't exist yet.
 
     Defaults to false.
 
-`PAPERLESS_CONSUMER_IGNORE_PATTERNS=<json>`
+#### [`PAPERLESS_CONSUMER_IGNORE_PATTERNS=<json>`](#PAPERLESS_CONSUMER_IGNORE_PATTERNS) {#PAPERLESS_CONSUMER_IGNORE_PATTERNS}
 
 : By default, paperless ignores certain files and folders in the
 consumption directory, such as system files created by the Mac OS
@@ -917,7 +917,7 @@ or hidden folders some tools use to store data.
     Defaults to
     `[".DS_STORE/*", "._*", ".stfolder/*", ".stversions/*", ".localized/*", "desktop.ini", "@eaDir/*"]`.
 
-`PAPERLESS_CONSUMER_BARCODE_SCANNER=<string>`
+#### [`PAPERLESS_CONSUMER_BARCODE_SCANNER=<string>`](#PAPERLESS_CONSUMER_BARCODE_SCANNER) {#PAPERLESS_CONSUMER_BARCODE_SCANNER}
 
 : Sets the barcode scanner used for barcode functionality.
 
@@ -927,7 +927,7 @@ or hidden folders some tools use to store data.
 
     zxing is not available on all platforms.
 
-`PAPERLESS_PRE_CONSUME_SCRIPT=<filename>`
+#### [`PAPERLESS_PRE_CONSUME_SCRIPT=<filename>`](#PAPERLESS_PRE_CONSUME_SCRIPT) {#PAPERLESS_PRE_CONSUME_SCRIPT}
 
 : After some initial validation, Paperless can trigger an arbitrary
 script if you like before beginning consumption. This script will be provided
@@ -937,7 +937,7 @@ data for it to work with via the environment.
 
     The default is blank, which means nothing will be executed.
 
-`PAPERLESS_POST_CONSUME_SCRIPT=<filename>`
+#### [`PAPERLESS_POST_CONSUME_SCRIPT=<filename>`](#PAPERLESS_POST_CONSUME_SCRIPT) {#PAPERLESS_POST_CONSUME_SCRIPT}
 
 : After a document is consumed, Paperless can trigger an arbitrary
 script if you like. This script will be provided
@@ -947,7 +947,7 @@ data for it to work with via the environment.
 
     The default is blank, which means nothing will be executed.
 
-`PAPERLESS_FILENAME_DATE_ORDER=<format>`
+#### [`PAPERLESS_FILENAME_DATE_ORDER=<format>`](#PAPERLESS_FILENAME_DATE_ORDER) {#PAPERLESS_FILENAME_DATE_ORDER}
 
 : Paperless will check the document text for document date
 information. Use this setting to enable checking the document
@@ -961,7 +961,7 @@ document text will be checked as normal.
 
     Defaults to none, which disables this feature.
 
-`PAPERLESS_NUMBER_OF_SUGGESTED_DATES=<num>`
+#### [`PAPERLESS_NUMBER_OF_SUGGESTED_DATES=<num>`](#PAPERLESS_NUMBER_OF_SUGGESTED_DATES) {#PAPERLESS_NUMBER_OF_SUGGESTED_DATES}
 
 : Paperless searches an entire document for dates. The first date
 found will be used as the initial value for the created date. When
@@ -976,7 +976,7 @@ setting value.
 
     Defaults to 3. Set to 0 to disable this feature.
 
-`PAPERLESS_THUMBNAIL_FONT_NAME=<filename>`
+#### [`PAPERLESS_THUMBNAIL_FONT_NAME=<filename>`](#PAPERLESS_THUMBNAIL_FONT_NAME) {#PAPERLESS_THUMBNAIL_FONT_NAME}
 
 : Paperless creates thumbnails for plain text files by rendering the
 content of the file on an image and uses a predefined font for that.
@@ -988,7 +988,7 @@ This font can be changed here.
     Defaults to
     `/usr/share/fonts/liberation/LiberationSerif-Regular.ttf`.
 
-`PAPERLESS_IGNORE_DATES=<string>`
+#### [`PAPERLESS_IGNORE_DATES=<string>`](#PAPERLESS_IGNORE_DATES) {#PAPERLESS_IGNORE_DATES}
 
 : Paperless parses a documents creation date from filename and file
 content. You may specify a comma separated list of dates that should
@@ -1000,7 +1000,7 @@ unlikely to be the documents creation date.
 
     Defaults to an empty string to not ignore any dates.
 
-`PAPERLESS_DATE_ORDER=<format>`
+#### [`PAPERLESS_DATE_ORDER=<format>`](#PAPERLESS_DATE_ORDER) {#PAPERLESS_DATE_ORDER}
 
 : Paperless will try to determine the document creation date from its
 contents. Specify the date format Paperless should expect to see
@@ -1012,7 +1012,7 @@ within your documents.
 
 ### Polling {#polling}
 
-`PAPERLESS_CONSUMER_POLLING=<num>`
+#### [`PAPERLESS_CONSUMER_POLLING=<num>`](#PAPERLESS_CONSUMER_POLLING) {#PAPERLESS_CONSUMER_POLLING}
 
 : If paperless won't find documents added to your consume folder, it
 might not be able to automatically detect filesystem changes. In
@@ -1024,14 +1024,14 @@ system changes with `inotify`.
     Defaults to 0, which disables polling and uses filesystem
     notifications.
 
-`PAPERLESS_CONSUMER_POLLING_RETRY_COUNT=<num>`
+#### [`PAPERLESS_CONSUMER_POLLING_RETRY_COUNT=<num>`](#PAPERLESS_CONSUMER_POLLING_RETRY_COUNT) {#PAPERLESS_CONSUMER_POLLING_RETRY_COUNT}
 
 : If consumer polling is enabled, sets the number of times paperless
 will check for a file to remain unmodified.
 
     Defaults to 5.
 
-`PAPERLESS_CONSUMER_POLLING_DELAY=<num>`
+#### [`PAPERLESS_CONSUMER_POLLING_DELAY=<num>`](#PAPERLESS_CONSUMER_POLLING_DELAY) {#PAPERLESS_CONSUMER_POLLING_DELAY}
 
 : If consumer polling is enabled, sets the delay in seconds between
 each check (above) paperless will do while waiting for a file to
@@ -1041,7 +1041,7 @@ remain unmodified.
 
 ### iNotify {#inotify}
 
-`PAPERLESS_CONSUMER_INOTIFY_DELAY=<num>`
+#### [`PAPERLESS_CONSUMER_INOTIFY_DELAY=<num>`](#PAPERLESS_CONSUMER_INOTIFY_DELAY) {#PAPERLESS_CONSUMER_INOTIFY_DELAY}
 
 : Sets the time in seconds the consumer will wait for additional
 events from inotify before the consumer will consider a file ready
@@ -1053,7 +1053,7 @@ consumers working on the same file. Configure this to prevent that.
 
 ## Barcodes {#barcodes}
 
-`PAPERLESS_CONSUMER_ENABLE_BARCODES=<bool>`
+#### [`PAPERLESS_CONSUMER_ENABLE_BARCODES=<bool>`](#PAPERLESS_CONSUMER_ENABLE_BARCODES) {#PAPERLESS_CONSUMER_ENABLE_BARCODES}
 
 : Enables the scanning and page separation based on detected barcodes.
 This allows for scanning and adding multiple documents per uploaded
@@ -1072,7 +1072,7 @@ file, which are separated by one or multiple barcode pages.
 
     Defaults to false.
 
-`PAPERLESS_CONSUMER_BARCODE_TIFF_SUPPORT=<bool>`
+#### [`PAPERLESS_CONSUMER_BARCODE_TIFF_SUPPORT=<bool>`](#PAPERLESS_CONSUMER_BARCODE_TIFF_SUPPORT) {#PAPERLESS_CONSUMER_BARCODE_TIFF_SUPPORT}
 
 : Whether TIFF image files should be scanned for barcodes. This will
 automatically convert any TIFF image(s) to pdfs for later
@@ -1081,7 +1081,7 @@ PAPERLESS_CONSUMER_ENABLE_BARCODES has been enabled.
 
     Defaults to false.
 
-`PAPERLESS_CONSUMER_BARCODE_STRING=<string>`
+#### [`PAPERLESS_CONSUMER_BARCODE_STRING=<string>`](#PAPERLESS_CONSUMER_BARCODE_STRING) {#PAPERLESS_CONSUMER_BARCODE_STRING}
 
 : Defines the string to be detected as a separator barcode. If
 paperless is used with the PATCH-T separator pages, users shouldn't
@@ -1089,7 +1089,7 @@ change this.
 
     Defaults to "PATCHT"
 
-`PAPERLESS_CONSUMER_ENABLE_ASN_BARCODE=<bool>`
+#### [`PAPERLESS_CONSUMER_ENABLE_ASN_BARCODE=<bool>`](#PAPERLESS_CONSUMER_ENABLE_ASN_BARCODE) {#PAPERLESS_CONSUMER_ENABLE_ASN_BARCODE}
 
 : Enables the detection of barcodes in the scanned document and
 setting the ASN (archive serial number) if a properly formatted
@@ -1107,14 +1107,14 @@ barcode is detected.
 
     Defaults to false.
 
-`PAPERLESS_CONSUMER_ASN_BARCODE_PREFIX=<string>`
+#### [`PAPERLESS_CONSUMER_ASN_BARCODE_PREFIX=<string>`](#PAPERLESS_CONSUMER_ASN_BARCODE_PREFIX) {#PAPERLESS_CONSUMER_ASN_BARCODE_PREFIX}
 
 : Defines the prefix that is used to identify a barcode as an ASN
 barcode.
 
     Defaults to "ASN"
 
-`PAPERLESS_CONSUMER_BARCODE_UPSCALE=<float>`
+#### [`PAPERLESS_CONSUMER_BARCODE_UPSCALE=<float>`](#PAPERLESS_CONSUMER_BARCODE_UPSCALE) {#PAPERLESS_CONSUMER_BARCODE_UPSCALE}
 
 : Defines the upscale factor used in barcode detection.
 Improves the detection of small barcodes, i.e. with a value of 1.5 by
@@ -1125,7 +1125,7 @@ PAPERLESS_CONSUMER_BARCODE_DPI set to a value higher than default.
 
     Defaults to 0.0
 
-`PAPERLESS_CONSUMER_BARCODE_DPI=<int>`
+#### [`PAPERLESS_CONSUMER_BARCODE_DPI=<int>`](#PAPERLESS_CONSUMER_BARCODE_DPI) {#PAPERLESS_CONSUMER_BARCODE_DPI}
 
 : During barcode detection every page from a PDF document needs
 to be converted to an image. A dpi value can be specified in the
@@ -1137,7 +1137,7 @@ combination with PAPERLESS_CONSUMER_BARCODE_UPSCALE bigger than 1.0.
 
 ## Collate Double-Sided Documents {#collate}
 
-`PAPERLESS_CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED=<bool>`
+#### [`PAPERLESS_CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED=<bool>`](#PAPERLESS_CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED) {#PAPERLESS_CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED}
 
 : Enables automatic collation of two single-sided scans into a double-sided
 document.
@@ -1153,7 +1153,7 @@ document.
 
     Defaults to false.
 
-`PAPERLESS_CONSUMER_COLLATE_DOUBLE_SIDED_SUBDIR_NAME=<str>`
+#### [`PAPERLESS_CONSUMER_COLLATE_DOUBLE_SIDED_SUBDIR_NAME=<str>`](#PAPERLESS_CONSUMER_COLLATE_DOUBLE_SIDED_SUBDIR_NAME) {#PAPERLESS_CONSUMER_COLLATE_DOUBLE_SIDED_SUBDIR_NAME}
 
 : The name of the subdirectory that the collate feature expects documents to
 arrive.
@@ -1164,7 +1164,8 @@ arrive.
 
     Defaults to "double-sided".
 
-`PAPERLESS_CONSUMER_COLLATE_DOUBLE_SIDED_TIFF_SUPPORT=<bool>`
+#### [`PAPERLESS_CONSUMER_COLLATE_DOUBLE_SIDED_TIFF_SUPPORT=<bool>`](#PAPERLESS_CONSUMER_COLLATE_DOUBLE_SIDED_TIFF_SUPPORT) {#PAPERLESS_CONSUMER_COLLATE_DOUBLE_SIDED_TIFF_SUPPORT}
+
 : Whether TIFF image files should be supported when collating documents.
 This will automatically convert any TIFF image(s) to pdfs for later
 processing. This only has an effect if
@@ -1182,11 +1183,11 @@ simply typing the name of the program doesn't automatically execute it
 (ie. the program isn't in your $PATH), then you'll need to specify
 the literal path for that program.
 
-`PAPERLESS_CONVERT_BINARY=<path>`
+#### [`PAPERLESS_CONVERT_BINARY=<path>`](#PAPERLESS_CONVERT_BINARY) {#PAPERLESS_CONVERT_BINARY}
 
 : Defaults to "convert".
 
-`PAPERLESS_GS_BINARY=<path>`
+#### [`PAPERLESS_GS_BINARY=<path>`](#PAPERLESS_GS_BINARY) {#PAPERLESS_GS_BINARY}
 
 : Defaults to "gs".
 
@@ -1196,7 +1197,7 @@ These options don't have any effect in `paperless.conf`. These options
 adjust the behavior of the docker container. Configure these in
 `docker-compose.env`.
 
-`PAPERLESS_WEBSERVER_WORKERS=<num>`
+#### [`PAPERLESS_WEBSERVER_WORKERS=<num>`](#PAPERLESS_WEBSERVER_WORKERS) {#PAPERLESS_WEBSERVER_WORKERS}
 
 : The number of worker processes the webserver should spawn. More
 worker processes usually result in the front end to load data much
@@ -1206,7 +1207,7 @@ increase RAM usage.
 
     Defaults to 1.
 
-`PAPERLESS_BIND_ADDR=<ip address>`
+#### [`PAPERLESS_BIND_ADDR=<ip address>`](#PAPERLESS_BIND_ADDR) {#PAPERLESS_BIND_ADDR}
 
 : The IP address the webserver will listen on inside the container.
 There are special setups where you may need to configure this value
@@ -1214,7 +1215,7 @@ to restrict the Ip address or interface the webserver listens on.
 
     Defaults to `[::]`, meaning all interfaces, including IPv6.
 
-`PAPERLESS_PORT=<port>`
+#### [`PAPERLESS_PORT=<port>`](#PAPERLESS_PORT) {#PAPERLESS_PORT}
 
 : The port number the webserver will listen on inside the container.
 There are special setups where you may need this to avoid collisions
@@ -1227,7 +1228,7 @@ one pod).
 
     Defaults to 8000.
 
-`USERMAP_UID=<uid>`
+#### [`USERMAP_UID=<uid>`](#USERMAP_UID) {#USERMAP_UID}
 
 : The ID of the paperless user in the container. Set this to your
 actual user ID on the host system, which you can get by executing
@@ -1242,7 +1243,7 @@ actual user ID on the host system, which you can get by executing
 
     Defaults to 1000.
 
-`USERMAP_GID=<gid>`
+#### [`USERMAP_GID=<gid>`](#USERMAP_GID) {#USERMAP_GID}
 
 : The ID of the paperless Group in the container. Set this to your
 actual group ID on the host system, which you can get by executing
@@ -1257,7 +1258,7 @@ actual group ID on the host system, which you can get by executing
 
     Defaults to 1000.
 
-`PAPERLESS_OCR_LANGUAGES=<list>`
+#### [`PAPERLESS_OCR_LANGUAGES=<list>`](#PAPERLESS_OCR_LANGUAGES) {#PAPERLESS_OCR_LANGUAGES}
 
 : Additional OCR languages to install. By default, paperless comes
 with English, German, Italian, Spanish and French. If your language
@@ -1282,7 +1283,7 @@ specified as "chi-tra".
 
     Defaults to none, which does not install any additional languages.
 
-`PAPERLESS_ENABLE_FLOWER=<defined>`
+#### [`PAPERLESS_ENABLE_FLOWER=<defined>`](#PAPERLESS_ENABLE_FLOWER) {#PAPERLESS_ENABLE_FLOWER}
 
 : If this environment variable is defined, the Celery monitoring tool
 [Flower](https://flower.readthedocs.io/en/latest/index.html) will be
@@ -1292,7 +1293,7 @@ started by the container.
 
 ## Update Checking {#update-checking}
 
-`PAPERLESS_ENABLE_UPDATE_CHECK=<bool>`
+#### [`PAPERLESS_ENABLE_UPDATE_CHECK=<bool>`](#PAPERLESS_ENABLE_UPDATE_CHECK) {#PAPERLESS_ENABLE_UPDATE_CHECK}
 
 !!! note
 
