@@ -132,7 +132,46 @@
           </div>
         </div>
 
-        <h4 i18n>Permissions</h4>
+        <h4 class="mt-4" id="update-checking" i18n>Update checking</h4>
+
+        <div class="row mb-3">
+          <div class="offset-md-3 col">
+            <p i18n>
+              Update checking works by pinging the public <a href="https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest" target="_blank" rel="noopener noreferrer">GitHub API</a> for the latest release to determine whether a new version is available.<br/>
+              Actual updating of the app must still be performed manually.
+            </p>
+            <p i18n>
+              <em>No tracking data is collected by the app in any way.</em>
+            </p>
+            <pngx-input-check i18n-title title="Enable update checking" formControlName="updateCheckingEnabled"></pngx-input-check>
+          </div>
+        </div>
+
+        <h4 class="mt-4" i18n>Bulk editing</h4>
+
+        <div class="row mb-3">
+          <div class="offset-md-3 col">
+            <pngx-input-check i18n-title title="Show confirmation dialogs" formControlName="bulkEditConfirmationDialogs" i18n-hint hint="Deleting documents will always ask for confirmation."></pngx-input-check>
+            <pngx-input-check i18n-title title="Apply on close" formControlName="bulkEditApplyOnClose"></pngx-input-check>
+          </div>
+        </div>
+
+        <h4 class="mt-4" i18n>Notes</h4>
+
+        <div class="row mb-3">
+          <div class="offset-md-3 col">
+            <pngx-input-check i18n-title title="Enable notes" formControlName="notesEnabled"></pngx-input-check>
+          </div>
+        </div>
+
+      </ng-template>
+    </li>
+
+    <li [ngbNavItem]="SettingsNavIDs.Permissions">
+      <a ngbNavLink i18n>Permissions</a>
+      <ng-template ngbNavContent>
+
+        <h4 i18n>Default Permissions</h4>
 
         <div class="row mb-3">
           <div class="offset-md-3 col">
@@ -207,39 +246,6 @@
             </div>
           </div>
         </div>
-
-        <h4 class="mt-4" id="update-checking" i18n>Update checking</h4>
-
-        <div class="row mb-3">
-          <div class="offset-md-3 col">
-            <p i18n>
-              Update checking works by pinging the public <a href="https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest" target="_blank" rel="noopener noreferrer">GitHub API</a> for the latest release to determine whether a new version is available.<br/>
-              Actual updating of the app must still be performed manually.
-            </p>
-            <p i18n>
-              <em>No tracking data is collected by the app in any way.</em>
-            </p>
-            <pngx-input-check i18n-title title="Enable update checking" formControlName="updateCheckingEnabled" i18n-hint hint="Note that for users of third-party containers e.g. linuxserver.io this notification may be 'ahead' of the current third-party release."></pngx-input-check>
-          </div>
-        </div>
-
-        <h4 class="mt-4" i18n>Bulk editing</h4>
-
-        <div class="row mb-3">
-          <div class="offset-md-3 col">
-            <pngx-input-check i18n-title title="Show confirmation dialogs" formControlName="bulkEditConfirmationDialogs" i18n-hint hint="Deleting documents will always ask for confirmation."></pngx-input-check>
-            <pngx-input-check i18n-title title="Apply on close" formControlName="bulkEditApplyOnClose"></pngx-input-check>
-          </div>
-        </div>
-
-        <h4 class="mt-4" i18n>Notes</h4>
-
-        <div class="row mb-3">
-          <div class="offset-md-3 col">
-            <pngx-input-check i18n-title title="Enable notes" formControlName="notesEnabled"></pngx-input-check>
-          </div>
-        </div>
-
       </ng-template>
     </li>
 

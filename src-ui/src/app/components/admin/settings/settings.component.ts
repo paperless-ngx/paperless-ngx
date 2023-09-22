@@ -9,7 +9,7 @@ import {
 } from '@angular/core'
 import { FormGroup, FormControl } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
-import { NgbModal, NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap'
+import { NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap'
 import { DirtyComponent, dirtyCheck } from '@ngneat/dirty-check-forms'
 import { TourService } from 'ngx-ui-tour-ng-bootstrap'
 import {
@@ -40,16 +40,13 @@ import {
   LanguageOption,
 } from 'src/app/services/settings.service'
 import { ToastService, Toast } from 'src/app/services/toast.service'
-import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
-import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
-import { GroupEditDialogComponent } from '../../common/edit-dialog/group-edit-dialog/group-edit-dialog.component'
-import { UserEditDialogComponent } from '../../common/edit-dialog/user-edit-dialog/user-edit-dialog.component'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 
 enum SettingsNavIDs {
   General = 1,
-  Notifications = 2,
-  SavedViews = 3,
+  Permissions = 2,
+  Notifications = 3,
+  SavedViews = 4,
 }
 
 @Component({

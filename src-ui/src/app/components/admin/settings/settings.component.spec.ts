@@ -153,8 +153,10 @@ describe('SettingsComponent', () => {
     const navigateSpy = jest.spyOn(router, 'navigate')
     const tabButtons = fixture.debugElement.queryAll(By.directive(NgbNavLink))
     tabButtons[1].nativeElement.dispatchEvent(new MouseEvent('click'))
-    expect(navigateSpy).toHaveBeenCalledWith(['settings', 'notifications'])
+    expect(navigateSpy).toHaveBeenCalledWith(['settings', 'permissions'])
     tabButtons[2].nativeElement.dispatchEvent(new MouseEvent('click'))
+    expect(navigateSpy).toHaveBeenCalledWith(['settings', 'notifications'])
+    tabButtons[3].nativeElement.dispatchEvent(new MouseEvent('click'))
     expect(navigateSpy).toHaveBeenCalledWith(['settings', 'savedviews'])
 
     const initSpy = jest.spyOn(component, 'initialize')
@@ -178,7 +180,7 @@ describe('SettingsComponent', () => {
     activatedRoute.snapshot.fragment = '#notifications'
     const scrollSpy = jest.spyOn(viewportScroller, 'scrollToAnchor')
     component.ngOnInit()
-    expect(component.activeNavID).toEqual(2) // Users & Groups
+    expect(component.activeNavID).toEqual(3) // Users & Groups
     component.ngAfterViewInit()
     expect(scrollSpy).toHaveBeenCalledWith('#notifications')
   })
