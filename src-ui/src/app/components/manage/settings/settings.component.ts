@@ -51,6 +51,8 @@ import {
   PermissionType,
   PermissionsService,
 } from 'src/app/services/permissions.service'
+import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
+import { AbstractPaperlessService } from 'src/app/services/rest/abstract-paperless-service'
 
 enum SettingsNavIDs {
   General = 1,
@@ -307,14 +309,14 @@ export class SettingsComponent
       (!this.mailAccounts || !this.mailRules)
     ) {
       this.mailAccountService
-        .listAll()
+        .listAll(null, null, { full_perms: true })
         .pipe(first())
         .subscribe({
           next: (r) => {
             this.mailAccounts = r.results
 
             this.mailRuleService
-              .listAll()
+              .listAll(null, null, { full_perms: true })
               .pipe(first())
               .subscribe({
                 next: (r) => {
@@ -889,10 +891,12 @@ export class SettingsComponent
           $localize`Saved account "${newMailAccount.name}".`
         )
         this.mailAccountService.clearCache()
-        this.mailAccountService.listAll().subscribe((r) => {
-          this.mailAccounts = r.results
-          this.initialize()
-        })
+        this.mailAccountService
+          .listAll(null, null, { full_perms: true })
+          .subscribe((r) => {
+            this.mailAccounts = r.results
+            this.initialize()
+          })
       })
     modal.componentInstance.failed
       .pipe(takeUntil(this.unsubscribeNotifier))
@@ -917,10 +921,12 @@ export class SettingsComponent
           modal.close()
           this.toastService.showInfo($localize`Deleted mail account`)
           this.mailAccountService.clearCache()
-          this.mailAccountService.listAll().subscribe((r) => {
-            this.mailAccounts = r.results
-            this.initialize(true)
-          })
+          this.mailAccountService
+            .listAll(null, null, { full_perms: true })
+            .subscribe((r) => {
+              this.mailAccounts = r.results
+              this.initialize(true)
+            })
         },
         error: (e) => {
           this.toastService.showError(
@@ -946,11 +952,13 @@ export class SettingsComponent
       .subscribe((newMailRule) => {
         this.toastService.showInfo($localize`Saved rule "${newMailRule.name}".`)
         this.mailRuleService.clearCache()
-        this.mailRuleService.listAll().subscribe((r) => {
-          this.mailRules = r.results
+        this.mailRuleService
+          .listAll(null, null, { full_perms: true })
+          .subscribe((r) => {
+            this.mailRules = r.results
 
-          this.initialize(true)
-        })
+            this.initialize(true)
+          })
       })
     modal.componentInstance.failed
       .pipe(takeUntil(this.unsubscribeNotifier))
@@ -975,13 +983,41 @@ export class SettingsComponent
           modal.close()
           this.toastService.showInfo($localize`Deleted mail rule`)
           this.mailRuleService.clearCache()
-          this.mailRuleService.listAll().subscribe((r) => {
-            this.mailRules = r.results
-            this.initialize(true)
-          })
+          this.mailRuleService
+            .listAll(null, null, { full_perms: true })
+            .subscribe((r) => {
+              this.mailRules = r.results
+              this.initialize(true)
+            })
         },
         error: (e) => {
           this.toastService.showError($localize`Error deleting mail rule.`, e)
+        },
+      })
+    })
+  }
+
+  editPermissions(object: PaperlessMailRule | PaperlessMailAccount) {
+    const modal = this.modalService.open(PermissionsDialogComponent, {
+      backdrop: 'static',
+    })
+    const dialog: PermissionsDialogComponent =
+      modal.componentInstance as PermissionsDialogComponent
+    dialog.object = object
+    modal.componentInstance.confirmClicked.subscribe((permissions) => {
+      modal.componentInstance.buttonsEnabled = false
+      const service: AbstractPaperlessService<
+        PaperlessMailRule | PaperlessMailAccount
+      > = 'account' in object ? this.mailRuleService : this.mailAccountService
+      object.owner = permissions['owner']
+      object['set_permissions'] = permissions['set_permissions']
+      service.patch(object).subscribe({
+        next: () => {
+          this.toastService.showInfo($localize`Permissions updated`)
+          modal.close()
+        },
+        error: (e) => {
+          this.toastService.showError($localize`Error updating permissions`, e)
         },
       })
     })
