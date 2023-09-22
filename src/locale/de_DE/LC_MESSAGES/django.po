@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-19 14:30-0700\n"
-"PO-Revision-Date: 2023-09-20 06:24\n"
+"PO-Revision-Date: 2023-09-22 10:11\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -607,11 +607,11 @@ msgstr "Ihr Benutzername und Kennwort stimmen nicht überein. Bitte versuchen Si
 
 #: documents/templates/registration/login.html:48
 msgid "Share link was not found."
-msgstr "Freigabelink wurde nicht gefunden."
+msgstr "Geteilter Link wurde nicht gefunden."
 
 #: documents/templates/registration/login.html:52
 msgid "Share link has expired."
-msgstr "Freigabelink ist abgelaufen."
+msgstr "Geteilter Link ist abgelaufen."
 
 #: documents/templates/registration/login.html:55
 msgid "Username"
