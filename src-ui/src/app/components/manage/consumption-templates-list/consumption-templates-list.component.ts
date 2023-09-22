@@ -14,11 +14,11 @@ import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dial
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 
 @Component({
-  selector: 'pngx-consmption-templates-list',
-  templateUrl: './consmption-templates-list.component.html',
-  styleUrls: ['./consmption-templates-list.component.scss'],
+  selector: 'pngx-consumption-templates-list',
+  templateUrl: './consumption-templates-list.component.html',
+  styleUrls: ['./consumption-templates-list.component.scss'],
 })
-export class ConsmptionTemplatesListComponent
+export class ConsumptionTemplatesListComponent
   extends ComponentWithPermissions
   implements OnInit
 {

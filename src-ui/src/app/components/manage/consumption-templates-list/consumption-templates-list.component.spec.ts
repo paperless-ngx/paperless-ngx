@@ -18,7 +18,7 @@ import { ConsumptionTemplateService } from 'src/app/services/rest/consumption-te
 import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
-import { ConsmptionTemplatesListComponent } from './consmption-templates-list.component'
+import { ConsumptionTemplatesListComponent } from './consumption-templates-list.component'
 import { ConsumptionTemplateEditDialogComponent } from '../../common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component'
 import { PermissionsService } from 'src/app/services/permissions.service'
 
@@ -47,9 +47,9 @@ const templates: PaperlessConsumptionTemplate[] = [
   },
 ]
 
-describe('ConsmptionTemplatesComponent', () => {
-  let component: ConsmptionTemplatesListComponent
-  let fixture: ComponentFixture<ConsmptionTemplatesListComponent>
+describe('ConsumptionTemplatesComponent', () => {
+  let component: ConsumptionTemplatesListComponent
+  let fixture: ComponentFixture<ConsumptionTemplatesListComponent>
   let consumptionTemplateService: ConsumptionTemplateService
   let modalService: NgbModal
   let toastService: ToastService
@@ -57,7 +57,7 @@ describe('ConsmptionTemplatesComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [
-        ConsmptionTemplatesListComponent,
+        ConsumptionTemplatesListComponent,
         IfPermissionsDirective,
         PageHeaderComponent,
         ConfirmDialogComponent,
@@ -92,7 +92,7 @@ describe('ConsmptionTemplatesComponent', () => {
     modalService = TestBed.inject(NgbModal)
     toastService = TestBed.inject(ToastService)
 
-    fixture = TestBed.createComponent(ConsmptionTemplatesListComponent)
+    fixture = TestBed.createComponent(ConsumptionTemplatesListComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
   })

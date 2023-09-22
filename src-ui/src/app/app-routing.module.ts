@@ -21,7 +21,7 @@ import {
   PermissionAction,
   PermissionType,
 } from './services/permissions.service'
-import { ConsmptionTemplatesListComponent } from './components/manage/consmption-templates-list/consmption-templates-list.component'
+import { ConsumptionTemplatesListComponent } from './components/manage/consumption-templates-list/consumption-templates-list.component'
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -185,7 +185,7 @@ export const routes: Routes = [
       },
       {
         path: 'templates',
-        component: ConsmptionTemplatesListComponent,
+        component: ConsumptionTemplatesListComponent,
         canActivate: [PermissionsGuard],
         data: {
           requiredPermission: {
