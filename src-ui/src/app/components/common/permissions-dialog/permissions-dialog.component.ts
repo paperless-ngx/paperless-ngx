@@ -21,10 +21,13 @@ export class PermissionsDialogComponent {
     this.userService.listAll().subscribe((r) => (this.users = r.results))
   }
 
+  @Output()
   public confirmClicked = new EventEmitter()
 
+  @Input()
   title = $localize`Set permissions`
 
+  @Input()
   set object(o: ObjectWithPermissions) {
     this.o = o
     this.title = $localize`Edit permissions for ` + o['name']
@@ -54,6 +57,7 @@ export class PermissionsDialogComponent {
     }
   }
 
+  @Input()
   message = $localize`Note that permissions set here will override any existing permissions`
 
   cancelClicked() {
