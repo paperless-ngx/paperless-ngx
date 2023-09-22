@@ -11,9 +11,12 @@ from unittest.mock import MagicMock
 
 from dateutil import tz
 from django.conf import settings
+from django.contrib.auth.models import Group
+from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test import override_settings
 from django.utils import timezone
+from guardian.core import ObjectPermissionChecker
 
 from documents.consumer import Consumer
 from documents.consumer import ConsumerError
@@ -22,6 +25,7 @@ from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import FileInfo
+from documents.models import StoragePath
 from documents.models import Tag
 from documents.parsers import DocumentParser
 from documents.parsers import ParseError
@@ -431,6 +435,16 @@ class TestConsumer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertEqual(document.document_type.id, dt.id)
         self._assert_first_last_send_progress()
 
+    def testOverrideStoragePath(self):
+        sp = StoragePath.objects.create(name="test")
+
+        document = self.consumer.try_consume_file(
+            self.get_test_file(),
+            override_storage_path_id=sp.pk,
+        )
+        self.assertEqual(document.storage_path.id, sp.id)
+        self._assert_first_last_send_progress()
+
     def testOverrideTags(self):
         t1 = Tag.objects.create(name="t1")
         t2 = Tag.objects.create(name="t2")
@@ -443,6 +457,51 @@ class TestConsumer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertIn(t1, document.tags.all())
         self.assertNotIn(t2, document.tags.all())
         self.assertIn(t3, document.tags.all())
+        self._assert_first_last_send_progress()
+
+    def testOverrideAsn(self):
+        document = self.consumer.try_consume_file(
+            self.get_test_file(),
+            override_asn=123,
+        )
+        self.assertEqual(document.archive_serial_number, 123)
+        self._assert_first_last_send_progress()
+
+    def testOverrideTitlePlaceholders(self):
+        c = Correspondent.objects.create(name="Correspondent Name")
+        dt = DocumentType.objects.create(name="DocType Name")
+
+        document = self.consumer.try_consume_file(
+            self.get_test_file(),
+            override_correspondent_id=c.pk,
+            override_document_type_id=dt.pk,
+            override_title="{correspondent}{document_type} {added_month}-{added_year_short}",
+        )
+        now = timezone.now()
+        self.assertEqual(document.title, f"{c.name}{dt.name} {now.strftime('%m-%y')}")
+        self._assert_first_last_send_progress()
+
+    def testOverrideOwner(self):
+        testuser = User.objects.create(username="testuser")
+        document = self.consumer.try_consume_file(
+            self.get_test_file(),
+            override_owner_id=testuser.pk,
+        )
+        self.assertEqual(document.owner, testuser)
+        self._assert_first_last_send_progress()
+
+    def testOverridePermissions(self):
+        testuser = User.objects.create(username="testuser")
+        testgroup = Group.objects.create(name="testgroup")
+        document = self.consumer.try_consume_file(
+            self.get_test_file(),
+            override_view_users=[testuser.pk],
+            override_view_groups=[testgroup.pk],
+        )
+        user_checker = ObjectPermissionChecker(testuser)
+        self.assertTrue(user_checker.has_perm("view_document", document))
+        group_checker = ObjectPermissionChecker(testgroup)
+        self.assertTrue(group_checker.has_perm("view_document", document))
         self._assert_first_last_send_progress()
 
     def testNotAFile(self):

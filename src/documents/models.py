@@ -11,17 +11,17 @@ import dateutil.parser
 import pathvalidate
 from celery import states
 from django.conf import settings
+from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from multiselectfield import MultiSelectField
 
+from documents.data_models import DocumentSource
 from documents.parsers import get_default_file_extension
-
-ALL_STATES = sorted(states.ALL_STATES)
-TASK_STATE_CHOICES = sorted(zip(ALL_STATES, ALL_STATES))
 
 
 class ModelWithOwner(models.Model):
@@ -572,6 +572,9 @@ class UiSettings(models.Model):
 
 
 class PaperlessTask(models.Model):
+    ALL_STATES = sorted(states.ALL_STATES)
+    TASK_STATE_CHOICES = sorted(zip(ALL_STATES, ALL_STATES))
+
     task_id = models.CharField(
         max_length=255,
         unique=True,
@@ -735,3 +738,137 @@ class ShareLink(models.Model):
 
     def __str__(self):
         return f"Share Link for {self.document.title}"
+
+
+class ConsumptionTemplate(models.Model):
+    class DocumentSourceChoices(models.IntegerChoices):
+        CONSUME_FOLDER = DocumentSource.ConsumeFolder.value, _("Consume Folder")
+        API_UPLOAD = DocumentSource.ApiUpload.value, _("Api Upload")
+        MAIL_FETCH = DocumentSource.MailFetch.value, _("Mail Fetch")
+
+    name = models.CharField(_("name"), max_length=256, unique=True)
+
+    order = models.IntegerField(_("order"), default=0)
+
+    sources = MultiSelectField(
+        max_length=3,
+        choices=DocumentSourceChoices.choices,
+        default=f"{DocumentSource.ConsumeFolder},{DocumentSource.ApiUpload},{DocumentSource.MailFetch}",
+    )
+
+    filter_path = models.CharField(
+        _("filter path"),
+        max_length=256,
+        null=True,
+        blank=True,
+        help_text=_(
+            "Only consume documents with a path that matches "
+            "this if specified. Wildcards specified as * are "
+            "allowed. Case insensitive.",
+        ),
+    )
+
+    filter_filename = models.CharField(
+        _("filter filename"),
+        max_length=256,
+        null=True,
+        blank=True,
+        help_text=_(
+            "Only consume documents which entirely match this "
+            "filename if specified. Wildcards such as *.pdf or "
+            "*invoice* are allowed. Case insensitive.",
+        ),
+    )
+
+    filter_mailrule = models.ForeignKey(
+        "paperless_mail.MailRule",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        verbose_name=_("filter documents from this mail rule"),
+    )
+
+    assign_title = models.CharField(
+        _("assign title"),
+        max_length=256,
+        null=True,
+        blank=True,
+        help_text=_(
+            "Assign a document title, can include some placeholders, "
+            "see documentation.",
+        ),
+    )
+
+    assign_tags = models.ManyToManyField(
+        Tag,
+        blank=True,
+        verbose_name=_("assign this tag"),
+    )
+
+    assign_document_type = models.ForeignKey(
+        DocumentType,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        verbose_name=_("assign this document type"),
+    )
+
+    assign_correspondent = models.ForeignKey(
+        Correspondent,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        verbose_name=_("assign this correspondent"),
+    )
+
+    assign_storage_path = models.ForeignKey(
+        StoragePath,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        verbose_name=_("assign this storage path"),
+    )
+
+    assign_owner = models.ForeignKey(
+        User,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+        verbose_name=_("assign this owner"),
+    )
+
+    assign_view_users = models.ManyToManyField(
+        User,
+        blank=True,
+        related_name="+",
+        verbose_name=_("grant view permissions to these users"),
+    )
+
+    assign_view_groups = models.ManyToManyField(
+        Group,
+        blank=True,
+        related_name="+",
+        verbose_name=_("grant view permissions to these groups"),
+    )
+
+    assign_change_users = models.ManyToManyField(
+        User,
+        blank=True,
+        related_name="+",
+        verbose_name=_("grant change permissions to these users"),
+    )
+
+    assign_change_groups = models.ManyToManyField(
+        Group,
+        blank=True,
+        related_name="+",
+        verbose_name=_("grant change permissions to these groups"),
+    )
+
+    class Meta:
+        verbose_name = _("consumption template")
+        verbose_name_plural = _("consumption templates")
+
+    def __str__(self):
+        return f"{self.name}"

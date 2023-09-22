@@ -95,6 +95,8 @@ import { UsernamePipe } from './pipes/username.pipe'
 import { LogoComponent } from './components/common/logo/logo.component'
 import { IsNumberPipe } from './pipes/is-number.pipe'
 import { ShareLinksDropdownComponent } from './components/common/share-links-dropdown/share-links-dropdown.component'
+import { ConsumptionTemplatesListComponent } from './components/manage/consumption-templates-list/consumption-templates-list.component'
+import { ConsumptionTemplateEditDialogComponent } from './components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component'
 
 import localeAf from '@angular/common/locales/af'
 import localeAr from '@angular/common/locales/ar'
@@ -233,6 +235,8 @@ function initializeApp(settings: SettingsService) {
     LogoComponent,
     IsNumberPipe,
     ShareLinksDropdownComponent,
+    ConsumptionTemplatesListComponent,
+    ConsumptionTemplateEditDialogComponent,
   ],
   imports: [
     BrowserModule,
