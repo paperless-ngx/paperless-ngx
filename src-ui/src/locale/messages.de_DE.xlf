@@ -2057,7 +2057,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.html</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="translated">(Erteilt alle Berechtigungen und kann Objekte ansehen)</target>
+        <target state="translated">(Erteilt alle Berechtigungen und kann Objekte anzeigen)</target>
       </trans-unit>
       <trans-unit id="5944812089887969249" datatype="html">
         <source>Groups</source>
@@ -2226,7 +2226,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">150</context>
         </context-group>
-        <target state="translated">Objekte ohne Eigentümer können von allen Benutzern angesehen und bearbeitet werden</target>
+        <target state="translated">Objekte ohne Eigentümer können von allen Benutzern angezeigt und bearbeitet werden</target>
       </trans-unit>
       <trans-unit id="2509141182388535183" datatype="html" approved="yes">
         <source>View</source>
@@ -2362,7 +2362,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">206</context>
         </context-group>
-        <target state="translated">Berechtigungen bearbeiten und Zugriffsrechte gewähren</target>
+        <target state="translated">Bearbeitungsberechtigungen gewähren auch Anzeigeberechtigungen</target>
       </trans-unit>
       <trans-unit id="2722549756198502062" datatype="html" approved="yes">
         <source>Add item</source>
@@ -4974,7 +4974,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">139,141</context>
         </context-group>
-        <target state="needs-translation"> Settings apply to this user account for objects (Tags, Mail Rules, etc.) created via the web UI </target>
+        <target state="translated"> Einstellungen gelten für dieses Benutzerkonto für Objekte (Tags, E-Mail-Regeln, etc.), die über die Weboberfläche erstellt wurden </target>
       </trans-unit>
       <trans-unit id="4292903881380648974" datatype="html">
         <source>Default Owner</source>
@@ -4982,7 +4982,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">146</context>
         </context-group>
-        <target state="needs-translation">Default Owner</target>
+        <target state="translated">Standardeigentümer</target>
       </trans-unit>
       <trans-unit id="1835394624061684099" datatype="html">
         <source>Default View Permissions</source>
@@ -4990,7 +4990,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">155</context>
         </context-group>
-        <target state="needs-translation">Default View Permissions</target>
+        <target state="translated">Standard Ansichtsberechtigungen</target>
       </trans-unit>
       <trans-unit id="3748107313403519340" datatype="html">
         <source>Default Edit Permissions</source>
@@ -4998,7 +4998,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">182</context>
         </context-group>
-        <target state="needs-translation">Default Edit Permissions</target>
+        <target state="translated">Standard Bearbeitungsberechtigungen</target>
       </trans-unit>
       <trans-unit id="8901931207592071833" datatype="html">
         <source>Update checking</source>
