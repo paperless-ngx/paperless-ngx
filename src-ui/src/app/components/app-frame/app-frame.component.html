@@ -80,8 +80,8 @@
             </a>
           </li>
         </ul>
-        <div *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }">
-          <h6 class="sidebar-heading px-3 mt-4 mb-1 text-muted" *ngIf='savedViewService.loading || savedViewService.sidebarViews.length > 0'>
+        <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }">
+          <h6 class="sidebar-heading px-3 mt-3 mb-1 text-muted" *ngIf='savedViewService.loading || savedViewService.sidebarViews.length > 0'>
             <span i18n>Saved views</span>
             <div *ngIf="savedViewService.loading" class="spinner-border spinner-border-sm fw-normal ms-2" role="status"></div>
           </h6>
@@ -94,10 +94,10 @@
               </a>
             </li>
           </ul>
-        </div>
+        </ng-container>
 
-        <div *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
-          <h6 class="sidebar-heading px-3 mt-4 mb-1 text-muted" *ngIf='openDocuments.length > 0'>
+        <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
+          <h6 class="sidebar-heading px-3 mt-3 mb-1 text-muted" *ngIf='openDocuments.length > 0'>
             <span i18n>Open documents</span>
           </h6>
           <ul class="nav flex-column mb-2">
@@ -121,9 +121,9 @@
               </a>
             </li>
           </ul>
-      </div>
+        </ng-container>
 
-        <h6 class="sidebar-heading px-3 mt-4 mb-1 text-muted">
+        <h6 class="sidebar-heading px-3 mt-3 mb-1 text-muted">
           <span i18n>Manage</span>
         </h6>
         <ul class="nav flex-column mb-2">
@@ -162,6 +162,12 @@
               </svg><span>&nbsp;<ng-container i18n>Templates</ng-container></span>
             </a>
           </li>
+        </ul>
+
+        <h6 class="sidebar-heading px-3 mt-3 mb-1 text-muted">
+          <span i18n>Administration</span>
+        </h6>
+        <ul class="nav flex-column mb-2">
           <li class="nav-item" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.PaperlessTask }" tourAnchor="tour.file-tasks">
             <a class="nav-link" routerLink="tasks" routerLinkActive="active" (click)="closeMenu()" ngbPopover="File Tasks" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
               <span *ngIf="tasksService.failedFileTasks.length > 0 && slimSidebarEnabled" class="badge bg-danger position-absolute top-0 end-0">{{tasksService.failedFileTasks.length}}</span>

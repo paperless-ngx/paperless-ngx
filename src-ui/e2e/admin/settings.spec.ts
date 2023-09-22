@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 
-const REQUESTS_HAR = 'e2e/settings/requests/api-settings.har'
+const REQUESTS_HAR = 'e2e/admin/requests/api-settings.har'
 
 test('should post settings on save', async ({ page }) => {
   await page.routeFromHAR(REQUESTS_HAR, { notFound: 'fallback' })
