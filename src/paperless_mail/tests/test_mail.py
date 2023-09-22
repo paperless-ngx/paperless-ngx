@@ -392,6 +392,11 @@ class TestMail(
             assign_title_from=MailRule.TitleSource.FROM_SUBJECT,
         )
         self.assertEqual(handler._get_title(message, att, rule), "the message title")
+        rule = MailRule(
+            name="b",
+            assign_title_from=MailRule.TitleSource.NONE,
+        )
+        self.assertEqual(handler._get_title(message, att, rule), None)
 
     def test_handle_message(self):
         message = self.create_message(

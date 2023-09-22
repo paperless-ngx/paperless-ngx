@@ -464,6 +464,7 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
             "assign_tags": [tag.pk],
             "assign_correspondent": correspondent.pk,
             "assign_document_type": document_type.pk,
+            "assign_owner_from_rule": True,
         }
 
         response = self.client.post(
@@ -512,6 +513,10 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
             rule1["assign_document_type"],
         )
         self.assertEqual(returned_rule1["assign_tags"], rule1["assign_tags"])
+        self.assertEqual(
+            returned_rule1["assign_owner_from_rule"],
+            rule1["assign_owner_from_rule"],
+        )
 
     def test_delete_mail_rule(self):
         """

@@ -1,7 +1,11 @@
 import logging
 import re
+from fnmatch import fnmatch
 
 from documents.classifier import DocumentClassifier
+from documents.data_models import ConsumableDocument
+from documents.data_models import DocumentSource
+from documents.models import ConsumptionTemplate
 from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
@@ -231,3 +235,67 @@ def _split_match(matching_model):
         re.escape(normspace(" ", (t[0] or t[1]).strip())).replace(r"\ ", r"\s+")
         for t in findterms(matching_model.match)
     ]
+
+
+def document_matches_template(
+    document: ConsumableDocument,
+    template: ConsumptionTemplate,
+) -> bool:
+    """
+    Returns True if the incoming document matches all filters and
+    settings from the template, False otherwise
+    """
+
+    def log_match_failure(reason: str):
+        logger.info(f"Document did not match template {template.name}")
+        logger.debug(reason)
+
+    # Document source vs template source
+    if document.source not in [int(x) for x in list(template.sources)]:
+        log_match_failure(
+            f"Document source {document.source.name} not in"
+            f" {[DocumentSource(int(x)).name for x in template.sources]}",
+        )
+        return False
+
+    # Document mail rule vs template mail rule
+    if (
+        document.mailrule_id is not None
+        and template.filter_mailrule is not None
+        and document.mailrule_id != template.filter_mailrule.pk
+    ):
+        log_match_failure(
+            f"Document mail rule {document.mailrule_id}"
+            f" != {template.filter_mailrule.pk}",
+        )
+        return False
+
+    # Document filename vs template filename
+    if (
+        template.filter_filename is not None
+        and len(template.filter_filename) > 0
+        and not fnmatch(
+            document.original_file.name.lower(),
+            template.filter_filename.lower(),
+        )
+    ):
+        log_match_failure(
+            f"Document filename {document.original_file.name} does not match"
+            f" {template.filter_filename.lower()}",
+        )
+        return False
+
+    # Document path vs template path
+    if (
+        template.filter_path is not None
+        and len(template.filter_path) > 0
+        and not document.original_file.match(template.filter_path)
+    ):
+        log_match_failure(
+            f"Document path {document.original_file}"
+            f" does not match {template.filter_path}",
+        )
+        return False
+
+    logger.info(f"Document matched template {template.name}")
+    return True

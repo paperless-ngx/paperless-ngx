@@ -155,6 +155,13 @@
               </svg><span>&nbsp;<ng-container i18n>Storage paths</ng-container></span>
             </a>
           </li>
+          <li class="nav-item" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.ConsumptionTemplate }">
+            <a class="nav-link" routerLink="templates" routerLinkActive="active" (click)="closeMenu()" ngbPopover="Consumption templates" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
+              <svg class="sidebaricon" fill="currentColor">
+                <use xlink:href="assets/bootstrap-icons.svg#file-earmark-ruled"/>
+              </svg><span>&nbsp;<ng-container i18n>Templates</ng-container></span>
+            </a>
+          </li>
           <li class="nav-item" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.PaperlessTask }" tourAnchor="tour.file-tasks">
             <a class="nav-link" routerLink="tasks" routerLinkActive="active" (click)="closeMenu()" ngbPopover="File Tasks" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
               <span *ngIf="tasksService.failedFileTasks.length > 0 && slimSidebarEnabled" class="badge bg-danger position-absolute top-0 end-0">{{tasksService.failedFileTasks.length}}</span>

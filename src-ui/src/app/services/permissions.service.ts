@@ -25,6 +25,7 @@ export enum PermissionType {
   Group = '%s_group',
   Admin = '%s_logentry',
   ShareLink = '%s_sharelink',
+  ConsumptionTemplate = '%s_consumptiontemplate',
 }
 
 @Injectable({
