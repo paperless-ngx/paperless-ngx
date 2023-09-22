@@ -5,7 +5,7 @@
   </div>
   <div class="modal-body">
 
-    <p class="mb-3" *ngIf="message" [innerHTML]="message | safeHtml"></p>
+    <p *ngIf="!object && message" class="mb-3" [innerHTML]="message | safeHtml"></p>
 
     <form [formGroup]="form">
       <pngx-permissions-form [users]="users" formControlName="permissions_form"></pngx-permissions-form>

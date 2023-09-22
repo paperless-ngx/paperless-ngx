@@ -343,6 +343,7 @@
                     <div class="col">
                       <div class="btn-group">
                         <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailAccount }" [disabled]="!userCanEdit(account)" class="btn btn-sm btn-primary" type="button" (click)="editMailAccount(account)" i18n>Edit</button>
+                        <button *pngxIfOwner="rule" class="btn btn-sm btn-primary" type="button" (click)="editPermissions(account)" i18n>Permissions</button>
                         <button *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.MailAccount }" [disabled]="!userIsOwner(account)" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteMailAccount(account)" i18n>Delete</button>
                       </div>
                     </div>
@@ -380,6 +381,7 @@
                     <div class="col">
                       <div class="btn-group">
                         <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailRule }" [disabled]="!userCanEdit(rule)" class="btn btn-sm btn-primary" type="button" (click)="editMailRule(rule)" i18n>Edit</button>
+                        <button *pngxIfOwner="rule" class="btn btn-sm btn-primary" type="button" (click)="editPermissions(rule)" i18n>Permissions</button>
                         <button *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.MailRule }" [disabled]="!userIsOwner(rule)" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteMailRule(rule)" i18n>Delete</button>
                       </div>
                     </div>
