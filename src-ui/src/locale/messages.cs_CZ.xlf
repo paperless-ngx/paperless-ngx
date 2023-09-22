@@ -515,7 +515,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">192</context>
+          <context context-type="linenumber">268</context>
         </context-group>
         <target state="final">Nastavení</target>
       </trans-unit>
@@ -583,7 +583,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">189</context>
+          <context context-type="linenumber">265</context>
         </context-group>
         <target state="final">Uložené pohledy</target>
       </trans-unit>
@@ -807,7 +807,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">641</context>
+          <context context-type="linenumber">691</context>
         </context-group>
         <target state="translated">Nastala chyba při ukládání uživatelských nastavení.</target>
       </trans-unit>
@@ -1003,23 +1003,23 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">204</context>
+          <context context-type="linenumber">280</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">257</context>
+          <context context-type="linenumber">333</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">294</context>
+          <context context-type="linenumber">370</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">345</context>
+          <context context-type="linenumber">421</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">379</context>
+          <context context-type="linenumber">455</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
@@ -1183,7 +1183,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">415</context>
+          <context context-type="linenumber">491</context>
         </context-group>
         <target state="final">Uložit</target>
       </trans-unit>
@@ -1223,7 +1223,7 @@
         <source>Create new item</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/edit-dialog.component.ts</context>
-          <context context-type="linenumber">88</context>
+          <context context-type="linenumber">101</context>
         </context-group>
         <target state="final">Vytvořit novou položku</target>
       </trans-unit>
@@ -1231,7 +1231,7 @@
         <source>Edit item</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/edit-dialog.component.ts</context>
-          <context context-type="linenumber">92</context>
+          <context context-type="linenumber">105</context>
         </context-group>
         <target state="final">Upravit položku</target>
       </trans-unit>
@@ -1276,6 +1276,10 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
           <context context-type="linenumber">10</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">135</context>
         </context-group>
         <target state="translated">Oprávnění</target>
       </trans-unit>
@@ -1331,7 +1335,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">344</context>
+          <context context-type="linenumber">420</context>
         </context-group>
         <target state="translated">Uživatelské jméno</target>
       </trans-unit>
@@ -1419,15 +1423,15 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">230</context>
+          <context context-type="linenumber">306</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">320</context>
+          <context context-type="linenumber">396</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">406</context>
+          <context context-type="linenumber">482</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
@@ -1511,7 +1515,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">295</context>
+          <context context-type="linenumber">371</context>
         </context-group>
         <target state="needs-translation">Account</target>
       </trans-unit>
@@ -1795,23 +1799,23 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">222</context>
+          <context context-type="linenumber">298</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">270</context>
+          <context context-type="linenumber">346</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">307</context>
+          <context context-type="linenumber">383</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">359</context>
+          <context context-type="linenumber">435</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">394</context>
+          <context context-type="linenumber">470</context>
         </context-group>
         <target state="final">Odstranit</target>
       </trans-unit>
@@ -2063,11 +2067,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">346</context>
+          <context context-type="linenumber">422</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">367</context>
+          <context context-type="linenumber">443</context>
         </context-group>
         <target state="translated">Skupiny</target>
       </trans-unit>
@@ -2218,6 +2222,10 @@
           <context context-type="sourcefile">src/app/components/common/input/permissions/permissions-form/permissions-form.component.html</context>
           <context context-type="linenumber">25</context>
         </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">150</context>
+        </context-group>
         <target state="translated">Objekty bez vlastníka mohou být zobrazeny a editovány všemi uživateli</target>
       </trans-unit>
       <trans-unit id="2509141182388535183" datatype="html" approved="yes">
@@ -2246,6 +2254,14 @@
           <context context-type="sourcefile">src/app/components/common/input/permissions/permissions-form/permissions-form.component.html</context>
           <context context-type="linenumber">50</context>
         </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">160</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">187</context>
+        </context-group>
         <target state="translated">Uživatelé:</target>
       </trans-unit>
       <trans-unit id="239911470633002624" datatype="html">
@@ -2257,6 +2273,14 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/permissions/permissions-form/permissions-form.component.html</context>
           <context context-type="linenumber">58</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">170</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">197</context>
         </context-group>
         <target state="translated">Skupiny:</target>
       </trans-unit>
@@ -2312,19 +2336,19 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">269</context>
+          <context context-type="linenumber">345</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">306</context>
+          <context context-type="linenumber">382</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">358</context>
+          <context context-type="linenumber">434</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">393</context>
+          <context context-type="linenumber">469</context>
         </context-group>
         <target state="final">Upravit</target>
       </trans-unit>
@@ -2333,6 +2357,10 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/permissions/permissions-form/permissions-form.component.html</context>
           <context context-type="linenumber">64</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">206</context>
         </context-group>
         <target state="translated">Oprávnění editovat také přidá oprávnění prohlížet</target>
       </trans-unit>
@@ -2429,7 +2457,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">332</context>
+          <context context-type="linenumber">408</context>
         </context-group>
         <target state="needs-translation">Users</target>
       </trans-unit>
@@ -3018,23 +3046,23 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">221</context>
+          <context context-type="linenumber">297</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">259</context>
+          <context context-type="linenumber">335</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">296</context>
+          <context context-type="linenumber">372</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">347</context>
+          <context context-type="linenumber">423</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">382</context>
+          <context context-type="linenumber">458</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
@@ -3474,19 +3502,19 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">746</context>
+          <context context-type="linenumber">796</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">798</context>
+          <context context-type="linenumber">848</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">857</context>
+          <context context-type="linenumber">907</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">915</context>
+          <context context-type="linenumber">965</context>
         </context-group>
         <target state="final">Tuto operaci nelze vrátit zpět.</target>
       </trans-unit>
@@ -3502,19 +3530,19 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">748</context>
+          <context context-type="linenumber">798</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">800</context>
+          <context context-type="linenumber">850</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">859</context>
+          <context context-type="linenumber">909</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">917</context>
+          <context context-type="linenumber">967</context>
         </context-group>
         <target state="needs-translation">Proceed</target>
       </trans-unit>
@@ -4000,7 +4028,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">199</context>
+          <context context-type="linenumber">275</context>
         </context-group>
         <target state="final">Pohledy</target>
       </trans-unit>
@@ -4140,7 +4168,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">159</context>
+          <context context-type="linenumber">235</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
@@ -4404,7 +4432,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">216</context>
+          <context context-type="linenumber">292</context>
         </context-group>
         <target state="final">Zobrazit na postranním panelu</target>
       </trans-unit>
@@ -4416,7 +4444,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">212</context>
+          <context context-type="linenumber">288</context>
         </context-group>
         <target state="final">Zobrazit na nástěnce</target>
       </trans-unit>
@@ -4940,11 +4968,43 @@
         </context-group>
         <target state="needs-translation">Reset</target>
       </trans-unit>
+      <trans-unit id="8222269449891326545" datatype="html">
+        <source> Settings apply to this user account for objects (Tags, Mail Rules, etc.) created via the web UI </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">139,141</context>
+        </context-group>
+        <target state="needs-translation"> Settings apply to this user account for objects (Tags, Mail Rules, etc.) created via the web UI </target>
+      </trans-unit>
+      <trans-unit id="4292903881380648974" datatype="html">
+        <source>Default Owner</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">146</context>
+        </context-group>
+        <target state="needs-translation">Default Owner</target>
+      </trans-unit>
+      <trans-unit id="1835394624061684099" datatype="html">
+        <source>Default View Permissions</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">155</context>
+        </context-group>
+        <target state="needs-translation">Default View Permissions</target>
+      </trans-unit>
+      <trans-unit id="3748107313403519340" datatype="html">
+        <source>Default Edit Permissions</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">182</context>
+        </context-group>
+        <target state="needs-translation">Default Edit Permissions</target>
+      </trans-unit>
       <trans-unit id="8901931207592071833" datatype="html">
         <source>Update checking</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">135</context>
+          <context context-type="linenumber">211</context>
         </context-group>
         <target state="needs-translation">Update checking</target>
       </trans-unit>
@@ -4952,7 +5012,7 @@
         <source> Update checking works by pinging the public <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;"/>GitHub API<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> for the latest release to determine whether a new version is available.<x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br/&gt;"/> Actual updating of the app must still be performed manually. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">139,142</context>
+          <context context-type="linenumber">215,218</context>
         </context-group>
         <target state="needs-translation"> Update checking works by pinging the public <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;"/>GitHub API<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> for the latest release to determine whether a new version is available.<x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br/&gt;"/> Actual updating of the app must still be performed manually. </target>
       </trans-unit>
@@ -4960,7 +5020,7 @@
         <source><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&gt;"/>No tracking data is collected by the app in any way.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">144,146</context>
+          <context context-type="linenumber">220,222</context>
         </context-group>
         <target state="needs-translation"><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&gt;"/>No tracking data is collected by the app in any way.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></target>
       </trans-unit>
@@ -4968,7 +5028,7 @@
         <source>Enable update checking</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">146</context>
+          <context context-type="linenumber">222</context>
         </context-group>
         <target state="needs-translation">Enable update checking</target>
       </trans-unit>
@@ -4976,7 +5036,7 @@
         <source>Note that for users of third-party containers e.g. linuxserver.io this notification may be &apos;ahead&apos; of the current third-party release.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">146</context>
+          <context context-type="linenumber">222</context>
         </context-group>
         <target state="needs-translation">Note that for users of third-party containers e.g. linuxserver.io this notification may be 'ahead' of the current third-party release.</target>
       </trans-unit>
@@ -4984,7 +5044,7 @@
         <source>Bulk editing</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">150</context>
+          <context context-type="linenumber">226</context>
         </context-group>
         <target state="final">Hromadné úpravy</target>
       </trans-unit>
@@ -4992,7 +5052,7 @@
         <source>Show confirmation dialogs</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">154</context>
+          <context context-type="linenumber">230</context>
         </context-group>
         <target state="final">Zobrazit potvrzovací dialogy</target>
       </trans-unit>
@@ -5000,7 +5060,7 @@
         <source>Deleting documents will always ask for confirmation.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">154</context>
+          <context context-type="linenumber">230</context>
         </context-group>
         <target state="final">Smazání dokumentů bude vždy vyžadovat potvrzení.</target>
       </trans-unit>
@@ -5008,7 +5068,7 @@
         <source>Apply on close</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">155</context>
+          <context context-type="linenumber">231</context>
         </context-group>
         <target state="final">Aplikovat při zavření</target>
       </trans-unit>
@@ -5016,7 +5076,7 @@
         <source>Enable notes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">163</context>
+          <context context-type="linenumber">239</context>
         </context-group>
         <target state="needs-translation">Enable notes</target>
       </trans-unit>
@@ -5024,7 +5084,7 @@
         <source>Notifications</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">171</context>
+          <context context-type="linenumber">247</context>
         </context-group>
         <target state="final">Oznámení</target>
       </trans-unit>
@@ -5032,7 +5092,7 @@
         <source>Document processing</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">174</context>
+          <context context-type="linenumber">250</context>
         </context-group>
         <target state="final">Zpracovávání dokumentu</target>
       </trans-unit>
@@ -5040,7 +5100,7 @@
         <source>Show notifications when new documents are detected</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">178</context>
+          <context context-type="linenumber">254</context>
         </context-group>
         <target state="final">Zobrazit oznámení, když jsou zjištěny nové dokumenty</target>
       </trans-unit>
@@ -5048,7 +5108,7 @@
         <source>Show notifications when document processing completes successfully</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">179</context>
+          <context context-type="linenumber">255</context>
         </context-group>
         <target state="final">Zobrazit oznámení při úspěšném dokončení zpracování dokumentu</target>
       </trans-unit>
@@ -5056,7 +5116,7 @@
         <source>Show notifications when document processing fails</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">180</context>
+          <context context-type="linenumber">256</context>
         </context-group>
         <target state="final">Zobrazit oznámení, když zpracování dokumentu selže</target>
       </trans-unit>
@@ -5064,7 +5124,7 @@
         <source>Suppress notifications on dashboard</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">181</context>
+          <context context-type="linenumber">257</context>
         </context-group>
         <target state="final">Potlačit oznámení na nástěnce</target>
       </trans-unit>
@@ -5072,7 +5132,7 @@
         <source>This will suppress all messages about document processing status on the dashboard.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">181</context>
+          <context context-type="linenumber">257</context>
         </context-group>
         <target state="final">Toto potlačí všechny zprávy o stavu zpracování dokumentu na nástěnce.</target>
       </trans-unit>
@@ -5080,7 +5140,7 @@
         <source>Show warning when closing saved views with unsaved changes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">195</context>
+          <context context-type="linenumber">271</context>
         </context-group>
         <target state="needs-translation">Show warning when closing saved views with unsaved changes</target>
       </trans-unit>
@@ -5088,7 +5148,7 @@
         <source> <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;visually-hidden&quot;&gt;"/>Appears on<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">209,210</context>
+          <context context-type="linenumber">285,286</context>
         </context-group>
         <target state="needs-translation"> <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;visually-hidden&quot;&gt;"/>Appears on<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
       </trans-unit>
@@ -5096,7 +5156,7 @@
         <source>No saved views defined.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">226</context>
+          <context context-type="linenumber">302</context>
         </context-group>
         <target state="final">Nejsou definovány žádné uložené pohledy.</target>
       </trans-unit>
@@ -5104,7 +5164,7 @@
         <source>Mail</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">239</context>
+          <context context-type="linenumber">315</context>
         </context-group>
         <target state="needs-translation">Mail</target>
       </trans-unit>
@@ -5112,7 +5172,7 @@
         <source>Mail accounts</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">245</context>
+          <context context-type="linenumber">321</context>
         </context-group>
         <target state="needs-translation">Mail accounts</target>
       </trans-unit>
@@ -5120,7 +5180,7 @@
         <source>Add Account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">250</context>
+          <context context-type="linenumber">326</context>
         </context-group>
         <target state="needs-translation">Add Account</target>
       </trans-unit>
@@ -5128,7 +5188,7 @@
         <source>Server</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">258</context>
+          <context context-type="linenumber">334</context>
         </context-group>
         <target state="needs-translation">Server</target>
       </trans-unit>
@@ -5136,7 +5196,7 @@
         <source>No mail accounts defined.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">276</context>
+          <context context-type="linenumber">352</context>
         </context-group>
         <target state="needs-translation">No mail accounts defined.</target>
       </trans-unit>
@@ -5144,7 +5204,7 @@
         <source>Mail rules</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">282</context>
+          <context context-type="linenumber">358</context>
         </context-group>
         <target state="needs-translation">Mail rules</target>
       </trans-unit>
@@ -5152,7 +5212,7 @@
         <source>Add Rule</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">287</context>
+          <context context-type="linenumber">363</context>
         </context-group>
         <target state="needs-translation">Add Rule</target>
       </trans-unit>
@@ -5160,7 +5220,7 @@
         <source>No mail rules defined.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">313</context>
+          <context context-type="linenumber">389</context>
         </context-group>
         <target state="needs-translation">No mail rules defined.</target>
       </trans-unit>
@@ -5168,7 +5228,7 @@
         <source>Users &amp; Groups</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">327</context>
+          <context context-type="linenumber">403</context>
         </context-group>
         <target state="needs-translation">Users &amp; Groups</target>
       </trans-unit>
@@ -5176,7 +5236,7 @@
         <source>Add User</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">337</context>
+          <context context-type="linenumber">413</context>
         </context-group>
         <target state="needs-translation">Add User</target>
       </trans-unit>
@@ -5184,7 +5244,7 @@
         <source>Add Group</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">372</context>
+          <context context-type="linenumber">448</context>
         </context-group>
         <target state="needs-translation">Add Group</target>
       </trans-unit>
@@ -5192,23 +5252,15 @@
         <source>Error retrieving groups</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">278</context>
+          <context context-type="linenumber">299</context>
         </context-group>
         <target state="needs-translation">Error retrieving groups</target>
-      </trans-unit>
-      <trans-unit id="1235706724900303689" datatype="html">
-        <source>Error retrieving users</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">285</context>
-        </context-group>
-        <target state="needs-translation">Error retrieving users</target>
       </trans-unit>
       <trans-unit id="5241231471117657636" datatype="html">
         <source>Error retrieving mail rules</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">309</context>
+          <context context-type="linenumber">325</context>
         </context-group>
         <target state="needs-translation">Error retrieving mail rules</target>
       </trans-unit>
@@ -5216,15 +5268,23 @@
         <source>Error retrieving mail accounts</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">317</context>
+          <context context-type="linenumber">333</context>
         </context-group>
         <target state="needs-translation">Error retrieving mail accounts</target>
+      </trans-unit>
+      <trans-unit id="1235706724900303689" datatype="html">
+        <source>Error retrieving users</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
+          <context context-type="linenumber">350</context>
+        </context-group>
+        <target state="needs-translation">Error retrieving users</target>
       </trans-unit>
       <trans-unit id="5610279464668232148" datatype="html" approved="yes">
         <source>Saved view &quot;<x id="PH" equiv-text="savedView.name"/>&quot; deleted.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">523</context>
+          <context context-type="linenumber">553</context>
         </context-group>
         <target state="final">Uložený pohled "<x id="PH" equiv-text="savedView.name"/>" odstraněn.</target>
       </trans-unit>
@@ -5232,7 +5292,7 @@
         <source>Settings saved</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">625</context>
+          <context context-type="linenumber">675</context>
         </context-group>
         <target state="needs-translation">Settings saved</target>
       </trans-unit>
@@ -5240,7 +5300,7 @@
         <source>Settings were saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">626</context>
+          <context context-type="linenumber">676</context>
         </context-group>
         <target state="needs-translation">Settings were saved successfully.</target>
       </trans-unit>
@@ -5248,7 +5308,7 @@
         <source>Settings were saved successfully. Reload is required to apply some changes.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">630</context>
+          <context context-type="linenumber">680</context>
         </context-group>
         <target state="needs-translation">Settings were saved successfully. Reload is required to apply some changes.</target>
       </trans-unit>
@@ -5256,7 +5316,7 @@
         <source>Reload now</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">631</context>
+          <context context-type="linenumber">681</context>
         </context-group>
         <target state="needs-translation">Reload now</target>
       </trans-unit>
@@ -5264,7 +5324,7 @@
         <source>Use system language</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">649</context>
+          <context context-type="linenumber">699</context>
         </context-group>
         <target state="final">Použít systémový jazyk</target>
       </trans-unit>
@@ -5272,7 +5332,7 @@
         <source>Use date format of display language</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">656</context>
+          <context context-type="linenumber">706</context>
         </context-group>
         <target state="final">Použít formát data zobrazeného jazyka</target>
       </trans-unit>
@@ -5280,7 +5340,7 @@
         <source>Error while storing settings on server.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">676</context>
+          <context context-type="linenumber">726</context>
         </context-group>
         <target state="needs-translation">Error while storing settings on server.</target>
       </trans-unit>
@@ -5288,7 +5348,7 @@
         <source>Password has been changed, you will be logged out momentarily.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">718</context>
+          <context context-type="linenumber">768</context>
         </context-group>
         <target state="needs-translation">Password has been changed, you will be logged out momentarily.</target>
       </trans-unit>
@@ -5296,7 +5356,7 @@
         <source>Saved user &quot;<x id="PH" equiv-text="newUser.username"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">725</context>
+          <context context-type="linenumber">775</context>
         </context-group>
         <target state="needs-translation">Saved user "<x id="PH" equiv-text="newUser.username"/>".</target>
       </trans-unit>
@@ -5304,7 +5364,7 @@
         <source>Error saving user.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">736</context>
+          <context context-type="linenumber">786</context>
         </context-group>
         <target state="needs-translation">Error saving user.</target>
       </trans-unit>
@@ -5312,7 +5372,7 @@
         <source>Confirm delete user account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">744</context>
+          <context context-type="linenumber">794</context>
         </context-group>
         <target state="needs-translation">Confirm delete user account</target>
       </trans-unit>
@@ -5320,7 +5380,7 @@
         <source>This operation will permanently delete this user account.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">745</context>
+          <context context-type="linenumber">795</context>
         </context-group>
         <target state="needs-translation">This operation will permanently delete this user account.</target>
       </trans-unit>
@@ -5328,7 +5388,7 @@
         <source>Deleted user</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">754</context>
+          <context context-type="linenumber">804</context>
         </context-group>
         <target state="needs-translation">Deleted user</target>
       </trans-unit>
@@ -5336,7 +5396,7 @@
         <source>Error deleting user.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">761</context>
+          <context context-type="linenumber">811</context>
         </context-group>
         <target state="needs-translation">Error deleting user.</target>
       </trans-unit>
@@ -5344,7 +5404,7 @@
         <source>Saved group &quot;<x id="PH" equiv-text="newGroup.name"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">779</context>
+          <context context-type="linenumber">829</context>
         </context-group>
         <target state="needs-translation">Saved group "<x id="PH" equiv-text="newGroup.name"/>".</target>
       </trans-unit>
@@ -5352,7 +5412,7 @@
         <source>Error saving group.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">788</context>
+          <context context-type="linenumber">838</context>
         </context-group>
         <target state="needs-translation">Error saving group.</target>
       </trans-unit>
@@ -5360,7 +5420,7 @@
         <source>Confirm delete user group</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">796</context>
+          <context context-type="linenumber">846</context>
         </context-group>
         <target state="needs-translation">Confirm delete user group</target>
       </trans-unit>
@@ -5368,7 +5428,7 @@
         <source>This operation will permanently delete this user group.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">797</context>
+          <context context-type="linenumber">847</context>
         </context-group>
         <target state="needs-translation">This operation will permanently delete this user group.</target>
       </trans-unit>
@@ -5376,7 +5436,7 @@
         <source>Deleted group</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">806</context>
+          <context context-type="linenumber">856</context>
         </context-group>
         <target state="needs-translation">Deleted group</target>
       </trans-unit>
@@ -5384,7 +5444,7 @@
         <source>Error deleting group.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">813</context>
+          <context context-type="linenumber">863</context>
         </context-group>
         <target state="needs-translation">Error deleting group.</target>
       </trans-unit>
@@ -5392,7 +5452,7 @@
         <source>Saved account &quot;<x id="PH" equiv-text="newMailAccount.name"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">836</context>
+          <context context-type="linenumber">886</context>
         </context-group>
         <target state="needs-translation">Saved account "<x id="PH" equiv-text="newMailAccount.name"/>".</target>
       </trans-unit>
@@ -5400,7 +5460,7 @@
         <source>Error saving account.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">847</context>
+          <context context-type="linenumber">897</context>
         </context-group>
         <target state="needs-translation">Error saving account.</target>
       </trans-unit>
@@ -5408,7 +5468,7 @@
         <source>Confirm delete mail account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">855</context>
+          <context context-type="linenumber">905</context>
         </context-group>
         <target state="needs-translation">Confirm delete mail account</target>
       </trans-unit>
@@ -5416,7 +5476,7 @@
         <source>This operation will permanently delete this mail account.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">856</context>
+          <context context-type="linenumber">906</context>
         </context-group>
         <target state="needs-translation">This operation will permanently delete this mail account.</target>
       </trans-unit>
@@ -5424,7 +5484,7 @@
         <source>Deleted mail account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">865</context>
+          <context context-type="linenumber">915</context>
         </context-group>
         <target state="needs-translation">Deleted mail account</target>
       </trans-unit>
@@ -5432,7 +5492,7 @@
         <source>Error deleting mail account.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">874</context>
+          <context context-type="linenumber">924</context>
         </context-group>
         <target state="needs-translation">Error deleting mail account.</target>
       </trans-unit>
@@ -5440,7 +5500,7 @@
         <source>Saved rule &quot;<x id="PH" equiv-text="newMailRule.name"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">894</context>
+          <context context-type="linenumber">944</context>
         </context-group>
         <target state="needs-translation">Saved rule "<x id="PH" equiv-text="newMailRule.name"/>".</target>
       </trans-unit>
@@ -5448,7 +5508,7 @@
         <source>Error saving rule.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">905</context>
+          <context context-type="linenumber">955</context>
         </context-group>
         <target state="needs-translation">Error saving rule.</target>
       </trans-unit>
@@ -5456,7 +5516,7 @@
         <source>Confirm delete mail rule</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">913</context>
+          <context context-type="linenumber">963</context>
         </context-group>
         <target state="needs-translation">Confirm delete mail rule</target>
       </trans-unit>
@@ -5464,7 +5524,7 @@
         <source>This operation will permanently delete this mail rule.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">914</context>
+          <context context-type="linenumber">964</context>
         </context-group>
         <target state="needs-translation">This operation will permanently delete this mail rule.</target>
       </trans-unit>
@@ -5472,7 +5532,7 @@
         <source>Deleted mail rule</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">923</context>
+          <context context-type="linenumber">973</context>
         </context-group>
         <target state="needs-translation">Deleted mail rule</target>
       </trans-unit>
@@ -5480,7 +5540,7 @@
         <source>Error deleting mail rule.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">931</context>
+          <context context-type="linenumber">981</context>
         </context-group>
         <target state="needs-translation">Error deleting mail rule.</target>
       </trans-unit>
@@ -6333,7 +6393,7 @@
         <source>Successfully completed one-time migratration of settings to the database!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">446</context>
+          <context context-type="linenumber">454</context>
         </context-group>
         <target state="needs-translation">Successfully completed one-time migratration of settings to the database!</target>
       </trans-unit>
@@ -6341,7 +6401,7 @@
         <source>Unable to migrate settings to the database, please try saving manually.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">447</context>
+          <context context-type="linenumber">455</context>
         </context-group>
         <target state="needs-translation">Unable to migrate settings to the database, please try saving manually.</target>
       </trans-unit>
@@ -6349,7 +6409,7 @@
         <source>You can restart the tour from the settings page.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">521</context>
+          <context context-type="linenumber">529</context>
         </context-group>
         <target state="needs-translation">You can restart the tour from the settings page.</target>
       </trans-unit>
