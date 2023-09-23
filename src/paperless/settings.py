@@ -217,6 +217,12 @@ def _parse_beat_schedule() -> Dict:
 # NEVER RUN WITH DEBUG IN PRODUCTION.
 DEBUG = __get_boolean("PAPERLESS_DEBUG", "NO")
 
+# Google Cloud Storage
+GOOGLE_CLOUD_STORAGE = __get_boolean("GOOGLE_CLOUD_STORAGE", "NO")
+GCP_BUCKET_NAME = os.getenv('GCP_BUCKET_NAME', 'dms_files_local')
+GCP_SERVICE_ACCOUNT_JSON = os.getenv('GCP_SERVICE_ACCOUNT_JSON', '')
+if GCP_SERVICE_ACCOUNT_JSON != '':
+    GCP_SERVICE_ACCOUNT_JSON = json.loads(GCP_SERVICE_ACCOUNT_JSON)
 
 ###############################################################################
 # Directories                                                                 #

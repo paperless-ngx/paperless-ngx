@@ -198,6 +198,8 @@ RUN set -eux \
   && echo "Installing psycopg2" \
     && python3 -m pip install --no-cache-dir ./psycopg2/${PSYCOPG2_VERSION}/${TARGETARCH}${TARGETVARIANT}/psycopg2*.whl \
     && python3 -m pip list \
+  && echo "Installing google cloud storage" \
+    && python3 -m pip install google-cloud-storage \
   && echo "Cleaning up image layer" \
     && cd ../ \
     && rm -rf paperless-ngx \

@@ -37,6 +37,8 @@ from .parsers import ParseError
 from .signals import document_consumption_finished
 from .signals import document_consumption_started
 
+from google.cloud import storage
+
 
 class ConsumerError(Exception):
     pass
@@ -431,6 +433,16 @@ class Consumer(LoggingMixin):
 
         classifier = load_classifier()
 
+        try:
+            self.log("debug", "Initializing Google Cloud Storage: " + str(settings.GCP_SERVICE_ACCOUNT_JSON))
+            # Prepare Google Cloud Storage client
+            # client = storage.Client()
+            client = storage.Client.from_service_account_info(settings.GCP_SERVICE_ACCOUNT_JSON)
+            self.log("debug", "Getting bucket: " + settings.GCP_BUCKET_NAME)
+            self.bucket = client.bucket(settings.GCP_BUCKET_NAME)
+        except Exception as e:
+            self.log("warning", 'Failed to initialize GCP: ' + str(e))
+
         self._send_progress(95, 100, "WORKING", MESSAGE_SAVE_DOCUMENT)
         # now that everything is done, we can start to store the document
         # in the system. This will be a transaction and reasonably fast.
@@ -487,7 +499,7 @@ class Consumer(LoggingMixin):
                 document.save()
 
                 # Delete the file only if it was successfully consumed
-                self.log("debug", f"Deleting file {self.path}")
+                self.log("debug", f"Deleting file 123 {self.path}")
                 os.unlink(self.path)
                 self.original_path.unlink()
 
@@ -625,6 +637,16 @@ class Consumer(LoggingMixin):
     def _write(self, storage_type, source, target):
         with open(source, "rb") as read_file, open(target, "wb") as write_file:
             write_file.write(read_file.read())
+        
+        with open(source, "rb") as read_file_2:
+            self.log("debug", "GOOGLE_CLOUD_STORAGE:" + str(settings.GOOGLE_CLOUD_STORAGE))
+            # Reference: https://github.com/GoogleCloudPlatform/getting-started-python/blob/main/bookshelf/storage.py#L59
+            if settings.GOOGLE_CLOUD_STORAGE:
+                self.log("debug", "Uploading to Google Cloud Storage")
+                # GCP was initialized earlier
+                blob = self.bucket.blob(str(target))
+                # Reference: https://cloud.google.com/python/docs/reference/storage/latest/google.cloud.storage.blob.Blob#google_cloud_storage_blob_Blob_upload_from_file
+                blob.upload_from_file(read_file_2)
 
     def _log_script_outputs(self, completed_process: CompletedProcess):
         """

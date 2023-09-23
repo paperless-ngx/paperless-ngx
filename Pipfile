@@ -51,7 +51,6 @@ uvicorn = {extras = ["standard"], version = "*"}
 concurrent-log-handler = "*"
 "pdfminer.six" = "*"
 pyzbar = "*"
-mysqlclient = "*"
 celery = {extras = ["redis"], version = "*"}
 setproctitle = "*"
 nltk = "*"
@@ -64,6 +63,10 @@ zxing-cpp = {version = "*", platform_machine = "== 'x86_64'"}
 #
 # Pin this until piwheels is building 1.9 (see https://www.piwheels.org/project/scipy/)
 scipy = "==1.8.1"
+google-cloud-storage = "*"
+google = "*"
+google-api-core = "*"
+google-cloud-core = "*"
 
 [dev-packages]
 coveralls = "*"
