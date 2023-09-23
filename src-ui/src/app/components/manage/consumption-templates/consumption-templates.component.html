@@ -5,29 +5,32 @@
       </svg>
       <ng-container i18n>Add Template</ng-container>
     </button>
-  </pngx-page-header>
+</pngx-page-header>
 
-  <table class="table table-striped align-middle border shadow-sm">
-    <thead>
-        <tr>
-            <th scope="col" i18n>Name</th>
-            <th scope="col" i18n>Sort order</th>
-            <th scope="col" i18n>Document Sources</th>
-            <th scope="col" i18n>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr *ngFor="let template of templates">
-            <td scope="row"><button class="btn btn-link p-0" type="button" (click)="editTemplate(template)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.ConsumptionTemplate)">{{template.name}}</button></td>
-            <td scope="row"><code>{{template.order}}</code></td>
-            <td scope="row">{{getSourceList(template)}}</td>
-            <td scope="row">
+<ul class="list-group">
+
+    <li class="list-group-item">
+        <div class="row">
+            <div class="col" i18n>Name</div>
+            <div class="col" i18n>Sort order</div>
+            <div class="col" i18n>Document Sources</div>
+            <div class="col" i18n>Actions</div>
+        </div>
+    </li>
+
+    <li *ngFor="let template of templates" class="list-group-item">
+        <div class="row">
+            <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editTemplate(template)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.ConsumptionTemplate)">{{template.name}}</button></div>
+            <div class="col d-flex align-items-center"><code>{{template.order}}</code></div>
+            <div class="col d-flex align-items-center">{{getSourceList(template)}}</div>
+            <div class="col">
                 <div class="btn-group">
                     <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.ConsumptionTemplate }" class="btn btn-sm btn-primary" type="button" (click)="editTemplate(template)" i18n>Edit</button>
                     <button *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.ConsumptionTemplate }" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteTemplate(template)" i18n>Delete</button>
                 </div>
-            </td>
-        </tr>
-    </tbody>
-</table>
+            </div>
+        </div>
+    </li>
+</ul>
+
 <div *ngIf="templates.length === 0" i18n>No templates defined.</div>

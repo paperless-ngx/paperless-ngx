@@ -95,7 +95,7 @@ import { UsernamePipe } from './pipes/username.pipe'
 import { LogoComponent } from './components/common/logo/logo.component'
 import { IsNumberPipe } from './pipes/is-number.pipe'
 import { ShareLinksDropdownComponent } from './components/common/share-links-dropdown/share-links-dropdown.component'
-import { ConsumptionTemplatesListComponent } from './components/manage/consumption-templates-list/consumption-templates-list.component'
+import { ConsumptionTemplatesComponent } from './components/manage/consumption-templates/consumption-templates.component'
 import { ConsumptionTemplateEditDialogComponent } from './components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component'
 import { MailComponent } from './components/manage/mail/mail.component'
 import { UsersAndGroupsComponent } from './components/admin/users-groups/users-groups.component'
@@ -237,7 +237,7 @@ function initializeApp(settings: SettingsService) {
     LogoComponent,
     IsNumberPipe,
     ShareLinksDropdownComponent,
-    ConsumptionTemplatesListComponent,
+    ConsumptionTemplatesComponent,
     ConsumptionTemplateEditDialogComponent,
     MailComponent,
     UsersAndGroupsComponent,

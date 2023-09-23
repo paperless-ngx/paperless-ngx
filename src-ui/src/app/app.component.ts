@@ -188,6 +188,14 @@ export class AppComponent implements OnInit, OnDestroy {
           },
         },
         {
+          anchorId: 'tour.consumption-templates',
+          content: $localize`Consumption templates give you finer control over the document ingestion process.`,
+          route: '/templates',
+          backdropConfig: {
+            offset: 0,
+          },
+        },
+        {
           anchorId: 'tour.file-tasks',
           content: $localize`File Tasks shows you documents that have been consumed, are waiting to be, or may have failed during the process.`,
           route: '/tasks',
