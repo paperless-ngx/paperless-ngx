@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-19 14:30-0700\n"
-"PO-Revision-Date: 2023-09-23 00:11\n"
+"PO-Revision-Date: 2023-09-23 18:50\n"
 "Last-Translator: \n"
 "Language-Team: Hebrew\n"
 "Language: he_IL\n"
@@ -369,7 +369,7 @@ msgstr "עוד כמו זה"
 
 #: documents/models.py:444
 msgid "has tags in"
-msgstr "מכיל תגים ב-"
+msgstr "מכיל תגים ב־"
 
 #: documents/models.py:445
 msgid "ASN greater than"
