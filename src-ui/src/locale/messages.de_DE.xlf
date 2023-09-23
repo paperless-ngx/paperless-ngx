@@ -681,7 +681,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">159</context>
         </context-group>
-        <target state="needs-translation">Consumption templates</target>
+        <target state="translated">Verarbeitungsvorlagen</target>
       </trans-unit>
       <trans-unit id="5433675495457939071" datatype="html">
         <source>Templates</source>
@@ -689,7 +689,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">162</context>
         </context-group>
-        <target state="needs-translation">Templates</target>
+        <target state="translated">Vorlagen</target>
       </trans-unit>
       <trans-unit id="2991443309752293110" datatype="html">
         <source>File Tasks</source>
@@ -1061,7 +1061,7 @@
           <context context-type="sourcefile">src/app/components/manage/consumption-templates-list/consumption-templates-list.component.html</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="needs-translation">Sort order</target>
+        <target state="translated">Sortierreihenfolge</target>
       </trans-unit>
       <trans-unit id="4163272119298020373" datatype="html">
         <source>Filters</source>
@@ -1069,7 +1069,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="needs-translation">Filters</target>
+        <target state="translated">Filter</target>
       </trans-unit>
       <trans-unit id="9090904435418488635" datatype="html">
         <source>Process documents that match <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>all<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> filters specified below.</source>
@@ -1077,7 +1077,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">19</context>
         </context-group>
-        <target state="needs-translation">Process documents that match <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>all<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> filters specified below.</target>
+        <target state="translated">Dokumente verarbeiten, die mit <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>allen<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> unten ausgewählten Filtern übereinstimmen.</target>
       </trans-unit>
       <trans-unit id="1473412958770421458" datatype="html">
         <source>Filter sources</source>
@@ -1085,7 +1085,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Filter sources</target>
+        <target state="translated">Quellen filtern</target>
       </trans-unit>
       <trans-unit id="7467799586957602479" datatype="html">
         <source>Filter filename</source>
@@ -1093,7 +1093,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="needs-translation">Filter filename</target>
+        <target state="translated">Dateinamen filtern</target>
       </trans-unit>
       <trans-unit id="3694878959415278689" datatype="html">
         <source>Apply to documents that match this filename. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive.</source>
@@ -1101,7 +1101,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="needs-translation">Apply to documents that match this filename. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive.</target>
+        <target state="translated">Auf Dokumente anwenden, die diesem Dateinamen entsprechen. Platzhalter wie *.pdf oder *rechung* sind erlaubt. Groß- und Kleinschreibung wird nicht beachtet.</target>
       </trans-unit>
       <trans-unit id="6540860478788535250" datatype="html">
         <source>Filter path</source>
@@ -1109,7 +1109,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="needs-translation">Filter path</target>
+        <target state="translated">Pfad filtern</target>
       </trans-unit>
       <trans-unit id="2900550647231873115" datatype="html">
         <source>Apply to documents that match this path. Wildcards specified as * are allowed. Case insensitive.&lt;/a&gt;</source>
@@ -1117,7 +1117,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="needs-translation">Apply to documents that match this path. Wildcards specified as * are allowed. Case insensitive.&lt;/a&gt;</target>
+        <target state="translated">Auf Dokumente anwenden, die mit diesem Pfad übereinstimmen. Platzhalter wie * sind zulässig. Groß- und Kleinschreibung wird nicht beachtet.&lt;/a&gt;</target>
       </trans-unit>
       <trans-unit id="7468453896129193641" datatype="html">
         <source>Filter mail rule</source>
@@ -1125,7 +1125,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="needs-translation">Filter mail rule</target>
+        <target state="translated">E-Mail-Regel filtern</target>
       </trans-unit>
       <trans-unit id="8663702115863339485" datatype="html">
         <source>Apply to documents consumed via this mail rule.</source>
@@ -1133,7 +1133,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="needs-translation">Apply to documents consumed via this mail rule.</target>
+        <target state="translated">Auf Dokumente anwenden, die über diese E-Mail-Regel verarbeitet wurden.</target>
       </trans-unit>
       <trans-unit id="5070601857075675729" datatype="html">
         <source>Assignments</source>
@@ -1141,7 +1141,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">28</context>
         </context-group>
-        <target state="needs-translation">Assignments</target>
+        <target state="translated">Zuweisungen</target>
       </trans-unit>
       <trans-unit id="6019822389883736115" datatype="html">
         <source>Assign title</source>
@@ -1149,7 +1149,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="needs-translation">Assign title</target>
+        <target state="translated">Titel zuweisen</target>
       </trans-unit>
       <trans-unit id="7071676931416298160" datatype="html">
         <source>Can include some placeholders, see &lt;a target=&apos;_blank&apos; href=&apos;https://docs.paperless-ngx.com/usage/#consumption-templates&apos;&gt;documentation&lt;/a&gt;.</source>
@@ -1157,7 +1157,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="needs-translation">Can include some placeholders, see &lt;a target='_blank' href='https://docs.paperless-ngx.com/usage/#consumption-templates'&gt;documentation&lt;/a&gt;.</target>
+        <target state="translated">Kann Platzhalter beinhalten, siehe &lt;a target='_blank' href='https://docs.paperless-ngx.com/usage/#consumption-templates'&gt;Dokumentation&lt;/a&gt;.</target>
       </trans-unit>
       <trans-unit id="6528897010417701530" datatype="html">
         <source>Assign tags</source>
@@ -1165,7 +1165,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">34</context>
         </context-group>
-        <target state="needs-translation">Assign tags</target>
+        <target state="translated">Tags zuweisen</target>
       </trans-unit>
       <trans-unit id="6695990587380209737" datatype="html">
         <source>Assign document type</source>
@@ -1197,7 +1197,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="needs-translation">Assign storage path</target>
+        <target state="translated">Speicherpfad zuweisen</target>
       </trans-unit>
       <trans-unit id="5057200219587080996" datatype="html">
         <source>Assign owner</source>
@@ -1205,7 +1205,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">40</context>
         </context-group>
-        <target state="needs-translation">Assign owner</target>
+        <target state="translated">Eigentümer zuweisen</target>
       </trans-unit>
       <trans-unit id="1749184201773078639" datatype="html">
         <source>Assign view permissions</source>
@@ -1213,7 +1213,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">42</context>
         </context-group>
-        <target state="needs-translation">Assign view permissions</target>
+        <target state="translated">Anzeigeberechtigungen zuweisen</target>
       </trans-unit>
       <trans-unit id="2191775412581217688" datatype="html">
         <source>Users:</source>
@@ -1277,7 +1277,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">61</context>
         </context-group>
-        <target state="needs-translation">Assign edit permissions</target>
+        <target state="translated">Bearbeitungsberechtigungen zuweisen</target>
       </trans-unit>
       <trans-unit id="3728984448750213892" datatype="html">
         <source>Edit permissions also grant viewing permissions</source>
@@ -1429,7 +1429,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.ts</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">Consume Folder</target>
+        <target state="translated">Verarbeitungsordner</target>
       </trans-unit>
       <trans-unit id="526966086395145275" datatype="html">
         <source>API Upload</source>
@@ -1437,7 +1437,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.ts</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="needs-translation">API Upload</target>
+        <target state="translated">API-Upload</target>
       </trans-unit>
       <trans-unit id="7502272564743467653" datatype="html">
         <source>Mail Fetch</source>
@@ -1445,7 +1445,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.ts</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="needs-translation">Mail Fetch</target>
+        <target state="translated">Mail-Abruf</target>
       </trans-unit>
       <trans-unit id="2057608151109082984" datatype="html">
         <source>Create new consumption template</source>
@@ -1453,7 +1453,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.ts</context>
           <context context-type="linenumber">83</context>
         </context-group>
-        <target state="needs-translation">Create new consumption template</target>
+        <target state="translated">Neue Verarbeitungsvorlage erstellen</target>
       </trans-unit>
       <trans-unit id="3745279073747685988" datatype="html">
         <source>Edit consumption template</source>
@@ -1461,7 +1461,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.ts</context>
           <context context-type="linenumber">87</context>
         </context-group>
-        <target state="needs-translation">Edit consumption template</target>
+        <target state="translated">Verarbeitungsvorlage bearbeiten</target>
       </trans-unit>
       <trans-unit id="8743659855412792665" datatype="html" approved="yes">
         <source>Matching algorithm</source>
@@ -2005,7 +2005,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="needs-translation">Assignments specified here will supersede any consumption templates.</target>
+        <target state="translated">Die hier angegebenen Zuordnungen werden alle Verarbeitungsvorlagen ersetzen.</target>
       </trans-unit>
       <trans-unit id="6093797930511670257" datatype="html">
         <source>Assign title from</source>
@@ -2029,7 +2029,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">35</context>
         </context-group>
-        <target state="needs-translation">Assign owner from rule</target>
+        <target state="translated">Eigentümer von Regel zuweisen</target>
       </trans-unit>
       <trans-unit id="6886003843406464884" datatype="html">
         <source>Only process attachments</source>
@@ -2205,7 +2205,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">84</context>
         </context-group>
-        <target state="needs-translation">Do not assign title from this rule</target>
+        <target state="translated">Titel nicht aus dieser Regel zuweisen</target>
       </trans-unit>
       <trans-unit id="1568902914205618549" datatype="html">
         <source>Do not assign a correspondent</source>
@@ -2701,7 +2701,7 @@
           <context context-type="sourcefile">src/app/components/manage/tasks/tasks.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="needs-translation"><x id="INTERPOLATION" equiv-text="{{title}}"/></target>
+        <target state="translated"><x id="INTERPOLATION" equiv-text="{{title}}"/></target>
       </trans-unit>
       <trans-unit id="6560126119609945418" datatype="html" approved="yes">
         <source>Add tag</source>
@@ -4838,7 +4838,7 @@
           <context context-type="sourcefile">src/app/components/manage/consumption-templates-list/consumption-templates-list.component.html</context>
           <context context-type="linenumber">6</context>
         </context-group>
-        <target state="needs-translation">Add Template</target>
+        <target state="translated">Vorlage hinzufügen</target>
       </trans-unit>
       <trans-unit id="6043932623370318890" datatype="html">
         <source>Document Sources</source>
@@ -4846,7 +4846,7 @@
           <context context-type="sourcefile">src/app/components/manage/consumption-templates-list/consumption-templates-list.component.html</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="needs-translation">Document Sources</target>
+        <target state="translated">Dokumentquellen</target>
       </trans-unit>
       <trans-unit id="3954560573326461437" datatype="html">
         <source>No templates defined.</source>
@@ -4854,7 +4854,7 @@
           <context context-type="sourcefile">src/app/components/manage/consumption-templates-list/consumption-templates-list.component.html</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="needs-translation">No templates defined.</target>
+        <target state="translated">Keine Vorlagen definiert.</target>
       </trans-unit>
       <trans-unit id="5957685099370605085" datatype="html">
         <source>Saved template &quot;<x id="PH" equiv-text="newTemplate.name"/>&quot;.</source>
@@ -4862,7 +4862,7 @@
           <context context-type="sourcefile">src/app/components/manage/consumption-templates-list/consumption-templates-list.component.ts</context>
           <context context-type="linenumber">73</context>
         </context-group>
-        <target state="needs-translation">Saved template "<x id="PH" equiv-text="newTemplate.name"/>".</target>
+        <target state="translated">Vorlage „<x id="PH" equiv-text="newTemplate.name"/>“ gespeichert.</target>
       </trans-unit>
       <trans-unit id="5291506186551056893" datatype="html">
         <source>Error saving template.</source>
@@ -4870,7 +4870,7 @@
           <context context-type="sourcefile">src/app/components/manage/consumption-templates-list/consumption-templates-list.component.ts</context>
           <context context-type="linenumber">81</context>
         </context-group>
-        <target state="needs-translation">Error saving template.</target>
+        <target state="translated">Fehler beim Speichern der Vorlage.</target>
       </trans-unit>
       <trans-unit id="9152231933218802310" datatype="html">
         <source>Confirm delete template</source>
@@ -4878,7 +4878,7 @@
           <context context-type="sourcefile">src/app/components/manage/consumption-templates-list/consumption-templates-list.component.ts</context>
           <context context-type="linenumber">89</context>
         </context-group>
-        <target state="needs-translation">Confirm delete template</target>
+        <target state="translated">Löschen der Vorlage bestätigen</target>
       </trans-unit>
       <trans-unit id="3359315394839441814" datatype="html">
         <source>This operation will permanently delete this template.</source>
@@ -4886,7 +4886,7 @@
           <context context-type="sourcefile">src/app/components/manage/consumption-templates-list/consumption-templates-list.component.ts</context>
           <context context-type="linenumber">90</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently delete this template.</target>
+        <target state="translated">Dieser Vorgang wird diese Vorlage dauerhaft löschen.</target>
       </trans-unit>
       <trans-unit id="9198120062446364156" datatype="html">
         <source>Deleted template</source>
@@ -4894,7 +4894,7 @@
           <context context-type="sourcefile">src/app/components/manage/consumption-templates-list/consumption-templates-list.component.ts</context>
           <context context-type="linenumber">99</context>
         </context-group>
-        <target state="needs-translation">Deleted template</target>
+        <target state="translated">Vorlage gelöscht</target>
       </trans-unit>
       <trans-unit id="8513868194237937637" datatype="html">
         <source>Error deleting template.</source>
@@ -4902,7 +4902,7 @@
           <context context-type="sourcefile">src/app/components/manage/consumption-templates-list/consumption-templates-list.component.ts</context>
           <context context-type="linenumber">104</context>
         </context-group>
-        <target state="needs-translation">Error deleting template.</target>
+        <target state="translated">Fehler beim Löschen der Vorlage.</target>
       </trans-unit>
       <trans-unit id="6316128875819022658" datatype="html">
         <source>correspondent</source>
