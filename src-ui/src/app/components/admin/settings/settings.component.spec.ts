@@ -39,8 +39,8 @@ import { SettingsComponent } from './settings.component'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 
 const savedViews = [
-  { id: 1, name: 'view1' },
-  { id: 2, name: 'view2' },
+  { id: 1, name: 'view1', show_in_sidebar: true, show_on_dashboard: true },
+  { id: 2, name: 'view2', show_in_sidebar: false, show_on_dashboard: false },
 ]
 const users = [
   { id: 1, username: 'user1', is_superuser: false },
@@ -188,9 +188,19 @@ describe('SettingsComponent', () => {
   it('should support save saved views, show error', () => {
     completeSetup()
 
+    const tabButtons = fixture.debugElement.queryAll(By.directive(NgbNavLink))
+    tabButtons[3].nativeElement.dispatchEvent(new MouseEvent('click'))
+    fixture.detectChanges()
+
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
     const toastSpy = jest.spyOn(toastService, 'show')
     const savedViewPatchSpy = jest.spyOn(savedViewService, 'patchMany')
+
+    const toggle = fixture.debugElement.query(
+      By.css('.form-check.form-switch input')
+    )
+    toggle.nativeElement.checked = true
+    toggle.nativeElement.dispatchEvent(new Event('change'))
 
     // saved views error first
     savedViewPatchSpy.mockReturnValueOnce(
@@ -210,6 +220,40 @@ describe('SettingsComponent', () => {
     component.saveSettings()
     expect(toastErrorSpy).not.toHaveBeenCalled()
     expect(savedViewPatchSpy).toHaveBeenCalled()
+  })
+
+  it('should update only patch saved views that have changed', () => {
+    completeSetup()
+
+    const tabButtons = fixture.debugElement.queryAll(By.directive(NgbNavLink))
+    tabButtons[3].nativeElement.dispatchEvent(new MouseEvent('click'))
+    fixture.detectChanges()
+
+    const patchSpy = jest.spyOn(savedViewService, 'patchMany')
+    component.saveSettings()
+    expect(patchSpy).not.toHaveBeenCalled()
+
+    const view = savedViews[0]
+    const toggle = fixture.debugElement.query(
+      By.css('.form-check.form-switch input')
+    )
+    toggle.nativeElement.checked = true
+    toggle.nativeElement.dispatchEvent(new Event('change'))
+    // register change
+    component.savedViewGroup.get(view.id.toString()).value[
+      'show_on_dashboard'
+    ] = !view.show_on_dashboard
+    fixture.detectChanges()
+
+    component.saveSettings()
+    expect(patchSpy).toHaveBeenCalledWith([
+      {
+        id: view.id,
+        name: view.name,
+        show_in_sidebar: view.show_in_sidebar,
+        show_on_dashboard: !view.show_on_dashboard,
+      },
+    ])
   })
 
   it('should support save local settings updating appearance settings and calling API, show error', () => {

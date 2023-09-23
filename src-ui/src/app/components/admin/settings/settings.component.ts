@@ -148,7 +148,6 @@ export class SettingsComponent
         .subscribe({
           next: (r) => {
             this.users = r.results
-            this.initialize(false)
           },
           error: (e) => {
             this.toastService.showError($localize`Error retrieving users`, e)
@@ -168,7 +167,6 @@ export class SettingsComponent
         .subscribe({
           next: (r) => {
             this.groups = r.results
-            this.initialize(false)
           },
           error: (e) => {
             this.toastService.showError($localize`Error retrieving groups`, e)
@@ -524,12 +522,15 @@ export class SettingsComponent
   }
 
   saveSettings() {
-    let x = []
-    for (let id in this.savedViewGroup.value) {
-      x.push(this.savedViewGroup.value[id])
-    }
-    if (x.length > 0) {
-      this.savedViewService.patchMany(x).subscribe({
+    // only patch views that have actually changed
+    const changed: PaperlessSavedView[] = []
+    Object.values(this.savedViewGroup.controls)
+      .filter((g: FormGroup) => !g.pristine)
+      .forEach((group: FormGroup) => {
+        changed.push(group.value)
+      })
+    if (changed.length > 0) {
+      this.savedViewService.patchMany(changed).subscribe({
         next: () => {
           this.saveLocalSettings()
         },
