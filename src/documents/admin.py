@@ -1,16 +1,16 @@
 from django.contrib import admin
 from guardian.admin import GuardedModelAdmin
 
-from .models import Correspondent
-from .models import Document
-from .models import DocumentType
-from .models import Note
-from .models import PaperlessTask
-from .models import SavedView
-from .models import SavedViewFilterRule
-from .models import ShareLink
-from .models import StoragePath
-from .models import Tag
+from documents.models import Correspondent
+from documents.models import Document
+from documents.models import DocumentType
+from documents.models import Note
+from documents.models import PaperlessTask
+from documents.models import SavedView
+from documents.models import SavedViewFilterRule
+from documents.models import ShareLink
+from documents.models import StoragePath
+from documents.models import Tag
 
 
 class CorrespondentAdmin(GuardedModelAdmin):
