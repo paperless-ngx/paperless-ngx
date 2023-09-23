@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-19 14:30-0700\n"
-"PO-Revision-Date: 2023-09-23 00:10\n"
+"PO-Revision-Date: 2023-09-23 09:15\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -553,23 +553,23 @@ msgstr "Geteilte Links"
 
 #: documents/models.py:744
 msgid "Consume Folder"
-msgstr ""
+msgstr "Importordner"
 
 #: documents/models.py:745
 msgid "Api Upload"
-msgstr ""
+msgstr "API-Upload"
 
 #: documents/models.py:746
 msgid "Mail Fetch"
-msgstr ""
+msgstr "Mail-Abruf"
 
 #: documents/models.py:752
 msgid "consumption template"
-msgstr ""
+msgstr "Verarbeitungsvorlage"
 
 #: documents/models.py:753
 msgid "consumption templates"
-msgstr ""
+msgstr "Verarbeitungsvorlagen"
 
 #: documents/models.py:757 paperless_mail/models.py:95
 msgid "order"
@@ -577,15 +577,15 @@ msgstr "Reihenfolge"
 
 #: documents/models.py:766
 msgid "filter path"
-msgstr ""
+msgstr "Pfad filtern"
 
 #: documents/models.py:771
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
-msgstr ""
+msgstr "Nur Dokumente verarbeiten, deren Pfad diesem entspricht, falls angegeben. Platzhalter wie * sind erlaubt. Groß- und Kleinschreibung wird nicht beachtet."
 
 #: documents/models.py:778
 msgid "filter filename"
-msgstr ""
+msgstr "Dateinamen filtern"
 
 #: documents/models.py:783 paperless_mail/models.py:148
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
@@ -593,15 +593,15 @@ msgstr "Wenn angegeben werden nur Dateien verarbeitet, die diesem Dateinamen exa
 
 #: documents/models.py:794
 msgid "filter documents from this mail rule"
-msgstr ""
+msgstr "Dokumente aus dieser E-Mail-Regel filtern"
 
 #: documents/models.py:798
 msgid "assign title"
-msgstr ""
+msgstr "Titel zuweisen"
 
 #: documents/models.py:803
 msgid "Assign a document title, can include some placeholders, see documentation."
-msgstr ""
+msgstr "Weisen Sie einen Dokumententitel zu. Dieser kann Platzhalter beinhalten, siehe Dokumenation."
 
 #: documents/models.py:811 paperless_mail/models.py:204
 msgid "assign this tag"
@@ -617,27 +617,27 @@ msgstr "Diesen Korrespondent zuweisen"
 
 #: documents/models.py:835
 msgid "assign this storage path"
-msgstr ""
+msgstr "Diesen Speicherpfad zuweisen"
 
 #: documents/models.py:844
 msgid "assign this owner"
-msgstr ""
+msgstr "Diesen Eigentümer zuordnen"
 
 #: documents/models.py:851
 msgid "grant view permissions to these users"
-msgstr ""
+msgstr "Diesen Benutzern Anzeigeberechtigungen erteilen"
 
 #: documents/models.py:858
 msgid "grant view permissions to these groups"
-msgstr ""
+msgstr "Diesen Gruppen Anzeigeberechtigungen erteilen"
 
 #: documents/models.py:865
 msgid "grant change permissions to these users"
-msgstr ""
+msgstr "Diesen Benutzern Änderungsberechtigungen erteilen"
 
 #: documents/models.py:872
 msgid "grant change permissions to these groups"
-msgstr ""
+msgstr "Diesen Gruppen Änderungsberechtigungen erteilen"
 
 #: documents/serialisers.py:100
 #, python-format
@@ -983,7 +983,7 @@ msgstr "Dateiname des Anhangs als Titel verwenden"
 
 #: paperless_mail/models.py:85
 msgid "Do not assign title from rule"
-msgstr ""
+msgstr "Titel nicht aus Regel zuweisen"
 
 #: paperless_mail/models.py:88
 msgid "Do not assign a correspondent"
@@ -1075,7 +1075,7 @@ msgstr "Korrespondent zuweisen von"
 
 #: paperless_mail/models.py:230
 msgid "Assign the rule owner to documents"
-msgstr ""
+msgstr "Dokumenten den Regeleigentümer zuweisen"
 
 #: paperless_mail/models.py:256
 msgid "uid"
