@@ -252,12 +252,9 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   public get dragDropEnabled(): boolean {
-    return (
-      !this.router.url.includes('dashboard') &&
-      this.permissionsService.currentUserCan(
-        PermissionAction.Add,
-        PermissionType.Document
-      )
+    return this.permissionsService.currentUserCan(
+      PermissionAction.Add,
+      PermissionType.Document
     )
   }
 

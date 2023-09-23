@@ -139,14 +139,6 @@ describe('AppComponent', () => {
     expect(toastSpy).toHaveBeenCalled()
   })
 
-  it('should disable drag-drop if on dashboard', () => {
-    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
-    jest.spyOn(router, 'url', 'get').mockReturnValueOnce('/dashboard')
-    expect(component.dragDropEnabled).toBeFalsy()
-    jest.spyOn(router, 'url', 'get').mockReturnValueOnce('/documents')
-    expect(component.dragDropEnabled).toBeTruthy()
-  })
-
   it('should enable drag-drop if user has permissions', () => {
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
     expect(component.dragDropEnabled).toBeTruthy()
