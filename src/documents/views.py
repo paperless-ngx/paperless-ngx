@@ -907,6 +907,39 @@ class StatisticsView(APIView):
             if user is None
             else get_objects_for_user_owner_aware(user, "documents.view_tag", Tag)
         )
+        correspondent_count = (
+            Correspondent.objects.count()
+            if user is None
+            else len(
+                get_objects_for_user_owner_aware(
+                    user,
+                    "documents.view_correspondent",
+                    Correspondent,
+                ),
+            )
+        )
+        document_type_count = (
+            DocumentType.objects.count()
+            if user is None
+            else len(
+                get_objects_for_user_owner_aware(
+                    user,
+                    "documents.view_documenttype",
+                    DocumentType,
+                ),
+            )
+        )
+        storage_path_count = (
+            StoragePath.objects.count()
+            if user is None
+            else len(
+                get_objects_for_user_owner_aware(
+                    user,
+                    "documents.view_storagepath",
+                    StoragePath,
+                ),
+            )
+        )
 
         documents_total = documents.count()
 
@@ -941,6 +974,10 @@ class StatisticsView(APIView):
                 "inbox_tag": inbox_tag.first().pk if inbox_tag.exists() else None,
                 "document_file_type_counts": document_file_type_counts,
                 "character_count": character_count,
+                "tag_count": len(tags),
+                "correspondent_count": correspondent_count,
+                "document_type_count": document_type_count,
+                "storage_path_count": storage_path_count,
             },
         )
 

@@ -1,29 +1,36 @@
 <pngx-page-header title="Dashboard" [subTitle]="subtitle" i18n-title>
-  <pngx-logo extra_classes="d-none d-md-block"></pngx-logo>
+  <pngx-logo extra_classes="d-none d-md-block mt-n2 p-1" height="4.5rem"></pngx-logo>
 </pngx-page-header>
 
 <div class="row">
-  <div class="col-lg-8">
-    <div tourAnchor="tour.dashboard">
-      <ng-container *ngIf="savedViewService.loading">
+  <div class="col col-md-9 mb-3">
+    <div class="row row-cols-1 g-4" tourAnchor="tour.dashboard">
+      <div *ngIf="savedViewService.loading" class="col">
         <div class="spinner-border spinner-border-sm me-2" role="status"></div>
         <ng-container i18n>Loading...</ng-container>
-      </ng-container>
-
-      <pngx-welcome-widget *ngIf="settingsService.offerTour()" (dismiss)="completeTour()"></pngx-welcome-widget>
-
-      <div *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }">
-        <ng-container *ngFor="let v of savedViewService.dashboardViews; first as isFirst">
-          <pngx-saved-view-widget [savedView]="v"></pngx-saved-view-widget>
-        </ng-container>
       </div>
+
+      <div *ngIf="settingsService.offerTour()" class="col">
+        <pngx-welcome-widget (dismiss)="completeTour()"></pngx-welcome-widget>
+      </div>
+
+      <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }">
+          <ng-container *ngFor="let v of savedViewService.dashboardViews; first as isFirst">
+            <div class="col">
+              <pngx-saved-view-widget [savedView]="v"></pngx-saved-view-widget>
+            </div>
+          </ng-container>
+      </ng-container>
     </div>
   </div>
-  <div class="col-lg-4">
-
-    <pngx-statistics-widget></pngx-statistics-widget>
-
-    <pngx-upload-file-widget></pngx-upload-file-widget>
-
+  <div class="col">
+    <div class="row row-cols-1 g-4">
+      <div class="col">
+        <pngx-statistics-widget></pngx-statistics-widget>
+      </div>
+      <div class="col">
+        <pngx-upload-file-widget></pngx-upload-file-widget>
+      </div>
+    </div>
   </div>
 </div>

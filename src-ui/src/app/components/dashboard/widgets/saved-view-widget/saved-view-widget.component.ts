@@ -6,18 +6,22 @@ import {
   QueryList,
   ViewChildren,
 } from '@angular/core'
-import { Router } from '@angular/router'
+import { Params, Router } from '@angular/router'
 import { Subject, takeUntil } from 'rxjs'
 import { PaperlessDocument } from 'src/app/data/paperless-document'
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
 import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { PaperlessTag } from 'src/app/data/paperless-tag'
-import { FILTER_HAS_TAGS_ALL } from 'src/app/data/filter-rule-type'
+import {
+  FILTER_CORRESPONDENT,
+  FILTER_HAS_TAGS_ALL,
+} from 'src/app/data/filter-rule-type'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { ComponentWithPermissions } from 'src/app/components/with-permissions/with-permissions.component'
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
+import { queryParamsFromFilterRules } from 'src/app/utils/query-params'
 
 @Component({
   selector: 'pngx-saved-view-widget',
@@ -38,7 +42,8 @@ export class SavedViewWidgetComponent
     private router: Router,
     private list: DocumentListViewService,
     private consumerStatusService: ConsumerStatusService,
-    public openDocumentsService: OpenDocumentsService
+    public openDocumentsService: OpenDocumentsService,
+    public documentListViewService: DocumentListViewService
   ) {
     super()
   }
@@ -140,5 +145,16 @@ export class SavedViewWidgetComponent
 
   mouseLeaveCard() {
     this.popover?.close()
+  }
+
+  getCorrespondentQueryParams(correspondentId: number): Params {
+    return correspondentId !== undefined
+      ? queryParamsFromFilterRules([
+          {
+            rule_type: FILTER_CORRESPONDENT,
+            value: correspondentId.toString(),
+          },
+        ])
+      : null
   }
 }

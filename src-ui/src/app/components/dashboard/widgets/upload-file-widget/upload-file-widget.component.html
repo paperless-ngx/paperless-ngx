@@ -8,12 +8,12 @@
       </svg>
     </a>
   </div>
-  <div content tourAnchor="tour.upload-widget">
-    <form>
+  <div content tourAnchor="tour.upload-widget" class="h-100">
+    <form class="h-100">
       <ngx-file-drop dropZoneLabel="Drop documents here or" browseBtnLabel="Browse files" (onFileDrop)="dropped($event)"
-        (onFileOver)="fileOver($event)" (onFileLeave)="fileLeave($event)" dropZoneClassName="bg-light card"
-        multiple="true" contentClassName="justify-content-center d-flex align-items-center py-5 px-2" [showBrowseBtn]=true
-        browseBtnClassName="btn btn-sm btn-outline-primary ms-2" i18n-dropZoneLabel i18n-browseBtnLabel>
+        (onFileOver)="fileOver($event)" (onFileLeave)="fileLeave($event)" dropZoneClassName="bg-light card h-100"
+        multiple="true" contentClassName="justify-content-center d-flex flex-column text-muted align-items-center py-5 px-2 h-100" [showBrowseBtn]=true
+        browseBtnClassName="btn btn-sm btn-outline-primary mt-2" i18n-dropZoneLabel i18n-browseBtnLabel>
       </ngx-file-drop>
     </form>
     <p class="mt-3" *ngIf="getStatus().length > 0">{{getStatusSummary()}}</p>

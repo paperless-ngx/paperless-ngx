@@ -52,6 +52,7 @@ const documentResults = [
   {
     id: 3,
     title: 'doc3',
+    correspondent: 0,
   },
 ]
 

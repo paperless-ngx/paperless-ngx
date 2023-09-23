@@ -11,6 +11,7 @@ import { environment } from 'src/environments/environment'
 import { RouterTestingModule } from '@angular/router/testing'
 import { routes } from 'src/app/app-routing.module'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
+import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 
 describe('StatisticsWidgetComponent', () => {
   let component: StatisticsWidgetComponent
@@ -19,7 +20,11 @@ describe('StatisticsWidgetComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [StatisticsWidgetComponent, WidgetFrameComponent],
+      declarations: [
+        StatisticsWidgetComponent,
+        WidgetFrameComponent,
+        IfPermissionsDirective,
+      ],
       providers: [PermissionsGuard],
       imports: [
         HttpClientTestingModule,
