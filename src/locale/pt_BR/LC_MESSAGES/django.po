@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-19 14:30-0700\n"
-"PO-Revision-Date: 2023-09-19 22:08\n"
+"PO-Revision-Date: 2023-09-23 00:11\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
@@ -21,551 +21,640 @@ msgstr ""
 msgid "Documents"
 msgstr "Documentos"
 
-#: documents/models.py:33 documents/models.py:728
+#: documents/models.py:36 documents/models.py:731
 msgid "owner"
 msgstr "proprietário"
 
-#: documents/models.py:50
+#: documents/models.py:53
 msgid "None"
 msgstr "Nenhum"
 
-#: documents/models.py:51
+#: documents/models.py:54
 msgid "Any word"
 msgstr "Qualquer palavra"
 
-#: documents/models.py:52
+#: documents/models.py:55
 msgid "All words"
 msgstr "Todas as palavras"
 
-#: documents/models.py:53
+#: documents/models.py:56
 msgid "Exact match"
 msgstr "Correspondência exata"
 
-#: documents/models.py:54
+#: documents/models.py:57
 msgid "Regular expression"
 msgstr "Expressão regular"
 
-#: documents/models.py:55
+#: documents/models.py:58
 msgid "Fuzzy word"
 msgstr "Palavra difusa (fuzzy)"
 
-#: documents/models.py:56
+#: documents/models.py:59
 msgid "Automatic"
 msgstr "Automático"
 
-#: documents/models.py:59 documents/models.py:399 paperless_mail/models.py:18
-#: paperless_mail/models.py:92
+#: documents/models.py:62 documents/models.py:402 documents/models.py:755
+#: paperless_mail/models.py:18 paperless_mail/models.py:93
 msgid "name"
 msgstr "nome"
 
-#: documents/models.py:61
+#: documents/models.py:64
 msgid "match"
 msgstr "correspondência"
 
-#: documents/models.py:64
+#: documents/models.py:67
 msgid "matching algorithm"
 msgstr "algoritmo de correspondência"
 
-#: documents/models.py:69
+#: documents/models.py:72
 msgid "is insensitive"
 msgstr "diferencia maiúsculas de minúsculas"
 
-#: documents/models.py:92 documents/models.py:144
+#: documents/models.py:95 documents/models.py:147
 msgid "correspondent"
 msgstr "correspondente"
 
-#: documents/models.py:93
+#: documents/models.py:96
 msgid "correspondents"
 msgstr "correspondentes"
 
-#: documents/models.py:97
+#: documents/models.py:100
 msgid "color"
 msgstr "cor"
 
-#: documents/models.py:100
+#: documents/models.py:103
 msgid "is inbox tag"
 msgstr "é etiqueta caixa de entrada"
 
-#: documents/models.py:103
+#: documents/models.py:106
 msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
 msgstr "Marca essa etiqueta como caixa de entrada: Todos os novos documentos consumidos terão as etiquetas de caixa de entrada."
 
-#: documents/models.py:109
+#: documents/models.py:112
 msgid "tag"
 msgstr "etiqueta"
 
-#: documents/models.py:110 documents/models.py:182
+#: documents/models.py:113 documents/models.py:185
 msgid "tags"
 msgstr "etiquetas"
 
-#: documents/models.py:115 documents/models.py:164
+#: documents/models.py:118 documents/models.py:167
 msgid "document type"
 msgstr "tipo de documento"
 
-#: documents/models.py:116
+#: documents/models.py:119
 msgid "document types"
 msgstr "tipos de documento"
 
-#: documents/models.py:121
+#: documents/models.py:124
 msgid "path"
 msgstr "caminho"
 
-#: documents/models.py:126 documents/models.py:153
+#: documents/models.py:129 documents/models.py:156
 msgid "storage path"
 msgstr "caminho de armazenamento"
 
-#: documents/models.py:127
+#: documents/models.py:130
 msgid "storage paths"
 msgstr "caminhos de armazenamento"
 
-#: documents/models.py:134
+#: documents/models.py:137
 msgid "Unencrypted"
 msgstr "Não encriptado"
 
-#: documents/models.py:135
+#: documents/models.py:138
 msgid "Encrypted with GNU Privacy Guard"
 msgstr "Encriptado com GNU Privacy Guard"
 
-#: documents/models.py:156
+#: documents/models.py:159
 msgid "title"
 msgstr "título"
 
-#: documents/models.py:168 documents/models.py:642
+#: documents/models.py:171 documents/models.py:645
 msgid "content"
 msgstr "conteúdo"
 
-#: documents/models.py:171
+#: documents/models.py:174
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
 msgstr "O conteúdo de texto bruto do documento. Esse campo é usado principalmente para busca."
 
-#: documents/models.py:176
+#: documents/models.py:179
 msgid "mime type"
 msgstr "tipo mime"
 
-#: documents/models.py:186
+#: documents/models.py:189
 msgid "checksum"
 msgstr "soma de verificação"
 
-#: documents/models.py:190
+#: documents/models.py:193
 msgid "The checksum of the original document."
 msgstr "A soma de verificação original do documento."
 
-#: documents/models.py:194
+#: documents/models.py:197
 msgid "archive checksum"
 msgstr "Soma de verificação de arquivamento."
 
-#: documents/models.py:199
+#: documents/models.py:202
 msgid "The checksum of the archived document."
 msgstr "A soma de verificação do documento arquivado."
 
-#: documents/models.py:202 documents/models.py:382 documents/models.py:648
-#: documents/models.py:686
+#: documents/models.py:205 documents/models.py:385 documents/models.py:651
+#: documents/models.py:689
 msgid "created"
 msgstr "criado"
 
-#: documents/models.py:205
+#: documents/models.py:208
 msgid "modified"
 msgstr "modificado"
 
-#: documents/models.py:212
+#: documents/models.py:215
 msgid "storage type"
 msgstr "tipo de armazenamento"
 
-#: documents/models.py:220
+#: documents/models.py:223
 msgid "added"
 msgstr "adicionado"
 
-#: documents/models.py:227
+#: documents/models.py:230
 msgid "filename"
 msgstr "nome do arquivo"
 
-#: documents/models.py:233
+#: documents/models.py:236
 msgid "Current filename in storage"
 msgstr "Nome do arquivo atual armazenado"
 
-#: documents/models.py:237
+#: documents/models.py:240
 msgid "archive filename"
 msgstr "nome do arquivo para arquivamento"
 
-#: documents/models.py:243
+#: documents/models.py:246
 msgid "Current archive filename in storage"
 msgstr "Nome do arquivo para arquivamento armazenado"
 
-#: documents/models.py:247
+#: documents/models.py:250
 msgid "original filename"
 msgstr "nome do arquivo original"
 
-#: documents/models.py:253
+#: documents/models.py:256
 msgid "The original name of the file when it was uploaded"
 msgstr "O nome original do arquivo quando ele foi carregado"
 
-#: documents/models.py:260
+#: documents/models.py:263
 msgid "archive serial number"
 msgstr "número de sério de arquivamento"
 
-#: documents/models.py:270
+#: documents/models.py:273
 msgid "The position of this document in your physical document archive."
 msgstr "A posição deste documento no seu arquivamento físico."
 
-#: documents/models.py:276 documents/models.py:659 documents/models.py:713
+#: documents/models.py:279 documents/models.py:662 documents/models.py:716
 msgid "document"
 msgstr "documento"
 
-#: documents/models.py:277
+#: documents/models.py:280
 msgid "documents"
 msgstr "documentos"
 
-#: documents/models.py:365
+#: documents/models.py:368
 msgid "debug"
 msgstr "debug"
 
-#: documents/models.py:366
+#: documents/models.py:369
 msgid "information"
 msgstr "informação"
 
-#: documents/models.py:367
+#: documents/models.py:370
 msgid "warning"
 msgstr "aviso"
 
-#: documents/models.py:368 paperless_mail/models.py:287
+#: documents/models.py:371 paperless_mail/models.py:293
 msgid "error"
 msgstr "erro"
 
-#: documents/models.py:369
+#: documents/models.py:372
 msgid "critical"
 msgstr "crítico"
 
-#: documents/models.py:372
+#: documents/models.py:375
 msgid "group"
 msgstr "grupo"
 
-#: documents/models.py:374
+#: documents/models.py:377
 msgid "message"
 msgstr "mensagem"
 
-#: documents/models.py:377
+#: documents/models.py:380
 msgid "level"
 msgstr "nível"
 
-#: documents/models.py:386
+#: documents/models.py:389
 msgid "log"
 msgstr "log"
 
-#: documents/models.py:387
+#: documents/models.py:390
 msgid "logs"
 msgstr "logs"
 
-#: documents/models.py:396 documents/models.py:461
+#: documents/models.py:399 documents/models.py:464
 msgid "saved view"
 msgstr "visualização"
 
-#: documents/models.py:397
+#: documents/models.py:400
 msgid "saved views"
 msgstr "visualizações"
 
-#: documents/models.py:402
+#: documents/models.py:405
 msgid "show on dashboard"
 msgstr "exibir no painel de controle"
 
-#: documents/models.py:405
+#: documents/models.py:408
 msgid "show in sidebar"
 msgstr "exibir no painel lateral"
 
-#: documents/models.py:409
+#: documents/models.py:412
 msgid "sort field"
 msgstr "ordenar campo"
 
-#: documents/models.py:414
+#: documents/models.py:417
 msgid "sort reverse"
 msgstr "odernar reverso"
 
-#: documents/models.py:419
+#: documents/models.py:422
 msgid "title contains"
 msgstr "título contém"
 
-#: documents/models.py:420
+#: documents/models.py:423
 msgid "content contains"
 msgstr "conteúdo contém"
 
-#: documents/models.py:421
+#: documents/models.py:424
 msgid "ASN is"
 msgstr "NSA é"
 
-#: documents/models.py:422
+#: documents/models.py:425
 msgid "correspondent is"
 msgstr "correspondente é"
 
-#: documents/models.py:423
+#: documents/models.py:426
 msgid "document type is"
 msgstr "tipo de documento é"
 
-#: documents/models.py:424
+#: documents/models.py:427
 msgid "is in inbox"
 msgstr "é caixa de entrada"
 
-#: documents/models.py:425
+#: documents/models.py:428
 msgid "has tag"
 msgstr "contém etiqueta"
 
-#: documents/models.py:426
+#: documents/models.py:429
 msgid "has any tag"
 msgstr "contém qualquer etiqueta"
 
-#: documents/models.py:427
+#: documents/models.py:430
 msgid "created before"
 msgstr "criado antes de"
 
-#: documents/models.py:428
+#: documents/models.py:431
 msgid "created after"
 msgstr "criado depois de"
 
-#: documents/models.py:429
+#: documents/models.py:432
 msgid "created year is"
 msgstr "ano de criação é"
 
-#: documents/models.py:430
+#: documents/models.py:433
 msgid "created month is"
 msgstr "mês de criação é"
 
-#: documents/models.py:431
+#: documents/models.py:434
 msgid "created day is"
 msgstr "dia de criação é"
 
-#: documents/models.py:432
+#: documents/models.py:435
 msgid "added before"
 msgstr "adicionado antes de"
 
-#: documents/models.py:433
+#: documents/models.py:436
 msgid "added after"
 msgstr "adicionado depois de"
 
-#: documents/models.py:434
+#: documents/models.py:437
 msgid "modified before"
 msgstr "modificado antes de"
 
-#: documents/models.py:435
+#: documents/models.py:438
 msgid "modified after"
 msgstr "modificado depois de"
 
-#: documents/models.py:436
+#: documents/models.py:439
 msgid "does not have tag"
 msgstr "não tem etiqueta"
 
-#: documents/models.py:437
+#: documents/models.py:440
 msgid "does not have ASN"
 msgstr "não tem NSA"
 
-#: documents/models.py:438
+#: documents/models.py:441
 msgid "title or content contains"
 msgstr "título ou conteúdo contém"
 
-#: documents/models.py:439
+#: documents/models.py:442
 msgid "fulltext query"
 msgstr "pesquisa de texto completo"
 
-#: documents/models.py:440
+#: documents/models.py:443
 msgid "more like this"
 msgstr "mais como este"
 
-#: documents/models.py:441
+#: documents/models.py:444
 msgid "has tags in"
 msgstr "contém etiquetas em"
 
-#: documents/models.py:442
+#: documents/models.py:445
 msgid "ASN greater than"
 msgstr "NSA maior que"
 
-#: documents/models.py:443
+#: documents/models.py:446
 msgid "ASN less than"
 msgstr "NSA menor que"
 
-#: documents/models.py:444
+#: documents/models.py:447
 msgid "storage path is"
 msgstr "caminho de armazenamento é"
 
-#: documents/models.py:445
+#: documents/models.py:448
 msgid "has correspondent in"
 msgstr ""
 
-#: documents/models.py:446
+#: documents/models.py:449
 msgid "does not have correspondent in"
 msgstr ""
 
-#: documents/models.py:447
+#: documents/models.py:450
 msgid "has document type in"
 msgstr ""
 
-#: documents/models.py:448
+#: documents/models.py:451
 msgid "does not have document type in"
 msgstr ""
 
-#: documents/models.py:449
+#: documents/models.py:452
 msgid "has storage path in"
 msgstr ""
 
-#: documents/models.py:450
+#: documents/models.py:453
 msgid "does not have storage path in"
 msgstr ""
 
-#: documents/models.py:451
+#: documents/models.py:454
 msgid "owner is"
 msgstr ""
 
-#: documents/models.py:452
+#: documents/models.py:455
 msgid "has owner in"
 msgstr ""
 
-#: documents/models.py:453
+#: documents/models.py:456
 msgid "does not have owner"
 msgstr ""
 
-#: documents/models.py:454
+#: documents/models.py:457
 msgid "does not have owner in"
 msgstr ""
 
-#: documents/models.py:464
+#: documents/models.py:467
 msgid "rule type"
 msgstr "tipo de regra"
 
-#: documents/models.py:466
+#: documents/models.py:469
 msgid "value"
 msgstr "valor"
 
-#: documents/models.py:469
+#: documents/models.py:472
 msgid "filter rule"
 msgstr "regra de filtragem"
 
-#: documents/models.py:470
+#: documents/models.py:473
 msgid "filter rules"
 msgstr "regras de filtragem"
 
-#: documents/models.py:578
+#: documents/models.py:581
 msgid "Task ID"
 msgstr "ID da tarefa"
 
-#: documents/models.py:579
+#: documents/models.py:582
 msgid "Celery ID for the Task that was run"
 msgstr "ID da Celery para a tarefa que foi executada"
 
-#: documents/models.py:584
+#: documents/models.py:587
 msgid "Acknowledged"
 msgstr "Confirmado"
 
-#: documents/models.py:585
+#: documents/models.py:588
 msgid "If the task is acknowledged via the frontend or API"
 msgstr "Se a tarefa é reconhecida através do frontend ou API"
 
-#: documents/models.py:591
+#: documents/models.py:594
 msgid "Task Filename"
 msgstr "Nome do arquivo da tarefa"
 
-#: documents/models.py:592
+#: documents/models.py:595
 msgid "Name of the file which the Task was run for"
 msgstr "Nome do arquivo para o qual a tarefa foi executada"
 
-#: documents/models.py:598
+#: documents/models.py:601
 msgid "Task Name"
 msgstr "Nome da tarefa"
 
-#: documents/models.py:599
+#: documents/models.py:602
 msgid "Name of the Task which was run"
 msgstr "Nome da tarefa executada"
 
-#: documents/models.py:606
+#: documents/models.py:609
 msgid "Task State"
 msgstr "Estado da tarefa"
 
-#: documents/models.py:607
+#: documents/models.py:610
 msgid "Current state of the task being run"
 msgstr "Estado atual da tarefa sendo executada"
 
-#: documents/models.py:612
+#: documents/models.py:615
 msgid "Created DateTime"
 msgstr "Data/Hora de criação"
 
-#: documents/models.py:613
+#: documents/models.py:616
 msgid "Datetime field when the task result was created in UTC"
 msgstr "Campo Data/Hora quando o resultado da tarefa foi criado, em UTC"
 
-#: documents/models.py:618
+#: documents/models.py:621
 msgid "Started DateTime"
 msgstr "Data/Hora de início"
 
-#: documents/models.py:619
+#: documents/models.py:622
 msgid "Datetime field when the task was started in UTC"
 msgstr "Campo Data/Hora quando a tarefa começou, em UTC"
 
-#: documents/models.py:624
+#: documents/models.py:627
 msgid "Completed DateTime"
 msgstr "Data/Hora de conclusão"
 
-#: documents/models.py:625
+#: documents/models.py:628
 msgid "Datetime field when the task was completed in UTC"
 msgstr "Campo Data/Hora quando a tarefa foi concluída, em UTC"
 
-#: documents/models.py:630
+#: documents/models.py:633
 msgid "Result Data"
 msgstr "Dados de Resultado"
 
-#: documents/models.py:632
+#: documents/models.py:635
 msgid "The data returned by the task"
 msgstr "Os dados retornados pela tarefa"
 
-#: documents/models.py:644
+#: documents/models.py:647
 msgid "Note for the document"
 msgstr ""
 
-#: documents/models.py:668
+#: documents/models.py:671
 msgid "user"
 msgstr "usuário"
 
-#: documents/models.py:673
+#: documents/models.py:676
 msgid "note"
 msgstr ""
 
-#: documents/models.py:674
+#: documents/models.py:677
 msgid "notes"
 msgstr ""
 
-#: documents/models.py:682
+#: documents/models.py:685
 msgid "Archive"
 msgstr ""
 
-#: documents/models.py:683
+#: documents/models.py:686
 msgid "Original"
 msgstr ""
 
-#: documents/models.py:694
+#: documents/models.py:697
 msgid "expiration"
 msgstr ""
 
-#: documents/models.py:701
+#: documents/models.py:704
 msgid "slug"
 msgstr ""
 
-#: documents/models.py:733
+#: documents/models.py:736
 msgid "share link"
 msgstr ""
 
-#: documents/models.py:734
+#: documents/models.py:737
 msgid "share links"
 msgstr ""
 
-#: documents/serialisers.py:96
+#: documents/models.py:744
+msgid "Consume Folder"
+msgstr ""
+
+#: documents/models.py:745
+msgid "Api Upload"
+msgstr ""
+
+#: documents/models.py:746
+msgid "Mail Fetch"
+msgstr ""
+
+#: documents/models.py:752
+msgid "consumption template"
+msgstr ""
+
+#: documents/models.py:753
+msgid "consumption templates"
+msgstr ""
+
+#: documents/models.py:757 paperless_mail/models.py:95
+msgid "order"
+msgstr "ordem"
+
+#: documents/models.py:766
+msgid "filter path"
+msgstr ""
+
+#: documents/models.py:771
+msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
+msgstr ""
+
+#: documents/models.py:778
+msgid "filter filename"
+msgstr ""
+
+#: documents/models.py:783 paperless_mail/models.py:148
+msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
+msgstr "Consumir somente documentos que correspondem a este nome de arquivo se especificado.\n"
+"Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsculas e minúsculas."
+
+#: documents/models.py:794
+msgid "filter documents from this mail rule"
+msgstr ""
+
+#: documents/models.py:798
+msgid "assign title"
+msgstr ""
+
+#: documents/models.py:803
+msgid "Assign a document title, can include some placeholders, see documentation."
+msgstr ""
+
+#: documents/models.py:811 paperless_mail/models.py:204
+msgid "assign this tag"
+msgstr "atribuir esta etiqueta"
+
+#: documents/models.py:819 paperless_mail/models.py:212
+msgid "assign this document type"
+msgstr "atribuir este tipo de documento"
+
+#: documents/models.py:827 paperless_mail/models.py:226
+msgid "assign this correspondent"
+msgstr "atribuir este correspondente"
+
+#: documents/models.py:835
+msgid "assign this storage path"
+msgstr ""
+
+#: documents/models.py:844
+msgid "assign this owner"
+msgstr ""
+
+#: documents/models.py:851
+msgid "grant view permissions to these users"
+msgstr ""
+
+#: documents/models.py:858
+msgid "grant view permissions to these groups"
+msgstr ""
+
+#: documents/models.py:865
+msgid "grant change permissions to these users"
+msgstr ""
+
+#: documents/models.py:872
+msgid "grant change permissions to these groups"
+msgstr ""
+
+#: documents/serialisers.py:100
 #, python-format
 msgid "Invalid regular expression: %(error)s"
 msgstr "Expressão regular inválida: %(error)s"
 
-#: documents/serialisers.py:371
+#: documents/serialisers.py:375
 msgid "Invalid color."
 msgstr "Cor inválida."
 
-#: documents/serialisers.py:747
+#: documents/serialisers.py:751
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Tipo de arquivo %(type)s não suportado"
 
-#: documents/serialisers.py:844
+#: documents/serialisers.py:848
 msgid "Invalid variable detected."
 msgstr "Variável inválida detectada."
 
@@ -745,7 +834,7 @@ msgstr ""
 msgid "Chinese Simplified"
 msgstr "Chinês Simplificado"
 
-#: paperless/urls.py:182
+#: paperless/urls.py:184
 msgid "Paperless-ngx administration"
 msgstr "Administração do Paperless-ngx"
 
@@ -893,132 +982,119 @@ msgstr "Usar assunto como título"
 msgid "Use attachment filename as title"
 msgstr "Usar nome do arquivo anexo como título"
 
-#: paperless_mail/models.py:87
+#: paperless_mail/models.py:85
+msgid "Do not assign title from rule"
+msgstr ""
+
+#: paperless_mail/models.py:88
 msgid "Do not assign a correspondent"
 msgstr "Não atribuir um correspondente"
 
-#: paperless_mail/models.py:88
+#: paperless_mail/models.py:89
 msgid "Use mail address"
 msgstr "Usar endereço de e-mail"
 
-#: paperless_mail/models.py:89
+#: paperless_mail/models.py:90
 msgid "Use name (or mail address if not available)"
 msgstr "Usar nome (ou endereço de e-mail se não disponível)"
 
-#: paperless_mail/models.py:90
+#: paperless_mail/models.py:91
 msgid "Use correspondent selected below"
 msgstr "Usar correspondente selecionado abaixo"
 
-#: paperless_mail/models.py:94
-msgid "order"
-msgstr "ordem"
-
-#: paperless_mail/models.py:100
+#: paperless_mail/models.py:101
 msgid "account"
 msgstr "conta"
 
-#: paperless_mail/models.py:104 paperless_mail/models.py:242
+#: paperless_mail/models.py:105 paperless_mail/models.py:248
 msgid "folder"
 msgstr "pasta"
 
-#: paperless_mail/models.py:108
+#: paperless_mail/models.py:109
 msgid "Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server."
 msgstr "Subpastas devem ser separadas por um delimitador, muitas vezes um ponto ('.') ou uma barra ('/'), mas varia de acordo com o servidor de e-mail."
 
-#: paperless_mail/models.py:114
+#: paperless_mail/models.py:115
 msgid "filter from"
 msgstr "filtrar de"
 
-#: paperless_mail/models.py:121
+#: paperless_mail/models.py:122
 msgid "filter to"
 msgstr ""
 
-#: paperless_mail/models.py:128
+#: paperless_mail/models.py:129
 msgid "filter subject"
 msgstr "filtrar assunto"
 
-#: paperless_mail/models.py:135
+#: paperless_mail/models.py:136
 msgid "filter body"
 msgstr "filtrar corpo"
 
-#: paperless_mail/models.py:142
+#: paperless_mail/models.py:143
 msgid "filter attachment filename"
 msgstr "filtrar nome do arquivo anexo"
 
-#: paperless_mail/models.py:147
-msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr "Consumir somente documentos que correspondem a este nome de arquivo se especificado.\n"
-"Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsculas e minúsculas."
-
-#: paperless_mail/models.py:154
+#: paperless_mail/models.py:155
 msgid "maximum age"
 msgstr "idade máxima"
 
-#: paperless_mail/models.py:156
+#: paperless_mail/models.py:157
 msgid "Specified in days."
 msgstr "Especificada em dias."
 
-#: paperless_mail/models.py:160
+#: paperless_mail/models.py:161
 msgid "attachment type"
 msgstr "tipo de anexo"
 
-#: paperless_mail/models.py:164
+#: paperless_mail/models.py:165
 msgid "Inline attachments include embedded images, so it's best to combine this option with a filename filter."
 msgstr "Anexos inline incluem imagens inseridas, por isso é melhor combinar essa opção com um filtro de nome de arquivo."
 
-#: paperless_mail/models.py:170
+#: paperless_mail/models.py:171
 msgid "consumption scope"
 msgstr "escopo do consumo"
 
-#: paperless_mail/models.py:176
+#: paperless_mail/models.py:177
 msgid "action"
 msgstr "ação"
 
-#: paperless_mail/models.py:182
+#: paperless_mail/models.py:183
 msgid "action parameter"
 msgstr "parâmetro da ação"
 
-#: paperless_mail/models.py:187
+#: paperless_mail/models.py:188
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
 msgstr "Parâmetro adicional para a ação selecionada acima, por exemplo: a pasta de destino da ação de mover pasta. Subpastas devem ser separadas por pontos."
 
-#: paperless_mail/models.py:195
+#: paperless_mail/models.py:196
 msgid "assign title from"
 msgstr "atribuir título de"
 
-#: paperless_mail/models.py:203
-msgid "assign this tag"
-msgstr "atribuir esta etiqueta"
-
-#: paperless_mail/models.py:211
-msgid "assign this document type"
-msgstr "atribuir este tipo de documento"
-
-#: paperless_mail/models.py:215
+#: paperless_mail/models.py:216
 msgid "assign correspondent from"
 msgstr "atribuir correspondente de"
 
-#: paperless_mail/models.py:225
-msgid "assign this correspondent"
-msgstr "atribuir este correspondente"
+#: paperless_mail/models.py:230
+msgid "Assign the rule owner to documents"
+msgstr ""
 
-#: paperless_mail/models.py:250
+#: paperless_mail/models.py:256
 msgid "uid"
 msgstr "uid"
 
-#: paperless_mail/models.py:258
+#: paperless_mail/models.py:264
 msgid "subject"
 msgstr "assunto"
 
-#: paperless_mail/models.py:266
+#: paperless_mail/models.py:272
 msgid "received"
 msgstr "recebido"
 
-#: paperless_mail/models.py:273
+#: paperless_mail/models.py:279
 msgid "processed"
 msgstr "processado"
 
-#: paperless_mail/models.py:279
+#: paperless_mail/models.py:285
 msgid "status"
 msgstr "status"
 
