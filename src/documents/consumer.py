@@ -20,30 +20,29 @@ from django.utils import timezone
 from filelock import FileLock
 from rest_framework.reverse import reverse
 
+from documents.classifier import load_classifier
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
+from documents.file_handling import create_source_path_directory
+from documents.file_handling import generate_unique_filename
+from documents.loggers import LoggingMixin
 from documents.matching import document_matches_template
+from documents.models import ConsumptionTemplate
+from documents.models import Correspondent
+from documents.models import Document
+from documents.models import DocumentType
+from documents.models import FileInfo
+from documents.models import StoragePath
+from documents.models import Tag
+from documents.parsers import DocumentParser
+from documents.parsers import ParseError
+from documents.parsers import get_parser_class_for_mime_type
+from documents.parsers import parse_date
 from documents.permissions import set_permissions_for_object
+from documents.signals import document_consumption_finished
+from documents.signals import document_consumption_started
 from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
-
-from .classifier import load_classifier
-from .file_handling import create_source_path_directory
-from .file_handling import generate_unique_filename
-from .loggers import LoggingMixin
-from .models import ConsumptionTemplate
-from .models import Correspondent
-from .models import Document
-from .models import DocumentType
-from .models import FileInfo
-from .models import StoragePath
-from .models import Tag
-from .parsers import DocumentParser
-from .parsers import ParseError
-from .parsers import get_parser_class_for_mime_type
-from .parsers import parse_date
-from .signals import document_consumption_finished
-from .signals import document_consumption_started
 
 
 class ConsumerError(Exception):

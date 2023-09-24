@@ -4,13 +4,13 @@ from django_filters.rest_framework import Filter
 from django_filters.rest_framework import FilterSet
 from rest_framework_guardian.filters import ObjectPermissionsFilter
 
-from .models import Correspondent
-from .models import Document
-from .models import DocumentType
-from .models import Log
-from .models import ShareLink
-from .models import StoragePath
-from .models import Tag
+from documents.models import Correspondent
+from documents.models import Document
+from documents.models import DocumentType
+from documents.models import Log
+from documents.models import ShareLink
+from documents.models import StoragePath
+from documents.models import Tag
 
 CHAR_KWARGS = ["istartswith", "iendswith", "icontains", "iexact"]
 ID_KWARGS = ["in", "exact"]
