@@ -21,7 +21,6 @@ import {
   takeUntil,
   tap,
 } from 'rxjs'
-import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
 import { PaperlessGroup } from 'src/app/data/paperless-group'
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
 import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
@@ -548,16 +547,5 @@ export class SettingsComponent
 
   clearThemeColor() {
     this.settingsForm.get('themeColor').patchValue('')
-  }
-
-  userCanEdit(obj: ObjectWithPermissions): boolean {
-    return this.permissionsService.currentUserHasObjectPermissions(
-      PermissionAction.Change,
-      obj
-    )
-  }
-
-  userIsOwner(obj: ObjectWithPermissions): boolean {
-    return this.permissionsService.currentUserOwnsObject(obj)
   }
 }
