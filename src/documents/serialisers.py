@@ -17,24 +17,23 @@ from rest_framework import fields
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
+from documents import bulk_edit
 from documents.data_models import DocumentSource
 from documents.models import ConsumptionTemplate
+from documents.models import Correspondent
+from documents.models import Document
+from documents.models import DocumentType
+from documents.models import MatchingModel
+from documents.models import PaperlessTask
+from documents.models import SavedView
+from documents.models import SavedViewFilterRule
+from documents.models import ShareLink
+from documents.models import StoragePath
+from documents.models import Tag
+from documents.models import UiSettings
+from documents.parsers import is_mime_type_supported
 from documents.permissions import get_groups_with_only_permission
 from documents.permissions import set_permissions_for_object
-
-from . import bulk_edit
-from .models import Correspondent
-from .models import Document
-from .models import DocumentType
-from .models import MatchingModel
-from .models import PaperlessTask
-from .models import SavedView
-from .models import SavedViewFilterRule
-from .models import ShareLink
-from .models import StoragePath
-from .models import Tag
-from .models import UiSettings
-from .parsers import is_mime_type_supported
 
 
 # https://www.django-rest-framework.org/api-guide/serializers/#example

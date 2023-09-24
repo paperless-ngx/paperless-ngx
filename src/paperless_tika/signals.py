@@ -1,5 +1,5 @@
 def get_parser(*args, **kwargs):
-    from .parsers import TikaDocumentParser
+    from paperless_tika.parsers import TikaDocumentParser
 
     return TikaDocumentParser(*args, **kwargs)
 
