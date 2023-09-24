@@ -25,8 +25,16 @@
             <div class="col d-flex align-items-center">{{getSourceList(template)}}</div>
             <div class="col">
                 <div class="btn-group">
-                    <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.ConsumptionTemplate }" class="btn btn-sm btn-primary" type="button" (click)="editTemplate(template)" i18n>Edit</button>
-                    <button *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.ConsumptionTemplate }" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteTemplate(template)" i18n>Delete</button>
+                    <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.ConsumptionTemplate }" class="btn btn-sm btn-outline-secondary" type="button" (click)="editTemplate(template)">
+                    <svg class="buttonicon-sm" fill="currentColor">
+                        <use xlink:href="assets/bootstrap-icons.svg#pencil" />
+                      </svg>&nbsp;<ng-container i18n>Edit</ng-container>
+                    </button>
+                    <button *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.ConsumptionTemplate }" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteTemplate(template)">
+                        <svg class="buttonicon-sm" fill="currentColor">
+                            <use xlink:href="assets/bootstrap-icons.svg#trash" />
+                        </svg>&nbsp;<ng-container i18n>Delete</ng-container>
+                    </button>
                 </div>
             </div>
         </div>

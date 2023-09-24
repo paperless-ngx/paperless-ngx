@@ -172,7 +172,7 @@ describe('ManagementListComponent', () => {
     const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
     const reloadSpy = jest.spyOn(component, 'reloadData')
 
-    const editButton = fixture.debugElement.queryAll(By.css('button'))[5]
+    const editButton = fixture.debugElement.queryAll(By.css('button'))[6]
     editButton.triggerEventHandler('click')
 
     expect(modal).not.toBeUndefined()
@@ -198,7 +198,7 @@ describe('ManagementListComponent', () => {
     const deleteSpy = jest.spyOn(tagService, 'delete')
     const reloadSpy = jest.spyOn(component, 'reloadData')
 
-    const deleteButton = fixture.debugElement.queryAll(By.css('button'))[6]
+    const deleteButton = fixture.debugElement.queryAll(By.css('button'))[7]
     deleteButton.triggerEventHandler('click')
 
     expect(modal).not.toBeUndefined()
@@ -218,7 +218,7 @@ describe('ManagementListComponent', () => {
 
   it('should support quick filter for objects', () => {
     const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
-    const filterButton = fixture.debugElement.queryAll(By.css('button'))[4]
+    const filterButton = fixture.debugElement.queryAll(By.css('button'))[5]
     filterButton.triggerEventHandler('click')
     expect(qfSpy).toHaveBeenCalledWith([
       { rule_type: FILTER_HAS_TAGS_ALL, value: tags[0].id.toString() },
