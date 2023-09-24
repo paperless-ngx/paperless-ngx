@@ -30,9 +30,8 @@ from documents.models import Tag
 from documents.parsers import DocumentParser
 from documents.parsers import ParseError
 from documents.tasks import sanity_check
+from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
-
-from .utils import DirectoriesMixin
 
 
 class TestAttributes(TestCase):
