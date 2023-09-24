@@ -56,6 +56,7 @@ export class SettingsService {
   }
 
   public globalDropzoneEnabled: boolean = true
+  public globalDropzoneActive: boolean = false
 
   constructor(
     rendererFactory: RendererFactory2,

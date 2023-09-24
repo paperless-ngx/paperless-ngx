@@ -262,6 +262,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   public fileOver() {
+    this.settings.globalDropzoneActive = true
     // allows transition
     setTimeout(() => {
       this.fileIsOver = true
@@ -272,6 +273,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   public fileLeave(immediate: boolean = false) {
+    this.settings.globalDropzoneActive = false
     const ms = immediate ? 0 : 500
 
     this.fileLeaveTimeoutID = setTimeout(() => {
@@ -284,6 +286,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   public dropped(files: NgxFileDropEntry[]) {
+    this.settings.globalDropzoneActive = false
     this.fileLeave(true)
     this.uploadDocumentsService.uploadFiles(files)
     this.toastService.showInfo($localize`Initiating upload...`, 3000)

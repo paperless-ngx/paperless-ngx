@@ -6,6 +6,7 @@
   <div class="col-auto col-lg-8 col-xl-9 mb-4">
     <div class="row row-cols-1 g-4" tourAnchor="tour.dashboard"
       dndDropzone
+      [dndDisableIf]="settingsService.globalDropzoneActive"
       dndEffectAllowed="move"
       (dndDrop)="onDrop($event)"
     >

@@ -40,11 +40,6 @@ export class DashboardComponent extends ComponentWithPermissions {
               )
               .filter((v) => v)
           : [...this.savedViewService.dashboardViews]
-      console.log(
-        this.dashboardViews,
-        sorted,
-        this.savedViewService.dashboardViews
-      )
     })
   }
 
