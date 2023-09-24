@@ -9,7 +9,7 @@
     </form>
     <div class="fixed-bottom p-2 p-md-4" [ngClass]="slimSidebarEnabled ? 'col-slim' : 'offset-md-3 offset-lg-2'">
       <div class="row d-flex justify-content-end">
-        <div class="col-12 col-md-4 col-lg-3 d-flex px-4 justify-content-between align-items-center">
+        <div class="col col-lg-4 col-xl-3 d-flex px-4 justify-content-between align-items-center">
           <p class="m-0 small text-muted" *ngIf="getStatus().length > 0">{{getStatusSummary()}}</p>
           <a *ngIf="getStatusCompleted().length > 0" class="btn-link" (click)="dismissCompleted()" [routerLink]="[]" >
             <span class="me-1" i18n="This button dismisses all status messages about processed documents on the dashboard (failed and successful)">Dismiss completed</span>
@@ -41,7 +41,7 @@
 
 <ng-template #consumerAlert let-status>
   <div class="row d-flex justify-content-end">
-    <div class="col-12 col-md-4 col-lg-3">
+    <div class="col col-lg-4 col-xl-3">
       <ngb-alert type="secondary" class="mt-2 mb-0" [dismissible]="isFinished(status)" (closed)="dismiss(status)">
         <h6 class="alert-heading">{{status.filename}}</h6>
         <p class="mb-0 pb-1" *ngIf="!isFinished(status) || (isFinished(status) && !status.documentId)">{{status.message}}</p>
