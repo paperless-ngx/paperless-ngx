@@ -1,11 +1,14 @@
-import { Component } from '@angular/core'
+import { Component, QueryList, ViewChildren } from '@angular/core'
+import { NgbAlert } from '@ng-bootstrap/ng-bootstrap'
 import { NgxFileDropEntry } from 'ngx-file-drop'
 import { ComponentWithPermissions } from 'src/app/components/with-permissions/with-permissions.component'
+import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 import {
   ConsumerStatusService,
   FileStatus,
   FileStatusPhase,
 } from 'src/app/services/consumer-status.service'
+import { SettingsService } from 'src/app/services/settings.service'
 import { UploadDocumentsService } from 'src/app/services/upload-documents.service'
 
 const MAX_ALERTS = 5
@@ -18,9 +21,12 @@ const MAX_ALERTS = 5
 export class UploadFileWidgetComponent extends ComponentWithPermissions {
   alertsExpanded = false
 
+  @ViewChildren(NgbAlert) alerts: QueryList<NgbAlert>
+
   constructor(
     private consumerStatusService: ConsumerStatusService,
-    private uploadDocumentsService: UploadDocumentsService
+    private uploadDocumentsService: UploadDocumentsService,
+    public settingsService: SettingsService
   ) {
     super()
   }
@@ -69,6 +75,10 @@ export class UploadFileWidgetComponent extends ComponentWithPermissions {
     return this.consumerStatusService.getConsumerStatus(FileStatusPhase.SUCCESS)
   }
 
+  getStatusCompleted() {
+    return this.consumerStatusService.getConsumerStatusCompleted()
+  }
+
   getTotalUploadProgress() {
     let current = 0
     let max = 0
@@ -106,7 +116,7 @@ export class UploadFileWidgetComponent extends ComponentWithPermissions {
   }
 
   dismissCompleted() {
-    this.consumerStatusService.dismissCompleted()
+    this.alerts.forEach((a) => a.close())
   }
 
   public fileOver(event) {}
@@ -115,5 +125,9 @@ export class UploadFileWidgetComponent extends ComponentWithPermissions {
 
   public dropped(files: NgxFileDropEntry[]) {
     this.uploadDocumentsService.uploadFiles(files)
+  }
+
+  get slimSidebarEnabled(): boolean {
+    return this.settingsService.get(SETTINGS_KEYS.SLIM_SIDEBAR)
   }
 }

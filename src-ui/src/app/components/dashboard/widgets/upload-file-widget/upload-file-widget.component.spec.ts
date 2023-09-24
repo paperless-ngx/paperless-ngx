@@ -1,5 +1,10 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing'
-import { ComponentFixture, TestBed } from '@angular/core/testing'
+import {
+  ComponentFixture,
+  TestBed,
+  fakeAsync,
+  tick,
+} from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
 import { RouterTestingModule } from '@angular/router/testing'
 import {
@@ -114,11 +119,15 @@ describe('UploadFileWidgetComponent', () => {
     expect(dismissSpy).toHaveBeenCalled()
   })
 
-  it('should allow dismissing all alerts', () => {
-    const dismissSpy = jest.spyOn(consumerStatusService, 'dismissCompleted')
+  it('should allow dismissing all alerts', fakeAsync(() => {
+    mockConsumerStatuses(consumerStatusService)
+    fixture.detectChanges()
+    const dismissSpy = jest.spyOn(consumerStatusService, 'dismiss')
     component.dismissCompleted()
-    expect(dismissSpy).toHaveBeenCalled()
-  })
+    tick(1000)
+    fixture.detectChanges()
+    expect(dismissSpy).toHaveBeenCalledTimes(6)
+  }))
 })
 
 function mockConsumerStatuses(consumerStatusService) {
