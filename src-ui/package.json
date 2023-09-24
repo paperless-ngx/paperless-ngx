@@ -29,6 +29,7 @@
     "ngx-clipboard": "^16.0.0",
     "ngx-color": "^9.0.0",
     "ngx-cookie-service": "^16.0.1",
+    "ngx-drag-drop": "^16.1.0",
     "ngx-file-drop": "^16.0.0",
     "ngx-ui-tour-ng-bootstrap": "^13.0.4",
     "rxjs": "^7.8.1",

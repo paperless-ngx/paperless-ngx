@@ -1,8 +1,10 @@
 import {
   Component,
+  EventEmitter,
   Input,
   OnDestroy,
   OnInit,
+  Output,
   QueryList,
   ViewChildren,
 } from '@angular/core'
@@ -50,6 +52,18 @@ export class SavedViewWidgetComponent
 
   @Input()
   savedView: PaperlessSavedView
+
+  @Output()
+  dndStart: EventEmitter<DragEvent> = new EventEmitter()
+
+  @Output()
+  dndMoved: EventEmitter<DragEvent> = new EventEmitter()
+
+  @Output()
+  dndCanceled: EventEmitter<DragEvent> = new EventEmitter()
+
+  @Output()
+  dndEnd: EventEmitter<DragEvent> = new EventEmitter()
 
   documents: PaperlessDocument[] = []
 

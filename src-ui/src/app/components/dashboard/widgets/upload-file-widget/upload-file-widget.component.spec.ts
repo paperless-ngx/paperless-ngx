@@ -26,6 +26,7 @@ import { PermissionsService } from 'src/app/services/permissions.service'
 import { UploadDocumentsService } from 'src/app/services/upload-documents.service'
 import { WidgetFrameComponent } from '../widget-frame/widget-frame.component'
 import { UploadFileWidgetComponent } from './upload-file-widget.component'
+import { DndModule } from 'ngx-drag-drop'
 
 describe('UploadFileWidgetComponent', () => {
   let component: UploadFileWidgetComponent
@@ -55,6 +56,7 @@ describe('UploadFileWidgetComponent', () => {
         RouterTestingModule.withRoutes(routes),
         NgxFileDropModule,
         NgbAlertModule,
+        DndModule,
       ],
     }).compileComponents()
 

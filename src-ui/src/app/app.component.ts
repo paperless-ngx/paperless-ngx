@@ -252,9 +252,12 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   public get dragDropEnabled(): boolean {
-    return this.permissionsService.currentUserCan(
-      PermissionAction.Add,
-      PermissionType.Document
+    return (
+      this.settings.globalDropzoneEnabled &&
+      this.permissionsService.currentUserCan(
+        PermissionAction.Add,
+        PermissionType.Document
+      )
     )
   }
 

@@ -12,6 +12,7 @@ import { RouterTestingModule } from '@angular/router/testing'
 import { routes } from 'src/app/app-routing.module'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
+import { DndModule } from 'ngx-drag-drop'
 
 describe('StatisticsWidgetComponent', () => {
   let component: StatisticsWidgetComponent
@@ -30,6 +31,7 @@ describe('StatisticsWidgetComponent', () => {
         HttpClientTestingModule,
         NgbModule,
         RouterTestingModule.withRoutes(routes),
+        DndModule,
       ],
     }).compileComponents()
 
