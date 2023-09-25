@@ -11,7 +11,7 @@
 <form [formGroup]="settingsForm" (ngSubmit)="saveSettings()">
 
   <ul ngbNav #nav="ngbNav" (navChange)="onNavChange($event)" [(activeId)]="activeNavID" class="nav-tabs">
-    <li [ngbNavItem]="SettingsNavIDs.General" (mouseover)="maybeInitializeTab(SettingsNavIDs.General)">
+    <li [ngbNavItem]="SettingsNavIDs.General">
       <a ngbNavLink i18n>General</a>
       <ng-template ngbNavContent>
 
@@ -132,7 +132,46 @@
           </div>
         </div>
 
-        <h4 i18n>Permissions</h4>
+        <h4 class="mt-4" id="update-checking" i18n>Update checking</h4>
+
+        <div class="row mb-3">
+          <div class="offset-md-3 col">
+            <p i18n>
+              Update checking works by pinging the public <a href="https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest" target="_blank" rel="noopener noreferrer">GitHub API</a> for the latest release to determine whether a new version is available.<br/>
+              Actual updating of the app must still be performed manually.
+            </p>
+            <p i18n>
+              <em>No tracking data is collected by the app in any way.</em>
+            </p>
+            <pngx-input-check i18n-title title="Enable update checking" formControlName="updateCheckingEnabled"></pngx-input-check>
+          </div>
+        </div>
+
+        <h4 class="mt-4" i18n>Bulk editing</h4>
+
+        <div class="row mb-3">
+          <div class="offset-md-3 col">
+            <pngx-input-check i18n-title title="Show confirmation dialogs" formControlName="bulkEditConfirmationDialogs" i18n-hint hint="Deleting documents will always ask for confirmation."></pngx-input-check>
+            <pngx-input-check i18n-title title="Apply on close" formControlName="bulkEditApplyOnClose"></pngx-input-check>
+          </div>
+        </div>
+
+        <h4 class="mt-4" i18n>Notes</h4>
+
+        <div class="row mb-3">
+          <div class="offset-md-3 col">
+            <pngx-input-check i18n-title title="Enable notes" formControlName="notesEnabled"></pngx-input-check>
+          </div>
+        </div>
+
+      </ng-template>
+    </li>
+
+    <li [ngbNavItem]="SettingsNavIDs.Permissions">
+      <a ngbNavLink i18n>Permissions</a>
+      <ng-template ngbNavContent>
+
+        <h4 i18n>Default Permissions</h4>
 
         <div class="row mb-3">
           <div class="offset-md-3 col">
@@ -207,39 +246,6 @@
             </div>
           </div>
         </div>
-
-        <h4 class="mt-4" id="update-checking" i18n>Update checking</h4>
-
-        <div class="row mb-3">
-          <div class="offset-md-3 col">
-            <p i18n>
-              Update checking works by pinging the public <a href="https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest" target="_blank" rel="noopener noreferrer">GitHub API</a> for the latest release to determine whether a new version is available.<br/>
-              Actual updating of the app must still be performed manually.
-            </p>
-            <p i18n>
-              <em>No tracking data is collected by the app in any way.</em>
-            </p>
-            <pngx-input-check i18n-title title="Enable update checking" formControlName="updateCheckingEnabled" i18n-hint hint="Note that for users of third-party containers e.g. linuxserver.io this notification may be 'ahead' of the current third-party release."></pngx-input-check>
-          </div>
-        </div>
-
-        <h4 class="mt-4" i18n>Bulk editing</h4>
-
-        <div class="row mb-3">
-          <div class="offset-md-3 col">
-            <pngx-input-check i18n-title title="Show confirmation dialogs" formControlName="bulkEditConfirmationDialogs" i18n-hint hint="Deleting documents will always ask for confirmation."></pngx-input-check>
-            <pngx-input-check i18n-title title="Apply on close" formControlName="bulkEditApplyOnClose"></pngx-input-check>
-          </div>
-        </div>
-
-        <h4 class="mt-4" i18n>Notes</h4>
-
-        <div class="row mb-3">
-          <div class="offset-md-3 col">
-            <pngx-input-check i18n-title title="Enable notes" formControlName="notesEnabled"></pngx-input-check>
-          </div>
-        </div>
-
       </ng-template>
     </li>
 
@@ -261,7 +267,7 @@
       </ng-template>
     </li>
 
-    <li [ngbNavItem]="SettingsNavIDs.SavedViews" (mouseover)="maybeInitializeTab(SettingsNavIDs.SavedViews)" (focusin)="maybeInitializeTab(SettingsNavIDs.SavedViews)">
+    <li [ngbNavItem]="SettingsNavIDs.SavedViews">
       <a ngbNavLink i18n>Saved views</a>
       <ng-template ngbNavContent>
 
@@ -307,182 +313,6 @@
             </div>
 
         </div>
-
-      </ng-template>
-    </li>
-
-    <li *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.MailRule }" [ngbNavItem]="SettingsNavIDs.Mail" (mouseover)="maybeInitializeTab(SettingsNavIDs.Mail)" (focusin)="maybeInitializeTab(SettingsNavIDs.Mail)">
-      <a ngbNavLink i18n>Mail</a>
-      <ng-template ngbNavContent>
-
-        <ng-container *ngIf="mailAccounts && mailRules">
-          <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.MailAccount }">
-            <h4>
-              <ng-container i18n>Mail accounts</ng-container>
-              <button type="button" class="btn btn-sm btn-primary ms-4" (click)="editMailAccount()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.MailAccount }">
-                <svg class="sidebaricon me-1" fill="currentColor">
-                  <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
-                </svg>
-                <ng-container i18n>Add Account</ng-container>
-              </button>
-            </h4>
-            <ul class="list-group" formGroupName="mailAccounts">
-
-                <li class="list-group-item">
-                  <div class="row">
-                    <div class="col" i18n>Name</div>
-                    <div class="col" i18n>Server</div>
-                    <div class="col" i18n>Actions</div>
-                  </div>
-                </li>
-
-                <li *ngFor="let account of mailAccounts" class="list-group-item" [formGroupName]="account.id">
-                  <div class="row">
-                    <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editMailAccount(account)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.MailAccount)">{{account.name}}</button></div>
-                    <div class="col d-flex align-items-center">{{account.imap_server}}</div>
-                    <div class="col">
-                      <div class="btn-group">
-                        <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailAccount }" [disabled]="!userCanEdit(account)" class="btn btn-sm btn-primary" type="button" (click)="editMailAccount(account)" i18n>Edit</button>
-                        <button *pngxIfOwner="account" class="btn btn-sm btn-primary" type="button" (click)="editPermissions(account)" i18n>Permissions</button>
-                        <button *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.MailAccount }" [disabled]="!userIsOwner(account)" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteMailAccount(account)" i18n>Delete</button>
-                      </div>
-                    </div>
-                  </div>
-                </li>
-
-                <div *ngIf="mailAccounts.length === 0" i18n>No mail accounts defined.</div>
-            </ul>
-          </ng-container>
-
-          <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.MailRule }">
-            <h4 class="mt-4">
-              <ng-container i18n>Mail rules</ng-container>
-              <button type="button" class="btn btn-sm btn-primary ms-4" (click)="editMailRule()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.MailRule }">
-                <svg class="sidebaricon me-1" fill="currentColor">
-                  <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
-                </svg>
-                <ng-container i18n>Add Rule</ng-container>
-              </button>
-            </h4>
-            <ul class="list-group" formGroupName="mailRules">
-
-                <li class="list-group-item">
-                  <div class="row">
-                    <div class="col" i18n>Name</div>
-                    <div class="col" i18n>Account</div>
-                    <div class="col" i18n>Actions</div>
-                  </div>
-                </li>
-
-                <li *ngFor="let rule of mailRules" class="list-group-item" [formGroupName]="rule.id">
-                  <div class="row">
-                    <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editMailRule(rule)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.MailRule)">{{rule.name}}</button></div>
-                    <div class="col d-flex align-items-center">{{(mailAccountService.getCached(rule.account) | async)?.name}}</div>
-                    <div class="col">
-                      <div class="btn-group">
-                        <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailRule }" [disabled]="!userCanEdit(rule)" class="btn btn-sm btn-primary" type="button" (click)="editMailRule(rule)" i18n>Edit</button>
-                        <button *pngxIfOwner="rule" class="btn btn-sm btn-primary" type="button" (click)="editPermissions(rule)" i18n>Permissions</button>
-                        <button *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.MailRule }" [disabled]="!userIsOwner(rule)" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteMailRule(rule)" i18n>Delete</button>
-                      </div>
-                    </div>
-                  </div>
-                </li>
-
-                <div *ngIf="mailRules.length === 0" i18n>No mail rules defined.</div>
-            </ul>
-          </ng-container>
-        </ng-container>
-
-        <div *ngIf="!mailAccounts || !mailRules">
-          <div class="spinner-border spinner-border-sm fw-normal ms-2 me-auto" role="status"></div>
-          <div class="visually-hidden" i18n>Loading...</div>
-        </div>
-
-      </ng-template>
-    </li>
-
-    <li [ngbNavItem]="SettingsNavIDs.UsersGroups" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.User }" (mouseover)="maybeInitializeTab(SettingsNavIDs.UsersGroups)" (focusin)="maybeInitializeTab(SettingsNavIDs.UsersGroups)">
-      <a ngbNavLink i18n>Users & Groups</a>
-      <ng-template ngbNavContent>
-
-      <ng-container *ngIf="users && groups">
-        <h4 class="d-flex">
-          <ng-container i18n>Users</ng-container>
-          <button type="button" class="btn btn-sm btn-primary ms-4" (click)="editUser()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.User }">
-            <svg class="sidebaricon me-1" fill="currentColor">
-              <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
-            </svg>
-            <ng-container i18n>Add User</ng-container>
-          </button>
-        </h4>
-        <ul class="list-group" formGroupName="usersGroup">
-
-          <li class="list-group-item">
-            <div class="row">
-              <div class="col" i18n>Username</div>
-              <div class="col" i18n>Name</div>
-              <div class="col" i18n>Groups</div>
-              <div class="col" i18n>Actions</div>
-            </div>
-          </li>
-
-          <li *ngFor="let user of users" class="list-group-item" [formGroupName]="user.id">
-            <div class="row">
-              <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editUser(user)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.User)">{{user.username}}</button></div>
-              <div class="col d-flex align-items-center">{{user.first_name}} {{user.last_name}}</div>
-              <div class="col d-flex align-items-center">{{user.groups?.map(getGroupName, this).join(', ')}}</div>
-              <div class="col">
-                <div class="btn-group">
-                  <button class="btn btn-sm btn-primary" type="button" (click)="editUser(user)" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.User }" i18n>Edit</button>
-                  <button class="btn btn-sm btn-outline-danger" type="button" (click)="deleteUser(user)" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.User }" i18n>Delete</button>
-                </div>
-              </div>
-            </div>
-          </li>
-        </ul>
-
-        <h4 class="mt-4 d-flex">
-          <ng-container i18n>Groups</ng-container>
-          <button type="button" class="btn btn-sm btn-primary ms-4" (click)="editGroup()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.Group }">
-            <svg class="sidebaricon me-1" fill="currentColor">
-              <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
-            </svg>
-            <ng-container i18n>Add Group</ng-container>
-          </button>
-        </h4>
-        <ul *ngIf="groups.length > 0" class="list-group" formGroupName="groupsGroup">
-
-          <li class="list-group-item">
-            <div class="row">
-              <div class="col" i18n>Name</div>
-              <div class="col"></div>
-              <div class="col"></div>
-              <div class="col" i18n>Actions</div>
-            </div>
-          </li>
-
-          <li *ngFor="let group of groups" class="list-group-item" [formGroupName]="group.id">
-            <div class="row">
-              <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editGroup(group)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.Group)">{{group.name}}</button></div>
-              <div class="col"></div>
-              <div class="col"></div>
-              <div class="col">
-                <div class="btn-group">
-                  <button class="btn btn-sm btn-primary" type="button" (click)="editGroup(group)" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Group }" i18n>Edit</button>
-                  <button class="btn btn-sm btn-outline-danger" type="button" (click)="deleteGroup(group)" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Group }" i18n>Delete</button>
-                </div>
-              </div>
-            </div>
-          </li>
-        </ul>
-
-        <div *ngIf="groups.length === 0">No groups defined</div>
-      </ng-container>
-
-      <div *ngIf="!users || !groups">
-        <div class="spinner-border spinner-border-sm fw-normal ms-2 me-auto" role="status"></div>
-        <div class="visually-hidden" i18n>Loading...</div>
-      </div>
 
       </ng-template>
     </li>

@@ -9,7 +9,12 @@
       <use xlink:href="assets/bootstrap-icons.svg#person-fill-lock" />
     </svg>&nbsp;<ng-container i18n>Permissions</ng-container>
   </button>
-  <button type="button" class="btn btn-sm btn-outline-primary" (click)="openCreateDialog()" *pngxIfPermissions="{ action: PermissionAction.Add, type: permissionType }" i18n>Create</button>
+  <button type="button" class="btn btn-sm btn-outline-primary" (click)="openCreateDialog()" *pngxIfPermissions="{ action: PermissionAction.Add, type: permissionType }" i18n>
+    <svg class="sidebaricon me-1" fill="currentColor">
+      <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
+    </svg>
+    Create
+  </button>
 </pngx-page-header>
 
 <div class="row mb-3">
@@ -23,20 +28,21 @@
   <ngb-pagination class="col-auto" [pageSize]="25" [collectionSize]="collectionSize" [(page)]="page" [maxSize]="5" (pageChange)="reloadData()" size="sm" aria-label="Pagination"></ngb-pagination>
 </div>
 
-<table class="table table-striped align-middle border shadow-sm">
+<div class="card border mb-3">
+<table class="table table-striped align-middle shadow-sm mb-0">
   <thead>
     <tr>
       <th scope="col">
-        <div class="form-check">
+        <div class="form-check m-0 ms-2 me-n2">
           <input type="checkbox" class="form-check-input" id="all-objects" [disabled]="data.length === 0" (click)="toggleAll($event); $event.stopPropagation();">
           <label class="form-check-label" for="all-objects"></label>
         </div>
       </th>
-      <th scope="col" pngxSortable="name" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Name</th>
-      <th scope="col" class="d-none d-sm-table-cell" pngxSortable="matching_algorithm" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Matching</th>
-      <th scope="col" pngxSortable="document_count" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Document count</th>
-      <th scope="col" *ngFor="let column of extraColumns" pngxSortable="{{column.key}}" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)">{{column.name}}</th>
-      <th scope="col" i18n>Actions</th>
+      <th scope="col" class="fw-normal" pngxSortable="name" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Name</th>
+      <th scope="col" class="fw-normal d-none d-sm-table-cell" pngxSortable="matching_algorithm" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Matching</th>
+      <th scope="col" class="fw-normal" pngxSortable="document_count" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Document count</th>
+      <th scope="col" class="fw-normal" *ngFor="let column of extraColumns" pngxSortable="{{column.key}}" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)">{{column.name}}</th>
+      <th scope="col" class="fw-normal" i18n>Actions</th>
     </tr>
   </thead>
   <tbody>
@@ -48,12 +54,12 @@
     </tr>
     <tr *ngFor="let object of data" (click)="toggleSelected(object, $event); $event.stopPropagation();">
       <td>
-        <div class="form-check">
+        <div class="form-check m-0 ms-2 me-n2">
           <input type="checkbox" class="form-check-input" id="{{typeName}}{{object.id}}" [checked]="selectedObjects.has(object.id)" (click)="toggleSelected(object); $event.stopPropagation();">
           <label class="form-check-label" for="{{typeName}}{{object.id}}"></label>
         </div>
       </td>
-      <td scope="row">{{ object.name }}</td>
+      <td scope="row"><button class="btn btn-link ms-0 ps-0" (click)="openEditDialog(object)">{{ object.name }}</button> </td>
       <td scope="row" class="d-none d-sm-table-cell">{{ getMatching(object) }}</td>
       <td scope="row">{{ object.document_count }}</td>
       <td scope="row" *ngFor="let column of extraColumns">
@@ -96,6 +102,7 @@
     </tr>
   </tbody>
 </table>
+</div>
 
 <div class="d-flex mb-2" *ngIf="!isLoading">
   <div *ngIf="collectionSize > 0">
