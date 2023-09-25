@@ -6777,13 +6777,13 @@
         </context-group>
         <target state="final">Russe</target>
       </trans-unit>
-      <trans-unit id="9102963095355753902" datatype="html">
+      <trans-unit id="9102963095355753902" datatype="html" approved="yes">
         <source>Slovak</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">282</context>
         </context-group>
-        <target state="translated">Slovaque</target>
+        <target state="final">Slovaque</target>
       </trans-unit>
       <trans-unit id="4287008301409320881" datatype="html" approved="yes">
         <source>Slovenian</source>
