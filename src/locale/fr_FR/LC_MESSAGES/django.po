@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-19 14:30-0700\n"
-"PO-Revision-Date: 2023-09-23 00:10\n"
+"PO-Revision-Date: 2023-09-25 09:36\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -201,7 +201,7 @@ msgstr "Le nom original du fichier quand il a été envoyé"
 
 #: documents/models.py:263
 msgid "archive serial number"
-msgstr "numéro de série de l'archive"
+msgstr "numéro de série d'archivage"
 
 #: documents/models.py:273
 msgid "The position of this document in your physical document archive."
@@ -373,11 +373,11 @@ msgstr "porte une étiquette parmi"
 
 #: documents/models.py:445
 msgid "ASN greater than"
-msgstr "ASN supérieur à"
+msgstr "NSA supérieur à"
 
 #: documents/models.py:446
 msgid "ASN less than"
-msgstr "ASN inférieur à"
+msgstr "NSA inférieur à"
 
 #: documents/models.py:447
 msgid "storage path is"
