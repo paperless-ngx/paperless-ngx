@@ -172,7 +172,7 @@ export class DocumentDetailComponent
   }
 
   get folderPath(): string {
-    return this.storagePaths.find(s => s.id === this.document.storage_path)?.path ?? '';
+    return this.storagePaths?.find(s => s.id === this.document?.storage_path)?.path ?? '';
   }
 
   getContentType() {
@@ -402,6 +402,7 @@ export class DocumentDetailComponent
   }
 
   updateComponent(doc: PaperlessDocument) {
+    console.log('[updateComponent] doc:', doc);
     this.document = doc
     this.requiresPassword = false
     this.documentsService

@@ -19,6 +19,8 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from documents.parsers import get_default_file_extension
 
+from google_cloud_storage.storage import is_gcs_enabled, get_file_from_gcs
+
 ALL_STATES = sorted(states.ALL_STATES)
 TASK_STATE_CHOICES = sorted(zip(ALL_STATES, ALL_STATES))
 
@@ -312,6 +314,9 @@ class Document(ModelWithOwner):
 
     @property
     def source_file(self):
+        # print(f"is_gcs_enabled: {is_gcs_enabled}")
+        if is_gcs_enabled:
+            return get_file_from_gcs(self.source_path)
         return open(self.source_path, "rb")
 
     @property
@@ -327,6 +332,9 @@ class Document(ModelWithOwner):
 
     @property
     def archive_file(self):
+        # print(f"is_gcs_enabled: {is_gcs_enabled}")
+        if is_gcs_enabled:
+            return get_file_from_gcs(self.archive_path)
         return open(self.archive_path, "rb")
 
     def get_public_filename(self, archive=False, counter=0, suffix=None) -> str:
@@ -364,6 +372,9 @@ class Document(ModelWithOwner):
 
     @property
     def thumbnail_file(self):
+        # print(f"is_gcs_enabled: {is_gcs_enabled}")
+        if is_gcs_enabled:
+            return get_file_from_gcs(self.thumbnail_path)
         return open(self.thumbnail_path, "rb")
 
     @property
