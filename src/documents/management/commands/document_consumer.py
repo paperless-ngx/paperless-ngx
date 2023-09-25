@@ -9,6 +9,7 @@ from time import monotonic
 from time import sleep
 from typing import Final
 
+from django import db
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.core.management.base import CommandError
@@ -38,6 +39,7 @@ def _tags_from_path(filepath) -> set[Tag]:
 
     Returns set of Tag models
     """
+    db.close_old_connections()
     tag_ids = set()
     path_parts = Path(filepath).relative_to(settings.CONSUMPTION_DIR).parent.parts
     for part in path_parts:
