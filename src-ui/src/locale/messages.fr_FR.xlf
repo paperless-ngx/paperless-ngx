@@ -364,7 +364,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">65</context>
         </context-group>
-        <target state="final">Suiv.</target>
+        <target state="final">Suivant</target>
       </trans-unit>
       <trans-unit id="1241348629231510663" datatype="html" approved="yes">
         <source>End</source>
@@ -704,7 +704,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">92</context>
         </context-group>
-        <target state="final">Utiliser la visionneuse PDF fournie par le navigateur</target>
+        <target state="final">Utiliser la visionneuse PDF intégrée du navigateur</target>
       </trans-unit>
       <trans-unit id="9003921625412907981" datatype="html" approved="yes">
         <source>This is usually faster for displaying large PDF documents, but it might not work on some browsers.</source>
@@ -928,7 +928,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">174</context>
         </context-group>
-        <target state="needs-translation">Default Permissions</target>
+        <target state="translated">Droits d'accès par défaut</target>
       </trans-unit>
       <trans-unit id="8222269449891326545" datatype="html">
         <source> Settings apply to this user account for objects (Tags, Mail Rules, etc.) created via the web UI </source>
@@ -1252,7 +1252,7 @@
           <context context-type="sourcefile">src/app/components/document-list/save-view-config-dialog/save-view-config-dialog.component.html</context>
           <context context-type="linenumber">10</context>
         </context-group>
-        <target state="final">Montrer sur le tableau de bord</target>
+        <target state="final">Afficher sur le tableau de bord</target>
       </trans-unit>
       <trans-unit id="8689274715612276035" datatype="html" approved="yes">
         <source>Show in sidebar</source>
@@ -1264,7 +1264,7 @@
           <context context-type="sourcefile">src/app/components/document-list/save-view-config-dialog/save-view-config-dialog.component.html</context>
           <context context-type="linenumber">9</context>
         </context-group>
-        <target state="final">Montrer dans la barre latérale</target>
+        <target state="final">Afficher dans la barre latérale</target>
       </trans-unit>
       <trans-unit id="3193976279273491157" datatype="html" approved="yes">
         <source>Actions</source>
@@ -1618,7 +1618,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="needs-translation"><x id="INTERPOLATION" equiv-text="{{dismissButtonText}}"/></target>
+        <target state="translated"><x id="INTERPOLATION" equiv-text="{{dismissButtonText}}"/></target>
       </trans-unit>
       <trans-unit id="1102717806459547726" datatype="html" approved="yes">
         <source>Refresh</source>
@@ -1680,7 +1680,7 @@
         </context-group>
         <target state="translated">cliquer pour obtenir l'affichage complet</target>
       </trans-unit>
-      <trans-unit id="1536087519743707362" datatype="html">
+      <trans-unit id="1536087519743707362" datatype="html" approved="yes">
         <source>Dismiss</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
@@ -1690,7 +1690,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">64</context>
         </context-group>
-        <target state="translated">Ignorer</target>
+        <target state="final">Ignorer</target>
       </trans-unit>
       <trans-unit id="2134950584701094962" datatype="html" approved="yes">
         <source>Open Document</source>
@@ -1740,15 +1740,15 @@
         </context-group>
         <target state="final">En attente<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.queuedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.queuedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
       </trans-unit>
-      <trans-unit id="5404910960991552159" datatype="html">
+      <trans-unit id="5404910960991552159" datatype="html" approved="yes">
         <source>Dismiss selected</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">28</context>
         </context-group>
-        <target state="translated">Ignorer la sélection</target>
+        <target state="final">Ignorer la sélection</target>
       </trans-unit>
-      <trans-unit id="8829078752502782653" datatype="html">
+      <trans-unit id="8829078752502782653" datatype="html" approved="yes">
         <source>Dismiss all</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
@@ -1758,15 +1758,15 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">62</context>
         </context-group>
-        <target state="translated">Ignorer tout</target>
+        <target state="final">Tout ignorer</target>
       </trans-unit>
-      <trans-unit id="1323591410517879795" datatype="html">
+      <trans-unit id="1323591410517879795" datatype="html" approved="yes">
         <source>Confirm Dismiss All</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">60</context>
         </context-group>
-        <target state="translated">Confirmer « ignorer tout »</target>
+        <target state="final">Confirmer « Tout ignorer »</target>
       </trans-unit>
       <trans-unit id="6566358716882976903" datatype="html">
         <source>tasks?</source>
@@ -2227,7 +2227,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">120</context>
         </context-group>
-        <target state="final">Fermer tout</target>
+        <target state="final">Tout fermer</target>
       </trans-unit>
       <trans-unit id="3897348120591552265" datatype="html" approved="yes">
         <source>Manage</source>
@@ -2311,7 +2311,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">162</context>
         </context-group>
-        <target state="needs-translation">Templates</target>
+        <target state="translated">Modèles</target>
       </trans-unit>
       <trans-unit id="1292737233370901804" datatype="html">
         <source>Mail</source>
@@ -2331,7 +2331,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">175</context>
         </context-group>
-        <target state="needs-translation">Administration</target>
+        <target state="translated">Administration</target>
       </trans-unit>
       <trans-unit id="5537285341303594392" datatype="html">
         <source>File Tasks<x id="START_TAG_SPAN_1" ctype="x-span_1" equiv-text="&lt;span *ngIf=&quot;tasksService.failedFileTasks.length &gt; 0&quot;&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-danger ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
@@ -2551,7 +2551,7 @@
           <context context-type="sourcefile">src/app/components/manage/consumption-templates/consumption-templates.component.html</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="needs-translation">Sort order</target>
+        <target state="translated">Ordre de tri</target>
       </trans-unit>
       <trans-unit id="4163272119298020373" datatype="html">
         <source>Filters</source>
@@ -2559,7 +2559,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="needs-translation">Filters</target>
+        <target state="translated">Filtres</target>
       </trans-unit>
       <trans-unit id="9090904435418488635" datatype="html" approved="yes">
         <source>Process documents that match <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>all<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> filters specified below.</source>
@@ -2657,7 +2657,7 @@
         </context-group>
         <target state="final">Assigner des étiquettes</target>
       </trans-unit>
-      <trans-unit id="6695990587380209737" datatype="html">
+      <trans-unit id="6695990587380209737" datatype="html" approved="yes">
         <source>Assign document type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
@@ -2667,7 +2667,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="translated">Affecter ce type de document</target>
+        <target state="final">Affectation du type de document</target>
       </trans-unit>
       <trans-unit id="4875491778188965469" datatype="html" approved="yes">
         <source>Assign correspondent</source>
@@ -2819,7 +2819,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.ts</context>
           <context context-type="linenumber">83</context>
         </context-group>
-        <target state="needs-translation">Create new consumption template</target>
+        <target state="translated">Créer un nouveau modèle de consommation</target>
       </trans-unit>
       <trans-unit id="3745279073747685988" datatype="html">
         <source>Edit consumption template</source>
@@ -2827,7 +2827,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.ts</context>
           <context context-type="linenumber">87</context>
         </context-group>
-        <target state="needs-translation">Edit consumption template</target>
+        <target state="translated">Modifier le modèle de consommation</target>
       </trans-unit>
       <trans-unit id="8743659855412792665" datatype="html" approved="yes">
         <source>Matching algorithm</source>
@@ -3089,21 +3089,21 @@
         </context-group>
         <target state="final">Compte</target>
       </trans-unit>
-      <trans-unit id="7046259383943324039" datatype="html">
+      <trans-unit id="7046259383943324039" datatype="html" approved="yes">
         <source>Folder</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="translated">Dossier</target>
+        <target state="final">Dossier</target>
       </trans-unit>
-      <trans-unit id="1391527525114848695" datatype="html">
+      <trans-unit id="1391527525114848695" datatype="html" approved="yes">
         <source>Subfolders must be separated by a delimiter, often a dot (&apos;.&apos;) or slash (&apos;/&apos;), but it varies by mail server.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="translated">Les sous-dossiers doivent être séparés par un délimiteurs, souvent un point ('.') ou un slash ('/'), en fonction du serveur de messagerie.</target>
+        <target state="final">Les sous-dossiers doivent être séparés par un délimiteur, souvent un point ('.') ou un slash ('/'), en fonction du serveur de messagerie.</target>
       </trans-unit>
       <trans-unit id="101686279614365671" datatype="html" approved="yes">
         <source>Maximum age (days)</source>
@@ -3121,21 +3121,21 @@
         </context-group>
         <target state="final">Type de pièce jointe</target>
       </trans-unit>
-      <trans-unit id="559099472394646919" datatype="html">
+      <trans-unit id="559099472394646919" datatype="html" approved="yes">
         <source>Consumption scope</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="translated">Périmètre de consommation</target>
+        <target state="final">Périmètre de consommation</target>
       </trans-unit>
-      <trans-unit id="56643687972548912" datatype="html">
+      <trans-unit id="56643687972548912" datatype="html" approved="yes">
         <source>See docs for .eml processing requirements</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="translated">Consulter la documentation pour les exigences de traitement des .eml</target>
+        <target state="final">Consulter la documentation pour les exigences de traitement des .eml</target>
       </trans-unit>
       <trans-unit id="5163375362523428079" datatype="html" approved="yes">
         <source>Rule order</source>
@@ -3143,15 +3143,15 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="final">Ordre des règles</target>
+        <target state="final">Ordre de la règle</target>
       </trans-unit>
-      <trans-unit id="5488632521862493221" datatype="html">
+      <trans-unit id="5488632521862493221" datatype="html" approved="yes">
         <source>Paperless will only process mails that match <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>all<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> of the filters specified below.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">19</context>
         </context-group>
-        <target state="translated">Paperless ne traitera que les courriels correspondant à <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>tous<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> les filtres spécifiés ci-dessous.</target>
+        <target state="final">Paperless ne traitera que les courriels correspondant à <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>tous<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> les filtres spécifiés ci-dessous.</target>
       </trans-unit>
       <trans-unit id="6925928412364847639" datatype="html" approved="yes">
         <source>Filter from</source>
@@ -3159,15 +3159,15 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="final">Filtrer l'expéditeur</target>
+        <target state="final">Filtre selon le courriel de l'expéditeur</target>
       </trans-unit>
-      <trans-unit id="8977094263269822022" datatype="html">
+      <trans-unit id="8977094263269822022" datatype="html" approved="yes">
         <source>Filter to</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="translated">Filtrer pour</target>
+        <target state="final">Filtre selon le courriel du destinataire</target>
       </trans-unit>
       <trans-unit id="8497813481090627874" datatype="html" approved="yes">
         <source>Filter subject</source>
@@ -3175,7 +3175,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="final">Filtrer le sujet</target>
+        <target state="final">Filtre selon l'objet du courriel</target>
       </trans-unit>
       <trans-unit id="7314357616097563149" datatype="html" approved="yes">
         <source>Filter body</source>
@@ -3183,7 +3183,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="final">Filtrer le corps du message</target>
+        <target state="final">Filtre selon le contenu du courriel</target>
       </trans-unit>
       <trans-unit id="5031687746498952417" datatype="html" approved="yes">
         <source>Filter attachment filename</source>
@@ -3191,7 +3191,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="final">Filtrer le nom de fichier de la pièce jointe</target>
+        <target state="final">Filtre selon le nom de fichier de la pièce jointe</target>
       </trans-unit>
       <trans-unit id="4245210767172267486" datatype="html" approved="yes">
         <source>Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive.</source>
@@ -3209,21 +3209,21 @@
         </context-group>
         <target state="final">Action</target>
       </trans-unit>
-      <trans-unit id="4274038999388817994" datatype="html">
+      <trans-unit id="4274038999388817994" datatype="html" approved="yes">
         <source>Action is only performed when documents are consumed from the mail. Mails without attachments remain entirely untouched.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">27</context>
         </context-group>
-        <target state="translated">Cette action n'est exécutée que lorsque les documents ont été traités depuis des courriels. Les courriels sans pièces jointes demeurent totalement inchangés.</target>
+        <target state="final">Cette action n'est exécutée que lorsque les documents sont traités depuis des courriels. Les courriels sans pièces jointes ne seront pas affectés.</target>
       </trans-unit>
-      <trans-unit id="1261794314435932203" datatype="html">
+      <trans-unit id="1261794314435932203" datatype="html" approved="yes">
         <source>Action parameter</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">28</context>
         </context-group>
-        <target state="translated">Paramètre d'action</target>
+        <target state="final">Paramètre d'action</target>
       </trans-unit>
       <trans-unit id="5512171567357420308" datatype="html">
         <source>Assignments specified here will supersede any consumption templates.</source>
@@ -3233,21 +3233,21 @@
         </context-group>
         <target state="needs-translation">Assignments specified here will supersede any consumption templates.</target>
       </trans-unit>
-      <trans-unit id="6093797930511670257" datatype="html">
+      <trans-unit id="6093797930511670257" datatype="html" approved="yes">
         <source>Assign title from</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="translated">Affecter le titre depuis</target>
+        <target state="final">Affectation du titre du document</target>
       </trans-unit>
-      <trans-unit id="4754802869258527587" datatype="html">
+      <trans-unit id="4754802869258527587" datatype="html" approved="yes">
         <source>Assign correspondent from</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="translated">Affecter le correspondant depuis</target>
+        <target state="final">Affectation du correspondant</target>
       </trans-unit>
       <trans-unit id="5232720756589450549" datatype="html">
         <source>Assign owner from rule</source>
@@ -3749,7 +3749,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-dialog/permissions-dialog.component.ts</context>
           <context context-type="linenumber">28</context>
         </context-group>
-        <target state="needs-translation">Set permissions</target>
+        <target state="translated">Définir les droits d'accès</target>
       </trans-unit>
       <trans-unit id="1678966148862835666" datatype="html">
         <source>Edit permissions for </source>
@@ -3757,7 +3757,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-dialog/permissions-dialog.component.ts</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="needs-translation">Edit permissions for </target>
+        <target state="translated">Modifier les droits d'accès pour </target>
       </trans-unit>
       <trans-unit id="8283439432608484491" datatype="html" approved="yes">
         <source>Note that permissions set here will override any existing permissions</source>
@@ -3767,21 +3767,21 @@
         </context-group>
         <target state="final">Notez que les droits d'accès définis ici écraseront tous les droits d'accès existants</target>
       </trans-unit>
-      <trans-unit id="5947558132119506443" datatype="html">
+      <trans-unit id="5947558132119506443" datatype="html" approved="yes">
         <source>My documents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-filter-dropdown/permissions-filter-dropdown.component.html</context>
           <context context-type="linenumber">28</context>
         </context-group>
-        <target state="translated">Mes documents</target>
+        <target state="final">Mes documents</target>
       </trans-unit>
-      <trans-unit id="231920238966427751" datatype="html">
+      <trans-unit id="231920238966427751" datatype="html" approved="yes">
         <source>Shared with me</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-filter-dropdown/permissions-filter-dropdown.component.html</context>
           <context context-type="linenumber">38</context>
         </context-group>
-        <target state="translated">Partagés avec moi</target>
+        <target state="final">Partagés avec moi</target>
       </trans-unit>
       <trans-unit id="5151074932731293042" datatype="html" approved="yes">
         <source>Unowned</source>
@@ -4320,7 +4320,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">89</context>
         </context-group>
-        <target state="final">Relancer la ROC</target>
+        <target state="final">Relancer l’OCR</target>
       </trans-unit>
       <trans-unit id="1418444397960583910" datatype="html" approved="yes">
         <source>More like this</source>
@@ -4332,7 +4332,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
           <context context-type="linenumber">44</context>
         </context-group>
-        <target state="final">Documents relatifs</target>
+        <target state="final">Documents liés</target>
       </trans-unit>
       <trans-unit id="7819314041543176992" datatype="html" approved="yes">
         <source>Close</source>
@@ -4368,7 +4368,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">86</context>
         </context-group>
-        <target state="final">Numéro de série de l'archive</target>
+        <target state="final">Numéro de série d'archivage (NSA)</target>
       </trans-unit>
       <trans-unit id="5114742157723900905" datatype="html" approved="yes">
         <source>Date created</source>
@@ -4480,7 +4480,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">116</context>
         </context-group>
-        <target state="final">Modifié le</target>
+        <target state="final">Date de modification</target>
       </trans-unit>
       <trans-unit id="6392918669949841614" datatype="html" approved="yes">
         <source>Date added</source>
@@ -4716,15 +4716,15 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">498</context>
         </context-group>
-        <target state="final">Confirmer la relance de la ROC</target>
+        <target state="final">Confirmer la relance de l’OCR</target>
       </trans-unit>
-      <trans-unit id="9197453786953646058" datatype="html">
+      <trans-unit id="9197453786953646058" datatype="html" approved="yes">
         <source>This operation will permanently redo OCR for this document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">655</context>
         </context-group>
-        <target state="translated">Cette opération écrasera la ROC pour ce document.</target>
+        <target state="final">Cette opération écrasera l’OCR pour ce document.</target>
       </trans-unit>
       <trans-unit id="5729001209753056399" datatype="html">
         <source>Redo OCR operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.</source>
@@ -4732,7 +4732,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">666</context>
         </context-group>
-        <target state="translated">La relance de la ROC va démarrer en arrière-plan. Fermez et réouvrez ou recharger ce document une fois l'opération terminée pour voir le nouveau contenu.</target>
+        <target state="translated">La relance de l'ORC va démarrer en arrière-plan. Fermez et réouvrez ou recharger ce document une fois l'opération terminée pour voir le nouveau contenu.</target>
       </trans-unit>
       <trans-unit id="4409560272830824468" datatype="html" approved="yes">
         <source>Error executing operation</source>
@@ -5020,13 +5020,13 @@
         </context-group>
         <target state="final">Supprimer le(s) document(s)</target>
       </trans-unit>
-      <trans-unit id="8968869182645922415" datatype="html">
+      <trans-unit id="8968869182645922415" datatype="html" approved="yes">
         <source>This operation will permanently redo OCR for <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">499</context>
         </context-group>
-        <target state="translated">Cette opération écrasera la ROC pour les <x id="PH" equiv-text="this.list.selected.size"/> document(s) sélectionné(s).</target>
+        <target state="final">Cette opération écrasera l’OCR pour les <x id="PH" equiv-text="this.list.selected.size"/> document(s) sélectionné(s).</target>
       </trans-unit>
       <trans-unit id="8076495233090006322" datatype="html" approved="yes">
         <source>Filter by correspondent</source>
@@ -5266,7 +5266,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">131</context>
         </context-group>
-        <target state="final">Trier par ASN</target>
+        <target state="final">Trier par NSA</target>
       </trans-unit>
       <trans-unit id="7517688192215738656" datatype="html" approved="yes">
         <source>ASN</source>
@@ -5496,13 +5496,13 @@
         </context-group>
         <target state="final">Propriétaire non présent dans : <x id="PH" equiv-text="rule.value"/></target>
       </trans-unit>
-      <trans-unit id="1082034558646673343" datatype="html">
+      <trans-unit id="1082034558646673343" datatype="html" approved="yes">
         <source>Without an owner</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">167</context>
         </context-group>
-        <target state="translated">Sans propriétaire</target>
+        <target state="final">Sans propriétaire</target>
       </trans-unit>
       <trans-unit id="3100631071441658964" datatype="html" approved="yes">
         <source>Title &amp; content</source>
@@ -5528,45 +5528,45 @@
         </context-group>
         <target state="final">Plus comme</target>
       </trans-unit>
-      <trans-unit id="3697582909018473071" datatype="html">
+      <trans-unit id="3697582909018473071" datatype="html" approved="yes">
         <source>equals</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">234</context>
         </context-group>
-        <target state="translated">est égal à</target>
+        <target state="final">est égal à</target>
       </trans-unit>
-      <trans-unit id="5325481293405718739" datatype="html">
+      <trans-unit id="5325481293405718739" datatype="html" approved="yes">
         <source>is empty</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">238</context>
         </context-group>
-        <target state="translated">est vide</target>
+        <target state="final">est vide</target>
       </trans-unit>
-      <trans-unit id="6166785695326182482" datatype="html">
+      <trans-unit id="6166785695326182482" datatype="html" approved="yes">
         <source>is not empty</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">242</context>
         </context-group>
-        <target state="translated">n'est pas vide</target>
+        <target state="final">n'est pas vide</target>
       </trans-unit>
-      <trans-unit id="4686622206659266699" datatype="html">
+      <trans-unit id="4686622206659266699" datatype="html" approved="yes">
         <source>greater than</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">246</context>
         </context-group>
-        <target state="translated">est supérieur à</target>
+        <target state="final">est supérieur à</target>
       </trans-unit>
-      <trans-unit id="8014012170270529279" datatype="html">
+      <trans-unit id="8014012170270529279" datatype="html" approved="yes">
         <source>less than</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">250</context>
         </context-group>
-        <target state="translated">est inférieur à</target>
+        <target state="final">est inférieur à</target>
       </trans-unit>
       <trans-unit id="7210076240260527720" datatype="html" approved="yes">
         <source>Save current view</source>
@@ -5650,7 +5650,7 @@
           <context context-type="sourcefile">src/app/components/manage/consumption-templates/consumption-templates.component.html</context>
           <context context-type="linenumber">6</context>
         </context-group>
-        <target state="needs-translation">Add Template</target>
+        <target state="translated">Ajouter un modèle</target>
       </trans-unit>
       <trans-unit id="6043932623370318890" datatype="html">
         <source>Document Sources</source>
@@ -5666,7 +5666,7 @@
           <context context-type="sourcefile">src/app/components/manage/consumption-templates/consumption-templates.component.html</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="needs-translation">No templates defined.</target>
+        <target state="translated">Aucun modèle défini.</target>
       </trans-unit>
       <trans-unit id="5957685099370605085" datatype="html">
         <source>Saved template &quot;<x id="PH" equiv-text="newTemplate.name"/>&quot;.</source>
@@ -5674,7 +5674,7 @@
           <context context-type="sourcefile">src/app/components/manage/consumption-templates/consumption-templates.component.ts</context>
           <context context-type="linenumber">73</context>
         </context-group>
-        <target state="needs-translation">Saved template "<x id="PH" equiv-text="newTemplate.name"/>".</target>
+        <target state="translated">Modèle <x id="PH" equiv-text="newTemplate.name"/> enregistré.</target>
       </trans-unit>
       <trans-unit id="5291506186551056893" datatype="html">
         <source>Error saving template.</source>
@@ -5682,7 +5682,7 @@
           <context context-type="sourcefile">src/app/components/manage/consumption-templates/consumption-templates.component.ts</context>
           <context context-type="linenumber">81</context>
         </context-group>
-        <target state="needs-translation">Error saving template.</target>
+        <target state="translated">Erreur lors de l'enregistrement du modèle.</target>
       </trans-unit>
       <trans-unit id="9152231933218802310" datatype="html">
         <source>Confirm delete template</source>
@@ -5698,7 +5698,7 @@
           <context context-type="sourcefile">src/app/components/manage/consumption-templates/consumption-templates.component.ts</context>
           <context context-type="linenumber">90</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently delete this template.</target>
+        <target state="translated">Cette opération supprimera définitivement ce modèle.</target>
       </trans-unit>
       <trans-unit id="9198120062446364156" datatype="html">
         <source>Deleted template</source>
@@ -5706,7 +5706,7 @@
           <context context-type="sourcefile">src/app/components/manage/consumption-templates/consumption-templates.component.ts</context>
           <context context-type="linenumber">99</context>
         </context-group>
-        <target state="needs-translation">Deleted template</target>
+        <target state="translated">Modèle supprimé</target>
       </trans-unit>
       <trans-unit id="8513868194237937637" datatype="html">
         <source>Error deleting template.</source>
@@ -5714,7 +5714,7 @@
           <context context-type="sourcefile">src/app/components/manage/consumption-templates/consumption-templates.component.ts</context>
           <context context-type="linenumber">104</context>
         </context-group>
-        <target state="needs-translation">Error deleting template.</target>
+        <target state="translated">Erreur lors de la suppression du modèle.</target>
       </trans-unit>
       <trans-unit id="6316128875819022658" datatype="html" approved="yes">
         <source>correspondent</source>
@@ -5812,13 +5812,13 @@
         </context-group>
         <target state="translated">Aucun compte de messagerie défini.</target>
       </trans-unit>
-      <trans-unit id="5364020217520256833" datatype="html">
+      <trans-unit id="5364020217520256833" datatype="html" approved="yes">
         <source>Mail rules</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
           <context context-type="linenumber">44</context>
         </context-group>
-        <target state="translated">Règles de courriel</target>
+        <target state="final">Règles de courriel</target>
       </trans-unit>
       <trans-unit id="1372022816709469401" datatype="html" approved="yes">
         <source>Add Rule</source>
@@ -5828,13 +5828,13 @@
         </context-group>
         <target state="final">Ajouter une règle</target>
       </trans-unit>
-      <trans-unit id="6751234988479444294" datatype="html">
+      <trans-unit id="6751234988479444294" datatype="html" approved="yes">
         <source>No mail rules defined.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
           <context context-type="linenumber">76</context>
         </context-group>
-        <target state="translated">Aucune règle de courriel définie.</target>
+        <target state="final">Aucune règle de courriel définie.</target>
       </trans-unit>
       <trans-unit id="3178554336792037159" datatype="html">
         <source>Error retrieving mail accounts</source>
@@ -5954,7 +5954,7 @@
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
           <context context-type="linenumber">212</context>
         </context-group>
-        <target state="needs-translation">Permissions updated</target>
+        <target state="translated">Droits d'accès mis à jour</target>
       </trans-unit>
       <trans-unit id="4639647950943944112" datatype="html">
         <source>Error updating permissions</source>
@@ -6436,13 +6436,13 @@
         </context-group>
         <target state="final">Le document existe déjà.</target>
       </trans-unit>
-      <trans-unit id="6108404046106249255" datatype="html">
+      <trans-unit id="6108404046106249255" datatype="html" approved="yes">
         <source>Document with ASN already exists.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="translated">Un document avec un ASN identique existe déjà.</target>
+        <target state="final">Un document avec cet NSA existe déjà.</target>
       </trans-unit>
       <trans-unit id="148389968432135849" datatype="html" approved="yes">
         <source>File not found.</source>
