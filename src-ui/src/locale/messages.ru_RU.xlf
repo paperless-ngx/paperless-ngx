@@ -1684,7 +1684,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">64</context>
+          <context context-type="linenumber">63</context>
         </context-group>
         <target state="translated">Отклонить</target>
       </trans-unit>
@@ -1750,10 +1750,6 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">62</context>
-        </context-group>
         <target state="translated">Отменить все</target>
       </trans-unit>
       <trans-unit id="1323591410517879795" datatype="html">
@@ -1764,19 +1760,19 @@
         </context-group>
         <target state="translated">Подтвердить отмену всех</target>
       </trans-unit>
-      <trans-unit id="6566358716882976903" datatype="html">
-        <source>tasks?</source>
+      <trans-unit id="4157200209636243740" datatype="html">
+        <source>Dismiss all <x id="PH" equiv-text="tasks.size"/> tasks?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">62</context>
+          <context context-type="linenumber">61</context>
         </context-group>
-        <target state="translated">задачи?</target>
+        <target state="needs-translation">Dismiss all <x id="PH" equiv-text="tasks.size"/> tasks?</target>
       </trans-unit>
       <trans-unit id="9011556615675272238" datatype="html">
         <source>queued</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">130</context>
+          <context context-type="linenumber">129</context>
         </context-group>
         <target state="needs-translation">queued</target>
       </trans-unit>
@@ -1784,7 +1780,7 @@
         <source>started</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">132</context>
+          <context context-type="linenumber">131</context>
         </context-group>
         <target state="needs-translation">started</target>
       </trans-unit>
@@ -1792,7 +1788,7 @@
         <source>completed</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">134</context>
+          <context context-type="linenumber">133</context>
         </context-group>
         <target state="needs-translation">completed</target>
       </trans-unit>
@@ -1800,7 +1796,7 @@
         <source>failed</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">136</context>
+          <context context-type="linenumber">135</context>
         </context-group>
         <target state="needs-translation">failed</target>
       </trans-unit>
