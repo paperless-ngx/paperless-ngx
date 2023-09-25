@@ -50,6 +50,11 @@ svg.logo {
   color: var(--bs-body-color);
 }
 
+.list-group-item .btn-link,
+table .btn-link {
+  font-size: 1em;
+}
+
 .bg-body {
   background-color: var(--bs-body-bg);
 }

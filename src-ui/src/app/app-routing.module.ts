@@ -6,14 +6,14 @@ import { DocumentDetailComponent } from './components/document-detail/document-d
 import { DocumentListComponent } from './components/document-list/document-list.component'
 import { CorrespondentListComponent } from './components/manage/correspondent-list/correspondent-list.component'
 import { DocumentTypeListComponent } from './components/manage/document-type-list/document-type-list.component'
-import { LogsComponent } from './components/manage/logs/logs.component'
-import { SettingsComponent } from './components/manage/settings/settings.component'
+import { LogsComponent } from './components/admin/logs/logs.component'
+import { SettingsComponent } from './components/admin/settings/settings.component'
 import { TagListComponent } from './components/manage/tag-list/tag-list.component'
 import { NotFoundComponent } from './components/not-found/not-found.component'
 import { DocumentAsnComponent } from './components/document-asn/document-asn.component'
 import { DirtyFormGuard } from './guards/dirty-form.guard'
 import { StoragePathListComponent } from './components/manage/storage-path-list/storage-path-list.component'
-import { TasksComponent } from './components/manage/tasks/tasks.component'
+import { TasksComponent } from './components/admin/tasks/tasks.component'
 import { PermissionsGuard } from './guards/permissions.guard'
 import { DirtyDocGuard } from './guards/dirty-doc.guard'
 import { DirtySavedViewGuard } from './guards/dirty-saved-view.guard'
@@ -21,7 +21,9 @@ import {
   PermissionAction,
   PermissionType,
 } from './services/permissions.service'
-import { ConsumptionTemplatesListComponent } from './components/manage/consumption-templates-list/consumption-templates-list.component'
+import { ConsumptionTemplatesComponent } from './components/manage/consumption-templates/consumption-templates.component'
+import { MailComponent } from './components/manage/mail/mail.component'
+import { UsersAndGroupsComponent } from './components/admin/users-groups/users-groups.component'
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -143,6 +145,15 @@ export const routes: Routes = [
           },
         },
       },
+      // redirect old paths
+      {
+        path: 'settings/mail',
+        redirectTo: '/mail',
+      },
+      {
+        path: 'settings/usersgroups',
+        redirectTo: '/usersgroups',
+      },
       {
         path: 'settings',
         component: SettingsComponent,
@@ -168,11 +179,6 @@ export const routes: Routes = [
         },
       },
       {
-        path: 'settings/:section',
-        component: SettingsComponent,
-        canDeactivate: [DirtyFormGuard],
-      },
-      {
         path: 'tasks',
         component: TasksComponent,
         canActivate: [PermissionsGuard],
@@ -185,12 +191,34 @@ export const routes: Routes = [
       },
       {
         path: 'templates',
-        component: ConsumptionTemplatesListComponent,
+        component: ConsumptionTemplatesComponent,
         canActivate: [PermissionsGuard],
         data: {
           requiredPermission: {
             action: PermissionAction.View,
             type: PermissionType.ConsumptionTemplate,
+          },
+        },
+      },
+      {
+        path: 'mail',
+        component: MailComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.MailAccount,
+          },
+        },
+      },
+      {
+        path: 'usersgroups',
+        component: UsersAndGroupsComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.User,
           },
         },
       },
