@@ -13,7 +13,6 @@ import {
   NgbAlert,
   NgbCollapse,
 } from '@ng-bootstrap/ng-bootstrap'
-import { NgxFileDropModule } from 'ngx-file-drop'
 import { routes } from 'src/app/app-routing.module'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
@@ -54,7 +53,6 @@ describe('UploadFileWidgetComponent', () => {
         HttpClientTestingModule,
         NgbModule,
         RouterTestingModule.withRoutes(routes),
-        NgxFileDropModule,
         NgbAlertModule,
         DndModule,
       ],
@@ -68,13 +66,21 @@ describe('UploadFileWidgetComponent', () => {
     fixture.detectChanges()
   })
 
-  it('should support drop files', () => {
+  it('should support browse files', () => {
+    const fileInput = fixture.debugElement.query(By.css('input'))
+    const clickSpy = jest.spyOn(fileInput.nativeElement, 'click')
+    fixture.debugElement
+      .query(By.css('button'))
+      .nativeElement.dispatchEvent(new Event('click'))
+    expect(clickSpy).toHaveBeenCalled()
+  })
+
+  it('should upload files', () => {
     const uploadSpy = jest.spyOn(uploadDocumentsService, 'uploadFiles')
-    component.dropped([])
+    fixture.debugElement
+      .query(By.css('input'))
+      .nativeElement.dispatchEvent(new Event('change'))
     expect(uploadSpy).toHaveBeenCalled()
-    // coverage
-    component.fileLeave(null)
-    component.fileOver(null)
   })
 
   it('should generate stats summary', () => {

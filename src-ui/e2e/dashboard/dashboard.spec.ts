@@ -29,6 +29,7 @@ test('dashboard saved view show all', async ({ page }) => {
     .locator('pngx-widget-frame')
     .filter({ hasText: 'Inbox' })
     .getByRole('link', { name: 'Show all' })
+    .first()
     .click()
   await expect(page).toHaveURL(/view\/7/)
   await expect(page.locator('pngx-document-list')).toHaveText(/8 documents/)

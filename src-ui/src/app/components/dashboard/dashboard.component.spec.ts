@@ -13,7 +13,6 @@ import { PermissionsService } from 'src/app/services/permissions.service'
 import { By } from '@angular/platform-browser'
 import { SavedViewWidgetComponent } from './widgets/saved-view-widget/saved-view-widget.component'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
-import { NgxFileDropModule } from 'ngx-file-drop'
 import { RouterTestingModule } from '@angular/router/testing'
 import { TourNgBootstrapModule, TourService } from 'ngx-ui-tour-ng-bootstrap'
 import { LogoComponent } from '../common/logo/logo.component'
@@ -104,7 +103,6 @@ describe('DashboardComponent', () => {
       imports: [
         NgbAlertModule,
         HttpClientTestingModule,
-        NgxFileDropModule,
         RouterTestingModule,
         TourNgBootstrapModule,
         DndModule,

@@ -1,0 +1,7 @@
+<div [class.inert]="fileIsOver">
+    <ng-content select="[content]"></ng-content>
+</div>
+
+<div class="global-dropzone-overlay fade" [class.show]="fileIsOver" [class.hide]="hidden">
+    <h2 i18n>Drop files to begin upload</h2>
+</div>

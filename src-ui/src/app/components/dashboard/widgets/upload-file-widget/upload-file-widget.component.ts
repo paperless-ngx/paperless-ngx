@@ -1,6 +1,5 @@
 import { Component, QueryList, ViewChildren } from '@angular/core'
 import { NgbAlert } from '@ng-bootstrap/ng-bootstrap'
-import { NgxFileDropEntry } from 'ngx-file-drop'
 import { ComponentWithPermissions } from 'src/app/components/with-permissions/with-permissions.component'
 import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 import {
@@ -119,12 +118,10 @@ export class UploadFileWidgetComponent extends ComponentWithPermissions {
     this.alerts.forEach((a) => a.close())
   }
 
-  public fileOver(event) {}
-
-  public fileLeave(event) {}
-
-  public dropped(files: NgxFileDropEntry[]) {
-    this.uploadDocumentsService.uploadFiles(files)
+  public onFileSelected(event: Event) {
+    this.uploadDocumentsService.uploadFiles(
+      (event.target as HTMLInputElement).files
+    )
   }
 
   get slimSidebarEnabled(): boolean {

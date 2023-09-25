@@ -1,11 +1,9 @@
 <pngx-widget-frame title="Upload new documents" i18n-title *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.Document }">
   <div content tourAnchor="tour.upload-widget">
-    <form>
-      <ngx-file-drop dropZoneLabel="Drop documents anywhere or" browseBtnLabel="Browse files" (onFileDrop)="dropped($event)"
-        (onFileOver)="fileOver($event)" (onFileLeave)="fileLeave($event)" dropZoneClassName="bg-light card h-100"
-        multiple="true" contentClassName="justify-content-center d-flex flex-column text-muted align-items-center py-5 px-2 h-100" [showBrowseBtn]=true
-        browseBtnClassName="btn btn-sm btn-outline-primary mt-2" i18n-dropZoneLabel i18n-browseBtnLabel>
-      </ngx-file-drop>
+    <form class="justify-content-center d-flex flex-column align-items-center py-3 px-2">
+      <span class="text-muted" i18n>Drop documents anywhere or</span>
+      <button class="btn btn-sm btn-outline-primary mt-3" (click)="fileUpload.click()" i18n>Browse files</button>
+      <input type="file" class="visually-hidden" (change)="onFileSelected($event)" #fileUpload>
     </form>
     <div class="fixed-bottom p-2 p-md-4" [ngClass]="slimSidebarEnabled ? 'col-slim' : 'offset-md-3 offset-lg-2'">
       <div class="row d-flex justify-content-end">
