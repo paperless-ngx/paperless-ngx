@@ -1540,7 +1540,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">64</context>
+          <context context-type="linenumber">63</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2134950584701094962" datatype="html">
@@ -1598,10 +1598,6 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">62</context>
-        </context-group>
       </trans-unit>
       <trans-unit id="1323591410517879795" datatype="html">
         <source>Confirm Dismiss All</source>
@@ -1610,39 +1606,39 @@
           <context context-type="linenumber">60</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="6566358716882976903" datatype="html">
-        <source>tasks?</source>
+      <trans-unit id="4157200209636243740" datatype="html">
+        <source>Dismiss all <x id="PH" equiv-text="tasks.size"/> tasks?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">62</context>
+          <context context-type="linenumber">61</context>
         </context-group>
       </trans-unit>
       <trans-unit id="9011556615675272238" datatype="html">
         <source>queued</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">130</context>
+          <context context-type="linenumber">129</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6415892379431855826" datatype="html">
         <source>started</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">132</context>
+          <context context-type="linenumber">131</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7510279840486540181" datatype="html">
         <source>completed</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">134</context>
+          <context context-type="linenumber">133</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4083337005045748464" datatype="html">
         <source>failed</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">136</context>
+          <context context-type="linenumber">135</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8119815638230251386" datatype="html">
