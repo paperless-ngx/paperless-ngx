@@ -180,6 +180,22 @@ export class AppComponent implements OnInit, OnDestroy {
           },
         },
         {
+          anchorId: 'tour.mail',
+          content: $localize`Manage e-mail accounts and rules for automatically importing documents.`,
+          route: '/mail',
+          backdropConfig: {
+            offset: 0,
+          },
+        },
+        {
+          anchorId: 'tour.consumption-templates',
+          content: $localize`Consumption templates give you finer control over the document ingestion process.`,
+          route: '/templates',
+          backdropConfig: {
+            offset: 0,
+          },
+        },
+        {
           anchorId: 'tour.file-tasks',
           content: $localize`File Tasks shows you documents that have been consumed, are waiting to be, or may have failed during the process.`,
           route: '/tasks',
@@ -189,7 +205,7 @@ export class AppComponent implements OnInit, OnDestroy {
         },
         {
           anchorId: 'tour.settings',
-          content: $localize`Check out the settings for various tweaks to the web app, toggle settings for saved views or setup e-mail checking.`,
+          content: $localize`Check out the settings for various tweaks to the web app and toggle settings for saved views.`,
           route: '/settings',
           backdropConfig: {
             offset: 0,
