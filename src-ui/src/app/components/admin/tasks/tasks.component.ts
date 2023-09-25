@@ -58,8 +58,7 @@ export class TasksComponent
         backdrop: 'static',
       })
       modal.componentInstance.title = $localize`Confirm Dismiss All`
-      modal.componentInstance.messageBold =
-        $localize`Dismiss all` + ` ${tasks.size} ` + $localize`tasks?`
+      modal.componentInstance.messageBold = $localize`Dismiss all ${tasks.size} tasks?`
       modal.componentInstance.btnClass = 'btn-warning'
       modal.componentInstance.btnCaption = $localize`Dismiss`
       modal.componentInstance.confirmClicked.pipe(first()).subscribe(() => {
