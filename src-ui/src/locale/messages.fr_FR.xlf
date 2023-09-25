@@ -1766,7 +1766,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">61</context>
         </context-group>
-        <target state="needs-translation">Dismiss all <x id="PH" equiv-text="tasks.size"/> tasks?</target>
+        <target state="translated">Ignorer les <x id="PH" equiv-text="tasks.size"/> tâches ?</target>
       </trans-unit>
       <trans-unit id="9011556615675272238" datatype="html">
         <source>queued</source>
