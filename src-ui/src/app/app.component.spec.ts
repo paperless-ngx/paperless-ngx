@@ -71,6 +71,7 @@ describe('AppComponent', () => {
   }))
 
   it('should display toast on document consumed with link if user has access', () => {
+    const navigateSpy = jest.spyOn(router, 'navigate')
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
     let toast: Toast
     toastService.getToasts().subscribe((toasts) => (toast = toasts[0]))
@@ -80,9 +81,13 @@ describe('AppComponent', () => {
       .spyOn(consumerStatusService, 'onDocumentConsumptionFinished')
       .mockReturnValue(fileStatusSubject)
     component.ngOnInit()
-    fileStatusSubject.next(new FileStatus())
+    const status = new FileStatus()
+    status.documentId = 1
+    fileStatusSubject.next(status)
     expect(toastSpy).toHaveBeenCalled()
     expect(toast.action).not.toBeUndefined()
+    toast.action()
+    expect(navigateSpy).toHaveBeenCalledWith(['documents', status.documentId])
   })
 
   it('should display toast on document consumed without link if user does not have access', () => {

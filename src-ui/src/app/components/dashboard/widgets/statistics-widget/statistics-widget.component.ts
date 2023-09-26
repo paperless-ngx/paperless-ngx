@@ -97,7 +97,7 @@ export class StatisticsWidgetComponent
     this.reload()
     this.subscription = this.consumerStatusService
       .onDocumentConsumptionFinished()
-      .subscribe((status) => {
+      .subscribe(() => {
         this.reload()
       })
   }
