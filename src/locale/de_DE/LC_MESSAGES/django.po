@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-19 14:30-0700\n"
-"PO-Revision-Date: 2023-09-23 09:15\n"
+"PO-Revision-Date: 2023-09-26 07:02\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -453,7 +453,7 @@ msgstr "Bestätigt"
 
 #: documents/models.py:588
 msgid "If the task is acknowledged via the frontend or API"
-msgstr "Wenn die Aufgabe über das Frontend oder die API bestätigt wird"
+msgstr "Wenn die Aufgabe über die Benutzeroberfläche oder die API bestätigt wird"
 
 #: documents/models.py:594
 msgid "Task Filename"
@@ -655,7 +655,7 @@ msgstr "Dateityp %(type)s nicht unterstützt"
 
 #: documents/serialisers.py:848
 msgid "Invalid variable detected."
-msgstr "Ungültige Variable entdeckt."
+msgstr "Ungültige Variable erkannt."
 
 #: documents/templates/index.html:79
 msgid "Paperless-ngx is loading..."
@@ -831,7 +831,7 @@ msgstr "Ukrainisch"
 
 #: paperless/settings.py:601
 msgid "Chinese Simplified"
-msgstr "Vereinfachtes Chinesisch"
+msgstr "Chinesisch (vereinfacht)"
 
 #: paperless/urls.py:184
 msgid "Paperless-ngx administration"
@@ -859,7 +859,7 @@ msgstr "Aktionen"
 
 #: paperless_mail/admin.py:82
 msgid "The action applied to the mail. This action is only performed when the mail body or attachments were consumed from the mail."
-msgstr "Die auf die E-Mail angewandte Aktion. Diese Aktion wird nur ausgeführt, wenn der Mailtext oder die Anhänge aus der Mail verwendet wurden."
+msgstr "Die auf die E-Mail angewandte Aktion. Diese Aktion wird nur ausgeführt, wenn der Text oder Anhänger aus der E-Mail verarbeitet wurden."
 
 #: paperless_mail/admin.py:90
 msgid "Metadata"
@@ -1011,7 +1011,7 @@ msgstr "Ordner"
 
 #: paperless_mail/models.py:109
 msgid "Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server."
-msgstr "Unterordner müssen durch ein Trennzeichen getrennt werden, oft durch einen Punkt (‚.‘) oder einen Schrägstrich (‚/‘), dies variiert jedoch je nach Mailserver."
+msgstr "Unterordner müssen durch ein Trennzeichen, oft einen Punkt („.“) oder einen Schrägstrich („/“), getrennt werden. Dies variiert jedoch je nach Mailserver."
 
 #: paperless_mail/models.py:115
 msgid "filter from"
