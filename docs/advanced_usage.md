@@ -35,7 +35,8 @@ The following algorithms are available:
   (i.e. preserve ordering) in the PDF.
 - **Regular expression:** Parses the match as a regular expression and
   tries to find a match within the document.
-- **Fuzzy match:** I don't know. Look at [the source](https://github.com/paperless-ngx/paperless-ngx/blob/main/src/documents/matching.py).
+- **Fuzzy match:** Uses a partial matching based on locating the tag text
+  inside the document, using a [partial ratio](https://maxbachmann.github.io/RapidFuzz/Usage/fuzz.html#partial-ratio)
 - **Auto:** Tries to automatically match new documents. This does not
   require you to set a match. See the [notes below](#automatic-matching).
 
@@ -106,7 +107,7 @@ document is consumed using a couple of simple hooks.
 Just write a script, put it somewhere that Paperless can read & execute,
 and then put the path to that script in `paperless.conf` or
 `docker-compose.env` with the variable name of either
-`PAPERLESS_PRE_CONSUME_SCRIPT` or `PAPERLESS_POST_CONSUME_SCRIPT`.
+[`PAPERLESS_PRE_CONSUME_SCRIPT`](/configuration#PAPERLESS_PRE_CONSUME_SCRIPT) or [`PAPERLESS_POST_CONSUME_SCRIPT`](/configuration#PAPERLESS_POST_CONSUME_SCRIPT).
 
 !!! info
 
@@ -250,7 +251,7 @@ document. You will end up getting files like `0000123.pdf` in your media
 directory. This isn't necessarily a bad thing, because you normally
 don't have to access these files manually. However, if you wish to name
 your files differently, you can do that by adjusting the
-`PAPERLESS_FILENAME_FORMAT` configuration option. Paperless adds the
+[`PAPERLESS_FILENAME_FORMAT`](/configuration#PAPERLESS_FILENAME_FORMAT) configuration option. Paperless adds the
 correct file extension e.g. `.pdf`, `.jpg` automatically.
 
 This variable allows you to configure the filename (folders are allowed)
@@ -378,7 +379,7 @@ When a single storage layout is not sufficient for your use case,
 storage paths come to the rescue. Storage paths allow you to configure
 more precisely where each document is stored in the file system.
 
-- Each storage path is a `PAPERLESS_FILENAME_FORMAT` and
+- Each storage path is a [`PAPERLESS_FILENAME_FORMAT`](/configuration#PAPERLESS_FILENAME_FORMAT) and
   follows the rules described above
 - Each document is assigned a storage path using the matching
   algorithms described above, but can be overwritten at any time
@@ -418,7 +419,7 @@ Insurances/                             # Insurances
 !!! tip
 
     Defining a storage path is optional. If no storage path is defined for a
-    document, the global `PAPERLESS_FILENAME_FORMAT` is applied.
+    document, the global [`PAPERLESS_FILENAME_FORMAT`](/configuration#PAPERLESS_FILENAME_FORMAT) is applied.
 
 ## Celery Monitoring {#celery-monitoring}
 
