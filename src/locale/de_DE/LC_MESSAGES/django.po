@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-19 14:30-0700\n"
-"PO-Revision-Date: 2023-09-26 07:02\n"
+"PO-Revision-Date: 2023-09-26 08:16\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -23,7 +23,7 @@ msgstr "Dokumente"
 
 #: documents/models.py:36 documents/models.py:731
 msgid "owner"
-msgstr "Besitzer"
+msgstr "Eigentümer"
 
 #: documents/models.py:53
 msgid "None"
@@ -545,11 +545,11 @@ msgstr "Slug"
 
 #: documents/models.py:736
 msgid "share link"
-msgstr "Geteilter Link"
+msgstr "Freigabelink"
 
 #: documents/models.py:737
 msgid "share links"
-msgstr "Geteilte Links"
+msgstr "Freigabelinks"
 
 #: documents/models.py:744
 msgid "Consume Folder"
@@ -663,7 +663,7 @@ msgstr "Paperless-ngx wird geladen..."
 
 #: documents/templates/index.html:80
 msgid "Still here?! Hmm, something might be wrong."
-msgstr "Immer noch hier?! Hm, vielleicht stimmt was nicht."
+msgstr "Immer noch hier?! Hmm, vielleicht stimmt etwas nicht."
 
 #: documents/templates/index.html:80
 msgid "Here's a link to the docs."
@@ -695,11 +695,11 @@ msgstr "Ihr Benutzername und Kennwort stimmen nicht überein. Bitte versuchen Si
 
 #: documents/templates/registration/login.html:48
 msgid "Share link was not found."
-msgstr "Geteilter Link wurde nicht gefunden."
+msgstr "Freigabelink wurde nicht gefunden."
 
 #: documents/templates/registration/login.html:52
 msgid "Share link has expired."
-msgstr "Geteilter Link ist abgelaufen."
+msgstr "Freigabelink ist abgelaufen."
 
 #: documents/templates/registration/login.html:55
 msgid "Username"
@@ -971,7 +971,7 @@ msgstr "Als wichtig markieren, markierte E-Mails nicht verarbeiten"
 
 #: paperless_mail/models.py:80
 msgid "Tag the mail with specified tag, don't process tagged mails"
-msgstr "Markiere die Mail mit dem angegebenen Tag, verarbeite nicht markierte Mails"
+msgstr "Markiere die E-Mail mit dem angegebenen Tag, verarbeite markierte E-Mails nicht"
 
 #: paperless_mail/models.py:83
 msgid "Use subject as title"
