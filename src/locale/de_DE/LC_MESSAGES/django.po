@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-19 14:30-0700\n"
-"PO-Revision-Date: 2023-09-26 08:16\n"
+"PO-Revision-Date: 2023-09-26 09:26\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -473,7 +473,7 @@ msgstr "Name der ausgeführten Aufgabe"
 
 #: documents/models.py:609
 msgid "Task State"
-msgstr "Aufgabe: Status"
+msgstr "Aufgabenstatus"
 
 #: documents/models.py:610
 msgid "Current state of the task being run"
@@ -613,7 +613,7 @@ msgstr "Diesen Dokumenttyp zuweisen"
 
 #: documents/models.py:827 paperless_mail/models.py:226
 msgid "assign this correspondent"
-msgstr "Diesen Korrespondent zuweisen"
+msgstr "Diesen Korrespondenten zuweisen"
 
 #: documents/models.py:835
 msgid "assign this storage path"
@@ -633,11 +633,11 @@ msgstr "Diesen Gruppen Anzeigeberechtigungen erteilen"
 
 #: documents/models.py:865
 msgid "grant change permissions to these users"
-msgstr "Diesen Benutzern Änderungsberechtigungen erteilen"
+msgstr "Diesen Benutzern Bearbeitungsberechtigungen erteilen"
 
 #: documents/models.py:872
 msgid "grant change permissions to these groups"
-msgstr "Diesen Gruppen Änderungsberechtigungen erteilen"
+msgstr "Diesen Gruppen Bearbeitungsberechtigungen erteilen"
 
 #: documents/serialisers.py:100
 #, python-format
@@ -1019,7 +1019,7 @@ msgstr "Absender filtern"
 
 #: paperless_mail/models.py:122
 msgid "filter to"
-msgstr "filtern nach"
+msgstr "Empfänger filtern"
 
 #: paperless_mail/models.py:129
 msgid "filter subject"
