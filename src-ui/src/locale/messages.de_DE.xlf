@@ -594,13 +594,13 @@
         </context-group>
         <target state="final">Einstellungen</target>
       </trans-unit>
-      <trans-unit id="1685061484835793745" datatype="html">
+      <trans-unit id="1685061484835793745" datatype="html" approved="yes">
         <source>Start tour</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">2</context>
         </context-group>
-        <target state="translated">Tour beginnen</target>
+        <target state="final">Tour beginnen</target>
       </trans-unit>
       <trans-unit id="4798013226763881638" datatype="html" approved="yes">
         <source>Open Django Admin</source>
@@ -778,37 +778,37 @@
         </context-group>
         <target state="final">Zurücksetzen</target>
       </trans-unit>
-      <trans-unit id="8901931207592071833" datatype="html">
+      <trans-unit id="8901931207592071833" datatype="html" approved="yes">
         <source>Update checking</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">135</context>
         </context-group>
-        <target state="translated">Überprüfung auf Updates</target>
+        <target state="final">Überprüfung auf Aktualisierungen</target>
       </trans-unit>
-      <trans-unit id="7141691772243630313" datatype="html">
+      <trans-unit id="7141691772243630313" datatype="html" approved="yes">
         <source> Update checking works by pinging the public <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;"/>GitHub API<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> for the latest release to determine whether a new version is available.<x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br/&gt;"/> Actual updating of the app must still be performed manually. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">139,142</context>
         </context-group>
-        <target state="translated"> Die Überprüfung auf Updates erfolgt über Anfragen an die öffentliche <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;"/>GitHub API<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>, um zu ermitteln, ob eine neue Version verfügbar ist.<x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br/&gt;"/> Das eigentliche Update der Anwendung muss weiterhin manuell durchgeführt werden. </target>
+        <target state="final"> Die Überprüfung auf Aktualisierung erfolgt über Anfragen an die öffentliche <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;"/>GitHub-API<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>, um zu ermitteln, ob eine neue Version verfügbar ist.<x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br/&gt;"/> Die eigentliche Aktualisierung der Anwendung muss weiterhin manuell durchgeführt werden. </target>
       </trans-unit>
-      <trans-unit id="5489945693955857309" datatype="html">
+      <trans-unit id="5489945693955857309" datatype="html" approved="yes">
         <source><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&gt;"/>No tracking data is collected by the app in any way.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">144,146</context>
         </context-group>
-        <target state="translated"><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&gt;"/>Die Anwendung sammelt oder speichert keinerlei Tracking-Daten.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></target>
+        <target state="final"><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&gt;"/>Die Anwendung sammelt oder speichert keinerlei Tracking-Daten.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></target>
       </trans-unit>
-      <trans-unit id="5070799004079086984" datatype="html">
+      <trans-unit id="5070799004079086984" datatype="html" approved="yes">
         <source>Enable update checking</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">146</context>
         </context-group>
-        <target state="translated">Automatische Überprüfung auf Updates aktivieren</target>
+        <target state="final">Automatische Überprüfung auf Aktualisierungen aktivieren</target>
       </trans-unit>
       <trans-unit id="8508424367627989968" datatype="html" approved="yes">
         <source>Bulk editing</source>
@@ -946,7 +946,7 @@
         </context-group>
         <target state="final">Standardeigentümer</target>
       </trans-unit>
-      <trans-unit id="734147282056744882" datatype="html">
+      <trans-unit id="734147282056744882" datatype="html" approved="yes">
         <source>Objects without an owner can be viewed and edited by all users</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
@@ -956,7 +956,7 @@
           <context context-type="sourcefile">src/app/components/common/input/permissions/permissions-form/permissions-form.component.html</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="translated">Objekte ohne Eigentümer können von allen Benutzern angezeigt und bearbeitet werden</target>
+        <target state="final">Objekte ohne Eigentümer können von allen Benutzern angezeigt und bearbeitet werden</target>
       </trans-unit>
       <trans-unit id="1835394624061684099" datatype="html" approved="yes">
         <source>Default View Permissions</source>
@@ -2373,13 +2373,13 @@
         </context-group>
         <target state="final">Zum Anzeigen klicken.</target>
       </trans-unit>
-      <trans-unit id="9811291095862612" datatype="html">
+      <trans-unit id="9811291095862612" datatype="html" approved="yes">
         <source>Paperless-ngx can automatically check for updates</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">233</context>
         </context-group>
-        <target state="translated">Paperless-ngx kann automatisch auf Updates überprüfen</target>
+        <target state="final">Paperless-ngx kann automatisch auf Aktualisierungen überprüfen</target>
       </trans-unit>
       <trans-unit id="894819944961861800" datatype="html" approved="yes">
         <source> How does this work? </source>
@@ -2389,13 +2389,13 @@
         </context-group>
         <target state="final"> Wie funktioniert das? </target>
       </trans-unit>
-      <trans-unit id="509090351011426949" datatype="html">
+      <trans-unit id="509090351011426949" datatype="html" approved="yes">
         <source>Update available</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">251</context>
         </context-group>
-        <target state="translated">Update verfügbar</target>
+        <target state="final">Aktualisierung verfügbar</target>
       </trans-unit>
       <trans-unit id="2526035785704676448" datatype="html" approved="yes">
         <source>An error occurred while saving update checking settings.</source>
@@ -3093,13 +3093,13 @@
         </context-group>
         <target state="final">Maximales Alter (Tage)</target>
       </trans-unit>
-      <trans-unit id="7093509971705471817" datatype="html">
+      <trans-unit id="7093509971705471817" datatype="html" approved="yes">
         <source>Attachment type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="translated">Dateianhangstyp</target>
+        <target state="final">Dateianhangstyp</target>
       </trans-unit>
       <trans-unit id="559099472394646919" datatype="html" approved="yes">
         <source>Consumption scope</source>
@@ -3281,29 +3281,29 @@
         </context-group>
         <target state="final">In den angegebenen Ordner verschieben</target>
       </trans-unit>
-      <trans-unit id="4593278936733161020" datatype="html">
+      <trans-unit id="4593278936733161020" datatype="html" approved="yes">
         <source>Mark as read, don&apos;t process read mails</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">61</context>
         </context-group>
-        <target state="translated">Als gelesen markieren, verarbeite gelesene E-Mails nicht</target>
+        <target state="final">Als gelesen markieren, verarbeite gelesene E-Mails nicht</target>
       </trans-unit>
-      <trans-unit id="2378921144019636516" datatype="html">
+      <trans-unit id="2378921144019636516" datatype="html" approved="yes">
         <source>Flag the mail, don&apos;t process flagged mails</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">65</context>
         </context-group>
-        <target state="translated">Als wichtig markieren, verarbeite wichtige E-Mails nicht</target>
+        <target state="final">Als wichtig markieren, verarbeite wichtige E-Mails nicht</target>
       </trans-unit>
-      <trans-unit id="6457024618858980302" datatype="html">
+      <trans-unit id="6457024618858980302" datatype="html" approved="yes">
         <source>Tag the mail with specified tag, don&apos;t process tagged mails</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">69</context>
         </context-group>
-        <target state="translated">Markiere die E-Mail mit dem angegebenen Tag, verarbeite markierte E-Mails nicht</target>
+        <target state="final">Markiere die E-Mail mit dem angegebenen Tag, verarbeite markierte E-Mails nicht</target>
       </trans-unit>
       <trans-unit id="4673329664686432878" datatype="html" approved="yes">
         <source>Use subject as title</source>
@@ -3345,13 +3345,13 @@
         </context-group>
         <target state="final">E-Mail-Adresse verwenden</target>
       </trans-unit>
-      <trans-unit id="445154175758965852" datatype="html">
+      <trans-unit id="445154175758965852" datatype="html" approved="yes">
         <source>Use name (or mail address if not available)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">99</context>
         </context-group>
-        <target state="translated">Namen (oder, falls nicht verfügbar, E-Mail-Adresse) verwenden</target>
+        <target state="final">Namen (oder, falls nicht verfügbar, E-Mail-Adresse) verwenden</target>
       </trans-unit>
       <trans-unit id="1258862217749148424" datatype="html" approved="yes">
         <source>Use correspondent selected below</source>
@@ -3971,13 +3971,13 @@
         </context-group>
         <target state="final">Status</target>
       </trans-unit>
-      <trans-unit id="6732151329960766506" datatype="html">
+      <trans-unit id="6732151329960766506" datatype="html" approved="yes">
         <source>Copy Raw Error</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/toasts/toasts.component.html</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="translated">Fehler kopieren</target>
+        <target state="final">Fehler kopieren</target>
       </trans-unit>
       <trans-unit id="1865646076514070962" datatype="html" approved="yes">
         <source>Hello <x id="PH" equiv-text="this.settingsService.displayName"/>, welcome to Paperless-ngx</source>
@@ -4185,7 +4185,7 @@
         </context-group>
         <target state="final">Hinzugefügt: <x id="PH" equiv-text="countSuccess"/></target>
       </trans-unit>
-      <trans-unit id="760986369763309193" datatype="html">
+      <trans-unit id="760986369763309193" datatype="html" approved="yes">
         <source>, </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.ts</context>
@@ -4196,7 +4196,7 @@
           <context context-type="linenumber">268</context>
         </context-group>
         <note priority="1" from="description">this string is used to separate processing, failed and added on the file upload widget</note>
-        <target state="translated">, </target>
+        <target state="final">, </target>
       </trans-unit>
       <trans-unit id="7915903586014997661" datatype="html">
         <source>Paperless-ngx is running!</source>
@@ -5492,13 +5492,13 @@
         </context-group>
         <target state="final">Ähnlich zu</target>
       </trans-unit>
-      <trans-unit id="3697582909018473071" datatype="html">
+      <trans-unit id="3697582909018473071" datatype="html" approved="yes">
         <source>equals</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">234</context>
         </context-group>
-        <target state="translated">entspricht</target>
+        <target state="final">entspricht</target>
       </trans-unit>
       <trans-unit id="5325481293405718739" datatype="html" approved="yes">
         <source>is empty</source>
@@ -5546,7 +5546,7 @@
           <context context-type="sourcefile">src/app/components/document-list/save-view-config-dialog/save-view-config-dialog.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="translated">Fehler beim Speichern dieser Ansicht mit Filterregeln</target>
+        <target state="translated">Fehlerhafte Filterregeln beim Speichern dieser Ansicht</target>
       </trans-unit>
       <trans-unit id="6438839705789707938" datatype="html">
         <source>The error returned was</source>
@@ -5656,13 +5656,13 @@
         </context-group>
         <target state="final">Löschen der Vorlage bestätigen</target>
       </trans-unit>
-      <trans-unit id="3359315394839441814" datatype="html">
+      <trans-unit id="3359315394839441814" datatype="html" approved="yes">
         <source>This operation will permanently delete this template.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/consumption-templates/consumption-templates.component.ts</context>
           <context context-type="linenumber">90</context>
         </context-group>
-        <target state="translated">Dieser Vorgang wird diese Vorlage dauerhaft löschen.</target>
+        <target state="final">Dieser Vorgang wird diese Vorlage dauerhaft löschen.</target>
       </trans-unit>
       <trans-unit id="9198120062446364156" datatype="html" approved="yes">
         <source>Deleted template</source>
@@ -5880,47 +5880,47 @@
         </context-group>
         <target state="final">Fehler beim Speichern der Regel.</target>
       </trans-unit>
-      <trans-unit id="3896080636020672118" datatype="html">
+      <trans-unit id="3896080636020672118" datatype="html" approved="yes">
         <source>Confirm delete mail rule</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
           <context context-type="linenumber">171</context>
         </context-group>
-        <target state="translated">Löschen der E-Mail-Regel bestätigen</target>
+        <target state="final">Löschen der E-Mail-Regel bestätigen</target>
       </trans-unit>
-      <trans-unit id="2250372580580310337" datatype="html">
+      <trans-unit id="2250372580580310337" datatype="html" approved="yes">
         <source>This operation will permanently delete this mail rule.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
           <context context-type="linenumber">172</context>
         </context-group>
-        <target state="translated">Dieser Vorgang wird diese E-Mail-Regel dauerhaft löschen.</target>
+        <target state="final">Dieser Vorgang wird diese E-Mail-Regel dauerhaft löschen.</target>
       </trans-unit>
-      <trans-unit id="9077981247971516916" datatype="html">
+      <trans-unit id="9077981247971516916" datatype="html" approved="yes">
         <source>Deleted mail rule</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
           <context context-type="linenumber">181</context>
         </context-group>
-        <target state="translated">E-Mail-Regel gelöscht</target>
+        <target state="final">E-Mail-Regel gelöscht</target>
       </trans-unit>
-      <trans-unit id="2033194641751367552" datatype="html">
+      <trans-unit id="2033194641751367552" datatype="html" approved="yes">
         <source>Error deleting mail rule.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
           <context context-type="linenumber">190</context>
         </context-group>
-        <target state="translated">Fehler beim Löschen der E-Mail-Regel.</target>
+        <target state="final">Fehler beim Löschen der E-Mail-Regel.</target>
       </trans-unit>
-      <trans-unit id="3061362835271417984" datatype="html">
+      <trans-unit id="3061362835271417984" datatype="html" approved="yes">
         <source>Permissions updated</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
           <context context-type="linenumber">212</context>
         </context-group>
-        <target state="translated">Berechtigungen aktualisiert</target>
+        <target state="final">Berechtigungen aktualisiert</target>
       </trans-unit>
-      <trans-unit id="4639647950943944112" datatype="html">
+      <trans-unit id="4639647950943944112" datatype="html" approved="yes">
         <source>Error updating permissions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
@@ -5930,7 +5930,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">300</context>
         </context-group>
-        <target state="translated">Fehler beim Aktualisieren der Berechtigungen</target>
+        <target state="final">Fehler beim Aktualisieren der Berechtigungen</target>
       </trans-unit>
       <trans-unit id="4160063698699558716" datatype="html" approved="yes">
         <source><x id="START_TAG__SVG_SVG" ctype="x-_svg_svg" equiv-text="&lt;svg class=&quot;sidebaricon me-1&quot; fill=&quot;currentColor&quot;&gt;"/><x id="START_TAG__SVG_USE" ctype="x-_svg_use" equiv-text="&lt;use xlink:href=&quot;assets/bootstrap-icons.svg#plus-circle&quot; /&gt;"/><x id="CLOSE_TAG__SVG_USE" ctype="x-_svg_use" equiv-text="&lt;use xlink:href=&quot;assets/bootstrap-icons.svg#plus-circle&quot; /&gt;"/><x id="CLOSE_TAG__SVG_SVG" ctype="x-_svg_svg" equiv-text="&lt;/svg&gt;"/> Create </source>
@@ -6012,7 +6012,7 @@
         </context-group>
         <target state="final">Anzahl Dokumente</target>
       </trans-unit>
-      <trans-unit id="7376880254267897616" datatype="html">
+      <trans-unit id="7376880254267897616" datatype="html" approved="yes">
         <source>Filter Documents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
@@ -6030,7 +6030,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
           <context context-type="linenumber">78</context>
         </context-group>
-        <target state="translated">Dokumente filtern</target>
+        <target state="final">Dokumente filtern</target>
       </trans-unit>
       <trans-unit id="8095412801504464756" datatype="html">
         <source>{VAR_PLURAL, plural, =1 {One <x id="INTERPOLATION"/>} other {<x id="INTERPOLATION_1"/> total <x id="INTERPOLATION_2"/>}}</source>
@@ -6076,13 +6076,13 @@
         </context-group>
         <target state="translated">Keine</target>
       </trans-unit>
-      <trans-unit id="211408744872436427" datatype="html">
+      <trans-unit id="211408744872436427" datatype="html" approved="yes">
         <source>Successfully created <x id="PH" equiv-text="this.typeName"/>.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">158</context>
         </context-group>
-        <target state="translated"><x id="PH" equiv-text="this.typeName"/> erfolgreich erstellt.</target>
+        <target state="final"><x id="PH" equiv-text="this.typeName"/> erfolgreich erstellt.</target>
       </trans-unit>
       <trans-unit id="3928835053823658072" datatype="html">
         <source>Error occurred while creating <x id="PH" equiv-text="this.typeName"/>.</source>
@@ -6092,13 +6092,13 @@
         </context-group>
         <target state="translated">Fehler beim Erstellen von <x id="PH" equiv-text="this.typeName"/>.</target>
       </trans-unit>
-      <trans-unit id="2541368547549828690" datatype="html">
+      <trans-unit id="2541368547549828690" datatype="html" approved="yes">
         <source>Successfully updated <x id="PH" equiv-text="this.typeName"/>.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">178</context>
         </context-group>
-        <target state="translated"><x id="PH" equiv-text="this.typeName"/> erfolgreich aktualisiert.</target>
+        <target state="final"><x id="PH" equiv-text="this.typeName"/> erfolgreich aktualisiert.</target>
       </trans-unit>
       <trans-unit id="6442673774206210733" datatype="html">
         <source>Error occurred while saving <x id="PH" equiv-text="this.typeName"/>.</source>
@@ -6116,21 +6116,21 @@
         </context-group>
         <target state="final">Assoziierte Dokumente werden nicht gelöscht.</target>
       </trans-unit>
-      <trans-unit id="6639207128255974941" datatype="html">
+      <trans-unit id="6639207128255974941" datatype="html" approved="yes">
         <source>Error while deleting element</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">219</context>
         </context-group>
-        <target state="translated">Fehler beim Löschen des Elements</target>
+        <target state="final">Fehler beim Löschen des Elements</target>
       </trans-unit>
-      <trans-unit id="4863024195229581844" datatype="html">
+      <trans-unit id="4863024195229581844" datatype="html" approved="yes">
         <source>Permissions updated successfully</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">293</context>
         </context-group>
-        <target state="translated">Berechtigungen wurden erfolgreich aktualisiert</target>
+        <target state="final">Berechtigungen wurden erfolgreich aktualisiert</target>
       </trans-unit>
       <trans-unit id="5101757640976222639" datatype="html" approved="yes">
         <source>storage path</source>
@@ -6292,13 +6292,13 @@
         </context-group>
         <target state="final">Keine: Deaktiviere automatische Zuweisung</target>
       </trans-unit>
-      <trans-unit id="5948496158474272829" datatype="html">
+      <trans-unit id="5948496158474272829" datatype="html" approved="yes">
         <source>Warning: You have unsaved changes to your document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/guards/dirty-doc.guard.ts</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="translated">Warnung: Sie haben nicht gespeicherte Änderungen an Ihren Dokument(en).</target>
+        <target state="final">Warnung: Sie haben nicht gespeicherte Änderungen an einem oder mehreren Dokument(en).</target>
       </trans-unit>
       <trans-unit id="159901853873315050" datatype="html" approved="yes">
         <source>Unsaved Changes</source>
@@ -6372,13 +6372,13 @@
         </context-group>
         <target state="final">Speichern und schließen</target>
       </trans-unit>
-      <trans-unit id="8311312207500500516" datatype="html">
+      <trans-unit id="8311312207500500516" datatype="html" approved="yes">
         <source>You don&apos;t have permissions to do that</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/guards/permissions.guard.ts</context>
           <context context-type="linenumber">34</context>
         </context-group>
-        <target state="translated">Sie haben keine Berechtigung, dies zu tun</target>
+        <target state="final">Sie sind nicht berechtigt, dies zu tun</target>
       </trans-unit>
       <trans-unit id="7536524521722799066" datatype="html" approved="yes">
         <source>(no title)</source>
