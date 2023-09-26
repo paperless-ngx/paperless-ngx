@@ -1301,3 +1301,32 @@ started by the container.
     v1.9.2. A one-time migration is performed for users who have this
     setting set. This setting is always ignored if the corresponding
     frontend setting has been set.
+
+## Email sending
+
+Setting an SMTP server for the backend will allow you to reset your
+password. All of these options come from their similarly-named [Django settings](https://docs.djangoproject.com/en/1.8/ref/settings/#email-host)
+
+#### [`PAPERLESS_EMAIL_HOST=<str>`](#PAPERLESS_EMAIL_HOST) {#PAPERLESS_EMAIL_HOST}
+
+: Defaults to 'localhost'.
+
+#### [`PAPERLESS_EMAIL_PORT=<int>`](#PAPERLESS_EMAIL_PORT) {#PAPERLESS_EMAIL_PORT}
+
+: Defaults to port 25.
+
+#### [`PAPERLESS_EMAIL_USER=<str>`](#PAPERLESS_EMAIL_USER) {#PAPERLESS_EMAIL_USER}
+
+: Defaults to ''.
+
+#### [`PAPERLESS_EMAIL_PASSWORD=<str>`](#PAPERLESS_EMAIL_PASSWORD) {#PAPERLESS_EMAIL_PASSWORD}
+
+: Defaults to ''.
+
+#### [`PAPERLESS_EMAIL_USE_TLS=<bool>`](#PAPERLESS_EMAIL_USE_TLS) {#PAPERLESS_EMAIL_USE_TLS}
+
+: Defaults to false.
+
+#### [`PAPERLESS_EMAIL_USE_SSL=<bool>`](#PAPERLESS_EMAIL_USE_SSL) {#PAPERLESS_EMAIL_USE_SSL}
+
+: Defaults to false.
