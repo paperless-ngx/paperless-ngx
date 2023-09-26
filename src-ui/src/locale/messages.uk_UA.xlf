@@ -1618,7 +1618,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="needs-translation"><x id="INTERPOLATION" equiv-text="{{dismissButtonText}}"/></target>
+        <target state="translated"><x id="INTERPOLATION" equiv-text="{{dismissButtonText}}"/></target>
       </trans-unit>
       <trans-unit id="1102717806459547726" datatype="html">
         <source>Refresh</source>
@@ -2319,7 +2319,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">168</context>
         </context-group>
-        <target state="needs-translation">Templates</target>
+        <target state="translated">Шаблони</target>
       </trans-unit>
       <trans-unit id="1292737233370901804" datatype="html">
         <source>Mail</source>
@@ -2339,7 +2339,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">181</context>
         </context-group>
-        <target state="needs-translation">Administration</target>
+        <target state="translated">Адміністрування</target>
       </trans-unit>
       <trans-unit id="5537285341303594392" datatype="html">
         <source>File Tasks<x id="START_TAG_SPAN_1" ctype="x-span_1" equiv-text="&lt;span *ngIf=&quot;tasksService.failedFileTasks.length &gt; 0&quot;&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-danger ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
@@ -2539,7 +2539,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="needs-translation">Filters</target>
+        <target state="translated">Фільтри</target>
       </trans-unit>
       <trans-unit id="9090904435418488635" datatype="html">
         <source>Process documents that match <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>all<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> filters specified below.</source>
@@ -5614,7 +5614,7 @@
           <context context-type="sourcefile">src/app/components/manage/consumption-templates/consumption-templates.component.html</context>
           <context context-type="linenumber">6</context>
         </context-group>
-        <target state="needs-translation">Add Template</target>
+        <target state="translated">Додати шаблон</target>
       </trans-unit>
       <trans-unit id="6043932623370318890" datatype="html">
         <source>Document Sources</source>
@@ -5622,7 +5622,7 @@
           <context context-type="sourcefile">src/app/components/manage/consumption-templates/consumption-templates.component.html</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="needs-translation">Document Sources</target>
+        <target state="translated">Джерела документа</target>
       </trans-unit>
       <trans-unit id="3954560573326461437" datatype="html">
         <source>No templates defined.</source>
@@ -5630,7 +5630,7 @@
           <context context-type="sourcefile">src/app/components/manage/consumption-templates/consumption-templates.component.html</context>
           <context context-type="linenumber">44</context>
         </context-group>
-        <target state="needs-translation">No templates defined.</target>
+        <target state="translated">Немає шаблонів.</target>
       </trans-unit>
       <trans-unit id="5957685099370605085" datatype="html">
         <source>Saved template &quot;<x id="PH" equiv-text="newTemplate.name"/>&quot;.</source>
@@ -5638,7 +5638,7 @@
           <context context-type="sourcefile">src/app/components/manage/consumption-templates/consumption-templates.component.ts</context>
           <context context-type="linenumber">73</context>
         </context-group>
-        <target state="needs-translation">Saved template "<x id="PH" equiv-text="newTemplate.name"/>".</target>
+        <target state="translated">Шаблон "<x id="PH" equiv-text="newTemplate.name"/>" збережено.</target>
       </trans-unit>
       <trans-unit id="5291506186551056893" datatype="html">
         <source>Error saving template.</source>
@@ -5646,7 +5646,7 @@
           <context context-type="sourcefile">src/app/components/manage/consumption-templates/consumption-templates.component.ts</context>
           <context context-type="linenumber">81</context>
         </context-group>
-        <target state="needs-translation">Error saving template.</target>
+        <target state="translated">Помилка збереження шаблона.</target>
       </trans-unit>
       <trans-unit id="9152231933218802310" datatype="html">
         <source>Confirm delete template</source>
@@ -5654,7 +5654,7 @@
           <context context-type="sourcefile">src/app/components/manage/consumption-templates/consumption-templates.component.ts</context>
           <context context-type="linenumber">89</context>
         </context-group>
-        <target state="needs-translation">Confirm delete template</target>
+        <target state="translated">Підтвердьте видалення шаблона</target>
       </trans-unit>
       <trans-unit id="3359315394839441814" datatype="html">
         <source>This operation will permanently delete this template.</source>
@@ -5662,7 +5662,7 @@
           <context context-type="sourcefile">src/app/components/manage/consumption-templates/consumption-templates.component.ts</context>
           <context context-type="linenumber">90</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently delete this template.</target>
+        <target state="translated">Ця операція остаточно видалить цей шаблон.</target>
       </trans-unit>
       <trans-unit id="9198120062446364156" datatype="html">
         <source>Deleted template</source>
@@ -5670,7 +5670,7 @@
           <context context-type="sourcefile">src/app/components/manage/consumption-templates/consumption-templates.component.ts</context>
           <context context-type="linenumber">99</context>
         </context-group>
-        <target state="needs-translation">Deleted template</target>
+        <target state="translated">Шаблон видалено</target>
       </trans-unit>
       <trans-unit id="8513868194237937637" datatype="html">
         <source>Error deleting template.</source>
@@ -5678,7 +5678,7 @@
           <context context-type="sourcefile">src/app/components/manage/consumption-templates/consumption-templates.component.ts</context>
           <context context-type="linenumber">104</context>
         </context-group>
-        <target state="needs-translation">Error deleting template.</target>
+        <target state="translated">Помилка видалення шаблону.</target>
       </trans-unit>
       <trans-unit id="6316128875819022658" datatype="html">
         <source>correspondent</source>
@@ -5742,7 +5742,7 @@
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="needs-translation">Mail Settings</target>
+        <target state="translated">Налаштування пошти</target>
       </trans-unit>
       <trans-unit id="8913167930428886792" datatype="html">
         <source>Mail accounts</source>
@@ -5918,7 +5918,7 @@
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
           <context context-type="linenumber">212</context>
         </context-group>
-        <target state="needs-translation">Permissions updated</target>
+        <target state="translated">Права доступу оновлено</target>
       </trans-unit>
       <trans-unit id="4639647950943944112" datatype="html">
         <source>Error updating permissions</source>
@@ -5930,7 +5930,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">300</context>
         </context-group>
-        <target state="needs-translation">Error updating permissions</target>
+        <target state="translated">Помилка оновлення прав доступу</target>
       </trans-unit>
       <trans-unit id="4160063698699558716" datatype="html">
         <source><x id="START_TAG__SVG_SVG" ctype="x-_svg_svg" equiv-text="&lt;svg class=&quot;sidebaricon me-1&quot; fill=&quot;currentColor&quot;&gt;"/><x id="START_TAG__SVG_USE" ctype="x-_svg_use" equiv-text="&lt;use xlink:href=&quot;assets/bootstrap-icons.svg#plus-circle&quot; /&gt;"/><x id="CLOSE_TAG__SVG_USE" ctype="x-_svg_use" equiv-text="&lt;use xlink:href=&quot;assets/bootstrap-icons.svg#plus-circle&quot; /&gt;"/><x id="CLOSE_TAG__SVG_SVG" ctype="x-_svg_svg" equiv-text="&lt;/svg&gt;"/> Create </source>
@@ -5950,7 +5950,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
           <context context-type="linenumber">13,17</context>
         </context-group>
-        <target state="needs-translation"><x id="START_TAG__SVG_SVG" ctype="x-_svg_svg" equiv-text="&lt;svg class=&quot;sidebaricon me-1&quot; fill=&quot;currentColor&quot;&gt;"/><x id="START_TAG__SVG_USE" ctype="x-_svg_use" equiv-text="&lt;use xlink:href=&quot;assets/bootstrap-icons.svg#plus-circle&quot; /&gt;"/><x id="CLOSE_TAG__SVG_USE" ctype="x-_svg_use" equiv-text="&lt;use xlink:href=&quot;assets/bootstrap-icons.svg#plus-circle&quot; /&gt;"/><x id="CLOSE_TAG__SVG_SVG" ctype="x-_svg_svg" equiv-text="&lt;/svg&gt;"/> Create </target>
+        <target state="translated"><x id="START_TAG__SVG_SVG" ctype="x-_svg_svg" equiv-text="&lt;svg class=&quot;sidebaricon me-1&quot; fill=&quot;currentColor&quot;&gt;"/><x id="START_TAG__SVG_USE" ctype="x-_svg_use" equiv-text="&lt;use xlink:href=&quot;assets/bootstrap-icons.svg#plus-circle&quot; /&gt;"/><x id="CLOSE_TAG__SVG_USE" ctype="x-_svg_use" equiv-text="&lt;use xlink:href=&quot;assets/bootstrap-icons.svg#plus-circle&quot; /&gt;"/><x id="CLOSE_TAG__SVG_SVG" ctype="x-_svg_svg" equiv-text="&lt;/svg&gt;"/> Створити </target>
       </trans-unit>
       <trans-unit id="4010735610815226758" datatype="html">
         <source>Filter by:</source>
@@ -6130,7 +6130,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">293</context>
         </context-group>
-        <target state="needs-translation">Permissions updated successfully</target>
+        <target state="translated">Права доступу успішно оновлено</target>
       </trans-unit>
       <trans-unit id="5101757640976222639" datatype="html">
         <source>storage path</source>
