@@ -34,3 +34,24 @@
 .index-callout {
     margin-right: .5rem;
 }
+
+/* make code in headers not bold */
+h4 code {
+    font-weight: normal;
+}
+
+/* Hide config vars from sidebar, toc and move the border on mobile case their hidden */
+.md-nav.md-nav--secondary .md-nav__item .md-nav__link[href*="PAPERLESS_"],
+.md-nav.md-nav--secondary .md-nav__item .md-nav__link[href*="USERMAP_"] {
+    display: none;
+}
+
+@media screen and (max-width: 76.1875em) {
+    .md-nav--primary .md-nav__item {
+        border-top: none;
+    }
+
+    .md-nav--primary .md-nav__link {
+        border-top: .05rem solid var(--md-default-fg-color--lightest);
+    }
+}
