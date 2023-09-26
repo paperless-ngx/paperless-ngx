@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-19 14:30-0700\n"
-"PO-Revision-Date: 2023-09-26 12:25\n"
+"PO-Revision-Date: 2023-09-26 14:26\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -385,27 +385,27 @@ msgstr "Speicherpfad ist"
 
 #: documents/models.py:448
 msgid "has correspondent in"
-msgstr "Korrespondent ist"
+msgstr "hat Korrespondenten in"
 
 #: documents/models.py:449
 msgid "does not have correspondent in"
-msgstr "Korrespondent ist nicht"
+msgstr "hat keinen Korrespondenten in"
 
 #: documents/models.py:450
 msgid "has document type in"
-msgstr "Dokumenttyp ist"
+msgstr "hat Dokumenttyp in"
 
 #: documents/models.py:451
 msgid "does not have document type in"
-msgstr "Dokumenttyp ist nicht"
+msgstr "hat keinen Dokumenttyp in"
 
 #: documents/models.py:452
 msgid "has storage path in"
-msgstr "Speicherpfad ist"
+msgstr "hat Speicherpfad in"
 
 #: documents/models.py:453
 msgid "does not have storage path in"
-msgstr "Speicherpfad ist nicht"
+msgstr "hat keinen Speicherpfad in"
 
 #: documents/models.py:454
 msgid "owner is"
@@ -413,7 +413,7 @@ msgstr "Eigentümer ist"
 
 #: documents/models.py:455
 msgid "has owner in"
-msgstr "Eigentümer ist"
+msgstr "hat Eigentümer in"
 
 #: documents/models.py:456
 msgid "does not have owner"
@@ -421,7 +421,7 @@ msgstr "hat keinen Eigentümer"
 
 #: documents/models.py:457
 msgid "does not have owner in"
-msgstr "Eigentümer ist nicht"
+msgstr "hat keinen Eigentümer in"
 
 #: documents/models.py:467
 msgid "rule type"
@@ -537,7 +537,7 @@ msgstr "Original"
 
 #: documents/models.py:697
 msgid "expiration"
-msgstr "Gültigkeit"
+msgstr "Ablauf"
 
 #: documents/models.py:704
 msgid "slug"
