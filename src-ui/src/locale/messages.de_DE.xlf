@@ -1234,13 +1234,13 @@
         </context-group>
         <target state="final">Name</target>
       </trans-unit>
-      <trans-unit id="9187755754633397589" datatype="html">
+      <trans-unit id="9187755754633397589" datatype="html" approved="yes">
         <source> <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;visually-hidden&quot;&gt;"/>Appears on<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">291,292</context>
         </context-group>
-        <target state="translated"><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;visually-hidden&quot;&gt;"/>Erscheint auf<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
+        <target state="final"><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;visually-hidden&quot;&gt;"/>Erscheint auf<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
       </trans-unit>
       <trans-unit id="4104807402967139762" datatype="html" approved="yes">
         <source>Show on dashboard</source>
@@ -1768,37 +1768,37 @@
         </context-group>
         <target state="final">Alle <x id="PH" equiv-text="tasks.size"/> Aufgaben verwerfen?</target>
       </trans-unit>
-      <trans-unit id="9011556615675272238" datatype="html">
+      <trans-unit id="9011556615675272238" datatype="html" approved="yes">
         <source>queued</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">129</context>
         </context-group>
-        <target state="translated">ausstehend</target>
+        <target state="final">ausstehend</target>
       </trans-unit>
-      <trans-unit id="6415892379431855826" datatype="html">
+      <trans-unit id="6415892379431855826" datatype="html" approved="yes">
         <source>started</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">131</context>
         </context-group>
-        <target state="translated">gestartet</target>
+        <target state="final">gestartet</target>
       </trans-unit>
-      <trans-unit id="7510279840486540181" datatype="html">
+      <trans-unit id="7510279840486540181" datatype="html" approved="yes">
         <source>completed</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">133</context>
         </context-group>
-        <target state="translated">abgeschlossen</target>
+        <target state="final">abgeschlossen</target>
       </trans-unit>
-      <trans-unit id="4083337005045748464" datatype="html">
+      <trans-unit id="4083337005045748464" datatype="html" approved="yes">
         <source>failed</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">135</context>
         </context-group>
-        <target state="translated">fehlgeschlagen</target>
+        <target state="final">fehlgeschlagen</target>
       </trans-unit>
       <trans-unit id="8119815638230251386" datatype="html" approved="yes">
         <source>Users &amp; Groups</source>
@@ -2769,13 +2769,13 @@
         </context-group>
         <target state="final">Abbrechen</target>
       </trans-unit>
-      <trans-unit id="4626030417479279989" datatype="html">
+      <trans-unit id="4626030417479279989" datatype="html" approved="yes">
         <source>Consume Folder</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.ts</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="translated">Importordner</target>
+        <target state="final">Importordner</target>
       </trans-unit>
       <trans-unit id="526966086395145275" datatype="html" approved="yes">
         <source>API Upload</source>
@@ -3835,7 +3835,7 @@
         </context-group>
         <target state="final">Bitte wählen Sie ein Element aus</target>
       </trans-unit>
-      <trans-unit id="686374493515618129" datatype="html">
+      <trans-unit id="686374493515618129" datatype="html" approved="yes">
         <source>Share Links</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.html</context>
@@ -3845,7 +3845,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.ts</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="translated">Links teilen</target>
+        <target state="final">Link freigeben</target>
       </trans-unit>
       <trans-unit id="6617773613987957957" datatype="html" approved="yes">
         <source> No existing links </source>
@@ -3863,13 +3863,13 @@
         </context-group>
         <target state="final">Kopieren</target>
       </trans-unit>
-      <trans-unit id="7419704019640008953" datatype="html">
+      <trans-unit id="7419704019640008953" datatype="html" approved="yes">
         <source>Share</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.html</context>
           <context context-type="linenumber">28</context>
         </context-group>
-        <target state="translated">Teilen</target>
+        <target state="final">Freigeben</target>
       </trans-unit>
       <trans-unit id="5392341774767336507" datatype="html" approved="yes">
         <source>Copied!</source>
@@ -4198,13 +4198,13 @@
         <note priority="1" from="description">this string is used to separate processing, failed and added on the file upload widget</note>
         <target state="final">, </target>
       </trans-unit>
-      <trans-unit id="7915903586014997661" datatype="html">
+      <trans-unit id="7915903586014997661" datatype="html" approved="yes">
         <source>Paperless-ngx is running!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">2</context>
         </context-group>
-        <target state="translated">Paperless-ngx ist gestartet!</target>
+        <target state="final">Paperless-ngx wurde erfolgreich gestartet!</target>
       </trans-unit>
       <trans-unit id="3326049540711826572" datatype="html" approved="yes">
         <source>You&apos;re ready to start uploading documents! Explore the various features of this web app on your own, or start a quick tour using the button below.</source>
@@ -5452,13 +5452,13 @@
         </context-group>
         <target state="final">Eigentümer: <x id="PH" equiv-text="rule.value"/></target>
       </trans-unit>
-      <trans-unit id="3550877650686009106" datatype="html">
+      <trans-unit id="3550877650686009106" datatype="html" approved="yes">
         <source>Owner not in: <x id="PH" equiv-text="rule.value"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">164</context>
         </context-group>
-        <target state="translated">Eigentümer ist nicht: <x id="PH" equiv-text="rule.value"/></target>
+        <target state="final">Eigentümer nicht in: <x id="PH" equiv-text="rule.value"/></target>
       </trans-unit>
       <trans-unit id="1082034558646673343" datatype="html" approved="yes">
         <source>Without an owner</source>
@@ -5540,21 +5540,21 @@
         </context-group>
         <target state="final">Aktuelle Ansicht speichern</target>
       </trans-unit>
-      <trans-unit id="6965614903949668392" datatype="html">
+      <trans-unit id="6965614903949668392" datatype="html" approved="yes">
         <source>Filter rules error occurred while saving this view</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/save-view-config-dialog/save-view-config-dialog.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="translated">Fehlerhafte Filterregeln beim Speichern dieser Ansicht</target>
+        <target state="final">Beim Speichern dieser Ansicht ist ein Filterregelfehler aufgetreten</target>
       </trans-unit>
-      <trans-unit id="6438839705789707938" datatype="html">
+      <trans-unit id="6438839705789707938" datatype="html" approved="yes">
         <source>The error returned was</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/save-view-config-dialog/save-view-config-dialog.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="translated">Der zurückgegebene Fehler war</target>
+        <target state="final">Der zurückgegebene Fehler war</target>
       </trans-unit>
       <trans-unit id="1044349881182559852" datatype="html" approved="yes">
         <source>Enter note</source>
@@ -6084,13 +6084,13 @@
         </context-group>
         <target state="final"><x id="PH" equiv-text="this.typeName"/> erfolgreich erstellt.</target>
       </trans-unit>
-      <trans-unit id="3928835053823658072" datatype="html">
+      <trans-unit id="3928835053823658072" datatype="html" approved="yes">
         <source>Error occurred while creating <x id="PH" equiv-text="this.typeName"/>.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">163</context>
         </context-group>
-        <target state="translated">Fehler beim Erstellen von <x id="PH" equiv-text="this.typeName"/>.</target>
+        <target state="final">Fehler beim Erstellen von <x id="PH" equiv-text="this.typeName"/>.</target>
       </trans-unit>
       <trans-unit id="2541368547549828690" datatype="html" approved="yes">
         <source>Successfully updated <x id="PH" equiv-text="this.typeName"/>.</source>
@@ -6100,13 +6100,13 @@
         </context-group>
         <target state="final"><x id="PH" equiv-text="this.typeName"/> erfolgreich aktualisiert.</target>
       </trans-unit>
-      <trans-unit id="6442673774206210733" datatype="html">
+      <trans-unit id="6442673774206210733" datatype="html" approved="yes">
         <source>Error occurred while saving <x id="PH" equiv-text="this.typeName"/>.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">183</context>
         </context-group>
-        <target state="translated">Fehler beim Speichern von <x id="PH" equiv-text="this.typeName"/>.</target>
+        <target state="final">Fehler beim Speichern von <x id="PH" equiv-text="this.typeName"/>.</target>
       </trans-unit>
       <trans-unit id="8371896857609524947" datatype="html" approved="yes">
         <source>Associated documents will not be deleted.</source>
@@ -6388,13 +6388,13 @@
         </context-group>
         <target state="final">(kein Titel)</target>
       </trans-unit>
-      <trans-unit id="5739581984228459958" datatype="html">
+      <trans-unit id="5739581984228459958" datatype="html" approved="yes">
         <source>Shared</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/pipes/username.pipe.ts</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="translated">Geteilt</target>
+        <target state="final">Freigegeben</target>
       </trans-unit>
       <trans-unit id="2807800733729323332" datatype="html" approved="yes">
         <source>Yes</source>
