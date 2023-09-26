@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-19 14:30-0700\n"
-"PO-Revision-Date: 2023-09-26 09:26\n"
+"PO-Revision-Date: 2023-09-26 11:21\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -27,7 +27,7 @@ msgstr "Eigentümer"
 
 #: documents/models.py:53
 msgid "None"
-msgstr "Nichts"
+msgstr "Keiner"
 
 #: documents/models.py:54
 msgid "Any word"
@@ -493,11 +493,11 @@ msgstr "Startdatum/-zeit"
 
 #: documents/models.py:622
 msgid "Datetime field when the task was started in UTC"
-msgstr "Zeitpunkt, als die Aufgabe erstellt wurde (in UTC)"
+msgstr "Zeitpunkt, an dem die Aufgabe erstellt wurde (in UTC)"
 
 #: documents/models.py:627
 msgid "Completed DateTime"
-msgstr "Abgeschlossen Datum/Zeit"
+msgstr "Abschlussdatum/-zeit"
 
 #: documents/models.py:628
 msgid "Datetime field when the task was completed in UTC"
@@ -581,7 +581,7 @@ msgstr "Pfad filtern"
 
 #: documents/models.py:771
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
-msgstr "Nur Dokumente verarbeiten, deren Pfad diesem entspricht, falls angegeben. Platzhalter wie * sind erlaubt. Groß- und Kleinschreibung wird nicht beachtet."
+msgstr "Nur Dokumente mit einem übereinstimmenden Pfad (falls angegeben) verarbeiten. Platzhalter wie * sind erlaubt. Groß- und Kleinschreibung wird nicht beachtet."
 
 #: documents/models.py:778
 msgid "filter filename"
