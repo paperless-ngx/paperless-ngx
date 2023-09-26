@@ -92,13 +92,13 @@
         </context-group>
         <target state="final">«</target>
       </trans-unit>
-      <trans-unit id="ngb.carousel.previous" datatype="html">
+      <trans-unit id="ngb.carousel.previous" datatype="html" approved="yes">
         <source>Previous</source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="translated">Vorherige</target>
+        <target state="final">Vorherige</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.MM" datatype="html" approved="yes">
         <source>MM</source>
@@ -140,13 +140,13 @@
         </context-group>
         <target state="final">Nächster Monat</target>
       </trans-unit>
-      <trans-unit id="ngb.carousel.next" datatype="html">
+      <trans-unit id="ngb.carousel.next" datatype="html" approved="yes">
         <source>Next</source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="translated">Weiter</target>
+        <target state="final">Nächste</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.minutes" datatype="html" approved="yes">
         <source>Minutes</source>
@@ -172,21 +172,21 @@
         </context-group>
         <target state="final">Stunden erhöhen</target>
       </trans-unit>
-      <trans-unit id="ngb.pagination.first-aria" datatype="html">
+      <trans-unit id="ngb.pagination.first-aria" datatype="html" approved="yes">
         <source>First</source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="translated">Erste</target>
+        <target state="final">Erste</target>
       </trans-unit>
-      <trans-unit id="ngb.pagination.previous-aria" datatype="html">
+      <trans-unit id="ngb.pagination.previous-aria" datatype="html" approved="yes">
         <source>Previous</source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="translated">Vorherige</target>
+        <target state="final">Vorherige</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.decrement-hours" datatype="html" approved="yes">
         <source>Decrement hours</source>
@@ -196,13 +196,13 @@
         </context-group>
         <target state="final">Stunden verringern</target>
       </trans-unit>
-      <trans-unit id="ngb.pagination.next-aria" datatype="html">
+      <trans-unit id="ngb.pagination.next-aria" datatype="html" approved="yes">
         <source>Next</source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="translated">Nächste</target>
+        <target state="final">Nächste</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.increment-minutes" datatype="html" approved="yes">
         <source>Increment minutes</source>
@@ -212,13 +212,13 @@
         </context-group>
         <target state="final">Minuten erhöhen</target>
       </trans-unit>
-      <trans-unit id="ngb.pagination.last-aria" datatype="html">
+      <trans-unit id="ngb.pagination.last-aria" datatype="html" approved="yes">
         <source>Last</source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="translated">Letzte</target>
+        <target state="final">Letzte</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.decrement-minutes" datatype="html" approved="yes">
         <source>Decrement minutes</source>
@@ -346,15 +346,15 @@
         </context-group>
         <target state="final">Dokument <x id="PH" equiv-text="status.filename"/> wird von Paperless verarbeitet.</target>
       </trans-unit>
-      <trans-unit id="2501522447884928778" datatype="html">
+      <trans-unit id="2501522447884928778" datatype="html" approved="yes">
         <source>Prev</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">138</context>
         </context-group>
-        <target state="translated">Zurück</target>
+        <target state="final">Zurück</target>
       </trans-unit>
-      <trans-unit id="3885497195825665706" datatype="html">
+      <trans-unit id="3885497195825665706" datatype="html" approved="yes">
         <source>Next</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
@@ -364,15 +364,15 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">65</context>
         </context-group>
-        <target state="translated">Weiter</target>
+        <target state="final">Nächstes</target>
       </trans-unit>
-      <trans-unit id="1241348629231510663" datatype="html">
+      <trans-unit id="1241348629231510663" datatype="html" approved="yes">
         <source>End</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">140</context>
         </context-group>
-        <target state="translated">Ende</target>
+        <target state="final">Ende</target>
       </trans-unit>
       <trans-unit id="3909462337752654810" datatype="html" approved="yes">
         <source>The dashboard can be used to show saved views, such as an &apos;Inbox&apos;. Those settings are found under Settings &gt; Saved Views once you have created some.</source>
@@ -422,21 +422,21 @@
         </context-group>
         <target state="final">Tags, Korrespondenten, Dokumententypen und Speicherpfade können über diese Seiten verwaltet werden. Sie können auch beim Bearbeiten von Dokumenten erstellt werden.</target>
       </trans-unit>
-      <trans-unit id="7851939076947092983" datatype="html">
+      <trans-unit id="7851939076947092983" datatype="html" approved="yes">
         <source>Manage e-mail accounts and rules for automatically importing documents.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">184</context>
         </context-group>
-        <target state="translated">Verwalten Sie E-Mail-Konten und Regeln für den automatischen Import von Dokumenten.</target>
+        <target state="final">Verwalten Sie E-Mail-Konten und Regeln für den automatischen Import von Dokumenten.</target>
       </trans-unit>
-      <trans-unit id="1347174817382304718" datatype="html">
+      <trans-unit id="1347174817382304718" datatype="html" approved="yes">
         <source>Consumption templates give you finer control over the document ingestion process.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">192</context>
         </context-group>
-        <target state="translated">Verarbeitungsvorlagen geben Ihnen eine bessere Kontrolle über die Dokumentenverarbeitung beim Import.</target>
+        <target state="final">Verarbeitungsvorlagen geben Ihnen eine bessere Kontrolle über die Dokumentenverarbeitung beim Import.</target>
       </trans-unit>
       <trans-unit id="4680387114119209483" datatype="html" approved="yes">
         <source>File Tasks shows you documents that have been consumed, are waiting to be, or may have failed during the process.</source>
@@ -446,13 +446,13 @@
         </context-group>
         <target state="final">Die Dateiaufgaben zeigen Ihnen Dokumente, die verarbeitet wurden, auf Verarbeitung warten oder während der Verarbeitung fehlgeschlagen sind.</target>
       </trans-unit>
-      <trans-unit id="1453710303796913192" datatype="html">
+      <trans-unit id="1453710303796913192" datatype="html" approved="yes">
         <source>Check out the settings for various tweaks to the web app and toggle settings for saved views.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">208</context>
         </context-group>
-        <target state="translated">Überprüfen Sie die Einstellungen für diverse Verbesserung der Webanwendung und ändern Sie die Einstellungen für gespeicherte Ansichten.</target>
+        <target state="final">Überprüfen Sie die Einstellungen für diverse Verbesserung der Webanwendung und ändern Sie die Einstellungen für gespeicherte Ansichten.</target>
       </trans-unit>
       <trans-unit id="7172877665285340082" datatype="html" approved="yes">
         <source>Thank you! 🙏</source>
@@ -470,21 +470,21 @@
         </context-group>
         <target state="final">Es gibt noch &lt;em&gt;erheblich&lt;/em&gt; mehr Funktionen und Informationen, die mit der Tour nicht abgedeckt wurden. Nach der Tour sollten Sie jedoch direkt loslegen können. Schauen Sie sich die Dokumentation an oder besuchen Sie das Projekt auf GitHub, um mehr zu erfahren oder Probleme zu melden.</target>
       </trans-unit>
-      <trans-unit id="4270528545616947218" datatype="html">
+      <trans-unit id="4270528545616947218" datatype="html" approved="yes">
         <source>Lastly, on behalf of every contributor to this community-supported project, thank you for using Paperless-ngx!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">220</context>
         </context-group>
-        <target state="translated">Im Namen eines jeden Beitragenden zu diesem von der Gemeinschaft unterstützten Projekt, sagen wir Danke, dass Sie Paperless-ngx benutzen!</target>
+        <target state="final">Wir bedanken uns im Namen aller Mitwirkenden dieses gemeinschaftlich unterstützten Projekts, dass Sie Paperless-ngx benutzen!</target>
       </trans-unit>
-      <trans-unit id="5749300816154614125" datatype="html">
+      <trans-unit id="5749300816154614125" datatype="html" approved="yes">
         <source>Initiating upload...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">289</context>
         </context-group>
-        <target state="translated">Starte Upload...</target>
+        <target state="final">Beginne Upload...</target>
       </trans-unit>
       <trans-unit id="4804785061014590286" datatype="html" approved="yes">
         <source>Logs</source>
@@ -502,7 +502,7 @@
         </context-group>
         <target state="final">Protokolle</target>
       </trans-unit>
-      <trans-unit id="3894950702316166331" datatype="html">
+      <trans-unit id="3894950702316166331" datatype="html" approved="yes">
         <source>Loading...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/logs/logs.component.html</context>
@@ -568,7 +568,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
           <context context-type="linenumber">52</context>
         </context-group>
-        <target state="translated">Lädt...</target>
+        <target state="final">Wird geladen...</target>
       </trans-unit>
       <trans-unit id="4930506384627295710" datatype="html" approved="yes">
         <source>Settings</source>
@@ -930,13 +930,13 @@
         </context-group>
         <target state="final">Standardberechtigungen</target>
       </trans-unit>
-      <trans-unit id="8222269449891326545" datatype="html">
+      <trans-unit id="8222269449891326545" datatype="html" approved="yes">
         <source> Settings apply to this user account for objects (Tags, Mail Rules, etc.) created via the web UI </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">178,180</context>
         </context-group>
-        <target state="translated"> Einstellungen gelten für dieses Benutzerkonto für Objekte (Tags, E-Mail-Regeln, etc.), die über die Weboberfläche erstellt wurden </target>
+        <target state="final"> Einstellungen gelten für dieses Benutzerkonto für Objekte (Tags, E-Mail-Regeln, etc.), die über die Weboberfläche erstellt wurden </target>
       </trans-unit>
       <trans-unit id="4292903881380648974" datatype="html" approved="yes">
         <source>Default Owner</source>
@@ -1240,7 +1240,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">291,292</context>
         </context-group>
-        <target state="translated"><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;visually-hidden&quot;&gt;"/>Erscheint bei<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
+        <target state="translated"><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;visually-hidden&quot;&gt;"/>Erscheint auf<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
       </trans-unit>
       <trans-unit id="4104807402967139762" datatype="html" approved="yes">
         <source>Show on dashboard</source>
@@ -4310,13 +4310,13 @@
         </context-group>
         <target state="final">Schließen</target>
       </trans-unit>
-      <trans-unit id="4452427314943113135" datatype="html">
+      <trans-unit id="4452427314943113135" datatype="html" approved="yes">
         <source>Previous</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">60</context>
         </context-group>
-        <target state="translated">Zurück</target>
+        <target state="final">Vorheriges</target>
       </trans-unit>
       <trans-unit id="5028777105388019087" datatype="html" approved="yes">
         <source>Details</source>
@@ -4778,21 +4778,21 @@
         </context-group>
         <target state="translated">Einbeziehen:</target>
       </trans-unit>
-      <trans-unit id="1208547554603365604" datatype="html">
+      <trans-unit id="1208547554603365604" datatype="html" approved="yes">
         <source> Archived files </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">112,114</context>
         </context-group>
-        <target state="translated"> Archivierte Dateien </target>
+        <target state="final"> Archivierte Dateien </target>
       </trans-unit>
-      <trans-unit id="6791570188945688785" datatype="html">
+      <trans-unit id="6791570188945688785" datatype="html" approved="yes">
         <source> Original files </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">118,120</context>
         </context-group>
-        <target state="translated"> Originaldateien </target>
+        <target state="final"> Originaldateien </target>
       </trans-unit>
       <trans-unit id="3608345051493493574" datatype="html">
         <source> Use formatted filename </source>
@@ -6064,7 +6064,7 @@
         </context-group>
         <target state="final">Automatisch</target>
       </trans-unit>
-      <trans-unit id="6252070156626006029" datatype="html">
+      <trans-unit id="6252070156626006029" datatype="html" approved="yes">
         <source>None</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
@@ -6074,7 +6074,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="translated">Keine</target>
+        <target state="final">Keiner</target>
       </trans-unit>
       <trans-unit id="211408744872436427" datatype="html" approved="yes">
         <source>Successfully created <x id="PH" equiv-text="this.typeName"/>.</source>
