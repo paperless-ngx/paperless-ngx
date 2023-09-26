@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-19 14:30-0700\n"
-"PO-Revision-Date: 2023-09-26 11:21\n"
+"PO-Revision-Date: 2023-09-26 12:25\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -505,7 +505,7 @@ msgstr "Zeitpunkt, an dem die Aufgabe abgeschlossen wurde (in UTC)"
 
 #: documents/models.py:633
 msgid "Result Data"
-msgstr "Ergebnisse"
+msgstr "Ergebnisdaten"
 
 #: documents/models.py:635
 msgid "The data returned by the task"
@@ -601,7 +601,7 @@ msgstr "Titel zuweisen"
 
 #: documents/models.py:803
 msgid "Assign a document title, can include some placeholders, see documentation."
-msgstr "Weisen Sie einen Dokumententitel zu. Dieser kann Platzhalter beinhalten, siehe Dokumenation."
+msgstr "Weisen Sie einen Dokumententitel zu. Dieser kann Platzhalter beinhalten, siehe Dokumentation."
 
 #: documents/models.py:811 paperless_mail/models.py:204
 msgid "assign this tag"
