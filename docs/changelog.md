@@ -1,5 +1,15 @@
 # Changelog
 
+## paperless-ngx 1.17.4
+
+### Bug Fixes
+
+- Fix: ghostscript rendering error doesnt trigger frontend failure message [@shamoon](https://github.com/shamoon) ([#4092](https://github.com/paperless-ngx/paperless-ngx/pull/4092))
+
+### All App Changes
+
+- Fix: ghostscript rendering error doesnt trigger frontend failure message [@shamoon](https://github.com/shamoon) ([#4092](https://github.com/paperless-ngx/paperless-ngx/pull/4092))
+
 ## paperless-ngx 1.17.3
 
 ### Bug Fixes
