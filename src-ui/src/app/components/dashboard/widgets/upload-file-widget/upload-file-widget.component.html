@@ -3,7 +3,7 @@
     <form class="justify-content-center d-flex flex-column align-items-center py-3 px-2">
       <span class="text-muted" i18n>Drop documents anywhere or</span>
       <button class="btn btn-sm btn-outline-primary mt-3" (click)="fileUpload.click()" i18n>Browse files</button>
-      <input type="file" class="visually-hidden" (change)="onFileSelected($event)" #fileUpload>
+      <input type="file" class="visually-hidden" (change)="onFileSelected($event)" multiple #fileUpload>
     </form>
     <div class="fixed-bottom p-2 p-md-4" [ngClass]="slimSidebarEnabled ? 'col-slim' : 'offset-md-3 offset-lg-2'">
       <div class="row d-flex justify-content-end">

@@ -134,4 +134,35 @@ describe('UploadDocumentsService', () => {
       consumerStatusService.getConsumerStatus(FileStatusPhase.FAILED)
     ).toHaveLength(2)
   })
+
+  it('accepts files via drag and drop', () => {
+    const uploadSpy = jest.spyOn(
+      UploadDocumentsService.prototype as any,
+      'uploadFile'
+    )
+    const fileEntry = {
+      name: 'file.pdf',
+      isDirectory: false,
+      isFile: true,
+      file: (callback) => {
+        return callback(
+          new File(
+            [new Blob(['testing'], { type: 'application/pdf' })],
+            'file.pdf'
+          )
+        )
+      },
+    }
+    uploadDocumentsService.onNgxFileDrop([
+      {
+        relativePath: 'path/to/file.pdf',
+        fileEntry,
+      },
+    ])
+    expect(uploadSpy).toHaveBeenCalled()
+
+    let req = httpTestingController.match(
+      `${environment.apiBaseUrl}documents/post_document/`
+    )
+  })
 })

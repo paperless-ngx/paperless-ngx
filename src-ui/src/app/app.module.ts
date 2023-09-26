@@ -35,6 +35,7 @@ import { DateDropdownComponent } from './components/common/date-dropdown/date-dr
 import { DocumentCardLargeComponent } from './components/document-list/document-card-large/document-card-large.component'
 import { DocumentCardSmallComponent } from './components/document-list/document-card-small/document-card-small.component'
 import { BulkEditorComponent } from './components/document-list/bulk-editor/bulk-editor.component'
+import { NgxFileDropModule } from 'ngx-file-drop'
 import { TextComponent } from './components/common/input/text/text.component'
 import { SelectComponent } from './components/common/input/select/select.component'
 import { CheckComponent } from './components/common/input/check/check.component'
@@ -99,7 +100,6 @@ import { ConsumptionTemplateEditDialogComponent } from './components/common/edit
 import { MailComponent } from './components/manage/mail/mail.component'
 import { UsersAndGroupsComponent } from './components/admin/users-groups/users-groups.component'
 import { DndModule } from 'ngx-drag-drop'
-import { FileDropComponent } from './components/file-drop/file-drop.component'
 
 import localeAf from '@angular/common/locales/af'
 import localeAr from '@angular/common/locales/ar'
@@ -242,7 +242,6 @@ function initializeApp(settings: SettingsService) {
     ConsumptionTemplateEditDialogComponent,
     MailComponent,
     UsersAndGroupsComponent,
-    FileDropComponent,
   ],
   imports: [
     BrowserModule,
@@ -251,6 +250,7 @@ function initializeApp(settings: SettingsService) {
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
+    NgxFileDropModule,
     PdfViewerModule,
     NgSelectModule,
     ColorSliderModule,
