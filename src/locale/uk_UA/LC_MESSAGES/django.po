@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-19 14:30-0700\n"
-"PO-Revision-Date: 2023-09-23 00:11\n"
+"PO-Revision-Date: 2023-09-26 18:20\n"
 "Last-Translator: \n"
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
@@ -529,11 +529,11 @@ msgstr ""
 
 #: documents/models.py:685
 msgid "Archive"
-msgstr ""
+msgstr "Архів"
 
 #: documents/models.py:686
 msgid "Original"
-msgstr ""
+msgstr "Оригінал"
 
 #: documents/models.py:697
 msgid "expiration"
@@ -727,7 +727,7 @@ msgstr "Арабська"
 
 #: paperless/settings.py:575
 msgid "Afrikaans"
-msgstr ""
+msgstr "Африкаанс"
 
 #: paperless/settings.py:576
 msgid "Belarusian"
@@ -735,7 +735,7 @@ msgstr "Білоруська"
 
 #: paperless/settings.py:577
 msgid "Catalan"
-msgstr ""
+msgstr "Каталонська"
 
 #: paperless/settings.py:578
 msgid "Czech"
@@ -751,7 +751,7 @@ msgstr "Німецька"
 
 #: paperless/settings.py:581
 msgid "Greek"
-msgstr ""
+msgstr "Грецька"
 
 #: paperless/settings.py:582
 msgid "English (GB)"
@@ -763,7 +763,7 @@ msgstr "Іспанська"
 
 #: paperless/settings.py:584
 msgid "Finnish"
-msgstr ""
+msgstr "Фінська"
 
 #: paperless/settings.py:585
 msgid "French"
@@ -779,7 +779,7 @@ msgstr "Люксембурзька"
 
 #: paperless/settings.py:588
 msgid "Norwegian"
-msgstr ""
+msgstr "Норвезька"
 
 #: paperless/settings.py:589
 msgid "Dutch"
@@ -807,7 +807,7 @@ msgstr "Російська"
 
 #: paperless/settings.py:595
 msgid "Slovak"
-msgstr ""
+msgstr "Словацька"
 
 #: paperless/settings.py:596
 msgid "Slovenian"
@@ -827,7 +827,7 @@ msgstr "Турецька"
 
 #: paperless/settings.py:600
 msgid "Ukrainian"
-msgstr ""
+msgstr "Українська"
 
 #: paperless/settings.py:601
 msgid "Chinese Simplified"
