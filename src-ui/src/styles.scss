@@ -505,27 +505,24 @@ table.table {
   user-select: none !important;
   text-align: center;
   padding-top: 25%;
+  opacity: 0;
+  transition: opacity 0.05s linear;
 
   h2 {
     color: var(--pngx-primary-text-contrast)
   }
-
-  &.show {
-    opacity: 1 !important;
-  }
-
-  &.hide {
-    display: none;
-  }
 }
 
-.ngx-file-drop__drop-zone--over .global-dropzone-overlay {
-  opacity: 0;
-}
+.ngx-file-drop__drop-zone--over {
+  .global-dropzone-overlay {
+    opacity: 1;
+    pointer-events: all !important;
+  }
 
-.inert {
-  pointer-events: none !important;
-  user-select: none !important;
+  .main-wrapper {
+    pointer-events: none !important;
+    user-select: none !important;
+  }
 }
 
 .alert-primary {

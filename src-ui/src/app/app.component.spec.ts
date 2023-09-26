@@ -149,19 +149,17 @@ describe('AppComponent', () => {
   })
 
   it('should support drag drop', fakeAsync(() => {
-    expect(component.fileIsOver).toBeFalsy()
+    expect(settingsService.globalDropzoneActive).toBeFalsy()
     component.fileOver()
     tick(1)
     fixture.detectChanges()
-    expect(component.fileIsOver).toBeTruthy()
+    expect(settingsService.globalDropzoneActive).toBeTruthy()
     const dropzone = fixture.debugElement.query(
       By.css('.global-dropzone-overlay')
     )
     expect(dropzone).not.toBeNull()
-    component.fileLeave()
     tick(700)
     fixture.detectChanges()
-    expect(dropzone.classes['hide']).toBeTruthy()
     // drop
     const toastSpy = jest.spyOn(toastService, 'show')
     const uploadSpy = jest.spyOn(uploadDocumentsService, 'onNgxFileDrop')
@@ -173,6 +171,7 @@ describe('AppComponent', () => {
         },
       } as unknown as NgxFileDropEntry,
     ])
+    expect(settingsService.globalDropzoneActive).toBeFalsy()
     tick(3000)
     expect(toastSpy).toHaveBeenCalled()
     expect(uploadSpy).toHaveBeenCalled()
