@@ -76,9 +76,9 @@ export class FileDropComponent {
     if (!this.dragDropEnabled) return
     event.preventDefault()
     event.stopImmediatePropagation()
-    this.onDragLeave(event, true)
     // pass event onto ngx-file-drop to handle files
     this.ngxFileDrop.dropFiles(event)
+    this.onDragLeave(event, true)
   }
 
   public dropped(files: NgxFileDropEntry[]) {
