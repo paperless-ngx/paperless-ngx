@@ -57,8 +57,8 @@ export class FileDropComponent {
     immediate: boolean = false
   ) {
     if (!this.dragDropEnabled) return
-    event.preventDefault()
-    event.stopImmediatePropagation()
+    event?.preventDefault()
+    event?.stopImmediatePropagation()
     this.settings.globalDropzoneActive = false
 
     const ms = immediate ? 0 : 500
@@ -85,5 +85,14 @@ export class FileDropComponent {
     this.uploadDocumentsService.onNgxFileDrop(files)
     if (files.length > 0)
       this.toastService.showInfo($localize`Initiating upload...`, 3000)
+  }
+
+  @HostListener('window:blur', ['$event']) public onWindowBlur() {
+    if (this.fileIsOver) this.onDragLeave(null)
+  }
+
+  @HostListener('document:visibilitychange', ['$event'])
+  public onVisibilityChange() {
+    if (document.hidden && this.fileIsOver) this.onDragLeave(null)
   }
 }

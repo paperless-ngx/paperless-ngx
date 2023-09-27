@@ -4,6 +4,7 @@ import {
   TestBed,
   discardPeriodicTasks,
   fakeAsync,
+  flush,
   tick,
 } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
@@ -144,5 +145,33 @@ describe('FileDropComponent', () => {
     expect(settingsService.globalDropzoneActive).toBeTruthy()
     component.onDrop(new Event('drop') as DragEvent)
     expect(settingsService.globalDropzoneActive).toBeTruthy()
+  }))
+
+  it('should hide if app loses focus', fakeAsync(() => {
+    const leaveSpy = jest.spyOn(component, 'onDragLeave')
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    settingsService.globalDropzoneEnabled = true
+    component.onDragOver(new Event('dragover') as DragEvent)
+    tick(1)
+    expect(component.hidden).toBeFalsy()
+    expect(component.fileIsOver).toBeTruthy()
+    jest.spyOn(document, 'hidden', 'get').mockReturnValue(true)
+    component.onVisibilityChange()
+    expect(leaveSpy).toHaveBeenCalled()
+    flush()
+  }))
+
+  it('should hide on window blur', fakeAsync(() => {
+    const leaveSpy = jest.spyOn(component, 'onDragLeave')
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    settingsService.globalDropzoneEnabled = true
+    component.onDragOver(new Event('dragover') as DragEvent)
+    tick(1)
+    expect(component.hidden).toBeFalsy()
+    expect(component.fileIsOver).toBeTruthy()
+    jest.spyOn(document, 'hidden', 'get').mockReturnValue(true)
+    component.onWindowBlur()
+    expect(leaveSpy).toHaveBeenCalled()
+    flush()
   }))
 })
