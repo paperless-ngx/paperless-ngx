@@ -517,6 +517,10 @@ table.table {
   .global-dropzone-overlay {
     opacity: 1;
     pointer-events: all !important;
+
+    * {
+      pointer-events: none;
+    }
   }
 
   .main-wrapper {
