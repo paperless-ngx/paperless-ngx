@@ -100,6 +100,7 @@ import { ConsumptionTemplateEditDialogComponent } from './components/common/edit
 import { MailComponent } from './components/manage/mail/mail.component'
 import { UsersAndGroupsComponent } from './components/admin/users-groups/users-groups.component'
 import { DndModule } from 'ngx-drag-drop'
+import { FileDropComponent } from './components/file-drop/file-drop.component'
 
 import localeAf from '@angular/common/locales/af'
 import localeAr from '@angular/common/locales/ar'
@@ -242,6 +243,7 @@ function initializeApp(settings: SettingsService) {
     ConsumptionTemplateEditDialogComponent,
     MailComponent,
     UsersAndGroupsComponent,
+    FileDropComponent,
   ],
   imports: [
     BrowserModule,

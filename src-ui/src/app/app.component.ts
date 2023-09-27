@@ -5,8 +5,6 @@ import { Router } from '@angular/router'
 import { Subscription, first } from 'rxjs'
 import { ConsumerStatusService } from './services/consumer-status.service'
 import { ToastService } from './services/toast.service'
-import { NgxFileDropEntry } from 'ngx-file-drop'
-import { UploadDocumentsService } from './services/upload-documents.service'
 import { TasksService } from './services/tasks.service'
 import { TourService } from 'ngx-ui-tour-ng-bootstrap'
 import {
@@ -30,7 +28,6 @@ export class AppComponent implements OnInit, OnDestroy {
     private consumerStatusService: ConsumerStatusService,
     private toastService: ToastService,
     private router: Router,
-    private uploadDocumentsService: UploadDocumentsService,
     private tasksService: TasksService,
     public tourService: TourService,
     private renderer: Renderer2,
@@ -245,30 +242,5 @@ export class AppComponent implements OnInit, OnDestroy {
         }, 500)
       })
     })
-  }
-
-  public get dragDropEnabled(): boolean {
-    return (
-      this.settings.globalDropzoneEnabled &&
-      this.permissionsService.currentUserCan(
-        PermissionAction.Add,
-        PermissionType.Document
-      )
-    )
-  }
-
-  public fileOver() {
-    this.settings.globalDropzoneActive = true
-  }
-
-  public fileLeave() {
-    this.settings.globalDropzoneActive = false
-  }
-
-  public dropped(files: NgxFileDropEntry[]) {
-    this.fileLeave()
-    this.uploadDocumentsService.onNgxFileDrop(files)
-    if (files.length > 0)
-      this.toastService.showInfo($localize`Initiating upload...`, 3000)
   }
 }
