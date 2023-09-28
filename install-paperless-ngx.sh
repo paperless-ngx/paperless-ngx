@@ -38,7 +38,6 @@ ask_docker_folder() {
 			echo "Invalid folder: $result"
 		fi
 
-
 	done
 }
 
@@ -321,7 +320,8 @@ fi
 wget "https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/docker/compose/docker-compose.$DOCKER_COMPOSE_VERSION.yml" -O docker-compose.yml
 wget "https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/docker/compose/.env" -O .env
 
-SECRET_KEY=$(tr --delete --complement 'a-zA-Z0-9' < /dev/urandom 2>/dev/null | head --bytes 64)
+SECRET_KEY=$(LC_ALL=C tr -dc 'a-zA-Z0-9!"#$%&'\''()*+,-./:;<=>?@[\]^_`{|}~' < /dev/urandom | head --bytes 64)
+
 
 DEFAULT_LANGUAGES=("deu eng fra ita spa")
 
