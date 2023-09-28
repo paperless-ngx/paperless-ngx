@@ -1,22 +1,38 @@
-<pngx-widget-frame [title]="savedView.name" [loading]="loading">
+<pngx-widget-frame
+  *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }"
+  [title]="savedView.name"
+  [loading]="loading"
+  [draggable]="savedView"
+  (dndStart)="dndStart.emit($event)"
+  (dndMoved)="dndMoved.emit($event)"
+  (dndCanceled)="dndCanceled.emit($event)"
+  (dndEnd)="dndEnd.emit($event)"
+>
 
-  <a class="btn-link" header-buttons [routerLink]="[]" (click)="showAll()" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }" i18n>Show all</a>
+  <a *ngIf="documents.length" class="btn-link" header-buttons [routerLink]="[]" (click)="showAll()" i18n>Show all</a>
 
-
-  <table content class="table table-sm table-hover table-borderless mb-0">
+  <table *ngIf="documents.length; else empty" content class="table table-hover mb-0 align-middle">
     <thead>
       <tr>
         <th scope="col" i18n>Created</th>
         <th scope="col" i18n>Title</th>
+        <th scope="col" class="d-none d-md-table-cell" i18n>Tags</th>
+        <th scope="col" class="d-none d-md-table-cell" i18n>Correspondent</th>
       </tr>
     </thead>
-    <tbody *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
+    <tbody>
       <tr *ngFor="let doc of documents" (mouseleave)="mouseLeaveCard()">
-        <td><a routerLink="/documents/{{doc.id}}" class="d-block text-dark text-decoration-none">{{doc.created_date | customDate}}</a></td>
-        <td class="position-relative">
-          <a routerLink="/documents/{{doc.id}}" title="Edit" i18n-title class="d-block text-dark text-decoration-none">{{doc.title | documentTitle}}<pngx-tag [tag]="t" *ngFor="let t of doc.tags$ | async" class="ms-1" (click)="clickTag(t, $event)"></pngx-tag></a>
+        <td class="py-2 py-md-3"><a routerLink="/documents/{{doc.id}}" class="btn-link text-dark text-decoration-none">{{doc.created_date | customDate}}</a></td>
+        <td class="py-2 py-md-3">
+          <a routerLink="/documents/{{doc.id}}" title="Edit" i18n-title class="btn-link text-dark text-decoration-none">{{doc.title | documentTitle}}</a>
+        </td>
+        <td class="py-2 py-md-3 d-none d-md-table-cell">
+          <pngx-tag [tag]="t" *ngFor="let t of doc.tags$ | async" class="ms-1" (click)="clickTag(t, $event)"></pngx-tag>
+        </td>
+        <td class="position-relative py-2 py-md-3 d-none d-md-table-cell">
+          <a *ngIf="doc.correspondent !== null" class="btn-link" routerLink="/documents" [queryParams]="getCorrespondentQueryParams(doc.correspondent)">{{(doc.correspondent$ | async)?.name}}</a>
           <div class="btn-group position-absolute top-50 end-0 translate-middle-y">
-            <a [href]="getPreviewUrl(doc)" title="View Preview" i18n-title target="_blank" class="btn btn-sm px-4 py-0 btn-dark border-dark-subtle"
+            <a [href]="getPreviewUrl(doc)" title="View Preview" i18n-title target="_blank" class="btn px-4 btn-dark border-dark-subtle"
             [ngbPopover]="previewContent" [popoverTitle]="doc.title | documentTitle"
             autoClose="true" popoverClass="shadow popover-preview" container="body" (mouseenter)="mouseEnterPreview(doc)" (mouseleave)="mouseLeavePreview()" #popover="ngbPopover">
               <svg class="buttonicon-xs" fill="currentColor">
@@ -26,7 +42,7 @@
             <ng-template #previewContent>
               <object [data]="getPreviewUrl(doc) | safeUrl" class="preview" width="100%"></object>
             </ng-template>
-            <a [href]="getDownloadUrl(doc)" class="btn btn-sm px-4 py-0 btn-dark border-dark-subtle" title="Download" i18n-title (click)="$event.stopPropagation()">
+            <a [href]="getDownloadUrl(doc)" class="btn px-4 btn-dark border-dark-subtle" title="Download" i18n-title (click)="$event.stopPropagation()">
               <svg class="buttonicon-xs" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#download"/>
               </svg>
@@ -36,5 +52,9 @@
       </tr>
     </tbody>
   </table>
+
+  <ng-template #empty>
+    <p i18n class="text-center text-muted mb-0 fst-italic">No documents</p>
+  </ng-template>
 
 </pngx-widget-frame>

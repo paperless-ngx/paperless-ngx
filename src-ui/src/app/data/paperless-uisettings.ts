@@ -41,6 +41,8 @@ export const SETTINGS_KEYS = {
     'general-settings:update-checking:backend-setting',
   SAVED_VIEWS_WARN_ON_UNSAVED_CHANGE:
     'general-settings:saved-views:warn-on-unsaved-change',
+  DASHBOARD_VIEWS_SORT_ORDER:
+    'general-settings:saved-views:dashboard-views-sort-order',
   TOUR_COMPLETE: 'general-settings:tour-complete',
   DEFAULT_PERMS_OWNER: 'general-settings:permissions:default-owner',
   DEFAULT_PERMS_VIEW_USERS: 'general-settings:permissions:default-view-users',
@@ -177,6 +179,11 @@ export const SETTINGS: PaperlessUiSetting[] = [
   },
   {
     key: SETTINGS_KEYS.DEFAULT_PERMS_EDIT_GROUPS,
+    type: 'array',
+    default: [],
+  },
+  {
+    key: SETTINGS_KEYS.DASHBOARD_VIEWS_SORT_ORDER,
     type: 'array',
     default: [],
   },

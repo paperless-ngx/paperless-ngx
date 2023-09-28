@@ -25,7 +25,7 @@ describe('PageHeaderComponent', () => {
     component.title = 'Foo'
     component.subTitle = 'Bar'
     fixture.detectChanges()
-    expect(fixture.nativeElement.textContent).toContain('FooBar')
+    expect(fixture.nativeElement.textContent).toContain('Foo Bar')
   })
 
   it('should set html title', () => {

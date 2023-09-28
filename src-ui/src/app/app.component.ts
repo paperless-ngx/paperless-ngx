@@ -5,8 +5,6 @@ import { Router } from '@angular/router'
 import { Subscription, first } from 'rxjs'
 import { ConsumerStatusService } from './services/consumer-status.service'
 import { ToastService } from './services/toast.service'
-import { NgxFileDropEntry } from 'ngx-file-drop'
-import { UploadDocumentsService } from './services/upload-documents.service'
 import { TasksService } from './services/tasks.service'
 import { TourService } from 'ngx-ui-tour-ng-bootstrap'
 import {
@@ -25,16 +23,11 @@ export class AppComponent implements OnInit, OnDestroy {
   successSubscription: Subscription
   failedSubscription: Subscription
 
-  private fileLeaveTimeoutID: any
-  fileIsOver: boolean = false
-  hidden: boolean = true
-
   constructor(
     private settings: SettingsService,
     private consumerStatusService: ConsumerStatusService,
     private toastService: ToastService,
     private router: Router,
-    private uploadDocumentsService: UploadDocumentsService,
     private tasksService: TasksService,
     public tourService: TourService,
     private renderer: Renderer2,
@@ -249,43 +242,5 @@ export class AppComponent implements OnInit, OnDestroy {
         }, 500)
       })
     })
-  }
-
-  public get dragDropEnabled(): boolean {
-    return (
-      !this.router.url.includes('dashboard') &&
-      this.permissionsService.currentUserCan(
-        PermissionAction.Add,
-        PermissionType.Document
-      )
-    )
-  }
-
-  public fileOver() {
-    // allows transition
-    setTimeout(() => {
-      this.fileIsOver = true
-    }, 1)
-    this.hidden = false
-    // stop fileLeave timeout
-    clearTimeout(this.fileLeaveTimeoutID)
-  }
-
-  public fileLeave(immediate: boolean = false) {
-    const ms = immediate ? 0 : 500
-
-    this.fileLeaveTimeoutID = setTimeout(() => {
-      this.fileIsOver = false
-      // await transition completed
-      setTimeout(() => {
-        this.hidden = true
-      }, 150)
-    }, ms)
-  }
-
-  public dropped(files: NgxFileDropEntry[]) {
-    this.fileLeave(true)
-    this.uploadDocumentsService.uploadFiles(files)
-    this.toastService.showInfo($localize`Initiating upload...`, 3000)
   }
 }
