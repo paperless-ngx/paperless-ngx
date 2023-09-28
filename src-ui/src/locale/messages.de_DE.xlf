@@ -388,7 +388,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">153</context>
         </context-group>
-        <target state="final">Ziehen Sie Dokumente hierhin, um mit dem Hochladen zu beginnen oder kopieren Sie Dateien in den „consume“-Ordner. Sie können auch Dokumente per drag-and-drop auf alle anderen Seiten der Anwendung ziehen. Wenn Sie dies tun, beginnt Paperless-ngx seine Algorithmen für maschinelles Lernen zu trainieren.</target>
+        <target state="final">Ziehen Sie Dokumente hier hinein, um mit dem Hochladen zu beginnen oder kopieren Sie Dateien in den Importordner („consume“). Sie können auch Dokumente per drag-and-drop auf alle anderen Seiten der Anwendung ziehen. Wenn Sie dies tun, beginnt Paperless-ngx seine Algorithmen für maschinelles Lernen zu trainieren.</target>
       </trans-unit>
       <trans-unit id="7495498057594070122" datatype="html" approved="yes">
         <source>The documents list shows all of your documents and allows for filtering as well as bulk-editing. There are three different view styles: list, small cards and large cards. A list of documents currently opened for editing is shown in the sidebar.</source>
@@ -4220,7 +4220,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="final">Mehr Details zur Verwendung und Konfiguration von Paperless-ngx sind immer in der <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://docs.paperless-ngx.com&quot; target=&quot;_blank&quot;&gt;"/>-Dokumentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> verfügbar.</target>
+        <target state="final">Mehr Details zur Verwendung und Konfiguration von Paperless-ngx sind immer in der <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://docs.paperless-ngx.com&quot; target=&quot;_blank&quot;&gt;"/>Dokumentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> verfügbar.</target>
       </trans-unit>
       <trans-unit id="4294899532887357745" datatype="html" approved="yes">
         <source>Thanks for being a part of the Paperless-ngx community!</source>
