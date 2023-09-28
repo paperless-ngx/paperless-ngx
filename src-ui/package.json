@@ -6,7 +6,8 @@
     "start": "ng serve",
     "build": "ng build",
     "test": "ng test --no-watch --coverage",
-    "lint": "ng lint"
+    "lint": "ng lint",
+    "postinstall": "patch-package"
   },
   "private": true,
   "dependencies": {
@@ -29,6 +30,7 @@
     "ngx-clipboard": "^16.0.0",
     "ngx-color": "^9.0.0",
     "ngx-cookie-service": "^16.0.1",
+    "ngx-drag-drop": "^16.1.0",
     "ngx-file-drop": "^16.0.0",
     "ngx-ui-tour-ng-bootstrap": "^13.0.4",
     "rxjs": "^7.8.1",
@@ -57,6 +59,7 @@
     "jest-environment-jsdom": "^29.7.0",
     "jest-preset-angular": "^13.1.1",
     "jest-websocket-mock": "^2.5.0",
+    "patch-package": "^8.0.0",
     "ts-node": "~10.9.1",
     "typescript": "^5.1.6",
     "wait-on": "^7.0.1"

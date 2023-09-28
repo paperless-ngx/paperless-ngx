@@ -230,7 +230,10 @@ export class ConsumerStatusService {
 
   dismissCompleted() {
     this.consumerStatus = this.consumerStatus.filter(
-      (status) => status.phase != FileStatusPhase.SUCCESS
+      (status) =>
+        ![FileStatusPhase.SUCCESS, FileStatusPhase.FAILED].includes(
+          status.phase
+        )
     )
   }
 
