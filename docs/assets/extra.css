@@ -55,3 +55,18 @@ h4 code {
         border-top: .05rem solid var(--md-default-fg-color--lightest);
     }
 }
+
+/* Show search shortcut key */
+[data-md-toggle="search"]:not(:checked) ~ .md-header .md-search__form::after {
+    position: absolute;
+    top: .3rem;
+    right: .3rem;
+    display: block;
+    padding: .1rem .4rem;
+    color: var(--md-default-fg-color--lighter);
+    font-weight: bold;
+    font-size: .8rem;
+    border: .05rem solid var(--md-default-fg-color--lighter);
+    border-radius: .1rem;
+    content: "/";
+  }
