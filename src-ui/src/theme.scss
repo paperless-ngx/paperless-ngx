@@ -214,6 +214,10 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
     }
   }
 
+  .card .table {
+    border-color: var(--bs-gray-800);
+  }
+
   .alert-secondary {
     background-color: var(--bs-light);
     border-color: var(--pngx-bg-darker);

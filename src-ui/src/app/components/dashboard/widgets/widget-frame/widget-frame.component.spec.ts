@@ -4,6 +4,7 @@ import { By } from '@angular/platform-browser'
 import { NgbAlertModule, NgbAlert } from '@ng-bootstrap/ng-bootstrap'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { WidgetFrameComponent } from './widget-frame.component'
+import { DndModule } from 'ngx-drag-drop'
 
 @Component({
   template: `
@@ -29,7 +30,7 @@ describe('WidgetFrameComponent', () => {
     TestBed.configureTestingModule({
       declarations: [WidgetFrameComponent, WidgetFrameComponent],
       providers: [PermissionsGuard],
-      imports: [NgbAlertModule],
+      imports: [NgbAlertModule, DndModule],
     }).compileComponents()
 
     fixture = TestBed.createComponent(WidgetFrameComponent)

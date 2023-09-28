@@ -16,6 +16,12 @@ body {
   transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
+@media(min-width: 768px) {
+  .col-slim {
+    padding-left: calc(50px + $grid-gutter-width) !important;
+  }
+}
+
 svg.logo {
   .leaf {
     fill: var(--bs-primary) !important;
@@ -476,50 +482,6 @@ table.table {
 
 .modal .btn-close {
   color: var(--bs-body-color);
-}
-
-.main-dropzone {
-  height: 100%;
-  width: 100%;
-
-  &.ngx-file-drop__drop-zone--over {
-    background-color: transparent !important;
-  }
-}
-
-.global-dropzone-overlay {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background-color: hsla(var(--pngx-primary), var(--pngx-primary-lightness), .8);
-  z-index: 1055; // $zindex-modal
-  pointer-events: none !important;
-  user-select: none !important;
-  text-align: center;
-  padding-top: 25%;
-
-  h2 {
-    color: var(--pngx-primary-text-contrast)
-  }
-
-  &.show {
-    opacity: 1 !important;
-  }
-
-  &.hide {
-    display: none;
-  }
-}
-
-.ngx-file-drop__drop-zone--over .global-dropzone-overlay {
-  opacity: 0;
-}
-
-.inert {
-  pointer-events: none !important;
-  user-select: none !important;
 }
 
 .alert-primary {

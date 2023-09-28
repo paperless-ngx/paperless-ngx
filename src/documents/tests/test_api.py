@@ -1571,6 +1571,13 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         )
 
         tag_inbox = Tag.objects.create(name="t1", is_inbox_tag=True)
+        Tag.objects.create(name="t2")
+        Tag.objects.create(name="t3")
+        Correspondent.objects.create(name="c1")
+        Correspondent.objects.create(name="c2")
+        DocumentType.objects.create(name="dt1")
+        StoragePath.objects.create(name="sp1")
+        StoragePath.objects.create(name="sp2")
 
         doc1.tags.add(tag_inbox)
 
@@ -1588,6 +1595,10 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             1,
         )
         self.assertEqual(response.data["character_count"], 11)
+        self.assertEqual(response.data["tag_count"], 3)
+        self.assertEqual(response.data["correspondent_count"], 2)
+        self.assertEqual(response.data["document_type_count"], 1)
+        self.assertEqual(response.data["storage_path_count"], 2)
 
     def test_statistics_no_inbox_tag(self):
         Document.objects.create(title="none1", checksum="A")
