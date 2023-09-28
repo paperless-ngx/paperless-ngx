@@ -15,6 +15,7 @@ import {
   SETTINGS_KEYS,
 } from '../data/paperless-uisettings'
 import { SettingsService } from './settings.service'
+import { PaperlessSavedView } from '../data/paperless-saved-view'
 
 describe('SettingsService', () => {
   let httpTestingController: HttpTestingController
@@ -276,5 +277,23 @@ describe('SettingsService', () => {
       `${environment.apiBaseUrl}ui_settings/`
     )[0]
     expect(req.request.method).toEqual('POST')
+  })
+
+  it('should update saved view sorting', () => {
+    httpTestingController
+      .expectOne(`${environment.apiBaseUrl}ui_settings/`)
+      .flush(ui_settings)
+    const setSpy = jest.spyOn(settingsService, 'set')
+    settingsService.updateDashboardViewsSort([
+      { id: 1 } as PaperlessSavedView,
+      { id: 4 } as PaperlessSavedView,
+    ])
+    expect(setSpy).toHaveBeenCalledWith(
+      SETTINGS_KEYS.DASHBOARD_VIEWS_SORT_ORDER,
+      [1, 4]
+    )
+    httpTestingController
+      .expectOne(`${environment.apiBaseUrl}ui_settings/`)
+      .flush(ui_settings)
   })
 })

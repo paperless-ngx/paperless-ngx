@@ -42,5 +42,32 @@
         </div>
       </div>
     </div>
+
+    <div class="list-group border-light mt-3">
+      <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Tag }">
+        <a *ngIf="statistics?.tag_count > 0" class="list-group-item d-flex justify-content-between align-items-center" routerLink="/tags/">
+          <ng-container i18n>Tags</ng-container>:
+          <span class="badge bg-secondary text-light rounded-pill">{{statistics?.tag_count | number}}</span>
+        </a>
+      </ng-container>
+      <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Correspondent }">
+        <a *ngIf="statistics?.correspondent_count > 0" class="list-group-item d-flex justify-content-between align-items-center" routerLink="/correspondents/">
+          <ng-container i18n>Correspondents</ng-container>:
+          <span class="badge bg-secondary text-light rounded-pill">{{statistics?.correspondent_count | number}}</span>
+        </a>
+      </ng-container>
+      <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.DocumentType }">
+        <a *ngIf="statistics?.document_type_count > 0" class="list-group-item d-flex justify-content-between align-items-center" routerLink="/documenttypes/">
+          <ng-container i18n>Document Types</ng-container>:
+          <span class="badge bg-secondary text-light rounded-pill">{{statistics?.document_type_count | number}}</span>
+        </a>
+      </ng-container>
+      <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.StoragePath }">
+        <a *ngIf="statistics?.storage_path_count > 0" class="list-group-item d-flex justify-content-between align-items-center" routerLink="/documenttypes/">
+          <ng-container i18n>Storage Paths</ng-container>:
+          <span class="badge bg-secondary text-light rounded-pill">{{statistics?.storage_path_count | number}}</span>
+        </a>
+      </ng-container>
+    </div>
   </ng-container>
 </pngx-widget-frame>

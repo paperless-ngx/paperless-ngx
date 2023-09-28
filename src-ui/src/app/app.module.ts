@@ -99,6 +99,8 @@ import { ConsumptionTemplatesComponent } from './components/manage/consumption-t
 import { ConsumptionTemplateEditDialogComponent } from './components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component'
 import { MailComponent } from './components/manage/mail/mail.component'
 import { UsersAndGroupsComponent } from './components/admin/users-groups/users-groups.component'
+import { DndModule } from 'ngx-drag-drop'
+import { FileDropComponent } from './components/file-drop/file-drop.component'
 
 import localeAf from '@angular/common/locales/af'
 import localeAr from '@angular/common/locales/ar'
@@ -241,6 +243,7 @@ function initializeApp(settings: SettingsService) {
     ConsumptionTemplateEditDialogComponent,
     MailComponent,
     UsersAndGroupsComponent,
+    FileDropComponent,
   ],
   imports: [
     BrowserModule,
@@ -254,6 +257,7 @@ function initializeApp(settings: SettingsService) {
     NgSelectModule,
     ColorSliderModule,
     TourNgBootstrapModule,
+    DndModule,
   ],
   providers: [
     {

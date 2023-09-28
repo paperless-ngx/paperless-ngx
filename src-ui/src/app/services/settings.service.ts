@@ -26,6 +26,7 @@ import { PaperlessUser } from '../data/paperless-user'
 import { PermissionsService } from './permissions.service'
 import { SavedViewService } from './rest/saved-view.service'
 import { ToastService } from './toast.service'
+import { PaperlessSavedView } from '../data/paperless-saved-view'
 
 export interface LanguageOption {
   code: string
@@ -53,6 +54,9 @@ export class SettingsService {
   public get renderer(): Renderer2 {
     return this._renderer
   }
+
+  public globalDropzoneEnabled: boolean = true
+  public globalDropzoneActive: boolean = false
 
   constructor(
     rendererFactory: RendererFactory2,
@@ -530,5 +534,14 @@ export class SettingsService {
           )
         })
     }
+  }
+
+  updateDashboardViewsSort(
+    dashboardViews: PaperlessSavedView[]
+  ): Observable<any> {
+    this.set(SETTINGS_KEYS.DASHBOARD_VIEWS_SORT_ORDER, [
+      ...new Set(dashboardViews.map((v) => v.id)),
+    ])
+    return this.storeSettings()
   }
 }

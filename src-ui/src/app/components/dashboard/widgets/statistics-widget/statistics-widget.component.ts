@@ -6,6 +6,7 @@ import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { environment } from 'src/environments/environment'
 import * as mimeTypeNames from 'mime-names'
+import { ComponentWithPermissions } from 'src/app/components/with-permissions/with-permissions.component'
 
 export interface Statistics {
   documents_total?: number
@@ -13,6 +14,10 @@ export interface Statistics {
   inbox_tag?: number
   document_file_type_counts?: DocumentFileType[]
   character_count?: number
+  tag_count?: number
+  correspondent_count?: number
+  document_type_count?: number
+  storage_path_count?: number
 }
 
 interface DocumentFileType {
@@ -25,14 +30,19 @@ interface DocumentFileType {
   templateUrl: './statistics-widget.component.html',
   styleUrls: ['./statistics-widget.component.scss'],
 })
-export class StatisticsWidgetComponent implements OnInit, OnDestroy {
+export class StatisticsWidgetComponent
+  extends ComponentWithPermissions
+  implements OnInit, OnDestroy
+{
   loading: boolean = true
 
   constructor(
     private http: HttpClient,
     private consumerStatusService: ConsumerStatusService,
     private documentListViewService: DocumentListViewService
-  ) {}
+  ) {
+    super()
+  }
 
   statistics: Statistics = {}
 
@@ -87,7 +97,7 @@ export class StatisticsWidgetComponent implements OnInit, OnDestroy {
     this.reload()
     this.subscription = this.consumerStatusService
       .onDocumentConsumptionFinished()
-      .subscribe((status) => {
+      .subscribe(() => {
         this.reload()
       })
   }
