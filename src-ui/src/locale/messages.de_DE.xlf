@@ -4974,7 +4974,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">460</context>
         </context-group>
-        <target state="final">Diese Aktion wird <x id="PH" equiv-text="this.list.selected.size"/> ausgewählte Dokumente unwiderruflich löschen.</target>
+        <target state="final">Diese Aktion wird <x id="PH" equiv-text="this.list.selected.size"/> ausgewählte(s) Dokument(e) unwiderruflich löschen.</target>
       </trans-unit>
       <trans-unit id="6734339521247847366" datatype="html" approved="yes">
         <source>Delete document(s)</source>
