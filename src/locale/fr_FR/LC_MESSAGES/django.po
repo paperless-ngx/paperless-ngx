@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-19 14:30-0700\n"
-"PO-Revision-Date: 2023-09-29 10:39\n"
+"PO-Revision-Date: 2023-09-29 11:59\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -851,7 +851,7 @@ msgstr "Filtrage"
 
 #: paperless_mail/admin.py:63
 msgid "Paperless will only process mails that match ALL of the filters given below."
-msgstr "Paperless-ng ne traitera que les courriers qui correspondent à TOUS les filtres ci-dessous."
+msgstr "Paperless ne traitera que les courriels correspondant à TOUS les filtres ci-dessous."
 
 #: paperless_mail/admin.py:79
 msgid "Actions"
@@ -859,7 +859,7 @@ msgstr "Actions"
 
 #: paperless_mail/admin.py:82
 msgid "The action applied to the mail. This action is only performed when the mail body or attachments were consumed from the mail."
-msgstr "L'action appliquée au courrier. Cette action n'est effectuée que lorsque le corps du courrier ou les pièces jointes ont été consommés par le courrier."
+msgstr "L'action appliquée au courriel. Cette action n'est effectuée que lorsque le corps du courriel ou les pièces jointes ont été consommés par le courriel."
 
 #: paperless_mail/admin.py:90
 msgid "Metadata"
@@ -943,11 +943,11 @@ msgstr "Ne traiter que les pièces jointes."
 
 #: paperless_mail/models.py:65
 msgid "Process full Mail (with embedded attachments in file) as .eml"
-msgstr "Traiter le courrier complet (avec des pièces jointes intégrées dans le fichier) en tant que .eml"
+msgstr "Traiter le courriel entier (dont les pièces jointes comme fichier) en tant que .eml"
 
 #: paperless_mail/models.py:67
 msgid "Process full Mail (with embedded attachments in file) as .eml + process attachments as separate documents"
-msgstr "Traiter le courrier complet (avec des pièces jointes intégrées dans le fichier) en .eml + traiter les pièces jointes en tant que documents séparés"
+msgstr "Traiter le courriel entier (dont les pièces jointes intégrées comme fichier) en .eml + traiter les pièces jointes comme des documents séparés"
 
 #: paperless_mail/models.py:73
 msgid "Process all files, including 'inline' attachments."
@@ -971,7 +971,7 @@ msgstr "Marquer le courriel, ne pas traiter les courriels marqués"
 
 #: paperless_mail/models.py:80
 msgid "Tag the mail with specified tag, don't process tagged mails"
-msgstr "Affecter l’étiquette spécifiée au courrier, ne pas traiter les courriels étiquetés"
+msgstr "Affecter l’étiquette spécifiée au courriel, ne pas traiter les courriels étiquetés"
 
 #: paperless_mail/models.py:83
 msgid "Use subject as title"
