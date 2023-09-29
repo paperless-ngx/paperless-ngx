@@ -1305,7 +1305,7 @@ started by the container.
 ## Email sending
 
 Setting an SMTP server for the backend will allow you to reset your
-password. All of these options come from their similarly-named [Django settings](https://docs.djangoproject.com/en/1.8/ref/settings/#email-host)
+password. All of these options come from their similarly-named [Django settings](https://docs.djangoproject.com/en/4.2/ref/settings/#email-host)
 
 #### [`PAPERLESS_EMAIL_HOST=<str>`](#PAPERLESS_EMAIL_HOST) {#PAPERLESS_EMAIL_HOST}
 
@@ -1315,11 +1315,11 @@ password. All of these options come from their similarly-named [Django settings]
 
 : Defaults to port 25.
 
-#### [`PAPERLESS_EMAIL_USER=<str>`](#PAPERLESS_EMAIL_USER) {#PAPERLESS_EMAIL_USER}
+#### [`PAPERLESS_EMAIL_HOST_USER=<str>`](#PAPERLESS_EMAIL_HOST_USER) {#PAPERLESS_EMAIL_HOST_USER}
 
 : Defaults to ''.
 
-#### [`PAPERLESS_EMAIL_PASSWORD=<str>`](#PAPERLESS_EMAIL_PASSWORD) {#PAPERLESS_EMAIL_PASSWORD}
+#### [`PAPERLESS_EMAIL_HOST_PASSWORD=<str>`](#PAPERLESS_EMAIL_HOST_PASSWORD) {#PAPERLESS_EMAIL_HOST_PASSWORD}
 
 : Defaults to ''.
 
