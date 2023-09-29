@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-19 14:30-0700\n"
-"PO-Revision-Date: 2023-09-25 09:36\n"
+"PO-Revision-Date: 2023-09-29 10:39\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -493,7 +493,7 @@ msgstr "Date de début"
 
 #: documents/models.py:622
 msgid "Datetime field when the task was started in UTC"
-msgstr "Champ de date lorsque le résultat de la tâche a été créé en UTC"
+msgstr "Date UTC à laquelle la tâche a été créée"
 
 #: documents/models.py:627
 msgid "Completed DateTime"
@@ -501,7 +501,7 @@ msgstr "Date de fin"
 
 #: documents/models.py:628
 msgid "Datetime field when the task was completed in UTC"
-msgstr "Champ de date lorsque le résultat de la tâche a été créé en UTC"
+msgstr "Date UTC à laquelle la tâche a été terminée"
 
 #: documents/models.py:633
 msgid "Result Data"
@@ -715,7 +715,7 @@ msgstr "S'identifier"
 
 #: paperless/apps.py:10
 msgid "Paperless"
-msgstr "Sans papier"
+msgstr "Paperless"
 
 #: paperless/settings.py:573
 msgid "English (US)"
@@ -1079,11 +1079,11 @@ msgstr ""
 
 #: paperless_mail/models.py:256
 msgid "uid"
-msgstr "uid"
+msgstr "identifiant unique"
 
 #: paperless_mail/models.py:264
 msgid "subject"
-msgstr "sujet"
+msgstr "objet"
 
 #: paperless_mail/models.py:272
 msgid "received"
@@ -1091,7 +1091,7 @@ msgstr "reçu"
 
 #: paperless_mail/models.py:279
 msgid "processed"
-msgstr "traités"
+msgstr "traité"
 
 #: paperless_mail/models.py:285
 msgid "status"
