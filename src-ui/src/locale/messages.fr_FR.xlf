@@ -586,13 +586,13 @@
         </context-group>
         <target state="final">Commencer la visite </target>
       </trans-unit>
-      <trans-unit id="4798013226763881638" datatype="html">
+      <trans-unit id="4798013226763881638" datatype="html" approved="yes">
         <source>Open Django Admin</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="translated">Ouvrir l'interface d'administration Django</target>
+        <target state="final">Ouvrir l'interface d'administration Django</target>
       </trans-unit>
       <trans-unit id="6439365426343089851" datatype="html" approved="yes">
         <source>General</source>
