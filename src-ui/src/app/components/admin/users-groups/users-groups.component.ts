@@ -53,6 +53,7 @@ export class UsersAndGroupsComponent
           this.users = r.results
         },
         error: (e) => {
+          this.users = []
           this.toastService.showError($localize`Error retrieving users`, e)
         },
       })
@@ -65,6 +66,7 @@ export class UsersAndGroupsComponent
           this.groups = r.results
         },
         error: (e) => {
+          this.groups = []
           this.toastService.showError($localize`Error retrieving groups`, e)
         },
       })
@@ -77,6 +79,7 @@ export class UsersAndGroupsComponent
           this.ssoGroups = r.results
         },
         error: (e) => {
+          this.ssoGroups = []
           this.toastService.showError($localize`Error retrieving SSO groups`, e)
         },
       })

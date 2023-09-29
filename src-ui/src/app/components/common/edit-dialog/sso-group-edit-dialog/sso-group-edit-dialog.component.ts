@@ -11,7 +11,7 @@ import { SsoGroupService } from '../../../../services/rest/sso-group.service'
 import { first } from 'rxjs'
 
 @Component({
-  selector: 'app-sso-group-edit-dialog',
+  selector: 'pngx-sso-group-edit-dialog',
   templateUrl: './sso-group-edit-dialog.component.html',
   styleUrls: ['./sso-group-edit-dialog.component.scss'],
 })
