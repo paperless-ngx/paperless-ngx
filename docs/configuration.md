@@ -1306,26 +1306,26 @@ started by the container.
 
 To configure OpenIDConnect you need a provider. The redirect url is `${PAPERLESS_URL}/accounts/complete/oidc/`.
 
-`PAPERLESS_SSO_OIDC_ENABLE=<bool>`
+#### [`PAPERLESS_SSO_OIDC_ENABLE=<bool>`](#PAPERLESS_SSO_OIDC_ENABLE) {#PAPERLESS_SSO_OIDC_ENABLE}
 
 : If this environment variable is set to true the button to login with SSO is enabled
 
-`PAPERLESS_SSO_DISABLE_NORMAL_AUTH=<bool>`
+#### [`PAPERLESS_SSO_DISABLE_NORMAL_AUTH=<bool>`](#PAPERLESS_SSO_DISABLE_NORMAL_AUTH) {#PAPERLESS_SSO_DISABLE_NORMAL_AUTH}
 
 : If this environment variable, the normal form to login is disabled
 
-`PAPERLESS_SSO_OIDC_KEY=<str>`
+#### [`PAPERLESS_SSO_OIDC_KEY=<str>`](#PAPERLESS_SSO_OIDC_KEY) {#PAPERLESS_SSO_OIDC_KEY}
 
 : Client ID of this application
 
-`PAPERLESS_SSO_OIDC_ENDPOINT=<url>`
+#### [`PAPERLESS_SSO_OIDC_ENDPOINT=<url>`](#PAPERLESS_SSO_OIDC_ENDPOINT) {#PAPERLESS_SSO_OIDC_ENDPOINT}
 
 : This variable must contain the OpenID configuration issuer, without `.well-known/openid-configuration`
 
-`PAPERLESS_SSO_OIDC_SECRET=<str>`
+#### [`PAPERLESS_SSO_OIDC_SECRET=<str>`](#PAPERLESS_SSO_OIDC_SECRET) {#PAPERLESS_SSO_OIDC_SECRET}
 
 : Client secret of this application
 
-`PAPERLESS_SSO_OIDC_NAME=<str>`
+#### [`PAPERLESS_SSO_OIDC_NAME=<str>`](#PAPERLESS_SSO_OIDC_NAME) {#PAPERLESS_SSO_OIDC_NAME}
 
 : Value to display inside the button to login with openidconnect
