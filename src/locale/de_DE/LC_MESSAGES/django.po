@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-19 14:30-0700\n"
-"PO-Revision-Date: 2023-09-26 14:26\n"
+"PO-Revision-Date: 2023-09-29 07:53\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -1063,7 +1063,7 @@ msgstr "Parameter für Aktion"
 
 #: paperless_mail/models.py:188
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
-msgstr "Zusätzlicher Parameter für die oben ausgewählte Aktion, zum Beispiel der Zielordner für die Aktion \"In angegebenen Ordner verschieben\". Unterordner müssen durch Punkte getrennt werden."
+msgstr "Zusätzlicher Parameter für die oben ausgewählte Aktion, z. B. der Zielordner für die Aktion „In angegebenen Ordner verschieben“. Unterordner müssen durch Punkte getrennt werden."
 
 #: paperless_mail/models.py:196
 msgid "assign title from"
