@@ -7,7 +7,11 @@ on:
       - 'v[0-9]+.[0-9]+.[0-9]+'
       # https://semver.org/#spec-item-9
       - 'v[0-9]+.[0-9]+.[0-9]+-beta.rc[0-9]+'
+    branches-ignore:
+      - 'translations**'
   pull_request:
+    branches-ignore:
+      - 'translations**'
 
 env:
   # This is the version of pipenv all the steps will use
