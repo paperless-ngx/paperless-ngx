@@ -1,19 +1,19 @@
 <form [formGroup]="objectForm" (ngSubmit)="save()">
-    <div class="modal-header">
-      <h4 class="modal-title" id="modal-basic-title">{{getTitle()}}</h4>
-      <button type="button" [disabled]="!closeEnabled" class="btn-close" aria-label="Close" (click)="cancel()">
-      </button>
-    </div>
-    <div class="modal-body">
-      <div class="row">
-        <div class="col">
-          <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name"></pngx-input-text>
-          <pngx-input-select i18n-title title="Group" [items]="groups" formControlName="group"></pngx-input-select>
-        </div>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">{{getTitle()}}</h4>
+    <button type="button" [disabled]="!closeEnabled" class="btn-close" aria-label="Close" (click)="cancel()">
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+      <div class="col">
+        <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name"></pngx-input-text>
+        <pngx-input-select i18n-title title="Group" [items]="groups" formControlName="group"></pngx-input-select>
       </div>
     </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-outline-secondary" (click)="cancel()" i18n [disabled]="networkActive">Cancel</button>
-      <button type="submit" class="btn btn-primary" i18n [disabled]="networkActive">Save</button>
-    </div>
-  </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="cancel()" i18n [disabled]="networkActive">Cancel</button>
+    <button type="submit" class="btn btn-primary" i18n [disabled]="networkActive">Save</button>
+  </div>
+</form>
