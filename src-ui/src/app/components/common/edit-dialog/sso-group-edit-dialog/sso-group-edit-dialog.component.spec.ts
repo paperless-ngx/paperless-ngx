@@ -11,10 +11,12 @@ import { NgSelectModule } from '@ng-select/ng-select'
 import { PermissionsFormComponent } from '../../input/permissions/permissions-form/permissions-form.component'
 import { SsoGroupEditDialogComponent } from './sso-group-edit-dialog.component'
 import { PermissionsSelectComponent } from '../../permissions-select/permissions-select.component'
+import { SettingsService } from 'src/app/services/settings.service'
 
-describe('GroupEditDialogComponent', () => {
+describe('SSoGroupEditDialogComponent', () => {
   let component: SsoGroupEditDialogComponent
   let fixture: ComponentFixture<SsoGroupEditDialogComponent>
+  let settingsService: SettingsService
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -38,6 +40,8 @@ describe('GroupEditDialogComponent', () => {
     }).compileComponents()
 
     fixture = TestBed.createComponent(SsoGroupEditDialogComponent)
+    settingsService = TestBed.inject(SettingsService)
+    settingsService.currentUser = { id: 99, username: 'user99' }
     component = fixture.componentInstance
 
     fixture.detectChanges()

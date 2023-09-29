@@ -25,11 +25,13 @@ import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { GroupService } from 'src/app/services/rest/group.service'
 import { UserService } from 'src/app/services/rest/user.service'
+import { SsoGroupService } from 'src/app/services/rest/sso-group.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { GroupEditDialogComponent } from '../../common/edit-dialog/group-edit-dialog/group-edit-dialog.component'
 import { UserEditDialogComponent } from '../../common/edit-dialog/user-edit-dialog/user-edit-dialog.component'
+import { SsoGroupEditDialogComponent } from '../../common/edit-dialog/sso-group-edit-dialog/sso-group-edit-dialog.component'
 import { CheckComponent } from '../../common/input/check/check.component'
 import { NumberComponent } from '../../common/input/number/number.component'
 import { PasswordComponent } from '../../common/input/password/password.component'
@@ -43,6 +45,7 @@ import { SettingsComponent } from '../settings/settings.component'
 import { UsersAndGroupsComponent } from './users-groups.component'
 import { PaperlessUser } from 'src/app/data/paperless-user'
 import { PaperlessGroup } from 'src/app/data/paperless-group'
+import { PaperlessSSOGroup } from 'src/app/data/paperless-sso-group'
 
 const users = [
   { id: 1, username: 'user1', is_superuser: false },
@@ -51,6 +54,10 @@ const users = [
 const groups = [
   { id: 1, name: 'group1' },
   { id: 2, name: 'group2' },
+]
+const ssoGroups = [
+  { id: 1, name: 'sso group1', group: 1 },
+  { id: 2, name: 'sso group2', group: 2 },
 ]
 
 describe('UsersAndGroupsComponent', () => {
@@ -62,6 +69,7 @@ describe('UsersAndGroupsComponent', () => {
   let userService: UserService
   let permissionsService: PermissionsService
   let groupService: GroupService
+  let ssoGroupService: SsoGroupService
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -109,6 +117,7 @@ describe('UsersAndGroupsComponent', () => {
       .spyOn(permissionsService, 'currentUserOwnsObject')
       .mockReturnValue(true)
     groupService = TestBed.inject(GroupService)
+    ssoGroupService = TestBed.inject(SsoGroupService)
     component = fixture.componentInstance
     fixture.detectChanges()
   })
@@ -129,6 +138,15 @@ describe('UsersAndGroupsComponent', () => {
           all: groups.map((r) => r.id),
           count: groups.length,
           results: (groups as PaperlessGroup[]).concat([]),
+        })
+      )
+    }
+    if (excludeService !== ssoGroupService) {
+      jest.spyOn(ssoGroupService, 'listAll').mockReturnValue(
+        of({
+          all: ssoGroups.map((r) => r.id),
+          count: ssoGroups.length,
+          results: (ssoGroups as PaperlessSSOGroup[]).concat([]),
         })
       )
     }
@@ -263,5 +281,55 @@ describe('UsersAndGroupsComponent', () => {
     completeSetup(groupService)
     fixture.detectChanges()
     expect(toastErrorSpy).toBeCalled()
+  })
+
+  it('should show errors on load if load sso groups failure', () => {
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    jest
+      .spyOn(ssoGroupService, 'listAll')
+      .mockImplementation(() =>
+        throwError(() => new Error('failed to load SSO groups'))
+      )
+    completeSetup(ssoGroupService)
+    fixture.detectChanges()
+    expect(toastErrorSpy).toBeCalled()
+  })
+
+  it('should support edit / create sso group, show error if needed', () => {
+    completeSetup()
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
+    component.editSsoGroup(ssoGroups[0])
+    const editDialog = modal.componentInstance as SsoGroupEditDialogComponent
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    editDialog.failed.emit()
+    expect(toastErrorSpy).toBeCalled()
+    editDialog.succeeded.emit(ssoGroups[0])
+    expect(toastInfoSpy).toHaveBeenCalledWith(
+      `Saved SSO group "${ssoGroups[0].name}".`
+    )
+    component.editSsoGroup()
+  })
+
+  it('should support delete sso group, show error if needed', () => {
+    completeSetup()
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
+    component.deleteSsoGroup(ssoGroups[0])
+    const deleteDialog = modal.componentInstance as ConfirmDialogComponent
+    const deleteSpy = jest.spyOn(ssoGroupService, 'delete')
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const listAllSpy = jest.spyOn(ssoGroupService, 'listAll')
+    deleteSpy.mockReturnValueOnce(
+      throwError(() => new Error('error deleting SSO group'))
+    )
+    deleteDialog.confirm()
+    expect(toastErrorSpy).toBeCalled()
+    deleteSpy.mockReturnValueOnce(of(true))
+    deleteDialog.confirm()
+    expect(listAllSpy).toHaveBeenCalled()
+    expect(toastInfoSpy).toHaveBeenCalledWith('Deleted SSO group')
   })
 })

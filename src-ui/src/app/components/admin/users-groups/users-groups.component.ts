@@ -3,14 +3,17 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { Subject, first, takeUntil } from 'rxjs'
 import { PaperlessGroup } from 'src/app/data/paperless-group'
 import { PaperlessUser } from 'src/app/data/paperless-user'
+import { PaperlessSSOGroup } from 'src/app/data/paperless-sso-group'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { GroupService } from 'src/app/services/rest/group.service'
 import { UserService } from 'src/app/services/rest/user.service'
+import { SsoGroupService } from 'src/app/services/rest/sso-group.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 import { GroupEditDialogComponent } from '../../common/edit-dialog/group-edit-dialog/group-edit-dialog.component'
 import { UserEditDialogComponent } from '../../common/edit-dialog/user-edit-dialog/user-edit-dialog.component'
+import { SsoGroupEditDialogComponent } from '../../common/edit-dialog/sso-group-edit-dialog/sso-group-edit-dialog.component'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 import { SettingsService } from 'src/app/services/settings.service'
 
@@ -25,12 +28,14 @@ export class UsersAndGroupsComponent
 {
   users: PaperlessUser[]
   groups: PaperlessGroup[]
+  ssoGroups: PaperlessSSOGroup[]
 
   unsubscribeNotifier: Subject<any> = new Subject()
 
   constructor(
     private usersService: UserService,
     private groupsService: GroupService,
+    private ssoGroupService: SsoGroupService,
     private toastService: ToastService,
     private modalService: NgbModal,
     public permissionsService: PermissionsService,
@@ -61,6 +66,18 @@ export class UsersAndGroupsComponent
         },
         error: (e) => {
           this.toastService.showError($localize`Error retrieving groups`, e)
+        },
+      })
+
+    this.ssoGroupService
+      .listAll(null, null, { full_perms: true })
+      .pipe(first(), takeUntil(this.unsubscribeNotifier))
+      .subscribe({
+        next: (r) => {
+          this.ssoGroups = r.results
+        },
+        error: (e) => {
+          this.toastService.showError($localize`Error retrieving SSO groups`, e)
         },
       })
   }
@@ -178,6 +195,57 @@ export class UsersAndGroupsComponent
         },
         error: (e) => {
           this.toastService.showError($localize`Error deleting group.`, e)
+        },
+      })
+    })
+  }
+
+  editSsoGroup(ssoGroup: PaperlessSSOGroup = null) {
+    var modal = this.modalService.open(SsoGroupEditDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.dialogMode = ssoGroup
+      ? EditDialogMode.EDIT
+      : EditDialogMode.CREATE
+    modal.componentInstance.object = ssoGroup
+    modal.componentInstance.succeeded
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe((newGroup) => {
+        this.toastService.showInfo(
+          $localize`Saved SSO group "${newGroup.name}".`
+        )
+        this.ssoGroupService.listAll().subscribe((r) => {
+          this.ssoGroups = r.results
+        })
+      })
+    modal.componentInstance.failed
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe((e) => {
+        this.toastService.showError($localize`Error saving SSO group.`, e)
+      })
+  }
+
+  deleteSsoGroup(ssoGroup: PaperlessSSOGroup) {
+    let modal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.title = $localize`Confirm delete SSO group`
+    modal.componentInstance.messageBold = $localize`This operation will permanently delete this SSO group.`
+    modal.componentInstance.message = $localize`This operation cannot be undone.`
+    modal.componentInstance.btnClass = 'btn-danger'
+    modal.componentInstance.btnCaption = $localize`Proceed`
+    modal.componentInstance.confirmClicked.subscribe(() => {
+      modal.componentInstance.buttonsEnabled = false
+      this.ssoGroupService.delete(ssoGroup).subscribe({
+        next: () => {
+          modal.close()
+          this.toastService.showInfo($localize`Deleted SSO group`)
+          this.ssoGroupService.listAll().subscribe((r) => {
+            this.ssoGroups = r.results
+          })
+        },
+        error: (e) => {
+          this.toastService.showError($localize`Error deleting SSO group.`, e)
         },
       })
     })
