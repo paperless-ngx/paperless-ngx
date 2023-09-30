@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-19 14:30-0700\n"
-"PO-Revision-Date: 2023-09-23 00:11\n"
+"PO-Revision-Date: 2023-09-30 10:27\n"
 "Last-Translator: \n"
 "Language-Team: Catalan\n"
 "Language: ca_ES\n"
@@ -553,23 +553,23 @@ msgstr "comparteix enllaços"
 
 #: documents/models.py:744
 msgid "Consume Folder"
-msgstr ""
+msgstr "Directori 'Condumir'"
 
 #: documents/models.py:745
 msgid "Api Upload"
-msgstr ""
+msgstr "Api Pujada"
 
 #: documents/models.py:746
 msgid "Mail Fetch"
-msgstr ""
+msgstr "Recollida Correu"
 
 #: documents/models.py:752
 msgid "consumption template"
-msgstr ""
+msgstr "plantilla consumició"
 
 #: documents/models.py:753
 msgid "consumption templates"
-msgstr ""
+msgstr "plantilles consumicions"
 
 #: documents/models.py:757 paperless_mail/models.py:95
 msgid "order"
@@ -577,15 +577,15 @@ msgstr "ordena"
 
 #: documents/models.py:766
 msgid "filter path"
-msgstr ""
+msgstr "filtra camins"
 
 #: documents/models.py:771
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
-msgstr ""
+msgstr "Consumeix documents amb la ruta que coincideixi si està especificada. Wilcards especificats amb * estan permessos, no sensitiu."
 
 #: documents/models.py:778
 msgid "filter filename"
-msgstr ""
+msgstr "filtra nom arxiu"
 
 #: documents/models.py:783 paperless_mail/models.py:148
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
@@ -593,11 +593,11 @@ msgstr "Consumiu només documents que coincideixin completament amb aquest nom d
 
 #: documents/models.py:794
 msgid "filter documents from this mail rule"
-msgstr ""
+msgstr "filtra documents d'aquesta regla de correu"
 
 #: documents/models.py:798
 msgid "assign title"
-msgstr ""
+msgstr "assigna títol"
 
 #: documents/models.py:803
 msgid "Assign a document title, can include some placeholders, see documentation."
@@ -617,27 +617,27 @@ msgstr "assigna aquest corresponsal"
 
 #: documents/models.py:835
 msgid "assign this storage path"
-msgstr ""
+msgstr "assigna aquesta ruta emmagatzematge"
 
 #: documents/models.py:844
 msgid "assign this owner"
-msgstr ""
+msgstr "assigna aquest propietari"
 
 #: documents/models.py:851
 msgid "grant view permissions to these users"
-msgstr ""
+msgstr "dona permissos visualització a aquests usuaris"
 
 #: documents/models.py:858
 msgid "grant view permissions to these groups"
-msgstr ""
+msgstr "dóna permissos de visionat a aquests grups"
 
 #: documents/models.py:865
 msgid "grant change permissions to these users"
-msgstr ""
+msgstr "dóna permissos d'edició a aquests usuaris"
 
 #: documents/models.py:872
 msgid "grant change permissions to these groups"
-msgstr ""
+msgstr "dóna permissos d'edició a aquests grups"
 
 #: documents/serialisers.py:100
 #, python-format
@@ -983,7 +983,7 @@ msgstr "Utilitzeu el nom del fitxer adjunt com a títol"
 
 #: paperless_mail/models.py:85
 msgid "Do not assign title from rule"
-msgstr ""
+msgstr "No assignis títol desde regla"
 
 #: paperless_mail/models.py:88
 msgid "Do not assign a correspondent"
@@ -1075,7 +1075,7 @@ msgstr "assigna corresponsal des de"
 
 #: paperless_mail/models.py:230
 msgid "Assign the rule owner to documents"
-msgstr ""
+msgstr "Assigna propietari de la regla a documents"
 
 #: paperless_mail/models.py:256
 msgid "uid"
