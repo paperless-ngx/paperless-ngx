@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.test import TestCase
+from django.test import override_settings
 from django.utils import timezone
 from rest_framework import status
 
@@ -132,3 +133,58 @@ class TestViews(DirectoriesMixin, TestCase):
         response.render()
         self.assertEqual(response.request["PATH_INFO"], "/accounts/login/")
         self.assertContains(response, b"Share link has expired")
+
+    @override_settings(
+        SOCIAL_AUTH_OIDC_ENABLE=True,
+        SOCIAL_AUTH_OIDC_NAME="OIDC Login Link",
+    )
+    def test_oidc_enabled_login_view(self):
+        """
+        GIVEN:
+            - OIDC Enabled, regular login not disabled
+        WHEN:
+            - Login template loaded
+        THEN:
+            - Both options available
+        """
+        self.client.force_login(self.user)
+        response = self.client.get(
+            "/accounts/login/",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn(
+            "Sign in",
+            response.rendered_content,
+        )
+        self.assertIn(
+            "OIDC Login Link",
+            response.rendered_content,
+        )
+
+    @override_settings(
+        SOCIAL_AUTH_OIDC_ENABLE=True,
+        SOCIAL_AUTH_OIDC_NAME="OIDC Login Link",
+        SOCIAL_AUTH_DISABLE_NORMAL_AUTH=True,
+    )
+    def test_oidc_enabled_normal_auth_disabled_login_view(self):
+        """
+        GIVEN:
+            - OIDC Enabled, regular login disabled
+        WHEN:
+            - Login template loaded
+        THEN:
+            - Only OIDC login available
+        """
+        self.client.force_login(self.user)
+        response = self.client.get(
+            "/accounts/login/",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertNotIn(
+            "Sign in",
+            response.rendered_content,
+        )
+        self.assertIn(
+            "OIDC Login Link",
+            response.rendered_content,
+        )
