@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-19 14:30-0700\n"
-"PO-Revision-Date: 2023-09-23 00:11\n"
+"POT-Creation-Date: 2023-09-28 10:56-0700\n"
+"PO-Revision-Date: 2023-10-01 01:27\n"
 "Last-Translator: \n"
 "Language-Team: Thai\n"
 "Language: th_TH\n"
@@ -21,421 +21,421 @@ msgstr ""
 msgid "Documents"
 msgstr "เอกสาร"
 
-#: documents/models.py:36 documents/models.py:731
+#: documents/models.py:33 documents/models.py:731
 msgid "owner"
 msgstr "เจ้าของ"
 
-#: documents/models.py:53
+#: documents/models.py:50
 msgid "None"
 msgstr "ไม่ใช้งาน"
 
-#: documents/models.py:54
+#: documents/models.py:51
 msgid "Any word"
 msgstr "คำใดคำหนึ่ง"
 
-#: documents/models.py:55
+#: documents/models.py:52
 msgid "All words"
 msgstr "ทุกคำ"
 
-#: documents/models.py:56
+#: documents/models.py:53
 msgid "Exact match"
 msgstr "ตรงกันทุกประการ"
 
-#: documents/models.py:57
+#: documents/models.py:54
 msgid "Regular expression"
 msgstr "Regular expression"
 
-#: documents/models.py:58
+#: documents/models.py:55
 msgid "Fuzzy word"
 msgstr "Fuzzy word"
 
-#: documents/models.py:59
+#: documents/models.py:56
 msgid "Automatic"
 msgstr "อัตโนมัติ"
 
-#: documents/models.py:62 documents/models.py:402 documents/models.py:755
+#: documents/models.py:59 documents/models.py:399 documents/models.py:749
 #: paperless_mail/models.py:18 paperless_mail/models.py:93
 msgid "name"
 msgstr "ชื่อ"
 
-#: documents/models.py:64
+#: documents/models.py:61
 msgid "match"
 msgstr "การจำแนก"
 
-#: documents/models.py:67
+#: documents/models.py:64
 msgid "matching algorithm"
 msgstr "วิธีการจำแนก"
 
-#: documents/models.py:72
+#: documents/models.py:69
 msgid "is insensitive"
 msgstr "ไม่คำนึงถึงตัวพิมพ์เล็ก-ใหญ่"
 
-#: documents/models.py:95 documents/models.py:147
+#: documents/models.py:92 documents/models.py:144
 msgid "correspondent"
 msgstr "จาก"
 
-#: documents/models.py:96
+#: documents/models.py:93
 msgid "correspondents"
 msgstr "จาก"
 
-#: documents/models.py:100
+#: documents/models.py:97
 msgid "color"
 msgstr "สี"
 
-#: documents/models.py:103
+#: documents/models.py:100
 msgid "is inbox tag"
 msgstr "แท็กแรกเข้า"
 
-#: documents/models.py:106
+#: documents/models.py:103
 msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
 msgstr "แท็กเอกสารใหม่ทั้งหมดด้วยแท็กนี้ (แท็กแรกเข้า)"
 
-#: documents/models.py:112
+#: documents/models.py:109
 msgid "tag"
 msgstr "แท็ก"
 
-#: documents/models.py:113 documents/models.py:185
+#: documents/models.py:110 documents/models.py:182
 msgid "tags"
 msgstr "แท็ก"
 
-#: documents/models.py:118 documents/models.py:167
+#: documents/models.py:115 documents/models.py:164
 msgid "document type"
 msgstr "ประเภทเอกสาร"
 
-#: documents/models.py:119
+#: documents/models.py:116
 msgid "document types"
 msgstr "ประเภทเอกสาร"
 
-#: documents/models.py:124
+#: documents/models.py:121
 msgid "path"
 msgstr "พาธ"
 
-#: documents/models.py:129 documents/models.py:156
+#: documents/models.py:126 documents/models.py:153
 msgid "storage path"
 msgstr "พาธจัดเก็บ"
 
-#: documents/models.py:130
+#: documents/models.py:127
 msgid "storage paths"
 msgstr "พาธจัดเก็บ"
 
-#: documents/models.py:137
+#: documents/models.py:134
 msgid "Unencrypted"
 msgstr "ไม่เข้ารหัส"
 
-#: documents/models.py:138
+#: documents/models.py:135
 msgid "Encrypted with GNU Privacy Guard"
 msgstr "เข้ารหัสด้วย GNU Privacy Guard"
 
-#: documents/models.py:159
+#: documents/models.py:156
 msgid "title"
 msgstr "ชื่อ"
 
-#: documents/models.py:171 documents/models.py:645
+#: documents/models.py:168 documents/models.py:645
 msgid "content"
 msgstr "เนื้อหา"
 
-#: documents/models.py:174
+#: documents/models.py:171
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
 msgstr "เนื้อหาของเอกสารในรูปแบบข้อความล้วน ในการค้นหาข้อมูล เนื้อหาของเอกสาร จะถูกใช้ในการค้นเป็นหลัก"
 
-#: documents/models.py:179
+#: documents/models.py:176
 msgid "mime type"
 msgstr "mime type"
 
-#: documents/models.py:189
+#: documents/models.py:186
 msgid "checksum"
 msgstr "checksum"
 
-#: documents/models.py:193
+#: documents/models.py:190
 msgid "The checksum of the original document."
 msgstr "ค่า checksum ของไฟล์เอกสารต้นฉบับ"
 
-#: documents/models.py:197
+#: documents/models.py:194
 msgid "archive checksum"
 msgstr "archive checksum"
 
-#: documents/models.py:202
+#: documents/models.py:199
 msgid "The checksum of the archived document."
 msgstr "ค่า checksum ของเอกสารประเภทเก็บถาวร"
 
-#: documents/models.py:205 documents/models.py:385 documents/models.py:651
+#: documents/models.py:202 documents/models.py:382 documents/models.py:651
 #: documents/models.py:689
 msgid "created"
 msgstr "สร้างเมื่อ"
 
-#: documents/models.py:208
+#: documents/models.py:205
 msgid "modified"
 msgstr "แก้ไขเมื่อ"
 
-#: documents/models.py:215
+#: documents/models.py:212
 msgid "storage type"
 msgstr "วิธีการจัดเก็บ"
 
-#: documents/models.py:223
+#: documents/models.py:220
 msgid "added"
 msgstr "นำเข้าเมื่อ"
 
-#: documents/models.py:230
+#: documents/models.py:227
 msgid "filename"
 msgstr "ชื่อไฟล์"
 
-#: documents/models.py:236
+#: documents/models.py:233
 msgid "Current filename in storage"
 msgstr "ชื่อไฟล์ในพื้นที่จัดเก็บ"
 
-#: documents/models.py:240
+#: documents/models.py:237
 msgid "archive filename"
 msgstr "ชื่อไฟล์ที่ถูกเก็บถาวร"
 
-#: documents/models.py:246
+#: documents/models.py:243
 msgid "Current archive filename in storage"
 msgstr "ชื่อไฟล์ที่ถูกเก็บถาวรในพื้นที่จัดเก็บ"
 
-#: documents/models.py:250
+#: documents/models.py:247
 msgid "original filename"
 msgstr "ชื่อไฟล์ต้นฉบับ"
 
-#: documents/models.py:256
+#: documents/models.py:253
 msgid "The original name of the file when it was uploaded"
 msgstr "ชื่อไฟล์ต้นฉบับที่อัพโหลดเข้ามา"
 
-#: documents/models.py:263
+#: documents/models.py:260
 msgid "archive serial number"
 msgstr "รหัสการจัดเก็บถาวร"
 
-#: documents/models.py:273
+#: documents/models.py:270
 msgid "The position of this document in your physical document archive."
 msgstr "ตำแหน่งเอกสารนี้ในสถานที่จัดเก็บจริง ๆ ของคุณ"
 
-#: documents/models.py:279 documents/models.py:662 documents/models.py:716
+#: documents/models.py:276 documents/models.py:662 documents/models.py:716
 msgid "document"
 msgstr "เอกสาร"
 
-#: documents/models.py:280
+#: documents/models.py:277
 msgid "documents"
 msgstr "เอกสาร"
 
-#: documents/models.py:368
+#: documents/models.py:365
 msgid "debug"
 msgstr "debug"
 
-#: documents/models.py:369
+#: documents/models.py:366
 msgid "information"
 msgstr "ข้อมูล"
 
-#: documents/models.py:370
+#: documents/models.py:367
 msgid "warning"
 msgstr "คำเตือน"
 
-#: documents/models.py:371 paperless_mail/models.py:293
+#: documents/models.py:368 paperless_mail/models.py:293
 msgid "error"
 msgstr "ข้อผิดพลาด"
 
-#: documents/models.py:372
+#: documents/models.py:369
 msgid "critical"
 msgstr "ร้ายแรง"
 
-#: documents/models.py:375
+#: documents/models.py:372
 msgid "group"
 msgstr "กลุ่ม"
 
-#: documents/models.py:377
+#: documents/models.py:374
 msgid "message"
 msgstr "ข้อความ"
 
-#: documents/models.py:380
+#: documents/models.py:377
 msgid "level"
 msgstr "ระดับ"
 
-#: documents/models.py:389
+#: documents/models.py:386
 msgid "log"
 msgstr "log"
 
-#: documents/models.py:390
+#: documents/models.py:387
 msgid "logs"
 msgstr "logs"
 
-#: documents/models.py:399 documents/models.py:464
+#: documents/models.py:396 documents/models.py:461
 msgid "saved view"
 msgstr "การค้นที่เก็บไว้"
 
-#: documents/models.py:400
+#: documents/models.py:397
 msgid "saved views"
 msgstr "การค้นที่เก็บไว้"
 
-#: documents/models.py:405
+#: documents/models.py:402
 msgid "show on dashboard"
 msgstr "แสดงบนหน้าหลัก"
 
-#: documents/models.py:408
+#: documents/models.py:405
 msgid "show in sidebar"
 msgstr "แสดงบนเมนูด้านข้าง"
 
-#: documents/models.py:412
+#: documents/models.py:409
 msgid "sort field"
 msgstr "จัดเรียงตาม"
 
-#: documents/models.py:417
+#: documents/models.py:414
 msgid "sort reverse"
 msgstr "เรียงย้อนกลับ"
 
-#: documents/models.py:422
+#: documents/models.py:419
 msgid "title contains"
 msgstr "ชื่อมีคำว่า"
 
-#: documents/models.py:423
+#: documents/models.py:420
 msgid "content contains"
 msgstr "เนื้อหาเอกสารมีคำว่า"
 
-#: documents/models.py:424
+#: documents/models.py:421
 msgid "ASN is"
 msgstr "ASN คือ"
 
-#: documents/models.py:425
+#: documents/models.py:422
 msgid "correspondent is"
 msgstr "ผู้เขียนคือ"
 
-#: documents/models.py:426
+#: documents/models.py:423
 msgid "document type is"
 msgstr "ประเภทเอกสารคือ"
 
-#: documents/models.py:427
+#: documents/models.py:424
 msgid "is in inbox"
 msgstr "อยู่ในกล่องขาเข้า"
 
-#: documents/models.py:428
+#: documents/models.py:425
 msgid "has tag"
 msgstr "มีแท็ก"
 
-#: documents/models.py:429
+#: documents/models.py:426
 msgid "has any tag"
 msgstr "มีแท็กใดก็ตาม"
 
-#: documents/models.py:430
+#: documents/models.py:427
 msgid "created before"
 msgstr "สร้างก่อน"
 
-#: documents/models.py:431
+#: documents/models.py:428
 msgid "created after"
 msgstr "สร้างหลังจาก"
 
-#: documents/models.py:432
+#: documents/models.py:429
 msgid "created year is"
 msgstr "สร้างเมื่อปี"
 
-#: documents/models.py:433
+#: documents/models.py:430
 msgid "created month is"
 msgstr "สร้างเมื่อเดือน"
 
-#: documents/models.py:434
+#: documents/models.py:431
 msgid "created day is"
 msgstr "สร้างเมื่อวันที่"
 
-#: documents/models.py:435
+#: documents/models.py:432
 msgid "added before"
 msgstr "นำเข้าก่อน"
 
-#: documents/models.py:436
+#: documents/models.py:433
 msgid "added after"
 msgstr "นำเข้าหลังจาก"
 
-#: documents/models.py:437
+#: documents/models.py:434
 msgid "modified before"
 msgstr "แก้ไขก่อน"
 
-#: documents/models.py:438
+#: documents/models.py:435
 msgid "modified after"
 msgstr "แก้ไขหลังจาก"
 
-#: documents/models.py:439
+#: documents/models.py:436
 msgid "does not have tag"
 msgstr "ไม่มีแท็ก"
 
-#: documents/models.py:440
+#: documents/models.py:437
 msgid "does not have ASN"
 msgstr "ไม่มี ASN"
 
-#: documents/models.py:441
+#: documents/models.py:438
 msgid "title or content contains"
 msgstr "ชื่อหรือเนื้อหามีคำว่า"
 
-#: documents/models.py:442
+#: documents/models.py:439
 msgid "fulltext query"
 msgstr "ค้นจากทุกอย่าง"
 
-#: documents/models.py:443
+#: documents/models.py:440
 msgid "more like this"
 msgstr "เอกสารที่คล้ายกัน"
 
-#: documents/models.py:444
+#: documents/models.py:441
 msgid "has tags in"
 msgstr "มีแท็ก"
 
-#: documents/models.py:445
+#: documents/models.py:442
 msgid "ASN greater than"
 msgstr "ASN มากกว่า"
 
-#: documents/models.py:446
+#: documents/models.py:443
 msgid "ASN less than"
 msgstr "ASN น้อยกว่า"
 
-#: documents/models.py:447
+#: documents/models.py:444
 msgid "storage path is"
 msgstr "พาธจัดเก็บคือ"
 
-#: documents/models.py:448
+#: documents/models.py:445
 msgid "has correspondent in"
 msgstr "ผู้เขียนคือ"
 
-#: documents/models.py:449
+#: documents/models.py:446
 msgid "does not have correspondent in"
 msgstr "ไม่มีผู้เขียนเป็น"
 
-#: documents/models.py:450
+#: documents/models.py:447
 msgid "has document type in"
 msgstr "ประเภทเอกสารคือ"
 
-#: documents/models.py:451
+#: documents/models.py:448
 msgid "does not have document type in"
 msgstr "ไม่มีประเภทเป็น"
 
-#: documents/models.py:452
+#: documents/models.py:449
 msgid "has storage path in"
 msgstr "พาธจัดเก็บคือ"
 
-#: documents/models.py:453
+#: documents/models.py:450
 msgid "does not have storage path in"
 msgstr "ไม่มีพาธจัดเก็บเป็น"
 
-#: documents/models.py:454
+#: documents/models.py:451
 msgid "owner is"
 msgstr "เจ้าของคือ"
 
-#: documents/models.py:455
+#: documents/models.py:452
 msgid "has owner in"
 msgstr "เจ้าของคือ"
 
-#: documents/models.py:456
+#: documents/models.py:453
 msgid "does not have owner"
 msgstr "ไม่มีเจ้าของเป็น"
 
-#: documents/models.py:457
+#: documents/models.py:454
 msgid "does not have owner in"
 msgstr "ไม่มีเจ้าของเป็น"
 
-#: documents/models.py:467
+#: documents/models.py:464
 msgid "rule type"
 msgstr "ชนิดของกฎ"
 
-#: documents/models.py:469
+#: documents/models.py:466
 msgid "value"
 msgstr "ค่า"
 
-#: documents/models.py:472
+#: documents/models.py:469
 msgid "filter rule"
 msgstr "กฎในการค้น"
 
-#: documents/models.py:473
+#: documents/models.py:470
 msgid "filter rules"
 msgstr "กฎในการค้น"
 
@@ -551,109 +551,109 @@ msgstr "แชร์​ลิงก์"
 msgid "share links"
 msgstr "แชร์​ลิงก์"
 
-#: documents/models.py:744
+#: documents/models.py:745
 msgid "Consume Folder"
 msgstr ""
 
-#: documents/models.py:745
+#: documents/models.py:746
 msgid "Api Upload"
 msgstr ""
 
-#: documents/models.py:746
+#: documents/models.py:747
 msgid "Mail Fetch"
 msgstr ""
 
-#: documents/models.py:752
-msgid "consumption template"
-msgstr ""
-
-#: documents/models.py:753
-msgid "consumption templates"
-msgstr ""
-
-#: documents/models.py:757 paperless_mail/models.py:95
+#: documents/models.py:751 paperless_mail/models.py:95
 msgid "order"
 msgstr "อันดับ"
 
-#: documents/models.py:766
+#: documents/models.py:760
 msgid "filter path"
 msgstr ""
 
-#: documents/models.py:771
+#: documents/models.py:765
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
 msgstr ""
 
-#: documents/models.py:778
+#: documents/models.py:772
 msgid "filter filename"
 msgstr ""
 
-#: documents/models.py:783 paperless_mail/models.py:148
+#: documents/models.py:777 paperless_mail/models.py:148
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
 msgstr "ประมวลผลเอกสารที่ชื่อไฟล์ตรงกับที่ระบุ (หากมี) โดยไม่สนใจอักษรพิมพ์ใหญ่-เล็ก และสามารถระบุแบบ wildcard ได้เช่น .pdf หรือ *invoice*"
 
-#: documents/models.py:794
+#: documents/models.py:788
 msgid "filter documents from this mail rule"
 msgstr ""
 
-#: documents/models.py:798
+#: documents/models.py:792
 msgid "assign title"
 msgstr ""
 
-#: documents/models.py:803
+#: documents/models.py:797
 msgid "Assign a document title, can include some placeholders, see documentation."
 msgstr ""
 
-#: documents/models.py:811 paperless_mail/models.py:204
+#: documents/models.py:805 paperless_mail/models.py:204
 msgid "assign this tag"
 msgstr "กำหนดแท็กนี้"
 
-#: documents/models.py:819 paperless_mail/models.py:212
+#: documents/models.py:813 paperless_mail/models.py:212
 msgid "assign this document type"
 msgstr "กำหนดประเภทเอกสารนี้"
 
-#: documents/models.py:827 paperless_mail/models.py:226
+#: documents/models.py:821 paperless_mail/models.py:226
 msgid "assign this correspondent"
 msgstr "กำหนดผู้เขียนนี้"
 
-#: documents/models.py:835
+#: documents/models.py:829
 msgid "assign this storage path"
 msgstr ""
 
-#: documents/models.py:844
+#: documents/models.py:838
 msgid "assign this owner"
 msgstr ""
 
-#: documents/models.py:851
+#: documents/models.py:845
 msgid "grant view permissions to these users"
 msgstr ""
 
-#: documents/models.py:858
+#: documents/models.py:852
 msgid "grant view permissions to these groups"
 msgstr ""
 
-#: documents/models.py:865
+#: documents/models.py:859
 msgid "grant change permissions to these users"
 msgstr ""
 
-#: documents/models.py:872
+#: documents/models.py:866
 msgid "grant change permissions to these groups"
 msgstr ""
 
-#: documents/serialisers.py:100
+#: documents/models.py:870
+msgid "consumption template"
+msgstr ""
+
+#: documents/models.py:871
+msgid "consumption templates"
+msgstr ""
+
+#: documents/serialisers.py:98
 #, python-format
 msgid "Invalid regular expression: %(error)s"
 msgstr "Regular expression ไม่ถูกต้อง : %(error)s"
 
-#: documents/serialisers.py:375
+#: documents/serialisers.py:373
 msgid "Invalid color."
 msgstr "สีไม่ถูกต้อง"
 
-#: documents/serialisers.py:751
+#: documents/serialisers.py:749
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "ไม่รองรับไฟล์ประเภท %(type)s"
 
-#: documents/serialisers.py:848
+#: documents/serialisers.py:846
 msgid "Invalid variable detected."
 msgstr "ตรวจพบตัวแปรไม่ถูกต้อง"
 
@@ -713,123 +713,200 @@ msgstr "รหัสผ่าน"
 msgid "Sign in"
 msgstr "เข้าสู่ระบบ"
 
+#: documents/templates/registration/login.html:70
+msgid "Forgot your password?"
+msgstr ""
+
+#: documents/templates/registration/password_reset_complete.html:14
+msgid "Paperless-ngx reset password complete"
+msgstr ""
+
+#: documents/templates/registration/password_reset_complete.html:40
+msgid "Password reset complete."
+msgstr ""
+
+#: documents/templates/registration/password_reset_complete.html:42
+#, python-format
+msgid "Your new password has been set. You can now <a href=\"%(login_url)s\">log in</a>"
+msgstr ""
+
+#: documents/templates/registration/password_reset_confirm.html:14
+msgid "Paperless-ngx reset password confirmation"
+msgstr ""
+
+#: documents/templates/registration/password_reset_confirm.html:42
+msgid "Set a new password."
+msgstr ""
+
+#: documents/templates/registration/password_reset_confirm.html:46
+msgid "Passwords did not match or too weak. Try again."
+msgstr ""
+
+#: documents/templates/registration/password_reset_confirm.html:49
+msgid "New Password"
+msgstr ""
+
+#: documents/templates/registration/password_reset_confirm.html:50
+msgid "Confirm Password"
+msgstr ""
+
+#: documents/templates/registration/password_reset_confirm.html:61
+msgid "Change my password"
+msgstr ""
+
+#: documents/templates/registration/password_reset_confirm.html:65
+msgid "request a new password reset"
+msgstr ""
+
+#: documents/templates/registration/password_reset_done.html:14
+msgid "Paperless-ngx reset password sent"
+msgstr ""
+
+#: documents/templates/registration/password_reset_done.html:40
+msgid "Check your inbox."
+msgstr ""
+
+#: documents/templates/registration/password_reset_done.html:41
+msgid "We've emailed you instructions for setting your password. You should receive the email shortly!"
+msgstr ""
+
+#: documents/templates/registration/password_reset_form.html:14
+msgid "Paperless-ngx reset password request"
+msgstr ""
+
+#: documents/templates/registration/password_reset_form.html:41
+msgid "Enter your email address below, and we'll email instructions for setting a new one."
+msgstr ""
+
+#: documents/templates/registration/password_reset_form.html:44
+msgid "An error occurred. Please try again."
+msgstr ""
+
+#: documents/templates/registration/password_reset_form.html:47
+msgid "Email"
+msgstr ""
+
+#: documents/templates/registration/password_reset_form.html:54
+msgid "Send me instructions!"
+msgstr ""
+
 #: paperless/apps.py:10
 msgid "Paperless"
 msgstr "Paperless"
 
-#: paperless/settings.py:573
+#: paperless/settings.py:574
 msgid "English (US)"
 msgstr "ภาษาอังกฤษ (สหรัฐฯ)"
 
-#: paperless/settings.py:574
+#: paperless/settings.py:575
 msgid "Arabic"
 msgstr "ภาษาอาหรับ"
 
-#: paperless/settings.py:575
+#: paperless/settings.py:576
 msgid "Afrikaans"
 msgstr ""
 
-#: paperless/settings.py:576
+#: paperless/settings.py:577
 msgid "Belarusian"
 msgstr "ภาษาเบลารุส"
 
-#: paperless/settings.py:577
+#: paperless/settings.py:578
 msgid "Catalan"
 msgstr "ภาษาคาตาลัน"
 
-#: paperless/settings.py:578
+#: paperless/settings.py:579
 msgid "Czech"
 msgstr "ภาษาเช็ก"
 
-#: paperless/settings.py:579
+#: paperless/settings.py:580
 msgid "Danish"
 msgstr "ภาษาเดนมาร์ก"
 
-#: paperless/settings.py:580
+#: paperless/settings.py:581
 msgid "German"
 msgstr "ภาษาเยอรมัน"
 
-#: paperless/settings.py:581
+#: paperless/settings.py:582
 msgid "Greek"
 msgstr ""
 
-#: paperless/settings.py:582
+#: paperless/settings.py:583
 msgid "English (GB)"
 msgstr "ภาษาอังกฤษ (สหราชอาณาจักร)"
 
-#: paperless/settings.py:583
+#: paperless/settings.py:584
 msgid "Spanish"
 msgstr "ภาษาสเปน"
 
-#: paperless/settings.py:584
+#: paperless/settings.py:585
 msgid "Finnish"
 msgstr "ภาษาฟินแลนด์"
 
-#: paperless/settings.py:585
+#: paperless/settings.py:586
 msgid "French"
 msgstr "ภาษาฝรั่งเศส"
 
-#: paperless/settings.py:586
+#: paperless/settings.py:587
 msgid "Italian"
 msgstr "ภาษาอิตาลี"
 
-#: paperless/settings.py:587
+#: paperless/settings.py:588
 msgid "Luxembourgish"
 msgstr "ภาษาลักเซมเบิร์ก"
 
-#: paperless/settings.py:588
+#: paperless/settings.py:589
 msgid "Norwegian"
 msgstr ""
 
-#: paperless/settings.py:589
+#: paperless/settings.py:590
 msgid "Dutch"
 msgstr "ภาษาดัตช์"
 
-#: paperless/settings.py:590
+#: paperless/settings.py:591
 msgid "Polish"
 msgstr "ภาษาโปแลนด์"
 
-#: paperless/settings.py:591
+#: paperless/settings.py:592
 msgid "Portuguese (Brazil)"
 msgstr "ภาษาโปรตุเกส (บราซิล)"
 
-#: paperless/settings.py:592
+#: paperless/settings.py:593
 msgid "Portuguese"
 msgstr "ภาษาโปรตุเกส"
 
-#: paperless/settings.py:593
+#: paperless/settings.py:594
 msgid "Romanian"
 msgstr "ภาษาโรมาเนีย"
 
-#: paperless/settings.py:594
+#: paperless/settings.py:595
 msgid "Russian"
 msgstr "ภาษารัสเซีย"
 
-#: paperless/settings.py:595
+#: paperless/settings.py:596
 msgid "Slovak"
 msgstr "ภาษาสโลวาเกีย"
 
-#: paperless/settings.py:596
+#: paperless/settings.py:597
 msgid "Slovenian"
 msgstr "ภาษาสโลเวเนีย"
 
-#: paperless/settings.py:597
+#: paperless/settings.py:598
 msgid "Serbian"
 msgstr "ภาษาเซอร์เบีย"
 
-#: paperless/settings.py:598
+#: paperless/settings.py:599
 msgid "Swedish"
 msgstr "ภาษาสวีเดน"
 
-#: paperless/settings.py:599
+#: paperless/settings.py:600
 msgid "Turkish"
 msgstr "ภาษาตุรกี"
 
-#: paperless/settings.py:600
+#: paperless/settings.py:601
 msgid "Ukrainian"
 msgstr "ภาษายูเครน"
 
-#: paperless/settings.py:601
+#: paperless/settings.py:602
 msgid "Chinese Simplified"
 msgstr "ภาษาจีน (ตัวย่อ)"
 
