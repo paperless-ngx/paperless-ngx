@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-28 23:21-0700\n"
+"POT-Creation-Date: 2023-09-28 10:56-0700\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -710,147 +710,222 @@ msgstr ""
 msgid "Share link has expired."
 msgstr ""
 
-#: documents/templates/registration/login.html:56
+#: documents/templates/registration/login.html:55
 msgid "Username"
 msgstr ""
 
-#: documents/templates/registration/login.html:57
+#: documents/templates/registration/login.html:56
 msgid "Password"
 msgstr ""
 
-#: documents/templates/registration/login.html:67
+#: documents/templates/registration/login.html:66
 msgid "Sign in"
+msgstr ""
+
+#: documents/templates/registration/login.html:70
+msgid "Forgot your password?"
+msgstr ""
+
+#: documents/templates/registration/password_reset_complete.html:14
+msgid "Paperless-ngx reset password complete"
+msgstr ""
+
+#: documents/templates/registration/password_reset_complete.html:40
+msgid "Password reset complete."
+msgstr ""
+
+#: documents/templates/registration/password_reset_complete.html:42
+#, python-format
+msgid ""
+"Your new password has been set. You can now <a href=\"%(login_url)s\">log "
+"in</a>"
+msgstr ""
+
+#: documents/templates/registration/password_reset_confirm.html:14
+msgid "Paperless-ngx reset password confirmation"
+msgstr ""
+
+#: documents/templates/registration/password_reset_confirm.html:42
+msgid "Set a new password."
+msgstr ""
+
+#: documents/templates/registration/password_reset_confirm.html:46
+msgid "Passwords did not match or too weak. Try again."
+msgstr ""
+
+#: documents/templates/registration/password_reset_confirm.html:49
+msgid "New Password"
+msgstr ""
+
+#: documents/templates/registration/password_reset_confirm.html:50
+msgid "Confirm Password"
+msgstr ""
+
+#: documents/templates/registration/password_reset_confirm.html:61
+msgid "Change my password"
+msgstr ""
+
+#: documents/templates/registration/password_reset_confirm.html:65
+msgid "request a new password reset"
+msgstr ""
+
+#: documents/templates/registration/password_reset_done.html:14
+msgid "Paperless-ngx reset password sent"
+msgstr ""
+
+#: documents/templates/registration/password_reset_done.html:40
+msgid "Check your inbox."
+msgstr ""
+
+#: documents/templates/registration/password_reset_done.html:41
+msgid ""
+"We've emailed you instructions for setting your password. You should receive "
+"the email shortly!"
+msgstr ""
+
+#: documents/templates/registration/password_reset_form.html:14
+msgid "Paperless-ngx reset password request"
+msgstr ""
+
+#: documents/templates/registration/password_reset_form.html:41
+msgid ""
+"Enter your email address below, and we'll email instructions for setting a "
+"new one."
+msgstr ""
+
+#: documents/templates/registration/password_reset_form.html:44
+msgid "An error occurred. Please try again."
+msgstr ""
+
+#: documents/templates/registration/password_reset_form.html:47
+msgid "Email"
+msgstr ""
+
+#: documents/templates/registration/password_reset_form.html:54
+msgid "Send me instructions!"
 msgstr ""
 
 #: paperless/apps.py:10
 msgid "Paperless"
 msgstr ""
 
-#: paperless/models.py:17
-msgid "SSO group"
-msgstr ""
-
-#: paperless/models.py:18
-msgid "SSO groups"
-msgstr ""
-
-#: paperless/settings.py:605
+#: paperless/settings.py:574
 msgid "English (US)"
 msgstr ""
 
-#: paperless/settings.py:606
+#: paperless/settings.py:575
 msgid "Arabic"
 msgstr ""
 
-#: paperless/settings.py:607
+#: paperless/settings.py:576
 msgid "Afrikaans"
 msgstr ""
 
-#: paperless/settings.py:608
+#: paperless/settings.py:577
 msgid "Belarusian"
 msgstr ""
 
-#: paperless/settings.py:609
+#: paperless/settings.py:578
 msgid "Catalan"
 msgstr ""
 
-#: paperless/settings.py:610
+#: paperless/settings.py:579
 msgid "Czech"
 msgstr ""
 
-#: paperless/settings.py:611
+#: paperless/settings.py:580
 msgid "Danish"
 msgstr ""
 
-#: paperless/settings.py:612
+#: paperless/settings.py:581
 msgid "German"
 msgstr ""
 
-#: paperless/settings.py:613
+#: paperless/settings.py:582
 msgid "Greek"
 msgstr ""
 
-#: paperless/settings.py:614
+#: paperless/settings.py:583
 msgid "English (GB)"
 msgstr ""
 
-#: paperless/settings.py:615
+#: paperless/settings.py:584
 msgid "Spanish"
 msgstr ""
 
-#: paperless/settings.py:616
+#: paperless/settings.py:585
 msgid "Finnish"
 msgstr ""
 
-#: paperless/settings.py:617
+#: paperless/settings.py:586
 msgid "French"
 msgstr ""
 
-#: paperless/settings.py:618
+#: paperless/settings.py:587
 msgid "Italian"
 msgstr ""
 
-#: paperless/settings.py:619
+#: paperless/settings.py:588
 msgid "Luxembourgish"
 msgstr ""
 
-#: paperless/settings.py:620
+#: paperless/settings.py:589
 msgid "Norwegian"
 msgstr ""
 
-#: paperless/settings.py:621
+#: paperless/settings.py:590
 msgid "Dutch"
 msgstr ""
 
-#: paperless/settings.py:622
+#: paperless/settings.py:591
 msgid "Polish"
 msgstr ""
 
-#: paperless/settings.py:623
+#: paperless/settings.py:592
 msgid "Portuguese (Brazil)"
 msgstr ""
 
-#: paperless/settings.py:624
+#: paperless/settings.py:593
 msgid "Portuguese"
 msgstr ""
 
-#: paperless/settings.py:625
+#: paperless/settings.py:594
 msgid "Romanian"
 msgstr ""
 
-#: paperless/settings.py:626
+#: paperless/settings.py:595
 msgid "Russian"
 msgstr ""
 
-#: paperless/settings.py:627
+#: paperless/settings.py:596
 msgid "Slovak"
 msgstr ""
 
-#: paperless/settings.py:628
+#: paperless/settings.py:597
 msgid "Slovenian"
 msgstr ""
 
-#: paperless/settings.py:629
+#: paperless/settings.py:598
 msgid "Serbian"
 msgstr ""
 
-#: paperless/settings.py:630
+#: paperless/settings.py:599
 msgid "Swedish"
 msgstr ""
 
-#: paperless/settings.py:631
+#: paperless/settings.py:600
 msgid "Turkish"
 msgstr ""
 
-#: paperless/settings.py:632
+#: paperless/settings.py:601
 msgid "Ukrainian"
 msgstr ""
 
-#: paperless/settings.py:633
+#: paperless/settings.py:602
 msgid "Chinese Simplified"
 msgstr ""
 
-#: paperless/urls.py:187
+#: paperless/urls.py:184
 msgid "Paperless-ngx administration"
 msgstr ""
 

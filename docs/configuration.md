@@ -1302,6 +1302,35 @@ started by the container.
     setting set. This setting is always ignored if the corresponding
     frontend setting has been set.
 
+## Email sending
+
+Setting an SMTP server for the backend will allow you to reset your
+password. All of these options come from their similarly-named [Django settings](https://docs.djangoproject.com/en/4.2/ref/settings/#email-host)
+
+#### [`PAPERLESS_EMAIL_HOST=<str>`](#PAPERLESS_EMAIL_HOST) {#PAPERLESS_EMAIL_HOST}
+
+: Defaults to 'localhost'.
+
+#### [`PAPERLESS_EMAIL_PORT=<int>`](#PAPERLESS_EMAIL_PORT) {#PAPERLESS_EMAIL_PORT}
+
+: Defaults to port 25.
+
+#### [`PAPERLESS_EMAIL_HOST_USER=<str>`](#PAPERLESS_EMAIL_HOST_USER) {#PAPERLESS_EMAIL_HOST_USER}
+
+: Defaults to ''.
+
+#### [`PAPERLESS_EMAIL_HOST_PASSWORD=<str>`](#PAPERLESS_EMAIL_HOST_PASSWORD) {#PAPERLESS_EMAIL_HOST_PASSWORD}
+
+: Defaults to ''.
+
+#### [`PAPERLESS_EMAIL_USE_TLS=<bool>`](#PAPERLESS_EMAIL_USE_TLS) {#PAPERLESS_EMAIL_USE_TLS}
+
+: Defaults to false.
+
+#### [`PAPERLESS_EMAIL_USE_SSL=<bool>`](#PAPERLESS_EMAIL_USE_SSL) {#PAPERLESS_EMAIL_USE_SSL}
+
+: Defaults to false.
+
 ## SSO with OpenIDConnect
 
 To configure OpenIDConnect you need a provider. The redirect url is `${PAPERLESS_URL}/accounts/complete/oidc/`.
