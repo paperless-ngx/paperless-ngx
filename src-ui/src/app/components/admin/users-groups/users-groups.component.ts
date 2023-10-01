@@ -16,6 +16,7 @@ import { UserEditDialogComponent } from '../../common/edit-dialog/user-edit-dial
 import { SsoGroupEditDialogComponent } from '../../common/edit-dialog/sso-group-edit-dialog/sso-group-edit-dialog.component'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 import { SettingsService } from 'src/app/services/settings.service'
+import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 
 @Component({
   selector: 'pngx-users-groups',
@@ -71,18 +72,25 @@ export class UsersAndGroupsComponent
         },
       })
 
-    this.ssoGroupService
-      .listAll(null, null, { full_perms: true })
-      .pipe(first(), takeUntil(this.unsubscribeNotifier))
-      .subscribe({
-        next: (r) => {
-          this.ssoGroups = r.results
-        },
-        error: (e) => {
-          this.ssoGroups = []
-          this.toastService.showError($localize`Error retrieving SSO groups`, e)
-        },
-      })
+    if (this.ssoEnabled) {
+      this.ssoGroupService
+        .listAll(null, null, { full_perms: true })
+        .pipe(first(), takeUntil(this.unsubscribeNotifier))
+        .subscribe({
+          next: (r) => {
+            this.ssoGroups = r.results
+          },
+          error: (e) => {
+            this.ssoGroups = []
+            this.toastService.showError(
+              $localize`Error retrieving SSO groups`,
+              e
+            )
+          },
+        })
+    } else {
+      this.ssoGroups = []
+    }
   }
 
   ngOnDestroy() {
@@ -201,6 +209,10 @@ export class UsersAndGroupsComponent
         },
       })
     })
+  }
+
+  public get ssoEnabled(): boolean {
+    return this.settings.get(SETTINGS_KEYS.SSO_ENABLED)
   }
 
   editSsoGroup(ssoGroup: PaperlessSSOGroup = null) {

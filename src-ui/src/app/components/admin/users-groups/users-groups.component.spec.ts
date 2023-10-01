@@ -46,6 +46,7 @@ import { UsersAndGroupsComponent } from './users-groups.component'
 import { PaperlessUser } from 'src/app/data/paperless-user'
 import { PaperlessGroup } from 'src/app/data/paperless-group'
 import { PaperlessSSOGroup } from 'src/app/data/paperless-sso-group'
+import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 
 const users = [
   { id: 1, username: 'user1', is_superuser: false },
@@ -283,7 +284,17 @@ describe('UsersAndGroupsComponent', () => {
     expect(toastErrorSpy).toBeCalled()
   })
 
+  it('should hide sso groups if not enabled', () => {
+    settingsService.set(SETTINGS_KEYS.SSO_ENABLED, false)
+    const listSpy = jest.spyOn(ssoGroupService, 'listAll')
+    completeSetup()
+    fixture.detectChanges()
+    expect(listSpy).not.toHaveBeenCalled()
+    expect(fixture.debugElement.nativeElement.textContent).not.toContain('sso')
+  })
+
   it('should show errors on load if load sso groups failure', () => {
+    settingsService.set(SETTINGS_KEYS.SSO_ENABLED, true)
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
     jest
       .spyOn(ssoGroupService, 'listAll')
@@ -296,6 +307,7 @@ describe('UsersAndGroupsComponent', () => {
   })
 
   it('should support edit / create sso group, show error if needed', () => {
+    settingsService.set(SETTINGS_KEYS.SSO_ENABLED, true)
     completeSetup()
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
@@ -313,6 +325,7 @@ describe('UsersAndGroupsComponent', () => {
   })
 
   it('should support delete sso group, show error if needed', () => {
+    settingsService.set(SETTINGS_KEYS.SSO_ENABLED, true)
     completeSetup()
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((refs) => (modal = refs[0]))

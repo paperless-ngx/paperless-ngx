@@ -49,6 +49,7 @@ export const SETTINGS_KEYS = {
   DEFAULT_PERMS_VIEW_GROUPS: 'general-settings:permissions:default-view-groups',
   DEFAULT_PERMS_EDIT_USERS: 'general-settings:permissions:default-edit-users',
   DEFAULT_PERMS_EDIT_GROUPS: 'general-settings:permissions:default-edit-groups',
+  SSO_ENABLED: 'general-settings:sso-enabled',
 }
 
 export const SETTINGS: PaperlessUiSetting[] = [
@@ -186,5 +187,10 @@ export const SETTINGS: PaperlessUiSetting[] = [
     key: SETTINGS_KEYS.DASHBOARD_VIEWS_SORT_ORDER,
     type: 'array',
     default: [],
+  },
+  {
+    key: SETTINGS_KEYS.SSO_ENABLED,
+    type: 'boolean',
+    default: false,
   },
 ]

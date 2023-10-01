@@ -869,12 +869,14 @@ class UiSettingsViewSerializer(serializers.ModelSerializer):
         ]
 
     def validate_settings(self, settings):
-        # we never save update checking backend setting
+        # we never save these settings
         if "update_checking" in settings:
             try:
                 settings["update_checking"].pop("backend_setting")
             except KeyError:
                 pass
+        if "sso_enabled" in settings:
+            settings.pop("sso_enabled")
         return settings
 
     def create(self, validated_data):

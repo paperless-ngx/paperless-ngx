@@ -1106,6 +1106,7 @@ class UiSettingsView(GenericAPIView):
             ui_settings["update_checking"] = {
                 "backend_setting": settings.ENABLE_UPDATE_CHECK,
             }
+        ui_settings["sso_enabled"] = settings.SOCIAL_AUTH_OIDC_ENABLE
         user_resp = {
             "id": user.id,
             "username": user.username,

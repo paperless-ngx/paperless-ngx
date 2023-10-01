@@ -2783,6 +2783,14 @@ class TestApiUiSettings(DirectoriesMixin, APITestCase):
         self.client.force_authenticate(user=self.test_user)
 
     def test_api_get_ui_settings(self):
+        """
+        GIVEN:
+            - Normal setup
+        WHEN:
+            - UI settings loaded
+        THEN:
+            - UI settings returned including backend settings
+        """
         response = self.client.get(self.ENDPOINT, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertDictEqual(
@@ -2802,10 +2810,19 @@ class TestApiUiSettings(DirectoriesMixin, APITestCase):
                 "update_checking": {
                     "backend_setting": "default",
                 },
+                "sso_enabled": False,
             },
         )
 
     def test_api_set_ui_settings(self):
+        """
+        GIVEN:
+            - Normal setup
+        WHEN:
+            - UI settings set
+        THEN:
+            - UI settings are set
+        """
         settings = {
             "settings": {
                 "dark_mode": {
@@ -2826,6 +2843,55 @@ class TestApiUiSettings(DirectoriesMixin, APITestCase):
         self.assertDictEqual(
             ui_settings.settings,
             settings["settings"],
+        )
+
+    def test_api_set_ignored_ui_settings(self):
+        """
+        GIVEN:
+            - Normal setup
+        WHEN:
+            - UI settings including 'backend-only' settings are set
+        THEN:
+            - UI settings returned ignoring backend settings
+        """
+
+        settings = {
+            "settings": {
+                "dark_mode": {
+                    "enabled": True,
+                },
+                "update_checking": {
+                    "backend_setting": "foo",
+                },
+                "sso_enabled": True,
+            },
+        }
+
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(settings),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        ui_settings = self.test_user.ui_settings
+        # doesnt include 'ignored' settings
+        self.assertDictEqual(
+            ui_settings.settings,
+            {
+                "dark_mode": {
+                    "enabled": True,
+                },
+                "update_checking": {},
+            },
+        )
+
+        # cover KeyError
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps({"update_checking": {}}),
+            content_type="application/json",
         )
 
 

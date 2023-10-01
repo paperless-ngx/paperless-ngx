@@ -93,7 +93,7 @@
     <div *ngIf="groups.length === 0">No groups defined</div>
 </ng-container>
 
-<ng-container *ngIf="ssoGroups">
+<ng-container *ngIf="ssoEnabled && ssoGroups">
     <h4 class="mt-4 d-flex">
         <ng-container i18n>SSO Groups</ng-container>
         <button type="button" class="btn btn-sm btn-outline-primary ms-4" (click)="editSsoGroup()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.SsoGroup }">
