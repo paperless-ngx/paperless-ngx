@@ -1357,7 +1357,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
-          <context context-type="linenumber">56</context>
+          <context context-type="linenumber">57</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3066660568529853846" datatype="html">
@@ -1368,7 +1368,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
-          <context context-type="linenumber">68</context>
+          <context context-type="linenumber">70</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5610279464668232148" datatype="html">
@@ -1810,57 +1810,57 @@
         <source>Error retrieving SSO groups</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
-          <context context-type="linenumber">80</context>
+          <context context-type="linenumber">83</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4510369340305901516" datatype="html">
         <source>Password has been changed, you will be logged out momentarily.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
-          <context context-type="linenumber">106</context>
+          <context context-type="linenumber">109</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2753185112875184719" datatype="html">
         <source>Saved user &quot;<x id="PH" equiv-text="newUser.username"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
-          <context context-type="linenumber">113</context>
+          <context context-type="linenumber">116</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3471101514724661554" datatype="html">
         <source>Error saving user.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
-          <context context-type="linenumber">123</context>
+          <context context-type="linenumber">126</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5565868288871970148" datatype="html">
         <source>Confirm delete user account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
-          <context context-type="linenumber">131</context>
+          <context context-type="linenumber">134</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8133663925694885325" datatype="html">
         <source>This operation will permanently delete this user account.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
-          <context context-type="linenumber">132</context>
+          <context context-type="linenumber">135</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5641451190833696892" datatype="html">
         <source>This operation cannot be undone.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
-          <context context-type="linenumber">133</context>
+          <context context-type="linenumber">136</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
-          <context context-type="linenumber">183</context>
+          <context context-type="linenumber">186</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
-          <context context-type="linenumber">234</context>
+          <context context-type="linenumber">237</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
@@ -1891,15 +1891,15 @@
         <source>Proceed</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
-          <context context-type="linenumber">135</context>
+          <context context-type="linenumber">138</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
-          <context context-type="linenumber">185</context>
+          <context context-type="linenumber">188</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
-          <context context-type="linenumber">236</context>
+          <context context-type="linenumber">239</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
@@ -1926,98 +1926,98 @@
         <source>Deleted user</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
-          <context context-type="linenumber">141</context>
+          <context context-type="linenumber">144</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1942566571910298572" datatype="html">
         <source>Error deleting user.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
-          <context context-type="linenumber">147</context>
+          <context context-type="linenumber">150</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5766640174051730159" datatype="html">
         <source>Saved group &quot;<x id="PH" equiv-text="newGroup.name"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
-          <context context-type="linenumber">165</context>
+          <context context-type="linenumber">168</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8382042988405122578" datatype="html">
         <source>Error saving group.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
-          <context context-type="linenumber">173</context>
+          <context context-type="linenumber">176</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6538873300613683004" datatype="html">
         <source>Confirm delete user group</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
-          <context context-type="linenumber">181</context>
+          <context context-type="linenumber">184</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7710984639498518244" datatype="html">
         <source>This operation will permanently delete this user group.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
-          <context context-type="linenumber">182</context>
+          <context context-type="linenumber">185</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6834066329827670963" datatype="html">
         <source>Deleted group</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
-          <context context-type="linenumber">191</context>
+          <context context-type="linenumber">194</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8850738980935204840" datatype="html">
         <source>Error deleting group.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
-          <context context-type="linenumber">197</context>
+          <context context-type="linenumber">200</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5355421813806076589" datatype="html">
         <source>Saved SSO group &quot;<x id="PH" equiv-text="newGroup.name"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
-          <context context-type="linenumber">215</context>
+          <context context-type="linenumber">218</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7380194344799532571" datatype="html">
         <source>Error saving SSO group.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
-          <context context-type="linenumber">224</context>
+          <context context-type="linenumber">227</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3764224052736431096" datatype="html">
         <source>Confirm delete SSO group</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
-          <context context-type="linenumber">232</context>
+          <context context-type="linenumber">235</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3336438187874950546" datatype="html">
         <source>This operation will permanently delete this SSO group.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
-          <context context-type="linenumber">233</context>
+          <context context-type="linenumber">236</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7356963559044469964" datatype="html">
         <source>Deleted SSO group</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
-          <context context-type="linenumber">242</context>
+          <context context-type="linenumber">245</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6024233015220156350" datatype="html">
         <source>Error deleting SSO group.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
-          <context context-type="linenumber">248</context>
+          <context context-type="linenumber">251</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2173456130768795374" datatype="html">
