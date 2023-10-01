@@ -261,6 +261,11 @@ These can be found under Settings > Users & Groups, assuming the user has access
 as a member of a group those permissions will be inherited and this is reflected in the UI. Explicit
 permissions can be granted to limit access to certain parts of the UI (and corresponding API endpoints).
 
+### Password reset
+
+In order to enable the password reset feature you will need to setup an SMTP backend, see
+[`PAPERLESS_EMAIL_HOST`](/configuration#PAPERLESS_EMAIL_HOST)
+
 ## Consumption templates
 
 Consumption templates were introduced in v2.0 and allow for finer control over what metadata (tags, doc
