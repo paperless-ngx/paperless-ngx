@@ -389,8 +389,8 @@ AUTHENTICATION_BACKENDS = [
 SOCIAL_AUTH_DISABLE_NORMAL_AUTH = __get_boolean("PAPERLESS_SSO_DISABLE_NORMAL_AUTH")
 
 # Only support OIDC, but it should be easy to enable more backends
-if __get_boolean("PAPERLESS_SSO_OIDC_ENABLE"):
-    SOCIAL_AUTH_OIDC_ENABLE = True
+SOCIAL_AUTH_OIDC_ENABLE = __get_boolean("PAPERLESS_SSO_OIDC_ENABLE")
+if SOCIAL_AUTH_OIDC_ENABLE:
     AUTHENTICATION_BACKENDS.append(
         "social_core.backends.open_id_connect.OpenIdConnectAuth",
     )

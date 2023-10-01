@@ -52,7 +52,7 @@
           {% translate "Share link has expired." %}
         </div>
       {% endif %}
-      {% if not SOCIAL_AUTH_DISABLE_NORMAL_AUTH %}
+      {% if not DISABLE_NORMAL_AUTH %}
       {% translate "Username" as i18n_username %}
       {% translate "Password" as i18n_password %}
       <div class="form-floating">
@@ -72,8 +72,8 @@
         </div>
         {% endif %}
       {% endif %}
-      {% if SOCIAL_AUTH_OIDC_ENABLE %}
-      <a class="btn btn-lg btn-primary btn-block" href="{% url "social:begin" "oidc" %}">{{ SOCIAL_AUTH_OIDC_NAME }}</a>
+      {% if OIDC_ENABLE %}
+      <a class="btn btn-lg btn-primary btn-block" href="{% url "social:begin" "oidc" %}">{{ OIDC_NAME }}</a>
       {% endif %}
 		</form>
 	</body>
