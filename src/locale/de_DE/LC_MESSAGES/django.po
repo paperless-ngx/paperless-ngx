@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-28 10:56-0700\n"
-"PO-Revision-Date: 2023-10-02 06:53\n"
+"PO-Revision-Date: 2023-10-02 11:17\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -768,7 +768,7 @@ msgstr "Überprüfen Sie Ihren Posteingang."
 
 #: documents/templates/registration/password_reset_done.html:41
 msgid "We've emailed you instructions for setting your password. You should receive the email shortly!"
-msgstr "Wir haben Ihnen Anweisungen zum Setzen Ihres Kennworts gesendet. Sie sollten die E-Mail in Kürze erhalten!"
+msgstr "Wir haben Ihnen Anweisungen zum Setzen Ihres neuen Kennworts gesendet. Sie sollten die E-Mail in Kürze erhalten!"
 
 #: documents/templates/registration/password_reset_form.html:14
 msgid "Paperless-ngx reset password request"
@@ -788,7 +788,7 @@ msgstr "E-Mail"
 
 #: documents/templates/registration/password_reset_form.html:54
 msgid "Send me instructions!"
-msgstr "Senden Sie mir Anweisungen!"
+msgstr "Anweisungen senden!"
 
 #: paperless/apps.py:10
 msgid "Paperless"
