@@ -696,7 +696,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">92</context>
         </context-group>
-        <target state="final">Der integrierte PDF-Betrachter des Web-Browsers ist in der Regel schneller bei der Anzeige besonders großer Dokumente, funktioniert aber nicht in allen Browsern.</target>
+        <target state="final">Dies ist in der Regel schneller bei der Anzeige großer PDF-Dokumente, funktioniert aber möglicherweise nicht in allen Web-Browsern.</target>
       </trans-unit>
       <trans-unit id="3982403428275430291" datatype="html" approved="yes">
         <source>Sidebar</source>
