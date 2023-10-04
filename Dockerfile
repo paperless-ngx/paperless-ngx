@@ -165,19 +165,11 @@ ARG JBIG2ENC_VERSION=0.29
 RUN set -eux \
   && echo "Getting binaries" \
     && mkdir paperless-ngx \
-    && curl --fail --silent --show-error --output paperless-ngx.tar.gz --location https://github.com/paperless-ngx/builder/archive/58bb061b9b3b63009852d6d875f9a305d9ae6ac9.tar.gz \
-    && tar -xf paperless-ngx.tar.gz --directory paperless-ngx --strip-components=1 \
-    && cd paperless-ngx \
-    # Setting a specific revision ensures we know what this installed
-    # and ensures cache breaking on changes
+    && curl --fail --silent --show-error --output jbig2enc_${JBIG2ENC_VERSION}-1_${TARGETARCH}.deb --location https://github.com/paperless-ngx/builder/releases/download/v0.0.0/jbig2enc_${JBIG2ENC_VERSION}-1_${TARGETARCH}.deb \
   && echo "Installing jbig2enc" \
-    && cp ./jbig2enc/${JBIG2ENC_VERSION}/${TARGETARCH}${TARGETVARIANT}/jbig2 /usr/local/bin/ \
-    && cp ./jbig2enc/${JBIG2ENC_VERSION}/${TARGETARCH}${TARGETVARIANT}/libjbig2enc* /usr/local/lib/ \
-    && chmod a+x /usr/local/bin/jbig2 \
+    && dpkg -i ./jbig2enc_${JBIG2ENC_VERSION}-1_${TARGETARCH}.deb \
   && echo "Cleaning up image layer" \
-    && cd ../ \
-    && rm -rf paperless-ngx \
-    && rm paperless-ngx.tar.gz
+    && rm -f jbig2enc_${JBIG2ENC_VERSION}-1_${TARGETARCH}.deb
 
 WORKDIR /usr/src/paperless/src/
 
