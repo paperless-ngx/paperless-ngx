@@ -47,6 +47,14 @@ LABEL org.opencontainers.image.licenses="GPL-3.0-only"
 
 ARG DEBIAN_FRONTEND=noninteractive
 
+# Buildx provided, must be defined to use though
+ARG TARGETARCH
+
+# Can be workflow provided, defaults set for manual building
+ARG JBIG2ENC_VERSION=0.29
+ARG QPDF_VERSION=11.6.1
+ARG GS_VERSION=10.02.0
+
 #
 # Begin installation and configuration
 # Order the steps below from least often changed to most
@@ -102,7 +110,25 @@ RUN set -eux \
   echo "Installing system packages" \
     && apt-get update \
     && apt-get install --yes --quiet --no-install-recommends ${RUNTIME_PACKAGES} \
-    && rm -rf /var/lib/apt/lists/* \
+    && echo "Installing pre-built updates" \
+      && echo "Installing qpdf ${QPDF_VERSION}" \
+        && curl --fail --silent --show-error --output libqpdf29_${QPDF_VERSION}-1_${TARGETARCH}.deb --location https://github.com/paperless-ngx/builder/releases/download/v0.0.0/libqpdf29_${QPDF_VERSION}-1_${TARGETARCH}.deb \
+        && curl --fail --silent --show-error --output qpdf_${QPDF_VERSION}-1_${TARGETARCH}.deb --location https://github.com/paperless-ngx/builder/releases/download/v0.0.0/qpdf_${QPDF_VERSION}-1_${TARGETARCH}.deb \
+        && dpkg --install ./libqpdf29_${QPDF_VERSION}-1_${TARGETARCH}.deb \
+        && dpkg --install ./qpdf_${QPDF_VERSION}-1_${TARGETARCH}.deb \
+      && echo "Installing Ghostscript ${GS_VERSION}" \
+        && curl --fail --silent --show-error --output libgs10_${GS_VERSION}.dfsg-2_${TARGETARCH}.deb --location https://github.com/paperless-ngx/builder/releases/download/v0.0.0/libgs10_${GS_VERSION}.dfsg-2_${TARGETARCH}.deb \
+        && curl --fail --silent --show-error --output ghostscript_${GS_VERSION}.dfsg-2_${TARGETARCH}.deb --location https://github.com/paperless-ngx/builder/releases/download/v0.0.0/ghostscript_${GS_VERSION}.dfsg-2_${TARGETARCH}.deb \
+        && curl --fail --silent --show-error --output libgs10-common_${GS_VERSION}.dfsg-2_all.deb --location https://github.com/paperless-ngx/builder/releases/download/v0.0.0/libgs10-common_${GS_VERSION}.dfsg-2_all.deb \
+        && dpkg --install ./libgs10-common_${GS_VERSION}.dfsg-2_all.deb \
+        && dpkg --install ./libgs10_${GS_VERSION}.dfsg-2_${TARGETARCH}.deb \
+        && dpkg --install ./ghostscript_${GS_VERSION}.dfsg-2_${TARGETARCH}.deb \
+      && echo "Installing jbig2enc" \
+        && curl --fail --silent --show-error --output jbig2enc_${JBIG2ENC_VERSION}-1_${TARGETARCH}.deb --location https://github.com/paperless-ngx/builder/releases/download/v0.0.0/jbig2enc_${JBIG2ENC_VERSION}-1_${TARGETARCH}.deb \
+        && dpkg --install ./jbig2enc_${JBIG2ENC_VERSION}-1_${TARGETARCH}.deb \
+      && echo "Cleaning up image layer" \
+        && rm --force --verbose *.deb \
+    && rm --recursive --force --verbose /var/lib/apt/lists/* \
   && echo "Installing supervisor" \
     && python3 -m pip install --default-timeout=1000 --upgrade --no-cache-dir supervisor==4.2.5
 
@@ -153,24 +179,6 @@ RUN set -eux \
     && chmod +x install_management_commands.sh \
     && ./install_management_commands.sh
 
-# Buildx provided, must be defined to use though
-ARG TARGETARCH
-ARG TARGETVARIANT
-
-# Can be workflow provided, defaults set for manual building
-ARG JBIG2ENC_VERSION=0.29
-
-# Install the built packages from the installer library images
-# These change sometimes
-RUN set -eux \
-  && echo "Getting binaries" \
-    && mkdir paperless-ngx \
-    && curl --fail --silent --show-error --output jbig2enc_${JBIG2ENC_VERSION}-1_${TARGETARCH}.deb --location https://github.com/paperless-ngx/builder/releases/download/v0.0.0/jbig2enc_${JBIG2ENC_VERSION}-1_${TARGETARCH}.deb \
-  && echo "Installing jbig2enc" \
-    && dpkg -i ./jbig2enc_${JBIG2ENC_VERSION}-1_${TARGETARCH}.deb \
-  && echo "Cleaning up image layer" \
-    && rm -f jbig2enc_${JBIG2ENC_VERSION}-1_${TARGETARCH}.deb
-
 WORKDIR /usr/src/paperless/src/
 
 # Python dependencies
@@ -205,11 +213,11 @@ RUN --mount=type=cache,target=/root/.cache/pip/,id=pip-cache \
     && apt-get -y purge ${BUILD_PACKAGES} \
     && apt-get -y autoremove --purge \
     && apt-get clean --yes \
-    && rm -rf /var/lib/apt/lists/* \
-    && rm -rf /tmp/* \
-    && rm -rf /var/tmp/* \
-    && rm -rf /var/cache/apt/archives/* \
-    && truncate -s 0 /var/log/*log
+    && rm --recursive --force --verbose /var/lib/apt/lists/* \
+    && rm --recursive --force --verbose /tmp/* \
+    && rm --recursive --force --verbose /var/tmp/* \
+    && rm --recursive --force --verbose /var/cache/apt/archives/* \
+    && truncate --size 0 /var/log/*log
 
 # copy backend
 COPY ./src ./
