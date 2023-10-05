@@ -98,7 +98,7 @@ jobs:
           EXTRA_PACKAGES: build-base
 
   tests-backend:
-    name: "Tests (${{ matrix.python-version }})"
+    name: "Backend Tests (Python ${{ matrix.python-version }})"
     runs-on: ubuntu-22.04
     needs:
       - pre-commit
@@ -173,20 +173,23 @@ jobs:
           docker compose --file ${GITHUB_WORKSPACE}/docker/compose/docker-compose.ci-test.yml down
 
   tests-frontend:
-    name: "Tests Frontend"
+    name: "Frontend Tests (Node ${{ matrix.node-version }} - ${{ matrix.shard-index }}/${{ matrix.shard-count }})"
     runs-on: ubuntu-22.04
     needs:
       - pre-commit
     strategy:
+      fail-fast: false
       matrix:
         node-version: [20.x]
+        shard-index: [1, 2, 3, 4]
+        shard-count: [4]
     steps:
       - uses: actions/checkout@v4
       -
-        name: Use Node.js ${{ matrix.node-version }}
+        name: Use Node.js 20
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 20.x
           cache: 'npm'
           cache-dependency-path: 'src-ui/package-lock.json'
       -
@@ -200,19 +203,22 @@ jobs:
         run: cd src-ui && npm run lint
       -
         name: Run Jest unit tests
-        run: cd src-ui && npm run test
+        run: cd src-ui && npm run test -- --max-workers=2 --shard=${{ matrix.shard-index }}/${{ matrix.shard-count }}
       -
         name: Upload Jest coverage
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: jest-coverage-report
-          path: src-ui/coverage
+          name: jest-coverage-report-${{ matrix.shard-index }}
+          path: |
+            src-ui/coverage/coverage-final.json
+            src-ui/coverage/lcov.info
+            src-ui/coverage/clover.xml
           retention-days: 7
           if-no-files-found: warn
       -
         name: Run Playwright e2e tests
-        run: cd src-ui && npx playwright test
+        run: cd src-ui && npx playwright test --shard ${{ matrix.shard-index }}/${{ matrix.shard-count }}
       -
         name: Upload Playwright test results
         if: always()
@@ -223,7 +229,7 @@ jobs:
           retention-days: 7
 
   tests-coverage-upload:
-    name: "Upload coverage"
+    name: "Upload Coverage"
     runs-on: ubuntu-22.04
     needs:
       - tests-backend
@@ -235,8 +241,7 @@ jobs:
         name: Download frontend coverage
         uses: actions/download-artifact@v3
         with:
-          name: jest-coverage-report
-          path: src-ui/
+          path: src-ui/coverage/
       -
         name: Upload frontend coverage to Codecov
         uses: codecov/codecov-action@v3
@@ -244,7 +249,9 @@ jobs:
           # not required for public repos, but intermittently fails otherwise
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: frontend
-          directory: src-ui/
+          directory: src-ui/coverage/
+          # dont include backend coverage files here
+          files: '!coverage.xml'
       -
         name: Download backend coverage
         uses: actions/download-artifact@v3
