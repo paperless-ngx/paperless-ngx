@@ -688,7 +688,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">92</context>
         </context-group>
-        <target state="final">Benutze PDF-Betrachter des Web-Browsers</target>
+        <target state="final">Benutze PDF-Betrachter des Webbrowsers</target>
       </trans-unit>
       <trans-unit id="9003921625412907981" datatype="html" approved="yes">
         <source>This is usually faster for displaying large PDF documents, but it might not work on some browsers.</source>
@@ -696,7 +696,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">92</context>
         </context-group>
-        <target state="final">Dies ist in der Regel schneller bei der Anzeige großer PDF-Dokumente, funktioniert aber möglicherweise nicht in allen Web-Browsern.</target>
+        <target state="final">Dies ist in der Regel schneller bei der Anzeige großer PDF-Dokumente, funktioniert aber möglicherweise nicht in allen Webbrowsern.</target>
       </trans-unit>
       <trans-unit id="3982403428275430291" datatype="html" approved="yes">
         <source>Sidebar</source>
