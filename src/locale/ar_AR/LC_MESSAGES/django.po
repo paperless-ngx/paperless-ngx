@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-28 10:56-0700\n"
-"PO-Revision-Date: 2023-10-01 01:27\n"
+"PO-Revision-Date: 2023-10-05 12:06\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -124,7 +124,7 @@ msgstr "غير مشفرة"
 
 #: documents/models.py:135
 msgid "Encrypted with GNU Privacy Guard"
-msgstr "مشفر باستخدام حارس خصوصية غنو"
+msgstr "مشفر باستخدام حارس خصوصية GNU"
 
 #: documents/models.py:156
 msgid "title"
@@ -136,27 +136,27 @@ msgstr "محتوى"
 
 #: documents/models.py:171
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
-msgstr "الخام, فقط النص من المستند. يستخدم هذا الحقل أساسا للبحث."
+msgstr "بيانات النص الخام من المستند. يستخدم هذا الحقل أساسا للبحث."
 
 #: documents/models.py:176
 msgid "mime type"
-msgstr "MIME type"
+msgstr "mime type"
 
 #: documents/models.py:186
 msgid "checksum"
-msgstr "بصمة الملف"
+msgstr "بصمة المِلَفّ"
 
 #: documents/models.py:190
 msgid "The checksum of the original document."
-msgstr "بصمة الملف للمستند الأصلي."
+msgstr "بصمة المِلَفّ للمستند الأصلي."
 
 #: documents/models.py:194
 msgid "archive checksum"
-msgstr "بصمة الملف للربيدة"
+msgstr "مجموع الاختباري للأرشيف"
 
 #: documents/models.py:199
 msgid "The checksum of the archived document."
-msgstr "بصمة الملف للمستند الربيدة."
+msgstr "بصمة المِلَفّ للمستند ‏المحفوظ."
 
 #: documents/models.py:202 documents/models.py:382 documents/models.py:651
 #: documents/models.py:689
@@ -177,35 +177,35 @@ msgstr "أضيف"
 
 #: documents/models.py:227
 msgid "filename"
-msgstr "اسم الملف"
+msgstr "اسم المِلَفّ"
 
 #: documents/models.py:233
 msgid "Current filename in storage"
-msgstr "اسم الملف الحالي في التخزين"
+msgstr "اسم المِلَفّ الحالي في التخزين"
 
 #: documents/models.py:237
 msgid "archive filename"
-msgstr "اسم الربيدة"
+msgstr "اسم المِلَفّ ‏الأرشيف"
 
 #: documents/models.py:243
 msgid "Current archive filename in storage"
-msgstr "اسم ملف الربيدة الحالي في التخزين"
+msgstr "اسم مِلَفّ ‏الأرشيف الحالي في التخزين"
 
 #: documents/models.py:247
 msgid "original filename"
-msgstr "اسم الملف الأصلي"
+msgstr "اسم المِلَفّ الأصلي"
 
 #: documents/models.py:253
 msgid "The original name of the file when it was uploaded"
-msgstr "اسم الملف الأصلي عند تحميله"
+msgstr "اسم المِلَفّ الأصلي عند تحميله"
 
 #: documents/models.py:260
 msgid "archive serial number"
-msgstr "الرقم التسلسلي للربيدة"
+msgstr "الرَّقْم التسلسلي للأرشيف"
 
 #: documents/models.py:270
 msgid "The position of this document in your physical document archive."
-msgstr "موقع هذا المستند في ربيدة المستند الفيزيائي."
+msgstr "موقع هذا المستند في ‏أرشيف المستند الفيزيائي."
 
 #: documents/models.py:276 documents/models.py:662 documents/models.py:716
 msgid "document"
@@ -233,7 +233,7 @@ msgstr "خطأ"
 
 #: documents/models.py:369
 msgid "critical"
-msgstr "الحرجة"
+msgstr "حرج"
 
 #: documents/models.py:372
 msgid "group"
@@ -385,43 +385,43 @@ msgstr "مسار التخزين"
 
 #: documents/models.py:445
 msgid "has correspondent in"
-msgstr ""
+msgstr "له مراسل في"
 
 #: documents/models.py:446
 msgid "does not have correspondent in"
-msgstr ""
+msgstr "لا يوجد مراسل في"
 
 #: documents/models.py:447
 msgid "has document type in"
-msgstr ""
+msgstr "يحتوي على نوع المستند في"
 
 #: documents/models.py:448
 msgid "does not have document type in"
-msgstr ""
+msgstr "ليس لديه نوع مستند في"
 
 #: documents/models.py:449
 msgid "has storage path in"
-msgstr ""
+msgstr "لديه مسار تخزين في"
 
 #: documents/models.py:450
 msgid "does not have storage path in"
-msgstr ""
+msgstr "ليس لديه مسار تخزين في"
 
 #: documents/models.py:451
 msgid "owner is"
-msgstr ""
+msgstr "المالك هو"
 
 #: documents/models.py:452
 msgid "has owner in"
-msgstr ""
+msgstr "لديه مالك في"
 
 #: documents/models.py:453
 msgid "does not have owner"
-msgstr ""
+msgstr "ليس لديه مالك"
 
 #: documents/models.py:454
 msgid "does not have owner in"
-msgstr ""
+msgstr "ليس لديه مالك في"
 
 #: documents/models.py:464
 msgid "rule type"
@@ -513,7 +513,7 @@ msgstr "البيانات المستردة من قبل المهمة"
 
 #: documents/models.py:647
 msgid "Note for the document"
-msgstr ""
+msgstr "ملاحظه على المستند"
 
 #: documents/models.py:671
 msgid "user"
@@ -521,47 +521,47 @@ msgstr "المستخدم"
 
 #: documents/models.py:676
 msgid "note"
-msgstr ""
+msgstr "ملاحظة"
 
 #: documents/models.py:677
 msgid "notes"
-msgstr ""
+msgstr "ملاحظات"
 
 #: documents/models.py:685
 msgid "Archive"
-msgstr ""
+msgstr "أرشيف"
 
 #: documents/models.py:686
 msgid "Original"
-msgstr ""
+msgstr "الأصل"
 
 #: documents/models.py:697
 msgid "expiration"
-msgstr ""
+msgstr "تاريخ الانتهاء"
 
 #: documents/models.py:704
 msgid "slug"
-msgstr ""
+msgstr "slug"
 
 #: documents/models.py:736
 msgid "share link"
-msgstr ""
+msgstr "مشاركة الرابط"
 
 #: documents/models.py:737
 msgid "share links"
-msgstr ""
+msgstr "مشاركة الروابط"
 
 #: documents/models.py:745
 msgid "Consume Folder"
-msgstr ""
+msgstr "‏مِلَفّ الاستهلاك"
 
 #: documents/models.py:746
 msgid "Api Upload"
-msgstr ""
+msgstr "تحميل Api"
 
 #: documents/models.py:747
 msgid "Mail Fetch"
-msgstr ""
+msgstr "جلب البريد"
 
 #: documents/models.py:751 paperless_mail/models.py:95
 msgid "order"
@@ -569,15 +569,15 @@ msgstr "الطلب"
 
 #: documents/models.py:760
 msgid "filter path"
-msgstr ""
+msgstr "مسار التصفية"
 
 #: documents/models.py:765
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
-msgstr ""
+msgstr "فقط استهلك المستندات ذات المسار الذي يطابق هذا إذا تم تحديده. البطاقات البرية المحددة كما * مسموح بها. الحالة غير حساسة."
 
 #: documents/models.py:772
 msgid "filter filename"
-msgstr ""
+msgstr "تصفية اسم الملف"
 
 #: documents/models.py:777 paperless_mail/models.py:148
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
@@ -585,15 +585,15 @@ msgstr "فقط المستندات التي تتطابق تماما مع اسم �
 
 #: documents/models.py:788
 msgid "filter documents from this mail rule"
-msgstr ""
+msgstr "تصفية المستندات من قاعدة البريد هذه"
 
 #: documents/models.py:792
 msgid "assign title"
-msgstr ""
+msgstr "تعيين العنوان"
 
 #: documents/models.py:797
 msgid "Assign a document title, can include some placeholders, see documentation."
-msgstr ""
+msgstr "تعيين عنوان مستند، يمكن أن يتضمن بعض العناصر النائبة، انظر الوثائق."
 
 #: documents/models.py:805 paperless_mail/models.py:204
 msgid "assign this tag"
@@ -609,35 +609,35 @@ msgstr "تعيين هذا المراسل"
 
 #: documents/models.py:829
 msgid "assign this storage path"
-msgstr ""
+msgstr "تعيين مسار التخزين هذا"
 
 #: documents/models.py:838
 msgid "assign this owner"
-msgstr ""
+msgstr "تعيين هذا المالك"
 
 #: documents/models.py:845
 msgid "grant view permissions to these users"
-msgstr ""
+msgstr "منح أذونات العرض إلى هؤلاء المستخدمين"
 
 #: documents/models.py:852
 msgid "grant view permissions to these groups"
-msgstr ""
+msgstr "منح صلاحيات العرض إلى هذه المجموعات"
 
 #: documents/models.py:859
 msgid "grant change permissions to these users"
-msgstr ""
+msgstr "منح صلاحيات التغيير لهؤلاء المستخدمين"
 
 #: documents/models.py:866
 msgid "grant change permissions to these groups"
-msgstr ""
+msgstr "منح صلاحيات التغيير إلى هذه المجموعات"
 
 #: documents/models.py:870
 msgid "consumption template"
-msgstr ""
+msgstr "قالب الاستهلاك"
 
 #: documents/models.py:871
 msgid "consumption templates"
-msgstr ""
+msgstr "قوالب الاستهلاك"
 
 #: documents/serialisers.py:98
 #, python-format
@@ -695,11 +695,11 @@ msgstr "اسم المستخدم وكلمة المرور غير متطابقين.
 
 #: documents/templates/registration/login.html:48
 msgid "Share link was not found."
-msgstr ""
+msgstr "لم يتم العثور على رابط المشاركة."
 
 #: documents/templates/registration/login.html:52
 msgid "Share link has expired."
-msgstr ""
+msgstr "انتهت صلاحية رابط المشاركة."
 
 #: documents/templates/registration/login.html:55
 msgid "Username"
@@ -715,80 +715,80 @@ msgstr "تسجيل الدخول"
 
 #: documents/templates/registration/login.html:70
 msgid "Forgot your password?"
-msgstr ""
+msgstr "نسيت كلمة المرور؟"
 
 #: documents/templates/registration/password_reset_complete.html:14
 msgid "Paperless-ngx reset password complete"
-msgstr ""
+msgstr "تم إعادة تعيين كلمة المرور لPaperless-ngx"
 
 #: documents/templates/registration/password_reset_complete.html:40
 msgid "Password reset complete."
-msgstr ""
+msgstr "تم إعادة ضبط كلمة المرور."
 
 #: documents/templates/registration/password_reset_complete.html:42
 #, python-format
 msgid "Your new password has been set. You can now <a href=\"%(login_url)s\">log in</a>"
-msgstr ""
+msgstr "تم تعيين كلمة المرور الجديدة الخاصة بك. يمكنك الآن <a href=\"%(login_url)s\">تسجيل الدخول</a>"
 
 #: documents/templates/registration/password_reset_confirm.html:14
 msgid "Paperless-ngx reset password confirmation"
-msgstr ""
+msgstr "تأكيد إعادة تعيين كلمة المرور لPaperless-ngx"
 
 #: documents/templates/registration/password_reset_confirm.html:42
 msgid "Set a new password."
-msgstr ""
+msgstr "تعيين كلمة مرور جديدة."
 
 #: documents/templates/registration/password_reset_confirm.html:46
 msgid "Passwords did not match or too weak. Try again."
-msgstr ""
+msgstr "كلمات المرور غير متطابقة أو ضعيفة جداً. حاول مرة أخرى."
 
 #: documents/templates/registration/password_reset_confirm.html:49
 msgid "New Password"
-msgstr ""
+msgstr "كلمة المرور الجديدة"
 
 #: documents/templates/registration/password_reset_confirm.html:50
 msgid "Confirm Password"
-msgstr ""
+msgstr "أَكِد كلمة المرور"
 
 #: documents/templates/registration/password_reset_confirm.html:61
 msgid "Change my password"
-msgstr ""
+msgstr "تغيير كلمة المرور الخاصة بي"
 
 #: documents/templates/registration/password_reset_confirm.html:65
 msgid "request a new password reset"
-msgstr ""
+msgstr "طلب رابط جديد لإعادة تعيين كلمة المرور"
 
 #: documents/templates/registration/password_reset_done.html:14
 msgid "Paperless-ngx reset password sent"
-msgstr ""
+msgstr "‏تم إرسال رابط إعادة تعيين كلمة المرور لPaperless-ngx"
 
 #: documents/templates/registration/password_reset_done.html:40
 msgid "Check your inbox."
-msgstr ""
+msgstr "تحقَّق من بريدك الوارِد."
 
 #: documents/templates/registration/password_reset_done.html:41
 msgid "We've emailed you instructions for setting your password. You should receive the email shortly!"
-msgstr ""
+msgstr "لقد أرسلنا إليك تعليمات لإعداد كلمة المرور الخاصة بك. يجب أن تتلقى البريد الإلكتروني قريباً!"
 
 #: documents/templates/registration/password_reset_form.html:14
 msgid "Paperless-ngx reset password request"
-msgstr ""
+msgstr "طلب إعادة تعيين كلمة مرور Paperless-ngx"
 
 #: documents/templates/registration/password_reset_form.html:41
 msgid "Enter your email address below, and we'll email instructions for setting a new one."
-msgstr ""
+msgstr "أدخل عنوان بريدك الإلكتروني أدناه، وسنرسل تعليمات لإعداد ‏كلمة مرور جديدة."
 
 #: documents/templates/registration/password_reset_form.html:44
 msgid "An error occurred. Please try again."
-msgstr ""
+msgstr "لقد حصل خطأ، يرجى المحاولة مرة أخرى."
 
 #: documents/templates/registration/password_reset_form.html:47
 msgid "Email"
-msgstr ""
+msgstr "البريد الإلكتروني"
 
 #: documents/templates/registration/password_reset_form.html:54
 msgid "Send me instructions!"
-msgstr ""
+msgstr "أرسل لي التعليمات!"
 
 #: paperless/apps.py:10
 msgid "Paperless"
@@ -804,7 +804,7 @@ msgstr "العربية"
 
 #: paperless/settings.py:576
 msgid "Afrikaans"
-msgstr ""
+msgstr "اللغة الأفريقانية"
 
 #: paperless/settings.py:577
 msgid "Belarusian"
@@ -812,7 +812,7 @@ msgstr "البيلاروسية"
 
 #: paperless/settings.py:578
 msgid "Catalan"
-msgstr ""
+msgstr "اللغة الكتالونية"
 
 #: paperless/settings.py:579
 msgid "Czech"
@@ -828,7 +828,7 @@ msgstr "الألمانية"
 
 #: paperless/settings.py:582
 msgid "Greek"
-msgstr ""
+msgstr "اليونانية"
 
 #: paperless/settings.py:583
 msgid "English (GB)"
@@ -840,7 +840,7 @@ msgstr "الإسبانية"
 
 #: paperless/settings.py:585
 msgid "Finnish"
-msgstr ""
+msgstr "الفنلندية"
 
 #: paperless/settings.py:586
 msgid "French"
@@ -856,7 +856,7 @@ msgstr "اللوكسمبرجية"
 
 #: paperless/settings.py:589
 msgid "Norwegian"
-msgstr ""
+msgstr "النرويجية"
 
 #: paperless/settings.py:590
 msgid "Dutch"
@@ -884,7 +884,7 @@ msgstr "الروسية"
 
 #: paperless/settings.py:596
 msgid "Slovak"
-msgstr ""
+msgstr "السلوفاكية"
 
 #: paperless/settings.py:597
 msgid "Slovenian"
@@ -904,7 +904,7 @@ msgstr "التركية"
 
 #: paperless/settings.py:601
 msgid "Ukrainian"
-msgstr ""
+msgstr "الأوكرانية"
 
 #: paperless/settings.py:602
 msgid "Chinese Simplified"
@@ -996,7 +996,7 @@ msgstr "كلمة المرور"
 
 #: paperless_mail/models.py:42
 msgid "Is token authentication"
-msgstr ""
+msgstr "هو مصادقة الرمز"
 
 #: paperless_mail/models.py:45
 msgid "character set"
@@ -1060,7 +1060,7 @@ msgstr "استخدم اسم الملف المرفق كعنوان"
 
 #: paperless_mail/models.py:85
 msgid "Do not assign title from rule"
-msgstr ""
+msgstr "لا تقم بتعيين العنوان من القاعدة"
 
 #: paperless_mail/models.py:88
 msgid "Do not assign a correspondent"
@@ -1096,7 +1096,7 @@ msgstr "تصفية من"
 
 #: paperless_mail/models.py:122
 msgid "filter to"
-msgstr ""
+msgstr "تصفية إلى"
 
 #: paperless_mail/models.py:129
 msgid "filter subject"
@@ -1152,7 +1152,7 @@ msgstr "تعيين مراسل من"
 
 #: paperless_mail/models.py:230
 msgid "Assign the rule owner to documents"
-msgstr ""
+msgstr "تعيين مالك القاعدة إلى المستندات"
 
 #: paperless_mail/models.py:256
 msgid "uid"
