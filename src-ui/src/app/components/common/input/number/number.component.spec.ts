@@ -30,39 +30,9 @@ describe('NumberComponent', () => {
     input = component.inputField.nativeElement
   })
 
-  // TODO: why doesnt this work?
-  // it('should support use of input field', () => {
-  //   expect(component.value).toBeUndefined()
-  //   input.stepUp()
-  //   console.log(input.value);
-
-  //   input.dispatchEvent(new Event('change'))
-  //   fixture.detectChanges()
-  //   expect(component.value).toEqual('3')
-  // })
-
   it('should support +1 ASN', () => {
-    const listAllSpy = jest.spyOn(documentService, 'listFiltered')
-    listAllSpy
-      .mockReturnValueOnce(
-        of({
-          count: 1,
-          all: [1],
-          results: [
-            {
-              id: 1,
-              archive_serial_number: 1000,
-            },
-          ],
-        })
-      )
-      .mockReturnValueOnce(
-        of({
-          count: 0,
-          all: [],
-          results: [],
-        })
-      )
+    const nextAsnSpy = jest.spyOn(documentService, 'getNextAsn')
+    nextAsnSpy.mockReturnValueOnce(of(1001)).mockReturnValueOnce(of(1))
     expect(component.value).toBeUndefined()
     component.nextAsn()
     expect(component.value).toEqual(1001)
