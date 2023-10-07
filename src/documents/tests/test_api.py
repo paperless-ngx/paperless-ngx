@@ -2689,6 +2689,50 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
+    def test_next_asn(self):
+        """
+        GIVEN:
+            - Existing documents with ASNs, highest owned by user2
+        WHEN:
+            - API request is made by user1 to get next ASN
+        THEN:
+            - ASN +1 from user2's doc is returned for user1
+        """
+        user1 = User.objects.create_user(username="test1")
+        user1.user_permissions.add(*Permission.objects.all())
+        user1.save()
+
+        user2 = User.objects.create_user(username="test2")
+        user2.save()
+
+        doc1 = Document.objects.create(
+            title="test",
+            mime_type="application/pdf",
+            content="this is a document 1",
+            checksum="1",
+            archive_serial_number=998,
+        )
+        doc1.owner = user1
+        doc1.save()
+
+        doc2 = Document.objects.create(
+            title="test2",
+            mime_type="application/pdf",
+            content="this is a document 2 with higher ASN",
+            checksum="2",
+            archive_serial_number=999,
+        )
+        doc2.owner = user2
+        doc2.save()
+
+        self.client.force_authenticate(user1)
+
+        resp = self.client.get(
+            "/api/documents/next_asn/",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp.content, b"1000")
+
 
 class TestDocumentApiV2(DirectoriesMixin, APITestCase):
     def setUp(self):

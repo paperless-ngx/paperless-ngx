@@ -661,6 +661,19 @@ class UnifiedSearchViewSet(DocumentViewSet):
         else:
             return super().list(request)
 
+    @action(detail=False, methods=["GET"], name="Get Next ASN")
+    def next_asn(self, request, *args, **kwargs):
+        return Response(
+            (
+                Document.objects.filter(archive_serial_number__gte=0)
+                .order_by("archive_serial_number")
+                .last()
+                .archive_serial_number
+                or 0
+            )
+            + 1,
+        )
+
 
 class LogViewSet(ViewSet):
     permission_classes = (IsAuthenticated, PaperlessAdminPermissions)
