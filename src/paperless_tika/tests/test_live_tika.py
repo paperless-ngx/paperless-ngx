@@ -111,3 +111,27 @@ class TestTikaParserAgainstServer(TestCase):
         self.assertIsNotNone(self.parser.archive_path)
         with open(self.parser.archive_path, "rb") as f:
             self.assertTrue(b"PDF-" in f.read()[:10])
+
+    def test_tika_fails_multi_part(self):
+        """
+        GIVEN:
+            - An input ODT format document
+            - The document is known to crash Tika when uploaded via multi-part form data
+        WHEN:
+            - The document is parsed
+        THEN:
+            - Document content is correct
+            - Document date is correct
+        See also:
+            - https://issues.apache.org/jira/browse/TIKA-4110
+        """
+        test_file = self.SAMPLE_DIR / "multi-part-broken.odt"
+
+        util_call_with_backoff(
+            self.parser.parse,
+            [test_file, "application/vnd.oasis.opendocument.text"],
+        )
+
+        self.assertIsNotNone(self.parser.archive_path)
+        with open(self.parser.archive_path, "rb") as f:
+            self.assertTrue(b"PDF-" in f.read()[:10])
