@@ -62,7 +62,7 @@
 
 <div class="container-fluid">
   <div class="row">
-    <nav id="sidebarMenu" class="d-md-block bg-light sidebar collapse" [ngClass]="slimSidebarEnabled ? 'slim' : 'col-md-3 col-lg-2'" [class.animating]="slimSidebarAnimating" [ngbCollapse]="isMenuCollapsed">
+    <nav id="sidebarMenu" class="d-md-block bg-light sidebar collapse" [ngClass]="slimSidebarEnabled ? 'slim' : 'col-md-3 col-lg-2 col-xxxl-1'" [class.animating]="slimSidebarAnimating" [ngbCollapse]="isMenuCollapsed">
       <button class="btn btn-sm btn-dark sidebar-slim-toggler" (click)="toggleSlimSidebar()">
         <svg class="sidebaricon-sm" fill="currentColor">
           <use *ngIf="slimSidebarEnabled" xlink:href="assets/bootstrap-icons.svg#chevron-double-right"/>
@@ -266,7 +266,7 @@
       </div>
     </nav>
 
-    <main role="main" class="ms-sm-auto px-md-4" [ngClass]="slimSidebarEnabled ? 'col-slim' : 'col-md-9 col-lg-10'">
+    <main role="main" class="ms-sm-auto px-md-4" [ngClass]="slimSidebarEnabled ? 'col-slim' : 'col-md-9 col-lg-10 col-xxxl-11'">
       <router-outlet></router-outlet>
     </main>
   </div>
