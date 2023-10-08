@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-28 10:56-0700\n"
-"PO-Revision-Date: 2023-10-08 13:52\n"
+"PO-Revision-Date: 2023-10-08 23:50\n"
 "Last-Translator: \n"
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
@@ -273,7 +273,7 @@ msgstr "tunjukan di bilah sisi"
 
 #: documents/models.py:409
 msgid "sort field"
-msgstr ""
+msgstr "urutkan bidang"
 
 #: documents/models.py:414
 msgid "sort reverse"
@@ -321,15 +321,15 @@ msgstr "dibuat setelah"
 
 #: documents/models.py:429
 msgid "created year is"
-msgstr ""
+msgstr "dibuat pada tahun"
 
 #: documents/models.py:430
 msgid "created month is"
-msgstr ""
+msgstr "dibuat pada bulan"
 
 #: documents/models.py:431
 msgid "created day is"
-msgstr ""
+msgstr "dibuat pada hari"
 
 #: documents/models.py:432
 msgid "added before"
@@ -449,7 +449,7 @@ msgstr ""
 
 #: documents/models.py:587
 msgid "Acknowledged"
-msgstr ""
+msgstr "Diakui"
 
 #: documents/models.py:588
 msgid "If the task is acknowledged via the frontend or API"
@@ -521,19 +521,19 @@ msgstr "pengguna"
 
 #: documents/models.py:676
 msgid "note"
-msgstr ""
+msgstr "catatan"
 
 #: documents/models.py:677
 msgid "notes"
-msgstr ""
+msgstr "catatan"
 
 #: documents/models.py:685
 msgid "Archive"
-msgstr ""
+msgstr "Arsip"
 
 #: documents/models.py:686
 msgid "Original"
-msgstr ""
+msgstr "Orisinil"
 
 #: documents/models.py:697
 msgid "expiration"
@@ -545,11 +545,11 @@ msgstr ""
 
 #: documents/models.py:736
 msgid "share link"
-msgstr ""
+msgstr "bagikan tautan"
 
 #: documents/models.py:737
 msgid "share links"
-msgstr ""
+msgstr "bagikan tautan"
 
 #: documents/models.py:745
 msgid "Consume Folder"
@@ -557,7 +557,7 @@ msgstr ""
 
 #: documents/models.py:746
 msgid "Api Upload"
-msgstr ""
+msgstr "Unggah Menggunakan API"
 
 #: documents/models.py:747
 msgid "Mail Fetch"
@@ -577,7 +577,7 @@ msgstr ""
 
 #: documents/models.py:772
 msgid "filter filename"
-msgstr ""
+msgstr "saring nama file"
 
 #: documents/models.py:777 paperless_mail/models.py:148
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
@@ -585,7 +585,7 @@ msgstr ""
 
 #: documents/models.py:788
 msgid "filter documents from this mail rule"
-msgstr ""
+msgstr "saring dokumen dari peraturan surel"
 
 #: documents/models.py:792
 msgid "assign title"
