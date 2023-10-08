@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-28 10:56-0700\n"
-"PO-Revision-Date: 2023-10-01 01:27\n"
+"PO-Revision-Date: 2023-10-08 12:49\n"
 "Last-Translator: \n"
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
@@ -217,7 +217,7 @@ msgstr "dokumen"
 
 #: documents/models.py:365
 msgid "debug"
-msgstr ""
+msgstr "debug"
 
 #: documents/models.py:366
 msgid "information"
@@ -249,19 +249,19 @@ msgstr "tingkat"
 
 #: documents/models.py:386
 msgid "log"
-msgstr ""
+msgstr "catatan"
 
 #: documents/models.py:387
 msgid "logs"
-msgstr ""
+msgstr "catatan"
 
 #: documents/models.py:396 documents/models.py:461
 msgid "saved view"
-msgstr ""
+msgstr "tampilan disimpan"
 
 #: documents/models.py:397
 msgid "saved views"
-msgstr ""
+msgstr "tampilan disimpan"
 
 #: documents/models.py:402
 msgid "show on dashboard"
@@ -269,7 +269,7 @@ msgstr "tampilkan di dasbor"
 
 #: documents/models.py:405
 msgid "show in sidebar"
-msgstr ""
+msgstr "tunjukan di bilah sisi"
 
 #: documents/models.py:409
 msgid "sort field"
@@ -289,15 +289,15 @@ msgstr "konten memiliki"
 
 #: documents/models.py:421
 msgid "ASN is"
-msgstr ""
+msgstr "ASN adalah"
 
 #: documents/models.py:422
 msgid "correspondent is"
-msgstr ""
+msgstr "koresponden adalah"
 
 #: documents/models.py:423
 msgid "document type is"
-msgstr ""
+msgstr "jenis dokumen adalah"
 
 #: documents/models.py:424
 msgid "is in inbox"
@@ -305,11 +305,11 @@ msgstr "di dalam kotak masuk"
 
 #: documents/models.py:425
 msgid "has tag"
-msgstr ""
+msgstr "memiliki label"
 
 #: documents/models.py:426
 msgid "has any tag"
-msgstr ""
+msgstr "memiliki label apapun"
 
 #: documents/models.py:427
 msgid "created before"
