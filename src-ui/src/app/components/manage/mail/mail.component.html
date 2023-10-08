@@ -12,7 +12,6 @@
         </button>
     </h4>
     <ul class="list-group">
-
         <li class="list-group-item">
             <div class="row">
             <div class="col" i18n>Name</div>
@@ -46,12 +45,12 @@
             </div>
             </div>
         </li>
-
-        <div *ngIf="mailAccounts.length === 0" i18n>No mail accounts defined.</div>
     </ul>
-    </ng-container>
 
-    <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.MailRule }">
+    <div *ngIf="mailAccounts.length === 0" i18n>No mail accounts defined.</div>
+</ng-container>
+
+<ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.MailRule }">
     <h4 class="mt-4">
         <ng-container i18n>Mail rules</ng-container>
         <button type="button" class="btn btn-sm btn-outline-primary ms-4" (click)="editMailRule()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.MailRule }">
@@ -62,7 +61,6 @@
         </button>
     </h4>
     <ul class="list-group">
-
         <li class="list-group-item">
             <div class="row">
             <div class="col" i18n>Name</div>
@@ -96,9 +94,9 @@
             </div>
             </div>
         </li>
-
-        <div *ngIf="mailRules.length === 0" i18n>No mail rules defined.</div>
     </ul>
+
+    <div *ngIf="mailRules.length === 0" i18n>No mail rules defined.</div>
 </ng-container>
 
 <div *ngIf="!mailAccounts || !mailRules">
