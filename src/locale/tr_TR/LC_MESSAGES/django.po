@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-28 10:56-0700\n"
-"PO-Revision-Date: 2023-10-01 01:27\n"
+"PO-Revision-Date: 2023-10-08 09:29\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -193,11 +193,11 @@ msgstr "Depolamadaki geçerli arşiv dosya adı"
 
 #: documents/models.py:247
 msgid "original filename"
-msgstr "orjinal dosya adı"
+msgstr "özgün dosya adı"
 
 #: documents/models.py:253
 msgid "The original name of the file when it was uploaded"
-msgstr ""
+msgstr "Yüklendiğindeki özgün dosya adı"
 
 #: documents/models.py:260
 msgid "archive serial number"
@@ -205,7 +205,7 @@ msgstr "arşiv seri numarası"
 
 #: documents/models.py:270
 msgid "The position of this document in your physical document archive."
-msgstr "Bu belgenin fiziksel belge arşivinizdeki posizyonu."
+msgstr "Bu belgenin fiziksel belge arşivinizdeki konumu."
 
 #: documents/models.py:276 documents/models.py:662 documents/models.py:716
 msgid "document"
@@ -241,11 +241,11 @@ msgstr "grup"
 
 #: documents/models.py:374
 msgid "message"
-msgstr "mesaj"
+msgstr "ileti"
 
 #: documents/models.py:377
 msgid "level"
-msgstr "seviye"
+msgstr "düzey"
 
 #: documents/models.py:386
 msgid "log"
@@ -265,7 +265,7 @@ msgstr "kaydedilen görünümler"
 
 #: documents/models.py:402
 msgid "show on dashboard"
-msgstr "kontrol paneli'nde göster"
+msgstr "kontrol panelinde göster"
 
 #: documents/models.py:405
 msgid "show in sidebar"
@@ -273,7 +273,7 @@ msgstr "kenar çubuğunda göster"
 
 #: documents/models.py:409
 msgid "sort field"
-msgstr "alanı sıralama"
+msgstr "alan ile sırala"
 
 #: documents/models.py:414
 msgid "sort reverse"
@@ -281,11 +281,11 @@ msgstr "tersine sırala"
 
 #: documents/models.py:419
 msgid "title contains"
-msgstr "başlık içerir"
+msgstr "başlık şunu içerir"
 
 #: documents/models.py:420
 msgid "content contains"
-msgstr "içerik içerir"
+msgstr "içerik şunu içerir"
 
 #: documents/models.py:421
 msgid "ASN is"
@@ -301,7 +301,7 @@ msgstr "belge türü ise"
 
 #: documents/models.py:424
 msgid "is in inbox"
-msgstr "gelen kutusunun içerisindedir"
+msgstr "gelen kutusunun içinde"
 
 #: documents/models.py:425
 msgid "has tag"
@@ -353,7 +353,7 @@ msgstr "etikete sahip değil"
 
 #: documents/models.py:437
 msgid "does not have ASN"
-msgstr "ASN'e sahip değil"
+msgstr "ASN'ye sahip değil"
 
 #: documents/models.py:438
 msgid "title or content contains"
@@ -373,15 +373,15 @@ msgstr "içerisinde etiketine sahip"
 
 #: documents/models.py:442
 msgid "ASN greater than"
-msgstr ""
+msgstr "ASN şundan daha büyük"
 
 #: documents/models.py:443
 msgid "ASN less than"
-msgstr ""
+msgstr "ASN şundan daha küçük"
 
 #: documents/models.py:444
 msgid "storage path is"
-msgstr ""
+msgstr "depolama yolu ise"
 
 #: documents/models.py:445
 msgid "has correspondent in"
