@@ -1,6 +1,16 @@
 // bs options
 $enable-negative-margins: true;
 
+$grid-breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  xxl: 1400px,
+  xxxl: 2000px
+);
+
 @import "node_modules/bootstrap/scss/bootstrap";
 @import "theme";
 @import "~@ng-select/ng-select/themes/default.theme.css";
@@ -184,6 +194,12 @@ a, a:hover,
 .btn-link:active,
 .btn-link:focus-visible {
   color: var(--pngx-primary-darken-15) !important;
+}
+
+a.btn-link:hover,
+a.btn-link:active,
+a.btn-link:focus-visible {
+  color: var(--pngx-primary-darken-5) !important;
 }
 
 .form-control-dark {
