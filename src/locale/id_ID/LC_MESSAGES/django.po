@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-28 10:56-0700\n"
-"PO-Revision-Date: 2023-10-08 12:49\n"
+"PO-Revision-Date: 2023-10-08 13:52\n"
 "Last-Translator: \n"
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
@@ -313,11 +313,11 @@ msgstr "memiliki label apapun"
 
 #: documents/models.py:427
 msgid "created before"
-msgstr ""
+msgstr "dibuat sebelum"
 
 #: documents/models.py:428
 msgid "created after"
-msgstr ""
+msgstr "dibuat setelah"
 
 #: documents/models.py:429
 msgid "created year is"
@@ -333,31 +333,31 @@ msgstr ""
 
 #: documents/models.py:432
 msgid "added before"
-msgstr ""
+msgstr "ditambahkan sebelum"
 
 #: documents/models.py:433
 msgid "added after"
-msgstr ""
+msgstr "ditambahkan setelah"
 
 #: documents/models.py:434
 msgid "modified before"
-msgstr ""
+msgstr "disunting sebelum"
 
 #: documents/models.py:435
 msgid "modified after"
-msgstr ""
+msgstr "disunting setelah"
 
 #: documents/models.py:436
 msgid "does not have tag"
-msgstr ""
+msgstr "tidak memiliki label"
 
 #: documents/models.py:437
 msgid "does not have ASN"
-msgstr ""
+msgstr "tidak memiliki ASN"
 
 #: documents/models.py:438
 msgid "title or content contains"
-msgstr ""
+msgstr "judul atau konten mengandung"
 
 #: documents/models.py:439
 msgid "fulltext query"
@@ -369,15 +369,15 @@ msgstr "lebih seperti ini"
 
 #: documents/models.py:441
 msgid "has tags in"
-msgstr ""
+msgstr "memiliki label dalam"
 
 #: documents/models.py:442
 msgid "ASN greater than"
-msgstr ""
+msgstr "ASN lebih dari"
 
 #: documents/models.py:443
 msgid "ASN less than"
-msgstr ""
+msgstr "ASN kurang dari"
 
 #: documents/models.py:444
 msgid "storage path is"
@@ -385,43 +385,43 @@ msgstr "lokasi penyimpanan"
 
 #: documents/models.py:445
 msgid "has correspondent in"
-msgstr ""
+msgstr "memiliki koresponden dalam"
 
 #: documents/models.py:446
 msgid "does not have correspondent in"
-msgstr ""
+msgstr "tidak memiliki koresponden dalam"
 
 #: documents/models.py:447
 msgid "has document type in"
-msgstr ""
+msgstr "memiliki jenis dokumen dalam"
 
 #: documents/models.py:448
 msgid "does not have document type in"
-msgstr ""
+msgstr "tidak memiliki jenis dokumen dalam"
 
 #: documents/models.py:449
 msgid "has storage path in"
-msgstr ""
+msgstr "memiliki lokasi penyimpanan dalam"
 
 #: documents/models.py:450
 msgid "does not have storage path in"
-msgstr ""
+msgstr "tidak memiliki lokasi penyimpanan dalam"
 
 #: documents/models.py:451
 msgid "owner is"
-msgstr ""
+msgstr "pemilik adalah"
 
 #: documents/models.py:452
 msgid "has owner in"
-msgstr ""
+msgstr "memiliki pemilik dalam"
 
 #: documents/models.py:453
 msgid "does not have owner"
-msgstr ""
+msgstr "tidak memiliki pemilik"
 
 #: documents/models.py:454
 msgid "does not have owner in"
-msgstr ""
+msgstr "tidak memiliki pemilik dalam"
 
 #: documents/models.py:464
 msgid "rule type"
@@ -481,7 +481,7 @@ msgstr "Status tugas sekarang yang sedang dijalankan"
 
 #: documents/models.py:615
 msgid "Created DateTime"
-msgstr ""
+msgstr "Dibuat TanggalWaktu"
 
 #: documents/models.py:616
 msgid "Datetime field when the task result was created in UTC"
@@ -489,7 +489,7 @@ msgstr ""
 
 #: documents/models.py:621
 msgid "Started DateTime"
-msgstr ""
+msgstr "Dimulai TanggalWaktu"
 
 #: documents/models.py:622
 msgid "Datetime field when the task was started in UTC"
@@ -497,7 +497,7 @@ msgstr ""
 
 #: documents/models.py:627
 msgid "Completed DateTime"
-msgstr ""
+msgstr "Selesai TanggalWaktu"
 
 #: documents/models.py:628
 msgid "Datetime field when the task was completed in UTC"
@@ -513,7 +513,7 @@ msgstr "Data yang dikembalikan dari tugas"
 
 #: documents/models.py:647
 msgid "Note for the document"
-msgstr ""
+msgstr "Catatan untuk dokumen"
 
 #: documents/models.py:671
 msgid "user"
@@ -736,7 +736,7 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_confirm.html:42
 msgid "Set a new password."
-msgstr ""
+msgstr "Setel kata sandi baru."
 
 #: documents/templates/registration/password_reset_confirm.html:46
 msgid "Passwords did not match or too weak. Try again."
@@ -744,15 +744,15 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_confirm.html:49
 msgid "New Password"
-msgstr ""
+msgstr "Kata Sandi Baru"
 
 #: documents/templates/registration/password_reset_confirm.html:50
 msgid "Confirm Password"
-msgstr ""
+msgstr "Konfirmasi Kata Sandi"
 
 #: documents/templates/registration/password_reset_confirm.html:61
 msgid "Change my password"
-msgstr ""
+msgstr "Ubah kata sandi saya"
 
 #: documents/templates/registration/password_reset_confirm.html:65
 msgid "request a new password reset"
@@ -764,7 +764,7 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_done.html:40
 msgid "Check your inbox."
-msgstr ""
+msgstr "Periksa kotak masuk Anda."
 
 #: documents/templates/registration/password_reset_done.html:41
 msgid "We've emailed you instructions for setting your password. You should receive the email shortly!"
@@ -780,15 +780,15 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_form.html:44
 msgid "An error occurred. Please try again."
-msgstr ""
+msgstr "Terjadi kesalahan. Harap coba lagi."
 
 #: documents/templates/registration/password_reset_form.html:47
 msgid "Email"
-msgstr ""
+msgstr "Surat elektronik"
 
 #: documents/templates/registration/password_reset_form.html:54
 msgid "Send me instructions!"
-msgstr ""
+msgstr "Kirim saya instruksi!"
 
 #: paperless/apps.py:10
 msgid "Paperless"
@@ -984,7 +984,7 @@ msgstr ""
 
 #: paperless_mail/models.py:33
 msgid "IMAP security"
-msgstr ""
+msgstr "Keamanan IMAP"
 
 #: paperless_mail/models.py:38
 msgid "username"
@@ -1000,7 +1000,7 @@ msgstr ""
 
 #: paperless_mail/models.py:45
 msgid "character set"
-msgstr ""
+msgstr "set karakter"
 
 #: paperless_mail/models.py:49
 msgid "The character set to use when communicating with the mail server, such as 'UTF-8' or 'US-ASCII'."
@@ -1052,7 +1052,7 @@ msgstr ""
 
 #: paperless_mail/models.py:83
 msgid "Use subject as title"
-msgstr ""
+msgstr "Gunakan subjek sebagai judul"
 
 #: paperless_mail/models.py:84
 msgid "Use attachment filename as title"
