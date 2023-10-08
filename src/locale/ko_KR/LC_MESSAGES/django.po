@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-28 10:56-0700\n"
-"PO-Revision-Date: 2023-10-08 14:49\n"
+"PO-Revision-Date: 2023-10-08 15:54\n"
 "Last-Translator: \n"
 "Language-Team: Korean\n"
 "Language: ko_KR\n"
@@ -784,7 +784,7 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_form.html:47
 msgid "Email"
-msgstr ""
+msgstr "전자우편"
 
 #: documents/templates/registration/password_reset_form.html:54
 msgid "Send me instructions!"
@@ -792,71 +792,71 @@ msgstr ""
 
 #: paperless/apps.py:10
 msgid "Paperless"
-msgstr ""
+msgstr "Paperless"
 
 #: paperless/settings.py:574
 msgid "English (US)"
-msgstr ""
+msgstr "영어 (미국)"
 
 #: paperless/settings.py:575
 msgid "Arabic"
-msgstr ""
+msgstr "아랍어"
 
 #: paperless/settings.py:576
 msgid "Afrikaans"
-msgstr ""
+msgstr "아프리칸스어"
 
 #: paperless/settings.py:577
 msgid "Belarusian"
-msgstr ""
+msgstr "벨라루스어"
 
 #: paperless/settings.py:578
 msgid "Catalan"
-msgstr ""
+msgstr "카탈로니아어"
 
 #: paperless/settings.py:579
 msgid "Czech"
-msgstr ""
+msgstr "체코어"
 
 #: paperless/settings.py:580
 msgid "Danish"
-msgstr ""
+msgstr "덴마크어"
 
 #: paperless/settings.py:581
 msgid "German"
-msgstr ""
+msgstr "독일어"
 
 #: paperless/settings.py:582
 msgid "Greek"
-msgstr ""
+msgstr "그리스어"
 
 #: paperless/settings.py:583
 msgid "English (GB)"
-msgstr ""
+msgstr "영어 (영국)"
 
 #: paperless/settings.py:584
 msgid "Spanish"
-msgstr ""
+msgstr "스페인어"
 
 #: paperless/settings.py:585
 msgid "Finnish"
-msgstr ""
+msgstr "핀란드어"
 
 #: paperless/settings.py:586
 msgid "French"
-msgstr ""
+msgstr "프랑스어"
 
 #: paperless/settings.py:587
 msgid "Italian"
-msgstr ""
+msgstr "이탈리아어"
 
 #: paperless/settings.py:588
 msgid "Luxembourgish"
-msgstr ""
+msgstr "룩셈부르크어"
 
 #: paperless/settings.py:589
 msgid "Norwegian"
-msgstr ""
+msgstr "노르웨이어"
 
 #: paperless/settings.py:590
 msgid "Dutch"
