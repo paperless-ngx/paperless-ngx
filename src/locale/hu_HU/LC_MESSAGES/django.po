@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-28 10:56-0700\n"
-"PO-Revision-Date: 2023-10-01 01:27\n"
+"PO-Revision-Date: 2023-10-08 14:49\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -517,27 +517,27 @@ msgstr ""
 
 #: documents/models.py:671
 msgid "user"
-msgstr ""
+msgstr "felhasználó"
 
 #: documents/models.py:676
 msgid "note"
-msgstr ""
+msgstr "feljegyzés"
 
 #: documents/models.py:677
 msgid "notes"
-msgstr ""
+msgstr "jegyzetek"
 
 #: documents/models.py:685
 msgid "Archive"
-msgstr ""
+msgstr "Archív"
 
 #: documents/models.py:686
 msgid "Original"
-msgstr ""
+msgstr "Eredeti"
 
 #: documents/models.py:697
 msgid "expiration"
-msgstr ""
+msgstr "lejárat"
 
 #: documents/models.py:704
 msgid "slug"
@@ -545,11 +545,11 @@ msgstr ""
 
 #: documents/models.py:736
 msgid "share link"
-msgstr ""
+msgstr "link megosztása"
 
 #: documents/models.py:737
 msgid "share links"
-msgstr ""
+msgstr "linkek megosztása"
 
 #: documents/models.py:745
 msgid "Consume Folder"
@@ -589,7 +589,7 @@ msgstr ""
 
 #: documents/models.py:792
 msgid "assign title"
-msgstr ""
+msgstr "cím hozzárendelése"
 
 #: documents/models.py:797
 msgid "Assign a document title, can include some placeholders, see documentation."
@@ -679,7 +679,7 @@ msgstr ""
 
 #: documents/templates/registration/logged_out.html:41
 msgid "Sign in again"
-msgstr ""
+msgstr "Jelentkezz be újra"
 
 #: documents/templates/registration/login.html:14
 msgid "Paperless-ngx sign in"
@@ -687,35 +687,35 @@ msgstr ""
 
 #: documents/templates/registration/login.html:41
 msgid "Please sign in."
-msgstr ""
+msgstr "Jelentkezz be."
 
 #: documents/templates/registration/login.html:44
 msgid "Your username and password didn't match. Please try again."
-msgstr ""
+msgstr "A felhasználói név és a jelszó nem egyezik. Próbáld újra."
 
 #: documents/templates/registration/login.html:48
 msgid "Share link was not found."
-msgstr ""
+msgstr "A link nem található."
 
 #: documents/templates/registration/login.html:52
 msgid "Share link has expired."
-msgstr ""
+msgstr "A hivatkozás lejárt."
 
 #: documents/templates/registration/login.html:55
 msgid "Username"
-msgstr ""
+msgstr "Felhasználónév"
 
 #: documents/templates/registration/login.html:56
 msgid "Password"
-msgstr ""
+msgstr "Jelszó"
 
 #: documents/templates/registration/login.html:66
 msgid "Sign in"
-msgstr ""
+msgstr "Bejelentkezés"
 
 #: documents/templates/registration/login.html:70
 msgid "Forgot your password?"
-msgstr ""
+msgstr "Elfelejtette jelszavát?"
 
 #: documents/templates/registration/password_reset_complete.html:14
 msgid "Paperless-ngx reset password complete"
@@ -784,47 +784,47 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_form.html:47
 msgid "Email"
-msgstr ""
+msgstr "Email"
 
 #: documents/templates/registration/password_reset_form.html:54
 msgid "Send me instructions!"
-msgstr ""
+msgstr "Küldj instrukciókat számomra!"
 
 #: paperless/apps.py:10
 msgid "Paperless"
-msgstr ""
+msgstr "Paperless"
 
 #: paperless/settings.py:574
 msgid "English (US)"
-msgstr ""
+msgstr "Angol (Egyesült Államok)"
 
 #: paperless/settings.py:575
 msgid "Arabic"
-msgstr ""
+msgstr "Arab"
 
 #: paperless/settings.py:576
 msgid "Afrikaans"
-msgstr ""
+msgstr "Afrikai"
 
 #: paperless/settings.py:577
 msgid "Belarusian"
-msgstr ""
+msgstr "Fehérorosz"
 
 #: paperless/settings.py:578
 msgid "Catalan"
-msgstr ""
+msgstr "Katalán"
 
 #: paperless/settings.py:579
 msgid "Czech"
-msgstr ""
+msgstr "Cseh"
 
 #: paperless/settings.py:580
 msgid "Danish"
-msgstr ""
+msgstr "Dán"
 
 #: paperless/settings.py:581
 msgid "German"
-msgstr ""
+msgstr "Német"
 
 #: paperless/settings.py:582
 msgid "Greek"
