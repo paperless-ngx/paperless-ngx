@@ -52,7 +52,18 @@ class TikaDocumentParser(DocumentParser):
 
         try:
             with TikaClient(tika_url=settings.TIKA_ENDPOINT) as client:
-                parsed = client.tika.as_text.from_file(document_path, mime_type)
+                try:
+                    parsed = client.tika.as_text.from_file(document_path, mime_type)
+                except httpx.HTTPStatusError as err:
+                    # Workaround https://issues.apache.org/jira/browse/TIKA-4110
+                    # Tika fails with some files as multi-part form data
+                    if err.response.status_code == httpx.codes.INTERNAL_SERVER_ERROR:
+                        parsed = client.tika.as_text.from_buffer(
+                            document_path.read_bytes(),
+                            mime_type,
+                        )
+                    else:  # pragma: nocover
+                        raise
         except Exception as err:
             raise ParseError(
                 f"Could not parse {document_path} with tika server at "
