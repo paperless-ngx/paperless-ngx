@@ -21,8 +21,10 @@ from paperless.serialisers import UserSerializer
 
 
 class StandardPagination(PageNumberPagination):
-    """A class representing a standard pagination mechanism based on page
-numbers."""
+    """
+    A class representing a standard pagination mechanism based on page
+    numbers.
+    """
     page_size = 25
     page_size_query_param = "page_size"
     max_page_size = 100000
