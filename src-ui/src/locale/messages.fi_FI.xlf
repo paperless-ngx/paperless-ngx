@@ -372,7 +372,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">139</context>
         </context-group>
-        <target state="translated">Kojelautaa voidaan käyttää näytettäessä tallennettuja näkymiä, kuten 'Saapuneet'. Nämä asetukset löytyvät Asetuksista &gt; kohdasta Tallennetut näkymät.</target>
+        <target state="translated">Koontinäyttöä voidaan käyttää näytettäessä tallennettuja näkymiä, kuten 'Saapuneet'. Nämä asetukset löytyvät Asetuksista &gt; kohdasta Tallennetut näkymät.</target>
       </trans-unit>
       <trans-unit id="9075755296812854717" datatype="html">
         <source>Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Paperless-ngx will start training its machine learning algorithms.</source>
@@ -404,7 +404,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">164</context>
         </context-group>
-        <target state="translated">Mikä tahansa suodattimien yhdistelmä voidaan tallentaa 'näkymäksi', joka voidaan näyttää hallintapaneelissa ja / tai sivupalkissa.</target>
+        <target state="translated">Mikä tahansa suodattimien yhdistelmä voidaan tallentaa 'näkymäksi', joka voidaan näyttää koontinäytöllä ja / tai sivupalkissa.</target>
       </trans-unit>
       <trans-unit id="2804886236408698479" datatype="html">
         <source>Tags, correspondents, document types and storage paths can all be managed using these pages. They can also be created from the document edit view.</source>
@@ -784,7 +784,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">144,146</context>
         </context-group>
-        <target state="needs-translation"><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&gt;"/>No tracking data is collected by the app in any way.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></target>
+        <target state="translated"><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&gt;"/>Sovellus ei kerää seurantatietoja.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></target>
       </trans-unit>
       <trans-unit id="5070799004079086984" datatype="html">
         <source>Enable update checking</source>
@@ -912,7 +912,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">174</context>
         </context-group>
-        <target state="needs-translation">Default Permissions</target>
+        <target state="translated">Oletusoikeudet</target>
       </trans-unit>
       <trans-unit id="8222269449891326545" datatype="html">
         <source> Settings apply to this user account for objects (Tags, Mail Rules, etc.) created via the web UI </source>
@@ -928,7 +928,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">185</context>
         </context-group>
-        <target state="needs-translation">Default Owner</target>
+        <target state="translated">Oletusomistaja</target>
       </trans-unit>
       <trans-unit id="734147282056744882" datatype="html">
         <source>Objects without an owner can be viewed and edited by all users</source>
@@ -1076,7 +1076,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">263</context>
         </context-group>
-        <target state="translated">Älä näytä ilmoituksia hallintapaneelissa</target>
+        <target state="translated">Älä näytä ilmoituksia koontinäytöllä</target>
       </trans-unit>
       <trans-unit id="2741919327232918179" datatype="html">
         <source>This will suppress all messages about document processing status on the dashboard.</source>
@@ -1084,7 +1084,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">263</context>
         </context-group>
-        <target state="translated">Tämä estää hallintapaneelissa kaikki viestit, jotka koskevat asiakirjojen käsittelyn tilaa.</target>
+        <target state="translated">Tämä estää koontinäytöllä kaikki viestit, jotka koskevat asiakirjojen käsittelyn tilaa.</target>
       </trans-unit>
       <trans-unit id="472206565520537964" datatype="html">
         <source>Saved views</source>
@@ -1236,7 +1236,7 @@
           <context context-type="sourcefile">src/app/components/document-list/save-view-config-dialog/save-view-config-dialog.component.html</context>
           <context context-type="linenumber">10</context>
         </context-group>
-        <target state="translated">Näytä Dashboardissa</target>
+        <target state="translated">Näytä koontinäytöllä</target>
       </trans-unit>
       <trans-unit id="8689274715612276035" datatype="html">
         <source>Show in sidebar</source>
@@ -1758,7 +1758,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">129</context>
         </context-group>
-        <target state="needs-translation">queued</target>
+        <target state="translated">jonossa</target>
       </trans-unit>
       <trans-unit id="6415892379431855826" datatype="html">
         <source>started</source>
@@ -1766,7 +1766,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">131</context>
         </context-group>
-        <target state="needs-translation">started</target>
+        <target state="translated">aloitettu</target>
       </trans-unit>
       <trans-unit id="7510279840486540181" datatype="html">
         <source>completed</source>
@@ -1774,7 +1774,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">133</context>
         </context-group>
-        <target state="needs-translation">completed</target>
+        <target state="translated">valmistui</target>
       </trans-unit>
       <trans-unit id="4083337005045748464" datatype="html">
         <source>failed</source>
@@ -1782,7 +1782,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">135</context>
         </context-group>
-        <target state="needs-translation">failed</target>
+        <target state="translated">epäonnistui</target>
       </trans-unit>
       <trans-unit id="8119815638230251386" datatype="html">
         <source>Users &amp; Groups</source>
@@ -1954,7 +1954,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
           <context context-type="linenumber">106</context>
         </context-group>
-        <target state="needs-translation">Error saving user.</target>
+        <target state="translated">Virhe tallentaessa käyttäjää.</target>
       </trans-unit>
       <trans-unit id="5565868288871970148" datatype="html">
         <source>Confirm delete user account</source>
@@ -2054,7 +2054,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
           <context context-type="linenumber">130</context>
         </context-group>
-        <target state="needs-translation">Error deleting user.</target>
+        <target state="translated">Virhe poistaessa käyttäjää.</target>
       </trans-unit>
       <trans-unit id="5766640174051730159" datatype="html">
         <source>Saved group &quot;<x id="PH" equiv-text="newGroup.name"/>&quot;.</source>
@@ -2070,7 +2070,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
           <context context-type="linenumber">156</context>
         </context-group>
-        <target state="needs-translation">Error saving group.</target>
+        <target state="translated">Virhe tallentaessa ryhmää.</target>
       </trans-unit>
       <trans-unit id="6538873300613683004" datatype="html">
         <source>Confirm delete user group</source>
@@ -2102,7 +2102,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
           <context context-type="linenumber">180</context>
         </context-group>
-        <target state="needs-translation">Error deleting group.</target>
+        <target state="translated">Virhe poistaessa ryhmää.</target>
       </trans-unit>
       <trans-unit id="2173456130768795374" datatype="html">
         <source>Paperless-ngx</source>
@@ -2167,7 +2167,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="translated">Hallintapaneeli</target>
+        <target state="translated">Koontinäyttö</target>
       </trans-unit>
       <trans-unit id="4733307402565258070" datatype="html">
         <source>Documents</source>
@@ -2315,7 +2315,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">168</context>
         </context-group>
-        <target state="needs-translation">Templates</target>
+        <target state="translated">Mallipohjat</target>
       </trans-unit>
       <trans-unit id="1292737233370901804" datatype="html">
         <source>Mail</source>
@@ -2335,7 +2335,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">181</context>
         </context-group>
-        <target state="needs-translation">Administration</target>
+        <target state="translated">Ylläpito</target>
       </trans-unit>
       <trans-unit id="5537285341303594392" datatype="html">
         <source>File Tasks<x id="START_TAG_SPAN_1" ctype="x-span_1" equiv-text="&lt;span *ngIf=&quot;tasksService.failedFileTasks.length &gt; 0&quot;&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-danger ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
@@ -2467,7 +2467,7 @@
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">now</target>
+        <target state="translated">nyt</target>
       </trans-unit>
       <trans-unit id="6371576811194810854" datatype="html">
         <source>After</source>
@@ -2527,7 +2527,7 @@
           <context context-type="sourcefile">src/app/components/manage/consumption-templates/consumption-templates.component.html</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="needs-translation">Sort order</target>
+        <target state="translated">Järjestys</target>
       </trans-unit>
       <trans-unit id="4163272119298020373" datatype="html">
         <source>Filters</source>
@@ -2535,7 +2535,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="needs-translation">Filters</target>
+        <target state="translated">Suodattimet</target>
       </trans-unit>
       <trans-unit id="9090904435418488635" datatype="html">
         <source>Process documents that match <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>all<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> filters specified below.</source>
@@ -2779,7 +2779,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.ts</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="needs-translation">API Upload</target>
+        <target state="translated">API-lähetys</target>
       </trans-unit>
       <trans-unit id="7502272564743467653" datatype="html">
         <source>Mail Fetch</source>
@@ -3725,7 +3725,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-dialog/permissions-dialog.component.ts</context>
           <context context-type="linenumber">28</context>
         </context-group>
-        <target state="needs-translation">Set permissions</target>
+        <target state="translated">Määritä käyttöoikeudet</target>
       </trans-unit>
       <trans-unit id="1678966148862835666" datatype="html">
         <source>Edit permissions for </source>
@@ -3733,7 +3733,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-dialog/permissions-dialog.component.ts</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="needs-translation">Edit permissions for </target>
+        <target state="translated">Muokkaa käyttöoikeuksia </target>
       </trans-unit>
       <trans-unit id="8283439432608484491" datatype="html">
         <source>Note that permissions set here will override any existing permissions</source>
@@ -3749,7 +3749,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-filter-dropdown/permissions-filter-dropdown.component.html</context>
           <context context-type="linenumber">28</context>
         </context-group>
-        <target state="needs-translation">My documents</target>
+        <target state="translated">Omat asiakirjat</target>
       </trans-unit>
       <trans-unit id="231920238966427751" datatype="html">
         <source>Shared with me</source>
@@ -3757,7 +3757,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-filter-dropdown/permissions-filter-dropdown.component.html</context>
           <context context-type="linenumber">38</context>
         </context-group>
-        <target state="needs-translation">Shared with me</target>
+        <target state="translated">Jaettu kanssani</target>
       </trans-unit>
       <trans-unit id="5151074932731293042" datatype="html">
         <source>Unowned</source>
@@ -3857,7 +3857,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.html</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="needs-translation">Copy</target>
+        <target state="translated">Kopioi</target>
       </trans-unit>
       <trans-unit id="7419704019640008953" datatype="html">
         <source>Share</source>
@@ -3865,7 +3865,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.html</context>
           <context context-type="linenumber">28</context>
         </context-group>
-        <target state="needs-translation">Share</target>
+        <target state="translated">Jaa</target>
       </trans-unit>
       <trans-unit id="5392341774767336507" datatype="html">
         <source>Copied!</source>
@@ -3873,7 +3873,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.html</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="needs-translation">Copied!</target>
+        <target state="translated">Kopioitu!</target>
       </trans-unit>
       <trans-unit id="6811921365829755679" datatype="html">
         <source>Share archive version</source>
@@ -3901,7 +3901,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.ts</context>
           <context context-type="linenumber">90</context>
         </context-group>
-        <target state="needs-translation">1 day</target>
+        <target state="translated">1 päivä</target>
       </trans-unit>
       <trans-unit id="8542568275115626925" datatype="html">
         <source>7 days</source>
@@ -3909,7 +3909,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.ts</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">7 days</target>
+        <target state="translated">7 päivää</target>
       </trans-unit>
       <trans-unit id="7152095234138763013" datatype="html">
         <source>30 days</source>
@@ -3917,7 +3917,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.ts</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="needs-translation">30 days</target>
+        <target state="translated">30 päivää</target>
       </trans-unit>
       <trans-unit id="8372007266188249803" datatype="html">
         <source>Never</source>
@@ -3925,7 +3925,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.ts</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="needs-translation">Never</target>
+        <target state="translated">Ei koskaan</target>
       </trans-unit>
       <trans-unit id="3429210839568770054" datatype="html">
         <source>Error retrieving links</source>
@@ -3949,7 +3949,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.ts</context>
           <context context-type="linenumber">117</context>
         </context-group>
-        <target state="needs-translation">Error deleting link</target>
+        <target state="translated">Virhe poistaessa linkkiä</target>
       </trans-unit>
       <trans-unit id="8400747326190565173" datatype="html">
         <source>Error creating link</source>
@@ -3957,7 +3957,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.ts</context>
           <context context-type="linenumber">145</context>
         </context-group>
-        <target state="needs-translation">Error creating link</target>
+        <target state="translated">Virhe luotaessa linkkiä</target>
       </trans-unit>
       <trans-unit id="5611592591303869712" datatype="html">
         <source>Status</source>
@@ -3965,7 +3965,7 @@
           <context context-type="sourcefile">src/app/components/common/toasts/toasts.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation">Status</target>
+        <target state="translated">Tila</target>
       </trans-unit>
       <trans-unit id="6732151329960766506" datatype="html">
         <source>Copy Raw Error</source>
@@ -3981,7 +3981,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
           <context context-type="linenumber">48</context>
         </context-group>
-        <target state="translated">Hei <x id="PH" equiv-text="this.settingsService.displayName"/>, tervetuloa Paperless-ngx sovellukseen</target>
+        <target state="translated">Hei <x id="PH" equiv-text="this.settingsService.displayName"/>, tervetuloa Paperless-ngx:ään</target>
       </trans-unit>
       <trans-unit id="5334686081082652461" datatype="html">
         <source>Welcome to Paperless-ngx</source>
@@ -3989,7 +3989,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
           <context context-type="linenumber">50</context>
         </context-group>
-        <target state="translated">Tervetuloa Paperless-ngx sovellukseen</target>
+        <target state="translated">Tervetuloa, tämä on Paperless-ngx</target>
       </trans-unit>
       <trans-unit id="1325877348738783391" datatype="html">
         <source>Dashboard updated</source>
@@ -3997,7 +3997,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
           <context context-type="linenumber">73</context>
         </context-group>
-        <target state="needs-translation">Dashboard updated</target>
+        <target state="translated">Koontinäyttö päivitetty</target>
       </trans-unit>
       <trans-unit id="3214475953924351473" datatype="html">
         <source>Error updating dashboard</source>
@@ -4077,7 +4077,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/saved-view-widget/saved-view-widget.component.html</context>
           <context context-type="linenumber">35</context>
         </context-group>
-        <target state="needs-translation">View Preview</target>
+        <target state="translated">Näytä esikatselu</target>
       </trans-unit>
       <trans-unit id="3099741642167775297" datatype="html">
         <source>Download</source>
@@ -4109,7 +4109,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/saved-view-widget/saved-view-widget.component.html</context>
           <context context-type="linenumber">57</context>
         </context-group>
-        <target state="needs-translation">No documents</target>
+        <target state="translated">Ei asiakirjoja</target>
       </trans-unit>
       <trans-unit id="1069523139277190436" datatype="html">
         <source>Statistics</source>
@@ -4165,7 +4165,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">61</context>
         </context-group>
-        <target state="needs-translation">Document Types</target>
+        <target state="translated">Asiakirjatyypit</target>
       </trans-unit>
       <trans-unit id="5421255270838137624" datatype="html">
         <source>Storage Paths</source>
@@ -4173,7 +4173,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">67</context>
         </context-group>
-        <target state="needs-translation">Storage Paths</target>
+        <target state="translated">Tallennustilan polut</target>
       </trans-unit>
       <trans-unit id="8693603235657020323" datatype="html">
         <source>Other</source>
@@ -4189,7 +4189,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="translated">Lataa uusia dokumentteja</target>
+        <target state="translated">Lataa uusia asiakirjoja</target>
       </trans-unit>
       <trans-unit id="8161815301131859114" datatype="html">
         <source>Drop documents anywhere or</source>
@@ -4197,7 +4197,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="needs-translation">Drop documents anywhere or</target>
+        <target state="translated">Pudota asiakirjat mihin tahansa tai</target>
       </trans-unit>
       <trans-unit id="8133800334834354642" datatype="html">
         <source>Browse files</source>
@@ -4284,7 +4284,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="translated">Tarkempia tietoja Paperless-ngx sovelluksen käytöstä ja konfiguroinnista on saatavilla <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://docs.paperless-ngx.com&quot; target=&quot;_blank&quot;&gt;"/>dokumentaatiossa<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</target>
+        <target state="translated">Tarkempia tietoja Paperless-ngx: käytöstä ja konfiguroinnista on saatavilla <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://docs.paperless-ngx.com&quot; target=&quot;_blank&quot;&gt;"/>dokumentaatiossa<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</target>
       </trans-unit>
       <trans-unit id="4294899532887357745" datatype="html">
         <source>Thanks for being a part of the Paperless-ngx community!</source>
@@ -4292,7 +4292,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">7</context>
         </context-group>
-        <target state="translated">Kiitos, että olette osana Paperless-ngx -yhteisöä!</target>
+        <target state="translated">Kiitos, että olette osana Paperless-ngx:n yhteisöä!</target>
       </trans-unit>
       <trans-unit id="1415832194529539652" datatype="html">
         <source>Start the tour</source>
@@ -4348,7 +4348,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">89</context>
         </context-group>
-        <target state="translated">Tee OCR Uudelleen</target>
+        <target state="translated">Tee OCR uudelleen</target>
       </trans-unit>
       <trans-unit id="1418444397960583910" datatype="html">
         <source>More like this</source>
@@ -4616,7 +4616,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">207</context>
         </context-group>
-        <target state="needs-translation">Save &amp; close</target>
+        <target state="translated">Tallenna ja sulje</target>
       </trans-unit>
       <trans-unit id="2218903673684131427" datatype="html">
         <source>An error occurred loading content: <x id="PH" equiv-text="err.message ?? err.toString()"/></source>
@@ -5310,7 +5310,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">152</context>
         </context-group>
-        <target state="needs-translation">Sort by owner</target>
+        <target state="translated">Järjestä omistajan mukaan</target>
       </trans-unit>
       <trans-unit id="3715596725146409911" datatype="html">
         <source>Owner</source>
@@ -5322,7 +5322,7 @@
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="needs-translation">Owner</target>
+        <target state="translated">Omistaja</target>
       </trans-unit>
       <trans-unit id="3557446856808034218" datatype="html">
         <source>Sort by notes</source>
@@ -5490,7 +5490,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">161</context>
         </context-group>
-        <target state="needs-translation">Owner: <x id="PH" equiv-text="rule.value"/></target>
+        <target state="translated">Omistaja: <x id="PH" equiv-text="rule.value"/></target>
       </trans-unit>
       <trans-unit id="3550877650686009106" datatype="html">
         <source>Owner not in: <x id="PH" equiv-text="rule.value"/></source>
@@ -5670,7 +5670,7 @@
           <context context-type="sourcefile">src/app/components/manage/consumption-templates/consumption-templates.component.html</context>
           <context context-type="linenumber">6</context>
         </context-group>
-        <target state="needs-translation">Add Template</target>
+        <target state="translated">Lisää mallipohja</target>
       </trans-unit>
       <trans-unit id="6043932623370318890" datatype="html">
         <source>Document Sources</source>
@@ -5678,7 +5678,7 @@
           <context context-type="sourcefile">src/app/components/manage/consumption-templates/consumption-templates.component.html</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="needs-translation">Document Sources</target>
+        <target state="translated">Asiakirjalähteet</target>
       </trans-unit>
       <trans-unit id="3954560573326461437" datatype="html">
         <source>No templates defined.</source>
@@ -5686,7 +5686,7 @@
           <context context-type="sourcefile">src/app/components/manage/consumption-templates/consumption-templates.component.html</context>
           <context context-type="linenumber">44</context>
         </context-group>
-        <target state="needs-translation">No templates defined.</target>
+        <target state="translated">Mallipohjia ei ole määritelty.</target>
       </trans-unit>
       <trans-unit id="5957685099370605085" datatype="html">
         <source>Saved template &quot;<x id="PH" equiv-text="newTemplate.name"/>&quot;.</source>
@@ -5694,7 +5694,7 @@
           <context context-type="sourcefile">src/app/components/manage/consumption-templates/consumption-templates.component.ts</context>
           <context context-type="linenumber">73</context>
         </context-group>
-        <target state="needs-translation">Saved template "<x id="PH" equiv-text="newTemplate.name"/>".</target>
+        <target state="translated">Tallennettu mallipohja "<x id="PH" equiv-text="newTemplate.name"/>".</target>
       </trans-unit>
       <trans-unit id="5291506186551056893" datatype="html">
         <source>Error saving template.</source>
@@ -5798,7 +5798,7 @@
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="needs-translation">Mail Settings</target>
+        <target state="translated">Sähköpostin asetukset</target>
       </trans-unit>
       <trans-unit id="8913167930428886792" datatype="html">
         <source>Mail accounts</source>
@@ -5886,7 +5886,7 @@
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
           <context context-type="linenumber">104</context>
         </context-group>
-        <target state="needs-translation">Error saving account.</target>
+        <target state="translated">Virhe tiliä tallentaessa.</target>
       </trans-unit>
       <trans-unit id="5641934153807844674" datatype="html">
         <source>Confirm delete mail account</source>
@@ -5918,7 +5918,7 @@
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
           <context context-type="linenumber">132</context>
         </context-group>
-        <target state="needs-translation">Error deleting mail account.</target>
+        <target state="translated">Virhe sähköpostitiliä poistaessa.</target>
       </trans-unit>
       <trans-unit id="123368655395433699" datatype="html">
         <source>Saved rule &quot;<x id="PH" equiv-text="newMailRule.name"/>&quot;.</source>
@@ -5934,7 +5934,7 @@
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
           <context context-type="linenumber">163</context>
         </context-group>
-        <target state="needs-translation">Error saving rule.</target>
+        <target state="translated">Virhe sääntöä tallentaessa.</target>
       </trans-unit>
       <trans-unit id="3896080636020672118" datatype="html">
         <source>Confirm delete mail rule</source>
@@ -5966,7 +5966,7 @@
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
           <context context-type="linenumber">190</context>
         </context-group>
-        <target state="needs-translation">Error deleting mail rule.</target>
+        <target state="translated">Virhe sähköpostisääntöä poistaessa.</target>
       </trans-unit>
       <trans-unit id="3061362835271417984" datatype="html">
         <source>Permissions updated</source>
@@ -5974,7 +5974,7 @@
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
           <context context-type="linenumber">212</context>
         </context-group>
-        <target state="needs-translation">Permissions updated</target>
+        <target state="translated">Käyttöoikeudet päivitetty</target>
       </trans-unit>
       <trans-unit id="4639647950943944112" datatype="html">
         <source>Error updating permissions</source>
@@ -6006,7 +6006,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
           <context context-type="linenumber">13,17</context>
         </context-group>
-        <target state="needs-translation"><x id="START_TAG__SVG_SVG" ctype="x-_svg_svg" equiv-text="&lt;svg class=&quot;sidebaricon me-1&quot; fill=&quot;currentColor&quot;&gt;"/><x id="START_TAG__SVG_USE" ctype="x-_svg_use" equiv-text="&lt;use xlink:href=&quot;assets/bootstrap-icons.svg#plus-circle&quot; /&gt;"/><x id="CLOSE_TAG__SVG_USE" ctype="x-_svg_use" equiv-text="&lt;use xlink:href=&quot;assets/bootstrap-icons.svg#plus-circle&quot; /&gt;"/><x id="CLOSE_TAG__SVG_SVG" ctype="x-_svg_svg" equiv-text="&lt;/svg&gt;"/> Create </target>
+        <target state="translated"><x id="START_TAG__SVG_SVG" ctype="x-_svg_svg" equiv-text="&lt;svg class=&quot;sidebaricon me-1&quot; fill=&quot;currentColor&quot;&gt;"/><x id="START_TAG__SVG_USE" ctype="x-_svg_use" equiv-text="&lt;use xlink:href=&quot;assets/bootstrap-icons.svg#plus-circle&quot; /&gt;"/><x id="CLOSE_TAG__SVG_USE" ctype="x-_svg_use" equiv-text="&lt;use xlink:href=&quot;assets/bootstrap-icons.svg#plus-circle&quot; /&gt;"/><x id="CLOSE_TAG__SVG_SVG" ctype="x-_svg_svg" equiv-text="&lt;/svg&gt;"/> Luo </target>
       </trans-unit>
       <trans-unit id="4010735610815226758" datatype="html">
         <source>Filter by:</source>
@@ -6186,7 +6186,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">293</context>
         </context-group>
-        <target state="needs-translation">Permissions updated successfully</target>
+        <target state="translated">Käyttöoikeudet päivitettiin onnistuneesti</target>
       </trans-unit>
       <trans-unit id="5101757640976222639" datatype="html">
         <source>storage path</source>
@@ -6242,7 +6242,7 @@
           <context context-type="sourcefile">src/app/components/not-found/not-found.component.html</context>
           <context context-type="linenumber">6</context>
         </context-group>
-        <target state="needs-translation">Not Found</target>
+        <target state="translated">Ei löytynyt</target>
       </trans-unit>
       <trans-unit id="178520337056147266" datatype="html">
         <source>Go to Dashboard</source>
@@ -6250,7 +6250,7 @@
           <context context-type="sourcefile">src/app/components/not-found/not-found.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation">Go to Dashboard</target>
+        <target state="translated">Siirry koontinäyttöön</target>
       </trans-unit>
       <trans-unit id="2167862279705099846" datatype="html">
         <source>Auto: Learn matching automatically</source>
@@ -6450,7 +6450,7 @@
           <context context-type="sourcefile">src/app/pipes/username.pipe.ts</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="needs-translation">Shared</target>
+        <target state="translated">Jaettu</target>
       </trans-unit>
       <trans-unit id="2807800733729323332" datatype="html">
         <source>Yes</source>
@@ -6711,7 +6711,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">202</context>
         </context-group>
-        <target state="needs-translation">Greek</target>
+        <target state="translated">Kreikka</target>
       </trans-unit>
       <trans-unit id="6987083569809053351" datatype="html">
         <source>English (GB)</source>
@@ -6775,7 +6775,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">250</context>
         </context-group>
-        <target state="needs-translation">Norwegian</target>
+        <target state="translated">Norja</target>
       </trans-unit>
       <trans-unit id="792060551707690640" datatype="html">
         <source>Polish</source>
@@ -6823,7 +6823,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">286</context>
         </context-group>
-        <target state="needs-translation">Slovak</target>
+        <target state="translated">Slovakia</target>
       </trans-unit>
       <trans-unit id="4287008301409320881" datatype="html">
         <source>Slovenian</source>
@@ -6863,7 +6863,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">316</context>
         </context-group>
-        <target state="needs-translation">Ukrainian</target>
+        <target state="translated">Ukraina</target>
       </trans-unit>
       <trans-unit id="4689443708886954687" datatype="html">
         <source>Chinese Simplified</source>
@@ -6903,7 +6903,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">533</context>
         </context-group>
-        <target state="needs-translation">You can restart the tour from the settings page.</target>
+        <target state="translated">Voit käynnistää opastuksen uudelleen asetussivulta.</target>
       </trans-unit>
       <trans-unit id="5037437391296624618" datatype="html">
         <source>Information</source>
