@@ -172,11 +172,42 @@ jobs:
           docker compose --file ${GITHUB_WORKSPACE}/docker/compose/docker-compose.ci-test.yml logs
           docker compose --file ${GITHUB_WORKSPACE}/docker/compose/docker-compose.ci-test.yml down
 
+  install-frontend-depedendencies:
+    name: "Install Frontend Dependendencies"
+    runs-on: ubuntu-22.04
+    needs:
+      - pre-commit
+    steps:
+      - uses: actions/checkout@v4
+      -
+        name: Use Node.js 20
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20.x
+          cache: 'npm'
+          cache-dependency-path: 'src-ui/package-lock.json'
+      - name: Cache frontend depdendencies
+        id: cache-frontend-deps
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            ~/.cache
+          key: ${{ runner.os }}-frontenddeps-${{ hashFiles('src-ui/package-lock.json') }}
+      -
+        name: Install dependencies
+        if: steps.cache-frontend-deps.outputs.cache-hit != 'true'
+        run: cd src-ui && npm ci
+      -
+        name: Install Playwright
+        if: steps.cache-frontend-deps.outputs.cache-hit != 'true'
+        run: cd src-ui && npx playwright install --with-deps
+
   tests-frontend:
     name: "Frontend Tests (Node ${{ matrix.node-version }} - ${{ matrix.shard-index }}/${{ matrix.shard-count }})"
     runs-on: ubuntu-22.04
     needs:
-      - pre-commit
+      - install-frontend-depedendencies
     strategy:
       fail-fast: false
       matrix:
@@ -192,12 +223,16 @@ jobs:
           node-version: 20.x
           cache: 'npm'
           cache-dependency-path: 'src-ui/package-lock.json'
-      -
-        name: Install dependencies
-        run: cd src-ui && npm ci
-      -
-        name: Install Playwright
-        run: cd src-ui && npx playwright install --with-deps
+      - name: Cache frontend depdendencies
+        id: cache-frontend-deps
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            ~/.cache
+          key: ${{ runner.os }}-frontenddeps-${{ hashFiles('src-ui/package-lock.json') }}
+      - name: Re-link Angular cli
+        run: cd src-ui && npm link @angular/cli
       -
         name: Linting checks
         run: cd src-ui && npm run lint
@@ -392,6 +427,7 @@ jobs:
           retention-days: 7
 
   build-release:
+    name: "Build Release"
     needs:
       - build-docker-image
     runs-on: ubuntu-22.04
@@ -501,6 +537,7 @@ jobs:
           retention-days: 7
 
   publish-release:
+    name: "Publish Release"
     runs-on: ubuntu-22.04
     outputs:
       prerelease: ${{ steps.get_version.outputs.prerelease }}
@@ -550,6 +587,7 @@ jobs:
           asset_content_type: application/x-xz
 
   append-changelog:
+    name: "Append Changelog"
     runs-on: ubuntu-22.04
     needs:
       - publish-release
