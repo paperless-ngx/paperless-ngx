@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-28 10:56-0700\n"
-"PO-Revision-Date: 2023-10-01 01:27\n"
+"PO-Revision-Date: 2023-10-09 07:18\n"
 "Last-Translator: \n"
 "Language-Team: Norwegian\n"
 "Language: no_NO\n"
@@ -385,43 +385,43 @@ msgstr "lagringssti er"
 
 #: documents/models.py:445
 msgid "has correspondent in"
-msgstr ""
+msgstr "har korrespondent i"
 
 #: documents/models.py:446
 msgid "does not have correspondent in"
-msgstr ""
+msgstr "har ingen korrespondent i"
 
 #: documents/models.py:447
 msgid "has document type in"
-msgstr ""
+msgstr "har dokumenttype i"
 
 #: documents/models.py:448
 msgid "does not have document type in"
-msgstr ""
+msgstr "har ikke dokumenttype i"
 
 #: documents/models.py:449
 msgid "has storage path in"
-msgstr ""
+msgstr "har lagringssti i"
 
 #: documents/models.py:450
 msgid "does not have storage path in"
-msgstr ""
+msgstr "har ikke lagringssti i"
 
 #: documents/models.py:451
 msgid "owner is"
-msgstr ""
+msgstr "eier er"
 
 #: documents/models.py:452
 msgid "has owner in"
-msgstr ""
+msgstr "har eier i"
 
 #: documents/models.py:453
 msgid "does not have owner"
-msgstr ""
+msgstr "har ikke eier"
 
 #: documents/models.py:454
 msgid "does not have owner in"
-msgstr ""
+msgstr "har ikke eier i"
 
 #: documents/models.py:464
 msgid "rule type"
@@ -513,7 +513,7 @@ msgstr "Dataene returnert av oppgaven"
 
 #: documents/models.py:647
 msgid "Note for the document"
-msgstr ""
+msgstr "Merknad til dokumentet"
 
 #: documents/models.py:671
 msgid "user"
@@ -521,23 +521,23 @@ msgstr "bruker"
 
 #: documents/models.py:676
 msgid "note"
-msgstr ""
+msgstr "merknad"
 
 #: documents/models.py:677
 msgid "notes"
-msgstr ""
+msgstr "merknader"
 
 #: documents/models.py:685
 msgid "Archive"
-msgstr ""
+msgstr "Arkiv"
 
 #: documents/models.py:686
 msgid "Original"
-msgstr ""
+msgstr "Original"
 
 #: documents/models.py:697
 msgid "expiration"
-msgstr ""
+msgstr "utløp"
 
 #: documents/models.py:704
 msgid "slug"
