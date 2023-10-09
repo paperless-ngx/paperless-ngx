@@ -210,8 +210,8 @@ RUN --mount=type=cache,target=/root/.cache/pip/,id=pip-cache \
     && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/share/nltk_data" stopwords \
     && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/share/nltk_data" punkt \
   && echo "Cleaning up image" \
-    && apt-get -y purge ${BUILD_PACKAGES} \
-    && apt-get -y autoremove --purge \
+    && apt-get --yes purge ${BUILD_PACKAGES} \
+    && apt-get --yes autoremove --purge \
     && apt-get clean --yes \
     && rm --recursive --force --verbose /var/lib/apt/lists/* \
     && rm --recursive --force --verbose /tmp/* \
@@ -232,11 +232,12 @@ RUN set -eux \
     && addgroup --gid 1000 paperless \
     && useradd --uid 1000 --gid paperless --home-dir /usr/src/paperless paperless \
   && echo "Creating volume directories" \
-    && mkdir -p --verbose /usr/src/paperless/media \
-    && mkdir -p --verbose /usr/src/paperless/consume \
-    && mkdir -p --verbose /usr/src/paperless/export \
+    && mkdir --parents --verbose /usr/src/paperless/data \
+    && mkdir --parents --verbose /usr/src/paperless/media \
+    && mkdir --parents --verbose /usr/src/paperless/consume \
+    && mkdir --parents --verbose /usr/src/paperless/export \
   && echo "Adjusting all permissions" \
-    && chown -R paperless:paperless /usr/src/paperless \
+    && chown --recursive paperless:paperless /usr/src/paperless \
   && echo "Collecting static files" \
     && gosu paperless python3 manage.py collectstatic --clear --no-input --link \
     && gosu paperless python3 manage.py compilemessages
