@@ -501,7 +501,7 @@ HTTP header/value expected by Django, eg `'["HTTP_X_FORWARDED_PROTO", "https"]'`
     Settings this value has security implications.  Read the Django documentation
     and be sure you understand its usage before setting it.
 
-#### [`PAPERLESS_EMAIL_CERTIFICATE_FILE=<path>`](#PAPERLESS_EMAIL_CERTIFICATE_FILE) {#PAPERLESS_EMAIL_CERTIFICATE_FILE}
+#### [`PAPERLESS_EMAIL_CERTIFICATE_LOCATION=<path>`](#PAPERLESS_EMAIL_CERTIFICATE_LOCATION) {#PAPERLESS_EMAIL_CERTIFICATE_LOCATION}
 
 : Configures an additional SSL certificate file containing a [certificate](https://docs.python.org/3/library/ssl.html#certificates)
 or certificate chain which should be trusted for validating SSL connections against mail providers.
