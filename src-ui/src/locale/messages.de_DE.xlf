@@ -4998,7 +4998,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">436</context>
         </context-group>
-        <target state="final">Diese Aktion entfernt den Speicherpfad von <x id="PH" equiv-text="this.list.selected.size"/> ausgewählten Dokument(en).</target>
+        <target state="final">Diese Aktion entfernt den Speicherpfad von <x id="PH" equiv-text="this.list.selected.size"/> ausgewählten Dokumenten.</target>
       </trans-unit>
       <trans-unit id="749430623564850405" datatype="html" approved="yes">
         <source>Delete confirm</source>
