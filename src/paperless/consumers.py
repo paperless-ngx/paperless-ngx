@@ -7,6 +7,10 @@ from channels.generic.websocket import WebsocketConsumer
 
 
 class StatusConsumer(WebsocketConsumer):
+    """
+    WebSocket consumer class that handles connection, disconnection,
+    and status update events.
+    """
     def _authenticated(self):
         return "user" in self.scope and self.scope["user"].is_authenticated
 

@@ -21,6 +21,8 @@ from paperless.serialisers import UserSerializer
 
 
 class StandardPagination(PageNumberPagination):
+    """A class representing a standard pagination mechanism based on page
+numbers."""
     page_size = 25
     page_size_query_param = "page_size"
     max_page_size = 100000
@@ -59,6 +61,16 @@ class StandardPagination(PageNumberPagination):
         return ids
 
     def get_paginated_response_schema(self, schema):
+        """
+        Get the paginated response schema.
+        This function takes a schema as input and returns a modified
+        version of the schema.
+        Args:
+            self: The instance of the class.
+            schema: The input schema.
+        Returns:
+            dict: The modified response schema.
+        """
         response_schema = super().get_paginated_response_schema(schema)
         response_schema["properties"]["all"] = {
             "type": "array",
@@ -68,6 +80,9 @@ class StandardPagination(PageNumberPagination):
 
 
 class FaviconView(View):
+    """
+    A view for serving the favicon.ico file.
+    """
     def get(self, request, *args, **kwargs):  # pragma: nocover
         favicon = os.path.join(
             os.path.dirname(__file__),
@@ -81,6 +96,9 @@ class FaviconView(View):
 
 
 class UserViewSet(ModelViewSet):
+    """
+    A viewset for handling User model CRUD operations.
+    """
     model = User
 
     queryset = User.objects.exclude(
@@ -96,6 +114,9 @@ class UserViewSet(ModelViewSet):
 
 
 class GroupViewSet(ModelViewSet):
+    """
+    A viewset for handling Group model CRUD operations.
+    """
     model = Group
 
     queryset = Group.objects.order_by(Lower("name"))
