@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-28 10:56-0700\n"
-"PO-Revision-Date: 2023-10-01 01:27\n"
+"PO-Revision-Date: 2023-10-09 17:20\n"
 "Last-Translator: \n"
 "Language-Team: Finnish\n"
 "Language: fi_FI\n"
@@ -409,7 +409,7 @@ msgstr ""
 
 #: documents/models.py:451
 msgid "owner is"
-msgstr ""
+msgstr "omistaja on"
 
 #: documents/models.py:452
 msgid "has owner in"
@@ -441,7 +441,7 @@ msgstr "suodatussäännöt"
 
 #: documents/models.py:581
 msgid "Task ID"
-msgstr "Tehtävä ID"
+msgstr "Tehtävä-ID"
 
 #: documents/models.py:582
 msgid "Celery ID for the Task that was run"
@@ -533,7 +533,7 @@ msgstr ""
 
 #: documents/models.py:686
 msgid "Original"
-msgstr ""
+msgstr "Alkuperäinen"
 
 #: documents/models.py:697
 msgid "expiration"
@@ -557,7 +557,7 @@ msgstr ""
 
 #: documents/models.py:746
 msgid "Api Upload"
-msgstr ""
+msgstr "API-lähetys"
 
 #: documents/models.py:747
 msgid "Mail Fetch"
@@ -695,11 +695,11 @@ msgstr "Käyttäjätunnus ja salasana eivät täsmää. Yritä uudelleen."
 
 #: documents/templates/registration/login.html:48
 msgid "Share link was not found."
-msgstr ""
+msgstr "Jakolinkkiä ei löytynyt."
 
 #: documents/templates/registration/login.html:52
 msgid "Share link has expired."
-msgstr ""
+msgstr "Jakolinkki on vanhentunut."
 
 #: documents/templates/registration/login.html:55
 msgid "Username"
@@ -715,7 +715,7 @@ msgstr "Kirjaudu sisään"
 
 #: documents/templates/registration/login.html:70
 msgid "Forgot your password?"
-msgstr ""
+msgstr "Unohditko salasanan?"
 
 #: documents/templates/registration/password_reset_complete.html:14
 msgid "Paperless-ngx reset password complete"
@@ -728,7 +728,7 @@ msgstr ""
 #: documents/templates/registration/password_reset_complete.html:42
 #, python-format
 msgid "Your new password has been set. You can now <a href=\"%(login_url)s\">log in</a>"
-msgstr ""
+msgstr "Uusi salasanasi on asetettu. Voit nyt <a href=\"%(login_url)s\">kirjautua sisään</a>"
 
 #: documents/templates/registration/password_reset_confirm.html:14
 msgid "Paperless-ngx reset password confirmation"
@@ -736,23 +736,23 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_confirm.html:42
 msgid "Set a new password."
-msgstr ""
+msgstr "Aseta uusi salasana."
 
 #: documents/templates/registration/password_reset_confirm.html:46
 msgid "Passwords did not match or too weak. Try again."
-msgstr ""
+msgstr "Salasanat eivät täsmää tai salasana on liian heikko. Yritä uudelleen."
 
 #: documents/templates/registration/password_reset_confirm.html:49
 msgid "New Password"
-msgstr ""
+msgstr "Uusi salasana"
 
 #: documents/templates/registration/password_reset_confirm.html:50
 msgid "Confirm Password"
-msgstr ""
+msgstr "Vahvista salasana"
 
 #: documents/templates/registration/password_reset_confirm.html:61
 msgid "Change my password"
-msgstr ""
+msgstr "Vaihda salasana"
 
 #: documents/templates/registration/password_reset_confirm.html:65
 msgid "request a new password reset"
@@ -764,11 +764,11 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_done.html:40
 msgid "Check your inbox."
-msgstr ""
+msgstr "Tarkista postilaatikkosi."
 
 #: documents/templates/registration/password_reset_done.html:41
 msgid "We've emailed you instructions for setting your password. You should receive the email shortly!"
-msgstr ""
+msgstr "Olemme lähettäneet sinulle ohjeet salasanan asettamiseen. Sinun pitäisi saada sähköposti pian!"
 
 #: documents/templates/registration/password_reset_form.html:14
 msgid "Paperless-ngx reset password request"
@@ -776,11 +776,11 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_form.html:41
 msgid "Enter your email address below, and we'll email instructions for setting a new one."
-msgstr ""
+msgstr "Syötä sähköpostiosoitteesi alla ja lähetämme ohjeet uuden salasanan asettamiseen."
 
 #: documents/templates/registration/password_reset_form.html:44
 msgid "An error occurred. Please try again."
-msgstr ""
+msgstr "Tapahtui virhe. Yritä uudelleen."
 
 #: documents/templates/registration/password_reset_form.html:47
 msgid "Email"
@@ -788,7 +788,7 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_form.html:54
 msgid "Send me instructions!"
-msgstr ""
+msgstr "Lähettäkää ohjeet!"
 
 #: paperless/apps.py:10
 msgid "Paperless"
@@ -812,7 +812,7 @@ msgstr "valkovenäjä"
 
 #: paperless/settings.py:578
 msgid "Catalan"
-msgstr ""
+msgstr "Katalaani"
 
 #: paperless/settings.py:579
 msgid "Czech"
@@ -828,7 +828,7 @@ msgstr "Saksa"
 
 #: paperless/settings.py:582
 msgid "Greek"
-msgstr ""
+msgstr "Kreikka"
 
 #: paperless/settings.py:583
 msgid "English (GB)"
@@ -840,7 +840,7 @@ msgstr "Espanja"
 
 #: paperless/settings.py:585
 msgid "Finnish"
-msgstr ""
+msgstr "Suomi"
 
 #: paperless/settings.py:586
 msgid "French"
@@ -856,7 +856,7 @@ msgstr "Luxemburg"
 
 #: paperless/settings.py:589
 msgid "Norwegian"
-msgstr ""
+msgstr "Norja"
 
 #: paperless/settings.py:590
 msgid "Dutch"
@@ -884,7 +884,7 @@ msgstr "venäjä"
 
 #: paperless/settings.py:596
 msgid "Slovak"
-msgstr ""
+msgstr "Slovakia"
 
 #: paperless/settings.py:597
 msgid "Slovenian"
@@ -904,7 +904,7 @@ msgstr "Turkki"
 
 #: paperless/settings.py:601
 msgid "Ukrainian"
-msgstr ""
+msgstr "Ukraina"
 
 #: paperless/settings.py:602
 msgid "Chinese Simplified"
@@ -912,7 +912,7 @@ msgstr "Kiina (yksinkertaistettu)"
 
 #: paperless/urls.py:184
 msgid "Paperless-ngx administration"
-msgstr "Paperless-ngx hallintapaneeli"
+msgstr "Paperless-ngx:n ylläpito"
 
 #: paperless_mail/admin.py:41
 msgid "Authentication"
