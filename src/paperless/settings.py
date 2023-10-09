@@ -483,7 +483,7 @@ CSRF_COOKIE_NAME = f"{COOKIE_PREFIX}csrftoken"
 SESSION_COOKIE_NAME = f"{COOKIE_PREFIX}sessionid"
 LANGUAGE_COOKIE_NAME = f"{COOKIE_PREFIX}django_language"
 
-EMAIL_CERTIFICATE_FILE = __get_path("PAPERLESS_EMAIL_CERTIFICATE_FILE")
+EMAIL_CERTIFICATE_FILE = __get_path("PAPERLESS_EMAIL_CERTIFICATE_LOCATION")
 
 
 ###############################################################################
