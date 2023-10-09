@@ -4902,7 +4902,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">298,300</context>
         </context-group>
-        <target state="final">Diese Aktion wird die Tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> zu <x id="PH_1" equiv-text="this.list.selected.size"/> ausgewählten Dokument(en) hinzufügen.</target>
+        <target state="final">Diese Aktion wird die Tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> zu <x id="PH_1" equiv-text="this.list.selected.size"/> ausgewählten Dokumenten hinzufügen.</target>
       </trans-unit>
       <trans-unit id="7181166515756808573" datatype="html" approved="yes">
         <source>This operation will remove the tag &quot;<x id="PH" equiv-text="tag.name"/>&quot; from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -4918,7 +4918,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">311,313</context>
         </context-group>
-        <target state="final">Diese Aktion wird die Tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> von <x id="PH_1" equiv-text="this.list.selected.size"/> ausgewählten Dokument(en) entfernen.</target>
+        <target state="final">Diese Aktion wird die Tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> von <x id="PH_1" equiv-text="this.list.selected.size"/> ausgewählten Dokumenten entfernen.</target>
       </trans-unit>
       <trans-unit id="2739066218579571288" datatype="html" approved="yes">
         <source>This operation will add the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> and remove the tags <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> on <x id="PH_2" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -4926,7 +4926,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">315,319</context>
         </context-group>
-        <target state="final">Diese Aktion wird <x id="PH_2" equiv-text="this.list.selected.size"/> ausgewählten Dokument(en) die Tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> hinzufügen und die Tags <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> entfernen.</target>
+        <target state="final">Diese Aktion wird <x id="PH_2" equiv-text="this.list.selected.size"/> ausgewählten Dokumenten die Tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> hinzufügen und die Tags <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> entfernen.</target>
       </trans-unit>
       <trans-unit id="2996713129519325161" datatype="html" approved="yes">
         <source>Confirm correspondent assignment</source>
@@ -4974,7 +4974,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">398</context>
         </context-group>
-        <target state="final">Diese Aktion wird bei <x id="PH" equiv-text="this.list.selected.size"/> ausgewählten Dokumenten den Dokumenttyp entfernen.</target>
+        <target state="final">Diese Aktion wird den Dokumenttyp von <x id="PH" equiv-text="this.list.selected.size"/> ausgewählten Dokumenten entfernen.</target>
       </trans-unit>
       <trans-unit id="6386555513013840736" datatype="html" approved="yes">
         <source>Confirm storage path assignment</source>
@@ -6354,7 +6354,7 @@
           <context context-type="sourcefile">src/app/guards/dirty-doc.guard.ts</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="final">Warnung: Sie haben nicht gespeicherte Änderungen an einem oder mehreren Dokument(en).</target>
+        <target state="final">Warnung: Sie haben nicht gespeicherte Änderungen an einem oder mehreren Dokumenten.</target>
       </trans-unit>
       <trans-unit id="159901853873315050" datatype="html" approved="yes">
         <source>Unsaved Changes</source>
