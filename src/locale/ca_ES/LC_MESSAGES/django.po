@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-28 10:56-0700\n"
-"PO-Revision-Date: 2023-10-10 14:16\n"
+"PO-Revision-Date: 2023-10-10 15:41\n"
 "Last-Translator: \n"
 "Language-Team: Catalan\n"
 "Language: ca_ES\n"
@@ -593,7 +593,7 @@ msgstr "assigna títol"
 
 #: documents/models.py:797
 msgid "Assign a document title, can include some placeholders, see documentation."
-msgstr ""
+msgstr "Assigna un títol de document, pot incloure alguns marcadors de posició, vegeu la documentació."
 
 #: documents/models.py:805 paperless_mail/models.py:204
 msgid "assign this tag"
@@ -732,7 +732,7 @@ msgstr "Contrasenya enviada. Pots iniciar <a href=\"%(login_url)s\">sessió</a>"
 
 #: documents/templates/registration/password_reset_confirm.html:14
 msgid "Paperless-ngx reset password confirmation"
-msgstr ""
+msgstr "Paperless-ngx confirmació de restabliment de contrasenya"
 
 #: documents/templates/registration/password_reset_confirm.html:42
 msgid "Set a new password."
@@ -756,31 +756,31 @@ msgstr "Canvia contrasenya"
 
 #: documents/templates/registration/password_reset_confirm.html:65
 msgid "request a new password reset"
-msgstr ""
+msgstr "sol·licitar restabliment de contrasenya"
 
 #: documents/templates/registration/password_reset_done.html:14
 msgid "Paperless-ngx reset password sent"
-msgstr ""
+msgstr "S'ha enviat el restabliment de contrasenya"
 
 #: documents/templates/registration/password_reset_done.html:40
 msgid "Check your inbox."
-msgstr ""
+msgstr "Reviseu el correu."
 
 #: documents/templates/registration/password_reset_done.html:41
 msgid "We've emailed you instructions for setting your password. You should receive the email shortly!"
-msgstr ""
+msgstr "Enviat per correu electrònic instruccions per configurar la vostra contrasenya. Hauríeu de rebre el correu electrònic en breu!"
 
 #: documents/templates/registration/password_reset_form.html:14
 msgid "Paperless-ngx reset password request"
-msgstr ""
+msgstr "Sol·licitud de restabliment de la contrasenya"
 
 #: documents/templates/registration/password_reset_form.html:41
 msgid "Enter your email address below, and we'll email instructions for setting a new one."
-msgstr ""
+msgstr "Introduïu la vostra adreça de correu electrònic a continuació i us enviarem les instruccions per configurar-ne una de nova."
 
 #: documents/templates/registration/password_reset_form.html:44
 msgid "An error occurred. Please try again."
-msgstr ""
+msgstr "Error. Prova de nou."
 
 #: documents/templates/registration/password_reset_form.html:47
 msgid "Email"
