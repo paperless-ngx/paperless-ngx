@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-28 10:56-0700\n"
-"PO-Revision-Date: 2023-10-01 01:27\n"
+"PO-Revision-Date: 2023-10-10 14:16\n"
 "Last-Translator: \n"
 "Language-Team: Catalan\n"
 "Language: ca_ES\n"
@@ -715,20 +715,20 @@ msgstr "Validació"
 
 #: documents/templates/registration/login.html:70
 msgid "Forgot your password?"
-msgstr ""
+msgstr "Contrasenya oblidada?"
 
 #: documents/templates/registration/password_reset_complete.html:14
 msgid "Paperless-ngx reset password complete"
-msgstr ""
+msgstr "Contrasenya restablerta"
 
 #: documents/templates/registration/password_reset_complete.html:40
 msgid "Password reset complete."
-msgstr ""
+msgstr "Contrasenya restablerta."
 
 #: documents/templates/registration/password_reset_complete.html:42
 #, python-format
 msgid "Your new password has been set. You can now <a href=\"%(login_url)s\">log in</a>"
-msgstr ""
+msgstr "Contrasenya enviada. Pots iniciar <a href=\"%(login_url)s\">sessió</a>"
 
 #: documents/templates/registration/password_reset_confirm.html:14
 msgid "Paperless-ngx reset password confirmation"
@@ -736,23 +736,23 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_confirm.html:42
 msgid "Set a new password."
-msgstr ""
+msgstr "Entra una contrasenya nova"
 
 #: documents/templates/registration/password_reset_confirm.html:46
 msgid "Passwords did not match or too weak. Try again."
-msgstr ""
+msgstr "Contrasenyes no coincideixen o son massa febles."
 
 #: documents/templates/registration/password_reset_confirm.html:49
 msgid "New Password"
-msgstr ""
+msgstr "Nova contrasenya"
 
 #: documents/templates/registration/password_reset_confirm.html:50
 msgid "Confirm Password"
-msgstr ""
+msgstr "Confirmar contrasenya"
 
 #: documents/templates/registration/password_reset_confirm.html:61
 msgid "Change my password"
-msgstr ""
+msgstr "Canvia contrasenya"
 
 #: documents/templates/registration/password_reset_confirm.html:65
 msgid "request a new password reset"
@@ -784,11 +784,11 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_form.html:47
 msgid "Email"
-msgstr ""
+msgstr "Email"
 
 #: documents/templates/registration/password_reset_form.html:54
 msgid "Send me instructions!"
-msgstr ""
+msgstr "Enviar instruccions"
 
 #: paperless/apps.py:10
 msgid "Paperless"
