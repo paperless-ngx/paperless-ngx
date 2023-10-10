@@ -345,9 +345,13 @@ class DocumentViewSet(
             return []
 
     def get_filesize(self, filename):
-        if os.path.isfile(filename):
-            return os.stat(filename).st_size
-        else:
+        try:
+            if os.path.isfile(filename):
+                return os.stat(filename).st_size
+            else:
+                return None
+        except (FileNotFoundError, PermissionError) as e:
+            logger.debug(f'Error: {e}')
             return None
 
     @action(methods=["get"], detail=True)
@@ -692,8 +696,11 @@ class LogViewSet(ViewSet):
         if not os.path.isfile(filename):
             raise Http404
 
-        with open(filename) as f:
-            lines = [line.rstrip() for line in f.readlines()]
+        try:
+            with open(filename) as f:
+                lines = [line.rstrip() for line in f.readlines()]
+        except FileNotFoundError:
+            raise Http404
 
         return Response(lines)
 
@@ -784,9 +791,12 @@ class PostDocumentView(GenericAPIView):
             pathvalidate.sanitize_filename(doc_name),
         )
 
-        temp_file_path.write_bytes(doc_data)
-
-        os.utime(temp_file_path, times=(t, t))
+        try:
+            temp_file_path.write_bytes(doc_data)
+            os.utime(temp_file_path, times=(t, t))
+        except Exception as e:
+            logger.debug(f"Error occurred during file processing: {e}")
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         input_doc = ConsumableDocument(
             source=DocumentSource.ApiUpload,
@@ -1009,34 +1019,37 @@ class BulkDownloadView(GenericAPIView):
         content = serializer.validated_data.get("content")
         follow_filename_format = serializer.validated_data.get("follow_formatting")
 
-        os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
-        temp = tempfile.NamedTemporaryFile(
-            dir=settings.SCRATCH_DIR,
-            suffix="-compressed-archive",
-            delete=False,
-        )
-
-        if content == "both":
-            strategy_class = OriginalAndArchiveStrategy
-        elif content == "originals":
-            strategy_class = OriginalsOnlyStrategy
-        else:
-            strategy_class = ArchiveOnlyStrategy
-
-        with zipfile.ZipFile(temp.name, "w", compression) as zipf:
-            strategy = strategy_class(zipf, follow_filename_format)
-            for id in ids:
-                doc = Document.objects.get(id=id)
-                strategy.add_document(doc)
-
-        with open(temp.name, "rb") as f:
-            response = HttpResponse(f, content_type="application/zip")
-            response["Content-Disposition"] = '{}; filename="{}"'.format(
-                "attachment",
-                "documents.zip",
+        try:
+            os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
+            temp = tempfile.NamedTemporaryFile(
+                dir=settings.SCRATCH_DIR,
+                suffix="-compressed-archive",
+                delete=False,
             )
 
-            return response
+            if content == "both":
+                strategy_class = OriginalAndArchiveStrategy
+            elif content == "originals":
+                strategy_class = OriginalsOnlyStrategy
+            else:
+                strategy_class = ArchiveOnlyStrategy
+
+            with zipfile.ZipFile(temp.name, "w", compression) as zipf:
+                strategy = strategy_class(zipf, follow_filename_format)
+                for id in ids:
+                    doc = Document.objects.get(id=id)
+                    strategy.add_document(doc)
+
+            with open(temp.name, "rb") as f:
+                response = HttpResponse(f, content_type="application/zip")
+                response["Content-Disposition"] = '{}; filename="{}"'.format(
+                    "attachment",
+                    "documents.zip",
+                )
+
+                return response
+        except (FileNotFoundError, PermissionError) as e:
+            return HttpResponse(f"File IO error: {str(e)}", status=500)
 
 
 class RemoteVersionView(GenericAPIView):
