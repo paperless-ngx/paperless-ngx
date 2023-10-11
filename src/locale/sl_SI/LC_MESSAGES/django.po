@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-28 10:56-0700\n"
-"PO-Revision-Date: 2023-10-01 01:27\n"
+"PO-Revision-Date: 2023-10-11 17:22\n"
 "Last-Translator: \n"
 "Language-Team: Slovenian\n"
 "Language: sl_SI\n"
@@ -736,7 +736,7 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_confirm.html:42
 msgid "Set a new password."
-msgstr ""
+msgstr "Nastavite novo geslo."
 
 #: documents/templates/registration/password_reset_confirm.html:46
 msgid "Passwords did not match or too weak. Try again."
@@ -744,15 +744,15 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_confirm.html:49
 msgid "New Password"
-msgstr ""
+msgstr "Novo geslo"
 
 #: documents/templates/registration/password_reset_confirm.html:50
 msgid "Confirm Password"
-msgstr ""
+msgstr "Potrdi geslo"
 
 #: documents/templates/registration/password_reset_confirm.html:61
 msgid "Change my password"
-msgstr ""
+msgstr "Spremeni moje geslo"
 
 #: documents/templates/registration/password_reset_confirm.html:65
 msgid "request a new password reset"
@@ -780,19 +780,19 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_form.html:44
 msgid "An error occurred. Please try again."
-msgstr ""
+msgstr "Prišlo je do napake. Prosimo, poskusite znova."
 
 #: documents/templates/registration/password_reset_form.html:47
 msgid "Email"
-msgstr ""
+msgstr "E-pošta"
 
 #: documents/templates/registration/password_reset_form.html:54
 msgid "Send me instructions!"
-msgstr ""
+msgstr "Pošljite mi navodila!"
 
 #: paperless/apps.py:10
 msgid "Paperless"
-msgstr ""
+msgstr "Paperless"
 
 #: paperless/settings.py:574
 msgid "English (US)"
