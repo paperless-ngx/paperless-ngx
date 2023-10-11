@@ -223,19 +223,7 @@ steps described in [Docker setup](#docker_hub) automatically.
     webserver:
       build:
         context: .
-        args:
-          QPDF_VERSION: x.y.x
-          PIKEPDF_VERSION: x.y.z
-          PSYCOPG2_VERSION: x.y.z
-          JBIG2ENC_VERSION: 0.29
     ```
-
-    !!! note
-
-        You should match the build argument versions to the version for the
-        release you have checked out. These are pre-built images with
-        certain, more updated software. If you want to build these images
-        your self, that is possible, but beyond the scope of these steps.
 
 4.  Follow steps 3 to 8 of [Docker Setup](#docker_hub). When asked to run
     `docker-compose pull` to pull the image, do
