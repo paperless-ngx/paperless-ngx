@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-28 10:56-0700\n"
-"PO-Revision-Date: 2023-10-01 01:27\n"
+"PO-Revision-Date: 2023-10-12 07:27\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -385,43 +385,43 @@ msgstr "保存路径"
 
 #: documents/models.py:445
 msgid "has correspondent in"
-msgstr ""
+msgstr "联系人"
 
 #: documents/models.py:446
 msgid "does not have correspondent in"
-msgstr ""
+msgstr "没有联系人"
 
 #: documents/models.py:447
 msgid "has document type in"
-msgstr ""
+msgstr "文档类型"
 
 #: documents/models.py:448
 msgid "does not have document type in"
-msgstr ""
+msgstr "没有文档类型"
 
 #: documents/models.py:449
 msgid "has storage path in"
-msgstr ""
+msgstr "存储路径"
 
 #: documents/models.py:450
 msgid "does not have storage path in"
-msgstr ""
+msgstr "没有存储路径"
 
 #: documents/models.py:451
 msgid "owner is"
-msgstr ""
+msgstr "所有者是"
 
 #: documents/models.py:452
 msgid "has owner in"
-msgstr ""
+msgstr "已经设置所有者"
 
 #: documents/models.py:453
 msgid "does not have owner"
-msgstr ""
+msgstr "没有所有者"
 
 #: documents/models.py:454
 msgid "does not have owner in"
-msgstr ""
+msgstr "没有所有者"
 
 #: documents/models.py:464
 msgid "rule type"
@@ -513,7 +513,7 @@ msgstr "任务返回的数据"
 
 #: documents/models.py:647
 msgid "Note for the document"
-msgstr ""
+msgstr "文档备注"
 
 #: documents/models.py:671
 msgid "user"
@@ -521,23 +521,23 @@ msgstr "用户"
 
 #: documents/models.py:676
 msgid "note"
-msgstr ""
+msgstr "备注"
 
 #: documents/models.py:677
 msgid "notes"
-msgstr ""
+msgstr "备注"
 
 #: documents/models.py:685
 msgid "Archive"
-msgstr ""
+msgstr "归档"
 
 #: documents/models.py:686
 msgid "Original"
-msgstr ""
+msgstr "原版"
 
 #: documents/models.py:697
 msgid "expiration"
-msgstr ""
+msgstr "过期时间"
 
 #: documents/models.py:704
 msgid "slug"
@@ -545,23 +545,23 @@ msgstr ""
 
 #: documents/models.py:736
 msgid "share link"
-msgstr ""
+msgstr "分享链接"
 
 #: documents/models.py:737
 msgid "share links"
-msgstr ""
+msgstr "分享链接"
 
 #: documents/models.py:745
 msgid "Consume Folder"
-msgstr ""
+msgstr "消费文件夹"
 
 #: documents/models.py:746
 msgid "Api Upload"
-msgstr ""
+msgstr "Api上传"
 
 #: documents/models.py:747
 msgid "Mail Fetch"
-msgstr ""
+msgstr "邮件获取"
 
 #: documents/models.py:751 paperless_mail/models.py:95
 msgid "order"
@@ -569,15 +569,15 @@ msgstr "排序"
 
 #: documents/models.py:760
 msgid "filter path"
-msgstr ""
+msgstr "过滤路径"
 
 #: documents/models.py:765
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
-msgstr ""
+msgstr "只消耗匹配了指定路径的文档。路径指定中允许使用*作为通配符，大小写不敏感。"
 
 #: documents/models.py:772
 msgid "filter filename"
-msgstr ""
+msgstr "过滤文件名"
 
 #: documents/models.py:777 paperless_mail/models.py:148
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
@@ -585,15 +585,15 @@ msgstr "如果指定了文件名，只处理完全匹配此文件名的文档。
 
 #: documents/models.py:788
 msgid "filter documents from this mail rule"
-msgstr ""
+msgstr "从邮件规则中过滤文档"
 
 #: documents/models.py:792
 msgid "assign title"
-msgstr ""
+msgstr "指定标题"
 
 #: documents/models.py:797
 msgid "Assign a document title, can include some placeholders, see documentation."
-msgstr ""
+msgstr "指定一个文档标题，可以包含一些占位符，参见文档。"
 
 #: documents/models.py:805 paperless_mail/models.py:204
 msgid "assign this tag"
@@ -609,35 +609,35 @@ msgstr "分配此联系人"
 
 #: documents/models.py:829
 msgid "assign this storage path"
-msgstr ""
+msgstr "指定存储路径"
 
 #: documents/models.py:838
 msgid "assign this owner"
-msgstr ""
+msgstr "指定所有者"
 
 #: documents/models.py:845
 msgid "grant view permissions to these users"
-msgstr ""
+msgstr "为这些用户授予观看权限"
 
 #: documents/models.py:852
 msgid "grant view permissions to these groups"
-msgstr ""
+msgstr "为这些用户组授予观看权限"
 
 #: documents/models.py:859
 msgid "grant change permissions to these users"
-msgstr ""
+msgstr "为这些用户授予修改权限"
 
 #: documents/models.py:866
 msgid "grant change permissions to these groups"
-msgstr ""
+msgstr "为这些用户组授予修改权限"
 
 #: documents/models.py:870
 msgid "consumption template"
-msgstr ""
+msgstr "消费模板"
 
 #: documents/models.py:871
 msgid "consumption templates"
-msgstr ""
+msgstr "消费模板"
 
 #: documents/serialisers.py:98
 #, python-format
@@ -695,11 +695,11 @@ msgstr "您的用户名和密码不匹配。请重试。"
 
 #: documents/templates/registration/login.html:48
 msgid "Share link was not found."
-msgstr ""
+msgstr "未找到共享链接。"
 
 #: documents/templates/registration/login.html:52
 msgid "Share link has expired."
-msgstr ""
+msgstr "分享链接已失效！"
 
 #: documents/templates/registration/login.html:55
 msgid "Username"
@@ -715,80 +715,80 @@ msgstr "登录"
 
 #: documents/templates/registration/login.html:70
 msgid "Forgot your password?"
-msgstr ""
+msgstr "忘记密码"
 
 #: documents/templates/registration/password_reset_complete.html:14
 msgid "Paperless-ngx reset password complete"
-msgstr ""
+msgstr "Paperless-ngx密码重置完成"
 
 #: documents/templates/registration/password_reset_complete.html:40
 msgid "Password reset complete."
-msgstr ""
+msgstr "秘密重置完成"
 
 #: documents/templates/registration/password_reset_complete.html:42
 #, python-format
 msgid "Your new password has been set. You can now <a href=\"%(login_url)s\">log in</a>"
-msgstr ""
+msgstr "你的新密码已经被设置，你现在可以<a href=\"%(login_url)s\">登录</a>"
 
 #: documents/templates/registration/password_reset_confirm.html:14
 msgid "Paperless-ngx reset password confirmation"
-msgstr ""
+msgstr "Paperless-ngx密码重置确认"
 
 #: documents/templates/registration/password_reset_confirm.html:42
 msgid "Set a new password."
-msgstr ""
+msgstr "设置一个新密码"
 
 #: documents/templates/registration/password_reset_confirm.html:46
 msgid "Passwords did not match or too weak. Try again."
-msgstr ""
+msgstr "密码不匹配或者太弱，请重试。"
 
 #: documents/templates/registration/password_reset_confirm.html:49
 msgid "New Password"
-msgstr ""
+msgstr "新密码"
 
 #: documents/templates/registration/password_reset_confirm.html:50
 msgid "Confirm Password"
-msgstr ""
+msgstr "确认密码"
 
 #: documents/templates/registration/password_reset_confirm.html:61
 msgid "Change my password"
-msgstr ""
+msgstr "修改密码"
 
 #: documents/templates/registration/password_reset_confirm.html:65
 msgid "request a new password reset"
-msgstr ""
+msgstr "请求密码重置"
 
 #: documents/templates/registration/password_reset_done.html:14
 msgid "Paperless-ngx reset password sent"
-msgstr ""
+msgstr "Paperless-ngx密码重置发送"
 
 #: documents/templates/registration/password_reset_done.html:40
 msgid "Check your inbox."
-msgstr ""
+msgstr "检查你的收件箱。"
 
 #: documents/templates/registration/password_reset_done.html:41
 msgid "We've emailed you instructions for setting your password. You should receive the email shortly!"
-msgstr ""
+msgstr "我们已经通过电子邮件向您发送设置密码的说明。你应该很快就会收到。"
 
 #: documents/templates/registration/password_reset_form.html:14
 msgid "Paperless-ngx reset password request"
-msgstr ""
+msgstr "Paperless-ngx密码重置请求"
 
 #: documents/templates/registration/password_reset_form.html:41
 msgid "Enter your email address below, and we'll email instructions for setting a new one."
-msgstr ""
+msgstr "请在下面输入你的电子邮件地址，我们将发送电子邮件说明如何设置一个新的。"
 
 #: documents/templates/registration/password_reset_form.html:44
 msgid "An error occurred. Please try again."
-msgstr ""
+msgstr "出现错误。请重试。"
 
 #: documents/templates/registration/password_reset_form.html:47
 msgid "Email"
-msgstr ""
+msgstr "电子邮件"
 
 #: documents/templates/registration/password_reset_form.html:54
 msgid "Send me instructions!"
-msgstr ""
+msgstr "向为发送说明"
 
 #: paperless/apps.py:10
 msgid "Paperless"
@@ -1096,7 +1096,7 @@ msgstr "过滤来自"
 
 #: paperless_mail/models.py:122
 msgid "filter to"
-msgstr ""
+msgstr "过滤结果"
 
 #: paperless_mail/models.py:129
 msgid "filter subject"
@@ -1152,7 +1152,7 @@ msgstr "分配联系人来自"
 
 #: paperless_mail/models.py:230
 msgid "Assign the rule owner to documents"
-msgstr ""
+msgstr "赋予文档拥有者权限"
 
 #: paperless_mail/models.py:256
 msgid "uid"
