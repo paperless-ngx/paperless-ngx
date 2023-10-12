@@ -2,6 +2,7 @@ import logging
 import os
 from collections import defaultdict
 from pathlib import PurePath
+# import uuid
 
 import pathvalidate
 from django.conf import settings
@@ -124,6 +125,9 @@ def generate_unique_filename(doc, archive_filename=False):
             counter += 1
         else:
             return new_filename
+        # new_filename = str(uuid.uuid4()) + ".pdf"
+        # if not os.path.exists(os.path.join(root, new_filename)):
+        #     return new_filename
 
 
 def generate_filename(
@@ -141,7 +145,7 @@ def generate_filename(
                 f"Document has storage_path {doc.storage_path.id} "
                 f"({doc.storage_path.path}) set",
             )
-            filename_format = doc.storage_path.path
+            filename_format = doc.storage_path.path + '/' + doc.original_filename
 
         if filename_format is not None:
             tags = defaultdictNoStr(

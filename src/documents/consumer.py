@@ -607,8 +607,22 @@ class Consumer(LoggingMixin):
             )
         
         if self.full_path:
+            # e.g. full_path: "/CDV#3500648756/OR#1161.pdf"
+            # e.g. ['CDV#3500648756']
             folders = self.full_path.split('/')[:-1]
+            # remove empty values from splitting the leading slash
             folders = [i for i in folders if i]
+
+            # e.g. user dropped the file in storage path id 26
+            # which is "folder_test" or "test/test2/test3"
+            if document.storage_path:
+                # e.g. ['test', 'test2', 'test3']
+                parent_folders = document.storage_path.path.split('/')
+                # just double check that there are no empty values from leading slashes
+                parent_folders = [i for i in parent_folders if i]
+                # e.g. "test/test2/test3/CDV#3500648756"
+                folders = parent_folders + folders
+
             folder_path = '/'.join(folders)
             print(f'folder_path: {folder_path}')
             

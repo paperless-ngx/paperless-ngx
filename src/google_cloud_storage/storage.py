@@ -30,20 +30,26 @@ def upload_file(source, target):
         blob.upload_from_file(read_file_2)
 
 def get_file_from_gcs(bucket_path):
-    if (not client) or (not bucket):
-        raise Exception("Google Cloud Storage is not initialized.")
+    try:
+        if (not client) or (not bucket):
+            raise Exception("Google Cloud Storage is not initialized.")
 
-    # print("Getting blob from Google Cloud Storage")
-    # Create a blob object representing the path in the bucket
-    blob = bucket.blob(str(bucket_path))
+        # print("Getting blob from Google Cloud Storage")
+        # Create a blob object representing the path in the bucket
+        blob = bucket.blob(str(bucket_path))
 
-    # Download the file as a byte array
-    byte_stream = BytesIO()
-    # print("Downloading file from Google Cloud Storage")
-    blob.download_to_file(byte_stream)
+        # Download the file as a byte array
+        byte_stream = BytesIO()
+        # print("Downloading file from Google Cloud Storage")
+        blob.download_to_file(byte_stream)
 
-    # Seek to the start of the byte stream to allow reading from the beginning
-    byte_stream.seek(0)
+        # Seek to the start of the byte stream to allow reading from the beginning
+        byte_stream.seek(0)
 
-    # print("Returning downloaded file to caller")
-    return byte_stream
+        # print("Returning downloaded file to caller")
+        return byte_stream
+    except:
+        return None
+
+def exists():
+    return False
