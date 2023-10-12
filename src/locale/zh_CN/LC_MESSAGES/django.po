@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-28 10:56-0700\n"
-"PO-Revision-Date: 2023-10-12 07:27\n"
+"PO-Revision-Date: 2023-10-12 09:25\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -541,7 +541,7 @@ msgstr "过期时间"
 
 #: documents/models.py:704
 msgid "slug"
-msgstr ""
+msgstr "缩写"
 
 #: documents/models.py:736
 msgid "share link"
@@ -804,7 +804,7 @@ msgstr "阿拉伯语"
 
 #: paperless/settings.py:576
 msgid "Afrikaans"
-msgstr ""
+msgstr "Afrikaans 荷兰语"
 
 #: paperless/settings.py:577
 msgid "Belarusian"
@@ -812,7 +812,7 @@ msgstr "白俄罗斯语"
 
 #: paperless/settings.py:578
 msgid "Catalan"
-msgstr ""
+msgstr "Catalan 加泰罗尼亚语"
 
 #: paperless/settings.py:579
 msgid "Czech"
@@ -828,7 +828,7 @@ msgstr "德语"
 
 #: paperless/settings.py:582
 msgid "Greek"
-msgstr ""
+msgstr "Greek 希腊语"
 
 #: paperless/settings.py:583
 msgid "English (GB)"
@@ -840,7 +840,7 @@ msgstr "西班牙语"
 
 #: paperless/settings.py:585
 msgid "Finnish"
-msgstr ""
+msgstr "已完成"
 
 #: paperless/settings.py:586
 msgid "French"
@@ -856,7 +856,7 @@ msgstr "卢森堡语"
 
 #: paperless/settings.py:589
 msgid "Norwegian"
-msgstr ""
+msgstr "Norwegian 挪威语"
 
 #: paperless/settings.py:590
 msgid "Dutch"
@@ -884,7 +884,7 @@ msgstr "俄语"
 
 #: paperless/settings.py:596
 msgid "Slovak"
-msgstr ""
+msgstr "Slovak 斯洛伐克语"
 
 #: paperless/settings.py:597
 msgid "Slovenian"
@@ -904,7 +904,7 @@ msgstr "土耳其语"
 
 #: paperless/settings.py:601
 msgid "Ukrainian"
-msgstr ""
+msgstr "Ukrainian 乌克兰语"
 
 #: paperless/settings.py:602
 msgid "Chinese Simplified"
@@ -996,7 +996,7 @@ msgstr "密码"
 
 #: paperless_mail/models.py:42
 msgid "Is token authentication"
-msgstr ""
+msgstr "是令牌认证"
 
 #: paperless_mail/models.py:45
 msgid "character set"
@@ -1060,7 +1060,7 @@ msgstr "使用附件名作为标题"
 
 #: paperless_mail/models.py:85
 msgid "Do not assign title from rule"
-msgstr ""
+msgstr "不从规则分配标题"
 
 #: paperless_mail/models.py:88
 msgid "Do not assign a correspondent"
