@@ -272,19 +272,20 @@ consumption including the ID of a created document if consumption succeeded.
 ## Permissions
 
 All objects (documents, tags, etc.) allow setting object-level permissions
-with an optional `set_permissions` parameter which is of the form:
+with optional `owner` and / or a `set_permissions` parameters which are of
+the form:
 
 ```
-{
-  "owner": user_id,
-  "view": {
-      "users": [...],
-      "groups": [...],
-  },
-  "change": {
-      "users": [...],
-      "groups": [...],
-  },
+"owner": ...,
+"set_permissions": {
+    "view": {
+        "users": [...],
+        "groups": [...],
+    },
+    "change": {
+        "users": [...],
+        "groups": [...],
+    },
 }
 ```
 
@@ -292,7 +293,7 @@ with an optional `set_permissions` parameter which is of the form:
 
     Arrays should contain user or group ID numbers.
 
-If this parameter is supplied the object's permissions will be overwritten,
+If these parameters are supplied the object's permissions will be overwritten,
 assuming the authenticated user has permission to do so (the user must be
 the object owner or a superuser).
 
