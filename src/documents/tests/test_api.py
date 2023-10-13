@@ -4154,6 +4154,51 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
         self.assertEqual(checker.has_perm("view_tag", tag1), True)
         self.assertIn("view_tag", get_perms(group1, tag1))
 
+    def test_api_set_other_owner_w_permissions(self):
+        """
+        GIVEN:
+            - API request to create an object (Tag)
+        WHEN:
+            - a different owner than is logged in is set
+            - view > groups is set
+        THEN:
+            - Object permissions are set appropriately
+        """
+        user1 = User.objects.create_superuser(username="user1")
+        user2 = User.objects.create(username="user2")
+        group1 = Group.objects.create(name="group1")
+
+        self.client.force_authenticate(user1)
+
+        response = self.client.post(
+            "/api/tags/",
+            json.dumps(
+                {
+                    "name": "test1",
+                    "matching_algorithm": MatchingModel.MATCH_AUTO,
+                    "owner": user2.id,
+                    "set_permissions": {
+                        "view": {
+                            "users": None,
+                            "groups": [group1.id],
+                        },
+                        "change": {
+                            "users": None,
+                            "groups": None,
+                        },
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        tag1 = Tag.objects.filter(name="test1").first()
+
+        self.assertEqual(tag1.owner, user2)
+        self.assertIn("view_tag", get_perms(group1, tag1))
+
     def test_api_set_doc_permissions(self):
         """
         GIVEN:
