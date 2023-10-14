@@ -6,7 +6,7 @@ provides a browsable API for most of its endpoints, which you can
 inspect at `http://<paperless-host>:<port>/api/`. This also documents
 most of the available filters and ordering fields.
 
-The API provides 7 main endpoints:
+The API provides the following main endpoints:
 
 - `/api/documents/`: Full CRUD support, except POSTing new documents.
   See below.
@@ -19,6 +19,7 @@ The API provides 7 main endpoints:
 - `/api/mail_rules/`: Full CRUD support.
 - `/api/users/`: Full CRUD support.
 - `/api/groups/`: Full CRUD support.
+- `/api/share_links/`: Full CRUD support.
 
 All of these endpoints except for the logging endpoint allow you to
 fetch (and edit and delete where appropriate) individual objects by
@@ -47,6 +48,7 @@ fields:
   Read-only.
 - `archived_file_name`: Verbose filename of the archived document.
   Read-only. Null if no archived document is available.
+- `notes`: Array of notes associated with the document.
 - `set_permissions`: Allows setting document permissions. Optional,
   write-only. See [below](#permissions).
 
@@ -123,6 +125,11 @@ File metadata is reported as a list of objects in the following form:
 `namespace` and `prefix` can be null. The actual metadata reported
 depends on the file type and the metadata available in that specific
 document. Paperless only reports PDF metadata at this point.
+
+## Documents additional endpoints
+
+- `/api/documents/<id>/notes/`: Retrieve notes for a document.
+- `/api/documents/<id>/share_links/`: Retrieve share links for a document.
 
 ## Authorization
 
