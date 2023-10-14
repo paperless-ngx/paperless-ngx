@@ -522,6 +522,9 @@ class DocumentViewSet(
                 )
                 c.save()
 
+                doc.modified = timezone.now()
+                doc.save()
+
                 from documents import index
 
                 index.add_or_update_document(self.get_object())
@@ -544,6 +547,9 @@ class DocumentViewSet(
 
             note = Note.objects.get(id=int(request.GET.get("id")))
             note.delete()
+
+            doc.modified = timezone.now()
+            doc.save()
 
             from documents import index
 

@@ -2354,13 +2354,18 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         WHEN:
             - API request is made to add a note
         THEN:
-            - note is created and associated with document
+            - note is created and associated with document, modified time is updated
         """
         doc = Document.objects.create(
             title="test",
             mime_type="application/pdf",
             content="this is a document which will have notes added",
+            created=timezone.now() - timedelta(days=1),
         )
+        # set to yesterday
+        doc.modified = timezone.now() - timedelta(days=1)
+        self.assertEqual(doc.modified.day, (timezone.now() - timedelta(days=1)).day)
+
         resp = self.client.post(
             f"/api/documents/{doc.pk}/notes/",
             data={"note": "this is a posted note"},
@@ -2381,6 +2386,10 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         resp_data = resp_data[0]
 
         self.assertEqual(resp_data["note"], "this is a posted note")
+
+        doc = Document.objects.get(pk=doc.pk)
+        # modified was updated to today
+        self.assertEqual(doc.modified.day, timezone.now().day)
 
     def test_notes_permissions_aware(self):
         """
@@ -2441,17 +2450,21 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
     def test_delete_note(self):
         """
         GIVEN:
-            - Existing document
+            - Existing document, existing note
         WHEN:
-            - API request is made to add a note
+            - API request is made to delete a note
         THEN:
-            - note is created and associated with document
+            - note is deleted, document modified is updated
         """
         doc = Document.objects.create(
             title="test",
             mime_type="application/pdf",
             content="this is a document which will have notes!",
+            created=timezone.now() - timedelta(days=1),
         )
+        # set to yesterday
+        doc.modified = timezone.now() - timedelta(days=1)
+        self.assertEqual(doc.modified.day, (timezone.now() - timedelta(days=1)).day)
         note = Note.objects.create(
             note="This is a note.",
             document=doc,
@@ -2466,6 +2479,9 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         self.assertEqual(len(Note.objects.all()), 0)
+        doc = Document.objects.get(pk=doc.pk)
+        # modified was updated to today
+        self.assertEqual(doc.modified.day, timezone.now().day)
 
     def test_get_notes_no_doc(self):
         """
