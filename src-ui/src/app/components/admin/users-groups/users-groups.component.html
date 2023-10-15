@@ -86,9 +86,9 @@
             </div>
         </div>
         </li>
+        <li *ngIf="groups.length === 0" class="list-group-item" i18n>No groups defined</li>
     </ul>
 
-    <div *ngIf="groups.length === 0">No groups defined</div>
 </ng-container>
 
 <div *ngIf="!users || !groups">
