@@ -190,16 +190,16 @@ a, a:hover,
   color: var(--bs-primary);
 }
 
+a.btn-link:hover,
+a.btn-link:active,
+a.btn-link:focus-visible,
 .btn-link:hover,
 .btn-link:active,
 .btn-link:focus-visible {
-  color: var(--pngx-primary-darken-10) !important;
-}
-
-a.btn-link:hover,
-a.btn-link:active,
-a.btn-link:focus-visible {
-  color: var(--pngx-primary-darken-5) !important;
+  color: var(--pngx-primary-lighten-10) !important;
+  .primary-light & {
+    color: var(--pngx-primary-darken-15) !important;
+  }
 }
 
 .form-control-dark {
