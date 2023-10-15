@@ -45,9 +45,9 @@
             </div>
             </div>
         </li>
+        <li *ngIf="mailAccounts.length === 0" class="list-group-item" i18n>No mail accounts defined.</li>
     </ul>
 
-    <div *ngIf="mailAccounts.length === 0" i18n>No mail accounts defined.</div>
 </ng-container>
 
 <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.MailRule }">
@@ -94,9 +94,9 @@
             </div>
             </div>
         </li>
+        <li *ngIf="mailRules.length === 0" class="list-group-item" i18n>No mail rules defined.</li>
     </ul>
 
-    <div *ngIf="mailRules.length === 0" i18n>No mail rules defined.</div>
 </ng-container>
 
 <div *ngIf="!mailAccounts || !mailRules">
