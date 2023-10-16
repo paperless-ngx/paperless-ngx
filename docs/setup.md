@@ -30,7 +30,7 @@ steps described in [Docker setup](#docker_hub) automatically.
 2.  Download and run the installation script:
 
     ```shell-session
-    $ bash -c "$(curl -L https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/install-paperless-ngx.sh)"
+    $ bash -c "$(curl -L -s -S https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/install-paperless-ngx.sh)"
     ```
 
     !!! note
