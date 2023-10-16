@@ -1938,7 +1938,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.html</context>
           <context context-type="linenumber">89</context>
         </context-group>
-        <target state="needs-translation">No groups defined</target>
+        <target state="translated">Keine Gruppen definiert</target>
       </trans-unit>
       <trans-unit id="4510369340305901516" datatype="html" approved="yes">
         <source>Password has been changed, you will be logged out momentarily.</source>
