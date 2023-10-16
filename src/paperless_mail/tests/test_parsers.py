@@ -341,7 +341,7 @@ class TestTikaHtmlParse(HttpxMockMixin, BaseMailParserTestCase):
         )
         parsed = self.parser.tika_parse(html)
         self.assertEqual(expected_text, parsed.strip())
-        self.assertIn(self.parser.tika_server, str(self.httpx_mock.get_request().url))
+        self.assertIn("http://localhost:9998", str(self.httpx_mock.get_request().url))
 
     def test_tika_parse_exception(self):
         """
@@ -653,5 +653,5 @@ class TestParser(FileSystemAssertsMixin, HttpxMockMixin, BaseMailParserTestCase)
 
         self.assertEqual(
             str(request.url),
-            self.parser.gotenberg_server + "/forms/chromium/convert/html",
+            "http://localhost:3000/forms/chromium/convert/html",
         )
