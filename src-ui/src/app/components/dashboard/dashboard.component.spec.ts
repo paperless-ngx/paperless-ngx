@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { NgbAlertModule, NgbAlert } from '@ng-bootstrap/ng-bootstrap'
+import { NgbAlertModule } from '@ng-bootstrap/ng-bootstrap'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { DashboardComponent } from './dashboard.component'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
@@ -17,9 +17,10 @@ import { RouterTestingModule } from '@angular/router/testing'
 import { TourNgBootstrapModule, TourService } from 'ngx-ui-tour-ng-bootstrap'
 import { LogoComponent } from '../common/logo/logo.component'
 import { of, throwError } from 'rxjs'
-import { DndDropEvent, DndModule } from 'ngx-drag-drop'
 import { ToastService } from 'src/app/services/toast.service'
 import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
+import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop'
+import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
 
 const saved_views = [
   {
@@ -105,7 +106,7 @@ describe('DashboardComponent', () => {
         HttpClientTestingModule,
         RouterTestingModule,
         TourNgBootstrapModule,
-        DndModule,
+        DragDropModule,
       ],
     }).compileComponents()
 
@@ -165,18 +166,18 @@ describe('DashboardComponent', () => {
     const settingsSpy = jest.spyOn(settingsService, 'updateDashboardViewsSort')
     const toastSpy = jest.spyOn(toastService, 'showInfo')
     jest.spyOn(settingsService, 'storeSettings').mockReturnValue(of(true))
-    component.onDrop({ index: 2, data: saved_views[0] } as DndDropEvent)
-    component.onDragged(saved_views[0])
+    component.onDrop({ previousIndex: 0, currentIndex: 1 } as CdkDragDrop<
+      PaperlessSavedView[]
+    >)
     expect(settingsSpy).toHaveBeenCalledWith([
       saved_views[2],
       saved_views[0],
       saved_views[3],
     ])
     expect(toastSpy).toHaveBeenCalled()
-    component.onDrop({ data: saved_views[3] } as DndDropEvent)
   })
 
-  it('should update saved view sorting on drag + drop, show info2', () => {
+  it('should update saved view sorting on drag + drop, show error', () => {
     jest.spyOn(settingsService, 'get').mockImplementation((key) => {
       if (key === SETTINGS_KEYS.DASHBOARD_VIEWS_SORT_ORDER) return []
     })
@@ -188,8 +189,9 @@ describe('DashboardComponent', () => {
     jest
       .spyOn(settingsService, 'storeSettings')
       .mockReturnValue(throwError(() => new Error('unable to save')))
-    component.onDrop({ index: 2, data: saved_views[0] } as DndDropEvent)
-    component.onDragged(saved_views[0])
+    component.onDrop({ previousIndex: 0, currentIndex: 2 } as CdkDragDrop<
+      PaperlessSavedView[]
+    >)
     expect(toastSpy).toHaveBeenCalled()
   })
 })
