@@ -1,15 +1,8 @@
-<div class="card shadow-sm bg-light"
-  [dndDraggable]="draggable"
-  dndEffectAllowed="move"
-  [dndDisableIf]="!draggable"
-  (dndStart)="dndStart.emit($event)"
-  (dndMoved)="dndMoved.emit($event)"
-  (dndCanceled)="dndCanceled.emit($event)"
-  (dndEnd)="dndEnd.emit($event)">
+<div class="card shadow-sm bg-light" cdkDrag [cdkDragDisabled]="!draggable" cdkDragPreviewContainer="parent">
   <div class="card-header">
     <div class="d-flex justify-content-between align-items-center">
       <div class="d-flex">
-        <div *ngIf="draggable" class="ms-n2 me-1" dndHandle>
+        <div *ngIf="draggable" class="ms-n2 me-1" cdkDragHandle>
           <svg class="sidebaricon text-muted" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#grip-vertical"/>
           </svg>

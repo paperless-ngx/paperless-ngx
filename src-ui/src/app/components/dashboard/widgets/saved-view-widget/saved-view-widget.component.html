@@ -3,10 +3,6 @@
   [title]="savedView.name"
   [loading]="loading"
   [draggable]="savedView"
-  (dndStart)="dndStart.emit($event)"
-  (dndMoved)="dndMoved.emit($event)"
-  (dndCanceled)="dndCanceled.emit($event)"
-  (dndEnd)="dndEnd.emit($event)"
 >
 
   <a *ngIf="documents.length" class="btn-link text-decoration-none" header-buttons [routerLink]="[]" (click)="showAll()" i18n>Show all</a>

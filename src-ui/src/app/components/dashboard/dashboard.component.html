@@ -5,10 +5,9 @@
 <div class="row">
   <div class="col-auto col-lg-8 col-xl-9 mb-4">
     <div class="row row-cols-1 g-4" tourAnchor="tour.dashboard"
-      dndDropzone
-      [dndDisableIf]="settingsService.globalDropzoneActive"
-      dndEffectAllowed="move"
-      (dndDrop)="onDrop($event)"
+      cdkDropList
+      [cdkDropListDisabled]="settingsService.globalDropzoneActive"
+      (cdkDropListDropped)="onDrop($event)"
     >
       <div *ngIf="savedViewService.loading" class="col">
         <div class="spinner-border spinner-border-sm me-2" role="status"></div>
@@ -23,14 +22,12 @@
         <div *ngFor="let v of dashboardViews" class="col">
           <pngx-saved-view-widget
             [savedView]="v"
-            (dndStart)="onDragStart($event)"
-            (dndMoved)="onDragged(v)"
-            (dndEnd)="onDragEnd($event)"
-            >
+            (cdkDragStarted)="onDragStart($event)"
+            (cdkDragEnded)="onDragEnd($event)"
+          >
           </pngx-saved-view-widget>
         </div>
       </ng-container>
-      <div class="p-1" dndPlaceholderRef></div>
     </div>
   </div>
   <div class="col-auto col-lg-4 col-xl-3 col-sidebar">

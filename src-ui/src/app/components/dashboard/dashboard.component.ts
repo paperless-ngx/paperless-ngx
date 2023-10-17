@@ -4,9 +4,14 @@ import { SettingsService } from 'src/app/services/settings.service'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { TourService } from 'ngx-ui-tour-ng-bootstrap'
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
-import { DndDropEvent } from 'ngx-drag-drop'
 import { ToastService } from 'src/app/services/toast.service'
 import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
+import {
+  CdkDragDrop,
+  CdkDragEnd,
+  CdkDragStart,
+  moveItemInArray,
+} from '@angular/cdk/drag-drop'
 
 @Component({
   selector: 'pngx-dashboard',
@@ -59,13 +64,21 @@ export class DashboardComponent extends ComponentWithPermissions {
     }
   }
 
-  onDragStart(event: DragEvent) {
+  onDragStart(event: CdkDragStart) {
     this.settingsService.globalDropzoneEnabled = false
   }
 
-  onDragged(v: PaperlessSavedView) {
-    const index = this.dashboardViews.indexOf(v)
-    this.dashboardViews.splice(index, 1)
+  onDragEnd(event: CdkDragEnd) {
+    this.settingsService.globalDropzoneEnabled = true
+  }
+
+  onDrop(event: CdkDragDrop<PaperlessSavedView[]>) {
+    moveItemInArray(
+      this.dashboardViews,
+      event.previousIndex,
+      event.currentIndex
+    )
+
     this.settingsService
       .updateDashboardViewsSort(this.dashboardViews)
       .subscribe({
@@ -76,17 +89,5 @@ export class DashboardComponent extends ComponentWithPermissions {
           this.toastService.showError($localize`Error updating dashboard`, e)
         },
       })
-  }
-
-  onDragEnd(event: DragEvent) {
-    this.settingsService.globalDropzoneEnabled = true
-  }
-
-  onDrop(event: DndDropEvent) {
-    if (typeof event.index === 'undefined') {
-      event.index = this.dashboardViews.length
-    }
-
-    this.dashboardViews.splice(event.index, 0, event.data)
   }
 }

@@ -10,7 +10,7 @@ import { ComponentFixture } from '@angular/core/testing'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { of } from 'rxjs'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
-import { ClipboardService } from 'ngx-clipboard'
+import { Clipboard } from '@angular/cdk/clipboard'
 
 const toasts = [
   {
@@ -42,7 +42,7 @@ describe('ToastsComponent', () => {
   let component: ToastsComponent
   let fixture: ComponentFixture<ToastsComponent>
   let toastService: ToastService
-  let clipboardService: ClipboardService
+  let clipboard: Clipboard
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -60,7 +60,7 @@ describe('ToastsComponent', () => {
 
     fixture = TestBed.createComponent(ToastsComponent)
     toastService = TestBed.inject(ToastService)
-    clipboardService = TestBed.inject(ClipboardService)
+    clipboard = TestBed.inject(Clipboard)
 
     component = fixture.componentInstance
 
@@ -117,7 +117,7 @@ describe('ToastsComponent', () => {
       'Error 2 message details'
     )
 
-    const copySpy = jest.spyOn(clipboardService, 'copy')
+    const copySpy = jest.spyOn(clipboard, 'copy')
     component.copyError(toasts[2].error)
     expect(copySpy).toHaveBeenCalled()
 
