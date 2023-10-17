@@ -11,6 +11,7 @@
   },
   "private": true,
   "dependencies": {
+    "@angular/cdk": "^16.2.7",
     "@angular/common": "~16.2.7",
     "@angular/compiler": "~16.2.7",
     "@angular/core": "~16.2.7",
@@ -27,10 +28,8 @@
     "file-saver": "^2.0.5",
     "mime-names": "^1.0.0",
     "ng2-pdf-viewer": "^10.0.0",
-    "ngx-clipboard": "^16.0.0",
     "ngx-color": "^9.0.0",
     "ngx-cookie-service": "^16.0.1",
-    "ngx-drag-drop": "^16.1.0",
     "ngx-file-drop": "^16.0.0",
     "ngx-ui-tour-ng-bootstrap": "^13.0.4",
     "rxjs": "^7.8.1",

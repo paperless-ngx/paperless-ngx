@@ -99,7 +99,7 @@ import { ConsumptionTemplatesComponent } from './components/manage/consumption-t
 import { ConsumptionTemplateEditDialogComponent } from './components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component'
 import { MailComponent } from './components/manage/mail/mail.component'
 import { UsersAndGroupsComponent } from './components/admin/users-groups/users-groups.component'
-import { DndModule } from 'ngx-drag-drop'
+import { DragDropModule } from '@angular/cdk/drag-drop'
 import { FileDropComponent } from './components/file-drop/file-drop.component'
 
 import localeAf from '@angular/common/locales/af'
@@ -257,7 +257,7 @@ function initializeApp(settings: SettingsService) {
     NgSelectModule,
     ColorSliderModule,
     TourNgBootstrapModule,
-    DndModule,
+    DragDropModule,
   ],
   providers: [
     {

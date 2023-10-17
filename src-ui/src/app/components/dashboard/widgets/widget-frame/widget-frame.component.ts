@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core'
+import { Component, Input } from '@angular/core'
 
 @Component({
   selector: 'pngx-widget-frame',
@@ -16,16 +16,4 @@ export class WidgetFrameComponent {
 
   @Input()
   draggable: any
-
-  @Output()
-  dndStart: EventEmitter<DragEvent> = new EventEmitter()
-
-  @Output()
-  dndMoved: EventEmitter<DragEvent> = new EventEmitter()
-
-  @Output()
-  dndCanceled: EventEmitter<DragEvent> = new EventEmitter()
-
-  @Output()
-  dndEnd: EventEmitter<DragEvent> = new EventEmitter()
 }

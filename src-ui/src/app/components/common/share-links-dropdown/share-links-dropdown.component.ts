@@ -7,7 +7,7 @@ import {
 import { ShareLinkService } from 'src/app/services/rest/share-link.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
-import { ClipboardService } from 'ngx-clipboard'
+import { Clipboard } from '@angular/cdk/clipboard'
 
 @Component({
   selector: 'pngx-share-links-dropdown',
@@ -51,7 +51,7 @@ export class ShareLinksDropdownComponent implements OnInit {
   constructor(
     private shareLinkService: ShareLinkService,
     private toastService: ToastService,
-    private clipboardService: ClipboardService
+    private clipboard: Clipboard
   ) {}
 
   ngOnInit(): void {
@@ -91,7 +91,7 @@ export class ShareLinksDropdownComponent implements OnInit {
   }
 
   copy(link: PaperlessShareLink) {
-    this.clipboardService.copy(this.getShareUrl(link))
+    this.clipboard.copy(this.getShareUrl(link))
     this.copied = link.id
     setTimeout(() => {
       this.copied = null

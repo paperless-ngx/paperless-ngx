@@ -28,7 +28,7 @@ import { WidgetFrameComponent } from '../widget-frame/widget-frame.component'
 import { SavedViewWidgetComponent } from './saved-view-widget.component'
 import { By } from '@angular/platform-browser'
 import { SafeUrlPipe } from 'src/app/pipes/safeurl.pipe'
-import { DndModule } from 'ngx-drag-drop'
+import { DragDropModule } from '@angular/cdk/drag-drop'
 
 const savedView: PaperlessSavedView = {
   id: 1,
@@ -91,7 +91,7 @@ describe('SavedViewWidgetComponent', () => {
         HttpClientTestingModule,
         NgbModule,
         RouterTestingModule.withRoutes(routes),
-        DndModule,
+        DragDropModule,
       ],
     }).compileComponents()
 
