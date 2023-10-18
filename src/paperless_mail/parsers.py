@@ -38,9 +38,9 @@ class MailDocumentParser(DocumentParser):
         """
         if settings.OCR_OUTPUT_TYPE in {"pdfa", "pdfa-2"}:
             return PdfAFormat.A2b
-        elif settings.OCR_OUTPUT_TYPE == "pdfa-1":
+        elif settings.OCR_OUTPUT_TYPE == "pdfa-1":  # pragma: no cover
             return PdfAFormat.A1a
-        elif settings.OCR_OUTPUT_TYPE == "pdfa-3":
+        elif settings.OCR_OUTPUT_TYPE == "pdfa-3":  # pragma: no cover
             return PdfAFormat.A3b
         return None
 
