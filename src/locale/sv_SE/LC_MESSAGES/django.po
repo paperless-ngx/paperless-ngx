@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-28 10:56-0700\n"
-"PO-Revision-Date: 2023-10-01 01:27\n"
+"PO-Revision-Date: 2023-10-19 11:30\n"
 "Last-Translator: \n"
 "Language-Team: Swedish\n"
 "Language: sv_SE\n"
@@ -533,7 +533,7 @@ msgstr ""
 
 #: documents/models.py:686
 msgid "Original"
-msgstr ""
+msgstr "Original"
 
 #: documents/models.py:697
 msgid "expiration"
@@ -557,7 +557,7 @@ msgstr ""
 
 #: documents/models.py:746
 msgid "Api Upload"
-msgstr ""
+msgstr "Api-uppladdning"
 
 #: documents/models.py:747
 msgid "Mail Fetch"
@@ -589,7 +589,7 @@ msgstr ""
 
 #: documents/models.py:792
 msgid "assign title"
-msgstr ""
+msgstr "tilldela titel"
 
 #: documents/models.py:797
 msgid "Assign a document title, can include some placeholders, see documentation."
@@ -613,7 +613,7 @@ msgstr ""
 
 #: documents/models.py:838
 msgid "assign this owner"
-msgstr ""
+msgstr "tilldela denna ägare"
 
 #: documents/models.py:845
 msgid "grant view permissions to these users"
@@ -699,7 +699,7 @@ msgstr ""
 
 #: documents/templates/registration/login.html:52
 msgid "Share link has expired."
-msgstr ""
+msgstr "Delningslänken har upphört att gälla."
 
 #: documents/templates/registration/login.html:55
 msgid "Username"
@@ -715,44 +715,44 @@ msgstr "Logga in"
 
 #: documents/templates/registration/login.html:70
 msgid "Forgot your password?"
-msgstr ""
+msgstr "Glömt ditt lösenord?"
 
 #: documents/templates/registration/password_reset_complete.html:14
 msgid "Paperless-ngx reset password complete"
-msgstr ""
+msgstr "Paperless-ngx återställning av lösenord slutfört"
 
 #: documents/templates/registration/password_reset_complete.html:40
 msgid "Password reset complete."
-msgstr ""
+msgstr "Återställning av lösenord slutfört."
 
 #: documents/templates/registration/password_reset_complete.html:42
 #, python-format
 msgid "Your new password has been set. You can now <a href=\"%(login_url)s\">log in</a>"
-msgstr ""
+msgstr "Ditt nya lösenord har ställts in. Du kan nu <a href=\"%(login_url)s\">logga in</a>"
 
 #: documents/templates/registration/password_reset_confirm.html:14
 msgid "Paperless-ngx reset password confirmation"
-msgstr ""
+msgstr "Paperless-ngx återställning av lösenord bekräftelse"
 
 #: documents/templates/registration/password_reset_confirm.html:42
 msgid "Set a new password."
-msgstr ""
+msgstr "Ange ett nytt lösenord."
 
 #: documents/templates/registration/password_reset_confirm.html:46
 msgid "Passwords did not match or too weak. Try again."
-msgstr ""
+msgstr "Lösenorden matchar inte eller var för svaga. Försök igen."
 
 #: documents/templates/registration/password_reset_confirm.html:49
 msgid "New Password"
-msgstr ""
+msgstr "Nytt lösenord"
 
 #: documents/templates/registration/password_reset_confirm.html:50
 msgid "Confirm Password"
-msgstr ""
+msgstr "Bekräfta lösenord"
 
 #: documents/templates/registration/password_reset_confirm.html:61
 msgid "Change my password"
-msgstr ""
+msgstr "Ändra mitt lösenord"
 
 #: documents/templates/registration/password_reset_confirm.html:65
 msgid "request a new password reset"
