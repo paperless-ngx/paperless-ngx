@@ -57,7 +57,7 @@ if ! command -v docker &> /dev/null ; then
 fi
 
 DOCKER_COMPOSE_CMD="docker-compose"
-if ! command -v ${DOCKER_COMPOSE_CMD} ; then
+if ! command -v ${DOCKER_COMPOSE_CMD} &> /dev/null ; then
 	if docker compose version &> /dev/null ; then
 		DOCKER_COMPOSE_CMD="docker compose"
 	else
