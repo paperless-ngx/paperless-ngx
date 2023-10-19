@@ -1097,7 +1097,7 @@ barcode is detected.
 
     The barcode must consist of a (configurable) prefix and the ASN
     to be set, for instance `ASN00123`. The content after the prefix
-    is cleaned of non-digits and interpreted as an integer.
+    is cleaned of non-numeric characters.
 
     This option is compatible with barcode page separation, since
     pages will be split up before reading the ASN.
