@@ -169,6 +169,7 @@ main {
 
 .nav-item {
   position: relative;
+  list-style-type: none;
 
   &:hover .close {
     display: block;
@@ -309,4 +310,12 @@ main {
   100% {
     opacity: 100%;
   }
+}
+
+.nav-item .position-absolute {
+  cursor: move;
+}
+
+::ng-deep .navItemDrag .position-absolute svg {
+  display: none;
 }

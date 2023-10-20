@@ -29,22 +29,7 @@ export class DashboardComponent extends ComponentWithPermissions {
     super()
 
     this.savedViewService.listAll().subscribe(() => {
-      const sorted: number[] = this.settingsService.get(
-        SETTINGS_KEYS.DASHBOARD_VIEWS_SORT_ORDER
-      )
-      this.dashboardViews =
-        sorted?.length > 0
-          ? sorted
-              .map((id) =>
-                this.savedViewService.dashboardViews.find((v) => v.id === id)
-              )
-              .concat(
-                this.savedViewService.dashboardViews.filter(
-                  (v) => !sorted.includes(v.id)
-                )
-              )
-              .filter((v) => v)
-          : [...this.savedViewService.dashboardViews]
+      this.dashboardViews = this.savedViewService.dashboardViews
     })
   }
 

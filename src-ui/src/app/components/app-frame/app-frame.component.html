@@ -87,17 +87,28 @@
           </li>
         </ul>
         <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }">
-          <h6 class="sidebar-heading px-3 mt-3 mb-1 text-muted" *ngIf='savedViewService.loading || savedViewService.sidebarViews.length > 0'>
+          <h6 class="sidebar-heading px-3 mt-3 mb-1 text-muted" *ngIf='savedViewService.loading || sidebarViews?.length > 0'>
             <span i18n>Saved views</span>
             <div *ngIf="savedViewService.loading" class="spinner-border spinner-border-sm fw-normal ms-2" role="status"></div>
           </h6>
-          <ul class="nav flex-column mb-2">
-            <li class="nav-item w-100" *ngFor="let view of savedViewService.sidebarViews">
+          <ul class="nav flex-column mb-2" cdkDropList (cdkDropListDropped)="onDrop($event)">
+            <li class="nav-item w-100" *ngFor="let view of sidebarViews"
+              cdkDrag
+              [cdkDragDisabled]="!settingsService.organizingSidebarSavedViews"
+              cdkDragPreviewContainer="parent"
+              cdkDragPreviewClass="navItemDrag"
+              (cdkDragStarted)="onDragStart($event)"
+              (cdkDragEnded)="onDragEnd($event)">
               <a class="nav-link" [class.text-truncate]="!slimSidebarEnabled" routerLink="view/{{view.id}}" routerLinkActive="active" (click)="closeMenu()" [ngbPopover]="view.name" [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
                 <svg class="sidebaricon" fill="currentColor">
                   <use xlink:href="assets/bootstrap-icons.svg#funnel"/>
                 </svg><span>&nbsp;{{view.name}}</span>
               </a>
+              <div *ngIf="settingsService.organizingSidebarSavedViews" class="position-absolute end-0 top-0 px-3 py-2" [class.me-n3]="slimSidebarEnabled" cdkDragHandle>
+                <svg class="sidebaricon text-muted" fill="currentColor">
+                  <use xlink:href="assets/bootstrap-icons.svg#grip-vertical"/>
+                </svg>
+              </div>
             </li>
           </ul>
         </ng-container>

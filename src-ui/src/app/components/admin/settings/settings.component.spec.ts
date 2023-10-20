@@ -180,9 +180,21 @@ describe('SettingsComponent', () => {
     activatedRoute.snapshot.fragment = '#notifications'
     const scrollSpy = jest.spyOn(viewportScroller, 'scrollToAnchor')
     component.ngOnInit()
-    expect(component.activeNavID).toEqual(3) // Users & Groups
+    expect(component.activeNavID).toEqual(3) // Notifications
     component.ngAfterViewInit()
     expect(scrollSpy).toHaveBeenCalledWith('#notifications')
+  })
+
+  it('should enable organizing of sidebar saved views even on direct navigation', () => {
+    completeSetup()
+    jest
+      .spyOn(activatedRoute, 'paramMap', 'get')
+      .mockReturnValue(of(convertToParamMap({ section: 'savedviews' })))
+    activatedRoute.snapshot.fragment = '#savedviews'
+    component.ngOnInit()
+    expect(component.activeNavID).toEqual(4) // Saved Views
+    component.ngAfterViewInit()
+    expect(settingsService.organizingSidebarSavedViews).toBeTruthy()
   })
 
   it('should support save saved views, show error', () => {
