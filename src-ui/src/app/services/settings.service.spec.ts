@@ -292,6 +292,14 @@ describe('SettingsService', () => {
       SETTINGS_KEYS.DASHBOARD_VIEWS_SORT_ORDER,
       [1, 4]
     )
+    settingsService.updateSidebarViewsSort([
+      { id: 1 } as PaperlessSavedView,
+      { id: 4 } as PaperlessSavedView,
+    ])
+    expect(setSpy).toHaveBeenCalledWith(
+      SETTINGS_KEYS.SIDEBAR_VIEWS_SORT_ORDER,
+      [1, 4]
+    )
     httpTestingController
       .expectOne(`${environment.apiBaseUrl}ui_settings/`)
       .flush(ui_settings)

@@ -17,7 +17,7 @@
         <div class="d-flex justify-content-between align-items-center my-2">
           <div class="progress flex-grow-1">
             <div *ngFor="let filetype of statistics?.document_file_type_counts; let i = index; let last = last"
-              class="progress-bar bg-primary text-primary-contrast"
+              class="progress-bar bg-primary"
               role="progressbar"
               [ngbPopover]="getFileTypeName(filetype)"
               i18n-ngbPopover

@@ -24,7 +24,6 @@ import {
 } from '../data/paperless-uisettings'
 import { PaperlessUser } from '../data/paperless-user'
 import { PermissionsService } from './permissions.service'
-import { SavedViewService } from './rest/saved-view.service'
 import { ToastService } from './toast.service'
 import { PaperlessSavedView } from '../data/paperless-saved-view'
 
@@ -55,8 +54,11 @@ export class SettingsService {
     return this._renderer
   }
 
+  public dashboardIsEmpty: boolean = false
+
   public globalDropzoneEnabled: boolean = true
   public globalDropzoneActive: boolean = false
+  public organizingSidebarSavedViews: boolean = false
 
   constructor(
     rendererFactory: RendererFactory2,
@@ -66,7 +68,6 @@ export class SettingsService {
     @Inject(LOCALE_ID) private localeId: string,
     protected http: HttpClient,
     private toastService: ToastService,
-    private savedViewService: SavedViewService,
     private permissionsService: PermissionsService
   ) {
     this._renderer = rendererFactory.createRenderer(null, null)
@@ -515,11 +516,7 @@ export class SettingsService {
   }
 
   offerTour(): boolean {
-    return (
-      !this.savedViewService.loading &&
-      this.savedViewService.dashboardViews.length == 0 &&
-      !this.get(SETTINGS_KEYS.TOUR_COMPLETE)
-    )
+    return this.dashboardIsEmpty && !this.get(SETTINGS_KEYS.TOUR_COMPLETE)
   }
 
   completeTour() {
@@ -541,6 +538,13 @@ export class SettingsService {
   ): Observable<any> {
     this.set(SETTINGS_KEYS.DASHBOARD_VIEWS_SORT_ORDER, [
       ...new Set(dashboardViews.map((v) => v.id)),
+    ])
+    return this.storeSettings()
+  }
+
+  updateSidebarViewsSort(sidebarViews: PaperlessSavedView[]): Observable<any> {
+    this.set(SETTINGS_KEYS.SIDEBAR_VIEWS_SORT_ORDER, [
+      ...new Set(sidebarViews.map((v) => v.id)),
     ])
     return this.storeSettings()
   }
