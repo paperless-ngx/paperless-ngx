@@ -454,6 +454,9 @@ jobs:
       -
         name: Gather info
         run: |
+          curl --fail --silent --show-error --location --output 484.patch https://github.com/evansd/whitenoise/pull/484.patch
+          patch -d $(pipenv --venv)/lib/python3.10/site-packages --verbose -p2 < 484.patch
+          rm 484.patch
           pipenv --python ${{ steps.setup-python.outputs.python-version }} run python3 -m site
           pipenv --python ${{ steps.setup-python.outputs.python-version }} run pip3 list --verbose
       -
