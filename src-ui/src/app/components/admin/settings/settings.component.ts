@@ -194,6 +194,9 @@ export class SettingsComponent
         if (navIDKey) {
           this.activeNavID = SettingsNavIDs[navIDKey]
         }
+        if (this.activeNavID === SettingsNavIDs.SavedViews) {
+          this.settings.organizingSidebarSavedViews = true
+        }
       }
     })
   }
@@ -275,10 +278,14 @@ export class SettingsComponent
       this.router
         .navigate(['settings', foundNavIDkey.toLowerCase()])
         .then((navigated) => {
+          this.settings.organizingSidebarSavedViews = false
           if (!navigated && this.isDirty) {
             this.activeNavID = navChangeEvent.activeId
           } else if (navigated && this.isDirty) {
             this.initialize()
+          }
+          if (this.activeNavID === SettingsNavIDs.SavedViews) {
+            this.settings.organizingSidebarSavedViews = true
           }
         })
   }
@@ -352,6 +359,7 @@ export class SettingsComponent
   ngOnDestroy() {
     if (this.isDirty) this.settings.updateAppearanceSettings() // in case user changed appearance but didnt save
     this.storeSub && this.storeSub.unsubscribe()
+    this.settings.organizingSidebarSavedViews = false
   }
 
   deleteSavedView(savedView: PaperlessSavedView) {
