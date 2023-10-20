@@ -28,6 +28,7 @@ from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
 from django.http import HttpResponseForbidden
 from django.http import HttpResponseRedirect
+from django.http import HttpResponseServerError
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.decorators import method_decorator
@@ -78,6 +79,7 @@ from documents.matching import match_storage_paths
 from documents.matching import match_tags
 from documents.models import ConsumptionTemplate
 from documents.models import Correspondent
+from documents.models import CustomMetadata
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import Note
@@ -497,7 +499,7 @@ class DocumentViewSet(
                 "view_document",
                 doc,
             ):
-                return HttpResponseForbidden("Insufficient permissions to view")
+                return HttpResponseForbidden("Insufficient permissions to view notes")
         except Document.DoesNotExist:
             raise Http404
 
@@ -507,7 +509,7 @@ class DocumentViewSet(
             except Exception as e:
                 logger.warning(f"An error occurred retrieving notes: {e!s}")
                 return Response(
-                    {"error": "Error retreiving notes, check logs for more detail."},
+                    {"error": "Error retrieving notes, check logs for more detail."},
                 )
         elif request.method == "POST":
             try:
@@ -516,7 +518,9 @@ class DocumentViewSet(
                     "change_document",
                     doc,
                 ):
-                    return HttpResponseForbidden("Insufficient permissions to create")
+                    return HttpResponseForbidden(
+                        "Insufficient permissions to create notes",
+                    )
 
                 c = Note.objects.create(
                     document=doc,
@@ -558,7 +562,7 @@ class DocumentViewSet(
                 "change_document",
                 doc,
             ):
-                return HttpResponseForbidden("Insufficient permissions to delete")
+                return HttpResponseForbidden("Insufficient permissions to delete notes")
 
             note = Note.objects.get(id=int(request.GET.get("id")))
             if settings.AUDIT_LOG_ENABLED:
@@ -599,7 +603,9 @@ class DocumentViewSet(
                 "change_document",
                 doc,
             ):
-                return HttpResponseForbidden("Insufficient permissions")
+                return HttpResponseForbidden(
+                    "Insufficient permissions to add share link",
+                )
         except Document.DoesNotExist:
             raise Http404
 
@@ -617,6 +623,100 @@ class DocumentViewSet(
                 .order_by("-created")
             ]
             return Response(links)
+
+    @action(methods=["get", "post", "delete"], detail=True)
+    def custom_metadata(self, request, pk=None) -> Response:
+        def package_custom_metadata(doc: Document):
+            return [
+                c.to_json()
+                for c in CustomMetadata.objects.filter(document=doc).order_by(
+                    "-created",
+                )
+            ]
+
+        request.user = request.user
+        try:
+            doc = Document.objects.get(pk=pk)
+            if request.user is not None and not has_perms_owner_aware(
+                request.user,
+                "view_document",
+                doc,
+            ):
+                return HttpResponseForbidden(
+                    "Insufficient permissions to view custom metadata",
+                )
+        except Document.DoesNotExist:
+            raise Http404
+
+        if request.method == "GET":
+            try:
+                return Response(package_custom_metadata(doc))
+            except Exception as e:
+                logger.warning(f"An error occurred retrieving custom metadata: {e!s}")
+                return HttpResponseServerError(
+                    {
+                        "error": (
+                            "Error retrieving custom metadata,"
+                            " check logs for more detail."
+                        ),
+                    },
+                )
+        elif request.method == "POST":
+            try:
+                if request.user is not None and not has_perms_owner_aware(
+                    request.user,
+                    "change_document",
+                    doc,
+                ):
+                    return HttpResponseForbidden(
+                        "Insufficient permissions to create custom metadata",
+                    )
+
+                CustomMetadata.from_json(doc, request.user, request.data)
+
+                doc.modified = timezone.now()
+                doc.save()
+
+                from documents import index
+
+                index.add_or_update_document(self.get_object())
+
+                return Response(package_custom_metadata(doc))
+            except Exception as e:
+                logger.warning(f"An error occurred saving custom metadata: {e!s}")
+                return HttpResponseServerError(
+                    {
+                        "error": (
+                            "Error saving custom metadata, "
+                            "check logs for more detail."
+                        ),
+                    },
+                )
+        elif request.method == "DELETE":
+            if request.user is not None and not has_perms_owner_aware(
+                request.user,
+                "change_document",
+                doc,
+            ):
+                return HttpResponseForbidden(
+                    "Insufficient permissions to delete custom metadata",
+                )
+
+            metadata = CustomMetadata.objects.get(id=int(request.GET.get("id")))
+            metadata.delete()
+
+            doc.modified = timezone.now()
+            doc.save()
+
+            from documents import index
+
+            index.add_or_update_document(self.get_object())
+
+            return Response(package_custom_metadata(doc))
+
+        return Response(
+            {"error": "unreachable error was reached for custom metadata"},
+        )  # pragma: no cover
 
 
 class SearchResultSerializer(DocumentSerializer, PassUserMixin):

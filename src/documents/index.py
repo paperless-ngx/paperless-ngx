@@ -30,6 +30,7 @@ from whoosh.searching import ResultsPage
 from whoosh.searching import Searcher
 from whoosh.writing import AsyncWriter
 
+from documents.models import CustomMetadata
 from documents.models import Document
 from documents.models import Note
 from documents.models import User
@@ -60,6 +61,8 @@ def get_schema():
         has_path=BOOLEAN(),
         notes=TEXT(),
         num_notes=NUMERIC(sortable=True, signed=False),
+        custom_metadata=TEXT(),
+        custom_field_count=NUMERIC(sortable=True, signed=False),
         owner=TEXT(),
         owner_id=NUMERIC(),
         has_owner=BOOLEAN(),
@@ -69,7 +72,7 @@ def get_schema():
     )
 
 
-def open_index(recreate=False):
+def open_index(recreate=False) -> FileIndex:
     try:
         if exists_in(settings.INDEX_DIR) and not recreate:
             return open_dir(settings.INDEX_DIR, schema=get_schema())
@@ -82,7 +85,7 @@ def open_index(recreate=False):
 
 
 @contextmanager
-def open_index_writer(optimize=False):
+def open_index_writer(optimize=False) -> AsyncWriter:
     writer = AsyncWriter(open_index())
 
     try:
@@ -95,7 +98,7 @@ def open_index_writer(optimize=False):
 
 
 @contextmanager
-def open_index_searcher():
+def open_index_searcher() -> Searcher:
     searcher = open_index().searcher()
 
     try:
@@ -108,6 +111,9 @@ def update_document(writer: AsyncWriter, doc: Document):
     tags = ",".join([t.name for t in doc.tags.all()])
     tags_ids = ",".join([str(t.id) for t in doc.tags.all()])
     notes = ",".join([str(c.note) for c in Note.objects.filter(document=doc)])
+    custom_fields = ",".join(
+        [str(c) for c in CustomMetadata.objects.filter(document=doc)],
+    )
     asn = doc.archive_serial_number
     if asn is not None and (
         asn < Document.ARCHIVE_SERIAL_NUMBER_MIN
@@ -147,6 +153,8 @@ def update_document(writer: AsyncWriter, doc: Document):
         has_path=doc.storage_path is not None,
         notes=notes,
         num_notes=len(notes),
+        custom_metadata=custom_fields,
+        custom_field_count=len(custom_fields),
         owner=doc.owner.username if doc.owner else None,
         owner_id=doc.owner.id if doc.owner else None,
         has_owner=doc.owner is not None,
@@ -156,20 +164,20 @@ def update_document(writer: AsyncWriter, doc: Document):
     )
 
 
-def remove_document(writer, doc):
+def remove_document(writer: AsyncWriter, doc: Document):
     remove_document_by_id(writer, doc.pk)
 
 
-def remove_document_by_id(writer, doc_id):
+def remove_document_by_id(writer: AsyncWriter, doc_id):
     writer.delete_by_term("id", doc_id)
 
 
-def add_or_update_document(document):
+def add_or_update_document(document: Document):
     with open_index_writer() as writer:
         update_document(writer, document)
 
 
-def remove_document_from_index(document):
+def remove_document_from_index(document: Document):
     with open_index_writer() as writer:
         remove_document(writer, document)
 

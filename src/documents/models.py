@@ -883,3 +883,83 @@ if settings.AUDIT_LOG_ENABLED:
     auditlog.register(Tag)
     auditlog.register(DocumentType)
     auditlog.register(Note)
+
+
+class CustomMetadata(models.Model):
+    class DataType(models.TextChoices):
+        STRING = ("string", _("String"))
+        URL = ("url", _("URL"))
+        DATE = ("date", _("Date"))
+
+    data_type = models.CharField(
+        max_length=50,
+        choices=DataType.choices,
+        default=DataType.STRING,
+    )
+
+    data = models.CharField(
+        max_length=512,
+        blank=True,
+    )
+
+    name = models.CharField(
+        max_length=512,
+        blank=True,
+    )
+
+    created = models.DateTimeField(
+        _("created"),
+        default=timezone.now,
+        db_index=True,
+    )
+
+    document = models.ForeignKey(
+        Document,
+        blank=True,
+        null=True,
+        related_name="metadata",
+        on_delete=models.CASCADE,
+        verbose_name=_("document"),
+    )
+
+    user = models.ForeignKey(
+        User,
+        blank=True,
+        null=True,
+        related_name="metadata",
+        on_delete=models.SET_NULL,
+        verbose_name=_("user"),
+    )
+
+    class Meta:
+        ordering = ("created",)
+        verbose_name = _("custom metadata")
+        verbose_name_plural = _("custom metadata")
+
+    def __str__(self):
+        return f"{self.data_type} : {self.name} : {self.data}"
+
+    def to_json(self) -> dict[str, str]:
+        return {
+            "id": self.id,
+            "created": self.created,
+            "type": self.data_type,
+            "name": self.name,
+            "data": self.data,
+            "user": {
+                "id": self.user.id,
+                "username": self.user.username,
+                "first_name": self.user.first_name,
+                "last_name": self.user.last_name,
+            },
+        }
+
+    @staticmethod
+    def from_json(document: Document, user: User, data) -> "CustomMetadata":
+        return CustomMetadata.objects.create(
+            document=document,
+            data_type=data["type"],
+            name=data["name"],
+            data=data["data"],
+            user=user,
+        )

@@ -2421,7 +2421,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             f"/api/documents/{doc.pk}/notes/",
             format="json",
         )
-        self.assertEqual(resp.content, b"Insufficient permissions to view")
+        self.assertEqual(resp.content, b"Insufficient permissions to view notes")
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
         assign_perm("view_document", user1, doc)
@@ -2430,7 +2430,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             f"/api/documents/{doc.pk}/notes/",
             data={"note": "this is a posted note"},
         )
-        self.assertEqual(resp.content, b"Insufficient permissions to create")
+        self.assertEqual(resp.content, b"Insufficient permissions to create notes")
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
         note = Note.objects.create(
@@ -2444,7 +2444,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             format="json",
         )
 
-        self.assertEqual(response.content, b"Insufficient permissions to delete")
+        self.assertEqual(response.content, b"Insufficient permissions to delete notes")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_delete_note(self):
@@ -2694,7 +2694,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             f"/api/documents/{doc.pk}/share_links/",
             format="json",
         )
-        self.assertEqual(resp.content, b"Insufficient permissions")
+        self.assertEqual(resp.content, b"Insufficient permissions to add share link")
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
         assign_perm("change_document", user1, doc)
