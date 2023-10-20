@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-28 10:56-0700\n"
-"PO-Revision-Date: 2023-10-20 15:28\n"
+"PO-Revision-Date: 2023-10-20 16:51\n"
 "Last-Translator: \n"
 "Language-Team: Bulgarian\n"
 "Language: bg_BG\n"
@@ -19,31 +19,31 @@ msgstr ""
 
 #: documents/apps.py:8
 msgid "Documents"
-msgstr ""
+msgstr "Документи"
 
 #: documents/models.py:33 documents/models.py:731
 msgid "owner"
-msgstr ""
+msgstr "собственик"
 
 #: documents/models.py:50
 msgid "None"
-msgstr ""
+msgstr "Няма"
 
 #: documents/models.py:51
 msgid "Any word"
-msgstr ""
+msgstr "Всяка дума"
 
 #: documents/models.py:52
 msgid "All words"
-msgstr ""
+msgstr "Всички думи"
 
 #: documents/models.py:53
 msgid "Exact match"
-msgstr ""
+msgstr "Точно съвпадение"
 
 #: documents/models.py:54
 msgid "Regular expression"
-msgstr ""
+msgstr "Регулярен израз"
 
 #: documents/models.py:55
 msgid "Fuzzy word"
@@ -51,36 +51,36 @@ msgstr ""
 
 #: documents/models.py:56
 msgid "Automatic"
-msgstr ""
+msgstr "Автоматично"
 
 #: documents/models.py:59 documents/models.py:399 documents/models.py:749
 #: paperless_mail/models.py:18 paperless_mail/models.py:93
 msgid "name"
-msgstr ""
+msgstr "име"
 
 #: documents/models.py:61
 msgid "match"
-msgstr ""
+msgstr "съвпадение"
 
 #: documents/models.py:64
 msgid "matching algorithm"
-msgstr ""
+msgstr "алгоритъм на съвпадение"
 
 #: documents/models.py:69
 msgid "is insensitive"
-msgstr ""
+msgstr "без чувствителност към големината на буквите"
 
 #: documents/models.py:92 documents/models.py:144
 msgid "correspondent"
-msgstr ""
+msgstr "кореспондент"
 
 #: documents/models.py:93
 msgid "correspondents"
-msgstr ""
+msgstr "кореспонденти"
 
 #: documents/models.py:97
 msgid "color"
-msgstr ""
+msgstr "цвят"
 
 #: documents/models.py:100
 msgid "is inbox tag"
@@ -92,31 +92,31 @@ msgstr ""
 
 #: documents/models.py:109
 msgid "tag"
-msgstr ""
+msgstr "таг"
 
 #: documents/models.py:110 documents/models.py:182
 msgid "tags"
-msgstr ""
+msgstr "тагове"
 
 #: documents/models.py:115 documents/models.py:164
 msgid "document type"
-msgstr ""
+msgstr "тип на документа"
 
 #: documents/models.py:116
 msgid "document types"
-msgstr ""
+msgstr "типове документи"
 
 #: documents/models.py:121
 msgid "path"
-msgstr ""
+msgstr "път"
 
 #: documents/models.py:126 documents/models.py:153
 msgid "storage path"
-msgstr ""
+msgstr "път към хранилище"
 
 #: documents/models.py:127
 msgid "storage paths"
-msgstr ""
+msgstr "пътища към хранилища"
 
 #: documents/models.py:134
 msgid "Unencrypted"
