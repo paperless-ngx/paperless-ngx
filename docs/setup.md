@@ -6,6 +6,7 @@ You can go multiple routes to setup and run Paperless:
 - [Pull the image from Docker Hub](#docker_hub)
 - [Build the Docker image yourself](#docker_build)
 - [Install Paperless directly on your system manually (bare metal)](#bare_metal)
+- [Managed hosting options](#managed_hosting)
 
 The Docker routes are quick & easy. These are the recommended routes.
 This configures all the stuff from the above automatically so that it
@@ -516,6 +517,16 @@ supported.
     `PAPERLESS_DATA_DIR/nltk`. Refer to the [NLTK
     instructions](https://www.nltk.org/data.html) for details on how to
     download the data.
+
+### Managed Hosting Options
+
+If you don't want to administer your own server, you can consider the following managed options:
+
+**PikaPods**
+
+Offers one-click setup for Paperless-ngx for about $3 per month. Provides full access to files and the database, as well as env vars.
+
+[![Run on PikaPods](https://www.pikapods.com/static/run-button.svg)](https://www.pikapods.com/pods?run=paperless-ngx)
 
 # Migrating to Paperless-ngx
 
