@@ -51,6 +51,7 @@ flower = "*"
 bleach = "*"
 zxing-cpp = {version = "*", platform_machine = "== 'x86_64'"}
 django-multiselectfield = "*"
+gotenberg-client = "*"
 
 [dev-packages]
 # Linting
