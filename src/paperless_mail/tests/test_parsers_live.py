@@ -1,16 +1,42 @@
 import os
+import shutil
+import subprocess
+import tempfile
+from pathlib import Path
 from unittest import mock
 
 import httpx
 import pytest
 from django.test import TestCase
 from imagehash import average_hash
-from pdfminer.high_level import extract_text
 from PIL import Image
 
 from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import util_call_with_backoff
 from paperless_mail.tests.test_parsers import BaseMailParserTestCase
+
+
+def extract_text(pdf_path: Path) -> str:
+    """
+    Using pdftotext from poppler, extracts the text of a PDF into a file,
+    then reads the file contents and returns it
+    """
+    with tempfile.NamedTemporaryFile(
+        mode="w+",
+    ) as tmp:
+        subprocess.run(
+            [
+                shutil.which("pdftotext"),
+                "-q",
+                "-layout",
+                "-enc",
+                "UTF-8",
+                str(pdf_path),
+                tmp.name,
+            ],
+            check=True,
+        )
+        return tmp.read()
 
 
 class MailAttachmentMock:
@@ -150,7 +176,7 @@ class TestParserLive(FileSystemAssertsMixin, BaseMailParserTestCase):
 
         extracted = extract_text(pdf_path)
         expected = (
-            "first\tPDF\tto\tbe\tmerged.\n\n\x0csecond\tPDF\tto\tbe\tmerged.\n\n\x0c"
+            "first   PDF   to   be   merged.\n\x0csecond PDF   to   be   merged.\n\x0c"
         )
 
         self.assertEqual(expected, extracted)

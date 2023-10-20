@@ -1,9 +1,10 @@
-import os
 from pathlib import Path
 
 import httpx
 from django.conf import settings
 from django.utils import timezone
+from gotenberg_client import GotenbergClient
+from gotenberg_client.options import PdfAFormat
 from tika_client import TikaClient
 
 from documents.parsers import DocumentParser
@@ -80,47 +81,33 @@ class TikaDocumentParser(DocumentParser):
 
         self.archive_path = self.convert_to_pdf(document_path, file_name)
 
-    def convert_to_pdf(self, document_path, file_name):
-        pdf_path = os.path.join(self.tempdir, "convert.pdf")
-        gotenberg_server = settings.TIKA_GOTENBERG_ENDPOINT
-        url = gotenberg_server + "/forms/libreoffice/convert"
+    def convert_to_pdf(self, document_path: Path, file_name):
+        pdf_path = Path(self.tempdir) / "convert.pdf"
 
         self.log.info(f"Converting {document_path} to PDF as {pdf_path}")
-        with open(document_path, "rb") as document_handle:
-            files = {
-                "files": (
-                    "convert" + os.path.splitext(document_path)[-1],
-                    document_handle,
-                ),
-            }
-            headers = {}
-            data = {}
 
+        with GotenbergClient(
+            host=settings.TIKA_GOTENBERG_ENDPOINT,
+            timeout=settings.CELERY_TASK_TIME_LIMIT,
+        ) as client, client.libre_office.to_pdf() as route:
             # Set the output format of the resulting PDF
-            # Valid inputs: https://gotenberg.dev/docs/modules/pdf-engines#uno
             if settings.OCR_OUTPUT_TYPE in {"pdfa", "pdfa-2"}:
-                data["pdfFormat"] = "PDF/A-2b"
+                route.pdf_format(PdfAFormat.A2b)
             elif settings.OCR_OUTPUT_TYPE == "pdfa-1":
-                data["pdfFormat"] = "PDF/A-1a"
+                route.pdf_format(PdfAFormat.A1a)
             elif settings.OCR_OUTPUT_TYPE == "pdfa-3":
-                data["pdfFormat"] = "PDF/A-3b"
+                route.pdf_format(PdfAFormat.A3b)
+
+            route.convert(document_path)
 
             try:
-                response = httpx.post(
-                    url,
-                    files=files,
-                    headers=headers,
-                    data=data,
-                    timeout=settings.CELERY_TASK_TIME_LIMIT,
-                )
-                response.raise_for_status()  # ensure we notice bad responses
+                response = route.run()
+
+                pdf_path.write_bytes(response.content)
+
+                return pdf_path
+
             except Exception as err:
                 raise ParseError(
                     f"Error while converting document to PDF: {err}",
                 ) from err
-
-        with open(pdf_path, "wb") as file:
-            file.write(response.content)
-            file.close()
-
-        return pdf_path
