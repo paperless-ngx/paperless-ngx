@@ -452,6 +452,11 @@ jobs:
         run: |
           pipenv --python ${{ steps.setup-python.outputs.python-version }} sync --dev
       -
+        name: Gather info
+        run: |
+          pipenv --python ${{ steps.setup-python.outputs.python-version }} run python3 -m site
+          pipenv --python ${{ steps.setup-python.outputs.python-version }} run pip3 list --verbose
+      -
         name: Install system dependencies
         run: |
           sudo apt-get update -qq
