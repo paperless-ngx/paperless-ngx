@@ -41,6 +41,9 @@ export class AbstractInputComponent<T> implements OnInit, ControlValueAccessor {
   @Input()
   error: string
 
+  @Input()
+  horizontal: boolean = false
+
   value: T
 
   ngOnInit(): void {

@@ -63,7 +63,11 @@ import { EditDialogMode } from '../common/edit-dialog/edit-dialog.component'
 import { ObjectWithId } from 'src/app/data/object-with-id'
 import { FilterRule } from 'src/app/data/filter-rule'
 import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
-import { ShareLinksDropdownComponent } from '../common/share-links-dropdown/share-links-dropdown.component'
+import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
+import {
+  PaperlessCustomField,
+  PaperlessCustomFieldDataType,
+} from 'src/app/data/paperless-custom-field'
 
 enum DocumentDetailNavIDs {
   Details = 1,
@@ -135,6 +139,9 @@ export class DocumentDetailComponent
 
   ogDate: Date
 
+  public readonly PaperlessCustomFieldDataType = PaperlessCustomFieldDataType
+  customFields: PaperlessCustomField[]
+
   @ViewChild('nav') nav: NgbNav
   @ViewChild('pdfPreview') set pdfPreview(element) {
     // this gets called when compontent added or removed from DOM
@@ -166,7 +173,8 @@ export class DocumentDetailComponent
     private storagePathService: StoragePathService,
     private permissionsService: PermissionsService,
     private userService: UserService,
-    private http: HttpClient
+    private http: HttpClient,
+    private customFieldsService: CustomFieldsService
   ) {
     super()
   }
@@ -385,6 +393,28 @@ export class DocumentDetailComponent
   updateComponent(doc: PaperlessDocument) {
     this.document = doc
     this.requiresPassword = false
+    this.customFieldsService
+      .getFields(doc.id)
+      .pipe(first())
+      .subscribe({
+        next: (fields) => {
+          this.customFields = fields
+          this.customFields.forEach((field) => {
+            this.documentForm.addControl(
+              `custom-field-${field.id}`,
+              new FormControl(field.data)
+            )
+          })
+          this.store.next(this.documentForm.value)
+          console.log(fields)
+        },
+        error: (error) => {
+          this.toastService.showError(
+            $localize`Error retrieving custom fields`,
+            error
+          )
+        },
+      })
     this.documentsService
       .getMetadata(doc.id)
       .pipe(first())
@@ -511,6 +541,11 @@ export class DocumentDetailComponent
           }
           this.title = doc.title
           this.documentForm.patchValue(doc)
+          this.customFields.forEach((field) => {
+            this.documentForm
+              .get(`custom-field-${field.id}`)
+              .patchValue(field.data)
+          })
           this.openDocumentService.setDirty(doc, false)
         },
         error: () => {

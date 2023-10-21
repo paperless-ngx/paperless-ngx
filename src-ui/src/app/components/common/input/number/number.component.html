@@ -1,12 +1,17 @@
 <div class="mb-3">
-  <label class="form-label" [for]="inputId">{{title}}</label>
-  <div class="input-group" [class.is-invalid]="error">
-    <input #inputField type="number" class="form-control" [id]="inputId" [(ngModel)]="value" (change)="onChange(value)" [class.is-invalid]="error" [disabled]="disabled">
-    <button *ngIf="showAdd" class="btn btn-outline-secondary" type="button" id="button-addon1" (click)="nextAsn()" [disabled]="disabled">+1</button>
+  <div class="row">
+    <div [class.col-md-3]="horizontal">
+      <label class="form-label" [for]="inputId">{{title}}</label>
+    </div>
+    <div [class.col-md-9]="horizontal">
+      <div class="input-group" [class.is-invalid]="error">
+        <input #inputField type="number" class="form-control" [id]="inputId" [(ngModel)]="value" (change)="onChange(value)" [class.is-invalid]="error" [disabled]="disabled">
+        <button *ngIf="showAdd" class="btn btn-outline-secondary" type="button" id="button-addon1" (click)="nextAsn()" [disabled]="disabled">+1</button>
+      </div>
+      <div class="invalid-feedback">
+        {{error}}
+      </div>
+      <small *ngIf="hint" class="form-text text-muted">{{hint}}</small>
+    </div>
   </div>
-  <div class="invalid-feedback">
-    {{error}}
-  </div>
-  <small *ngIf="hint" class="form-text text-muted">{{hint}}</small>
-
 </div>
