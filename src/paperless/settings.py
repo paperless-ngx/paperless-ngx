@@ -945,7 +945,7 @@ all_tables = db_conn.introspection.table_names()
 
 if ("auditlog_logentry" in all_tables) and not (AUDIT_ENABLED):
     raise ImproperlyConfigured(
-        "auditlog table was found but PAPERLESS_AUDIT_ENABLED is not active",
+        "auditlog table was found but PAPERLESS_AUDIT_ENABLED is not active.",
     )
 
 
