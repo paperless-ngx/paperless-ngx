@@ -736,7 +736,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">114</context>
         </context-group>
-        <target state="final">Dunklen Modus aktivieren</target>
+        <target state="final">Dunkelmodus aktivieren</target>
       </trans-unit>
       <trans-unit id="6336642923114460405" datatype="html" approved="yes">
         <source>Invert thumbnails in dark mode</source>
