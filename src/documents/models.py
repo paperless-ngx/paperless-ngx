@@ -20,6 +20,9 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from multiselectfield import MultiSelectField
 
+if settings.AUDIT_ENABLED:
+    from auditlog.registry import auditlog
+
 from documents.data_models import DocumentSource
 from documents.parsers import get_default_file_extension
 
@@ -872,3 +875,10 @@ class ConsumptionTemplate(models.Model):
 
     def __str__(self):
         return f"{self.name}"
+
+
+if settings.AUDIT_ENABLED:
+    auditlog.register(Document, m2m_fields={"tags"})
+    auditlog.register(Correspondent)
+    auditlog.register(Tag)
+    auditlog.register(DocumentType)

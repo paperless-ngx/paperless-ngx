@@ -222,7 +222,7 @@ RUN --mount=type=cache,target=/root/.cache/pip/,id=pip-cache \
     && rm --recursive --force --verbose /var/tmp/* \
     && rm --recursive --force --verbose /var/cache/apt/archives/* \
     && truncate --size 0 /var/log/*log
-
+RUN  --mount=type=cache,target=/root/.cache/pip/,id=pip-cache python3 -m pip install --default-timeout=1000 django-auditlog 
 # copy backend
 COPY --chown=1000:1000 ./src ./
 
