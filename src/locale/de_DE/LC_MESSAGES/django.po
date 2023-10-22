@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-28 10:56-0700\n"
-"PO-Revision-Date: 2023-10-02 11:17\n"
+"PO-Revision-Date: 2023-10-22 09:22\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -561,7 +561,7 @@ msgstr "API-Upload"
 
 #: documents/models.py:747
 msgid "Mail Fetch"
-msgstr "Mail-Abruf"
+msgstr "E-Mail-Abruf"
 
 #: documents/models.py:751 paperless_mail/models.py:95
 msgid "order"
