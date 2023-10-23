@@ -290,7 +290,6 @@ INSTALLED_APPS = [
     "django_filters",
     "django_celery_results",
     "guardian",
-    "auditlog",
     *env_apps,
 ]
 

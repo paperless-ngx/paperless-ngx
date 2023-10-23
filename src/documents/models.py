@@ -882,3 +882,4 @@ if settings.AUDIT_ENABLED:
     auditlog.register(Correspondent)
     auditlog.register(Tag)
     auditlog.register(DocumentType)
+    auditlog.register(Note)
