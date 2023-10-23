@@ -885,27 +885,46 @@ if settings.AUDIT_LOG_ENABLED:
     auditlog.register(Note)
 
 
-class CustomMetadata(models.Model):
-    class DataType(models.TextChoices):
+class CustomField(models.Model):
+    """
+    Defines the name and type of a custom field
+    """
+
+    class FieldDataType(models.TextChoices):
         STRING = ("string", _("String"))
         URL = ("url", _("URL"))
         DATE = ("date", _("Date"))
+        BOOL = ("boolean"), _("Boolean")
+
+    created = models.DateTimeField(
+        _("created"),
+        default=timezone.now,
+        db_index=True,
+    )
+
+    name = models.CharField(max_length=128)
 
     data_type = models.CharField(
+        _("data type"),
         max_length=50,
-        choices=DataType.choices,
-        default=DataType.STRING,
+        choices=FieldDataType.choices,
+        default=FieldDataType.STRING,
     )
 
-    data = models.CharField(
-        max_length=512,
-        blank=True,
-    )
+    class Meta:
+        ordering = ("created",)
+        verbose_name = _("custom field")
+        verbose_name_plural = _("custom fields")
 
-    name = models.CharField(
-        max_length=512,
-        blank=True,
-    )
+    def __str__(self) -> str:
+        return f"{self.name} : {self.data_type}"
+
+
+class CustomFieldInstance(models.Model):
+    """
+    A single instance of a field, attached to a CustomField for the name and type
+    and attached to a single Document to be metadata for it
+    """
 
     created = models.DateTimeField(
         _("created"),
@@ -915,51 +934,146 @@ class CustomMetadata(models.Model):
 
     document = models.ForeignKey(
         Document,
-        blank=True,
-        null=True,
-        related_name="metadata",
+        blank=False,
+        null=False,
         on_delete=models.CASCADE,
-        verbose_name=_("document"),
+        related_name="custom_fields",
     )
 
-    user = models.ForeignKey(
-        User,
-        blank=True,
-        null=True,
-        related_name="metadata",
-        on_delete=models.SET_NULL,
-        verbose_name=_("user"),
+    field = models.ForeignKey(
+        CustomField,
+        blank=False,
+        null=False,
+        on_delete=models.CASCADE,
+        related_name="fields",
     )
 
     class Meta:
         ordering = ("created",)
-        verbose_name = _("custom metadata")
-        verbose_name_plural = _("custom metadata")
+        verbose_name = _("custom field instance")
+        verbose_name_plural = _("custom field instances")
 
-    def __str__(self):
-        return f"{self.data_type} : {self.name} : {self.data}"
+    def __str__(self) -> str:
+        return str(self.field) + f" : {self.value}"
+
+    @property
+    def value(self):
+        """
+        Based on the data type, access the actual value the instance stores
+        """
+        if self.field.data_type == CustomField.FieldDataType.STRING:
+            return self.short_text.value
+        elif self.field.data_type == CustomField.FieldDataType.URL:
+            return self.url.value
+        elif self.field.data_type == CustomField.FieldDataType.DATE:
+            return self.date.value
+        elif self.field.data_type == CustomField.FieldDataType.BOOL:
+            return self.boolean.value
+        raise NotImplementedError(self.field.data_type)
+
+    @property
+    def field_type(self):
+        """
+        Based on the data type, quick access to class for storing that value
+        """
+        if self.field.data_type == CustomField.FieldDataType.STRING:
+            return CustomFieldShortText
+        elif self.field.data_type == CustomField.FieldDataType.URL:
+            return CustomFieldUrl
+        elif self.field.data_type == CustomField.FieldDataType.DATE:
+            return CustomFieldDate
+        elif self.field.data_type == CustomField.FieldDataType.BOOL:
+            return CustomFieldBoolean
+        raise NotImplementedError(self.field.data_type)
 
     def to_json(self) -> dict[str, str]:
         return {
             "id": self.id,
             "created": self.created,
-            "type": self.data_type,
-            "name": self.name,
-            "data": self.data,
-            "user": {
-                "id": self.user.id,
-                "username": self.user.username,
-                "first_name": self.user.first_name,
-                "last_name": self.user.last_name,
-            },
+            "type": self.field.data_type,
+            "name": self.field.name,
+            "data": self.value,
         }
 
     @staticmethod
-    def from_json(document: Document, user: User, data) -> "CustomMetadata":
-        return CustomMetadata.objects.create(
+    def from_json(
+        document: Document,
+        field: CustomField,
+        data,
+    ) -> "CustomFieldInstance":
+        instance = CustomFieldInstance.objects.create(
             document=document,
+            field=field,
             data_type=data["type"],
-            name=data["name"],
-            data=data["data"],
-            user=user,
         )
+        instance.field_type.objects.create(value=data["value"], parent=instance)
+
+        return field
+
+
+class CustomFieldShortText(models.Model):
+    """
+    Data storage for a short text custom field
+    """
+
+    value = models.CharField(max_length=128)
+    parent = models.OneToOneField(
+        CustomFieldInstance,
+        on_delete=models.CASCADE,
+        related_name="short_text",
+        parent_link=True,
+    )
+
+    def __str__(self) -> str:
+        return f"{self.value}"
+
+
+class CustomFieldBoolean(models.Model):
+    """
+    Data storage for a boolean custom field
+    """
+
+    value = models.BooleanField()
+    parent = models.OneToOneField(
+        CustomFieldInstance,
+        on_delete=models.CASCADE,
+        related_name="boolean",
+        parent_link=True,
+    )
+
+    def __str__(self) -> str:
+        return f"{self.value}"
+
+
+class CustomFieldUrl(models.Model):
+    """
+    Data storage for a URL custom field
+    """
+
+    value = models.URLField()
+    parent = models.OneToOneField(
+        CustomFieldInstance,
+        on_delete=models.CASCADE,
+        related_name="url",
+        parent_link=True,
+    )
+
+    def __str__(self) -> str:
+        return f"{self.value}"
+
+
+class CustomFieldDate(models.Model):
+    """
+    Data storage for a date custom field
+    """
+
+    value = models.DateField()
+    parent = models.OneToOneField(
+        CustomFieldInstance,
+        on_delete=models.CASCADE,
+        related_name="date",
+        parent_link=True,
+    )
+
+    def __str__(self) -> str:
+        return f"{self.value}"

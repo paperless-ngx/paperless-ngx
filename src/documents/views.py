@@ -1,10 +1,8 @@
 import itertools
-import json
 import logging
 import os
 import re
 import tempfile
-import urllib
 import zipfile
 from datetime import datetime
 from pathlib import Path
@@ -28,7 +26,6 @@ from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
 from django.http import HttpResponseForbidden
 from django.http import HttpResponseRedirect
-from django.http import HttpResponseServerError
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.decorators import method_decorator
@@ -38,7 +35,6 @@ from django.views.decorators.cache import cache_control
 from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
 from langdetect import detect
-from packaging import version as packaging_version
 from rest_framework import parsers
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
@@ -79,7 +75,8 @@ from documents.matching import match_storage_paths
 from documents.matching import match_tags
 from documents.models import ConsumptionTemplate
 from documents.models import Correspondent
-from documents.models import CustomMetadata
+
+# from documents.models import CustomMetadata
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import Note
@@ -113,7 +110,6 @@ from documents.serialisers import TagSerializerVersion1
 from documents.serialisers import TasksViewSerializer
 from documents.serialisers import UiSettingsViewSerializer
 from documents.tasks import consume_file
-from paperless import version
 from paperless.db import GnuPG
 from paperless.views import StandardPagination
 
@@ -624,99 +620,99 @@ class DocumentViewSet(
             ]
             return Response(links)
 
-    @action(methods=["get", "post", "delete"], detail=True)
-    def custom_metadata(self, request, pk=None) -> Response:
-        def package_custom_metadata(doc: Document):
-            return [
-                c.to_json()
-                for c in CustomMetadata.objects.filter(document=doc).order_by(
-                    "-created",
-                )
-            ]
+    # @action(methods=["get", "post", "delete"], detail=True)
+    # def custom_metadata(self, request, pk=None) -> Response:
+    #     def package_custom_metadata(doc: Document):
+    #         return [
+    #             c.to_json()
+    #             for c in CustomMetadata.objects.filter(document=doc).order_by(
+    #                 "-created",
+    #             )
+    #         ]
 
-        request.user = request.user
-        try:
-            doc = Document.objects.get(pk=pk)
-            if request.user is not None and not has_perms_owner_aware(
-                request.user,
-                "view_document",
-                doc,
-            ):
-                return HttpResponseForbidden(
-                    "Insufficient permissions to view custom metadata",
-                )
-        except Document.DoesNotExist:
-            raise Http404
+    #     request.user = request.user
+    #     try:
+    #         doc = Document.objects.get(pk=pk)
+    #         if request.user is not None and not has_perms_owner_aware(
+    #             request.user,
+    #             "view_document",
+    #             doc,
+    #         ):
+    #             return HttpResponseForbidden(
+    #                 "Insufficient permissions to view custom metadata",
+    #             )
+    #     except Document.DoesNotExist:
+    #         raise Http404
 
-        if request.method == "GET":
-            try:
-                return Response(package_custom_metadata(doc))
-            except Exception as e:
-                logger.warning(f"An error occurred retrieving custom metadata: {e!s}")
-                return HttpResponseServerError(
-                    {
-                        "error": (
-                            "Error retrieving custom metadata,"
-                            " check logs for more detail."
-                        ),
-                    },
-                )
-        elif request.method == "POST":
-            try:
-                if request.user is not None and not has_perms_owner_aware(
-                    request.user,
-                    "change_document",
-                    doc,
-                ):
-                    return HttpResponseForbidden(
-                        "Insufficient permissions to create custom metadata",
-                    )
+    #     if request.method == "GET":
+    #         try:
+    #             return Response(package_custom_metadata(doc))
+    #         except Exception as e:
+    #             logger.warning(f"An error occurred retrieving custom metadata: {e!s}")
+    #             return HttpResponseServerError(
+    #                 {
+    #                     "error": (
+    #                         "Error retrieving custom metadata,"
+    #                         " check logs for more detail."
+    #                     ),
+    #                 },
+    #             )
+    #     elif request.method == "POST":
+    #         try:
+    #             if request.user is not None and not has_perms_owner_aware(
+    #                 request.user,
+    #                 "change_document",
+    #                 doc,
+    #             ):
+    #                 return HttpResponseForbidden(
+    #                     "Insufficient permissions to create custom metadata",
+    #                 )
 
-                CustomMetadata.from_json(doc, request.user, request.data)
+    #             CustomMetadata.from_json(doc, request.user, request.data)
 
-                doc.modified = timezone.now()
-                doc.save()
+    #             doc.modified = timezone.now()
+    #             doc.save()
 
-                from documents import index
+    #             from documents import index
 
-                index.add_or_update_document(self.get_object())
+    #             index.add_or_update_document(self.get_object())
 
-                return Response(package_custom_metadata(doc))
-            except Exception as e:
-                logger.warning(f"An error occurred saving custom metadata: {e!s}")
-                return HttpResponseServerError(
-                    {
-                        "error": (
-                            "Error saving custom metadata, "
-                            "check logs for more detail."
-                        ),
-                    },
-                )
-        elif request.method == "DELETE":
-            if request.user is not None and not has_perms_owner_aware(
-                request.user,
-                "change_document",
-                doc,
-            ):
-                return HttpResponseForbidden(
-                    "Insufficient permissions to delete custom metadata",
-                )
+    #             return Response(package_custom_metadata(doc))
+    #         except Exception as e:
+    #             logger.warning(f"An error occurred saving custom metadata: {e!s}")
+    #             return HttpResponseServerError(
+    #                 {
+    #                     "error": (
+    #                         "Error saving custom metadata, "
+    #                         "check logs for more detail."
+    #                     ),
+    #                 },
+    #             )
+    #     elif request.method == "DELETE":
+    #         if request.user is not None and not has_perms_owner_aware(
+    #             request.user,
+    #             "change_document",
+    #             doc,
+    #         ):
+    #             return HttpResponseForbidden(
+    #                 "Insufficient permissions to delete custom metadata",
+    #             )
 
-            metadata = CustomMetadata.objects.get(id=int(request.GET.get("id")))
-            metadata.delete()
+    #         metadata = CustomMetadata.objects.get(id=int(request.GET.get("id")))
+    #         metadata.delete()
 
-            doc.modified = timezone.now()
-            doc.save()
+    #         doc.modified = timezone.now()
+    #         doc.save()
 
-            from documents import index
+    #         from documents import index
 
-            index.add_or_update_document(self.get_object())
+    #         index.add_or_update_document(self.get_object())
 
-            return Response(package_custom_metadata(doc))
+    #         return Response(package_custom_metadata(doc))
 
-        return Response(
-            {"error": "unreachable error was reached for custom metadata"},
-        )  # pragma: no cover
+    #     return Response(
+    #         {"error": "unreachable error was reached for custom metadata"},
+    #     )  # pragma: no cover
 
 
 class SearchResultSerializer(DocumentSerializer, PassUserMixin):
@@ -1169,47 +1165,6 @@ class BulkDownloadView(GenericAPIView):
             )
 
             return response
-
-
-class RemoteVersionView(GenericAPIView):
-    def get(self, request, format=None):
-        remote_version = "0.0.0"
-        is_greater_than_current = False
-        current_version = packaging_version.parse(version.__full_version_str__)
-        try:
-            req = urllib.request.Request(
-                "https://api.github.com/repos/paperless-ngx/"
-                "paperless-ngx/releases/latest",
-            )
-            # Ensure a JSON response
-            req.add_header("Accept", "application/json")
-
-            with urllib.request.urlopen(req) as response:
-                remote = response.read().decode("utf-8")
-            try:
-                remote_json = json.loads(remote)
-                remote_version = remote_json["tag_name"]
-                # Basically PEP 616 but that only went in 3.9
-                if remote_version.startswith("ngx-"):
-                    remote_version = remote_version[len("ngx-") :]
-            except ValueError:
-                logger.debug("An error occurred parsing remote version json")
-        except urllib.error.URLError:
-            logger.debug("An error occurred checking for available updates")
-
-        is_greater_than_current = (
-            packaging_version.parse(
-                remote_version,
-            )
-            > current_version
-        )
-
-        return Response(
-            {
-                "version": remote_version,
-                "update_available": is_greater_than_current,
-            },
-        )
 
 
 class StoragePathViewSet(ModelViewSet, PassUserMixin):
