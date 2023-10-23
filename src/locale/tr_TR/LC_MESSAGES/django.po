@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-28 10:56-0700\n"
-"PO-Revision-Date: 2023-10-08 09:29\n"
+"PO-Revision-Date: 2023-10-23 12:52\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -441,7 +441,7 @@ msgstr "filtreleme kuralları"
 
 #: documents/models.py:581
 msgid "Task ID"
-msgstr ""
+msgstr "Görev kimliği"
 
 #: documents/models.py:582
 msgid "Celery ID for the Task that was run"
@@ -449,7 +449,7 @@ msgstr ""
 
 #: documents/models.py:587
 msgid "Acknowledged"
-msgstr ""
+msgstr "Onaylandı"
 
 #: documents/models.py:588
 msgid "If the task is acknowledged via the frontend or API"
@@ -457,7 +457,7 @@ msgstr ""
 
 #: documents/models.py:594
 msgid "Task Filename"
-msgstr ""
+msgstr "Görev dosya adı"
 
 #: documents/models.py:595
 msgid "Name of the file which the Task was run for"
@@ -465,7 +465,7 @@ msgstr ""
 
 #: documents/models.py:601
 msgid "Task Name"
-msgstr ""
+msgstr "Görev adı"
 
 #: documents/models.py:602
 msgid "Name of the Task which was run"
@@ -473,7 +473,7 @@ msgstr ""
 
 #: documents/models.py:609
 msgid "Task State"
-msgstr ""
+msgstr "Görev Durumu"
 
 #: documents/models.py:610
 msgid "Current state of the task being run"
@@ -481,7 +481,7 @@ msgstr ""
 
 #: documents/models.py:615
 msgid "Created DateTime"
-msgstr ""
+msgstr "Oluşturulan tarih saat"
 
 #: documents/models.py:616
 msgid "Datetime field when the task result was created in UTC"
@@ -489,7 +489,7 @@ msgstr ""
 
 #: documents/models.py:621
 msgid "Started DateTime"
-msgstr ""
+msgstr "Başlangıç saati zamanı"
 
 #: documents/models.py:622
 msgid "Datetime field when the task was started in UTC"
@@ -521,11 +521,11 @@ msgstr "kullanıcı"
 
 #: documents/models.py:676
 msgid "note"
-msgstr ""
+msgstr "not"
 
 #: documents/models.py:677
 msgid "notes"
-msgstr ""
+msgstr "notlar"
 
 #: documents/models.py:685
 msgid "Archive"
@@ -752,11 +752,11 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_confirm.html:61
 msgid "Change my password"
-msgstr ""
+msgstr "Parolamı değiştir"
 
 #: documents/templates/registration/password_reset_confirm.html:65
 msgid "request a new password reset"
-msgstr ""
+msgstr "yeni bir şifre değişikliği talebi oluşturun"
 
 #: documents/templates/registration/password_reset_done.html:14
 msgid "Paperless-ngx reset password sent"
@@ -764,7 +764,7 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_done.html:40
 msgid "Check your inbox."
-msgstr ""
+msgstr "Gelen kutunuzu kontrol edin."
 
 #: documents/templates/registration/password_reset_done.html:41
 msgid "We've emailed you instructions for setting your password. You should receive the email shortly!"
@@ -780,19 +780,19 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_form.html:44
 msgid "An error occurred. Please try again."
-msgstr ""
+msgstr "Bir hata oluştu. Lütfen tekrar deneyin."
 
 #: documents/templates/registration/password_reset_form.html:47
 msgid "Email"
-msgstr ""
+msgstr "E-posta"
 
 #: documents/templates/registration/password_reset_form.html:54
 msgid "Send me instructions!"
-msgstr ""
+msgstr "Talimatları gönder!"
 
 #: paperless/apps.py:10
 msgid "Paperless"
-msgstr ""
+msgstr "Paperless"
 
 #: paperless/settings.py:574
 msgid "English (US)"
@@ -800,11 +800,11 @@ msgstr "İngilizce (Birleşik Devletler)"
 
 #: paperless/settings.py:575
 msgid "Arabic"
-msgstr ""
+msgstr "Arapça"
 
 #: paperless/settings.py:576
 msgid "Afrikaans"
-msgstr ""
+msgstr "Afrika dili"
 
 #: paperless/settings.py:577
 msgid "Belarusian"
@@ -812,7 +812,7 @@ msgstr "Belarusça"
 
 #: paperless/settings.py:578
 msgid "Catalan"
-msgstr ""
+msgstr "Katalanca"
 
 #: paperless/settings.py:579
 msgid "Czech"
@@ -828,7 +828,7 @@ msgstr "Almanca"
 
 #: paperless/settings.py:582
 msgid "Greek"
-msgstr ""
+msgstr "Yunanca"
 
 #: paperless/settings.py:583
 msgid "English (GB)"
@@ -840,7 +840,7 @@ msgstr "İspanyolca"
 
 #: paperless/settings.py:585
 msgid "Finnish"
-msgstr ""
+msgstr "Fince"
 
 #: paperless/settings.py:586
 msgid "French"
@@ -856,7 +856,7 @@ msgstr "Lüksemburgca"
 
 #: paperless/settings.py:589
 msgid "Norwegian"
-msgstr ""
+msgstr "Norveçce"
 
 #: paperless/settings.py:590
 msgid "Dutch"
@@ -884,7 +884,7 @@ msgstr "Rusça"
 
 #: paperless/settings.py:596
 msgid "Slovak"
-msgstr ""
+msgstr "Slovakça"
 
 #: paperless/settings.py:597
 msgid "Slovenian"
@@ -904,7 +904,7 @@ msgstr "Türkçe"
 
 #: paperless/settings.py:601
 msgid "Ukrainian"
-msgstr ""
+msgstr "Ukraynaca"
 
 #: paperless/settings.py:602
 msgid "Chinese Simplified"
