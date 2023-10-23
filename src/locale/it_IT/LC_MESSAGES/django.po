@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-28 10:56-0700\n"
-"PO-Revision-Date: 2023-10-01 01:27\n"
+"PO-Revision-Date: 2023-10-23 17:47\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -772,23 +772,23 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_form.html:14
 msgid "Paperless-ngx reset password request"
-msgstr ""
+msgstr "Richiesta di reimpostazione password Paperless-ngx"
 
 #: documents/templates/registration/password_reset_form.html:41
 msgid "Enter your email address below, and we'll email instructions for setting a new one."
-msgstr ""
+msgstr "Inserisci il tuo indirizzo email qui sotto, e ti invieremo istruzioni per impostarne uno nuovo."
 
 #: documents/templates/registration/password_reset_form.html:44
 msgid "An error occurred. Please try again."
-msgstr ""
+msgstr "Si è verificato un errore. Si prega di riprovare."
 
 #: documents/templates/registration/password_reset_form.html:47
 msgid "Email"
-msgstr ""
+msgstr "Email"
 
 #: documents/templates/registration/password_reset_form.html:54
 msgid "Send me instructions!"
-msgstr ""
+msgstr "Inviami le istruzioni!"
 
 #: paperless/apps.py:10
 msgid "Paperless"
@@ -804,7 +804,7 @@ msgstr "Arabo"
 
 #: paperless/settings.py:576
 msgid "Afrikaans"
-msgstr ""
+msgstr "Africano"
 
 #: paperless/settings.py:577
 msgid "Belarusian"
@@ -812,7 +812,7 @@ msgstr "Bielorusso"
 
 #: paperless/settings.py:578
 msgid "Catalan"
-msgstr ""
+msgstr "Catalano"
 
 #: paperless/settings.py:579
 msgid "Czech"
@@ -828,7 +828,7 @@ msgstr "Tedesco"
 
 #: paperless/settings.py:582
 msgid "Greek"
-msgstr ""
+msgstr "Greco"
 
 #: paperless/settings.py:583
 msgid "English (GB)"
@@ -840,7 +840,7 @@ msgstr "Spagnolo"
 
 #: paperless/settings.py:585
 msgid "Finnish"
-msgstr ""
+msgstr "Finlandese"
 
 #: paperless/settings.py:586
 msgid "French"
@@ -856,7 +856,7 @@ msgstr "Lussemburghese"
 
 #: paperless/settings.py:589
 msgid "Norwegian"
-msgstr ""
+msgstr "Norvegese"
 
 #: paperless/settings.py:590
 msgid "Dutch"
@@ -884,7 +884,7 @@ msgstr "Russo"
 
 #: paperless/settings.py:596
 msgid "Slovak"
-msgstr ""
+msgstr "Slovacco"
 
 #: paperless/settings.py:597
 msgid "Slovenian"
@@ -904,7 +904,7 @@ msgstr "Turco"
 
 #: paperless/settings.py:601
 msgid "Ukrainian"
-msgstr ""
+msgstr "Ucraino"
 
 #: paperless/settings.py:602
 msgid "Chinese Simplified"
