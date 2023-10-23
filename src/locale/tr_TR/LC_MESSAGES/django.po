@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-28 10:56-0700\n"
-"PO-Revision-Date: 2023-10-23 12:52\n"
+"PO-Revision-Date: 2023-10-23 14:40\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -409,7 +409,7 @@ msgstr ""
 
 #: documents/models.py:451
 msgid "owner is"
-msgstr ""
+msgstr "sahibi"
 
 #: documents/models.py:452
 msgid "has owner in"
@@ -529,15 +529,15 @@ msgstr "notlar"
 
 #: documents/models.py:685
 msgid "Archive"
-msgstr ""
+msgstr "Arşiv"
 
 #: documents/models.py:686
 msgid "Original"
-msgstr ""
+msgstr "Orjinal"
 
 #: documents/models.py:697
 msgid "expiration"
-msgstr ""
+msgstr "süre sonu"
 
 #: documents/models.py:704
 msgid "slug"
@@ -545,11 +545,11 @@ msgstr ""
 
 #: documents/models.py:736
 msgid "share link"
-msgstr ""
+msgstr "bağlantıyı paylaş"
 
 #: documents/models.py:737
 msgid "share links"
-msgstr ""
+msgstr "bağlantıları paylaş"
 
 #: documents/models.py:745
 msgid "Consume Folder"
@@ -577,7 +577,7 @@ msgstr ""
 
 #: documents/models.py:772
 msgid "filter filename"
-msgstr ""
+msgstr "dosya adı ara"
 
 #: documents/models.py:777 paperless_mail/models.py:148
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
@@ -589,7 +589,7 @@ msgstr ""
 
 #: documents/models.py:792
 msgid "assign title"
-msgstr ""
+msgstr "başlık at"
 
 #: documents/models.py:797
 msgid "Assign a document title, can include some placeholders, see documentation."
