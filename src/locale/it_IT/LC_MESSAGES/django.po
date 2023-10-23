@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-28 10:56-0700\n"
-"PO-Revision-Date: 2023-10-23 17:47\n"
+"PO-Revision-Date: 2023-10-23 18:44\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -996,7 +996,7 @@ msgstr "password"
 
 #: paperless_mail/models.py:42
 msgid "Is token authentication"
-msgstr ""
+msgstr "L'autenticazione è con token"
 
 #: paperless_mail/models.py:45
 msgid "character set"
@@ -1060,7 +1060,7 @@ msgstr "Usa il nome dell'allegato come titolo"
 
 #: paperless_mail/models.py:85
 msgid "Do not assign title from rule"
-msgstr ""
+msgstr "Non assegnare il titolo dalla regola"
 
 #: paperless_mail/models.py:88
 msgid "Do not assign a correspondent"
@@ -1096,7 +1096,7 @@ msgstr "filtra da"
 
 #: paperless_mail/models.py:122
 msgid "filter to"
-msgstr ""
+msgstr "filtra a"
 
 #: paperless_mail/models.py:129
 msgid "filter subject"
