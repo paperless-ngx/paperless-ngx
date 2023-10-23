@@ -290,6 +290,7 @@ INSTALLED_APPS = [
     "django_filters",
     "django_celery_results",
     "guardian",
+    "auditlog",
     *env_apps,
 ]
 
@@ -326,6 +327,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "auditlog.middleware.AuditlogMiddleware",
 ]
 
 # Optional to enable compression

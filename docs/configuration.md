@@ -1140,7 +1140,10 @@ combination with PAPERLESS_CONSUMER_BARCODE_UPSCALE bigger than 1.0.
 
 #### [`PAPERLESS_AUDIT_ENABLED=<bool>`](#PAPERLESS_AUDIT_ENABLED){PAPERLESS_AUDIT_ENABLED}
 
-: Enables an audit trail for each document,document type, correspondent, and tag. This records all changes made to the documents to meet requirement such as GoDB. **Once enabled cannot be disabled!!**
+: Enables an audit trail for each document,document type, correspondent, and tag. This records all changes made to the documents to make the changes traceable.
+
+!!! note Warning
+Once enabled cannot be disabled
 
 ## Collate Double-Sided Documents {#collate}
 
