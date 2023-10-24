@@ -527,7 +527,6 @@ class DocumentViewSet(
                 # If audit log is enabled make an entry in the log
                 # about this note change
                 if settings.AUDIT_LOG_ENABLED:
-                    timezone.now()
                     LogEntry.objects.log_create(
                         instance=doc,
                         changes=json.dumps(
@@ -563,7 +562,6 @@ class DocumentViewSet(
 
             note = Note.objects.get(id=int(request.GET.get("id")))
             if settings.AUDIT_LOG_ENABLED:
-                timezone.now()
                 LogEntry.objects.log_create(
                     instance=doc,
                     changes=json.dumps(
