@@ -936,17 +936,17 @@ TIKA_GOTENBERG_ENDPOINT = os.getenv(
 if TIKA_ENABLED:
     INSTALLED_APPS.append("paperless_tika.apps.PaperlessTikaConfig")
 
-AUDIT_ENABLED = __get_boolean("PAPERLESS_AUDIT_ENABLED", "NO")
-if AUDIT_ENABLED:
+AUDIT_LOG_ENABLED = __get_boolean("PAPERLESS_AUDIT_LOG_ENABLED", "NO")
+if AUDIT_LOG_ENABLED:
     INSTALLED_APPS.append("auditlog")
     MIDDLEWARE.append("auditlog.middleware.AuditlogMiddleware")
 db_conn = connections["default"]
 
 all_tables = db_conn.introspection.table_names()
 
-if ("auditlog_logentry" in all_tables) and not (AUDIT_ENABLED):
+if ("auditlog_logentry" in all_tables) and not (AUDIT_LOG_ENABLED):
     raise ImproperlyConfigured(
-        "auditlog table was found but PAPERLESS_AUDIT_ENABLED is not active.",
+        "auditlog table was found but PAPERLESS_AUDIT_LOG_ENABLED is not active.",
     )
 
 

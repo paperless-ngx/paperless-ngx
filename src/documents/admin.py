@@ -13,7 +13,7 @@ from documents.models import ShareLink
 from documents.models import StoragePath
 from documents.models import Tag
 
-if settings.AUDIT_ENABLED:
+if settings.AUDIT_LOG_ENABLED:
     from auditlog.admin import LogEntryAdmin
     from auditlog.models import LogEntry
 
@@ -154,7 +154,7 @@ admin.site.register(PaperlessTask, TaskAdmin)
 admin.site.register(Note, NotesAdmin)
 admin.site.register(ShareLink, ShareLinksAdmin)
 
-if settings.AUDIT_ENABLED:
+if settings.AUDIT_LOG_ENABLED:
 
     class LogEntryAUDIT(LogEntryAdmin):
         def has_delete_permission(self, request, obj=None):

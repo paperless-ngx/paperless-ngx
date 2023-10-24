@@ -115,7 +115,7 @@ from paperless import version
 from paperless.db import GnuPG
 from paperless.views import StandardPagination
 
-if settings.AUDIT_ENABLED:
+if settings.AUDIT_LOG_ENABLED:
     from auditlog.models import LogEntry
 
 logger = logging.getLogger("paperless.api")
@@ -526,7 +526,7 @@ class DocumentViewSet(
                 c.save()
                 # If audit log is enabled make an entry in the log
                 # about this note change
-                if settings.AUDIT_ENABLED:
+                if settings.AUDIT_LOG_ENABLED:
                     timezone.now()
                     LogEntry.objects.log_create(
                         instance=doc,
@@ -562,7 +562,7 @@ class DocumentViewSet(
                 return HttpResponseForbidden("Insufficient permissions to delete")
 
             note = Note.objects.get(id=int(request.GET.get("id")))
-            if settings.AUDIT_ENABLED:
+            if settings.AUDIT_LOG_ENABLED:
                 timezone.now()
                 LogEntry.objects.log_create(
                     instance=doc,

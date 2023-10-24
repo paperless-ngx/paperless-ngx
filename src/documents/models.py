@@ -20,7 +20,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from multiselectfield import MultiSelectField
 
-if settings.AUDIT_ENABLED:
+if settings.AUDIT_LOG_ENABLED:
     from auditlog.registry import auditlog
 
 from documents.data_models import DocumentSource
@@ -877,7 +877,7 @@ class ConsumptionTemplate(models.Model):
         return f"{self.name}"
 
 
-if settings.AUDIT_ENABLED:
+if settings.AUDIT_LOG_ENABLED:
     auditlog.register(Document, m2m_fields={"tags"})
     auditlog.register(Correspondent)
     auditlog.register(Tag)
