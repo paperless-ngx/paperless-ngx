@@ -1142,7 +1142,7 @@ combination with PAPERLESS_CONSUMER_BARCODE_UPSCALE bigger than 1.0.
 
 : Enables an audit trail for documents, document types, correspondents, and tags. Log entries can be viewed in the Django backend only.
 
-    !!! note Warning
+    !!! warning
     Once enabled cannot be disabled
 
 ## Collate Double-Sided Documents {#collate}
