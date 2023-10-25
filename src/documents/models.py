@@ -920,7 +920,7 @@ class CustomField(models.Model):
         return f"{self.name} : {self.data_type}"
 
 
-class CustomFieldInstance(models.Model):
+class CustomFieldInstance(ModelWithOwner):
     """
     A single instance of a field, attached to a CustomField for the name and type
     and attached to a single Document to be metadata for it

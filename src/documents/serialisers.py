@@ -21,6 +21,8 @@ from documents import bulk_edit
 from documents.data_models import DocumentSource
 from documents.models import ConsumptionTemplate
 from documents.models import Correspondent
+from documents.models import CustomField
+from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import MatchingModel
@@ -1090,3 +1092,13 @@ class ConsumptionTemplateSerializer(serializers.ModelSerializer):
             )
 
         return attrs
+
+
+class CustomFieldSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomField
+
+
+class CustomFieldInstanceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomFieldInstance
