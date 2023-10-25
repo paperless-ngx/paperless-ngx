@@ -32,7 +32,7 @@ except ImportError:  # pragma: nocover
 logger = logging.getLogger("paperless.management.consumer")
 
 
-def _tags_from_path(filepath) -> set[Tag]:
+def _tags_from_path(filepath) -> list[int]:
     """
     Walk up the directory tree from filepath to CONSUMPTION_DIR
     and get or create Tag IDs for every directory.
@@ -47,7 +47,7 @@ def _tags_from_path(filepath) -> set[Tag]:
             Tag.objects.get_or_create(name__iexact=part, defaults={"name": part})[0].pk,
         )
 
-    return tag_ids
+    return list(tag_ids)
 
 
 def _is_ignored(filepath: str) -> bool:
