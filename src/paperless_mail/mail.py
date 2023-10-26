@@ -8,6 +8,7 @@ import traceback
 from datetime import date
 from datetime import timedelta
 from fnmatch import fnmatch
+from typing import Optional
 from typing import Union
 
 import magic
@@ -21,6 +22,7 @@ from django.utils.timezone import is_naive
 from django.utils.timezone import make_aware
 from imap_tools import AND
 from imap_tools import NOT
+from imap_tools import MailAttachment
 from imap_tools import MailBox
 from imap_tools import MailboxFolderSelectError
 from imap_tools import MailBoxUnencrypted
@@ -422,14 +424,19 @@ class MailAccountHandler(LoggingMixin):
 
     logging_name = "paperless_mail"
 
-    def _correspondent_from_name(self, name):
+    def _correspondent_from_name(self, name: str) -> Optional[Correspondent]:
         try:
             return Correspondent.objects.get_or_create(name=name)[0]
         except DatabaseError as e:
             self.log.error(f"Error while retrieving correspondent {name}: {e}")
             return None
 
-    def _get_title(self, message, att, rule):
+    def _get_title(
+        self,
+        message: MailMessage,
+        att: MailAttachment,
+        rule: MailRule,
+    ) -> Optional[str]:
         if rule.assign_title_from == MailRule.TitleSource.FROM_SUBJECT:
             return message.subject
 
@@ -444,7 +451,11 @@ class MailAccountHandler(LoggingMixin):
                 "Unknown title selector.",
             )  # pragma: nocover
 
-    def _get_correspondent(self, message: MailMessage, rule):
+    def _get_correspondent(
+        self,
+        message: MailMessage,
+        rule: MailRule,
+    ) -> Optional[Correspondent]:
         c_from = rule.assign_correspondent_from
 
         if c_from == MailRule.CorrespondentSource.FROM_NOTHING:
@@ -606,7 +617,6 @@ class MailAccountHandler(LoggingMixin):
             f"{len(message.attachments)} attachment(s)",
         )
 
-        correspondent = self._get_correspondent(message, rule)
         tag_ids = [tag.id for tag in rule.assign_tags.all()]
         doc_type = rule.assign_document_type
 
@@ -617,7 +627,6 @@ class MailAccountHandler(LoggingMixin):
             processed_elements += self._process_eml(
                 message,
                 rule,
-                correspondent,
                 tag_ids,
                 doc_type,
             )
@@ -629,7 +638,6 @@ class MailAccountHandler(LoggingMixin):
             processed_elements += self._process_attachments(
                 message,
                 rule,
-                correspondent,
                 tag_ids,
                 doc_type,
             )
@@ -640,7 +648,6 @@ class MailAccountHandler(LoggingMixin):
         self,
         message: MailMessage,
         rule: MailRule,
-        correspondent,
         tag_ids,
         doc_type,
     ):
@@ -668,6 +675,8 @@ class MailAccountHandler(LoggingMixin):
                 # Force the filename and pattern to the lowercase
                 # as this is system dependent otherwise
                 continue
+
+            correspondent = self._get_correspondent(message, rule)
 
             title = self._get_title(message, att, rule)
 
@@ -750,7 +759,6 @@ class MailAccountHandler(LoggingMixin):
         self,
         message: MailMessage,
         rule: MailRule,
-        correspondent,
         tag_ids,
         doc_type,
     ):
@@ -780,6 +788,8 @@ class MailAccountHandler(LoggingMixin):
                 message.obj._headers = new_headers
 
             f.write(message.obj.as_bytes())
+
+        correspondent = self._get_correspondent(message, rule)
 
         self.log.info(
             f"Rule {rule}: "
