@@ -895,6 +895,7 @@ class CustomField(models.Model):
         URL = ("url", _("URL"))
         DATE = ("date", _("Date"))
         BOOL = ("boolean"), _("Boolean")
+        INT = ("integer", _("Integer"))
 
     created = models.DateTimeField(
         _("created"),
@@ -908,7 +909,6 @@ class CustomField(models.Model):
         _("data type"),
         max_length=50,
         choices=FieldDataType.choices,
-        default=FieldDataType.STRING,
     )
 
     class Meta:
@@ -969,6 +969,8 @@ class CustomFieldInstance(ModelWithOwner):
             return self.date.value
         elif self.field.data_type == CustomField.FieldDataType.BOOL:
             return self.boolean.value
+        elif self.field.data_type == CustomField.FieldDataType.INT:
+            return self.integer.value
         raise NotImplementedError(self.field.data_type)
 
     @property
@@ -984,6 +986,8 @@ class CustomFieldInstance(ModelWithOwner):
             return CustomFieldDate
         elif self.field.data_type == CustomField.FieldDataType.BOOL:
             return CustomFieldBoolean
+        elif self.field.data_type == CustomField.FieldDataType.INT:
+            return CustomFieldInteger
         raise NotImplementedError(self.field.data_type)
 
     def to_json(self) -> dict[str, str]:
@@ -1072,6 +1076,23 @@ class CustomFieldDate(models.Model):
         CustomFieldInstance,
         on_delete=models.CASCADE,
         related_name="date",
+        parent_link=True,
+    )
+
+    def __str__(self) -> str:
+        return f"{self.value}"
+
+
+class CustomFieldInteger(models.Model):
+    """
+    Data storage for a date custom field
+    """
+
+    value = models.IntegerField()
+    parent = models.OneToOneField(
+        CustomFieldInstance,
+        on_delete=models.CASCADE,
+        related_name="integer",
         parent_link=True,
     )
 

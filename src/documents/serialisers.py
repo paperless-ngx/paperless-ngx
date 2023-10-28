@@ -396,6 +396,40 @@ class StoragePathField(serializers.PrimaryKeyRelatedField):
         return StoragePath.objects.all()
 
 
+class CustomFieldSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomField
+        fields = [
+            "id",
+            "name",
+            "data_type",
+        ]
+
+
+class CustomFieldInstanceSerializer(serializers.ModelSerializer):
+    parent = CustomFieldSerializer()
+    value = SerializerMethodField()
+
+    def get_value(self, obj: CustomFieldInstance):
+        return obj.value
+
+    def create(self, validated_data):
+        parent_data = validated_data.pop("parent")
+        parent = CustomField.objects.get(id=parent_data["id"])
+        instance = CustomFieldInstance.objects.create(parent=parent)
+        return instance
+
+    def update(self, instance: CustomFieldInstance):
+        return instance
+
+    class Meta:
+        model = CustomFieldInstance
+        fields = [
+            "parent",
+            "value",
+        ]
+
+
 class DocumentSerializer(OwnedObjectSerializer, DynamicFieldsModelSerializer):
     correspondent = CorrespondentField(allow_null=True)
     tags = TagsField(many=True)
@@ -405,6 +439,8 @@ class DocumentSerializer(OwnedObjectSerializer, DynamicFieldsModelSerializer):
     original_file_name = SerializerMethodField()
     archived_file_name = SerializerMethodField()
     created_date = serializers.DateField(required=False)
+
+    custom_fields = CustomFieldInstanceSerializer(many=True, allow_null=True)
 
     owner = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(),
@@ -468,6 +504,7 @@ class DocumentSerializer(OwnedObjectSerializer, DynamicFieldsModelSerializer):
             "user_can_change",
             "set_permissions",
             "notes",
+            "custom_fields",
         )
 
 
@@ -1092,13 +1129,3 @@ class ConsumptionTemplateSerializer(serializers.ModelSerializer):
             )
 
         return attrs
-
-
-class CustomFieldSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CustomField
-
-
-class CustomFieldInstanceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CustomFieldInstance

@@ -624,100 +624,6 @@ class DocumentViewSet(
             ]
             return Response(links)
 
-    # @action(methods=["get", "post", "delete"], detail=True)
-    # def custom_metadata(self, request, pk=None) -> Response:
-    #     def package_custom_metadata(doc: Document):
-    #         return [
-    #             c.to_json()
-    #             for c in CustomMetadata.objects.filter(document=doc).order_by(
-    #                 "-created",
-    #             )
-    #         ]
-
-    #     request.user = request.user
-    #     try:
-    #         doc = Document.objects.get(pk=pk)
-    #         if request.user is not None and not has_perms_owner_aware(
-    #             request.user,
-    #             "view_document",
-    #             doc,
-    #         ):
-    #             return HttpResponseForbidden(
-    #                 "Insufficient permissions to view custom metadata",
-    #             )
-    #     except Document.DoesNotExist:
-    #         raise Http404
-
-    #     if request.method == "GET":
-    #         try:
-    #             return Response(package_custom_metadata(doc))
-    #         except Exception as e:
-    #             logger.warning(f"An error occurred retrieving custom metadata: {e!s}")
-    #             return HttpResponseServerError(
-    #                 {
-    #                     "error": (
-    #                         "Error retrieving custom metadata,"
-    #                         " check logs for more detail."
-    #                     ),
-    #                 },
-    #             )
-    #     elif request.method == "POST":
-    #         try:
-    #             if request.user is not None and not has_perms_owner_aware(
-    #                 request.user,
-    #                 "change_document",
-    #                 doc,
-    #             ):
-    #                 return HttpResponseForbidden(
-    #                     "Insufficient permissions to create custom metadata",
-    #                 )
-
-    #             CustomMetadata.from_json(doc, request.user, request.data)
-
-    #             doc.modified = timezone.now()
-    #             doc.save()
-
-    #             from documents import index
-
-    #             index.add_or_update_document(self.get_object())
-
-    #             return Response(package_custom_metadata(doc))
-    #         except Exception as e:
-    #             logger.warning(f"An error occurred saving custom metadata: {e!s}")
-    #             return HttpResponseServerError(
-    #                 {
-    #                     "error": (
-    #                         "Error saving custom metadata, "
-    #                         "check logs for more detail."
-    #                     ),
-    #                 },
-    #             )
-    #     elif request.method == "DELETE":
-    #         if request.user is not None and not has_perms_owner_aware(
-    #             request.user,
-    #             "change_document",
-    #             doc,
-    #         ):
-    #             return HttpResponseForbidden(
-    #                 "Insufficient permissions to delete custom metadata",
-    #             )
-
-    #         metadata = CustomMetadata.objects.get(id=int(request.GET.get("id")))
-    #         metadata.delete()
-
-    #         doc.modified = timezone.now()
-    #         doc.save()
-
-    #         from documents import index
-
-    #         index.add_or_update_document(self.get_object())
-
-    #         return Response(package_custom_metadata(doc))
-
-    #     return Response(
-    #         {"error": "unreachable error was reached for custom metadata"},
-    #     )  # pragma: no cover
-
 
 class SearchResultSerializer(DocumentSerializer, PassUserMixin):
     def to_representation(self, instance):
@@ -1441,7 +1347,7 @@ class ConsumptionTemplateViewSet(ModelViewSet):
 
     model = ConsumptionTemplate
 
-    queryset = ConsumptionTemplate.objects.all().order_by("order")
+    queryset = ConsumptionTemplate.objects.all().order_by("name")
 
 
 class CustomFieldViewSet(ModelViewSet):
