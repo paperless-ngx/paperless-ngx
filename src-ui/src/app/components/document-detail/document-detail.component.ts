@@ -393,28 +393,29 @@ export class DocumentDetailComponent
   updateComponent(doc: PaperlessDocument) {
     this.document = doc
     this.requiresPassword = false
-    this.customFieldsService
-      .getFields(doc.id)
-      .pipe(first())
-      .subscribe({
-        next: (fields) => {
-          this.customFields = fields
-          this.customFields.forEach((field) => {
-            this.documentForm.addControl(
-              `custom-field-${field.id}`,
-              new FormControl(field.data)
-            )
-          })
-          this.store.next(this.documentForm.value)
-          console.log(fields)
-        },
-        error: (error) => {
-          this.toastService.showError(
-            $localize`Error retrieving custom fields`,
-            error
-          )
-        },
-      })
+    // TODO: Custom fields
+    // this.customFieldsService
+    //   .getFields(doc.id)
+    //   .pipe(first())
+    //   .subscribe({
+    //     next: (fields) => {
+    //       this.customFields = fields
+    //       this.customFields.forEach((field) => {
+    //         this.documentForm.addControl(
+    //           `custom-field-${field.id}`,
+    //           new FormControl(field.data)
+    //         )
+    //       })
+    //       this.store.next(this.documentForm.value)
+    //       console.log(fields)
+    //     },
+    //     error: (error) => {
+    //       this.toastService.showError(
+    //         $localize`Error retrieving custom fields`,
+    //         error
+    //       )
+    //     },
+    //   })
     this.documentsService
       .getMetadata(doc.id)
       .pipe(first())
@@ -541,11 +542,12 @@ export class DocumentDetailComponent
           }
           this.title = doc.title
           this.documentForm.patchValue(doc)
-          this.customFields.forEach((field) => {
-            this.documentForm
-              .get(`custom-field-${field.id}`)
-              .patchValue(field.data)
-          })
+          // TODO: custom field reset
+          // this.customFields.forEach((field) => {
+          //   this.documentForm
+          //     .get(`custom-field-${field.id}`)
+          //     .patchValue(field.data)
+          // })
           this.openDocumentService.setDirty(doc, false)
         },
         error: () => {

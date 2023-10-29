@@ -4,13 +4,35 @@ export enum PaperlessCustomFieldDataType {
   String = 'string',
   Url = 'url',
   Date = 'date',
+  Boolean = 'boolean',
+  Integer = 'integer',
 }
 
+export const DATA_TYPE_LABELS = [
+  {
+    id: PaperlessCustomFieldDataType.Boolean,
+    name: $localize`Boolean`,
+  },
+  {
+    id: PaperlessCustomFieldDataType.Date,
+    name: $localize`Date`,
+  },
+  {
+    id: PaperlessCustomFieldDataType.Integer,
+    name: $localize`Number`,
+  },
+  {
+    id: PaperlessCustomFieldDataType.String,
+    name: $localize`String`,
+  },
+  {
+    id: PaperlessCustomFieldDataType.Url,
+    name: $localize`Url`,
+  },
+]
+
 export interface PaperlessCustomField extends ObjectWithId {
-  type: PaperlessCustomFieldDataType
+  data_type: PaperlessCustomFieldDataType
   name: string
-  data: any
-  document: number // PaperlessDocument
   created?: Date
-  user: number // PaperlessUser
 }

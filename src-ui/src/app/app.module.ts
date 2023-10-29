@@ -101,6 +101,8 @@ import { MailComponent } from './components/manage/mail/mail.component'
 import { UsersAndGroupsComponent } from './components/admin/users-groups/users-groups.component'
 import { DragDropModule } from '@angular/cdk/drag-drop'
 import { FileDropComponent } from './components/file-drop/file-drop.component'
+import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
+import { CustomFieldEditDialogComponent } from './components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 
 import localeAf from '@angular/common/locales/af'
 import localeAr from '@angular/common/locales/ar'
@@ -246,6 +248,8 @@ function initializeApp(settings: SettingsService) {
     MailComponent,
     UsersAndGroupsComponent,
     FileDropComponent,
+    CustomFieldsComponent,
+    CustomFieldEditDialogComponent,
   ],
   imports: [
     BrowserModule,

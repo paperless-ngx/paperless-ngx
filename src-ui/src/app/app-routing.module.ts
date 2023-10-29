@@ -24,6 +24,7 @@ import {
 import { ConsumptionTemplatesComponent } from './components/manage/consumption-templates/consumption-templates.component'
 import { MailComponent } from './components/manage/mail/mail.component'
 import { UsersAndGroupsComponent } from './components/admin/users-groups/users-groups.component'
+import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -186,6 +187,17 @@ export const routes: Routes = [
           requiredPermission: {
             action: PermissionAction.View,
             type: PermissionType.PaperlessTask,
+          },
+        },
+      },
+      {
+        path: 'customfields',
+        component: CustomFieldsComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.CustomField,
           },
         },
       },

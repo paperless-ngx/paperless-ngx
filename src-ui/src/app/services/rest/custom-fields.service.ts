@@ -9,24 +9,24 @@ import { PaperlessCustomField } from 'src/app/data/paperless-custom-field'
 })
 export class CustomFieldsService extends AbstractPaperlessService<PaperlessCustomField> {
   constructor(http: HttpClient) {
-    super(http, 'documents')
+    super(http, 'custom_fields')
   }
 
-  getFields(documentId: number): Observable<PaperlessCustomField[]> {
-    return this.http.get<PaperlessCustomField[]>(
-      this.getResourceUrl(documentId, 'custom_metadata')
-    )
-  }
+  // getFields(documentId: number): Observable<PaperlessCustomField[]> {
+  //   return this.http.get<PaperlessCustomField[]>(
+  //     this.getResourceUrl(documentId, 'custom_fields')
+  //   )
+  // }
 
-  addField(
-    documentId: number,
-    field: PaperlessCustomField
-  ): Observable<PaperlessCustomField[]> {
-    return this.http.post<PaperlessCustomField[]>(
-      this.getResourceUrl(documentId, 'custom_metadata'),
-      field
-    )
-  }
+  // addField(
+  //   documentId: number,
+  //   field: PaperlessCustomField
+  // ): Observable<PaperlessCustomField[]> {
+  //   return this.http.post<PaperlessCustomField[]>(
+  //     this.getResourceUrl(documentId, 'custom_fields'),
+  //     field
+  //   )
+  // }
 
   // deleteField(
   //   documentId: number,
