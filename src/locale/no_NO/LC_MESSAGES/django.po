@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-28 10:56-0700\n"
-"PO-Revision-Date: 2023-10-29 19:14\n"
+"PO-Revision-Date: 2023-10-29 20:09\n"
 "Last-Translator: \n"
 "Language-Team: Norwegian\n"
 "Language: no_NO\n"
@@ -197,7 +197,7 @@ msgstr "opprinnelig filnavn"
 
 #: documents/models.py:253
 msgid "The original name of the file when it was uploaded"
-msgstr "Det opprinnelige filnavnet da den ble lastet opp"
+msgstr "Filens opprinnelige filnavn ved opplasting"
 
 #: documents/models.py:260
 msgid "archive serial number"
@@ -557,11 +557,11 @@ msgstr ""
 
 #: documents/models.py:746
 msgid "Api Upload"
-msgstr ""
+msgstr "API-opplasting"
 
 #: documents/models.py:747
 msgid "Mail Fetch"
-msgstr ""
+msgstr "Epost-henting"
 
 #: documents/models.py:751 paperless_mail/models.py:95
 msgid "order"
@@ -569,15 +569,15 @@ msgstr "ordre"
 
 #: documents/models.py:760
 msgid "filter path"
-msgstr ""
+msgstr "filtrer sti"
 
 #: documents/models.py:765
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
-msgstr ""
+msgstr "Bare last inn dokumenter med en sti som samsvarer med dette hvis angitt. Jokertegn angitt som * er tillatt. Saker er usensitive."
 
 #: documents/models.py:772
 msgid "filter filename"
-msgstr ""
+msgstr "filtrer filnavn"
 
 #: documents/models.py:777 paperless_mail/models.py:148
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
@@ -585,15 +585,15 @@ msgstr "Bare bruke dokumenter som samsvarer med dette filnavnet hvis angitt. Jok
 
 #: documents/models.py:788
 msgid "filter documents from this mail rule"
-msgstr ""
+msgstr "filtrere dokumenter fra denne epostregelen"
 
 #: documents/models.py:792
 msgid "assign title"
-msgstr ""
+msgstr "tildel tittel"
 
 #: documents/models.py:797
 msgid "Assign a document title, can include some placeholders, see documentation."
-msgstr ""
+msgstr "Tilordne en dokumenttittel, kan inkludere noen plassholdere, se dokumentasjon."
 
 #: documents/models.py:805 paperless_mail/models.py:204
 msgid "assign this tag"
@@ -609,35 +609,35 @@ msgstr "Tildel denne korrespondenten"
 
 #: documents/models.py:829
 msgid "assign this storage path"
-msgstr ""
+msgstr "tilordne denne lagringsstien"
 
 #: documents/models.py:838
 msgid "assign this owner"
-msgstr ""
+msgstr "tilordne denne eieren"
 
 #: documents/models.py:845
 msgid "grant view permissions to these users"
-msgstr ""
+msgstr "gir lesetilgang til disse brukerne"
 
 #: documents/models.py:852
 msgid "grant view permissions to these groups"
-msgstr ""
+msgstr "gi lesetilgang til disse brukerne"
 
 #: documents/models.py:859
 msgid "grant change permissions to these users"
-msgstr ""
+msgstr "gir skrivetilgang til disse brukerne"
 
 #: documents/models.py:866
 msgid "grant change permissions to these groups"
-msgstr ""
+msgstr "gi skrivetilgang til disse gruppene"
 
 #: documents/models.py:870
 msgid "consumption template"
-msgstr ""
+msgstr "forbruksmal"
 
 #: documents/models.py:871
 msgid "consumption templates"
-msgstr ""
+msgstr "forbruksmaler"
 
 #: documents/serialisers.py:98
 #, python-format
@@ -695,7 +695,7 @@ msgstr "Ditt brukernavn og passord stemte ikke. Prøv på nytt."
 
 #: documents/templates/registration/login.html:48
 msgid "Share link was not found."
-msgstr ""
+msgstr "Delingskobling ble ikke funnet."
 
 #: documents/templates/registration/login.html:52
 msgid "Share link has expired."
@@ -715,48 +715,48 @@ msgstr "Logg inn"
 
 #: documents/templates/registration/login.html:70
 msgid "Forgot your password?"
-msgstr ""
+msgstr "Glemt passord?"
 
 #: documents/templates/registration/password_reset_complete.html:14
 msgid "Paperless-ngx reset password complete"
-msgstr ""
+msgstr "Paperless-ngx tilbakestilling passord fullført"
 
 #: documents/templates/registration/password_reset_complete.html:40
 msgid "Password reset complete."
-msgstr ""
+msgstr "Tilbakestilling av passord fullført."
 
 #: documents/templates/registration/password_reset_complete.html:42
 #, python-format
 msgid "Your new password has been set. You can now <a href=\"%(login_url)s\">log in</a>"
-msgstr ""
+msgstr "Ditt nye passord er satt. Du kan nå <a href=\"%(login_url)s\">logge inn</a>"
 
 #: documents/templates/registration/password_reset_confirm.html:14
 msgid "Paperless-ngx reset password confirmation"
-msgstr ""
+msgstr "Paperless-ngx tilbakestilling av passord bekreftet"
 
 #: documents/templates/registration/password_reset_confirm.html:42
 msgid "Set a new password."
-msgstr ""
+msgstr "Angi et nytt passord."
 
 #: documents/templates/registration/password_reset_confirm.html:46
 msgid "Passwords did not match or too weak. Try again."
-msgstr ""
+msgstr "Passordene samsvarte ikke eller er for svake. Prøv igjen."
 
 #: documents/templates/registration/password_reset_confirm.html:49
 msgid "New Password"
-msgstr ""
+msgstr "Nytt passord"
 
 #: documents/templates/registration/password_reset_confirm.html:50
 msgid "Confirm Password"
-msgstr ""
+msgstr "Bekreft passord"
 
 #: documents/templates/registration/password_reset_confirm.html:61
 msgid "Change my password"
-msgstr ""
+msgstr "Endre passord"
 
 #: documents/templates/registration/password_reset_confirm.html:65
 msgid "request a new password reset"
-msgstr ""
+msgstr "be om tilbakestilling av passord"
 
 #: documents/templates/registration/password_reset_done.html:14
 msgid "Paperless-ngx reset password sent"
@@ -764,31 +764,31 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_done.html:40
 msgid "Check your inbox."
-msgstr ""
+msgstr "Sjekk innboksen din."
 
 #: documents/templates/registration/password_reset_done.html:41
 msgid "We've emailed you instructions for setting your password. You should receive the email shortly!"
-msgstr ""
+msgstr "Vi har sendt deg instruksjoner for å sette ditt passord. Du burde snart motta en e-post!"
 
 #: documents/templates/registration/password_reset_form.html:14
 msgid "Paperless-ngx reset password request"
-msgstr ""
+msgstr "Paperless-ngx forespørsel om tilbakestilling av passord"
 
 #: documents/templates/registration/password_reset_form.html:41
 msgid "Enter your email address below, and we'll email instructions for setting a new one."
-msgstr ""
+msgstr "Skriv inn e-postadressen din nedenfor, og du vil motta en e-post med instruksjoner for å angi et nytt."
 
 #: documents/templates/registration/password_reset_form.html:44
 msgid "An error occurred. Please try again."
-msgstr ""
+msgstr "En feil oppstod. Vennligst prøv på nytt."
 
 #: documents/templates/registration/password_reset_form.html:47
 msgid "Email"
-msgstr ""
+msgstr "E-post"
 
 #: documents/templates/registration/password_reset_form.html:54
 msgid "Send me instructions!"
-msgstr ""
+msgstr "Send meg instruksjoner!"
 
 #: paperless/apps.py:10
 msgid "Paperless"
@@ -804,7 +804,7 @@ msgstr "Arabisk"
 
 #: paperless/settings.py:576
 msgid "Afrikaans"
-msgstr ""
+msgstr "Afrikansk"
 
 #: paperless/settings.py:577
 msgid "Belarusian"
@@ -812,7 +812,7 @@ msgstr "Hviterussisk"
 
 #: paperless/settings.py:578
 msgid "Catalan"
-msgstr ""
+msgstr "Katalansk"
 
 #: paperless/settings.py:579
 msgid "Czech"
@@ -828,7 +828,7 @@ msgstr "Tysk"
 
 #: paperless/settings.py:582
 msgid "Greek"
-msgstr ""
+msgstr "Gresk"
 
 #: paperless/settings.py:583
 msgid "English (GB)"
@@ -840,7 +840,7 @@ msgstr "Spansk"
 
 #: paperless/settings.py:585
 msgid "Finnish"
-msgstr ""
+msgstr "Finsk"
 
 #: paperless/settings.py:586
 msgid "French"
@@ -856,7 +856,7 @@ msgstr "Luxembourgsk"
 
 #: paperless/settings.py:589
 msgid "Norwegian"
-msgstr ""
+msgstr "Norsk"
 
 #: paperless/settings.py:590
 msgid "Dutch"
@@ -884,7 +884,7 @@ msgstr "Russisk"
 
 #: paperless/settings.py:596
 msgid "Slovak"
-msgstr ""
+msgstr "Slovakisk"
 
 #: paperless/settings.py:597
 msgid "Slovenian"
@@ -904,7 +904,7 @@ msgstr "Tyrkisk"
 
 #: paperless/settings.py:601
 msgid "Ukrainian"
-msgstr ""
+msgstr "Ukrainsk"
 
 #: paperless/settings.py:602
 msgid "Chinese Simplified"
@@ -996,7 +996,7 @@ msgstr "passord"
 
 #: paperless_mail/models.py:42
 msgid "Is token authentication"
-msgstr ""
+msgstr "Er token-autentisering"
 
 #: paperless_mail/models.py:45
 msgid "character set"
@@ -1060,7 +1060,7 @@ msgstr "Bruk vedlagte filnavn som tittel"
 
 #: paperless_mail/models.py:85
 msgid "Do not assign title from rule"
-msgstr ""
+msgstr "Ikke tilordne tittel fra regel"
 
 #: paperless_mail/models.py:88
 msgid "Do not assign a correspondent"
@@ -1096,7 +1096,7 @@ msgstr "filtrer fra"
 
 #: paperless_mail/models.py:122
 msgid "filter to"
-msgstr ""
+msgstr "filtrer til"
 
 #: paperless_mail/models.py:129
 msgid "filter subject"
