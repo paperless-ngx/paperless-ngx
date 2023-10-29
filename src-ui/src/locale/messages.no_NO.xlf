@@ -74,7 +74,7 @@
           <context context-type="linenumber">13</context>
         </context-group>
         <note priority="1" from="description">Currently selected slide number read by screen reader</note>
-        <target state="needs-translation"> Slide <x id="INTERPOLATION"/> of <x id="INTERPOLATION_1"/> </target>
+        <target state="translated"> Lysbilde <x id="INTERPOLATION"/> av <x id="INTERPOLATION_1"/> </target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.hours" datatype="html">
         <source>Hours</source>
@@ -412,7 +412,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">169</context>
         </context-group>
-        <target state="needs-translation">Tags, correspondents, document types and storage paths can all be managed using these pages. They can also be created from the document edit view.</target>
+        <target state="translated">Både etiketter, korrespondenter, dokumenttyper og lagringsstier kan administreres ved bruk av disse sidene. De kan også opprettes fra redigeringsvisningen av dokumenter.</target>
       </trans-unit>
       <trans-unit id="7851939076947092983" datatype="html">
         <source>Manage e-mail accounts and rules for automatically importing documents.</source>
@@ -420,7 +420,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">177</context>
         </context-group>
-        <target state="needs-translation">Manage e-mail accounts and rules for automatically importing documents.</target>
+        <target state="translated">Administrer e-postkontoer og -regler for automatisk import av dokumenter.</target>
       </trans-unit>
       <trans-unit id="1347174817382304718" datatype="html">
         <source>Consumption templates give you finer control over the document ingestion process.</source>
@@ -428,7 +428,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">185</context>
         </context-group>
-        <target state="needs-translation">Consumption templates give you finer control over the document ingestion process.</target>
+        <target state="translated">Konsummaler gir deg mer finkornet kontroll over dokumentinntaksprosessen.</target>
       </trans-unit>
       <trans-unit id="4680387114119209483" datatype="html">
         <source>File Tasks shows you documents that have been consumed, are waiting to be, or may have failed during the process.</source>
@@ -436,7 +436,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">193</context>
         </context-group>
-        <target state="needs-translation">File Tasks shows you documents that have been consumed, are waiting to be, or may have failed during the process.</target>
+        <target state="translated">Filoppgaver viser dokumenter som er konsumert, som venter på å bli det, eller som kan ha mislyktes under prosessen.</target>
       </trans-unit>
       <trans-unit id="1453710303796913192" datatype="html">
         <source>Check out the settings for various tweaks to the web app and toggle settings for saved views.</source>
@@ -444,7 +444,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">201</context>
         </context-group>
-        <target state="needs-translation">Check out the settings for various tweaks to the web app and toggle settings for saved views.</target>
+        <target state="translated">Sjekk ut innstillingene for forskjellige justeringer for web-applikasjonen og endre innstillinger for lagrede visninger.</target>
       </trans-unit>
       <trans-unit id="7172877665285340082" datatype="html">
         <source>Thank you! 🙏</source>
@@ -460,7 +460,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">211</context>
         </context-group>
-        <target state="needs-translation">There are &lt;em&gt;tons&lt;/em&gt; more features and info we didn't cover here, but this should get you started. Check out the documentation or visit the project on GitHub to learn more or to report issues.</target>
+        <target state="translated">Det er &lt;em&gt;langt&lt;/em&gt; flere funksjoner og informasjon vi ikke dekte her, dette bør være nok til å komme i gang. Sjekk dokumentasjonen eller besøk prosjektet på GitHub for å lære mer eller rapportere feil.</target>
       </trans-unit>
       <trans-unit id="4270528545616947218" datatype="html">
         <source>Lastly, on behalf of every contributor to this community-supported project, thank you for using Paperless-ngx!</source>
@@ -712,7 +712,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">103</context>
         </context-group>
-        <target state="needs-translation">Use 'slim' sidebar (icons only)</target>
+        <target state="translated">Bruk forenklet sidepanel (kun ikoner)</target>
       </trans-unit>
       <trans-unit id="1356890996281769972" datatype="html">
         <source>Dark mode</source>
@@ -768,7 +768,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">135</context>
         </context-group>
-        <target state="needs-translation">Update checking</target>
+        <target state="translated">Sjekk for oppdateringer</target>
       </trans-unit>
       <trans-unit id="7141691772243630313" datatype="html">
         <source> Update checking works by pinging the public <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;"/>GitHub API<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> for the latest release to determine whether a new version is available.<x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br/&gt;"/> Actual updating of the app must still be performed manually. </source>
@@ -776,7 +776,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">139,142</context>
         </context-group>
-        <target state="needs-translation"> Update checking works by pinging the public <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;"/>GitHub API<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> for the latest release to determine whether a new version is available.<x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br/&gt;"/> Actual updating of the app must still be performed manually. </target>
+        <target state="translated"> Sjekk for oppdateringer fungerer ved å pinge den offentlige <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;"/>GitHub API<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> for siste utgivelse for å avgjøre om en ny versjon er tilgjengelig.<x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br/&gt;"/> Faktisk oppdatering av appen må fortsatt utføres manuelt. </target>
       </trans-unit>
       <trans-unit id="5489945693955857309" datatype="html">
         <source><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&gt;"/>No tracking data is collected by the app in any way.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></source>
@@ -784,7 +784,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">144,146</context>
         </context-group>
-        <target state="needs-translation"><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&gt;"/>No tracking data is collected by the app in any way.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></target>
+        <target state="translated"><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&gt;"/>Ingen sporingsdata samles inn av appen på noen måte.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></target>
       </trans-unit>
       <trans-unit id="5070799004079086984" datatype="html">
         <source>Enable update checking</source>
@@ -808,7 +808,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">154</context>
         </context-group>
-        <target state="needs-translation">Show confirmation dialogs</target>
+        <target state="translated">Vis bekreftelsesdialoger</target>
       </trans-unit>
       <trans-unit id="6906812245033969309" datatype="html">
         <source>Deleting documents will always ask for confirmation.</source>
@@ -816,7 +816,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">154</context>
         </context-group>
-        <target state="needs-translation">Deleting documents will always ask for confirmation.</target>
+        <target state="translated">Sletting av dokumenter vil alltid be om bekreftelse.</target>
       </trans-unit>
       <trans-unit id="290238406234356122" datatype="html">
         <source>Apply on close</source>
@@ -848,7 +848,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">163</context>
         </context-group>
-        <target state="needs-translation">Enable notes</target>
+        <target state="translated">Aktiver notater</target>
       </trans-unit>
       <trans-unit id="7314814725704332646" datatype="html">
         <source>Permissions</source>
@@ -912,7 +912,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">174</context>
         </context-group>
-        <target state="needs-translation">Default Permissions</target>
+        <target state="translated">Standardtillatelser</target>
       </trans-unit>
       <trans-unit id="8222269449891326545" datatype="html">
         <source> Settings apply to this user account for objects (Tags, Mail Rules, etc.) created via the web UI </source>
@@ -920,7 +920,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">178,180</context>
         </context-group>
-        <target state="needs-translation"> Settings apply to this user account for objects (Tags, Mail Rules, etc.) created via the web UI </target>
+        <target state="translated"> Innstillinger gjelder denne brukerkontoen for objekter (Tags, e-postregler, osv.) opprettet via web-grensesnittet </target>
       </trans-unit>
       <trans-unit id="4292903881380648974" datatype="html">
         <source>Default Owner</source>
@@ -928,7 +928,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">185</context>
         </context-group>
-        <target state="needs-translation">Default Owner</target>
+        <target state="translated">Standard eier</target>
       </trans-unit>
       <trans-unit id="734147282056744882" datatype="html">
         <source>Objects without an owner can be viewed and edited by all users</source>
@@ -948,7 +948,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">194</context>
         </context-group>
-        <target state="needs-translation">Default View Permissions</target>
+        <target state="translated">Standard visningstillatelser</target>
       </trans-unit>
       <trans-unit id="2191775412581217688" datatype="html">
         <source>Users:</source>
@@ -1012,7 +1012,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">221</context>
         </context-group>
-        <target state="needs-translation">Default Edit Permissions</target>
+        <target state="translated">Standard redigeringstillatelser</target>
       </trans-unit>
       <trans-unit id="3728984448750213892" datatype="html">
         <source>Edit permissions also grant viewing permissions</source>
@@ -1044,7 +1044,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">256</context>
         </context-group>
-        <target state="needs-translation">Document processing</target>
+        <target state="translated">Dokumentbehandling</target>
       </trans-unit>
       <trans-unit id="3656786776644872398" datatype="html">
         <source>Show notifications when new documents are detected</source>
@@ -1052,7 +1052,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">260</context>
         </context-group>
-        <target state="needs-translation">Show notifications when new documents are detected</target>
+        <target state="translated">Vis varsler når nye dokumenter oppdages</target>
       </trans-unit>
       <trans-unit id="6057053428592387613" datatype="html">
         <source>Show notifications when document processing completes successfully</source>
@@ -1060,7 +1060,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">261</context>
         </context-group>
-        <target state="needs-translation">Show notifications when document processing completes successfully</target>
+        <target state="translated">Vis varsler når dokumentbehandling er fullført</target>
       </trans-unit>
       <trans-unit id="370315664367425513" datatype="html">
         <source>Show notifications when document processing fails</source>
@@ -1068,7 +1068,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">262</context>
         </context-group>
-        <target state="needs-translation">Show notifications when document processing fails</target>
+        <target state="translated">Vis varsler når dokumentbehandlingen mislykkes</target>
       </trans-unit>
       <trans-unit id="6838309441164918531" datatype="html">
         <source>Suppress notifications on dashboard</source>
@@ -1076,7 +1076,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">263</context>
         </context-group>
-        <target state="needs-translation">Suppress notifications on dashboard</target>
+        <target state="translated">Skjul varsler på dashbordet</target>
       </trans-unit>
       <trans-unit id="2741919327232918179" datatype="html">
         <source>This will suppress all messages about document processing status on the dashboard.</source>
@@ -1084,7 +1084,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">263</context>
         </context-group>
-        <target state="needs-translation">This will suppress all messages about document processing status on the dashboard.</target>
+        <target state="translated">Dette vil skjule alle meldinger om dokumentbehandlingsstatus på dashbordet.</target>
       </trans-unit>
       <trans-unit id="472206565520537964" datatype="html">
         <source>Saved views</source>
@@ -1104,7 +1104,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">277</context>
         </context-group>
-        <target state="needs-translation">Show warning when closing saved views with unsaved changes</target>
+        <target state="translated">Vis advarsel når du lukker lagrede visninger med ulagrede endringer</target>
       </trans-unit>
       <trans-unit id="2123659921722214537" datatype="html">
         <source>Views</source>
@@ -1224,7 +1224,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">291,292</context>
         </context-group>
-        <target state="needs-translation"> <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;visually-hidden&quot;&gt;"/>Appears on<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
+        <target state="translated"><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;visually-hidden&quot;&gt;"/>Vises på<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
       </trans-unit>
       <trans-unit id="4104807402967139762" datatype="html">
         <source>Show on dashboard</source>
@@ -1460,7 +1460,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
           <context context-type="linenumber">51</context>
         </context-group>
-        <target state="needs-translation">Error retrieving users</target>
+        <target state="translated">Feil ved innhenting av brukere</target>
       </trans-unit>
       <trans-unit id="3066660568529853846" datatype="html">
         <source>Error retrieving groups</source>
@@ -1472,7 +1472,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
           <context context-type="linenumber">63</context>
         </context-group>
-        <target state="needs-translation">Error retrieving groups</target>
+        <target state="translated">Feil ved innhenting av grupper</target>
       </trans-unit>
       <trans-unit id="5610279464668232148" datatype="html">
         <source>Saved view &quot;<x id="PH" equiv-text="savedView.name"/>&quot; deleted.</source>
@@ -1504,7 +1504,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.ts</context>
           <context context-type="linenumber">497</context>
         </context-group>
-        <target state="needs-translation">Settings were saved successfully. Reload is required to apply some changes.</target>
+        <target state="translated">Innstillingene ble lagret. Siden må lastes inn på nytt for å ta i bruk alle endringer.</target>
       </trans-unit>
       <trans-unit id="8491974984518503778" datatype="html">
         <source>Reload now</source>
@@ -1602,7 +1602,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="needs-translation"><x id="INTERPOLATION" equiv-text="{{dismissButtonText}}"/></target>
+        <target state="translated"><x id="INTERPOLATION" equiv-text="{{dismissButtonText}}"/></target>
       </trans-unit>
       <trans-unit id="1102717806459547726" datatype="html">
         <source>Refresh</source>
@@ -1686,7 +1686,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
           <context context-type="linenumber">103</context>
         </context-group>
-        <target state="needs-translation">{VAR_PLURAL, plural, =1 {One <x id="INTERPOLATION"/> task} other {<x id="INTERPOLATION_1"/> total <x id="INTERPOLATION"/> tasks}}</target>
+        <target state="translated">{VAR_PLURAL, plural, =1 {En <x id="INTERPOLATION"/> oppgave} other {<x id="INTERPOLATION_1"/> totalt<x id="INTERPOLATION"/> oppgaver}}}"/&gt;</target>
       </trans-unit>
       <trans-unit id="1830925490604698731" datatype="html">
         <source>Failed<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.failedFileTasks.length &gt; 0&quot; class=&quot;badge bg-danger ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
@@ -1694,7 +1694,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
           <context context-type="linenumber">110</context>
         </context-group>
-        <target state="needs-translation">Failed<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.failedFileTasks.length &gt; 0&quot; class=&quot;badge bg-danger ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
+        <target state="translated">Feilet<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.failedFileTasks.length &gt; 0&quot; class=&quot;badge bg-danger ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
       </trans-unit>
       <trans-unit id="6149567896789735123" datatype="html">
         <source>Complete<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.completedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.completedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
