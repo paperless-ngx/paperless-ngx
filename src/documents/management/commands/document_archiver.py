@@ -14,14 +14,11 @@ logger = logging.getLogger("paperless.management.archiver")
 
 
 class Command(BaseCommand):
-    help = """
-        Using the current classification model, assigns correspondents, tags
-        and document types to all documents, effectively allowing you to
-        back-tag all previously indexed documents with metadata created (or
-        modified) after their initial import.
-    """.replace(
-        "    ",
-        "",
+    help = (
+        "Using the current classification model, assigns correspondents, tags "
+        "and document types to all documents, effectively allowing you to "
+        "back-tag all previously indexed documents with metadata created (or "
+        "modified) after their initial import."
     )
 
     def add_arguments(self, parser):
@@ -30,8 +27,10 @@ class Command(BaseCommand):
             "--overwrite",
             default=False,
             action="store_true",
-            help="Recreates the archived document for documents that already "
-            "have an archived version.",
+            help=(
+                "Recreates the archived document for documents that already "
+                "have an archived version."
+            ),
         )
         parser.add_argument(
             "-d",
@@ -39,14 +38,22 @@ class Command(BaseCommand):
             default=None,
             type=int,
             required=False,
-            help="Specify the ID of a document, and this command will only "
-            "run on this specific document.",
+            help=(
+                "Specify the ID of a document, and this command will only "
+                "run on this specific document."
+            ),
         )
         parser.add_argument(
             "--no-progress-bar",
             default=False,
             action="store_true",
             help="If set, the progress bar will not be shown",
+        )
+        parser.add_argument(
+            "--processes",
+            default=max(1, os.cpu_count() // 4),
+            type=int,
+            help="Number of processes to distribute work amongst",
         )
 
     def handle(self, *args, **options):
@@ -73,7 +80,7 @@ class Command(BaseCommand):
 
         try:
             logging.getLogger().handlers[0].level = logging.ERROR
-            with multiprocessing.Pool(processes=settings.TASK_WORKERS) as pool:
+            with multiprocessing.Pool(processes=options["processes"]) as pool:
                 list(
                     tqdm.tqdm(
                         pool.imap_unordered(update_document_archive_file, document_ids),

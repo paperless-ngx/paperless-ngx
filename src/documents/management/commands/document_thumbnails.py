@@ -1,5 +1,6 @@
 import logging
 import multiprocessing
+import os
 import shutil
 
 import tqdm
@@ -33,12 +34,7 @@ def _process_document(doc_id):
 
 
 class Command(BaseCommand):
-    help = """
-        This will regenerate the thumbnails for all documents.
-    """.replace(
-        "    ",
-        "",
-    )
+    help = "This will regenerate the thumbnails for all documents."
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -47,14 +43,22 @@ class Command(BaseCommand):
             default=None,
             type=int,
             required=False,
-            help="Specify the ID of a document, and this command will only "
-            "run on this specific document.",
+            help=(
+                "Specify the ID of a document, and this command will only "
+                "run on this specific document."
+            ),
         )
         parser.add_argument(
             "--no-progress-bar",
             default=False,
             action="store_true",
             help="If set, the progress bar will not be shown",
+        )
+        parser.add_argument(
+            "--processes",
+            default=max(1, os.cpu_count() // 4),
+            type=int,
+            help="Number of processes to distribute work amongst",
         )
 
     def handle(self, *args, **options):
@@ -72,7 +76,7 @@ class Command(BaseCommand):
         # with postgres.
         db.connections.close_all()
 
-        with multiprocessing.Pool() as pool:
+        with multiprocessing.Pool(processes=options["processes"]) as pool:
             list(
                 tqdm.tqdm(
                     pool.imap_unordered(_process_document, ids),

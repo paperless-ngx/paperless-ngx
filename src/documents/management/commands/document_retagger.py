@@ -14,14 +14,11 @@ logger = logging.getLogger("paperless.management.retagger")
 
 
 class Command(BaseCommand):
-    help = """
-        Using the current classification model, assigns correspondents, tags
-        and document types to all documents, effectively allowing you to
-        back-tag all previously indexed documents with metadata created (or
-        modified) after their initial import.
-    """.replace(
-        "    ",
-        "",
+    help = (
+        "Using the current classification model, assigns correspondents, tags "
+        "and document types to all documents, effectively allowing you to "
+        "back-tag all previously indexed documents with metadata created (or "
+        "modified) after their initial import."
     )
 
     def add_arguments(self, parser):
@@ -34,18 +31,22 @@ class Command(BaseCommand):
             "--use-first",
             default=False,
             action="store_true",
-            help="By default this command won't try to assign a correspondent "
-            "if more than one matches the document.  Use this flag if "
-            "you'd rather it just pick the first one it finds.",
+            help=(
+                "By default this command won't try to assign a correspondent "
+                "if more than one matches the document.  Use this flag if "
+                "you'd rather it just pick the first one it finds."
+            ),
         )
         parser.add_argument(
             "-f",
             "--overwrite",
             default=False,
             action="store_true",
-            help="If set, the document retagger will overwrite any previously"
-            "set correspondent, document and remove correspondents, types"
-            "and tags that do not match anymore due to changed rules.",
+            help=(
+                "If set, the document retagger will overwrite any previously"
+                "set correspondent, document and remove correspondents, types"
+                "and tags that do not match anymore due to changed rules."
+            ),
         )
         parser.add_argument(
             "--no-progress-bar",

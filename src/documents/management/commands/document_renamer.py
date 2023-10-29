@@ -8,12 +8,7 @@ from documents.models import Document
 
 
 class Command(BaseCommand):
-    help = """
-        This will rename all documents to match the latest filename format.
-    """.replace(
-        "    ",
-        "",
-    )
+    help = "This will rename all documents to match the latest filename format."
 
     def add_arguments(self, parser):
         parser.add_argument(

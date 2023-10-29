@@ -40,12 +40,9 @@ def disable_signal(sig, receiver, sender):
 
 
 class Command(BaseCommand):
-    help = """
-        Using a manifest.json file, load the data from there, and import the
-        documents it refers to.
-    """.replace(
-        "    ",
-        "",
+    help = (
+        "Using a manifest.json file, load the data from there, and import the "
+        "documents it refers to."
     )
 
     def add_arguments(self, parser):

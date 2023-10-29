@@ -4,12 +4,7 @@ from documents.sanity_checker import check_sanity
 
 
 class Command(BaseCommand):
-    help = """
-        This command checks your document archive for issues.
-    """.replace(
-        "    ",
-        "",
-    )
+    help = "This command checks your document archive for issues."
 
     def add_arguments(self, parser):
         parser.add_argument(

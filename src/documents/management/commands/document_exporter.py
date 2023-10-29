@@ -43,13 +43,10 @@ from paperless_mail.models import MailRule
 
 
 class Command(BaseCommand):
-    help = """
-        Decrypt and rename all files in our collection into a given target
-        directory.  And include a manifest file containing document data for
-        easy import.
-    """.replace(
-        "    ",
-        "",
+    help = (
+        "Decrypt and rename all files in our collection into a given target "
+        "directory.  And include a manifest file containing document data for "
+        "easy import."
     )
 
     def add_arguments(self, parser):
@@ -60,9 +57,11 @@ class Command(BaseCommand):
             "--compare-checksums",
             default=False,
             action="store_true",
-            help="Compare file checksums when determining whether to export "
-            "a file or not. If not specified, file size and time "
-            "modified is used instead.",
+            help=(
+                "Compare file checksums when determining whether to export "
+                "a file or not. If not specified, file size and time "
+                "modified is used instead."
+            ),
         )
 
         parser.add_argument(
@@ -70,9 +69,11 @@ class Command(BaseCommand):
             "--delete",
             default=False,
             action="store_true",
-            help="After exporting, delete files in the export directory that "
-            "do not belong to the current export, such as files from "
-            "deleted documents.",
+            help=(
+                "After exporting, delete files in the export directory that "
+                "do not belong to the current export, such as files from "
+                "deleted documents."
+            ),
         )
 
         parser.add_argument(
@@ -80,8 +81,10 @@ class Command(BaseCommand):
             "--use-filename-format",
             default=False,
             action="store_true",
-            help="Use PAPERLESS_FILENAME_FORMAT for storing files in the "
-            "export directory, if configured.",
+            help=(
+                "Use PAPERLESS_FILENAME_FORMAT for storing files in the "
+                "export directory, if configured."
+            ),
         )
 
         parser.add_argument(
@@ -105,8 +108,10 @@ class Command(BaseCommand):
             "--use-folder-prefix",
             default=False,
             action="store_true",
-            help="Export files in dedicated folders according to their nature: "
-            "archive, originals or thumbnails",
+            help=(
+                "Export files in dedicated folders according to their nature: "
+                "archive, originals or thumbnails"
+            ),
         )
 
         parser.add_argument(
