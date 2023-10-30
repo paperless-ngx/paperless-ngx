@@ -48,6 +48,13 @@
         </div>
     </div>
 
+    <pngx-custom-fields-dropdown
+        [documentId]="documentId"
+        [disabled]="!userIsOwner"
+        [existingFields]="customFields"
+        (added)="addField($event)">
+    </pngx-custom-fields-dropdown>
+
     <pngx-share-links-dropdown [documentId]="documentId" [disabled]="!userIsOwner" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.ShareLink }"></pngx-share-links-dropdown>
 
     <button type="button" class="btn btn-sm btn-outline-primary me-2" i18n-title title="Close" (click)="close()">
@@ -93,9 +100,12 @@
                             <pngx-input-select [items]="storagePaths" i18n-title title="Storage path" formControlName="storage_path" [allowNull]="true" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event)"
                                 (createNew)="createStoragePath($event)" [suggestions]="suggestions?.storage_paths" i18n-placeholder placeholder="Default" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.StoragePath }"></pngx-input-select>
                             <pngx-input-tags formControlName="tags" [suggestions]="suggestions?.tags" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event)" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Tag }"></pngx-input-tags>
-                            <ng-container *ngFor="let field of customFields">
-                                <pngx-input-text [formControlName]="'custom-field-' + field.id" *ngIf="field.type === PaperlessCustomFieldDataType.String" [title]="field.name" [horizontal]="true"></pngx-input-text>
-                                <pngx-input-date [formControlName]="'custom-field-' + field.id" *ngIf="field.type === PaperlessCustomFieldDataType.Date" [title]="field.name" [horizontal]="true"></pngx-input-date>
+                            <ng-container *ngFor="let field of customFields; let i = index">
+                                <div [formGroup]="customFieldFormFields.controls[i]">
+                                    <pngx-input-text formControlName="value" *ngIf="field.data_type === PaperlessCustomFieldDataType.String" [title]="field.name" [horizontal]="true"></pngx-input-text>
+                                    <pngx-input-date formControlName="value" *ngIf="field.data_type === PaperlessCustomFieldDataType.Date" [title]="field.name" [horizontal]="true"></pngx-input-date>
+                                    <pngx-input-number formControlName="value" *ngIf="field.data_type === PaperlessCustomFieldDataType.Integer" [title]="field.name" [horizontal]="true" [showAdd]="false"></pngx-input-number>
+                                </div>
                             </ng-container>
                         </div>
                     </ng-template>

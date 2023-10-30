@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core'
-import { FormControl, FormGroup } from '@angular/forms'
+import { FormArray, FormControl, FormGroup } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import {
   NgbDateStruct,
@@ -124,6 +124,7 @@ export class DocumentDetailComponent
     archive_serial_number: new FormControl(),
     tags: new FormControl([]),
     permissions_form: new FormControl(null),
+    custom_fields: new FormArray([]),
   })
 
   previewCurrentPage: number = 1
@@ -140,7 +141,7 @@ export class DocumentDetailComponent
   ogDate: Date
 
   public readonly PaperlessCustomFieldDataType = PaperlessCustomFieldDataType
-  customFields: PaperlessCustomField[]
+  customFields: PaperlessCustomField[] = []
 
   @ViewChild('nav') nav: NgbNav
   @ViewChild('pdfPreview') set pdfPreview(element) {
@@ -173,8 +174,7 @@ export class DocumentDetailComponent
     private storagePathService: StoragePathService,
     private permissionsService: PermissionsService,
     private userService: UserService,
-    private http: HttpClient,
-    private customFieldsService: CustomFieldsService
+    private http: HttpClient
   ) {
     super()
   }
@@ -332,6 +332,7 @@ export class DocumentDetailComponent
               owner: doc.owner,
               set_permissions: doc.permissions,
             },
+            custom_fields: doc.custom_fields,
           })
 
           this.isDirty$ = dirtyCheck(
@@ -393,29 +394,7 @@ export class DocumentDetailComponent
   updateComponent(doc: PaperlessDocument) {
     this.document = doc
     this.requiresPassword = false
-    // TODO: Custom fields
-    // this.customFieldsService
-    //   .getFields(doc.id)
-    //   .pipe(first())
-    //   .subscribe({
-    //     next: (fields) => {
-    //       this.customFields = fields
-    //       this.customFields.forEach((field) => {
-    //         this.documentForm.addControl(
-    //           `custom-field-${field.id}`,
-    //           new FormControl(field.data)
-    //         )
-    //       })
-    //       this.store.next(this.documentForm.value)
-    //       console.log(fields)
-    //     },
-    //     error: (error) => {
-    //       this.toastService.showError(
-    //         $localize`Error retrieving custom fields`,
-    //         error
-    //       )
-    //     },
-    //   })
+    this.updateFormForCustomFields()
     this.documentsService
       .getMetadata(doc.id)
       .pipe(first())
@@ -462,6 +441,22 @@ export class DocumentDetailComponent
 
     this.documentForm.patchValue(docFormValues, { emitEvent: false })
     if (!this.userCanEdit) this.documentForm.disable()
+  }
+
+  get customFieldFormFields(): FormArray {
+    return this.documentForm.get('custom_fields') as FormArray
+  }
+
+  updateFormForCustomFields() {
+    this.customFieldFormFields.clear()
+    this.customFields.forEach((field) => {
+      this.customFieldFormFields.push(
+        new FormGroup({
+          parent: new FormControl(field.id),
+          value: new FormControl(null),
+        })
+      )
+    })
   }
 
   createDocumentType(newName: string) {
@@ -543,11 +538,8 @@ export class DocumentDetailComponent
           this.title = doc.title
           this.documentForm.patchValue(doc)
           // TODO: custom field reset
-          // this.customFields.forEach((field) => {
-          //   this.documentForm
-          //     .get(`custom-field-${field.id}`)
-          //     .patchValue(field.data)
-          // })
+          this.customFields = doc.custom_fields
+          this.updateFormForCustomFields()
           this.openDocumentService.setDirty(doc, false)
         },
         error: () => {
@@ -855,5 +847,10 @@ export class DocumentDetailComponent
     })
 
     this.documentListViewService.quickFilter(filterRules)
+  }
+
+  addField(field: PaperlessCustomField) {
+    this.customFields.push(field)
+    this.updateFormForCustomFields()
   }
 }
