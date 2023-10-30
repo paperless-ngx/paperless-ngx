@@ -248,7 +248,7 @@ class DocumentClassifier:
         data_vectorized = self.data_vectorizer.fit_transform(content_generator())
 
         # See the notes here:
-        # https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.CountVectorizer.html  # noqa: E501
+        # https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.CountVectorizer.html
         # This attribute isn't needed to function and can be large
         self.data_vectorizer.stop_words_ = None
 
