@@ -37,6 +37,10 @@ from documents.parsers import DocumentParser
 from documents.parsers import get_parser_class_for_mime_type
 from documents.sanity_checker import SanityCheckFailedException
 
+if settings.AUDIT_LOG_ENABLED:
+    import json
+
+    from auditlog.models import LogEntry
 logger = logging.getLogger("paperless.tasks")
 
 
@@ -258,11 +262,37 @@ def update_document_archive_file(document_id):
                     document,
                     archive_filename=True,
                 )
+                oldDocument = Document.objects.get(pk=document.pk)
                 Document.objects.filter(pk=document.pk).update(
                     archive_checksum=checksum,
                     content=parser.get_text(),
                     archive_filename=document.archive_filename,
                 )
+                newDocument = Document.objects.get(pk=document.pk)
+                if settings.AUDIT_LOG_ENABLED:
+                    LogEntry.objects.log_create(
+                        instance=oldDocument,
+                        changes=json.dumps(
+                            {
+                                "content": [oldDocument.content, newDocument.content],
+                                "archive_checksum": [
+                                    oldDocument.archive_checksum,
+                                    newDocument.archive_checksum,
+                                ],
+                                "archive_filename": [
+                                    oldDocument.archive_filename,
+                                    newDocument.archive_filename,
+                                ],
+                            },
+                        ),
+                        additional_data=json.dumps(
+                            {
+                                "reason": "Redo OCR called",
+                            },
+                        ),
+                        action=LogEntry.Action.UPDATE,
+                    )
+
                 with FileLock(settings.MEDIA_LOCK):
                     create_source_path_directory(document.archive_path)
                     shutil.move(parser.get_archive_path(), document.archive_path)

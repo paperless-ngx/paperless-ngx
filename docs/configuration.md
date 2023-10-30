@@ -1136,6 +1136,15 @@ combination with PAPERLESS_CONSUMER_BARCODE_UPSCALE bigger than 1.0.
 
     Defaults to "300"
 
+## Audit Trail
+
+#### [`PAPERLESS_AUDIT_LOG_ENABLED=<bool>`](#PAPERLESS_AUDIT_LOG_ENABLED){#PAPERLESS_AUDIT_LOG_ENABLED}
+
+: Enables an audit trail for documents, document types, correspondents, and tags. Log entries can be viewed in the Django backend only.
+
+    !!! warning
+    Once enabled cannot be disabled
+
 ## Collate Double-Sided Documents {#collate}
 
 #### [`PAPERLESS_CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED=<bool>`](#PAPERLESS_CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED) {#PAPERLESS_CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED}
