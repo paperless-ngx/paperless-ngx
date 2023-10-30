@@ -52,6 +52,7 @@ bleach = "*"
 zxing-cpp = {version = "*", platform_machine = "== 'x86_64'"}
 django-multiselectfield = "*"
 gotenberg-client = "*"
+django-auditlog = "*"
 
 [dev-packages]
 # Linting
