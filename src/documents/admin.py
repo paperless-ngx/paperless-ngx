@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import admin
 from guardian.admin import GuardedModelAdmin
 
@@ -11,6 +12,10 @@ from documents.models import SavedViewFilterRule
 from documents.models import ShareLink
 from documents.models import StoragePath
 from documents.models import Tag
+
+if settings.AUDIT_LOG_ENABLED:
+    from auditlog.admin import LogEntryAdmin
+    from auditlog.models import LogEntry
 
 
 class CorrespondentAdmin(GuardedModelAdmin):
@@ -148,3 +153,12 @@ admin.site.register(StoragePath, StoragePathAdmin)
 admin.site.register(PaperlessTask, TaskAdmin)
 admin.site.register(Note, NotesAdmin)
 admin.site.register(ShareLink, ShareLinksAdmin)
+
+if settings.AUDIT_LOG_ENABLED:
+
+    class LogEntryAUDIT(LogEntryAdmin):
+        def has_delete_permission(self, request, obj=None):
+            return False
+
+    admin.site.unregister(LogEntry)
+    admin.site.register(LogEntry, LogEntryAUDIT)
