@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-28 10:56-0700\n"
-"PO-Revision-Date: 2023-10-01 01:27\n"
+"PO-Revision-Date: 2023-10-30 16:46\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -715,7 +715,7 @@ msgstr "Iniciar sessão"
 
 #: documents/templates/registration/login.html:70
 msgid "Forgot your password?"
-msgstr ""
+msgstr "Esqueceu-se da sua palavra-passe?"
 
 #: documents/templates/registration/password_reset_complete.html:14
 msgid "Paperless-ngx reset password complete"
@@ -723,12 +723,12 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_complete.html:40
 msgid "Password reset complete."
-msgstr ""
+msgstr "Redefinição de senha concluída."
 
 #: documents/templates/registration/password_reset_complete.html:42
 #, python-format
 msgid "Your new password has been set. You can now <a href=\"%(login_url)s\">log in</a>"
-msgstr ""
+msgstr "A sua nova senha foi definida. Agora pode <a href=\"%(login_url)s\">entrar</a>"
 
 #: documents/templates/registration/password_reset_confirm.html:14
 msgid "Paperless-ngx reset password confirmation"
