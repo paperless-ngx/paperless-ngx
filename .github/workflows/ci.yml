@@ -64,7 +64,7 @@ jobs:
       -
         name: Install pipenv
         run: |
-          pip install --user pipenv==${DEFAULT_PIP_ENV_VERSION}
+          pip install --user pipenv==${{ env.DEFAULT_PIP_ENV_VERSION }}
       -
         name: Install dependencies
         run: |
@@ -133,7 +133,7 @@ jobs:
       -
         name: Install pipenv
         run: |
-          pip install --user pipenv==${DEFAULT_PIP_ENV_VERSION}
+          pip install --user pipenv==${{ env.DEFAULT_PIP_ENV_VERSION }}
       -
         name: Install system dependencies
         run: |
@@ -453,7 +453,7 @@ jobs:
       -
         name: Install pipenv + tools
         run: |
-          pip install --upgrade --user pipenv==${DEFAULT_PIP_ENV_VERSION} setuptools wheel
+          pip install --upgrade --user pipenv==${{ env.DEFAULT_PIP_ENV_VERSION }} setuptools wheel
       -
         name: Install Python dependencies
         run: |
@@ -621,7 +621,7 @@ jobs:
       -
         name: Install pipenv + tools
         run: |
-          pip install --upgrade --user pipenv==${DEFAULT_PIP_ENV_VERSION} setuptools wheel
+          pip install --upgrade --user pipenv==${{ env.DEFAULT_PIP_ENV_VERSION }} setuptools wheel
       -
         name: Append Changelog to docs
         id: append-Changelog
