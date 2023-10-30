@@ -1001,7 +1001,7 @@ class StatisticsView(APIView):
             .annotate(mime_type_count=Count("mime_type"))
             .order_by("-mime_type_count")
             if documents_total > 0
-            else 0
+            else []
         )
 
         character_count = (
