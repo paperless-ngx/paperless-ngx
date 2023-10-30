@@ -203,13 +203,16 @@ def settings_values_check(app_configs, **kwargs):
 def audit_log_check(app_configs, **kwargs):
     db_conn = connections["default"]
     all_tables = db_conn.introspection.table_names()
+    result = []
 
     if ("auditlog_logentry" in all_tables) and not (settings.AUDIT_LOG_ENABLED):
-        return [
+        result.append(
             Critical(
                 (
                     "auditlog table was found but PAPERLESS_AUDIT_LOG_ENABLED"
                     " is not active.  This setting cannot be disabled after enabling"
                 ),
             ),
-        ]
+        )
+
+    return result
