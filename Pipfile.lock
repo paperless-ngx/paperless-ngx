@@ -1293,12 +1293,11 @@
         },
         "python-ipware": {
             "hashes": [
-                "sha256:01b9fa589521c29d7573f69fc4855c6b95687f0029601b78fffef1eb17f1de27",
-                "sha256:ee84cd16c2cf862faae197ad5f8fae6c75e4b1f40bb13357944a5d63ddc2a373"
+                "sha256:802858aa13308d572876d1883edae0eae380fe70a51fdefcb46c8a2099240862",
+                "sha256:a52757123c718342f74b16ab2d9d4a531888d69d10b8197c073164635df0a13b"
             ],
             "index": "pypi",
-            "markers": "python_version >= '3.7'",
-            "version": "==0.9.0"
+            "version": "==2.0.0"
         },
         "python-magic": {
             "hashes": [
