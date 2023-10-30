@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-28 10:56-0700\n"
-"PO-Revision-Date: 2023-10-22 13:31\n"
+"PO-Revision-Date: 2023-10-30 18:37\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -1004,7 +1004,7 @@ msgstr "Zeichensatz"
 
 #: paperless_mail/models.py:49
 msgid "The character set to use when communicating with the mail server, such as 'UTF-8' or 'US-ASCII'."
-msgstr "Der Zeichensatz, der bei der Kommunikation mit dem E-Mail-Server verwendet werden soll, wie z.B. 'UTF-8' oder 'US-ASCII'. "
+msgstr "Der Zeichensatz, der bei der Kommunikation mit dem E-Mail-Server verwendet werden soll, wie z. B. „UTF-8“ oder „US-ASCII“."
 
 #: paperless_mail/models.py:60
 msgid "mail rule"
