@@ -67,6 +67,7 @@ import { PageHeaderComponent } from '../common/page-header/page-header.component
 import { DocumentNotesComponent } from '../document-notes/document-notes.component'
 import { DocumentDetailComponent } from './document-detail.component'
 import { ShareLinksDropdownComponent } from '../common/share-links-dropdown/share-links-dropdown.component'
+import { CustomFieldsDropdownComponent } from '../common/custom-fields-dropdown/custom-fields-dropdown.component'
 
 const doc: PaperlessDocument = {
   id: 3,
@@ -136,6 +137,7 @@ describe('DocumentDetailComponent', () => {
         PdfViewerComponent,
         SafeUrlPipe,
         ShareLinksDropdownComponent,
+        CustomFieldsDropdownComponent,
       ],
       providers: [
         DocumentTitlePipe,

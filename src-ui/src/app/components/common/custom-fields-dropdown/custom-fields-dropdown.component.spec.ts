@@ -16,6 +16,7 @@ import { SelectComponent } from '../input/select/select.component'
 import { NgSelectModule } from '@ng-select/ng-select'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import {
+  NgbDropdownModule,
   NgbModal,
   NgbModalModule,
   NgbModalRef,
@@ -53,6 +54,7 @@ describe('CustomFieldsDropdownComponent', () => {
         FormsModule,
         ReactiveFormsModule,
         NgbModalModule,
+        NgbDropdownModule,
       ],
     })
     customFieldService = TestBed.inject(CustomFieldsService)
