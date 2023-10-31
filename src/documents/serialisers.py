@@ -464,7 +464,7 @@ class DocumentSerializer(OwnedObjectSerializer, DynamicFieldsModelSerializer):
                 field_instance["value"] = data_custom_field["value"]
         return values
 
-    def update(self, instance, validated_data):
+    def update(self, instance: Document, validated_data):
         if "custom_fields" in validated_data:
             custom_fields = validated_data.pop("custom_fields")
             for field_data in custom_fields:
@@ -473,6 +473,19 @@ class DocumentSerializer(OwnedObjectSerializer, DynamicFieldsModelSerializer):
                     field=field_data["field"],
                     value=field_data["value"],
                 )
+            existing_fields = CustomFieldInstance.objects.filter(document=instance)
+            for existing_field in existing_fields:
+                if (
+                    not len(
+                        [
+                            f
+                            for f in custom_fields
+                            if f["field"]["id"] == existing_field.field.id
+                        ],
+                    )
+                    > 0
+                ):
+                    existing_field.delete()
         if "created_date" in validated_data and "created" not in validated_data:
             new_datetime = datetime.datetime.combine(
                 validated_data.get("created_date"),

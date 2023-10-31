@@ -916,6 +916,12 @@ class CustomField(models.Model):
         ordering = ("created",)
         verbose_name = _("custom field")
         verbose_name_plural = _("custom fields")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["name"],
+                name="%(app_label)s_%(class)s_unique_name",
+            ),
+        ]
 
     def __str__(self) -> str:
         return f"{self.name} : {self.data_type}"

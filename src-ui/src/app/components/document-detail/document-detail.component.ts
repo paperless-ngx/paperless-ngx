@@ -68,6 +68,7 @@ import {
   PaperlessCustomFieldDataType,
 } from 'src/app/data/paperless-custom-field'
 import { PaperlessCustomFieldInstance } from 'src/app/data/paperless-custom-field-instance'
+import { AbstractInputComponent } from '../common/input/abstract-input'
 
 enum DocumentDetailNavIDs {
   Details = 1,
@@ -141,7 +142,6 @@ export class DocumentDetailComponent
   ogDate: Date
 
   public readonly PaperlessCustomFieldDataType = PaperlessCustomFieldDataType
-  customFields: PaperlessCustomFieldInstance[] = []
 
   @ViewChild('nav') nav: NgbNav
   @ViewChild('pdfPreview') set pdfPreview(element) {
@@ -394,7 +394,7 @@ export class DocumentDetailComponent
   updateComponent(doc: PaperlessDocument) {
     this.document = doc
     this.requiresPassword = false
-    this.customFields = doc.custom_fields
+    // this.customFields = doc.custom_fields.concat([])
     this.updateFormForCustomFields()
     this.documentsService
       .getMetadata(doc.id)
@@ -446,23 +446,6 @@ export class DocumentDetailComponent
 
   get customFieldFormFields(): FormArray {
     return this.documentForm.get('custom_fields') as FormArray
-  }
-
-  updateFormForCustomFields() {
-    this.customFieldFormFields.clear()
-    this.customFields.forEach((fieldInstance) => {
-      this.customFieldFormFields.push(
-        new FormGroup({
-          field: new FormGroup({
-            id: new FormControl(fieldInstance.field.id),
-            name: new FormControl(fieldInstance.field.name),
-            data_type: new FormControl(fieldInstance.field.data_type),
-          }),
-          value: new FormControl(fieldInstance.value),
-        }),
-        { emitEvent: false }
-      )
-    })
   }
 
   createDocumentType(newName: string) {
@@ -542,9 +525,8 @@ export class DocumentDetailComponent
             set_permissions: doc.permissions,
           }
           this.title = doc.title
-          this.documentForm.patchValue(doc)
-          this.customFields = doc.custom_fields
           this.updateFormForCustomFields()
+          this.documentForm.patchValue(doc)
           this.openDocumentService.setDirty(doc, false)
         },
         error: () => {
@@ -855,13 +837,41 @@ export class DocumentDetailComponent
     this.documentListViewService.quickFilter(filterRules)
   }
 
+  updateFormForCustomFields(emitEvent: boolean = false) {
+    this.customFieldFormFields.clear({ emitEvent: false })
+    this.document.custom_fields.forEach((fieldInstance) => {
+      this.customFieldFormFields.push(
+        new FormGroup({
+          field: new FormGroup({
+            id: new FormControl(fieldInstance.field.id),
+            name: new FormControl(fieldInstance.field.name),
+            data_type: new FormControl(fieldInstance.field.data_type),
+          }),
+          value: new FormControl(fieldInstance.value),
+        }),
+        { emitEvent }
+      )
+    })
+  }
+
   addField(field: PaperlessCustomField) {
-    this.customFields.push({
+    this.document.custom_fields.push({
       field,
       value: null,
       document: this.documentId,
       created: new Date(),
     })
-    this.updateFormForCustomFields()
+    this.updateFormForCustomFields(true)
+  }
+
+  removeField(input: AbstractInputComponent<any>) {
+    // ok for now as custom field name unique is a constraint
+    const customFieldIndex = this.document.custom_fields.findIndex(
+      (f) => f.field.name === input.title
+    )
+    if (customFieldIndex) {
+      this.document.custom_fields.splice(customFieldIndex, 1)
+      this.updateFormForCustomFields(true)
+    }
   }
 }

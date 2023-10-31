@@ -220,6 +220,13 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.AddConstraint(
+            model_name="customfield",
+            constraint=models.UniqueConstraint(
+                fields=("name",),
+                name="documents_customfield_unique_name",
+            ),
+        ),
+        migrations.AddConstraint(
             model_name="customfieldinstance",
             constraint=models.UniqueConstraint(
                 fields=("document", "field"),

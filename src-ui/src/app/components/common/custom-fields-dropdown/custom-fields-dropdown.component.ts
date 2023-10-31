@@ -69,7 +69,7 @@ export class CustomFieldsDropdownComponent implements OnDestroy {
 
   private updateUnusedFields() {
     this.unusedFields = this.customFields.filter(
-      (f) => !this.existingFields.find((e) => e.field.id === f.id)
+      (f) => !this.existingFields?.find((e) => e.field.id === f.id)
     )
   }
 
