@@ -1044,7 +1044,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">256</context>
         </context-group>
-        <target state="needs-translation">Document processing</target>
+        <target state="translated">Обработване на документ</target>
       </trans-unit>
       <trans-unit id="3656786776644872398" datatype="html">
         <source>Show notifications when new documents are detected</source>
@@ -1052,7 +1052,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">260</context>
         </context-group>
-        <target state="needs-translation">Show notifications when new documents are detected</target>
+        <target state="translated">Показване на известия, когато са засечени нови документи</target>
       </trans-unit>
       <trans-unit id="6057053428592387613" datatype="html">
         <source>Show notifications when document processing completes successfully</source>
@@ -1060,7 +1060,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">261</context>
         </context-group>
-        <target state="needs-translation">Show notifications when document processing completes successfully</target>
+        <target state="translated">Показване на известия, когато обработката на документ приключи успешно</target>
       </trans-unit>
       <trans-unit id="370315664367425513" datatype="html">
         <source>Show notifications when document processing fails</source>
@@ -1068,7 +1068,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">262</context>
         </context-group>
-        <target state="needs-translation">Show notifications when document processing fails</target>
+        <target state="translated">Показване на известия, когато обработката на документ се провали</target>
       </trans-unit>
       <trans-unit id="6838309441164918531" datatype="html">
         <source>Suppress notifications on dashboard</source>
@@ -1076,7 +1076,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">263</context>
         </context-group>
-        <target state="needs-translation">Suppress notifications on dashboard</target>
+        <target state="translated">Потискане на известията на таблото за управление</target>
       </trans-unit>
       <trans-unit id="2741919327232918179" datatype="html">
         <source>This will suppress all messages about document processing status on the dashboard.</source>
@@ -1084,7 +1084,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">263</context>
         </context-group>
-        <target state="needs-translation">This will suppress all messages about document processing status on the dashboard.</target>
+        <target state="translated">Това ще потисне всички съобщения за състоянието на обработка на документи в таблото за управление.</target>
       </trans-unit>
       <trans-unit id="472206565520537964" datatype="html">
         <source>Saved views</source>
@@ -1096,7 +1096,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">91</context>
         </context-group>
-        <target state="needs-translation">Saved views</target>
+        <target state="translated">Запазени изгледи</target>
       </trans-unit>
       <trans-unit id="1595668988802980095" datatype="html">
         <source>Show warning when closing saved views with unsaved changes</source>
@@ -1104,7 +1104,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">277</context>
         </context-group>
-        <target state="needs-translation">Show warning when closing saved views with unsaved changes</target>
+        <target state="translated">Показване на предупреждение при затваряне на запазени изгледи с незапазени промени</target>
       </trans-unit>
       <trans-unit id="2123659921722214537" datatype="html">
         <source>Views</source>
@@ -1116,7 +1116,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">64</context>
         </context-group>
-        <target state="needs-translation">Views</target>
+        <target state="translated">Изгледи</target>
       </trans-unit>
       <trans-unit id="8953033926734869941" datatype="html">
         <source>Name</source>
@@ -1216,7 +1216,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
           <context context-type="linenumber">41</context>
         </context-group>
-        <target state="needs-translation">Name</target>
+        <target state="translated">Име</target>
       </trans-unit>
       <trans-unit id="9187755754633397589" datatype="html">
         <source> <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;visually-hidden&quot;&gt;"/>Appears on<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
@@ -1224,7 +1224,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">291,292</context>
         </context-group>
-        <target state="needs-translation"> <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;visually-hidden&quot;&gt;"/>Appears on<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
+        <target state="translated"> <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;visually-hidden&quot;&gt;"/>Появява се върху<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
       </trans-unit>
       <trans-unit id="4104807402967139762" datatype="html">
         <source>Show on dashboard</source>
@@ -1236,7 +1236,7 @@
           <context context-type="sourcefile">src/app/components/document-list/save-view-config-dialog/save-view-config-dialog.component.html</context>
           <context context-type="linenumber">10</context>
         </context-group>
-        <target state="needs-translation">Show on dashboard</target>
+        <target state="translated">Показване на таблото</target>
       </trans-unit>
       <trans-unit id="8689274715612276035" datatype="html">
         <source>Show in sidebar</source>
@@ -1658,7 +1658,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
           <context context-type="linenumber">66</context>
         </context-group>
-        <target state="needs-translation">click for full output</target>
+        <target state="translated">щракнете за пълен резултат</target>
       </trans-unit>
       <trans-unit id="1536087519743707362" datatype="html">
         <source>Dismiss</source>
@@ -1970,7 +1970,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
           <context context-type="linenumber">114</context>
         </context-group>
-        <target state="needs-translation">Confirm delete user account</target>
+        <target state="translated">Потвърдете изтриването на потребителски акаунт</target>
       </trans-unit>
       <trans-unit id="8133663925694885325" datatype="html">
         <source>This operation will permanently delete this user account.</source>
@@ -1978,7 +1978,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
           <context context-type="linenumber">115</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently delete this user account.</target>
+        <target state="translated">Тази операция ще изтрие завинаги този потребителски акаунт.</target>
       </trans-unit>
       <trans-unit id="5641451190833696892" datatype="html">
         <source>This operation cannot be undone.</source>
@@ -2014,7 +2014,7 @@
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
           <context context-type="linenumber">173</context>
         </context-group>
-        <target state="needs-translation">This operation cannot be undone.</target>
+        <target state="translated">Това действие не може да бъде отменено.</target>
       </trans-unit>
       <trans-unit id="1181910457994920507" datatype="html">
         <source>Proceed</source>
@@ -2046,7 +2046,7 @@
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
           <context context-type="linenumber">175</context>
         </context-group>
-        <target state="needs-translation">Proceed</target>
+        <target state="translated">Продължи</target>
       </trans-unit>
       <trans-unit id="857903183180440990" datatype="html">
         <source>Deleted user</source>
@@ -2054,7 +2054,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
           <context context-type="linenumber">124</context>
         </context-group>
-        <target state="needs-translation">Deleted user</target>
+        <target state="translated">Изтрит потребител</target>
       </trans-unit>
       <trans-unit id="1942566571910298572" datatype="html">
         <source>Error deleting user.</source>
@@ -2062,7 +2062,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
           <context context-type="linenumber">130</context>
         </context-group>
-        <target state="needs-translation">Error deleting user.</target>
+        <target state="translated">Грешка при изтриване на потребител.</target>
       </trans-unit>
       <trans-unit id="5766640174051730159" datatype="html">
         <source>Saved group &quot;<x id="PH" equiv-text="newGroup.name"/>&quot;.</source>
@@ -2070,7 +2070,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
           <context context-type="linenumber">148</context>
         </context-group>
-        <target state="needs-translation">Saved group "<x id="PH" equiv-text="newGroup.name"/>".</target>
+        <target state="translated">Запазена група "<x id="PH" equiv-text="newGroup.name"/>".</target>
       </trans-unit>
       <trans-unit id="8382042988405122578" datatype="html">
         <source>Error saving group.</source>
@@ -2078,7 +2078,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
           <context context-type="linenumber">156</context>
         </context-group>
-        <target state="needs-translation">Error saving group.</target>
+        <target state="translated">Грешка при запазване на група.</target>
       </trans-unit>
       <trans-unit id="6538873300613683004" datatype="html">
         <source>Confirm delete user group</source>
@@ -2086,7 +2086,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
           <context context-type="linenumber">164</context>
         </context-group>
-        <target state="needs-translation">Confirm delete user group</target>
+        <target state="translated">Потвърдете изтриването на потребителска група</target>
       </trans-unit>
       <trans-unit id="7710984639498518244" datatype="html">
         <source>This operation will permanently delete this user group.</source>
@@ -2094,7 +2094,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
           <context context-type="linenumber">165</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently delete this user group.</target>
+        <target state="translated">Тази операция ще изтрие завинаги тази потребителска група.</target>
       </trans-unit>
       <trans-unit id="6834066329827670963" datatype="html">
         <source>Deleted group</source>
@@ -2102,7 +2102,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
           <context context-type="linenumber">174</context>
         </context-group>
-        <target state="needs-translation">Deleted group</target>
+        <target state="translated">Изтрита група</target>
       </trans-unit>
       <trans-unit id="8850738980935204840" datatype="html">
         <source>Error deleting group.</source>
@@ -2110,7 +2110,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
           <context context-type="linenumber">180</context>
         </context-group>
-        <target state="needs-translation">Error deleting group.</target>
+        <target state="translated">Грешка при изтриване на група.</target>
       </trans-unit>
       <trans-unit id="2173456130768795374" datatype="html">
         <source>Paperless-ngx</source>
@@ -2119,7 +2119,7 @@
           <context context-type="linenumber">11</context>
         </context-group>
         <note priority="1" from="description">app title</note>
-        <target state="needs-translation">Paperless-ngx</target>
+        <target state="translated">Paperless-ngx</target>
       </trans-unit>
       <trans-unit id="7100953725264790651" datatype="html">
         <source>Search documents</source>
@@ -2127,7 +2127,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="needs-translation">Search documents</target>
+        <target state="translated">Търсене на документи</target>
       </trans-unit>
       <trans-unit id="2448391510242468907" datatype="html">
         <source>Logged in as <x id="INTERPOLATION" equiv-text="{{this.settingsService.displayName}}"/></source>
@@ -2135,7 +2135,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">39</context>
         </context-group>
-        <target state="needs-translation">Logged in as <x id="INTERPOLATION" equiv-text="{{this.settingsService.displayName}}"/></target>
+        <target state="translated">Влезли сте като <x id="INTERPOLATION" equiv-text="{{this.settingsService.displayName}}"/></target>
       </trans-unit>
       <trans-unit id="3797778920049399855" datatype="html">
         <source>Logout</source>
@@ -2143,7 +2143,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">50</context>
         </context-group>
-        <target state="needs-translation">Logout</target>
+        <target state="translated">Изход</target>
       </trans-unit>
       <trans-unit id="4895326106573044490" datatype="html">
         <source>Documentation</source>
@@ -2159,7 +2159,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">228</context>
         </context-group>
-        <target state="needs-translation">Documentation</target>
+        <target state="translated">Документация</target>
       </trans-unit>
       <trans-unit id="6570363013146073520" datatype="html">
         <source>Dashboard</source>
@@ -2175,7 +2175,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="needs-translation">Dashboard</target>
+        <target state="translated">Табло</target>
       </trans-unit>
       <trans-unit id="4733307402565258070" datatype="html">
         <source>Documents</source>
@@ -2207,7 +2207,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
           <context context-type="linenumber">88</context>
         </context-group>
-        <target state="needs-translation">Documents</target>
+        <target state="translated">Документи</target>
       </trans-unit>
       <trans-unit id="6988090220128974198" datatype="html">
         <source>Open documents</source>
@@ -2215,7 +2215,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">118</context>
         </context-group>
-        <target state="needs-translation">Open documents</target>
+        <target state="translated">Отваряне на документи</target>
       </trans-unit>
       <trans-unit id="5687256342387781369" datatype="html">
         <source>Close all</source>
@@ -2227,7 +2227,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">137</context>
         </context-group>
-        <target state="needs-translation">Close all</target>
+        <target state="translated">Затвори всички</target>
       </trans-unit>
       <trans-unit id="3897348120591552265" datatype="html">
         <source>Manage</source>
@@ -2235,7 +2235,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">144</context>
         </context-group>
-        <target state="needs-translation">Manage</target>
+        <target state="translated">Управление</target>
       </trans-unit>
       <trans-unit id="7437910965833684826" datatype="html">
         <source>Correspondents</source>
@@ -2251,7 +2251,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">55</context>
         </context-group>
-        <target state="needs-translation">Correspondents</target>
+        <target state="translated">Кореспонденти</target>
       </trans-unit>
       <trans-unit id="7886570921510760899" datatype="html">
         <source>Tags</source>
@@ -2283,7 +2283,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="needs-translation">Tags</target>
+        <target state="translated">Етикети</target>
       </trans-unit>
       <trans-unit id="3079652255369035" datatype="html">
         <source>Document types</source>
@@ -2295,7 +2295,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">165</context>
         </context-group>
-        <target state="needs-translation">Document types</target>
+        <target state="translated">Типове документи</target>
       </trans-unit>
       <trans-unit id="8835528846812581148" datatype="html">
         <source>Storage paths</source>
@@ -2307,7 +2307,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">172</context>
         </context-group>
-        <target state="needs-translation">Storage paths</target>
+        <target state="translated">Пътища към хранилища</target>
       </trans-unit>
       <trans-unit id="4462691404891390153" datatype="html">
         <source>Consumption templates</source>
@@ -2315,7 +2315,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">176</context>
         </context-group>
-        <target state="needs-translation">Consumption templates</target>
+        <target state="translated">Шаблони за консумация</target>
       </trans-unit>
       <trans-unit id="5433675495457939071" datatype="html">
         <source>Templates</source>
@@ -2323,7 +2323,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">179</context>
         </context-group>
-        <target state="needs-translation">Templates</target>
+        <target state="translated">Шаблони</target>
       </trans-unit>
       <trans-unit id="1292737233370901804" datatype="html">
         <source>Mail</source>
@@ -2335,7 +2335,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">186</context>
         </context-group>
-        <target state="needs-translation">Mail</target>
+        <target state="translated">Поща</target>
       </trans-unit>
       <trans-unit id="7844706011418789951" datatype="html">
         <source>Administration</source>
@@ -2343,7 +2343,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">192</context>
         </context-group>
-        <target state="needs-translation">Administration</target>
+        <target state="translated">Администрация</target>
       </trans-unit>
       <trans-unit id="5537285341303594392" datatype="html">
         <source>File Tasks<x id="START_TAG_SPAN_1" ctype="x-span_1" equiv-text="&lt;span *ngIf=&quot;tasksService.failedFileTasks.length &gt; 0&quot;&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-danger ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
@@ -2351,7 +2351,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">214</context>
         </context-group>
-        <target state="needs-translation">File Tasks<x id="START_TAG_SPAN_1" ctype="x-span_1" equiv-text="&lt;span *ngIf=&quot;tasksService.failedFileTasks.length &gt; 0&quot;&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-danger ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
+        <target state="translated">Файлови задачи<x id="START_TAG_SPAN_1" ctype="x-span_1" equiv-text="&lt;span *ngIf=&quot;tasksService.failedFileTasks.length &gt; 0&quot;&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-danger ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
       </trans-unit>
       <trans-unit id="1534029177398918729" datatype="html">
         <source>GitHub</source>
@@ -2359,7 +2359,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">234</context>
         </context-group>
-        <target state="needs-translation">GitHub</target>
+        <target state="translated">GitHub</target>
       </trans-unit>
       <trans-unit id="4112664765954374539" datatype="html">
         <source>is available.</source>
@@ -2367,7 +2367,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">240</context>
         </context-group>
-        <target state="needs-translation">is available.</target>
+        <target state="translated">е налично.</target>
       </trans-unit>
       <trans-unit id="1175891574282637937" datatype="html">
         <source>Click to view.</source>
@@ -2375,7 +2375,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">240</context>
         </context-group>
-        <target state="needs-translation">Click to view.</target>
+        <target state="translated">Натисни за преглед.</target>
       </trans-unit>
       <trans-unit id="9811291095862612" datatype="html">
         <source>Paperless-ngx can automatically check for updates</source>
@@ -2383,7 +2383,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">244</context>
         </context-group>
-        <target state="needs-translation">Paperless-ngx can automatically check for updates</target>
+        <target state="translated">Paperless-ngx може автоматично да проверява за актуализации</target>
       </trans-unit>
       <trans-unit id="894819944961861800" datatype="html">
         <source> How does this work? </source>
@@ -2391,7 +2391,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">251,253</context>
         </context-group>
-        <target state="needs-translation"> How does this work? </target>
+        <target state="translated"> Как работи това? </target>
       </trans-unit>
       <trans-unit id="509090351011426949" datatype="html">
         <source>Update available</source>
@@ -2399,7 +2399,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">262</context>
         </context-group>
-        <target state="needs-translation">Update available</target>
+        <target state="translated">Налична актуализация</target>
       </trans-unit>
       <trans-unit id="1542489069631984294" datatype="html">
         <source>Sidebar views updated</source>
@@ -2407,7 +2407,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
           <context context-type="linenumber">248</context>
         </context-group>
-        <target state="needs-translation">Sidebar views updated</target>
+        <target state="translated">Изгледите на страничната лента са актуализирани</target>
       </trans-unit>
       <trans-unit id="3547923076537026828" datatype="html">
         <source>Error updating sidebar views</source>
@@ -2415,7 +2415,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
           <context context-type="linenumber">251</context>
         </context-group>
-        <target state="needs-translation">Error updating sidebar views</target>
+        <target state="translated">Грешка при актуализиране на изгледите на страничната лента</target>
       </trans-unit>
       <trans-unit id="2526035785704676448" datatype="html">
         <source>An error occurred while saving update checking settings.</source>
@@ -2423,7 +2423,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
           <context context-type="linenumber">272</context>
         </context-group>
-        <target state="needs-translation">An error occurred while saving update checking settings.</target>
+        <target state="translated">Възникна грешка при запазване на настройките за проверка за актуализация.</target>
       </trans-unit>
       <trans-unit id="8700121026680200191" datatype="html">
         <source>Clear</source>
@@ -2439,7 +2439,7 @@
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.html</context>
           <context context-type="linenumber">56</context>
         </context-group>
-        <target state="needs-translation">Clear</target>
+        <target state="translated">Изчистване</target>
       </trans-unit>
       <trans-unit id="5000042972069710005" datatype="html">
         <source><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;d-inline-block&quot; style=&quot;padding-bottom: 1px;&quot; &gt;"/>Cancel<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
@@ -2447,7 +2447,7 @@
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/confirm-dialog.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation"><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;d-inline-block&quot; style=&quot;padding-bottom: 1px;&quot; &gt;"/>Cancel<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
+        <target state="translated"><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;d-inline-block&quot; style=&quot;padding-bottom: 1px;&quot; &gt;"/>Отказ<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
       </trans-unit>
       <trans-unit id="1234709746630139322" datatype="html">
         <source>Confirmation</source>
@@ -2455,7 +2455,7 @@
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/confirm-dialog.component.ts</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Confirmation</target>
+        <target state="translated">Потвърждение</target>
       </trans-unit>
       <trans-unit id="9178182467454450952" datatype="html">
         <source>Confirm</source>
@@ -2483,7 +2483,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">439</context>
         </context-group>
-        <target state="needs-translation">Confirm</target>
+        <target state="translated">Потвърди</target>
       </trans-unit>
       <trans-unit id="6052766076365105714" datatype="html">
         <source>now</source>
@@ -2491,7 +2491,7 @@
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">now</target>
+        <target state="translated">сега</target>
       </trans-unit>
       <trans-unit id="6371576811194810854" datatype="html">
         <source>After</source>
@@ -2499,7 +2499,7 @@
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.html</context>
           <context context-type="linenumber">28</context>
         </context-group>
-        <target state="needs-translation">After</target>
+        <target state="translated">След</target>
       </trans-unit>
       <trans-unit id="1218334388194408974" datatype="html">
         <source>Before</source>
@@ -2507,7 +2507,7 @@
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.html</context>
           <context context-type="linenumber">51</context>
         </context-group>
-        <target state="needs-translation">Before</target>
+        <target state="translated">Преди</target>
       </trans-unit>
       <trans-unit id="4873149362496451858" datatype="html">
         <source>Last 7 days</source>
@@ -2515,7 +2515,7 @@
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.ts</context>
           <context context-type="linenumber">42</context>
         </context-group>
-        <target state="needs-translation">Last 7 days</target>
+        <target state="translated">Последните 7 дни</target>
       </trans-unit>
       <trans-unit id="4463380307954693363" datatype="html">
         <source>Last month</source>
@@ -2523,7 +2523,7 @@
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.ts</context>
           <context context-type="linenumber">47</context>
         </context-group>
-        <target state="needs-translation">Last month</target>
+        <target state="translated">Миналия месец</target>
       </trans-unit>
       <trans-unit id="8697368973702409683" datatype="html">
         <source>Last 3 months</source>
@@ -2531,7 +2531,7 @@
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.ts</context>
           <context context-type="linenumber">52</context>
         </context-group>
-        <target state="needs-translation">Last 3 months</target>
+        <target state="translated">Последните 3 месеца</target>
       </trans-unit>
       <trans-unit id="3566342898065860218" datatype="html">
         <source>Last year</source>
@@ -2539,7 +2539,7 @@
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.ts</context>
           <context context-type="linenumber">57</context>
         </context-group>
-        <target state="needs-translation">Last year</target>
+        <target state="translated">Миналата година</target>
       </trans-unit>
       <trans-unit id="8419515490539218007" datatype="html">
         <source>Sort order</source>
@@ -2551,7 +2551,7 @@
           <context context-type="sourcefile">src/app/components/manage/consumption-templates/consumption-templates.component.html</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="needs-translation">Sort order</target>
+        <target state="translated">Ред на сортиране</target>
       </trans-unit>
       <trans-unit id="4163272119298020373" datatype="html">
         <source>Filters</source>
@@ -2559,7 +2559,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="needs-translation">Filters</target>
+        <target state="translated">Филтри</target>
       </trans-unit>
       <trans-unit id="9090904435418488635" datatype="html">
         <source>Process documents that match <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>all<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> filters specified below.</source>
@@ -2575,7 +2575,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Filter sources</target>
+        <target state="translated">Филтриране на източници</target>
       </trans-unit>
       <trans-unit id="7467799586957602479" datatype="html">
         <source>Filter filename</source>
@@ -2583,7 +2583,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="needs-translation">Filter filename</target>
+        <target state="translated">Филтриране по файлово име</target>
       </trans-unit>
       <trans-unit id="3694878959415278689" datatype="html">
         <source>Apply to documents that match this filename. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive.</source>
@@ -3135,7 +3135,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="needs-translation">See docs for .eml processing requirements</target>
+        <target state="translated">Преглед на документация за изискванията за обработка на .eml</target>
       </trans-unit>
       <trans-unit id="5163375362523428079" datatype="html">
         <source>Rule order</source>
@@ -3199,7 +3199,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="needs-translation">Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive.</target>
+        <target state="translated">Да се консумират само документи, които изцяло съответстват на това файлово име, ако е посочено. Разрешени са заместващи символи като *.pdf или *invoice*. Нечувствителност към големи и малки букви.</target>
       </trans-unit>
       <trans-unit id="9216117865911519658" datatype="html">
         <source>Action</source>
@@ -3207,7 +3207,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">27</context>
         </context-group>
-        <target state="needs-translation">Action</target>
+        <target state="translated">Действие</target>
       </trans-unit>
       <trans-unit id="4274038999388817994" datatype="html">
         <source>Action is only performed when documents are consumed from the mail. Mails without attachments remain entirely untouched.</source>
@@ -3215,7 +3215,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">27</context>
         </context-group>
-        <target state="needs-translation">Action is only performed when documents are consumed from the mail. Mails without attachments remain entirely untouched.</target>
+        <target state="translated">Действието се извършва само когато документите се консумират от пощата. Писмата без прикачени файлове остават напълно недокоснати.</target>
       </trans-unit>
       <trans-unit id="1261794314435932203" datatype="html">
         <source>Action parameter</source>
@@ -3395,7 +3395,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">149</context>
         </context-group>
-        <target state="needs-translation">Edit mail rule</target>
+        <target state="translated">Редактиране на правило за поща</target>
       </trans-unit>
       <trans-unit id="8911059720204770105" datatype="html">
         <source>Path</source>
@@ -3423,7 +3423,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.ts</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="needs-translation">or use slashes to add directories e.g.</target>
+        <target state="translated">или използвайте наклонени черти, за да добавите директории, напр.</target>
       </trans-unit>
       <trans-unit id="7871464228487558644" datatype="html">
         <source>See &lt;a target=&quot;_blank&quot; href=&quot;https://docs.paperless-ngx.com/advanced_usage/#file-name-handling&quot;&gt;documentation&lt;/a&gt; for full list.</source>
@@ -3431,7 +3431,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.ts</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="needs-translation">See &lt;a target="_blank" href="https://docs.paperless-ngx.com/advanced_usage/#file-name-handling"&gt;documentation&lt;/a&gt; for full list.</target>
+        <target state="translated">Вижте &lt;a target="_blank" href="https://docs.paperless-ngx.com/advanced_usage/#file-name-handling"&gt;документация&lt;/a&gt; за пълен списък.</target>
       </trans-unit>
       <trans-unit id="6898961890896270754" datatype="html">
         <source>Create new storage path</source>
@@ -3439,7 +3439,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.ts</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="needs-translation">Create new storage path</target>
+        <target state="translated">Създаване на нов път към хранилище</target>
       </trans-unit>
       <trans-unit id="3754859110054016570" datatype="html">
         <source>Edit storage path</source>
@@ -3483,7 +3483,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component.ts</context>
           <context context-type="linenumber">28</context>
         </context-group>
-        <target state="needs-translation">Create new tag</target>
+        <target state="translated">Създаване на нов етикет</target>
       </trans-unit>
       <trans-unit id="5872175735754226507" datatype="html">
         <source>Edit tag</source>
@@ -3491,7 +3491,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component.ts</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="needs-translation">Edit tag</target>
+        <target state="translated">Редактиране на етикет</target>
       </trans-unit>
       <trans-unit id="4768749765465246664" datatype="html">
         <source>Email</source>
@@ -4284,7 +4284,7 @@
           <context context-type="linenumber">268</context>
         </context-group>
         <note priority="1" from="description">this string is used to separate processing, failed and added on the file upload widget</note>
-        <target state="needs-translation">, </target>
+        <target state="translated">, </target>
       </trans-unit>
       <trans-unit id="7915903586014997661" datatype="html">
         <source>Paperless-ngx is running!</source>
@@ -4292,7 +4292,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">2</context>
         </context-group>
-        <target state="needs-translation">Paperless-ngx is running!</target>
+        <target state="translated">Paperless-ngx работи!</target>
       </trans-unit>
       <trans-unit id="3326049540711826572" datatype="html">
         <source>You&apos;re ready to start uploading documents! Explore the various features of this web app on your own, or start a quick tour using the button below.</source>
@@ -4316,7 +4316,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">7</context>
         </context-group>
-        <target state="needs-translation">Thanks for being a part of the Paperless-ngx community!</target>
+        <target state="translated">Благодарим ви, че сте част от общността на Paperless-ngx!</target>
       </trans-unit>
       <trans-unit id="1415832194529539652" datatype="html">
         <source>Start the tour</source>
@@ -4324,7 +4324,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">8</context>
         </context-group>
-        <target state="needs-translation">Start the tour</target>
+        <target state="translated">Започване на обиколката</target>
       </trans-unit>
       <trans-unit id="7822640317427130239" datatype="html">
         <source>Searching document with asn <x id="INTERPOLATION" equiv-text="{{asn}}"/></source>
@@ -4384,7 +4384,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
           <context context-type="linenumber">44</context>
         </context-group>
-        <target state="needs-translation">More like this</target>
+        <target state="translated">Още като това</target>
       </trans-unit>
       <trans-unit id="7819314041543176992" datatype="html">
         <source>Close</source>
@@ -4396,7 +4396,7 @@
           <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="needs-translation">Close</target>
+        <target state="translated">Затвори</target>
       </trans-unit>
       <trans-unit id="4452427314943113135" datatype="html">
         <source>Previous</source>
@@ -4404,7 +4404,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">60</context>
         </context-group>
-        <target state="needs-translation">Previous</target>
+        <target state="translated">Предишно</target>
       </trans-unit>
       <trans-unit id="5028777105388019087" datatype="html">
         <source>Details</source>
@@ -4412,7 +4412,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">82</context>
         </context-group>
-        <target state="needs-translation">Details</target>
+        <target state="translated">Подробности</target>
       </trans-unit>
       <trans-unit id="1379170675585571971" datatype="html">
         <source>Archive serial number</source>
@@ -4420,7 +4420,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">86</context>
         </context-group>
-        <target state="needs-translation">Archive serial number</target>
+        <target state="translated">Сериен номер на архива</target>
       </trans-unit>
       <trans-unit id="5114742157723900905" datatype="html">
         <source>Date created</source>
@@ -4428,7 +4428,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">87</context>
         </context-group>
-        <target state="needs-translation">Date created</target>
+        <target state="translated">Дата на създаване</target>
       </trans-unit>
       <trans-unit id="5066119607229701477" datatype="html">
         <source>Document type</source>
@@ -4452,7 +4452,7 @@
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="needs-translation">Document type</target>
+        <target state="translated">Тип на документа</target>
       </trans-unit>
       <trans-unit id="2091353339965748767" datatype="html">
         <source>Storage path</source>
@@ -4472,7 +4472,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">51</context>
         </context-group>
-        <target state="needs-translation">Storage path</target>
+        <target state="translated">Път за съхранение</target>
       </trans-unit>
       <trans-unit id="5607669932062416162" datatype="html">
         <source>Default</source>
@@ -4480,7 +4480,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">94</context>
         </context-group>
-        <target state="needs-translation">Default</target>
+        <target state="translated">По подразбиране</target>
       </trans-unit>
       <trans-unit id="6205355627445317276" datatype="html">
         <source>Content</source>
@@ -4488,7 +4488,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">101</context>
         </context-group>
-        <target state="needs-translation">Content</target>
+        <target state="translated">Съдържание</target>
       </trans-unit>
       <trans-unit id="218403386307979629" datatype="html">
         <source>Metadata</source>
@@ -4500,7 +4500,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/metadata-collapse/metadata-collapse.component.ts</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="needs-translation">Metadata</target>
+        <target state="translated">Метаданни</target>
       </trans-unit>
       <trans-unit id="1826652001816486190" datatype="html">
         <source>Date modified</source>
@@ -4508,7 +4508,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">116</context>
         </context-group>
-        <target state="needs-translation">Date modified</target>
+        <target state="translated">Дата на промяна</target>
       </trans-unit>
       <trans-unit id="6392918669949841614" datatype="html">
         <source>Date added</source>
@@ -4516,7 +4516,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">120</context>
         </context-group>
-        <target state="needs-translation">Date added</target>
+        <target state="translated">Дата на добавяне</target>
       </trans-unit>
       <trans-unit id="146828917013192897" datatype="html">
         <source>Media filename</source>
@@ -4524,7 +4524,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">124</context>
         </context-group>
-        <target state="needs-translation">Media filename</target>
+        <target state="translated">Име на медиен файл</target>
       </trans-unit>
       <trans-unit id="4500855521601039868" datatype="html">
         <source>Original filename</source>
@@ -4532,7 +4532,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">128</context>
         </context-group>
-        <target state="needs-translation">Original filename</target>
+        <target state="translated">Оригинално име на файла</target>
       </trans-unit>
       <trans-unit id="7985558498848210210" datatype="html">
         <source>Original MD5 checksum</source>
@@ -4540,7 +4540,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">132</context>
         </context-group>
-        <target state="needs-translation">Original MD5 checksum</target>
+        <target state="translated">Оригинална контролна сума MD5</target>
       </trans-unit>
       <trans-unit id="5888243105821763422" datatype="html">
         <source>Original file size</source>
@@ -4548,7 +4548,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">136</context>
         </context-group>
-        <target state="needs-translation">Original file size</target>
+        <target state="translated">Оригинален размер на файла</target>
       </trans-unit>
       <trans-unit id="2696647325713149563" datatype="html">
         <source>Original mime type</source>
@@ -4556,7 +4556,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">140</context>
         </context-group>
-        <target state="needs-translation">Original mime type</target>
+        <target state="translated">Оригинален мим тип</target>
       </trans-unit>
       <trans-unit id="342875990758166588" datatype="html">
         <source>Archive MD5 checksum</source>
@@ -4564,7 +4564,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">144</context>
         </context-group>
-        <target state="needs-translation">Archive MD5 checksum</target>
+        <target state="translated">Архивна контролна сума MD5</target>
       </trans-unit>
       <trans-unit id="6033581412811562084" datatype="html">
         <source>Archive file size</source>
@@ -4616,7 +4616,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">185,186</context>
         </context-group>
-        <target state="needs-translation">Notes <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;document?.notes.length&quot; class=&quot;badge text-bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="ngth}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/a&gt;"/></target>
+        <target state="translated">Бележки <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;document?.notes.length&quot; class=&quot;badge text-bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="ngth}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/a&gt;"/></target>
       </trans-unit>
       <trans-unit id="3823219296477075982" datatype="html">
         <source>Discard</source>
@@ -4624,7 +4624,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">204</context>
         </context-group>
-        <target state="needs-translation">Discard</target>
+        <target state="translated">Изхвърли</target>
       </trans-unit>
       <trans-unit id="5129524307369213584" datatype="html">
         <source>Save &amp; next</source>
@@ -4632,7 +4632,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">206</context>
         </context-group>
-        <target state="needs-translation">Save &amp; next</target>
+        <target state="translated">Запази &amp; следващото</target>
       </trans-unit>
       <trans-unit id="4910102545766233758" datatype="html">
         <source>Save &amp; close</source>
@@ -4640,7 +4640,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">207</context>
         </context-group>
-        <target state="needs-translation">Save &amp; close</target>
+        <target state="translated">Запази &amp; затвори</target>
       </trans-unit>
       <trans-unit id="2218903673684131427" datatype="html">
         <source>An error occurred loading content: <x id="PH" equiv-text="err.message ?? err.toString()"/></source>
@@ -4648,7 +4648,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">253,255</context>
         </context-group>
-        <target state="needs-translation">An error occurred loading content: <x id="PH" equiv-text="err.message ?? err.toString()"/></target>
+        <target state="translated">Възникна грешка при зареждане на съдържание: <x id="PH" equiv-text="err.message ?? err.toString()"/></target>
       </trans-unit>
       <trans-unit id="5758784066858623886" datatype="html">
         <source>Error retrieving metadata</source>
@@ -4656,7 +4656,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">398</context>
         </context-group>
-        <target state="needs-translation">Error retrieving metadata</target>
+        <target state="translated">Грешка при извличане на метаданни</target>
       </trans-unit>
       <trans-unit id="3456881259945295697" datatype="html">
         <source>Error retrieving suggestions.</source>
@@ -4664,7 +4664,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">419</context>
         </context-group>
-        <target state="needs-translation">Error retrieving suggestions.</target>
+        <target state="translated">Грешка при извличане на предложения.</target>
       </trans-unit>
       <trans-unit id="8348337312757497317" datatype="html">
         <source>Document saved successfully.</source>
@@ -4676,7 +4676,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">540</context>
         </context-group>
-        <target state="needs-translation">Document saved successfully.</target>
+        <target state="translated">Документът е запазен успешно.</target>
       </trans-unit>
       <trans-unit id="448882439049417053" datatype="html">
         <source>Error saving document</source>
@@ -4688,7 +4688,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">585</context>
         </context-group>
-        <target state="needs-translation">Error saving document</target>
+        <target state="translated">Грешка при запазване на документа</target>
       </trans-unit>
       <trans-unit id="9021887951960049161" datatype="html">
         <source>Confirm delete</source>
@@ -4700,7 +4700,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">201</context>
         </context-group>
-        <target state="needs-translation">Confirm delete</target>
+        <target state="translated">Потвърдете изтриването</target>
       </trans-unit>
       <trans-unit id="5382975254277698192" datatype="html">
         <source>Do you really want to delete document &quot;<x id="PH" equiv-text="this.document.title"/>&quot;?</source>
@@ -4708,7 +4708,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">612</context>
         </context-group>
-        <target state="needs-translation">Do you really want to delete document "<x id="PH" equiv-text="this.document.title"/>"?</target>
+        <target state="translated">Наистина ли искате да изтриете документа "<x id="PH" equiv-text="this.document.title"/>"?</target>
       </trans-unit>
       <trans-unit id="6691075929777935948" datatype="html">
         <source>The files for this document will be deleted permanently. This operation cannot be undone.</source>
@@ -4716,7 +4716,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">613</context>
         </context-group>
-        <target state="needs-translation">The files for this document will be deleted permanently. This operation cannot be undone.</target>
+        <target state="translated">Файловете за този документ ще бъдат изтрити завинаги. Тази операция не може да бъде отменена.</target>
       </trans-unit>
       <trans-unit id="719892092227206532" datatype="html">
         <source>Delete document</source>
@@ -4724,7 +4724,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">615</context>
         </context-group>
-        <target state="needs-translation">Delete document</target>
+        <target state="translated">Изтриване на документ</target>
       </trans-unit>
       <trans-unit id="7295637485862454066" datatype="html">
         <source>Error deleting document</source>
@@ -4732,7 +4732,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">634</context>
         </context-group>
-        <target state="needs-translation">Error deleting document</target>
+        <target state="translated">Грешка при изтриване на документа</target>
       </trans-unit>
       <trans-unit id="7362691899087997122" datatype="html">
         <source>Redo OCR confirm</source>
@@ -4744,7 +4744,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">498</context>
         </context-group>
-        <target state="needs-translation">Redo OCR confirm</target>
+        <target state="translated">Потвърдете Повтаряне OCR</target>
       </trans-unit>
       <trans-unit id="9197453786953646058" datatype="html">
         <source>This operation will permanently redo OCR for this document.</source>
@@ -4752,7 +4752,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">655</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently redo OCR for this document.</target>
+        <target state="translated">Тази операция ще повтори за постоянно OCR за този документ.</target>
       </trans-unit>
       <trans-unit id="5729001209753056399" datatype="html">
         <source>Redo OCR operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.</source>
@@ -4760,7 +4760,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">666</context>
         </context-group>
-        <target state="needs-translation">Redo OCR operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.</target>
+        <target state="translated">Операцията Повтаряне OCR ще започне във фонов режим. Затворете и отворете отново или презаредете този документ, след като операцията приключи, за да видите новото съдържание.</target>
       </trans-unit>
       <trans-unit id="4409560272830824468" datatype="html">
         <source>Error executing operation</source>
@@ -6574,7 +6574,7 @@
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="needs-translation">Processing document...</target>
+        <target state="translated">Обработка на документ...</target>
       </trans-unit>
       <trans-unit id="1085975194762600381" datatype="html">
         <source>Generating thumbnail...</source>
