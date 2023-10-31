@@ -2,6 +2,7 @@ import datetime
 import math
 import re
 import zoneinfo
+from typing import Any
 
 import magic
 from celery import states
@@ -406,26 +407,16 @@ class CustomFieldSerializer(serializers.ModelSerializer):
         ]
 
 
-class CustomFieldInstanceSerializer(serializers.ModelSerializer):
-    parent = CustomFieldSerializer()
+class CustomFieldInstanceSerializer(serializers.Serializer):
+    field = CustomFieldSerializer(required=True)
     value = SerializerMethodField()
 
     def get_value(self, obj: CustomFieldInstance):
         return obj.value
 
-    def create(self, validated_data):
-        parent_data = validated_data.pop("parent")
-        parent = CustomField.objects.get(id=parent_data["id"])
-        instance = CustomFieldInstance.objects.create(parent=parent)
-        return instance
-
-    def update(self, instance: CustomFieldInstance):
-        return instance
-
     class Meta:
-        model = CustomFieldInstance
         fields = [
-            "parent",
+            "field",
             "value",
         ]
 
@@ -463,7 +454,25 @@ class DocumentSerializer(OwnedObjectSerializer, DynamicFieldsModelSerializer):
             doc["content"] = doc.get("content")[0:550]
         return doc
 
+    def to_internal_value(self, data: Any) -> Any:
+        # hack-y
+        values = super().to_internal_value(data)
+        if "custom_fields" in values:
+            for index, field_instance in enumerate(values["custom_fields"]):
+                data_custom_field = data["custom_fields"][index]
+                field_instance["field"]["id"] = data_custom_field["field"]["id"]
+                field_instance["value"] = data_custom_field["value"]
+        return values
+
     def update(self, instance, validated_data):
+        if "custom_fields" in validated_data:
+            custom_fields = validated_data.pop("custom_fields")
+            for field_data in custom_fields:
+                CustomFieldInstance.from_json(
+                    document=instance,
+                    field=field_data["field"],
+                    value=field_data["value"],
+                )
         if "created_date" in validated_data and "created" not in validated_data:
             new_datetime = datetime.datetime.combine(
                 validated_data.get("created_date"),

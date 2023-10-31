@@ -4,6 +4,7 @@ import os
 import re
 from collections import OrderedDict
 from pathlib import Path
+from typing import Any
 from typing import Final
 from typing import Optional
 
@@ -920,7 +921,7 @@ class CustomField(models.Model):
         return f"{self.name} : {self.data_type}"
 
 
-class CustomFieldInstance(ModelWithOwner):
+class CustomFieldInstance(models.Model):
     """
     A single instance of a field, attached to a CustomField for the name and type
     and attached to a single Document to be metadata for it
@@ -952,6 +953,12 @@ class CustomFieldInstance(ModelWithOwner):
         ordering = ("created",)
         verbose_name = _("custom field instance")
         verbose_name_plural = _("custom field instances")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["document", "field"],
+                name="%(app_label)s_%(class)s_unique_document_field",
+            ),
+        ]
 
     def __str__(self) -> str:
         return str(self.field) + f" : {self.value}"
@@ -1002,17 +1009,19 @@ class CustomFieldInstance(ModelWithOwner):
     @staticmethod
     def from_json(
         document: Document,
-        field: CustomField,
-        data,
+        field: OrderedDict,
+        value: Any,
     ) -> "CustomFieldInstance":
-        instance = CustomFieldInstance.objects.create(
+        instance, _ = CustomFieldInstance.objects.get_or_create(
             document=document,
-            field=field,
-            data_type=data["type"],
+            field=CustomField.objects.get(id=field["id"]),
         )
-        instance.field_type.objects.create(value=data["value"], parent=instance)
+        instance.field_type.objects.update_or_create(
+            parent=instance,
+            defaults={"value": value},
+        )
 
-        return field
+        return instance
 
 
 class CustomFieldShortText(models.Model):
