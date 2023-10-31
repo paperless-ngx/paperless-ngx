@@ -30,6 +30,7 @@ class TestCustomField(DirectoriesMixin, APITestCase):
             ("url", "Wikipedia Link"),
             ("date", "Invoiced Date"),
             ("integer", "Invoice #"),
+            ("boolean", "Is Active"),
         ]:
             resp = self.client.post(
                 self.ENDPOINT,
@@ -53,9 +54,25 @@ class TestCustomField(DirectoriesMixin, APITestCase):
             checksum="123",
             mime_type="application/pdf",
         )
-        custom_field = CustomField.objects.create(
-            name="Test Custom Field",
+        custom_field_string = CustomField.objects.create(
+            name="Test Custom Field String",
             data_type=CustomField.FieldDataType.STRING,
+        )
+        custom_field_date = CustomField.objects.create(
+            name="Test Custom Field Date",
+            data_type=CustomField.FieldDataType.DATE,
+        )
+        custom_field_int = CustomField.objects.create(
+            name="Test Custom Field Int",
+            data_type=CustomField.FieldDataType.INT,
+        )
+        custom_field_boolean = CustomField.objects.create(
+            name="Test Custom Field Boolean",
+            data_type=CustomField.FieldDataType.BOOL,
+        )
+        custom_field_url = CustomField.objects.create(
+            name="Test Custom Field Url",
+            data_type=CustomField.FieldDataType.URL,
         )
 
         resp = self.client.patch(
@@ -63,10 +80,39 @@ class TestCustomField(DirectoriesMixin, APITestCase):
             data={
                 "custom_fields": [
                     {
-                        "parent": {
-                            "id": custom_field.id,
+                        "field": {
+                            "id": custom_field_string.id,
+                            "name": custom_field_string.name,
                         },
                         "value": "test value",
+                    },
+                    {
+                        "field": {
+                            "id": custom_field_date.id,
+                            "name": custom_field_date.name,
+                        },
+                        "value": "2023-10-31",
+                    },
+                    {
+                        "field": {
+                            "id": custom_field_int.id,
+                            "name": custom_field_int.name,
+                        },
+                        "value": 3,
+                    },
+                    {
+                        "field": {
+                            "id": custom_field_boolean.id,
+                            "name": custom_field_boolean.name,
+                        },
+                        "value": True,
+                    },
+                    {
+                        "field": {
+                            "id": custom_field_url.id,
+                            "name": custom_field_url.name,
+                        },
+                        "value": "https://example.com",
                     },
                 ],
             },
@@ -75,8 +121,5 @@ class TestCustomField(DirectoriesMixin, APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
         doc.refresh_from_db()
-        from pprint import pprint
-
-        for item in doc.custom_fields.all():
-            pprint(item)
-        self.assertFalse(True)
+        self.assertEqual(len(doc.custom_fields.all()), 5)
+        self.assertEqual(doc.custom_fields.first().value, "test value")
