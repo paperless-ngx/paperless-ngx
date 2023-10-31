@@ -869,7 +869,7 @@ export class DocumentDetailComponent
     const customFieldIndex = this.document.custom_fields.findIndex(
       (f) => f.field.name === input.title
     )
-    if (customFieldIndex) {
+    if (customFieldIndex > -1) {
       this.document.custom_fields.splice(customFieldIndex, 1)
       this.updateFormForCustomFields(true)
     }

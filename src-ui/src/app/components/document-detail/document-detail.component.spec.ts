@@ -68,6 +68,7 @@ import { DocumentNotesComponent } from '../document-notes/document-notes.compone
 import { DocumentDetailComponent } from './document-detail.component'
 import { ShareLinksDropdownComponent } from '../common/share-links-dropdown/share-links-dropdown.component'
 import { CustomFieldsDropdownComponent } from '../common/custom-fields-dropdown/custom-fields-dropdown.component'
+import { PaperlessCustomFieldDataType } from 'src/app/data/paperless-custom-field'
 
 const doc: PaperlessDocument = {
   id: 3,
@@ -93,6 +94,19 @@ const doc: PaperlessDocument = {
       created: new Date(),
       note: 'note 2',
       user: 2,
+    },
+  ],
+  custom_fields: [
+    {
+      field: {
+        id: 0,
+        name: 'Field 1',
+        data_type: PaperlessCustomFieldDataType.String,
+        created: new Date(),
+      },
+      document: 3,
+      created: new Date(),
+      value: 'custom foo bar',
     },
   ],
 }
@@ -799,8 +813,58 @@ describe('DocumentDetailComponent', () => {
     expect(toastSpy).toHaveBeenCalledWith('Error retrieving metadata', error)
   })
 
+  it('should display custom fields', () => {
+    initNormally()
+    expect(fixture.debugElement.nativeElement.textContent).toContain(
+      doc.custom_fields[0].field.name
+    )
+  })
+
+  it('should support add custom field, correctly send via post', () => {
+    const field = {
+      id: 1,
+      name: 'Custom Field 2',
+      data_type: PaperlessCustomFieldDataType.Integer,
+    }
+    initNormally()
+    const initialLength = doc.custom_fields.length
+    expect(component.customFieldFormFields).toHaveLength(initialLength)
+    component.addField(field)
+    fixture.detectChanges()
+    expect(component.document.custom_fields).toHaveLength(initialLength + 1)
+    expect(component.customFieldFormFields).toHaveLength(initialLength + 1)
+    expect(fixture.debugElement.nativeElement.textContent).toContain(field.name)
+    const updateSpy = jest.spyOn(documentService, 'update')
+    component.save(true)
+    expect(updateSpy.mock.lastCall[0].custom_fields).toHaveLength(2)
+    expect(updateSpy.mock.lastCall[0].custom_fields[1]).toEqual({
+      field,
+      value: null,
+    })
+  })
+
+  it('should support remove custom field, correctly send via post', () => {
+    initNormally()
+    const initialLength = doc.custom_fields.length
+    expect(component.customFieldFormFields).toHaveLength(initialLength)
+    component.removeField({ title: 'Field 1' } as any)
+    fixture.detectChanges()
+    expect(component.document.custom_fields).toHaveLength(initialLength - 1)
+    expect(component.customFieldFormFields).toHaveLength(initialLength - 1)
+    expect(fixture.debugElement.nativeElement.textContent).not.toContain(
+      'Field 1'
+    )
+    const updateSpy = jest.spyOn(documentService, 'update')
+    component.save(true)
+    expect(updateSpy.mock.lastCall[0].custom_fields).toHaveLength(
+      initialLength - 1
+    )
+  })
+
   function initNormally() {
-    jest.spyOn(documentService, 'get').mockReturnValueOnce(of(doc))
+    jest
+      .spyOn(documentService, 'get')
+      .mockReturnValueOnce(of(Object.assign({}, doc)))
     jest.spyOn(openDocumentsService, 'getOpenDocument').mockReturnValue(null)
     jest
       .spyOn(openDocumentsService, 'openDocument')
