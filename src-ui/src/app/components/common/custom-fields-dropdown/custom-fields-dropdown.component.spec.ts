@@ -92,7 +92,7 @@ describe('CustomFieldsDropdownComponent', () => {
       CustomFieldsDropdownComponent.prototype as any,
       'updateUnusedFields'
     )
-    component.existingFields = [fields[1]]
+    component.existingFields = [{ field: fields[1] } as any]
     component.onOpenClose()
     expect(updateSpy).toHaveBeenCalled()
     expect(component.unusedFields).toEqual([fields[0]])

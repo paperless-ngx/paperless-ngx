@@ -4,11 +4,11 @@ import {
   Input,
   OnDestroy,
   Output,
-  SimpleChanges,
 } from '@angular/core'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { Subject, first, takeUntil } from 'rxjs'
 import { PaperlessCustomField } from 'src/app/data/paperless-custom-field'
+import { PaperlessCustomFieldInstance } from 'src/app/data/paperless-custom-field-instance'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { CustomFieldEditDialogComponent } from '../edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
@@ -26,7 +26,7 @@ export class CustomFieldsDropdownComponent implements OnDestroy {
   disabled: boolean = false
 
   @Input()
-  existingFields: PaperlessCustomField[] = []
+  existingFields: PaperlessCustomFieldInstance[] = []
 
   @Output()
   added = new EventEmitter()
@@ -69,7 +69,7 @@ export class CustomFieldsDropdownComponent implements OnDestroy {
 
   private updateUnusedFields() {
     this.unusedFields = this.customFields.filter(
-      (f) => !this.existingFields.find((e) => e.id === f.id)
+      (f) => !this.existingFields.find((e) => e.field.id === f.id)
     )
   }
 

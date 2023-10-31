@@ -63,11 +63,11 @@ import { EditDialogMode } from '../common/edit-dialog/edit-dialog.component'
 import { ObjectWithId } from 'src/app/data/object-with-id'
 import { FilterRule } from 'src/app/data/filter-rule'
 import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
-import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import {
   PaperlessCustomField,
   PaperlessCustomFieldDataType,
 } from 'src/app/data/paperless-custom-field'
+import { PaperlessCustomFieldInstance } from 'src/app/data/paperless-custom-field-instance'
 
 enum DocumentDetailNavIDs {
   Details = 1,
@@ -141,7 +141,7 @@ export class DocumentDetailComponent
   ogDate: Date
 
   public readonly PaperlessCustomFieldDataType = PaperlessCustomFieldDataType
-  customFields: PaperlessCustomField[] = []
+  customFields: PaperlessCustomFieldInstance[] = []
 
   @ViewChild('nav') nav: NgbNav
   @ViewChild('pdfPreview') set pdfPreview(element) {
@@ -394,6 +394,7 @@ export class DocumentDetailComponent
   updateComponent(doc: PaperlessDocument) {
     this.document = doc
     this.requiresPassword = false
+    this.customFields = doc.custom_fields
     this.updateFormForCustomFields()
     this.documentsService
       .getMetadata(doc.id)
@@ -449,12 +450,17 @@ export class DocumentDetailComponent
 
   updateFormForCustomFields() {
     this.customFieldFormFields.clear()
-    this.customFields.forEach((field) => {
+    this.customFields.forEach((fieldInstance) => {
       this.customFieldFormFields.push(
         new FormGroup({
-          parent: new FormControl(field.id),
-          value: new FormControl(null),
-        })
+          field: new FormGroup({
+            id: new FormControl(fieldInstance.field.id),
+            name: new FormControl(fieldInstance.field.name),
+            data_type: new FormControl(fieldInstance.field.data_type),
+          }),
+          value: new FormControl(fieldInstance.value),
+        }),
+        { emitEvent: false }
       )
     })
   }
@@ -537,7 +543,6 @@ export class DocumentDetailComponent
           }
           this.title = doc.title
           this.documentForm.patchValue(doc)
-          // TODO: custom field reset
           this.customFields = doc.custom_fields
           this.updateFormForCustomFields()
           this.openDocumentService.setDirty(doc, false)
@@ -562,6 +567,7 @@ export class DocumentDetailComponent
           close && this.close()
           this.networkActive = false
           this.error = null
+          this.openDocumentService.refreshDocument(this.documentId)
         },
         error: (error) => {
           this.networkActive = false
@@ -850,7 +856,12 @@ export class DocumentDetailComponent
   }
 
   addField(field: PaperlessCustomField) {
-    this.customFields.push(field)
+    this.customFields.push({
+      field,
+      value: null,
+      document: this.documentId,
+      created: new Date(),
+    })
     this.updateFormForCustomFields()
   }
 }
