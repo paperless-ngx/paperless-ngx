@@ -84,7 +84,7 @@ export class ShareLinksDropdownComponent implements OnInit {
   }
 
   getDaysRemaining(link: PaperlessShareLink): string {
-    const days: number = Math.ceil(
+    const days: number = Math.round(
       (Date.parse(link.expiration) - Date.now()) / (1000 * 60 * 60 * 24)
     )
     return days === 1 ? $localize`1 day` : $localize`${days} days`
