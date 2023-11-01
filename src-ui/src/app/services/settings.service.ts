@@ -175,6 +175,12 @@ export class SettingsService {
         dateInputFormat: 'dd.mm.yyyy',
       },
       {
+        code: 'bg-bg',
+        name: $localize`Bulgarian`,
+        englishName: 'Bulgarian',
+        dateInputFormat: 'dd.mm.yyyy',
+      },
+      {
         code: 'ca-es',
         name: $localize`Catalan`,
         englishName: 'Catalan',
