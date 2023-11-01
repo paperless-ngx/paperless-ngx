@@ -3175,7 +3175,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="translated">Филтриране на тема</target>
+        <target state="translated">Филтриране по тема</target>
       </trans-unit>
       <trans-unit id="7314357616097563149" datatype="html">
         <source>Filter body</source>
@@ -3183,7 +3183,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="translated">Филтриране на тяло</target>
+        <target state="translated">Филтриране по тяло</target>
       </trans-unit>
       <trans-unit id="5031687746498952417" datatype="html">
         <source>Filter attachment filename</source>
@@ -3215,7 +3215,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">27</context>
         </context-group>
-        <target state="translated">Действието се извършва само когато документите се консумират от пощата. Писмата без прикачени файлове остават напълно недокоснати.</target>
+        <target state="translated">Действието се извършва само когато документите се консумират от пощата. Писмата без прикачени файлове остават напълно непокътнати.</target>
       </trans-unit>
       <trans-unit id="1261794314435932203" datatype="html">
         <source>Action parameter</source>
@@ -3275,7 +3275,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">31</context>
         </context-group>
-        <target state="translated">Обр. на вс. файлове, вкл. на "вградените" прикачени файлове</target>
+        <target state="translated">Обр. на вс. файлове, вкл. на "вградените" прик. файлове</target>
       </trans-unit>
       <trans-unit id="9025522236384167767" datatype="html">
         <source>Process message as .eml</source>
@@ -3307,7 +3307,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">61</context>
         </context-group>
-        <target state="translated">Маркиране като прочетено, да не се обработват прочетени писма</target>
+        <target state="translated">Марк. като проч., да не се обраб. проч. писма</target>
       </trans-unit>
       <trans-unit id="2378921144019636516" datatype="html">
         <source>Flag the mail, don&apos;t process flagged mails</source>
@@ -3315,7 +3315,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">65</context>
         </context-group>
-        <target state="translated">Маркиране на писмото, да не се обработват маркираните писма</target>
+        <target state="translated">Марк. на писм., да не се обр. марк. писма</target>
       </trans-unit>
       <trans-unit id="6457024618858980302" datatype="html">
         <source>Tag the mail with specified tag, don&apos;t process tagged mails</source>
@@ -3323,7 +3323,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">69</context>
         </context-group>
-        <target state="translated">Маркиране на писмото с определен етикет, да не се обработват маркирани писма</target>
+        <target state="translated">Марк. на писм. с опр. етикет, да не се обр. маркирани писма</target>
       </trans-unit>
       <trans-unit id="4673329664686432878" datatype="html">
         <source>Use subject as title</source>
@@ -3339,7 +3339,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">80</context>
         </context-group>
-        <target state="translated">Използване на име на прикачен файл като заглавие</target>
+        <target state="translated">Изп. име на прик. файл като загл.</target>
       </trans-unit>
       <trans-unit id="2881879110886196973" datatype="html">
         <source>Do not assign title from this rule</source>
@@ -3371,7 +3371,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">99</context>
         </context-group>
-        <target state="translated">Използвано име (или пощенски адрес, ако няма такова)</target>
+        <target state="translated">Използвано име (или пощ. адрес, ако няма такова)</target>
       </trans-unit>
       <trans-unit id="1258862217749148424" datatype="html">
         <source>Use correspondent selected below</source>
