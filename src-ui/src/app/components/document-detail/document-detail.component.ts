@@ -68,7 +68,6 @@ import {
   PaperlessCustomFieldDataType,
 } from 'src/app/data/paperless-custom-field'
 import { PaperlessCustomFieldInstance } from 'src/app/data/paperless-custom-field-instance'
-import { AbstractInputComponent } from '../common/input/abstract-input'
 
 enum DocumentDetailNavIDs {
   Details = 1,
@@ -864,14 +863,11 @@ export class DocumentDetailComponent
     this.updateFormForCustomFields(true)
   }
 
-  removeField(input: AbstractInputComponent<any>) {
-    // ok for now as custom field name unique is a constraint
-    const customFieldIndex = this.document.custom_fields.findIndex(
-      (f) => f.field.name === input.title
+  removeField(fieldInstance: PaperlessCustomFieldInstance) {
+    this.document.custom_fields.splice(
+      this.document.custom_fields.indexOf(fieldInstance),
+      1
     )
-    if (customFieldIndex > -1) {
-      this.document.custom_fields.splice(customFieldIndex, 1)
-      this.updateFormForCustomFields(true)
-    }
+    this.updateFormForCustomFields(true)
   }
 }

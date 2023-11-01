@@ -102,9 +102,12 @@
                             <pngx-input-tags formControlName="tags" [suggestions]="suggestions?.tags" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event)" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Tag }"></pngx-input-tags>
                             <ng-container *ngFor="let fieldInstance of document?.custom_fields; let i = index">
                                 <div [formGroup]="customFieldFormFields.controls[i]">
-                                    <pngx-input-text formControlName="value" *ngIf="fieldInstance.field.data_type === PaperlessCustomFieldDataType.String" [title]="fieldInstance.field.name" [removable]="true" (removed)="removeField($event)" [horizontal]="true"></pngx-input-text>
-                                    <pngx-input-date formControlName="value" *ngIf="fieldInstance.field.data_type === PaperlessCustomFieldDataType.Date" [title]="fieldInstance.field.name" [removable]="true" (removed)="removeField($event)" [horizontal]="true"></pngx-input-date>
-                                    <pngx-input-number formControlName="value" *ngIf="fieldInstance.field.data_type === PaperlessCustomFieldDataType.Integer" [title]="fieldInstance.field.name" [removable]="true" (removed)="removeField($event)" [horizontal]="true" [showAdd]="false"></pngx-input-number>
+                                    <!-- TODO: boolean + URL -->
+                                    <pngx-input-text formControlName="value" *ngIf="fieldInstance.field.data_type === PaperlessCustomFieldDataType.String" [title]="fieldInstance.field.name" [removable]="true" (removed)="removeField(fieldInstance)" [horizontal]="true"></pngx-input-text>
+                                    <pngx-input-date formControlName="value" *ngIf="fieldInstance.field.data_type === PaperlessCustomFieldDataType.Date" [title]="fieldInstance.field.name" [removable]="true" (removed)="removeField(fieldInstance)" [horizontal]="true"></pngx-input-date>
+                                    <pngx-input-number formControlName="value" *ngIf="fieldInstance.field.data_type === PaperlessCustomFieldDataType.Integer" [title]="fieldInstance.field.name" [removable]="true" (removed)="removeField(fieldInstance)" [horizontal]="true" [showAdd]="false"></pngx-input-number>
+                                    <pngx-input-check formControlName="value" *ngIf="fieldInstance.field.data_type === PaperlessCustomFieldDataType.Boolean" [title]="fieldInstance.field.name" [removable]="true" (removed)="removeField(fieldInstance)" [horizontal]="true"></pngx-input-check>
+                                    <pngx-input-url formControlName="value" *ngIf="fieldInstance.field.data_type === PaperlessCustomFieldDataType.Url" [title]="fieldInstance.field.name" [removable]="true" (removed)="removeField(fieldInstance)" [horizontal]="true"></pngx-input-url>
                                 </div>
                             </ng-container>
                         </div>

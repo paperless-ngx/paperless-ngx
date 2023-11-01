@@ -39,6 +39,7 @@ import { NgxFileDropModule } from 'ngx-file-drop'
 import { TextComponent } from './components/common/input/text/text.component'
 import { SelectComponent } from './components/common/input/select/select.component'
 import { CheckComponent } from './components/common/input/check/check.component'
+import { UrlComponent } from './components/common/input/url/url.component'
 import { PasswordComponent } from './components/common/input/password/password.component'
 import { SaveViewConfigDialogComponent } from './components/document-list/save-view-config-dialog/save-view-config-dialog.component'
 import { TagsComponent } from './components/common/input/tags/tags.component'
@@ -203,6 +204,7 @@ function initializeApp(settings: SettingsService) {
     TextComponent,
     SelectComponent,
     CheckComponent,
+    UrlComponent,
     PasswordComponent,
     SaveViewConfigDialogComponent,
     TagsComponent,

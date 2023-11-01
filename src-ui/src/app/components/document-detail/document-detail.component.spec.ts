@@ -847,7 +847,7 @@ describe('DocumentDetailComponent', () => {
     initNormally()
     const initialLength = doc.custom_fields.length
     expect(component.customFieldFormFields).toHaveLength(initialLength)
-    component.removeField({ title: 'Field 1' } as any)
+    component.removeField(doc.custom_fields[0])
     fixture.detectChanges()
     expect(component.document.custom_fields).toHaveLength(initialLength - 1)
     expect(component.customFieldFormFields).toHaveLength(initialLength - 1)
