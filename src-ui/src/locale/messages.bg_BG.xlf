@@ -344,7 +344,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">131</context>
         </context-group>
-        <target state="translated">Предходен</target>
+        <target state="translated">Назад</target>
       </trans-unit>
       <trans-unit id="3885497195825665706" datatype="html">
         <source>Next</source>
@@ -356,7 +356,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">65</context>
         </context-group>
-        <target state="translated">Следващ</target>
+        <target state="translated">Напред</target>
       </trans-unit>
       <trans-unit id="1241348629231510663" datatype="html">
         <source>End</source>
@@ -380,7 +380,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">146</context>
         </context-group>
-        <target state="translated">Завлечете и пуснете документи тук, за да започнете да качвате, или ги поставете в папката за консумация. Можете също така да плъзгате и пускате документи навсякъде на всички други страници на уеб приложението. След като го направите, Paperless-ngx ще започне да обучава своите алгоритми за машинно обучение.</target>
+        <target state="translated">Завлечете и пуснете документите тук, за да започнете качването, или ги поставете в папката за консумация. Също така можете да влачите и пускате документи навсякъде във всички други страници на уеб приложението. След като го направите, Paperless-ngx ще започне да обучава своите алгоритми за машинно обучение.</target>
       </trans-unit>
       <trans-unit id="7495498057594070122" datatype="html">
         <source>The documents list shows all of your documents and allows for filtering as well as bulk-editing. There are three different view styles: list, small cards and large cards. A list of documents currently opened for editing is shown in the sidebar.</source>
@@ -388,7 +388,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">151</context>
         </context-group>
-        <target state="translated">Списъкът с документи показва всички ваши документи и позволява филтриране, както и групово редактиране. Има три различни стила на изглед: списък, малки карти и големи карти. В страничната лента се показва списък с документи, отворени в момента за редактиране.</target>
+        <target state="translated">Списъкът с документи показва всички ваши документи и позволява филтриране, както и групово редактиране. Има три различни стила за изглед: списък, малки карти и големи карти. В страничната лента се показва списък с документи, отворени в момента за редактиране.</target>
       </trans-unit>
       <trans-unit id="1334220418719920556" datatype="html">
         <source>The filtering tools allow you to quickly find documents using various searches, dates, tags, etc.</source>
@@ -396,7 +396,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">158</context>
         </context-group>
-        <target state="translated">Инструментите за филтриране ви позволяват бързо да намирате документи, като използвате различни търсения, дати, тагове и др.</target>
+        <target state="translated">Инструментите за филтриране позволяват бързо да намирате документи, като използвате различни търсения, дати, етикети и др.</target>
       </trans-unit>
       <trans-unit id="5427326625898532358" datatype="html">
         <source>Any combination of filters can be saved as a &apos;view&apos; which can then be displayed on the dashboard and / or sidebar.</source>
@@ -428,7 +428,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">185</context>
         </context-group>
-        <target state="translated">Шаблоните за консумация ви дават по-фин контрол върху процеса на приемане на документи.</target>
+        <target state="translated">Шаблоните за консумация дават по-фин контрол върху процеса за приемане на документи.</target>
       </trans-unit>
       <trans-unit id="4680387114119209483" datatype="html">
         <source>File Tasks shows you documents that have been consumed, are waiting to be, or may have failed during the process.</source>
@@ -436,7 +436,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">193</context>
         </context-group>
-        <target state="translated">Файловите Задачи ви показва документи, които са били обработени, чакат да бъдат или са се провалили по време на процеса.</target>
+        <target state="translated">Файловите задачи ви показват документи, които са били обработени, чакат да бъдат или са се провалили по време на процеса.</target>
       </trans-unit>
       <trans-unit id="1453710303796913192" datatype="html">
         <source>Check out the settings for various tweaks to the web app and toggle settings for saved views.</source>
@@ -468,7 +468,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">213</context>
         </context-group>
-        <target state="translated">И накрая, от името на всеки участник в този проект, поддържан от общността, благодарим ви, че използвате Paperless-ngx!</target>
+        <target state="translated">И накрая, от името на всеки участник в този проект, поддържан от общността, благодарим Ви, че използвате Paperless-ngx!</target>
       </trans-unit>
       <trans-unit id="4804785061014590286" datatype="html">
         <source>Logs</source>
@@ -648,7 +648,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">56,57</context>
         </context-group>
-        <target state="translated">Кратко: <x id="INTERPOLATION" equiv-text="{{today | customDate:'shortDate':null:computedDateLocale}}"/></target>
+        <target state="translated">Кратка: <x id="INTERPOLATION" equiv-text="{{today | customDate:'shortDate':null:computedDateLocale}}"/></target>
       </trans-unit>
       <trans-unit id="6290748171049664628" datatype="html">
         <source>Medium: <x id="INTERPOLATION" equiv-text="{{today | customDate:&apos;mediumDate&apos;:null:computedDateLocale}}"/></source>
@@ -656,7 +656,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">60,61</context>
         </context-group>
-        <target state="translated">Средно: <x id="INTERPOLATION" equiv-text="{{today | customDate:'mediumDate':null:computedDateLocale}}"/></target>
+        <target state="translated">Средна: <x id="INTERPOLATION" equiv-text="{{today | customDate:'mediumDate':null:computedDateLocale}}"/></target>
       </trans-unit>
       <trans-unit id="7189855711197998347" datatype="html">
         <source>Long: <x id="INTERPOLATION" equiv-text="{{today | customDate:&apos;longDate&apos;:null:computedDateLocale}}"/></source>
@@ -1028,7 +1028,7 @@
           <context context-type="sourcefile">src/app/components/common/input/permissions/permissions-form/permissions-form.component.html</context>
           <context context-type="linenumber">64</context>
         </context-group>
-        <target state="translated">Разрешенията за редактиране също предоставят права за преглед</target>
+        <target state="translated">Правата за редактиране също предоставят права за преглед</target>
       </trans-unit>
       <trans-unit id="5851560788527570644" datatype="html">
         <source>Notifications</source>
@@ -1236,7 +1236,7 @@
           <context context-type="sourcefile">src/app/components/document-list/save-view-config-dialog/save-view-config-dialog.component.html</context>
           <context context-type="linenumber">10</context>
         </context-group>
-        <target state="translated">Показване на таблото</target>
+        <target state="translated">Показване в таблото за управление</target>
       </trans-unit>
       <trans-unit id="8689274715612276035" datatype="html">
         <source>Show in sidebar</source>
@@ -1634,7 +1634,7 @@
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="translated">Създадено</target>
+        <target state="translated">Създаден</target>
       </trans-unit>
       <trans-unit id="5968132631442328843" datatype="html">
         <source>Results</source>
@@ -2175,7 +2175,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="translated">Табло</target>
+        <target state="translated">Табло за управление</target>
       </trans-unit>
       <trans-unit id="4733307402565258070" datatype="html">
         <source>Documents</source>
@@ -2215,7 +2215,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">118</context>
         </context-group>
-        <target state="translated">Отваряне на документи</target>
+        <target state="translated">Отворени документи</target>
       </trans-unit>
       <trans-unit id="5687256342387781369" datatype="html">
         <source>Close all</source>
@@ -2515,7 +2515,7 @@
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.ts</context>
           <context context-type="linenumber">42</context>
         </context-group>
-        <target state="translated">Последните 7 дни</target>
+        <target state="translated">Миналите 7 дена</target>
       </trans-unit>
       <trans-unit id="4463380307954693363" datatype="html">
         <source>Last month</source>
@@ -2531,7 +2531,7 @@
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.ts</context>
           <context context-type="linenumber">52</context>
         </context-group>
-        <target state="translated">Последните 3 месеца</target>
+        <target state="translated">Миналите 3 месеца</target>
       </trans-unit>
       <trans-unit id="3566342898065860218" datatype="html">
         <source>Last year</source>
@@ -3579,7 +3579,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="translated">Всичко</target>
+        <target state="translated">Всички</target>
       </trans-unit>
       <trans-unit id="3184700926171002527" datatype="html">
         <source>Any</source>
@@ -3595,7 +3595,7 @@
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="translated">Включване</target>
+        <target state="translated">Включва</target>
       </trans-unit>
       <trans-unit id="5668077948386857930" datatype="html">
         <source>Exclude</source>
@@ -3603,7 +3603,7 @@
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="translated">Изключване</target>
+        <target state="translated">Изключва</target>
       </trans-unit>
       <trans-unit id="4391289919356861627" datatype="html">
         <source>Apply</source>
@@ -3628,7 +3628,7 @@
           <context context-type="linenumber">337</context>
         </context-group>
         <note priority="1" from="description">Filter drop down element to filter for documents with no correspondent/type/tag assigned</note>
-        <target state="translated">Не е възложен</target>
+        <target state="translated">Не е зададен</target>
       </trans-unit>
       <trans-unit id="445302259125375799" datatype="html">
         <source>Invalid date.</source>
@@ -3781,7 +3781,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-filter-dropdown/permissions-filter-dropdown.component.html</context>
           <context context-type="linenumber">38</context>
         </context-group>
-        <target state="translated">Споделено с мен</target>
+        <target state="translated">Споделени с мен</target>
       </trans-unit>
       <trans-unit id="5151074932731293042" datatype="html">
         <source>Unowned</source>
@@ -3789,7 +3789,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-filter-dropdown/permissions-filter-dropdown.component.html</context>
           <context context-type="linenumber">48</context>
         </context-group>
-        <target state="translated">Безстопанственo</target>
+        <target state="translated">Безстопанствени</target>
       </trans-unit>
       <trans-unit id="8999708063434507268" datatype="html">
         <source>Hide unowned</source>
@@ -4021,7 +4021,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
           <context context-type="linenumber">71</context>
         </context-group>
-        <target state="translated">Актуализирано табло</target>
+        <target state="translated">Таблото за управление е актуализирано</target>
       </trans-unit>
       <trans-unit id="3214475953924351473" datatype="html">
         <source>Error updating dashboard</source>
@@ -4029,7 +4029,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
           <context context-type="linenumber">74</context>
         </context-group>
-        <target state="translated">Грешка при актуализиране на табло</target>
+        <target state="translated">Грешка при актуализиране на таблото за управление</target>
       </trans-unit>
       <trans-unit id="2946624699882754313" datatype="html">
         <source>Show all</source>
@@ -4181,7 +4181,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="translated">Общо символи</target>
+        <target state="translated">Общо знаци</target>
       </trans-unit>
       <trans-unit id="4369111787961525769" datatype="html">
         <source>Document Types</source>
@@ -4271,7 +4271,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.ts</context>
           <context context-type="linenumber">50</context>
         </context-group>
-        <target state="translated">Добавено: <x id="PH" equiv-text="countSuccess"/></target>
+        <target state="translated">Добавени: <x id="PH" equiv-text="countSuccess"/></target>
       </trans-unit>
       <trans-unit id="760986369763309193" datatype="html">
         <source>, </source>
@@ -4308,7 +4308,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="translated">Повече подробности за това как да използвате и конфигурирате Paperless-ngx можете да намерите в <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://docs.paperless-ngx.com&quot; target=&quot;_blank&quot;&gt;"/>документация<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</target>
+        <target state="translated">Повече подробности за това как да използвате и конфигурирате Paperless-ngx можете да намерите в <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://docs.paperless-ngx.com&quot; target=&quot;_blank&quot;&gt;"/>документацията<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</target>
       </trans-unit>
       <trans-unit id="4294899532887357745" datatype="html">
         <source>Thanks for being a part of the Paperless-ngx community!</source>
@@ -4556,7 +4556,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">140</context>
         </context-group>
-        <target state="translated">Оригинален мим тип</target>
+        <target state="translated">Оригинален mime тип</target>
       </trans-unit>
       <trans-unit id="342875990758166588" datatype="html">
         <source>Archive MD5 checksum</source>
@@ -4588,7 +4588,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">155</context>
         </context-group>
-        <target state="translated">Архивирани метаданни на документ</target>
+        <target state="translated">Архивирани метаданни на документа</target>
       </trans-unit>
       <trans-unit id="1295614462098694869" datatype="html">
         <source>Preview</source>
@@ -4624,7 +4624,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">204</context>
         </context-group>
-        <target state="translated">Изхвърли</target>
+        <target state="translated">Откажи</target>
       </trans-unit>
       <trans-unit id="5129524307369213584" datatype="html">
         <source>Save &amp; next</source>
@@ -4676,7 +4676,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">540</context>
         </context-group>
-        <target state="translated">Документът е запазен успешно.</target>
+        <target state="translated">Документа е запазен успешно.</target>
       </trans-unit>
       <trans-unit id="448882439049417053" datatype="html">
         <source>Error saving document</source>
@@ -4820,7 +4820,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">44</context>
         </context-group>
-        <target state="translated">Филтриране на типове документи</target>
+        <target state="translated">Филтриране по тип на документ</target>
       </trans-unit>
       <trans-unit id="8816999377397522522" datatype="html">
         <source>Filter storage paths</source>
@@ -5130,7 +5130,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">56,57</context>
         </context-group>
-        <target state="translated">Създаде: <x id="INTERPOLATION" equiv-text="{{ document.created | customDate }}"/></target>
+        <target state="translated">Създаден: <x id="INTERPOLATION" equiv-text="{{ document.created | customDate }}"/></target>
       </trans-unit>
       <trans-unit id="2030261243264601523" datatype="html">
         <source>Added: <x id="INTERPOLATION" equiv-text="{{ document.added | customDate }}"/></source>
@@ -5142,7 +5142,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">57,58</context>
         </context-group>
-        <target state="translated">Добави: <x id="INTERPOLATION" equiv-text="{{ document.added | customDate }}"/></target>
+        <target state="translated">Добавен: <x id="INTERPOLATION" equiv-text="{{ document.added | customDate }}"/></target>
       </trans-unit>
       <trans-unit id="4235671847487610290" datatype="html">
         <source>Modified: <x id="INTERPOLATION" equiv-text="{{ document.modified | customDate }}"/></source>
@@ -5154,7 +5154,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">58,59</context>
         </context-group>
-        <target state="translated">Промени: <x id="INTERPOLATION" equiv-text="{{ document.modified | customDate }}"/></target>
+        <target state="translated">Променен: <x id="INTERPOLATION" equiv-text="{{ document.modified | customDate }}"/></target>
       </trans-unit>
       <trans-unit id="2332107018974972998" datatype="html">
         <source>Score:</source>
@@ -5210,7 +5210,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="translated">Изберете страница</target>
+        <target state="translated">Избери страница</target>
       </trans-unit>
       <trans-unit id="1494518490116523821" datatype="html">
         <source>Select all</source>
@@ -5402,7 +5402,7 @@
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="translated">Добавено</target>
+        <target state="translated">Добавен</target>
       </trans-unit>
       <trans-unit id="2179847500064178686" datatype="html">
         <source>Edit document</source>
@@ -6274,7 +6274,7 @@
           <context context-type="sourcefile">src/app/components/not-found/not-found.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="translated">Отиди до таблото</target>
+        <target state="translated">Отиди до таблото за управление</target>
       </trans-unit>
       <trans-unit id="2167862279705099846" datatype="html">
         <source>Auto: Learn matching automatically</source>
@@ -6282,7 +6282,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="translated">Автоматично: Научете съвпадението автоматично</target>
+        <target state="translated">Автоматично: Автоматично научено съвпадение</target>
       </trans-unit>
       <trans-unit id="5851669019930456395" datatype="html">
         <source>Any word</source>
@@ -6298,7 +6298,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="translated">Всеки: Документ съдържащ някоя от тези думи (разделени с интервал)</target>
+        <target state="translated">Всичко: Документ съдържащ някоя от тези думи (разделени с интервал)</target>
       </trans-unit>
       <trans-unit id="700315718208181326" datatype="html">
         <source>All words</source>
@@ -6314,7 +6314,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="translated">Всички: Документи съдържащи всички тези думи (разделени с интервал)</target>
+        <target state="translated">Всичко: Документи, съдържащи всички тези думи (разделени с интервал)</target>
       </trans-unit>
       <trans-unit id="9180173992399180575" datatype="html">
         <source>Exact match</source>
@@ -6330,7 +6330,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">31</context>
         </context-group>
-        <target state="translated">Точно: Документът съдържа този низ</target>
+        <target state="translated">Точно: Документа съдържа този низ</target>
       </trans-unit>
       <trans-unit id="1338733395833138319" datatype="html">
         <source>Regular expression</source>
@@ -6346,7 +6346,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="translated">Регулярен израз: Документът съответства на този регулярен израз</target>
+        <target state="translated">Регулярен израз: Документа съответства на този регулярен израз</target>
       </trans-unit>
       <trans-unit id="1856513373880048959" datatype="html">
         <source>Fuzzy word</source>
@@ -6362,7 +6362,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">41</context>
         </context-group>
-        <target state="translated">Неясно: Документът съдържа дума, подобна на тази дума</target>
+        <target state="translated">Неясно: Документа съдържа дума, подобна на тази дума</target>
       </trans-unit>
       <trans-unit id="8233576851457338601" datatype="html">
         <source>None: Disable matching</source>
