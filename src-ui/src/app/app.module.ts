@@ -105,6 +105,7 @@ import { FileDropComponent } from './components/file-drop/file-drop.component'
 import localeAf from '@angular/common/locales/af'
 import localeAr from '@angular/common/locales/ar'
 import localeBe from '@angular/common/locales/be'
+import localeBg from '@angular/common/locales/bg'
 import localeCa from '@angular/common/locales/ca'
 import localeCs from '@angular/common/locales/cs'
 import localeDa from '@angular/common/locales/da'
@@ -133,6 +134,7 @@ import localeZh from '@angular/common/locales/zh'
 registerLocaleData(localeAf)
 registerLocaleData(localeAr)
 registerLocaleData(localeBe)
+registerLocaleData(localeBg)
 registerLocaleData(localeCa)
 registerLocaleData(localeCs)
 registerLocaleData(localeDa)
