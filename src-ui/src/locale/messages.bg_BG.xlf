@@ -2307,7 +2307,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">172</context>
         </context-group>
-        <target state="translated">Пътища към хранилища</target>
+        <target state="translated">Пътища за съхранение</target>
       </trans-unit>
       <trans-unit id="4462691404891390153" datatype="html">
         <source>Consumption templates</source>
@@ -2567,7 +2567,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">19</context>
         </context-group>
-        <target state="translated">Обработване на документи, които отговарят на <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>all<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> филтрите, посочени по-долу.</target>
+        <target state="translated">Обработване на документи, които отговарят на <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>all<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> филтри, посочени по-долу.</target>
       </trans-unit>
       <trans-unit id="1473412958770421458" datatype="html">
         <source>Filter sources</source>
@@ -2647,7 +2647,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="translated">Може да съдържа някои заместващи елементи (placeholders), вижте &lt;a target='_blank' href='https://docs.paperless-ngx.com/usage/#consumption-templates'&gt;документация&lt;/a&gt;.</target>
+        <target state="translated">Може да съдържа някои заместващи елементи (placeholders), вижте &lt;a target='_blank' href='https://docs.paperless-ngx.com/usage/#consumption-templates'&gt;документацията&lt;/a&gt;.</target>
       </trans-unit>
       <trans-unit id="6528897010417701530" datatype="html">
         <source>Assign tags</source>
@@ -2803,7 +2803,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.ts</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="translated">Качване на API</target>
+        <target state="translated">Качване от API</target>
       </trans-unit>
       <trans-unit id="7502272564743467653" datatype="html">
         <source>Mail Fetch</source>
@@ -2995,7 +2995,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.html</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="translated">Паролата е жетон</target>
+        <target state="translated">Паролата е токен</target>
       </trans-unit>
       <trans-unit id="8313198211675984619" datatype="html">
         <source>Check if the password above is a token used for authentication</source>
@@ -3275,7 +3275,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">31</context>
         </context-group>
-        <target state="translated">Обработване на всички файлове, включително на "вградените" прикачени файлове</target>
+        <target state="translated">Обр. на вс. файлове, вкл. на "вградените" прикачени файлове</target>
       </trans-unit>
       <trans-unit id="9025522236384167767" datatype="html">
         <source>Process message as .eml</source>
@@ -3291,7 +3291,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">46</context>
         </context-group>
-        <target state="translated">Обработване на съобщение като .eml и прикачени файлове поотделно</target>
+        <target state="translated">Обр. на съоб. като .eml и прик. файлове поотделно</target>
       </trans-unit>
       <trans-unit id="2784260611081866636" datatype="html">
         <source>Move to specified folder</source>
@@ -3431,7 +3431,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.ts</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="translated">Вижте &lt;a target="_blank" href="https://docs.paperless-ngx.com/advanced_usage/#file-name-handling"&gt;документация&lt;/a&gt; за пълен списък.</target>
+        <target state="translated">Вижте &lt;a target="_blank" href="https://docs.paperless-ngx.com/advanced_usage/#file-name-handling"&gt;документацията&lt;/a&gt; за пълен списък.</target>
       </trans-unit>
       <trans-unit id="6898961890896270754" datatype="html">
         <source>Create new storage path</source>
@@ -4197,7 +4197,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">67</context>
         </context-group>
-        <target state="translated">Пътища към хранилища</target>
+        <target state="translated">Пътища за съхранение</target>
       </trans-unit>
       <trans-unit id="8693603235657020323" datatype="html">
         <source>Other</source>
