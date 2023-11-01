@@ -32,6 +32,7 @@ class Migration(migrations.Migration):
                         db_index=True,
                         default=django.utils.timezone.now,
                         verbose_name="created",
+                        editable=False,
                     ),
                 ),
                 ("name", models.CharField(max_length=128)),
@@ -47,6 +48,7 @@ class Migration(migrations.Migration):
                         ],
                         max_length=50,
                         verbose_name="data type",
+                        editable=False,
                     ),
                 ),
             ],
@@ -71,6 +73,7 @@ class Migration(migrations.Migration):
                 (
                     "created",
                     models.DateTimeField(
+                        editable=False,
                         db_index=True,
                         default=django.utils.timezone.now,
                         verbose_name="created",
@@ -79,6 +82,7 @@ class Migration(migrations.Migration):
                 (
                     "document",
                     models.ForeignKey(
+                        editable=False,
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="custom_fields",
                         to="documents.document",
@@ -87,6 +91,7 @@ class Migration(migrations.Migration):
                 (
                     "field",
                     models.ForeignKey(
+                        editable=False,
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="fields",
                         to="documents.customfield",

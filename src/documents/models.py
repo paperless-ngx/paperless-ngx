@@ -902,6 +902,7 @@ class CustomField(models.Model):
         _("created"),
         default=timezone.now,
         db_index=True,
+        editable=False,
     )
 
     name = models.CharField(max_length=128)
@@ -910,6 +911,7 @@ class CustomField(models.Model):
         _("data type"),
         max_length=50,
         choices=FieldDataType.choices,
+        editable=False,
     )
 
     class Meta:
@@ -937,6 +939,7 @@ class CustomFieldInstance(models.Model):
         _("created"),
         default=timezone.now,
         db_index=True,
+        editable=False,
     )
 
     document = models.ForeignKey(
@@ -945,6 +948,7 @@ class CustomFieldInstance(models.Model):
         null=False,
         on_delete=models.CASCADE,
         related_name="custom_fields",
+        editable=False,
     )
 
     field = models.ForeignKey(
@@ -953,6 +957,7 @@ class CustomFieldInstance(models.Model):
         null=False,
         on_delete=models.CASCADE,
         related_name="fields",
+        editable=False,
     )
 
     class Meta:

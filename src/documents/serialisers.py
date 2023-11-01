@@ -398,6 +398,11 @@ class StoragePathField(serializers.PrimaryKeyRelatedField):
 
 
 class CustomFieldSerializer(serializers.ModelSerializer):
+    data_type = serializers.ChoiceField(
+        choices=CustomField.FieldDataType,
+        read_only=False,
+    )
+
     class Meta:
         model = CustomField
         fields = [
