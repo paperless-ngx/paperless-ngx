@@ -44,6 +44,10 @@ export class CustomFieldsDropdownComponent implements OnDestroy {
     return $localize`Choose field`
   }
 
+  get notFoundText(): string {
+    return $localize`No unused fields found`
+  }
+
   constructor(
     private customFieldsService: CustomFieldsService,
     private modalService: NgbModal,
@@ -82,8 +86,9 @@ export class CustomFieldsDropdownComponent implements OnDestroy {
     this.added.emit(this.customFields.find((f) => f.id === this.field))
   }
 
-  createField() {
+  createField(newName: string = null) {
     const modal = this.modalService.open(CustomFieldEditDialogComponent)
+    if (newName) modal.componentInstance.object = { name: newName }
     modal.componentInstance.succeeded
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((newField) => {

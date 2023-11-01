@@ -88,6 +88,9 @@ export class SelectComponent extends AbstractInputComponent<number> {
   @Input()
   showFilter: boolean = false
 
+  @Input()
+  notFoundText: string = $localize`No items found`
+
   @Output()
   createNew = new EventEmitter<string>()
 

@@ -8,7 +8,7 @@
         </svg>&nbsp;<ng-container i18n>Remove</ng-container>
       </button>
     </div>
-    <div [class.col-md-9]="horizontal">
+    <div [ngClass]="{'col-md-9': horizontal, 'align-items-center': horizontal, 'd-flex': horizontal}">
       <div class="form-check">
         <input #inputField type="checkbox" class="form-check-input" [id]="inputId" [(ngModel)]="value" (change)="onChange(value)" (blur)="onTouched()" [disabled]="disabled">
         <label *ngIf="!horizontal" class="form-check-label" [for]="inputId">{{title}}</label>

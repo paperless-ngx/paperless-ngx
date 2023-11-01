@@ -124,4 +124,14 @@ describe('CustomFieldsDropdownComponent', () => {
     expect(toastInfoSpy).toHaveBeenCalled()
     expect(getFieldsSpy).toHaveBeenCalled()
   })
+
+  it('should support creating field with name', () => {
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
+    component.createField('Foo bar')
+
+    expect(modal).not.toBeUndefined()
+    const editDialog = modal.componentInstance as CustomFieldEditDialogComponent
+    expect(editDialog.object.name).toEqual('Foo bar')
+  })
 })

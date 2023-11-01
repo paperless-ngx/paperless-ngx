@@ -13,6 +13,8 @@
                     bindLabel="name"
                     [(ngModel)]="field"
                     [placeholder]="placeholderText"
+                    [notFoundText]="notFoundText"
+                    (createNew)="createField($event)"
                     bindValue="id">
                 </pngx-input-select>
                 <div class="btn-toolbar" role="toolbar">
