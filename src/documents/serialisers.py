@@ -2,7 +2,6 @@ import datetime
 import math
 import re
 import zoneinfo
-from typing import Any
 
 import magic
 from celery import states
@@ -459,24 +458,16 @@ class DocumentSerializer(OwnedObjectSerializer, DynamicFieldsModelSerializer):
             doc["content"] = doc.get("content")[0:550]
         return doc
 
-    def to_internal_value(self, data: Any) -> Any:
-        # hack-y
-        values = super().to_internal_value(data)
-        if "custom_fields" in values:
-            for index, field_instance in enumerate(values["custom_fields"]):
-                data_custom_field = data["custom_fields"][index]
-                field_instance["field"]["id"] = data_custom_field["field"]["id"]
-                field_instance["value"] = data_custom_field["value"]
-        return values
-
     def update(self, instance: Document, validated_data):
         if "custom_fields" in validated_data:
             custom_fields = validated_data.pop("custom_fields")
-            for field_data in custom_fields:
+            for index, field_data in enumerate(custom_fields):
+                # get field value from initial_data since its not on the model
+                initial_field_data = self.initial_data["custom_fields"][index]
                 CustomFieldInstance.from_json(
                     document=instance,
-                    field=field_data["field"],
-                    value=field_data["value"],
+                    field=initial_field_data["field"],
+                    value=initial_field_data["value"],
                 )
             existing_fields = CustomFieldInstance.objects.filter(document=instance)
             for existing_field in existing_fields:
@@ -484,7 +475,7 @@ class DocumentSerializer(OwnedObjectSerializer, DynamicFieldsModelSerializer):
                     not len(
                         [
                             f
-                            for f in custom_fields
+                            for f in self.initial_data["custom_fields"]
                             if f["field"]["id"] == existing_field.field.id
                         ],
                     )

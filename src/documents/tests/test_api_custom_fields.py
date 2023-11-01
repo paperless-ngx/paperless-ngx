@@ -82,35 +82,30 @@ class TestCustomField(DirectoriesMixin, APITestCase):
                     {
                         "field": {
                             "id": custom_field_string.id,
-                            "name": custom_field_string.name,
                         },
                         "value": "test value",
                     },
                     {
                         "field": {
                             "id": custom_field_date.id,
-                            "name": custom_field_date.name,
                         },
                         "value": "2023-10-31",
                     },
                     {
                         "field": {
                             "id": custom_field_int.id,
-                            "name": custom_field_int.name,
                         },
                         "value": 3,
                     },
                     {
                         "field": {
                             "id": custom_field_boolean.id,
-                            "name": custom_field_boolean.name,
                         },
                         "value": True,
                     },
                     {
                         "field": {
                             "id": custom_field_url.id,
-                            "name": custom_field_url.name,
                         },
                         "value": "https://example.com",
                     },
