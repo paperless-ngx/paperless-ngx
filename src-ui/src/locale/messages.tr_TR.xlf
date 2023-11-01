@@ -2335,7 +2335,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">186</context>
         </context-group>
-        <target state="needs-translation">Mail</target>
+        <target state="translated">Posta</target>
       </trans-unit>
       <trans-unit id="7844706011418789951" datatype="html">
         <source>Administration</source>
@@ -2391,7 +2391,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">251,253</context>
         </context-group>
-        <target state="needs-translation"> How does this work? </target>
+        <target state="translated"> Bu nasıl çalışıyor? </target>
       </trans-unit>
       <trans-unit id="509090351011426949" datatype="html">
         <source>Update available</source>
@@ -2407,7 +2407,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
           <context context-type="linenumber">248</context>
         </context-group>
-        <target state="needs-translation">Sidebar views updated</target>
+        <target state="translated">Kenar çubuğu görünümleri güncellendi</target>
       </trans-unit>
       <trans-unit id="3547923076537026828" datatype="html">
         <source>Error updating sidebar views</source>
@@ -2415,7 +2415,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
           <context context-type="linenumber">251</context>
         </context-group>
-        <target state="needs-translation">Error updating sidebar views</target>
+        <target state="translated">Kenar çubuğu görünümlerini güncellerken hata oluştu</target>
       </trans-unit>
       <trans-unit id="2526035785704676448" datatype="html">
         <source>An error occurred while saving update checking settings.</source>
@@ -2423,7 +2423,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
           <context context-type="linenumber">272</context>
         </context-group>
-        <target state="needs-translation">An error occurred while saving update checking settings.</target>
+        <target state="translated">Güncelleme denetimi ayarları kaydedilirken bir hata oluştu.</target>
       </trans-unit>
       <trans-unit id="8700121026680200191" datatype="html">
         <source>Clear</source>
@@ -2447,7 +2447,7 @@
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/confirm-dialog.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation"><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;d-inline-block&quot; style=&quot;padding-bottom: 1px;&quot; &gt;"/>Cancel<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
+        <target state="translated"><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;d-inline-block&quot; style=&quot;padding-bottom: 1px;&quot; &gt;"/>İptal Et<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
       </trans-unit>
       <trans-unit id="1234709746630139322" datatype="html">
         <source>Confirmation</source>
@@ -2491,7 +2491,7 @@
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">now</target>
+        <target state="translated">şimdi</target>
       </trans-unit>
       <trans-unit id="6371576811194810854" datatype="html">
         <source>After</source>
@@ -2551,7 +2551,7 @@
           <context context-type="sourcefile">src/app/components/manage/consumption-templates/consumption-templates.component.html</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="needs-translation">Sort order</target>
+        <target state="translated">Sıralama</target>
       </trans-unit>
       <trans-unit id="4163272119298020373" datatype="html">
         <source>Filters</source>
@@ -2559,7 +2559,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="needs-translation">Filters</target>
+        <target state="translated">Filtreler</target>
       </trans-unit>
       <trans-unit id="9090904435418488635" datatype="html">
         <source>Process documents that match <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>all<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> filters specified below.</source>
@@ -2695,7 +2695,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">40</context>
         </context-group>
-        <target state="needs-translation">Assign owner</target>
+        <target state="translated">Sahip Ata</target>
       </trans-unit>
       <trans-unit id="1749184201773078639" datatype="html">
         <source>Assign view permissions</source>
@@ -2703,7 +2703,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">42</context>
         </context-group>
-        <target state="needs-translation">Assign view permissions</target>
+        <target state="translated">Yeni görüntüleme izni ata</target>
       </trans-unit>
       <trans-unit id="1744964187586405039" datatype="html">
         <source>Assign edit permissions</source>
@@ -2711,7 +2711,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">61</context>
         </context-group>
-        <target state="needs-translation">Assign edit permissions</target>
+        <target state="translated">Yeni değiştire izni ata</target>
       </trans-unit>
       <trans-unit id="1519954996184640001" datatype="html">
         <source>Error</source>
@@ -2975,7 +2975,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">IMAP Security</target>
+        <target state="translated">IMAP Güvenliği</target>
       </trans-unit>
       <trans-unit id="1431416938026210429" datatype="html">
         <source>Password</source>
@@ -2995,7 +2995,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.html</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="needs-translation">Password is token</target>
+        <target state="translated">Parola bir token</target>
       </trans-unit>
       <trans-unit id="8313198211675984619" datatype="html">
         <source>Check if the password above is a token used for authentication</source>
@@ -3003,7 +3003,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.html</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="needs-translation">Check if the password above is a token used for authentication</target>
+        <target state="translated">Yukarıdaki parolanın kimlik doğrulama için kullanılan bir token olup olmadığını kontrol edin</target>
       </trans-unit>
       <trans-unit id="6124167940736826613" datatype="html">
         <source>Character Set</source>
@@ -3011,7 +3011,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.html</context>
           <context context-type="linenumber">19</context>
         </context-group>
-        <target state="needs-translation">Character Set</target>
+        <target state="translated">Karakter Seti</target>
       </trans-unit>
       <trans-unit id="6563391987554512024" datatype="html">
         <source>Test</source>
@@ -3019,7 +3019,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.html</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="needs-translation">Test</target>
+        <target state="translated">Test</target>
       </trans-unit>
       <trans-unit id="451418349275958054" datatype="html">
         <source>No encryption</source>
@@ -3027,7 +3027,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.ts</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="needs-translation">No encryption</target>
+        <target state="translated">Şifrelemesiz</target>
       </trans-unit>
       <trans-unit id="3719080555538542367" datatype="html">
         <source>SSL</source>
@@ -3035,7 +3035,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.ts</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="needs-translation">SSL</target>
+        <target state="translated">SSL</target>
       </trans-unit>
       <trans-unit id="2620794666957669114" datatype="html">
         <source>STARTTLS</source>
@@ -3043,7 +3043,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.ts</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="needs-translation">STARTTLS</target>
+        <target state="translated">STARTTLS</target>
       </trans-unit>
       <trans-unit id="8758081884575368561" datatype="html">
         <source>Create new mail account</source>
@@ -3051,7 +3051,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.ts</context>
           <context context-type="linenumber">41</context>
         </context-group>
-        <target state="needs-translation">Create new mail account</target>
+        <target state="translated">Yeni bir kullanıcı postası oluştur</target>
       </trans-unit>
       <trans-unit id="5559445021532852612" datatype="html">
         <source>Edit mail account</source>
@@ -3059,7 +3059,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.ts</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="needs-translation">Edit mail account</target>
+        <target state="translated">Posta hesabını düzenle</target>
       </trans-unit>
       <trans-unit id="7726734777863565313" datatype="html">
         <source>Successfully connected to the mail server</source>
@@ -3067,7 +3067,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.ts</context>
           <context context-type="linenumber">90</context>
         </context-group>
-        <target state="needs-translation">Successfully connected to the mail server</target>
+        <target state="translated">Posta sunucusuna başarıyla bağlanıldı</target>
       </trans-unit>
       <trans-unit id="6533084895896956145" datatype="html">
         <source>Unable to connect to the mail server</source>
@@ -3075,7 +3075,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.ts</context>
           <context context-type="linenumber">91</context>
         </context-group>
-        <target state="needs-translation">Unable to connect to the mail server</target>
+        <target state="translated">Posta sunucusuna bağlanılamadı</target>
       </trans-unit>
       <trans-unit id="4086606389696938932" datatype="html">
         <source>Account</source>
@@ -3087,7 +3087,7 @@
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
           <context context-type="linenumber">67</context>
         </context-group>
-        <target state="needs-translation">Account</target>
+        <target state="translated">Hesap</target>
       </trans-unit>
       <trans-unit id="7046259383943324039" datatype="html">
         <source>Folder</source>
@@ -3095,7 +3095,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation">Folder</target>
+        <target state="translated">Klasör</target>
       </trans-unit>
       <trans-unit id="1391527525114848695" datatype="html">
         <source>Subfolders must be separated by a delimiter, often a dot (&apos;.&apos;) or slash (&apos;/&apos;), but it varies by mail server.</source>
@@ -3103,7 +3103,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation">Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server.</target>
+        <target state="translated">Alt klasörler, genellikle nokta ('.') veya eğik çizgi ('/') gibi bir sınırlayıcı ile ayrılmalıdır, ancak bu posta sunucusuna göre değişir.</target>
       </trans-unit>
       <trans-unit id="101686279614365671" datatype="html">
         <source>Maximum age (days)</source>
@@ -3111,7 +3111,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">Maximum age (days)</target>
+        <target state="translated">Maximum age (gün)</target>
       </trans-unit>
       <trans-unit id="7093509971705471817" datatype="html">
         <source>Attachment type</source>
@@ -3119,7 +3119,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="needs-translation">Attachment type</target>
+        <target state="translated">Ek türü</target>
       </trans-unit>
       <trans-unit id="559099472394646919" datatype="html">
         <source>Consumption scope</source>
@@ -3159,7 +3159,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Filter from</target>
+        <target state="translated">Şuradan filtrele</target>
       </trans-unit>
       <trans-unit id="8977094263269822022" datatype="html">
         <source>Filter to</source>
@@ -3167,7 +3167,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="needs-translation">Filter to</target>
+        <target state="translated">Buraya kadar filtrele</target>
       </trans-unit>
       <trans-unit id="8497813481090627874" datatype="html">
         <source>Filter subject</source>
@@ -3175,7 +3175,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="needs-translation">Filter subject</target>
+        <target state="translated">Filtre konusu</target>
       </trans-unit>
       <trans-unit id="7314357616097563149" datatype="html">
         <source>Filter body</source>
@@ -3797,7 +3797,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-filter-dropdown/permissions-filter-dropdown.component.html</context>
           <context context-type="linenumber">77</context>
         </context-group>
-        <target state="needs-translation">Hide unowned</target>
+        <target state="translated">Sahipsizleri gizle</target>
       </trans-unit>
       <trans-unit id="8650499415827640724" datatype="html">
         <source>Type</source>
@@ -3805,7 +3805,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
           <context context-type="linenumber">5</context>
         </context-group>
-        <target state="needs-translation">Type</target>
+        <target state="translated">Tür</target>
       </trans-unit>
       <trans-unit id="3249513483374643425" datatype="html">
         <source>Add</source>
@@ -3813,7 +3813,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
           <context context-type="linenumber">7</context>
         </context-group>
-        <target state="needs-translation">Add</target>
+        <target state="translated">Ekle</target>
       </trans-unit>
       <trans-unit id="1230154438678955604" datatype="html">
         <source>Change</source>
@@ -3821,7 +3821,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
           <context context-type="linenumber">8</context>
         </context-group>
-        <target state="needs-translation">Change</target>
+        <target state="translated">Değiştir</target>
       </trans-unit>
       <trans-unit id="6895273602775249942" datatype="html">
         <source>Inherited from group</source>
@@ -3865,7 +3865,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.ts</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="needs-translation">Share Links</target>
+        <target state="translated">Bağlantıları Paylaş</target>
       </trans-unit>
       <trans-unit id="6617773613987957957" datatype="html">
         <source> No existing links </source>
@@ -4205,7 +4205,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.ts</context>
           <context context-type="linenumber">65</context>
         </context-group>
-        <target state="needs-translation">Other</target>
+        <target state="translated">Diğer</target>
       </trans-unit>
       <trans-unit id="8187573012244728580" datatype="html">
         <source>Upload new documents</source>
@@ -4324,7 +4324,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">8</context>
         </context-group>
-        <target state="needs-translation">Start the tour</target>
+        <target state="translated">Tura başla</target>
       </trans-unit>
       <trans-unit id="7822640317427130239" datatype="html">
         <source>Searching document with asn <x id="INTERPOLATION" equiv-text="{{asn}}"/></source>
@@ -4372,7 +4372,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">89</context>
         </context-group>
-        <target state="needs-translation">Redo OCR</target>
+        <target state="translated">Yeniden OCR (Optik Karakter Tanıma) yap</target>
       </trans-unit>
       <trans-unit id="1418444397960583910" datatype="html">
         <source>More like this</source>
@@ -4404,7 +4404,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">60</context>
         </context-group>
-        <target state="needs-translation">Previous</target>
+        <target state="translated">Önceki</target>
       </trans-unit>
       <trans-unit id="5028777105388019087" datatype="html">
         <source>Details</source>
@@ -4472,7 +4472,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">51</context>
         </context-group>
-        <target state="needs-translation">Storage path</target>
+        <target state="translated">Depolama dizini</target>
       </trans-unit>
       <trans-unit id="5607669932062416162" datatype="html">
         <source>Default</source>
@@ -4532,7 +4532,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">128</context>
         </context-group>
-        <target state="needs-translation">Original filename</target>
+        <target state="translated">Orjinal dosya adı</target>
       </trans-unit>
       <trans-unit id="7985558498848210210" datatype="html">
         <source>Original MD5 checksum</source>
@@ -4596,7 +4596,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">161</context>
         </context-group>
-        <target state="needs-translation">Preview</target>
+        <target state="translated">Ön İzleme</target>
       </trans-unit>
       <trans-unit id="8191371354890763172" datatype="html">
         <source>Enter Password</source>
@@ -4656,7 +4656,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">398</context>
         </context-group>
-        <target state="needs-translation">Error retrieving metadata</target>
+        <target state="translated">Metaveri alınırken hata oluştu</target>
       </trans-unit>
       <trans-unit id="3456881259945295697" datatype="html">
         <source>Error retrieving suggestions.</source>
@@ -4664,7 +4664,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">419</context>
         </context-group>
-        <target state="needs-translation">Error retrieving suggestions.</target>
+        <target state="translated">Önerileri getirirken hata oluştu.</target>
       </trans-unit>
       <trans-unit id="8348337312757497317" datatype="html">
         <source>Document saved successfully.</source>
