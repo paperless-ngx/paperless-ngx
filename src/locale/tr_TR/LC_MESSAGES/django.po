@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-28 10:56-0700\n"
-"PO-Revision-Date: 2023-10-23 14:40\n"
+"PO-Revision-Date: 2023-11-01 11:11\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -393,15 +393,15 @@ msgstr ""
 
 #: documents/models.py:447
 msgid "has document type in"
-msgstr ""
+msgstr "belge türüne şurada sahip"
 
 #: documents/models.py:448
 msgid "does not have document type in"
-msgstr ""
+msgstr "belge türüne şurada sahip değil"
 
 #: documents/models.py:449
 msgid "has storage path in"
-msgstr ""
+msgstr "şurada depolama yolu mevcut"
 
 #: documents/models.py:450
 msgid "does not have storage path in"
@@ -744,11 +744,11 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_confirm.html:49
 msgid "New Password"
-msgstr ""
+msgstr "Yeni Parola"
 
 #: documents/templates/registration/password_reset_confirm.html:50
 msgid "Confirm Password"
-msgstr ""
+msgstr "Yeni Şifre (Tekrar)"
 
 #: documents/templates/registration/password_reset_confirm.html:61
 msgid "Change my password"
@@ -760,7 +760,7 @@ msgstr "yeni bir şifre değişikliği talebi oluşturun"
 
 #: documents/templates/registration/password_reset_done.html:14
 msgid "Paperless-ngx reset password sent"
-msgstr ""
+msgstr "Paperless-ngx sıfırlama şifresi gönderildi"
 
 #: documents/templates/registration/password_reset_done.html:40
 msgid "Check your inbox."
@@ -1024,7 +1024,7 @@ msgstr ""
 
 #: paperless_mail/models.py:67
 msgid "Process full Mail (with embedded attachments in file) as .eml + process attachments as separate documents"
-msgstr ""
+msgstr "Tüm postayı (dosyaya gömülü eklerle birlikte) .eml olarak işleyin + ekleri ayrı belgeler olarak işleyin"
 
 #: paperless_mail/models.py:73
 msgid "Process all files, including 'inline' attachments."
@@ -1048,7 +1048,7 @@ msgstr "E-Postayi etiketlendir, etiketlendirilmiş e-postaları işleme"
 
 #: paperless_mail/models.py:80
 msgid "Tag the mail with specified tag, don't process tagged mails"
-msgstr ""
+msgstr "Postayı belirtilen etiketle etiketleyin, etiketlenmiş postaları ise işleme koymayın"
 
 #: paperless_mail/models.py:83
 msgid "Use subject as title"
@@ -1060,7 +1060,7 @@ msgstr "Eklenti dosyanın ismini başlık olarak kullan"
 
 #: paperless_mail/models.py:85
 msgid "Do not assign title from rule"
-msgstr ""
+msgstr "Kuraldan başlık atama"
 
 #: paperless_mail/models.py:88
 msgid "Do not assign a correspondent"
@@ -1088,7 +1088,7 @@ msgstr "klasör"
 
 #: paperless_mail/models.py:109
 msgid "Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server."
-msgstr ""
+msgstr "Alt klasörler, genellikle nokta ('.') veya eğik çizgi ('/') gibi bir sınırlayıcı ile ayrılmalıdır, ancak bu posta sunucusuna göre değişir."
 
 #: paperless_mail/models.py:115
 msgid "filter from"
@@ -1096,7 +1096,7 @@ msgstr "den filtrele"
 
 #: paperless_mail/models.py:122
 msgid "filter to"
-msgstr ""
+msgstr "buraya kadar filtrele"
 
 #: paperless_mail/models.py:129
 msgid "filter subject"
@@ -1152,25 +1152,25 @@ msgstr "muhabiri atan"
 
 #: paperless_mail/models.py:230
 msgid "Assign the rule owner to documents"
-msgstr ""
+msgstr "Kural sahibini belgelere ata"
 
 #: paperless_mail/models.py:256
 msgid "uid"
-msgstr ""
+msgstr "uid"
 
 #: paperless_mail/models.py:264
 msgid "subject"
-msgstr ""
+msgstr "konu"
 
 #: paperless_mail/models.py:272
 msgid "received"
-msgstr ""
+msgstr "alındı"
 
 #: paperless_mail/models.py:279
 msgid "processed"
-msgstr ""
+msgstr "işlendi"
 
 #: paperless_mail/models.py:285
 msgid "status"
-msgstr ""
+msgstr "durum"
 
