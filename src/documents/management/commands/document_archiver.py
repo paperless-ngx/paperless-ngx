@@ -7,13 +7,15 @@ from django import db
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
+from documents.management.commands.mixins import MultiProcessMixin
+from documents.management.commands.mixins import ProgressBarMixin
 from documents.models import Document
 from documents.tasks import update_document_archive_file
 
 logger = logging.getLogger("paperless.management.archiver")
 
 
-class Command(BaseCommand):
+class Command(MultiProcessMixin, ProgressBarMixin, BaseCommand):
     help = (
         "Using the current classification model, assigns correspondents, tags "
         "and document types to all documents, effectively allowing you to "
@@ -43,20 +45,13 @@ class Command(BaseCommand):
                 "run on this specific document."
             ),
         )
-        parser.add_argument(
-            "--no-progress-bar",
-            default=False,
-            action="store_true",
-            help="If set, the progress bar will not be shown",
-        )
-        parser.add_argument(
-            "--processes",
-            default=max(1, os.cpu_count() // 4),
-            type=int,
-            help="Number of processes to distribute work amongst",
-        )
+        self.add_argument_progress_bar_mixin(parser)
+        self.add_argument_processes_mixin(parser)
 
     def handle(self, *args, **options):
+        self.handle_processes_mixin(**options)
+        self.handle_progress_bar_mixin(**options)
+
         os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
 
         overwrite = options["overwrite"]
@@ -74,18 +69,18 @@ class Command(BaseCommand):
         )
 
         # Note to future self: this prevents django from reusing database
-        # conncetions between processes, which is bad and does not work
+        # connections between processes, which is bad and does not work
         # with postgres.
         db.connections.close_all()
 
         try:
             logging.getLogger().handlers[0].level = logging.ERROR
-            with multiprocessing.Pool(processes=options["processes"]) as pool:
+            with multiprocessing.Pool(self.process_count) as pool:
                 list(
                     tqdm.tqdm(
                         pool.imap_unordered(update_document_archive_file, document_ids),
                         total=len(document_ids),
-                        disable=options["no_progress_bar"],
+                        disable=self.no_progress_bar,
                     ),
                 )
         except KeyboardInterrupt:

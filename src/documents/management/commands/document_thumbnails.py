@@ -1,12 +1,13 @@
 import logging
 import multiprocessing
-import os
 import shutil
 
 import tqdm
 from django import db
 from django.core.management.base import BaseCommand
 
+from documents.management.commands.mixins import MultiProcessMixin
+from documents.management.commands.mixins import ProgressBarMixin
 from documents.models import Document
 from documents.parsers import get_parser_class_for_mime_type
 
@@ -33,7 +34,7 @@ def _process_document(doc_id):
         parser.cleanup()
 
 
-class Command(BaseCommand):
+class Command(MultiProcessMixin, ProgressBarMixin, BaseCommand):
     help = "This will regenerate the thumbnails for all documents."
 
     def add_arguments(self, parser):
@@ -48,21 +49,14 @@ class Command(BaseCommand):
                 "run on this specific document."
             ),
         )
-        parser.add_argument(
-            "--no-progress-bar",
-            default=False,
-            action="store_true",
-            help="If set, the progress bar will not be shown",
-        )
-        parser.add_argument(
-            "--processes",
-            default=max(1, os.cpu_count() // 4),
-            type=int,
-            help="Number of processes to distribute work amongst",
-        )
+        self.add_argument_progress_bar_mixin(parser)
+        self.add_argument_processes_mixin(parser)
 
     def handle(self, *args, **options):
         logging.getLogger().handlers[0].level = logging.ERROR
+
+        self.handle_processes_mixin(**options)
+        self.handle_progress_bar_mixin(**options)
 
         if options["document"]:
             documents = Document.objects.filter(pk=options["document"])
@@ -76,11 +70,11 @@ class Command(BaseCommand):
         # with postgres.
         db.connections.close_all()
 
-        with multiprocessing.Pool(processes=options["processes"]) as pool:
+        with multiprocessing.Pool(processes=self.process_count) as pool:
             list(
                 tqdm.tqdm(
                     pool.imap_unordered(_process_document, ids),
                     total=len(ids),
-                    disable=options["no_progress_bar"],
+                    disable=self.no_progress_bar,
                 ),
             )

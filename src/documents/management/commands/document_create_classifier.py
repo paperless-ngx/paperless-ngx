@@ -9,8 +9,5 @@ class Command(BaseCommand):
         "file. The document consumer will then automatically use this new model."
     )
 
-    def __init__(self, *args, **kwargs):
-        BaseCommand.__init__(self, *args, **kwargs)
-
     def handle(self, *args, **options):
         train_classifier()
