@@ -587,6 +587,7 @@ LANGUAGES = [
     ("ar-ar", _("Arabic")),
     ("af-za", _("Afrikaans")),
     ("be-by", _("Belarusian")),
+    ("bg-bg", _("Bulgarian")),
     ("ca-es", _("Catalan")),
     ("cs-cz", _("Czech")),
     ("da-dk", _("Danish")),
