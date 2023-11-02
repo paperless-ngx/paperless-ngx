@@ -163,24 +163,61 @@ def consume_file(
 
     overrides.update(template_overrides)
 
-    # continue with consumption if no barcode was found
-    document = Consumer().try_consume_file(
-        input_doc.original_file,
-        override_filename=overrides.filename,
-        override_title=overrides.title,
-        override_correspondent_id=overrides.correspondent_id,
-        override_document_type_id=overrides.document_type_id,
-        override_tag_ids=overrides.tag_ids,
-        override_storage_path_id=overrides.storage_path_id,
-        override_created=overrides.created,
-        override_asn=overrides.asn,
-        override_owner_id=overrides.owner_id,
-        override_view_users=overrides.view_users,
-        override_view_groups=overrides.view_groups,
-        override_change_users=overrides.change_users,
-        override_change_groups=overrides.change_groups,
-        task_id=self.request.id,
-    )
+    document = None
+
+    import magic
+    import zipfile
+
+    mime_type = magic.from_file(input_doc.original_file, mime=True)
+    if mime_type == "application/zip":
+        with zipfile.ZipFile(input_doc.original_file, "r") as zip_ref:
+            for member in zip_ref.namelist():
+                filename = os.path.basename(member)
+                # skip directories
+                if not filename:
+                    continue
+
+                # copy file (taken from zipfile's extract)
+                try:
+                    source = zip_ref.open(member)
+                    target = open(os.path.join(input_doc.original_file.parent, filename), "wb")
+                    logger.info(f"extracting {filename} from zipfile {path}")
+                    with source, target:
+                        shutil.copyfileobj(source, target)
+                        # continue with consumption if no barcode was found
+                        document = Consumer().try_consume_file(
+                            os.path.join(input_doc.original_file.parent, filename),
+                            override_filename=override_filename,
+                            override_title=override_title,
+                            override_correspondent_id=override_correspondent_id,
+                            override_document_type_id=override_document_type_id,
+                            override_tag_ids=override_tag_ids,
+                            task_id=task_id,
+                            override_created=override_created,
+                            override_date_of_receipt=override_date_of_receipt,
+                            override_asn=asn,
+                        )
+                except Exception as e:
+                    logger.warning("error extracting zipfile: " + str(e))
+    else:
+        # continue with consumption if no barcode was found
+        document = Consumer().try_consume_file(
+            input_doc.original_file,
+            override_filename=overrides.filename,
+            override_title=overrides.title,
+            override_correspondent_id=overrides.correspondent_id,
+            override_document_type_id=overrides.document_type_id,
+            override_tag_ids=overrides.tag_ids,
+            override_storage_path_id=overrides.storage_path_id,
+            override_created=overrides.created,
+            override_asn=overrides.asn,
+            override_owner_id=overrides.owner_id,
+            override_view_users=overrides.view_users,
+            override_view_groups=overrides.view_groups,
+            override_change_users=overrides.change_users,
+            override_change_groups=overrides.change_groups,
+            task_id=self.request.id,
+        )
 
     if document:
         return f"Success. New document id {document.pk} created"
