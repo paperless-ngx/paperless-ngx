@@ -138,6 +138,7 @@ class TestParserAvailability(TestCase):
             - The Tesseract based parser is return
         """
         supported_mimes_and_exts = [
+            ("application/zip", ".zip"),
             ("application/pdf", ".pdf"),
             ("image/png", ".png"),
             ("image/jpeg", ".jpg"),
