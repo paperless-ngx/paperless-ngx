@@ -1636,10 +1636,6 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertIsNone(overrides.tag_ids)
 
     def test_upload_zipfile(self):
-        import logging
-
-        LOGGER = logging.getLogger(__name__)
-
         self.consume_file_mock.return_value = celery.result.AsyncResult(
             id=str(uuid.uuid4()),
         )
@@ -1652,7 +1648,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
                 "/api/documents/post_document/",
                 {"document": f},
             )
-            LOGGER.info(response.content)
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_upload_empty_metadata(self):
