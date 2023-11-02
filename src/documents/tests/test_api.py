@@ -1684,7 +1684,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         )
 
         with open(
-            os.path.join(os.path.dirname(__file__), "samples", "simple.zip"),
+            os.path.join(os.path.dirname(__file__), "samples", "simple.raw"),
             "rb",
         ) as f:
             response = self.client.post(
