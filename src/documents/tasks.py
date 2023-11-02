@@ -1,6 +1,7 @@
 import hashlib
 import logging
 import shutil
+import os
 import uuid
 from typing import Optional
 
