@@ -838,7 +838,7 @@ export class DocumentDetailComponent
 
   updateFormForCustomFields(emitEvent: boolean = false) {
     this.customFieldFormFields.clear({ emitEvent: false })
-    this.document.custom_fields.forEach((fieldInstance) => {
+    this.document.custom_fields?.forEach((fieldInstance) => {
       this.customFieldFormFields.push(
         new FormGroup({
           field: new FormGroup({
