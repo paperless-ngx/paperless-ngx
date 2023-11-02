@@ -422,40 +422,19 @@ class CustomFieldOnUpdateSerializer(serializers.ModelSerializer):
         ]
 
 
+class ReadWriteSerializerMethodField(serializers.SerializerMethodField):
+    def __init__(self, method_name=None, **kwargs):
+        self.method_name = method_name
+        kwargs["source"] = "*"
+        super(serializers.SerializerMethodField, self).__init__(**kwargs)
+
+    def to_internal_value(self, data):
+        return {self.field_name: data}
+
+
 class CustomFieldInstanceSerializer(serializers.ModelSerializer):
     field = serializers.PrimaryKeyRelatedField(queryset=CustomField.objects.all())
-    value = serializers.SerializerMethodField(read_only=True)
-    value_text = serializers.CharField(required=False, write_only=True)
-    value_bool = serializers.BooleanField(required=False, write_only=True)
-    value_url = serializers.URLField(required=False, write_only=True)
-    value_date = serializers.DateField(required=False, write_only=True)
-    value_int = serializers.IntegerField(required=False, write_only=True)
-
-    def validate(self, data):
-        """
-        Check that start is before finish.
-        """
-        # Let the normal validation run first
-        data = super().validate(data)
-        # This field must exist, as it is validated
-        parent_field = data["field"]
-        type_to_key_map = {
-            CustomField.FieldDataType.STRING: "value_text",
-            CustomField.FieldDataType.URL: "value_url",
-            CustomField.FieldDataType.DATE: "value_date",
-            CustomField.FieldDataType.BOOL: "value_bool",
-            CustomField.FieldDataType.INT: "value_int",
-        }
-        # For the given data type, a certain key must exist
-        expected_key = type_to_key_map[parent_field.data_type]
-        if expected_key not in data:
-            raise serializers.ValidationError(
-                (
-                    f"Field of type {parent_field.data_type} must"
-                    f' contain a "{expected_key}" key'
-                ),
-            )
-        return data
+    value = ReadWriteSerializerMethodField()
 
     def create(self, validated_data):
         type_to_key_map = {
@@ -476,7 +455,7 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
         instance, _ = CustomFieldInstance.objects.update_or_create(
             document=document,
             field=custom_field,
-            defaults={expected_key: validated_data[expected_key]},
+            defaults={expected_key: validated_data["value"]},
         )
         return instance
 
@@ -487,11 +466,6 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
         model = CustomFieldInstance
         fields = [
             "value",
-            "value_text",
-            "value_bool",
-            "value_url",
-            "value_date",
-            "value_int",
             "field",
         ]
 

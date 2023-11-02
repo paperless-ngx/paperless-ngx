@@ -87,23 +87,23 @@ class TestCustomField(DirectoriesMixin, APITestCase):
                 "custom_fields": [
                     {
                         "field": custom_field_string.id,
-                        "value_text": "test value",
+                        "value": "test value",
                     },
                     {
                         "field": custom_field_date.id,
-                        "value_date": date_value.isoformat(),
+                        "value": date_value.isoformat(),
                     },
                     {
                         "field": custom_field_int.id,
-                        "value_int": 3,
+                        "value": 3,
                     },
                     {
                         "field": custom_field_boolean.id,
-                        "value_bool": True,
+                        "value": True,
                     },
                     {
                         "field": custom_field_url.id,
-                        "value_url": "https://example.com",
+                        "value": "https://example.com",
                     },
                 ],
             },
@@ -150,7 +150,7 @@ class TestCustomField(DirectoriesMixin, APITestCase):
                 "custom_fields": [
                     {
                         "field": custom_field_string.id,
-                        "value_text": "test value",
+                        "value": "test value",
                     },
                 ],
             },
@@ -170,7 +170,7 @@ class TestCustomField(DirectoriesMixin, APITestCase):
                 "custom_fields": [
                     {
                         "field": custom_field_string.id,
-                        "value_text": "a new test value",
+                        "value": "a new test value",
                     },
                 ],
             },
@@ -207,11 +207,11 @@ class TestCustomField(DirectoriesMixin, APITestCase):
                 "custom_fields": [
                     {
                         "field": custom_field_string.id,
-                        "value_text": "a new test value",
+                        "value": "a new test value",
                     },
                     {
                         "field": custom_field_date.id,
-                        "value_date": date_value.isoformat(),
+                        "value": date_value.isoformat(),
                     },
                 ],
             },
@@ -227,7 +227,7 @@ class TestCustomField(DirectoriesMixin, APITestCase):
                 "custom_fields": [
                     {
                         "field": custom_field_date.id,
-                        "value_date": date_value.isoformat(),
+                        "value": date_value.isoformat(),
                     },
                 ],
             },
