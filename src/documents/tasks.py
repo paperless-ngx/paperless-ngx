@@ -181,21 +181,26 @@ def consume_file(
                 try:
                     source = zip_ref.open(member)
                     target = open(os.path.join(input_doc.original_file.parent, filename), "wb")
-                    logger.info(f"extracting {filename} from zipfile {path}")
+                    logger.info(f"extracting {filename} from zipfile {input_doc.original_file}")
                     with source, target:
                         shutil.copyfileobj(source, target)
                         # continue with consumption if no barcode was found
                         document = Consumer().try_consume_file(
                             os.path.join(input_doc.original_file.parent, filename),
-                            override_filename=override_filename,
-                            override_title=override_title,
-                            override_correspondent_id=override_correspondent_id,
-                            override_document_type_id=override_document_type_id,
-                            override_tag_ids=override_tag_ids,
-                            task_id=task_id,
-                            override_created=override_created,
-                            override_date_of_receipt=override_date_of_receipt,
-                            override_asn=asn,
+                            override_filename=overrides.filename,
+                            override_title=overrides.title,
+                            override_correspondent_id=overrides.correspondent_id,
+                            override_document_type_id=overrides.document_type_id,
+                            override_tag_ids=overrides.tag_ids,
+                            override_storage_path_id=overrides.storage_path_id,
+                            override_created=overrides.created,
+                            override_asn=overrides.asn,
+                            override_owner_id=overrides.owner_id,
+                            override_view_users=overrides.view_users,
+                            override_view_groups=overrides.view_groups,
+                            override_change_users=overrides.change_users,
+                            override_change_groups=overrides.change_groups,
+                            task_id=self.request.id,
                         )
                 except Exception as e:
                     logger.warning("error extracting zipfile: " + str(e))
