@@ -9,6 +9,7 @@ def tesseract_consumer_declaration(sender, **kwargs):
         "parser": get_parser,
         "weight": 0,
         "mime_types": {
+            "application/zip": ".zip",
             "application/pdf": ".pdf",
             "image/jpeg": ".jpg",
             "image/png": ".png",
