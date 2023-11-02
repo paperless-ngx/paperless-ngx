@@ -15,6 +15,7 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator
 from django.core.validators import MinValueValidator
+from django.core.validators import MinLengthValidator
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -128,6 +129,58 @@ class StoragePath(MatchingModel):
     class Meta(MatchingModel.Meta):
         verbose_name = _("storage path")
         verbose_name_plural = _("storage paths")
+
+class ASNPrefix(models.Model):
+    prefix = models.CharField(_("ASN-Prefix"), max_length=16, blank=False, primary_key=True, validators=[MinLengthValidator(2)])
+    description = models.CharField(_("Description", max_length=512, blank=True))
+
+    def __str__(self):
+        return f"{self.prefix.prefix}"
+
+class ASN(models.Model):
+    prefix = models.ForeignKey(
+        ASNPrefix,
+        blank = False,
+        on_delete = models.CASCADE  # TODO: Not shure about that one
+    )
+
+    ARCHIVE_SERIAL_NUMBER_MIN: Final[int] = 0
+    ARCHIVE_SERIAL_NUMBER_MAX: Final[int] = 0xFF_FF_FF_FF
+
+    number = models.PositiveIntegerField(
+        _("archive serial number"),
+        blank=True,
+        null=True,
+        unique=False,
+        db_index=True,
+        validators=[
+            MaxValueValidator(ARCHIVE_SERIAL_NUMBER_MAX),
+            MinValueValidator(ARCHIVE_SERIAL_NUMBER_MIN),
+        ],
+        help_text=_(
+            "The position of this document in your physical document archive.",
+        ),
+    )
+
+    class Meta:
+        unique_together = ('prefix', 'number')
+
+    def __str__(self):
+        return f"{self.prefix.prefix}-{self.number:06d}"
+
+    @staticmethod
+    def get_max_number_for_prefix(prefix):
+        try:
+            max_number = ASN.objects.filter(prefix=prefix).aggregate(models.Max('number'))['number__max']
+            return max_number if max_number is not None else 0
+        except ASN.DoesNotExist:
+            return 0
+
+    @staticmethod
+    def get_next_ASN_for_prefix(prefix):
+        return ASN(prefix, ASN.get_max_number_for_prefix(prefix)+1)
+
+
 
 
 class Document(ModelWithOwner):
@@ -256,19 +309,14 @@ class Document(ModelWithOwner):
         help_text=_("The original name of the file when it was uploaded"),
     )
 
-    ARCHIVE_SERIAL_NUMBER_MIN: Final[int] = 0
-    ARCHIVE_SERIAL_NUMBER_MAX: Final[int] = 0xFF_FF_FF_FF
 
-    archive_serial_number = models.PositiveIntegerField(
-        _("archive serial number"),
+
+    archive_serial_number = models.OneToOneField(
+        to=ASN,
+        on_delete=models.CASCADE,
+        verbose_name=_("archive serial number"),
         blank=True,
         null=True,
-        unique=True,
-        db_index=True,
-        validators=[
-            MaxValueValidator(ARCHIVE_SERIAL_NUMBER_MAX),
-            MinValueValidator(ARCHIVE_SERIAL_NUMBER_MIN),
-        ],
         help_text=_(
             "The position of this document in your physical document archive.",
         ),
@@ -572,6 +620,7 @@ class UiSettings(models.Model):
 
     def __str__(self):
         return self.user.username
+
 
 
 class PaperlessTask(models.Model):

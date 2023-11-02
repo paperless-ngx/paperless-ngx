@@ -17,8 +17,18 @@ from documents.converters import convert_from_tiff_to_pdf
 from documents.data_models import DocumentSource
 from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
+from documents.models import ASNPrefix
+from documents.models import ASN 
 
 logger = logging.getLogger("paperless.barcodes")
+
+ASNPrefixes = list(ASNPrefix.objects.all())
+
+@receiver(post_save, sender=ASNPrefix)
+@receiver(post_delete, sender=ASNPrefix)
+def update_asn_prefix_list(sender, instance, **kwargs):
+    global ASNPrefixes
+    ASNPrefixes = list(ASNPrefix.objects.all())
 
 
 @dataclass(frozen=True)
@@ -44,7 +54,10 @@ class Barcode:
         Returns True if the barcode value matches the configured ASN prefix,
         False otherwise
         """
-        return self.value.startswith(settings.CONSUMER_ASN_BARCODE_PREFIX)
+        for ASNPrefix in ASNPrefixes:
+            if self.value.startswith(ASNPrefix.prefix):
+                return True
+        return False
 
 
 class BarcodeReader:
@@ -78,7 +91,7 @@ class BarcodeReader:
         return self.mime in self.SUPPORTED_FILE_MIMES
 
     @property
-    def asn(self) -> Optional[int]:
+    def asn(self) -> Optional[ASN]:
         """
         Search the parsed barcodes for any ASNs.
         The first barcode that starts with CONSUMER_ASN_BARCODE_PREFIX
@@ -99,18 +112,32 @@ class BarcodeReader:
         if asn_text:
             logger.debug(f"Found ASN Barcode: {asn_text}")
             # remove the prefix and remove whitespace
-            asn_text = asn_text[len(settings.CONSUMER_ASN_BARCODE_PREFIX) :].strip()
+            
+
+            asn_prefix = None
+            asn_prefix_len = 0
+            for prefix in ASNPrefixes:
+                if asn_text.startswith(prefix.prefix) and len(prefix.prefix) > asn_prefix_len:
+                    asn_prefix = prefix
+                    asn_prefix_len = len(prefix.prefix)
+
+            if asn_prefix == None:
+                logger.warning("Failed to parse ASN Prefix")
+                return None
+
+            asn_value = asn_text[asn_prefix_len :].strip()
 
             # remove non-numeric parts of the remaining string
-            asn_text = re.sub("[^0-9]", "", asn_text)
+            asn_value = re.sub("[^0-9]", "", asn_value)
 
             # now, try parsing the ASN number
             try:
-                asn = int(asn_text)
+                asn_number = int(asn_value)
             except ValueError as e:
                 logger.warning(f"Failed to parse ASN number because: {e}")
+                return None
 
-        return asn
+        return ASN(prefix=asn_prefix,number=asn_number)
 
     @staticmethod
     def read_barcodes_zxing(image: Image) -> list[str]:

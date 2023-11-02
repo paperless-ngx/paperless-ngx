@@ -34,6 +34,7 @@ from documents.models import DocumentType
 from documents.models import FileInfo
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.models import ASN
 from documents.parsers import DocumentParser
 from documents.parsers import ParseError
 from documents.parsers import get_parser_class_for_mime_type
@@ -174,8 +175,8 @@ class Consumer(LoggingMixin):
         # Validate the range is above zero and less than uint32_t max
         # otherwise, Whoosh can't handle it in the index
         if (
-            self.override_asn < Document.ARCHIVE_SERIAL_NUMBER_MIN
-            or self.override_asn > Document.ARCHIVE_SERIAL_NUMBER_MAX
+            self.override_asn.number < Document.ARCHIVE_SERIAL_NUMBER_MIN
+            or self.override_asn.number > Document.ARCHIVE_SERIAL_NUMBER_MAX
         ):
             self._fail(
                 ConsumerStatusShortMessage.ASN_RANGE,
@@ -184,10 +185,11 @@ class Consumer(LoggingMixin):
                 f"[{Document.ARCHIVE_SERIAL_NUMBER_MIN:,}, "
                 f"{Document.ARCHIVE_SERIAL_NUMBER_MAX:,}]",
             )
-        if Document.objects.filter(archive_serial_number=self.override_asn).exists():
+
+        if ASN.objects.filter(prefix=self.override_asn.prefix, number=self.override_asn.number).exists():
             self._fail(
                 ConsumerStatusShortMessage.ASN_ALREADY_EXISTS,
-                f"Not consuming {self.filename}: Given ASN already exists!",
+                f"Not consuming {self.filename}: Given ASN already exists for the Prefix {self.override_asn.prefix.prefix}!",
             )
 
     def run_pre_consume_script(self):
