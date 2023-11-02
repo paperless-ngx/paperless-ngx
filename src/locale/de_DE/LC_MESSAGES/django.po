@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-31 15:23-0700\n"
-"PO-Revision-Date: 2023-11-01 15:28\n"
+"PO-Revision-Date: 2023-11-02 23:16\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -812,7 +812,7 @@ msgstr "Belarussisch"
 
 #: paperless/settings.py:590
 msgid "Bulgarian"
-msgstr ""
+msgstr "Bulgarisch"
 
 #: paperless/settings.py:591
 msgid "Catalan"
