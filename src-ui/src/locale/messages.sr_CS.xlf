@@ -6703,7 +6703,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">179</context>
         </context-group>
-        <target state="needs-translation">Bulgarian</target>
+        <target state="translated">Bugarski</target>
       </trans-unit>
       <trans-unit id="1001043467371963032" datatype="html">
         <source>Catalan</source>
