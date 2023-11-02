@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-31 15:23-0700\n"
-"PO-Revision-Date: 2023-11-01 15:28\n"
+"PO-Revision-Date: 2023-11-02 14:14\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -405,7 +405,7 @@ msgstr "şurada depolama yolu mevcut"
 
 #: documents/models.py:453
 msgid "does not have storage path in"
-msgstr ""
+msgstr "şurada depolama yolu yok"
 
 #: documents/models.py:454
 msgid "owner is"
@@ -413,15 +413,15 @@ msgstr "sahibi"
 
 #: documents/models.py:455
 msgid "has owner in"
-msgstr ""
+msgstr "şurada sahibi"
 
 #: documents/models.py:456
 msgid "does not have owner"
-msgstr ""
+msgstr "sahipsiz"
 
 #: documents/models.py:457
 msgid "does not have owner in"
-msgstr ""
+msgstr "şurada sahibi yoktur"
 
 #: documents/models.py:467
 msgid "rule type"
@@ -445,7 +445,7 @@ msgstr "Görev kimliği"
 
 #: documents/models.py:585
 msgid "Celery ID for the Task that was run"
-msgstr ""
+msgstr "Görevler için yürütülen Celery ID"
 
 #: documents/models.py:590
 msgid "Acknowledged"
