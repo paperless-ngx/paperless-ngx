@@ -11,6 +11,7 @@ from django.contrib.auth.models import User
 from django.utils.crypto import get_random_string
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
+from drf_writable_nested.serializers import NestedUpdateMixin
 from guardian.core import ObjectPermissionChecker
 from guardian.shortcuts import get_users_with_perms
 from rest_framework import fields
@@ -396,9 +397,6 @@ class StoragePathField(serializers.PrimaryKeyRelatedField):
         return StoragePath.objects.all()
 
 
-from drf_writable_nested.serializers import NestedUpdateMixin
-
-
 class CustomFieldSerializer(serializers.ModelSerializer):
     data_type = serializers.ChoiceField(
         choices=CustomField.FieldDataType,
@@ -426,41 +424,82 @@ class CustomFieldOnUpdateSerializer(serializers.ModelSerializer):
 
 class CustomFieldInstanceSerializer(serializers.ModelSerializer):
     field = serializers.PrimaryKeyRelatedField(queryset=CustomField.objects.all())
-    value = serializers.JSONField()
+    value = serializers.SerializerMethodField(read_only=True)
+    value_text = serializers.CharField(required=False, write_only=True)
+    value_bool = serializers.BooleanField(required=False, write_only=True)
+    value_url = serializers.URLField(required=False, write_only=True)
+    value_date = serializers.DateField(required=False, write_only=True)
+    value_int = serializers.IntegerField(required=False, write_only=True)
+
+    def validate(self, data):
+        """
+        Check that start is before finish.
+        """
+        # Let the normal validation run first
+        data = super().validate(data)
+        # This field must exist, as it is validated
+        parent_field = data["field"]
+        type_to_key_map = {
+            CustomField.FieldDataType.STRING: "value_text",
+            CustomField.FieldDataType.URL: "value_url",
+            CustomField.FieldDataType.DATE: "value_date",
+            CustomField.FieldDataType.BOOL: "value_bool",
+            CustomField.FieldDataType.INT: "value_int",
+        }
+        # For the given data type, a certain key must exist
+        expected_key = type_to_key_map[parent_field.data_type]
+        if expected_key not in data:
+            raise serializers.ValidationError(
+                (
+                    f"Field of type {parent_field.data_type} must"
+                    f' contain a "{expected_key}" key'
+                ),
+            )
+        return data
 
     def create(self, validated_data):
-        print("hello from create")
-        from pprint import pprint
-
-        pprint(dict(validated_data))
+        type_to_key_map = {
+            CustomField.FieldDataType.STRING: "value_text",
+            CustomField.FieldDataType.URL: "value_url",
+            CustomField.FieldDataType.DATE: "value_date",
+            CustomField.FieldDataType.BOOL: "value_bool",
+            CustomField.FieldDataType.INT: "value_int",
+        }
+        # An instance is attached to a document
         document: Document = validated_data["document"]
+        # And to a CustomField
         custom_field: CustomField = validated_data["field"]
-        instance, _ = CustomFieldInstance.objects.get_or_create(
-            document=document, field=custom_field
-        )
-        instance_data_class = instance.field_type
-        _, _ = instance_data_class.objects.update_or_create(
-            parent=instance, defaults={"value": validated_data["value"]}
+        # This key must exist, as it is validated
+        expected_key = type_to_key_map[custom_field.data_type]
+
+        # Actually update or create the instance, providing the value
+        instance, _ = CustomFieldInstance.objects.update_or_create(
+            document=document,
+            field=custom_field,
+            defaults={expected_key: validated_data[expected_key]},
         )
         return instance
-
-    def update(self, instance: CustomFieldInstance, validated_data):
-        print("hello from update")
-        from pprint import pprint
-
-        pprint(validated_data)
-        pprint(instance.id)
 
     def get_value(self, obj: CustomFieldInstance):
         return obj.value
 
     class Meta:
         model = CustomFieldInstance
-        fields = ["value", "field"]
+        fields = [
+            "value",
+            "value_text",
+            "value_bool",
+            "value_url",
+            "value_date",
+            "value_int",
+            "field",
+        ]
 
 
 class DocumentSerializer(
-    OwnedObjectSerializer, NestedUpdateMixin, DynamicFieldsModelSerializer
+    OwnedObjectSerializer,
+    NestedUpdateMixin,
+    DynamicFieldsModelSerializer,
 ):
     correspondent = CorrespondentField(allow_null=True)
     tags = TagsField(many=True)

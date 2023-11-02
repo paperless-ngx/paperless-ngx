@@ -4,7 +4,6 @@ import os
 import re
 from collections import OrderedDict
 from pathlib import Path
-from typing import Any
 from typing import Final
 from typing import Optional
 
@@ -960,6 +959,17 @@ class CustomFieldInstance(models.Model):
         editable=False,
     )
 
+    # Actual data storage
+    value_text = models.CharField(max_length=128, null=True)
+
+    value_bool = models.BooleanField(null=True)
+
+    value_url = models.URLField(null=True)
+
+    value_date = models.DateField(null=True)
+
+    value_int = models.IntegerField(null=True)
+
     class Meta:
         ordering = ("created",)
         verbose_name = _("custom field instance")
@@ -978,134 +988,16 @@ class CustomFieldInstance(models.Model):
     def value(self):
         """
         Based on the data type, access the actual value the instance stores
+        A little shorthand/quick way to get what is actually here
         """
         if self.field.data_type == CustomField.FieldDataType.STRING:
-            return self.short_text.value
+            return self.value_text
         elif self.field.data_type == CustomField.FieldDataType.URL:
-            return self.url.value
+            return self.value_url
         elif self.field.data_type == CustomField.FieldDataType.DATE:
-            return self.date.value
+            return self.value_date
         elif self.field.data_type == CustomField.FieldDataType.BOOL:
-            return self.boolean.value
+            return self.value_bool
         elif self.field.data_type == CustomField.FieldDataType.INT:
-            return self.integer.value
+            return self.value_int
         raise NotImplementedError(self.field.data_type)
-
-    @property
-    def field_type(self):
-        """
-        Based on the data type, quick access to class for storing that value
-        """
-        if self.field.data_type == CustomField.FieldDataType.STRING:
-            return CustomFieldShortText
-        elif self.field.data_type == CustomField.FieldDataType.URL:
-            return CustomFieldUrl
-        elif self.field.data_type == CustomField.FieldDataType.DATE:
-            return CustomFieldDate
-        elif self.field.data_type == CustomField.FieldDataType.BOOL:
-            return CustomFieldBoolean
-        elif self.field.data_type == CustomField.FieldDataType.INT:
-            return CustomFieldInteger
-        raise NotImplementedError(self.field.data_type)
-
-    @staticmethod
-    def from_json(
-        document: Document,
-        field: OrderedDict,
-        value: Any,
-    ) -> "CustomFieldInstance":
-        instance, _ = CustomFieldInstance.objects.get_or_create(
-            document=document,
-            field=CustomField.objects.get(id=field["id"]),
-        )
-        instance.field_type.objects.update_or_create(
-            parent=instance,
-            defaults={"value": value},
-        )
-
-        return instance
-
-
-class CustomFieldShortText(models.Model):
-    """
-    Data storage for a short text custom field
-    """
-
-    value = models.CharField(max_length=128)
-    parent = models.OneToOneField(
-        CustomFieldInstance,
-        on_delete=models.CASCADE,
-        related_name="short_text",
-        parent_link=True,
-    )
-
-    def __str__(self) -> str:
-        return f"{self.value}"
-
-
-class CustomFieldBoolean(models.Model):
-    """
-    Data storage for a boolean custom field
-    """
-
-    value = models.BooleanField()
-    parent = models.OneToOneField(
-        CustomFieldInstance,
-        on_delete=models.CASCADE,
-        related_name="boolean",
-        parent_link=True,
-    )
-
-    def __str__(self) -> str:
-        return f"{self.value}"
-
-
-class CustomFieldUrl(models.Model):
-    """
-    Data storage for a URL custom field
-    """
-
-    value = models.URLField()
-    parent = models.OneToOneField(
-        CustomFieldInstance,
-        on_delete=models.CASCADE,
-        related_name="url",
-        parent_link=True,
-    )
-
-    def __str__(self) -> str:
-        return f"{self.value}"
-
-
-class CustomFieldDate(models.Model):
-    """
-    Data storage for a date custom field
-    """
-
-    value = models.DateField()
-    parent = models.OneToOneField(
-        CustomFieldInstance,
-        on_delete=models.CASCADE,
-        related_name="date",
-        parent_link=True,
-    )
-
-    def __str__(self) -> str:
-        return f"{self.value}"
-
-
-class CustomFieldInteger(models.Model):
-    """
-    Data storage for a date custom field
-    """
-
-    value = models.IntegerField()
-    parent = models.OneToOneField(
-        CustomFieldInstance,
-        on_delete=models.CASCADE,
-        related_name="integer",
-        parent_link=True,
-    )
-
-    def __str__(self) -> str:
-        return f"{self.value}"
