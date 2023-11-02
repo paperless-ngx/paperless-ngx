@@ -384,6 +384,14 @@ ul.pagination {
   }
 }
 
+.nav-underline {
+  .nav-link {
+    &.active, &:hover, &:focus {
+      color: var(--bs-primary);
+    }
+  }
+}
+
 .ng-select-container,
 .ng-select.ng-select-opened > .ng-select-container,
 .ng-dropdown-panel,
