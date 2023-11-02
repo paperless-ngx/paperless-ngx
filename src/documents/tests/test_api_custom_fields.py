@@ -2,9 +2,10 @@ from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from documents.models import CustomField
+from documents.models import CustomField, CustomFieldInstance, CustomFieldShortText
 from documents.models import Document
 from documents.tests.utils import DirectoriesMixin
+from pprint import pprint
 
 
 class TestCustomField(DirectoriesMixin, APITestCase):
@@ -80,34 +81,96 @@ class TestCustomField(DirectoriesMixin, APITestCase):
             data={
                 "custom_fields": [
                     {
-                        "field": {
-                            "id": custom_field_string.id,
-                        },
+                        "field": custom_field_string.id,
                         "value": "test value",
                     },
                     {
-                        "field": {
-                            "id": custom_field_date.id,
-                        },
+                        "field": custom_field_date.id,
                         "value": "2023-10-31",
                     },
                     {
-                        "field": {
-                            "id": custom_field_int.id,
-                        },
-                        "value": 3,
+                        "field": custom_field_int.id,
+                        "value": "3",
                     },
                     {
-                        "field": {
-                            "id": custom_field_boolean.id,
-                        },
-                        "value": True,
+                        "field": custom_field_boolean.id,
+                        "value": "True",
                     },
                     {
-                        "field": {
-                            "id": custom_field_url.id,
-                        },
+                        "field": custom_field_url.id,
                         "value": "https://example.com",
+                    },
+                ],
+            },
+            format="json",
+        )
+        from pprint import pprint
+
+        print("Response data")
+        pprint(resp.json())
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        resp_data = resp.json()["custom_fields"]
+
+        self.assertCountEqual(
+            resp_data,
+            [
+                {"field": custom_field_string.id, "value": "test value"},
+                {"field": custom_field_date.id, "value": "2023-10-31"},
+                {"field": custom_field_int.id, "value": 3},
+                {"field": custom_field_boolean.id, "value": True},
+                {"field": custom_field_url.id, "value": "https://example.com"},
+            ],
+        )
+
+        doc.refresh_from_db()
+        self.assertEqual(len(doc.custom_fields.all()), 5)
+        for custom_field in doc.custom_fields.all():
+            print(custom_field.value, type(custom_field.value))
+
+    def test_change_custom_field_instance_value(self):
+        doc = Document.objects.create(
+            title="WOW",
+            content="the content",
+            checksum="123",
+            mime_type="application/pdf",
+        )
+        custom_field_string = CustomField.objects.create(
+            name="Test Custom Field String",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+
+        self.assertEqual(CustomFieldInstance.objects.count(), 0)
+        self.assertEqual(CustomFieldShortText.objects.count(), 0)
+
+        resp = self.client.patch(
+            f"/api/documents/{doc.id}/",
+            data={
+                "custom_fields": [
+                    {
+                        "field": custom_field_string.id,
+                        "value": "test value",
+                    },
+                ],
+            },
+            format="json",
+        )
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        pprint(resp.json())
+
+        self.assertEqual(doc.custom_fields.first().value, "test value")
+        self.assertEqual(CustomFieldInstance.objects.count(), 1)
+        self.assertEqual(CustomFieldShortText.objects.count(), 1)
+
+        resp = self.client.patch(
+            f"/api/documents/{doc.id}/",
+            data={
+                "custom_fields": [
+                    {
+                        "field": custom_field_string.id,
+                        "value": "a new test value",
                     },
                 ],
             },
@@ -115,6 +178,8 @@ class TestCustomField(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
-        doc.refresh_from_db()
-        self.assertEqual(len(doc.custom_fields.all()), 5)
-        self.assertEqual(doc.custom_fields.first().value, "test value")
+        pprint(resp.json())
+
+        self.assertEqual(doc.custom_fields.first().value, "a new test value")
+        self.assertEqual(CustomFieldInstance.objects.count(), 1)
+        self.assertEqual(CustomFieldShortText.objects.count(), 1)

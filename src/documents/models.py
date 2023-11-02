@@ -1008,15 +1008,6 @@ class CustomFieldInstance(models.Model):
             return CustomFieldInteger
         raise NotImplementedError(self.field.data_type)
 
-    def to_json(self) -> dict[str, str]:
-        return {
-            "id": self.id,
-            "created": self.created,
-            "type": self.field.data_type,
-            "name": self.field.name,
-            "data": self.value,
-        }
-
     @staticmethod
     def from_json(
         document: Document,

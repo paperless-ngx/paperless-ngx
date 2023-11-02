@@ -396,6 +396,9 @@ class StoragePathField(serializers.PrimaryKeyRelatedField):
         return StoragePath.objects.all()
 
 
+from drf_writable_nested.serializers import NestedUpdateMixin
+
+
 class CustomFieldSerializer(serializers.ModelSerializer):
     data_type = serializers.ChoiceField(
         choices=CustomField.FieldDataType,
@@ -411,21 +414,54 @@ class CustomFieldSerializer(serializers.ModelSerializer):
         ]
 
 
-class CustomFieldInstanceSerializer(serializers.Serializer):
-    field = CustomFieldSerializer(required=True)
-    value = SerializerMethodField()
+class CustomFieldOnUpdateSerializer(serializers.ModelSerializer):
+    id = serializers.PrimaryKeyRelatedField(queryset=CustomField.objects.all())
+
+    class Meta:
+        model = CustomField
+        fields = [
+            "id",
+        ]
+
+
+class CustomFieldInstanceSerializer(serializers.ModelSerializer):
+    field = serializers.PrimaryKeyRelatedField(queryset=CustomField.objects.all())
+    value = serializers.JSONField()
+
+    def create(self, validated_data):
+        print("hello from create")
+        from pprint import pprint
+
+        pprint(dict(validated_data))
+        document: Document = validated_data["document"]
+        custom_field: CustomField = validated_data["field"]
+        instance, _ = CustomFieldInstance.objects.get_or_create(
+            document=document, field=custom_field
+        )
+        instance_data_class = instance.field_type
+        _, _ = instance_data_class.objects.update_or_create(
+            parent=instance, defaults={"value": validated_data["value"]}
+        )
+        return instance
+
+    def update(self, instance: CustomFieldInstance, validated_data):
+        print("hello from update")
+        from pprint import pprint
+
+        pprint(validated_data)
+        pprint(instance.id)
 
     def get_value(self, obj: CustomFieldInstance):
         return obj.value
 
     class Meta:
-        fields = [
-            "field",
-            "value",
-        ]
+        model = CustomFieldInstance
+        fields = ["value", "field"]
 
 
-class DocumentSerializer(OwnedObjectSerializer, DynamicFieldsModelSerializer):
+class DocumentSerializer(
+    OwnedObjectSerializer, NestedUpdateMixin, DynamicFieldsModelSerializer
+):
     correspondent = CorrespondentField(allow_null=True)
     tags = TagsField(many=True)
     document_type = DocumentTypeField(allow_null=True)
@@ -459,29 +495,6 @@ class DocumentSerializer(OwnedObjectSerializer, DynamicFieldsModelSerializer):
         return doc
 
     def update(self, instance: Document, validated_data):
-        if "custom_fields" in validated_data:
-            custom_fields = validated_data.pop("custom_fields")
-            for index, field_data in enumerate(custom_fields):
-                # get field value from initial_data since its not on the model
-                initial_field_data = self.initial_data["custom_fields"][index]
-                CustomFieldInstance.from_json(
-                    document=instance,
-                    field=initial_field_data["field"],
-                    value=initial_field_data["value"],
-                )
-            existing_fields = CustomFieldInstance.objects.filter(document=instance)
-            for existing_field in existing_fields:
-                if (
-                    not len(
-                        [
-                            f
-                            for f in self.initial_data["custom_fields"]
-                            if f["field"]["id"] == existing_field.field.id
-                        ],
-                    )
-                    > 0
-                ):
-                    existing_field.delete()
         if "created_date" in validated_data and "created" not in validated_data:
             new_datetime = datetime.datetime.combine(
                 validated_data.get("created_date"),
