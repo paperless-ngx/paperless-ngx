@@ -184,12 +184,12 @@ def consume_file(
                     with open(
                         os.path.join(inputfile.parent, filename),
                         "wb",
-                    ) as f:
+                    ) as target:
                         logger.info(
                             f"extracting {filename} from zipfile {inputfile}",
                         )
-                        with source, f:
-                            shutil.copyfileobj(source, f)
+                        with source, target:
+                            shutil.copyfileobj(source, target)
                             # continue with consumption if no barcode was found
                             document = Consumer().try_consume_file(
                                 os.path.join(inputfile.parent, filename),
