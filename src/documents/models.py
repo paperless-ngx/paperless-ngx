@@ -877,14 +877,6 @@ class ConsumptionTemplate(models.Model):
         return f"{self.name}"
 
 
-if settings.AUDIT_LOG_ENABLED:
-    auditlog.register(Document, m2m_fields={"tags"})
-    auditlog.register(Correspondent)
-    auditlog.register(Tag)
-    auditlog.register(DocumentType)
-    auditlog.register(Note)
-
-
 class CustomField(models.Model):
     """
     Defines the name and type of a custom field
@@ -1001,3 +993,13 @@ class CustomFieldInstance(models.Model):
         elif self.field.data_type == CustomField.FieldDataType.INT:
             return self.value_int
         raise NotImplementedError(self.field.data_type)
+
+
+if settings.AUDIT_LOG_ENABLED:
+    auditlog.register(Document, m2m_fields={"tags"})
+    auditlog.register(Correspondent)
+    auditlog.register(Tag)
+    auditlog.register(DocumentType)
+    auditlog.register(Note)
+    auditlog.register(CustomField)
+    auditlog.register(CustomFieldInstance)
