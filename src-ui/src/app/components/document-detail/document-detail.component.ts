@@ -856,7 +856,7 @@ export class DocumentDetailComponent
   public getCustomFieldFromInstance(
     instance: PaperlessCustomFieldInstance
   ): PaperlessCustomField {
-    return this.customFields.find((f) => f.id === instance.field)
+    return this.customFields?.find((f) => f.id === instance.field)
   }
 
   private updateFormForCustomFields(emitEvent: boolean = false) {
