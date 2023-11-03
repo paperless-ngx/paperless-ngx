@@ -12,6 +12,11 @@ import { PaperlessCustomFieldInstance } from 'src/app/data/paperless-custom-fiel
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { CustomFieldEditDialogComponent } from '../edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
+import {
+  PermissionAction,
+  PermissionType,
+  PermissionsService,
+} from 'src/app/services/permissions.service'
 
 @Component({
   selector: 'pngx-custom-fields-dropdown',
@@ -48,10 +53,18 @@ export class CustomFieldsDropdownComponent implements OnDestroy {
     return $localize`No unused fields found`
   }
 
+  get canCreateFields(): boolean {
+    return this.permissionsService.currentUserCan(
+      PermissionAction.Add,
+      PermissionType.CustomField
+    )
+  }
+
   constructor(
     private customFieldsService: CustomFieldsService,
     private modalService: NgbModal,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private permissionsService: PermissionsService
   ) {
     this.getFields()
   }

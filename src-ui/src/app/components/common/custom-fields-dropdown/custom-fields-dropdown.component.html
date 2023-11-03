@@ -14,11 +14,12 @@
                     [(ngModel)]="field"
                     [placeholder]="placeholderText"
                     [notFoundText]="notFoundText"
+                    [disableCreateNew]="!canCreateFields"
                     (createNew)="createField($event)"
                     bindValue="id">
                 </pngx-input-select>
                 <div class="btn-toolbar" role="toolbar">
-                    <button class="btn btn-sm btn-outline-secondary me-auto" type="button" (click)="createField()">
+                    <button class="btn btn-sm btn-outline-secondary me-auto" type="button" (click)="createField()" [disabled]="!canCreateFields">
                         <svg fill="currentColor" class="buttonicon-sm me-1 mb-1">
                         <use xlink:href="assets/bootstrap-icons.svg#asterisk"/>
                         </svg><ng-container i18n>Create New Field</ng-container>

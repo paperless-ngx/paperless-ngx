@@ -49,6 +49,7 @@
     </div>
 
     <pngx-custom-fields-dropdown
+        *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.CustomField }"
         class="me-2"
         [documentId]="documentId"
         [disabled]="!userIsOwner"
