@@ -69,6 +69,7 @@ import { DocumentDetailComponent } from './document-detail.component'
 import { ShareLinksDropdownComponent } from '../common/share-links-dropdown/share-links-dropdown.component'
 import { CustomFieldsDropdownComponent } from '../common/custom-fields-dropdown/custom-fields-dropdown.component'
 import { PaperlessCustomFieldDataType } from 'src/app/data/paperless-custom-field'
+import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 
 const doc: PaperlessDocument = {
   id: 3,
@@ -98,18 +99,28 @@ const doc: PaperlessDocument = {
   ],
   custom_fields: [
     {
-      field: {
-        id: 0,
-        name: 'Field 1',
-        data_type: PaperlessCustomFieldDataType.String,
-        created: new Date(),
-      },
+      field: 0,
       document: 3,
       created: new Date(),
       value: 'custom foo bar',
     },
   ],
 }
+
+const customFields = [
+  {
+    id: 0,
+    name: 'Field 1',
+    data_type: PaperlessCustomFieldDataType.String,
+    created: new Date(),
+  },
+  {
+    id: 1,
+    name: 'Custom Field 2',
+    data_type: PaperlessCustomFieldDataType.Integer,
+    created: new Date(),
+  },
+]
 
 describe('DocumentDetailComponent', () => {
   let component: DocumentDetailComponent
@@ -122,6 +133,7 @@ describe('DocumentDetailComponent', () => {
   let toastService: ToastService
   let documentListViewService: DocumentListViewService
   let settingsService: SettingsService
+  let customFieldsService: CustomFieldsService
 
   let currentUserCan = true
   let currentUserHasObjectPermissions = true
@@ -215,6 +227,7 @@ describe('DocumentDetailComponent', () => {
               }),
           },
         },
+        CustomFieldsService,
         {
           provide: PermissionsService,
           useValue: {
@@ -250,6 +263,7 @@ describe('DocumentDetailComponent', () => {
     toastService = TestBed.inject(ToastService)
     documentListViewService = TestBed.inject(DocumentListViewService)
     settingsService = TestBed.inject(SettingsService)
+    customFieldsService = TestBed.inject(CustomFieldsService)
     fixture = TestBed.createComponent(DocumentDetailComponent)
     component = fixture.componentInstance
   })
@@ -306,6 +320,13 @@ describe('DocumentDetailComponent', () => {
   it('should load already-opened document via param', () => {
     jest.spyOn(documentService, 'get').mockReturnValueOnce(of(doc))
     jest.spyOn(openDocumentsService, 'getOpenDocument').mockReturnValue(doc)
+    jest.spyOn(customFieldsService, 'listAll').mockReturnValue(
+      of({
+        count: customFields.length,
+        all: customFields.map((f) => f.id),
+        results: customFields,
+      })
+    )
     fixture.detectChanges() // calls ngOnInit
     expect(component.document).toEqual(doc)
   })
@@ -816,29 +837,26 @@ describe('DocumentDetailComponent', () => {
   it('should display custom fields', () => {
     initNormally()
     expect(fixture.debugElement.nativeElement.textContent).toContain(
-      doc.custom_fields[0].field.name
+      customFields[0].name
     )
   })
 
   it('should support add custom field, correctly send via post', () => {
-    const field = {
-      id: 1,
-      name: 'Custom Field 2',
-      data_type: PaperlessCustomFieldDataType.Integer,
-    }
     initNormally()
     const initialLength = doc.custom_fields.length
     expect(component.customFieldFormFields).toHaveLength(initialLength)
-    component.addField(field)
+    component.addField(customFields[1])
     fixture.detectChanges()
     expect(component.document.custom_fields).toHaveLength(initialLength + 1)
     expect(component.customFieldFormFields).toHaveLength(initialLength + 1)
-    expect(fixture.debugElement.nativeElement.textContent).toContain(field.name)
+    expect(fixture.debugElement.nativeElement.textContent).toContain(
+      customFields[1].name
+    )
     const updateSpy = jest.spyOn(documentService, 'update')
     component.save(true)
     expect(updateSpy.mock.lastCall[0].custom_fields).toHaveLength(2)
     expect(updateSpy.mock.lastCall[0].custom_fields[1]).toEqual({
-      field,
+      field: customFields[1].id,
       value: null,
     })
   })
@@ -869,6 +887,13 @@ describe('DocumentDetailComponent', () => {
     jest
       .spyOn(openDocumentsService, 'openDocument')
       .mockReturnValueOnce(of(true))
+    jest.spyOn(customFieldsService, 'listAll').mockReturnValue(
+      of({
+        count: customFields.length,
+        all: customFields.map((f) => f.id),
+        results: customFields,
+      })
+    )
     fixture.detectChanges()
   }
 })

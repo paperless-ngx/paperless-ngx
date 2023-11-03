@@ -54,6 +54,7 @@
         [documentId]="documentId"
         [disabled]="!userIsOwner"
         [existingFields]="document?.custom_fields"
+        (created)="refreshCustomFields()"
         (added)="addField($event)">
     </pngx-custom-fields-dropdown>
 
@@ -94,7 +95,7 @@
                 </div>
             </div>
 
-            <ul ngbNav #nav="ngbNav" class="nav-underline flex-nowrap flex-md-wrap overflow-x-scroll" (navChange)="onNavChange($event)" [(activeId)]="activeNavID">
+            <ul ngbNav #nav="ngbNav" class="nav-underline flex-nowrap flex-md-wrap overflow-auto" (navChange)="onNavChange($event)" [(activeId)]="activeNavID">
                 <li [ngbNavItem]="DocumentDetailNavIDs.Details">
                     <a ngbNavLink i18n>Details</a>
                     <ng-template ngbNavContent>
@@ -113,11 +114,11 @@
                             <ng-container *ngFor="let fieldInstance of document?.custom_fields; let i = index">
                                 <div [formGroup]="customFieldFormFields.controls[i]">
                                     <!-- TODO: boolean + URL -->
-                                    <pngx-input-text formControlName="value" *ngIf="fieldInstance.field.data_type === PaperlessCustomFieldDataType.String" [title]="fieldInstance.field.name" [removable]="true" (removed)="removeField(fieldInstance)" [horizontal]="true"></pngx-input-text>
-                                    <pngx-input-date formControlName="value" *ngIf="fieldInstance.field.data_type === PaperlessCustomFieldDataType.Date" [title]="fieldInstance.field.name" [removable]="true" (removed)="removeField(fieldInstance)" [horizontal]="true"></pngx-input-date>
-                                    <pngx-input-number formControlName="value" *ngIf="fieldInstance.field.data_type === PaperlessCustomFieldDataType.Integer" [title]="fieldInstance.field.name" [removable]="true" (removed)="removeField(fieldInstance)" [horizontal]="true" [showAdd]="false"></pngx-input-number>
-                                    <pngx-input-check formControlName="value" *ngIf="fieldInstance.field.data_type === PaperlessCustomFieldDataType.Boolean" [title]="fieldInstance.field.name" [removable]="true" (removed)="removeField(fieldInstance)" [horizontal]="true"></pngx-input-check>
-                                    <pngx-input-url formControlName="value" *ngIf="fieldInstance.field.data_type === PaperlessCustomFieldDataType.Url" [title]="fieldInstance.field.name" [removable]="true" (removed)="removeField(fieldInstance)" [horizontal]="true"></pngx-input-url>
+                                    <pngx-input-text formControlName="value" *ngIf="getCustomFieldFromInstance(fieldInstance)?.data_type === PaperlessCustomFieldDataType.String" [title]="getCustomFieldFromInstance(fieldInstance)?.name" [removable]="true" (removed)="removeField(fieldInstance)" [horizontal]="true"></pngx-input-text>
+                                    <pngx-input-date formControlName="value" *ngIf="getCustomFieldFromInstance(fieldInstance)?.data_type === PaperlessCustomFieldDataType.Date" [title]="getCustomFieldFromInstance(fieldInstance)?.name" [removable]="true" (removed)="removeField(fieldInstance)" [horizontal]="true"></pngx-input-date>
+                                    <pngx-input-number formControlName="value" *ngIf="getCustomFieldFromInstance(fieldInstance)?.data_type === PaperlessCustomFieldDataType.Integer" [title]="getCustomFieldFromInstance(fieldInstance)?.name" [removable]="true" (removed)="removeField(fieldInstance)" [horizontal]="true" [showAdd]="false"></pngx-input-number>
+                                    <pngx-input-check formControlName="value" *ngIf="getCustomFieldFromInstance(fieldInstance)?.data_type === PaperlessCustomFieldDataType.Boolean" [title]="getCustomFieldFromInstance(fieldInstance)?.name" [removable]="true" (removed)="removeField(fieldInstance)" [horizontal]="true"></pngx-input-check>
+                                    <pngx-input-url formControlName="value" *ngIf="getCustomFieldFromInstance(fieldInstance)?.data_type === PaperlessCustomFieldDataType.Url" [title]="getCustomFieldFromInstance(fieldInstance)?.name" [removable]="true" (removed)="removeField(fieldInstance)" [horizontal]="true"></pngx-input-url>
                                 </div>
                             </ng-container>
                         </div>

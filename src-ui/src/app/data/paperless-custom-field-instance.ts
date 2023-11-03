@@ -3,7 +3,7 @@ import { PaperlessCustomField } from './paperless-custom-field'
 
 export interface PaperlessCustomFieldInstance extends ObjectWithId {
   document: number // PaperlessDocument
-  field: PaperlessCustomField
+  field: number // PaperlessCustomField
   created: Date
   value?: any
 }

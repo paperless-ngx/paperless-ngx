@@ -34,7 +34,10 @@ export class CustomFieldsDropdownComponent implements OnDestroy {
   existingFields: PaperlessCustomFieldInstance[] = []
 
   @Output()
-  added = new EventEmitter()
+  added: EventEmitter<PaperlessCustomField> = new EventEmitter()
+
+  @Output()
+  created: EventEmitter<PaperlessCustomField> = new EventEmitter()
 
   private customFields: PaperlessCustomField[] = []
   public unusedFields: PaperlessCustomField[]
@@ -84,9 +87,18 @@ export class CustomFieldsDropdownComponent implements OnDestroy {
       })
   }
 
+  public getCustomFieldFromInstance(
+    instance: PaperlessCustomFieldInstance
+  ): PaperlessCustomField {
+    return this.customFields.find((f) => f.id === instance.field)
+  }
+
   private updateUnusedFields() {
     this.unusedFields = this.customFields.filter(
-      (f) => !this.existingFields?.find((e) => e.field.id === f.id)
+      (f) =>
+        !this.existingFields?.find(
+          (e) => this.getCustomFieldFromInstance(e)?.id === f.id
+        )
     )
   }
 
@@ -108,6 +120,7 @@ export class CustomFieldsDropdownComponent implements OnDestroy {
         this.toastService.showInfo($localize`Saved field "${newField.name}".`)
         this.customFieldsService.clearCache()
         this.getFields()
+        this.created.emit(newField)
       })
     modal.componentInstance.failed
       .pipe(takeUntil(this.unsubscribeNotifier))

@@ -68,6 +68,7 @@ import {
   PaperlessCustomFieldDataType,
 } from 'src/app/data/paperless-custom-field'
 import { PaperlessCustomFieldInstance } from 'src/app/data/paperless-custom-field-instance'
+import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 
 enum DocumentDetailNavIDs {
   Details = 1,
@@ -140,6 +141,7 @@ export class DocumentDetailComponent
 
   ogDate: Date
 
+  customFields: PaperlessCustomField[]
   public readonly PaperlessCustomFieldDataType = PaperlessCustomFieldDataType
 
   @ViewChild('nav') nav: NgbNav
@@ -173,6 +175,7 @@ export class DocumentDetailComponent
     private storagePathService: StoragePathService,
     private permissionsService: PermissionsService,
     private userService: UserService,
+    private customFieldsService: CustomFieldsService,
     private http: HttpClient
   ) {
     super()
@@ -238,6 +241,8 @@ export class DocumentDetailComponent
       .listAll()
       .pipe(first(), takeUntil(this.unsubscribeNotifier))
       .subscribe((result) => (this.users = result.results))
+
+    this.getCustomFields()
 
     this.route.paramMap
       .pipe(
@@ -836,16 +841,32 @@ export class DocumentDetailComponent
     this.documentListViewService.quickFilter(filterRules)
   }
 
-  updateFormForCustomFields(emitEvent: boolean = false) {
+  private getCustomFields() {
+    this.customFieldsService
+      .listAll()
+      .pipe(first(), takeUntil(this.unsubscribeNotifier))
+      .subscribe((result) => (this.customFields = result.results))
+  }
+
+  public refreshCustomFields() {
+    this.customFieldsService.clearCache()
+    this.getCustomFields()
+  }
+
+  public getCustomFieldFromInstance(
+    instance: PaperlessCustomFieldInstance
+  ): PaperlessCustomField {
+    return this.customFields.find((f) => f.id === instance.field)
+  }
+
+  private updateFormForCustomFields(emitEvent: boolean = false) {
     this.customFieldFormFields.clear({ emitEvent: false })
     this.document.custom_fields?.forEach((fieldInstance) => {
       this.customFieldFormFields.push(
         new FormGroup({
-          field: new FormGroup({
-            id: new FormControl(fieldInstance.field.id),
-            name: new FormControl(fieldInstance.field.name),
-            data_type: new FormControl(fieldInstance.field.data_type),
-          }),
+          field: new FormControl(
+            this.getCustomFieldFromInstance(fieldInstance)?.id
+          ),
           value: new FormControl(fieldInstance.value),
         }),
         { emitEvent }
@@ -853,9 +874,9 @@ export class DocumentDetailComponent
     })
   }
 
-  addField(field: PaperlessCustomField) {
+  public addField(field: PaperlessCustomField) {
     this.document.custom_fields.push({
-      field,
+      field: field.id,
       value: null,
       document: this.documentId,
       created: new Date(),
@@ -863,11 +884,12 @@ export class DocumentDetailComponent
     this.updateFormForCustomFields(true)
   }
 
-  removeField(fieldInstance: PaperlessCustomFieldInstance) {
+  public removeField(fieldInstance: PaperlessCustomFieldInstance) {
     this.document.custom_fields.splice(
       this.document.custom_fields.indexOf(fieldInstance),
       1
     )
     this.updateFormForCustomFields(true)
+    this.documentForm.updateValueAndValidity()
   }
 }
