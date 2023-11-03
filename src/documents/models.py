@@ -974,7 +974,7 @@ class CustomFieldInstance(models.Model):
         ]
 
     def __str__(self) -> str:
-        return str(self.field) + f" : {self.value}"
+        return str(self.field.name) + f" : {self.value}"
 
     @property
     def value(self):
