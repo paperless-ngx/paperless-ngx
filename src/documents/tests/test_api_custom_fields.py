@@ -1,5 +1,4 @@
 from datetime import date
-from pprint import pprint
 
 from django.contrib.auth.models import User
 from rest_framework import status
@@ -52,6 +51,16 @@ class TestCustomField(DirectoriesMixin, APITestCase):
             self.assertEqual(data["data_type"], field_type)
 
     def test_create_custom_field_instance(self):
+        """
+        GIVEN:
+            - Field of each data type is created
+        WHEN:
+            - API request to create custom metadata instance with each data type
+        THEN:
+            - the field instance is created
+            - the field returns the correct fields and values
+            - the field is attached to the given document
+        """
         doc = Document.objects.create(
             title="WOW",
             content="the content",
@@ -127,10 +136,17 @@ class TestCustomField(DirectoriesMixin, APITestCase):
 
         doc.refresh_from_db()
         self.assertEqual(len(doc.custom_fields.all()), 5)
-        for custom_field in doc.custom_fields.all():
-            print(custom_field.value, type(custom_field.value))
 
     def test_change_custom_field_instance_value(self):
+        """
+        GIVEN:
+            - Custom field instance is created and attached to document
+        WHEN:
+            - API request to create change the value of the custom field
+        THEN:
+            - the field instance is updated
+            - the field returns the correct fields and values
+        """
         doc = Document.objects.create(
             title="WOW",
             content="the content",
@@ -144,6 +160,7 @@ class TestCustomField(DirectoriesMixin, APITestCase):
 
         self.assertEqual(CustomFieldInstance.objects.count(), 0)
 
+        # Create
         resp = self.client.patch(
             f"/api/documents/{doc.id}/",
             data={
@@ -158,12 +175,10 @@ class TestCustomField(DirectoriesMixin, APITestCase):
         )
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-
-        pprint(resp.json())
-
-        self.assertEqual(doc.custom_fields.first().value, "test value")
         self.assertEqual(CustomFieldInstance.objects.count(), 1)
+        self.assertEqual(doc.custom_fields.first().value, "test value")
 
+        # Update
         resp = self.client.patch(
             f"/api/documents/{doc.id}/",
             data={
@@ -177,13 +192,20 @@ class TestCustomField(DirectoriesMixin, APITestCase):
             format="json",
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-
-        pprint(resp.json())
-
-        self.assertEqual(doc.custom_fields.first().value, "a new test value")
         self.assertEqual(CustomFieldInstance.objects.count(), 1)
+        self.assertEqual(doc.custom_fields.first().value, "a new test value")
 
     def test_delete_custom_field_instance(self):
+        """
+        GIVEN:
+            - Multiple custom field instances are created and attached to document
+        WHEN:
+            - API request to remove a field
+        THEN:
+            - the field instance is removed
+            - the other field remains unchanged
+            - the field returns the correct fields and values
+        """
         doc = Document.objects.create(
             title="WOW",
             content="the content",
@@ -240,6 +262,17 @@ class TestCustomField(DirectoriesMixin, APITestCase):
         self.assertEqual(doc.custom_fields.first().value, date_value)
 
     def test_custom_field_validation(self):
+        """
+        GIVEN:
+            - Document exists with no fields
+        WHEN:
+            - API request to remove a field
+            - API request is not valid
+        THEN:
+            - HTTP 400 is returned
+            - No field created
+            - No field attached to the document
+        """
         doc = Document.objects.create(
             title="WOW",
             content="the content",
@@ -258,7 +291,7 @@ class TestCustomField(DirectoriesMixin, APITestCase):
                     {
                         "field": custom_field_string.id,
                         # Whoops, spelling
-                        "value_test": "a new test value",
+                        "valeu": "a new test value",
                     },
                 ],
             },

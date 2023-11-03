@@ -412,21 +412,15 @@ class CustomFieldSerializer(serializers.ModelSerializer):
         ]
 
 
-class CustomFieldOnUpdateSerializer(serializers.ModelSerializer):
-    id = serializers.PrimaryKeyRelatedField(queryset=CustomField.objects.all())
-
-    class Meta:
-        model = CustomField
-        fields = [
-            "id",
-        ]
-
-
 class ReadWriteSerializerMethodField(serializers.SerializerMethodField):
-    def __init__(self, method_name=None, **kwargs):
+    """
+    Based on https://stackoverflow.com/a/62579804
+    """
+
+    def __init__(self, method_name=None, *args, **kwargs):
         self.method_name = method_name
         kwargs["source"] = "*"
-        super(serializers.SerializerMethodField, self).__init__(**kwargs)
+        super(serializers.SerializerMethodField, self).__init__(*args, **kwargs)
 
     def to_internal_value(self, data):
         return {self.field_name: data}
@@ -437,7 +431,7 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
     value = ReadWriteSerializerMethodField()
 
     def create(self, validated_data):
-        type_to_key_map = {
+        type_to_data_store_name_map = {
             CustomField.FieldDataType.STRING: "value_text",
             CustomField.FieldDataType.URL: "value_url",
             CustomField.FieldDataType.DATE: "value_date",
@@ -449,13 +443,14 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
         # And to a CustomField
         custom_field: CustomField = validated_data["field"]
         # This key must exist, as it is validated
-        expected_key = type_to_key_map[custom_field.data_type]
+        data_store_name = type_to_data_store_name_map[custom_field.data_type]
 
         # Actually update or create the instance, providing the value
+        # to fill in the correct attribute based on the type
         instance, _ = CustomFieldInstance.objects.update_or_create(
             document=document,
             field=custom_field,
-            defaults={expected_key: validated_data["value"]},
+            defaults={data_store_name: validated_data["value"]},
         )
         return instance
 
