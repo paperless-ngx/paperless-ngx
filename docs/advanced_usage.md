@@ -619,3 +619,24 @@ single-sided split marker page, the split document(s) will have an empty page at
 whatever else was on the backside of the split marker page.) You can work around that by having
 a split marker page that has the split barcode on _both_ sides. This way, the extra page will
 get automatically removed.
+
+## Custom Fields {#custom-fields}
+
+Paperless allows the addition of custom fields to be attached to documents, allowing a user
+to optionally include additional data which does not fit in the existing set of metadata
+Paperless provides.
+
+First, the user creates a custom field, with a given name and data type. This could be
+something like "Invoice Number", with a data type of "Number". This allows
+reuse of the same name and data type, obviating the need to type the same name again and
+again, instead selecting.
+
+Next. the field may be used with a particular document and custom data stored. The data
+stored is required to match the chosen data type for the field.
+
+Multiple fields may be attached to a document. The same field name cannot be assigned multiple
+times to a document, so you cannot use "Invoice Number" twice **on the same document**.
+
+!!! note
+
+    Once the data type for a field is set, it cannot be changed again.
