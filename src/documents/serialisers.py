@@ -2,7 +2,6 @@ import datetime
 import math
 import re
 import zoneinfo
-from typing import Any
 
 import magic
 from celery import states
@@ -461,13 +460,16 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
     def get_value(self, obj: CustomFieldInstance):
         return obj.value
 
-    def run_validation(self, data: Any = ...) -> Any:
-        # other fields get validated by db
-        field = CustomField.objects.get(pk=data["field"])
+    def validate(self, data):
+        """
+        For some reason, URLField validation is not run against the value
+        automatically.  Force it to run against the value
+        """
+        data = super().validate(data)
+        field: CustomField = data["field"]
         if field.data_type == CustomField.FieldDataType.URL:
-            validator = URLValidator()
-            URLValidator.__call__(validator, data["value"])
-        return super().run_validation(data)
+            URLValidator()(data["value"])
+        return data
 
     class Meta:
         model = CustomFieldInstance
