@@ -33,7 +33,7 @@ export const DATA_TYPE_LABELS = [
   },
   {
     id: PaperlessCustomFieldDataType.String,
-    name: $localize`String`,
+    name: $localize`Text`,
   },
   {
     id: PaperlessCustomFieldDataType.Url,
