@@ -879,6 +879,23 @@ describe('DocumentDetailComponent', () => {
     )
   })
 
+  it('should show custom field errors', () => {
+    initNormally()
+    component.error = {
+      custom_fields: [
+        {},
+        {},
+        { value: ['This field may not be null.'] },
+        {},
+        { non_field_errors: ['Enter a valid URL.'] },
+      ],
+    }
+    expect(component.getCustomFieldError(2)).toEqual([
+      'This field may not be null.',
+    ])
+    expect(component.getCustomFieldError(4)).toEqual(['Enter a valid URL.'])
+  })
+
   function initNormally() {
     jest
       .spyOn(documentService, 'get')

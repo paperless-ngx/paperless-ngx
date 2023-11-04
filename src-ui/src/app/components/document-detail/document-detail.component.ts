@@ -859,6 +859,11 @@ export class DocumentDetailComponent
     return this.customFields?.find((f) => f.id === instance.field)
   }
 
+  public getCustomFieldError(index: number) {
+    const fieldError = this.error?.custom_fields?.[index]
+    return fieldError?.['non_field_errors'] ?? fieldError?.['value']
+  }
+
   private updateFormForCustomFields(emitEvent: boolean = false) {
     this.customFieldFormFields.clear({ emitEvent: false })
     this.document.custom_fields?.forEach((fieldInstance) => {
