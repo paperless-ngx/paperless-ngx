@@ -322,3 +322,63 @@ class TestCustomField(DirectoriesMixin, APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(CustomFieldInstance.objects.count(), 0)
         self.assertEqual(len(doc.custom_fields.all()), 0)
+
+    def test_custom_field_value_validation(self):
+        """
+        GIVEN:
+            - Document & custom field exist
+        WHEN:
+            - API request to set a field value
+        THEN:
+            - HTTP 400 is returned
+            - No field instance is created or attached to the document
+        """
+        doc = Document.objects.create(
+            title="WOW",
+            content="the content",
+            checksum="123",
+            mime_type="application/pdf",
+        )
+        custom_field_url = CustomField.objects.create(
+            name="Test Custom Field URL",
+            data_type=CustomField.FieldDataType.URL,
+        )
+        custom_field_int = CustomField.objects.create(
+            name="Test Custom Field INT",
+            data_type=CustomField.FieldDataType.INT,
+        )
+
+        resp = self.client.patch(
+            f"/api/documents/{doc.id}/",
+            data={
+                "custom_fields": [
+                    {
+                        "field": custom_field_url.id,
+                        "value": "not a url",
+                    },
+                ],
+            },
+            format="json",
+        )
+
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(CustomFieldInstance.objects.count(), 0)
+        self.assertEqual(len(doc.custom_fields.all()), 0)
+
+        self.assertRaises(
+            Exception,
+            self.client.patch,
+            f"/api/documents/{doc.id}/",
+            data={
+                "custom_fields": [
+                    {
+                        "field": custom_field_int.id,
+                        "value": "not an int",
+                    },
+                ],
+            },
+            format="json",
+        )
+
+        self.assertEqual(CustomFieldInstance.objects.count(), 0)
+        self.assertEqual(len(doc.custom_fields.all()), 0)

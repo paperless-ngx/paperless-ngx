@@ -2,12 +2,14 @@ import datetime
 import math
 import re
 import zoneinfo
+from typing import Any
 
 import magic
 from celery import states
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
+from django.core.validators import URLValidator
 from django.utils.crypto import get_random_string
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
@@ -458,6 +460,14 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
 
     def get_value(self, obj: CustomFieldInstance):
         return obj.value
+
+    def run_validation(self, data: Any = ...) -> Any:
+        # other fields get validated by db
+        field = CustomField.objects.get(pk=data["field"])
+        if field.data_type == CustomField.FieldDataType.URL:
+            validator = URLValidator()
+            URLValidator.__call__(validator, data["value"])
+        return super().run_validation(data)
 
     class Meta:
         model = CustomFieldInstance
