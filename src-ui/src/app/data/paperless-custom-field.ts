@@ -6,6 +6,8 @@ export enum PaperlessCustomFieldDataType {
   Date = 'date',
   Boolean = 'boolean',
   Integer = 'integer',
+  Float = 'float',
+  Monetary = 'monetary',
 }
 
 export const DATA_TYPE_LABELS = [
@@ -19,7 +21,15 @@ export const DATA_TYPE_LABELS = [
   },
   {
     id: PaperlessCustomFieldDataType.Integer,
+    name: $localize`Integer`,
+  },
+  {
+    id: PaperlessCustomFieldDataType.Float,
     name: $localize`Number`,
+  },
+  {
+    id: PaperlessCustomFieldDataType.Monetary,
+    name: $localize`Monetary`,
   },
   {
     id: PaperlessCustomFieldDataType.String,

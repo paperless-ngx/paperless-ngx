@@ -34,6 +34,7 @@ class TestCustomField(DirectoriesMixin, APITestCase):
             ("date", "Invoiced Date"),
             ("integer", "Invoice #"),
             ("boolean", "Is Active"),
+            ("float", "Total Paid"),
         ]:
             resp = self.client.post(
                 self.ENDPOINT,
@@ -87,6 +88,14 @@ class TestCustomField(DirectoriesMixin, APITestCase):
             name="Test Custom Field Url",
             data_type=CustomField.FieldDataType.URL,
         )
+        custom_field_float = CustomField.objects.create(
+            name="Test Custom Field Float",
+            data_type=CustomField.FieldDataType.FLOAT,
+        )
+        custom_field_monetary = CustomField.objects.create(
+            name="Test Custom Field Monetary",
+            data_type=CustomField.FieldDataType.MONETARY,
+        )
 
         date_value = date.today()
 
@@ -114,6 +123,14 @@ class TestCustomField(DirectoriesMixin, APITestCase):
                         "field": custom_field_url.id,
                         "value": "https://example.com",
                     },
+                    {
+                        "field": custom_field_float.id,
+                        "value": 12.3456,
+                    },
+                    {
+                        "field": custom_field_monetary.id,
+                        "value": 11.10,
+                    },
                 ],
             },
             format="json",
@@ -131,11 +148,13 @@ class TestCustomField(DirectoriesMixin, APITestCase):
                 {"field": custom_field_int.id, "value": 3},
                 {"field": custom_field_boolean.id, "value": True},
                 {"field": custom_field_url.id, "value": "https://example.com"},
+                {"field": custom_field_float.id, "value": 12.3456},
+                {"field": custom_field_monetary.id, "value": 11.10},
             ],
         )
 
         doc.refresh_from_db()
-        self.assertEqual(len(doc.custom_fields.all()), 5)
+        self.assertEqual(len(doc.custom_fields.all()), 7)
 
     def test_change_custom_field_instance_value(self):
         """

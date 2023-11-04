@@ -888,6 +888,8 @@ class CustomField(models.Model):
         DATE = ("date", _("Date"))
         BOOL = ("boolean"), _("Boolean")
         INT = ("integer", _("Integer"))
+        FLOAT = ("float", _("Float"))
+        MONETARY = ("monetary", _("Monetary"))
 
     created = models.DateTimeField(
         _("created"),
@@ -962,6 +964,10 @@ class CustomFieldInstance(models.Model):
 
     value_int = models.IntegerField(null=True)
 
+    value_float = models.FloatField(null=True)
+
+    value_monetary = models.DecimalField(null=True, decimal_places=2, max_digits=12)
+
     class Meta:
         ordering = ("created",)
         verbose_name = _("custom field instance")
@@ -992,6 +998,10 @@ class CustomFieldInstance(models.Model):
             return self.value_bool
         elif self.field.data_type == CustomField.FieldDataType.INT:
             return self.value_int
+        elif self.field.data_type == CustomField.FieldDataType.FLOAT:
+            return self.value_float
+        elif self.field.data_type == CustomField.FieldDataType.MONETARY:
+            return self.value_monetary
         raise NotImplementedError(self.field.data_type)
 
 

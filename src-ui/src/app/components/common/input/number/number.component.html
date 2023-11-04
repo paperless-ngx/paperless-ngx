@@ -10,7 +10,7 @@
     </div>
     <div [class.col-md-9]="horizontal">
       <div class="input-group" [class.is-invalid]="error">
-        <input #inputField type="number" class="form-control" [id]="inputId" [(ngModel)]="value" (change)="onChange(value)" [class.is-invalid]="error" [disabled]="disabled">
+        <input #inputField type="number" class="form-control" [step]="step" [id]="inputId" [(ngModel)]="value" (change)="onChange(value)" [class.is-invalid]="error" [disabled]="disabled">
         <button *ngIf="showAdd" class="btn btn-outline-secondary" type="button" id="button-addon1" (click)="nextAsn()" [disabled]="disabled">+1</button>
       </div>
       <div class="invalid-feedback">

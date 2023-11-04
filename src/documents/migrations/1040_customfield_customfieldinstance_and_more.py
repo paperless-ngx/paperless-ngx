@@ -43,6 +43,8 @@ class Migration(migrations.Migration):
                             ("date", "Date"),
                             ("boolean", "Boolean"),
                             ("integer", "Integer"),
+                            ("float", "Float"),
+                            ("monetary", "Monetary"),
                         ],
                         editable=False,
                         max_length=50,
@@ -82,6 +84,11 @@ class Migration(migrations.Migration):
                 ("value_url", models.URLField(null=True)),
                 ("value_date", models.DateField(null=True)),
                 ("value_int", models.IntegerField(null=True)),
+                ("value_float", models.FloatField(null=True)),
+                (
+                    "value_monetary",
+                    models.DecimalField(decimal_places=2, max_digits=12, null=True),
+                ),
                 (
                     "document",
                     models.ForeignKey(
