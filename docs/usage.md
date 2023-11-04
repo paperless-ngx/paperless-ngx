@@ -344,6 +344,16 @@ Paperless-ngx provides.
 
 Multiple fields may be attached to a document but the same field name cannot be assigned multiple times to the a single document.
 
+The following custom field types are supported:
+
+- `Text`: any text
+- `Boolean`: true / false (check / unchecked) field
+- `Date`: date
+- `URL`: a valid url
+- `Integer`: integer number e.g. 12
+- `Number`: float number e.g. 12.3456
+- `Monetary`: float number with exactly two decimals, e.g. 12.30
+
 ## Best practices {#basic-searching}
 
 Paperless offers a couple tools that help you organize your document
