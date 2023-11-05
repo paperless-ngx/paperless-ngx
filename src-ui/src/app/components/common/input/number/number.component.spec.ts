@@ -46,4 +46,18 @@ describe('NumberComponent', () => {
     component.nextAsn()
     expect(component.value).toEqual(1002)
   })
+
+  it('should support float & monetary values', () => {
+    component.writeValue(11.13)
+    expect(component.value).toEqual(11)
+    component.step = 0.01
+    component.writeValue(11.1)
+    expect(component.value).toEqual('11.10')
+    component.step = 0.1
+    component.writeValue(12.3456)
+    expect(component.value).toEqual(12.3456)
+    // float (step = .1) doesnt force 2 decimals
+    component.writeValue(11.1)
+    expect(component.value).toEqual(11.1)
+  })
 })

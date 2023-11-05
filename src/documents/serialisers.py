@@ -8,9 +8,11 @@ from celery import states
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
+from django.core.validators import URLValidator
 from django.utils.crypto import get_random_string
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
+from drf_writable_nested.serializers import NestedUpdateMixin
 from guardian.core import ObjectPermissionChecker
 from guardian.shortcuts import get_users_with_perms
 from rest_framework import fields
@@ -21,6 +23,8 @@ from documents import bulk_edit
 from documents.data_models import DocumentSource
 from documents.models import ConsumptionTemplate
 from documents.models import Correspondent
+from documents.models import CustomField
+from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import MatchingModel
@@ -394,7 +398,92 @@ class StoragePathField(serializers.PrimaryKeyRelatedField):
         return StoragePath.objects.all()
 
 
-class DocumentSerializer(OwnedObjectSerializer, DynamicFieldsModelSerializer):
+class CustomFieldSerializer(serializers.ModelSerializer):
+    data_type = serializers.ChoiceField(
+        choices=CustomField.FieldDataType,
+        read_only=False,
+    )
+
+    class Meta:
+        model = CustomField
+        fields = [
+            "id",
+            "name",
+            "data_type",
+        ]
+
+
+class ReadWriteSerializerMethodField(serializers.SerializerMethodField):
+    """
+    Based on https://stackoverflow.com/a/62579804
+    """
+
+    def __init__(self, method_name=None, *args, **kwargs):
+        self.method_name = method_name
+        kwargs["source"] = "*"
+        super(serializers.SerializerMethodField, self).__init__(*args, **kwargs)
+
+    def to_internal_value(self, data):
+        return {self.field_name: data}
+
+
+class CustomFieldInstanceSerializer(serializers.ModelSerializer):
+    field = serializers.PrimaryKeyRelatedField(queryset=CustomField.objects.all())
+    value = ReadWriteSerializerMethodField()
+
+    def create(self, validated_data):
+        type_to_data_store_name_map = {
+            CustomField.FieldDataType.STRING: "value_text",
+            CustomField.FieldDataType.URL: "value_url",
+            CustomField.FieldDataType.DATE: "value_date",
+            CustomField.FieldDataType.BOOL: "value_bool",
+            CustomField.FieldDataType.INT: "value_int",
+            CustomField.FieldDataType.FLOAT: "value_float",
+            CustomField.FieldDataType.MONETARY: "value_monetary",
+        }
+        # An instance is attached to a document
+        document: Document = validated_data["document"]
+        # And to a CustomField
+        custom_field: CustomField = validated_data["field"]
+        # This key must exist, as it is validated
+        data_store_name = type_to_data_store_name_map[custom_field.data_type]
+
+        # Actually update or create the instance, providing the value
+        # to fill in the correct attribute based on the type
+        instance, _ = CustomFieldInstance.objects.update_or_create(
+            document=document,
+            field=custom_field,
+            defaults={data_store_name: validated_data["value"]},
+        )
+        return instance
+
+    def get_value(self, obj: CustomFieldInstance):
+        return obj.value
+
+    def validate(self, data):
+        """
+        For some reason, URLField validation is not run against the value
+        automatically.  Force it to run against the value
+        """
+        data = super().validate(data)
+        field: CustomField = data["field"]
+        if field.data_type == CustomField.FieldDataType.URL:
+            URLValidator()(data["value"])
+        return data
+
+    class Meta:
+        model = CustomFieldInstance
+        fields = [
+            "value",
+            "field",
+        ]
+
+
+class DocumentSerializer(
+    OwnedObjectSerializer,
+    NestedUpdateMixin,
+    DynamicFieldsModelSerializer,
+):
     correspondent = CorrespondentField(allow_null=True)
     tags = TagsField(many=True)
     document_type = DocumentTypeField(allow_null=True)
@@ -403,6 +492,8 @@ class DocumentSerializer(OwnedObjectSerializer, DynamicFieldsModelSerializer):
     original_file_name = SerializerMethodField()
     archived_file_name = SerializerMethodField()
     created_date = serializers.DateField(required=False)
+
+    custom_fields = CustomFieldInstanceSerializer(many=True, allow_null=True)
 
     owner = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(),
@@ -425,7 +516,7 @@ class DocumentSerializer(OwnedObjectSerializer, DynamicFieldsModelSerializer):
             doc["content"] = doc.get("content")[0:550]
         return doc
 
-    def update(self, instance, validated_data):
+    def update(self, instance: Document, validated_data):
         if "created_date" in validated_data and "created" not in validated_data:
             new_datetime = datetime.datetime.combine(
                 validated_data.get("created_date"),
@@ -466,6 +557,7 @@ class DocumentSerializer(OwnedObjectSerializer, DynamicFieldsModelSerializer):
             "user_can_change",
             "set_permissions",
             "notes",
+            "custom_fields",
         )
 
 

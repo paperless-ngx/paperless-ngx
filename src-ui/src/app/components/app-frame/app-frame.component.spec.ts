@@ -30,7 +30,7 @@ import { DocumentListViewService } from 'src/app/services/document-list-view.ser
 import { FILTER_FULLTEXT_QUERY } from 'src/app/data/filter-rule-type'
 import { routes } from 'src/app/app-routing.module'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
-import { CdkDragDrop } from '@angular/cdk/drag-drop'
+import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop'
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
 
 const saved_views = [
@@ -97,6 +97,7 @@ describe('AppFrameComponent', () => {
         NgbModule,
         FormsModule,
         ReactiveFormsModule,
+        DragDropModule,
       ],
       providers: [
         SettingsService,
