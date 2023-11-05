@@ -896,6 +896,15 @@ describe('DocumentDetailComponent', () => {
     expect(component.getCustomFieldError(4)).toEqual(['Enter a valid URL.'])
   })
 
+  it('should refresh custom fields when created', () => {
+    initNormally()
+    const refreshSpy = jest.spyOn(component, 'refreshCustomFields')
+    fixture.debugElement
+      .query(By.directive(CustomFieldsDropdownComponent))
+      .triggerEventHandler('created')
+    expect(refreshSpy).toHaveBeenCalled()
+  })
+
   function initNormally() {
     jest
       .spyOn(documentService, 'get')
