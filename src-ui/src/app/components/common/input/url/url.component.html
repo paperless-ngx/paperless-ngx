@@ -16,11 +16,11 @@
               <use xlink:href="assets/bootstrap-icons.svg#box-arrow-up-right" />
             </svg>
           </a>
+          <div class="invalid-feedback">
+            {{error}}
+          </div>
         </div>
         <small *ngIf="hint" class="form-text text-muted" [innerHTML]="hint | safeHtml"></small>
-        <div class="invalid-feedback">
-          {{error}}
-        </div>
       </div>
     </div>
   </div>
