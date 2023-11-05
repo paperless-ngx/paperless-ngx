@@ -9,9 +9,9 @@
         </button>
       </div>
       <div [class.col-md-9]="horizontal">
-        <div class="input-group">
+        <div class="input-group" [class.is-invalid]="error">
           <input #inputField type="url" class="form-control" [class.is-invalid]="error" placeholder="https://" [id]="inputId" [(ngModel)]="value" (change)="onChange(value)" [disabled]="disabled">
-          <a class="btn btn-outline-secondary" title="Open link" i18n-title [href]="value" target="_blank">
+          <a class="btn btn-outline-secondary rounded-end" title="Open link" i18n-title [href]="value" target="_blank">
             <svg class="buttonicon-sm" fill="currentColor">
               <use xlink:href="assets/bootstrap-icons.svg#box-arrow-up-right" />
             </svg>
