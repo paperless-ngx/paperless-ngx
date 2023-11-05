@@ -9,7 +9,14 @@
         </button>
       </div>
       <div [class.col-md-9]="horizontal">
-        <input #inputField type="url" class="form-control" [class.is-invalid]="error" placeholder="https://" [id]="inputId" [(ngModel)]="value" (change)="onChange(value)" [disabled]="disabled">
+        <div class="input-group">
+          <input #inputField type="url" class="form-control" [class.is-invalid]="error" placeholder="https://" [id]="inputId" [(ngModel)]="value" (change)="onChange(value)" [disabled]="disabled">
+          <a class="btn btn-outline-secondary" title="Open link" i18n-title [href]="value" target="_blank">
+            <svg class="buttonicon-sm" fill="currentColor">
+              <use xlink:href="assets/bootstrap-icons.svg#box-arrow-up-right" />
+            </svg>
+          </a>
+        </div>
         <small *ngIf="hint" class="form-text text-muted" [innerHTML]="hint | safeHtml"></small>
         <div class="invalid-feedback">
           {{error}}
