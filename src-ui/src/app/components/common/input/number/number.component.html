@@ -1,4 +1,4 @@
-<div class="mb-3">
+<div class="mb-3" [class.pb-3]="error">
   <div class="row">
     <div class="d-flex align-items-center position-relative hidden-button-container" [class.col-md-3]="horizontal">
       <label class="form-label mb-md-0" [for]="inputId">{{title}}</label>
@@ -8,12 +8,12 @@
         </svg>&nbsp;<ng-container i18n>Remove</ng-container>
       </button>
     </div>
-    <div [class.col-md-9]="horizontal">
+    <div class="position-relative" [class.col-md-9]="horizontal">
       <div class="input-group" [class.is-invalid]="error">
         <input #inputField type="number" class="form-control" [step]="step" [id]="inputId" [(ngModel)]="value" (change)="onChange(value)" [class.is-invalid]="error" [disabled]="disabled">
         <button *ngIf="showAdd" class="btn btn-outline-secondary" type="button" id="button-addon1" (click)="nextAsn()" [disabled]="disabled">+1</button>
       </div>
-      <div class="invalid-feedback">
+      <div class="invalid-feedback position-absolute top-100">
         {{error}}
       </div>
       <small *ngIf="hint" class="form-text text-muted">{{hint}}</small>

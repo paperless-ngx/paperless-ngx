@@ -1,4 +1,4 @@
-<div class="mb-3">
+<div class="mb-3" [class.pb-3]="error">
     <div class="row">
       <div class="d-flex align-items-center position-relative hidden-button-container" [class.col-md-3]="horizontal">
         <label class="form-label mb-md-0" [for]="inputId">{{title}}</label>
@@ -16,7 +16,7 @@
               <use xlink:href="assets/bootstrap-icons.svg#box-arrow-up-right" />
             </svg>
           </a>
-          <div class="invalid-feedback">
+          <div class="invalid-feedback position-absolute top-100">
             {{error}}
           </div>
         </div>
