@@ -12,7 +12,7 @@
         <div class="input-group" [class.is-invalid]="error">
           <input #inputField type="url" class="form-control" [class.is-invalid]="error" placeholder="https://" [id]="inputId" [(ngModel)]="value" (change)="onChange(value)" [disabled]="disabled">
           <a class="btn btn-outline-secondary rounded-end" title="Open link" i18n-title [href]="value" target="_blank">
-            <svg class="buttonicon-sm" fill="currentColor">
+            <svg class="buttonicon mb-1" fill="currentColor">
               <use xlink:href="assets/bootstrap-icons.svg#box-arrow-up-right" />
             </svg>
           </a>
