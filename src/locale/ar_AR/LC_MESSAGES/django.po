@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-31 15:23-0700\n"
-"PO-Revision-Date: 2023-11-01 15:28\n"
+"POT-Creation-Date: 2023-11-04 20:12-0700\n"
+"PO-Revision-Date: 2023-11-05 18:03\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -159,7 +159,7 @@ msgid "The checksum of the archived document."
 msgstr "بصمة المِلَفّ للمستند ‏المحفوظ."
 
 #: documents/models.py:205 documents/models.py:385 documents/models.py:654
-#: documents/models.py:692
+#: documents/models.py:692 documents/models.py:895 documents/models.py:932
 msgid "created"
 msgstr "أُنشئ"
 
@@ -639,21 +639,69 @@ msgstr "قالب الاستهلاك"
 msgid "consumption templates"
 msgstr "قوالب الاستهلاك"
 
-#: documents/serialisers.py:98
+#: documents/models.py:886
+msgid "String"
+msgstr ""
+
+#: documents/models.py:887
+msgid "URL"
+msgstr ""
+
+#: documents/models.py:888
+msgid "Date"
+msgstr ""
+
+#: documents/models.py:889
+msgid "Boolean"
+msgstr ""
+
+#: documents/models.py:890
+msgid "Integer"
+msgstr ""
+
+#: documents/models.py:891
+msgid "Float"
+msgstr ""
+
+#: documents/models.py:892
+msgid "Monetary"
+msgstr ""
+
+#: documents/models.py:904
+msgid "data type"
+msgstr ""
+
+#: documents/models.py:912
+msgid "custom field"
+msgstr ""
+
+#: documents/models.py:913
+msgid "custom fields"
+msgstr ""
+
+#: documents/models.py:973
+msgid "custom field instance"
+msgstr ""
+
+#: documents/models.py:974
+msgid "custom field instances"
+msgstr ""
+
+#: documents/serialisers.py:102
 #, python-format
 msgid "Invalid regular expression: %(error)s"
 msgstr "التعبير النظامي خاطىء: %(error)s"
 
-#: documents/serialisers.py:373
+#: documents/serialisers.py:377
 msgid "Invalid color."
 msgstr "لون خاطئ."
 
-#: documents/serialisers.py:749
+#: documents/serialisers.py:841
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "نوع الملف %(type)s غير مدعوم"
 
-#: documents/serialisers.py:846
+#: documents/serialisers.py:938
 msgid "Invalid variable detected."
 msgstr "اكتشاف متغير خاطئ."
 
@@ -914,7 +962,7 @@ msgstr "الأوكرانية"
 msgid "Chinese Simplified"
 msgstr "الصينية المبسطة"
 
-#: paperless/urls.py:184
+#: paperless/urls.py:186
 msgid "Paperless-ngx administration"
 msgstr "Paperless-ngx الإدارة"
 
