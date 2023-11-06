@@ -2,8 +2,44 @@
 
 import django.db.models.deletion
 import django.utils.timezone
+from django.contrib.auth.management import create_permissions
+from django.contrib.auth.models import Group
+from django.contrib.auth.models import Permission
+from django.contrib.auth.models import User
 from django.db import migrations
 from django.db import models
+from django.db.models import Q
+
+
+def add_customfield_permissions(apps, schema_editor):
+    # create permissions without waiting for post_migrate signal
+    for app_config in apps.get_app_configs():
+        app_config.models_module = True
+        create_permissions(app_config, apps=apps, verbosity=0)
+        app_config.models_module = None
+
+    add_permission = Permission.objects.get(codename="add_document")
+    customfield_permissions = Permission.objects.filter(
+        codename__contains="customfield",
+    )
+
+    for user in User.objects.filter(Q(user_permissions=add_permission)).distinct():
+        user.user_permissions.add(*customfield_permissions)
+
+    for group in Group.objects.filter(Q(permissions=add_permission)).distinct():
+        group.permissions.add(*customfield_permissions)
+
+
+def remove_customfield_permissions(apps, schema_editor):
+    customfield_permissions = Permission.objects.filter(
+        codename__contains="customfield",
+    )
+
+    for user in User.objects.all():
+        user.user_permissions.remove(*customfield_permissions)
+
+    for group in Group.objects.all():
+        group.permissions.remove(*customfield_permissions)
 
 
 class Migration(migrations.Migration):
@@ -127,5 +163,9 @@ class Migration(migrations.Migration):
                 fields=("document", "field"),
                 name="documents_customfieldinstance_unique_document_field",
             ),
+        ),
+        migrations.RunPython(
+            add_customfield_permissions,
+            remove_customfield_permissions,
         ),
     ]
