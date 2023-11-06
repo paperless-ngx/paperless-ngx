@@ -46,7 +46,7 @@ run:
 If you notice that the consumer will only pickup files in the
 consumption directory at startup, but won't find any other files added
 later, you will need to enable filesystem polling with the configuration
-option [`PAPERLESS_CONSUMER_POLLING`](/configuration#PAPERLESS_CONSUMER_POLLING).
+option [`PAPERLESS_CONSUMER_POLLING`](configuration.md#PAPERLESS_CONSUMER_POLLING).
 
 This will disable listening to filesystem changes with inotify and
 paperless will manually check the consumption directory for changes
@@ -144,7 +144,7 @@ The following error occured while consuming document.pdf: [Errno 13] Permission 
 This happens when paperless does not have permission to delete files
 inside the consumption directory. Ensure that `USERMAP_UID` and
 `USERMAP_GID` are set to the user id and group id you use on the host
-operating system, if these are different from `1000`. See [Docker setup](/setup#docker_hub).
+operating system, if these are different from `1000`. See [Docker setup](setup.md#docker_hub).
 
 Also ensure that you are able to read and write to the consumption
 directory on the host.
@@ -264,8 +264,8 @@ This probably indicates paperless tried to consume the same file twice.
 This can happen for a number of reasons, depending on how documents are
 placed into the consume folder. If paperless is using inotify (the
 default) to check for documents, try adjusting the
-[inotify configuration](/configuration#inotify). If polling is enabled, try adjusting the
-[polling configuration](/configuration#polling).
+[inotify configuration](configuration.md#inotify). If polling is enabled, try adjusting the
+[polling configuration](configuration.md#polling).
 
 ## Consumer fails waiting for file to remain unmodified.
 
@@ -277,7 +277,7 @@ You might find messages like these in your log files:
 
 This indicates paperless timed out while waiting for the file to be
 completely written to the consume folder. Adjusting
-[polling configuration](/configuration#polling) values should resolve the issue.
+[polling configuration](configuration.md#polling) values should resolve the issue.
 
 !!! note
 
@@ -296,8 +296,8 @@ This indicates paperless was unable to open the file, as the OS reported
 the file as still being in use. To prevent a crash, paperless did not
 try to consume the file. If paperless is using inotify (the default) to
 check for documents, try adjusting the
-[inotify configuration](/configuration#inotify). If polling is enabled, try adjusting the
-[polling configuration](/configuration#polling).
+[inotify configuration](configuration.md#inotify). If polling is enabled, try adjusting the
+[polling configuration](configuration.md#polling).
 
 !!! note
 
@@ -319,7 +319,7 @@ many workers attempting to access the database simultaneously.
 
 Consider changing to the PostgreSQL database if you will be processing
 many documents at once often. Otherwise, try tweaking the
-[`PAPERLESS_DB_TIMEOUT`](/configuration#PAPERLESS_DB_TIMEOUT) setting to allow more time for the database to
+[`PAPERLESS_DB_TIMEOUT`](configuration.md#PAPERLESS_DB_TIMEOUT) setting to allow more time for the database to
 unlock. This may have minor performance implications.
 
 ## gunicorn fails to start with "is not a valid port number"
@@ -329,7 +329,7 @@ environment variable named `${serviceName}_PORT`. This is
 the same environment variable which is used by Paperless to optionally
 change the port gunicorn listens on.
 
-To fix this, set [`PAPERLESS_PORT`](/configuration#PAPERLESS_PORT) again to your desired port, or the
+To fix this, set [`PAPERLESS_PORT`](configuration.md#PAPERLESS_PORT) again to your desired port, or the
 default of 8000.
 
 ## Database Warns about unique constraint "documents_tag_name_uniq

@@ -62,7 +62,7 @@ following operations on your documents:
     paperless to create archived versions for digital documents, you can
     configure that by configuring
     `PAPERLESS_OCR_SKIP_ARCHIVE_FILE=with_text`. Please read the
-    [relevant section in the documentation](/configuration#ocr).
+    [relevant section in the documentation](configuration.md#ocr).
 
 !!! note
 
@@ -208,11 +208,11 @@ different means. These are as follows:
     them further.
 
 Paperless is set up to check your mails every 10 minutes. This can be
-configured via [`PAPERLESS_EMAIL_TASK_CRON`](/configuration#PAPERLESS_EMAIL_TASK_CRON)
+configured via [`PAPERLESS_EMAIL_TASK_CRON`](configuration.md#PAPERLESS_EMAIL_TASK_CRON)
 
 ### REST API
 
-You can also submit a document using the REST API, see [POSTing documents](/api#file-uploads)
+You can also submit a document using the REST API, see [POSTing documents](api.md#file-uploads)
 for details.
 
 ## Permissions
@@ -264,7 +264,7 @@ permissions can be granted to limit access to certain parts of the UI (and corre
 ### Password reset
 
 In order to enable the password reset feature you will need to setup an SMTP backend, see
-[`PAPERLESS_EMAIL_HOST`](/configuration#PAPERLESS_EMAIL_HOST)
+[`PAPERLESS_EMAIL_HOST`](configuration.md#PAPERLESS_EMAIL_HOST)
 
 ## Consumption templates
 
@@ -290,7 +290,7 @@ Consumption templates allow you to filter by:
 
 Consumption templates can assign:
 
-- Title, see [title placeholders](/usage#title_placeholders) below
+- Title, see [title placeholders](usage.md#title_placeholders) below
 - Tags, correspondent, document types
 - Document owner
 - View and / or edit permissions to users or groups
@@ -562,7 +562,7 @@ Once you have scanned in a document, proceed in paperless as follows.
     paperless will assign them automatically. After consuming a couple
     documents, you can even ask paperless to *learn* when to assign tags and
     correspondents by itself. For details on this feature, see
-    [advanced matching](/advanced_usage#matching).
+    [advanced matching](advanced_usage.md#matching).
 
 ### Task management
 

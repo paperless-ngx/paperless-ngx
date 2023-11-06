@@ -53,7 +53,7 @@ database engine. Available options are `postgresql` and
 
     !!! warning
 
-        Using MariaDB comes with some caveats. See [MySQL Caveats](/advanced_usage#mysql-caveats).
+        Using MariaDB comes with some caveats. See [MySQL Caveats](advanced_usage.md#mysql-caveats).
 
 #### [`PAPERLESS_DBHOST=<hostname>`](#PAPERLESS_DBHOST) {#PAPERLESS_DBHOST}
 
@@ -246,7 +246,7 @@ files created using "collectstatic" manager command are stored.
 #### [`PAPERLESS_FILENAME_FORMAT=<format>`](#PAPERLESS_FILENAME_FORMAT) {#PAPERLESS_FILENAME_FORMAT}
 
 : Changes the filenames paperless uses to store documents in the media
-directory. See [File name handling](/advanced_usage#file-name-handling) for details.
+directory. See [File name handling](advanced_usage.md#file-name-handling) for details.
 
     Default is none, which disables this feature.
 
@@ -255,7 +255,7 @@ directory. See [File name handling](/advanced_usage#file-name-handling) for deta
 : Tells paperless to replace placeholders in
 `PAPERLESS_FILENAME_FORMAT` that would resolve to
 'none' to be omitted from the resulting filename. This also holds
-true for directory names. See [File name handling](/advanced_usage#file-name-handling) for
+true for directory names. See [File name handling](advanced_usage.md#file-name-handling) for
 details.
 
     Defaults to `false` which disables this feature.
@@ -708,7 +708,7 @@ but could result in missing text content.
 additional arguments you wish to pass to OCRmyPDF. Since Paperless
 uses the API of OCRmyPDF, you have to specify these in a format that
 can be passed to the API. See [the API reference of
-OCRmyPDF](https://ocrmypdf.readthedocs.io/en/latest/api.html#reference)
+OCRmyPDF](https://ocrmypdf.readthedocs.io/en/latestapi.md.html#reference)
 for valid parameters. All command line options are supported, but
 they use underscores instead of dashes.
 
@@ -933,7 +933,7 @@ or hidden folders some tools use to store data.
 script if you like before beginning consumption. This script will be provided
 data for it to work with via the environment.
 
-    For more information, take a look at [pre-consumption script](/advanced_usage#pre-consume-script).
+    For more information, take a look at [pre-consumption script](advanced_usage.md#pre-consume-script).
 
     The default is blank, which means nothing will be executed.
 
@@ -943,7 +943,7 @@ data for it to work with via the environment.
 script if you like. This script will be provided
 data for it to work with via the environment.
 
-    For more information, take a look at [Post-consumption script](/advanced_usage#post-consume-script).
+    For more information, take a look at [Post-consumption script](advanced_usage.md#post-consume-script).
 
     The default is blank, which means nothing will be executed.
 
@@ -1068,7 +1068,7 @@ file, which are separated by one or multiple barcode pages.
     The original document will be removed and the separated pages will
     be saved as pdf.
 
-    See additional information in the [advanced usage documentation](/advanced_usage#barcodes)
+    See additional information in the [advanced usage documentation](advanced_usage.md#barcodes)
 
     Defaults to false.
 
@@ -1159,7 +1159,7 @@ document.
     `PAPERLESS_CONSUMER_RECURSIVE` must be enabled for this to work.
 
     For more information, read the [corresponding section in the advanced
-    documentation](/advanced_usage#collate).
+    documentation](advanced_usage.md#collate).
 
     Defaults to false.
 
@@ -1299,7 +1299,7 @@ specified as "chi-tra".
 [Flower](https://flower.readthedocs.io/en/latest/index.html) will be
 started by the container.
 
-    You can read more about this in the [advanced documentation](/advanced_usage#celery-monitoring).
+    You can read more about this in the [advanced documentation](advanced_usage.md#celery-monitoring).
 
 ## Update Checking {#update-checking}
 
