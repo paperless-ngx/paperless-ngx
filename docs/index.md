@@ -17,31 +17,31 @@ physical documents into a searchable online archive so you can keep, well, _less
 
 ## Features
 
-- **Organize and index** your scanned documents with tags, correspondents, types, and more.
-- Performs **OCR** on your documents, adding selectable text to image-only documents.
-- Uses machine-learning to automatically add tags, correspondents and document types to your documents.
-- Supports PDF documents, images, plain text files, Office documents (Word, Excel, Powerpoint, and LibreOffice equivalents)[^1] and more.
-- Paperless stores your documents plain on disk. Filenames and folders are managed by paperless and their format can be configured freely with different configurations assigned to different documents.
-- **Beautiful, modern web application** that features:
-  - Customizable dashboard with statistics.
-    - Filtering by tags, correspondents, types, and more.
-    - Bulk editing of tags, correspondents, types and more.
-    - Drag-and-drop uploading of documents throughout the app.
-    - Customizable views can be saved and displayed on the dashboard and / or sidebar.
-    - Support for custom fields of various data types.
-    - Shareable public links with optional expiration.
-  - **Full text search** helps you find what you need.
-  - Auto completion suggests relevant words from your documents.
-    - Results are sorted by relevance to your search query.
-    - Highlighting shows you which parts of the document matched the query.
-    - Searching for similar documents ("More like this")
-  - **Email processing**[^1]: import documents from your email accounts
-  - Configure multiple accounts and rules for each account.
-    - After processing, paperless can perform actions on the messages such as marking as read, deleting and more.
-  - A built-in robust **multi-user permissions** system that supports 'global' permissions as well as per document or object.
-- A powerful templating system that gives you more control over the consumption pipeline.
-- **Optimized** for multi core systems: Paperless-ngx consumes multiple documents in parallel.
-- The integrated sanity checker makes sure that your document archive is in good health.
+-   **Organize and index** your scanned documents with tags, correspondents, types, and more.
+-   Performs **OCR** on your documents, adding selectable text to image-only documents.
+-   Uses machine-learning to automatically add tags, correspondents and document types to your documents.
+-   Supports PDF documents, images, plain text files, Office documents (Word, Excel, Powerpoint, and LibreOffice equivalents)[^1] and more.
+-   Paperless stores your documents plain on disk. Filenames and folders are managed by paperless and their format can be configured freely with different configurations assigned to different documents.
+-   **Beautiful, modern web application** that features:
+    -   Customizable dashboard with statistics.
+    -   Filtering by tags, correspondents, types, and more.
+    -   Bulk editing of tags, correspondents, types and more.
+    -   Drag-and-drop uploading of documents throughout the app.
+    -   Customizable views can be saved and displayed on the dashboard and / or sidebar.
+    -   Support for custom fields of various data types.
+    -   Shareable public links with optional expiration.
+-   **Full text search** helps you find what you need:
+    -   Auto completion suggests relevant words from your documents.
+    -   Results are sorted by relevance to your search query.
+    -   Highlighting shows you which parts of the document matched the query.
+    -   Searching for similar documents ("More like this")
+-   **Email processing**[^1]: import documents from your email accounts:
+    -   Configure multiple accounts and rules for each account.
+    -   After processing, paperless can perform actions on the messages such as marking as read, deleting and more.
+-   A built-in robust **multi-user permissions** system that supports 'global' permissions as well as per document or object.
+-   A powerful templating system that gives you more control over the consumption pipeline.
+-   **Optimized** for multi core systems: Paperless-ngx consumes multiple documents in parallel.
+-   The integrated sanity checker makes sure that your document archive is in good health.
 
 [^1]: Office document and email consumption support is optional and provided by Apache Tika (see [configuration](https://docs.paperless-ngx.com/configuration/#tika))
 
