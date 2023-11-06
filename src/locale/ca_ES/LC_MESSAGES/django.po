@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-04 20:12-0700\n"
-"PO-Revision-Date: 2023-11-05 18:02\n"
+"PO-Revision-Date: 2023-11-06 06:20\n"
 "Last-Translator: \n"
 "Language-Team: Catalan\n"
 "Language: ca_ES\n"
@@ -641,27 +641,27 @@ msgstr "plantilles consumicions"
 
 #: documents/models.py:886
 msgid "String"
-msgstr ""
+msgstr "Cadena"
 
 #: documents/models.py:887
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: documents/models.py:888
 msgid "Date"
-msgstr ""
+msgstr "Data"
 
 #: documents/models.py:889
 msgid "Boolean"
-msgstr ""
+msgstr "Booleà"
 
 #: documents/models.py:890
 msgid "Integer"
-msgstr ""
+msgstr "Enter"
 
 #: documents/models.py:891
 msgid "Float"
-msgstr ""
+msgstr "Flotant"
 
 #: documents/models.py:892
 msgid "Monetary"
