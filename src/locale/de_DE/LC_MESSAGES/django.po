@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-04 20:12-0700\n"
-"PO-Revision-Date: 2023-11-05 18:03\n"
+"PO-Revision-Date: 2023-11-06 07:47\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -641,31 +641,31 @@ msgstr "Verarbeitungsvorlagen"
 
 #: documents/models.py:886
 msgid "String"
-msgstr ""
+msgstr "Zeichenfolge"
 
 #: documents/models.py:887
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: documents/models.py:888
 msgid "Date"
-msgstr ""
+msgstr "Datum"
 
 #: documents/models.py:889
 msgid "Boolean"
-msgstr ""
+msgstr "Wahrheitswert"
 
 #: documents/models.py:890
 msgid "Integer"
-msgstr ""
+msgstr "Ganzzahl"
 
 #: documents/models.py:891
 msgid "Float"
-msgstr ""
+msgstr "Gleitkommazahl"
 
 #: documents/models.py:892
 msgid "Monetary"
-msgstr ""
+msgstr "Währung"
 
 #: documents/models.py:904
 msgid "data type"
