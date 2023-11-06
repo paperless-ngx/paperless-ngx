@@ -1,5 +1,19 @@
-<div class="mb-3 form-check">
-  <input #inputField type="checkbox" class="form-check-input" [id]="inputId" [(ngModel)]="value" (change)="onChange(value)" (blur)="onTouched()" [disabled]="disabled">
-  <label class="form-check-label" [for]="inputId">{{title}}</label>
-  <div *ngIf="hint" class="form-text text-muted">{{hint}}</div>
+<div class="mb-3">
+  <div class="row">
+    <div *ngIf="horizontal" class="d-flex align-items-center position-relative hidden-button-container col-md-3">
+      <label class="form-label mb-md-0" [for]="inputId">{{title}}</label>
+      <button type="button" *ngIf="removable" class="btn btn-sm btn-danger position-absolute left-0" (click)="removed.emit(this)">
+        <svg class="sidebaricon" fill="currentColor">
+          <use xlink:href="assets/bootstrap-icons.svg#x"/>
+        </svg>&nbsp;<ng-container i18n>Remove</ng-container>
+      </button>
+    </div>
+    <div [ngClass]="{'col-md-9': horizontal, 'align-items-center': horizontal, 'd-flex': horizontal}">
+      <div class="form-check">
+        <input #inputField type="checkbox" class="form-check-input" [id]="inputId" [(ngModel)]="value" (change)="onChange(value)" (blur)="onTouched()" [disabled]="disabled">
+        <label *ngIf="!horizontal" class="form-check-label" [for]="inputId">{{title}}</label>
+        <div *ngIf="hint" class="form-text text-muted">{{hint}}</div>
+      </div>
+    </div>
+  </div>
 </div>

@@ -20,6 +20,7 @@ The API provides the following main endpoints:
 - `/api/users/`: Full CRUD support.
 - `/api/groups/`: Full CRUD support.
 - `/api/share_links/`: Full CRUD support.
+- `/api/custom_fields/`: Full CRUD support.
 
 All of these endpoints except for the logging endpoint allow you to
 fetch (and edit and delete where appropriate) individual objects by
@@ -51,6 +52,8 @@ fields:
 - `notes`: Array of notes associated with the document.
 - `set_permissions`: Allows setting document permissions. Optional,
   write-only. See [below](#permissions).
+- `custom_fields`: Array of custom fields & values, specified as
+  { field: CUSTOM_FIELD_ID, value: VALUE }
 
 ## Downloading documents
 
