@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-04 20:12-0700\n"
-"PO-Revision-Date: 2023-11-05 18:03\n"
+"PO-Revision-Date: 2023-11-06 19:08\n"
 "Last-Translator: \n"
 "Language-Team: Bulgarian\n"
 "Language: bg_BG\n"
@@ -641,51 +641,51 @@ msgstr "шаблони за консумация"
 
 #: documents/models.py:886
 msgid "String"
-msgstr ""
+msgstr "Низ"
 
 #: documents/models.py:887
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: documents/models.py:888
 msgid "Date"
-msgstr ""
+msgstr "Дата"
 
 #: documents/models.py:889
 msgid "Boolean"
-msgstr ""
+msgstr "Булев"
 
 #: documents/models.py:890
 msgid "Integer"
-msgstr ""
+msgstr "Целочислен"
 
 #: documents/models.py:891
 msgid "Float"
-msgstr ""
+msgstr "Плаващо"
 
 #: documents/models.py:892
 msgid "Monetary"
-msgstr ""
+msgstr "Паричен"
 
 #: documents/models.py:904
 msgid "data type"
-msgstr ""
+msgstr "тип данни"
 
 #: documents/models.py:912
 msgid "custom field"
-msgstr ""
+msgstr "персонализирано поле"
 
 #: documents/models.py:913
 msgid "custom fields"
-msgstr ""
+msgstr "персонализирани полета"
 
 #: documents/models.py:973
 msgid "custom field instance"
-msgstr ""
+msgstr "инстанция на персонализирано поле"
 
 #: documents/models.py:974
 msgid "custom field instances"
-msgstr ""
+msgstr "инстанции на персонализирано поле"
 
 #: documents/serialisers.py:102
 #, python-format
@@ -860,7 +860,7 @@ msgstr "Беларуски"
 
 #: paperless/settings.py:590
 msgid "Bulgarian"
-msgstr ""
+msgstr "Български"
 
 #: paperless/settings.py:591
 msgid "Catalan"
