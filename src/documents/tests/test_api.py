@@ -450,6 +450,27 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         results = response.data["results"]
         self.assertEqual(len(results), 0)
 
+        response = self.client.get(
+            f"/api/documents/?id__in={doc1.id},{doc2.id}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 2)
+
+        response = self.client.get(
+            f"/api/documents/?id__range={doc1.id},{doc3.id}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 3)
+
+        response = self.client.get(
+            f"/api/documents/?id={doc2.id}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+
         # custom field name
         response = self.client.get(
             f"/api/documents/?custom_fields__icontains={cf1.name}",
@@ -4698,6 +4719,82 @@ class TestApiRemoteVersion(DirectoriesMixin, APITestCase):
                 "update_available": False,
             },
         )
+
+
+class TestApiObjects(DirectoriesMixin, APITestCase):
+    def setUp(self) -> None:
+        super().setUp()
+
+        user = User.objects.create_superuser(username="temp_admin")
+        self.client.force_authenticate(user=user)
+
+        self.tag1 = Tag.objects.create(name="t1", is_inbox_tag=True)
+        self.tag2 = Tag.objects.create(name="t2")
+        self.tag3 = Tag.objects.create(name="t3")
+        self.c1 = Correspondent.objects.create(name="c1")
+        self.c2 = Correspondent.objects.create(name="c2")
+        self.c3 = Correspondent.objects.create(name="c3")
+        self.dt1 = DocumentType.objects.create(name="dt1")
+        self.dt2 = DocumentType.objects.create(name="dt2")
+        self.sp1 = StoragePath.objects.create(name="sp1", path="Something/{title}")
+        self.sp2 = StoragePath.objects.create(name="sp2", path="Something2/{title}")
+
+    def test_object_filters(self):
+        response = self.client.get(
+            f"/api/tags/?id={self.tag2.id}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+
+        response = self.client.get(
+            f"/api/tags/?id__in={self.tag1.id},{self.tag3.id}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 2)
+
+        response = self.client.get(
+            f"/api/correspondents/?id={self.c2.id}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+
+        response = self.client.get(
+            f"/api/correspondents/?id__in={self.c1.id},{self.c3.id}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 2)
+
+        response = self.client.get(
+            f"/api/document_types/?id={self.dt1.id}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+
+        response = self.client.get(
+            f"/api/document_types/?id__in={self.dt1.id},{self.dt2.id}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 2)
+
+        response = self.client.get(
+            f"/api/storage_paths/?id={self.sp1.id}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+
+        response = self.client.get(
+            f"/api/storage_paths/?id__in={self.sp1.id},{self.sp2.id}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 2)
 
 
 class TestApiStoragePaths(DirectoriesMixin, APITestCase):
