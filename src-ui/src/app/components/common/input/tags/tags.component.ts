@@ -77,6 +77,9 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
   @Input()
   showFilter: boolean = false
 
+  @Input()
+  horizontal: boolean = false
+
   @Output()
   filterDocuments = new EventEmitter<PaperlessTag[]>()
 

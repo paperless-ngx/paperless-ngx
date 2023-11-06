@@ -39,6 +39,7 @@ import { NgxFileDropModule } from 'ngx-file-drop'
 import { TextComponent } from './components/common/input/text/text.component'
 import { SelectComponent } from './components/common/input/select/select.component'
 import { CheckComponent } from './components/common/input/check/check.component'
+import { UrlComponent } from './components/common/input/url/url.component'
 import { PasswordComponent } from './components/common/input/password/password.component'
 import { SaveViewConfigDialogComponent } from './components/document-list/save-view-config-dialog/save-view-config-dialog.component'
 import { TagsComponent } from './components/common/input/tags/tags.component'
@@ -101,6 +102,9 @@ import { MailComponent } from './components/manage/mail/mail.component'
 import { UsersAndGroupsComponent } from './components/admin/users-groups/users-groups.component'
 import { DragDropModule } from '@angular/cdk/drag-drop'
 import { FileDropComponent } from './components/file-drop/file-drop.component'
+import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
+import { CustomFieldEditDialogComponent } from './components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
+import { CustomFieldsDropdownComponent } from './components/common/custom-fields-dropdown/custom-fields-dropdown.component'
 
 import localeAf from '@angular/common/locales/af'
 import localeAr from '@angular/common/locales/ar'
@@ -200,6 +204,7 @@ function initializeApp(settings: SettingsService) {
     TextComponent,
     SelectComponent,
     CheckComponent,
+    UrlComponent,
     PasswordComponent,
     SaveViewConfigDialogComponent,
     TagsComponent,
@@ -246,6 +251,9 @@ function initializeApp(settings: SettingsService) {
     MailComponent,
     UsersAndGroupsComponent,
     FileDropComponent,
+    CustomFieldsComponent,
+    CustomFieldEditDialogComponent,
+    CustomFieldsDropdownComponent,
   ],
   imports: [
     BrowserModule,

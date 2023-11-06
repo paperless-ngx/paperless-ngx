@@ -1,8 +1,19 @@
-<div class="mb-3">
-  <label class="form-label" [for]="inputId">{{title}}</label>
-  <input #inputField type="text" class="form-control" [class.is-invalid]="error" [id]="inputId" [(ngModel)]="value" (change)="onChange(value)" [disabled]="disabled">
-  <small *ngIf="hint" class="form-text text-muted" [innerHTML]="hint | safeHtml"></small>
-  <div class="invalid-feedback">
-    {{error}}
+<div class="mb-3" [class.pb-3]="error">
+  <div class="row">
+    <div class="d-flex align-items-center position-relative hidden-button-container" [class.col-md-3]="horizontal">
+      <label class="form-label mb-md-0" [for]="inputId">{{title}}</label>
+      <button type="button" *ngIf="removable" class="btn btn-sm btn-danger position-absolute left-0" (click)="removed.emit(this)">
+        <svg class="sidebaricon" fill="currentColor">
+          <use xlink:href="assets/bootstrap-icons.svg#x"/>
+        </svg>&nbsp;<ng-container i18n>Remove</ng-container>
+      </button>
+    </div>
+    <div class="position-relative" [class.col-md-9]="horizontal">
+      <input #inputField type="text" class="form-control" [class.is-invalid]="error" [id]="inputId" [(ngModel)]="value" (change)="onChange(value)" [disabled]="disabled">
+      <small *ngIf="hint" class="form-text text-muted" [innerHTML]="hint | safeHtml"></small>
+      <div class="invalid-feedback position-absolute top-100">
+        {{error}}
+      </div>
+    </div>
   </div>
 </div>

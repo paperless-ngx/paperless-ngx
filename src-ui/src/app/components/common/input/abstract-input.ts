@@ -1,4 +1,12 @@
-import { Directive, ElementRef, Input, OnInit, ViewChild } from '@angular/core'
+import {
+  Directive,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ViewChild,
+} from '@angular/core'
 import { ControlValueAccessor } from '@angular/forms'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -41,6 +49,18 @@ export class AbstractInputComponent<T> implements OnInit, ControlValueAccessor {
   @Input()
   error: string
 
+  @Input()
+  hint: string
+
+  @Input()
+  horizontal: boolean = false
+
+  @Input()
+  removable: boolean = false
+
+  @Output()
+  removed: EventEmitter<AbstractInputComponent<any>> = new EventEmitter()
+
   value: T
 
   ngOnInit(): void {
@@ -48,7 +68,4 @@ export class AbstractInputComponent<T> implements OnInit, ControlValueAccessor {
   }
 
   inputId: string
-
-  @Input()
-  hint: string
 }

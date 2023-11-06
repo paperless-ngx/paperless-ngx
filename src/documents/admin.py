@@ -3,6 +3,8 @@ from django.contrib import admin
 from guardian.admin import GuardedModelAdmin
 
 from documents.models import Correspondent
+from documents.models import CustomField
+from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import Note
@@ -144,6 +146,20 @@ class ShareLinksAdmin(GuardedModelAdmin):
     list_display_links = ("created",)
 
 
+class CustomFieldsAdmin(GuardedModelAdmin):
+    fields = ("name", "created", "data_type")
+    readonly_fields = ("created", "data_type")
+    list_display = ("name", "created", "data_type")
+    list_filter = ("created", "data_type")
+
+
+class CustomFieldInstancesAdmin(GuardedModelAdmin):
+    fields = ("field", "document", "created", "value")
+    readonly_fields = ("field", "document", "created", "value")
+    list_display = ("field", "document", "value", "created")
+    list_filter = ("document", "created")
+
+
 admin.site.register(Correspondent, CorrespondentAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(DocumentType, DocumentTypeAdmin)
@@ -153,6 +169,8 @@ admin.site.register(StoragePath, StoragePathAdmin)
 admin.site.register(PaperlessTask, TaskAdmin)
 admin.site.register(Note, NotesAdmin)
 admin.site.register(ShareLink, ShareLinksAdmin)
+admin.site.register(CustomField, CustomFieldsAdmin)
+admin.site.register(CustomFieldInstance, CustomFieldInstancesAdmin)
 
 if settings.AUDIT_LOG_ENABLED:
 
