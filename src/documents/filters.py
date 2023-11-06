@@ -21,19 +21,38 @@ DATE_KWARGS = ["year", "month", "day", "date__gt", "gt", "date__lt", "lt"]
 class CorrespondentFilterSet(FilterSet):
     class Meta:
         model = Correspondent
-        fields = {"name": CHAR_KWARGS}
+        fields = {
+            "id": ID_KWARGS,
+            "name": CHAR_KWARGS,
+        }
 
 
 class TagFilterSet(FilterSet):
     class Meta:
         model = Tag
-        fields = {"name": CHAR_KWARGS}
+        fields = {
+            "id": ID_KWARGS,
+            "name": CHAR_KWARGS,
+        }
 
 
 class DocumentTypeFilterSet(FilterSet):
     class Meta:
         model = DocumentType
-        fields = {"name": CHAR_KWARGS}
+        fields = {
+            "id": ID_KWARGS,
+            "name": CHAR_KWARGS,
+        }
+
+
+class StoragePathFilterSet(FilterSet):
+    class Meta:
+        model = StoragePath
+        fields = {
+            "id": ID_KWARGS,
+            "name": CHAR_KWARGS,
+            "path": CHAR_KWARGS,
+        }
 
 
 class ObjectFilter(Filter):
@@ -128,6 +147,7 @@ class DocumentFilterSet(FilterSet):
     class Meta:
         model = Document
         fields = {
+            "id": ID_KWARGS,
             "title": CHAR_KWARGS,
             "content": CHAR_KWARGS,
             "archive_serial_number": INT_KWARGS,
@@ -157,15 +177,6 @@ class LogFilterSet(FilterSet):
     class Meta:
         model = Log
         fields = {"level": INT_KWARGS, "created": DATE_KWARGS, "group": ID_KWARGS}
-
-
-class StoragePathFilterSet(FilterSet):
-    class Meta:
-        model = StoragePath
-        fields = {
-            "name": CHAR_KWARGS,
-            "path": CHAR_KWARGS,
-        }
 
 
 class ShareLinkFilterSet(FilterSet):
