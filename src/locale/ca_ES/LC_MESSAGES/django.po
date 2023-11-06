@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-04 20:12-0700\n"
-"PO-Revision-Date: 2023-11-06 06:20\n"
+"PO-Revision-Date: 2023-11-06 07:47\n"
 "Last-Translator: \n"
 "Language-Team: Catalan\n"
 "Language: ca_ES\n"
@@ -665,27 +665,27 @@ msgstr "Flotant"
 
 #: documents/models.py:892
 msgid "Monetary"
-msgstr ""
+msgstr "Monetari"
 
 #: documents/models.py:904
 msgid "data type"
-msgstr ""
+msgstr "tipus dada"
 
 #: documents/models.py:912
 msgid "custom field"
-msgstr ""
+msgstr "camp personalitzat"
 
 #: documents/models.py:913
 msgid "custom fields"
-msgstr ""
+msgstr "camps personalitzats"
 
 #: documents/models.py:973
 msgid "custom field instance"
-msgstr ""
+msgstr "instància de camp personalitzat"
 
 #: documents/models.py:974
 msgid "custom field instances"
-msgstr ""
+msgstr "instàncies de camps personalitzats"
 
 #: documents/serialisers.py:102
 #, python-format
