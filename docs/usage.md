@@ -103,25 +103,14 @@ Typically, you're looking at an FTP server like
 
 ### Web UI Upload
 
-The dashboard has a file drop field to upload documents to paperless.
-Simply drag a file onto this field or select a file with the file
-dialog. Multiple files are supported.
-
-You can also upload documents on any other page of the web UI by
-dragging-and-dropping files into your browser window.
+The dashboard has a button to upload documents to paperless or you
+can simply drag a file anywhere into the app to initiate the consumption
+process.
 
 ### Mobile upload {#usage-mobile_upload}
 
-The mobile app over at [https://github.com/qcasey/paperless_share](https://github.com/qcasey/paperless_share)
-allows Android users to share any documents with paperless. This can be
-combined with any of the mobile scanning apps out there, such as Office
-Lens.
-
-Furthermore, there is the [Paperless
-App](https://github.com/bauerj/paperless_app) as well, which not only
-has document upload, but also document browsing and download features.
-
-Another option is [Paperless Mobile](https://github.com/astubenbord/paperless-mobile), an Android app that supports document upload, scanning, management of labels and more.
+Please see [the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Affiliated-Projects) for a user-maintained list of affiliated projects and
+software (e.g. for mobile devices) that is compatible with Paperless-ngx.
 
 ### IMAP (Email) {#usage-email}
 
@@ -145,9 +134,9 @@ These rules perform the following:
 5.  If documents were consumed from a mail, the rule action is performed
     on that mail.
 
-Paperless will completely ignore mails that do not match your filters.
-It will also only perform the action on mails that it has consumed
-documents from.
+Paperless will check all emails only once and completely ignore messages
+that do not match your filters. It will also only perform the rule action
+on e-mails that it has consumed documents from.
 
 The actions all ensure that the same mail is not consumed twice by
 different means. These are as follows:
@@ -353,6 +342,19 @@ The following custom field types are supported:
 - `Integer`: integer number e.g. 12
 - `Number`: float number e.g. 12.3456
 - `Monetary`: float number with exactly two decimals, e.g. 12.30
+
+## Share Links
+
+Paperless-ngx added the abiltiy to create shareable links to files in version 2.0. You can find the button for this on the document detail screen.
+
+- Share links do not require a user to login and thus link directly to a file.
+- Links are unique and are of the form `{paperless-url}/share/{randomly-generated-slug}`.
+- Links can optionally have an expiration time set.
+- After a link expires or is deleted users will be redirected to the regular paperless-ngx login.
+
+!!! tip
+
+    If your paperless-ngx instance is behind a reverse-proxy you may want to create an exception to bypass any authentication layers that are part of your setup in order to make links truly publicly-accessible. Of course, do so with caution.
 
 ## Best practices {#basic-searching}
 
@@ -645,16 +647,3 @@ Paperless-ngx consists of the following components:
 
 - Optional: A database server. Paperless supports PostgreSQL, MariaDB
   and SQLite for storing its data.
-
-## Share Links
-
-Paperless-ngx added the abiltiy to create shareable links to files in version 2.0. You can find the button for this on the document detail screen.
-
-- Share links do not require a user to login and thus link directly to a file.
-- Links are unique and are of the form `{paperless-url}/share/{randomly-generated-slug}`.
-- Links can optionally have an expiration time set.
-- After a link expires or is deleted users will be redirected to the regular paperless-ngx login.
-
-!!! tip
-
-    If your paperless-ngx instance is behind a reverse-proxy you may want to create an exception to bypass any authentication layers that are part of your setup in order to make links truly publicly-accessible. Of course, do so with caution.

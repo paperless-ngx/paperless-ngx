@@ -15,62 +15,52 @@ physical documents into a searchable online archive so you can keep, well, _less
 </div>
 <div class="clear"></div>
 
-## Why This Exists
+## Features
 
-Paper is a nightmare. Environmental issues aside, there's no excuse for
-it in the 21st century. It takes up space, collects dust, doesn't
-support any form of a search feature, indexing is tedious, it's heavy
-and prone to damage & loss.
+- **Organize and index** your scanned documents with tags, correspondents, types, and more.
+- Performs **OCR** on your documents, adding selectable text to image-only documents.
+- Uses machine-learning to automatically add tags, correspondents and document types to your documents.
+- Supports PDF documents, images, plain text files, Office documents (Word, Excel, Powerpoint, and LibreOffice equivalents)[^1] and more.
+- Paperless stores your documents plain on disk. Filenames and folders are managed by paperless and their format can be configured freely with different configurations assigned to different documents.
+- **Beautiful, modern web application** that features:
+  - Customizable dashboard with statistics.
+    - Filtering by tags, correspondents, types, and more.
+    - Bulk editing of tags, correspondents, types and more.
+    - Drag-and-drop uploading of documents throughout the app.
+    - Customizable views can be saved and displayed on the dashboard and / or sidebar.
+    - Support for custom fields of various data types.
+    - Shareable public links with optional expiration.
+  - **Full text search** helps you find what you need.
+  - Auto completion suggests relevant words from your documents.
+    - Results are sorted by relevance to your search query.
+    - Highlighting shows you which parts of the document matched the query.
+    - Searching for similar documents ("More like this")
+  - **Email processing**[^1]: import documents from your email accounts
+  - Configure multiple accounts and rules for each account.
+    - After processing, paperless can perform actions on the messages such as marking as read, deleting and more.
+  - A built-in robust **multi-user permissions** system that supports 'global' permissions as well as per document or object.
+- A powerful templating system that gives you more control over the consumption pipeline.
+- **Optimized** for multi core systems: Paperless-ngx consumes multiple documents in parallel.
+- The integrated sanity checker makes sure that your document archive is in good health.
 
-This software is designed to make "going paperless" easier. No more worrying
-about finding stuff again, feed documents right from the post box into
-the scanner and then shred them. Perhaps you might find it useful too.
+[^1]: Office document and email consumption support is optional and provided by Apache Tika (see [configuration](https://docs.paperless-ngx.com/configuration/#tika))
 
 ## Paperless, a history
 
-Paperless is a simple Django application running in two parts: a
-_Consumer_ (the thing that does the indexing) and the _Web server_ (the
-part that lets you search & download already-indexed documents). If you
-want to learn more about its functions keep on reading after the
-installation section.
+Paperless-ngx is the official successor to the original [Paperless](https://github.com/the-paperless-project/paperless) & [Paperless-ng](https://github.com/jonaswinkler/paperless-ng) projects and is designed to continue the great work and distribute responsibility of supporting and advancing the project among a team of people. [Consider joining us!](https://github.com/paperless-ngx/paperless-ngx#community-support)
 
-Paperless-ngx is a document management system that transforms your
-physical documents into a searchable online archive so you can keep,
-well, _less paper_.
-
-Paperless-ngx forked from paperless-ng to continue the great work and
-distribute responsibility of supporting and advancing the project among
-a team of people.
-
-NG stands for both Angular (the framework used for the Frontend) and
-next-gen. Publishing this project under a different name also avoids
-confusion between paperless and paperless-ngx.
-
-If you want to learn about what's different in paperless-ngx from
-Paperless, check out these resources in the documentation:
-
-- [Some screenshots](#screenshots) of the new UI are available.
-- Read [this section](advanced_usage.md#automatic-matching) if you want to learn about how paperless automates all
-  tagging using machine learning.
-- Paperless now comes with a [proper email consumer](usage.md#usage-email) that's fully tested and production ready.
-- Paperless creates searchable PDF/A documents from whatever you put into the consumption directory. This means
-  that you can select text in image-only documents coming from your scanner.
-- See [this note](administration.md#encryption) about GnuPG encryption in paperless-ngx.
-- Paperless is now integrated with a
-  [task processing queue](setup.md#task_processor) that tells you at a glance when and why something is not working.
-- The [changelog](changelog.md) contains a detailed list of all changes in paperless-ngx.
+Further discussion of the transition between these projects can be found at
+[ng#1599](https://github.com/jonaswinkler/paperless-ng/issues/1599) and [ng#1632](https://github.com/jonaswinkler/paperless-ng/issues/1632).
 
 ## Screenshots
 
-This is what Paperless-ngx looks like.
+Paperless-ngx aims to be as nice to use as it is useful. Check out some screenshots below.
 
-The dashboard shows customizable views on your document and allows
-document uploads:
+The dashboard shows saved views which can be sorted. Documents can be uploaded with the button or dropped anywhere in the application:
 
 [![image](assets/screenshots/dashboard.png)](assets/screenshots/dashboard.png)
 
-The document list provides three different styles to scroll through your
-documents:
+The document list provides three different styles to browser your documents:
 
 [![image](assets/screenshots/documents-table.png)](assets/screenshots/documents-table.png)
 
@@ -78,15 +68,19 @@ documents:
 
 [![image](assets/screenshots/documents-largecards.png)](assets/screenshots/documents-largecards.png)
 
+Use the 'slim' sidebar to focus on just your docs:
+
+[![image](assets/screenshots/documents-smallcards-slimsidebar.png)](assets/screenshots/documents-smallcards-slimsidebar.png)
+
 Paperless-ngx also supports dark mode:
 
 [![image](assets/screenshots/documents-smallcards-dark.png)](assets/screenshots/documents-smallcards-dark.png)
 
-Extensive filtering mechanisms:
+Quickly find documents with extensive filtering mechanisms:
 
 [![image](assets/screenshots/documents-filter.png)](assets/screenshots/documents-filter.png)
 
-Bulk editing of document tags, correspondents, etc.:
+Bulk edit document tags, correspondents, etc. as well as permissions:
 
 [![image](assets/screenshots/bulk-edit.png)](assets/screenshots/bulk-edit.png)
 
@@ -94,24 +88,36 @@ Side-by-side editing of documents:
 
 [![image](assets/screenshots/editing.png)](assets/screenshots/editing.png)
 
+Support for custom fields:
+
+[![image](assets/screenshots/custom_field1.png){: style="width:50%; margin-left: 25%"}](assets/screenshots/custom_field1.png)
+[![image](assets/screenshots/custom_field2.png)](assets/screenshots/custom_field2.png)
+
+A robust permissions system with support for 'global' and document / object permissions:
+
+[![image](assets/screenshots/permissions_global.png){: style="width:50%; margin-left: 25%"}](assets/screenshots/permissions_global.png)
+[![image](assets/screenshots/permissions_document.png)](assets/screenshots/permissions_document.png)
+
 Tag editing. This looks about the same for correspondents and document
 types.
 
-[![image](assets/screenshots/new-tag.png)](assets/screenshots/new-tag.png)
+[![image](assets/screenshots/new-tag.png){: style="width:50%; margin-left: 25%"}](assets/screenshots/new-tag.png)
 
 Searching provides auto complete and highlights the results.
 
-[![image](assets/screenshots/search-preview.png)](assets/screenshots/search-preview.png)
+[![image](assets/screenshots/search-preview.png){: style="width:50%; margin-left: 25%"}](assets/screenshots/search-preview.png)
 
 [![image](assets/screenshots/search-results.png)](assets/screenshots/search-results.png)
 
 Fancy mail filters!
 
-[![image](assets/screenshots/mail-rules-edited.png)](assets/screenshots/mail-rules-edited.png)
+[![image](assets/screenshots/mail-rules-edited.png){: style="width:80%; margin-left: 10%"}](assets/screenshots/mail-rules-edited.png)
 
 Mobile devices are supported.
 
-[![image](assets/screenshots/mobile.png)](assets/screenshots/mobile.png)
+[![image](assets/screenshots/mobile1.png){: style="width:33%"}](assets/screenshots/mobile1.png)
+[![image](assets/screenshots/mobile2.png){: style="width:33%"}](assets/screenshots/mobile2.png)
+[![image](assets/screenshots/mobile3.png){: style="width:33%"}](assets/screenshots/mobile3.png)
 
 ## Support
 
@@ -131,7 +137,7 @@ People interested in continuing the work on paperless-ngx are encouraged to reac
 
 ### Translation
 
-Paperless-ngx is available in many languages that are coordinated on [Crowdin](https://crwd.in/paperless-ngx). If you want to help out by translating paperless-ngx into your language, please head over to https://crwd.in/paperless-ngx, and thank you!
+Paperless-ngx is available in many languages that are coordinated on [Crowdin](https://crwd.in/paperless-ngx). If you want to help out by translating paperless-ngx into your language, please head over to the [Paperless-ngx project at Crowdin](https://crwd.in/paperless-ngx), and thank you!
 
 ## Scanners & Software
 

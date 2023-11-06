@@ -708,7 +708,7 @@ but could result in missing text content.
 additional arguments you wish to pass to OCRmyPDF. Since Paperless
 uses the API of OCRmyPDF, you have to specify these in a format that
 can be passed to the API. See [the API reference of
-OCRmyPDF](https://ocrmypdf.readthedocs.io/en/latestapi.md.html#reference)
+OCRmyPDF](https://ocrmypdf.readthedocs.io/en/latest/api.html#reference)
 for valid parameters. All command line options are supported, but
 they use underscores instead of dashes.
 
