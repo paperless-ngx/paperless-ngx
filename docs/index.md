@@ -58,66 +58,66 @@ Paperless-ngx aims to be as nice to use as it is useful. Check out some screensh
 
 The dashboard shows saved views which can be sorted. Documents can be uploaded with the button or dropped anywhere in the application:
 
-[![image](assets/screenshots/dashboard.png)](assets/screenshots/dashboard.png)
+![image](assets/screenshots/dashboard.png)
 
 The document list provides three different styles to browser your documents:
 
-[![image](assets/screenshots/documents-table.png)](assets/screenshots/documents-table.png)
+![image](assets/screenshots/documents-table.png)
 
-[![image](assets/screenshots/documents-smallcards.png)](assets/screenshots/documents-smallcards.png)
+![image](assets/screenshots/documents-smallcards.png)
 
-[![image](assets/screenshots/documents-largecards.png)](assets/screenshots/documents-largecards.png)
+![image](assets/screenshots/documents-largecards.png)
 
 Use the 'slim' sidebar to focus on just your docs:
 
-[![image](assets/screenshots/documents-smallcards-slimsidebar.png)](assets/screenshots/documents-smallcards-slimsidebar.png)
+![image](assets/screenshots/documents-smallcards-slimsidebar.png)
 
 Paperless-ngx also supports dark mode:
 
-[![image](assets/screenshots/documents-smallcards-dark.png)](assets/screenshots/documents-smallcards-dark.png)
+![image](assets/screenshots/documents-smallcards-dark.png)
 
 Quickly find documents with extensive filtering mechanisms:
 
-[![image](assets/screenshots/documents-filter.png)](assets/screenshots/documents-filter.png)
+![image](assets/screenshots/documents-filter.png)
 
 Bulk edit document tags, correspondents, etc. as well as permissions:
 
-[![image](assets/screenshots/bulk-edit.png)](assets/screenshots/bulk-edit.png)
+![image](assets/screenshots/bulk-edit.png)
 
 Side-by-side editing of documents:
 
-[![image](assets/screenshots/editing.png)](assets/screenshots/editing.png)
+![image](assets/screenshots/editing.png)
 
 Support for custom fields:
 
-[![image](assets/screenshots/custom_field1.png){: style="width:50%; margin-left: 25%"}](assets/screenshots/custom_field1.png)
-[![image](assets/screenshots/custom_field2.png)](assets/screenshots/custom_field2.png)
+![image](assets/screenshots/custom_field1.png){: style="width:50%; margin-left: 25%"}
+![image](assets/screenshots/custom_field2.png)
 
 A robust permissions system with support for 'global' and document / object permissions:
 
-[![image](assets/screenshots/permissions_global.png){: style="width:50%; margin-left: 25%"}](assets/screenshots/permissions_global.png)
-[![image](assets/screenshots/permissions_document.png)](assets/screenshots/permissions_document.png)
+![image](assets/screenshots/permissions_global.png){: style="width:50%; margin-left: 25%"}
+![image](assets/screenshots/permissions_document.png)
 
 Tag editing. This looks about the same for correspondents and document
 types.
 
-[![image](assets/screenshots/new-tag.png){: style="width:50%; margin-left: 25%"}](assets/screenshots/new-tag.png)
+![image](assets/screenshots/new-tag.png){: style="width:50%; margin-left: 25%"}
 
 Searching provides auto complete and highlights the results.
 
-[![image](assets/screenshots/search-preview.png){: style="width:50%; margin-left: 25%"}](assets/screenshots/search-preview.png)
+![image](assets/screenshots/search-preview.png){: style="width:50%; margin-left: 25%"}
 
-[![image](assets/screenshots/search-results.png)](assets/screenshots/search-results.png)
+![image](assets/screenshots/search-results.png)
 
 Fancy mail filters!
 
-[![image](assets/screenshots/mail-rules-edited.png){: style="width:80%; margin-left: 10%"}](assets/screenshots/mail-rules-edited.png)
+![image](assets/screenshots/mail-rules-edited.png){: style="width:80%; margin-left: 10%"}
 
 Mobile devices are supported.
 
-[![image](assets/screenshots/mobile1.png){: style="width:33%"}](assets/screenshots/mobile1.png)
-[![image](assets/screenshots/mobile2.png){: style="width:33%"}](assets/screenshots/mobile2.png)
-[![image](assets/screenshots/mobile3.png){: style="width:33%"}](assets/screenshots/mobile3.png)
+![image](assets/screenshots/mobile1.png){: style="width:33%"}
+![image](assets/screenshots/mobile2.png){: style="width:33%"}
+![image](assets/screenshots/mobile3.png){: style="width:33%"}
 
 ## Support
 
