@@ -3,8 +3,6 @@ codecov:
 # https://docs.codecov.com/docs/flags#recommended-automatic-flag-management
 # Require each flag to have 1 upload before notification
 flag_management:
-  default_rules:
-    after_n_builds: 1
   individual_flags:
     - name: backend
       paths:
@@ -22,12 +20,9 @@ coverage:
       default:
         # https://docs.codecov.com/docs/commit-status#threshold
         threshold: 1%
-        # https://docs.codecov.com/docs/commit-status#only_pulls
-        only_pulls: true
     patch:
       default:
         # For the changed lines only, target 75% covered, but
         # allow as low as 50%
         target: 75%
         threshold: 25%
-        only_pulls: true
