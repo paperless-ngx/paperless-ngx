@@ -82,6 +82,21 @@ class TitleContentFilter(Filter):
             return qs
 
 
+class CustomFieldsFilter(Filter):
+    def filter(self, qs, value):
+        if value:
+            return (
+                qs.filter(custom_fields__field__name__icontains=value)
+                | qs.filter(custom_fields__value_text__icontains=value)
+                | qs.filter(custom_fields__value_bool__icontains=value)
+                | qs.filter(custom_fields__value_int__icontains=value)
+                | qs.filter(custom_fields__value_date__icontains=value)
+                | qs.filter(custom_fields__value_url__icontains=value)
+            )
+        else:
+            return qs
+
+
 class DocumentFilterSet(FilterSet):
     is_tagged = BooleanFilter(
         label="Is tagged",
@@ -108,6 +123,8 @@ class DocumentFilterSet(FilterSet):
 
     owner__id__none = ObjectFilter(field_name="owner", exclude=True)
 
+    custom_fields__icontains = CustomFieldsFilter()
+
     class Meta:
         model = Document
         fields = {
@@ -132,6 +149,7 @@ class DocumentFilterSet(FilterSet):
             "storage_path__name": CHAR_KWARGS,
             "owner": ["isnull"],
             "owner__id": ID_KWARGS,
+            "custom_fields": ["icontains"],
         }
 
 

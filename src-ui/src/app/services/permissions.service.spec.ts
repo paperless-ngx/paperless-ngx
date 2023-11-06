@@ -256,6 +256,10 @@ describe('PermissionsService', () => {
         'view_consumptiontemplate',
         'change_consumptiontemplate',
         'delete_consumptiontemplate',
+        'add_customfield',
+        'view_customfield',
+        'change_customfield',
+        'delete_customfield',
       ],
       {
         username: 'testuser',

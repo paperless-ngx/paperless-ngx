@@ -16,6 +16,7 @@ from documents.views import BulkEditObjectPermissionsView
 from documents.views import BulkEditView
 from documents.views import ConsumptionTemplateViewSet
 from documents.views import CorrespondentViewSet
+from documents.views import CustomFieldViewSet
 from documents.views import DocumentTypeViewSet
 from documents.views import IndexView
 from documents.views import LogViewSet
@@ -55,6 +56,7 @@ api_router.register(r"mail_accounts", MailAccountViewSet)
 api_router.register(r"mail_rules", MailRuleViewSet)
 api_router.register(r"share_links", ShareLinkViewSet)
 api_router.register(r"consumption_templates", ConsumptionTemplateViewSet)
+api_router.register(r"custom_fields", CustomFieldViewSet)
 
 
 urlpatterns = [

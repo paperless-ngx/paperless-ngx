@@ -322,6 +322,38 @@ applied. You can use the following placeholders:
 - `{added_month_name_short}`: added month short name
 - `{added_day}`: added day
 
+## Custom Fields {#custom-fields}
+
+Paperless-ngx supports the use of custom fields for documents as of v2.0, allowing a user
+to optionally attach data to documents which does not fit in the existing set of fields
+Paperless-ngx provides.
+
+1. First, create a custom field (under "Manage"), with a given name and data type. This could be something like "Invoice Number" or "Date Paid", with a data type of "Number", "Date", "String", etc.
+2. Once created, a field can be used with documents and data stored. To do so, use the "Custom Fields" menu on the document detail page, choose your existing field and click "Add". Once the field is visible in the form you can enter the appropriate
+   data which will be validated according to the custom field "data type".
+3. Fields can be removed by hovering over the field name revealing a "Remove" button.
+
+!!! important
+
+    Added / removed fields, as well as any data is not saved to the document until you
+    actually hit the "Save" button, similar to other changes on the document details page.
+
+!!! note
+
+    Once the data type for a field is set, it cannot be changed.
+
+Multiple fields may be attached to a document but the same field name cannot be assigned multiple times to the a single document.
+
+The following custom field types are supported:
+
+- `Text`: any text
+- `Boolean`: true / false (check / unchecked) field
+- `Date`: date
+- `URL`: a valid url
+- `Integer`: integer number e.g. 12
+- `Number`: float number e.g. 12.3456
+- `Monetary`: float number with exactly two decimals, e.g. 12.30
+
 ## Best practices {#basic-searching}
 
 Paperless offers a couple tools that help you organize your document

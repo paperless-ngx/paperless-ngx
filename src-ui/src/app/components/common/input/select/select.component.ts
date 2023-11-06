@@ -88,6 +88,12 @@ export class SelectComponent extends AbstractInputComponent<number> {
   @Input()
   showFilter: boolean = false
 
+  @Input()
+  notFoundText: string = $localize`No items found`
+
+  @Input()
+  disableCreateNew: boolean = false
+
   @Output()
   createNew = new EventEmitter<string>()
 
@@ -99,7 +105,7 @@ export class SelectComponent extends AbstractInputComponent<number> {
   private _lastSearchTerm: string
 
   get allowCreateNew(): boolean {
-    return this.createNew.observers.length > 0
+    return !this.disableCreateNew && this.createNew.observers.length > 0
   }
 
   get isPrivate(): boolean {
