@@ -384,6 +384,14 @@ ul.pagination {
   }
 }
 
+.nav-underline {
+  .nav-link {
+    &.active, &:hover, &:focus {
+      color: var(--bs-primary);
+    }
+  }
+}
+
 .ng-select-container,
 .ng-select.ng-select-opened > .ng-select-container,
 .ng-dropdown-panel,
@@ -660,4 +668,18 @@ code {
 /* Animate an item that has been dropped. */
 .cdk-drag-animating {
   transition: transform 300ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.hidden-button-container {
+  button {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s ease;
+  }
+  &:hover {
+    button {
+      opacity: 1;
+      pointer-events: initial;
+    }
+  }
 }

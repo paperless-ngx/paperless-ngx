@@ -78,6 +78,7 @@ from documents.matching import match_storage_paths
 from documents.matching import match_tags
 from documents.models import ConsumptionTemplate
 from documents.models import Correspondent
+from documents.models import CustomField
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import Note
@@ -99,6 +100,7 @@ from documents.serialisers import BulkEditObjectPermissionsSerializer
 from documents.serialisers import BulkEditSerializer
 from documents.serialisers import ConsumptionTemplateSerializer
 from documents.serialisers import CorrespondentSerializer
+from documents.serialisers import CustomFieldSerializer
 from documents.serialisers import DocumentListSerializer
 from documents.serialisers import DocumentSerializer
 from documents.serialisers import DocumentTypeSerializer
@@ -497,7 +499,7 @@ class DocumentViewSet(
                 "view_document",
                 doc,
             ):
-                return HttpResponseForbidden("Insufficient permissions to view")
+                return HttpResponseForbidden("Insufficient permissions to view notes")
         except Document.DoesNotExist:
             raise Http404
 
@@ -507,7 +509,7 @@ class DocumentViewSet(
             except Exception as e:
                 logger.warning(f"An error occurred retrieving notes: {e!s}")
                 return Response(
-                    {"error": "Error retreiving notes, check logs for more detail."},
+                    {"error": "Error retrieving notes, check logs for more detail."},
                 )
         elif request.method == "POST":
             try:
@@ -516,7 +518,9 @@ class DocumentViewSet(
                     "change_document",
                     doc,
                 ):
-                    return HttpResponseForbidden("Insufficient permissions to create")
+                    return HttpResponseForbidden(
+                        "Insufficient permissions to create notes",
+                    )
 
                 c = Note.objects.create(
                     document=doc,
@@ -558,7 +562,7 @@ class DocumentViewSet(
                 "change_document",
                 doc,
             ):
-                return HttpResponseForbidden("Insufficient permissions to delete")
+                return HttpResponseForbidden("Insufficient permissions to delete notes")
 
             note = Note.objects.get(id=int(request.GET.get("id")))
             if settings.AUDIT_LOG_ENABLED:
@@ -599,7 +603,9 @@ class DocumentViewSet(
                 "change_document",
                 doc,
             ):
-                return HttpResponseForbidden("Insufficient permissions")
+                return HttpResponseForbidden(
+                    "Insufficient permissions to add share link",
+                )
         except Document.DoesNotExist:
             raise Http404
 
@@ -1071,47 +1077,6 @@ class BulkDownloadView(GenericAPIView):
             return response
 
 
-class RemoteVersionView(GenericAPIView):
-    def get(self, request, format=None):
-        remote_version = "0.0.0"
-        is_greater_than_current = False
-        current_version = packaging_version.parse(version.__full_version_str__)
-        try:
-            req = urllib.request.Request(
-                "https://api.github.com/repos/paperless-ngx/"
-                "paperless-ngx/releases/latest",
-            )
-            # Ensure a JSON response
-            req.add_header("Accept", "application/json")
-
-            with urllib.request.urlopen(req) as response:
-                remote = response.read().decode("utf-8")
-            try:
-                remote_json = json.loads(remote)
-                remote_version = remote_json["tag_name"]
-                # Basically PEP 616 but that only went in 3.9
-                if remote_version.startswith("ngx-"):
-                    remote_version = remote_version[len("ngx-") :]
-            except ValueError:
-                logger.debug("An error occurred parsing remote version json")
-        except urllib.error.URLError:
-            logger.debug("An error occurred checking for available updates")
-
-        is_greater_than_current = (
-            packaging_version.parse(
-                remote_version,
-            )
-            > current_version
-        )
-
-        return Response(
-            {
-                "version": remote_version,
-                "update_available": is_greater_than_current,
-            },
-        )
-
-
 class StoragePathViewSet(ModelViewSet, PassUserMixin):
     model = StoragePath
 
@@ -1182,6 +1147,47 @@ class UiSettingsView(GenericAPIView):
         return Response(
             {
                 "success": True,
+            },
+        )
+
+
+class RemoteVersionView(GenericAPIView):
+    def get(self, request, format=None):
+        remote_version = "0.0.0"
+        is_greater_than_current = False
+        current_version = packaging_version.parse(version.__full_version_str__)
+        try:
+            req = urllib.request.Request(
+                "https://api.github.com/repos/paperlessngx/"
+                "paperlessngx/releases/latest",
+            )
+            # Ensure a JSON response
+            req.add_header("Accept", "application/json")
+
+            with urllib.request.urlopen(req) as response:
+                remote = response.read().decode("utf8")
+            try:
+                remote_json = json.loads(remote)
+                remote_version = remote_json["tag_name"]
+                # Basically PEP 616 but that only went in 3.9
+                if remote_version.startswith("ngx-"):
+                    remote_version = remote_version[len("ngx-") :]
+            except ValueError:
+                logger.debug("An error occurred parsing remote version json")
+        except urllib.error.URLError:
+            logger.debug("An error occurred checking for available updates")
+
+        is_greater_than_current = (
+            packaging_version.parse(
+                remote_version,
+            )
+            > current_version
+        )
+
+        return Response(
+            {
+                "version": remote_version,
+                "update_available": is_greater_than_current,
             },
         )
 
@@ -1341,4 +1347,15 @@ class ConsumptionTemplateViewSet(ModelViewSet):
 
     model = ConsumptionTemplate
 
-    queryset = ConsumptionTemplate.objects.all().order_by("order")
+    queryset = ConsumptionTemplate.objects.all().order_by("name")
+
+
+class CustomFieldViewSet(ModelViewSet):
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+
+    serializer_class = CustomFieldSerializer
+    pagination_class = StandardPagination
+
+    model = CustomField
+
+    queryset = CustomField.objects.all().order_by("-created")

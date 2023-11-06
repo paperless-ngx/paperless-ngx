@@ -1,51 +1,53 @@
-<div class="mb-3 paperless-input-select paperless-input-tags" [class.disabled]="disabled">
-  <label class="form-label" for="tags" i18n>{{title}}</label>
+<div class="mb-3 paperless-input-select paperless-input-tags" [class.disabled]="disabled" [class.pb-3]="suggestions">
+  <div class="row">
+    <div class="d-flex align-items-center" [class.col-md-3]="horizontal">
+      <label class="form-label mb-md-0" for="tags" i18n>{{title}}</label>
+    </div>
+    <div class="position-relative" [class.col-md-9]="horizontal">
+      <div class="input-group flex-nowrap">
+        <ng-select #tagSelect name="tags" [items]="tags" bindLabel="name" bindValue="id" [(ngModel)]="value"
+          [disabled]="disabled"
+          [multiple]="true"
+          [closeOnSelect]="false"
+          [clearSearchOnAdd]="true"
+          [hideSelected]="tags.length > 0"
+          [addTag]="allowCreate ? createTagRef : false"
+          addTagText="Add tag"
+          i18n-addTagText
+          (change)="onChange(value)">
 
-  <div class="input-group flex-nowrap">
-    <ng-select #tagSelect name="tags" [items]="tags" bindLabel="name" bindValue="id" [(ngModel)]="value"
-      [disabled]="disabled"
-      [multiple]="true"
-      [closeOnSelect]="false"
-      [clearSearchOnAdd]="true"
-      [hideSelected]="tags.length > 0"
-      [addTag]="allowCreate ? createTagRef : false"
-      addTagText="Add tag"
-      i18n-addTagText
-      (change)="onChange(value)">
-
-      <ng-template ng-label-tmp let-item="item">
-        <span class="tag-wrap tag-wrap-delete" (mousedown)="removeTag($event, item.id)">
-          <svg width="1.2em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-            <use xlink:href="assets/bootstrap-icons.svg#x"/>
+          <ng-template ng-label-tmp let-item="item">
+            <span class="tag-wrap tag-wrap-delete" (mousedown)="removeTag($event, item.id)">
+              <svg width="1.2em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <use xlink:href="assets/bootstrap-icons.svg#x"/>
+              </svg>
+              <pngx-tag *ngIf="item.id && tags" style="background-color: none;" [tag]="getTag(item.id)"></pngx-tag>
+            </span>
+          </ng-template>
+          <ng-template ng-option-tmp let-item="item" let-index="index" let-search="searchTerm">
+            <div class="tag-wrap">
+              <pngx-tag *ngIf="item.id && tags" class="me-2" [tag]="getTag(item.id)"></pngx-tag>
+            </div>
+          </ng-template>
+        </ng-select>
+        <button *ngIf="allowCreate" class="btn btn-outline-secondary" type="button" (click)="createTag()" [disabled]="disabled">
+          <svg class="buttonicon" fill="currentColor">
+            <use xlink:href="assets/bootstrap-icons.svg#plus" />
           </svg>
-          <pngx-tag *ngIf="item.id && tags" style="background-color: none;" [tag]="getTag(item.id)"></pngx-tag>
-        </span>
-      </ng-template>
-      <ng-template ng-option-tmp let-item="item" let-index="index" let-search="searchTerm">
-        <div class="tag-wrap">
-          <pngx-tag *ngIf="item.id && tags" class="me-2" [tag]="getTag(item.id)"></pngx-tag>
-        </div>
-      </ng-template>
-    </ng-select>
-    <button *ngIf="allowCreate" class="btn btn-outline-secondary" type="button" (click)="createTag()" [disabled]="disabled">
-      <svg class="buttonicon" fill="currentColor">
-        <use xlink:href="assets/bootstrap-icons.svg#plus" />
-      </svg>
-    </button>
-    <button *ngIf="showFilter" class="btn btn-outline-secondary" type="button" (click)="onFilterDocuments()" [disabled]="hasPrivate || this.value === null" i18n-title title="Filter documents with these Tags">
-      <svg class="buttonicon" fill="currentColor">
-        <use xlink:href="assets/bootstrap-icons.svg#filter" />
-      </svg>
-    </button>
+        </button>
+        <button *ngIf="showFilter" class="btn btn-outline-secondary" type="button" (click)="onFilterDocuments()" [disabled]="hasPrivate || this.value === null" i18n-title title="Filter documents with these Tags">
+          <svg class="buttonicon" fill="currentColor">
+            <use xlink:href="assets/bootstrap-icons.svg#filter" />
+          </svg>
+        </button>
+      </div>
+      <small class="form-text text-muted" *ngIf="hint">{{hint}}</small>
+      <small *ngIf="getSuggestions().length > 0" class="position-absolute top-100">
+        <span i18n>Suggestions:</span>&nbsp;
+        <ng-container *ngFor="let tag of getSuggestions()">
+          <a (click)="addTag(tag.id)" [routerLink]="[]">{{tag?.name}}</a>&nbsp;
+        </ng-container>
+      </small>
+    </div>
   </div>
-  <small class="form-text text-muted" *ngIf="hint">{{hint}}</small>
-  <small *ngIf="getSuggestions().length > 0">
-    <span i18n>Suggestions:</span>&nbsp;
-    <ng-container *ngFor="let tag of getSuggestions()">
-      <a (click)="addTag(tag.id)" [routerLink]="[]">{{tag.name}}</a>&nbsp;
-    </ng-container>
-
-
-  </small>
-
 </div>

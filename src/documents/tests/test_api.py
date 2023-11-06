@@ -35,6 +35,8 @@ from documents import index
 from documents.data_models import DocumentSource
 from documents.models import ConsumptionTemplate
 from documents.models import Correspondent
+from documents.models import CustomField
+from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import MatchingModel
@@ -347,10 +349,35 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         tag_2 = Tag.objects.create(name="t2")
         tag_3 = Tag.objects.create(name="t3")
 
+        cf1 = CustomField.objects.create(
+            name="stringfield",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        cf2 = CustomField.objects.create(
+            name="numberfield",
+            data_type=CustomField.FieldDataType.INT,
+        )
+
         doc1.tags.add(tag_inbox)
         doc2.tags.add(tag_2)
         doc3.tags.add(tag_2)
         doc3.tags.add(tag_3)
+
+        cf1_d1 = CustomFieldInstance.objects.create(
+            document=doc1,
+            field=cf1,
+            value_text="foobard1",
+        )
+        CustomFieldInstance.objects.create(
+            document=doc1,
+            field=cf2,
+            value_int=999,
+        )
+        cf1_d3 = CustomFieldInstance.objects.create(
+            document=doc3,
+            field=cf1,
+            value_text="foobard3",
+        )
 
         response = self.client.get("/api/documents/?is_in_inbox=true")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -422,6 +449,31 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data["results"]
         self.assertEqual(len(results), 0)
+
+        # custom field name
+        response = self.client.get(
+            f"/api/documents/?custom_fields__icontains={cf1.name}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 2)
+
+        # custom field value
+        response = self.client.get(
+            f"/api/documents/?custom_fields__icontains={cf1_d1.value}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["id"], doc1.id)
+
+        response = self.client.get(
+            f"/api/documents/?custom_fields__icontains={cf1_d3.value}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["id"], doc3.id)
 
     def test_document_checksum_filter(self):
         Document.objects.create(
@@ -1146,6 +1198,14 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         dt2 = DocumentType.objects.create(name="type2")
         sp = StoragePath.objects.create(name="path")
         sp2 = StoragePath.objects.create(name="path2")
+        cf1 = CustomField.objects.create(
+            name="string field",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        cf2 = CustomField.objects.create(
+            name="number field",
+            data_type=CustomField.FieldDataType.INT,
+        )
 
         d1 = Document.objects.create(checksum="1", correspondent=c, content="test")
         d2 = Document.objects.create(checksum="2", document_type=dt, content="test")
@@ -1174,6 +1234,22 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             document_type=dt2,
             storage_path=sp2,
             content="test",
+        )
+
+        cf1_d1 = CustomFieldInstance.objects.create(
+            document=d1,
+            field=cf1,
+            value_text="foobard1",
+        )
+        cf2_d1 = CustomFieldInstance.objects.create(
+            document=d1,
+            field=cf2,
+            value_int=999,
+        )
+        cf1_d4 = CustomFieldInstance.objects.create(
+            document=d4,
+            field=cf1,
+            value_text="foobard4",
         )
 
         with AsyncWriter(index.open_index()) as writer:
@@ -1304,6 +1380,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
                 + datetime.datetime(2020, 1, 2).strftime("%Y-%m-%d"),
             ),
         )
+
         self.assertIn(
             d5.id,
             search_query(
@@ -1320,6 +1397,27 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertCountEqual(
             search_query("&original_filename__istartswith=doc"),
             [d4.id, d5.id],
+        )
+
+        self.assertIn(
+            d1.id,
+            search_query(
+                "&custom_fields__icontains=" + cf1_d1.value,
+            ),
+        )
+
+        self.assertIn(
+            d1.id,
+            search_query(
+                "&custom_fields__icontains=" + str(cf2_d1.value),
+            ),
+        )
+
+        self.assertIn(
+            d4.id,
+            search_query(
+                "&custom_fields__icontains=" + cf1_d4.value,
+            ),
         )
 
     def test_search_filtering_respect_owner(self):
@@ -2421,7 +2519,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             f"/api/documents/{doc.pk}/notes/",
             format="json",
         )
-        self.assertEqual(resp.content, b"Insufficient permissions to view")
+        self.assertEqual(resp.content, b"Insufficient permissions to view notes")
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
         assign_perm("view_document", user1, doc)
@@ -2430,7 +2528,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             f"/api/documents/{doc.pk}/notes/",
             data={"note": "this is a posted note"},
         )
-        self.assertEqual(resp.content, b"Insufficient permissions to create")
+        self.assertEqual(resp.content, b"Insufficient permissions to create notes")
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
         note = Note.objects.create(
@@ -2444,7 +2542,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             format="json",
         )
 
-        self.assertEqual(response.content, b"Insufficient permissions to delete")
+        self.assertEqual(response.content, b"Insufficient permissions to delete notes")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_delete_note(self):
@@ -2694,7 +2792,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             f"/api/documents/{doc.pk}/share_links/",
             format="json",
         )
-        self.assertEqual(resp.content, b"Insufficient permissions")
+        self.assertEqual(resp.content, b"Insufficient permissions to add share link")
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
         assign_perm("change_document", user1, doc)
