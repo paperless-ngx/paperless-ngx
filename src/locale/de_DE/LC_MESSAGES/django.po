@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-04 20:12-0700\n"
-"PO-Revision-Date: 2023-11-06 07:47\n"
+"PO-Revision-Date: 2023-11-06 09:53\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -669,23 +669,23 @@ msgstr "Währung"
 
 #: documents/models.py:904
 msgid "data type"
-msgstr ""
+msgstr "Datentyp"
 
 #: documents/models.py:912
 msgid "custom field"
-msgstr ""
+msgstr "Benutzerdefiniertes Feld"
 
 #: documents/models.py:913
 msgid "custom fields"
-msgstr ""
+msgstr "Benutzerdefinierte Felder"
 
 #: documents/models.py:973
 msgid "custom field instance"
-msgstr ""
+msgstr "Benutzerdefinierte Feld-Instanz"
 
 #: documents/models.py:974
 msgid "custom field instances"
-msgstr ""
+msgstr "Benutzerdefinierte Feld-Instanzen"
 
 #: documents/serialisers.py:102
 #, python-format
