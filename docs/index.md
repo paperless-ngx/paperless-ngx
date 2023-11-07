@@ -56,68 +56,118 @@ Further discussion of the transition between these projects can be found at
 
 Paperless-ngx aims to be as nice to use as it is useful. Check out some screenshots below.
 
-The dashboard shows saved views which can be sorted. Documents can be uploaded with the button or dropped anywhere in the application:
+<div class="grid-flipped-left" markdown>
+  ![image](assets/screenshots/dashboard.png)
+</div>
+<div class="grid-flipped-right" markdown>
+  The dashboard shows saved views which can be sorted. Documents can be uploaded with the button or dropped anywhere in the application.
+</div>
+<div class="clear"></div>
 
-![image](assets/screenshots/dashboard.png)
+The document list provides three different styles to browse your documents.
 
-The document list provides three different styles to browser your documents:
+![image](assets/screenshots/documents-table.png){: style="width:32%"}
+![image](assets/screenshots/documents-smallcards.png){: style="width:32%"}
+![image](assets/screenshots/documents-largecards.png){: style="width:32%"}
 
-![image](assets/screenshots/documents-table.png)
+<div class="clear"></div>
 
-![image](assets/screenshots/documents-smallcards.png)
+<div class="grid-left" markdown>
+  Use the 'slim' sidebar to focus on your docs and minimize the UI.
+</div>
+<div class="grid-right" markdown>
+  ![image](assets/screenshots/documents-smallcards-slimsidebar.png)
+</div>
+<div class="clear"></div>
 
-![image](assets/screenshots/documents-largecards.png)
-
-Use the 'slim' sidebar to focus on just your docs:
-
-![image](assets/screenshots/documents-smallcards-slimsidebar.png)
-
-Paperless-ngx also supports dark mode:
+Of course, Paperless-ngx also supports dark mode:
 
 ![image](assets/screenshots/documents-smallcards-dark.png)
 
-Quickly find documents with extensive filtering mechanisms:
+<div class="clear"></div>
 
-![image](assets/screenshots/documents-filter.png)
+<div class="grid-left" markdown>
+  Quickly find documents with extensive filtering mechanisms.
+</div>
+<div class="grid-right" markdown>
+  ![image](assets/screenshots/documents-filter.png)
+</div>
+<div class="clear"></div>
+<div class="grid-left" markdown>
+  And perform bulk edit operations to set tags, correspondents, etc. as well as permissions.
+</div>
+<div class="grid-right" markdown>
+  ![image](assets/screenshots/bulk-edit.png)
+</div>
+<div class="clear"></div>
 
-Bulk edit document tags, correspondents, etc. as well as permissions:
-
-![image](assets/screenshots/bulk-edit.png)
-
-Side-by-side editing of documents:
+Side-by-side editing of documents.
 
 ![image](assets/screenshots/editing.png)
 
-Support for custom fields:
+<div class="grid-left" markdown>
+  Support for custom fields.
 
-![image](assets/screenshots/custom_field1.png){: style="width:50%; margin-left: 25%"}
-![image](assets/screenshots/custom_field2.png)
+![image](assets/screenshots/custom_field1.png)
 
-A robust permissions system with support for 'global' and document / object permissions:
+</div>
+<div class="grid-right" markdown>
+  ![image](assets/screenshots/custom_field2.png)
+</div>
+<div class="clear"></div>
 
-![image](assets/screenshots/permissions_global.png){: style="width:50%; margin-left: 25%"}
-![image](assets/screenshots/permissions_document.png)
+<div class="grid-left" markdown>
+  A robust permissions system with support for 'global' and document / object permissions.
 
-Tag editing. This looks about the same for correspondents and document
-types.
+![image](assets/screenshots/permissions_global.png)
 
-![image](assets/screenshots/new-tag.png){: style="width:50%; margin-left: 25%"}
+</div>
+<div class="grid-right" markdown>
+  ![image](assets/screenshots/permissions_document.png)
+</div>
+<div class="clear"></div>
 
-Searching provides auto complete and highlights the results.
+<div class="grid-left" markdown>
+  Searching provides auto complete and highlights the results.
 
-![image](assets/screenshots/search-preview.png){: style="width:50%; margin-left: 25%"}
+![image](assets/screenshots/search-preview.png)
 
-![image](assets/screenshots/search-results.png)
+</div>
+<div class="grid-right" markdown>
+  ![image](assets/screenshots/search-results.png)
+</div>
+<div class="clear"></div>
 
-Fancy mail filters!
+Tag, correspondent, document type and storage path editing.
 
-![image](assets/screenshots/mail-rules-edited.png){: style="width:80%; margin-left: 10%"}
+![image](assets/screenshots/new-tag.png){: style="width:21%; float: left"}
+![image](assets/screenshots/new-correspondent.png){: style="width:21%; margin-left: 4%; float: left"}
+![image](assets/screenshots/new-document_type.png){: style="width:21%; margin-left: 4%; float: left"}
+![image](assets/screenshots/new-storage_path.png){: style="width:21%; margin-left: 4%; float: left"}
+
+<div class="clear"></div>
+
+<div class="grid-half-left" markdown>
+  Mail rules support various filters and actions for incoming e-mails.
+
+![image](assets/screenshots/mail-rules-edited.png)
+
+</div>
+<div class="grid-half-right" markdown>
+  Consumption templates provide finer control over the document pipeline.
+
+![image](assets/screenshots/consumption_template.png)
+
+</div>
+<div class="clear"></div>
+
+<div class="clear"></div>
 
 Mobile devices are supported.
 
-![image](assets/screenshots/mobile1.png){: style="width:33%"}
-![image](assets/screenshots/mobile2.png){: style="width:33%"}
-![image](assets/screenshots/mobile3.png){: style="width:33%"}
+![image](assets/screenshots/mobile1.png){: style="width:32%"}
+![image](assets/screenshots/mobile2.png){: style="width:32%"}
+![image](assets/screenshots/mobile3.png){: style="width:32%"}
 
 ## Support
 
