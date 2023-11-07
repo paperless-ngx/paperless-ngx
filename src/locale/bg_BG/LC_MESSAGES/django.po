@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-04 20:12-0700\n"
-"PO-Revision-Date: 2023-11-06 19:08\n"
+"PO-Revision-Date: 2023-11-07 19:23\n"
 "Last-Translator: \n"
 "Language-Team: Bulgarian\n"
 "Language: bg_BG\n"
@@ -64,7 +64,7 @@ msgstr "съвпадение"
 
 #: documents/models.py:67
 msgid "matching algorithm"
-msgstr "алгоритъм на съвпадение"
+msgstr "алгоритъм за съвпадение"
 
 #: documents/models.py:72
 msgid "is insensitive"
@@ -96,7 +96,7 @@ msgstr "таг"
 
 #: documents/models.py:113 documents/models.py:185
 msgid "tags"
-msgstr "тагове"
+msgstr "етикети"
 
 #: documents/models.py:118 documents/models.py:167
 msgid "document type"
@@ -653,19 +653,19 @@ msgstr "Дата"
 
 #: documents/models.py:889
 msgid "Boolean"
-msgstr "Булев"
+msgstr "Булева"
 
 #: documents/models.py:890
 msgid "Integer"
-msgstr "Целочислен"
+msgstr "Цяло число"
 
 #: documents/models.py:891
 msgid "Float"
-msgstr "Плаващо"
+msgstr "Плаваща запетая"
 
 #: documents/models.py:892
 msgid "Monetary"
-msgstr "Паричен"
+msgstr "Пари"
 
 #: documents/models.py:904
 msgid "data type"
@@ -685,7 +685,7 @@ msgstr "инстанция на персонализирано поле"
 
 #: documents/models.py:974
 msgid "custom field instances"
-msgstr "инстанции на персонализирано поле"
+msgstr "инстанции на персонализирани полета"
 
 #: documents/serialisers.py:102
 #, python-format
