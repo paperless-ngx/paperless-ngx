@@ -352,3 +352,54 @@ This is intentional as the output archive file may differ in unexpected or undes
 ways from the original. As the logs indicate, if you encounter this error you can set
 `PAPERLESS_OCR_USER_ARGS: '{"continue_on_soft_render_error": true}'` to try to 'force'
 processing documents with this issue.
+
+## Permission problems on Fedora Server (SELinux)
+
+If you are trying to run *paperless-ngx* on Linux distributions with SELinux, for example, Fedora Server, you might
+run into issues like:
+
+```
+Creating directory /usr/src/paperless/data/index
+mkdir: cannot create directory '/usr/src/paperless/data/index': Permission denied
+```
+
+This usally happens due to SELinux being enabled on those devices, **especially if you mount directories into the container**.
+For example, if you run paperless with Podman using `podman run -v /etc/paperless/consume:/usr/src/paperless/consume ...`.
+Containers expect a SELinux context of `unconfined_u:object_r:container_file_t`, but depending on the folder you want to mount this
+might differ.
+
+### Relabeling on the command line
+
+In such cases, you need to tell Podman whether the mount is going to be used by others (`:z`) or not.
+For example: `podman run -v /etc/paperless/consume:/usr/src/paperless/consume:z ...`.
+
+### Relabeling with `podman kube play`
+
+Podman also has the ability to run Kubernetes Pod manifests, either with [podman-systemd](https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html#kube-units-kube)
+or `podman kube play`. Under those circumstances, several things can be done:
+
+1. Pass the `mountPropagation` to each `volumeMount`, e.g:
+
+```yaml
+  # ...omitted for brevity
+  volumeMounts:
+  - mountPath: /usr/src/paperless/consume
+    name: paperless-consume-pvc
+    mountPropagation: Bidrectional # this is the important line!
+```
+
+2. Change the SELinux type on the host itself
+
+You can also override the SELinux type on the host.
+Under the assumption that we want to change the `/etc/paperless/consume` folder,
+this can be done by executing the following commands:
+
+```shell
+$ sudo semanage fcontext --add --type container_file_t "/etc/paperless/consume(/.*)?"
+```
+
+After you added the SELinux override, it's time to relabel the directory and all subfolders and -files.
+
+```shell
+$ sudo restorecon -Rv /etc/paperless/consume
+```
