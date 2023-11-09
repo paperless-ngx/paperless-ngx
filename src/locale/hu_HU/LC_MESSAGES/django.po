@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-04 20:12-0700\n"
-"PO-Revision-Date: 2023-11-05 18:03\n"
+"PO-Revision-Date: 2023-11-09 10:35\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -948,19 +948,19 @@ msgstr ""
 
 #: paperless/settings.py:612
 msgid "Swedish"
-msgstr ""
+msgstr "Svéd"
 
 #: paperless/settings.py:613
 msgid "Turkish"
-msgstr ""
+msgstr "Török"
 
 #: paperless/settings.py:614
 msgid "Ukrainian"
-msgstr ""
+msgstr "Ukrán"
 
 #: paperless/settings.py:615
 msgid "Chinese Simplified"
-msgstr ""
+msgstr "Egyszerűsített kínai"
 
 #: paperless/urls.py:186
 msgid "Paperless-ngx administration"
@@ -968,15 +968,15 @@ msgstr ""
 
 #: paperless_mail/admin.py:41
 msgid "Authentication"
-msgstr ""
+msgstr "Hitelesítés"
 
 #: paperless_mail/admin.py:44
 msgid "Advanced settings"
-msgstr ""
+msgstr "Speciális beállítások"
 
 #: paperless_mail/admin.py:60
 msgid "Filter"
-msgstr ""
+msgstr "Szűrő"
 
 #: paperless_mail/admin.py:63
 msgid "Paperless will only process mails that match ALL of the filters given below."
@@ -984,7 +984,7 @@ msgstr ""
 
 #: paperless_mail/admin.py:79
 msgid "Actions"
-msgstr ""
+msgstr "Műveletek"
 
 #: paperless_mail/admin.py:82
 msgid "The action applied to the mail. This action is only performed when the mail body or attachments were consumed from the mail."
@@ -992,7 +992,7 @@ msgstr ""
 
 #: paperless_mail/admin.py:90
 msgid "Metadata"
-msgstr ""
+msgstr "Metaadatok"
 
 #: paperless_mail/admin.py:93
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
@@ -1004,19 +1004,19 @@ msgstr ""
 
 #: paperless_mail/models.py:10
 msgid "mail account"
-msgstr ""
+msgstr "e-mail fiók"
 
 #: paperless_mail/models.py:11
 msgid "mail accounts"
-msgstr ""
+msgstr "e-mail fiókok"
 
 #: paperless_mail/models.py:14
 msgid "No encryption"
-msgstr ""
+msgstr "Titkosítás mellőzése"
 
 #: paperless_mail/models.py:15
 msgid "Use SSL"
-msgstr ""
+msgstr "SSL használata"
 
 #: paperless_mail/models.py:16
 msgid "Use STARTTLS"
@@ -1024,11 +1024,11 @@ msgstr ""
 
 #: paperless_mail/models.py:20
 msgid "IMAP server"
-msgstr ""
+msgstr "IMAP szerver"
 
 #: paperless_mail/models.py:23
 msgid "IMAP port"
-msgstr ""
+msgstr "IMAP port"
 
 #: paperless_mail/models.py:27
 msgid "This is usually 143 for unencrypted and STARTTLS connections, and 993 for SSL connections."
@@ -1036,15 +1036,15 @@ msgstr ""
 
 #: paperless_mail/models.py:33
 msgid "IMAP security"
-msgstr ""
+msgstr "IMAP biztonság"
 
 #: paperless_mail/models.py:38
 msgid "username"
-msgstr ""
+msgstr "felhasználónév"
 
 #: paperless_mail/models.py:40
 msgid "password"
-msgstr ""
+msgstr "jelszó"
 
 #: paperless_mail/models.py:42
 msgid "Is token authentication"
@@ -1052,7 +1052,7 @@ msgstr ""
 
 #: paperless_mail/models.py:45
 msgid "character set"
-msgstr ""
+msgstr "karakterkészlet"
 
 #: paperless_mail/models.py:49
 msgid "The character set to use when communicating with the mail server, such as 'UTF-8' or 'US-ASCII'."
@@ -1060,11 +1060,11 @@ msgstr ""
 
 #: paperless_mail/models.py:60
 msgid "mail rule"
-msgstr ""
+msgstr "e-mail szabály"
 
 #: paperless_mail/models.py:61
 msgid "mail rules"
-msgstr ""
+msgstr "e-mail szabályok"
 
 #: paperless_mail/models.py:64 paperless_mail/models.py:72
 msgid "Only process attachments."
@@ -1084,7 +1084,7 @@ msgstr ""
 
 #: paperless_mail/models.py:76
 msgid "Delete"
-msgstr ""
+msgstr "Törlés"
 
 #: paperless_mail/models.py:77
 msgid "Move to specified folder"
@@ -1132,11 +1132,11 @@ msgstr ""
 
 #: paperless_mail/models.py:101
 msgid "account"
-msgstr ""
+msgstr "fiók"
 
 #: paperless_mail/models.py:105 paperless_mail/models.py:248
 msgid "folder"
-msgstr ""
+msgstr "mappa"
 
 #: paperless_mail/models.py:109
 msgid "Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server."
@@ -1144,11 +1144,11 @@ msgstr ""
 
 #: paperless_mail/models.py:115
 msgid "filter from"
-msgstr ""
+msgstr "szűrő"
 
 #: paperless_mail/models.py:122
 msgid "filter to"
-msgstr ""
+msgstr "szűrő"
 
 #: paperless_mail/models.py:129
 msgid "filter subject"
@@ -1164,7 +1164,7 @@ msgstr ""
 
 #: paperless_mail/models.py:155
 msgid "maximum age"
-msgstr ""
+msgstr "max. érvényesség"
 
 #: paperless_mail/models.py:157
 msgid "Specified in days."
@@ -1196,7 +1196,7 @@ msgstr ""
 
 #: paperless_mail/models.py:196
 msgid "assign title from"
-msgstr ""
+msgstr "cím hozzárendelése innen"
 
 #: paperless_mail/models.py:216
 msgid "assign correspondent from"
@@ -1208,21 +1208,21 @@ msgstr ""
 
 #: paperless_mail/models.py:256
 msgid "uid"
-msgstr ""
+msgstr "uid"
 
 #: paperless_mail/models.py:264
 msgid "subject"
-msgstr ""
+msgstr "tárgy"
 
 #: paperless_mail/models.py:272
 msgid "received"
-msgstr ""
+msgstr "fogadott"
 
 #: paperless_mail/models.py:279
 msgid "processed"
-msgstr ""
+msgstr "lefuttatva"
 
 #: paperless_mail/models.py:285
 msgid "status"
-msgstr ""
+msgstr "állapot"
 
