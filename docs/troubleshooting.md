@@ -352,3 +352,7 @@ This is intentional as the output archive file may differ in unexpected or undes
 ways from the original. As the logs indicate, if you encounter this error you can set
 `PAPERLESS_OCR_USER_ARGS: '{"continue_on_soft_render_error": true}'` to try to 'force'
 processing documents with this issue.
+
+## Platform-Specific Deployment Troubleshooting
+
+A user-maintained wiki page is available to help troubleshoot issues that may arise when trying to deploy Paperless-ngx on specific platforms, for example SELinux. Please see [the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Platform%E2%80%90Specific-Troubleshooting).
