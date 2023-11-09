@@ -75,13 +75,21 @@ class Command(MultiProcessMixin, ProgressBarMixin, BaseCommand):
 
         try:
             logging.getLogger().handlers[0].level = logging.ERROR
-            with multiprocessing.Pool(self.process_count) as pool:
-                list(
-                    tqdm.tqdm(
-                        pool.imap_unordered(update_document_archive_file, document_ids),
-                        total=len(document_ids),
-                        disable=self.no_progress_bar,
-                    ),
-                )
+
+            if self.process_count == 1:
+                for doc_id in document_ids:
+                    update_document_archive_file(doc_id)
+            else:  # pragma: no cover
+                with multiprocessing.Pool(self.process_count) as pool:
+                    list(
+                        tqdm.tqdm(
+                            pool.imap_unordered(
+                                update_document_archive_file,
+                                document_ids,
+                            ),
+                            total=len(document_ids),
+                            disable=self.no_progress_bar,
+                        ),
+                    )
         except KeyboardInterrupt:
             self.stdout.write(self.style.NOTICE("Aborting..."))

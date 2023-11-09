@@ -70,11 +70,15 @@ class Command(MultiProcessMixin, ProgressBarMixin, BaseCommand):
         # with postgres.
         db.connections.close_all()
 
-        with multiprocessing.Pool(processes=self.process_count) as pool:
-            list(
-                tqdm.tqdm(
-                    pool.imap_unordered(_process_document, ids),
-                    total=len(ids),
-                    disable=self.no_progress_bar,
-                ),
-            )
+        if self.process_count == 1:
+            for doc_id in ids:
+                _process_document(doc_id)
+        else:  # pragma: no cover
+            with multiprocessing.Pool(processes=self.process_count) as pool:
+                list(
+                    tqdm.tqdm(
+                        pool.imap_unordered(_process_document, ids),
+                        total=len(ids),
+                        disable=self.no_progress_bar,
+                    ),
+                )

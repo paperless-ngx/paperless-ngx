@@ -36,7 +36,7 @@ class TestArchiver(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             os.path.join(self.dirs.originals_dir, f"{doc.id:07}.pdf"),
         )
 
-        call_command("document_archiver")
+        call_command("document_archiver", "--processes", "1")
 
     def test_handle_document(self):
         doc = self.make_models()

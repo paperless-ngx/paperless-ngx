@@ -83,13 +83,13 @@ class TestMakeThumbnails(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     def test_command(self):
         self.assertIsNotFile(self.d1.thumbnail_path)
         self.assertIsNotFile(self.d2.thumbnail_path)
-        call_command("document_thumbnails")
+        call_command("document_thumbnails", "--processes", "1")
         self.assertIsFile(self.d1.thumbnail_path)
         self.assertIsFile(self.d2.thumbnail_path)
 
     def test_command_documentid(self):
         self.assertIsNotFile(self.d1.thumbnail_path)
         self.assertIsNotFile(self.d2.thumbnail_path)
-        call_command("document_thumbnails", "-d", f"{self.d1.id}")
+        call_command("document_thumbnails", "--processes", "1", "-d", f"{self.d1.id}")
         self.assertIsFile(self.d1.thumbnail_path)
         self.assertIsNotFile(self.d2.thumbnail_path)

@@ -93,12 +93,12 @@ class Command(MultiProcessMixin, ProgressBarMixin, BaseCommand):
                 work_pkgs.append(_WorkPackage(first_doc, second_doc))
 
         # Don't spin up a pool of 1 process
-        if options["processes"] == 1:
+        if self.process_count == 1:
             results = []
             for work in tqdm.tqdm(work_pkgs, disable=self.no_progress_bar):
                 results.append(_process_and_match(work))
-        else:
-            with multiprocessing.Pool(processes=options["processes"]) as pool:
+        else:  # pragma: no cover
+            with multiprocessing.Pool(processes=self.process_count) as pool:
                 results = list(
                     tqdm.tqdm(
                         pool.imap_unordered(_process_and_match, work_pkgs),
