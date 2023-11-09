@@ -4,6 +4,7 @@ import tqdm
 from django.core.management.base import BaseCommand
 
 from documents.classifier import load_classifier
+from documents.management.commands.mixins import ProgressBarMixin
 from documents.models import Document
 from documents.signals.handlers import set_correspondent
 from documents.signals.handlers import set_document_type
@@ -13,15 +14,12 @@ from documents.signals.handlers import set_tags
 logger = logging.getLogger("paperless.management.retagger")
 
 
-class Command(BaseCommand):
-    help = """
-        Using the current classification model, assigns correspondents, tags
-        and document types to all documents, effectively allowing you to
-        back-tag all previously indexed documents with metadata created (or
-        modified) after their initial import.
-    """.replace(
-        "    ",
-        "",
+class Command(ProgressBarMixin, BaseCommand):
+    help = (
+        "Using the current classification model, assigns correspondents, tags "
+        "and document types to all documents, effectively allowing you to "
+        "back-tag all previously indexed documents with metadata created (or "
+        "modified) after their initial import."
     )
 
     def add_arguments(self, parser):
@@ -34,25 +32,24 @@ class Command(BaseCommand):
             "--use-first",
             default=False,
             action="store_true",
-            help="By default this command won't try to assign a correspondent "
-            "if more than one matches the document.  Use this flag if "
-            "you'd rather it just pick the first one it finds.",
+            help=(
+                "By default this command won't try to assign a correspondent "
+                "if more than one matches the document.  Use this flag if "
+                "you'd rather it just pick the first one it finds."
+            ),
         )
         parser.add_argument(
             "-f",
             "--overwrite",
             default=False,
             action="store_true",
-            help="If set, the document retagger will overwrite any previously"
-            "set correspondent, document and remove correspondents, types"
-            "and tags that do not match anymore due to changed rules.",
+            help=(
+                "If set, the document retagger will overwrite any previously"
+                "set correspondent, document and remove correspondents, types"
+                "and tags that do not match anymore due to changed rules."
+            ),
         )
-        parser.add_argument(
-            "--no-progress-bar",
-            default=False,
-            action="store_true",
-            help="If set, the progress bar will not be shown",
-        )
+        self.add_argument_progress_bar_mixin(parser)
         parser.add_argument(
             "--suggest",
             default=False,
@@ -71,6 +68,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
+        self.handle_progress_bar_mixin(**options)
         # Detect if we support color
         color = self.style.ERROR("test") != "test"
 
@@ -88,7 +86,7 @@ class Command(BaseCommand):
 
         classifier = load_classifier()
 
-        for document in tqdm.tqdm(documents, disable=options["no_progress_bar"]):
+        for document in tqdm.tqdm(documents, disable=self.no_progress_bar):
             if options["correspondent"]:
                 set_correspondent(
                     sender=None,

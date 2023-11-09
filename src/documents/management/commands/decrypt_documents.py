@@ -17,19 +17,27 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument(
             "--passphrase",
-            help="If PAPERLESS_PASSPHRASE isn't set already, you need to "
-            "specify it here",
+            help=(
+                "If PAPERLESS_PASSPHRASE isn't set already, you need to "
+                "specify it here"
+            ),
         )
 
     def handle(self, *args, **options):
         try:
-            print(
-                "\n\nWARNING: This script is going to work directly on your "
-                "document originals, so\nWARNING: you probably shouldn't run "
-                "this unless you've got a recent backup\nWARNING: handy.  It "
-                "*should* work without a hitch, but be safe and backup your\n"
-                "WARNING: stuff first.\n\nHit Ctrl+C to exit now, or Enter to "
-                "continue.\n\n",
+            self.stdout.write(
+                self.style.WARNING(
+                    "\n\n"
+                    "WARNING: This script is going to work directly on your "
+                    "document originals, so\n"
+                    "WARNING: you probably shouldn't run "
+                    "this unless you've got a recent backup\n"
+                    "WARNING: handy.  It "
+                    "*should* work without a hitch, but be safe and backup your\n"
+                    "WARNING: stuff first.\n\n"
+                    "Hit Ctrl+C to exit now, or Enter to "
+                    "continue.\n\n",
+                ),
             )
             _ = input()
         except KeyboardInterrupt:
@@ -44,14 +52,13 @@ class Command(BaseCommand):
 
         self.__gpg_to_unencrypted(passphrase)
 
-    @staticmethod
-    def __gpg_to_unencrypted(passphrase):
+    def __gpg_to_unencrypted(self, passphrase: str):
         encrypted_files = Document.objects.filter(
             storage_type=Document.STORAGE_TYPE_GPG,
         )
 
         for document in encrypted_files:
-            print(f"Decrypting {document}".encode())
+            self.stdout.write(f"Decrypting {document}")
 
             old_paths = [document.source_path, document.thumbnail_path]
 
