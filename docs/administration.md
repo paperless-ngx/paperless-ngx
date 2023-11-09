@@ -10,8 +10,8 @@ Before making backups, make sure that paperless is not running.
 Options available to any installation of paperless:
 
 - Use the [document exporter](#exporter). The document exporter exports all your documents,
-  thumbnails and metadata to a specific folder. You may import your
-  documents into a fresh instance of paperless again or store your
+  thumbnails, metadata, and database contents to a specific folder. You may import your
+  documents and settings into a fresh instance of paperless again or store your
   documents in another DMS with this export.
 - The document exporter is also able to update an already existing
   export. Therefore, incremental backups with `rsync` are entirely
@@ -239,8 +239,9 @@ with the argument `--help`.
 
 ### Document exporter {#exporter}
 
-The document exporter exports all your data from paperless into a folder
-for backup or migration to another DMS.
+The document exporter exports all your data (including your settings
+and database contents) from paperless into a folder for backup or
+migration to another DMS.
 
 If you use the document exporter within a cronjob to backup your data
 you might use the `-T` flag behind exec to suppress "The input device
