@@ -414,6 +414,9 @@ This command takes no arguments.
 
 Use this command to re-create document thumbnails. Optionally include the ` --document {id}` option to generate thumbnails for a specific document only.
 
+You may also specify `--processes` to control the number of processes used to generate new thumbnails. The default is to utilize
+a quarter of the available processors.
+
 ```
 document_thumbnails
 ```
@@ -591,7 +594,7 @@ take into account by the detection.
 document_fuzzy_match [--ratio] [--processes N]
 ```
 
-| Option      | Required | Default | Description                                                                                                                    |
-| ----------- | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| --ratio     | No       | 85.0    | a number between 0 and 100, setting how similar a document must be for it to be reported. Higher numbers mean more similarity. |
-| --processes | No       | 4       | Number of processes to use for matching. Setting 1 disables multiple processes                                                 |
+| Option      | Required | Default             | Description                                                                                                                    |
+| ----------- | -------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| --ratio     | No       | 85.0                | a number between 0 and 100, setting how similar a document must be for it to be reported. Higher numbers mean more similarity. |
+| --processes | No       | 1/4 of system cores | Number of processes to use for matching. Setting 1 disables multiple processes                                                 |
