@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-04 20:12-0700\n"
-"PO-Revision-Date: 2023-11-09 10:35\n"
+"PO-Revision-Date: 2023-11-09 14:28\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -641,23 +641,23 @@ msgstr ""
 
 #: documents/models.py:886
 msgid "String"
-msgstr ""
+msgstr "Karakterlánc"
 
 #: documents/models.py:887
 msgid "URL"
-msgstr ""
+msgstr "URL-cím"
 
 #: documents/models.py:888
 msgid "Date"
-msgstr ""
+msgstr "Dátum"
 
 #: documents/models.py:889
 msgid "Boolean"
-msgstr ""
+msgstr "Boolean (Logikai)"
 
 #: documents/models.py:890
 msgid "Integer"
-msgstr ""
+msgstr "Egész szám"
 
 #: documents/models.py:891
 msgid "Float"
