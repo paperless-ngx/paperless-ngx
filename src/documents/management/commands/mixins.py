@@ -1,4 +1,5 @@
 import os
+from argparse import ArgumentParser
 
 from django.core.management import CommandError
 
@@ -9,7 +10,7 @@ class MultiProcessMixin:
     for the use of multiple processes
     """
 
-    def add_argument_processes_mixin(self, parser):
+    def add_argument_processes_mixin(self, parser: ArgumentParser):
         parser.add_argument(
             "--processes",
             default=max(1, os.cpu_count() // 4),
@@ -29,7 +30,7 @@ class ProgressBarMixin:
     via this class
     """
 
-    def add_argument_progress_bar_mixin(self, parser):
+    def add_argument_progress_bar_mixin(self, parser: ArgumentParser):
         parser.add_argument(
             "--no-progress-bar",
             default=False,
