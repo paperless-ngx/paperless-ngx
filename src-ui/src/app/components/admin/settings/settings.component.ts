@@ -489,7 +489,6 @@ export class SettingsComponent
           this.documentListViewService.updatePageSize()
           this.settings.updateAppearanceSettings()
           let savedToast: Toast = {
-            title: $localize`Settings saved`,
             content: $localize`Settings were saved successfully.`,
             delay: 5000,
           }

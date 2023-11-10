@@ -1,9 +1,13 @@
 <ngb-toast
   *ngFor="let toast of toasts"
-  [header]="toast.title" [autohide]="true" [delay]="toast.delay"
+  [autohide]="true" [delay]="toast.delay"
   [class]="toast.classname"
+  [class.mb-2]="true"
   (hidden)="toastService.closeToast(toast)">
-  <p>{{toast.content}}</p>
+  <div class="d-flex">
+    <p class="mb-0">{{toast.content}}</p>
+    <button type="button" class="btn-close ms-auto" data-bs-dismiss="toast" aria-label="Close" (click)="toastService.closeToast(toast);"></button>
+  </div>
   <details *ngIf="toast.error">
     <div class="p-3">
       <dl class="row" *ngIf="isDetailedError(toast.error)">
@@ -26,5 +30,5 @@
       </div>
     </div>
   </details>
-  <p class="mb-0" *ngIf="toast.action"><button class="btn btn-sm btn-outline-secondary" (click)="toastService.closeToast(toast); toast.action()">{{toast.actionName}}</button></p>
+  <p class="mb-0 mt-2" *ngIf="toast.action"><button class="btn btn-sm btn-outline-secondary" (click)="toastService.closeToast(toast); toast.action()">{{toast.actionName}}</button></p>
 </ngb-toast>

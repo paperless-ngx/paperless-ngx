@@ -2,8 +2,6 @@ import { Injectable } from '@angular/core'
 import { Subject } from 'rxjs'
 
 export interface Toast {
-  title: string
-
   content: string
 
   delay: number
@@ -34,7 +32,6 @@ export class ToastService {
 
   showError(content: string, error: any = null, delay: number = 10000) {
     this.show({
-      title: $localize`Error`,
       content: content,
       delay: delay,
       classname: 'error',
@@ -43,7 +40,7 @@ export class ToastService {
   }
 
   showInfo(content: string, delay: number = 5000) {
-    this.show({ title: $localize`Information`, content: content, delay: delay })
+    this.show({ content: content, delay: delay })
   }
 
   closeToast(toast: Toast) {
