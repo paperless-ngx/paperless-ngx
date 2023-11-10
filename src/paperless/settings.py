@@ -597,6 +597,7 @@ LANGUAGES = [
     ("es-es", _("Spanish")),
     ("fi-fi", _("Finnish")),
     ("fr-fr", _("French")),
+    ("hu-hu", _("Hungarian")),
     ("it-it", _("Italian")),
     ("lb-lu", _("Luxembourgish")),
     ("no-no", _("Norwegian")),
