@@ -4696,7 +4696,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/metadata-collapse/metadata-collapse.component.ts</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="translated">Matadades</target>
+        <target state="translated">Metadades</target>
       </trans-unit>
       <trans-unit id="1826652001816486190" datatype="html">
         <source>Date modified</source>
@@ -4776,7 +4776,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">183</context>
         </context-group>
-        <target state="translated">Metadates document original</target>
+        <target state="translated">Metadades del document original</target>
       </trans-unit>
       <trans-unit id="2846565152091361585" datatype="html">
         <source>Archived document metadata</source>
@@ -4828,7 +4828,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">413</context>
         </context-group>
-        <target state="translated">Error recuperant metadata</target>
+        <target state="translated">Error recuperant metadada</target>
       </trans-unit>
       <trans-unit id="3456881259945295697" datatype="html">
         <source>Error retrieving suggestions.</source>
@@ -6550,7 +6550,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="translated">Qualsevol: Document conté qualsevol de les paraules (separades espai)</target>
+        <target state="translated">Totes: Document conté totes les paraules (separades espai)</target>
       </trans-unit>
       <trans-unit id="9180173992399180575" datatype="html">
         <source>Exact match</source>
