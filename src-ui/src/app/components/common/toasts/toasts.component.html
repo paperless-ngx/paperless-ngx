@@ -3,7 +3,10 @@
   [autohide]="true" [delay]="toast.delay"
   [class]="toast.classname"
   [class.mb-2]="true"
+  (shown)="onShow(toast)"
   (hidden)="toastService.closeToast(toast)">
+  <ngb-progressbar class="position-absolute h-100 w-100 top-90 start-0 bottom-0 end-0 pointer-events-none" type="dark" [max]="toast.delay" [value]="toast.delayRemaining"></ngb-progressbar>
+  <span class="visually-hidden">{{ toast.delayRemaining / 1000 | number: '1.0-0' }} seconds</span>
   <div class="d-flex">
     <p class="mb-0">{{toast.content}}</p>
     <button type="button" class="btn-close ms-auto" data-bs-dismiss="toast" aria-label="Close" (click)="toastService.closeToast(toast);"></button>

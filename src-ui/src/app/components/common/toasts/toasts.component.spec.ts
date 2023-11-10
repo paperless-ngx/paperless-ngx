@@ -3,6 +3,7 @@ import {
   discardPeriodicTasks,
   fakeAsync,
   flush,
+  tick,
 } from '@angular/core/testing'
 import { ToastService } from 'src/app/services/toast.service'
 import { ToastsComponent } from './toasts.component'
@@ -87,6 +88,17 @@ describe('ToastsComponent', () => {
 
     expect(fixture.nativeElement.textContent).toContain('foo bar')
 
+    component.ngOnDestroy()
+    flush()
+    discardPeriodicTasks()
+  }))
+
+  it('should countdown toast', fakeAsync(() => {
+    component.ngOnInit()
+    fixture.detectChanges()
+    component.onShow(toasts[0])
+    tick(5000)
+    expect(component.toasts[0].delayRemaining).toEqual(0)
     component.ngOnDestroy()
     flush()
     discardPeriodicTasks()
