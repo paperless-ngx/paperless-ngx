@@ -47,7 +47,7 @@ physical documents into a searchable online archive so you can keep, well, _less
 
 ## Paperless, a history
 
-Paperless-ngx is the official successor to the original [Paperless](https://github.com/the-paperless-project/paperless) & [Paperless-ng](https://github.com/jonaswinkler/paperless-ng) projects and is designed to continue the great work and distribute responsibility of supporting and advancing the project among a team of people. [Consider joining us!](https://github.com/paperless-ngx/paperless-ngx#community-support)
+Paperless-ngx is the official successor to the original [Paperless](https://github.com/the-paperless-project/paperless) & [Paperless-ng](https://github.com/jonaswinkler/paperless-ng) projects and is designed to distribute the responsibility of advancing and supporting the project among a team of people. [Consider joining us!](https://github.com/paperless-ngx/paperless-ngx#community-support)
 
 Further discussion of the transition between these projects can be found at
 [ng#1599](https://github.com/jonaswinkler/paperless-ng/issues/1599) and [ng#1632](https://github.com/jonaswinkler/paperless-ng/issues/1632).
