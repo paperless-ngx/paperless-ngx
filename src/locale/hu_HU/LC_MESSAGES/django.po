@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-04 20:12-0700\n"
-"PO-Revision-Date: 2023-11-09 14:28\n"
+"PO-Revision-Date: 2023-11-10 09:34\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -27,15 +27,15 @@ msgstr "tulajdonos"
 
 #: documents/models.py:53
 msgid "None"
-msgstr "Egyik sem"
+msgstr "Nincs"
 
 #: documents/models.py:54
 msgid "Any word"
-msgstr "Bármely szó"
+msgstr "Bármilyen szó"
 
 #: documents/models.py:55
 msgid "All words"
-msgstr "Összes szó"
+msgstr "Minden szó"
 
 #: documents/models.py:56
 msgid "Exact match"
@@ -43,11 +43,11 @@ msgstr "Pontos egyezés"
 
 #: documents/models.py:57
 msgid "Regular expression"
-msgstr "Reguláris kifejezés"
+msgstr "Szabályos kifejezés"
 
 #: documents/models.py:58
 msgid "Fuzzy word"
-msgstr "Elmosódott szó"
+msgstr "Fuzzy szó"
 
 #: documents/models.py:59
 msgid "Automatic"
@@ -64,7 +64,7 @@ msgstr "egyezés"
 
 #: documents/models.py:67
 msgid "matching algorithm"
-msgstr "egyeztető algoritmus"
+msgstr "megfelelő algoritmus"
 
 #: documents/models.py:72
 msgid "is insensitive"
@@ -72,11 +72,11 @@ msgstr "érzéketlen"
 
 #: documents/models.py:95 documents/models.py:147
 msgid "correspondent"
-msgstr "partner"
+msgstr "levelező"
 
 #: documents/models.py:96
 msgid "correspondents"
-msgstr "partnerek"
+msgstr "levelezők"
 
 #: documents/models.py:100
 msgid "color"
@@ -84,11 +84,11 @@ msgstr "szín"
 
 #: documents/models.py:103
 msgid "is inbox tag"
-msgstr "bejövő címke"
+msgstr "a postaláda címke"
 
 #: documents/models.py:106
 msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
-msgstr "Ezt a címkét bejövő címkeként jelöli: Minden újonnan bevitt dokumentumot bejövő címkejelöléssel lát el."
+msgstr "Ezt a címkét bejövő címkeként jelöli: Az összes újonnan feldolgozott dokumentumot postaláda-címkével jelöli meg."
 
 #: documents/models.py:112
 msgid "tag"
@@ -100,23 +100,23 @@ msgstr "címkék"
 
 #: documents/models.py:118 documents/models.py:167
 msgid "document type"
-msgstr "dokumentum típus"
+msgstr "dokumentumtípus"
 
 #: documents/models.py:119
 msgid "document types"
-msgstr "dokumentum típusok"
+msgstr "dokumentumtípusok"
 
 #: documents/models.py:124
 msgid "path"
-msgstr "elérési út"
+msgstr "útvonal"
 
 #: documents/models.py:129 documents/models.py:156
 msgid "storage path"
-msgstr "tárhely elérési útja"
+msgstr "tárolási útvonal"
 
 #: documents/models.py:130
 msgid "storage paths"
-msgstr "tárhely elérési útjai"
+msgstr "tárolási útvonalak"
 
 #: documents/models.py:137
 msgid "Unencrypted"
@@ -136,7 +136,7 @@ msgstr "tartalom"
 
 #: documents/models.py:174
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
-msgstr "A dokumentum nyers, csak szöveges adatai. Ez a mező elsősorban keresésre szolgál."
+msgstr "A dokumentum nyers, csak szöveges adatai. Ezt a mezőt elsősorban keresésre használják."
 
 #: documents/models.py:179
 msgid "mime type"
@@ -152,7 +152,7 @@ msgstr "Az eredeti dokumentum ellenőrző összege."
 
 #: documents/models.py:197
 msgid "archive checksum"
-msgstr "archív ellenőrző összeg"
+msgstr "archiválási ellenőrző összeg"
 
 #: documents/models.py:202
 msgid "The checksum of the archived document."
@@ -161,19 +161,19 @@ msgstr "Az archivált dokumentum ellenőrző összege."
 #: documents/models.py:205 documents/models.py:385 documents/models.py:654
 #: documents/models.py:692 documents/models.py:895 documents/models.py:932
 msgid "created"
-msgstr "létrehozva"
+msgstr "létrehozott"
 
 #: documents/models.py:208
 msgid "modified"
-msgstr "módosítva"
+msgstr "módosított"
 
 #: documents/models.py:215
 msgid "storage type"
-msgstr "tárhely típus"
+msgstr "tárolási típus"
 
 #: documents/models.py:223
 msgid "added"
-msgstr "hozzáadva"
+msgstr "hozzáadott"
 
 #: documents/models.py:230
 msgid "filename"
@@ -181,15 +181,15 @@ msgstr "fájlnév"
 
 #: documents/models.py:236
 msgid "Current filename in storage"
-msgstr "Aktuális fájlnév a tárhelyen"
+msgstr "Aktuális fájlnév a tárolóban"
 
 #: documents/models.py:240
 msgid "archive filename"
-msgstr "archív fájlnév"
+msgstr "archiválási fájlnév"
 
 #: documents/models.py:246
 msgid "Current archive filename in storage"
-msgstr "Aktuális archívum fájlnév a tárhelyen"
+msgstr "Aktuális archívum fájlnév a tárolóban"
 
 #: documents/models.py:250
 msgid "original filename"
@@ -197,15 +197,15 @@ msgstr "eredeti fájlnév"
 
 #: documents/models.py:256
 msgid "The original name of the file when it was uploaded"
-msgstr "A fájl eredeti neve feltöltéskor"
+msgstr "A fájl eredeti neve a feltöltéskor"
 
 #: documents/models.py:263
 msgid "archive serial number"
-msgstr "archív sorozatszám"
+msgstr "archiválási sorozatszám"
 
 #: documents/models.py:273
 msgid "The position of this document in your physical document archive."
-msgstr "A dokumentum helye az Ön fizikai dokumentumarchívumában."
+msgstr "A dokumentum helye a fizikai dokumentumarchívumban."
 
 #: documents/models.py:279 documents/models.py:665 documents/models.py:719
 msgid "document"
@@ -257,15 +257,15 @@ msgstr "naplók"
 
 #: documents/models.py:399 documents/models.py:464
 msgid "saved view"
-msgstr "mentett nézet"
+msgstr "elmentett nézet"
 
 #: documents/models.py:400
 msgid "saved views"
-msgstr "mentett nézetek"
+msgstr "elmentett nézetek"
 
 #: documents/models.py:405
 msgid "show on dashboard"
-msgstr "megjelenítés a vezérlőpulton"
+msgstr "az irányítópulton megjelenik"
 
 #: documents/models.py:408
 msgid "show in sidebar"
@@ -273,7 +273,7 @@ msgstr "megjelenítés az oldalsávban"
 
 #: documents/models.py:412
 msgid "sort field"
-msgstr "mező rendezése"
+msgstr "rendezési mező"
 
 #: documents/models.py:417
 msgid "sort reverse"
@@ -281,11 +281,11 @@ msgstr "fordított rendezés"
 
 #: documents/models.py:422
 msgid "title contains"
-msgstr "cím tartalmazza"
+msgstr "a cím tartalmazza"
 
 #: documents/models.py:423
 msgid "content contains"
-msgstr "tartalom tartalmazza"
+msgstr "a tartalom tartalmazza"
 
 #: documents/models.py:424
 msgid "ASN is"
@@ -293,31 +293,31 @@ msgstr "Az ASN"
 
 #: documents/models.py:425
 msgid "correspondent is"
-msgstr "partnerek"
+msgstr "a levelező"
 
 #: documents/models.py:426
 msgid "document type is"
-msgstr "dokumentum típusa"
+msgstr "a dokumentum típusa"
 
 #: documents/models.py:427
 msgid "is in inbox"
-msgstr "beérkezők között"
+msgstr "a postaládában van"
 
 #: documents/models.py:428
 msgid "has tag"
-msgstr "címkézve van"
+msgstr "van címke"
 
 #: documents/models.py:429
 msgid "has any tag"
-msgstr "bármilyen címkéje van"
+msgstr "bármilyen címkével rendelkezik"
 
 #: documents/models.py:430
 msgid "created before"
-msgstr "előtt létrehozva"
+msgstr "létrehozva mielőtt"
 
 #: documents/models.py:431
 msgid "created after"
-msgstr "után létrehozva"
+msgstr "létrehozva után"
 
 #: documents/models.py:432
 msgid "created year is"
@@ -333,31 +333,31 @@ msgstr "létrehozás napja"
 
 #: documents/models.py:435
 msgid "added before"
-msgstr "előtt hozzáadva"
+msgstr "korábban hozzáadva"
 
 #: documents/models.py:436
 msgid "added after"
-msgstr "után hozzáadva"
+msgstr "hozzáadva a"
 
 #: documents/models.py:437
 msgid "modified before"
-msgstr "előtt módosítva"
+msgstr "korábban módosítva"
 
 #: documents/models.py:438
 msgid "modified after"
-msgstr "után módosítva"
+msgstr "módosítva"
 
 #: documents/models.py:439
 msgid "does not have tag"
-msgstr "nincs címkézve"
+msgstr "nem rendelkezik címkével"
 
 #: documents/models.py:440
 msgid "does not have ASN"
-msgstr "nincs ASN"
+msgstr "nem rendelkezik ASN-nel"
 
 #: documents/models.py:441
 msgid "title or content contains"
-msgstr "cím, vagy tartalom tartalmazza"
+msgstr "a cím vagy a tartalom tartalmaz"
 
 #: documents/models.py:442
 msgid "fulltext query"
@@ -365,7 +365,7 @@ msgstr "teljes szöveges lekérdezés"
 
 #: documents/models.py:443
 msgid "more like this"
-msgstr "ehhez hasonlók"
+msgstr "több ilyet"
 
 #: documents/models.py:444
 msgid "has tags in"
@@ -381,51 +381,51 @@ msgstr "ASN kisebb, mint"
 
 #: documents/models.py:447
 msgid "storage path is"
-msgstr "tárhely elérési útja"
+msgstr "tárolási útvonal"
 
 #: documents/models.py:448
 msgid "has correspondent in"
-msgstr ""
+msgstr "levelezője van a"
 
 #: documents/models.py:449
 msgid "does not have correspondent in"
-msgstr ""
+msgstr "nincs megfelelője a"
 
 #: documents/models.py:450
 msgid "has document type in"
-msgstr ""
+msgstr "dokumentumtípusa a"
 
 #: documents/models.py:451
 msgid "does not have document type in"
-msgstr ""
+msgstr "nem rendelkezik dokumentumtípussal a"
 
 #: documents/models.py:452
 msgid "has storage path in"
-msgstr ""
+msgstr "tárolási útvonala a"
 
 #: documents/models.py:453
 msgid "does not have storage path in"
-msgstr ""
+msgstr "nincs tárolási útvonal a"
 
 #: documents/models.py:454
 msgid "owner is"
-msgstr ""
+msgstr "a tulajdonos"
 
 #: documents/models.py:455
 msgid "has owner in"
-msgstr ""
+msgstr "tulajdonosa van"
 
 #: documents/models.py:456
 msgid "does not have owner"
-msgstr ""
+msgstr "nincs tulajdonosa"
 
 #: documents/models.py:457
 msgid "does not have owner in"
-msgstr ""
+msgstr "nem rendelkezik tulajdonossal a"
 
 #: documents/models.py:467
 msgid "rule type"
-msgstr "szabály típus"
+msgstr "szabálytípus"
 
 #: documents/models.py:469
 msgid "value"
@@ -433,15 +433,15 @@ msgstr "érték"
 
 #: documents/models.py:472
 msgid "filter rule"
-msgstr "szűrési szabály"
+msgstr "szűrőszabály"
 
 #: documents/models.py:473
 msgid "filter rules"
-msgstr "szûrési szabályok"
+msgstr "szűrési szabályok"
 
 #: documents/models.py:584
 msgid "Task ID"
-msgstr "Feladatazonosító"
+msgstr "Feladat azonosítója"
 
 #: documents/models.py:585
 msgid "Celery ID for the Task that was run"
@@ -453,7 +453,7 @@ msgstr "Visszaigazolva"
 
 #: documents/models.py:591
 msgid "If the task is acknowledged via the frontend or API"
-msgstr "Ha a feladatot a frontenden vagy az API-n keresztül visszaigazolták"
+msgstr "Ha a feladatot a frontenden vagy az API-n keresztül nyugtázzák"
 
 #: documents/models.py:597
 msgid "Task Filename"
@@ -461,7 +461,7 @@ msgstr "Feladat fájlnév"
 
 #: documents/models.py:598
 msgid "Name of the file which the Task was run for"
-msgstr "A fájl neve, amiért a feladatot futtatták"
+msgstr "A fájl neve, amelyre a feladatot futtatták"
 
 #: documents/models.py:604
 msgid "Task Name"
@@ -469,51 +469,51 @@ msgstr "Feladat neve"
 
 #: documents/models.py:605
 msgid "Name of the Task which was run"
-msgstr ""
+msgstr "A futtatott feladat neve"
 
 #: documents/models.py:612
 msgid "Task State"
-msgstr ""
+msgstr "Feladat Állapot"
 
 #: documents/models.py:613
 msgid "Current state of the task being run"
-msgstr ""
+msgstr "A futó feladat aktuális állapota"
 
 #: documents/models.py:618
 msgid "Created DateTime"
-msgstr ""
+msgstr "Létrehozás dátum idő"
 
 #: documents/models.py:619
 msgid "Datetime field when the task result was created in UTC"
-msgstr ""
+msgstr "A feladat eredményének létrehozásakor UTC-ben megadott dátum-mező"
 
 #: documents/models.py:624
 msgid "Started DateTime"
-msgstr ""
+msgstr "Elkezdve Dátum idő"
 
 #: documents/models.py:625
 msgid "Datetime field when the task was started in UTC"
-msgstr ""
+msgstr "A feladat indításának időpontja UTC-ben"
 
 #: documents/models.py:630
 msgid "Completed DateTime"
-msgstr ""
+msgstr "Befejeződött Dátum idő"
 
 #: documents/models.py:631
 msgid "Datetime field when the task was completed in UTC"
-msgstr ""
+msgstr "A feladat befejezésének időpontja UTC-ben"
 
 #: documents/models.py:636
 msgid "Result Data"
-msgstr ""
+msgstr "Eredmény adatok"
 
 #: documents/models.py:638
 msgid "The data returned by the task"
-msgstr ""
+msgstr "A feladat által visszaküldött adatok"
 
 #: documents/models.py:650
 msgid "Note for the document"
-msgstr ""
+msgstr "Megjegyzés a dokumentumhoz"
 
 #: documents/models.py:674
 msgid "user"
@@ -521,7 +521,7 @@ msgstr "felhasználó"
 
 #: documents/models.py:679
 msgid "note"
-msgstr "feljegyzés"
+msgstr "megjegyzés"
 
 #: documents/models.py:680
 msgid "notes"
@@ -529,7 +529,7 @@ msgstr "jegyzetek"
 
 #: documents/models.py:688
 msgid "Archive"
-msgstr "Archív"
+msgstr "Archívum"
 
 #: documents/models.py:689
 msgid "Original"
@@ -541,11 +541,11 @@ msgstr "lejárat"
 
 #: documents/models.py:707
 msgid "slug"
-msgstr ""
+msgstr "slug"
 
 #: documents/models.py:739
 msgid "share link"
-msgstr "link megosztása"
+msgstr "megosztási link"
 
 #: documents/models.py:740
 msgid "share links"
@@ -553,39 +553,39 @@ msgstr "linkek megosztása"
 
 #: documents/models.py:748
 msgid "Consume Folder"
-msgstr ""
+msgstr "Fogyasztás mappa"
 
 #: documents/models.py:749
 msgid "Api Upload"
-msgstr ""
+msgstr "Api feltöltés"
 
 #: documents/models.py:750
 msgid "Mail Fetch"
-msgstr ""
+msgstr "Mail Fetch"
 
 #: documents/models.py:754 paperless_mail/models.py:95
 msgid "order"
-msgstr ""
+msgstr "megrendelés"
 
 #: documents/models.py:763
 msgid "filter path"
-msgstr ""
+msgstr "szűrési útvonal"
 
 #: documents/models.py:768
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
-msgstr ""
+msgstr "Csak olyan dokumentumokat dolgoz fel, amelyeknek az elérési útvonala megegyezik ezzel, ha ez meg van adva. A *-gal megadott helyettesítő karakterek engedélyezettek. Nagy- és kisbetűket nem érzékeny."
 
 #: documents/models.py:775
 msgid "filter filename"
-msgstr ""
+msgstr "szűrő fájlnév"
 
 #: documents/models.py:780 paperless_mail/models.py:148
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr ""
+msgstr "Csak olyan dokumentumokat dolgoz fel, amelyek teljes mértékben megfelelnek ennek a fájlnévnek, ha meg van adva. Az olyan helyettesítő karakterek, mint *.pdf vagy *számla* engedélyezettek. Nagy- és kisbetűket nem érzékeny."
 
 #: documents/models.py:791
 msgid "filter documents from this mail rule"
-msgstr ""
+msgstr "dokumentumok szűrése ebből a levélszabályból"
 
 #: documents/models.py:795
 msgid "assign title"
@@ -593,59 +593,59 @@ msgstr "cím hozzárendelése"
 
 #: documents/models.py:800
 msgid "Assign a document title, can include some placeholders, see documentation."
-msgstr ""
+msgstr "A dokumentum címének hozzárendelése, tartalmazhat néhány helykitöltőt, lásd a dokumentációt."
 
 #: documents/models.py:808 paperless_mail/models.py:204
 msgid "assign this tag"
-msgstr ""
+msgstr "hozzárendelni ezt a címkét"
 
 #: documents/models.py:816 paperless_mail/models.py:212
 msgid "assign this document type"
-msgstr ""
+msgstr "rendelje hozzá ezt a dokumentumtípust"
 
 #: documents/models.py:824 paperless_mail/models.py:226
 msgid "assign this correspondent"
-msgstr ""
+msgstr "bízza meg ezt a levelezőt"
 
 #: documents/models.py:832
 msgid "assign this storage path"
-msgstr ""
+msgstr "rendelje hozzá ezt a tárolási útvonalat"
 
 #: documents/models.py:841
 msgid "assign this owner"
-msgstr ""
+msgstr "kijelölni ezt a tulajdonost"
 
 #: documents/models.py:848
 msgid "grant view permissions to these users"
-msgstr ""
+msgstr "adjon megtekintési engedélyeket ezeknek a felhasználóknak"
 
 #: documents/models.py:855
 msgid "grant view permissions to these groups"
-msgstr ""
+msgstr "nézeti engedélyeket adjon ezeknek a csoportoknak"
 
 #: documents/models.py:862
 msgid "grant change permissions to these users"
-msgstr ""
+msgstr "adjon módosítási engedélyeket ezeknek a felhasználóknak"
 
 #: documents/models.py:869
 msgid "grant change permissions to these groups"
-msgstr ""
+msgstr "adjon módosítási jogosultságokat ezeknek a csoportoknak"
 
 #: documents/models.py:873
 msgid "consumption template"
-msgstr ""
+msgstr "fogyasztói sablon"
 
 #: documents/models.py:874
 msgid "consumption templates"
-msgstr ""
+msgstr "fogyasztási sablonok"
 
 #: documents/models.py:886
 msgid "String"
-msgstr "Karakterlánc"
+msgstr "Karaktersor"
 
 #: documents/models.py:887
 msgid "URL"
-msgstr "URL-cím"
+msgstr "URL"
 
 #: documents/models.py:888
 msgid "Date"
@@ -653,7 +653,7 @@ msgstr "Dátum"
 
 #: documents/models.py:889
 msgid "Boolean"
-msgstr "Boolean (Logikai)"
+msgstr "Boolean"
 
 #: documents/models.py:890
 msgid "Integer"
@@ -661,93 +661,93 @@ msgstr "Egész szám"
 
 #: documents/models.py:891
 msgid "Float"
-msgstr ""
+msgstr "Valós szám"
 
 #: documents/models.py:892
 msgid "Monetary"
-msgstr ""
+msgstr "Monetáris"
 
 #: documents/models.py:904
 msgid "data type"
-msgstr ""
+msgstr "adattípus"
 
 #: documents/models.py:912
 msgid "custom field"
-msgstr ""
+msgstr "egyéni mező"
 
 #: documents/models.py:913
 msgid "custom fields"
-msgstr ""
+msgstr "egyéni mezők"
 
 #: documents/models.py:973
 msgid "custom field instance"
-msgstr ""
+msgstr "egyéni mező példány"
 
 #: documents/models.py:974
 msgid "custom field instances"
-msgstr ""
+msgstr "egyéni mező példányok"
 
 #: documents/serialisers.py:102
 #, python-format
 msgid "Invalid regular expression: %(error)s"
-msgstr ""
+msgstr "Érvénytelen reguláris kifejezés: %(error)s"
 
 #: documents/serialisers.py:377
 msgid "Invalid color."
-msgstr ""
+msgstr "Érvénytelen szín."
 
 #: documents/serialisers.py:841
 #, python-format
 msgid "File type %(type)s not supported"
-msgstr ""
+msgstr "Fájltípus %(type)s nem támogatott"
 
 #: documents/serialisers.py:938
 msgid "Invalid variable detected."
-msgstr ""
+msgstr "Érvénytelen változót észleltek."
 
 #: documents/templates/index.html:79
 msgid "Paperless-ngx is loading..."
-msgstr ""
+msgstr "Paperless-ngx betöltődik..."
 
 #: documents/templates/index.html:80
 msgid "Still here?! Hmm, something might be wrong."
-msgstr ""
+msgstr "Még mindig itt vagy?! Hmm, valami baj lehet."
 
 #: documents/templates/index.html:80
 msgid "Here's a link to the docs."
-msgstr ""
+msgstr "Itt egy link a dokumentumokhoz."
 
 #: documents/templates/registration/logged_out.html:14
 msgid "Paperless-ngx signed out"
-msgstr ""
+msgstr "Paperless-ngx kijelentkezett"
 
 #: documents/templates/registration/logged_out.html:40
 msgid "You have been successfully logged out. Bye!"
-msgstr ""
+msgstr "Sikeresen kijelentkeztél. Viszlát!"
 
 #: documents/templates/registration/logged_out.html:41
 msgid "Sign in again"
-msgstr "Jelentkezz be újra"
+msgstr "Jelentkezzen be újra"
 
 #: documents/templates/registration/login.html:14
 msgid "Paperless-ngx sign in"
-msgstr ""
+msgstr "Paperless-ngx bejelentkezés"
 
 #: documents/templates/registration/login.html:41
 msgid "Please sign in."
-msgstr "Jelentkezz be."
+msgstr "Kérjük, jelentkezzen be."
 
 #: documents/templates/registration/login.html:44
 msgid "Your username and password didn't match. Please try again."
-msgstr "A felhasználói név és a jelszó nem egyezik. Próbáld újra."
+msgstr "A felhasználónév és a jelszó nem egyezik. Kérjük, próbálja meg újra."
 
 #: documents/templates/registration/login.html:48
 msgid "Share link was not found."
-msgstr "A link nem található."
+msgstr "A megosztási linket nem találtuk."
 
 #: documents/templates/registration/login.html:52
 msgid "Share link has expired."
-msgstr "A hivatkozás lejárt."
+msgstr "A megosztási link lejárt."
 
 #: documents/templates/registration/login.html:55
 msgid "Username"
@@ -767,84 +767,84 @@ msgstr "Elfelejtette jelszavát?"
 
 #: documents/templates/registration/password_reset_complete.html:14
 msgid "Paperless-ngx reset password complete"
-msgstr ""
+msgstr "Paperless-ngx jelszó visszaállítása befejeződött"
 
 #: documents/templates/registration/password_reset_complete.html:40
 msgid "Password reset complete."
-msgstr ""
+msgstr "Jelszó visszaállítása befejeződött."
 
 #: documents/templates/registration/password_reset_complete.html:42
 #, python-format
 msgid "Your new password has been set. You can now <a href=\"%(login_url)s\">log in</a>"
-msgstr ""
+msgstr "Az új jelszót beállítottuk. Mostantól a <a href=\"%(login_url)s\">címen jelentkezhet be:</a>"
 
 #: documents/templates/registration/password_reset_confirm.html:14
 msgid "Paperless-ngx reset password confirmation"
-msgstr ""
+msgstr "Paperless-ngx jelszó visszaállításának megerősítése"
 
 #: documents/templates/registration/password_reset_confirm.html:42
 msgid "Set a new password."
-msgstr ""
+msgstr "Új jelszó beállítása."
 
 #: documents/templates/registration/password_reset_confirm.html:46
 msgid "Passwords did not match or too weak. Try again."
-msgstr ""
+msgstr "A jelszavak nem egyeztek vagy túl gyengék voltak. Próbálja újra."
 
 #: documents/templates/registration/password_reset_confirm.html:49
 msgid "New Password"
-msgstr ""
+msgstr "Új jelszó"
 
 #: documents/templates/registration/password_reset_confirm.html:50
 msgid "Confirm Password"
-msgstr ""
+msgstr "Jelszó megerősítése"
 
 #: documents/templates/registration/password_reset_confirm.html:61
 msgid "Change my password"
-msgstr ""
+msgstr "Jelszó módosítása"
 
 #: documents/templates/registration/password_reset_confirm.html:65
 msgid "request a new password reset"
-msgstr ""
+msgstr "új jelszó visszaállításának kérése"
 
 #: documents/templates/registration/password_reset_done.html:14
 msgid "Paperless-ngx reset password sent"
-msgstr ""
+msgstr "Paperless-ngx jelszó visszaállítása elküldve"
 
 #: documents/templates/registration/password_reset_done.html:40
 msgid "Check your inbox."
-msgstr ""
+msgstr "Ellenőrizze a postaládáját."
 
 #: documents/templates/registration/password_reset_done.html:41
 msgid "We've emailed you instructions for setting your password. You should receive the email shortly!"
-msgstr ""
+msgstr "E-mailben küldtünk utasításokat a jelszó beállításához. Hamarosan megkapja az e-mailt!"
 
 #: documents/templates/registration/password_reset_form.html:14
 msgid "Paperless-ngx reset password request"
-msgstr ""
+msgstr "Paperless-ngx jelszó-visszaállítási kérelem"
 
 #: documents/templates/registration/password_reset_form.html:41
 msgid "Enter your email address below, and we'll email instructions for setting a new one."
-msgstr ""
+msgstr "Adja meg az alábbiakban az e-mail címét, és mi elküldjük Önnek az új cím beállításához szükséges utasításokat."
 
 #: documents/templates/registration/password_reset_form.html:44
 msgid "An error occurred. Please try again."
-msgstr ""
+msgstr "Hiba történt. Kérjük, próbálja meg újra."
 
 #: documents/templates/registration/password_reset_form.html:47
 msgid "Email"
-msgstr "Email"
+msgstr "E-mail"
 
 #: documents/templates/registration/password_reset_form.html:54
 msgid "Send me instructions!"
-msgstr "Küldj instrukciókat számomra!"
+msgstr "Küldjenek utasításokat!"
 
 #: paperless/apps.py:10
 msgid "Paperless"
-msgstr "Paperless"
+msgstr "Papírmentes"
 
 #: paperless/settings.py:586
 msgid "English (US)"
-msgstr "Angol (Egyesült Államok)"
+msgstr "Angol (US)"
 
 #: paperless/settings.py:587
 msgid "Arabic"
@@ -860,7 +860,7 @@ msgstr "Fehérorosz"
 
 #: paperless/settings.py:590
 msgid "Bulgarian"
-msgstr ""
+msgstr "Bolgár"
 
 #: paperless/settings.py:591
 msgid "Catalan"
@@ -880,71 +880,71 @@ msgstr "Német"
 
 #: paperless/settings.py:595
 msgid "Greek"
-msgstr ""
+msgstr "Görög"
 
 #: paperless/settings.py:596
 msgid "English (GB)"
-msgstr ""
+msgstr "Angol (GB)"
 
 #: paperless/settings.py:597
 msgid "Spanish"
-msgstr ""
+msgstr "Spanyol"
 
 #: paperless/settings.py:598
 msgid "Finnish"
-msgstr ""
+msgstr "Finn"
 
 #: paperless/settings.py:599
 msgid "French"
-msgstr ""
+msgstr "Francia"
 
 #: paperless/settings.py:600
 msgid "Italian"
-msgstr ""
+msgstr "Olasz"
 
 #: paperless/settings.py:601
 msgid "Luxembourgish"
-msgstr ""
+msgstr "Luxemburgi"
 
 #: paperless/settings.py:602
 msgid "Norwegian"
-msgstr ""
+msgstr "Norvég"
 
 #: paperless/settings.py:603
 msgid "Dutch"
-msgstr ""
+msgstr "Holland"
 
 #: paperless/settings.py:604
 msgid "Polish"
-msgstr ""
+msgstr "Lengyel"
 
 #: paperless/settings.py:605
 msgid "Portuguese (Brazil)"
-msgstr ""
+msgstr "Portugál (Brazília)"
 
 #: paperless/settings.py:606
 msgid "Portuguese"
-msgstr ""
+msgstr "Portugál"
 
 #: paperless/settings.py:607
 msgid "Romanian"
-msgstr ""
+msgstr "Román"
 
 #: paperless/settings.py:608
 msgid "Russian"
-msgstr ""
+msgstr "Orosz"
 
 #: paperless/settings.py:609
 msgid "Slovak"
-msgstr ""
+msgstr "Szlovák"
 
 #: paperless/settings.py:610
 msgid "Slovenian"
-msgstr ""
+msgstr "Szlovén"
 
 #: paperless/settings.py:611
 msgid "Serbian"
-msgstr ""
+msgstr "Szerb"
 
 #: paperless/settings.py:612
 msgid "Swedish"
@@ -960,11 +960,11 @@ msgstr "Ukrán"
 
 #: paperless/settings.py:615
 msgid "Chinese Simplified"
-msgstr "Egyszerűsített kínai"
+msgstr "Kínai egyszerűsített"
 
 #: paperless/urls.py:186
 msgid "Paperless-ngx administration"
-msgstr ""
+msgstr "Paperless-ngx adminisztráció"
 
 #: paperless_mail/admin.py:41
 msgid "Authentication"
@@ -980,15 +980,15 @@ msgstr "Szűrő"
 
 #: paperless_mail/admin.py:63
 msgid "Paperless will only process mails that match ALL of the filters given below."
-msgstr ""
+msgstr "A Paperless csak azokat a leveleket dolgozza fel, amelyek az alábbiakban megadott MINDEN szűrőnek megfelelnek."
 
 #: paperless_mail/admin.py:79
 msgid "Actions"
-msgstr "Műveletek"
+msgstr "Tevékenységek"
 
 #: paperless_mail/admin.py:82
 msgid "The action applied to the mail. This action is only performed when the mail body or attachments were consumed from the mail."
-msgstr ""
+msgstr "A levélre alkalmazott művelet. Ez a művelet csak akkor kerül végrehajtásra, ha a levéltest vagy a mellékletek a levélből kerültek felhasználásra."
 
 #: paperless_mail/admin.py:90
 msgid "Metadata"
@@ -996,23 +996,23 @@ msgstr "Metaadatok"
 
 #: paperless_mail/admin.py:93
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
-msgstr ""
+msgstr "Automatikusan hozzárendelhet metaadatokat a szabály által feldolgozott dokumentumokhoz. Ha itt nem rendel hozzá címkéket, típusokat vagy levelezőket, a papírmentes rendszer akkor is feldolgozza az Ön által meghatározott összes egyező szabályt."
 
 #: paperless_mail/apps.py:11
 msgid "Paperless mail"
-msgstr ""
+msgstr "Papírmentes levelezés"
 
 #: paperless_mail/models.py:10
 msgid "mail account"
-msgstr "e-mail fiók"
+msgstr "levelezési fiók"
 
 #: paperless_mail/models.py:11
 msgid "mail accounts"
-msgstr "e-mail fiókok"
+msgstr "postafiókok"
 
 #: paperless_mail/models.py:14
 msgid "No encryption"
-msgstr "Titkosítás mellőzése"
+msgstr "Nincs titkosítás"
 
 #: paperless_mail/models.py:15
 msgid "Use SSL"
@@ -1020,11 +1020,11 @@ msgstr "SSL használata"
 
 #: paperless_mail/models.py:16
 msgid "Use STARTTLS"
-msgstr ""
+msgstr "STARTTLS használata"
 
 #: paperless_mail/models.py:20
 msgid "IMAP server"
-msgstr "IMAP szerver"
+msgstr "IMAP-kiszolgáló"
 
 #: paperless_mail/models.py:23
 msgid "IMAP port"
@@ -1032,7 +1032,7 @@ msgstr "IMAP port"
 
 #: paperless_mail/models.py:27
 msgid "This is usually 143 for unencrypted and STARTTLS connections, and 993 for SSL connections."
-msgstr ""
+msgstr "Ez általában 143 a titkosítatlan és STARTTLS kapcsolatok esetében, és 993 az SSL kapcsolatok esetében."
 
 #: paperless_mail/models.py:33
 msgid "IMAP security"
@@ -1048,7 +1048,7 @@ msgstr "jelszó"
 
 #: paperless_mail/models.py:42
 msgid "Is token authentication"
-msgstr ""
+msgstr "Token hitelesítés"
 
 #: paperless_mail/models.py:45
 msgid "character set"
@@ -1056,31 +1056,31 @@ msgstr "karakterkészlet"
 
 #: paperless_mail/models.py:49
 msgid "The character set to use when communicating with the mail server, such as 'UTF-8' or 'US-ASCII'."
-msgstr ""
+msgstr "A levelezőszerverrel való kommunikáció során használandó karakterkészlet, például 'UTF-8' vagy 'US-ASCII'."
 
 #: paperless_mail/models.py:60
 msgid "mail rule"
-msgstr "e-mail szabály"
+msgstr "levelezési szabály"
 
 #: paperless_mail/models.py:61
 msgid "mail rules"
-msgstr "e-mail szabályok"
+msgstr "levelezési szabályok"
 
 #: paperless_mail/models.py:64 paperless_mail/models.py:72
 msgid "Only process attachments."
-msgstr ""
+msgstr "Csak a mellékleteket dolgozza fel."
 
 #: paperless_mail/models.py:65
 msgid "Process full Mail (with embedded attachments in file) as .eml"
-msgstr ""
+msgstr "Teljes Mail feldolgozás (beágyazott mellékletekkel a fájlban) .eml formátumban"
 
 #: paperless_mail/models.py:67
 msgid "Process full Mail (with embedded attachments in file) as .eml + process attachments as separate documents"
-msgstr ""
+msgstr "A teljes Mail (a fájlba ágyazott mellékletekkel) .eml-ként történő feldolgozása + a mellékletek külön dokumentumként történő feldolgozása"
 
 #: paperless_mail/models.py:73
 msgid "Process all files, including 'inline' attachments."
-msgstr ""
+msgstr "Az összes fájl feldolgozása, beleértve az \"inline\" mellékleteket is."
 
 #: paperless_mail/models.py:76
 msgid "Delete"
@@ -1088,47 +1088,47 @@ msgstr "Törlés"
 
 #: paperless_mail/models.py:77
 msgid "Move to specified folder"
-msgstr ""
+msgstr "Mozgás a megadott mappába"
 
 #: paperless_mail/models.py:78
 msgid "Mark as read, don't process read mails"
-msgstr ""
+msgstr "Olvasottként jelölje, ne dolgozza fel az olvasott leveleket"
 
 #: paperless_mail/models.py:79
 msgid "Flag the mail, don't process flagged mails"
-msgstr ""
+msgstr "Jelölje meg a leveleket, ne dolgozza fel a megjelölt leveleket"
 
 #: paperless_mail/models.py:80
 msgid "Tag the mail with specified tag, don't process tagged mails"
-msgstr ""
+msgstr "A levelek címkézése megadott címkével, a címkével ellátott levelek feldolgozása nem történik meg"
 
 #: paperless_mail/models.py:83
 msgid "Use subject as title"
-msgstr ""
+msgstr "Használja a tárgyat címként"
 
 #: paperless_mail/models.py:84
 msgid "Use attachment filename as title"
-msgstr ""
+msgstr "A csatolmány fájlnevének használata címként"
 
 #: paperless_mail/models.py:85
 msgid "Do not assign title from rule"
-msgstr ""
+msgstr "Ne rendeljen címet a szabályból"
 
 #: paperless_mail/models.py:88
 msgid "Do not assign a correspondent"
-msgstr ""
+msgstr "Ne rendeljen ki levelezőt"
 
 #: paperless_mail/models.py:89
 msgid "Use mail address"
-msgstr ""
+msgstr "Levelezési cím használata"
 
 #: paperless_mail/models.py:90
 msgid "Use name (or mail address if not available)"
-msgstr ""
+msgstr "Név használata (vagy postacím, ha nem áll rendelkezésre)"
 
 #: paperless_mail/models.py:91
 msgid "Use correspondent selected below"
-msgstr ""
+msgstr "Használja az alább kiválasztott levelezőt"
 
 #: paperless_mail/models.py:101
 msgid "account"
@@ -1140,71 +1140,71 @@ msgstr "mappa"
 
 #: paperless_mail/models.py:109
 msgid "Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server."
-msgstr ""
+msgstr "Az almappákat el kell választani egymástól egy elválasztó jelzővel, gyakran egy ponttal ('.') vagy egy perjel ('/'), de ez levelezőszerverenként változik."
 
 #: paperless_mail/models.py:115
 msgid "filter from"
-msgstr "szűrő"
+msgstr "szűrő feladóra"
 
 #: paperless_mail/models.py:122
 msgid "filter to"
-msgstr "szűrő"
+msgstr "szűrő címzettre"
 
 #: paperless_mail/models.py:129
 msgid "filter subject"
-msgstr ""
+msgstr "szűrő tárgyra"
 
 #: paperless_mail/models.py:136
 msgid "filter body"
-msgstr ""
+msgstr "szűrő tartalomra"
 
 #: paperless_mail/models.py:143
 msgid "filter attachment filename"
-msgstr ""
+msgstr "szűrő melléklet fájlnévre"
 
 #: paperless_mail/models.py:155
 msgid "maximum age"
-msgstr "max. érvényesség"
+msgstr "maximális életkor"
 
 #: paperless_mail/models.py:157
 msgid "Specified in days."
-msgstr ""
+msgstr "Napokban megadva."
 
 #: paperless_mail/models.py:161
 msgid "attachment type"
-msgstr ""
+msgstr "csatolás típusa"
 
 #: paperless_mail/models.py:165
 msgid "Inline attachments include embedded images, so it's best to combine this option with a filename filter."
-msgstr ""
+msgstr "Az inline csatolmányok beágyazott képeket is tartalmaznak, ezért ezt az opciót célszerű egy fájlnévszűrővel kombinálni."
 
 #: paperless_mail/models.py:171
 msgid "consumption scope"
-msgstr ""
+msgstr "feldolgozási kör"
 
 #: paperless_mail/models.py:177
 msgid "action"
-msgstr ""
+msgstr "akció"
 
 #: paperless_mail/models.py:183
 msgid "action parameter"
-msgstr ""
+msgstr "művelet paraméter"
 
 #: paperless_mail/models.py:188
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
-msgstr ""
+msgstr "A fent kiválasztott művelet további paramétere, azaz a mappába áthelyezés művelet célmappája. Az almappákat pontokkal kell elválasztani."
 
 #: paperless_mail/models.py:196
 msgid "assign title from"
-msgstr "cím hozzárendelése innen"
+msgstr "cím hozzárendelése a"
 
 #: paperless_mail/models.py:216
 msgid "assign correspondent from"
-msgstr ""
+msgstr "megbízott levelezőt a"
 
 #: paperless_mail/models.py:230
 msgid "Assign the rule owner to documents"
-msgstr ""
+msgstr "A szabály tulajdonosának hozzárendelése a dokumentumokhoz"
 
 #: paperless_mail/models.py:256
 msgid "uid"
@@ -1216,13 +1216,13 @@ msgstr "tárgy"
 
 #: paperless_mail/models.py:272
 msgid "received"
-msgstr "fogadott"
+msgstr "kapott"
 
 #: paperless_mail/models.py:279
 msgid "processed"
-msgstr "lefuttatva"
+msgstr "feldolgozott"
 
 #: paperless_mail/models.py:285
 msgid "status"
-msgstr "állapot"
+msgstr "státusz"
 
