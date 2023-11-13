@@ -6026,7 +6026,7 @@
           <context context-type="sourcefile">src/app/components/manage/custom-fields/custom-fields.component.ts</context>
           <context context-type="linenumber">89</context>
         </context-group>
-        <target state="needs-translation">Error deleting field.</target>
+        <target state="translated">Erreur lors de la suppression du champ.</target>
       </trans-unit>
       <trans-unit id="8084492669582894778" datatype="html">
         <source>document type</source>
@@ -6614,7 +6614,7 @@
           <context context-type="sourcefile">src/app/data/paperless-custom-field.ts</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="needs-translation">Boolean</target>
+        <target state="translated">Booléen</target>
       </trans-unit>
       <trans-unit id="3973931101896534797" datatype="html">
         <source>Date</source>
@@ -6622,7 +6622,7 @@
           <context context-type="sourcefile">src/app/data/paperless-custom-field.ts</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Date</target>
+        <target state="translated">Date</target>
       </trans-unit>
       <trans-unit id="362956598863566327" datatype="html">
         <source>Integer</source>
