@@ -476,8 +476,8 @@ export class BulkEditorComponent
       this.downloadForm.get('downloadFileTypeOriginals').value
         ? 'both'
         : this.downloadForm.get('downloadFileTypeArchive').value
-        ? 'archive'
-        : 'originals'
+          ? 'archive'
+          : 'originals'
     this.documentService
       .bulkDownload(
         Array.from(this.list.selected),

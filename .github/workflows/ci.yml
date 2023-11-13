@@ -16,7 +16,7 @@ on:
 env:
   # This is the version of pipenv all the steps will use
   # If changing this, change Dockerfile
-  DEFAULT_PIP_ENV_VERSION: "2023.9.8"
+  DEFAULT_PIP_ENV_VERSION: "2023.10.24"
   # This is the default version of Python to use in most steps which aren't specific
   DEFAULT_PYTHON_VERSION: "3.10"
 
@@ -64,7 +64,7 @@ jobs:
       -
         name: Install pipenv
         run: |
-          pip install --user pipenv==${DEFAULT_PIP_ENV_VERSION}
+          pip install --user pipenv==${{ env.DEFAULT_PIP_ENV_VERSION }}
       -
         name: Install dependencies
         run: |
@@ -133,7 +133,7 @@ jobs:
       -
         name: Install pipenv
         run: |
-          pip install --user pipenv==${DEFAULT_PIP_ENV_VERSION}
+          pip install --user pipenv==${{ env.DEFAULT_PIP_ENV_VERSION }}
       -
         name: Install system dependencies
         run: |
@@ -453,7 +453,7 @@ jobs:
       -
         name: Install pipenv + tools
         run: |
-          pip install --upgrade --user pipenv==${DEFAULT_PIP_ENV_VERSION} setuptools wheel
+          pip install --upgrade --user pipenv==${{ env.DEFAULT_PIP_ENV_VERSION }} setuptools wheel
       -
         name: Install Python dependencies
         run: |
@@ -621,7 +621,7 @@ jobs:
       -
         name: Install pipenv + tools
         run: |
-          pip install --upgrade --user pipenv==${DEFAULT_PIP_ENV_VERSION} setuptools wheel
+          pip install --upgrade --user pipenv==${{ env.DEFAULT_PIP_ENV_VERSION }} setuptools wheel
       -
         name: Append Changelog to docs
         id: append-Changelog
