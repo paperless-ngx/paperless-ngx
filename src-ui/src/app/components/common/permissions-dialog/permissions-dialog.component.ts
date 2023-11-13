@@ -58,7 +58,8 @@ export class PermissionsDialogComponent {
   }
 
   @Input()
-  message = $localize`Note that permissions set here will override any existing permissions`
+  message =
+    $localize`Note that permissions set here will override any existing permissions`
 
   cancelClicked() {
     this.activeModal.close()
