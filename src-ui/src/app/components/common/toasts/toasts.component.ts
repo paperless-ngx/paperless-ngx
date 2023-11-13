@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core'
-import { Subscription } from 'rxjs'
+import { Subscription, interval, take } from 'rxjs'
 import { Toast, ToastService } from 'src/app/services/toast.service'
 import { Clipboard } from '@angular/cdk/clipboard'
 
@@ -20,6 +20,8 @@ export class ToastsComponent implements OnInit, OnDestroy {
 
   public copied: boolean = false
 
+  public seconds: number = 0
+
   ngOnDestroy(): void {
     this.subscription?.unsubscribe()
   }
@@ -35,6 +37,20 @@ export class ToastsComponent implements OnInit, OnDestroy {
         }
       })
     })
+  }
+
+  onShow(toast: Toast) {
+    const refreshInterval = 150
+    const delay = toast.delay - 500 // for fade animation
+
+    interval(refreshInterval)
+      .pipe(take(delay / refreshInterval))
+      .subscribe((count) => {
+        toast.delayRemaining = Math.max(
+          0,
+          delay - refreshInterval * (count + 1)
+        )
+      })
   }
 
   public isDetailedError(error: any): boolean {
