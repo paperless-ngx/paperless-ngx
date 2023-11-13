@@ -235,6 +235,12 @@ export class SettingsService {
         dateInputFormat: 'dd/mm/yyyy',
       },
       {
+        code: 'hu-hu',
+        name: $localize`Hungarian`,
+        englishName: 'Hungarian',
+        dateInputFormat: 'yyyy.mm.dd',
+      },
+      {
         code: 'it-it',
         name: $localize`Italian`,
         englishName: 'Italian',
