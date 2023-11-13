@@ -784,7 +784,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">144,146</context>
         </context-group>
-        <target state="needs-translation"><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&gt;"/>No tracking data is collected by the app in any way.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm"><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&gt;"/>Geen naspoordata word op enige wyse deur die toep versamel nie.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></target>
       </trans-unit>
       <trans-unit id="5070799004079086984" datatype="html">
         <source>Enable update checking</source>
@@ -1622,7 +1622,9 @@
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="needs-translation"><x id="INTERPOLATION" equiv-text="{{dismissButtonText}}"/></target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">
+          <x id="INTERPOLATION" equiv-text="{{dismissButtonText}}"/>
+        </target>
       </trans-unit>
       <trans-unit id="1102717806459547726" datatype="html">
         <source>Refresh</source>
@@ -1714,7 +1716,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
           <context context-type="linenumber">110</context>
         </context-group>
-        <target state="needs-translation">Failed<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.failedFileTasks.length &gt; 0&quot; class=&quot;badge bg-danger ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Misluk<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.failedFileTasks.length &gt; 0&quot; class=&quot;badge bg-danger ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
       </trans-unit>
       <trans-unit id="6149567896789735123" datatype="html">
         <source>Complete<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.completedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.completedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
@@ -1722,7 +1724,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
           <context context-type="linenumber">116</context>
         </context-group>
-        <target state="needs-translation">Complete<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.completedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.completedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Voltooid<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.completedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.completedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
       </trans-unit>
       <trans-unit id="7531670556122409927" datatype="html">
         <source>Started<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.startedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.startedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
@@ -1730,7 +1732,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
           <context context-type="linenumber">122</context>
         </context-group>
-        <target state="needs-translation">Started<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.startedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.startedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Begin<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.startedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.startedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
       </trans-unit>
       <trans-unit id="7252570681759700719" datatype="html">
         <source>Queued<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.queuedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.queuedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
@@ -1738,7 +1740,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
           <context context-type="linenumber">128</context>
         </context-group>
-        <target state="needs-translation">Queued<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.queuedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.queuedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Wagry<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.queuedFileTasks.length &gt; 0&quot; class=&quot;badge bg-secondary ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.queuedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
       </trans-unit>
       <trans-unit id="5404910960991552159" datatype="html">
         <source>Dismiss selected</source>
@@ -5266,7 +5268,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
           <context context-type="linenumber">74</context>
         </context-group>
-        <target state="needs-translation"><x id="INTERPOLATION" equiv-text="ocument.notes.length}}"/> Notes</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm"><x id="INTERPOLATION" equiv-text="ocument.notes.length}}"/> notas</target>
       </trans-unit>
       <trans-unit id="78870852467682010" datatype="html">
         <source>Filter by document type</source>
@@ -5654,7 +5656,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">148,149</context>
         </context-group>
-        <target state="needs-translation">Tag: <x id="PH" equiv-text="this.tags.find((t) =&gt; t.id == +rule.value)             ?.name"/></target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Etiket: <x id="PH" equiv-text="this.tags.find((t) =&gt; t.id == +rule.value)             ?.name"/></target>
       </trans-unit>
       <trans-unit id="6494566478302448576" datatype="html">
         <source>Without any tag</source>
