@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-04 20:12-0700\n"
-"PO-Revision-Date: 2023-11-05 18:03\n"
+"PO-Revision-Date: 2023-11-13 00:34\n"
 "Last-Translator: \n"
 "Language-Team: Korean\n"
 "Language: ko_KR\n"
@@ -1040,11 +1040,11 @@ msgstr ""
 
 #: paperless_mail/models.py:38
 msgid "username"
-msgstr ""
+msgstr "사용자 이름"
 
 #: paperless_mail/models.py:40
 msgid "password"
-msgstr ""
+msgstr "비밀번호"
 
 #: paperless_mail/models.py:42
 msgid "Is token authentication"
