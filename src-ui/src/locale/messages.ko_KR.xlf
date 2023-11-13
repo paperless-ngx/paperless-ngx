@@ -1854,7 +1854,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.html</context>
           <context context-type="linenumber">10</context>
         </context-group>
-        <target state="needs-translation">Username</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">사용자 이름</target>
       </trans-unit>
       <trans-unit id="5944812089887969249" datatype="html">
         <source>Groups</source>
@@ -2239,7 +2239,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
           <context context-type="linenumber">88</context>
         </context-group>
-        <target state="needs-translation">Documents</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">문서</target>
       </trans-unit>
       <trans-unit id="6988090220128974198" datatype="html">
         <source>Open documents</source>
@@ -3139,7 +3139,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation">Password</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">비밀번호</target>
       </trans-unit>
       <trans-unit id="4249303448466017578" datatype="html">
         <source>Password is token</source>
@@ -3651,7 +3651,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="needs-translation">Email</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">전자우편</target>
       </trans-unit>
       <trans-unit id="5342432350421167093" datatype="html">
         <source>First name</source>
@@ -6034,7 +6034,7 @@
           <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.ts</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="needs-translation">document type</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">문서 유형</target>
       </trans-unit>
       <trans-unit id="2992451138146293104" datatype="html">
         <source>document types</source>
@@ -6042,7 +6042,7 @@
           <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.ts</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="needs-translation">document types</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">문서 유형</target>
       </trans-unit>
       <trans-unit id="4990731724078522539" datatype="html">
         <source>Do you really want to delete the document type &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
@@ -6378,7 +6378,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="needs-translation">Automatic</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">자동</target>
       </trans-unit>
       <trans-unit id="6252070156626006029" datatype="html">
         <source>None</source>
@@ -6390,7 +6390,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="needs-translation">None</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">없음</target>
       </trans-unit>
       <trans-unit id="211408744872436427" datatype="html">
         <source>Successfully created <x id="PH" equiv-text="this.typeName"/>.</source>
@@ -6454,7 +6454,7 @@
           <context context-type="sourcefile">src/app/components/manage/storage-path-list/storage-path-list.component.ts</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="needs-translation">storage path</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">저장소 경로</target>
       </trans-unit>
       <trans-unit id="22235115124223314" datatype="html">
         <source>storage paths</source>
@@ -6462,7 +6462,7 @@
           <context context-type="sourcefile">src/app/components/manage/storage-path-list/storage-path-list.component.ts</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="needs-translation">storage paths</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">저장소 경로</target>
       </trans-unit>
       <trans-unit id="1569070683025071137" datatype="html">
         <source>Do you really want to delete the storage path &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
@@ -6478,7 +6478,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.ts</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="needs-translation">tag</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">태그</target>
       </trans-unit>
       <trans-unit id="4975748273657042999" datatype="html">
         <source>tags</source>
@@ -6486,7 +6486,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.ts</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="needs-translation">tags</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">태그</target>
       </trans-unit>
       <trans-unit id="93754014749412887" datatype="html">
         <source>Do you really want to delete the tag &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
@@ -6542,7 +6542,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">All words</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">모든 단어</target>
       </trans-unit>
       <trans-unit id="111914402588955480" datatype="html">
         <source>All: Document contains all of these words (space separated)</source>
@@ -6558,7 +6558,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="needs-translation">Exact match</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">정확히 일치</target>
       </trans-unit>
       <trans-unit id="7109184332944610787" datatype="html">
         <source>Exact: Document contains this string</source>
@@ -6574,7 +6574,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">35</context>
         </context-group>
-        <target state="needs-translation">Regular expression</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">정규 표현식</target>
       </trans-unit>
       <trans-unit id="7548151332424148033" datatype="html">
         <source>Regular expression: Document matches this regular expression</source>
@@ -6963,7 +6963,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">155</context>
         </context-group>
-        <target state="needs-translation">English (US)</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">영어 (미국)</target>
       </trans-unit>
       <trans-unit id="7318555235181361185" datatype="html">
         <source>Afrikaans</source>
@@ -6971,7 +6971,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">161</context>
         </context-group>
-        <target state="needs-translation">Afrikaans</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">아프리칸스어</target>
       </trans-unit>
       <trans-unit id="6269202464699193298" datatype="html">
         <source>Arabic</source>
@@ -6979,7 +6979,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">167</context>
         </context-group>
-        <target state="needs-translation">Arabic</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">아랍어</target>
       </trans-unit>
       <trans-unit id="3098941349689899577" datatype="html">
         <source>Belarusian</source>
@@ -6987,7 +6987,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">173</context>
         </context-group>
-        <target state="needs-translation">Belarusian</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">벨라루스어</target>
       </trans-unit>
       <trans-unit id="6821856961727142928" datatype="html">
         <source>Bulgarian</source>
@@ -7003,7 +7003,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">185</context>
         </context-group>
-        <target state="needs-translation">Catalan</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">카탈로니아어</target>
       </trans-unit>
       <trans-unit id="2719780722934172508" datatype="html">
         <source>Czech</source>
@@ -7011,7 +7011,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">191</context>
         </context-group>
-        <target state="needs-translation">Czech</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">체코어</target>
       </trans-unit>
       <trans-unit id="2924289692679201020" datatype="html">
         <source>Danish</source>
@@ -7019,7 +7019,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">197</context>
         </context-group>
-        <target state="needs-translation">Danish</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">덴마크어</target>
       </trans-unit>
       <trans-unit id="1858110241312746425" datatype="html">
         <source>German</source>
@@ -7027,7 +7027,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">203</context>
         </context-group>
-        <target state="needs-translation">German</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">독일어</target>
       </trans-unit>
       <trans-unit id="7067741492320440272" datatype="html">
         <source>Greek</source>
@@ -7035,7 +7035,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">209</context>
         </context-group>
-        <target state="needs-translation">Greek</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">그리스어</target>
       </trans-unit>
       <trans-unit id="6987083569809053351" datatype="html">
         <source>English (GB)</source>
@@ -7043,7 +7043,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">215</context>
         </context-group>
-        <target state="needs-translation">English (GB)</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">영어 (영국)</target>
       </trans-unit>
       <trans-unit id="5190825892106392539" datatype="html">
         <source>Spanish</source>
@@ -7051,7 +7051,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">221</context>
         </context-group>
-        <target state="needs-translation">Spanish</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">스페인어</target>
       </trans-unit>
       <trans-unit id="861663369293303028" datatype="html">
         <source>Finnish</source>
@@ -7059,7 +7059,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">227</context>
         </context-group>
-        <target state="needs-translation">Finnish</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">핀란드어</target>
       </trans-unit>
       <trans-unit id="7633754075223722162" datatype="html">
         <source>French</source>
@@ -7067,7 +7067,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">233</context>
         </context-group>
-        <target state="needs-translation">French</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">프랑스어</target>
       </trans-unit>
       <trans-unit id="2935232983274991580" datatype="html">
         <source>Italian</source>
@@ -7075,7 +7075,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">239</context>
         </context-group>
-        <target state="needs-translation">Italian</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">이탈리아어</target>
       </trans-unit>
       <trans-unit id="1334425850005897370" datatype="html">
         <source>Luxembourgish</source>
@@ -7083,7 +7083,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">245</context>
         </context-group>
-        <target state="needs-translation">Luxembourgish</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">룩셈부르크어</target>
       </trans-unit>
       <trans-unit id="3071065188816255493" datatype="html">
         <source>Dutch</source>
@@ -7099,7 +7099,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">257</context>
         </context-group>
-        <target state="needs-translation">Norwegian</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">노르웨이어</target>
       </trans-unit>
       <trans-unit id="792060551707690640" datatype="html">
         <source>Polish</source>
