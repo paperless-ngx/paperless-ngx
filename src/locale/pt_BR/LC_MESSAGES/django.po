@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-04 20:12-0700\n"
-"PO-Revision-Date: 2023-11-05 18:03\n"
+"PO-Revision-Date: 2023-11-13 00:34\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
@@ -525,7 +525,7 @@ msgstr ""
 
 #: documents/models.py:680
 msgid "notes"
-msgstr ""
+msgstr "notas"
 
 #: documents/models.py:688
 msgid "Archive"
@@ -833,7 +833,7 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_form.html:47
 msgid "Email"
-msgstr ""
+msgstr "E-mail"
 
 #: documents/templates/registration/password_reset_form.html:54
 msgid "Send me instructions!"
@@ -865,7 +865,7 @@ msgstr ""
 
 #: paperless/settings.py:591
 msgid "Catalan"
-msgstr ""
+msgstr "Catalão"
 
 #: paperless/settings.py:592
 msgid "Czech"
@@ -893,7 +893,7 @@ msgstr "Espanhol"
 
 #: paperless/settings.py:598
 msgid "Finnish"
-msgstr ""
+msgstr "Finlandês"
 
 #: paperless/settings.py:599
 msgid "French"
@@ -937,7 +937,7 @@ msgstr "Russo"
 
 #: paperless/settings.py:609
 msgid "Slovak"
-msgstr ""
+msgstr "Eslovaco"
 
 #: paperless/settings.py:610
 msgid "Slovenian"
