@@ -7069,13 +7069,13 @@
         </context-group>
         <target state="final">Französisch</target>
       </trans-unit>
-      <trans-unit id="7891809788881004730" datatype="html">
+      <trans-unit id="7891809788881004730" datatype="html" approved="yes">
         <source>Hungarian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">239</context>
         </context-group>
-        <target state="needs-translation">Hungarian</target>
+        <target state="final">Ungarisch</target>
       </trans-unit>
       <trans-unit id="2935232983274991580" datatype="html" approved="yes">
         <source>Italian</source>
