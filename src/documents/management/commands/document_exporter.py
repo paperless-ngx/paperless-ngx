@@ -396,20 +396,31 @@ class Command(BaseCommand):
                         notes,
                     ),
                 )
-                manifest_name.write_text(json.dumps(content, indent=2))
+                manifest_name.write_text(
+                    json.dumps(content, indent=2, ensure_ascii=False),
+                    encoding="utf-8",
+                )
                 if manifest_name in self.files_in_export_dir:
                     self.files_in_export_dir.remove(manifest_name)
 
         # 4.1 write manifest to target folder
         manifest_path = (self.target / Path("manifest.json")).resolve()
-        manifest_path.write_text(json.dumps(manifest, indent=2))
+        manifest_path.write_text(
+            json.dumps(manifest, indent=2, ensure_ascii=False),
+            encoding="utf-8",
+        )
         if manifest_path in self.files_in_export_dir:
             self.files_in_export_dir.remove(manifest_path)
 
         # 4.2 write version information to target folder
         version_path = (self.target / Path("version.json")).resolve()
         version_path.write_text(
-            json.dumps({"version": version.__full_version_str__}, indent=2),
+            json.dumps(
+                {"version": version.__full_version_str__},
+                indent=2,
+                ensure_ascii=False,
+            ),
+            encoding="utf-8",
         )
         if version_path in self.files_in_export_dir:
             self.files_in_export_dir.remove(version_path)
