@@ -278,35 +278,23 @@
           <context context-type="linenumber">13</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="9103526311244275943" datatype="html">
-        <source>Document added</source>
+      <trans-unit id="3527354815023530656" datatype="html">
+        <source>Document <x id="PH" equiv-text="status.filename"/> was added to Paperless-ngx.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">83</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">93</context>
+          <context context-type="linenumber">92</context>
         </context-group>
-        <target state="translated">Документ додано</target>
-      </trans-unit>
-      <trans-unit id="9204248378636247318" datatype="html">
-        <source>Document <x id="PH" equiv-text="status.filename"/> was added to paperless.</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">85</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">95</context>
-        </context-group>
-        <target state="translated">Документ <x id="PH" equiv-text="status.filename"/> було додано до Paperless-ngx.</target>
+        <target state="needs-translation">Document <x id="PH" equiv-text="status.filename"/> was added to Paperless-ngx.</target>
       </trans-unit>
       <trans-unit id="1931214133925051574" datatype="html">
         <source>Open document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">86</context>
+          <context context-type="linenumber">85</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
@@ -318,31 +306,23 @@
         <source>Could not add <x id="PH" equiv-text="status.filename"/>: <x id="PH_1" equiv-text="status.message"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">109</context>
+          <context context-type="linenumber">107</context>
         </context-group>
         <target state="translated">Не вдалося додати <x id="PH" equiv-text="status.filename"/>: <x id="PH_1" equiv-text="status.message"/></target>
       </trans-unit>
-      <trans-unit id="1710712016675379662" datatype="html">
-        <source>New document detected</source>
+      <trans-unit id="1218124467712564468" datatype="html">
+        <source>Document <x id="PH" equiv-text="status.filename"/> is being processed by Paperless-ngx.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">124</context>
+          <context context-type="linenumber">122</context>
         </context-group>
-        <target state="translated">Виявлено новий документ</target>
-      </trans-unit>
-      <trans-unit id="587031278561344416" datatype="html">
-        <source>Document <x id="PH" equiv-text="status.filename"/> is being processed by paperless.</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">126</context>
-        </context-group>
-        <target state="translated">Документ <x id="PH" equiv-text="status.filename"/> обробляється Paperless-ngx.</target>
+        <target state="needs-translation">Document <x id="PH" equiv-text="status.filename"/> is being processed by Paperless-ngx.</target>
       </trans-unit>
       <trans-unit id="2501522447884928778" datatype="html">
         <source>Prev</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">131</context>
+          <context context-type="linenumber">128</context>
         </context-group>
         <target state="translated">Назад</target>
       </trans-unit>
@@ -350,7 +330,7 @@
         <source>Next</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">132</context>
+          <context context-type="linenumber">129</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
@@ -362,7 +342,7 @@
         <source>End</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">133</context>
+          <context context-type="linenumber">130</context>
         </context-group>
         <target state="translated">Закінчити</target>
       </trans-unit>
@@ -370,7 +350,7 @@
         <source>The dashboard can be used to show saved views, such as an &apos;Inbox&apos;. Those settings are found under Settings &gt; Saved Views once you have created some.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">139</context>
+          <context context-type="linenumber">136</context>
         </context-group>
         <target state="translated">Головна сторінка може використовуватися для показу збережених представлень, таких як "Вхідні". Ці параметри можуть бути знайдені у "Налаштування" &gt; "Збережені представлення" після того, як ви їх створите.</target>
       </trans-unit>
@@ -378,7 +358,7 @@
         <source>Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Paperless-ngx will start training its machine learning algorithms.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">146</context>
+          <context context-type="linenumber">143</context>
         </context-group>
         <target state="translated">Перетягніть сюди документи, щоб почати відвантаження, або покладіть їх в CONSUMPTION_DIR. Ви також можете перетягувати документи будь-де на усіх інших сторінках цього вебдодатку. Як тільки ви це зробите, Paperless-ngx автоматично почне тренування алгоритмів машинного навчання.</target>
       </trans-unit>
@@ -386,7 +366,7 @@
         <source>The documents list shows all of your documents and allows for filtering as well as bulk-editing. There are three different view styles: list, small cards and large cards. A list of documents currently opened for editing is shown in the sidebar.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">151</context>
+          <context context-type="linenumber">148</context>
         </context-group>
         <target state="translated">Список документів показує всі ваші документи, дозволяє їх фільтрацію, а також групове редагування. Є три різних стилі: список, плитка та детальний список. Відкриті для редагування документи показані у бічній панелі.</target>
       </trans-unit>
@@ -394,7 +374,7 @@
         <source>The filtering tools allow you to quickly find documents using various searches, dates, tags, etc.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">158</context>
+          <context context-type="linenumber">155</context>
         </context-group>
         <target state="translated">Інструменти фільтрації дозволяють швидко знаходити документи, використовуючи різні пошуки, дати, теги та інше.</target>
       </trans-unit>
@@ -402,7 +382,7 @@
         <source>Any combination of filters can be saved as a &apos;view&apos; which can then be displayed on the dashboard and / or sidebar.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">164</context>
+          <context context-type="linenumber">161</context>
         </context-group>
         <target state="translated">Будь-яка комбінація фільтрів може бути збережена як представлення, яке може потім бути показане на головній сторінці або у бічній панелі.</target>
       </trans-unit>
@@ -410,7 +390,7 @@
         <source>Tags, correspondents, document types and storage paths can all be managed using these pages. They can also be created from the document edit view.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">169</context>
+          <context context-type="linenumber">166</context>
         </context-group>
         <target state="translated">Теги, кореспонденти, типи документів і шляхи зберігання можуть керуватися використовуючи ці сторінки. Вони також можуть бути створені з режиму редагування документа.</target>
       </trans-unit>
@@ -418,7 +398,7 @@
         <source>Manage e-mail accounts and rules for automatically importing documents.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">177</context>
+          <context context-type="linenumber">174</context>
         </context-group>
         <target state="needs-translation">Manage e-mail accounts and rules for automatically importing documents.</target>
       </trans-unit>
@@ -426,7 +406,7 @@
         <source>Consumption templates give you finer control over the document ingestion process.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">185</context>
+          <context context-type="linenumber">182</context>
         </context-group>
         <target state="needs-translation">Consumption templates give you finer control over the document ingestion process.</target>
       </trans-unit>
@@ -434,7 +414,7 @@
         <source>File Tasks shows you documents that have been consumed, are waiting to be, or may have failed during the process.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">193</context>
+          <context context-type="linenumber">190</context>
         </context-group>
         <target state="translated">Обробка файлів показує документи, які було оброблено, які в очікуванні, або які зазнали невдачі в процесі обробки.</target>
       </trans-unit>
@@ -442,7 +422,7 @@
         <source>Check out the settings for various tweaks to the web app and toggle settings for saved views.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">201</context>
+          <context context-type="linenumber">198</context>
         </context-group>
         <target state="needs-translation">Check out the settings for various tweaks to the web app and toggle settings for saved views.</target>
       </trans-unit>
@@ -450,7 +430,7 @@
         <source>Thank you! 🙏</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">209</context>
+          <context context-type="linenumber">206</context>
         </context-group>
         <target state="translated">Дякуємо! 🙏</target>
       </trans-unit>
@@ -458,7 +438,7 @@
         <source>There are &lt;em&gt;tons&lt;/em&gt; more features and info we didn&apos;t cover here, but this should get you started. Check out the documentation or visit the project on GitHub to learn more or to report issues.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">211</context>
+          <context context-type="linenumber">208</context>
         </context-group>
         <target state="translated">Є ще &lt;em&gt;дуже багато&lt;/em&gt; функціоналу та інформації, яку ми тут не розглядали, але це має допомогти вам почати. Перегляньте документацію, або відвідайте проєкт на GitHub, щоб дізнатися більше, або повідомити про проблеми.</target>
       </trans-unit>
@@ -466,7 +446,7 @@
         <source>Lastly, on behalf of every contributor to this community-supported project, thank you for using Paperless-ngx!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">213</context>
+          <context context-type="linenumber">210</context>
         </context-group>
         <target state="translated">Наостанок хочемо подякувати від імені кожного, хто підтримує Paperless-ngx, за використання цього проєкту!</target>
       </trans-unit>
@@ -1502,19 +1482,11 @@
         </context-group>
         <target state="translated">Збережене представлення було "<x id="PH" equiv-text="savedView.name"/>" видалено.</target>
       </trans-unit>
-      <trans-unit id="3891152409365583719" datatype="html">
-        <source>Settings saved</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/admin/settings/settings.component.ts</context>
-          <context context-type="linenumber">492</context>
-        </context-group>
-        <target state="translated">Налаштування збережено</target>
-      </trans-unit>
       <trans-unit id="7217000812750597833" datatype="html">
         <source>Settings were saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.ts</context>
-          <context context-type="linenumber">493</context>
+          <context context-type="linenumber">492</context>
         </context-group>
         <target state="translated">Налаштування успішно збережено.</target>
       </trans-unit>
@@ -1522,7 +1494,7 @@
         <source>Settings were saved successfully. Reload is required to apply some changes.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.ts</context>
-          <context context-type="linenumber">497</context>
+          <context context-type="linenumber">496</context>
         </context-group>
         <target state="translated">Налаштування успішно збережені. Оновіть сторінку для застосування змін.</target>
       </trans-unit>
@@ -1530,7 +1502,7 @@
         <source>Reload now</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.ts</context>
-          <context context-type="linenumber">498</context>
+          <context context-type="linenumber">497</context>
         </context-group>
         <target state="translated">Перезавантажити зараз</target>
       </trans-unit>
@@ -1538,7 +1510,7 @@
         <source>An error occurred while saving settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.ts</context>
-          <context context-type="linenumber">508</context>
+          <context context-type="linenumber">507</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
@@ -1550,7 +1522,7 @@
         <source>Use system language</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.ts</context>
-          <context context-type="linenumber">516</context>
+          <context context-type="linenumber">515</context>
         </context-group>
         <target state="translated">Використовувати мову системи</target>
       </trans-unit>
@@ -1558,7 +1530,7 @@
         <source>Use date format of display language</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.ts</context>
-          <context context-type="linenumber">523</context>
+          <context context-type="linenumber">522</context>
         </context-group>
         <target state="translated">Використовувати формат, що відповідає вибраній мові</target>
       </trans-unit>
@@ -1566,7 +1538,7 @@
         <source>Error while storing settings on server.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.ts</context>
-          <context context-type="linenumber">546</context>
+          <context context-type="linenumber">545</context>
         </context-group>
         <target state="translated">Помилка при збереженні налаштувань на сервері.</target>
       </trans-unit>
@@ -2841,11 +2813,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/toasts/toasts.component.html</context>
-          <context context-type="linenumber">14</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/services/toast.service.ts</context>
-          <context context-type="linenumber">37</context>
+          <context context-type="linenumber">18</context>
         </context-group>
         <target state="translated">Помилка</target>
       </trans-unit>
@@ -4175,7 +4143,7 @@
         <source>Status</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/toasts/toasts.component.html</context>
-          <context context-type="linenumber">12</context>
+          <context context-type="linenumber">16</context>
         </context-group>
         <target state="translated">Статус</target>
       </trans-unit>
@@ -4183,7 +4151,7 @@
         <source>Copy Raw Error</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/toasts/toasts.component.html</context>
-          <context context-type="linenumber">23</context>
+          <context context-type="linenumber">27</context>
         </context-group>
         <target state="translated">Копіювати деталізовану помилку</target>
       </trans-unit>
@@ -7236,14 +7204,6 @@
           <context context-type="linenumber">542</context>
         </context-group>
         <target state="translated">Ви можете пройти знайомство ще раз зі сторінки налаштувань.</target>
-      </trans-unit>
-      <trans-unit id="5037437391296624618" datatype="html">
-        <source>Information</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/services/toast.service.ts</context>
-          <context context-type="linenumber">46</context>
-        </context-group>
-        <target state="translated">Інформація</target>
       </trans-unit>
       <trans-unit id="3852289441366561594" datatype="html">
         <source>Connecting...</source>
