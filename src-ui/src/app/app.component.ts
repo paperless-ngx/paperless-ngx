@@ -80,9 +80,8 @@ export class AppComponent implements OnInit, OnDestroy {
             )
           ) {
             this.toastService.show({
-              title: $localize`Document added`,
+              content: $localize`Document ${status.filename} was added to Paperless-ngx.`,
               delay: 10000,
-              content: $localize`Document ${status.filename} was added to paperless.`,
               actionName: $localize`Open document`,
               action: () => {
                 this.router.navigate(['documents', status.documentId])
@@ -90,9 +89,8 @@ export class AppComponent implements OnInit, OnDestroy {
             })
           } else {
             this.toastService.show({
-              title: $localize`Document added`,
+              content: $localize`Document ${status.filename} was added to Paperless-ngx.`,
               delay: 10000,
-              content: $localize`Document ${status.filename} was added to paperless.`,
             })
           }
         }
@@ -121,9 +119,8 @@ export class AppComponent implements OnInit, OnDestroy {
           )
         ) {
           this.toastService.show({
-            title: $localize`New document detected`,
+            content: $localize`Document ${status.filename} is being processed by Paperless-ngx.`,
             delay: 5000,
-            content: $localize`Document ${status.filename} is being processed by paperless.`,
           })
         }
       })
