@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-04 20:12-0700\n"
-"PO-Revision-Date: 2023-11-05 18:03\n"
+"PO-Revision-Date: 2023-11-13 00:34\n"
 "Last-Translator: \n"
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
@@ -992,7 +992,7 @@ msgstr ""
 
 #: paperless_mail/admin.py:90
 msgid "Metadata"
-msgstr ""
+msgstr "Metadata"
 
 #: paperless_mail/admin.py:93
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
@@ -1068,7 +1068,7 @@ msgstr "peraturan surat"
 
 #: paperless_mail/models.py:64 paperless_mail/models.py:72
 msgid "Only process attachments."
-msgstr ""
+msgstr "Hanya memproses lampiran."
 
 #: paperless_mail/models.py:65
 msgid "Process full Mail (with embedded attachments in file) as .eml"
