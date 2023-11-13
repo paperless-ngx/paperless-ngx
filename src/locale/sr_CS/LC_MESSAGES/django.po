@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-04 20:12-0700\n"
-"PO-Revision-Date: 2023-11-05 18:03\n"
+"PO-Revision-Date: 2023-11-13 00:34\n"
 "Last-Translator: \n"
 "Language-Team: Serbian (Latin)\n"
 "Language: sr_CS\n"
@@ -23,11 +23,11 @@ msgstr "Dokumenta"
 
 #: documents/models.py:36 documents/models.py:734
 msgid "owner"
-msgstr ""
+msgstr "vlasnik"
 
 #: documents/models.py:53
 msgid "None"
-msgstr ""
+msgstr "Nijedan"
 
 #: documents/models.py:54
 msgid "Any word"
@@ -525,7 +525,7 @@ msgstr ""
 
 #: documents/models.py:680
 msgid "notes"
-msgstr ""
+msgstr "beleške"
 
 #: documents/models.py:688
 msgid "Archive"
@@ -553,7 +553,7 @@ msgstr ""
 
 #: documents/models.py:748
 msgid "Consume Folder"
-msgstr ""
+msgstr "Folder za obradu"
 
 #: documents/models.py:749
 msgid "Api Upload"
@@ -561,7 +561,7 @@ msgstr ""
 
 #: documents/models.py:750
 msgid "Mail Fetch"
-msgstr ""
+msgstr "Preuzimanje e-pošte"
 
 #: documents/models.py:754 paperless_mail/models.py:95
 msgid "order"
@@ -569,7 +569,7 @@ msgstr "raspored"
 
 #: documents/models.py:763
 msgid "filter path"
-msgstr ""
+msgstr "filtriraj putanju"
 
 #: documents/models.py:768
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
@@ -577,7 +577,7 @@ msgstr ""
 
 #: documents/models.py:775
 msgid "filter filename"
-msgstr ""
+msgstr "filtriraj ime fajla"
 
 #: documents/models.py:780 paperless_mail/models.py:148
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
@@ -589,7 +589,7 @@ msgstr ""
 
 #: documents/models.py:795
 msgid "assign title"
-msgstr ""
+msgstr "dodeli naslov"
 
 #: documents/models.py:800
 msgid "Assign a document title, can include some placeholders, see documentation."
@@ -637,7 +637,7 @@ msgstr ""
 
 #: documents/models.py:874
 msgid "consumption templates"
-msgstr ""
+msgstr "šabloni za obradu"
 
 #: documents/models.py:886
 msgid "String"
@@ -649,15 +649,15 @@ msgstr ""
 
 #: documents/models.py:888
 msgid "Date"
-msgstr ""
+msgstr "Datum"
 
 #: documents/models.py:889
 msgid "Boolean"
-msgstr ""
+msgstr "Logičko"
 
 #: documents/models.py:890
 msgid "Integer"
-msgstr ""
+msgstr "Ceo broj"
 
 #: documents/models.py:891
 msgid "Float"
@@ -665,11 +665,11 @@ msgstr ""
 
 #: documents/models.py:892
 msgid "Monetary"
-msgstr ""
+msgstr "Monetarno"
 
 #: documents/models.py:904
 msgid "data type"
-msgstr ""
+msgstr "tip podataka"
 
 #: documents/models.py:912
 msgid "custom field"
@@ -677,7 +677,7 @@ msgstr ""
 
 #: documents/models.py:913
 msgid "custom fields"
-msgstr ""
+msgstr "dodatna polja"
 
 #: documents/models.py:973
 msgid "custom field instance"
@@ -832,7 +832,7 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_form.html:47
 msgid "Email"
-msgstr ""
+msgstr "Email"
 
 #: documents/templates/registration/password_reset_form.html:54
 msgid "Send me instructions!"
@@ -848,11 +848,11 @@ msgstr "Engleski (US)"
 
 #: paperless/settings.py:587
 msgid "Arabic"
-msgstr ""
+msgstr "Arapski"
 
 #: paperless/settings.py:588
 msgid "Afrikaans"
-msgstr ""
+msgstr "Afrički"
 
 #: paperless/settings.py:589
 msgid "Belarusian"
@@ -860,11 +860,11 @@ msgstr "Beloruski"
 
 #: paperless/settings.py:590
 msgid "Bulgarian"
-msgstr ""
+msgstr "Bugarski"
 
 #: paperless/settings.py:591
 msgid "Catalan"
-msgstr ""
+msgstr "Katalonski"
 
 #: paperless/settings.py:592
 msgid "Czech"
@@ -880,7 +880,7 @@ msgstr "Nemački"
 
 #: paperless/settings.py:595
 msgid "Greek"
-msgstr ""
+msgstr "Grčki"
 
 #: paperless/settings.py:596
 msgid "English (GB)"
@@ -892,7 +892,7 @@ msgstr "Španski"
 
 #: paperless/settings.py:598
 msgid "Finnish"
-msgstr ""
+msgstr "Finski"
 
 #: paperless/settings.py:599
 msgid "French"
@@ -908,7 +908,7 @@ msgstr "Luksemburški"
 
 #: paperless/settings.py:602
 msgid "Norwegian"
-msgstr ""
+msgstr "Norveški"
 
 #: paperless/settings.py:603
 msgid "Dutch"
@@ -936,7 +936,7 @@ msgstr "Ruski"
 
 #: paperless/settings.py:609
 msgid "Slovak"
-msgstr ""
+msgstr "Slovački"
 
 #: paperless/settings.py:610
 msgid "Slovenian"
@@ -956,7 +956,7 @@ msgstr "Turski"
 
 #: paperless/settings.py:614
 msgid "Ukrainian"
-msgstr ""
+msgstr "Ukrajinski"
 
 #: paperless/settings.py:615
 msgid "Chinese Simplified"
@@ -1148,7 +1148,7 @@ msgstr "filter od"
 
 #: paperless_mail/models.py:122
 msgid "filter to"
-msgstr ""
+msgstr "filtriraj po"
 
 #: paperless_mail/models.py:129
 msgid "filter subject"
@@ -1180,7 +1180,7 @@ msgstr "Ugrađeni prilozi uključuju ugrađene slike, pa je najbolje kombinovati
 
 #: paperless_mail/models.py:171
 msgid "consumption scope"
-msgstr ""
+msgstr "obim obrade priloga"
 
 #: paperless_mail/models.py:177
 msgid "action"
@@ -1224,5 +1224,5 @@ msgstr ""
 
 #: paperless_mail/models.py:285
 msgid "status"
-msgstr ""
+msgstr "status"
 
