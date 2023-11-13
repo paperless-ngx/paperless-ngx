@@ -338,7 +338,7 @@ class RasterisedDocumentParser(DocumentParser):
             if "Ghostscript PDF/A rendering" in str(e):
                 self.log.warning(
                     "Ghostscript PDF/A rendering failed, consider setting "
-                    "PAPERLESS_OCR_USER_ARGS: '{\"continue_on_soft_render_error\": true}'",  # noqa: E501
+                    "PAPERLESS_OCR_USER_ARGS: '{\"continue_on_soft_render_error\": true}'",
                 )
 
             raise ParseError(
