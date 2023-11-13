@@ -1023,7 +1023,6 @@ class AcknowledgeTasksViewSerializer(serializers.Serializer):
     )
 
     def _validate_task_id_list(self, tasks, name="tasks"):
-        pass
         if not isinstance(tasks, list):
             raise serializers.ValidationError(f"{name} must be a list")
         if not all(isinstance(i, int) for i in tasks):
