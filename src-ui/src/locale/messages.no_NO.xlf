@@ -2931,7 +2931,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.ts</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="needs-translation">Mail Fetch</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Epost-henting</target>
       </trans-unit>
       <trans-unit id="2057608151109082984" datatype="html">
         <source>Create new consumption template</source>
@@ -3351,7 +3351,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="needs-translation">Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive.</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Bare bruke dokumenter som samsvarer med dette filnavnet hvis angitt. Jokertegn som *.pdf eller *faktura* er tillatt. Saksfortegnet.</target>
       </trans-unit>
       <trans-unit id="9216117865911519658" datatype="html">
         <source>Action</source>
@@ -3475,7 +3475,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">69</context>
         </context-group>
-        <target state="needs-translation">Tag the mail with specified tag, don't process tagged mails</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Merk e-post med angitte tag, ikke bruk merkede meldinger</target>
       </trans-unit>
       <trans-unit id="4673329664686432878" datatype="html">
         <source>Use subject as title</source>
@@ -4121,7 +4121,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.ts</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">7 days</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">7 dager</target>
       </trans-unit>
       <trans-unit id="7152095234138763013" datatype="html">
         <source>30 days</source>
@@ -5606,7 +5606,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">120,122</context>
         </context-group>
-        <target state="needs-translation">Correspondent: <x id="PH" equiv-text="this.correspondents.find(               (c) =&gt; c.id == +rule.value             )?.name"/></target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Korrespondent: <x id="PH" equiv-text="this.correspondents.find(               (c) =&gt; c.id == +rule.value             )?.name"/></target>
       </trans-unit>
       <trans-unit id="8170755470576301659" datatype="html">
         <source>Without correspondent</source>
@@ -5622,7 +5622,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">130,132</context>
         </context-group>
-        <target state="needs-translation">Document type: <x id="PH" equiv-text="this.documentTypes.find(               (dt) =&gt; dt.id == +rule.value             )?.name"/></target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Dokumenttype: <x id="PH" equiv-text="this.documentTypes.find(               (dt) =&gt; dt.id == +rule.value             )?.name"/></target>
       </trans-unit>
       <trans-unit id="4362173610367509215" datatype="html">
         <source>Without document type</source>
@@ -5638,7 +5638,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">140,142</context>
         </context-group>
-        <target state="needs-translation">Storage path: <x id="PH" equiv-text="this.storagePaths.find(               (sp) =&gt; sp.id == +rule.value             )?.name"/></target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Lagringssti: <x id="PH" equiv-text="this.storagePaths.find(               (sp) =&gt; sp.id == +rule.value             )?.name"/></target>
       </trans-unit>
       <trans-unit id="1562820715074533164" datatype="html">
         <source>Without storage path</source>
@@ -5654,7 +5654,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">148,149</context>
         </context-group>
-        <target state="needs-translation">Tag: <x id="PH" equiv-text="this.tags.find((t) =&gt; t.id == +rule.value)             ?.name"/></target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Etikett: <x id="PH" equiv-text="this.tags.find((t) =&gt; t.id == +rule.value)             ?.name"/></target>
       </trans-unit>
       <trans-unit id="6494566478302448576" datatype="html">
         <source>Without any tag</source>
@@ -6590,7 +6590,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">40</context>
         </context-group>
-        <target state="needs-translation">Fuzzy word</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Fuzzy word</target>
       </trans-unit>
       <trans-unit id="8419167206585286450" datatype="html">
         <source>Fuzzy: Document contains a word similar to this word</source>
@@ -6971,7 +6971,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">161</context>
         </context-group>
-        <target state="needs-translation">Afrikaans</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Afrikansk</target>
       </trans-unit>
       <trans-unit id="6269202464699193298" datatype="html">
         <source>Arabic</source>
@@ -7035,7 +7035,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">209</context>
         </context-group>
-        <target state="needs-translation">Greek</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Gresk</target>
       </trans-unit>
       <trans-unit id="6987083569809053351" datatype="html">
         <source>English (GB)</source>
@@ -7099,7 +7099,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">257</context>
         </context-group>
-        <target state="needs-translation">Norwegian</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Norsk</target>
       </trans-unit>
       <trans-unit id="792060551707690640" datatype="html">
         <source>Polish</source>
@@ -7187,7 +7187,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">323</context>
         </context-group>
-        <target state="needs-translation">Ukrainian</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Ukrainsk</target>
       </trans-unit>
       <trans-unit id="4689443708886954687" datatype="html">
         <source>Chinese Simplified</source>
