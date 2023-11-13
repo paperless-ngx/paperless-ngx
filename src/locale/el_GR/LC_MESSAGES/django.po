@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-04 20:12-0700\n"
-"PO-Revision-Date: 2023-11-05 18:03\n"
+"PO-Revision-Date: 2023-11-13 00:34\n"
 "Last-Translator: \n"
 "Language-Team: Greek\n"
 "Language: el_GR\n"
@@ -832,7 +832,7 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_form.html:47
 msgid "Email"
-msgstr ""
+msgstr "E-mail"
 
 #: documents/templates/registration/password_reset_form.html:54
 msgid "Send me instructions!"
@@ -852,7 +852,7 @@ msgstr "Αραβικά"
 
 #: paperless/settings.py:588
 msgid "Afrikaans"
-msgstr ""
+msgstr "Αφρικανικά"
 
 #: paperless/settings.py:589
 msgid "Belarusian"
@@ -880,7 +880,7 @@ msgstr "Γερμανικά"
 
 #: paperless/settings.py:595
 msgid "Greek"
-msgstr ""
+msgstr "Ελληνικά"
 
 #: paperless/settings.py:596
 msgid "English (GB)"
@@ -908,7 +908,7 @@ msgstr "Λουξεμβουργικά"
 
 #: paperless/settings.py:602
 msgid "Norwegian"
-msgstr ""
+msgstr "Νορβηγικά"
 
 #: paperless/settings.py:603
 msgid "Dutch"
