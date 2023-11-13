@@ -107,7 +107,7 @@ document is consumed using a couple of simple hooks.
 Just write a script, put it somewhere that Paperless can read & execute,
 and then put the path to that script in `paperless.conf` or
 `docker-compose.env` with the variable name of either
-[`PAPERLESS_PRE_CONSUME_SCRIPT`](/configuration#PAPERLESS_PRE_CONSUME_SCRIPT) or [`PAPERLESS_POST_CONSUME_SCRIPT`](/configuration#PAPERLESS_POST_CONSUME_SCRIPT).
+[`PAPERLESS_PRE_CONSUME_SCRIPT`](configuration.md#PAPERLESS_PRE_CONSUME_SCRIPT) or [`PAPERLESS_POST_CONSUME_SCRIPT`](configuration.md#PAPERLESS_POST_CONSUME_SCRIPT).
 
 !!! info
 
@@ -251,7 +251,7 @@ document. You will end up getting files like `0000123.pdf` in your media
 directory. This isn't necessarily a bad thing, because you normally
 don't have to access these files manually. However, if you wish to name
 your files differently, you can do that by adjusting the
-[`PAPERLESS_FILENAME_FORMAT`](/configuration#PAPERLESS_FILENAME_FORMAT) configuration option. Paperless adds the
+[`PAPERLESS_FILENAME_FORMAT`](configuration.md#PAPERLESS_FILENAME_FORMAT) configuration option. Paperless adds the
 correct file extension e.g. `.pdf`, `.jpg` automatically.
 
 This variable allows you to configure the filename (folders are allowed)
@@ -344,7 +344,7 @@ value.
     Paperless checks the filename of a document whenever it is saved.
     Therefore, you need to update the filenames of your documents and move
     them after altering this setting by invoking the
-    [`document renamer`](/administration#renamer).
+    [`document renamer`](administration.md#renamer).
 
 !!! warning
 
@@ -379,7 +379,7 @@ When a single storage layout is not sufficient for your use case,
 storage paths come to the rescue. Storage paths allow you to configure
 more precisely where each document is stored in the file system.
 
-- Each storage path is a [`PAPERLESS_FILENAME_FORMAT`](/configuration#PAPERLESS_FILENAME_FORMAT) and
+- Each storage path is a [`PAPERLESS_FILENAME_FORMAT`](configuration.md#PAPERLESS_FILENAME_FORMAT) and
   follows the rules described above
 - Each document is assigned a storage path using the matching
   algorithms described above, but can be overwritten at any time
@@ -419,7 +419,7 @@ Insurances/                             # Insurances
 !!! tip
 
     Defining a storage path is optional. If no storage path is defined for a
-    document, the global [`PAPERLESS_FILENAME_FORMAT`](/configuration#PAPERLESS_FILENAME_FORMAT) is applied.
+    document, the global [`PAPERLESS_FILENAME_FORMAT`](configuration.md#PAPERLESS_FILENAME_FORMAT) is applied.
 
 ## Celery Monitoring {#celery-monitoring}
 
@@ -528,7 +528,7 @@ At this time, the library utilized for detection of barcodes supports the follow
 You may check for updates on the [zbar library homepage](https://github.com/mchehab/zbar).
 For usage in Paperless, the type of barcode does not matter, only the contents of it.
 
-For how to enable barcode usage, see [the configuration](/configuration#barcodes).
+For how to enable barcode usage, see [the configuration](configuration.md#barcodes).
 The two settings may be enabled independently, but do have interactions as explained
 below.
 
@@ -554,7 +554,7 @@ one which holds data to keep in the document.
 
     If your scanner supports double-sided scanning natively, you do not need this feature.
 
-This feature is turned off by default, see [configuration](/configuration#collate) on how to turn it on.
+This feature is turned off by default, see [configuration](configuration.md#collate) on how to turn it on.
 
 ### Summary
 
@@ -594,7 +594,7 @@ followed by the even pages.
 
 It's important that the scan files get consumed in the correct order, and one at a time.
 You therefore need to make sure that Paperless is running while you upload the files into
-the directory; and if you're using [polling](/configuration#polling), make sure that
+the directory; and if you're using [polling](configuration.md#polling), make sure that
 `CONSUMER_POLLING` is set to a value lower than it takes for the second scan to appear,
 like 5-10 or even lower.
 
@@ -606,7 +606,7 @@ scan a completely new "odd numbered pages" one. The old staging file will get di
 
 ### Interaction with "subdirs as tags"
 
-The collation feature can be used together with the [subdirs as tags](/configuration#consume_config)
+The collation feature can be used together with the [subdirs as tags](configuration.md#consume_config)
 feature (but this is not a requirement). Just create a correctly named double-sided subdir
 in the hierachy and upload your scans there. For example, both `double-sided/foo/bar` as
 well as `foo/bar/double-sided` will cause the collated document to be treated as if it
