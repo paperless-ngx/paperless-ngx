@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-04 20:12-0700\n"
-"PO-Revision-Date: 2023-11-05 18:03\n"
+"PO-Revision-Date: 2023-11-13 00:34\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -553,7 +553,7 @@ msgstr "compartir enlaces"
 
 #: documents/models.py:748
 msgid "Consume Folder"
-msgstr ""
+msgstr "Consumir carpeta"
 
 #: documents/models.py:749
 msgid "Api Upload"
@@ -832,7 +832,7 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_form.html:47
 msgid "Email"
-msgstr ""
+msgstr "E-mail"
 
 #: documents/templates/registration/password_reset_form.html:54
 msgid "Send me instructions!"
@@ -864,7 +864,7 @@ msgstr ""
 
 #: paperless/settings.py:591
 msgid "Catalan"
-msgstr ""
+msgstr "Catalán"
 
 #: paperless/settings.py:592
 msgid "Czech"
@@ -892,7 +892,7 @@ msgstr "Español"
 
 #: paperless/settings.py:598
 msgid "Finnish"
-msgstr ""
+msgstr "Finlandés"
 
 #: paperless/settings.py:599
 msgid "French"
@@ -1148,7 +1148,7 @@ msgstr "filtrar desde"
 
 #: paperless_mail/models.py:122
 msgid "filter to"
-msgstr ""
+msgstr "filtrar a"
 
 #: paperless_mail/models.py:129
 msgid "filter subject"
