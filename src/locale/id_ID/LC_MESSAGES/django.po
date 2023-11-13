@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-04 20:12-0700\n"
-"PO-Revision-Date: 2023-11-13 00:34\n"
+"POT-Creation-Date: 2023-11-10 09:02-0800\n"
+"PO-Revision-Date: 2023-11-13 01:31\n"
 "Last-Translator: \n"
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
@@ -899,66 +899,70 @@ msgid "French"
 msgstr ""
 
 #: paperless/settings.py:600
-msgid "Italian"
+msgid "Hungarian"
 msgstr ""
 
 #: paperless/settings.py:601
-msgid "Luxembourgish"
+msgid "Italian"
 msgstr ""
 
 #: paperless/settings.py:602
-msgid "Norwegian"
+msgid "Luxembourgish"
 msgstr ""
 
 #: paperless/settings.py:603
+msgid "Norwegian"
+msgstr ""
+
+#: paperless/settings.py:604
 msgid "Dutch"
 msgstr "Belanda"
 
-#: paperless/settings.py:604
+#: paperless/settings.py:605
 msgid "Polish"
 msgstr "Polandia"
 
-#: paperless/settings.py:605
+#: paperless/settings.py:606
 msgid "Portuguese (Brazil)"
 msgstr "Portugis (Brasil)"
 
-#: paperless/settings.py:606
+#: paperless/settings.py:607
 msgid "Portuguese"
 msgstr "Portugis"
 
-#: paperless/settings.py:607
+#: paperless/settings.py:608
 msgid "Romanian"
 msgstr "Rumania"
 
-#: paperless/settings.py:608
+#: paperless/settings.py:609
 msgid "Russian"
 msgstr "Rusia"
 
-#: paperless/settings.py:609
+#: paperless/settings.py:610
 msgid "Slovak"
 msgstr ""
 
-#: paperless/settings.py:610
+#: paperless/settings.py:611
 msgid "Slovenian"
 msgstr "Slovenia"
 
-#: paperless/settings.py:611
+#: paperless/settings.py:612
 msgid "Serbian"
 msgstr "Serbia"
 
-#: paperless/settings.py:612
+#: paperless/settings.py:613
 msgid "Swedish"
 msgstr "Swedia"
 
-#: paperless/settings.py:613
+#: paperless/settings.py:614
 msgid "Turkish"
 msgstr "Turki"
 
-#: paperless/settings.py:614
+#: paperless/settings.py:615
 msgid "Ukrainian"
 msgstr ""
 
-#: paperless/settings.py:615
+#: paperless/settings.py:616
 msgid "Chinese Simplified"
 msgstr "Mandarin Sederhana"
 
