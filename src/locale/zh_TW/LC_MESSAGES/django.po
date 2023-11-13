@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-04 20:12-0700\n"
-"PO-Revision-Date: 2023-11-05 18:03\n"
+"PO-Revision-Date: 2023-11-13 00:34\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
@@ -19,7 +19,7 @@ msgstr ""
 
 #: documents/apps.py:8
 msgid "Documents"
-msgstr ""
+msgstr "文件"
 
 #: documents/models.py:36 documents/models.py:734
 msgid "owner"
@@ -213,7 +213,7 @@ msgstr ""
 
 #: documents/models.py:280
 msgid "documents"
-msgstr ""
+msgstr "文件"
 
 #: documents/models.py:368
 msgid "debug"
@@ -261,7 +261,7 @@ msgstr ""
 
 #: documents/models.py:400
 msgid "saved views"
-msgstr ""
+msgstr "保存視圖"
 
 #: documents/models.py:405
 msgid "show on dashboard"
