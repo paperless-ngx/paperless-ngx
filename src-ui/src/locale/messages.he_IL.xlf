@@ -976,7 +976,7 @@
           <context context-type="sourcefile">src/app/components/common/input/permissions/permissions-form/permissions-form.component.html</context>
           <context context-type="linenumber">50</context>
         </context-group>
-        <target state="needs-translation">Users:</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">משתמשים:</target>
       </trans-unit>
       <trans-unit id="239911470633002624" datatype="html">
         <source>Groups:</source>
@@ -1004,7 +1004,7 @@
           <context context-type="sourcefile">src/app/components/common/input/permissions/permissions-form/permissions-form.component.html</context>
           <context context-type="linenumber">58</context>
         </context-group>
-        <target state="needs-translation">Groups:</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">קבוצות:</target>
       </trans-unit>
       <trans-unit id="3748107313403519340" datatype="html">
         <source>Default Edit Permissions</source>
@@ -1622,7 +1622,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="needs-translation"><x id="INTERPOLATION" equiv-text="{{dismissButtonText}}"/></target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm"><x id="INTERPOLATION" equiv-text="{{dismissButtonText}}"/></target>
       </trans-unit>
       <trans-unit id="1102717806459547726" datatype="html">
         <source>Refresh</source>
@@ -3583,7 +3583,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.ts</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="needs-translation">See &lt;a target="_blank" href="https://docs.paperless-ngx.com/advanced_usage/#file-name-handling"&gt;documentation&lt;/a&gt; for full list.</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">ראה &lt;a target="_blank" href="https://docs.paperless-ngx.com/advanced_usage/#file-name-handling"&gt; את התיעוד&lt;/a&gt; לרשימה מלאה.</target>
       </trans-unit>
       <trans-unit id="6898961890896270754" datatype="html">
         <source>Create new storage path</source>
@@ -5314,7 +5314,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">57,58</context>
         </context-group>
-        <target state="needs-translation">Added: <x id="INTERPOLATION" equiv-text="{{ document.added | customDate }}"/></target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">התווסף: <x id="INTERPOLATION" equiv-text="{{ document.added | customDate }}"/></target>
       </trans-unit>
       <trans-unit id="4235671847487610290" datatype="html">
         <source>Modified: <x id="INTERPOLATION" equiv-text="{{ document.modified | customDate }}"/></source>
@@ -5638,7 +5638,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">140,142</context>
         </context-group>
-        <target state="needs-translation">Storage path: <x id="PH" equiv-text="this.storagePaths.find(               (sp) =&gt; sp.id == +rule.value             )?.name"/></target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">נתיב אחסון: <x id="PH" equiv-text="this.storagePaths.find(               (sp) =&gt; sp.id == +rule.value             )?.name"/></target>
       </trans-unit>
       <trans-unit id="1562820715074533164" datatype="html">
         <source>Without storage path</source>
@@ -5654,7 +5654,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">148,149</context>
         </context-group>
-        <target state="needs-translation">Tag: <x id="PH" equiv-text="this.tags.find((t) =&gt; t.id == +rule.value)             ?.name"/></target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">תיוג: <x id="PH" equiv-text="this.tags.find((t) =&gt; t.id == +rule.value)             ?.name"/></target>
       </trans-unit>
       <trans-unit id="6494566478302448576" datatype="html">
         <source>Without any tag</source>
@@ -6590,7 +6590,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">40</context>
         </context-group>
-        <target state="needs-translation">Fuzzy word</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">מילה מעורפלת</target>
       </trans-unit>
       <trans-unit id="8419167206585286450" datatype="html">
         <source>Fuzzy: Document contains a word similar to this word</source>
