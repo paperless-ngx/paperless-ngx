@@ -1622,7 +1622,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="needs-translation"><x id="INTERPOLATION" equiv-text="{{dismissButtonText}}"/></target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm"><x id="INTERPOLATION" equiv-text="{{dismissButtonText}}"/></target>
       </trans-unit>
       <trans-unit id="1102717806459547726" datatype="html">
         <source>Refresh</source>
@@ -3351,7 +3351,8 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="needs-translation">Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive.</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Consumir somente documentos que correspondem a este nome de arquivo se especificado.
+Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsculas e minúsculas.</target>
       </trans-unit>
       <trans-unit id="9216117865911519658" datatype="html">
         <source>Action</source>
@@ -3459,7 +3460,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">61</context>
         </context-group>
-        <target state="needs-translation">Mark as read, don't process read mails</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Marcar como lido, não processar e-mails lidos</target>
       </trans-unit>
       <trans-unit id="2378921144019636516" datatype="html">
         <source>Flag the mail, don&apos;t process flagged mails</source>
@@ -3467,7 +3468,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">65</context>
         </context-group>
-        <target state="needs-translation">Flag the mail, don't process flagged mails</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Sinalizar o e-mail, não processar e-mails sinalizados</target>
       </trans-unit>
       <trans-unit id="6457024618858980302" datatype="html">
         <source>Tag the mail with specified tag, don&apos;t process tagged mails</source>
@@ -3475,7 +3476,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">69</context>
         </context-group>
-        <target state="needs-translation">Tag the mail with specified tag, don't process tagged mails</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Marcar o e-mail com a etiqueta especificada, não processar e-mails marcados</target>
       </trans-unit>
       <trans-unit id="4673329664686432878" datatype="html">
         <source>Use subject as title</source>
@@ -4836,7 +4837,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">434</context>
         </context-group>
-        <target state="needs-translation">Error retrieving suggestions.</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Erro ao recuperar sugestões.</target>
       </trans-unit>
       <trans-unit id="8348337312757497317" datatype="html">
         <source>Document saved successfully.</source>
@@ -5056,7 +5057,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">266</context>
         </context-group>
-        <target state="needs-translation">"<x id="PH" equiv-text="items[0].name"/>"</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">"<x id="PH" equiv-text="items[0].name"/>"</target>
       </trans-unit>
       <trans-unit id="8639884465898458690" datatype="html" approved="yes">
         <source>&quot;<x id="PH" equiv-text="items[0].name"/>&quot; and &quot;<x id="PH_1" equiv-text="items[1].name"/>&quot;</source>
@@ -5122,7 +5123,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">315,319</context>
         </context-group>
-        <target state="needs-translation">This operation will add the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> and remove the tags <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> on <x id="PH_2" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Essa operação irá adicionar as etiquetas <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> e remover as etiquetas <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> de <x id="PH_2" equiv-text="this.list.selected.size"/> documento(s) selecionado(s).</target>
       </trans-unit>
       <trans-unit id="2996713129519325161" datatype="html" approved="yes">
         <source>Confirm correspondent assignment</source>
@@ -5606,7 +5607,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">120,122</context>
         </context-group>
-        <target state="needs-translation">Correspondent: <x id="PH" equiv-text="this.correspondents.find(               (c) =&gt; c.id == +rule.value             )?.name"/></target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Correspondente: <x id="PH" equiv-text="this.correspondents.find(               (c) =&gt; c.id == +rule.value             )?.name"/></target>
       </trans-unit>
       <trans-unit id="8170755470576301659" datatype="html" approved="yes">
         <source>Without correspondent</source>
@@ -5654,7 +5655,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">148,149</context>
         </context-group>
-        <target state="needs-translation">Tag: <x id="PH" equiv-text="this.tags.find((t) =&gt; t.id == +rule.value)             ?.name"/></target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Etiqueta: <x id="PH" equiv-text="this.tags.find((t) =&gt; t.id == +rule.value)             ?.name"/></target>
       </trans-unit>
       <trans-unit id="6494566478302448576" datatype="html" approved="yes">
         <source>Without any tag</source>
@@ -6478,7 +6479,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.ts</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="needs-translation">tag</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">etiqueta</target>
       </trans-unit>
       <trans-unit id="4975748273657042999" datatype="html">
         <source>tags</source>
@@ -6486,7 +6487,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.ts</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="needs-translation">tags</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">etiquetas</target>
       </trans-unit>
       <trans-unit id="93754014749412887" datatype="html" approved="yes">
         <source>Do you really want to delete the tag &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
