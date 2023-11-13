@@ -976,7 +976,7 @@
           <context context-type="sourcefile">src/app/components/common/input/permissions/permissions-form/permissions-form.component.html</context>
           <context context-type="linenumber">50</context>
         </context-group>
-        <target state="needs-translation">Users:</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Korisnici:</target>
       </trans-unit>
       <trans-unit id="239911470633002624" datatype="html">
         <source>Groups:</source>
@@ -1622,7 +1622,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="needs-translation"><x id="INTERPOLATION" equiv-text="{{dismissButtonText}}"/></target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm"><x id="INTERPOLATION" equiv-text="{{dismissButtonText}}"/></target>
       </trans-unit>
       <trans-unit id="1102717806459547726" datatype="html">
         <source>Refresh</source>
@@ -1786,7 +1786,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">131</context>
         </context-group>
-        <target state="needs-translation">started</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">započeto</target>
       </trans-unit>
       <trans-unit id="7510279840486540181" datatype="html">
         <source>completed</source>
@@ -1870,7 +1870,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.html</context>
           <context context-type="linenumber">27</context>
         </context-group>
-        <target state="needs-translation">Groups</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Grupe</target>
       </trans-unit>
       <trans-unit id="7585826646011739428" datatype="html">
         <source>Edit</source>
@@ -3179,7 +3179,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.ts</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="needs-translation">No encryption</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Nema enkripcije</target>
       </trans-unit>
       <trans-unit id="3719080555538542367" datatype="html">
         <source>SSL</source>
@@ -3467,7 +3467,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">65</context>
         </context-group>
-        <target state="needs-translation">Flag the mail, don't process flagged mails</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Označi poštu zastavicom. Ne obrađuj e-poštu sa zastavicom</target>
       </trans-unit>
       <trans-unit id="6457024618858980302" datatype="html">
         <source>Tag the mail with specified tag, don&apos;t process tagged mails</source>
@@ -3475,7 +3475,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">69</context>
         </context-group>
-        <target state="needs-translation">Tag the mail with specified tag, don't process tagged mails</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Označite poštu specifičnom oznakom. Ne obrađuj e-poštu s specifičnom oznakom</target>
       </trans-unit>
       <trans-unit id="4673329664686432878" datatype="html">
         <source>Use subject as title</source>
@@ -3483,7 +3483,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">76</context>
         </context-group>
-        <target state="needs-translation">Use subject as title</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Koristi predmet kao naziv</target>
       </trans-unit>
       <trans-unit id="8645471396972938185" datatype="html">
         <source>Use attachment filename as title</source>
@@ -3491,7 +3491,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">80</context>
         </context-group>
-        <target state="needs-translation">Use attachment filename as title</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Koristi naziv datoteke priloga kao naziv</target>
       </trans-unit>
       <trans-unit id="2881879110886196973" datatype="html">
         <source>Do not assign title from this rule</source>
@@ -3507,7 +3507,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">91</context>
         </context-group>
-        <target state="needs-translation">Do not assign a correspondent</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Nemojte dodijeliti dopisnika</target>
       </trans-unit>
       <trans-unit id="3567746385454588269" datatype="html">
         <source>Use mail address</source>
@@ -3515,7 +3515,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">95</context>
         </context-group>
-        <target state="needs-translation">Use mail address</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Koristi adresu e-pošte</target>
       </trans-unit>
       <trans-unit id="445154175758965852" datatype="html">
         <source>Use name (or mail address if not available)</source>
@@ -3523,7 +3523,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">99</context>
         </context-group>
-        <target state="needs-translation">Use name (or mail address if not available)</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Koristi ime (ili adresu e-pošte ukoliko ime nije dostupno)</target>
       </trans-unit>
       <trans-unit id="1258862217749148424" datatype="html">
         <source>Use correspondent selected below</source>
@@ -3531,7 +3531,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">103</context>
         </context-group>
-        <target state="needs-translation">Use correspondent selected below</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Koristi dopisnika odabranog u nastavku</target>
       </trans-unit>
       <trans-unit id="3147349817770432927" datatype="html">
         <source>Create new mail rule</source>
@@ -3583,7 +3583,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.ts</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="needs-translation">See &lt;a target="_blank" href="https://docs.paperless-ngx.com/advanced_usage/#file-name-handling"&gt;documentation&lt;/a&gt; for full list.</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Vidi &lt;a target="_blank" href="https://docs.paperless-ngx.com/advanced_usage/#file-name-handling"&gt;documentation&lt;/a&gt; za cijeli popis.</target>
       </trans-unit>
       <trans-unit id="6898961890896270754" datatype="html">
         <source>Create new storage path</source>
@@ -3747,7 +3747,7 @@
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="needs-translation">Include</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Uključi</target>
       </trans-unit>
       <trans-unit id="5668077948386857930" datatype="html">
         <source>Exclude</source>
@@ -4696,7 +4696,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/metadata-collapse/metadata-collapse.component.ts</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="needs-translation">Metadata</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Metapodaci</target>
       </trans-unit>
       <trans-unit id="1826652001816486190" datatype="html">
         <source>Date modified</source>
@@ -4948,7 +4948,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">10</context>
         </context-group>
-        <target state="needs-translation">Select:</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Odaberi:</target>
       </trans-unit>
       <trans-unit id="6299008920007331381" datatype="html">
         <source>Edit:</source>
@@ -4956,7 +4956,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">Edit:</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Uredi:</target>
       </trans-unit>
       <trans-unit id="7001227209911602786" datatype="html">
         <source>Filter tags</source>
@@ -5314,7 +5314,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">57,58</context>
         </context-group>
-        <target state="needs-translation">Added: <x id="INTERPOLATION" equiv-text="{{ document.added | customDate }}"/></target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Dodano: <x id="INTERPOLATION" equiv-text="{{ document.added | customDate }}"/></target>
       </trans-unit>
       <trans-unit id="4235671847487610290" datatype="html">
         <source>Modified: <x id="INTERPOLATION" equiv-text="{{ document.modified | customDate }}"/></source>
@@ -5946,7 +5946,7 @@
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.ts</context>
           <context context-type="linenumber">39</context>
         </context-group>
-        <target state="needs-translation">correspondent</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">dopisnik</target>
       </trans-unit>
       <trans-unit id="1612355304340685070" datatype="html">
         <source>correspondents</source>
@@ -5954,7 +5954,7 @@
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.ts</context>
           <context context-type="linenumber">40</context>
         </context-group>
-        <target state="needs-translation">correspondents</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">dopisnici</target>
       </trans-unit>
       <trans-unit id="6360600151505327572" datatype="html">
         <source>Last used</source>
@@ -6034,7 +6034,7 @@
           <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.ts</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="needs-translation">document type</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">vrsta dokumenta</target>
       </trans-unit>
       <trans-unit id="2992451138146293104" datatype="html">
         <source>document types</source>
@@ -6042,7 +6042,7 @@
           <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.ts</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="needs-translation">document types</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">vrste dokumenta</target>
       </trans-unit>
       <trans-unit id="4990731724078522539" datatype="html">
         <source>Do you really want to delete the document type &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
@@ -6378,7 +6378,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="needs-translation">Automatic</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Automatski</target>
       </trans-unit>
       <trans-unit id="6252070156626006029" datatype="html">
         <source>None</source>
@@ -6390,7 +6390,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="needs-translation">None</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Ništa</target>
       </trans-unit>
       <trans-unit id="211408744872436427" datatype="html">
         <source>Successfully created <x id="PH" equiv-text="this.typeName"/>.</source>
@@ -6454,7 +6454,7 @@
           <context context-type="sourcefile">src/app/components/manage/storage-path-list/storage-path-list.component.ts</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="needs-translation">storage path</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">putanja pohrane</target>
       </trans-unit>
       <trans-unit id="22235115124223314" datatype="html">
         <source>storage paths</source>
@@ -6462,7 +6462,7 @@
           <context context-type="sourcefile">src/app/components/manage/storage-path-list/storage-path-list.component.ts</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="needs-translation">storage paths</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">putanje pohrane</target>
       </trans-unit>
       <trans-unit id="1569070683025071137" datatype="html">
         <source>Do you really want to delete the storage path &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
@@ -6478,7 +6478,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.ts</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="needs-translation">tag</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">oznaka</target>
       </trans-unit>
       <trans-unit id="4975748273657042999" datatype="html">
         <source>tags</source>
@@ -6486,7 +6486,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.ts</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="needs-translation">tags</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">oznake</target>
       </trans-unit>
       <trans-unit id="93754014749412887" datatype="html">
         <source>Do you really want to delete the tag &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
@@ -6526,7 +6526,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Any word</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Bilo koja riječ</target>
       </trans-unit>
       <trans-unit id="7517655726614958140" datatype="html">
         <source>Any: Document contains any of these words (space separated)</source>
@@ -6542,7 +6542,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">All words</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Sve riječi</target>
       </trans-unit>
       <trans-unit id="111914402588955480" datatype="html">
         <source>All: Document contains all of these words (space separated)</source>
@@ -6558,7 +6558,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="needs-translation">Exact match</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Točno podudaranje</target>
       </trans-unit>
       <trans-unit id="7109184332944610787" datatype="html">
         <source>Exact: Document contains this string</source>
@@ -6574,7 +6574,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">35</context>
         </context-group>
-        <target state="needs-translation">Regular expression</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Uobičajeni izraz</target>
       </trans-unit>
       <trans-unit id="7548151332424148033" datatype="html">
         <source>Regular expression: Document matches this regular expression</source>
@@ -6590,7 +6590,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">40</context>
         </context-group>
-        <target state="needs-translation">Fuzzy word</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Nejasna riječ</target>
       </trans-unit>
       <trans-unit id="8419167206585286450" datatype="html">
         <source>Fuzzy: Document contains a word similar to this word</source>
@@ -6963,7 +6963,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">155</context>
         </context-group>
-        <target state="needs-translation">English (US)</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Engleski (US)</target>
       </trans-unit>
       <trans-unit id="7318555235181361185" datatype="html">
         <source>Afrikaans</source>
@@ -6979,7 +6979,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">167</context>
         </context-group>
-        <target state="needs-translation">Arabic</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Arapski</target>
       </trans-unit>
       <trans-unit id="3098941349689899577" datatype="html">
         <source>Belarusian</source>
@@ -6987,7 +6987,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">173</context>
         </context-group>
-        <target state="needs-translation">Belarusian</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Bjeloruski</target>
       </trans-unit>
       <trans-unit id="6821856961727142928" datatype="html">
         <source>Bulgarian</source>
@@ -7011,7 +7011,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">191</context>
         </context-group>
-        <target state="needs-translation">Czech</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Češki</target>
       </trans-unit>
       <trans-unit id="2924289692679201020" datatype="html">
         <source>Danish</source>
@@ -7019,7 +7019,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">197</context>
         </context-group>
-        <target state="needs-translation">Danish</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Danski</target>
       </trans-unit>
       <trans-unit id="1858110241312746425" datatype="html">
         <source>German</source>
@@ -7027,7 +7027,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">203</context>
         </context-group>
-        <target state="needs-translation">German</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Njemački</target>
       </trans-unit>
       <trans-unit id="7067741492320440272" datatype="html">
         <source>Greek</source>
@@ -7043,7 +7043,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">215</context>
         </context-group>
-        <target state="needs-translation">English (GB)</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Engleski (GB)</target>
       </trans-unit>
       <trans-unit id="5190825892106392539" datatype="html">
         <source>Spanish</source>
@@ -7051,7 +7051,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">221</context>
         </context-group>
-        <target state="needs-translation">Spanish</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Španjolski</target>
       </trans-unit>
       <trans-unit id="861663369293303028" datatype="html">
         <source>Finnish</source>
@@ -7067,7 +7067,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">233</context>
         </context-group>
-        <target state="needs-translation">French</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Francuski</target>
       </trans-unit>
       <trans-unit id="2935232983274991580" datatype="html">
         <source>Italian</source>
@@ -7075,7 +7075,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">239</context>
         </context-group>
-        <target state="needs-translation">Italian</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Talijanski</target>
       </trans-unit>
       <trans-unit id="1334425850005897370" datatype="html">
         <source>Luxembourgish</source>
@@ -7083,7 +7083,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">245</context>
         </context-group>
-        <target state="needs-translation">Luxembourgish</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Luksemburški</target>
       </trans-unit>
       <trans-unit id="3071065188816255493" datatype="html">
         <source>Dutch</source>
@@ -7091,7 +7091,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">251</context>
         </context-group>
-        <target state="needs-translation">Dutch</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Nizozemski</target>
       </trans-unit>
       <trans-unit id="8069284467804715623" datatype="html">
         <source>Norwegian</source>
@@ -7107,7 +7107,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">263</context>
         </context-group>
-        <target state="needs-translation">Polish</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Poljski</target>
       </trans-unit>
       <trans-unit id="9184513005098760425" datatype="html">
         <source>Portuguese (Brazil)</source>
@@ -7115,7 +7115,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">269</context>
         </context-group>
-        <target state="needs-translation">Portuguese (Brazil)</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Portugalski (Brazil)</target>
       </trans-unit>
       <trans-unit id="153799456510623899" datatype="html">
         <source>Portuguese</source>
@@ -7123,7 +7123,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">275</context>
         </context-group>
-        <target state="needs-translation">Portuguese</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Portugalski</target>
       </trans-unit>
       <trans-unit id="8118856427047826368" datatype="html">
         <source>Romanian</source>
@@ -7131,7 +7131,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">281</context>
         </context-group>
-        <target state="needs-translation">Romanian</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Rumunjski</target>
       </trans-unit>
       <trans-unit id="7137419789978325708" datatype="html">
         <source>Russian</source>
@@ -7139,7 +7139,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">287</context>
         </context-group>
-        <target state="needs-translation">Russian</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Ruski</target>
       </trans-unit>
       <trans-unit id="9102963095355753902" datatype="html">
         <source>Slovak</source>
@@ -7155,7 +7155,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">299</context>
         </context-group>
-        <target state="needs-translation">Slovenian</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Slovenski</target>
       </trans-unit>
       <trans-unit id="8608389829607915090" datatype="html">
         <source>Serbian</source>
@@ -7163,7 +7163,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">305</context>
         </context-group>
-        <target state="needs-translation">Serbian</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Srpski</target>
       </trans-unit>
       <trans-unit id="499386805970351976" datatype="html">
         <source>Swedish</source>
@@ -7171,7 +7171,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">311</context>
         </context-group>
-        <target state="needs-translation">Swedish</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Švedski</target>
       </trans-unit>
       <trans-unit id="5682359291233237791" datatype="html">
         <source>Turkish</source>
@@ -7179,7 +7179,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">317</context>
         </context-group>
-        <target state="needs-translation">Turkish</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Turski</target>
       </trans-unit>
       <trans-unit id="3578644052206125685" datatype="html">
         <source>Ukrainian</source>
@@ -7195,7 +7195,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">329</context>
         </context-group>
-        <target state="needs-translation">Chinese Simplified</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Pojednostavljeni kineski</target>
       </trans-unit>
       <trans-unit id="4912706592792948707" datatype="html">
         <source>ISO 8601</source>
