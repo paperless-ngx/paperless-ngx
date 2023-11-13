@@ -75,6 +75,7 @@ imagehash = "*"
 daphne = "*"
 # Documentation
 mkdocs-material = "*"
+mkdocs-glightbox = "*"
 
 [typing-dev]
 mypy = "*"
