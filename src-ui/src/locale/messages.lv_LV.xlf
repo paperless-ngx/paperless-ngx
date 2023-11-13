@@ -356,7 +356,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">81</context>
         </context-group>
-        <target state="needs-translation">Next</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Nākamā</target>
       </trans-unit>
       <trans-unit id="1241348629231510663" datatype="html">
         <source>End</source>
@@ -2239,7 +2239,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
           <context context-type="linenumber">88</context>
         </context-group>
-        <target state="needs-translation">Documents</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Dokuments</target>
       </trans-unit>
       <trans-unit id="6988090220128974198" datatype="html">
         <source>Open documents</source>
@@ -4568,7 +4568,7 @@
           <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="needs-translation">Close</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Aizvērt</target>
       </trans-unit>
       <trans-unit id="4452427314943113135" datatype="html">
         <source>Previous</source>
@@ -4576,7 +4576,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">76</context>
         </context-group>
-        <target state="needs-translation">Previous</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Iepriekšējā</target>
       </trans-unit>
       <trans-unit id="3823219296477075982" datatype="html">
         <source>Discard</source>
@@ -6390,7 +6390,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="needs-translation">None</target>
+        <target state="needs-review-translation" state-qualifier="leveraged-tm">Neviens</target>
       </trans-unit>
       <trans-unit id="211408744872436427" datatype="html">
         <source>Successfully created <x id="PH" equiv-text="this.typeName"/>.</source>
