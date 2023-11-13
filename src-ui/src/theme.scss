@@ -249,12 +249,11 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
     filter: invert(1) grayscale(100%) brightness(200%);
   }
 
-  .toast, .toast-header {
-    background-color: hsla(var(--pngx-primary), calc(var(--pngx-primary-lightness) - 15%), 0.8);
+  .toast {
+    background-color: hsla(var(--pngx-primary), calc(var(--pngx-primary-lightness) - 15%), 0.9);
   }
 
   .toast,
-  .toast .toast-header,
   .toast .btn,
   .toast .btn-close {
     color: var(--pngx-primary-text-contrast);
