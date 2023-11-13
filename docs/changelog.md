@@ -2079,7 +2079,7 @@ This is a maintenance release.
     The changed to the full text searching require you to reindex your
     documents. _The docker image does this automatically, you don't need to
     do anything._ To do this, execute the `document_index reindex`
-    management command (see [Managing the document search index](/administration#index)).
+    management command (see [Managing the document search index](administration.md#index)).
 
 ### paperless-ng 1.3.2
 
@@ -2118,7 +2118,7 @@ This release contains new database migrations.
 - Changes
   - The REST API is versioned from this point onwards. This will
     allow me to make changes without breaking existing clients. See
-    the documentation about [API versioning](/api#api-versioning) for details.
+    the documentation about [API versioning](api.md#api-versioning) for details.
   - Added a color picker for tag colors.
   - Added the ability to use the filter for searching the document
     content as well.
@@ -2152,7 +2152,7 @@ This release contains new database migrations.
 - Changes to the OCRmyPDF integration
   - Added support for deskewing and automatic rotation of
     incorrectly rotated pages. This is enabled by default, see
-    [OCR settings](/configuration#ocr).
+    [OCR settings](configuration.md#ocr).
   - Better support for encrypted files.
   - Better support for various other PDF files: Paperless will now
     attempt to force OCR with safe options when OCR fails with the
@@ -2179,7 +2179,7 @@ This release contains new database migrations.
 
 - Added a docker-specific configuration option to adjust the number of
   worker processes of the web server. See
-  [Docker options](/configuration#docker).
+  [Docker options](configuration.md#docker).
 - Some more memory usage optimizations.
 - Don't show inbox statistics if no inbox tag is defined.
 
@@ -2188,7 +2188,7 @@ This release contains new database migrations.
 - Always show top left corner of thumbnails, even for extra wide
   documents.
 - Added a management command for executing the sanity checker
-  directly. See [management utilities](/administration#sanity-checker).
+  directly. See [management utilities](administration.md#sanity-checker).
 - The weekly sanity check now reports messages in the log files.
 - Fixed an issue with the metadata tab not reporting anything in case
   of missing files.
@@ -2222,7 +2222,7 @@ This release contains new database migrations.
   management commands, since these also ensure that they're always
   executed as the paperless user and you're less likely to run into
   permission issues. See
-  [management commands](/administration#management-commands).
+  [management commands](administration.md#management-commands).
 
 ### paperless-ng 1.1.0
 
@@ -2264,7 +2264,7 @@ This release contains new database migrations.
   status notifications.
 
   Apache `mod_wsgi` users, see
-  [this note](/faq#how-do-i-get-websocket-support-with-apache-mod_wsgi).
+  [this note](faq.md#how-do-i-get-websocket-support-with-apache-mod_wsgi).
 
 - Paperless now offers suggestions for tags, correspondents and types
   on the document detail page.
@@ -2309,7 +2309,7 @@ bug reports coming in, I think that this is reasonably stable.
   - The document exporter locks the media directory and the database
     during execution to ensure that the resulting export is
     consistent.
-  - See the [updated documentation](/administration#exporter) for more details.
+  - See the [updated documentation](administration.md#exporter) for more details.
 - Other changes and additions
   - Added a language selector to the settings.
   - Added date format options to the settings.
@@ -2398,7 +2398,7 @@ paperless.
 - Thanks to [Jo Vandeginste](https://github.com/jovandeginste),
   Paperless has optional support for Office documents such as .docx,
   .doc, .odt and more.
-  - See the [Tika settings](/configuration#tika) on how to enable this
+  - See the [Tika settings](configuration.md#tika) on how to enable this
     feature. This feature requires two additional services (one for
     parsing Office documents and metadata extraction and another for
     converting Office documents to PDF), and is therefore not enabled
@@ -2485,7 +2485,7 @@ paperless.
 
     However, this change is not retroactive: If you used the delete method
     of the bulk editor, you need to reindex your search index by
-    [running the management command `document_index` with the argument `reindex`](/administration#index).
+    [running the management command `document_index` with the argument `reindex`](administration.md#index).
 
 ### paperless-ng 0.9.9
 
@@ -2642,13 +2642,13 @@ primarily.
     edit page. If available, a dropdown menu will appear next to the
     download button.
   - Many of the configuration options regarding OCR have changed.
-    See [OCR settings](/configuration#ocr) for details.
+    See [OCR settings](configuration.md#ocr) for details.
   - Paperless no longer guesses the language of your documents. It
     always uses the language that you specified with
     `PAPERLESS_OCR_LANGUAGE`. Be sure to set this to the language
     the majority of your documents are in. Multiple languages can be
     specified, but that requires more CPU time.
-  - The management command [`document_archiver`](/administration#archiver)
+  - The management command [`document_archiver`](administration.md#archiver)
     can be used to create archived versions for already existing documents.
 - Tags from consumption folder.
   - Thanks to [jayme-github](https://github.com/jayme-github),
@@ -2662,7 +2662,7 @@ primarily.
   - The endpoint for uploading documents now supports specifying
     custom titles, correspondents, tags and types. This can be used
     by clients to override the default behavior of paperless. See
-    [POSTing documents](/api#file-uploads).
+    [POSTing documents](api.md#file-uploads).
   - The document endpoint of API now serves documents in this form:
     - correspondents, document types and tags are referenced by
       their ID in the fields `correspondent`, `document_type` and
@@ -2696,14 +2696,14 @@ primarily.
   - Paperless now supports searching by tags, types and dates and
     correspondents. In order to have this applied to your existing
     documents, you need to perform a `document_index reindex`
-    management command (see [document search index](/administration#index))
+    management command (see [document search index](administration.md#index))
     that adds the data to the search index. You only need to do this
     once, since the schema of the search index changed. Paperless
     keeps the index updated after that whenever something changes.
   - Paperless now has spelling corrections ("Did you mean") for
     miss-typed queries.
   - The documentation contains
-    [information about the query syntax](/usage#basic-usage_searching).
+    [information about the query syntax](usage.md#basic-usage_searching).
 - Front end:
   - Clickable tags, correspondents and types allow quick filtering
     for related documents.
@@ -2764,7 +2764,7 @@ primarily.
 
 ### paperless-ng 0.9.0
 
-- **Deprecated:** GnuPG. [See this note on the state of GnuPG in paperless-ng.](/administration#encryption)
+- **Deprecated:** GnuPG. [See this note on the state of GnuPG in paperless-ng.](administration.md#encryption)
   This features will most likely be removed in future versions.
 - **Added:** New frontend. Features:
   - Single page application: It's much more responsive than the
@@ -2822,7 +2822,7 @@ primarily.
     uses PostgreSQL instead of SQLite. Username, database and
     password all default to `paperless` if not specified.
 - **Modified \[breaking\]:** document_retagger management command
-  rework. See [Document retagger](/administration#retagger) for
+  rework. See [Document retagger](administration.md#retagger) for
   details. Replaces `document_correspondents` management command.
 - **Removed \[breaking\]:** Reminders.
 - **Removed:** All customizations made to the django admin pages.
