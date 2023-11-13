@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-04 20:12-0700\n"
-"PO-Revision-Date: 2023-11-05 18:03\n"
+"POT-Creation-Date: 2023-11-10 09:02-0800\n"
+"PO-Revision-Date: 2023-11-13 01:30\n"
 "Last-Translator: \n"
 "Language-Team: Norwegian\n"
 "Language: no_NO\n"
@@ -899,66 +899,70 @@ msgid "French"
 msgstr "Fransk"
 
 #: paperless/settings.py:600
+msgid "Hungarian"
+msgstr ""
+
+#: paperless/settings.py:601
 msgid "Italian"
 msgstr "Italiensk"
 
-#: paperless/settings.py:601
+#: paperless/settings.py:602
 msgid "Luxembourgish"
 msgstr "Luxembourgsk"
 
-#: paperless/settings.py:602
+#: paperless/settings.py:603
 msgid "Norwegian"
 msgstr "Norsk"
 
-#: paperless/settings.py:603
+#: paperless/settings.py:604
 msgid "Dutch"
 msgstr "Nederlandsk"
 
-#: paperless/settings.py:604
+#: paperless/settings.py:605
 msgid "Polish"
 msgstr "Polsk"
 
-#: paperless/settings.py:605
+#: paperless/settings.py:606
 msgid "Portuguese (Brazil)"
 msgstr "Portugisisk (Brasil)"
 
-#: paperless/settings.py:606
+#: paperless/settings.py:607
 msgid "Portuguese"
 msgstr "Portugisisk"
 
-#: paperless/settings.py:607
+#: paperless/settings.py:608
 msgid "Romanian"
 msgstr "Rumensk"
 
-#: paperless/settings.py:608
+#: paperless/settings.py:609
 msgid "Russian"
 msgstr "Russisk"
 
-#: paperless/settings.py:609
+#: paperless/settings.py:610
 msgid "Slovak"
 msgstr "Slovakisk"
 
-#: paperless/settings.py:610
+#: paperless/settings.py:611
 msgid "Slovenian"
 msgstr "Slovenian"
 
-#: paperless/settings.py:611
+#: paperless/settings.py:612
 msgid "Serbian"
 msgstr "Serbisk"
 
-#: paperless/settings.py:612
+#: paperless/settings.py:613
 msgid "Swedish"
 msgstr "Svensk"
 
-#: paperless/settings.py:613
+#: paperless/settings.py:614
 msgid "Turkish"
 msgstr "Tyrkisk"
 
-#: paperless/settings.py:614
+#: paperless/settings.py:615
 msgid "Ukrainian"
 msgstr "Ukrainsk"
 
-#: paperless/settings.py:615
+#: paperless/settings.py:616
 msgid "Chinese Simplified"
 msgstr "Kinesisk forenklet"
 
