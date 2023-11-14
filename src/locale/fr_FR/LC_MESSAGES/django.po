@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-10 09:02-0800\n"
-"PO-Revision-Date: 2023-11-13 01:30\n"
+"PO-Revision-Date: 2023-11-14 09:54\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -641,31 +641,31 @@ msgstr ""
 
 #: documents/models.py:886
 msgid "String"
-msgstr ""
+msgstr "Chaîne de caractères"
 
 #: documents/models.py:887
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: documents/models.py:888
 msgid "Date"
-msgstr ""
+msgstr "Date"
 
 #: documents/models.py:889
 msgid "Boolean"
-msgstr ""
+msgstr "Booléen"
 
 #: documents/models.py:890
 msgid "Integer"
-msgstr ""
+msgstr "Nombre entier"
 
 #: documents/models.py:891
 msgid "Float"
-msgstr ""
+msgstr "Nombre décimal"
 
 #: documents/models.py:892
 msgid "Monetary"
-msgstr ""
+msgstr "Monétaire"
 
 #: documents/models.py:904
 msgid "data type"
@@ -673,11 +673,11 @@ msgstr ""
 
 #: documents/models.py:912
 msgid "custom field"
-msgstr ""
+msgstr "champ personnalisé"
 
 #: documents/models.py:913
 msgid "custom fields"
-msgstr ""
+msgstr "champs personnalisés"
 
 #: documents/models.py:973
 msgid "custom field instance"
@@ -860,7 +860,7 @@ msgstr "Biélorusse"
 
 #: paperless/settings.py:590
 msgid "Bulgarian"
-msgstr ""
+msgstr "Bulgare"
 
 #: paperless/settings.py:591
 msgid "Catalan"
@@ -900,7 +900,7 @@ msgstr "Français"
 
 #: paperless/settings.py:600
 msgid "Hungarian"
-msgstr ""
+msgstr "Hongrois"
 
 #: paperless/settings.py:601
 msgid "Italian"
