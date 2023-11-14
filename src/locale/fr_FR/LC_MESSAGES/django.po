@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-10 09:02-0800\n"
-"PO-Revision-Date: 2023-11-14 09:54\n"
+"PO-Revision-Date: 2023-11-14 10:50\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -545,11 +545,11 @@ msgstr "identifiant URL"
 
 #: documents/models.py:739
 msgid "share link"
-msgstr "partager le lien"
+msgstr "lien de partage"
 
 #: documents/models.py:740
 msgid "share links"
-msgstr "partager les liens"
+msgstr "liens de partage"
 
 #: documents/models.py:748
 msgid "Consume Folder"
@@ -669,7 +669,7 @@ msgstr "Monétaire"
 
 #: documents/models.py:904
 msgid "data type"
-msgstr ""
+msgstr "type de données"
 
 #: documents/models.py:912
 msgid "custom field"
@@ -681,11 +681,11 @@ msgstr "champs personnalisés"
 
 #: documents/models.py:973
 msgid "custom field instance"
-msgstr ""
+msgstr "instance de champs personnalisés"
 
 #: documents/models.py:974
 msgid "custom field instances"
-msgstr ""
+msgstr "instances de champs personnalisés"
 
 #: documents/serialisers.py:102
 #, python-format
@@ -1052,7 +1052,7 @@ msgstr "mot de passe"
 
 #: paperless_mail/models.py:42
 msgid "Is token authentication"
-msgstr ""
+msgstr "Est un jeton d'authentification"
 
 #: paperless_mail/models.py:45
 msgid "character set"
@@ -1116,7 +1116,7 @@ msgstr "Utiliser le nom de la pièce jointe en tant que titre"
 
 #: paperless_mail/models.py:85
 msgid "Do not assign title from rule"
-msgstr ""
+msgstr "Ne pas affecter de titre avec cette règle"
 
 #: paperless_mail/models.py:88
 msgid "Do not assign a correspondent"
