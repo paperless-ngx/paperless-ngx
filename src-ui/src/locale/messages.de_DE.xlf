@@ -288,7 +288,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">92</context>
         </context-group>
-        <target state="needs-translation">Document <x id="PH" equiv-text="status.filename"/> was added to Paperless-ngx.</target>
+        <target state="translated">Dokument <x id="PH" equiv-text="status.filename"/> wurde zu Paperless-ngx hinzugefügt.</target>
       </trans-unit>
       <trans-unit id="1931214133925051574" datatype="html" approved="yes">
         <source>Open document</source>
@@ -316,7 +316,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">122</context>
         </context-group>
-        <target state="needs-translation">Document <x id="PH" equiv-text="status.filename"/> is being processed by Paperless-ngx.</target>
+        <target state="translated">Dokument <x id="PH" equiv-text="status.filename"/> wird von Paperless-ngx verarbeitet.</target>
       </trans-unit>
       <trans-unit id="2501522447884928778" datatype="html" approved="yes">
         <source>Prev</source>
