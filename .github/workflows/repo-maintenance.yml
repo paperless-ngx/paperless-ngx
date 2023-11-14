@@ -50,9 +50,13 @@ jobs:
     name: 'Close Answered Discussions'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/github-script@v6
+      - uses: actions/github-script@v7
         with:
           script: |
+            function sleep(ms) {
+              return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
             const query = `query($owner:String!, $name:String!) {
               repository(owner:$owner, name:$name){
                 discussions(first:100, answered:true, states:[OPEN]) {
@@ -96,4 +100,5 @@ jobs:
               }
               await github.graphql(closeDiscussionMutation, closeVariables)
 
+              await sleep(1000)
             }
