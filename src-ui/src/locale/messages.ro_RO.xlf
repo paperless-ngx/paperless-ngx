@@ -2335,6 +2335,10 @@
           <context context-type="sourcefile">src/app/components/common/custom-fields-dropdown/custom-fields-dropdown.component.html</context>
           <context context-type="linenumber">6</context>
         </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/custom-fields/custom-fields.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
         <target state="needs-translation">Custom Fields</target>
       </trans-unit>
       <trans-unit id="4462691404891390153" datatype="html">
@@ -5843,6 +5847,14 @@
           <context context-type="linenumber">87</context>
         </context-group>
         <target state="needs-translation">Initiating upload...</target>
+      </trans-unit>
+      <trans-unit id="3789574458951567089" datatype="html">
+        <source>Consumption Templates</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/consumption-templates/consumption-templates.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+        <target state="needs-translation">Consumption Templates</target>
       </trans-unit>
       <trans-unit id="7308826808299076537" datatype="html">
         <source>Add Template</source>
