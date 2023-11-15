@@ -5,7 +5,8 @@
 Multiple options exist for making backups of your paperless instance,
 depending on how you installed paperless.
 
-Before making backups, make sure that paperless is not running.
+Before making a backup, it's probably best to make sure that paperless is not actively
+consuming documents at that time.
 
 Options available to any installation of paperless:
 
