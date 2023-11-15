@@ -33,10 +33,11 @@ jobs:
     name: 'Lock Old Threads'
     runs-on: ubuntu-latest
     steps:
-      - uses: dessant/lock-threads@v4
+      - uses: dessant/lock-threads@v5
         with:
           issue-inactive-days: '30'
           pr-inactive-days: '30'
+          discussion-inactive-days: '30'
           log-output: true
           issue-comment: >
             This issue has been automatically locked since there
@@ -46,6 +47,10 @@ jobs:
             This pull request has been automatically locked since there
             has not been any recent activity after it was closed.
             Please open a new discussion or issue for related concerns.
+          discussion-comment: >
+            This discussion has been automatically locked since there
+            has not been any recent activity after it was closed.
+            Please open a new discussion for related concerns.
   close-answered-discussions:
     name: 'Close Answered Discussions'
     runs-on: ubuntu-latest
