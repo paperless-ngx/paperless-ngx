@@ -13,7 +13,8 @@ Options available to any installation of paperless:
     thumbnails, metadata, and database contents to a specific folder. You may import your
     documents and settings into a fresh instance of paperless again or store your
     documents in another DMS with this export.
--   The document exporter is also able to update an already existing
+
+    The document exporter is also able to update an already existing
     export. Therefore, incremental backups with `rsync` are entirely
     possible.
 
