@@ -43,7 +43,7 @@
             </div>
           </div>
           <div class="input-group input-group-sm w-100 mt-2">
-            <label class="input-group-text" for="addLink">Expires:</label>
+            <label class="input-group-text" for="addLink"><ng-container i18n>Expires</ng-container>:</label>
             <select class="form-select form-select-sm" [(ngModel)]="expirationDays">
               <option *ngFor="let option of EXPIRATION_OPTIONS" [ngValue]="option.value">{{ option.label }}</option>
             </select>
