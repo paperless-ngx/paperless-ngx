@@ -7,8 +7,6 @@ depending on how you installed paperless.
 
 Before making backups, make sure that paperless is not running.
 
-### Any Installation {#backup-any}
-
 Options available to any installation of paperless:
 
 - Use the [document exporter](#exporter). The document exporter exports all your documents,
@@ -24,8 +22,6 @@ Options available to any installation of paperless:
     You cannot import the export generated with one version of paperless in
     a different version of paperless. The export contains an exact image of
     the database, and migrations may change the database layout.
-
-### Docker Installation {#backup-docker}
 
 Options available to docker installations:
 
@@ -43,8 +39,6 @@ Options available to docker installations:
   - `paperless_dbdata`: Exists only if you use MariaDB and contains
     the database.
 
-### Bare-Metal Installation {#backup-baremetal}
-
 Options available to bare-metal and non-docker installations:
 
 - Backup the entire paperless folder. This ensures that if your
@@ -53,6 +47,8 @@ Options available to bare-metal and non-docker installations:
 
   When using PostgreSQL or MariaDB, you'll also have to backup the
   database.
+
+### Restoring {#migrating-restoring}
 
 ## Updating Paperless {#updating}
 
