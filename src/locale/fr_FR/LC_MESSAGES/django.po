@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-10 09:02-0800\n"
-"PO-Revision-Date: 2023-11-14 10:50\n"
+"PO-Revision-Date: 2023-11-16 13:09\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -385,11 +385,11 @@ msgstr "Le chemin de stockage est"
 
 #: documents/models.py:448
 msgid "has correspondent in"
-msgstr ""
+msgstr "a un correspondant dans"
 
 #: documents/models.py:449
 msgid "does not have correspondent in"
-msgstr ""
+msgstr "n'a pas de correspondant dans"
 
 #: documents/models.py:450
 msgid "has document type in"
