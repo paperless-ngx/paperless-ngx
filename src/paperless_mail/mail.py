@@ -617,7 +617,7 @@ class MailAccountHandler(LoggingMixin):
             f"{len(message.attachments)} attachment(s)",
         )
 
-        tag_ids = [tag.id for tag in rule.assign_tags.all()]
+        tag_ids: list[int] = [tag.id for tag in rule.assign_tags.all()]
         doc_type = rule.assign_document_type
 
         if (
