@@ -5,17 +5,19 @@
 Multiple options exist for making backups of your paperless instance,
 depending on how you installed paperless.
 
-Before making backups, make sure that paperless is not running.
+Before making a backup, it's probably best to make sure that paperless is not actively
+consuming documents at that time.
 
 Options available to any installation of paperless:
 
-- Use the [document exporter](#exporter). The document exporter exports all your documents,
-  thumbnails, metadata, and database contents to a specific folder. You may import your
-  documents and settings into a fresh instance of paperless again or store your
-  documents in another DMS with this export.
-- The document exporter is also able to update an already existing
-  export. Therefore, incremental backups with `rsync` are entirely
-  possible.
+-   Use the [document exporter](#exporter). The document exporter exports all your documents,
+    thumbnails, metadata, and database contents to a specific folder. You may import your
+    documents and settings into a fresh instance of paperless again or store your
+    documents in another DMS with this export.
+
+    The document exporter is also able to update an already existing
+    export. Therefore, incremental backups with `rsync` are entirely
+    possible.
 
 !!! caution
 
@@ -25,30 +27,36 @@ Options available to any installation of paperless:
 
 Options available to docker installations:
 
-- Backup the docker volumes. These usually reside within
-  `/var/lib/docker/volumes` on the host and you need to be root in
-  order to access them.
+-   Backup the docker volumes. These usually reside within
+    `/var/lib/docker/volumes` on the host and you need to be root in
+    order to access them.
 
-  Paperless uses 4 volumes:
+    Paperless uses 4 volumes:
 
-  - `paperless_media`: This is where your documents are stored.
-  - `paperless_data`: This is where auxillary data is stored. This
-    folder also contains the SQLite database, if you use it.
-  - `paperless_pgdata`: Exists only if you use PostgreSQL and
-    contains the database.
-  - `paperless_dbdata`: Exists only if you use MariaDB and contains
-    the database.
+    -   `paperless_media`: This is where your documents are stored.
+    -   `paperless_data`: This is where auxillary data is stored. This
+        folder also contains the SQLite database, if you use it.
+    -   `paperless_pgdata`: Exists only if you use PostgreSQL and
+        contains the database.
+    -   `paperless_dbdata`: Exists only if you use MariaDB and contains
+        the database.
 
 Options available to bare-metal and non-docker installations:
 
-- Backup the entire paperless folder. This ensures that if your
-  paperless instance crashes at some point or your disk fails, you can
-  simply copy the folder back into place and it works.
+-   Backup the entire paperless folder. This ensures that if your
+    paperless instance crashes at some point or your disk fails, you can
+    simply copy the folder back into place and it works.
 
-  When using PostgreSQL or MariaDB, you'll also have to backup the
-  database.
+    When using PostgreSQL or MariaDB, you'll also have to backup the
+    database.
 
 ### Restoring {#migrating-restoring}
+
+If you've backed-up Paperless-ngx using the [document exporter](#exporter),
+restoring can simply be done with the [document importer](#importer).
+
+Of course, other backup strategies require restoring any volumes, folders and database
+copies you created in the steps above.
 
 ## Updating Paperless {#updating}
 
@@ -470,19 +478,19 @@ collection for issues.
 
 The issues detected by the sanity checker are as follows:
 
-- Missing original files.
-- Missing archive files.
-- Inaccessible original files due to improper permissions.
-- Inaccessible archive files due to improper permissions.
-- Corrupted original documents by comparing their checksum against
-  what is stored in the database.
-- Corrupted archive documents by comparing their checksum against what
-  is stored in the database.
-- Missing thumbnails.
-- Inaccessible thumbnails due to improper permissions.
-- Documents without any content (warning).
-- Orphaned files in the media directory (warning). These are files
-  that are not referenced by any document in paperless.
+-   Missing original files.
+-   Missing archive files.
+-   Inaccessible original files due to improper permissions.
+-   Inaccessible archive files due to improper permissions.
+-   Corrupted original documents by comparing their checksum against
+    what is stored in the database.
+-   Corrupted archive documents by comparing their checksum against what
+    is stored in the database.
+-   Missing thumbnails.
+-   Inaccessible thumbnails due to improper permissions.
+-   Documents without any content (warning).
+-   Orphaned files in the media directory (warning). These are files
+    that are not referenced by any document in paperless.
 
 ```
 document_sanity_checker
