@@ -278,7 +278,7 @@
           <context context-type="linenumber">13</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="3527354815023530656" datatype="html">
+      <trans-unit id="3527354815023530656" datatype="html" approved="yes">
         <source>Document <x id="PH" equiv-text="status.filename"/> was added to Paperless-ngx.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
@@ -288,7 +288,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">92</context>
         </context-group>
-        <target state="translated">Dokument <x id="PH" equiv-text="status.filename"/> wurde zu Paperless-ngx hinzugefügt.</target>
+        <target state="final">Dokument <x id="PH" equiv-text="status.filename"/> wurde zu Paperless-ngx hinzugefügt.</target>
       </trans-unit>
       <trans-unit id="1931214133925051574" datatype="html" approved="yes">
         <source>Open document</source>
@@ -310,13 +310,13 @@
         </context-group>
         <target state="final">Konnte <x id="PH" equiv-text="status.filename"/> nicht hinzufügen: <x id="PH_1" equiv-text="status.message"/></target>
       </trans-unit>
-      <trans-unit id="1218124467712564468" datatype="html">
+      <trans-unit id="1218124467712564468" datatype="html" approved="yes">
         <source>Document <x id="PH" equiv-text="status.filename"/> is being processed by Paperless-ngx.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">122</context>
         </context-group>
-        <target state="translated">Dokument <x id="PH" equiv-text="status.filename"/> wird von Paperless-ngx verarbeitet.</target>
+        <target state="final">Dokument <x id="PH" equiv-text="status.filename"/> wird von Paperless-ngx verarbeitet.</target>
       </trans-unit>
       <trans-unit id="2501522447884928778" datatype="html" approved="yes">
         <source>Prev</source>
@@ -4073,7 +4073,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.html</context>
           <context context-type="linenumber">46</context>
         </context-group>
-        <target state="needs-translation">Expires</target>
+        <target state="translated">Läuft ab</target>
       </trans-unit>
       <trans-unit id="5674286808255988565" datatype="html" approved="yes">
         <source>Create</source>
@@ -5848,13 +5848,13 @@
         </context-group>
         <target state="final">Beginne Upload...</target>
       </trans-unit>
-      <trans-unit id="3789574458951567089" datatype="html">
+      <trans-unit id="3789574458951567089" datatype="html" approved="yes">
         <source>Consumption Templates</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/consumption-templates/consumption-templates.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="needs-translation">Consumption Templates</target>
+        <target state="final">Verarbeitungsvorlagen</target>
       </trans-unit>
       <trans-unit id="7308826808299076537" datatype="html" approved="yes">
         <source>Add Template</source>
@@ -6000,13 +6000,13 @@
         </context-group>
         <target state="final">Diese Aktion wird dieses Feld dauerhaft löschen.</target>
       </trans-unit>
-      <trans-unit id="5137089475515834162" datatype="html">
+      <trans-unit id="5137089475515834162" datatype="html" approved="yes">
         <source>Deleted field</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-fields/custom-fields.component.ts</context>
           <context context-type="linenumber">84</context>
         </context-group>
-        <target state="translated">Feld entfernt</target>
+        <target state="final">Feld entfernt</target>
       </trans-unit>
       <trans-unit id="6352403551920829405" datatype="html" approved="yes">
         <source>Error deleting field.</source>
@@ -6596,13 +6596,13 @@
         </context-group>
         <target state="final">Keine: Deaktiviere automatische Zuweisung</target>
       </trans-unit>
-      <trans-unit id="969459137986754249" datatype="html">
+      <trans-unit id="969459137986754249" datatype="html" approved="yes">
         <source>Boolean</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-custom-field.ts</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="translated">Wahrheitswert</target>
+        <target state="final">Wahrheitswert</target>
       </trans-unit>
       <trans-unit id="3973931101896534797" datatype="html" approved="yes">
         <source>Date</source>
@@ -6612,13 +6612,13 @@
         </context-group>
         <target state="final">Datum</target>
       </trans-unit>
-      <trans-unit id="362956598863566327" datatype="html">
+      <trans-unit id="362956598863566327" datatype="html" approved="yes">
         <source>Integer</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-custom-field.ts</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="translated">Ganzzahl</target>
+        <target state="final">Ganzzahl</target>
       </trans-unit>
       <trans-unit id="6370642728789544052" datatype="html" approved="yes">
         <source>Number</source>
@@ -6628,13 +6628,13 @@
         </context-group>
         <target state="final">Zahl</target>
       </trans-unit>
-      <trans-unit id="6430409302408843009" datatype="html">
+      <trans-unit id="6430409302408843009" datatype="html" approved="yes">
         <source>Monetary</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-custom-field.ts</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="translated">Währung</target>
+        <target state="final">Währung</target>
       </trans-unit>
       <trans-unit id="6162693758764653365" datatype="html" approved="yes">
         <source>Text</source>
