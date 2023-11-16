@@ -2367,7 +2367,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">193</context>
         </context-group>
-        <target state="translated">Messagerie</target>
+        <target state="translated">Courriel</target>
       </trans-unit>
       <trans-unit id="7844706011418789951" datatype="html">
         <source>Administration</source>
