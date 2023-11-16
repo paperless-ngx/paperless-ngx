@@ -583,7 +583,7 @@ class DocumentViewSet(
 
             from documents import index
 
-            index.add_or_update_document(self.get_object())
+            index.add_or_update_document(doc)
 
             return Response(self.getNotes(doc))
 
