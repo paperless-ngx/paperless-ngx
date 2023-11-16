@@ -7,7 +7,7 @@
     "trailingComma": "es5",
     "overrides": [
         {
-            "files": "index.md",
+            "files": ["index.md", "administration.md"],
             "options": {
                 "tabWidth": 4
             }
