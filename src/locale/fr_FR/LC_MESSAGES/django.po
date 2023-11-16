@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-10 09:02-0800\n"
-"PO-Revision-Date: 2023-11-16 13:09\n"
+"PO-Revision-Date: 2023-11-16 23:23\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -393,11 +393,11 @@ msgstr "n'a pas de correspondant dans"
 
 #: documents/models.py:450
 msgid "has document type in"
-msgstr ""
+msgstr "a le type de document dans"
 
 #: documents/models.py:451
 msgid "does not have document type in"
-msgstr ""
+msgstr "n'a pas de type de document dans"
 
 #: documents/models.py:452
 msgid "has storage path in"
@@ -413,11 +413,11 @@ msgstr "le propriétaire est"
 
 #: documents/models.py:455
 msgid "has owner in"
-msgstr ""
+msgstr "a le propriétaire dans"
 
 #: documents/models.py:456
 msgid "does not have owner"
-msgstr ""
+msgstr "n'a pas de propriétaire"
 
 #: documents/models.py:457
 msgid "does not have owner in"
@@ -557,11 +557,11 @@ msgstr ""
 
 #: documents/models.py:749
 msgid "Api Upload"
-msgstr ""
+msgstr "Téléverser l'Api"
 
 #: documents/models.py:750
 msgid "Mail Fetch"
-msgstr ""
+msgstr "Récupération du courriel"
 
 #: documents/models.py:754 paperless_mail/models.py:95
 msgid "order"
@@ -577,7 +577,7 @@ msgstr ""
 
 #: documents/models.py:775
 msgid "filter filename"
-msgstr ""
+msgstr "filtrer le nom de fichier"
 
 #: documents/models.py:780 paperless_mail/models.py:148
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
@@ -589,11 +589,11 @@ msgstr ""
 
 #: documents/models.py:795
 msgid "assign title"
-msgstr ""
+msgstr "attribuer un titre"
 
 #: documents/models.py:800
 msgid "Assign a document title, can include some placeholders, see documentation."
-msgstr ""
+msgstr "Assigner un titre de document, peut inclure certains marqueurs, voir la documentation."
 
 #: documents/models.py:808 paperless_mail/models.py:204
 msgid "assign this tag"
@@ -609,27 +609,27 @@ msgstr "affecter ce correspondant"
 
 #: documents/models.py:832
 msgid "assign this storage path"
-msgstr ""
+msgstr "assigner ce chemin de stockage"
 
 #: documents/models.py:841
 msgid "assign this owner"
-msgstr ""
+msgstr "assigner ce propriétaire"
 
 #: documents/models.py:848
 msgid "grant view permissions to these users"
-msgstr ""
+msgstr "accorder des permissions de vue à ces utilisateurs"
 
 #: documents/models.py:855
 msgid "grant view permissions to these groups"
-msgstr ""
+msgstr "accorder des droits de vue à ces groupes"
 
 #: documents/models.py:862
 msgid "grant change permissions to these users"
-msgstr ""
+msgstr "accorder des droits de modification à ces utilisateurs"
 
 #: documents/models.py:869
 msgid "grant change permissions to these groups"
-msgstr ""
+msgstr "accorder des droits de modification à ces groupes"
 
 #: documents/models.py:873
 msgid "consumption template"
