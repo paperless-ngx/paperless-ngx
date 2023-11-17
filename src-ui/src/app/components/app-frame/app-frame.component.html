@@ -87,12 +87,12 @@
           </li>
         </ul>
         <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }">
-          <h6 class="sidebar-heading px-3 mt-3 mb-1 text-muted" *ngIf='savedViewService.loading || sidebarViews?.length > 0'>
+          <h6 class="sidebar-heading px-3 mt-3 mb-1 text-muted" *ngIf='savedViewService.loading || savedViewService.sidebarViews?.length > 0'>
             <span i18n>Saved views</span>
             <div *ngIf="savedViewService.loading" class="spinner-border spinner-border-sm fw-normal ms-2" role="status"></div>
           </h6>
           <ul class="nav flex-column mb-2" cdkDropList (cdkDropListDropped)="onDrop($event)">
-            <li class="nav-item w-100" *ngFor="let view of sidebarViews"
+            <li class="nav-item w-100" *ngFor="let view of savedViewService.sidebarViews"
               cdkDrag
               [cdkDragDisabled]="!settingsService.organizingSidebarSavedViews"
               cdkDragPreviewContainer="parent"
