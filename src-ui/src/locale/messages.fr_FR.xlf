@@ -2781,13 +2781,13 @@
         </context-group>
         <target state="translated">Attribuer un chemin de stockage</target>
       </trans-unit>
-      <trans-unit id="5057200219587080996" datatype="html">
+      <trans-unit id="5057200219587080996" datatype="html" approved="yes">
         <source>Assign owner</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">40</context>
         </context-group>
-        <target state="translated">Affecter un propriétaire</target>
+        <target state="final">Affecter un propriétaire</target>
       </trans-unit>
       <trans-unit id="1749184201773078639" datatype="html">
         <source>Assign view permissions</source>
