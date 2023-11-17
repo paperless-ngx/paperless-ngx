@@ -1576,7 +1576,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
           <context context-type="linenumber">5</context>
         </context-group>
-        <target state="final">Effacer la sélection</target>
+        <target state="final">Désélectionner</target>
       </trans-unit>
       <trans-unit id="187187500641108332" datatype="html">
         <source>
