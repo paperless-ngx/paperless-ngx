@@ -221,6 +221,8 @@ directory.
     inside docker, ensure that this path is within a permanent volume
     (such as "../media/trash") so it won't get lost on upgrades.
 
+    Note that the directory must exist prior to using this setting.
+
     Defaults to empty (i.e. really delete documents).
 
 #### [`PAPERLESS_MEDIA_ROOT=<path>`](#PAPERLESS_MEDIA_ROOT) {#PAPERLESS_MEDIA_ROOT}
