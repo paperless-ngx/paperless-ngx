@@ -58,8 +58,6 @@ export class AppFrameComponent
 
   searchField = new FormControl('')
 
-  sidebarViews: PaperlessSavedView[]
-
   constructor(
     public router: Router,
     private activatedRoute: ActivatedRoute,
@@ -90,10 +88,6 @@ export class AppFrameComponent
       this.checkForUpdates()
     }
     this.tasksService.reload()
-
-    this.savedViewService.listAll().subscribe(() => {
-      this.sidebarViews = this.savedViewService.sidebarViews
-    })
   }
 
   toggleSlimSidebar(): void {
@@ -240,9 +234,10 @@ export class AppFrameComponent
   }
 
   onDrop(event: CdkDragDrop<PaperlessSavedView[]>) {
-    moveItemInArray(this.sidebarViews, event.previousIndex, event.currentIndex)
+    const sidebarViews = this.savedViewService.sidebarViews.concat([])
+    moveItemInArray(sidebarViews, event.previousIndex, event.currentIndex)
 
-    this.settingsService.updateSidebarViewsSort(this.sidebarViews).subscribe({
+    this.settingsService.updateSidebarViewsSort(sidebarViews).subscribe({
       next: () => {
         this.toastService.showInfo($localize`Sidebar views updated`)
       },
