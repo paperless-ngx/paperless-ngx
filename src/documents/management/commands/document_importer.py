@@ -118,10 +118,10 @@ class Command(BaseCommand):
             # Fill up the database with whatever is in the manifest
             try:
                 with transaction.atomic():
+                    # delete these since pk can change, re-created from import
+                    ContentType.objects.all().delete()
+                    Permission.objects.all().delete()
                     for manifest_path in manifest_paths:
-                        # delete these since pk can change, re-created from import
-                        ContentType.objects.all().delete()
-                        Permission.objects.all().delete()
                         call_command("loaddata", manifest_path)
             except (FieldDoesNotExist, DeserializationError, IntegrityError) as e:
                 self.stdout.write(self.style.ERROR("Database import failed"))
