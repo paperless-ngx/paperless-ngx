@@ -289,7 +289,7 @@ class Command(BaseCommand):
             logger.debug(f"Configuring timeout to {timeout}ms")
 
         inotify = INotify()
-        inotify_flags = flags.CLOSE_WRITE | flags.MOVED_TO
+        inotify_flags = flags.CLOSE_WRITE | flags.MOVED_TO | flags.MODIFY
         if recursive:
             descriptor = inotify.add_watch_recursive(directory, inotify_flags)
         else:
@@ -306,7 +306,10 @@ class Command(BaseCommand):
                 for event in inotify.read(timeout=timeout):
                     path = inotify.get_path(event.wd) if recursive else directory
                     filepath = os.path.join(path, event.name)
-                    notified_files[filepath] = monotonic()
+                    if flags.MODIFY in flags.from_mask(event.mask):
+                        notified_files.pop(filepath, None)
+                    else:
+                        notified_files[filepath] = monotonic()
 
                 # Check the files against the timeout
                 still_waiting = {}
