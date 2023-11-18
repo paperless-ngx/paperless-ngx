@@ -18,7 +18,9 @@ physical documents into a searchable online archive so you can keep, well, _less
 ## Features
 
 -   **Organize and index** your scanned documents with tags, correspondents, types, and more.
--   Performs **OCR** on your documents, adding selectable text to image-only documents.
+-   Performs **OCR** on your documents, adding searchable and selectable text, even to documents scanned with only images.
+-   Utilizes the open-source Tesseract engine to recognize more than 100 languages.
+-   Documents are saved as PDF/A format which is designed for long term storage, alongside the unaltered originals.
 -   Uses machine-learning to automatically add tags, correspondents and document types to your documents.
 -   Supports PDF documents, images, plain text files, Office documents (Word, Excel, Powerpoint, and LibreOffice equivalents)[^1] and more.
 -   Paperless stores your documents plain on disk. Filenames and folders are managed by paperless and their format can be configured freely with different configurations assigned to different documents.
