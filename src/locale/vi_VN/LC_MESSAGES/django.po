@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-10 09:02-0800\n"
-"PO-Revision-Date: 2023-11-19 15:53\n"
+"PO-Revision-Date: 2023-11-19 17:25\n"
 "Last-Translator: \n"
 "Language-Team: Vietnamese\n"
 "Language: vi_VN\n"
@@ -27,64 +27,64 @@ msgstr "chủ sở hữu"
 
 #: documents/models.py:53
 msgid "None"
-msgstr ""
+msgstr "Không có"
 
 #: documents/models.py:54
 msgid "Any word"
-msgstr ""
+msgstr "Từ bất kỳ"
 
 #: documents/models.py:55
 msgid "All words"
-msgstr ""
+msgstr "Tất cả từ"
 
 #: documents/models.py:56
 msgid "Exact match"
-msgstr ""
+msgstr "Chính xác"
 
 #: documents/models.py:57
 msgid "Regular expression"
-msgstr ""
+msgstr "Biểu hiện bình thường"
 
 #: documents/models.py:58
 msgid "Fuzzy word"
-msgstr ""
+msgstr "từ fuzzy"
 
 #: documents/models.py:59
 msgid "Automatic"
-msgstr ""
+msgstr "Tự động"
 
 #: documents/models.py:62 documents/models.py:402 documents/models.py:752
 #: paperless_mail/models.py:18 paperless_mail/models.py:93
 msgid "name"
-msgstr ""
+msgstr "tên"
 
 #: documents/models.py:64
 msgid "match"
-msgstr ""
+msgstr "phù hợp"
 
 #: documents/models.py:67
 msgid "matching algorithm"
-msgstr ""
+msgstr "thuật toán tìm kiếm"
 
 #: documents/models.py:72
 msgid "is insensitive"
-msgstr ""
+msgstr "không phân biệt chữ hoa/thường"
 
 #: documents/models.py:95 documents/models.py:147
 msgid "correspondent"
-msgstr ""
+msgstr "tương ứng"
 
 #: documents/models.py:96
 msgid "correspondents"
-msgstr ""
+msgstr "tương ứng"
 
 #: documents/models.py:100
 msgid "color"
-msgstr ""
+msgstr "màu"
 
 #: documents/models.py:103
 msgid "is inbox tag"
-msgstr ""
+msgstr "là thẻ inbox"
 
 #: documents/models.py:106
 msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
@@ -92,35 +92,35 @@ msgstr ""
 
 #: documents/models.py:112
 msgid "tag"
-msgstr ""
+msgstr "thẻ"
 
 #: documents/models.py:113 documents/models.py:185
 msgid "tags"
-msgstr ""
+msgstr "các thẻ"
 
 #: documents/models.py:118 documents/models.py:167
 msgid "document type"
-msgstr ""
+msgstr "loại tài liệu"
 
 #: documents/models.py:119
 msgid "document types"
-msgstr ""
+msgstr "các loại tài liệu"
 
 #: documents/models.py:124
 msgid "path"
-msgstr ""
+msgstr "đường dẫn"
 
 #: documents/models.py:129 documents/models.py:156
 msgid "storage path"
-msgstr ""
+msgstr "đường dẫn lưu trữ dữ liệu"
 
 #: documents/models.py:130
 msgid "storage paths"
-msgstr ""
+msgstr "các đường dẫn lưu trữ dữ liệu"
 
 #: documents/models.py:137
 msgid "Unencrypted"
-msgstr ""
+msgstr "Không mã hóa"
 
 #: documents/models.py:138
 msgid "Encrypted with GNU Privacy Guard"
