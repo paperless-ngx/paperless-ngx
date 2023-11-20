@@ -63,6 +63,7 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
 }
 
 @mixin dark-mode {
+  --bs-primary: hsl(var(--pngx-primary),var(--pngx-primary-lightness));
   --bs-body-color: #{$text-color-dark-bg};
   --pngx-body-color-accent: #{$text-color-dark-bg-accent};
   --bs-secondary-color: #6c757d;
