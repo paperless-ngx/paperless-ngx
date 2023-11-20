@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-10 09:02-0800\n"
-"PO-Revision-Date: 2023-11-19 17:25\n"
+"PO-Revision-Date: 2023-11-20 03:08\n"
 "Last-Translator: \n"
 "Language-Team: Vietnamese\n"
 "Language: vi_VN\n"
@@ -128,11 +128,11 @@ msgstr ""
 
 #: documents/models.py:159
 msgid "title"
-msgstr ""
+msgstr "tiêu đề"
 
 #: documents/models.py:171 documents/models.py:648
 msgid "content"
-msgstr ""
+msgstr "nội dung"
 
 #: documents/models.py:174
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
@@ -140,11 +140,11 @@ msgstr ""
 
 #: documents/models.py:179
 msgid "mime type"
-msgstr ""
+msgstr "định dạng mime"
 
 #: documents/models.py:189
 msgid "checksum"
-msgstr ""
+msgstr "kiểm tra giá trị"
 
 #: documents/models.py:193
 msgid "The checksum of the original document."
@@ -161,27 +161,27 @@ msgstr ""
 #: documents/models.py:205 documents/models.py:385 documents/models.py:654
 #: documents/models.py:692 documents/models.py:895 documents/models.py:932
 msgid "created"
-msgstr ""
+msgstr "đã tạo"
 
 #: documents/models.py:208
 msgid "modified"
-msgstr ""
+msgstr "đã sửa đổi"
 
 #: documents/models.py:215
 msgid "storage type"
-msgstr ""
+msgstr "loại lưu trữ"
 
 #: documents/models.py:223
 msgid "added"
-msgstr ""
+msgstr "đã thêm"
 
 #: documents/models.py:230
 msgid "filename"
-msgstr ""
+msgstr "tên tập tin"
 
 #: documents/models.py:236
 msgid "Current filename in storage"
-msgstr ""
+msgstr "Tên tệp hiện tại trong bộ nhớ"
 
 #: documents/models.py:240
 msgid "archive filename"
@@ -209,27 +209,27 @@ msgstr ""
 
 #: documents/models.py:279 documents/models.py:665 documents/models.py:719
 msgid "document"
-msgstr ""
+msgstr "tài liệu"
 
 #: documents/models.py:280
 msgid "documents"
-msgstr ""
+msgstr "tài liệu"
 
 #: documents/models.py:368
 msgid "debug"
-msgstr ""
+msgstr "gỡ lỗi"
 
 #: documents/models.py:369
 msgid "information"
-msgstr ""
+msgstr "thông tin"
 
 #: documents/models.py:370
 msgid "warning"
-msgstr ""
+msgstr "cảnh báo"
 
 #: documents/models.py:371 paperless_mail/models.py:293
 msgid "error"
-msgstr ""
+msgstr "lỗi"
 
 #: documents/models.py:372
 msgid "critical"
@@ -237,11 +237,11 @@ msgstr ""
 
 #: documents/models.py:375
 msgid "group"
-msgstr ""
+msgstr "nhóm"
 
 #: documents/models.py:377
 msgid "message"
-msgstr ""
+msgstr "tin nhắn"
 
 #: documents/models.py:380
 msgid "level"
@@ -249,31 +249,31 @@ msgstr ""
 
 #: documents/models.py:389
 msgid "log"
-msgstr ""
+msgstr "bản ghi"
 
 #: documents/models.py:390
 msgid "logs"
-msgstr ""
+msgstr "log"
 
 #: documents/models.py:399 documents/models.py:464
 msgid "saved view"
-msgstr ""
+msgstr "lưu chế độ xem"
 
 #: documents/models.py:400
 msgid "saved views"
-msgstr ""
+msgstr "lưu chế độ xem"
 
 #: documents/models.py:405
 msgid "show on dashboard"
-msgstr ""
+msgstr "hiển thị dashboard"
 
 #: documents/models.py:408
 msgid "show in sidebar"
-msgstr ""
+msgstr "hiển thị trong slidebar"
 
 #: documents/models.py:412
 msgid "sort field"
-msgstr ""
+msgstr "trường sắp xếp"
 
 #: documents/models.py:417
 msgid "sort reverse"
