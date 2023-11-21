@@ -83,7 +83,7 @@ has to do much less work to serve the data.
 ## _How do I install paperless-ngx on Raspberry Pi?_
 
 **A:** Docker images are available for arm64 hardware, so just
-follow the [docker-compose instructions](https://docs.paperless-ngx.com/setup/#installation). Apart from more required disk
+follow the [Docker Compose instructions](https://docs.paperless-ngx.com/setup/#installation). Apart from more required disk
 space compared to a bare metal installation, docker comes with close to
 zero overhead, even on Raspberry Pi.
 

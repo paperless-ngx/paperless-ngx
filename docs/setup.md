@@ -25,7 +25,10 @@ necessary configuration files, pull the docker image, start paperless
 and create your user account. This script essentially performs all the
 steps described in [Docker setup](#docker_hub) automatically.
 
-1.  Make sure that docker and docker-compose are installed.
+1.  Make sure that Docker and Docker Compose are installed.
+
+    !!! tip
+    See the Docker installation instructions at https://docs.docker.com/engine/install/
 
 2.  Download and run the installation script:
 
@@ -62,19 +65,19 @@ steps described in [Docker setup](#docker_hub) automatically.
         For new installations, it is recommended to use PostgreSQL as the
         database backend.
 
-3.  Install [Docker](https://www.docker.com/) and
-    [docker-compose](https://docs.docker.com/compose/install/).
+3.  Install [Docker](https://docs.docker.com/engine/install/) and
+    [Docker Compose](https://docs.docker.com/compose/install/).
 
     !!! warning
 
         If you want to use the included `docker-compose.*.yml` file, you
-        need to have at least Docker version **17.09.0** and docker-compose
-        version **1.17.0**. To check do: `docker-compose -v` or `docker -v`
+        need to have at least Docker version **17.09.0** and Docker Compose
+        version **v2**. To check do: `docker compose -v` or `docker -v`
 
         See the [Docker installation guide](https://docs.docker.com/engine/install/) on how to install the current
         version of Docker for your operating system or Linux distribution of
-        choice. To get the latest version of docker-compose, follow the
-        [docker-compose installation guide](https://docs.docker.com/compose/install/linux/) if your package repository
+        choice. To get the latest version of Docker Compose, follow the
+        [Docker Compose installation guide](https://docs.docker.com/compose/install/linux/) if your package repository
         doesn't include it.
 
 4.  Modify `docker-compose.yml` to your preferences. You may want to
@@ -165,13 +168,13 @@ steps described in [Docker setup](#docker_hub) automatically.
         [`PAPERLESS_CONSUMER_POLLING`](configuration.md#PAPERLESS_CONSUMER_POLLING), which will disable inotify. See
         [here](configuration.md#polling).
 
-6.  Run `docker-compose pull`. This will pull the image.
+6.  Run `docker compose pull`. This will pull the image.
 
 7.  To be able to login, you will need a super user. To create it,
     execute the following command:
 
     ```shell-session
-    $ docker-compose run --rm webserver createsuperuser
+    $ docker compose run --rm webserver createsuperuser
     ```
 
     or using docker exec from within the container:
@@ -183,7 +186,7 @@ steps described in [Docker setup](#docker_hub) automatically.
     This will prompt you to set a username, an optional e-mail address
     and finally a password (at least 8 characters).
 
-8.  Run `docker-compose up -d`. This will create and start the necessary containers.
+8.  Run `docker compose up -d`. This will create and start the necessary containers.
 
 9.  The default `docker-compose.yml` exports the webserver on your local
     port
@@ -209,14 +212,14 @@ steps described in [Docker setup](#docker_hub) automatically.
     root as well.
 
 3.  In the `docker-compose.yml` file, find the line that instructs
-    docker-compose to pull the paperless image from Docker Hub:
+    Docker Compose to pull the paperless image from Docker Hub:
 
     ```yaml
     webserver:
       image: ghcr.io/paperless-ngx/paperless-ngx:latest
     ```
 
-    and replace it with a line that instructs docker-compose to build
+    and replace it with a line that instructs Docker Compose to build
     the image from the current working directory instead:
 
     ```yaml
@@ -226,10 +229,10 @@ steps described in [Docker setup](#docker_hub) automatically.
     ```
 
 4.  Follow steps 3 to 8 of [Docker Setup](#docker_hub). When asked to run
-    `docker-compose pull` to pull the image, do
+    `docker compose pull` to pull the image, do
 
     ```shell-session
-    $ docker-compose build
+    $ docker compose build
     ```
 
     instead to build the image.
@@ -541,7 +544,7 @@ to
 image: ghcr.io/paperless-ngx/paperless-ngx:latest
 ```
 
-and then run `docker-compose up -d` which will pull the new image
+and then run `docker compose up -d` which will pull the new image
 recreate the container. That's it!
 
 Users who installed with the bare-metal route should also update their
@@ -570,7 +573,7 @@ installation. The important things to keep in mind are as follows:
 - The task scheduler of paperless, which is used to execute periodic
   tasks such as email checking and maintenance, requires a
   [redis](https://redis.io/) message broker instance. The
-  docker-compose route takes care of that.
+  Docker Compose route takes care of that.
 - The layout of the folder structure for your documents and data
   remains the same, so you can just plug your old docker volumes into
   paperless-ngx and expect it to find everything where it should be.
@@ -581,7 +584,7 @@ Migration to paperless-ngx is then performed in a few simple steps:
 
     ```bash
     $ cd /path/to/current/paperless
-    $ docker-compose down
+    $ docker compose down
     ```
 
 2.  Do a backup for two purposes: If something goes wrong, you still
@@ -589,7 +592,7 @@ Migration to paperless-ngx is then performed in a few simple steps:
     switch back to paperless.
 
 3.  Download the latest release of paperless-ngx. You can either go with
-    the docker-compose files from
+    the Docker Compose files from
     [here](https://github.com/paperless-ngx/paperless-ngx/tree/main/docker/compose)
     or clone the repository to build the image yourself (see
     [above](#docker_build)). You can
@@ -626,7 +629,7 @@ Migration to paperless-ngx is then performed in a few simple steps:
     the search index:
 
     ```shell-session
-    $ docker-compose run --rm webserver document_index reindex
+    $ docker compose run --rm webserver document_index reindex
     ```
 
     This will migrate your database and create the search index. After
@@ -635,7 +638,7 @@ Migration to paperless-ngx is then performed in a few simple steps:
 8.  Start paperless-ngx.
 
     ```bash
-    $ docker-compose up -d
+    $ docker compose up -d
     ```
 
     This will run paperless in the background and automatically start it
@@ -679,7 +682,7 @@ commands as well.
 8.  Modify the `image:` to point to
     `ghcr.io/paperless-ngx/paperless-ngx:latest` or a specific version
     if preferred.
-9.  Start the containers as before, using `docker-compose`.
+9.  Start the containers as before, using `docker compose`.
 
 ## Moving data from SQLite to PostgreSQL or MySQL/MariaDB {#sqlite_to_psql}
 
@@ -737,7 +740,7 @@ below use PostgreSQL, but are applicable to MySQL/MariaDB with the
 
         ``` shell-session
         $ cd /path/to/paperless
-        $ docker-compose run --rm webserver /bin/bash
+        $ docker compose run --rm webserver /bin/bash
         ```
 
         This will launch the container and initialize the PostgreSQL
@@ -790,7 +793,7 @@ Execute this:
 
 ```shell-session
 $ cd /path/to/paperless
-$ docker-compose run --rm webserver migrate documents 0023
+$ docker compose run --rm webserver migrate documents 0023
 ```
 
 Or without docker:

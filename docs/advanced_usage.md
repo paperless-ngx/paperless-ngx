@@ -236,8 +236,8 @@ webserver:
 
 Troubleshooting:
 
-- Monitor the docker-compose log
-  `cd ~/paperless-ngx; docker-compose logs -f`
+- Monitor the Docker Compose log
+  `cd ~/paperless-ngx; docker compose logs -f`
 - Check your script's permission e.g. in case of permission error
   `sudo chmod 755 post-consumption-example.sh`
 - Pipe your scripts's output to a log file e.g.

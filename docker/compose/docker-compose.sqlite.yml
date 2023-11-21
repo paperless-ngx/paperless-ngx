@@ -1,4 +1,4 @@
-# docker-compose file for running paperless from the Docker Hub.
+# Docker Compose file for running paperless from the Docker Hub.
 # This file contains everything paperless needs to run.
 # Paperless supports amd64, arm and arm64 hardware.
 #
@@ -16,9 +16,9 @@
 #
 # - Copy this file as 'docker-compose.yml' and the files 'docker-compose.env'
 #   and '.env' into a folder.
-# - Run 'docker-compose pull'.
-# - Run 'docker-compose run --rm webserver createsuperuser' to create a user.
-# - Run 'docker-compose up -d'.
+# - Run 'docker compose pull'.
+# - Run 'docker compose run --rm webserver createsuperuser' to create a user.
+# - Run 'docker compose up -d'.
 #
 # For more extensive installation and update instructions, refer to the
 # documentation.
