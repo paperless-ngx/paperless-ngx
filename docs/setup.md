@@ -168,7 +168,7 @@ steps described in [Docker setup](#docker_hub) automatically.
         [`PAPERLESS_CONSUMER_POLLING`](configuration.md#PAPERLESS_CONSUMER_POLLING), which will disable inotify. See
         [here](configuration.md#polling).
 
-6.  Run `docker-compose pull`. This will pull the image.
+6.  Run `docker compose pull`. This will pull the image.
 
 7.  To be able to login, you will need a super user. To create it,
     execute the following command:
@@ -629,7 +629,7 @@ Migration to paperless-ngx is then performed in a few simple steps:
     the search index:
 
     ```shell-session
-    $ docker-compose run --rm webserver document_index reindex
+    $ docker compose run --rm webserver document_index reindex
     ```
 
     This will migrate your database and create the search index. After
@@ -638,7 +638,7 @@ Migration to paperless-ngx is then performed in a few simple steps:
 8.  Start paperless-ngx.
 
     ```bash
-    $ docker-compose up -d
+    $ docker compose up -d
     ```
 
     This will run paperless in the background and automatically start it
@@ -682,7 +682,7 @@ commands as well.
 8.  Modify the `image:` to point to
     `ghcr.io/paperless-ngx/paperless-ngx:latest` or a specific version
     if preferred.
-9.  Start the containers as before, using `docker-compose`.
+9.  Start the containers as before, using `docker compose`.
 
 ## Moving data from SQLite to PostgreSQL or MySQL/MariaDB {#sqlite_to_psql}
 
@@ -740,7 +740,7 @@ below use PostgreSQL, but are applicable to MySQL/MariaDB with the
 
         ``` shell-session
         $ cd /path/to/paperless
-        $ docker-compose run --rm webserver /bin/bash
+        $ docker compose run --rm webserver /bin/bash
         ```
 
         This will launch the container and initialize the PostgreSQL
@@ -793,7 +793,7 @@ Execute this:
 
 ```shell-session
 $ cd /path/to/paperless
-$ docker-compose run --rm webserver migrate documents 0023
+$ docker compose run --rm webserver migrate documents 0023
 ```
 
 Or without docker:
