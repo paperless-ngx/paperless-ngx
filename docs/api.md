@@ -21,6 +21,7 @@ The API provides the following main endpoints:
 - `/api/groups/`: Full CRUD support.
 - `/api/share_links/`: Full CRUD support.
 - `/api/custom_fields/`: Full CRUD support.
+- `/api/profile/`: GET, PATCH
 
 All of these endpoints except for the logging endpoint allow you to
 fetch (and edit and delete where appropriate) individual objects by

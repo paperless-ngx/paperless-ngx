@@ -97,3 +97,17 @@ class GroupSerializer(serializers.ModelSerializer):
             "name",
             "permissions",
         )
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(allow_null=False)
+    password = ObfuscatedUserPasswordField(required=False)
+
+    class Meta:
+        model = User
+        fields = (
+            "email",
+            "password",
+            "first_name",
+            "last_name",
+        )

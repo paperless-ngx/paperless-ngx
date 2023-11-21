@@ -5793,3 +5793,62 @@ class TestApiConsumptionTemplates(DirectoriesMixin, APITestCase):
         self.assertEqual(ConsumptionTemplate.objects.count(), 2)
         ct = ConsumptionTemplate.objects.get(name="Template 2")
         self.assertEqual(ct.sources, [int(DocumentSource.MailFetch).__str__()])
+
+
+class TestApiProfile(DirectoriesMixin, APITestCase):
+    ENDPOINT = "/api/profile/"
+
+    def setUp(self):
+        super().setUp()
+
+        self.user = User.objects.create_superuser(
+            username="temp_admin",
+            first_name="firstname",
+            last_name="surname",
+        )
+        self.client.force_authenticate(user=self.user)
+
+    def test_get_profile(self):
+        """
+        GIVEN:
+            - Configured user
+        WHEN:
+            - API call is made to get profile
+        THEN:
+            - Profile is returned
+        """
+
+        response = self.client.get(self.ENDPOINT)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(response.data["email"], self.user.email)
+        self.assertEqual(response.data["password"], "**********")
+        self.assertEqual(response.data["first_name"], self.user.first_name)
+        self.assertEqual(response.data["last_name"], self.user.last_name)
+
+    def test_update_profile(self):
+        """
+        GIVEN:
+            - Configured user
+        WHEN:
+            - API call is made to update profile
+        THEN:
+            - Profile is updated
+        """
+
+        user_data = {
+            "email": "new@email.com",
+            "password": "superpassword1234",
+            "first_name": "new first name",
+            "last_name": "new last name",
+        }
+        response = self.client.patch(self.ENDPOINT, user_data)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        user = User.objects.get(username=self.user.username)
+        self.assertTrue(user.check_password(user_data["password"]))
+        self.assertEqual(user.email, user_data["email"])
+        self.assertEqual(user.first_name, user_data["first_name"])
+        self.assertEqual(user.last_name, user_data["last_name"])
