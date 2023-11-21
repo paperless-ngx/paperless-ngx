@@ -181,7 +181,7 @@ configure their endpoints, and enable the feature.
     Defaults to "<http://localhost:3000>".
 
 If you run paperless on docker, you can add those services to the
-docker-compose file (see the provided
+Docker Compose file (see the provided
 [`docker-compose.sqlite-tika.yml`](https://github.com/paperless-ngx/paperless-ngx/blob/main/docker/compose/docker-compose.sqlite-tika.yml)
 file for reference).
 

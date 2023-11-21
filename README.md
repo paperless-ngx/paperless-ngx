@@ -45,9 +45,9 @@ A full list of [features](https://docs.paperless-ngx.com/#features) and [screens
 
 # Getting started
 
-The easiest way to deploy paperless is docker-compose. The files in the [`/docker/compose` directory](https://github.com/paperless-ngx/paperless-ngx/tree/main/docker/compose) are configured to pull the image from GitHub Packages.
+The easiest way to deploy paperless is `docker compose`. The files in the [`/docker/compose` directory](https://github.com/paperless-ngx/paperless-ngx/tree/main/docker/compose) are configured to pull the image from GitHub Packages.
 
-If you'd like to jump right in, you can configure a docker-compose environment with our install script:
+If you'd like to jump right in, you can configure a `docker compose` environment with our install script:
 
 ```bash
 bash -c "$(curl -L https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/install-paperless-ngx.sh)"
