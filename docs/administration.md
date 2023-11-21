@@ -71,7 +71,7 @@ First of all, ensure that paperless is stopped.
 
 ```shell-session
 $ cd /path/to/paperless
-$ docker-compose down
+$ docker compose down
 ```
 
 After that, [make a backup](#backup).
@@ -79,22 +79,22 @@ After that, [make a backup](#backup).
 1.  If you pull the image from the docker hub, all you need to do is:
 
     ```shell-session
-    $ docker-compose pull
-    $ docker-compose up
+    $ docker compose pull
+    $ docker compose up
     ```
 
-    The docker-compose files refer to the `latest` version, which is
+    The Docker Compose files refer to the `latest` version, which is
     always the latest stable release.
 
 1.  If you built the image yourself, do the following:
 
     ```shell-session
     $ git pull
-    $ docker-compose build
-    $ docker-compose up
+    $ docker compose build
+    $ docker compose up
     ```
 
-Running `docker-compose up` will also apply any new database migrations.
+Running `docker compose up` will also apply any new database migrations.
 If you see everything working, press CTRL+C once to gracefully stop
 paperless. Then you can start paperless-ngx with `-d` to have it run in
 the background.
@@ -102,7 +102,7 @@ the background.
 !!! note
 
     In version 0.9.14, the update process was changed. In 0.9.13 and
-    earlier, the docker-compose files specified exact versions and pull
+    earlier, the Docker Compose files specified exact versions and pull
     won't automatically update to newer versions. In order to enable
     updates as described above, either get the new `docker-compose.yml`
     file from
@@ -220,11 +220,11 @@ Paperless comes with some management commands that perform various
 maintenance tasks on your paperless instance. You can invoke these
 commands in the following way:
 
-With docker-compose, while paperless is running:
+With Docker Compose, while paperless is running:
 
 ```shell-session
 $ cd /path/to/paperless
-$ docker-compose exec webserver <command> <arguments>
+$ docker compose exec webserver <command> <arguments>
 ```
 
 With docker, while paperless is running:
@@ -254,7 +254,7 @@ migration to another DMS.
 If you use the document exporter within a cronjob to backup your data
 you might use the `-T` flag behind exec to suppress "The input device
 is not a TTY" errors. For example:
-`docker-compose exec -T webserver document_exporter ../export`
+`docker compose exec -T webserver document_exporter ../export`
 
 ```
 document_exporter target [-c] [-d] [-f] [-na] [-nt] [-p] [-sm] [-z]
