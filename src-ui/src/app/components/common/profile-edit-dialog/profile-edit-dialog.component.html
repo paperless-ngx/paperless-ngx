@@ -5,13 +5,31 @@
       </button>
     </div>
     <div class="modal-body">
-        <pngx-input-text i18n-title title="Email" formControlName="email" [error]="error?.email"></pngx-input-text>
-        <pngx-input-password i18n-title title="Password" formControlName="password" [error]="error?.password"></pngx-input-password>
+        <pngx-input-text i18n-title title="Email" formControlName="email" (keyup)="onEmailKeyUp($event)" [error]="error?.email"></pngx-input-text>
+        <div ngbAccordion>
+          <div ngbAccordionItem="first" [collapsed]="!showEmailConfirm" class="border-0 bg-transparent">
+            <div ngbAccordionCollapse>
+              <div ngbAccordionBody class="p-0 pb-3">
+                <pngx-input-text i18n-title title="Confirm Email" formControlName="email_confirm" (keyup)="onEmailConfirmKeyUp($event)" [error]="error?.email_confirm"></pngx-input-text>
+              </div>
+            </div>
+          </div>
+        </div>
+        <pngx-input-password i18n-title title="Password" formControlName="password" (keyup)="onPasswordKeyUp($event)" [error]="error?.password"></pngx-input-password>
+        <div ngbAccordion>
+          <div ngbAccordionItem="first" [collapsed]="!showPasswordConfirm" class="border-0 bg-transparent">
+            <div ngbAccordionCollapse>
+              <div ngbAccordionBody class="p-0 pb-3">
+                <pngx-input-password i18n-title title="Confirm Password" formControlName="password_confirm" (keyup)="onPasswordConfirmKeyUp($event)" [error]="error?.password_confirm"></pngx-input-password>
+              </div>
+            </div>
+          </div>
+        </div>
         <pngx-input-text i18n-title title="First name" formControlName="first_name" [error]="error?.first_name"></pngx-input-text>
         <pngx-input-text i18n-title title="Last name" formControlName="last_name" [error]="error?.first_name"></pngx-input-text>
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline-secondary" (click)="cancel()" i18n [disabled]="networkActive">Cancel</button>
-      <button type="submit" class="btn btn-primary" i18n [disabled]="networkActive">Save</button>
+      <button type="submit" class="btn btn-primary" i18n [disabled]="networkActive || saveDisabled">Save</button>
     </div>
   </form>
