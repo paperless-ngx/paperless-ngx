@@ -956,7 +956,7 @@
           <context context-type="sourcefile">src/app/components/common/input/permissions/permissions-form/permissions-form.component.html</context>
           <context context-type="linenumber">50</context>
         </context-group>
-        <target state="needs-translation">Users:</target>
+        <target state="translated">Uporabniki:</target>
       </trans-unit>
       <trans-unit id="239911470633002624" datatype="html">
         <source>Groups:</source>
@@ -992,7 +992,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">221</context>
         </context-group>
-        <target state="needs-translation">Default Edit Permissions</target>
+        <target state="translated">Privzeta dovoljenja za urejanje</target>
       </trans-unit>
       <trans-unit id="3728984448750213892" datatype="html">
         <source>Edit permissions also grant viewing permissions</source>
@@ -1008,7 +1008,7 @@
           <context context-type="sourcefile">src/app/components/common/input/permissions/permissions-form/permissions-form.component.html</context>
           <context context-type="linenumber">64</context>
         </context-group>
-        <target state="needs-translation">Edit permissions also grant viewing permissions</target>
+        <target state="translated">Dovoljenja za urejanje omogočajo tudi dovoljenja za ogled</target>
       </trans-unit>
       <trans-unit id="5851560788527570644" datatype="html">
         <source>Notifications</source>
@@ -1212,7 +1212,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">291,292</context>
         </context-group>
-        <target state="needs-translation"> <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;visually-hidden&quot;&gt;"/>Appears on<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
+        <target state="translated"><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;visually-hidden&quot;&gt;"/>Pojavlja se v<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
       </trans-unit>
       <trans-unit id="4104807402967139762" datatype="html">
         <source>Show on dashboard</source>
@@ -1460,7 +1460,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
           <context context-type="linenumber">51</context>
         </context-group>
-        <target state="needs-translation">Error retrieving users</target>
+        <target state="translated">Napaka pri pridobivanju uporabnikov</target>
       </trans-unit>
       <trans-unit id="3066660568529853846" datatype="html">
         <source>Error retrieving groups</source>
@@ -1472,7 +1472,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
           <context context-type="linenumber">63</context>
         </context-group>
-        <target state="needs-translation">Error retrieving groups</target>
+        <target state="translated">Napaka pri pridobivanju skupin</target>
       </trans-unit>
       <trans-unit id="5610279464668232148" datatype="html">
         <source>Saved view &quot;<x id="PH" equiv-text="savedView.name"/>&quot; deleted.</source>
@@ -1540,7 +1540,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.ts</context>
           <context context-type="linenumber">545</context>
         </context-group>
-        <target state="needs-translation">Error while storing settings on server.</target>
+        <target state="translated">Napaka pri shranjevanju nastavitev na strežnik.</target>
       </trans-unit>
       <trans-unit id="2991443309752293110" datatype="html">
         <source>File Tasks</source>
@@ -1678,7 +1678,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
           <context context-type="linenumber">103</context>
         </context-group>
-        <target state="needs-translation">{VAR_PLURAL, plural, =1 {One <x id="INTERPOLATION"/> task} other {<x id="INTERPOLATION_1"/> total <x id="INTERPOLATION"/> tasks}}</target>
+        <target state="translated">{VAR_PLURAL, plural, =1 {Ena <x id="INTERPOLATION"/> naloga} other {<x id="INTERPOLATION_1"/> skupno <x id="INTERPOLATION"/> nalog}}</target>
       </trans-unit>
       <trans-unit id="1830925490604698731" datatype="html">
         <source>Failed<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span *ngIf=&quot;tasksService.failedFileTasks.length &gt; 0&quot; class=&quot;badge bg-danger ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
@@ -1742,7 +1742,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">61</context>
         </context-group>
-        <target state="needs-translation">Dismiss all <x id="PH" equiv-text="tasks.size"/> tasks?</target>
+        <target state="translated">Opustite vsa <x id="PH" equiv-text="tasks.size"/> opravila?</target>
       </trans-unit>
       <trans-unit id="9011556615675272238" datatype="html">
         <source>queued</source>
@@ -1790,7 +1790,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">213</context>
         </context-group>
-        <target state="needs-translation">Users &amp; Groups</target>
+        <target state="translated">Uporabniki &amp; Skupine</target>
       </trans-unit>
       <trans-unit id="4555457172864212828" datatype="html">
         <source>Users</source>
@@ -1802,7 +1802,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-filter-dropdown/permissions-filter-dropdown.component.html</context>
           <context context-type="linenumber">68</context>
         </context-group>
-        <target state="needs-translation">Users</target>
+        <target state="translated">Uporabniki</target>
       </trans-unit>
       <trans-unit id="2941198503117307737" datatype="html">
         <source>Add User</source>
@@ -1934,7 +1934,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.html</context>
           <context context-type="linenumber">89</context>
         </context-group>
-        <target state="needs-translation">No groups defined</target>
+        <target state="translated">Ni definiranih skupin</target>
       </trans-unit>
       <trans-unit id="4510369340305901516" datatype="html">
         <source>Password has been changed, you will be logged out momentarily.</source>
