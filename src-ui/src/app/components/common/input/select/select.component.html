@@ -1,7 +1,7 @@
 <div class="mb-3 paperless-input-select" [class.disabled]="disabled">
   <div class="row">
     <div class="d-flex align-items-center position-relative hidden-button-container" [class.col-md-3]="horizontal">
-      <label *ngIf="title" class="form-label mb-md-0" [for]="inputId">{{title}}</label>
+      <label *ngIf="title" class="form-label" [class.mb-md-0]="horizontal" [for]="inputId">{{title}}</label>
       <button type="button" *ngIf="removable" class="btn btn-sm btn-danger position-absolute left-0" (click)="removed.emit(this)">
         <svg class="sidebaricon" fill="currentColor">
           <use xlink:href="assets/bootstrap-icons.svg#x"/>
