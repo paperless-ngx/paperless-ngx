@@ -1,0 +1,17 @@
+<form [formGroup]="form" (ngSubmit)="save()" autocomplete="off">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title" i18n>Edit Profile</h4>
+      <button type="button" class="btn-close" aria-label="Close" (click)="cancel()">
+      </button>
+    </div>
+    <div class="modal-body">
+        <pngx-input-text i18n-title title="Email" formControlName="email" [error]="error?.email"></pngx-input-text>
+        <pngx-input-password i18n-title title="Password" formControlName="password" [error]="error?.password"></pngx-input-password>
+        <pngx-input-text i18n-title title="First name" formControlName="first_name" [error]="error?.first_name"></pngx-input-text>
+        <pngx-input-text i18n-title title="Last name" formControlName="last_name" [error]="error?.first_name"></pngx-input-text>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-secondary" (click)="cancel()" i18n [disabled]="networkActive">Cancel</button>
+      <button type="submit" class="btn btn-primary" i18n [disabled]="networkActive">Save</button>
+    </div>
+  </form>
