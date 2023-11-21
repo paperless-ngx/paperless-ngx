@@ -6,7 +6,7 @@ Check for the following issues:
 
 - Ensure that the directory you're putting your documents in is the
   folder paperless is watching. With docker, this setting is performed
-  in the `docker-compose.yml` file. Without docker, look at the
+  in the `docker-compose.yml` file. Without Docker, look at the
   `CONSUMPTION_DIR` setting. Don't adjust this setting if you're
   using docker.
 
@@ -120,7 +120,7 @@ Gotenberg raises this error.
 
 You can increase the timeout by configuring a command flag for Gotenberg
 (see also [here](https://gotenberg.dev/docs/modules/api#properties)). If
-using docker-compose, this is achieved by the following configuration
+using Docker Compose, this is achieved by the following configuration
 change in the `docker-compose.yml` file:
 
 ```yaml

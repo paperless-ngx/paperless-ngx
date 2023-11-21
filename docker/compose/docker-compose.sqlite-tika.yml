@@ -1,4 +1,4 @@
-# docker-compose file for running paperless from the docker container registry.
+# Docker Compose file for running paperless from the docker container registry.
 # This file contains everything paperless needs to run.
 # Paperless supports amd64, arm and arm64 hardware.
 # All compose files of paperless configure paperless in the following way:
@@ -11,7 +11,7 @@
 #
 # SQLite is used as the database. The SQLite file is stored in the data volume.
 #
-# In addition to that, this docker-compose file adds the following optional
+# In addition to that, this Docker Compose file adds the following optional
 # configurations:
 #
 # - Apache Tika and Gotenberg servers are started with paperless and paperless
@@ -23,9 +23,9 @@
 #
 # - Copy this file as 'docker-compose.yml' and the files 'docker-compose.env'
 #   and '.env' into a folder.
-# - Run 'docker-compose pull'.
-# - Run 'docker-compose run --rm webserver createsuperuser' to create a user.
-# - Run 'docker-compose up -d'.
+# - Run 'docker compose pull'.
+# - Run 'docker compose run --rm webserver createsuperuser' to create a user.
+# - Run 'docker compose up -d'.
 #
 # For more extensive installation and update instructions, refer to the
 # documentation.
