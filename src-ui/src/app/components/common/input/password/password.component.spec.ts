@@ -5,6 +5,7 @@ import {
   NG_VALUE_ACCESSOR,
 } from '@angular/forms'
 import { PasswordComponent } from './password.component'
+import { By } from '@angular/platform-browser'
 
 describe('PasswordComponent', () => {
   let component: PasswordComponent
@@ -32,5 +33,22 @@ describe('PasswordComponent', () => {
     // input.dispatchEvent(new Event('change'))
     // fixture.detectChanges()
     // expect(component.value).toEqual('foo')
+  })
+
+  it('should support toggling field visibility', () => {
+    expect(component.inputField.nativeElement.type).toEqual('password')
+    component.showReveal = true
+    fixture.detectChanges()
+    fixture.debugElement.query(By.css('button')).triggerEventHandler('click')
+    fixture.detectChanges()
+    expect(component.inputField.nativeElement.type).toEqual('text')
+  })
+
+  it('should empty field if password is obfuscated', () => {
+    component.value = '*********'
+    component.toggleVisibility()
+    expect(component.value).toEqual('')
+    component.toggleVisibility()
+    expect(component.value).toEqual('*********')
   })
 })

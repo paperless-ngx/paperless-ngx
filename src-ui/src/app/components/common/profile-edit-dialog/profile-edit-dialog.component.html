@@ -15,7 +15,7 @@
             </div>
           </div>
         </div>
-        <pngx-input-password i18n-title title="Password" formControlName="password" (keyup)="onPasswordKeyUp($event)" [error]="error?.password"></pngx-input-password>
+        <pngx-input-password i18n-title title="Password" formControlName="password" (keyup)="onPasswordKeyUp($event)" [showReveal]="true" [error]="error?.password"></pngx-input-password>
         <div ngbAccordion>
           <div ngbAccordionItem="first" [collapsed]="!showPasswordConfirm" class="border-0 bg-transparent">
             <div ngbAccordionCollapse>
