@@ -400,7 +400,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">174</context>
         </context-group>
-        <target state="needs-translation">Manage e-mail accounts and rules for automatically importing documents.</target>
+        <target state="translated">E-mailaccounts en regels voor automatisch importeren van documenten beheren.</target>
       </trans-unit>
       <trans-unit id="1347174817382304718" datatype="html">
         <source>Consumption templates give you finer control over the document ingestion process.</source>
@@ -424,7 +424,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">198</context>
         </context-group>
-        <target state="needs-translation">Check out the settings for various tweaks to the web app and toggle settings for saved views.</target>
+        <target state="translated">Bekijk de instellingen voor verschillende aanpassingen aan de web-app en bewerk de instellingen voor opgeslagen weergaven.</target>
       </trans-unit>
       <trans-unit id="7172877665285340082" datatype="html">
         <source>Thank you! 🙏</source>
@@ -900,7 +900,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">178,180</context>
         </context-group>
-        <target state="needs-translation"> Settings apply to this user account for objects (Tags, Mail Rules, etc.) created via the web UI </target>
+        <target state="translated"> Instellingen zijn van toepassing op dit gebruikersaccount voor objecten (Tags, Mailregels, etc.) gemaakt via de web UI </target>
       </trans-unit>
       <trans-unit id="4292903881380648974" datatype="html">
         <source>Default Owner</source>
@@ -928,7 +928,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">194</context>
         </context-group>
-        <target state="needs-translation">Default View Permissions</target>
+        <target state="translated">Standaard weergaverechten</target>
       </trans-unit>
       <trans-unit id="2191775412581217688" datatype="html">
         <source>Users:</source>
@@ -992,7 +992,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">221</context>
         </context-group>
-        <target state="needs-translation">Default Edit Permissions</target>
+        <target state="translated">Standaard bewerkingsrechten</target>
       </trans-unit>
       <trans-unit id="3728984448750213892" datatype="html">
         <source>Edit permissions also grant viewing permissions</source>
@@ -1934,7 +1934,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.html</context>
           <context context-type="linenumber">89</context>
         </context-group>
-        <target state="needs-translation">No groups defined</target>
+        <target state="translated">Er zijn geen groepen gedefinieerd</target>
       </trans-unit>
       <trans-unit id="4510369340305901516" datatype="html">
         <source>Password has been changed, you will be logged out momentarily.</source>
@@ -2303,7 +2303,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">61</context>
         </context-group>
-        <target state="needs-translation">Document Types</target>
+        <target state="translated">Documenttypes</target>
       </trans-unit>
       <trans-unit id="5421255270838137624" datatype="html">
         <source>Storage Paths</source>
@@ -2319,7 +2319,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">67</context>
         </context-group>
-        <target state="needs-translation">Storage Paths</target>
+        <target state="translated">Opslagpaden</target>
       </trans-unit>
       <trans-unit id="3188389494264426470" datatype="html">
         <source>Custom Fields</source>
@@ -2339,7 +2339,7 @@
           <context context-type="sourcefile">src/app/components/manage/custom-fields/custom-fields.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="needs-translation">Custom Fields</target>
+        <target state="translated">Aangepaste velden</target>
       </trans-unit>
       <trans-unit id="4462691404891390153" datatype="html">
         <source>Consumption templates</source>
@@ -2347,7 +2347,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">183</context>
         </context-group>
-        <target state="needs-translation">Consumption templates</target>
+        <target state="translated">Consumptie sjablonen</target>
       </trans-unit>
       <trans-unit id="5433675495457939071" datatype="html">
         <source>Templates</source>
@@ -2523,7 +2523,7 @@
           <context context-type="sourcefile">src/app/components/common/custom-fields-dropdown/custom-fields-dropdown.component.html</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">Create New Field</target>
+        <target state="translated">Nieuw veld aanmaken</target>
       </trans-unit>
       <trans-unit id="3249513483374643425" datatype="html">
         <source>Add</source>
@@ -2543,7 +2543,7 @@
           <context context-type="sourcefile">src/app/components/common/custom-fields-dropdown/custom-fields-dropdown.component.ts</context>
           <context context-type="linenumber">52</context>
         </context-group>
-        <target state="needs-translation">Choose field</target>
+        <target state="translated">Kies een veld</target>
       </trans-unit>
       <trans-unit id="7284517513296281043" datatype="html">
         <source>No unused fields found</source>
@@ -2551,7 +2551,7 @@
           <context context-type="sourcefile">src/app/components/common/custom-fields-dropdown/custom-fields-dropdown.component.ts</context>
           <context context-type="linenumber">56</context>
         </context-group>
-        <target state="needs-translation">No unused fields found</target>
+        <target state="translated">Geen ongebruikte velden gevonden</target>
       </trans-unit>
       <trans-unit id="6973528734330066202" datatype="html">
         <source>Saved field &quot;<x id="PH" equiv-text="newField.name"/>&quot;.</source>
@@ -2575,7 +2575,7 @@
           <context context-type="sourcefile">src/app/components/manage/custom-fields/custom-fields.component.ts</context>
           <context context-type="linenumber">66</context>
         </context-group>
-        <target state="needs-translation">Error saving field.</target>
+        <target state="translated">Fout bij opslaan veld.</target>
       </trans-unit>
       <trans-unit id="6052766076365105714" datatype="html">
         <source>now</source>
@@ -2675,7 +2675,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="needs-translation">Filter filename</target>
+        <target state="translated">Bestandsnaam filteren</target>
       </trans-unit>
       <trans-unit id="3694878959415278689" datatype="html">
         <source>Apply to documents that match this filename. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive.</source>
@@ -2691,7 +2691,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="needs-translation">Filter path</target>
+        <target state="translated">Filter op opslaglocatie</target>
       </trans-unit>
       <trans-unit id="2900550647231873115" datatype="html">
         <source>Apply to documents that match this path. Wildcards specified as * are allowed. Case insensitive.&lt;/a&gt;</source>
@@ -2731,7 +2731,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="needs-translation">Assign title</target>
+        <target state="translated">Titel toewijzen</target>
       </trans-unit>
       <trans-unit id="7071676931416298160" datatype="html">
         <source>Can include some placeholders, see &lt;a target=&apos;_blank&apos; href=&apos;https://docs.paperless-ngx.com/usage/#consumption-templates&apos;&gt;documentation&lt;/a&gt;.</source>
@@ -2747,7 +2747,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">34</context>
         </context-group>
-        <target state="needs-translation">Assign tags</target>
+        <target state="translated">Labels toewijzen</target>
       </trans-unit>
       <trans-unit id="6695990587380209737" datatype="html">
         <source>Assign document type</source>
@@ -2779,7 +2779,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="needs-translation">Assign storage path</target>
+        <target state="translated">Opslaglocatie toewijzen</target>
       </trans-unit>
       <trans-unit id="5057200219587080996" datatype="html">
         <source>Assign owner</source>
@@ -2787,7 +2787,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">40</context>
         </context-group>
-        <target state="needs-translation">Assign owner</target>
+        <target state="translated">Eigenaar toewijzen</target>
       </trans-unit>
       <trans-unit id="1749184201773078639" datatype="html">
         <source>Assign view permissions</source>
@@ -2795,7 +2795,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">42</context>
         </context-group>
-        <target state="needs-translation">Assign view permissions</target>
+        <target state="translated">Weergaverechten toewijzen</target>
       </trans-unit>
       <trans-unit id="1744964187586405039" datatype="html">
         <source>Assign edit permissions</source>
@@ -2803,7 +2803,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">61</context>
         </context-group>
-        <target state="needs-translation">Assign edit permissions</target>
+        <target state="translated">Bewerkingsrechten toewijzen</target>
       </trans-unit>
       <trans-unit id="1519954996184640001" datatype="html" approved="yes">
         <source>Error</source>
@@ -2887,7 +2887,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.ts</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">Consume Folder</target>
+        <target state="translated">Inname locatie</target>
       </trans-unit>
       <trans-unit id="526966086395145275" datatype="html">
         <source>API Upload</source>
@@ -2895,7 +2895,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.ts</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="needs-translation">API Upload</target>
+        <target state="translated">API Upload</target>
       </trans-unit>
       <trans-unit id="7502272564743467653" datatype="html">
         <source>Mail Fetch</source>
@@ -2903,7 +2903,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.ts</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="needs-translation">Mail Fetch</target>
+        <target state="translated">E-mail ophalen</target>
       </trans-unit>
       <trans-unit id="2057608151109082984" datatype="html">
         <source>Create new consumption template</source>
@@ -2911,7 +2911,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.ts</context>
           <context context-type="linenumber">83</context>
         </context-group>
-        <target state="needs-translation">Create new consumption template</target>
+        <target state="translated">Nieuw consumptiesjabloon aanmaken</target>
       </trans-unit>
       <trans-unit id="3745279073747685988" datatype="html">
         <source>Edit consumption template</source>
@@ -2919,7 +2919,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.ts</context>
           <context context-type="linenumber">87</context>
         </context-group>
-        <target state="needs-translation">Edit consumption template</target>
+        <target state="translated">Consumptiesjabloon bewerken</target>
       </trans-unit>
       <trans-unit id="8743659855412792665" datatype="html" approved="yes">
         <source>Matching algorithm</source>
@@ -3003,7 +3003,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.html</context>
           <context context-type="linenumber">9</context>
         </context-group>
-        <target state="needs-translation">Data type</target>
+        <target state="translated">Gegevenstype</target>
       </trans-unit>
       <trans-unit id="5933665691581884232" datatype="html">
         <source>Data type cannot be changed after a field is created</source>
@@ -3011,7 +3011,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.html</context>
           <context context-type="linenumber">10</context>
         </context-group>
-        <target state="needs-translation">Data type cannot be changed after a field is created</target>
+        <target state="translated">Gegevenstype kan niet worden gewijzigd nadat een veld is aangemaakt</target>
       </trans-unit>
       <trans-unit id="528950215505228201" datatype="html">
         <source>Create new custom field</source>
