@@ -323,6 +323,10 @@ textarea,
   }
 }
 
+.input-group .btn-outline-secondary {
+  border-color: var(--bs-border-color);
+}
+
 .form-check-input:checked {
   background-color: var(--bs-primary);
   border-color: var(--bs-primary);
