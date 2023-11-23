@@ -657,7 +657,7 @@ class Consumer(LoggingMixin):
         )
         doc_type_name = (
             DocumentType.objects.get(pk=self.override_document_type_id).name
-            if self.override_correspondent_id is not None
+            if self.override_document_type_id is not None
             else None
         )
         owner_username = (
