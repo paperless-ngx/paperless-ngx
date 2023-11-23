@@ -60,10 +60,10 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
 // Dark mode
 @mixin paperless-green-dark-mode {
   --pngx-primary-lightness: 31%;
+  --bs-primary: hsl(var(--pngx-primary),var(--pngx-primary-lightness));
 }
 
 @mixin dark-mode {
-  --bs-primary: hsl(var(--pngx-primary),var(--pngx-primary-lightness));
   --bs-body-color: #{$text-color-dark-bg};
   --pngx-body-color-accent: #{$text-color-dark-bg-accent};
   --bs-secondary-color: #6c757d;
@@ -80,6 +80,7 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
   --pngx-primary-faded: var(--pngx-primary-darken-15);
   --pngx-primary-text-contrast: var(--bs-body-color);
   --bs-dark-border-subtle: var(--pngx-bg-darker);
+  --bs-border-color-translucent: rgba(0, 0, 0, .175); // override bs
 
   .text-dark, .text-light {
     color: var(--bs-body-color) !important;
@@ -142,6 +143,7 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
 
   .card {
     background-color: var(--bs-body-bg);
+    --bs-card-cap-bg: var(--bs-body-bg-rgb);
 
     .card-header {
       background-color: rgba(0, 0, 0, 0.12);
@@ -278,6 +280,10 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
     .bg-secondary {
       background-color: rgb(var(--bs-dark-rgb)) !important;
     }
+  }
+
+  .tooltip {
+    --bs-tooltip-bg: #000;
   }
 }
 
