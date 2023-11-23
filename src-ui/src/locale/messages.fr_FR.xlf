@@ -67,22 +67,22 @@
           <context context-type="linenumber">13</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="ngb.carousel.slide-number" datatype="html">
+      <trans-unit id="ngb.carousel.slide-number" datatype="html" approved="yes">
         <source> Slide <x id="INTERPOLATION"/> of <x id="INTERPOLATION_1"/> </source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <note priority="1" from="description">Currently selected slide number read by screen reader</note>
-        <target state="translated"> Diapositive <x id="INTERPOLATION"/> sur <x id="INTERPOLATION_1"/> </target>
+        <target state="final"> Diapositive <x id="INTERPOLATION"/> sur <x id="INTERPOLATION_1"/> </target>
       </trans-unit>
-      <trans-unit id="ngb.timepicker.hours" datatype="html">
+      <trans-unit id="ngb.timepicker.hours" datatype="html" approved="yes">
         <source>Hours</source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="translated">Heures</target>
+        <target state="final">Heures</target>
       </trans-unit>
       <trans-unit id="ngb.pagination.previous" datatype="html" approved="yes">
         <source>«</source>
@@ -148,13 +148,13 @@
         </context-group>
         <target state="final">Suivant</target>
       </trans-unit>
-      <trans-unit id="ngb.timepicker.minutes" datatype="html">
+      <trans-unit id="ngb.timepicker.minutes" datatype="html" approved="yes">
         <source>Minutes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="translated">Minutes</target>
+        <target state="final">Minutes</target>
       </trans-unit>
       <trans-unit id="ngb.pagination.last" datatype="html" approved="yes">
         <source>»»</source>
@@ -236,13 +236,13 @@
         </context-group>
         <target state="translated">SS</target>
       </trans-unit>
-      <trans-unit id="ngb.timepicker.seconds" datatype="html">
+      <trans-unit id="ngb.timepicker.seconds" datatype="html" approved="yes">
         <source>Seconds</source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="translated">Secondes</target>
+        <target state="final">Secondes</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.increment-seconds" datatype="html">
         <source>Increment seconds</source>
@@ -886,13 +886,13 @@
         </context-group>
         <target state="final">Droits d'accès</target>
       </trans-unit>
-      <trans-unit id="309314153079578337" datatype="html">
+      <trans-unit id="309314153079578337" datatype="html" approved="yes">
         <source>Default Permissions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">174</context>
         </context-group>
-        <target state="translated">Droits d'accès par défaut</target>
+        <target state="final">Droits d'accès par défaut</target>
       </trans-unit>
       <trans-unit id="8222269449891326545" datatype="html">
         <source> Settings apply to this user account for objects (Tags, Mail Rules, etc.) created via the web UI </source>
@@ -902,13 +902,13 @@
         </context-group>
         <target state="translated"> Les paramètres s'appliquent à ce compte utilisateur pour les objets (Tags, Règles de Mail, etc.) créés via l'interface web </target>
       </trans-unit>
-      <trans-unit id="4292903881380648974" datatype="html">
+      <trans-unit id="4292903881380648974" datatype="html" approved="yes">
         <source>Default Owner</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">185</context>
         </context-group>
-        <target state="translated">Propriétaire par défaut</target>
+        <target state="final">Propriétaire par défaut</target>
       </trans-unit>
       <trans-unit id="734147282056744882" datatype="html" approved="yes">
         <source>Objects without an owner can be viewed and edited by all users</source>
@@ -2349,13 +2349,13 @@
         </context-group>
         <target state="final">Modèles de consommation</target>
       </trans-unit>
-      <trans-unit id="5433675495457939071" datatype="html">
+      <trans-unit id="5433675495457939071" datatype="html" approved="yes">
         <source>Templates</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">186</context>
         </context-group>
-        <target state="translated">Modèles</target>
+        <target state="final">Modèles</target>
       </trans-unit>
       <trans-unit id="1292737233370901804" datatype="html">
         <source>Mail</source>
@@ -2369,13 +2369,13 @@
         </context-group>
         <target state="translated">Courriel</target>
       </trans-unit>
-      <trans-unit id="7844706011418789951" datatype="html">
+      <trans-unit id="7844706011418789951" datatype="html" approved="yes">
         <source>Administration</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">199</context>
         </context-group>
-        <target state="translated">Administration</target>
+        <target state="final">Administration</target>
       </trans-unit>
       <trans-unit id="5537285341303594392" datatype="html">
         <source>File Tasks<x id="START_TAG_SPAN_1" ctype="x-span_1" equiv-text="&lt;span *ngIf=&quot;tasksService.failedFileTasks.length &gt; 0&quot;&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-danger ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
@@ -2725,13 +2725,13 @@
         </context-group>
         <target state="translated">Affectations</target>
       </trans-unit>
-      <trans-unit id="6019822389883736115" datatype="html">
+      <trans-unit id="6019822389883736115" datatype="html" approved="yes">
         <source>Assign title</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="translated">Attribuer un titre</target>
+        <target state="final">Attribuer un titre</target>
       </trans-unit>
       <trans-unit id="7071676931416298160" datatype="html">
         <source>Can include some placeholders, see &lt;a target=&apos;_blank&apos; href=&apos;https://docs.paperless-ngx.com/usage/#consumption-templates&apos;&gt;documentation&lt;/a&gt;.</source>
@@ -4524,7 +4524,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">89</context>
         </context-group>
-        <target state="final">Relancer l’OCR</target>
+        <target state="final">Relancer la ROC</target>
       </trans-unit>
       <trans-unit id="1418444397960583910" datatype="html" approved="yes">
         <source>More like this</source>
@@ -4896,7 +4896,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">498</context>
         </context-group>
-        <target state="final">Confirmer la relance de l’OCR</target>
+        <target state="final">Confirmer la relance de la ROC</target>
       </trans-unit>
       <trans-unit id="9197453786953646058" datatype="html" approved="yes">
         <source>This operation will permanently redo OCR for this document.</source>
