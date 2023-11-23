@@ -7,6 +7,7 @@ from django.db.models.functions import Lower
 from django.http import HttpResponse
 from django.views.generic import View
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.authtoken.models import Token
 from rest_framework.filters import OrderingFilter
 from rest_framework.generics import GenericAPIView
 from rest_framework.pagination import PageNumberPagination
@@ -111,20 +112,17 @@ class GroupViewSet(ModelViewSet):
 
 
 class ProfileView(GenericAPIView):
+    """
+    User profile view, only available when logged in
+    """
+
     permission_classes = [IsAuthenticated]
     serializer_class = ProfileSerializer
 
     def get(self, request, *args, **kwargs):
         user = self.request.user if hasattr(self.request, "user") else None
-
-        return Response(
-            {
-                "email": user.email,
-                "password": "**********",
-                "first_name": user.first_name,
-                "last_name": user.last_name,
-            },
-        )
+        serializer = self.get_serializer(data=request.data)
+        return Response(serializer.to_representation(user))
 
     def patch(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -139,11 +137,25 @@ class ProfileView(GenericAPIView):
         for key, value in serializer.validated_data.items():
             setattr(user, key, value)
         user.save()
+
+        return Response(serializer.to_representation(user))
+
+
+class GenerateAuthTokenView(GenericAPIView):
+    """
+    Generates (or re-generates) an auth token, requires a logged in user
+    unlike the default DRF endpoint
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        user = self.request.user if hasattr(self.request, "user") else None
+
+        existing_token = Token.objects.filter(user=user).first()
+        if existing_token is not None:
+            existing_token.delete()
+        token = Token.objects.create(user=user)
         return Response(
-            {
-                "email": user.email,
-                "password": "**********",
-                "first_name": user.first_name,
-                "last_name": user.last_name,
-            },
+            token.key,
         )

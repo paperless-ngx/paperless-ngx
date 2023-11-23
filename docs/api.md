@@ -158,6 +158,10 @@ The REST api provides three different forms of authentication.
 
 3.  Token authentication
 
+    You can create (or re-create) an API token by opening the "My Profile"
+    link in the user dropdown found in the web UI and clicking the circular
+    arrow button.
+
     Paperless also offers an endpoint to acquire authentication tokens.
 
     POST a username and password as a form or json string to
@@ -169,7 +173,7 @@ The REST api provides three different forms of authentication.
     Authorization: Token <token>
     ```
 
-    Tokens can be managed and revoked in the paperless admin.
+    Tokens can also be managed in the Django admin.
 
 ## Searching for documents
 

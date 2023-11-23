@@ -4,6 +4,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { ProfileService } from 'src/app/services/profile.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { Subject, takeUntil } from 'rxjs'
+import { Clipboard } from '@angular/cdk/clipboard'
 
 @Component({
   selector: 'pngx-profile-edit-dialog',
@@ -22,6 +23,7 @@ export class ProfileEditDialogComponent implements OnInit, OnDestroy {
     password_confirm: new FormControl({ value: null, disabled: true }),
     first_name: new FormControl(''),
     last_name: new FormControl(''),
+    auth_token: new FormControl(''),
   })
 
   private currentPassword: string
@@ -34,10 +36,13 @@ export class ProfileEditDialogComponent implements OnInit, OnDestroy {
   private emailConfirm: string
   public showEmailConfirm: boolean = false
 
+  public copied: boolean = false
+
   constructor(
     private profileService: ProfileService,
     public activeModal: NgbActiveModal,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private clipboard: Clipboard
   ) {}
 
   ngOnInit(): void {
@@ -70,17 +75,17 @@ export class ProfileEditDialogComponent implements OnInit, OnDestroy {
     return this.error?.password_confirm || this.error?.email_confirm
   }
 
-  onEmailKeyUp(event: KeyboardEvent) {
+  onEmailKeyUp(event: KeyboardEvent): void {
     this.newEmail = (event.target as HTMLInputElement)?.value
     this.onEmailChange()
   }
 
-  onEmailConfirmKeyUp(event: KeyboardEvent) {
+  onEmailConfirmKeyUp(event: KeyboardEvent): void {
     this.emailConfirm = (event.target as HTMLInputElement)?.value
     this.onEmailChange()
   }
 
-  onEmailChange() {
+  onEmailChange(): void {
     this.showEmailConfirm = this.currentEmail !== this.newEmail
     if (this.showEmailConfirm) {
       this.form.get('email_confirm').enable()
@@ -96,19 +101,18 @@ export class ProfileEditDialogComponent implements OnInit, OnDestroy {
     }
   }
 
-  onPasswordKeyUp(event: KeyboardEvent) {
+  onPasswordKeyUp(event: KeyboardEvent): void {
     this.newPassword = (event.target as HTMLInputElement)?.value
     this.onPasswordChange()
   }
 
-  onPasswordConfirmKeyUp(event: KeyboardEvent) {
+  onPasswordConfirmKeyUp(event: KeyboardEvent): void {
     this.passwordConfirm = (event.target as HTMLInputElement)?.value
     this.onPasswordChange()
   }
 
-  onPasswordChange() {
+  onPasswordChange(): void {
     this.showPasswordConfirm = this.currentPassword !== this.newPassword
-    console.log(this.currentPassword, this.newPassword, this.passwordConfirm)
 
     if (this.showPasswordConfirm) {
       this.form.get('password_confirm').enable()
@@ -124,7 +128,7 @@ export class ProfileEditDialogComponent implements OnInit, OnDestroy {
     }
   }
 
-  save() {
+  save(): void {
     const profile = Object.assign({}, this.form.value)
     this.networkActive = true
     this.profileService
@@ -142,7 +146,30 @@ export class ProfileEditDialogComponent implements OnInit, OnDestroy {
       })
   }
 
-  cancel() {
+  cancel(): void {
     this.activeModal.close()
+  }
+
+  generateAuthToken(): void {
+    this.profileService.generateAuthToken().subscribe({
+      next: (token: string) => {
+        console.log(token)
+        this.form.patchValue({ auth_token: token })
+      },
+      error: (error) => {
+        this.toastService.showError(
+          $localize`Error generating auth token`,
+          error
+        )
+      },
+    })
+  }
+
+  copyAuthToken(): void {
+    this.clipboard.copy(this.form.get('auth_token').value)
+    this.copied = true
+    setTimeout(() => {
+      this.copied = false
+    }, 3000)
   }
 }

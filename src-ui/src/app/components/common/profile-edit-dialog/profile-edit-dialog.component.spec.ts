@@ -1,4 +1,9 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing'
+import {
+  ComponentFixture,
+  TestBed,
+  fakeAsync,
+  tick,
+} from '@angular/core/testing'
 
 import { ProfileEditDialogComponent } from './profile-edit-dialog.component'
 import { ProfileService } from 'src/app/services/profile.service'
@@ -6,9 +11,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import {
   NgbAccordionModule,
   NgbActiveModal,
-  NgbModal,
   NgbModalModule,
-  NgbModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { HttpClientModule } from '@angular/common/http'
 import { TextComponent } from '../input/text/text.component'
@@ -16,12 +19,14 @@ import { PasswordComponent } from '../input/password/password.component'
 import { of, throwError } from 'rxjs'
 import { ToastService } from 'src/app/services/toast.service'
 import { By } from '@angular/platform-browser'
+import { Clipboard } from '@angular/cdk/clipboard'
 
 const profile = {
   email: 'foo@bar.com',
   password: '*********',
   first_name: 'foo',
   last_name: 'bar',
+  auth_token: '123456789abcdef',
 }
 
 describe('ProfileEditDialogComponent', () => {
@@ -29,6 +34,7 @@ describe('ProfileEditDialogComponent', () => {
   let fixture: ComponentFixture<ProfileEditDialogComponent>
   let profileService: ProfileService
   let toastService: ToastService
+  let clipboard: Clipboard
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -48,6 +54,7 @@ describe('ProfileEditDialogComponent', () => {
     })
     profileService = TestBed.inject(ProfileService)
     toastService = TestBed.inject(ToastService)
+    clipboard = TestBed.inject(Clipboard)
     fixture = TestBed.createComponent(ProfileEditDialogComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
@@ -68,6 +75,7 @@ describe('ProfileEditDialogComponent', () => {
       password: profile.password,
       first_name: 'foo2',
       last_name: profile.last_name,
+      auth_token: profile.auth_token,
     }
     const updateSpy = jest.spyOn(profileService, 'update')
     const errorSpy = jest.spyOn(toastService, 'showError')
@@ -150,5 +158,40 @@ describe('ProfileEditDialogComponent', () => {
       'Passwords must match'
     )
     expect(component.saveDisabled).toBeFalsy()
+  })
+
+  it('should support auth token copy', fakeAsync(() => {
+    const getSpy = jest.spyOn(profileService, 'get')
+    getSpy.mockReturnValue(of(profile))
+    component.ngOnInit()
+    const copySpy = jest.spyOn(clipboard, 'copy')
+    component.copyAuthToken()
+    expect(copySpy).toHaveBeenCalledWith(profile.auth_token)
+    expect(component.copied).toBeTruthy()
+    tick(3000)
+    expect(component.copied).toBeFalsy()
+  }))
+
+  it('should support generate token, display error if needed', () => {
+    const getSpy = jest.spyOn(profileService, 'get')
+    getSpy.mockReturnValue(of(profile))
+
+    const generateSpy = jest.spyOn(profileService, 'generateAuthToken')
+    const errorSpy = jest.spyOn(toastService, 'showError')
+    generateSpy.mockReturnValueOnce(
+      throwError(() => new Error('failed to generate'))
+    )
+    component.generateAuthToken()
+    expect(errorSpy).toHaveBeenCalled()
+
+    generateSpy.mockClear()
+    const newToken = '789101112hijk'
+    generateSpy.mockReturnValueOnce(of(newToken))
+    component.generateAuthToken()
+    expect(generateSpy).toHaveBeenCalled()
+    expect(component.form.get('auth_token').value).not.toEqual(
+      profile.auth_token
+    )
+    expect(component.form.get('auth_token').value).toEqual(newToken)
   })
 })

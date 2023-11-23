@@ -27,6 +27,27 @@
         </div>
         <pngx-input-text i18n-title title="First name" formControlName="first_name" [error]="error?.first_name"></pngx-input-text>
         <pngx-input-text i18n-title title="Last name" formControlName="last_name" [error]="error?.first_name"></pngx-input-text>
+        <div class="mb-3">
+          <label class="form-label" i18n>API Auth Token</label>
+          <div class="position-relative">
+            <div class="input-group">
+              <input type="text" class="form-control" formControlName="auth_token" readonly>
+              <button type="button" class="btn btn-outline-secondary" (click)="copyAuthToken()" i18n-title title="Copy">
+                <svg class="buttonicon-sm" fill="currentColor">
+                  <use *ngIf="!copied" xlink:href="assets/bootstrap-icons.svg#clipboard-fill" />
+                  <use *ngIf="copied" xlink:href="assets/bootstrap-icons.svg#clipboard-check-fill" />
+                </svg><span class="visually-hidden" i18n>Copy</span>
+              </button>
+              <button type="button" class="btn btn-outline-secondary" (click)="generateAuthToken()" i18n-title title="Regenerate auth token">
+                <svg class="buttonicon" fill="currentColor">
+                  <use xlink:href="assets/bootstrap-icons.svg#arrow-repeat" />
+                </svg>
+              </button>
+            </div>
+            <span class="badge copied-badge bg-primary small fade ms-4 position-absolute top-50 translate-middle-y pe-none z-3" [class.show]="copied" i18n>Copied!</span>
+          </div>
+          <div class="form-text text-muted text-end fst-italic" i18n>Warning: changing the token cannot be undone</div>
+        </div>
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline-secondary" (click)="cancel()" i18n [disabled]="networkActive">Cancel</button>

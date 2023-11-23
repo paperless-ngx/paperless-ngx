@@ -43,4 +43,12 @@ describe('ProfileService', () => {
       email: 'foo@bar.com',
     })
   })
+
+  it('supports generating new auth token', () => {
+    service.generateAuthToken().subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}profile/generate_auth_token/`
+    )
+    expect(req.request.method).toEqual('POST')
+  })
 })

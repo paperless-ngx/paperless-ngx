@@ -24,4 +24,11 @@ export class ProfileService {
       profile
     )
   }
+
+  generateAuthToken(): Observable<string> {
+    return this.http.post<string>(
+      `${environment.apiBaseUrl}${this.endpoint}/generate_auth_token/`,
+      {}
+    )
+  }
 }

@@ -27,6 +27,7 @@ from guardian.shortcuts import assign_perm
 from guardian.shortcuts import get_perms
 from guardian.shortcuts import get_users_with_perms
 from rest_framework import status
+from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 from whoosh.writing import AsyncWriter
 
@@ -5823,7 +5824,6 @@ class TestApiProfile(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         self.assertEqual(response.data["email"], self.user.email)
-        self.assertEqual(response.data["password"], "**********")
         self.assertEqual(response.data["first_name"], self.user.first_name)
         self.assertEqual(response.data["last_name"], self.user.last_name)
 
@@ -5852,3 +5852,26 @@ class TestApiProfile(DirectoriesMixin, APITestCase):
         self.assertEqual(user.email, user_data["email"])
         self.assertEqual(user.first_name, user_data["first_name"])
         self.assertEqual(user.last_name, user_data["last_name"])
+
+    def test_update_auth_token(self):
+        """
+        GIVEN:
+            - Configured user
+        WHEN:
+            - API call is made to generate auth token
+        THEN:
+            - Token is created the first time, updated the second
+        """
+
+        self.assertEqual(len(Token.objects.all()), 0)
+
+        response = self.client.post(f"{self.ENDPOINT}generate_auth_token/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        token1 = Token.objects.filter(user=self.user).first()
+        self.assertIsNotNone(token1)
+
+        response = self.client.post(f"{self.ENDPOINT}generate_auth_token/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        token2 = Token.objects.filter(user=self.user).first()
+
+        self.assertNotEqual(token1.key, token2.key)

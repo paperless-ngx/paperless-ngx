@@ -3,4 +3,5 @@ export interface PaperlessUserProfile {
   password?: string
   first_name?: string
   last_name?: string
+  auth_token?: string
 }
