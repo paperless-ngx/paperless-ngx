@@ -57,6 +57,10 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
   --pngx-primary-text-contrast: #{$text-color-dark-bg} !important;
 }
 
+.text-primary-contrast {
+  color: var(--pngx-primary-text-contrast);
+}
+
 // Dark mode
 @mixin paperless-green-dark-mode {
   --pngx-primary-lightness: 31%;
@@ -150,6 +154,10 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
     }
   }
 
+  .row-cols-paperless-cards .card {
+    --bs-border-color-translucent: rgba(0, 0, 0, .3);
+  }
+
   .modal-content, .modal-header, .modal-body, .modal-footer {
     background-color: var(--bs-body-bg);
     border-color: var(--bs-border-color);
@@ -230,7 +238,7 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
 
   .alert-primary {
     --bs-alert-color: var(--bs-primary);
-    --bs-alert-bg: var(--pngx-primary-darken-27);
+    --bs-alert-bg: var(--pngx-primary-darken-18);
     --bs-alert-border-color: var(--pngx-bg-darker);
   }
 
