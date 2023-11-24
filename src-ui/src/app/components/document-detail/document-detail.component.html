@@ -240,7 +240,7 @@
 </div>
 
 <ng-template #previewContent>
-    <div *ngIf="previewLoading" class="w-100 h-100 d-flex align-items-center justify-content-center">
+    <div *ngIf="!metadata" class="w-100 h-100 d-flex align-items-center justify-content-center">
         <div>
             <div class="spinner-border spinner-border-sm me-2" role="status"></div>
             <ng-container i18n>Loading...</ng-container>
@@ -255,7 +255,6 @@
                 [showBorders]="false"
                 [zoom]="previewZoomSetting"
                 (pagesLoaded)="onPagesLoaded($event)"
-                (pdfLoadingStarts)="onPdfLoadingStarts()"
                 (pdfLoadingFailed)="onPdfLoadingFailed($event)"
                 (beforePrint)="onBeforePrint()"
                 (afterPrint)="onAfterPrint()"
