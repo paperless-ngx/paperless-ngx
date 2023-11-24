@@ -5,14 +5,21 @@
             <input class="form-control flex-grow-0 w-auto" type="number" min="1" [max]="previewNumPages" [(ngModel)]="previewCurrentPage" />
             <div class="input-group-text" i18n>of {{previewNumPages}}</div>
         </div>
-        <div class="input-group input-group-sm me-5 d-none d-md-flex">
+        <div class="input-group input-group-sm me-2 d-none d-md-flex">
             <button class="btn btn-outline-secondary" (click)="decreaseZoom()" i18n>-</button>
             <select class="form-select" (change)="onZoomSelect($event)">
                 <option *ngFor="let setting of zoomSettings" [value]="setting" [selected]="previewZoomSetting == setting">
                     {{ getZoomSettingTitle(setting) }}
                 </option>
-              </select>
+            </select>
             <button class="btn btn-outline-secondary" (click)="increaseZoom()" i18n>+</button>
+        </div>
+        <div class="input-group input-group-sm me-5 d-none d-md-flex">
+            <button class="btn btn-sm btn-outline-secondary me-5" (click)="print()">
+                <svg class="buttonicon-sm" fill="currentColor">
+                    <use xlink:href="assets/bootstrap-icons.svg#printer" />
+                </svg><span class="ps-2" i18n>Print</span>
+            </button>
         </div>
     </ng-container>
 

@@ -76,6 +76,7 @@ import { PaperlessCustomFieldInstance } from 'src/app/data/paperless-custom-fiel
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { InvalidPDFException } from 'ngx-extended-pdf-viewer/lib/events/invalid-pdf-exception'
 import { PagesLoadedEvent } from 'ngx-extended-pdf-viewer/lib/events/pages-loaded-event'
+import { NgxExtendedPdfViewerService } from 'ngx-extended-pdf-viewer'
 import { pdfDefaultOptions } from 'ngx-extended-pdf-viewer'
 
 enum DocumentDetailNavIDs {
@@ -201,7 +202,8 @@ export class DocumentDetailComponent
     private userService: UserService,
     private customFieldsService: CustomFieldsService,
     private http: HttpClient,
-    private ref: ChangeDetectorRef
+    private ref: ChangeDetectorRef,
+    private printService: NgxExtendedPdfViewerService
   ) {
     super()
     pdfDefaultOptions.passwordPrompt = {
@@ -978,5 +980,9 @@ export class DocumentDetailComponent
     if (currentIndex < 4) currentIndex = 7
     this.previewZoomSetting =
       Object.values(ZoomSetting)[Math.max(4, currentIndex - 1)]
+  }
+
+  print(): void {
+    this.printService.print()
   }
 }
