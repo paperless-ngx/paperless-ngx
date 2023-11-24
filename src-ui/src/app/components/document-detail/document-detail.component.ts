@@ -154,6 +154,7 @@ export class DocumentDetailComponent
   previewCurrentPage: number = 1
   previewNumPages: number = 1
   previewZoomSetting: ZoomSetting = ZoomSetting.Width
+  previewLoading: boolean = true
 
   store: BehaviorSubject<any>
   isDirty$: Observable<boolean>
@@ -445,6 +446,8 @@ export class DocumentDetailComponent
       .subscribe({
         next: (result) => {
           this.metadata = result
+          if (this.getContentType() !== 'application/pdf')
+            this.previewLoading = false
         },
         error: (error) => {
           this.metadata = null
@@ -766,6 +769,10 @@ export class DocumentDetailComponent
       })
   }
 
+  onPdfLoadingStarts() {
+    this.previewLoading = false
+  }
+
   onPagesLoaded(event: PagesLoadedEvent) {
     this.previewNumPages = event.pagesCount
   }
@@ -782,6 +789,54 @@ export class DocumentDetailComponent
       this.showPasswordField = false
       this.setPasswordCallback((event.target as HTMLInputElement).value)
     }
+  }
+
+  onZoomSelect(event: Event) {
+    this.previewZoomSetting = (event.target as HTMLSelectElement)
+      ?.value as ZoomSetting
+  }
+
+  get zoomSettings() {
+    return Object.values(ZoomSetting)
+  }
+
+  getZoomSettingTitle(setting: ZoomSetting = null): string {
+    switch (setting) {
+      case ZoomSetting.Auto:
+        return $localize`Auto`
+      case ZoomSetting.Actual:
+        return $localize`Actual Size`
+      case ZoomSetting.Fit:
+        return $localize`Page Fit`
+      case ZoomSetting.Width:
+        return $localize`Page Width`
+      default:
+        return setting
+    }
+  }
+
+  increaseZoom(): void {
+    let currentIndex = Object.values(ZoomSetting).indexOf(
+      this.previewZoomSetting
+    )
+    if (currentIndex < 4) currentIndex = 7
+    this.previewZoomSetting =
+      Object.values(ZoomSetting)[
+        Math.min(Object.values(ZoomSetting).length - 1, currentIndex + 1)
+      ]
+  }
+
+  decreaseZoom(): void {
+    let currentIndex = Object.values(ZoomSetting).indexOf(
+      this.previewZoomSetting
+    )
+    if (currentIndex < 4) currentIndex = 7
+    this.previewZoomSetting =
+      Object.values(ZoomSetting)[Math.max(4, currentIndex - 1)]
+  }
+
+  print(): void {
+    this.printService.print()
   }
 
   get showPermissions(): boolean {
@@ -936,53 +991,5 @@ export class DocumentDetailComponent
     )
     this.updateFormForCustomFields(true)
     this.documentForm.updateValueAndValidity()
-  }
-
-  onZoomSelect(event: Event) {
-    this.previewZoomSetting = (event.target as HTMLSelectElement)
-      ?.value as ZoomSetting
-  }
-
-  get zoomSettings() {
-    return Object.values(ZoomSetting)
-  }
-
-  getZoomSettingTitle(setting: ZoomSetting = null): string {
-    switch (setting) {
-      case ZoomSetting.Auto:
-        return $localize`Auto`
-      case ZoomSetting.Actual:
-        return $localize`Actual Size`
-      case ZoomSetting.Fit:
-        return $localize`Page Fit`
-      case ZoomSetting.Width:
-        return $localize`Page Width`
-      default:
-        return setting
-    }
-  }
-
-  increaseZoom(): void {
-    let currentIndex = Object.values(ZoomSetting).indexOf(
-      this.previewZoomSetting
-    )
-    if (currentIndex < 4) currentIndex = 7
-    this.previewZoomSetting =
-      Object.values(ZoomSetting)[
-        Math.min(Object.values(ZoomSetting).length - 1, currentIndex + 1)
-      ]
-  }
-
-  decreaseZoom(): void {
-    let currentIndex = Object.values(ZoomSetting).indexOf(
-      this.previewZoomSetting
-    )
-    if (currentIndex < 4) currentIndex = 7
-    this.previewZoomSetting =
-      Object.values(ZoomSetting)[Math.max(4, currentIndex - 1)]
-  }
-
-  print(): void {
-    this.printService.print()
   }
 }

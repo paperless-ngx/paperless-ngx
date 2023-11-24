@@ -240,6 +240,12 @@
 </div>
 
 <ng-template #previewContent>
+    <div *ngIf="previewLoading" class="w-100 h-100 d-flex align-items-center justify-content-center">
+        <div>
+            <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+            <ng-container i18n>Loading...</ng-container>
+        </div>
+    </div>
     <ng-container *ngIf="getContentType() === 'application/pdf'">
         <div class="preview-sticky pdf-viewer-container" *ngIf="!useNativePdfViewer ; else nativePdfViewer">
             <ngx-extended-pdf-viewer
@@ -248,6 +254,7 @@
                 [showToolbar]="false"
                 [zoom]="previewZoomSetting"
                 (pagesLoaded)="onPagesLoaded($event)"
+                (pdfLoadingStarts)="onPdfLoadingStarts()"
                 (pdfLoadingFailed)="onPdfLoadingFailed($event)"
                 [(page)]="previewCurrentPage">
             </ngx-extended-pdf-viewer>
