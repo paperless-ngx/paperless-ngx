@@ -44,8 +44,8 @@ class Command(ProgressBarMixin, BaseCommand):
             default=False,
             action="store_true",
             help=(
-                "If set, the document retagger will overwrite any previously"
-                "set correspondent, document and remove correspondents, types"
+                "If set, the document retagger will overwrite any previously "
+                "set correspondent, document and remove correspondents, types "
                 "and tags that do not match anymore due to changed rules."
             ),
         )
