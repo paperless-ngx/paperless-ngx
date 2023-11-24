@@ -87,6 +87,20 @@ enum DocumentDetailNavIDs {
   Permissions = 6,
 }
 
+enum ZoomSetting {
+  Auto = 'auto',
+  Actual = 'page-actual',
+  Fit = 'page-fit',
+  Width = 'page-width',
+  Quarter = '25%',
+  Half = '50%',
+  ThreeQuarters = '75%',
+  OneHundred = '100%',
+  OneHundredFifty = '150%',
+  TwoHundred = '200%',
+  ThreeHundred = '300%',
+}
+
 @Component({
   selector: 'pngx-document-detail',
   templateUrl: './document-detail.component.html',
@@ -138,6 +152,7 @@ export class DocumentDetailComponent
 
   previewCurrentPage: number = 1
   previewNumPages: number = 1
+  previewZoomSetting: ZoomSetting = ZoomSetting.Width
 
   store: BehaviorSubject<any>
   isDirty$: Observable<boolean>
@@ -919,5 +934,49 @@ export class DocumentDetailComponent
     )
     this.updateFormForCustomFields(true)
     this.documentForm.updateValueAndValidity()
+  }
+
+  onZoomSelect(event: Event) {
+    this.previewZoomSetting = (event.target as HTMLSelectElement)
+      ?.value as ZoomSetting
+  }
+
+  get zoomSettings() {
+    return Object.values(ZoomSetting)
+  }
+
+  getZoomSettingTitle(setting: ZoomSetting = null): string {
+    switch (setting) {
+      case ZoomSetting.Auto:
+        return $localize`Auto`
+      case ZoomSetting.Actual:
+        return $localize`Actual Size`
+      case ZoomSetting.Fit:
+        return $localize`Page Fit`
+      case ZoomSetting.Width:
+        return $localize`Page Width`
+      default:
+        return setting
+    }
+  }
+
+  increaseZoom(): void {
+    let currentIndex = Object.values(ZoomSetting).indexOf(
+      this.previewZoomSetting
+    )
+    if (currentIndex < 4) currentIndex = 7
+    this.previewZoomSetting =
+      Object.values(ZoomSetting)[
+        Math.min(Object.values(ZoomSetting).length - 1, currentIndex + 1)
+      ]
+  }
+
+  decreaseZoom(): void {
+    let currentIndex = Object.values(ZoomSetting).indexOf(
+      this.previewZoomSetting
+    )
+    if (currentIndex < 4) currentIndex = 7
+    this.previewZoomSetting =
+      Object.values(ZoomSetting)[Math.max(4, currentIndex - 1)]
   }
 }

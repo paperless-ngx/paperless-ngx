@@ -1,9 +1,20 @@
 <pngx-page-header [(title)]="title">
-    <div class="input-group input-group-sm me-5 d-none d-md-flex" *ngIf="getContentType() === 'application/pdf' && !useNativePdfViewer">
-      <div class="input-group-text" i18n>Page</div>
-      <input class="form-control flex-grow-0 w-auto" type="number" min="1" [max]="previewNumPages" [(ngModel)]="previewCurrentPage" />
-      <div class="input-group-text" i18n>of {{previewNumPages}}</div>
-    </div>
+    <ng-container *ngIf="getContentType() === 'application/pdf' && !useNativePdfViewer">
+        <div class="input-group input-group-sm me-2 d-none d-md-flex">
+            <div class="input-group-text" i18n>Page</div>
+            <input class="form-control flex-grow-0 w-auto" type="number" min="1" [max]="previewNumPages" [(ngModel)]="previewCurrentPage" />
+            <div class="input-group-text" i18n>of {{previewNumPages}}</div>
+        </div>
+        <div class="input-group input-group-sm me-5 d-none d-md-flex">
+            <button class="btn btn-outline-secondary" (click)="decreaseZoom()" i18n>-</button>
+            <select class="form-select" (change)="onZoomSelect($event)">
+                <option *ngFor="let setting of zoomSettings" [value]="setting" [selected]="previewZoomSetting == setting">
+                    {{ getZoomSettingTitle(setting) }}
+                </option>
+              </select>
+            <button class="btn btn-outline-secondary" (click)="increaseZoom()" i18n>+</button>
+        </div>
+    </ng-container>
 
     <button type="button" class="btn btn-sm btn-outline-danger me-4" (click)="delete()" [disabled]="!userIsOwner" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Document }">
         <svg class="buttonicon" fill="currentColor">
@@ -227,15 +238,8 @@
             <ngx-extended-pdf-viewer
                 [src]="previewUrl"
                 [useBrowserLocale]="true"
-                [showPagingButtons]="false"
-                [showRotateButton]="false"
-                [showHandToolButton]="false"
-                [showOpenFileButton]="false"
-                [showDownloadButton]="false"
-                [showDrawEditor]="false"
-                [showTextEditor]="false"
-                [showSecondaryToolbarButton]="false"
-                [showStampEditor]="false"
+                [showToolbar]="false"
+                [zoom]="previewZoomSetting"
                 (pagesLoaded)="onPagesLoaded($event)"
                 (pdfLoadingFailed)="onPdfLoadingFailed($event)"
                 [(page)]="previewCurrentPage">
