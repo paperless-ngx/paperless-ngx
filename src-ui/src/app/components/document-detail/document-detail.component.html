@@ -15,7 +15,7 @@
             <button class="btn btn-outline-secondary" (click)="increaseZoom()" i18n>+</button>
         </div>
         <div class="input-group input-group-sm me-5 d-none d-md-flex">
-            <button class="btn btn-sm btn-outline-secondary me-5" (click)="print()">
+            <button class="btn btn-sm btn-outline-secondary me-5" (click)="print()" [disabled]="printLoadingModal">
                 <svg class="buttonicon-sm" fill="currentColor">
                     <use xlink:href="assets/bootstrap-icons.svg#printer" />
                 </svg><span class="ps-2" i18n>Print</span>
@@ -257,6 +257,9 @@
                 (pagesLoaded)="onPagesLoaded($event)"
                 (pdfLoadingStarts)="onPdfLoadingStarts()"
                 (pdfLoadingFailed)="onPdfLoadingFailed($event)"
+                (beforePrint)="onBeforePrint()"
+                (afterPrint)="onAfterPrint()"
+                (progress)="onProgress($event)"
                 [(page)]="previewCurrentPage">
             </ngx-extended-pdf-viewer>
         </div>

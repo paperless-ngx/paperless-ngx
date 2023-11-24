@@ -135,6 +135,7 @@ import localeSv from '@angular/common/locales/sv'
 import localeTr from '@angular/common/locales/tr'
 import localeUk from '@angular/common/locales/uk'
 import localeZh from '@angular/common/locales/zh'
+import { LoadingDialogComponent } from './components/common/loading-dialog/loading-dialog.component'
 
 registerLocaleData(localeAf)
 registerLocaleData(localeAr)
@@ -256,6 +257,7 @@ function initializeApp(settings: SettingsService) {
     CustomFieldsComponent,
     CustomFieldEditDialogComponent,
     CustomFieldsDropdownComponent,
+    LoadingDialogComponent,
   ],
   imports: [
     BrowserModule,

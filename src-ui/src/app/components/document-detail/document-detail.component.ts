@@ -10,6 +10,7 @@ import { ActivatedRoute, Router } from '@angular/router'
 import {
   NgbDateStruct,
   NgbModal,
+  NgbModalRef,
   NgbNav,
   NgbNavChangeEvent,
 } from '@ng-bootstrap/ng-bootstrap'
@@ -78,6 +79,8 @@ import { InvalidPDFException } from 'ngx-extended-pdf-viewer/lib/events/invalid-
 import { PagesLoadedEvent } from 'ngx-extended-pdf-viewer/lib/events/pages-loaded-event'
 import { NgxExtendedPdfViewerService } from 'ngx-extended-pdf-viewer'
 import { pdfDefaultOptions } from 'ngx-extended-pdf-viewer'
+import { LoadingDialogComponent } from '../common/loading-dialog/loading-dialog.component'
+import { ProgressBarEvent } from 'ngx-extended-pdf-viewer/lib/events/progress-bar-event'
 
 enum DocumentDetailNavIDs {
   Details = 1,
@@ -155,6 +158,8 @@ export class DocumentDetailComponent
   previewNumPages: number = 1
   previewZoomSetting: ZoomSetting = ZoomSetting.Width
   previewLoading: boolean = true
+
+  printLoadingModal: NgbModalRef
 
   store: BehaviorSubject<any>
   isDirty$: Observable<boolean>
@@ -837,6 +842,29 @@ export class DocumentDetailComponent
 
   print(): void {
     this.printService.print()
+  }
+
+  onBeforePrint(): void {
+    this.printLoadingModal = this.modalService.open(LoadingDialogComponent, {
+      backdrop: 'static',
+    })
+    const loadingDialog = this.printLoadingModal
+      .componentInstance as LoadingDialogComponent
+    loadingDialog.verb = $localize`Processing page`
+  }
+
+  onProgress(event: ProgressBarEvent): void {
+    if (event.type === 'print' && this.printLoadingModal) {
+      const loadingDialog = this.printLoadingModal
+        .componentInstance as LoadingDialogComponent
+      loadingDialog.current = event.page ?? 0
+      loadingDialog.total = event.total
+    }
+  }
+
+  onAfterPrint(): void {
+    this.printLoadingModal.close()
+    this.printLoadingModal = null
   }
 
   get showPermissions(): boolean {

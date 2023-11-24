@@ -1,0 +1,14 @@
+<div class="modal-header">
+    <h6 class="modal-title" id="modal-basic-title">Please wait</h6>
+</div>
+<div class="modal-body">
+    <div class="mb-2" i18n>{{verb}} {{current}} of {{total}}</div>
+    <div class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+        <div class="progress-bar bg-primary"
+            role="progressbar"
+            [style.width]="(current / total) * 100 + '%'"
+            [attr.aria-valuenow]="(current / total) * 100">
+        </div>
+      </div>
+</div>
+<div class="modal-footer"></div>
