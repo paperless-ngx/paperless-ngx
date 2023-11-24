@@ -16,7 +16,7 @@
       <p class="mb-0">{{toast.content}}</p>
       <details *ngIf="toast.error">
         <div class="mt-2">
-          <dl class="row mb-0" *ngIf="isDetailedError(toast.error)">
+          <dl class="row mb-0" *ngIf="isDetailedError(toast.error); else simpleError">
             <dt class="col-sm-3 fw-normal text-end">URL</dt>
             <dd class="col-sm-9">{{ toast.error.url }}</dd>
             <dt class="col-sm-3 fw-normal text-end" i18n>Status</dt>
@@ -24,6 +24,12 @@
             <dt class="col-sm-3 fw-normal text-end" i18n>Error</dt>
             <dd class="col-sm-9">{{ getErrorText(toast.error) }}</dd>
           </dl>
+          <ng-template #simpleError>
+            <dl class="row mb-0">
+              <dt class="col-sm-3 fw-normal text-end" i18n>Error</dt>
+              <dd class="col-sm-9">{{ getErrorText(toast.error) }}</dd>
+            </dl>
+          </ng-template>
           <div class="row">
             <div class="col offset-sm-3">
               <button class="btn btn-sm btn-outline-dark" (click)="copyError(toast.error)">

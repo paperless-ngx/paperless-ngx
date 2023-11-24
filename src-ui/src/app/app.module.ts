@@ -51,7 +51,7 @@ import { SavedViewWidgetComponent } from './components/dashboard/widgets/saved-v
 import { StatisticsWidgetComponent } from './components/dashboard/widgets/statistics-widget/statistics-widget.component'
 import { UploadFileWidgetComponent } from './components/dashboard/widgets/upload-file-widget/upload-file-widget.component'
 import { WidgetFrameComponent } from './components/dashboard/widgets/widget-frame/widget-frame.component'
-import { PdfViewerModule } from 'ng2-pdf-viewer'
+import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer'
 import { WelcomeWidgetComponent } from './components/dashboard/widgets/welcome-widget/welcome-widget.component'
 import { YesNoPipe } from './pipes/yes-no.pipe'
 import { FileSizePipe } from './pipes/file-size.pipe'
@@ -265,11 +265,11 @@ function initializeApp(settings: SettingsService) {
     FormsModule,
     ReactiveFormsModule,
     NgxFileDropModule,
-    PdfViewerModule,
     NgSelectModule,
     ColorSliderModule,
     TourNgBootstrapModule,
     DragDropModule,
+    NgxExtendedPdfViewerModule,
   ],
   providers: [
     {

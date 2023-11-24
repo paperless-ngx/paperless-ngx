@@ -65,18 +65,15 @@
               "src/assets",
               "src/manifest.webmanifest",
               {
-                "glob": "pdf.worker.min.js",
-                "input": "node_modules/pdfjs-dist/build/",
-                "output": "/assets/js/"
+                "glob": "**/*",
+                "input": "node_modules/ngx-extended-pdf-viewer/assets/",
+                "output": "/assets/"
               }
             ],
             "styles": [
               "src/styles.scss"
             ],
             "scripts": [],
-            "allowedCommonJsDependencies": [
-              "ng2-pdf-viewer"
-            ],
             "vendorChunk": true,
             "extractLicenses": false,
             "buildOptimizer": false,
