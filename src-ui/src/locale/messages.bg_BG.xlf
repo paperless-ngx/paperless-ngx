@@ -4073,7 +4073,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.html</context>
           <context context-type="linenumber">46</context>
         </context-group>
-        <target state="needs-translation">Expires</target>
+        <target state="translated">Изтича</target>
       </trans-unit>
       <trans-unit id="5674286808255988565" datatype="html">
         <source>Create</source>
@@ -5854,7 +5854,7 @@
           <context context-type="sourcefile">src/app/components/manage/consumption-templates/consumption-templates.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="needs-translation">Consumption Templates</target>
+        <target state="translated">Шаблони за консумация</target>
       </trans-unit>
       <trans-unit id="7308826808299076537" datatype="html">
         <source>Add Template</source>
