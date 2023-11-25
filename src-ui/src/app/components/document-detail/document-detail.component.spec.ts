@@ -19,7 +19,11 @@ import {
   NgbDateStruct,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
-import { PdfViewerComponent } from 'ng2-pdf-viewer'
+import {
+  NgxExtendedPdfViewerModule,
+  NgxExtendedPdfViewerService,
+} from 'ngx-extended-pdf-viewer'
+import { pdfDefaultOptions } from 'ngx-extended-pdf-viewer'
 import { of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
 import {
@@ -134,6 +138,7 @@ describe('DocumentDetailComponent', () => {
   let documentListViewService: DocumentListViewService
   let settingsService: SettingsService
   let customFieldsService: CustomFieldsService
+  let printService: NgxExtendedPdfViewerService
 
   let currentUserCan = true
   let currentUserHasObjectPermissions = true
@@ -160,7 +165,6 @@ describe('DocumentDetailComponent', () => {
         PermissionsFormComponent,
         SafeHtmlPipe,
         ConfirmDialogComponent,
-        PdfViewerComponent,
         SafeUrlPipe,
         ShareLinksDropdownComponent,
         CustomFieldsDropdownComponent,
@@ -249,6 +253,7 @@ describe('DocumentDetailComponent', () => {
         FormsModule,
         ReactiveFormsModule,
         NgbModalModule,
+        NgxExtendedPdfViewerModule,
       ],
     }).compileComponents()
 
@@ -264,6 +269,7 @@ describe('DocumentDetailComponent', () => {
     documentListViewService = TestBed.inject(DocumentListViewService)
     settingsService = TestBed.inject(SettingsService)
     customFieldsService = TestBed.inject(CustomFieldsService)
+    printService = TestBed.inject(NgxExtendedPdfViewerService)
     fixture = TestBed.createComponent(DocumentDetailComponent)
     component = fixture.componentInstance
   })
@@ -299,6 +305,7 @@ describe('DocumentDetailComponent', () => {
     component.titleSubject.next('Foo Bar')
     tick(1000)
     expect(component.documentForm.get('title').value).toEqual('Foo Bar')
+    component.titleKeyUp({}) // coverage
     discardPeriodicTasks()
   }))
 
@@ -652,34 +659,98 @@ describe('DocumentDetailComponent', () => {
 
   it('should support password-protected PDFs with a password field', () => {
     initNormally()
-    component.onError({ name: 'PasswordException' }) // normally dispatched by pdf viewer
+    pdfDefaultOptions.passwordPrompt.open() // normally called by pdf viewer
     expect(component.showPasswordField).toBeTruthy()
     fixture.detectChanges()
     expect(
       fixture.debugElement.query(By.css('input[type=password]'))
     ).not.toBeUndefined()
-    component.password = 'foo'
-    component.pdfPreviewLoaded({ numPages: 1000 } as any)
-    expect(component.showPasswordField).toBeFalsy()
+    let passwordSet = false
+    const passwordCallback = (password) => {
+      passwordSet = true
+    }
+    pdfDefaultOptions.passwordPrompt.setUpdateCallback(passwordCallback)
+    component.setPasswordCallback('foo')
+    expect(passwordSet).toBeTruthy()
   })
 
   it('should support Enter key in password field', () => {
     initNormally()
-    component.onError({ name: 'PasswordException' }) // normally dispatched by pdf viewer
+    pdfDefaultOptions.passwordPrompt.open() // normally called by pdf viewer
+    expect(component.showPasswordField).toBeTruthy()
     fixture.detectChanges()
-    expect(component.password).toBeUndefined()
+    expect(
+      fixture.debugElement.query(By.css('input[type=password]'))
+    ).not.toBeUndefined()
+    let passwordSet = false
+    const passwordCallback = (password) => {
+      passwordSet = true
+    }
+    pdfDefaultOptions.passwordPrompt.setUpdateCallback(passwordCallback)
     const pwField = fixture.debugElement.query(By.css('input[type=password]'))
     pwField.nativeElement.value = 'foobar'
     pwField.nativeElement.dispatchEvent(
       new KeyboardEvent('keyup', { key: 'Enter' })
     )
-    expect(component.password).toEqual('foobar')
+    expect(passwordSet).toBeTruthy()
   })
 
   it('should update n pages after pdf loaded', () => {
     initNormally()
-    component.pdfPreviewLoaded({ numPages: 1000 } as any)
-    expect(component.previewNumPages).toEqual(1000)
+    component.onPagesLoaded({ source: 'example.com', pagesCount: 100 })
+    expect(component.previewNumPages).toEqual(100)
+  })
+
+  it('should show toast if error loading pdf', () => {
+    const toastSpy = jest.spyOn(toastService, 'showError')
+    const error = { message: 'Error loading PDF', name: 'ErrorLoading' }
+    initNormally()
+    component.onPdfLoadingFailed(error)
+    expect(toastSpy).toHaveBeenCalledWith(error.message, {
+      error: error.message,
+    })
+  })
+
+  it('should support zoom controls', () => {
+    initNormally()
+    component.onZoomSelect({ target: { value: 'auto' } } as any) // from select
+    expect(component.previewZoomSetting).toEqual('auto')
+    component.increaseZoom()
+    expect(component.previewZoomSetting).toEqual('150%')
+    component.increaseZoom()
+    expect(component.previewZoomSetting).toEqual('200%')
+    component.decreaseZoom()
+    expect(component.previewZoomSetting).toEqual('150%')
+    component.onZoomSelect({ target: { value: 'page-width' } } as any) // from select
+    component.decreaseZoom()
+    expect(component.previewZoomSetting).toEqual('75%')
+  })
+
+  it('should support print', () => {
+    initNormally()
+    const printSpy = jest.spyOn(printService, 'print')
+    try {
+      // fails without a PDF loaded
+      component.print()
+    } catch (e) {}
+    expect(printSpy).toHaveBeenCalled()
+  })
+
+  it('should show loading dialog on print start, close after', () => {
+    initNormally()
+    let openModal: NgbModalRef
+    modalService.activeInstances.subscribe((modal) => (openModal = modal[0]))
+    const modalSpy = jest.spyOn(modalService, 'open')
+    component.onBeforePrint()
+    expect(modalSpy).toHaveBeenCalled()
+    component.onProgress({ type: 'print', total: 100 } as any)
+    expect(openModal.componentInstance.current).toEqual(0)
+    component.onProgress({ type: 'print', total: 100, page: 10 } as any)
+    expect(openModal.componentInstance.verb).toEqual('Processing page')
+    expect(openModal.componentInstance.current).toEqual(10)
+    expect(openModal.componentInstance.total).toEqual(100)
+    component.onAfterPrint()
+    expect(openModal.closed).toBeTruthy()
   })
 
   it('should support updating notes dynamically', () => {
@@ -805,7 +876,9 @@ describe('DocumentDetailComponent', () => {
     jest.spyOn(settingsService, 'get').mockReturnValue(false)
     expect(component.useNativePdfViewer).toBeFalsy()
     fixture.detectChanges()
-    expect(fixture.debugElement.query(By.css('pdf-viewer'))).not.toBeNull()
+    expect(
+      fixture.debugElement.query(By.css('ngx-extended-pdf-viewer'))
+    ).not.toBeNull()
   })
 
   it('should display native pdf viewer if enabled', () => {
