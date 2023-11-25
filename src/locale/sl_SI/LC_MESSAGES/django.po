@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-10 09:02-0800\n"
-"PO-Revision-Date: 2023-11-25 13:20\n"
+"PO-Revision-Date: 2023-11-25 14:26\n"
 "Last-Translator: \n"
 "Language-Team: Slovenian\n"
 "Language: sl_SI\n"
@@ -573,7 +573,7 @@ msgstr "filtriraj pot"
 
 #: documents/models.py:768
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
-msgstr ""
+msgstr "Če je določena, zajemi samo dokumente s potjo, ki se ujema s to. Dovoljeni so nadomestni znaki, določeni kot *. Ni občutljivo na velikost črk."
 
 #: documents/models.py:775
 msgid "filter filename"
@@ -820,11 +820,11 @@ msgstr "Poslali smo vam navodila za nastavitev gesla. Kmalu boste prejeli e-poš
 
 #: documents/templates/registration/password_reset_form.html:14
 msgid "Paperless-ngx reset password request"
-msgstr ""
+msgstr "Zahteva za ponastavitev gesla Paperless-ngx"
 
 #: documents/templates/registration/password_reset_form.html:41
 msgid "Enter your email address below, and we'll email instructions for setting a new one."
-msgstr ""
+msgstr "Spodaj vnesite svoj e-poštni naslov, mi pa vam bomo poslali navodila za nastavitev novega."
 
 #: documents/templates/registration/password_reset_form.html:44
 msgid "An error occurred. Please try again."
@@ -860,7 +860,7 @@ msgstr "Beloruščina"
 
 #: paperless/settings.py:590
 msgid "Bulgarian"
-msgstr ""
+msgstr "Bolgarščina"
 
 #: paperless/settings.py:591
 msgid "Catalan"
@@ -900,7 +900,7 @@ msgstr "Francoščina"
 
 #: paperless/settings.py:600
 msgid "Hungarian"
-msgstr ""
+msgstr "Madžarščina"
 
 #: paperless/settings.py:601
 msgid "Italian"
@@ -992,7 +992,7 @@ msgstr "Dejanja"
 
 #: paperless_mail/admin.py:82
 msgid "The action applied to the mail. This action is only performed when the mail body or attachments were consumed from the mail."
-msgstr ""
+msgstr "Dejanje, ki se uporablja za e-pošto. To dejanje se izvede le, če je bilo iz e-pošte zajeto telo ali priponke."
 
 #: paperless_mail/admin.py:90
 msgid "Metadata"
@@ -1052,7 +1052,7 @@ msgstr "geslo"
 
 #: paperless_mail/models.py:42
 msgid "Is token authentication"
-msgstr ""
+msgstr "Je avtentikacija z žetonom"
 
 #: paperless_mail/models.py:45
 msgid "character set"
@@ -1076,11 +1076,11 @@ msgstr "Obdelujte samo priloge."
 
 #: paperless_mail/models.py:65
 msgid "Process full Mail (with embedded attachments in file) as .eml"
-msgstr ""
+msgstr "Obdelava celotne e-pošte (z vstavljenimi priponkami v datoteki) kot .eml"
 
 #: paperless_mail/models.py:67
 msgid "Process full Mail (with embedded attachments in file) as .eml + process attachments as separate documents"
-msgstr ""
+msgstr "Obdelava celotne e-pošte (z vstavljenimi prilogami v datoteki) kot .eml + obdelava prilog kot ločenih dokumentov"
 
 #: paperless_mail/models.py:73
 msgid "Process all files, including 'inline' attachments."
@@ -1116,7 +1116,7 @@ msgstr "Uporabite ime datoteke priloge kot naslov"
 
 #: paperless_mail/models.py:85
 msgid "Do not assign title from rule"
-msgstr ""
+msgstr "Ne dodelite naslova s pravilom"
 
 #: paperless_mail/models.py:88
 msgid "Do not assign a correspondent"
@@ -1184,7 +1184,7 @@ msgstr "Vgrajene priloge vključujejo vdelane slike, zato je najbolje, da to mo�
 
 #: paperless_mail/models.py:171
 msgid "consumption scope"
-msgstr ""
+msgstr "obseg zajemanja"
 
 #: paperless_mail/models.py:177
 msgid "action"
@@ -1208,7 +1208,7 @@ msgstr "dodeli dopisnika iz"
 
 #: paperless_mail/models.py:230
 msgid "Assign the rule owner to documents"
-msgstr ""
+msgstr "Dodelitev lastnika pravila dokumentom"
 
 #: paperless_mail/models.py:256
 msgid "uid"
