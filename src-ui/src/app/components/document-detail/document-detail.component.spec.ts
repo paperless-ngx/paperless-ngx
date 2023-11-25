@@ -749,6 +749,7 @@ describe('DocumentDetailComponent', () => {
     expect(openModal.componentInstance.verb).toEqual('Processing page')
     expect(openModal.componentInstance.current).toEqual(10)
     expect(openModal.componentInstance.total).toEqual(100)
+    component.onProgress({ type: 'print', total: 100, page: 100 } as any)
     component.onAfterPrint()
     expect(openModal.closed).toBeTruthy()
   })

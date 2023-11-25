@@ -853,10 +853,11 @@ export class DocumentDetailComponent
       loadingDialog.current = event.page ?? 0
       loadingDialog.total = event.total
     }
+    if (event.total === event.page) this.onAfterPrint()
   }
 
   onAfterPrint(): void {
-    this.printLoadingModal.close()
+    this.printLoadingModal?.close()
     this.printLoadingModal = null
   }
 
