@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-10 09:02-0800\n"
-"PO-Revision-Date: 2023-11-13 01:31\n"
+"PO-Revision-Date: 2023-11-26 20:35\n"
 "Last-Translator: \n"
 "Language-Team: Serbian (Latin)\n"
 "Language: sr_CS\n"
@@ -641,11 +641,11 @@ msgstr "šabloni za obradu"
 
 #: documents/models.py:886
 msgid "String"
-msgstr ""
+msgstr "String"
 
 #: documents/models.py:887
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: documents/models.py:888
 msgid "Date"
@@ -661,7 +661,7 @@ msgstr "Ceo broj"
 
 #: documents/models.py:891
 msgid "Float"
-msgstr ""
+msgstr "Float"
 
 #: documents/models.py:892
 msgid "Monetary"
@@ -673,7 +673,7 @@ msgstr "tip podataka"
 
 #: documents/models.py:912
 msgid "custom field"
-msgstr ""
+msgstr "prilagođeno polje"
 
 #: documents/models.py:913
 msgid "custom fields"
@@ -763,7 +763,7 @@ msgstr "Prijavite se"
 
 #: documents/templates/registration/login.html:70
 msgid "Forgot your password?"
-msgstr ""
+msgstr "Zaboravili ste lozinku?"
 
 #: documents/templates/registration/password_reset_complete.html:14
 msgid "Paperless-ngx reset password complete"
@@ -784,23 +784,23 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_confirm.html:42
 msgid "Set a new password."
-msgstr ""
+msgstr "Postavi novu lozinku."
 
 #: documents/templates/registration/password_reset_confirm.html:46
 msgid "Passwords did not match or too weak. Try again."
-msgstr ""
+msgstr "Lozinke se ne poklapaju ili je preslaba. Pokušajte ponovo."
 
 #: documents/templates/registration/password_reset_confirm.html:49
 msgid "New Password"
-msgstr ""
+msgstr "Nova lozinka"
 
 #: documents/templates/registration/password_reset_confirm.html:50
 msgid "Confirm Password"
-msgstr ""
+msgstr "Potvrdi lozinku"
 
 #: documents/templates/registration/password_reset_confirm.html:61
 msgid "Change my password"
-msgstr ""
+msgstr "Promeni moju lozinku"
 
 #: documents/templates/registration/password_reset_confirm.html:65
 msgid "request a new password reset"
@@ -812,7 +812,7 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_done.html:40
 msgid "Check your inbox."
-msgstr ""
+msgstr "Proverite vaše prijamno sanduče."
 
 #: documents/templates/registration/password_reset_done.html:41
 msgid "We've emailed you instructions for setting your password. You should receive the email shortly!"
@@ -836,7 +836,7 @@ msgstr "Email"
 
 #: documents/templates/registration/password_reset_form.html:54
 msgid "Send me instructions!"
-msgstr ""
+msgstr "Pošalji mi uputstva!"
 
 #: paperless/apps.py:10
 msgid "Paperless"
@@ -900,7 +900,7 @@ msgstr "Francuski"
 
 #: paperless/settings.py:600
 msgid "Hungarian"
-msgstr ""
+msgstr "Mađarski"
 
 #: paperless/settings.py:601
 msgid "Italian"
@@ -1216,15 +1216,15 @@ msgstr ""
 
 #: paperless_mail/models.py:264
 msgid "subject"
-msgstr ""
+msgstr "tema"
 
 #: paperless_mail/models.py:272
 msgid "received"
-msgstr ""
+msgstr "primljeno"
 
 #: paperless_mail/models.py:279
 msgid "processed"
-msgstr ""
+msgstr "obrađeno"
 
 #: paperless_mail/models.py:285
 msgid "status"
