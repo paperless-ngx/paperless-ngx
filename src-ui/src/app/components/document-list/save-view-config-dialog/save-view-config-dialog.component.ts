@@ -3,7 +3,7 @@ import { FormControl, FormGroup } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 
 @Component({
-  selector: 'app-save-view-config-dialog',
+  selector: 'pngx-save-view-config-dialog',
   templateUrl: './save-view-config-dialog.component.html',
   styleUrls: ['./save-view-config-dialog.component.scss'],
 })

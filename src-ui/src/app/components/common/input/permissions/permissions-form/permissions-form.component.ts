@@ -25,7 +25,7 @@ export interface PermissionsFormObject {
       multi: true,
     },
   ],
-  selector: 'app-permissions-form',
+  selector: 'pngx-permissions-form',
   templateUrl: './permissions-form.component.html',
   styleUrls: ['./permissions-form.component.scss'],
 })

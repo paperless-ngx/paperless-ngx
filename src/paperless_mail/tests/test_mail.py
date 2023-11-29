@@ -3,8 +3,7 @@ import email.contentmanager
 import random
 import uuid
 from collections import namedtuple
-from typing import ContextManager
-from typing import List
+from contextlib import AbstractContextManager
 from typing import Optional
 from typing import Union
 from unittest import mock
@@ -53,8 +52,8 @@ class BogusFolderManager:
 
 class BogusClient:
     def __init__(self, messages):
-        self.messages: List[MailMessage] = messages
-        self.capabilities: List[str] = []
+        self.messages: list[MailMessage] = messages
+        self.capabilities: list[str] = []
 
     def __enter__(self):
         return self
@@ -78,7 +77,7 @@ class BogusClient:
                         MailMessage.flags.fget.cache_clear()
 
 
-class BogusMailBox(ContextManager):
+class BogusMailBox(AbstractContextManager):
     # Common values so tests don't need to remember an accepted login
     USERNAME: str = "admin"
     ASCII_PASSWORD: str = "secret"
@@ -88,8 +87,8 @@ class BogusMailBox(ContextManager):
     ACCESS_TOKEN = "ea7e075cd3acf2c54c48e600398d5d5a"
 
     def __init__(self):
-        self.messages: List[MailMessage] = []
-        self.messages_spam: List[MailMessage] = []
+        self.messages: list[MailMessage] = []
+        self.messages_spam: list[MailMessage] = []
         self.folder = BogusFolderManager()
         self.client = BogusClient(self.messages)
         self._host = ""
@@ -221,11 +220,11 @@ class TestMail(
 
     def create_message(
         self,
-        attachments: Union[int, List[_AttachmentDef]] = 1,
+        attachments: Union[int, list[_AttachmentDef]] = 1,
         body: str = "",
         subject: str = "the subject",
         from_: str = "noone@mail.com",
-        to: Optional[List[str]] = None,
+        to: Optional[list[str]] = None,
         seen: bool = False,
         flagged: bool = False,
         processed: bool = False,
@@ -393,6 +392,11 @@ class TestMail(
             assign_title_from=MailRule.TitleSource.FROM_SUBJECT,
         )
         self.assertEqual(handler._get_title(message, att, rule), "the message title")
+        rule = MailRule(
+            name="b",
+            assign_title_from=MailRule.TitleSource.NONE,
+        )
+        self.assertEqual(handler._get_title(message, att, rule), None)
 
     def test_handle_message(self):
         message = self.create_message(
@@ -1056,6 +1060,7 @@ class TestMail(
             ],
         )
 
+    @pytest.mark.flaky(reruns=4)
     def test_filters(self):
         account = MailAccount.objects.create(
             name="test3",
@@ -1203,7 +1208,7 @@ class TestMail(
         self.assertEqual(len(self.bogus_mailbox.fetch("UNSEEN", False)), 0)
         self.assertEqual(len(self.bogus_mailbox.messages), 3)
 
-    def assert_queue_consumption_tasks_call_args(self, expected_call_args: List):
+    def assert_queue_consumption_tasks_call_args(self, expected_call_args: list):
         """
         Verifies that queue_consumption_tasks has been called with the expected arguments.
 

@@ -1,6 +1,6 @@
 import {
-  HttpClientTestingModule,
   HttpTestingController,
+  HttpClientTestingModule,
 } from '@angular/common/http/testing'
 import { Component } from '@angular/core'
 import {
@@ -16,19 +16,20 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
+import { of } from 'rxjs'
+import {
+  DEFAULT_MATCHING_ALGORITHM,
+  MATCH_AUTO,
+  MATCH_NONE,
+  MATCH_ALL,
+} from 'src/app/data/matching-model'
 import { PaperlessTag } from 'src/app/data/paperless-tag'
+import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
-import { EditDialogComponent, EditDialogMode } from './edit-dialog.component'
-import {
-  DEFAULT_MATCHING_ALGORITHM,
-  MATCH_ALL,
-  MATCH_AUTO,
-  MATCH_NONE,
-} from 'src/app/data/matching-model'
-import { of } from 'rxjs'
 import { environment } from 'src/environments/environment'
+import { EditDialogComponent, EditDialogMode } from './edit-dialog.component'
 
 @Component({
   template: `
@@ -88,6 +89,7 @@ describe('EditDialogComponent', () => {
   let component: TestComponent
   let fixture: ComponentFixture<TestComponent>
   let tagService: TagService
+  let settingsService: SettingsService
   let activeModal: NgbActiveModal
   let httpTestingController: HttpTestingController
 
@@ -110,18 +112,15 @@ describe('EditDialogComponent', () => {
               }),
           },
         },
-        {
-          provide: SettingsService,
-          useValue: {
-            currentUser,
-          },
-        },
+        SettingsService,
         TagService,
       ],
       imports: [HttpClientTestingModule, FormsModule, ReactiveFormsModule],
     }).compileComponents()
 
     tagService = TestBed.inject(TagService)
+    settingsService = TestBed.inject(SettingsService)
+    settingsService.currentUser = currentUser
     activeModal = TestBed.inject(NgbActiveModal)
     httpTestingController = TestBed.inject(HttpTestingController)
 
@@ -149,12 +148,38 @@ describe('EditDialogComponent', () => {
     expect(component.closeEnabled).toBeTruthy()
   }))
 
-  it('should set default owner when in create mode', () => {
+  it('should set default owner when in create mode if unset', () => {
     component.dialogMode = EditDialogMode.CREATE
     component.ngOnInit()
     expect(component.objectForm.get('permissions_form').value.owner).toEqual(
       currentUser.id
     )
+    // cover optional chaining
+    component.objectForm.removeControl('permissions_form')
+    component.ngOnInit()
+  })
+
+  it('should set default perms when in create mode if set', () => {
+    component.dialogMode = EditDialogMode.CREATE
+    settingsService.set(SETTINGS_KEYS.DEFAULT_PERMS_OWNER, 11)
+    settingsService.set(SETTINGS_KEYS.DEFAULT_PERMS_VIEW_USERS, [1, 2])
+    settingsService.set(SETTINGS_KEYS.DEFAULT_PERMS_VIEW_GROUPS, [3])
+    settingsService.set(SETTINGS_KEYS.DEFAULT_PERMS_EDIT_USERS, [4])
+    settingsService.set(SETTINGS_KEYS.DEFAULT_PERMS_EDIT_GROUPS, [5])
+    component.ngOnInit()
+    expect(component.objectForm.get('permissions_form').value.owner).toEqual(11)
+    expect(
+      component.objectForm.get('permissions_form').value.set_permissions
+    ).toEqual({
+      view: {
+        users: [1, 2],
+        groups: [3],
+      },
+      change: {
+        users: [4],
+        groups: [5],
+      },
+    })
     // cover optional chaining
     component.objectForm.removeControl('permissions_form')
     component.ngOnInit()

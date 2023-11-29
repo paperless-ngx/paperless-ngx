@@ -4,20 +4,19 @@ import re
 import shutil
 import stat
 import tempfile
+import uuid
+import zoneinfo
 from unittest import mock
 from unittest.mock import MagicMock
 
 from dateutil import tz
-
-try:
-    import zoneinfo
-except ImportError:
-    from backports import zoneinfo
-
 from django.conf import settings
+from django.contrib.auth.models import Group
+from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test import override_settings
 from django.utils import timezone
+from guardian.core import ObjectPermissionChecker
 
 from documents.consumer import Consumer
 from documents.consumer import ConsumerError
@@ -26,13 +25,13 @@ from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import FileInfo
+from documents.models import StoragePath
 from documents.models import Tag
 from documents.parsers import DocumentParser
 from documents.parsers import ParseError
 from documents.tasks import sanity_check
+from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
-
-from .utils import DirectoriesMixin
 
 
 class TestAttributes(TestCase):
@@ -435,6 +434,16 @@ class TestConsumer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertEqual(document.document_type.id, dt.id)
         self._assert_first_last_send_progress()
 
+    def testOverrideStoragePath(self):
+        sp = StoragePath.objects.create(name="test")
+
+        document = self.consumer.try_consume_file(
+            self.get_test_file(),
+            override_storage_path_id=sp.pk,
+        )
+        self.assertEqual(document.storage_path.id, sp.id)
+        self._assert_first_last_send_progress()
+
     def testOverrideTags(self):
         t1 = Tag.objects.create(name="t1")
         t2 = Tag.objects.create(name="t2")
@@ -447,6 +456,51 @@ class TestConsumer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertIn(t1, document.tags.all())
         self.assertNotIn(t2, document.tags.all())
         self.assertIn(t3, document.tags.all())
+        self._assert_first_last_send_progress()
+
+    def testOverrideAsn(self):
+        document = self.consumer.try_consume_file(
+            self.get_test_file(),
+            override_asn=123,
+        )
+        self.assertEqual(document.archive_serial_number, 123)
+        self._assert_first_last_send_progress()
+
+    def testOverrideTitlePlaceholders(self):
+        c = Correspondent.objects.create(name="Correspondent Name")
+        dt = DocumentType.objects.create(name="DocType Name")
+
+        document = self.consumer.try_consume_file(
+            self.get_test_file(),
+            override_correspondent_id=c.pk,
+            override_document_type_id=dt.pk,
+            override_title="{correspondent}{document_type} {added_month}-{added_year_short}",
+        )
+        now = timezone.now()
+        self.assertEqual(document.title, f"{c.name}{dt.name} {now.strftime('%m-%y')}")
+        self._assert_first_last_send_progress()
+
+    def testOverrideOwner(self):
+        testuser = User.objects.create(username="testuser")
+        document = self.consumer.try_consume_file(
+            self.get_test_file(),
+            override_owner_id=testuser.pk,
+        )
+        self.assertEqual(document.owner, testuser)
+        self._assert_first_last_send_progress()
+
+    def testOverridePermissions(self):
+        testuser = User.objects.create(username="testuser")
+        testgroup = Group.objects.create(name="testgroup")
+        document = self.consumer.try_consume_file(
+            self.get_test_file(),
+            override_view_users=[testuser.pk],
+            override_view_groups=[testgroup.pk],
+        )
+        user_checker = ObjectPermissionChecker(testuser)
+        self.assertTrue(user_checker.has_perm("view_document", document))
+        group_checker = ObjectPermissionChecker(testgroup)
+        self.assertTrue(group_checker.has_perm("view_document", document))
         self._assert_first_last_send_progress()
 
     def testNotAFile(self):
@@ -862,6 +916,7 @@ class PreConsumeTestCase(TestCase):
                 c = Consumer()
                 c.original_path = "path-to-file"
                 c.path = "/tmp/somewhere/path-to-file"
+                c.task_id = str(uuid.uuid4())
                 c.run_pre_consume_script()
 
                 m.assert_called_once()
@@ -877,6 +932,7 @@ class PreConsumeTestCase(TestCase):
                 subset = {
                     "DOCUMENT_SOURCE_PATH": c.original_path,
                     "DOCUMENT_WORKING_PATH": c.path,
+                    "TASK_ID": c.task_id,
                 }
                 self.assertDictEqual(environment, {**environment, **subset})
 
@@ -937,7 +993,10 @@ class PreConsumeTestCase(TestCase):
             with override_settings(PRE_CONSUME_SCRIPT=script.name):
                 c = Consumer()
                 c.path = "path-to-file"
-                self.assertRaises(ConsumerError, c.run_pre_consume_script)
+                self.assertRaises(
+                    ConsumerError,
+                    c.run_pre_consume_script,
+                )
 
 
 class PostConsumeTestCase(TestCase):
@@ -968,7 +1027,11 @@ class PostConsumeTestCase(TestCase):
         doc = Document.objects.create(title="Test", mime_type="application/pdf")
         c = Consumer()
         c.filename = "somefile.pdf"
-        self.assertRaises(ConsumerError, c.run_post_consume_script, doc)
+        self.assertRaises(
+            ConsumerError,
+            c.run_post_consume_script,
+            doc,
+        )
 
     @mock.patch("documents.consumer.run")
     def test_post_consume_script_simple(self, m):
@@ -995,7 +1058,9 @@ class PostConsumeTestCase(TestCase):
                 doc.tags.add(tag1)
                 doc.tags.add(tag2)
 
-                Consumer().run_post_consume_script(doc)
+                consumer = Consumer()
+                consumer.task_id = str(uuid.uuid4())
+                consumer.run_post_consume_script(doc)
 
                 m.assert_called_once()
 
@@ -1017,6 +1082,7 @@ class PostConsumeTestCase(TestCase):
                     "DOCUMENT_THUMBNAIL_URL": f"/api/documents/{doc.pk}/thumb/",
                     "DOCUMENT_CORRESPONDENT": "my_bank",
                     "DOCUMENT_TAGS": "a,b",
+                    "TASK_ID": consumer.task_id,
                 }
 
                 self.assertDictEqual(environment, {**environment, **subset})

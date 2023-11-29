@@ -14,12 +14,12 @@ import {
 } from '../services/permissions.service'
 
 @Directive({
-  selector: '[appIfObjectPermissions]',
+  selector: '[pngxIfObjectPermissions]',
 })
 export class IfObjectPermissionsDirective implements OnInit, OnChanges {
   // The role the user must have
   @Input()
-  appIfObjectPermissions: {
+  pngxIfObjectPermissions: {
     object: ObjectWithPermissions
     action: PermissionAction
   }
@@ -39,10 +39,10 @@ export class IfObjectPermissionsDirective implements OnInit, OnChanges {
 
   public ngOnInit(): void {
     if (
-      !this.appIfObjectPermissions?.object ||
+      !this.pngxIfObjectPermissions?.object ||
       this.permissionsService.currentUserHasObjectPermissions(
-        this.appIfObjectPermissions.action,
-        this.appIfObjectPermissions.object
+        this.pngxIfObjectPermissions.action,
+        this.pngxIfObjectPermissions.object
       )
     ) {
       if (!this.createdView)

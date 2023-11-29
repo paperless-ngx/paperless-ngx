@@ -1,29 +1,43 @@
-<app-page-header title="Dashboard" [subTitle]="subtitle" i18n-title>
-  <app-logo extra_classes="d-none d-md-block"></app-logo>
-</app-page-header>
+<pngx-page-header title="Dashboard" [subTitle]="subtitle" i18n-title>
+  <pngx-logo extra_classes="d-none d-md-block mt-n2 me-1" height="3.5rem"></pngx-logo>
+</pngx-page-header>
 
 <div class="row">
-  <div class="col-lg-8">
-    <div tourAnchor="tour.dashboard">
-      <ng-container *ngIf="savedViewService.loading">
+  <div class="col-12 col-lg-8 col-xl-9 mb-4">
+    <div class="row row-cols-1 g-4" tourAnchor="tour.dashboard"
+      cdkDropList
+      [cdkDropListDisabled]="settingsService.globalDropzoneActive"
+      (cdkDropListDropped)="onDrop($event)"
+    >
+      <div *ngIf="savedViewService.loading" class="col">
         <div class="spinner-border spinner-border-sm me-2" role="status"></div>
         <ng-container i18n>Loading...</ng-container>
-      </ng-container>
-
-      <app-welcome-widget *ngIf="settingsService.offerTour()" (dismiss)="completeTour()"></app-welcome-widget>
-
-      <div *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }">
-        <ng-container *ngFor="let v of savedViewService.dashboardViews; first as isFirst">
-          <app-saved-view-widget [savedView]="v"></app-saved-view-widget>
-        </ng-container>
       </div>
+
+      <div *ngIf="settingsService.offerTour()" class="col">
+        <pngx-welcome-widget (dismiss)="completeTour()"></pngx-welcome-widget>
+      </div>
+
+      <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }">
+        <div *ngFor="let v of dashboardViews" class="col">
+          <pngx-saved-view-widget
+            [savedView]="v"
+            (cdkDragStarted)="onDragStart($event)"
+            (cdkDragEnded)="onDragEnd($event)"
+          >
+          </pngx-saved-view-widget>
+        </div>
+      </ng-container>
     </div>
   </div>
-  <div class="col-lg-4">
-
-    <app-statistics-widget></app-statistics-widget>
-
-    <app-upload-file-widget></app-upload-file-widget>
-
+  <div class="col-auto col-lg-4 col-xl-3 col-sidebar">
+    <div class="row row-cols-1 g-4 mb-4 sticky-lg-top z-0">
+      <div class="col">
+        <pngx-statistics-widget></pngx-statistics-widget>
+      </div>
+      <div class="col">
+        <pngx-upload-file-widget></pngx-upload-file-widget>
+      </div>
+    </div>
   </div>
 </div>

@@ -43,6 +43,7 @@ markdown_extensions:
   - pymdownx.superfences
   - pymdownx.inlinehilite
   - pymdownx.snippets
+  - footnotes
 strict: true
 nav:
     - index.md
@@ -65,3 +66,5 @@ extra:
       link: https://hub.docker.com/r/paperlessngx/paperless-ngx
     - icon: material/chat
       link: https://matrix.to/#/#paperless:matrix.org
+plugins:
+  - glightbox

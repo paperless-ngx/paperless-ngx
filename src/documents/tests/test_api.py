@@ -7,19 +7,15 @@ import tempfile
 import urllib.request
 import uuid
 import zipfile
+import zoneinfo
 from datetime import timedelta
 from pathlib import Path
 from unittest import mock
 from unittest.mock import MagicMock
 
 import celery
-
-try:
-    import zoneinfo
-except ImportError:
-    from backports import zoneinfo
-
 import pytest
+from dateutil import parser
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.auth.models import Group
@@ -29,24 +25,32 @@ from django.test import override_settings
 from django.utils import timezone
 from guardian.shortcuts import assign_perm
 from guardian.shortcuts import get_perms
+from guardian.shortcuts import get_users_with_perms
 from rest_framework import status
 from rest_framework.test import APITestCase
 from whoosh.writing import AsyncWriter
 
 from documents import bulk_edit
 from documents import index
+from documents.data_models import DocumentSource
+from documents.models import ConsumptionTemplate
 from documents.models import Correspondent
+from documents.models import CustomField
+from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import MatchingModel
 from documents.models import Note
 from documents.models import PaperlessTask
 from documents.models import SavedView
+from documents.models import ShareLink
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import DocumentConsumeDelayMixin
 from paperless import version
+from paperless_mail.models import MailAccount
+from paperless_mail.models import MailRule
 
 
 class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
@@ -345,10 +349,35 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         tag_2 = Tag.objects.create(name="t2")
         tag_3 = Tag.objects.create(name="t3")
 
+        cf1 = CustomField.objects.create(
+            name="stringfield",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        cf2 = CustomField.objects.create(
+            name="numberfield",
+            data_type=CustomField.FieldDataType.INT,
+        )
+
         doc1.tags.add(tag_inbox)
         doc2.tags.add(tag_2)
         doc3.tags.add(tag_2)
         doc3.tags.add(tag_3)
+
+        cf1_d1 = CustomFieldInstance.objects.create(
+            document=doc1,
+            field=cf1,
+            value_text="foobard1",
+        )
+        CustomFieldInstance.objects.create(
+            document=doc1,
+            field=cf2,
+            value_int=999,
+        )
+        cf1_d3 = CustomFieldInstance.objects.create(
+            document=doc3,
+            field=cf1,
+            value_text="foobard3",
+        )
 
         response = self.client.get("/api/documents/?is_in_inbox=true")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -420,6 +449,52 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data["results"]
         self.assertEqual(len(results), 0)
+
+        response = self.client.get(
+            f"/api/documents/?id__in={doc1.id},{doc2.id}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 2)
+
+        response = self.client.get(
+            f"/api/documents/?id__range={doc1.id},{doc3.id}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 3)
+
+        response = self.client.get(
+            f"/api/documents/?id={doc2.id}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+
+        # custom field name
+        response = self.client.get(
+            f"/api/documents/?custom_fields__icontains={cf1.name}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 2)
+
+        # custom field value
+        response = self.client.get(
+            f"/api/documents/?custom_fields__icontains={cf1_d1.value}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["id"], doc1.id)
+
+        response = self.client.get(
+            f"/api/documents/?custom_fields__icontains={cf1_d3.value}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["id"], doc3.id)
 
     def test_document_checksum_filter(self):
         Document.objects.create(
@@ -1144,6 +1219,14 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         dt2 = DocumentType.objects.create(name="type2")
         sp = StoragePath.objects.create(name="path")
         sp2 = StoragePath.objects.create(name="path2")
+        cf1 = CustomField.objects.create(
+            name="string field",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        cf2 = CustomField.objects.create(
+            name="number field",
+            data_type=CustomField.FieldDataType.INT,
+        )
 
         d1 = Document.objects.create(checksum="1", correspondent=c, content="test")
         d2 = Document.objects.create(checksum="2", document_type=dt, content="test")
@@ -1172,6 +1255,22 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             document_type=dt2,
             storage_path=sp2,
             content="test",
+        )
+
+        cf1_d1 = CustomFieldInstance.objects.create(
+            document=d1,
+            field=cf1,
+            value_text="foobard1",
+        )
+        cf2_d1 = CustomFieldInstance.objects.create(
+            document=d1,
+            field=cf2,
+            value_int=999,
+        )
+        cf1_d4 = CustomFieldInstance.objects.create(
+            document=d4,
+            field=cf1,
+            value_text="foobard4",
         )
 
         with AsyncWriter(index.open_index()) as writer:
@@ -1302,6 +1401,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
                 + datetime.datetime(2020, 1, 2).strftime("%Y-%m-%d"),
             ),
         )
+
         self.assertIn(
             d5.id,
             search_query(
@@ -1318,6 +1418,27 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertCountEqual(
             search_query("&original_filename__istartswith=doc"),
             [d4.id, d5.id],
+        )
+
+        self.assertIn(
+            d1.id,
+            search_query(
+                "&custom_fields__icontains=" + cf1_d1.value,
+            ),
+        )
+
+        self.assertIn(
+            d1.id,
+            search_query(
+                "&custom_fields__icontains=" + str(cf2_d1.value),
+            ),
+        )
+
+        self.assertIn(
+            d4.id,
+            search_query(
+                "&custom_fields__icontains=" + cf1_d4.value,
+            ),
         )
 
     def test_search_filtering_respect_owner(self):
@@ -1569,6 +1690,13 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         )
 
         tag_inbox = Tag.objects.create(name="t1", is_inbox_tag=True)
+        Tag.objects.create(name="t2")
+        Tag.objects.create(name="t3")
+        Correspondent.objects.create(name="c1")
+        Correspondent.objects.create(name="c2")
+        DocumentType.objects.create(name="dt1")
+        StoragePath.objects.create(name="sp1")
+        StoragePath.objects.create(name="sp2")
 
         doc1.tags.add(tag_inbox)
 
@@ -1586,6 +1714,10 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             1,
         )
         self.assertEqual(response.data["character_count"], 11)
+        self.assertEqual(response.data["tag_count"], 3)
+        self.assertEqual(response.data["correspondent_count"], 2)
+        self.assertEqual(response.data["document_type_count"], 1)
+        self.assertEqual(response.data["storage_path_count"], 2)
 
     def test_statistics_no_inbox_tag(self):
         Document.objects.create(title="none1", checksum="A")
@@ -2341,13 +2473,18 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         WHEN:
             - API request is made to add a note
         THEN:
-            - note is created and associated with document
+            - note is created and associated with document, modified time is updated
         """
         doc = Document.objects.create(
             title="test",
             mime_type="application/pdf",
             content="this is a document which will have notes added",
+            created=timezone.now() - timedelta(days=1),
         )
+        # set to yesterday
+        doc.modified = timezone.now() - timedelta(days=1)
+        self.assertEqual(doc.modified.day, (timezone.now() - timedelta(days=1)).day)
+
         resp = self.client.post(
             f"/api/documents/{doc.pk}/notes/",
             data={"note": "this is a posted note"},
@@ -2368,6 +2505,10 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         resp_data = resp_data[0]
 
         self.assertEqual(resp_data["note"], "this is a posted note")
+
+        doc = Document.objects.get(pk=doc.pk)
+        # modified was updated to today
+        self.assertEqual(doc.modified.day, timezone.now().day)
 
     def test_notes_permissions_aware(self):
         """
@@ -2399,7 +2540,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             f"/api/documents/{doc.pk}/notes/",
             format="json",
         )
-        self.assertEqual(resp.content, b"Insufficient permissions to view")
+        self.assertEqual(resp.content, b"Insufficient permissions to view notes")
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
         assign_perm("view_document", user1, doc)
@@ -2408,7 +2549,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             f"/api/documents/{doc.pk}/notes/",
             data={"note": "this is a posted note"},
         )
-        self.assertEqual(resp.content, b"Insufficient permissions to create")
+        self.assertEqual(resp.content, b"Insufficient permissions to create notes")
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
         note = Note.objects.create(
@@ -2422,23 +2563,27 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             format="json",
         )
 
-        self.assertEqual(response.content, b"Insufficient permissions to delete")
+        self.assertEqual(response.content, b"Insufficient permissions to delete notes")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_delete_note(self):
         """
         GIVEN:
-            - Existing document
+            - Existing document, existing note
         WHEN:
-            - API request is made to add a note
+            - API request is made to delete a note
         THEN:
-            - note is created and associated with document
+            - note is deleted, document modified is updated
         """
         doc = Document.objects.create(
             title="test",
             mime_type="application/pdf",
             content="this is a document which will have notes!",
+            created=timezone.now() - timedelta(days=1),
         )
+        # set to yesterday
+        doc.modified = timezone.now() - timedelta(days=1)
+        self.assertEqual(doc.modified.day, (timezone.now() - timedelta(days=1)).day)
         note = Note.objects.create(
             note="This is a note.",
             document=doc,
@@ -2453,6 +2598,9 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         self.assertEqual(len(Note.objects.all()), 0)
+        doc = Document.objects.get(pk=doc.pk)
+        # modified was updated to today
+        self.assertEqual(doc.modified.day, timezone.now().day)
 
     def test_get_notes_no_doc(self):
         """
@@ -2562,6 +2710,163 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_share_links(self):
+        """
+        GIVEN:
+            - Existing document
+        WHEN:
+            - API request is made to generate a share_link
+            - API request is made to view share_links on incorrect doc pk
+            - Invalid method request is made to view share_links doc
+        THEN:
+            - Link is created with a slug and associated with document
+            - 404
+            - Error
+        """
+        doc = Document.objects.create(
+            title="test",
+            mime_type="application/pdf",
+            content="this is a document which will have notes added",
+        )
+        # never expires
+        resp = self.client.post(
+            "/api/share_links/",
+            data={
+                "document": doc.pk,
+            },
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        resp = self.client.post(
+            "/api/share_links/",
+            data={
+                "expiration": (timezone.now() + timedelta(days=7)).isoformat(),
+                "document": doc.pk,
+                "file_version": "original",
+            },
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        response = self.client.get(
+            f"/api/documents/{doc.pk}/share_links/",
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        resp_data = response.json()
+
+        self.assertEqual(len(resp_data), 2)
+
+        self.assertGreater(len(resp_data[1]["slug"]), 0)
+        self.assertIsNone(resp_data[1]["expiration"])
+        self.assertEqual(
+            (parser.isoparse(resp_data[0]["expiration"]) - timezone.now()).days,
+            6,
+        )
+
+        sl1 = ShareLink.objects.get(slug=resp_data[1]["slug"])
+        self.assertEqual(str(sl1), f"Share Link for {doc.title}")
+
+        response = self.client.post(
+            f"/api/documents/{doc.pk}/share_links/",
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+        response = self.client.get(
+            "/api/documents/99/share_links/",
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_share_links_permissions_aware(self):
+        """
+        GIVEN:
+            - Existing document owned by user2 but with granted view perms for user1
+        WHEN:
+            - API request is made by user1 to view share links
+        THEN:
+            - Links only shown if user has permissions
+        """
+        user1 = User.objects.create_user(username="test1")
+        user1.user_permissions.add(*Permission.objects.all())
+        user1.save()
+
+        user2 = User.objects.create_user(username="test2")
+        user2.save()
+
+        doc = Document.objects.create(
+            title="test",
+            mime_type="application/pdf",
+            content="this is a document which will have share links added",
+        )
+        doc.owner = user2
+        doc.save()
+
+        self.client.force_authenticate(user1)
+
+        resp = self.client.get(
+            f"/api/documents/{doc.pk}/share_links/",
+            format="json",
+        )
+        self.assertEqual(resp.content, b"Insufficient permissions to add share link")
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+
+        assign_perm("change_document", user1, doc)
+
+        resp = self.client.get(
+            f"/api/documents/{doc.pk}/share_links/",
+            format="json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+    def test_next_asn(self):
+        """
+        GIVEN:
+            - Existing documents with ASNs, highest owned by user2
+        WHEN:
+            - API request is made by user1 to get next ASN
+        THEN:
+            - ASN +1 from user2's doc is returned for user1
+        """
+        user1 = User.objects.create_user(username="test1")
+        user1.user_permissions.add(*Permission.objects.all())
+        user1.save()
+
+        user2 = User.objects.create_user(username="test2")
+        user2.save()
+
+        doc1 = Document.objects.create(
+            title="test",
+            mime_type="application/pdf",
+            content="this is a document 1",
+            checksum="1",
+            archive_serial_number=998,
+        )
+        doc1.owner = user1
+        doc1.save()
+
+        doc2 = Document.objects.create(
+            title="test2",
+            mime_type="application/pdf",
+            content="this is a document 2 with higher ASN",
+            checksum="2",
+            archive_serial_number=999,
+        )
+        doc2.owner = user2
+        doc2.save()
+
+        self.client.force_authenticate(user1)
+
+        resp = self.client.get(
+            "/api/documents/next_asn/",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp.content, b"1000")
 
 
 class TestDocumentApiV2(DirectoriesMixin, APITestCase):
@@ -4416,6 +4721,82 @@ class TestApiRemoteVersion(DirectoriesMixin, APITestCase):
         )
 
 
+class TestApiObjects(DirectoriesMixin, APITestCase):
+    def setUp(self) -> None:
+        super().setUp()
+
+        user = User.objects.create_superuser(username="temp_admin")
+        self.client.force_authenticate(user=user)
+
+        self.tag1 = Tag.objects.create(name="t1", is_inbox_tag=True)
+        self.tag2 = Tag.objects.create(name="t2")
+        self.tag3 = Tag.objects.create(name="t3")
+        self.c1 = Correspondent.objects.create(name="c1")
+        self.c2 = Correspondent.objects.create(name="c2")
+        self.c3 = Correspondent.objects.create(name="c3")
+        self.dt1 = DocumentType.objects.create(name="dt1")
+        self.dt2 = DocumentType.objects.create(name="dt2")
+        self.sp1 = StoragePath.objects.create(name="sp1", path="Something/{title}")
+        self.sp2 = StoragePath.objects.create(name="sp2", path="Something2/{title}")
+
+    def test_object_filters(self):
+        response = self.client.get(
+            f"/api/tags/?id={self.tag2.id}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+
+        response = self.client.get(
+            f"/api/tags/?id__in={self.tag1.id},{self.tag3.id}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 2)
+
+        response = self.client.get(
+            f"/api/correspondents/?id={self.c2.id}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+
+        response = self.client.get(
+            f"/api/correspondents/?id__in={self.c1.id},{self.c3.id}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 2)
+
+        response = self.client.get(
+            f"/api/document_types/?id={self.dt1.id}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+
+        response = self.client.get(
+            f"/api/document_types/?id__in={self.dt1.id},{self.dt2.id}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 2)
+
+        response = self.client.get(
+            f"/api/storage_paths/?id={self.sp1.id}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+
+        response = self.client.get(
+            f"/api/storage_paths/?id__in={self.sp1.id},{self.sp2.id}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 2)
+
+
 class TestApiStoragePaths(DirectoriesMixin, APITestCase):
     ENDPOINT = "/api/storage_paths/"
 
@@ -4513,7 +4894,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
                     "/{created_month_name_short}/{created_day}/{added}/{added_year}"
                     "/{added_year_short}/{added_month}/{added_month_name}"
                     "/{added_month_name_short}/{added_day}/{asn}/{tags}"
-                    "/{tag_list}/",
+                    "/{tag_list}/{owner_username}/{original_name}/{doc_pk}/",
                 },
             ),
             content_type="application/json",
@@ -5023,3 +5404,392 @@ class TestApiGroup(DirectoriesMixin, APITestCase):
 
         returned_group1 = Group.objects.get(pk=group1.pk)
         self.assertEqual(returned_group1.name, "Updated Name 1")
+
+
+class TestBulkEditObjectPermissions(APITestCase):
+    def setUp(self):
+        super().setUp()
+
+        user = User.objects.create_superuser(username="temp_admin")
+        self.client.force_authenticate(user=user)
+
+        self.t1 = Tag.objects.create(name="t1")
+        self.t2 = Tag.objects.create(name="t2")
+        self.c1 = Correspondent.objects.create(name="c1")
+        self.dt1 = DocumentType.objects.create(name="dt1")
+        self.sp1 = StoragePath.objects.create(name="sp1")
+        self.user1 = User.objects.create(username="user1")
+        self.user2 = User.objects.create(username="user2")
+        self.user3 = User.objects.create(username="user3")
+
+    def test_bulk_object_set_permissions(self):
+        """
+        GIVEN:
+            - Existing objects
+        WHEN:
+            - bulk_edit_object_perms API endpoint is called
+        THEN:
+            - Permissions and / or owner are changed
+        """
+        permissions = {
+            "view": {
+                "users": [self.user1.id, self.user2.id],
+                "groups": [],
+            },
+            "change": {
+                "users": [self.user1.id],
+                "groups": [],
+            },
+        }
+
+        response = self.client.post(
+            "/api/bulk_edit_object_perms/",
+            json.dumps(
+                {
+                    "objects": [self.t1.id, self.t2.id],
+                    "object_type": "tags",
+                    "permissions": permissions,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn(self.user1, get_users_with_perms(self.t1))
+
+        response = self.client.post(
+            "/api/bulk_edit_object_perms/",
+            json.dumps(
+                {
+                    "objects": [self.c1.id],
+                    "object_type": "correspondents",
+                    "permissions": permissions,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn(self.user1, get_users_with_perms(self.c1))
+
+        response = self.client.post(
+            "/api/bulk_edit_object_perms/",
+            json.dumps(
+                {
+                    "objects": [self.dt1.id],
+                    "object_type": "document_types",
+                    "permissions": permissions,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn(self.user1, get_users_with_perms(self.dt1))
+
+        response = self.client.post(
+            "/api/bulk_edit_object_perms/",
+            json.dumps(
+                {
+                    "objects": [self.sp1.id],
+                    "object_type": "storage_paths",
+                    "permissions": permissions,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn(self.user1, get_users_with_perms(self.sp1))
+
+        response = self.client.post(
+            "/api/bulk_edit_object_perms/",
+            json.dumps(
+                {
+                    "objects": [self.t1.id, self.t2.id],
+                    "object_type": "tags",
+                    "owner": self.user3.id,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Tag.objects.get(pk=self.t2.id).owner, self.user3)
+
+        response = self.client.post(
+            "/api/bulk_edit_object_perms/",
+            json.dumps(
+                {
+                    "objects": [self.sp1.id],
+                    "object_type": "storage_paths",
+                    "owner": self.user3.id,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(StoragePath.objects.get(pk=self.sp1.id).owner, self.user3)
+
+    def test_bulk_edit_object_permissions_insufficient_perms(self):
+        """
+        GIVEN:
+            - Objects owned by user other than logged in user
+        WHEN:
+            - bulk_edit_object_perms API endpoint is called
+        THEN:
+            - User is not able to change permissions
+        """
+        self.t1.owner = User.objects.get(username="temp_admin")
+        self.t1.save()
+        self.client.force_authenticate(user=self.user1)
+
+        response = self.client.post(
+            "/api/bulk_edit_object_perms/",
+            json.dumps(
+                {
+                    "objects": [self.t1.id, self.t2.id],
+                    "object_type": "tags",
+                    "owner": self.user1.id,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.content, b"Insufficient permissions")
+
+    def test_bulk_edit_object_permissions_validation(self):
+        """
+        GIVEN:
+            - Existing objects
+        WHEN:
+            - bulk_edit_object_perms API endpoint is called with invalid params
+        THEN:
+            - Validation fails
+        """
+        # not a list
+        response = self.client.post(
+            "/api/bulk_edit_object_perms/",
+            json.dumps(
+                {
+                    "objects": self.t1.id,
+                    "object_type": "tags",
+                    "owner": self.user1.id,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # not a list of ints
+        response = self.client.post(
+            "/api/bulk_edit_object_perms/",
+            json.dumps(
+                {
+                    "objects": ["one"],
+                    "object_type": "tags",
+                    "owner": self.user1.id,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # duplicates
+        response = self.client.post(
+            "/api/bulk_edit_object_perms/",
+            json.dumps(
+                {
+                    "objects": [self.t1.id, self.t2.id, self.t1.id],
+                    "object_type": "tags",
+                    "owner": self.user1.id,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # not a valid object type
+        response = self.client.post(
+            "/api/bulk_edit_object_perms/",
+            json.dumps(
+                {
+                    "objects": [1],
+                    "object_type": "madeup",
+                    "owner": self.user1.id,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class TestApiConsumptionTemplates(DirectoriesMixin, APITestCase):
+    ENDPOINT = "/api/consumption_templates/"
+
+    def setUp(self) -> None:
+        super().setUp()
+
+        user = User.objects.create_superuser(username="temp_admin")
+        self.client.force_authenticate(user=user)
+        self.user2 = User.objects.create(username="user2")
+        self.user3 = User.objects.create(username="user3")
+        self.group1 = Group.objects.create(name="group1")
+
+        self.c = Correspondent.objects.create(name="Correspondent Name")
+        self.c2 = Correspondent.objects.create(name="Correspondent Name 2")
+        self.dt = DocumentType.objects.create(name="DocType Name")
+        self.t1 = Tag.objects.create(name="t1")
+        self.t2 = Tag.objects.create(name="t2")
+        self.t3 = Tag.objects.create(name="t3")
+        self.sp = StoragePath.objects.create(path="/test/")
+
+        self.ct = ConsumptionTemplate.objects.create(
+            name="Template 1",
+            order=0,
+            sources=f"{int(DocumentSource.ApiUpload)},{int(DocumentSource.ConsumeFolder)},{int(DocumentSource.MailFetch)}",
+            filter_filename="*simple*",
+            filter_path="*/samples/*",
+            assign_title="Doc from {correspondent}",
+            assign_correspondent=self.c,
+            assign_document_type=self.dt,
+            assign_storage_path=self.sp,
+            assign_owner=self.user2,
+        )
+        self.ct.assign_tags.add(self.t1)
+        self.ct.assign_tags.add(self.t2)
+        self.ct.assign_tags.add(self.t3)
+        self.ct.assign_view_users.add(self.user3.pk)
+        self.ct.assign_view_groups.add(self.group1.pk)
+        self.ct.assign_change_users.add(self.user3.pk)
+        self.ct.assign_change_groups.add(self.group1.pk)
+        self.ct.save()
+
+    def test_api_get_consumption_template(self):
+        """
+        GIVEN:
+            - API request to get all consumption template
+        WHEN:
+            - API is called
+        THEN:
+            - Existing consumption templates are returned
+        """
+        response = self.client.get(self.ENDPOINT, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 1)
+
+        resp_consumption_template = response.data["results"][0]
+        self.assertEqual(resp_consumption_template["id"], self.ct.id)
+        self.assertEqual(
+            resp_consumption_template["assign_correspondent"],
+            self.ct.assign_correspondent.pk,
+        )
+
+    def test_api_create_consumption_template(self):
+        """
+        GIVEN:
+            - API request to create a consumption template
+        WHEN:
+            - API is called
+        THEN:
+            - Correct HTTP response
+            - New template is created
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Template 2",
+                    "order": 1,
+                    "sources": [DocumentSource.ApiUpload],
+                    "filter_filename": "*test*",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(ConsumptionTemplate.objects.count(), 2)
+
+    def test_api_create_invalid_consumption_template(self):
+        """
+        GIVEN:
+            - API request to create a consumption template
+            - Neither file name nor path filter are specified
+        WHEN:
+            - API is called
+        THEN:
+            - Correct HTTP 400 response
+            - No template is created
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Template 2",
+                    "order": 1,
+                    "sources": [DocumentSource.ApiUpload],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(StoragePath.objects.count(), 1)
+
+    def test_api_create_consumption_template_with_mailrule(self):
+        """
+        GIVEN:
+            - API request to create a consumption template with a mail rule but no MailFetch source
+        WHEN:
+            - API is called
+        THEN:
+            - Correct HTTP response
+            - New template is created with MailFetch as source
+        """
+        account1 = MailAccount.objects.create(
+            name="Email1",
+            username="username1",
+            password="password1",
+            imap_server="server.example.com",
+            imap_port=443,
+            imap_security=MailAccount.ImapSecurity.SSL,
+            character_set="UTF-8",
+        )
+        rule1 = MailRule.objects.create(
+            name="Rule1",
+            account=account1,
+            folder="INBOX",
+            filter_from="from@example.com",
+            filter_to="someone@somewhere.com",
+            filter_subject="subject",
+            filter_body="body",
+            filter_attachment_filename="file.pdf",
+            maximum_age=30,
+            action=MailRule.MailAction.MARK_READ,
+            assign_title_from=MailRule.TitleSource.FROM_SUBJECT,
+            assign_correspondent_from=MailRule.CorrespondentSource.FROM_NOTHING,
+            order=0,
+            attachment_type=MailRule.AttachmentProcessing.ATTACHMENTS_ONLY,
+        )
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Template 2",
+                    "order": 1,
+                    "sources": [DocumentSource.ApiUpload],
+                    "filter_mailrule": rule1.pk,
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(ConsumptionTemplate.objects.count(), 2)
+        ct = ConsumptionTemplate.objects.get(name="Template 2")
+        self.assertEqual(ct.sources, [int(DocumentSource.MailFetch).__str__()])

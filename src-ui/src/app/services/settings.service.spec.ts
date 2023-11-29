@@ -1,21 +1,26 @@
-import { TestBed } from '@angular/core/testing'
-import { SettingsService } from './settings.service'
 import {
-  HttpClientTestingModule,
   HttpTestingController,
+  HttpClientTestingModule,
 } from '@angular/common/http/testing'
-import { RouterTestingModule } from '@angular/router/testing'
-import { environment } from 'src/environments/environment'
-import { Subscription } from 'rxjs'
-import { PaperlessUiSettings } from '../data/paperless-uisettings'
-import { SETTINGS_KEYS } from '../data/paperless-uisettings'
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
+import { TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { RouterTestingModule } from '@angular/router/testing'
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
+import { CookieService } from 'ngx-cookie-service'
+import { Subscription } from 'rxjs'
+import { environment } from 'src/environments/environment'
 import { AppModule } from '../app.module'
+import {
+  PaperlessUiSettings,
+  SETTINGS_KEYS,
+} from '../data/paperless-uisettings'
+import { SettingsService } from './settings.service'
+import { PaperlessSavedView } from '../data/paperless-saved-view'
 
 describe('SettingsService', () => {
   let httpTestingController: HttpTestingController
   let settingsService: SettingsService
+  let cookieService: CookieService
   let subscription: Subscription
 
   const ui_settings: PaperlessUiSettings = {
@@ -46,6 +51,13 @@ describe('SettingsService', () => {
       saved_views: { warn_on_unsaved_change: true },
       notes_enabled: true,
       tour_complete: false,
+      permissions: {
+        default_owner: null,
+        default_view_users: [1],
+        default_view_groups: [2],
+        default_edit_users: [3],
+        default_edit_groups: [4],
+      },
     },
     permissions: [],
   }
@@ -53,7 +65,7 @@ describe('SettingsService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [],
-      providers: [SettingsService],
+      providers: [SettingsService, CookieService],
       imports: [
         HttpClientTestingModule,
         RouterTestingModule,
@@ -65,6 +77,7 @@ describe('SettingsService', () => {
     })
 
     httpTestingController = TestBed.inject(HttpTestingController)
+    cookieService = TestBed.inject(CookieService)
     settingsService = TestBed.inject(SettingsService)
   })
 
@@ -136,48 +149,104 @@ describe('SettingsService', () => {
     expect(settingsService.get(SETTINGS_KEYS.THEME_COLOR)).toEqual('#000000')
   })
 
-  it('updates appearnce settings', () => {
+  it('sets django cookie for languages', () => {
+    httpTestingController
+      .expectOne(`${environment.apiBaseUrl}ui_settings/`)
+      .flush(ui_settings)
+    const cookieSetSpy = jest.spyOn(cookieService, 'set')
+    settingsService.initializeSettings().subscribe(() => {})
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}ui_settings/`
+    )
+    ui_settings.settings['language'] = 'foobar'
+    req.flush(ui_settings)
+    expect(cookieSetSpy).toHaveBeenCalledWith('django_language', 'foobar')
+    const cookieDeleteSpy = jest.spyOn(cookieService, 'delete')
+    settingsService.setLanguage('')
+    expect(cookieDeleteSpy).toHaveBeenCalled()
+  })
+
+  it('should support null values for settings if set, undefined if not', () => {
+    httpTestingController
+      .expectOne(`${environment.apiBaseUrl}ui_settings/`)
+      .flush(ui_settings)
+    expect(settingsService.get('foo')).toEqual(undefined)
+    expect(settingsService.get(SETTINGS_KEYS.DEFAULT_PERMS_OWNER)).toEqual(null)
+  })
+
+  it('should support array values', () => {
+    httpTestingController
+      .expectOne(`${environment.apiBaseUrl}ui_settings/`)
+      .flush(ui_settings)
+    expect(settingsService.get(SETTINGS_KEYS.DEFAULT_PERMS_VIEW_USERS)).toEqual(
+      [1]
+    )
+  })
+
+  it('should support default permissions values', () => {
+    delete ui_settings.settings['permissions']
+    httpTestingController
+      .expectOne(`${environment.apiBaseUrl}ui_settings/`)
+      .flush(ui_settings)
+    expect(settingsService.get(SETTINGS_KEYS.DEFAULT_PERMS_OWNER)).toEqual(1)
+    expect(settingsService.get(SETTINGS_KEYS.DEFAULT_PERMS_VIEW_USERS)).toEqual(
+      []
+    )
+  })
+
+  it('updates appearance settings', () => {
     const req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}ui_settings/`
     )
     req.flush(ui_settings)
 
     expect(
-      document.body.style.getPropertyValue('--pngx-primary-lightness')
+      document.documentElement.style.getPropertyValue(
+        '--pngx-primary-lightness'
+      )
     ).toEqual('')
 
     const addClassSpy = jest.spyOn(settingsService.renderer, 'addClass')
-    const removeClassSpy = jest.spyOn(settingsService.renderer, 'removeClass')
+    const setAttributeSpy = jest.spyOn(settingsService.renderer, 'setAttribute')
 
     settingsService.updateAppearanceSettings(true, true, '#fff000')
     expect(addClassSpy).toHaveBeenCalledWith(document.body, 'primary-light')
-    expect(addClassSpy).toHaveBeenCalledWith(
-      document.body,
-      'color-scheme-system'
+    expect(setAttributeSpy).toHaveBeenCalledWith(
+      document.documentElement,
+      'data-bs-theme',
+      'auto'
     )
     expect(
-      document.body.style.getPropertyValue('--pngx-primary-lightness')
+      document.documentElement.style.getPropertyValue(
+        '--pngx-primary-lightness'
+      )
     ).toEqual('50%')
 
     settingsService.updateAppearanceSettings(false, false, '#000000')
     expect(addClassSpy).toHaveBeenCalledWith(document.body, 'primary-light')
-    expect(removeClassSpy).toHaveBeenCalledWith(
-      document.body,
-      'color-scheme-system'
+    expect(setAttributeSpy).toHaveBeenCalledWith(
+      document.documentElement,
+      'data-bs-theme',
+      'light'
     )
+
     expect(
-      document.body.style.getPropertyValue('--pngx-primary-lightness')
+      document.documentElement.style.getPropertyValue(
+        '--pngx-primary-lightness'
+      )
     ).toEqual('0%')
 
     settingsService.updateAppearanceSettings(false, true, '#ffffff')
     expect(addClassSpy).toHaveBeenCalledWith(document.body, 'primary-dark')
-    expect(removeClassSpy).toHaveBeenCalledWith(
-      document.body,
-      'color-scheme-system'
+    expect(setAttributeSpy).toHaveBeenCalledWith(
+      document.documentElement,
+      'data-bs-theme',
+      'dark'
     )
-    expect(addClassSpy).toHaveBeenCalledWith(document.body, 'color-scheme-dark')
     expect(
-      document.body.style.getPropertyValue('--pngx-primary-lightness')
+      document.documentElement.style.getPropertyValue(
+        '--pngx-primary-lightness'
+      )
     ).toEqual('100%')
   })
 
@@ -208,5 +277,31 @@ describe('SettingsService', () => {
       `${environment.apiBaseUrl}ui_settings/`
     )[0]
     expect(req.request.method).toEqual('POST')
+  })
+
+  it('should update saved view sorting', () => {
+    httpTestingController
+      .expectOne(`${environment.apiBaseUrl}ui_settings/`)
+      .flush(ui_settings)
+    const setSpy = jest.spyOn(settingsService, 'set')
+    settingsService.updateDashboardViewsSort([
+      { id: 1 } as PaperlessSavedView,
+      { id: 4 } as PaperlessSavedView,
+    ])
+    expect(setSpy).toHaveBeenCalledWith(
+      SETTINGS_KEYS.DASHBOARD_VIEWS_SORT_ORDER,
+      [1, 4]
+    )
+    settingsService.updateSidebarViewsSort([
+      { id: 1 } as PaperlessSavedView,
+      { id: 4 } as PaperlessSavedView,
+    ])
+    expect(setSpy).toHaveBeenCalledWith(
+      SETTINGS_KEYS.SIDEBAR_VIEWS_SORT_ORDER,
+      [1, 4]
+    )
+    httpTestingController
+      .expectOne(`${environment.apiBaseUrl}ui_settings/`)
+      .flush(ui_settings)
   })
 })

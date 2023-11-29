@@ -8,14 +8,14 @@ class DocumentsConfig(AppConfig):
     verbose_name = _("Documents")
 
     def ready(self):
-        from .signals import document_consumption_finished
-        from .signals.handlers import add_inbox_tags
-        from .signals.handlers import add_to_index
-        from .signals.handlers import set_correspondent
-        from .signals.handlers import set_document_type
-        from .signals.handlers import set_log_entry
-        from .signals.handlers import set_storage_path
-        from .signals.handlers import set_tags
+        from documents.signals import document_consumption_finished
+        from documents.signals.handlers import add_inbox_tags
+        from documents.signals.handlers import add_to_index
+        from documents.signals.handlers import set_correspondent
+        from documents.signals.handlers import set_document_type
+        from documents.signals.handlers import set_log_entry
+        from documents.signals.handlers import set_storage_path
+        from documents.signals.handlers import set_tags
 
         document_consumption_finished.connect(add_inbox_tags)
         document_consumption_finished.connect(set_correspondent)

@@ -28,6 +28,7 @@ const mail_rules = [
     attachment_type: MailFilterAttachmentType.Everything,
     action: MailAction.MarkRead,
     assign_title_from: MailMetadataTitleOption.FromSubject,
+    assign_owner_from_rule: true,
   },
   {
     name: 'Mail Rule 2',
@@ -44,6 +45,7 @@ const mail_rules = [
     attachment_type: MailFilterAttachmentType.Everything,
     action: MailAction.Delete,
     assign_title_from: MailMetadataTitleOption.FromSubject,
+    assign_owner_from_rule: true,
   },
   {
     name: 'Mail Rule 3',
@@ -60,6 +62,7 @@ const mail_rules = [
     attachment_type: MailFilterAttachmentType.Everything,
     action: MailAction.Flag,
     assign_title_from: MailMetadataTitleOption.FromSubject,
+    assign_owner_from_rule: false,
   },
 ]
 

@@ -2,8 +2,8 @@ import os
 import shutil
 import tempfile
 import uuid
+from contextlib import AbstractContextManager
 from pathlib import Path
-from typing import ContextManager
 from unittest import mock
 
 from django.test import TestCase
@@ -29,7 +29,7 @@ def fake_convert(input_file, output_file, **kwargs):
             f2.write(line.strip())
 
 
-class FakeImageFile(ContextManager):
+class FakeImageFile(AbstractContextManager):
     def __init__(self, fname):
         self.fname = fname
 

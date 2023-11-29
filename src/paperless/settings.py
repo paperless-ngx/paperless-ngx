@@ -7,12 +7,9 @@ import re
 import tempfile
 from os import PathLike
 from pathlib import Path
-from typing import Dict
+from platform import machine
 from typing import Final
-from typing import List
 from typing import Optional
-from typing import Set
-from typing import Tuple
 from typing import Union
 from urllib.parse import urlparse
 
@@ -85,9 +82,9 @@ def __get_path(
 
 def __get_list(
     key: str,
-    default: Optional[List[str]] = None,
+    default: Optional[list[str]] = None,
     sep: str = ",",
-) -> List[str]:
+) -> list[str]:
     """
     Return a list of elements from the environment, as separated by the given
     string, or the default if the key does not exist
@@ -100,7 +97,7 @@ def __get_list(
         return []
 
 
-def _parse_redis_url(env_redis: Optional[str]) -> Tuple[str]:
+def _parse_redis_url(env_redis: Optional[str]) -> tuple[str]:
     """
     Gets the Redis information from the environment or a default and handles
     converting from incompatible django_channels and celery formats.
@@ -138,7 +135,7 @@ def _parse_redis_url(env_redis: Optional[str]) -> Tuple[str]:
     return (env_redis, env_redis)
 
 
-def _parse_beat_schedule() -> Dict:
+def _parse_beat_schedule() -> dict:
     """
     Configures the scheduled tasks, according to default or
     environment variables.  Task expiration is configured so the task will
@@ -346,6 +343,17 @@ ASGI_APPLICATION = "paperless.asgi.application"
 STATIC_URL = os.getenv("PAPERLESS_STATIC_URL", BASE_URL + "static/")
 WHITENOISE_STATIC_PREFIX = "/static/"
 
+if machine().lower() == "aarch64":  # pragma: no cover
+    _static_backend = "django.contrib.staticfiles.storage.StaticFilesStorage"
+else:
+    _static_backend = "whitenoise.storage.CompressedStaticFilesStorage"
+
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": _static_backend,
+    },
+}
+
 _CELERY_REDIS_URL, _CHANNELS_REDIS_URL = _parse_redis_url(
     os.getenv("PAPERLESS_REDIS", None),
 )
@@ -361,6 +369,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "documents.context_processors.settings",
             ],
         },
     },
@@ -460,7 +469,7 @@ SECRET_KEY = os.getenv(
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",  # noqa: E501
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
@@ -486,13 +495,13 @@ CSRF_COOKIE_NAME = f"{COOKIE_PREFIX}csrftoken"
 SESSION_COOKIE_NAME = f"{COOKIE_PREFIX}sessionid"
 LANGUAGE_COOKIE_NAME = f"{COOKIE_PREFIX}django_language"
 
-EMAIL_CERTIFICATE_FILE = __get_path("PAPERLESS_EMAIL_CERTIFICATE_FILE")
+EMAIL_CERTIFICATE_FILE = __get_path("PAPERLESS_EMAIL_CERTIFICATE_LOCATION")
 
 
 ###############################################################################
 # Database                                                                    #
 ###############################################################################
-def _parse_db_settings() -> Dict:
+def _parse_db_settings() -> dict:
     databases = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
@@ -576,17 +585,22 @@ LANGUAGE_CODE = "en-us"
 LANGUAGES = [
     ("en-us", _("English (US)")),  # needs to be first to act as fallback language
     ("ar-ar", _("Arabic")),
+    ("af-za", _("Afrikaans")),
     ("be-by", _("Belarusian")),
+    ("bg-bg", _("Bulgarian")),
     ("ca-es", _("Catalan")),
     ("cs-cz", _("Czech")),
     ("da-dk", _("Danish")),
     ("de-de", _("German")),
+    ("el-gr", _("Greek")),
     ("en-gb", _("English (GB)")),
     ("es-es", _("Spanish")),
     ("fi-fi", _("Finnish")),
     ("fr-fr", _("French")),
+    ("hu-hu", _("Hungarian")),
     ("it-it", _("Italian")),
     ("lb-lu", _("Luxembourgish")),
+    ("no-no", _("Norwegian")),
     ("nl-nl", _("Dutch")),
     ("pl-pl", _("Polish")),
     ("pt-br", _("Portuguese (Brazil)")),
@@ -762,7 +776,7 @@ CONSUMER_IGNORE_PATTERNS = list(
     json.loads(
         os.getenv(
             "PAPERLESS_CONSUMER_IGNORE_PATTERNS",
-            '[".DS_Store", ".DS_STORE", "._*", ".stfolder/*", ".stversions/*", ".localized/*", "desktop.ini", "@eaDir/*"]',  # noqa: E501
+            '[".DS_Store", ".DS_STORE", "._*", ".stfolder/*", ".stversions/*", ".localized/*", "desktop.ini", "@eaDir/*"]',
         ),
     ),
 )
@@ -921,11 +935,16 @@ TIKA_GOTENBERG_ENDPOINT = os.getenv(
 if TIKA_ENABLED:
     INSTALLED_APPS.append("paperless_tika.apps.PaperlessTikaConfig")
 
+AUDIT_LOG_ENABLED = __get_boolean("PAPERLESS_AUDIT_LOG_ENABLED", "NO")
+if AUDIT_LOG_ENABLED:
+    INSTALLED_APPS.append("auditlog")
+    MIDDLEWARE.append("auditlog.middleware.AuditlogMiddleware")
+
 
 def _parse_ignore_dates(
     env_ignore: str,
     date_order: str = DATE_ORDER,
-) -> Set[datetime.datetime]:
+) -> set[datetime.datetime]:
     """
     If the PAPERLESS_IGNORE_DATES environment variable is set, parse the
     user provided string(s) into dates
@@ -954,7 +973,7 @@ def _parse_ignore_dates(
 
 
 # List dates that should be ignored when trying to parse date from document text
-IGNORE_DATES: Set[datetime.date] = set()
+IGNORE_DATES: set[datetime.date] = set()
 
 if os.getenv("PAPERLESS_IGNORE_DATES") is not None:
     IGNORE_DATES = _parse_ignore_dates(os.getenv("PAPERLESS_IGNORE_DATES"))
@@ -1003,3 +1022,15 @@ def _get_nltk_language_setting(ocr_lang: str) -> Optional[str]:
 NLTK_ENABLED: Final[bool] = __get_boolean("PAPERLESS_ENABLE_NLTK", "yes")
 
 NLTK_LANGUAGE: Optional[str] = _get_nltk_language_setting(OCR_LANGUAGE)
+
+###############################################################################
+# Email (SMTP) Backend                                                        #
+###############################################################################
+
+EMAIL_HOST: Final[str] = os.getenv("PAPERLESS_EMAIL_HOST", "localhost")
+EMAIL_PORT: Final[int] = int(os.getenv("PAPERLESS_EMAIL_PORT", 25))
+EMAIL_HOST_USER: Final[str] = os.getenv("PAPERLESS_EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD: Final[str] = os.getenv("PAPERLESS_EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS: Final[bool] = __get_boolean("PAPERLESS_EMAIL_USE_TLS")
+EMAIL_USE_SSL: Final[bool] = __get_boolean("PAPERLESS_EMAIL_USE_SSL")
+EMAIL_SUBJECT_PREFIX: Final[str] = "[Paperless-ngx] "

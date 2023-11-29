@@ -10,7 +10,7 @@ import { AbstractInputComponent } from '../abstract-input'
       multi: true,
     },
   ],
-  selector: 'app-input-text',
+  selector: 'pngx-input-text',
   templateUrl: './text.component.html',
   styleUrls: ['./text.component.scss'],
 })

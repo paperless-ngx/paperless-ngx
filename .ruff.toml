@@ -7,8 +7,8 @@ fix = true
 line-length = 88
 respect-gitignore = true
 src = ["src"]
-target-version = "py38"
-format = "grouped"
+target-version = "py39"
+output-format = "grouped"
 show-fixes = true
 
 [per-file-ignores]

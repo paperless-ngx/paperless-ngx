@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { NgbAlertModule, NgbAlert } from '@ng-bootstrap/ng-bootstrap'
+import { NgbAlertModule } from '@ng-bootstrap/ng-bootstrap'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { DashboardComponent } from './dashboard.component'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
@@ -13,16 +13,60 @@ import { PermissionsService } from 'src/app/services/permissions.service'
 import { By } from '@angular/platform-browser'
 import { SavedViewWidgetComponent } from './widgets/saved-view-widget/saved-view-widget.component'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
-import { NgxFileDropModule } from 'ngx-file-drop'
 import { RouterTestingModule } from '@angular/router/testing'
 import { TourNgBootstrapModule, TourService } from 'ngx-ui-tour-ng-bootstrap'
 import { LogoComponent } from '../common/logo/logo.component'
+import { of, throwError } from 'rxjs'
+import { ToastService } from 'src/app/services/toast.service'
+import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
+import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop'
+import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
+
+const saved_views = [
+  {
+    name: 'Saved View 0',
+    id: 0,
+    show_on_dashboard: true,
+    show_in_sidebar: true,
+    sort_field: 'name',
+    sort_reverse: true,
+    filter_rules: [],
+  },
+  {
+    name: 'Saved View 1',
+    id: 1,
+    show_on_dashboard: false,
+    show_in_sidebar: false,
+    sort_field: 'name',
+    sort_reverse: true,
+    filter_rules: [],
+  },
+  {
+    name: 'Saved View 2',
+    id: 2,
+    show_on_dashboard: true,
+    show_in_sidebar: false,
+    sort_field: 'name',
+    sort_reverse: true,
+    filter_rules: [],
+  },
+  {
+    name: 'Saved View 3',
+    id: 3,
+    show_on_dashboard: true,
+    show_in_sidebar: false,
+    sort_field: 'name',
+    sort_reverse: true,
+    filter_rules: [],
+  },
+]
 
 describe('DashboardComponent', () => {
   let component: DashboardComponent
   let fixture: ComponentFixture<DashboardComponent>
   let settingsService: SettingsService
   let tourService: TourService
+  let toastService: ToastService
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -47,33 +91,22 @@ describe('DashboardComponent', () => {
         {
           provide: SavedViewService,
           useValue: {
-            dashboardViews: [
-              {
-                id: 1,
-                name: 'saved view 1',
-                show_on_dashboard: true,
-                sort_field: 'added',
-                sort_reverse: true,
-                filter_rules: [],
-              },
-              {
-                id: 2,
-                name: 'saved view 2',
-                show_on_dashboard: true,
-                sort_field: 'created',
-                sort_reverse: true,
-                filter_rules: [],
-              },
-            ],
+            listAll: () =>
+              of({
+                all: [saved_views.map((v) => v.id)],
+                count: saved_views.length,
+                results: saved_views,
+              }),
+            dashboardViews: saved_views.filter((v) => v.show_on_dashboard),
           },
         },
       ],
       imports: [
         NgbAlertModule,
         HttpClientTestingModule,
-        NgxFileDropModule,
         RouterTestingModule,
         TourNgBootstrapModule,
+        DragDropModule,
       ],
     }).compileComponents()
 
@@ -82,7 +115,11 @@ describe('DashboardComponent', () => {
       first_name: 'Foo',
       last_name: 'Bar',
     }
+    jest.spyOn(settingsService, 'get').mockImplementation((key) => {
+      if (key === SETTINGS_KEYS.DASHBOARD_VIEWS_SORT_ORDER) return [0, 2, 3]
+    })
     tourService = TestBed.inject(TourService)
+    toastService = TestBed.inject(ToastService)
     fixture = TestBed.createComponent(DashboardComponent)
     component = fixture.componentInstance
 
@@ -100,7 +137,7 @@ describe('DashboardComponent', () => {
   it('should show dashboard widgets', () => {
     expect(
       fixture.debugElement.queryAll(By.directive(SavedViewWidgetComponent))
-    ).toHaveLength(2)
+    ).toHaveLength(saved_views.filter((v) => v.show_on_dashboard).length)
   })
 
   it('should end tour service if still running and welcome widget dismissed', () => {
@@ -115,5 +152,46 @@ describe('DashboardComponent', () => {
     const settingsCompleteTourSpy = jest.spyOn(settingsService, 'completeTour')
     component.completeTour()
     expect(settingsCompleteTourSpy).toHaveBeenCalled()
+  })
+
+  it('should disable global dropzone on start drag + drop, re-enable after', () => {
+    expect(settingsService.globalDropzoneEnabled).toBeTruthy()
+    component.onDragStart(null)
+    expect(settingsService.globalDropzoneEnabled).toBeFalsy()
+    component.onDragEnd(null)
+    expect(settingsService.globalDropzoneEnabled).toBeTruthy()
+  })
+
+  it('should update saved view sorting on drag + drop, show info', () => {
+    const settingsSpy = jest.spyOn(settingsService, 'updateDashboardViewsSort')
+    const toastSpy = jest.spyOn(toastService, 'showInfo')
+    jest.spyOn(settingsService, 'storeSettings').mockReturnValue(of(true))
+    component.onDrop({ previousIndex: 0, currentIndex: 1 } as CdkDragDrop<
+      PaperlessSavedView[]
+    >)
+    expect(settingsSpy).toHaveBeenCalledWith([
+      saved_views[2],
+      saved_views[0],
+      saved_views[3],
+    ])
+    expect(toastSpy).toHaveBeenCalled()
+  })
+
+  it('should update saved view sorting on drag + drop, show error', () => {
+    jest.spyOn(settingsService, 'get').mockImplementation((key) => {
+      if (key === SETTINGS_KEYS.DASHBOARD_VIEWS_SORT_ORDER) return []
+    })
+    fixture.destroy()
+    fixture = TestBed.createComponent(DashboardComponent)
+    component = fixture.componentInstance
+    fixture.detectChanges()
+    const toastSpy = jest.spyOn(toastService, 'showError')
+    jest
+      .spyOn(settingsService, 'storeSettings')
+      .mockReturnValue(throwError(() => new Error('unable to save')))
+    component.onDrop({ previousIndex: 0, currentIndex: 2 } as CdkDragDrop<
+      PaperlessSavedView[]
+    >)
+    expect(toastSpy).toHaveBeenCalled()
   })
 })

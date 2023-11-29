@@ -40,12 +40,9 @@ def disable_signal(sig, receiver, sender):
 
 
 class Command(BaseCommand):
-    help = """
-        Using a manifest.json file, load the data from there, and import the
-        documents it refers to.
-    """.replace(
-        "    ",
-        "",
+    help = (
+        "Using a manifest.json file, load the data from there, and import the "
+        "documents it refers to."
     )
 
     def add_arguments(self, parser):
@@ -121,10 +118,10 @@ class Command(BaseCommand):
             # Fill up the database with whatever is in the manifest
             try:
                 with transaction.atomic():
+                    # delete these since pk can change, re-created from import
+                    ContentType.objects.all().delete()
+                    Permission.objects.all().delete()
                     for manifest_path in manifest_paths:
-                        # delete these since pk can change, re-created from import
-                        ContentType.objects.all().delete()
-                        Permission.objects.all().delete()
                         call_command("loaddata", manifest_path)
             except (FieldDoesNotExist, DeserializationError, IntegrityError) as e:
                 self.stdout.write(self.style.ERROR("Database import failed"))
@@ -182,8 +179,8 @@ class Command(BaseCommand):
             doc_path = self.source / doc_file
             if not doc_path.exists():
                 raise CommandError(
-                    'The manifest file refers to "{}" which does not '
-                    "appear to be in the source directory.".format(doc_file),
+                    f'The manifest file refers to "{doc_file}" which does not '
+                    "appear to be in the source directory.",
                 )
             try:
                 with doc_path.open(mode="rb") as infile:

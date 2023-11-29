@@ -5,7 +5,7 @@
     </svg>
     <div class="d-none d-sm-inline">&nbsp;{{title}}</div>
     <ng-container *ngIf="!editing && selectionModel.totalCount > 0">
-      <app-clearable-badge [number]="selectionModel.totalCount" [selected]="selectionModel.selectionSize() > 0" (cleared)="reset()"></app-clearable-badge>
+      <pngx-clearable-badge [number]="selectionModel.totalCount" [selected]="selectionModel.selectionSize() > 0" (cleared)="reset()"></pngx-clearable-badge>
     </ng-container>
   </button>
   <div class="dropdown-menu py-0 shadow" ngbDropdownMenu attr.aria-labelledby="dropdown_{{name}}">
@@ -33,9 +33,9 @@
       </div>
       <div *ngIf="selectionModel.items" class="items" #buttonItems>
         <ng-container *ngFor="let item of selectionModel.itemsSorted | filter: filterText; let i = index">
-          <app-toggleable-dropdown-button
+          <pngx-toggleable-dropdown-button
             *ngIf="allowSelectNone || item.id" [item]="item" [hideCount]="hideCount(item)" [state]="selectionModel.get(item.id)" [count]="getUpdatedDocumentCount(item.id)" (toggle)="selectionModel.toggle(item.id)" (exclude)="excludeClicked(item.id)" (click)="setButtonItemIndex(i - 1)" [disabled]="disabled">
-          </app-toggleable-dropdown-button>
+          </pngx-toggleable-dropdown-button>
         </ng-container>
       </div>
       <button *ngIf="editing" class="list-group-item list-group-item-action bg-light" (click)="applyClicked()" [disabled]="!modelIsDirty || disabled">

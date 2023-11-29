@@ -11,4 +11,5 @@ module.exports = {
   moduleNameMapper: {
     '^src/(.*)': '<rootDir>/src/$1',
   },
+  workerIdleMemoryLimit: '512MB',
 }

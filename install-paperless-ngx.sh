@@ -38,7 +38,6 @@ ask_docker_folder() {
 			echo "Invalid folder: $result"
 		fi
 
-
 	done
 }
 
@@ -57,14 +56,9 @@ if ! command -v docker &> /dev/null ; then
 	exit 1
 fi
 
-DOCKER_COMPOSE_CMD="docker-compose"
-if ! command -v ${DOCKER_COMPOSE_CMD} ; then
-	if docker compose version &> /dev/null ; then
-		DOCKER_COMPOSE_CMD="docker compose"
-	else
-		echo "docker-compose executable not found. Is docker-compose installed?"
-		exit 1
-	fi
+if ! command -v docker compose &> /dev/null ; then
+	echo "docker compose executable not found. Is docker compose installed?"
+	exit 1
 fi
 
 # Check if user has permissions to run Docker by trying to get the status of Docker (docker status).
@@ -321,7 +315,8 @@ fi
 wget "https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/docker/compose/docker-compose.$DOCKER_COMPOSE_VERSION.yml" -O docker-compose.yml
 wget "https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/docker/compose/.env" -O .env
 
-SECRET_KEY=$(tr --delete --complement 'a-zA-Z0-9' < /dev/urandom 2>/dev/null | head --bytes 64)
+SECRET_KEY=$(LC_ALL=C tr -dc 'a-zA-Z0-9!"#$%&'\''()*+,-./:;<=>?@[\]^_`{|}~' < /dev/urandom | head --bytes 64)
+
 
 DEFAULT_LANGUAGES=("deu eng fra ita spa")
 
@@ -382,16 +377,16 @@ if [ "$l1" -eq "$l2" ] ; then
 fi
 
 
-${DOCKER_COMPOSE_CMD} pull
+docker compose pull
 
 if [ "$DATABASE_BACKEND" == "postgres" ] || [ "$DATABASE_BACKEND" == "mariadb" ] ; then
 	echo "Starting DB first for initilzation"
-	${DOCKER_COMPOSE_CMD} up --detach db
+	docker compose up --detach db
 	# hopefully enough time for even the slower systems
 	sleep 15
-	${DOCKER_COMPOSE_CMD} stop
+	docker compose stop
 fi
 
-${DOCKER_COMPOSE_CMD} run --rm -e DJANGO_SUPERUSER_PASSWORD="$PASSWORD" webserver createsuperuser --noinput --username "$USERNAME" --email "$EMAIL"
+docker compose run --rm -e DJANGO_SUPERUSER_PASSWORD="$PASSWORD" webserver createsuperuser --noinput --username "$USERNAME" --email "$EMAIL"
 
-${DOCKER_COMPOSE_CMD} up --detach
+docker compose up --detach

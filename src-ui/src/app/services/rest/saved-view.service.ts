@@ -5,6 +5,8 @@ import { tap } from 'rxjs/operators'
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
 import { PermissionsService } from '../permissions.service'
 import { AbstractPaperlessService } from './abstract-paperless-service'
+import { SettingsService } from '../settings.service'
+import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 
 @Injectable({
   providedIn: 'root',
@@ -12,7 +14,11 @@ import { AbstractPaperlessService } from './abstract-paperless-service'
 export class SavedViewService extends AbstractPaperlessService<PaperlessSavedView> {
   loading: boolean
 
-  constructor(http: HttpClient, permissionService: PermissionsService) {
+  constructor(
+    http: HttpClient,
+    permissionService: PermissionsService,
+    private settingsService: SettingsService
+  ) {
     super(http, 'saved_views')
   }
 
@@ -25,6 +31,7 @@ export class SavedViewService extends AbstractPaperlessService<PaperlessSavedVie
     this.listAll().subscribe((r) => {
       this.savedViews = r.results
       this.loading = false
+      this.settingsService.dashboardIsEmpty = this.dashboardViews.length === 0
     })
   }
 
@@ -34,12 +41,34 @@ export class SavedViewService extends AbstractPaperlessService<PaperlessSavedVie
     return this.savedViews
   }
 
-  get sidebarViews() {
-    return this.savedViews.filter((v) => v.show_in_sidebar)
+  get sidebarViews(): PaperlessSavedView[] {
+    const sidebarViews = this.savedViews.filter((v) => v.show_in_sidebar)
+
+    const sorted: number[] = this.settingsService.get(
+      SETTINGS_KEYS.SIDEBAR_VIEWS_SORT_ORDER
+    )
+
+    return sorted?.length > 0
+      ? sorted
+          .map((id) => sidebarViews.find((v) => v.id === id))
+          .concat(sidebarViews.filter((v) => !sorted.includes(v.id)))
+          .filter((v) => v)
+      : [...sidebarViews]
   }
 
-  get dashboardViews() {
-    return this.savedViews.filter((v) => v.show_on_dashboard)
+  get dashboardViews(): PaperlessSavedView[] {
+    const dashboardViews = this.savedViews.filter((v) => v.show_on_dashboard)
+
+    const sorted: number[] = this.settingsService.get(
+      SETTINGS_KEYS.DASHBOARD_VIEWS_SORT_ORDER
+    )
+
+    return sorted?.length > 0
+      ? sorted
+          .map((id) => dashboardViews.find((v) => v.id === id))
+          .concat(dashboardViews.filter((v) => !sorted.includes(v.id)))
+          .filter((v) => v)
+      : [...dashboardViews]
   }
 
   create(o: PaperlessSavedView) {

@@ -1,15 +1,18 @@
 import re
 from html import escape
 from pathlib import Path
-from typing import List
+from typing import Optional
 
-import httpx
 from bleach import clean
 from bleach import linkify
 from django.conf import settings
 from django.utils.timezone import is_naive
 from django.utils.timezone import make_aware
-from humanfriendly import format_size
+from gotenberg_client import GotenbergClient
+from gotenberg_client.options import Margin
+from gotenberg_client.options import PageSize
+from gotenberg_client.options import PdfAFormat
+from humanize import naturalsize
 from imap_tools import MailAttachment
 from imap_tools import MailMessage
 from tika_client import TikaClient
@@ -25,10 +28,21 @@ class MailDocumentParser(DocumentParser):
     Gotenberg and sends the html part to a Tika server for text extraction.
     """
 
-    gotenberg_server = settings.TIKA_GOTENBERG_ENDPOINT
-    tika_server = settings.TIKA_ENDPOINT
-
     logging_name = "paperless.parsing.mail"
+
+    @staticmethod
+    def _settings_to_gotenberg_pdfa() -> Optional[PdfAFormat]:
+        """
+        Converts our requested PDF/A output into the Gotenberg API
+        format
+        """
+        if settings.OCR_OUTPUT_TYPE in {"pdfa", "pdfa-2"}:
+            return PdfAFormat.A2b
+        elif settings.OCR_OUTPUT_TYPE == "pdfa-1":  # pragma: no cover
+            return PdfAFormat.A1a
+        elif settings.OCR_OUTPUT_TYPE == "pdfa-3":  # pragma: no cover
+            return PdfAFormat.A3b
+        return None
 
     def get_thumbnail(self, document_path: Path, mime_type: str, file_name=None):
         if not self.archive_path:
@@ -72,7 +86,7 @@ class MailDocumentParser(DocumentParser):
                 "key": "attachments",
                 "value": ", ".join(
                     f"{attachment.filename}"
-                    f"({format_size(attachment.size, binary=True)})"
+                    f"({naturalsize(attachment.size, binary=True, format='%.2f')})"
                     for attachment in mail.attachments
                 ),
             },
@@ -124,7 +138,10 @@ class MailDocumentParser(DocumentParser):
             if mail_message.attachments:
                 att = []
                 for a in mail.attachments:
-                    att.append(f"{a.filename} ({format_size(a.size, binary=True)})")
+                    attachment_size = naturalsize(a.size, binary=True, format="%.2f")
+                    att.append(
+                        f"{a.filename} ({attachment_size})",
+                    )
                 fmt_text += f"Attachments: {', '.join(att)}\n\n"
 
             if mail.html:
@@ -171,7 +188,7 @@ class MailDocumentParser(DocumentParser):
         self.log.info("Sending content to Tika server")
 
         try:
-            with TikaClient(tika_url=self.tika_server) as client:
+            with TikaClient(tika_url=settings.TIKA_ENDPOINT) as client:
                 parsed = client.tika.as_text.from_buffer(html, "text/html")
 
                 if parsed.content is not None:
@@ -180,7 +197,7 @@ class MailDocumentParser(DocumentParser):
         except Exception as err:
             raise ParseError(
                 f"Could not parse content with tika server at "
-                f"{self.tika_server}: {err}",
+                f"{settings.TIKA_ENDPOINT}: {err}",
             ) from err
 
     def generate_pdf(self, mail_message: MailMessage) -> Path:
@@ -193,45 +210,29 @@ class MailDocumentParser(DocumentParser):
         if not mail_message.html:
             archive_path.write_bytes(mail_pdf_file.read_bytes())
         else:
-            url_merge = self.gotenberg_server + "/forms/pdfengines/merge"
-
             pdf_of_html_content = self.generate_pdf_from_html(
                 mail_message.html,
                 mail_message.attachments,
             )
 
-            pdf_collection = {
-                "1_mail.pdf": ("1_mail.pdf", mail_pdf_file, "application/pdf"),
-                "2_html.pdf": ("2_html.pdf", pdf_of_html_content, "application/pdf"),
-            }
+            with GotenbergClient(
+                host=settings.TIKA_GOTENBERG_ENDPOINT,
+                timeout=settings.CELERY_TASK_TIME_LIMIT,
+            ) as client, client.merge.merge() as route:
+                # Configure requested PDF/A formatting, if any
+                pdf_a_format = self._settings_to_gotenberg_pdfa()
+                if pdf_a_format is not None:
+                    route.pdf_format(pdf_a_format)
 
-            try:
-                # Open a handle to each file, replacing the tuple
-                for filename in pdf_collection:
-                    file_multi_part = pdf_collection[filename]
-                    pdf_collection[filename] = (
-                        file_multi_part[0],
-                        file_multi_part[1].open("rb"),
-                        file_multi_part[2],
-                    )
+                route.merge([mail_pdf_file, pdf_of_html_content])
 
-                response = httpx.post(
-                    url_merge,
-                    files=pdf_collection,
-                    timeout=settings.CELERY_TASK_TIME_LIMIT,
-                )
-                response.raise_for_status()  # ensure we notice bad responses
-
-                archive_path.write_bytes(response.content)
-
-            except Exception as err:
-                raise ParseError(
-                    f"Error while merging email HTML into PDF: {err}",
-                ) from err
-            finally:
-                for filename in pdf_collection:
-                    file_multi_part_handle = pdf_collection[filename][1]
-                    file_multi_part_handle.close()
+                try:
+                    response = route.run()
+                    archive_path.write_bytes(response.content)
+                except Exception as err:
+                    raise ParseError(
+                        f"Error while merging email HTML into PDF: {err}",
+                    ) from err
 
         return archive_path
 
@@ -247,7 +248,7 @@ class MailDocumentParser(DocumentParser):
             """
             if isinstance(text, list):
                 text = "\n".join([str(e) for e in text])
-            if type(text) != str:
+            if not isinstance(text, str):
                 text = str(text)
             text = escape(text)
             text = clean(text)
@@ -275,7 +276,9 @@ class MailDocumentParser(DocumentParser):
 
         att = []
         for a in mail.attachments:
-            att.append(f"{a.filename} ({format_size(a.size, binary=True)})")
+            att.append(
+                f"{a.filename} ({naturalsize(a.size, binary=True, format='%.2f')})",
+            )
         data["attachments"] = clean_html(", ".join(att))
         if data["attachments"]:
             data["attachments_label"] = "Attachments"
@@ -295,48 +298,29 @@ class MailDocumentParser(DocumentParser):
         Creates a PDF based on the given email, using the email's values in a
         an HTML template
         """
-        url = self.gotenberg_server + "/forms/chromium/convert/html"
         self.log.info("Converting mail to PDF")
 
         css_file = Path(__file__).parent / "templates" / "output.css"
         email_html_file = self.mail_to_html(mail)
 
-        with css_file.open("rb") as css_handle, email_html_file.open(
-            "rb",
-        ) as email_html_handle:
-            files = {
-                "html": ("index.html", email_html_handle, "text/html"),
-                "css": ("output.css", css_handle, "text/css"),
-            }
-            headers = {}
-            data = {
-                "marginTop": "0.1",
-                "marginBottom": "0.1",
-                "marginLeft": "0.1",
-                "marginRight": "0.1",
-                "paperWidth": "8.27",
-                "paperHeight": "11.7",
-                "scale": "1.0",
-            }
-
-            # Set the output format of the resulting PDF
-            # Valid inputs: https://gotenberg.dev/docs/modules/pdf-engines#uno
-            if settings.OCR_OUTPUT_TYPE in {"pdfa", "pdfa-2"}:
-                data["pdfFormat"] = "PDF/A-2b"
-            elif settings.OCR_OUTPUT_TYPE == "pdfa-1":
-                data["pdfFormat"] = "PDF/A-1a"
-            elif settings.OCR_OUTPUT_TYPE == "pdfa-3":
-                data["pdfFormat"] = "PDF/A-3b"
+        with GotenbergClient(
+            host=settings.TIKA_GOTENBERG_ENDPOINT,
+            timeout=settings.CELERY_TASK_TIME_LIMIT,
+        ) as client, client.chromium.html_to_pdf() as route:
+            # Configure requested PDF/A formatting, if any
+            pdf_a_format = self._settings_to_gotenberg_pdfa()
+            if pdf_a_format is not None:
+                route.pdf_format(pdf_a_format)
 
             try:
-                response = httpx.post(
-                    url,
-                    files=files,
-                    headers=headers,
-                    data=data,
-                    timeout=settings.CELERY_TASK_TIME_LIMIT,
+                response = (
+                    route.index(email_html_file)
+                    .resource(css_file)
+                    .margins(Margin(top=0.1, bottom=0.1, left=0.1, right=0.1))
+                    .size(PageSize(height=11.7, width=8.27))
+                    .scale(1.0)
+                    .run()
                 )
-                response.raise_for_status()  # ensure we notice bad responses
             except Exception as err:
                 raise ParseError(
                     f"Error while converting email to PDF: {err}",
@@ -350,7 +334,7 @@ class MailDocumentParser(DocumentParser):
     def generate_pdf_from_html(
         self,
         orig_html: str,
-        attachments: List[MailAttachment],
+        attachments: list[MailAttachment],
     ) -> Path:
         """
         Generates a PDF file based on the HTML and attachments of the email
@@ -364,69 +348,57 @@ class MailDocumentParser(DocumentParser):
             text = compiled_close.sub("</div", text)
             return text
 
-        url = self.gotenberg_server + "/forms/chromium/convert/html"
         self.log.info("Converting html to PDF")
 
         tempdir = Path(self.tempdir)
 
         html_clean = clean_html_script(orig_html)
-
-        files = {}
-
-        for attachment in attachments:
-            # Clean the attachment name to be valid
-            name_cid = f"cid:{attachment.content_id}"
-            name_clean = "".join(e for e in name_cid if e.isalnum())
-
-            # Write attachment payload to a temp file
-            temp_file = tempdir / name_clean
-            temp_file.write_bytes(attachment.payload)
-
-            # Store the attachment for upload
-            files[name_clean] = (name_clean, temp_file, attachment.content_type)
-
-            # Replace as needed the name with the clean name
-            html_clean = html_clean.replace(name_cid, name_clean)
-
-        # Now store the cleaned up HTML version
         html_clean_file = tempdir / "index.html"
         html_clean_file.write_text(html_clean)
 
-        files["index.html"] = ("index.html", html_clean_file, "text/html")
+        with GotenbergClient(
+            host=settings.TIKA_GOTENBERG_ENDPOINT,
+            timeout=settings.CELERY_TASK_TIME_LIMIT,
+        ) as client, client.chromium.html_to_pdf() as route:
+            # Configure requested PDF/A formatting, if any
+            pdf_a_format = self._settings_to_gotenberg_pdfa()
+            if pdf_a_format is not None:
+                route.pdf_format(pdf_a_format)
 
-        data = {
-            "marginTop": "0.1",
-            "marginBottom": "0.1",
-            "marginLeft": "0.1",
-            "marginRight": "0.1",
-            "paperWidth": "8.27",
-            "paperHeight": "11.7",
-            "scale": "1.0",
-        }
-        try:
-            # Open a handle to each file, replacing the tuple
-            for filename in files:
-                file_multi_part = files[filename]
-                files[filename] = (
-                    file_multi_part[0],
-                    file_multi_part[1].open("rb"),
-                    file_multi_part[2],
-                )
+            # Add attachments as resources, cleaning the filename and replacing
+            # it in the index file for inclusion
+            for attachment in attachments:
+                # Clean the attachment name to be valid
+                name_cid = f"cid:{attachment.content_id}"
+                name_clean = "".join(e for e in name_cid if e.isalnum())
 
-            response = httpx.post(
-                url,
-                files=files,
-                data=data,
-                timeout=settings.CELERY_TASK_TIME_LIMIT,
-            )
-            response.raise_for_status()  # ensure we notice bad responses
-        except Exception as err:
-            raise ParseError(f"Error while converting document to PDF: {err}") from err
-        finally:
-            # Ensure all file handles as closed
-            for filename in files:
-                file_multi_part_handle = files[filename][1]
-                file_multi_part_handle.close()
+                # Write attachment payload to a temp file
+                temp_file = tempdir / name_clean
+                temp_file.write_bytes(attachment.payload)
+
+                route.resource(temp_file)
+
+                # Replace as needed the name with the clean name
+                html_clean = html_clean.replace(name_cid, name_clean)
+
+            # Now store the cleaned up HTML version
+            html_clean_file = tempdir / "index.html"
+            html_clean_file.write_text(html_clean)
+            # This is our index file, the main page basically
+            route.index(html_clean_file)
+
+            # Set page size, margins
+            route.margins(Margin(top=0.1, bottom=0.1, left=0.1, right=0.1)).size(
+                PageSize(height=11.7, width=8.27),
+            ).scale(1.0)
+
+            try:
+                response = route.run()
+
+            except Exception as err:
+                raise ParseError(
+                    f"Error while converting document to PDF: {err}",
+                ) from err
 
         html_pdf = tempdir / "html.pdf"
         html_pdf.write_bytes(response.content)

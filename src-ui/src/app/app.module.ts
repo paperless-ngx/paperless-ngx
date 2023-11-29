@@ -14,8 +14,8 @@ import { DashboardComponent } from './components/dashboard/dashboard.component'
 import { TagListComponent } from './components/manage/tag-list/tag-list.component'
 import { DocumentTypeListComponent } from './components/manage/document-type-list/document-type-list.component'
 import { CorrespondentListComponent } from './components/manage/correspondent-list/correspondent-list.component'
-import { LogsComponent } from './components/manage/logs/logs.component'
-import { SettingsComponent } from './components/manage/settings/settings.component'
+import { LogsComponent } from './components/admin/logs/logs.component'
+import { SettingsComponent } from './components/admin/settings/settings.component'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { DatePipe, registerLocaleData } from '@angular/common'
 import { NotFoundComponent } from './components/not-found/not-found.component'
@@ -39,6 +39,7 @@ import { NgxFileDropModule } from 'ngx-file-drop'
 import { TextComponent } from './components/common/input/text/text.component'
 import { SelectComponent } from './components/common/input/select/select.component'
 import { CheckComponent } from './components/common/input/check/check.component'
+import { UrlComponent } from './components/common/input/url/url.component'
 import { PasswordComponent } from './components/common/input/password/password.component'
 import { SaveViewConfigDialogComponent } from './components/document-list/save-view-config-dialog/save-view-config-dialog.component'
 import { TagsComponent } from './components/common/input/tags/tags.component'
@@ -77,7 +78,7 @@ import { DirtySavedViewGuard } from './guards/dirty-saved-view.guard'
 import { StoragePathListComponent } from './components/manage/storage-path-list/storage-path-list.component'
 import { StoragePathEditDialogComponent } from './components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
 import { SettingsService } from './services/settings.service'
-import { TasksComponent } from './components/manage/tasks/tasks.component'
+import { TasksComponent } from './components/admin/tasks/tasks.component'
 import { TourNgBootstrapModule } from 'ngx-ui-tour-ng-bootstrap'
 import { UserEditDialogComponent } from './components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component'
 import { GroupEditDialogComponent } from './components/common/edit-dialog/group-edit-dialog/group-edit-dialog.component'
@@ -94,20 +95,35 @@ import { PermissionsFilterDropdownComponent } from './components/common/permissi
 import { UsernamePipe } from './pipes/username.pipe'
 import { LogoComponent } from './components/common/logo/logo.component'
 import { IsNumberPipe } from './pipes/is-number.pipe'
+import { ShareLinksDropdownComponent } from './components/common/share-links-dropdown/share-links-dropdown.component'
+import { ConsumptionTemplatesComponent } from './components/manage/consumption-templates/consumption-templates.component'
+import { ConsumptionTemplateEditDialogComponent } from './components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component'
+import { MailComponent } from './components/manage/mail/mail.component'
+import { UsersAndGroupsComponent } from './components/admin/users-groups/users-groups.component'
+import { DragDropModule } from '@angular/cdk/drag-drop'
+import { FileDropComponent } from './components/file-drop/file-drop.component'
+import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
+import { CustomFieldEditDialogComponent } from './components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
+import { CustomFieldsDropdownComponent } from './components/common/custom-fields-dropdown/custom-fields-dropdown.component'
 
+import localeAf from '@angular/common/locales/af'
 import localeAr from '@angular/common/locales/ar'
 import localeBe from '@angular/common/locales/be'
+import localeBg from '@angular/common/locales/bg'
 import localeCa from '@angular/common/locales/ca'
 import localeCs from '@angular/common/locales/cs'
 import localeDa from '@angular/common/locales/da'
 import localeDe from '@angular/common/locales/de'
+import localeEl from '@angular/common/locales/el'
 import localeEnGb from '@angular/common/locales/en-GB'
 import localeEs from '@angular/common/locales/es'
 import localeFi from '@angular/common/locales/fi'
 import localeFr from '@angular/common/locales/fr'
+import localeHu from '@angular/common/locales/hu'
 import localeIt from '@angular/common/locales/it'
 import localeLb from '@angular/common/locales/lb'
 import localeNl from '@angular/common/locales/nl'
+import localeNo from '@angular/common/locales/no'
 import localePl from '@angular/common/locales/pl'
 import localePt from '@angular/common/locales/pt'
 import localeRo from '@angular/common/locales/ro'
@@ -120,19 +136,24 @@ import localeTr from '@angular/common/locales/tr'
 import localeUk from '@angular/common/locales/uk'
 import localeZh from '@angular/common/locales/zh'
 
+registerLocaleData(localeAf)
 registerLocaleData(localeAr)
 registerLocaleData(localeBe)
+registerLocaleData(localeBg)
 registerLocaleData(localeCa)
 registerLocaleData(localeCs)
 registerLocaleData(localeDa)
 registerLocaleData(localeDe)
+registerLocaleData(localeEl)
 registerLocaleData(localeEnGb)
 registerLocaleData(localeEs)
 registerLocaleData(localeFi)
 registerLocaleData(localeFr)
+registerLocaleData(localeHu)
 registerLocaleData(localeIt)
 registerLocaleData(localeLb)
 registerLocaleData(localeNl)
+registerLocaleData(localeNo)
 registerLocaleData(localePl)
 registerLocaleData(localePt, 'pt-BR')
 registerLocaleData(localePt, 'pt-PT')
@@ -185,6 +206,7 @@ function initializeApp(settings: SettingsService) {
     TextComponent,
     SelectComponent,
     CheckComponent,
+    UrlComponent,
     PasswordComponent,
     SaveViewConfigDialogComponent,
     TagsComponent,
@@ -225,6 +247,15 @@ function initializeApp(settings: SettingsService) {
     UsernamePipe,
     LogoComponent,
     IsNumberPipe,
+    ShareLinksDropdownComponent,
+    ConsumptionTemplatesComponent,
+    ConsumptionTemplateEditDialogComponent,
+    MailComponent,
+    UsersAndGroupsComponent,
+    FileDropComponent,
+    CustomFieldsComponent,
+    CustomFieldEditDialogComponent,
+    CustomFieldsDropdownComponent,
   ],
   imports: [
     BrowserModule,
@@ -238,6 +269,7 @@ function initializeApp(settings: SettingsService) {
     NgSelectModule,
     ColorSliderModule,
     TourNgBootstrapModule,
+    DragDropModule,
   ],
   providers: [
     {

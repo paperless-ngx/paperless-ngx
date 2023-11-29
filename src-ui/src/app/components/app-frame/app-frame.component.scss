@@ -18,13 +18,17 @@
     height: 0.8em;
   }
 
-  // These come from the col-md-3 col-lg-2 classes for regular sidebar, needed for animation
+  // These come from the col-* classes for non-slim sidebar, needed for animation
   @media (min-width: 768px) {
     max-width: 25%;
   }
 
   @media (min-width: 992px) {
     max-width: 16.66666667%;
+  }
+
+  @media (min-width: 2400px) {
+    max-width: 8.33333333%;
   }
 
   transition: all .2s ease;
@@ -99,10 +103,6 @@ main {
     }
   }
 
-  .col-slim {
-    padding-left: calc(50px + $grid-gutter-width) !important;
-  }
-
   .sidebar-slim-toggler {
     display: block;
     position: absolute;
@@ -169,6 +169,7 @@ main {
 
 .nav-item {
   position: relative;
+  list-style-type: none;
 
   &:hover .close {
     display: block;
@@ -309,4 +310,12 @@ main {
   100% {
     opacity: 100%;
   }
+}
+
+.nav-item .position-absolute {
+  cursor: move;
+}
+
+::ng-deep .navItemDrag .position-absolute svg {
+  display: none;
 }

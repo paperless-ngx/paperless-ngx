@@ -143,6 +143,10 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
     return url
   }
 
+  getNextAsn(): Observable<number> {
+    return this.http.get<number>(this.getResourceUrl(null, 'next_asn'))
+  }
+
   update(o: PaperlessDocument): Observable<PaperlessDocument> {
     // we want to only set created_date
     o.created = undefined

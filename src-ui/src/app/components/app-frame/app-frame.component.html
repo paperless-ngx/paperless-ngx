@@ -1,4 +1,4 @@
-<nav class="navbar navbar-dark sticky-top bg-primary flex-md-nowrap p-0 shadow">
+<nav class="navbar navbar-dark sticky-top bg-primary flex-md-nowrap p-0 shadow-sm">
   <button class="navbar-toggler d-md-none collapsed border-0" type="button" data-toggle="collapse"
     data-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation"
     (click)="isMenuCollapsed = !isMenuCollapsed">
@@ -10,7 +10,7 @@
     </svg>
     <span class="ms-2" [class.visually-hidden]="slimSidebarEnabled" i18n="app title">Paperless-ngx</span>
   </a>
-  <div class="search-form-container flex-grow-1 py-2 pb-3 pb-sm-2 px-3 ps-md-4 me-sm-auto order-3 order-sm-1" *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
+  <div class="search-form-container flex-grow-1 py-2 pb-3 pb-sm-2 px-3 ps-md-4 me-sm-auto order-3 order-sm-1" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
     <form (ngSubmit)="search()" class="form-inline flex-grow-1">
       <svg width="1em" height="1em" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#search"/>
@@ -39,7 +39,7 @@
           <p class="small mb-0 px-3 text-muted" i18n>Logged in as {{this.settingsService.displayName}}</p>
           <div class="dropdown-divider"></div>
         </div>
-        <a ngbDropdownItem class="nav-link" routerLink="settings" (click)="closeMenu()" *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.UISettings }">
+        <a ngbDropdownItem class="nav-link" routerLink="settings" (click)="closeMenu()" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.UISettings }">
           <svg class="sidebaricon me-2" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#gear"/>
           </svg><ng-container i18n>Settings</ng-container>
@@ -49,6 +49,12 @@
             <use xlink:href="assets/bootstrap-icons.svg#door-open"/>
           </svg><ng-container i18n>Logout</ng-container>
         </a>
+				<div class="dropdown-divider"></div>
+        <a ngbDropdownItem class="nav-link" target="_blank" rel="noopener noreferrer" href="https://docs.paperless-ngx.com">
+          <svg class="sidebaricon me-2" fill="currentColor">
+            <use xlink:href="assets/bootstrap-icons.svg#question-circle"/>
+          </svg><ng-container i18n>Documentation</ng-container>
+        </a>
       </div>
     </li>
   </ul>
@@ -56,7 +62,7 @@
 
 <div class="container-fluid">
   <div class="row">
-    <nav id="sidebarMenu" class="d-md-block bg-light sidebar collapse" [ngClass]="slimSidebarEnabled ? 'slim' : 'col-md-3 col-lg-2'" [class.animating]="slimSidebarAnimating" [ngbCollapse]="isMenuCollapsed">
+    <nav id="sidebarMenu" class="d-md-block bg-light sidebar collapse" [ngClass]="slimSidebarEnabled ? 'slim' : 'col-md-3 col-lg-2 col-xxxl-1'" [class.animating]="slimSidebarAnimating" [ngbCollapse]="isMenuCollapsed">
       <button class="btn btn-sm btn-dark sidebar-slim-toggler" (click)="toggleSlimSidebar()">
         <svg class="sidebaricon-sm" fill="currentColor">
           <use *ngIf="slimSidebarEnabled" xlink:href="assets/bootstrap-icons.svg#chevron-double-right"/>
@@ -72,7 +78,7 @@
               </svg><span>&nbsp;<ng-container i18n>Dashboard</ng-container></span>
             </a>
           </li>
-          <li class="nav-item" *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
+          <li class="nav-item" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
             <a class="nav-link" routerLink="documents" routerLinkActive="active" (click)="closeMenu()" ngbPopover="Documents" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#files"/>
@@ -80,24 +86,35 @@
             </a>
           </li>
         </ul>
-        <div *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }">
-          <h6 class="sidebar-heading px-3 mt-4 mb-1 text-muted" *ngIf='savedViewService.loading || savedViewService.sidebarViews.length > 0'>
+        <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }">
+          <h6 class="sidebar-heading px-3 mt-3 mb-1 text-muted" *ngIf='savedViewService.loading || savedViewService.sidebarViews?.length > 0'>
             <span i18n>Saved views</span>
             <div *ngIf="savedViewService.loading" class="spinner-border spinner-border-sm fw-normal ms-2" role="status"></div>
           </h6>
-          <ul class="nav flex-column mb-2">
-            <li class="nav-item w-100" *ngFor="let view of savedViewService.sidebarViews">
+          <ul class="nav flex-column mb-2" cdkDropList (cdkDropListDropped)="onDrop($event)">
+            <li class="nav-item w-100" *ngFor="let view of savedViewService.sidebarViews"
+              cdkDrag
+              [cdkDragDisabled]="!settingsService.organizingSidebarSavedViews"
+              cdkDragPreviewContainer="parent"
+              cdkDragPreviewClass="navItemDrag"
+              (cdkDragStarted)="onDragStart($event)"
+              (cdkDragEnded)="onDragEnd($event)">
               <a class="nav-link" [class.text-truncate]="!slimSidebarEnabled" routerLink="view/{{view.id}}" routerLinkActive="active" (click)="closeMenu()" [ngbPopover]="view.name" [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
                 <svg class="sidebaricon" fill="currentColor">
                   <use xlink:href="assets/bootstrap-icons.svg#funnel"/>
                 </svg><span>&nbsp;{{view.name}}</span>
               </a>
+              <div *ngIf="settingsService.organizingSidebarSavedViews" class="position-absolute end-0 top-0 px-3 py-2" [class.me-n3]="slimSidebarEnabled" cdkDragHandle>
+                <svg class="sidebaricon text-muted" fill="currentColor">
+                  <use xlink:href="assets/bootstrap-icons.svg#grip-vertical"/>
+                </svg>
+              </div>
             </li>
           </ul>
-        </div>
+        </ng-container>
 
-        <div *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
-          <h6 class="sidebar-heading px-3 mt-4 mb-1 text-muted" *ngIf='openDocuments.length > 0'>
+        <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
+          <h6 class="sidebar-heading px-3 mt-3 mb-1 text-muted" *ngIf='openDocuments.length > 0'>
             <span i18n>Open documents</span>
           </h6>
           <ul class="nav flex-column mb-2">
@@ -121,41 +138,82 @@
               </a>
             </li>
           </ul>
-      </div>
+        </ng-container>
 
-        <h6 class="sidebar-heading px-3 mt-4 mb-1 text-muted">
+        <h6 class="sidebar-heading px-3 mt-3 mb-1 text-muted">
           <span i18n>Manage</span>
         </h6>
         <ul class="nav flex-column mb-2">
-          <li class="nav-item" *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.Correspondent }">
+          <li class="nav-item" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Correspondent }">
             <a class="nav-link" routerLink="correspondents" routerLinkActive="active" (click)="closeMenu()" ngbPopover="Correspondents" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#person"/>
               </svg><span>&nbsp;<ng-container i18n>Correspondents</ng-container></span>
             </a>
           </li>
-          <li class="nav-item" *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.Tag }" tourAnchor="tour.tags">
+          <li class="nav-item" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Tag }" tourAnchor="tour.tags">
             <a class="nav-link" routerLink="tags" routerLinkActive="active" (click)="closeMenu()" ngbPopover="Tags" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#tags"/>
               </svg><span>&nbsp;<ng-container i18n>Tags</ng-container></span>
             </a>
           </li>
-          <li class="nav-item" *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.DocumentType }">
-            <a class="nav-link" routerLink="documenttypes" routerLinkActive="active" (click)="closeMenu()" ngbPopover="Document types" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
+          <li class="nav-item" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.DocumentType }">
+            <a class="nav-link" routerLink="documenttypes" routerLinkActive="active" (click)="closeMenu()" ngbPopover="Document Types" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#hash"/>
-              </svg><span>&nbsp;<ng-container i18n>Document types</ng-container></span>
+              </svg><span>&nbsp;<ng-container i18n>Document Types</ng-container></span>
             </a>
           </li>
-          <li class="nav-item" *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.StoragePath }">
-            <a class="nav-link" routerLink="storagepaths" routerLinkActive="active" (click)="closeMenu()" ngbPopover="Storage paths" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
+          <li class="nav-item" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.StoragePath }">
+            <a class="nav-link" routerLink="storagepaths" routerLinkActive="active" (click)="closeMenu()" ngbPopover="Storage Paths" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#folder"/>
-              </svg><span>&nbsp;<ng-container i18n>Storage paths</ng-container></span>
+              </svg><span>&nbsp;<ng-container i18n>Storage Paths</ng-container></span>
             </a>
           </li>
-          <li class="nav-item" *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.PaperlessTask }" tourAnchor="tour.file-tasks">
+          <li class="nav-item" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.CustomField }">
+            <a class="nav-link" routerLink="customfields" routerLinkActive="active" (click)="closeMenu()" ngbPopover="Custom Fields" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
+              <svg class="sidebaricon" fill="currentColor">
+                <use xlink:href="assets/bootstrap-icons.svg#ui-radios"/>
+              </svg><span>&nbsp;<ng-container i18n>Custom Fields</ng-container></span>
+            </a>
+          </li>
+          <li class="nav-item" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.ConsumptionTemplate }" tourAnchor="tour.consumption-templates">
+            <a class="nav-link" routerLink="templates" routerLinkActive="active" (click)="closeMenu()" ngbPopover="Consumption templates" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
+              <svg class="sidebaricon" fill="currentColor">
+                <use xlink:href="assets/bootstrap-icons.svg#file-earmark-ruled"/>
+              </svg><span>&nbsp;<ng-container i18n>Templates</ng-container></span>
+            </a>
+          </li>
+          <li class="nav-item" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.MailAccount }" tourAnchor="tour.mail">
+            <a class="nav-link" routerLink="mail" routerLinkActive="active" (click)="closeMenu()" ngbPopover="Mail" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
+              <svg class="sidebaricon" fill="currentColor">
+                <use xlink:href="assets/bootstrap-icons.svg#envelope"/>
+              </svg><span>&nbsp;<ng-container i18n>Mail</ng-container></span>
+            </a>
+          </li>
+        </ul>
+
+        <h6 class="sidebar-heading px-3 mt-auto pt-4 mb-1 text-muted">
+          <span i18n>Administration</span>
+        </h6>
+        <ul class="nav flex-column mb-2">
+          <li class="nav-item" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.UISettings }" tourAnchor="tour.settings">
+            <a class="nav-link" routerLink="settings" routerLinkActive="active" (click)="closeMenu()" ngbPopover="Settings" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
+              <svg class="sidebaricon" fill="currentColor">
+                <use xlink:href="assets/bootstrap-icons.svg#gear"/>
+              </svg><span>&nbsp;<ng-container i18n>Settings</ng-container></span>
+            </a>
+          </li>
+          <li class="nav-item" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.User }">
+            <a class="nav-link" routerLink="usersgroups" routerLinkActive="active" (click)="closeMenu()" ngbPopover="Users & Groups" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
+              <svg class="sidebaricon" fill="currentColor">
+                <use xlink:href="assets/bootstrap-icons.svg#people"/>
+              </svg><span>&nbsp;<ng-container i18n>Users & Groups</ng-container></span>
+            </a>
+          </li>
+          <li class="nav-item" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.PaperlessTask }" tourAnchor="tour.file-tasks">
             <a class="nav-link" routerLink="tasks" routerLinkActive="active" (click)="closeMenu()" ngbPopover="File Tasks" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
               <span *ngIf="tasksService.failedFileTasks.length > 0 && slimSidebarEnabled" class="badge bg-danger position-absolute top-0 end-0">{{tasksService.failedFileTasks.length}}</span>
               <svg class="sidebaricon" fill="currentColor">
@@ -163,51 +221,27 @@
               </svg><span>&nbsp;<ng-container i18n>File Tasks<span *ngIf="tasksService.failedFileTasks.length > 0"><span class="badge bg-danger ms-2">{{tasksService.failedFileTasks.length}}</span></span></ng-container></span>
             </a>
           </li>
-          <li class="nav-item" *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.Admin }">
+          <li class="nav-item" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Admin }">
             <a class="nav-link" routerLink="logs" routerLinkActive="active" (click)="closeMenu()" ngbPopover="Logs" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#text-left"/>
               </svg><span>&nbsp;<ng-container i18n>Logs</ng-container></span>
             </a>
           </li>
-          <li class="nav-item" *appIfPermissions="{ action: PermissionAction.View, type: PermissionType.UISettings }" tourAnchor="tour.settings">
-            <a class="nav-link" routerLink="settings" routerLinkActive="active" (click)="closeMenu()" ngbPopover="Settings" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
-              <svg class="sidebaricon" fill="currentColor">
-                <use xlink:href="assets/bootstrap-icons.svg#gear"/>
-              </svg><span>&nbsp;<ng-container i18n>Settings</ng-container></span>
-            </a>
-          </li>
-        </ul>
-
-        <h6 class="sidebar-heading px-3 mt-auto pt-4 mb-1 text-muted">
-          <span i18n>Info</span>
-        </h6>
-        <ul class="nav flex-column mb-2">
-          <li class="nav-item" tourAnchor="tour.outro">
-            <a class="nav-link" target="_blank" rel="noopener noreferrer" href="https://docs.paperless-ngx.com" ngbPopover="Documentation" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
+          <li class="nav-item mt-2" tourAnchor="tour.outro">
+            <a class="px-3 py-2 text-muted small d-flex align-items-center flex-wrap text-decoration-none" target="_blank" rel="noopener noreferrer" href="https://docs.paperless-ngx.com" ngbPopover="Documentation" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#question-circle"/>
-              </svg><span>&nbsp;<ng-container i18n>Documentation</ng-container></span>
+              </svg><span class="ms-1">&nbsp;<ng-container i18n>Documentation</ng-container></span>
             </a>
           </li>
-          <li class="nav-item">
-            <div class="d-flex w-100 flex-wrap">
-              <a class="nav-link pe-2 pb-1" target="_blank" rel="noopener noreferrer" href="https://github.com/paperless-ngx/paperless-ngx" ngbPopover="GitHub" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="sidebaricon" viewBox="0 0 16 16">
-                  <use xlink:href="assets/bootstrap-icons.svg#github" />
-                </svg><span>&nbsp;<ng-container i18n>GitHub</ng-container></span>
-              </a>
-              <a class="nav-link-additional small text-muted ms-3" [class.visually-hidden]="slimSidebarEnabled" target="_blank" rel="noopener noreferrer" href="https://github.com/paperless-ngx/paperless-ngx/discussions/categories/feature-requests" title="Suggest an idea" i18n-title>
-                <svg xmlns="http://www.w3.org/2000/svg" width="1.1em" height="1.1em" fill="currentColor" class="me-1" viewBox="0 0 16 16">
-                  <use xlink:href="assets/bootstrap-icons.svg#lightbulb" />
-                </svg>
-                <ng-container i18n>Suggest an idea</ng-container>
-              </a>
-            </div>
-          </li>
-          <li class="nav-item mt-2" [class.visually-hidden]="slimSidebarEnabled">
-            <div class="px-3 py-2 text-muted small d-flex align-items-center flex-wrap">
-              <div class="me-3">{{ versionString }}</div>
+          <li class="nav-item" [class.visually-hidden]="slimSidebarEnabled">
+            <div class="px-3 py-0 text-muted small d-flex align-items-center flex-wrap">
+              <div class="me-3">
+                <a class="text-muted text-decoration-none" target="_blank" rel="noopener noreferrer" href="https://github.com/paperless-ngx/paperless-ngx" ngbPopover="GitHub" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
+                  {{ versionString }}
+                </a>
+              </div>
               <div *ngIf="!settingsService.updateCheckingIsSet || appRemoteVersion" class="version-check">
                 <ng-template #updateAvailablePopContent>
                   <span class="small">Paperless-ngx {{ appRemoteVersion.version }} <ng-container i18n>is available.</ng-container><br/><ng-container i18n>Click to view.</ng-container></span>
@@ -250,7 +284,7 @@
       </div>
     </nav>
 
-    <main role="main" class="ms-sm-auto px-md-4" [ngClass]="slimSidebarEnabled ? 'col-slim' : 'col-md-9 col-lg-10'">
+    <main role="main" class="ms-sm-auto px-md-4" [ngClass]="slimSidebarEnabled ? 'col-slim' : 'col-md-9 col-lg-10 col-xxxl-11'">
       <router-outlet></router-outlet>
     </main>
   </div>

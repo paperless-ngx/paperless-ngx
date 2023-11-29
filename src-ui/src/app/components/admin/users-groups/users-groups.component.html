@@ -1,0 +1,97 @@
+<pngx-page-header title="Users & Groups" i18n-title>
+</pngx-page-header>
+
+<ng-container *ngIf="users">
+    <h4 class="d-flex">
+        <ng-container i18n>Users</ng-container>
+        <button type="button" class="btn btn-sm btn-outline-primary ms-4" (click)="editUser()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.User }">
+        <svg class="sidebaricon me-1" fill="currentColor">
+            <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
+        </svg>
+        <ng-container i18n>Add User</ng-container>
+        </button>
+    </h4>
+    <ul class="list-group">
+        <li class="list-group-item">
+        <div class="row">
+            <div class="col" i18n>Username</div>
+            <div class="col" i18n>Name</div>
+            <div class="col" i18n>Groups</div>
+            <div class="col" i18n>Actions</div>
+        </div>
+        </li>
+
+        <li *ngFor="let user of users" class="list-group-item">
+        <div class="row">
+            <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editUser(user)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.User)">{{user.username}}</button></div>
+            <div class="col d-flex align-items-center">{{user.first_name}} {{user.last_name}}</div>
+            <div class="col d-flex align-items-center">{{user.groups?.map(getGroupName, this).join(', ')}}</div>
+            <div class="col">
+            <div class="btn-group">
+                <button class="btn btn-sm btn-outline-secondary" type="button" (click)="editUser(user)" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.User }">
+                    <svg class="buttonicon-sm" fill="currentColor">
+                        <use xlink:href="assets/bootstrap-icons.svg#pencil" />
+                    </svg>&nbsp;<ng-container i18n>Edit</ng-container>
+                </button>
+                <button class="btn btn-sm btn-outline-danger" type="button" (click)="deleteUser(user)" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.User }">
+                    <svg class="buttonicon-sm" fill="currentColor">
+                        <use xlink:href="assets/bootstrap-icons.svg#trash" />
+                    </svg>&nbsp;<ng-container i18n>Delete</ng-container>
+                </button>
+            </div>
+            </div>
+        </div>
+        </li>
+    </ul>
+</ng-container>
+
+<ng-container *ngIf="groups">
+    <h4 class="mt-4 d-flex">
+        <ng-container i18n>Groups</ng-container>
+        <button type="button" class="btn btn-sm btn-outline-primary ms-4" (click)="editGroup()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.Group }">
+        <svg class="sidebaricon me-1" fill="currentColor">
+            <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
+        </svg>
+        <ng-container i18n>Add Group</ng-container>
+        </button>
+    </h4>
+    <ul *ngIf="groups.length > 0" class="list-group">
+        <li class="list-group-item">
+        <div class="row">
+            <div class="col" i18n>Name</div>
+            <div class="col"></div>
+            <div class="col"></div>
+            <div class="col" i18n>Actions</div>
+        </div>
+        </li>
+
+        <li *ngFor="let group of groups" class="list-group-item">
+        <div class="row">
+            <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editGroup(group)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.Group)">{{group.name}}</button></div>
+            <div class="col"></div>
+            <div class="col"></div>
+            <div class="col">
+            <div class="btn-group">
+                <button class="btn btn-sm btn-outline-secondary" type="button" (click)="editGroup(group)" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Group }">
+                    <svg class="buttonicon-sm" fill="currentColor">
+                        <use xlink:href="assets/bootstrap-icons.svg#pencil" />
+                    </svg>&nbsp;<ng-container i18n>Edit</ng-container>
+                </button>
+                <button class="btn btn-sm btn-outline-danger" type="button" (click)="deleteGroup(group)" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Group }">
+                    <svg class="buttonicon-sm" fill="currentColor">
+                        <use xlink:href="assets/bootstrap-icons.svg#trash" />
+                    </svg>&nbsp;<ng-container i18n>Delete</ng-container>
+                </button>
+            </div>
+            </div>
+        </div>
+        </li>
+        <li *ngIf="groups.length === 0" class="list-group-item" i18n>No groups defined</li>
+    </ul>
+
+</ng-container>
+
+<div *ngIf="!users || !groups">
+    <div class="spinner-border spinner-border-sm fw-normal ms-2 me-auto" role="status"></div>
+    <div class="visually-hidden" i18n>Loading...</div>
+</div>

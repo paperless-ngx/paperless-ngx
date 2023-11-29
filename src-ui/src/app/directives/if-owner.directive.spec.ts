@@ -6,7 +6,7 @@ import { PermissionsService } from '../services/permissions.service'
 @Component({
   template: `
     <div>
-      <button *appIfOwner="{ id: 2, owner: user1 }">Some Text</button>
+      <button *pngxIfOwner="{ id: 2, owner: user1 }">Some Text</button>
     </div>
   `,
 })

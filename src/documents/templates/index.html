@@ -3,21 +3,22 @@
 {% load static %}
 {% load i18n %}
 
-<html lang="en">
+<html lang="en" data-bs-theme="auto">
 <head>
-  <meta charset="utf-8">
-  <title>Paperless-ngx</title>
-  <base href="{% url 'base' %}">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta charset="utf-8">
+	<title>Paperless-ngx</title>
+	<base href="{% url 'base' %}">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="cookie_prefix" content="{{cookie_prefix}}">
 	<meta name="robots" content="noindex,nofollow">
-  	<link rel="icon" type="image/x-icon" href="favicon.ico">
-  	<link rel="manifest" href="{% static webmanifest %}">
+	<meta name="author" content="The Paperless-ngx Team">
+	<link rel="icon" type="image/x-icon" href="favicon.ico">
+	<link rel="manifest" href="{% static webmanifest %}">
 	<link rel="stylesheet" href="{% static styles_css %}">
 	<link rel="apple-touch-icon" href="{% static apple_touch_icon %}">
 </head>
-<body class="color-scheme-system">
-	<app-root>
+<body>
+	<pngx-root>
 		<script type="text/javascript">
 			setTimeout(() => {
 				let warning = document.getElementsByClassName('warning').item(0)
@@ -33,7 +34,7 @@
 				height: 100%;
 			}
 
-			@-webkit-keyframes pulsate {
+			@keyframes pulsate {
 				0% {
 					opacity: 0.1;
 				}
@@ -47,8 +48,8 @@
 
 			.app-loader svg, .app-loader h6 {
 				opacity: 0.1;
-				-webkit-animation: pulsate 2s ease-out;
-				-webkit-animation-iteration-count: infinite;
+				animation: pulsate 2s ease-out;
+				animation-iteration-count: infinite;
 			}
 
 			svg.logo .leaf {
@@ -79,7 +80,7 @@
 				<p class="warning m-auto mt-3 small fade hide">{% translate "Still here?! Hmm, something might be wrong." %} <a href="https://docs.paperless-ngx.com">{% translate "Here's a link to the docs." %}</a></p>
 			</div>
 		</div>
-	</app-root>
+	</pngx-root>
 	<script src="{% static runtime_js %}" defer></script>
 	<script src="{% static polyfills_js %}" defer></script>
 	<script src="{% static main_js %}" defer></script>

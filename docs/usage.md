@@ -62,7 +62,7 @@ following operations on your documents:
     paperless to create archived versions for digital documents, you can
     configure that by configuring
     `PAPERLESS_OCR_SKIP_ARCHIVE_FILE=with_text`. Please read the
-    [relevant section in the documentation](/configuration#ocr).
+    [relevant section in the documentation](configuration.md#ocr).
 
 !!! note
 
@@ -103,25 +103,14 @@ Typically, you're looking at an FTP server like
 
 ### Web UI Upload
 
-The dashboard has a file drop field to upload documents to paperless.
-Simply drag a file onto this field or select a file with the file
-dialog. Multiple files are supported.
-
-You can also upload documents on any other page of the web UI by
-dragging-and-dropping files into your browser window.
+The dashboard has a button to upload documents to paperless or you
+can simply drag a file anywhere into the app to initiate the consumption
+process.
 
 ### Mobile upload {#usage-mobile_upload}
 
-The mobile app over at [https://github.com/qcasey/paperless_share](https://github.com/qcasey/paperless_share)
-allows Android users to share any documents with paperless. This can be
-combined with any of the mobile scanning apps out there, such as Office
-Lens.
-
-Furthermore, there is the [Paperless
-App](https://github.com/bauerj/paperless_app) as well, which not only
-has document upload, but also document browsing and download features.
-
-Another option is [Paperless Mobile](https://github.com/astubenbord/paperless-mobile), an Android app that supports document upload, scanning, management of labels and more.
+Please see [the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Affiliated-Projects) for a user-maintained list of affiliated projects and
+software (e.g. for mobile devices) that is compatible with Paperless-ngx.
 
 ### IMAP (Email) {#usage-email}
 
@@ -145,9 +134,9 @@ These rules perform the following:
 5.  If documents were consumed from a mail, the rule action is performed
     on that mail.
 
-Paperless will completely ignore mails that do not match your filters.
-It will also only perform the action on mails that it has consumed
-documents from.
+Paperless will check all emails only once and completely ignore messages
+that do not match your filters. It will also only perform the rule action
+on e-mails that it has consumed documents from.
 
 The actions all ensure that the same mail is not consumed twice by
 different means. These are as follows:
@@ -208,11 +197,11 @@ different means. These are as follows:
     them further.
 
 Paperless is set up to check your mails every 10 minutes. This can be
-configured via [`PAPERLESS_EMAIL_TASK_CRON`](/configuration#PAPERLESS_EMAIL_TASK_CRON)
+configured via [`PAPERLESS_EMAIL_TASK_CRON`](configuration.md#PAPERLESS_EMAIL_TASK_CRON)
 
 ### REST API
 
-You can also submit a document using the REST API, see [POSTing documents](/api#file-uploads)
+You can also submit a document using the REST API, see [POSTing documents](api.md#file-uploads)
 for details.
 
 ## Permissions
@@ -247,12 +236,125 @@ do not have an owner set.
 
     Note that superusers have access to all objects.
 
+### Default permissions
+
+Default permissions for documents can be set using consumption templates.
+
+For objects created via the web UI (tags, doc types, etc.) the default is to set the current user
+as owner and no extra permissions, but you explicitly set these under Settings > Permissions.
+
 ### Users and Groups
 
 Paperless-ngx versions after 1.14.0 allow creating and editing users and groups via the 'frontend' UI.
 These can be found under Settings > Users & Groups, assuming the user has access. If a user is designated
 as a member of a group those permissions will be inherited and this is reflected in the UI. Explicit
 permissions can be granted to limit access to certain parts of the UI (and corresponding API endpoints).
+
+### Password reset
+
+In order to enable the password reset feature you will need to setup an SMTP backend, see
+[`PAPERLESS_EMAIL_HOST`](configuration.md#PAPERLESS_EMAIL_HOST)
+
+## Consumption templates
+
+Consumption templates were introduced in v2.0 and allow for finer control over what metadata (tags, doc
+types) and permissions (owner, privileges) are assigned to documents during consumption. In general,
+templates are applied sequentially (by sort order) but subsequent templates will never override an
+assignment from a preceding template. The same is true for mail rules, e.g. if you set the correspondent
+in a mail rule any subsequent consumption templates that are applied _will not_ overwrite this. The
+exception to this is assignments that can be multiple e.g. tags and permissions, which will be merged.
+
+Consumption templates allow you to filter by:
+
+- Source, e.g. documents uploaded via consume folder, API (& the web UI) and mail fetch
+- File name, including wildcards e.g. \*.pdf will apply to all pdfs
+- File path, including wildcards. Note that enabling `PAPERLESS_CONSUMER_RECURSIVE` would allow, for
+  example, automatically assigning documents to different owners based on the upload directory.
+- Mail rule. Choosing this option will force 'mail fetch' to be the template source.
+
+!!! note
+
+    You must include a file name filter, a path filter or a mail rule filter. Use * for either to apply
+    to all files.
+
+Consumption templates can assign:
+
+- Title, see [title placeholders](usage.md#title_placeholders) below
+- Tags, correspondent, document types
+- Document owner
+- View and / or edit permissions to users or groups
+
+### Consumption template permissions
+
+All users who have application permissions for editing consumption templates can see the same set
+of templates. In other words, templates themselves intentionally do not have an owner or permissions.
+
+Given their potentially far-reaching capabilities, you may want to restrict access to templates.
+
+Upon migration, existing installs will grant access to consumption templates to users who can add
+documents (and superusers who can always access all parts of the app).
+
+### Title placeholders
+
+Consumption template titles can include placeholders, _only for items that are assigned within the template_.
+This is because at the time of consumption (when the title is to be set), no automatic tags etc. have been
+applied. You can use the following placeholders:
+
+- `{correspondent}`: assigned correspondent name
+- `{document_type}`: assigned document type name
+- `{owner_username}`: assigned owner username
+- `{added}`: added datetime
+- `{added_year}`: added year
+- `{added_year_short}`: added year
+- `{added_month}`: added month
+- `{added_month_name}`: added month name
+- `{added_month_name_short}`: added month short name
+- `{added_day}`: added day
+
+## Custom Fields {#custom-fields}
+
+Paperless-ngx supports the use of custom fields for documents as of v2.0, allowing a user
+to optionally attach data to documents which does not fit in the existing set of fields
+Paperless-ngx provides.
+
+1. First, create a custom field (under "Manage"), with a given name and data type. This could be something like "Invoice Number" or "Date Paid", with a data type of "Number", "Date", "String", etc.
+2. Once created, a field can be used with documents and data stored. To do so, use the "Custom Fields" menu on the document detail page, choose your existing field and click "Add". Once the field is visible in the form you can enter the appropriate
+   data which will be validated according to the custom field "data type".
+3. Fields can be removed by hovering over the field name revealing a "Remove" button.
+
+!!! important
+
+    Added / removed fields, as well as any data is not saved to the document until you
+    actually hit the "Save" button, similar to other changes on the document details page.
+
+!!! note
+
+    Once the data type for a field is set, it cannot be changed.
+
+Multiple fields may be attached to a document but the same field name cannot be assigned multiple times to the a single document.
+
+The following custom field types are supported:
+
+- `Text`: any text
+- `Boolean`: true / false (check / unchecked) field
+- `Date`: date
+- `URL`: a valid url
+- `Integer`: integer number e.g. 12
+- `Number`: float number e.g. 12.3456
+- `Monetary`: float number with exactly two decimals, e.g. 12.30
+
+## Share Links
+
+Paperless-ngx added the abiltiy to create shareable links to files in version 2.0. You can find the button for this on the document detail screen.
+
+- Share links do not require a user to login and thus link directly to a file.
+- Links are unique and are of the form `{paperless-url}/share/{randomly-generated-slug}`.
+- Links can optionally have an expiration time set.
+- After a link expires or is deleted users will be redirected to the regular paperless-ngx login.
+
+!!! tip
+
+    If your paperless-ngx instance is behind a reverse-proxy you may want to create an exception to bypass any authentication layers that are part of your setup in order to make links truly publicly-accessible. Of course, do so with caution.
 
 ## Best practices {#basic-searching}
 
@@ -462,7 +564,7 @@ Once you have scanned in a document, proceed in paperless as follows.
     paperless will assign them automatically. After consuming a couple
     documents, you can even ask paperless to *learn* when to assign tags and
     correspondents by itself. For details on this feature, see
-    [advanced matching](/advanced_usage#matching).
+    [advanced matching](advanced_usage.md#matching).
 
 ### Task management
 

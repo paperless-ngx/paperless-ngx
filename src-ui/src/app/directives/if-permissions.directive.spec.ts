@@ -6,7 +6,7 @@ import { PermissionsService } from '../services/permissions.service'
 @Component({
   template: `
     <div>
-      <button *appIfPermissions="{ action: 'add', type: '%s_user' }">
+      <button *pngxIfPermissions="{ action: 'add', type: '%s_user' }">
         Some Text
       </button>
     </div>
