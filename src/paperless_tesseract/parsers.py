@@ -244,7 +244,7 @@ class RasterisedDocumentParser(DocumentParser):
                     f"no DPI information is present in this image and "
                     f"OCR_IMAGE_DPI is not set.",
                 )
-            if ocrmypdf_args["image_dpi"] < 70:  # pragma: nocover
+            if ocrmypdf_args["image_dpi"] < 70:  # pragma: no cover
                 self.log.warning(
                     f"Image DPI of {ocrmypdf_args['image_dpi']} is low, OCR may fail",
                 )
