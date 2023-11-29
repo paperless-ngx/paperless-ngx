@@ -864,6 +864,11 @@ OCR_MAX_IMAGE_PIXELS: Optional[int] = None
 if os.environ.get("PAPERLESS_OCR_MAX_IMAGE_PIXELS") is not None:
     OCR_MAX_IMAGE_PIXELS: int = int(os.environ.get("PAPERLESS_OCR_MAX_IMAGE_PIXELS"))
 
+OCR_COLOR_CONVERSION_STRATEGY = os.getenv(
+    "PAPERLESS_OCR_COLOR_CONVERSION_STRATEGY",
+    "RGB",
+)
+
 OCR_USER_ARGS = os.getenv("PAPERLESS_OCR_USER_ARGS", "{}")
 
 # GNUPG needs a home directory for some reason
